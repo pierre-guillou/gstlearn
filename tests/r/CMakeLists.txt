@@ -80,7 +80,7 @@ foreach(TEST_SOURCE_FILE ${TEST_SOURCES})
     # - ignore lines starting with #NO_DIFF#
     # - ignore ALL whitespaces (https://stackoverflow.com/a/65462731)
     add_test(NAME ${TEST_NAME}_r_cmp
-             COMMAND git diff --no-index -I "#NO_DIFF#" --ignore-blank-lines --ignore-all-space --ignore-cr-at-eol ${REF_FILE} ${TEST_DST_DIR}/${TEST_NAME}.out)
+             COMMAND git diff --no-index -I "#NO_DIFF#" --ignore-blank-lines --ignore-all-space ${REF_FILE} ${TEST_DST_DIR}/${TEST_NAME}.out)
 endforeach(TEST_SOURCE_FILE ${TEST_SOURCES})
 
 
