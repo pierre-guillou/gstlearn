@@ -80,52 +80,60 @@ private:
   String _descr;
 };
 
+template <typename T> class GSTLEARN_EXPORT AEIterator
+{
+public:
+  using EMap = std::map<int, T*>;
+
+private:
+  friend T;
+  AEIterator() = delete;
+  AEIterator(EMap* map) : _stditer(map->begin()), _refmap(map) {}
+
+public:
+  const T& operator*() const { return (*(_stditer->second)); }
+
+  bool hasNext() const { return (_stditer != _refmap->end()); }
+  const T& toNext() { return (*((_stditer++)->second)); }
+  const T& toFront()
+  {
+    _stditer = _refmap->begin();
+    return (*(_stditer->second));
+  }
+
+  const T& getEnum() const { return (*(_stditer->second)); }
+
+  int getValue() const { return (_stditer->second->getValue()); }
+
+  const String& getKey() const { return (_stditer->second->getKey()); }
+
+  const String& getDescr() const { return (_stditer->second->getDescr()); }
+
+private:
+  typename EMap ::iterator _stditer;
+  EMap* _refmap;
+};
+
+
 #define ENUM_ITEM(NAME, x,y,z) E_ ## x = y,
 #define ENUM_ITEMS(NAME, ...) EXPAND(REPEAT3(ENUM_ITEM, NAME, __VA_ARGS__))
 
 #define ENUM_DECL(NAME, x,y,z) static const NAME x;
 #define ENUM_DECLS(NAME, ...) EXPAND(REPEAT3(ENUM_DECL, NAME, __VA_ARGS__))
 
-#define ENUM_IMPL(NAME, x,y,z) const NAME NAME::x = NAME(#x, y, z);
+#define ENUM_IMPL(NAME, x,y,z) const NAME NAME::x{#x, y, z};
 #define ENUM_IMPLS(NAME, ...) EXPAND(REPEAT3(ENUM_IMPL, NAME, __VA_ARGS__))
 
 // ######################
 //      ENUM DECLARE
 // ######################
 #define ENUM_DECLARE_(NAME, DEFAULT, ...)\
-class NAME;\
-\
-typedef std::map<int, NAME*> NAME ## Map;\
-\
-class GSTLEARN_EXPORT NAME ## Iterator\
-{\
-  friend class NAME;\
-\
-  NAME ## Iterator() = delete;\
-  NAME ## Iterator(NAME ## Map* map);\
-public:\
-  ~NAME ## Iterator() = default;\
-  NAME ## Iterator(const NAME ## Iterator&) = default;\
-  NAME ## Iterator& operator=(const NAME ## Iterator&) = default;\
-\
-  const NAME& operator*() const;\
-  bool hasNext() const;\
-  const NAME& toNext();\
-  const NAME& toFront();\
-  const NAME& getEnum() const;\
-  int getValue() const;\
-  const String& getKey() const;\
-  const String& getDescr() const;\
-\
-private:\
-  NAME ## Map::iterator _stditer;\
-  NAME ## Map*          _refmap;\
-};\
-\
 class GSTLEARN_EXPORT NAME : public AEnum\
 {\
-\
 public:\
+  using EIterator = AEIterator<NAME>;\
+  using EMap = EIterator::EMap;\
+\
   NAME();\
   ~NAME();\
   NAME(const NAME&) = default;\
@@ -134,7 +142,7 @@ public:\
   NAME& operator=(const NAME&) = default;\
 \
   static size_t getSize();\
-  static NAME ## Iterator getIterator();\
+  static EIterator getIterator();\
   static void printAll();\
   static VectorString getAllKeys();\
   static VectorString getAllDescr();\
@@ -149,8 +157,8 @@ public:\
 private:\
   NAME(const String& key, int value, const String& descr);\
 \
-  static NAME ## Map      _map;\
-  static NAME ## Iterator _iterator;\
+  static EMap      _map;\
+  static EIterator _iterator;\
   static const NAME*      _default;\
 \
 public:\
@@ -169,9 +177,8 @@ public:\
 //       ENUM DEFINE
 // ######################
 #define ENUM_DEFINE_(NAME, DEFAULT, ...)\
-NAME ## Map NAME::_map = NAME ## Map();\
-NAME ## Iterator NAME::_iterator = NAME ## Iterator(&NAME::_map);\
-\
+NAME::EMap NAME::_map = EMap();\
+NAME::EIterator NAME::_iterator = NAME::EIterator(&NAME::_map);\
 const NAME* NAME::_default = &NAME::DEFAULT;\
 \
 NAME::NAME()\
@@ -206,7 +213,7 @@ size_t NAME::getSize()\
   return _map.size();\
 }\
 \
-NAME ## Iterator NAME::getIterator()\
+NAME::EIterator NAME::getIterator()\
 {\
   auto it(_iterator);\
   it.toFront();\
@@ -307,53 +314,6 @@ NAME::E ## NAME NAME::toEnum() const\
 }\
 \
 EXPAND(ENUM_IMPLS(NAME, __VA_ARGS__))\
-\
-NAME ## Iterator::NAME ## Iterator(NAME ## Map* map) \
-: _stditer(map->begin())\
-, _refmap(map)\
-{\
-}\
-\
-const NAME& NAME ## Iterator::operator*() const\
-{\
-  return (*(_stditer->second));\
-}\
-\
-bool NAME ## Iterator::hasNext() const\
-{\
-  return (_stditer != _refmap->end());\
-}\
-\
-const NAME& NAME ## Iterator::toNext()\
-{\
-  return (*((_stditer++)->second));\
-}\
-\
-const NAME& NAME ## Iterator::toFront()\
-{\
-  _stditer = _refmap->begin();\
-  return (*(_stditer->second));\
-}\
-\
-const NAME& NAME ## Iterator::getEnum() const\
-{\
-  return (*(_stditer->second));\
-}\
-\
-int NAME ## Iterator::getValue() const\
-{\
-  return (_stditer->second->getValue());\
-}\
-\
-const String& NAME ## Iterator::getKey() const\
-{\
-  return (_stditer->second->getKey());\
-}\
-\
-const String& NAME ## Iterator::getDescr() const\
-{\
-  return (_stditer->second->getDescr());\
-}\
 \
 
 // Top level macros
