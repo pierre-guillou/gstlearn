@@ -4,43 +4,9 @@
 namespace hello
 {
 
-template <typename T> class GSTLEARN_EXPORT EIterator
-{
-public:
-  using EMap = std::map<int, T*>;
-
-private:
-  friend T;
-  EIterator() = delete;
-  EIterator(EMap* map) : _stditer(map->begin()), _refmap(map) {}
-
-public:
-  const T& operator*() const { return (*(_stditer->second)); }
-
-  bool hasNext() const { return (_stditer != _refmap->end()); }
-  const T& toNext() { return (*((_stditer++)->second)); }
-  const T& toFront()
-  {
-    _stditer = _refmap->begin();
-    return (*(_stditer->second));
-  }
-
-  const T& getEnum() const { return (*(_stditer->second)); }
-
-  int getValue() const { return (_stditer->second->getValue()); }
-
-  const String& getKey() const { return (_stditer->second->getKey()); }
-
-  const String& getDescr() const { return (_stditer->second->getDescr()); }
-
-private:
-  typename EMap ::iterator _stditer;
-  EMap* _refmap;
-};
-
 class GSTLEARN_EXPORT EMorpho : public AEnum
 {
-  using EIterator = EIterator<EMorpho>;
+  using EIterator = AEIterator<EMorpho>;
   using EMap = EIterator::EMap;
 
 public:
