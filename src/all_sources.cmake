@@ -3,6 +3,7 @@
 set(SRC
   Enum/AEnum.cpp
   Enum/Enums.cpp
+  Enum/Enums_test.cpp
   Fractures/FracEnviron.cpp
   Fractures/FracFamily.cpp
   Fractures/FracFault.cpp
