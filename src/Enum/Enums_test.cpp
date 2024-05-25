@@ -44,19 +44,20 @@ class GSTLEARN_EXPORT EMorpho : public AEnum
   using EMap = EIterator::EMap;
 
 public:
-  EMorpho();
-  ~EMorpho() = default;
-  EMorpho(const EMorpho&) = default;
-  EMorpho(int value);
-  EMorpho(const String& key);
-  EMorpho& operator=(const EMorpho&) = default;
-  static size_t getSize();
+  EMorpho() : AEnum(*_default) {}
+  EMorpho(int value) : AEnum(fromValue(value)) {}
+  EMorpho(const String& key) : AEnum(fromKey(key)) {}
+  static size_t getSize() { return _map.size(); }
   static EIterator getIterator();
   static void printAll();
   static VectorString getAllKeys();
   static VectorString getAllDescr();
   static bool existsKey(const String& key);
-  static bool existsValue(int value);
+  static bool existsValue(int value)
+  {
+    return (_map.find(value) != _map.end());
+  }
+
   static const EMorpho& fromKey(const String& key);
   static const EMorpho& fromValue(int value);
   static std ::vector<EMorpho> fromKeys(const VectorString& keys);
@@ -102,11 +103,8 @@ public:
 
 EMorpho::EMap EMorpho ::_map = EMap();
 EMorpho::EIterator EMorpho ::_iterator = EMorpho::EIterator(&EMorpho ::_map);
-
 const EMorpho* EMorpho ::_default = &EMorpho ::UNKNOWN;
-EMorpho ::EMorpho() : AEnum(*_default) {}
-EMorpho ::EMorpho(int value) : AEnum(fromValue(value)) {}
-EMorpho ::EMorpho(const String& key) : AEnum(fromKey(key)) {}
+
 EMorpho ::EMorpho(const String& key, int value, const String& descr)
     : AEnum(key, value, descr)
 {
@@ -115,7 +113,6 @@ EMorpho ::EMorpho(const String& key, int value, const String& descr)
   _map[value] = this;
 }
 
-size_t EMorpho ::getSize() { return _map.size(); }
 EMorpho::EIterator EMorpho ::getIterator()
 {
   auto it(_iterator);
@@ -167,11 +164,6 @@ bool EMorpho ::existsKey(const String& key)
       it++;
     }
   return false;
-}
-
-bool EMorpho ::existsValue(int value)
-{
-  return (_map.find(value) != _map.end());
 }
 
 const EMorpho& EMorpho ::fromKey(const String& key)
