@@ -53,18 +53,16 @@ VectorString CovHelper::getAllCovariances(Id ndim,
   const CovContext ctxt = CovContext(1, ndim);
 
   // Loop on the basic structures
-  auto it = ECov::getIterator();
-  while (it.hasNext())
+  for(auto el : ECov::iter())
   {
-    const ECov& covType = ECov::fromKey(it.getKey());
+    const ECov& covType = ECov::fromKey(el.getKey());
     ACovFunc* cov       = CovFactory::createCovFunc(covType, ctxt);
 
     // Check if the covariance is valid
     if (_isSelected(cov, ndim, minorder, hasrange, flagSimtub, flagSimuSpectral))
-      vs.push_back(String {it.getKey()});
+      vs.push_back(String {el.getKey()});
 
     delete cov;
-    it.toNext();
   }
   return vs;
 }

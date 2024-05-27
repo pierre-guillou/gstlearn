@@ -142,17 +142,15 @@ ACovFunc* CovFactory::duplicateCovFunc(const ACovFunc& cov)
 void CovFactory::displayCovList(const CovContext& ctxt)
 {
   message("List of authorized covariance / variogram names:\n");
-  auto it = ECov::getIterator();
-  while (it.hasNext())
+  for(auto el : ECov::iter())
   {
-    if (*it != ECov::UNKNOWN && *it != ECov::FUNCTION)
+    if (el != ECov::UNKNOWN && el != ECov::FUNCTION)
     {
-      ACovFunc* cova = createCovFunc(*it, ctxt);
+      ACovFunc* cova = createCovFunc(el, ctxt);
       if (_isValid(cova, ctxt))
-        message("%2d - %s\n", it.getValue(), cova->getCovName().c_str());
+        message("%2d - %s\n", el.getValue(), cova->getCovName().c_str());
       delete cova;
     }
-    it.toNext();
   }
 }
 
@@ -165,12 +163,11 @@ void CovFactory::displayCovList(const CovContext& ctxt)
 VectorString CovFactory::getCovList(const CovContext& ctxt, Id order)
 {
   VectorString names;
-  auto it = ECov::getIterator();
-  while (it.hasNext())
+  for(const auto el: ECov::iter())
   {
-    if (*it != ECov::UNKNOWN && *it != ECov::FUNCTION)
+    if (el != ECov::UNKNOWN && el != ECov::FUNCTION)
     {
-      ACovFunc* cova = createCovFunc(*it, ctxt);
+      ACovFunc* cova = createCovFunc(el, ctxt);
       if (_isValid(cova, ctxt))
       {
         if (cova->getMinOrder() <= order)
@@ -178,7 +175,6 @@ VectorString CovFactory::getCovList(const CovContext& ctxt, Id order)
       }
       delete cova;
     }
-    it.toNext();
   }
   return names;
 }
@@ -195,21 +191,19 @@ VectorString CovFactory::getCovList(const CovContext& ctxt, Id order)
 ECov CovFactory::identifyCovariance(const String& cov_name,
                                     const CovContext& ctxt)
 {
-  auto it = ECov::getIterator();
-  while (it.hasNext())
+  for(const auto el: ECov::iter())
   {
     // Test covariance name using ACovFunc::getCovName (not the ECov keys!)
     // (This permits to ensure RGeostats scripts retro compatibility)
-    if (*it != ECov::UNKNOWN && *it != ECov::FUNCTION)
+    if (el != ECov::UNKNOWN && el != ECov::FUNCTION)
     {
-      ACovFunc* cova = createCovFunc(*it, ctxt);
+      ACovFunc* cova = createCovFunc(el, ctxt);
       String cn      = toUpper(cov_name);
       String ccn     = toUpper(cova->getCovName());
       delete cova;
       if (cn == ccn)
-        return *it;
+        return el;
     }
-    it.toNext();
   }
   messerr("Unknown covariance name:%s!", cov_name.c_str());
   displayCovList(ctxt);

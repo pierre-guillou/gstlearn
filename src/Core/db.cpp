@@ -1276,10 +1276,9 @@ void db_locators_correct(VectorString& strings,
 
   /* Loop on the reference locator */
 
-  auto it = ELoc::getIterator();
-  while (it.hasNext())
+  for(auto el : ECov::iter())
   {
-    if (*it != ELoc::UNKNOWN)
+    if (el != ELoc::UNKNOWN)
     {
       /* Store the ranks of the locators matching the reference locator
        */
@@ -1287,14 +1286,13 @@ void db_locators_correct(VectorString& strings,
       for (Id i = 0; i < number; i++)
       {
         if (locatorIdentify(strings[i], &cur_type, &cur_item, &nmult)) continue;
-        if (cur_type != *it) continue;
+        if (cur_type != el) continue;
         rank[nmatch++] = cur_item;
       }
       // Do not forget to increment the iterator!
       // 'continue' keyword should be forbidden!!
       if (nmatch <= 0)
       {
-        it.toNext();
         continue;
       }
 
@@ -1311,7 +1309,7 @@ void db_locators_correct(VectorString& strings,
       for (Id i = 0; i < number; i++)
       {
         if (locatorIdentify(strings[i], &cur_type, &cur_item, &nmult)) continue;
-        if (cur_type != *it) continue;
+        if (cur_type != el) continue;
         found = -1;
         for (Id k = 0; k < ncount && found < 0; k++)
           if (ind[k] == nmatch) found = k;
@@ -1319,7 +1317,6 @@ void db_locators_correct(VectorString& strings,
         nmatch++;
       }
     }
-    it.toNext();
   }
 }
 
