@@ -222,22 +222,18 @@ NAME::EIterator NAME::getIterator()\
 \
 void NAME::printAll()\
 {\
-  auto it(getIterator());\
-  while (it.hasNext())\
+  for (const auto &el : _map)\
   {\
-    (*it).printEnum();\
-    it.toNext();\
+    el.second->printEnum();\
   }\
 }\
 \
 VectorString NAME::getAllKeys()\
 {\
   VectorString keys;\
-  auto it(getIterator());\
-  while (it.hasNext())\
+  for (const auto &el : _map)\
   {\
-    keys.push_back((*it).getKey());\
-    it.toNext();\
+    keys.push_back(el.second->getKey());\
   }\
   return keys;\
 }\
@@ -245,23 +241,19 @@ VectorString NAME::getAllKeys()\
 VectorString NAME::getAllDescr()\
 {\
   VectorString descr;\
-  auto it(getIterator());\
-  while (it.hasNext())\
+  for (const auto &el : _map)\
   {\
-    descr.push_back((*it).getDescr());\
-    it.toNext();\
+    descr.push_back(el.second->getDescr());\
   }\
   return descr;\
 }\
 \
 bool NAME::existsKey(const String& key)\
 {\
-  auto it = _map.begin();\
-  while (it != _map.end())\
+  for (const auto &el : _map)\
   {\
-    if (it->second->getKey() == key)\
+    if (el.second->getKey() == key)\
       return true;\
-    it++;\
   }\
   return false;\
 }\
@@ -273,12 +265,10 @@ bool NAME::existsValue(int value)\
 \
 const NAME& NAME::fromKey(const String& key)\
 {\
-  auto it = _map.begin();\
-  while (it != _map.end())\
+  for (const auto &el : _map)\
   {\
-    if (it->second->getKey() == toUpper(key))\
-      return (*(it->second));\
-    it++;\
+    if (el.second->getKey() == toUpper(key))\
+      return *(el.second);\
   }\
   std::cout << "Unknown key " << key << " for enum " << #NAME << std::endl;\
   return *_default;\
