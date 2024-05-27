@@ -64,9 +64,6 @@ protected:
   : _key(key), _value(value), _descr(descr)
   {
   }
-  AEnum(const AEnum&) = default;
-  ~AEnum() = default;
-  AEnum& operator=(const AEnum&) = default;
 
   template<typename ... Args>
   static void _printMsg(const char *format, Args... args);
@@ -134,21 +131,18 @@ public:\
   using EIterator = AEIterator<NAME>;\
   using EMap = EIterator::EMap;\
 \
-  NAME();\
-  ~NAME();\
-  NAME(const NAME&) = default;\
-  NAME(int value);\
-  NAME(const String& key);\
-  NAME& operator=(const NAME&) = default;\
+  NAME(): AEnum(*_default) {}\
+  NAME(int value): AEnum(fromValue(value)) {}\
+  NAME(const String& key): AEnum(fromKey(key)){}\
 \
-  static size_t getSize();\
+  static size_t getSize(){ return _map.size(); }\
   static EIterator getIterator();\
   static void printAll();\
   static VectorString getAllKeys();\
   static VectorString getAllDescr();\
 \
   static bool existsKey(const String& key);\
-  static bool existsValue(int value);\
+  static bool existsValue(int value) { return (_map.find(value) != _map.end()); }\
   static const NAME& fromKey(const String& key);\
   static const NAME& fromValue(int value);\
   static std::vector<NAME> fromKeys(const VectorString& keys);\
@@ -166,7 +160,7 @@ public:\
   {\
     EXPAND(ENUM_ITEMS(NAME, __VA_ARGS__))\
   };\
-  E ## NAME toEnum() const;\
+  E ## NAME toEnum() const { return static_cast<E ## NAME>(getValue()); }\
 \
   EXPAND(ENUM_DECLS(NAME, __VA_ARGS__))\
 };\
@@ -181,36 +175,12 @@ NAME::EMap NAME::_map = EMap();\
 NAME::EIterator NAME::_iterator = NAME::EIterator(&NAME::_map);\
 const NAME* NAME::_default = &NAME::DEFAULT;\
 \
-NAME::NAME()\
-: AEnum(*_default)\
-{\
-}\
-\
-NAME::NAME(int value)\
-: AEnum(fromValue(value))\
-{\
-}\
-\
-NAME::NAME(const String& key)\
-: AEnum(fromKey(key))\
-{\
-}\
-\
 NAME::NAME(const String& key, int value, const String& descr)\
 : AEnum(key, value, descr)\
 {\
   if (_map.find(value) != _map.end())\
     throw("Duplicated item");\
   _map[value] = this;\
-}\
-\
-NAME::~NAME()\
-{\
-}\
-\
-size_t NAME::getSize()\
-{\
-  return _map.size();\
 }\
 \
 NAME::EIterator NAME::getIterator()\
@@ -258,11 +228,6 @@ bool NAME::existsKey(const String& key)\
   return false;\
 }\
 \
-bool NAME::existsValue(int value)\
-{\
-  return (_map.find(value) != _map.end());\
-}\
-\
 const NAME& NAME::fromKey(const String& key)\
 {\
   for (const auto &el : _map)\
@@ -285,7 +250,7 @@ const NAME& NAME::fromValue(int value)\
 std::vector<NAME> NAME::fromKeys(const VectorString& keys)\
 {\
   std::vector<NAME> vec;\
-  for (auto v : keys)\
+  for (const auto &v : keys)\
     vec.push_back(fromKey(v));\
   return vec;\
 }\
@@ -296,11 +261,6 @@ std::vector<NAME> NAME::fromValues(const VectorInt& values)\
   for (auto v : values)\
     vec.push_back(fromValue(v));\
   return vec;\
-}\
-\
-NAME::E ## NAME NAME::toEnum() const\
-{\
-  return static_cast<E ## NAME>(getValue());\
 }\
 \
 EXPAND(ENUM_IMPLS(NAME, __VA_ARGS__))\
