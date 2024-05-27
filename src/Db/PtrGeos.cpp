@@ -144,16 +144,14 @@ bool isLocatorTypeValid(const ELoc& locatorType, bool unknownValid)
 
 int getLocatorTypeFromName(const String& name_type)
 {
-  auto it = ELoc::getIterator();
-  while (it.hasNext())
+  for(const auto el: ELoc::iter())
   {
-    if (*it != ELoc::UNKNOWN)
+    if (el != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      int i = el.getValue();
       unsigned int lng = static_cast<unsigned int> (strlen(DEF_LOCATOR[i].SREF));
       if (name_type.compare(0,lng,DEF_LOCATOR[i].SREF) == 0) return i;
     }
-    it.toNext();
   }
   return -1;
 }
@@ -179,16 +177,14 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
   String string_loc = string;
   toLower(string_loc);
 
-  auto it = ELoc::getIterator();
-  while (it.hasNext() && found < 0)
+  for(const auto el: ELoc::iter())
   {
-    if (*it != ELoc::UNKNOWN)
+    if (el != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      int i = el.getValue();
       unsigned int lng = static_cast<unsigned int> (strlen(DEF_LOCATOR[i].SREF));
       if (string_loc.compare(0,lng,DEF_LOCATOR[i].SREF) == 0) found = i;
     }
-    it.toNext();
   }
   if (found < 0)
   {
@@ -221,18 +217,16 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
 void printLocatorList()
 {
   mestitle(0, "List of the available locators");
-  auto it = ELoc::getIterator();
-  while (it.hasNext())
+  for(const auto el: ELoc::iter())
   {
-    if (*it != ELoc::UNKNOWN)
+    if (el != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      int i = el.getValue();
       if (DEF_LOCATOR[i].IREF == 1)
         message(" %10s %s\n", DEF_LOCATOR[i].SREF, DEF_LOCATOR[i].COMMENT);
       else
         message(" %7s(*) %s\n", DEF_LOCATOR[i].SREF, DEF_LOCATOR[i].COMMENT);
     }
-    it.toNext();
   }
   message("(*) These keywords must be followed by a number\n");
 }
@@ -240,15 +234,13 @@ void printLocatorList()
 VectorString getLocatorNames()
 {
   VectorString strings;
-  auto it = ELoc::getIterator();
-  while (it.hasNext())
+  for(const auto el: ELoc::iter())
   {
-    if (*it != ELoc::UNKNOWN)
+    if (el != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      int i = el.getValue();
       strings.push_back(DEF_LOCATOR[i].SREF);
     }
-    it.toNext();
   }
   return strings;
 }
@@ -256,15 +248,13 @@ VectorString getLocatorNames()
 VectorInt getLocatorMultiples()
 {
   VectorInt mult;
-  auto it = ELoc::getIterator();
-  while (it.hasNext())
+  for(const auto el: ELoc::iter())
   {
-    if (*it != ELoc::UNKNOWN)
+    if (el != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      int i = el.getValue();
       mult.push_back(DEF_LOCATOR[i].IREF);
     }
-    it.toNext();
   }
   return mult;
 }
