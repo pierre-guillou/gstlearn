@@ -101,7 +101,7 @@ public:
   static Model* createFromDb(const Db* db);
   static Model* createFromNF(const String& neutralFilename, bool verbose = true);
 
-  void   setCovList(const ACovAnisoList* covalist);
+  void   setCovList(const std::shared_ptr<ACov> &covalist);
   void   addCov(const CovAniso* cov);
   void   addCovFromParam(const ECov& type,
                          double range = 0.,
@@ -131,7 +131,7 @@ public:
 
   ////////////////////////////////////////////////
   /// TODO : to be removed (encapsulation of ACovAnisoList)
-  const ACovAnisoList* getCovAnisoList() const;
+  std::shared_ptr<const ACov> getCovAnisoList() const;
   const CovAniso* getCova(int icov) const;
   CovAniso* getCova(int icov);
   int getCovaNumber(bool skipNugget = false) const;
@@ -748,7 +748,7 @@ private:
   void _copyCovContext();
 
 private:
-  ACov*          _cova;         /* Generic Covariance structure */
+  std::shared_ptr<ACov>          _cova;         /* Generic Covariance structure */
   DriftList*     _driftList;    /* Series of Drift functions */
   CovContext     _ctxt;         /* Context */
 };

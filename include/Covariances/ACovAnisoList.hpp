@@ -159,7 +159,7 @@ public:
   void copyCovContext(const CovContext& ctxt);
   bool hasNugget() const;
 
-  const ACovAnisoList* createReduce(const VectorInt &validVars) const;
+  std::shared_ptr<ACov> createReduce(const VectorInt &validVars) const;
 
   int addNoStat(const ANoStat *anostat);
   void delNoStat();

@@ -104,7 +104,7 @@ Model* model_duplicate_for_gradient(const Model *model, double ball_radius)
   // Create the basic covariance structures
   // **************************************
 
-  ACovAnisoList* covs = new CovLMGradient();
+  auto covs = std::make_shared<CovLMGradient>();
 
   int lec = 0;
   for (int icov = 0; icov < ncova; icov++)
@@ -164,7 +164,6 @@ Model* model_duplicate_for_gradient(const Model *model, double ball_radius)
     }
   }
   new_model->setCovList(covs);
-  delete covs;
 
   // *********************************
   // Create the basic drift structures

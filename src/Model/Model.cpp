@@ -73,9 +73,9 @@ Model::Model(const Model &m)
       _driftList(nullptr),
       _ctxt(m._ctxt)
 {
-  ACovAnisoList* mcovalist = dynamic_cast<ACovAnisoList*>(m._cova);
+  ACovAnisoList* mcovalist = dynamic_cast<ACovAnisoList*>(m._cova.get());
   if (mcovalist != nullptr)
-    _cova = dynamic_cast<ACovAnisoList*>(mcovalist->clone());
+    _cova.reset(mcovalist->clone());
   if (m._driftList != nullptr)
     _driftList = m._driftList->clone();
 }
@@ -86,9 +86,9 @@ Model& Model::operator=(const Model &m)
   {
     AStringable::operator=(m);
     ASerializable::operator=(m);
-    ACovAnisoList* mcovalist = dynamic_cast<ACovAnisoList*>(m._cova);
+    ACovAnisoList* mcovalist = dynamic_cast<ACovAnisoList*>(m._cova.get());
     if (mcovalist != nullptr)
-      _cova = dynamic_cast<ACovAnisoList*>(mcovalist->clone());
+      _cova.reset(mcovalist->clone());
     if (m._driftList != nullptr)
       _driftList = m._driftList->clone();
     _ctxt = m._ctxt;
@@ -259,11 +259,10 @@ void Model::delAllCovas()
  * Add a list of Covariances. This operation cleans any previously stored covariance
  * @param covalist List of Covariances to be added
  */
-void Model::setCovList(const ACovAnisoList* covalist)
+void Model::setCovList(const std::shared_ptr<ACov> &covalist)
 {
   if (covalist == nullptr) return;
-  if (_cova != nullptr) delete _cova;
-  _cova = dynamic_cast<ACov*>(covalist->clone());
+  _cova.reset(dynamic_cast<const ACovAnisoList*>(covalist.get())->clone());
 }
 
 void Model::addCov(const CovAniso *cov)
@@ -666,7 +665,7 @@ void Model::evalZAndGradients(const SpacePoint &p1,
                               const CovCalcMode *mode,
                               bool flagGrad) const
 {
-  CovLMGradient* covgrad = dynamic_cast<CovLMGradient *>(_cova);
+  CovLMGradient* covgrad = dynamic_cast<CovLMGradient *>(_cova.get());
   if (covgrad != nullptr)
     covgrad->evalZAndGradients(p1, p2, covVal, covGp, covGG, mode, flagGrad);
 }
@@ -677,7 +676,7 @@ void Model::evalZAndGradients(const VectorDouble &vec,
                               const CovCalcMode *mode,
                               bool flagGrad) const
 {
-  CovLMGradient* covgrad = dynamic_cast<CovLMGradient *>(_cova);
+  CovLMGradient* covgrad = dynamic_cast<CovLMGradient *>(_cova.get());
   if (covgrad != nullptr)
     covgrad->evalZAndGradients(vec, covVal, covGp, covGG, mode, flagGrad);
 }
@@ -722,13 +721,13 @@ void Model::switchToGradient()
   // If no covariance has been defined yet: do nothing
   if (_cova == nullptr)
   {
-    _cova = new CovLMGradient(_ctxt.getSpace());
+    _cova = std::make_shared<CovLMGradient>(_ctxt.getSpace());
   }
   else
   {
     const ACovAnisoList* covalist = _castInCovAnisoListConst();
     if (covalist == nullptr) return;
-    _cova = new CovLMGradient(*covalist);
+    _cova = std::make_shared<CovLMGradient>(*covalist);
   }
 }
 
@@ -749,7 +748,7 @@ int Model::setAnam(const AAnam* anam, const VectorInt& strcnt)
   if (hasAnam())
   {
     // ACovAnisoList is already a covLMCAnamorphosis, simply update the anamorphosis
-    CovLMCAnamorphosis* cov = dynamic_cast<CovLMCAnamorphosis*>(_cova);
+    CovLMCAnamorphosis* cov = dynamic_cast<CovLMCAnamorphosis*>(_cova.get());
     if (cov == nullptr)
     {
       messerr("Impossible to reach the internal CovLMCAnamorphosis structure");
@@ -759,7 +758,7 @@ int Model::setAnam(const AAnam* anam, const VectorInt& strcnt)
   }
   else
   {
-    CovLMC* cov = dynamic_cast<CovLMC*>(_cova);
+    CovLMC* cov = dynamic_cast<CovLMC*>(_cova.get());
     if (cov == nullptr)
     {
       messerr("Impossible to add 'anam' to the covariance part of the Model");
@@ -768,20 +767,17 @@ int Model::setAnam(const AAnam* anam, const VectorInt& strcnt)
     }
 
     // Initiate a new CovLMCAnamorphosis class
-    CovLMCAnamorphosis* newcov = new CovLMCAnamorphosis(*cov, anam, strcnt);
-
-    // Delete the current ACovAnisoList structure
-    delete _cova;
+    auto newcov = std::make_shared<CovLMCAnamorphosis>(*cov, anam, strcnt);
 
     // Replace it by the newly create one (CovLMCAnamorphosis)
-    _cova = newcov;
+    _cova = std::move(newcov);
   }
   return 0;
 }
 
 void Model::setTapeRange(double range)
 {
-  CovLMCTapering* covtape = dynamic_cast<CovLMCTapering*>(_cova);
+  CovLMCTapering* covtape = dynamic_cast<CovLMCTapering*>(_cova.get());
   if (covtape != nullptr) covtape->setTapeRange(range);
 }
 
@@ -794,7 +790,7 @@ int Model::unsetAnam()
   }
   else
   {
-    CovLMC* cov = dynamic_cast<CovLMC*>(_cova);
+    CovLMC* cov = dynamic_cast<CovLMC*>(_cova.get());
     if (cov == nullptr)
     {
       messerr("Impossible to unset 'anam' from the covariance part of the Model");
@@ -803,13 +799,10 @@ int Model::unsetAnam()
     }
 
     // Initiate a new CovLMC class
-    CovLMC* newcov = new CovLMC(*cov);
-
-    // Delete the current ACovAnisoList structure
-    delete _cova;
+    auto newcov = std::make_shared<CovLMC>(*cov);
 
     // Replace it by the newly create one (CovLMC)
-    _cova = newcov;
+    _cova = std::move(newcov);
   }
   return 0;
 }
@@ -1225,7 +1218,7 @@ bool Model::_deserialize(std::istream& is, bool /*verbose*/)
 
   /* Reading the covariance part and store it into a CovLMC */
 
-  CovLMC covs(_ctxt.getSpace());
+  auto covs = std::make_shared<CovLMC>(_ctxt.getSpace());
   for (int icova = 0; ret && icova < ncova; icova++)
   {
     flag_aniso = flag_rotation = 0;
@@ -1270,9 +1263,9 @@ bool Model::_deserialize(std::istream& is, bool /*verbose*/)
     }
     else
       cova.setRangeIsotropic(range);
-    covs.addCov(&cova);
+    covs->addCov(&cova);
   }
-  setCovList(&covs);
+  setCovList(covs);
 
   /* Reading the drift part */
 
@@ -1403,8 +1396,7 @@ bool Model::_serialize(std::ostream& os, bool /*verbose*/) const
 
 void Model::_clear()
 {
-  delete _cova;
-  _cova = nullptr;
+  _cova.reset();
   delete _driftList;
   _driftList = nullptr;
 }
@@ -1414,18 +1406,18 @@ void Model::_create()
   // TODO: The next two lines are there in order to allow direct call to
   // model::addCov() and model::addDrift
   // The defaulted types of CovAnisoList and DriftList are assumed
-  _cova = new CovLMC(_ctxt.getSpace());
+  _cova = std::make_shared<CovLMC>(_ctxt.getSpace());
   _driftList = new DriftList(_ctxt);
 }
 
 double Model::getTotalSill(int ivar, int jvar) const
 {
-  return getCovAnisoList()->getTotalSill(ivar, jvar);
+  return _castInCovAnisoListConst()->getTotalSill(ivar, jvar);
 }
 
 MatrixSquareGeneral Model::getTotalSills() const
 {
-  return getCovAnisoList()->getTotalSill();
+  return _castInCovAnisoListConst()->getTotalSill();
 }
 
 /**
@@ -1461,7 +1453,7 @@ Model* Model::duplicate() const
 
   /* Add the list of Covariances */
 
-  model->setCovList(getCovAnisoList());
+  model->setCovList(_cova);
 
   /* Add the list of Drifts */
 
@@ -1488,7 +1480,7 @@ Model* Model::createReduce(const VectorInt& validVars) const
 
   /* Add the list of Covariances */
 
-  model->setCovList(getCovAnisoList()->createReduce(validVars));
+  model->setCovList(_castInCovAnisoListConst()->createReduce(validVars));
 
   /* Add the list of Drifts */
 
@@ -1609,16 +1601,16 @@ const EModelProperty& Model::getCovMode() const
   ACovAnisoList* covs;
   if (_cova == nullptr) return EModelProperty::NONE;
 
-  covs = dynamic_cast<CovLMCTapering*>(_cova);
+  covs = dynamic_cast<CovLMCTapering*>(_cova.get());
   if (covs != nullptr) return EModelProperty::TAPE;
 
-  covs = dynamic_cast<CovLMCConvolution*>(_cova);
+  covs = dynamic_cast<CovLMCConvolution*>(_cova.get());
   if (covs != nullptr) return EModelProperty::CONV;
 
-  covs = dynamic_cast<CovLMCAnamorphosis*>(_cova);
+  covs = dynamic_cast<CovLMCAnamorphosis*>(_cova.get());
   if (covs != nullptr) return EModelProperty::ANAM;
 
-  covs = dynamic_cast<CovLMGradient*>(_cova);
+  covs = dynamic_cast<CovLMGradient*>(_cova.get());
   if (covs != nullptr) return EModelProperty::GRAD;
 
   return EModelProperty::NONE;
@@ -1777,9 +1769,9 @@ bool Model::isValid() const
   return true;
 }
 
-const ACovAnisoList* Model::getCovAnisoList() const
+std::shared_ptr<const ACov> Model::getCovAnisoList() const
 {
-  return _castInCovAnisoListConst();
+  return _cova;
 }
 
 /**
@@ -1791,7 +1783,7 @@ const ACovAnisoList* Model::getCovAnisoList() const
 const ACovAnisoList* Model::_castInCovAnisoListConst(int icov) const
 {
   // Check the cast procedure
-  const ACovAnisoList* covalist = dynamic_cast<const ACovAnisoList*>(_cova);
+  const ACovAnisoList* covalist = dynamic_cast<const ACovAnisoList*>(_cova.get());
   if (covalist == nullptr)
   {
     messerr("The member '_cova' in this model cannot be converted into a pointer to CovAnisoList");
@@ -1812,7 +1804,7 @@ const ACovAnisoList* Model::_castInCovAnisoListConst(int icov) const
 ACovAnisoList* Model::_castInCovAnisoList(int icov)
 {
   // Check the cast procedure
-  ACovAnisoList* covalist = dynamic_cast<ACovAnisoList*>(_cova);
+  ACovAnisoList* covalist = dynamic_cast<ACovAnisoList*>(_cova.get());
   if (covalist == nullptr)
   {
     messerr("The member '_cova' in this model cannot be converted into a pointer to CovAnisoList");

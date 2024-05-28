@@ -718,9 +718,9 @@ void ACovAnisoList::optimizationPostProcess() const
 		_covs[is]->optimizationPostProcess();
 }
 
-const ACovAnisoList* ACovAnisoList::createReduce(const VectorInt &validVars) const
+std::shared_ptr<ACov> ACovAnisoList::createReduce(const VectorInt &validVars) const
 {
-  ACovAnisoList* newcovlist = this->clone();
+  auto newcovlist = std::make_shared<ACovAnisoList>(*this);
 
   for (int is = 0, ns = getCovaNumber(); is < ns; is++)
   {

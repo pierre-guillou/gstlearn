@@ -139,7 +139,7 @@ static Recint RECINT;
 
 static void st_modify_optvar_for_anam(Model* model, Option_VarioFit &optvar)
 {
-  const CovLMCAnamorphosis* covanam = dynamic_cast<const CovLMCAnamorphosis*>(model->getCovAnisoList());
+  const CovLMCAnamorphosis* covanam = dynamic_cast<const CovLMCAnamorphosis*>(model->getCovAnisoList().get());
   if (covanam != nullptr)
   {
     const EAnam anamtype = covanam->getAnamType();
