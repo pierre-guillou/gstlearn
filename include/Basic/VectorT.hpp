@@ -69,12 +69,24 @@ public:
   inline VectorT& operator=(std::initializer_list<T> init)            { _v = init; return (*this); }
 #endif
 
+#if __cplusplus >= 202002L
+
+  constexpr std::strong_ordering
+  operator<=>( const VectorT& other )
+  {
+    return this->_v <=> other._v;
+  }
+
+#else
+
   inline bool operator==(const VectorT& other) const                  { return _v == other._v; }
   inline bool operator!=(const VectorT& other) const                  { return _v != other._v; }
   inline bool operator <(const VectorT& other) const                  { return _v  < other._v; }
   inline bool operator<=(const VectorT& other) const                  { return _v <= other._v; }
   inline bool operator >(const VectorT& other) const                  { return _v  > other._v; }
   inline bool operator>=(const VectorT& other) const                  { return _v >= other._v; }
+
+#endif
 
   // For SWIG users (size_type is not much appreciated)
   inline const T& getAt(Id pos) const;
