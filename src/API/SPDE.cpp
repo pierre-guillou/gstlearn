@@ -727,7 +727,6 @@ VectorDouble SPDE::getCoeffs()
  * @param dbin Input Db (must contain the variable to be estimated)
  * @param dbout Output Db where the estimation must be performed
  * @param model Model definition
- * @param flag_est True for the estimation
  * @param flag_std True for the standard deviation of estimation error
  * @param mesh Mesh description (optional)
  * @param useCholesky Define the choice regarding Cholesky
@@ -749,7 +748,6 @@ VectorDouble SPDE::getCoeffs()
 int krigingSPDE(Db *dbin,
                 Db *dbout,
                 Model *model,
-                bool flag_est,
                 bool flag_std,
                 const AMesh *mesh,
                 int useCholesky,
@@ -759,7 +757,6 @@ int krigingSPDE(Db *dbin,
                 bool showStats,
                 const NamingConvention &namconv)
 {
-  DECLARE_UNUSED(flag_est);
   const ESPDECalcMode mode = (flag_std) ?
       ESPDECalcMode::KRIGVAR : ESPDECalcMode::KRIGING;
   SPDE spde(model, dbout, dbin, mode, mesh,

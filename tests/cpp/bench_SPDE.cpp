@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
         namconv.append(option);
         namconv.append(sncov);
         law_set_random_seed(13243);
-        (void) krigingSPDE(dat, grid, model, true, true, nullptr,
+        (void) krigingSPDE(dat, grid, model, true, nullptr,
                            useCholesky, SPDEParam(), nbMC, verbose, showStats,
                            NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 400);

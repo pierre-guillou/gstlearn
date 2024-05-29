@@ -134,7 +134,6 @@ private:
 GSTLEARN_EXPORT int krigingSPDE(Db *dbin,
                                 Db *dbout,
                                 Model *model,
-                                bool flag_est = true,
                                 bool flag_std = false,
                                 const AMesh* mesh = nullptr,
                                 int useCholesky = -1,

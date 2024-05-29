@@ -354,6 +354,7 @@ int GibbsMMulti::_storeAllWeights(bool verbose)
  */
 void GibbsMMulti::_storeWeights(int icol)
 {
+  DECLARE_UNUSED(icol);
   if (_flagStoreInternal)
   {
     // Store internally
