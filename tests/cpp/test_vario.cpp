@@ -58,11 +58,11 @@ int main(int argc, char *argv[])
 
   // Creating the Model(s) of the Underlying GRF(s)
   Model models(ctxt);
-  CovLMC covs(ctxt.getSpace());
+  auto covs = std::make_shared<CovLMC>(ctxt.getSpace());
   double range1 = 0.2;
   CovAniso cova1(ECov::BESSEL_K,range1,1.,1.,ctxt);
-  covs.addCov(&cova1);
-  models.setCovList(&covs);
+  covs->addCov(&cova1);
+  models.setCovList(covs);
   models.display();
 
   // Perform a non-conditional simulation on the Db and on the Grid

@@ -82,12 +82,12 @@ int main(int argc, char *argv[])
 
   CovContext ctxt(nvar,2,1.);
   Model* model = new Model(ctxt);
-  CovLMC covs(ctxt.getSpace());
+  auto covs = std::make_shared<CovLMC>(ctxt.getSpace());
   CovAniso cova(ECov::EXPONENTIAL,ctxt);
   cova.setRanges(ranges);
   cova.setSill(sill);
-  covs.addCov(&cova);
-  model->setCovList(&covs);
+  covs->addCov(&cova);
+  model->setCovList(covs);
   model->display();
 
   // Gibbs

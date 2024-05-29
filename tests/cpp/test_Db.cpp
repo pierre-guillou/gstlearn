@@ -53,12 +53,12 @@ int main(int argc, char *argv[])
   Model* model = Model::createFromDb(grid);
   model->display();
   CovContext ctxt = model->getContext();
-  CovLMC covs(ctxt.getSpace());
+  auto covs = std::make_shared<CovLMC>(ctxt.getSpace());
   CovAniso cova = CovAniso(ECov::CUBIC,ctxt);
   cova.setRanges({10,45});
   cova.setAnisoAngles({30.,0.});
-  covs.addCov(&cova);
-  model->setCovList(&covs);
+  covs->addCov(&cova);
+  model->setCovList(covs);
   model->display();
 
   // Creating the MeshTurbo which contains the Db

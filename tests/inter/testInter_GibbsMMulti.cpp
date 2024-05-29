@@ -95,12 +95,12 @@ int main()
 
   CovContext ctxt(nvar,2,1.); // use default space
   Model model(ctxt);
-  CovLMC covs(ctxt.getSpace());
+  auto covs = std::make_shared<CovLMC>(ctxt.getSpace());
   CovAniso cova(ECov::SPHERICAL,ctxt);
   cova.setRanges(ranges);
   cova.setSill({sill});
-  covs.addCov(&cova);
-  model.setCovList(&covs);
+  covs->addCov(&cova);
+  model.setCovList(covs);
   model.display();
 
   // Initialize Gibbs
