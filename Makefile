@@ -170,7 +170,7 @@ ifdef NLOPT_ROOT
   CMAKE_DEFINES := $(CMAKE_DEFINES) -DNLopt_ROOT=$(NLOPT_ROOT)
 endif
 
-.PHONY: all cmake cmake-python cmake-r cmake-python-r cmake-doxygen print_version static shared build_tests doxygen install uninstall
+.PHONY: all cmake cmake-python cmake-r cmake-python-r cmake-doxygen print_version shared build_tests doxygen install uninstall
 
 all: shared install
 
@@ -201,7 +201,7 @@ cmake-python-r-doxygen:
 print_version: cmake
 	@cmake --build $(BUILD_DIR) --target print_version --
 
-static shared build_tests doxygen install uninstall: cmake-doxygen
+shared build_tests doxygen install uninstall: cmake-doxygen
 	@cmake --build $(BUILD_DIR) --target $@ -- $(N_PROC_OPT)
 
 

@@ -152,8 +152,7 @@ endif()
 
 # Shared and Static libraries
 add_library(shared                  SHARED ${SOURCES})
-add_library(static EXCLUDE_FROM_ALL STATIC ${SOURCES})
-set(FLAVORS shared static)
+set(FLAVORS shared)
 
 ############################## Loop on flavors: shared and static
 foreach(FLAVOR ${FLAVORS})
@@ -287,16 +286,3 @@ generate_export_header(shared
 set_target_properties(shared PROPERTIES
   SOVERSION ${PROJECT_VERSION_MAJOR}
 )
-
-###################### Static library specific options
-
-# Prevent from using _declspec when static
-set_target_properties(static PROPERTIES
-  COMPILE_FLAGS -D${PROJECT_NAME_UP}_STATIC_DEFINE
-)
-
-# we need a specific name for the static library otherwise Ninja on
-# Windows not happy...
-if (WIN32 AND CMAKE_GENERATOR MATCHES "Ninja")
-  set_target_properties(static PROPERTIES OUTPUT_NAME ${PROJECT_NAME}_static)
-endif()
