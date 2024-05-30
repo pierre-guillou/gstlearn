@@ -140,7 +140,7 @@ ifdef BOOST_ROOT
   CMAKE_DEFINES := $(CMAKE_DEFINES) -DBoost_ROOT=$(BOOST_ROOT)
 endif
 
-.PHONY: all cmake cmake-python cmake-r cmake-python-r cmake-doxygen print_version static shared build_tests doxygen install uninstall
+.PHONY: all cmake cmake-python cmake-r cmake-python-r cmake-doxygen print_version shared build_tests doxygen install uninstall
 
 all: shared install
 
@@ -167,9 +167,6 @@ cmake-r-doxygen:
 
 print_version: cmake
 	@cmake --build $(BUILD_DIR) --target print_version --
-
-static: cmake
-	@cmake --build $(BUILD_DIR) --target static -- $(N_PROC_OPT)
 
 shared: cmake
 	@cmake --build $(BUILD_DIR) --target shared -- $(N_PROC_OPT)
