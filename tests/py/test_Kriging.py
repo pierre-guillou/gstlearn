@@ -24,7 +24,7 @@ def modelReduce(model,var):
     ctxt=model.getContext()
     ctxt.setNVar(len(var))
     modeln = gl.Model.create(ctxt)
-    covlist = model.getCovAnisoList()
+    covlist = gl.ACovAnisoList(model.getCovAnisoList())
     
     for i in range(covlist.getCovaNumber()):
         cova = covlist.getCova(i)
