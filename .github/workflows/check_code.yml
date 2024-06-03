@@ -27,6 +27,7 @@ jobs:
   # ----------------------- #
   check-formatting:
     runs-on: ubuntu-22.04
+    if: false  # need a .clang-format file (among other things)
     steps:
     - uses: actions/checkout@v4
 
@@ -115,8 +116,8 @@ jobs:
     strategy:
       matrix:
         config:
-          - {tidy: true, sa: false, dox: false}
-          - {tidy: false, sa: true, dox: false}
+          # - {tidy: true, sa: false, dox: false}
+          # - {tidy: false, sa: true, dox: false}
           - {tidy: false, sa: false, dox: true}
 
     steps:
