@@ -40,16 +40,16 @@ public:
   typedef typename Vector::const_reverse_iterator   const_reverse_iterator;
 
 public:
-  inline VectorNumT()                                              : Parent() { }
-  inline VectorNumT(const Vector& vec)                             : Parent(vec) { }
-  inline VectorNumT(size_type count, const T& value = T())         : Parent(count, value) { }
+  VectorNumT()                                              : Parent() { }
+  VectorNumT(const Vector& vec)                             : Parent(vec) { }
+  VectorNumT(size_type count, const T& value = T())         : Parent(count, value) { }
   template< class InputIt >
-  inline VectorNumT(InputIt first, InputIt last)                   : Parent(first, last) { }
-  inline VectorNumT(const VectorNumT& other) = default;
+  VectorNumT(InputIt first, InputIt last)                   : Parent(first, last) { }
+  VectorNumT(const VectorNumT& other) = default;
 #ifndef SWIG
-  inline VectorNumT(std::initializer_list<T> init)                 : Parent(init) { }
+  VectorNumT(std::initializer_list<T> init)                 : Parent(init) { }
 #endif
-  inline ~VectorNumT() = default;
+  ~VectorNumT() = default;
 
 public:
   inline bool isSame(const VectorNumT& other, double eps = 1.e-10) const;
