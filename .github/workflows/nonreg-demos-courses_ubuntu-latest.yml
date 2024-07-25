@@ -25,6 +25,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        wrapper: [python, r]
 
     steps:
     - uses: actions/checkout@v4
@@ -115,11 +118,12 @@ jobs:
         cmake --build ${{env.BUILD_DIR}} --parallel 3
 
     - name: Execute Python demos and courses
+      if: ${{matrix.wrapper == 'python'}}
       run: |
         cmake --build ${{env.BUILD_DIR}} --parallel 3 --target check_ipynb
 
     - name: Execute R demos and courses
-      if: success() || failure()
+      if: ${{matrix.wrapper == 'r'}}
       run: |
         cmake --build ${{env.BUILD_DIR}} --parallel 3 --target check_rmd
 
