@@ -91,6 +91,13 @@ jobs:
   publish:
     needs: build
     if: ${{inputs.dry_publish == false}}
+    strategy:
+      matrix:
+        # Last releases from here https://cran.r-project.org/src/base/R-4/
+        # Only last version of R for Linux (fake source package)
+        r_version: [4.4.1]
+        # Only one old Linux
+        os: [ubuntu-20.04]
 
     # Only ubuntu can upload to CRAN easily (ssh)
     runs-on: ubuntu-latest
