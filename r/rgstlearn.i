@@ -321,6 +321,11 @@ namespace gstlrn {
   if (inherits($input, "ExternalReference")) $input = slot($input,"ref");
 %}
 
+%typemap(scoercein) NamingConvention, NamingConvention &, const NamingConvention, const NamingConvention & %{
+  if (typeof($input) == "character") $input = NamingConvention($input);
+  if (inherits($input, "ExternalReference")) $input = slot($input,"ref");
+%}
+
 // Add typecheck typemaps for dispatching functions
 %typemap(rtypecheck, noblock=1) const Id&, Id                                                 { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
 %typemap(rtypecheck, noblock=1) const double&, double                                         { length($arg) == 1 &&  is.numeric(unlist($arg)) }
