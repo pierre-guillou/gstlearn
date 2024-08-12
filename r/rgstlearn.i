@@ -317,7 +317,7 @@ namespace gstlrn {
 }
 
 %typemap(scoercein) ECov, ECov &, const ECov, const ECov & %{
-  if (typeof($input) == "closure") rlang::abort("Enum should be called with parentheses");
+  if (typeof($input) == "closure") $input = $input();
   if (inherits($input, "ExternalReference")) $input = slot($input,"ref");
 %}
 
