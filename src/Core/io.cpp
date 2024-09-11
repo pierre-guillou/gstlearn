@@ -1145,7 +1145,6 @@ int _record_read(FILE *file, const char *format, ...)
   va_list ap;
   int error;
 
-  error = 0;
   va_start(ap, format);
   error = _file_read(file, format, ap);
   va_end(ap);

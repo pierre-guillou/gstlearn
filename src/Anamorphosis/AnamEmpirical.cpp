@@ -202,7 +202,7 @@ double AnamEmpirical::transformToRawValue(double yy) const
 
   if (yy < _YDisc[0])        yy = _YDisc[0];
   if (yy > _YDisc[_nDisc-1]) yy = _YDisc[_nDisc-1];
-  zz = za = zb = ya = yb = yy;
+  za = zb = ya = yb = yy;
 
   for (idisc=found=0; idisc<_nDisc && found==0; idisc++)
   {

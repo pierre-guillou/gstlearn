@@ -832,7 +832,6 @@ int Rule::gaus2facData(PropDef* propdef,
 
     /* Initializations */
 
-    facies = TEST;
     for (int igrf=0; igrf<2; igrf++) y[igrf] = TEST;
     if (rule_thresh_define(propdef,dbin,this,ITEST,
                            iech,isimu,nbsimu,1,
@@ -894,7 +893,6 @@ int Rule::gaus2facResult(PropDef  *propdef,
 
     /* Initializations */
 
-    facies = TEST;
     for (igrf=0; igrf<2; igrf++) y[igrf] = TEST;
 
     if (rule_thresh_define(propdef,dbout,this,ITEST,

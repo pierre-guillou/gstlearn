@@ -545,7 +545,6 @@ int db_rule_shadow(Db* db,
 
   error = 1;
   nbsimu = 1;
-  iptr = -1;
   propdef = nullptr;
 
   /* Preliminary checks */

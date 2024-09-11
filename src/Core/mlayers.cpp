@@ -1454,14 +1454,14 @@ static void st_estimate(LMlayers *lmlayers,
                         double * /*prior_mean*/,
                         double *post_mean)
 {
-  double estim, cx, coor[2], coefb, botval, ratio, stdv;
+  double estim, cx, coor[2], coefb, ratio, stdv;
   int iechout, ilayer, flag_correc, nlayers, neq;
 
   /* Loop on the grid nodes */
 
   nlayers = lmlayers->nlayers;
   neq = lmlayers->neq;
-  coefb = ratio = botval = stdv = 0.;
+  coefb = ratio = stdv = 0.;
   if (flag_std && !lmlayers->flag_cumul)
     st_covariance_c00(lmlayers, model, VectorDouble(), covtab, c00);
 
@@ -2222,7 +2222,7 @@ int multilayers_kriging(Db* dbin,
   mem_free((char* ) gs);
   mem_free((char* ) post_S);
   mem_free((char* ) post_mean);
-  lmlayers = lmlayers_free(lmlayers);
+  lmlayers_free(lmlayers);
   return (error);
 }
 
@@ -2849,7 +2849,7 @@ int multilayers_get_prior(Db* dbin,
   label_end:
   (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
   (void) manageExternalInformation(-1, ELoc::F, dbin, dbout, &flag_created);
-  lmlayers = lmlayers_free(lmlayers);
+  lmlayers_free(lmlayers);
   if (error)
   {
     *mean = (double*) mem_free((char* ) *mean);

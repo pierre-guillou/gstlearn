@@ -890,7 +890,7 @@ int MatrixSquareSymmetric::minimizeWithConstraintsInPlace(const VectorDouble& gm
 
     /* Construct the inequality matrices reduced to the active constraints */
 
-    ncur = _constraintsConcatenateMat(nae, nai, neq, active, aemat, aimat, aeimat);
+    _constraintsConcatenateMat(nae, nai, neq, active, aemat, aimat, aeimat);
     ncur = _constraintsConcatenateVD(nae, nai, active, bemat, bimat, beimat);
     if (_matrix_qoc(true, gmat, ncur, aeimat, beimat, xcand, lambda) != 0) return 1;
 

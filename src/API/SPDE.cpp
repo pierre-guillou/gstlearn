@@ -994,7 +994,7 @@ MatrixSparse* buildInvNugget(Db *db, Model *model, const SPDEParam& params)
 
   // Loop on the samples
   int rank;
-  int ndef = nvar;
+  int ndef;
   VectorInt position(nvar);
   VectorInt identity(nvar);
   for (int iech = 0; iech < nech; iech++)

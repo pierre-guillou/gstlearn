@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
   models.display();
 
   // Perform a non-conditional simulation on the Db and on the Grid
-  error = simtub(nullptr,db,&models);
+  simtub(nullptr,db,&models);
   db->display();
   error = simtub(nullptr,grid,&models);
   grid->display();

@@ -298,7 +298,6 @@ int RuleShift::gaus2facResult(PropDef* propdef,
   {
     if (! dbgrid->isActive(iech)) continue;
 
-    facies = TEST;
     for (igrf=0; igrf<2; igrf++) y[igrf] = TEST;
     icase = get_rank_from_propdef(propdef, ipgs, 0);
     y[0] = dbgrid->getSimvar(ELoc::SIMU, iech, isimu, 0, icase, nbsimu, 1);

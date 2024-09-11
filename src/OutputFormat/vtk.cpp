@@ -700,7 +700,7 @@ void write_point_mesh(const char* filename,
   for (i = 0 ; i < nvars ; i++)
     centering[i] = 1;
   write_variables(nvars, vardim, centering, varnames, vars, npts, npts);
-  centering = (int *) mem_free((char *) centering);
+  mem_free((char *) centering);
  
   close_file();
 }

@@ -166,9 +166,6 @@ AMesh* MeshSphericalExt::spde_mesh_load(Db *dbin,
 {
   DECLARE_UNUSED(gext);
 
-  int ndim_loc = 0;
-  if (dbin != nullptr) ndim_loc = MAX(ndim_loc, dbin->getNDim());
-  if (dbout != nullptr) ndim_loc = MAX(ndim_loc, dbout->getNDim());
   bool flag_sphere = isDefaultSpaceSphere();
 
   // Processing

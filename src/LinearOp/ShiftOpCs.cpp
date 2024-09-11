@@ -972,7 +972,7 @@ int ShiftOpCs::_buildS(const AMesh *amesh, double tol)
 
     // Prepare M matrix
 
-    bool flagSphere = (amesh->getVariety() != 0);
+    bool // flagSphere = (amesh->getVariety() != 0);
     flagSphere = false; // Modif DR a valider
     if (! flagSphere)
     {
@@ -1113,7 +1113,7 @@ int ShiftOpCs::_buildSGrad(const AMesh *amesh, double tol)
 
     // Prepare M matrix
     _loadHH(amesh, hh, imesh);
-    bool flagSphere = (amesh->getVariety() == 1);
+    bool // flagSphere = (amesh->getVariety() == 1);
     flagSphere = false; // Modif DR a valider
     if (! flagSphere)
     {

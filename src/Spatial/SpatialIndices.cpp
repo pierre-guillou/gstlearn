@@ -212,8 +212,6 @@ int SpatialIndices::computeCGI(const String &name)
   _mvectors = *mm.getEigenVectors();
 
   double r  = _mvalues[0] / _mvalues[1];
-  double e2 = (_mvectors.getValue(1,0) / _mvectors.getValue(0,0));
-  e2 = e2 * e2;
   _iso = 1. / sqrt(r);
 
   MatrixRectangular axes = getMatrixInertia();

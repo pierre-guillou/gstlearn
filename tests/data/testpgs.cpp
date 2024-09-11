@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
   /* Initializations */
 
-  npgs     = ntot = 0;
+  npgs     = 0;
   dbin     = nullptr;
   dbout    = nullptr;
   vario    = nullptr;

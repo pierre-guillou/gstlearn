@@ -1699,7 +1699,6 @@ static void st_gibbs(int igrf,
       mat.gibbs(iech, zcurVD, &yk, &sk);
       zcurVD[iech] = st_simu_constraints(dbout, igrf, iech - 1, iter0, ngibbs_burn, yk, sk);
     }
-  zcur = zcurVD.data();
 }
 
 /****************************************************************************/
@@ -3318,7 +3317,7 @@ static int st_build_Q(SPDE_Matelem &Matelem)
   error = 0;
 
   label_end:
-  if (error) QC = qchol_manage(-1, QC);
+  if (error) qchol_manage(-1, QC);
   return (error);
 }
 
@@ -4247,7 +4246,6 @@ static int st_kriging_several_results(const double *xcur, double *z)
   ranks = nullptr;
   valdat = TEST;
   amesh = spde_get_current_matelem(0).amesh;
-  flag_data = 0;
 
   /* Sample designation */
 
@@ -4827,7 +4825,6 @@ int spde_process(Db *dbin,
   flag_mult_data = (int) get_keypone("Flag_Mult_Data", 0);
   error = 1;
   data = zcur = zkrig = zout = vcur = zsnc = zdat = nullptr;
-  ndata = 0;
   ngrf = st_get_number_grf();
   nvar = S_ENV.nvar;
   ncur = st_get_nvertex_max();
@@ -5074,9 +5071,6 @@ static AMesh* st_create_meshes(Db *dbin,
       message("- Output targets do not participate to the Meshing\n");
   }
 
-  int ndim_loc = 0;
-  if (dbin != nullptr) ndim_loc = MAX(ndim_loc, dbin->getNDim());
-  if (dbout != nullptr) ndim_loc = MAX(ndim_loc, dbout->getNDim());
   bool flag_sphere = isDefaultSpaceSphere();
 
   // Processing
@@ -6043,7 +6037,8 @@ int spde_eval(const VectorDouble& blin,
 
   error = 0;
 
-  label_end: cheb_elem = spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, cheb_elem);
+  label_end:
+  spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, cheb_elem);
   return (error);
 }
 #endif
@@ -6476,7 +6471,6 @@ static int st_m2d_drift_inc_manage(M2D_Environ *m2denv,
   /* Initializations */
 
   if (m2denv == (M2D_Environ*) NULL) return (1);
-  iptr = -1;
 
   /* Dispatch */
 

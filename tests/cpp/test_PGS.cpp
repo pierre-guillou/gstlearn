@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     ruleprop = RuleProp::createFromRuleAndDb(rule, dbprop);
 
   // Perform a non-conditional simulation on the Db
-  error = simpgs(nullptr,db,ruleprop,model1,model2,neighU);
+  simpgs(nullptr,db,ruleprop,model1,model2,neighU);
   db->setLocator(db->getLastName(),ELoc::Z);
   (void) db->dumpToNF("simupgs.ascii");
   db->display(&dbfmt);

@@ -980,8 +980,8 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
 
   label_end:
   delete skin;
-  tabval = (double*) mem_free((char* ) tabval);
-  tabind = (int*) mem_free((char* ) tabind);
+  mem_free((char* ) tabval);
+  mem_free((char* ) tabind);
   return (error);
 }
 
@@ -1285,8 +1285,9 @@ int DbHelper::db_compositional_transform(Db *db,
 
   error = 0;
 
-  label_end: tabin = (double*) mem_free((char* ) tabin);
-  tabout = (double*) mem_free((char* ) tabout);
+  label_end:
+  mem_free((char* ) tabin);
+  mem_free((char* ) tabout);
   return (error);
 }
 

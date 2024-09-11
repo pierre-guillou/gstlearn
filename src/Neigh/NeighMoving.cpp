@@ -451,9 +451,7 @@ VectorDouble NeighMoving::summary(int iech_out)
   }
   if (getNSect() > 0)
   {
-    if(_movingNsect[0] > 0)
-      n_empty = 0;
-    else
+    if(_movingNsect[0] <= 0)
     {
       n_empty++;
       if (n_empty > number) number = n_empty;

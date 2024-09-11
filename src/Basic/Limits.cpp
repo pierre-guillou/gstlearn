@@ -682,14 +682,11 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
   /* Find extrema of all classes to sort too small or too large samples */
 
   double zmini =  1.e30;
-  double zmaxi = -1.e30;
   for (int iclass = 0; iclass < nclass; iclass++)
   {
     if (!FFFF(minival[iclass])) zmini = MIN(zmini, minival[iclass]);
-    if (!FFFF(maxival[iclass])) zmaxi = MAX(zmaxi, maxival[iclass]);
   }
   if (FFFF(zmini)) zmini = -1.e30;
-  if (FFFF(zmaxi)) zmaxi =  1.e30;
 
   /* Loop on the samples */
 

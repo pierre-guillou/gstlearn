@@ -478,7 +478,7 @@ static int st_edit_ask(int *item, int *rank, double *vmin, double *vmax)
 int db_edit(Db *db, int *flag_valid)
 
 {
-  int nech, nvar, ivar, iech, incr, type, ok, nrds, nrdv, flag_inter;
+  int nech, nvar, ivar, iech, incr, type, nrds, nrdv, flag_inter;
   double vmin, vmax, value;
 
   /* Initializations */
@@ -490,21 +490,18 @@ int db_edit(Db *db, int *flag_valid)
   vmin = vmax = TEST;
   if (nech < 1 || nvar < 1) return (1);
 
-  ok = 1;
-  while (ok)
+  while (true)
   {
     st_edit_display(db, nrdv, nrds, ivar, iech);
     flag_inter = st_edit_ask(&type, &incr, &vmin, &vmax);
     if (flag_inter > 0)
     {
       *flag_valid = 1;
-      ok = 0;
       break;
     }
     if (flag_inter < 0)
     {
       *flag_valid = 0;
-      ok = 0;
       break;
     }
 
@@ -1519,7 +1516,7 @@ int db_streamline(DbGrid *dbgrid,
  *****************************************************************************/
 int db_smooth_vpc(DbGrid *db, int width, double range)
 {
-  int iz, nz, nprop, ecr, nkern, jz, error;
+  int iz, nz, nprop, nkern, jz, error;
   double *prop1, *prop2, *kernel, total, propval, dz, quant, quant0;
 
   /* Initializations */
@@ -1576,7 +1573,7 @@ int db_smooth_vpc(DbGrid *db, int width, double range)
 
         /* Loop on the levels of the VPC */
 
-        for (iz = ecr = 0; iz < nz; iz++)
+        for (iz = 0; iz < nz; iz++)
         {
 
           /* Loop on the kernel items */
@@ -1958,7 +1955,7 @@ int db_grid2point_sampling(DbGrid *dbgrid,
   // Core deallocation
 
   label_end:
-  retain = (int*) mem_free((char* ) retain);
+  mem_free((char* ) retain);
   return (error);
 }
 

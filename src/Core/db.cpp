@@ -461,7 +461,7 @@ int db_selref(int ndim, const int* nx, const int* ref, const double* tabin, doub
     ntotal *= nx[idim];
 
   bool skip;
-  for (lec = ecr = 0; lec < ntotal; lec++)
+  for (lec = 0; lec < ntotal; lec++)
   {
     nval = ntotal;
     iech = lec;
@@ -1866,7 +1866,6 @@ DbGrid* db_grid_reduce(DbGrid *db_grid,
 
   // Initializations */
 
-  error = 1;
   ss_grid = nullptr;
 
   // Core allocation

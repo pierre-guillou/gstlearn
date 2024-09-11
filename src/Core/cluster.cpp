@@ -640,7 +640,6 @@ int* kmedoids(double *data,
     if (npass <= 1)
     {
       ifound = 1;
-      distot = total;
       for (j = 0; j < nech; j++)
       {
         clusterid[j] = centroids[tclusterid[j]];

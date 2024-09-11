@@ -367,7 +367,6 @@ int RuleShadow::gaus2facData(PropDef *propdef,
 
     /* Initializations */
 
-    facies = TEST;
     for (int igrf = 0; igrf < 2; igrf++)
       y[igrf] = TEST;
 
@@ -427,7 +426,6 @@ int RuleShadow::gaus2facResult(PropDef *propdef,
   if (dbgrid == nullptr) return 1;
 
   error = 1;
-  nstep = 0;
   ndim  = dbgrid->getNDim();
   nech  = dbgrid->getSampleNumber();
   icase = get_rank_from_propdef(propdef, ipgs, 0);
@@ -452,7 +450,6 @@ int RuleShadow::gaus2facResult(PropDef *propdef,
 
     /* Initializations */
 
-    facies = TEST;
     for (igrf = 0; igrf < 2; igrf++)
       y[igrf] = TEST;
 
@@ -537,7 +534,6 @@ int RuleShadow::evaluateBounds(PropDef *propdef,
   if (dbin == nullptr) return (0);
   nadd = jech = 0;
   nech = dbin->getSampleNumber();
-  dist = 0.;
   dinc = getIncr();
   nstep = (int) floor(getDMax() / dinc);
   seuil = s1min = s1max = s2min = s2max = TEST;
@@ -580,7 +576,6 @@ int RuleShadow::evaluateBounds(PropDef *propdef,
       /* - at a point where proportions are known */
       /* - after truncation, the point can create shadow at target */
 
-      alea = 1;
       valid = 0;
       while (!valid)
       {

@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
   RuleProp* ruleprop1 = RuleProp::createFromRule(rule1, props1);
 
   // Perform a non-conditional PGS simulation on a grid
-  error = simpgs(nullptr,dbgrid,ruleprop1,&model1,&model2,neighU,nbsimu);
+  simpgs(nullptr,dbgrid,ruleprop1,&model1,&model2,neighU,nbsimu);
   dbgrid->setNameByLocator(ELoc::FACIES,"PGS-Facies");
   dbfmt = DbStringFormat(FLAG_STATS,{"PGS-Facies*"});
   dbgrid->display(&dbfmt);
@@ -123,8 +123,8 @@ int main(int argc, char *argv[])
   RuleProp* rulepropbi = RuleProp::createFromRules(rule1, rule2, props2);
 
   // Perform a non-conditional BiPGS simulation on a grid
-  error = simbipgs(nullptr,dbgrid,rulepropbi,
-                   &model1,&model2,&model3,&model4,neighU,nbsimu);
+  simbipgs(nullptr,dbgrid,rulepropbi,
+           &model1,&model2,&model3,&model4,neighU,nbsimu);
   dbgrid->setNameByLocator(ELoc::FACIES,"BiPGS-Facies");
   dbfmt = DbStringFormat(FLAG_STATS,{"BiPGS-Facies*"});
   dbgrid->display(&dbfmt);
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
   RuleProp* rulepropshift = RuleProp::createFromRule(ruleshift, propshift);
 
   // Perform a non-conditional PGS Shift simulation on a grid
-  error = simpgs(nullptr,dbgrid,rulepropshift,&model1,nullptr,neighU,nbsimu);
+  simpgs(nullptr,dbgrid,rulepropshift,&model1,nullptr,neighU,nbsimu);
   dbgrid->setNameByLocator(ELoc::FACIES,"PGS-Shift-Facies");
   dbfmt = DbStringFormat(FLAG_STATS,{"PGS-Shift-Facies*"});
   dbgrid->display(&dbfmt);

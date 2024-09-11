@@ -2225,7 +2225,6 @@ static void st_model_auto_strmod_define(StrMod *strmod,
       MatrixSquareSymmetric* mat = MatrixSquareSymmetric::createFromTLTU(nvar, tritab);
       cova->setSill(*mat);
     }
-    flag_aic = 0;
   }
 
   // If 'lock_samerot' is ON, copy the rotation to all structures

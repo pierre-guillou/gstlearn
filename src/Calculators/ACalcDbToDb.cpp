@@ -70,10 +70,6 @@ bool ACalcDbToDb::_checkSpaceDimension()
          return false;
        }
      }
-     else
-     {
-       ndim = _dbout->getNDim();
-     }
    }
    return true;
 }

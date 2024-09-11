@@ -465,7 +465,6 @@ static int fftradix(double Re[],
       default:
         /* transform for odd factors */
         ispan = kspan;
-        k = factor[ii - 1];
         kspan /= factor[ii - 1];
 
         switch (factor[ii - 1])

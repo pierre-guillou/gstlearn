@@ -665,7 +665,7 @@ void MatrixSparse::_setValues(const double* values, bool byCol)
         }
     }
     _csMatrix = cs_triplet2(local);
-    local = cs_spfree2(local);
+    cs_spfree2(local);
   }
 }
 #endif
@@ -1106,8 +1106,8 @@ void MatrixSparse::prodMatMatInPlace(const AMatrix *x,
       cs *csy = ym->_csMatrix;
       if (transposeY) csy = cs_transpose(csy, 1);
       cs *res = cs_multiply(csx, csy);
-      if (transposeX) csx = cs_spfree2(csx);
-      if (transposeY) csy = cs_spfree2(csy);
+      if (transposeX) cs_spfree2(csx);
+      if (transposeY) cs_spfree2(csy);
       cs_spfree2(_csMatrix);
       _csMatrix = res;
     }
@@ -1393,7 +1393,7 @@ void MatrixSparse::_allocate()
       cs* local = cs_spalloc2(0, 0, 1, 1, 1);
       cs_entry2(local, nrow - 1, ncol - 1, 0.);
       _csMatrix = cs_triplet2(local);
-      local = cs_spfree2(local);
+      cs_spfree2(local);
     }
   }
 }
