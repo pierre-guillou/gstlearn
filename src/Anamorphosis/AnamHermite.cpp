@@ -155,7 +155,6 @@ double AnamHermite::rawToTransformValue(double z) const
   /* Look for a first interval in Y containing Z */
 
   dy = YPAS;
-  y1 = 0.;
   z1 = transformToRawValue(y1);
 
   if (z > z1)
@@ -428,9 +427,9 @@ void AnamHermite::_defineBounds(double pymin,
 
   nlag = static_cast<Id>(((ANAM_YMAX - ANAM_YMIN) / YPAS) + 1);
   if (FFFF(azmin)) azmin = pzmin;
-  if (FFFF(aymin)) aymin = pymin;
+  DECLARE_UNUSED(aymin);
   if (FFFF(azmax)) azmax = pzmax;
-  if (FFFF(aymax)) aymax = pymax;
+  DECLARE_UNUSED(aymax);
 
   /* Core allocation */
 

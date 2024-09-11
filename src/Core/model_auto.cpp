@@ -2157,7 +2157,6 @@ static void st_model_auto_strmod_define(StrMod* strmod,
       cova->setSill(*mat);
       delete mat;
     }
-    flag_aic = 0;
   }
 
   // If 'lock_samerot' is ON, copy the rotation to all structures

@@ -3904,7 +3904,7 @@ Id Vario::computeGeometry(Db* db, Vario_Order* vorder, Id* npair)
 
   /* Sort the geometry */
 
-  vorder = vario_order_final(vorder, npair);
+  vario_order_final(vorder, npair);
 
   return 0;
 }

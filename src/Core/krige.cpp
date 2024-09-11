@@ -547,13 +547,12 @@ static Id st_check_environment(Id flag_in,
   /* Initializations */
 
   error = 1;
-  ndim = nfex = 0;
+  ndim = 0;
 
   /*********************************/
   /* Compatibility between two Dbs */
   /*********************************/
 
-  ndim = 0;
   if (flag_in && ndim == 0) ndim = DBIN->getNDim();
   if (flag_out && ndim == 0) ndim = DBOUT->getNDim();
   if (flag_in && flag_out && !DBIN->hasSameDimension(DBOUT)) goto label_end;
@@ -2688,7 +2687,7 @@ Id anakexp_3D(DbGrid* db,
 
   /* Loop on the grid nodes */
 
-  status = nech = neq = 0;
+  status = 0;
   IECH_OUT = ecr = 0;
   for (ix = 0; ix < db->getNX(0); ix++)
     for (iy = 0; iy < db->getNX(1); iy++)

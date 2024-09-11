@@ -491,7 +491,7 @@ static void st_upscale(Id orient,
     mestitle(1, "Looking for the Minimum Upscaled Value");
     st_print_grid("Initial", nxyz, numtab0, valtab0);
   }
-  ncell = st_recopy(nxyz, numtab0, valtab0, nxyz1, numtab1, valtab1);
+  st_recopy(nxyz, numtab0, valtab0, nxyz1, numtab1, valtab1);
   ncell = st_recopy(nxyz, numtab0, valtab0, nxyz2, numtab2, valtab2);
   if (flag_save) st_print_upscale("Initial", nxyz1, valtab1);
 
@@ -533,7 +533,7 @@ static void st_upscale(Id orient,
     mestitle(1, "Looking for the Maximum Upscaled Value\n");
     st_print_grid("Initial", nxyz, numtab0, valtab0);
   }
-  ncell = st_recopy(nxyz, numtab0, valtab0, nxyz1, numtab1, valtab1);
+  st_recopy(nxyz, numtab0, valtab0, nxyz1, numtab1, valtab1);
   ncell = st_recopy(nxyz, numtab0, valtab0, nxyz2, numtab2, valtab2);
   if (flag_save) st_print_upscale("Initial", nxyz1, valtab1);
 
