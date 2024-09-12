@@ -212,6 +212,7 @@ Vario* Vario::createTransformZToY(const Vario& varioZ,
   if (varioY->transformZToY(anam))
   {
     messerr("Error when transforming Raw Variogram into Gaussian");
+    delete varioY;
     return nullptr;
   }
   return varioY;
