@@ -77,7 +77,7 @@ bool CalcSimuEden::_simulate()
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   _nxyz    = dbgrid->getSampleNumber();
 
-  Skin* skin = new Skin(this, dbgrid);
+  Skin skin{this, dbgrid};
 
   /* Preliminary checks */
 
@@ -106,16 +106,15 @@ bool CalcSimuEden::_simulate()
 
     _statsInit();
 
-    if (skin->init(_verbose))
+    if (skin.init(_verbose))
     {
-      delete skin;
       return true;
     }
 
     /* Modifying the peripheral cells using a random walk */
 
     int idate = 0;
-    while (skin->remains(_verbose))
+    while (skin.remains(_verbose))
     {
 
       /* Check that the maximum quantities have not been reached */
@@ -127,12 +126,12 @@ bool CalcSimuEden::_simulate()
 
       int rank;
       int ipos;
-      skin->getNext(&rank, &ipos);
+      skin.getNext(&rank, &ipos);
 
       /* Find the new value of the target cell according to its neighborhood */
 
       int ref_fluid;
-      if (_fluidModify(skin, ipos, &ref_fluid))
+      if (_fluidModify(&skin, ipos, &ref_fluid))
       {
         _ncork++;
         _setFACIES_CORK(ipos);
@@ -149,9 +148,8 @@ bool CalcSimuEden::_simulate()
 
       /* Deduce the initial influence of the central cell */
 
-      if (skin->unstack(rank, ipos))
+      if (skin.unstack(rank, ipos))
       {
-        delete skin;
         return false;
       }
     }
@@ -181,7 +179,7 @@ bool CalcSimuEden::_simulate()
 
   /* Print statistics */
 
-  if (_verbose) skin->skinPrint();
+  if (_verbose) skin.skinPrint();
 
   return true;
 }
