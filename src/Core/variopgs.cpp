@@ -5236,7 +5236,11 @@ Vario* variogram_pgs(Db *db,
   if (TEST_DISCRET)
     CTABLES = ct_tables_manage(-1, 0, 1, 200, 100, -1., 1., CTABLES);
   delete varioind;
-  if (error) delete vario;
+  if (error)
+  {
+    delete vario;
+    return nullptr;
+  }
   return vario;
 }
 
