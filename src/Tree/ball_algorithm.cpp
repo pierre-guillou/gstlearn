@@ -266,6 +266,7 @@ t_btree* btree_init(const double** data,
 	if (leaf_size < 1)
 	{
 		messerr("leaf_size must be greater than or equal to 1\n");
+        free(b);
 		return nullptr;
 	}
 

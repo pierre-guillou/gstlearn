@@ -130,11 +130,20 @@ int PrecisionOpMultiConditionalCs::_buildQpAtA()
 
   // Build the multiple projection matrix 'Amult'
   ProjMatrix* Amult = _buildAmult();
-  if (Amult == nullptr) return 1;
+  if (Amult == nullptr)
+  {
+    delete Amult;
+    return 1;
+  }
 
   // Build the multiple precision matrix 'Qmult'
   MatrixSparse* Qmult = _buildQmult();
-  if (Qmult == nullptr) return 1;
+  if (Qmult == nullptr)
+  {
+    delete Amult;
+    delete Qmult;
+    return 1;
+  }
 
   // Create the conditional multiple precision matrix 'Q'
   VectorDouble invsigma = VectorHelper::inverse(getAllVarianceData());
