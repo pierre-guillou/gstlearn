@@ -790,7 +790,7 @@ Id db_bounds_shadow(Db* db,
 
   for (igrf = 0; igrf < ngrf; igrf++)
   {
-    if (!flag_used[igrf]) continue;
+    if (igrf < 2 && !flag_used[igrf]) continue;
     if (rule->evaluateBounds(propdef, db, db, 0, igrf, 0, 0)) goto label_end;
   }
 
