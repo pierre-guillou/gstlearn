@@ -118,6 +118,10 @@ int init_node(t_btree *b, int i_node, int idx_start, int idx_end)
 {
   int n_features = b->n_features;
   int n_points = idx_end - idx_start;
+  if (b->n_nodes <= i_node)
+  {
+    return 0;
+  }
   double* centroid = b->node_bounds[0][i_node];
 
   for (int j = 0; j < n_features; j++)
