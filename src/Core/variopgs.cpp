@@ -4501,7 +4501,7 @@ static void st_variogram_scale(Vario *vario, int idir)
 static int st_vario_indic_model_nostat(Local_Pgs *local_pgs)
 
 {
-  double dist, cov[6];
+  double dist, cov[6] = {};
   int iech, jech, i, flag_ind, iconf[2];
 
   /* Initializations */
