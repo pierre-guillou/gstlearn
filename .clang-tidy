@@ -1,32 +1,5 @@
 Checks: >-
   -*,
-  bugprone-*,
-  -bugprone-easily-swappable-parameters,
-  -bugprone-implicit-widening-of-multiplication-result,
-  -bugprone-narrowing-conversions,
-  -bugprone-macro-parentheses,
-  -bugprone-reserved-identifier,
-  modernize-deprecated-headers,
-  modernize-use-auto,
-  modernize-use-override,
-  google-readability-casting,
-  mpi-*,
-  openmp-*,
-  -openmp-use-default-none,
-  performance-*,
-  portability-*,
-  readability-*,
-  -readability-avoid-const-params-in-decls,
-  -readability-braces-around-statements,
-  -readability-identifier-length,
-  -readability-isolate-declaration,
-  -readability-magic-numbers,
-  -readability-redundant-member-init,
-  -readability-redundant-access-specifiers,
-  -readability-suspicious-call-argument,
-  -readability-implicit-bool-conversion, # TODO: to be removed
-CheckOptions:
-  - key: readability-function-cognitive-complexity.Threshold
-    value: 500
+  clang-analyzer-*,
 HeaderFilterRegex: 'include'
 UseColor: true
