@@ -856,7 +856,8 @@ Id MeshETurbo::initFromCova(const CovAniso& cova,
   VectorVectorDouble extremesData;
   VectorDouble cornerRef(ndim, 0.);
   const DbGrid* fieldGrid = nullptr;
-  if (field->isGrid())
+  const auto isGrid = field->isGrid();
+  if (isGrid)
   {
     fieldGrid = dynamic_cast<const DbGrid*>(field);
     cornerRef = fieldGrid->getGrid().getCoordinatesByCorner(ic);
@@ -878,7 +879,7 @@ Id MeshETurbo::initFromCova(const CovAniso& cova,
       jcorner /= 2;
     }
     VectorDouble corner1(ndim, 0.);
-    if (field->isGrid())
+    if (isGrid)
     {
       corner1 = fieldGrid->getGrid().getCoordinatesByCorner(ic);
     }
