@@ -124,7 +124,7 @@ AStringable::~AStringable()
 String AStringable::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
-  sstr << "toString is not yet implemented for " << typeid(*this).name() << std::endl;
+  sstr << "toString is not yet implemented for " << typeid(*this).name() << '\n';
   return sstr.str();
 }
 
@@ -225,7 +225,7 @@ String _printColumnHeader(const VectorString& colnames,
     sstr << _tabPrintString(" ", EJustify::RIGHT) << " ";
     for (Id ix = colfrom; ix < colto; ix++)
       sstr << _tabPrintString(colnames[ix], EJustify::RIGHT, colSize);
-    sstr << std::endl;
+    sstr << '\n';
   }
   else
   {
@@ -233,7 +233,7 @@ String _printColumnHeader(const VectorString& colnames,
     sstr << _tabPrintString(" ", EJustify::RIGHT) << " ";
     for (Id ix = colfrom; ix < colto; ix++)
       sstr << _tabPrintRowColumn(CASE_COL, ix, false);
-    sstr << std::endl;
+    sstr << '\n';
   }
   return sstr.str();
 }
@@ -275,7 +275,7 @@ String _printTrailer(Id ncols, Id nrows, Id ncols_util, Id nrows_util)
       sstr << "Nrows=" << nrows_util << "[from " << nrows << "]";
   }
 
-  if (one_used) sstr << ")" << std::endl;
+  if (one_used) sstr << ")" << '\n';
   return sstr.str();
 }
 
@@ -445,11 +445,11 @@ String toTitle(Id level, const char* format, ...)
   char STRING[1000];
   va_list ap;
 
-  sstr << std::endl;
+  sstr << '\n';
   va_start(ap, format);
   (void)vsnprintf(STRING, sizeof(STRING), format, ap);
   va_end(ap);
-  sstr << STRING << std::endl;
+  sstr << STRING << '\n';
 
   /* Underline the string */
 
@@ -472,7 +472,7 @@ String toTitle(Id level, const char* format, ...)
         break;
     }
   }
-  sstr << STRING << std::endl;
+  sstr << STRING << '\n';
 
   return sstr.str();
 }
@@ -620,7 +620,7 @@ String toMatrix(const String& title,
   if (!title.empty())
   {
     sstr << title;
-    if (multi_row) sstr << std::endl;
+    if (multi_row) sstr << '\n';
   }
 
   // Loop on the batches
@@ -650,7 +650,7 @@ String toMatrix(const String& title,
         else
           sstr << _tabPrintDouble(tab[iad], EJustify::RIGHT, colSize);
       }
-      sstr << std::endl;
+      sstr << '\n';
     }
   }
 
@@ -715,7 +715,7 @@ String toMatrix(const String& title,
   if (!title.empty())
   {
     sstr << title;
-    if (multi_row) sstr << std::endl;
+    if (multi_row) sstr << '\n';
   }
 
   // Loop on the batches
@@ -746,7 +746,7 @@ String toMatrix(const String& title,
         else
           sstr << _tabPrintInt(tab[iad], EJustify::RIGHT, colSize);
       }
-      sstr << std::endl;
+      sstr << '\n';
     }
   }
 
@@ -779,7 +779,7 @@ String toVector(const String& title, const VectorDouble& tab, bool flagOverride)
   if (!title.empty())
   {
     sstr << title;
-    if (multi_row) sstr << std::endl;
+    if (multi_row) sstr << '\n';
   }
 
   Id lec = 0;
@@ -795,7 +795,7 @@ String toVector(const String& title, const VectorDouble& tab, bool flagOverride)
       sstr << toDouble(tab[lec]);
       lec++;
     }
-    sstr << std::endl;
+    sstr << '\n';
   }
 
   // Print the trailer
@@ -827,7 +827,7 @@ String toVector(const String& title, constvect tab, bool flagOverride)
   if (!title.empty())
   {
     sstr << title;
-    if (multi_row) sstr << std::endl;
+    if (multi_row) sstr << '\n';
   }
 
   Id lec = 0;
@@ -843,7 +843,7 @@ String toVector(const String& title, constvect tab, bool flagOverride)
       sstr << toDouble(tab[lec]);
       lec++;
     }
-    sstr << std::endl;
+    sstr << '\n';
   }
 
   // Print the trailer
@@ -866,7 +866,7 @@ String toVector(const String& title, const VectorVectorDouble& tab, bool flagOve
   if (tab.empty()) return sstr.str();
 
   if (!title.empty())
-    sstr << title << std::endl;
+    sstr << title << '\n';
 
   Id nrows  = static_cast<Id>(tab.size());
   Id nrutil = nrows;
@@ -895,7 +895,7 @@ String toVector(const String& title, const VectorVectorInt& tab, bool flagOverri
   std::stringstream sstr;
   if (tab.empty()) return sstr.str();
 
-  if (!title.empty()) sstr << title << std::endl;
+  if (!title.empty()) sstr << title << '\n';
 
   Id nrows  = static_cast<Id>(tab.size());
   Id nrutil = nrows;
@@ -934,7 +934,7 @@ String toVector(const String& title, const VectorString& tab, bool flagOverride)
   if (!title.empty())
   {
     sstr << title;
-    if (multi_row) sstr << std::endl;
+    if (multi_row) sstr << '\n';
   }
 
   Id lec = 0;
@@ -950,7 +950,7 @@ String toVector(const String& title, const VectorString& tab, bool flagOverride)
       sstr << tab[lec];
       lec++;
     }
-    sstr << std::endl;
+    sstr << '\n';
   }
 
   // Print the trailer
@@ -983,7 +983,7 @@ String toVector(const String& title, const VectorInt& tab, bool flagOverride)
   if (!title.empty())
   {
     sstr << title;
-    if (multi_row) sstr << std::endl;
+    if (multi_row) sstr << '\n';
   }
 
   Id lec = 0;
@@ -999,7 +999,7 @@ String toVector(const String& title, const VectorInt& tab, bool flagOverride)
       sstr << toInt(tab[lec]);
       lec++;
     }
-    sstr << std::endl;
+    sstr << '\n';
   }
 
   // Print the trailer
@@ -1051,7 +1051,7 @@ String toInterval(double zmin, double zmax)
     sstr << "N/A";
   else
     sstr << zmax;
-  sstr << "]" << std::endl;
+  sstr << "]" << '\n';
 
   return sstr.str();
 }
