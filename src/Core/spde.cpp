@@ -1704,7 +1704,6 @@ static Id st_fill_Bnugget(Db* dbin)
   /* In the non-stationary case, identify the rank of the parameter */
   /* which corresponds to the sill of the nugget effect */
 
-  flag_nostat_sillnug = st_identify_nostat_param(EConsElem::SILL) >= 0;
   /*  if (flag_nostat_sillnug)
     {
       messerr("Non-stationarity on nugget sill values not programmed yet");
@@ -1741,7 +1740,6 @@ static Id st_fill_Bnugget(Db* dbin)
 
   /* Loop on the active samples */
 
-  ecr = 0;
   /* for (Id iech = 0; iech < dbin->getNSample(); iech++)
   {
     if (!dbin->isActive(iech)) continue;
@@ -2195,7 +2193,6 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
   ndim    = amesh->getNDim();
   ncorner = amesh->getNApexPerMesh();
   NF_Triplet Gtriplet;
-  model       = st_get_model();
   flag_sphere = isDefaultSpaceSphere();
   flag_nostat = false;
   // flag_nostat = model->isNoStat();
