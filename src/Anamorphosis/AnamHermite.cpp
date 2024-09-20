@@ -421,6 +421,7 @@ void AnamHermite::_defineBounds(double pymin,
                                 double aymax,
                                 double azmax)
 {
+  DECLARE_UNUSED(pymax);
   int npas,ind,ind0;
   VectorDouble ym,zm;
 
