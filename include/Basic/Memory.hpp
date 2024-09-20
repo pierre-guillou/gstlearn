@@ -42,7 +42,6 @@ GSTLEARN_EXPORT char* mem_copy_(const char* call_file,
                                 int flag_fatal);
 GSTLEARN_EXPORT char*
 mem_free_(const char* call_file, unsigned int call_line, char* tab);
-GSTLEARN_EXPORT void mem_debug_set(int flag);
 GSTLEARN_EXPORT void memory_status(const char* title);
 GSTLEARN_EXPORT double** mem_tab_free(double** tab, int nvar);
 GSTLEARN_EXPORT double** mem_tab_alloc(int nvar, int size, int flag_fatal);

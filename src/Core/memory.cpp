@@ -38,7 +38,7 @@ typedef struct
 /*! \endcond */
 
 static int MEMORY_LEAK = 0;
-static int MEMORY_DEBUG = 0;
+static const int MEMORY_DEBUG = 0;
 static int MEMORY_TOTAL = 0;
 static int MEMORY_MAX = 0;
 static int MEMORY_MIN_PT = 1000000;
@@ -334,18 +334,6 @@ void memory_leak_report(void)
     }
     message("Total leak = %d\n", total);
   }
-}
-
-/****************************************************************************/
-/*!
- ** Set the status of the memory
- **
- ** \param[in]  flag      Activiation flag
- **
- *****************************************************************************/
-void mem_debug_set(int flag)
-{
-  MEMORY_DEBUG = flag;
 }
 
 /****************************************************************************/
