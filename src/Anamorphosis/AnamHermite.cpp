@@ -408,7 +408,7 @@ bool AnamHermite::_isIndexValid(Id i) const
 
 void AnamHermite::_defineBounds(double pymin,
                                 double pzmin,
-                                double pymax,
+                                [[maybe_unused]] double pymax,
                                 double pzmax,
                                 double aymin,
                                 double azmin,
