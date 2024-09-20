@@ -3941,6 +3941,7 @@ static int st_kriging_several_rhs(double *data,
           for (int i = 0; i < nrows; i++)
             work[i] += temp[i];
           delete B0;
+          B0 = nullptr;
         }
         Matelem.Aproj->prodMatVecInPlacePtr(work.data(), &RHS(icov, ivar, 0), true);
       }
@@ -3966,6 +3967,7 @@ static int st_kriging_several_rhs(double *data,
             for (int i = 0; i < nrows; i++)
               work[i] += temp[i];
             delete B0;
+            B0 = nullptr;
           }
           // -sum_j { Q1_td_ij * Z_j }
           for (int i = 0; i < ncur; i++)
@@ -3982,6 +3984,7 @@ static int st_kriging_several_rhs(double *data,
             for (int i = 0; i < nrows; i++)
               work[i] += temp[i];
             delete B0;
+            B0 = nullptr;
           }
           // A^t(icov) * sum{ Q1_dd_ij * Z_j } 
           Matelem.Aproj->prodMatVecInPlacePtr(work.data(), &RHS(icov, ivar, 0), true);
@@ -4093,6 +4096,7 @@ static int st_kriging_several_loop(int flag_crit,
               B0 = st_extract_Q1_hetero(ivar, jvar, 2, 2, &nrows, &ncols);
               B0->prodVecMatInPlacePtr(&XCUR(icov, jvar, 0), rhsloc, false);
               delete B0;
+              B0 = nullptr;
             }
             else
             {
@@ -4116,6 +4120,7 @@ static int st_kriging_several_loop(int flag_crit,
           Bf = MatrixFactory::prodMatMat<MatrixSparse>(tAicov, B0);
           if (Bf == nullptr) goto label_end;
           delete B0;
+          B0 = nullptr;
         }
         else
         {
@@ -4133,6 +4138,7 @@ static int st_kriging_several_loop(int flag_crit,
             Bf = MatrixFactory::prodMatMat<MatrixSparse>(tAicov, B0);
             if (Bf == nullptr) goto label_end;
             delete B0;
+            B0 = nullptr;
           }
         }
 
@@ -4167,6 +4173,7 @@ static int st_kriging_several_loop(int flag_crit,
                 B0->prodVecMatInPlacePtr(&XCUR(jcov, jvar, 0), work.data(), false);
                 tAicov->prodVecMatInPlacePtr(work.data(), rhsloc, false);
                 delete B0;
+                B0 = nullptr;
                 signe = -1;
               }
               else if (icov == 0 && jcov > 0)
@@ -4189,6 +4196,7 @@ static int st_kriging_several_loop(int flag_crit,
           }
         }
         delete Bf;
+        Bf = nullptr;
       }
 
       if (flag_crit)
