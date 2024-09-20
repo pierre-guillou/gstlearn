@@ -93,7 +93,7 @@ void VectorHelper::dump(const String &title, const VectorDouble& vect)
   }
   sstr.precision(20);
   for (int i = 0, n = (int) vect.size(); i < n; i++)
-    sstr << std::fixed << vect[i] << std::endl;
+    sstr << std::fixed << vect[i] << '\n';
   messageFlush(sstr.str());
 }
 

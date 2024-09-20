@@ -253,7 +253,7 @@ String VectorT<T>::toString(const AStringFormat* strfmt) const
     if (i != n-1)
       sstr << " ";
   }
-  sstr << "]" << std::endl;
+  sstr << "]" << '\n';
   return sstr.str();
 }
 
