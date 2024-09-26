@@ -145,10 +145,10 @@ public:
   static VectorInt subtract(const VectorInt& veca, const VectorInt& vecb);
   static void subtractInPlace(VectorDouble &dest, const VectorDouble &src);
   static void subtractInPlace(VectorInt &dest, const VectorInt &src);
-  template<template<typename...> class Container>
-  static void subtractInPlace(const Container<Container<double>>& in1,
-                              const Container<Container<double>>& in2,
-                              Container<Container<double>>& outv)
+  template<typename ContainerContainer>
+  static void subtractInPlace(const ContainerContainer& in1,
+                              const ContainerContainer& in2,
+                              ContainerContainer& outv)
   {
     for (int is = 0, ns = (int)in1.size(); is < ns; is++)
     {
@@ -175,9 +175,9 @@ public:
   static void divideConstant(vect vec, double v);
   static void copy(const VectorDouble& vecin, VectorDouble& vecout, int size = -1);
   static void copy(const VectorInt &vecin, VectorInt &vecout, int size = -1);
-  template<template<typename...> class Container>
-  static void copy(const Container<Container<double>>& inv,
-                   Container<Container<double>>& outv)
+  template<typename ContainerContainer>
+  static void copy(const ContainerContainer& inv,
+                   ContainerContainer& outv)
   {
     for (int is = 0, ns = (int)inv.size(); is < ns; is++)
     {
@@ -212,9 +212,9 @@ public:
 
   static double innerProduct(const VectorDouble &veca, const VectorDouble &vecb, int size = -1);
   static double innerProduct(const double* veca, const double* vecb, int size);
-  template<template<typename...> class Container>
-  static double innerProduct(const Container<Container<double>>& veca,
-                             const Container<Container<double>>& vecb)
+  template<typename ContainerContainer>
+  static double innerProduct(const ContainerContainer& veca,
+                             const ContainerContainer& vecb)
   {
     double s = 0.;
     for (int i = 0, n = (int)veca.size(); i < n; i++)
@@ -298,13 +298,13 @@ public:
                                        double val2,
                                        const VectorDouble &vd2,
                                        VectorDouble &outv);
-  template<template<typename...> class Container>
+  template<typename ContainerContainer>
   static void
   linearCombinationVVDInPlace(double val1,
-                              const Container<Container<double>>& vvd1,
+                              const ContainerContainer& vvd1,
                               double val2,
-                              const Container<Container<double>>& vvd2,
-                              Container<Container<double>>& outv)
+                              const ContainerContainer& vvd2,
+                              ContainerContainer& outv)
   {
     if (vvd1.empty() || vvd2.empty()) return;
 
