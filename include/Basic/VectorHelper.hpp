@@ -51,8 +51,15 @@ public:
   static int minimum(const VectorInt &vec, bool flagAbs = false);
   static double maximum(const VectorDouble &vec, bool flagAbs = false, const VectorDouble& aux = VectorDouble(), int mode=0);
   static double minimum(const VectorDouble &vec, bool flagAbs = false, const VectorDouble& aux = VectorDouble(), int mode=0);
-  static double maximum(const VectorVectorDouble &vec, bool flagAbs = false);
-  static double maximum(const std::vector<std::vector<double>> &vec, bool flagAbs = false);
+  template<template<typename...> class Container>
+  static double maximum(const Container<Container<double>>& vec,
+                        bool flagAbs = false)
+  {
+    double val = maximum(vec[0]);
+    for (int i = 1, n = (int)vec.size(); i < n; i++)
+      val = MAX(val, maximum(vec[i], flagAbs));
+    return val;
+  }
 
   static double minimum(const VectorVectorDouble &vec, bool flagAbs = false);
   static int product(const VectorInt& vec);
@@ -69,7 +76,12 @@ public:
   static double mean(const VectorDouble &vec);
   static double variance(const VectorDouble &vec, bool scaleByN = false);
   static double stdv(const VectorDouble &vec, bool scaleByN = false);
-  static double norm(const VectorDouble &vec);
+  template<typename Container>
+  static double norm(const Container& vec)
+  {
+    double ip = innerProduct(vec, vec);
+    return sqrt(ip);
+  }
   static double normL1(const VectorDouble &vec);
   static double norminf(const VectorDouble &vec);
   static double median(const VectorDouble& vec);
@@ -133,9 +145,19 @@ public:
   static VectorInt subtract(const VectorInt& veca, const VectorInt& vecb);
   static void subtractInPlace(VectorDouble &dest, const VectorDouble &src);
   static void subtractInPlace(VectorInt &dest, const VectorInt &src);
-  static void subtractInPlace(const VectorVectorDouble &in1,
-                              const VectorVectorDouble &in2,
-                              VectorVectorDouble &outv);
+  template<template<typename...> class Container>
+  static void subtractInPlace(const Container<Container<double>>& in1,
+                              const Container<Container<double>>& in2,
+                              Container<Container<double>>& outv)
+  {
+    for (int is = 0, ns = (int)in1.size(); is < ns; is++)
+    {
+      for (int i = 0, n = (int)in1[is].size(); i < n; i++)
+      {
+        outv[is][i] = in2[is][i] - in1[is][i];
+      }
+    }
+  }
 
   static void multiplyInPlace(VectorDouble& vec, const VectorDouble& v);
   static void divideInPlace(VectorDouble& vec, const VectorDouble& v);
@@ -153,8 +175,18 @@ public:
   static void divideConstant(vect vec, double v);
   static void copy(const VectorDouble& vecin, VectorDouble& vecout, int size = -1);
   static void copy(const VectorInt &vecin, VectorInt &vecout, int size = -1);
-  static void copy(const VectorVectorDouble &inv, VectorVectorDouble &outv);
-  static void copy(const std::vector<std::vector<double>> &inv, std::vector<std::vector<double>> &outv);
+  template<template<typename...> class Container>
+  static void copy(const Container<Container<double>>& inv,
+                   Container<Container<double>>& outv)
+  {
+    for (int is = 0, ns = (int)inv.size(); is < ns; is++)
+    {
+      for (int i = 0, n = (int)inv[is].size(); i < n; i++)
+      {
+        outv[is][i] = inv[is][i];
+      }
+    }
+  }
 
   static void addConstant(VectorDouble& vec, double v);
   static void addConstant(VectorInt& vec, int v);
@@ -180,8 +212,15 @@ public:
 
   static double innerProduct(const VectorDouble &veca, const VectorDouble &vecb, int size = -1);
   static double innerProduct(const double* veca, const double* vecb, int size);
-  static double innerProduct(const VectorVectorDouble &x,
-                             const VectorVectorDouble &y);
+  template<template<typename...> class Container>
+  static double innerProduct(const Container<Container<double>>& veca,
+                             const Container<Container<double>>& vecb)
+  {
+    double s = 0.;
+    for (int i = 0, n = (int)veca.size(); i < n; i++)
+      s += innerProduct(veca[i], vecb[i]);
+    return s;
+  }
   static double innerProduct(const std::vector<double> &veca, const std::vector<double> &vecb, int size = -1);
   static void divideInPlace(std::vector<double> &vec, const std::vector<double> &v);
 
@@ -259,18 +298,27 @@ public:
                                        double val2,
                                        const VectorDouble &vd2,
                                        VectorDouble &outv);
-  static void linearCombinationVVDInPlace(double val1,
-                                          const VectorVectorDouble &vvd1,
-                                          double val2,
-                                          const VectorVectorDouble &vvd2,
-                                          VectorVectorDouble &outv);
-  static double innerProduct(const std::vector<std::vector<double>> &x,
-                             const std::vector<std::vector<double>> &y);
-  static void linearCombinationVVDInPlace(double val1,
-                                          const std::vector<std::vector<double>> &vvd1,
-                                          double val2,
-                                          const std::vector<std::vector<double>> &vvd2,
-                                          std::vector<std::vector<double>> &outv);
+  template<template<typename...> class Container>
+  static void
+  linearCombinationVVDInPlace(double val1,
+                              const Container<Container<double>>& vvd1,
+                              double val2,
+                              const Container<Container<double>>& vvd2,
+                              Container<Container<double>>& outv)
+  {
+    if (vvd1.empty() || vvd2.empty()) return;
+
+    for (int is = 0, ns = (int)vvd1.size(); is < ns; is++)
+    {
+      for (int i = 0, n = (int)vvd1[is].size(); i < n; i++)
+      {
+        double value = 0.;
+        if (val1 != 0. && !vvd1.empty()) value += val1 * vvd1[is][i];
+        if (val2 != 0. && !vvd2.empty()) value += val2 * vvd2[is][i];
+        outv[is][i] = value;
+      }
+    }
+  }
 
   static VectorDouble suppressTest(const VectorDouble& vecin);
   static void extractInPlace(const VectorDouble& vecin, VectorDouble& vecout, int start);
@@ -294,14 +342,10 @@ public:
   static int whereMinimum(const VectorDouble& tab);
   static int whereMaximum(const VectorDouble& tab);
   static int whereElement(const VectorInt& tab, int target);
-  static double norm(const std::vector<double> &vec);
 
   static VectorDouble reduceOne(const VectorDouble &vecin, int index);
   static VectorDouble reduce(const VectorDouble &vecin, const VectorInt& vindex);
   static VectorDouble compress(const VectorDouble &vecin, const VectorInt& vindex);
-  static void  substractInPlace(const std::vector<std::vector<double>> &in1,
-                                   const std::vector<std::vector<double>> &in2,
-                                   std::vector<std::vector<double>> &outv);
   static void truncateDecimalsInPlace(VectorDouble& vec, int ndec);
   static void truncateDigitsInPlace(VectorDouble& vec, int ndec);
   static void simulateGaussianInPlace(std::vector<double> &vec,

@@ -308,23 +308,6 @@ int VectorHelper::maximum(const VectorInt &vec, bool flagAbs)
   return (max);
 }
 
-double VectorHelper::maximum(const std::vector<std::vector<double>> &vec, bool flagAbs)
-{
-  double val = VH::maximum(vec[0]);
-  for (int i = 1, n = (int) vec.size(); i < n; i++)
-    val = MAX(val,  VH::maximum(vec[i], flagAbs));
-  return val;
-
-}
-
-double VectorHelper::maximum(const VectorVectorDouble& vect, bool flagAbs)
-{
-  double val = VH::maximum(vect[0]);
-  for (int i = 1, n = (int) vect.size(); i < n; i++)
-    val = MAX(val,  VH::maximum(vect[i], flagAbs));
-  return val;
-}
-
 int VectorHelper::minimum(const VectorInt &vec, bool flagAbs)
 {
   if (vec.size() <= 0) return 0;
@@ -630,18 +613,6 @@ double VectorHelper::stdv(const VectorDouble &vec, bool scaleByN)
   double var = variance(vec, scaleByN);
   if (!FFFF(var)) return (sqrt(var));
   return TEST;
-}
-
-double VectorHelper::norm(const VectorDouble &vec)
-{
-  double ip = innerProduct(vec, vec);
-  return sqrt(ip);
-}
-
-double VectorHelper::norm(const std::vector<double> &vec)
-{
-  double ip = innerProduct(vec, vec);
-  return sqrt(ip);
 }
 
 double VectorHelper::normL1(const VectorDouble &vec)
@@ -1456,32 +1427,6 @@ void VectorHelper::subtractInPlace(VectorInt &dest, const VectorInt &src)
   }
 }
 
-void VectorHelper::subtractInPlace(const VectorVectorDouble &in1,
-                                   const VectorVectorDouble &in2,
-                                   VectorVectorDouble &outv)
-{
-  for (int is = 0, ns = (int) in1.size(); is < ns; is++)
-  {
-    for (int i = 0, n = (int) in1[is].size(); i < n; i++)
-    {
-      outv[is][i] = in2[is][i] - in1[is][i];
-    }
-  }
-}
-
-void VectorHelper::substractInPlace(const std::vector<std::vector<double>> &in1,
-                                   const std::vector<std::vector<double>> &in2,
-                                   std::vector<std::vector<double>> &outv)
-{
-  for (int is = 0, ns = (int) in1.size(); is < ns; is++)
-  {
-    for (int i = 0, n = (int) in1[is].size(); i < n; i++)
-    {
-      outv[is][i] = in2[is][i] - in1[is][i];
-    }
-  }
-}
-
 void VectorHelper::multiplyInPlace(VectorDouble &vec, const VectorDouble &v)
 {
   if (vec.size() != v.size())
@@ -1644,26 +1589,6 @@ void VectorHelper::copy(const VectorInt &vecin, VectorInt &vecout, int size)
     (*itout) = (*itin);
     itin++;
     itout++;
-  }
-}
-void VectorHelper::copy(const std::vector<std::vector<double>> &inv, std::vector<std::vector<double>> &outv)
-{
-  for (int is = 0, ns = (int) inv.size(); is < ns; is++)
-  {
-    for (int i = 0, n = (int) inv[is].size(); i < n; i++)
-    {
-      outv[is][i] = inv[is][i];
-    }
-  }
-}
-void VectorHelper::copy(const VectorVectorDouble &inv, VectorVectorDouble &outv)
-{
-  for (int is = 0, ns = (int) inv.size(); is < ns; is++)
-  {
-    for (int i = 0, n = (int) inv[is].size(); i < n; i++)
-    {
-      outv[is][i] = inv[is][i];
-    }
   }
 }
 
@@ -2206,23 +2131,6 @@ double VectorHelper::innerProduct(const double* veca,
   return prod;
 }
 
-double VectorHelper::innerProduct(const std::vector<std::vector<double>> &x,
-                                  const std::vector<std::vector<double>> &y)
-{
-  double s = 0.;
-  for (int i = 0, n = (int) x.size(); i < n; i++)
-    s += VH::innerProduct(x[i], y[i]);
-  return s;
-}
-double VectorHelper::innerProduct(const VectorVectorDouble &x,
-                                  const VectorVectorDouble &y)
-{
-  double s = 0.;
-  for (int i = 0, n = (int) x.size(); i < n; i++)
-    s += VH::innerProduct(x[i], y[i]);
-  return s;
-}
-
 /**
  * Cross product (limited to 3D)
  * @param veca First vector
@@ -2353,45 +2261,6 @@ void VectorHelper::linearCombinationInPlace(double val1,
     if (val1 != 0. && !vd1.empty()) value += val1 * vd1[i];
     if (val2 != 0. && !vd2.empty()) value += val2 * vd2[i];
     outv[i] = value;
-  }
-}
-void VectorHelper::linearCombinationVVDInPlace(double val1,
-                                          const std::vector<std::vector<double>> &vvd1,
-                                          double val2,
-                                          const std::vector<std::vector<double>> &vvd2,
-                                          std::vector<std::vector<double>> &outv)
-{
-if (vvd1.empty() || vvd2.empty()) return;
-
-  for (int is = 0, ns = (int) vvd1.size(); is < ns; is++)
-  {
-    for (int i = 0, n = (int) vvd1[is].size(); i < n; i++)
-    {
-      double value = 0.;
-      if (val1 != 0. && ! vvd1.empty()) value += val1 * vvd1[is][i];
-      if (val2 != 0. && ! vvd2.empty()) value += val2 * vvd2[is][i];
-      outv[is][i] = value;
-    }
-  }
-
-}
-void VectorHelper::linearCombinationVVDInPlace(double val1,
-                                               const VectorVectorDouble &vvd1,
-                                               double val2,
-                                               const VectorVectorDouble &vvd2,
-                                               VectorVectorDouble &outv)
-{
-  if (vvd1.empty() || vvd2.empty()) return;
-
-  for (int is = 0, ns = (int) vvd1.size(); is < ns; is++)
-  {
-    for (int i = 0, n = (int) vvd1[is].size(); i < n; i++)
-    {
-      double value = 0.;
-      if (val1 != 0. && ! vvd1.empty()) value += val1 * vvd1[is][i];
-      if (val2 != 0. && ! vvd2.empty()) value += val2 * vvd2[is][i];
-      outv[is][i] = value;
-    }
   }
 }
 
