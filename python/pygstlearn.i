@@ -508,8 +508,9 @@
   int myres = SWIG_AsVal_std_string($input, &value);
   if (SWIG_IsOK(myres))
   {
-    // TODO: Memory leak
-    localNC = new NamingConvention(value);
+    static NamingConvention tmp;
+    tmp = NamingConvention{value};
+    localNC = &tmp;
   }
   else
   {
