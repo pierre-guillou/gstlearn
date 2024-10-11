@@ -104,8 +104,8 @@ public:
   VectorInt coordinateToIndices(const VectorDouble &coor,
                                 bool centered = false,
                                 double eps = EPSILON6) const;
-  int coordinateToIndicesInPlace(const VectorDouble &coor,
-                                 VectorInt &indice,
+  int coordinateToIndicesInPlace(const constvect coor,
+                                 std::span<int> indice,
                                  bool centered = false,
                                  double eps = EPSILON6) const;
   int coordinateToRank(const VectorDouble &coor,

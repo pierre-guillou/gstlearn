@@ -262,7 +262,7 @@ void Chebychev::_fillCoeffs(const std::function<double(double)>& f,double a, dou
 #ifndef SWIG
 void Chebychev::evalOp(MatrixSparse* S, const constvect x, vect y) const
 {
-  VectorDouble tm1, tm2, px, tx;
+  std::vector<double> tm1, tm2, px, tx;
   int nvertex;
   MatrixSparse *T1;
 

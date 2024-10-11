@@ -219,7 +219,7 @@ void AMatrixDense::setRow(int irow, const VectorDouble& tab, bool flagCheck)
   _eigenMatrix.row(irow) = tabm;
 }
 
-void AMatrixDense::setDiagonal(const VectorDouble& tab, bool flagCheck)
+void AMatrixDense::setDiagonal(const constvect tab, bool flagCheck)
 {
   if (flagCheck)
   {
@@ -369,10 +369,12 @@ void AMatrixDense::multiplyColumn(const VectorDouble& vec)
   _eigenMatrix = _eigenMatrix * vecm.asDiagonal();
 }
 
+static std::vector<double> temp;
+
 /*! Divide a Matrix row-wise */
 void AMatrixDense::divideRow(const VectorDouble& vec)
 {
-  VectorDouble temp = VH::inverse(vec);
+  VH::inverse(temp, vec);
   Eigen::Map<const Eigen::VectorXd> vecm(temp.data(), getNCols());
   _eigenMatrix = vecm.asDiagonal() * _eigenMatrix;
 }

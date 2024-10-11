@@ -90,18 +90,20 @@ int Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
   return 0;
 }
 
-int Rotation::setAngles(const VectorDouble& angles)
+static std::vector<double> local;
+
+int Rotation::setAngles(const constvect angles)
 {
   if (! angles.empty())
   {
     if (angles.size() > _nDim)
       my_throw("Wrong dimension number for 'angles' argument");
 
-    _angles = angles;
+    _angles = {angles.begin(), angles.end()};
     _angles.resize(_nDim,0.);
     if (_nDim == 2) _angles[1] = 0.;
 
-    VectorDouble local = VectorDouble(_nDim * _nDim);
+    local.resize(_nDim * _nDim);
     GH::rotationMatrixInPlace(_nDim, _angles, local);
     _rotMat.setValues(local);
     _directToInverse();
@@ -113,7 +115,7 @@ int Rotation::setAngles(const VectorDouble& angles)
 void Rotation::setIdentity()
 {
   for (int idim = 0; idim < (int) _nDim; idim++)
-    VH::fill(_angles,0.);
+    std::fill(_angles.begin(), _angles.end(), 0.);
   _rotMat.setIdentity();
   _rotInv.setIdentity();
   _checkRotForIdentity();
@@ -123,7 +125,7 @@ String Rotation::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
   if (!_flagRot) return sstr.str();
-  sstr << toVector("Rotation Angles        = ",_angles);
+  sstr << toVector("Rotation Angles        = ", constvect {_angles});
 
   AStringFormat sf;
   if (strfmt != nullptr) sf = *strfmt;

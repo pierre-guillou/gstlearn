@@ -73,7 +73,7 @@ public:
   /*! Set the contents of a Row */
   virtual void setRow(int irow, const VectorDouble& tab, bool flagCheck=true);
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab, bool flagCheck=true);
+  virtual void setDiagonal(const constvect tab, bool flagCheck=true);
   /*! Set the contents of the (main) Diagonal to a constant value */
   virtual void setDiagonalToConstant(double value = 1.);
   /*! Transpose the matrix in place*/
@@ -190,7 +190,7 @@ public:
   /*! Sets the matrix as Identity */
   void setIdentity(double value = 1.);
   void fillRandom(int seed = 432432, double zeroPercent = 0);
-  void setValues(const VectorDouble& values, bool byCol=true);
+  void setValues(const constvect values, bool byCol = true);
   double getMeanByColumn(int icol) const;
   double getMinimum() const;
   double getMaximum() const;
@@ -257,7 +257,7 @@ protected:
   bool _isColVectorConsistent(const VectorDouble& tab) const;
   bool _isVectorSizeConsistent(const VectorDouble& tab) const;
   bool _isColumnSizeConsistent(const VectorDouble &tab) const;
-  bool _isRowSizeConsistent(const VectorDouble &tab) const;
+  bool _isRowSizeConsistent(const constvect tab) const;
   bool _isRankValid(int rank) const;
   void _fillFromVVD(const VectorVectorDouble& X);
 

@@ -31,14 +31,14 @@ public:
   bool isRotated() const { return _flagRot; }
   const MatrixSquareGeneral& getMatrixDirect() const { return _rotMat; }
   const MatrixSquareGeneral& getMatrixInverse() const { return _rotInv; }
-  const VectorDouble& getAngles() const { return _angles; }
+  const std::vector<double>& getAngles() const { return _angles; }
   double getAngle(int idim) const { return _angles[idim]; }
 
   void resetFromSpaceDimension(unsigned int ndim);
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
   int setMatrixDirect(const MatrixSquareGeneral& rotmat);
   int setMatrixDirectVec(const VectorDouble& rotmat);
-  int setAngles(const VectorDouble& angles);
+  int setAngles(const constvect angles);
   void setIdentity();
   void rotateDirect(const VectorDouble& inv, VectorDouble& outv) const;
   void rotateInverse(const VectorDouble& inv, VectorDouble& outv) const;
@@ -64,7 +64,7 @@ private:
 private:
   unsigned int _nDim;
   bool _flagRot; // true if a Rotation is defined other than Identity
-  VectorDouble    _angles;
+  std::vector<double> _angles;
   MatrixSquareGeneral _rotMat;
   MatrixSquareGeneral _rotInv;
 };

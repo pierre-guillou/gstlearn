@@ -244,7 +244,7 @@ void MatrixSparse::setRow(int irow, const VectorDouble& tab, bool flagCheck)
   }
 }
 
-void MatrixSparse::setDiagonal(const VectorDouble& tab, bool flagCheck)
+void MatrixSparse::setDiagonal(const constvect tab, bool flagCheck)
 {
   if (! isSquare())
     my_throw("This function is only valid for Square matrices");
@@ -613,7 +613,7 @@ MatrixSparse* MatrixSparse::addMatMat(const MatrixSparse *x,
   return mat;
 }
 
-MatrixSparse* MatrixSparse::diagVec(const VectorDouble& vec, int opt_eigen)
+MatrixSparse* MatrixSparse::diagVec(const constvect vec, int opt_eigen)
 {
   int size = (int) vec.size();
   MatrixSparse *mat = new MatrixSparse(size, size, opt_eigen);
@@ -1633,12 +1633,6 @@ int MatrixSparse::_addToDest(const constvect inv, vect outv) const
   Eigen::Map<Eigen::VectorXd> outm(outv.data(), outv.size());
   outm += _eigenMatrix * inm;
   return 0;
-}
-
-void MatrixSparse::setDiagonal(const constvect tab)
-{
-  Eigen::Map<const Eigen::VectorXd> tabm(tab.data(),tab.size());
-  setDiagonal(tabm);
 }
 
 void MatrixSparse::setDiagonal(const Eigen::Map<const Eigen::VectorXd>& tab)

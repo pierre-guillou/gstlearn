@@ -114,7 +114,7 @@ void cs_force_dimension(cs *T, int nrow, int ncol)
 }
 
 /* Transform VectorDouble to cs diagonal */
-cs* cs_diag(VectorDouble diag, double tol)
+cs* cs_diag(constvect diag, double tol)
 {
   int number = (int) diag.size();
 

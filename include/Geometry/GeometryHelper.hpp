@@ -22,21 +22,19 @@ class GSTLEARN_EXPORT GeometryHelper
 public:
   static void rotationGetSinCos(double angle, double *cosa, double *sina);
 
-  static void rotationMatrixIdentityInPlace(int ndim, VectorDouble &rot);
-  static void rotation2DMatrixInPlace(double angle, VectorDouble &rot);
+  static void rotationMatrixIdentityInPlace(int ndim, const vect rot);
+  static void rotation2DMatrixInPlace(double angle, const vect rot);
   static void rotation3DMatrixInPlace(double alpha,
                                       double beta,
                                       double gamma,
-                                      VectorDouble &rot);
-  static void rotationMatrixInPlace(int ndim,
-                                    const VectorDouble &angles,
-                                    VectorDouble &rot);
+                                      const vect rot);
+  static void
+  rotationMatrixInPlace(int ndim, const constvect angles, const vect rot);
   static VectorDouble rotationMatrix(int ndim, const VectorDouble &angles);
   static void rotationGetAnglesInPlace(int ndim,
                                        const double *rot,
                                        double *angles);
-  static void rotationGetAnglesInPlace(const VectorDouble &rot,
-                                       VectorDouble &angles);
+  static void rotationGetAnglesInPlace(const VectorDouble& rot, vect angles);
   static void rotationCopy(int ndim, const double *rotin, double *rotout);
   static bool rotationIsIdentity(int ndim, const double *rot, double eps = EPSILON10);
   static MatrixSquareGeneral EulerToRotation(const VectorDouble &angles,

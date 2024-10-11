@@ -111,7 +111,7 @@ void GeometryHelper::rotationGetSinCos(double angle, double *cosa, double *sina)
  ** \param[out] rot       Rotation matrix
  **
  *****************************************************************************/
-void GeometryHelper::rotationMatrixIdentityInPlace(int ndim, VectorDouble &rot)
+void GeometryHelper::rotationMatrixIdentityInPlace(int ndim, const vect rot)
 {
   int i, j, ecr;
 
@@ -129,7 +129,7 @@ void GeometryHelper::rotationMatrixIdentityInPlace(int ndim, VectorDouble &rot)
  ** \param[out]  rot   Rotation matrix (Dimension = 4)
  **
  *****************************************************************************/
-void GeometryHelper::rotation2DMatrixInPlace(double angle, VectorDouble &rot)
+void GeometryHelper::rotation2DMatrixInPlace(double angle, const vect rot)
 {
   double ca, sa;
 
@@ -157,7 +157,7 @@ void GeometryHelper::rotation2DMatrixInPlace(double angle, VectorDouble &rot)
 void GeometryHelper::rotation3DMatrixInPlace(double alpha,
                                              double beta,
                                              double gamma,
-                                             VectorDouble &rot)
+                                             const vect rot)
 {
   double ca[3], sa[3];
 
@@ -191,8 +191,8 @@ void GeometryHelper::rotation3DMatrixInPlace(double alpha,
  **
  *****************************************************************************/
 void GeometryHelper::rotationMatrixInPlace(int ndim,
-                                           const VectorDouble &angles,
-                                           VectorDouble &rot)
+                                           const constvect angles,
+                                           const vect rot)
 {
   if (ndim == 2)
     GH::rotation2DMatrixInPlace(angles[0], rot);
@@ -243,8 +243,8 @@ void GeometryHelper::rotationCopy(int ndim, const double *rotin, double *rotout)
     rotout[i] = rotin[i];
 }
 
-void GeometryHelper::rotationGetAnglesInPlace(const VectorDouble &rot,
-                                              VectorDouble &angles)
+void GeometryHelper::rotationGetAnglesInPlace(const VectorDouble& rot,
+                                              vect angles)
 {
   int ndim = sqrt((int) rot.size());
   GH::rotationGetAnglesInPlace(ndim, rot.data(), angles.data());

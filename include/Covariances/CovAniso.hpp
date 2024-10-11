@@ -177,9 +177,9 @@ public:
   void setAnisoAngles(const VectorDouble& angles);
   void setAnisoAngle(int idim, double angle);
 
-  void setRotationAnglesAndRadius(const VectorDouble& angles = VectorDouble(),
-                                  const VectorDouble& ranges = VectorDouble(),
-                                  const VectorDouble& scales = VectorDouble());
+  void setRotationAnglesAndRadius(const constvect angles = {},
+                                  const constvect ranges = {},
+                                  const constvect scales = {});
 
   const MatrixSquareSymmetric& getSill() const { return _sill; }
   double getSill(int ivar, int jvar) const;
@@ -195,7 +195,7 @@ public:
   bool   getFlagRotation() const { return hasRotation(); }
   double getRange(int idim) const { return getRanges()[idim]; }
   double getScale(int idim) const { return getScales()[idim]; }
-  VectorDouble getAnisoAngles() const { return _aniso.getAngles(); }
+  const std::vector<double> &getAnisoAngles() const { return _aniso.getAngles(); }
   const MatrixSquareGeneral& getAnisoRotMat() const { return _aniso.getMatrixDirect(); }
   const MatrixSquareGeneral& getAnisoInvMat() const { return _aniso.getMatrixInverse(); }
   VectorDouble getAnisoCoeffs() const;

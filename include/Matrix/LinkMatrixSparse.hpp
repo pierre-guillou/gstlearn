@@ -99,7 +99,7 @@ GSTLEARN_EXPORT void    cs_print_file(const char *radix, int rank, const cs *A);
 GSTLEARN_EXPORT cs     *cs_compress(cs *A);
 
 GSTLEARN_EXPORT void    cs_force_dimension(cs *T, int nrow, int ncol);
-GSTLEARN_EXPORT cs*     cs_diag(VectorDouble diag, double tol = EPSILON10);
+GSTLEARN_EXPORT cs*     cs_diag(constvect diag, double tol = EPSILON10);
 
 GSTLEARN_EXPORT int     _cs_findColor(const cs *Q,
                                      int imesh,

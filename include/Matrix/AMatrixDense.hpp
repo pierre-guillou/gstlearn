@@ -74,7 +74,7 @@ public:
                       const VectorDouble &tab,
                       bool flagCheck = false) override;
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab, bool flagCheck = false) override;
+  virtual void setDiagonal(const constvect tab, bool flagCheck = false) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
   virtual void setDiagonalToConstant(double value = 1.) override;
   /*! Add a value to each matrix component */
@@ -165,7 +165,7 @@ private:
 #endif
 protected:
   bool _flagEigenDecompose;
-  VectorDouble         _eigenValues;  // Used only when ! flag_eigen()
+  std::vector<double> _eigenValues;   // Used only when ! flag_eigen()
   MatrixSquareGeneral* _eigenVectors; // Used only when ! flag_eigen()
 
 protected:
