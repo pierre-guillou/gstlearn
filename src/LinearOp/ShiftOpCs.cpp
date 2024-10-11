@@ -594,6 +594,8 @@ void ShiftOpCs::_updateHH(MatrixSquareSymmetric& hh, int imesh)
     }
 }
 
+static std::vector<double> diag;
+
 /**
  * Calculate HH matrix from parameters
  * Note that this function is also called in Stationary case...
@@ -610,7 +612,7 @@ void ShiftOpCs::_loadHHRegular(MatrixSquareSymmetric &hh, int imesh)
   // Calculate the current HH matrix (using local covariance parameters)
   const MatrixSquareGeneral &rotmat = _getCovAniso()->getAnisoInvMat();
 
-  VectorDouble diag = VH::power(_getCovAniso()->getScales(), 2.);
+  VH::power(diag, _getCovAniso()->getScales(), 2.);
   MatrixSquareSymmetric temp(ndim);
   temp.setDiagonal(diag);
   hh.normMatrix(rotmat, temp);

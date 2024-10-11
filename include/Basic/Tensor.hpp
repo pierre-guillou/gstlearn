@@ -38,10 +38,10 @@ public:
   void setRotationAngles(const VectorDouble& angles);
   void setRotationAngle(unsigned int idim, double angle);
 
-  void setRotationAnglesAndRadius(const VectorDouble& angles = VectorDouble(),
-                                  const VectorDouble& radius = VectorDouble());
+  void setRotationAnglesAndRadius(const constvect angles = {},
+                                  const constvect radius = {});
 
-  const VectorDouble&          getAngles()         const { return  _rotation.getAngles(); }
+  const std::vector<double>&   getAngles()         const { return  _rotation.getAngles(); }
   const MatrixSquareGeneral&   getTensorDirect()   const { return  _tensorDirect; }
   const MatrixSquareGeneral&   getTensorInverse()  const { return  _tensorInverse; }
   const MatrixSquareSymmetric& getTensorDirect2()  const { return  _tensorDirect2; }

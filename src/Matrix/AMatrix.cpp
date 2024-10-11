@@ -373,7 +373,7 @@ void AMatrix::fillRandom(int seed, double zeroPercent)
  * @param values
  * @param byCol true for Column major; false for Row Major
  */
-void AMatrix::setValues(const VectorDouble& values, bool byCol)
+void AMatrix::setValues(const constvect values, bool byCol)
 {
   if ((int) values.size() != size())
   {
@@ -895,7 +895,7 @@ bool AMatrix::_isColumnSizeConsistent(const VectorDouble &tab) const
   return true;
 }
 
-bool AMatrix::_isRowSizeConsistent(const VectorDouble &tab) const
+bool AMatrix::_isRowSizeConsistent(const constvect tab) const
 {
   int ncols = getNCols();
   if ((int) tab.size() != ncols)
@@ -1082,7 +1082,7 @@ VectorDouble AMatrix::getDiagonal(int shift) const
  * @param tab Input vector to be copied to the diagonal of the output matrix
  * @param flagCheck When True, check the input arguments
  */
-void AMatrix::setDiagonal(const VectorDouble& tab, bool flagCheck)
+void AMatrix::setDiagonal(const constvect tab, bool flagCheck)
 {
   int nrows = getNRows();
   if (! isSquare())

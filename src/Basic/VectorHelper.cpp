@@ -1607,7 +1607,7 @@ void VectorHelper::addMultiplyConstantInPlace(double val1,
   }
 }
 
-void VectorHelper::divideConstant(VectorDouble &vec, double v)
+void VectorHelper::divideConstant(vect vec, double v)
 {
   if (isZero(v))
   my_throw("division by 0");
@@ -1710,32 +1710,36 @@ void VectorHelper::mean1AndMean2ToStdev(const VectorDouble &mean1,
   }
 }
 
-VectorDouble VectorHelper::power(const VectorDouble &vec, double power)
+void VectorHelper::power(std::vector<double> &res, const constvect vec, double power)
 {
-  VectorDouble res(vec.size());
-  VectorDouble::iterator it(res.begin());
-  VectorDouble::const_iterator itv(vec.begin());
-  while (it < res.end())
+  res.resize(vec.size());
+  for (size_t i = 0; i < vec.size(); ++i)
   {
-    *it = pow(*itv, power);
-    it++;
-    itv++;
+    res[i] = pow(vec[i], power);
   }
+}
+
+VectorDouble VectorHelper::power(const constvect vec, double power)
+{
+  std::vector<double> res;
+  VectorHelper::power(res, vec, power);
   return res;
 }
 
-VectorDouble VectorHelper::inverse(const VectorDouble& vec)
+void VectorHelper::inverse(std::vector<double> &res, const constvect vec)
 {
-  VectorDouble inv(vec.size());
-  VectorDouble::iterator it(inv.begin());
-  VectorDouble::const_iterator itv(vec.begin());
-  while (it < inv.end())
+  res.resize(vec.size());
+  for (size_t i = 0; i < vec.size(); ++i)
   {
-    *it = 1. / *itv;
-    it++;
-    itv++;
+    res[i] = 1.0 / vec[i];
   }
-  return inv;
+}
+
+VectorDouble VectorHelper::inverse(const constvect vec)
+{
+  std::vector<double> res;
+  VectorHelper::inverse(res, vec);
+  return res;
 }
 
 int VectorHelper::countUndefined(const VectorDouble &vec)

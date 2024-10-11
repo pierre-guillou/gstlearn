@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
   message("Cloning Matrix of doubles\n");
   MatrixRectangular matd(2,3);
-  matd.setValues({1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
+  matd.setValues(std::vector{1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
   matd.display();
   AMatrix* pmat = &matd;
   MatrixRectangular* matd2(dynamic_cast<MatrixRectangular*>(pmat->clone())); // dynamic_cast cannot be avoided here

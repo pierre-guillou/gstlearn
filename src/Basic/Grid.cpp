@@ -583,8 +583,8 @@ VectorInt Grid::coordinateToIndices(const VectorDouble &coor,
  * @param eps      Epsilon to over-pass roundoff problem
  * @return Error return code
  */
-int Grid::coordinateToIndicesInPlace(const VectorDouble &coor,
-                                     VectorInt &indice,
+int Grid::coordinateToIndicesInPlace(const constvect coor,
+                                     std::span<int> indice,
                                      bool centered,
                                      double eps) const
 {

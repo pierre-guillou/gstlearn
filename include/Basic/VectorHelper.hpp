@@ -150,7 +150,7 @@ public:
   static void addMultiplyConstantInPlace(double val1,
                                          const VectorVectorDouble &in1,
                                          VectorVectorDouble &outv);
-  static void divideConstant(VectorDouble& vec, double v);
+  static void divideConstant(vect vec, double v);
   static void copy(const VectorDouble& vecin, VectorDouble& vecout, int size = -1);
   static void copy(const VectorInt &vecin, VectorInt &vecout, int size = -1);
   static void copy(const VectorVectorDouble &inv, VectorVectorDouble &outv);
@@ -173,8 +173,10 @@ public:
   static VectorDouble qnormVec(const VectorDouble& vec);
   static VectorDouble pnormVec(const VectorDouble& vec);
   static VectorDouble concatenate(const VectorDouble &veca, const VectorDouble &vecb);
-  static VectorDouble power(const VectorDouble& vec, double power);
-  static VectorDouble inverse(const VectorDouble& vec);
+  static void power(std::vector<double> &res, const constvect vec, double power);
+  static VectorDouble power(const constvect vec, double power);
+  static void inverse(std::vector<double> &res, const constvect vec);
+  static VectorDouble inverse(const constvect vec);
 
   static double innerProduct(const VectorDouble &veca, const VectorDouble &vecb, int size = -1);
   static double innerProduct(const double* veca, const double* vecb, int size);

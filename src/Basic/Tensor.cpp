@@ -163,7 +163,8 @@ void Tensor::setRotationAngle(unsigned int idim, double angle)
  * @param angles Vector of rotation angles (optional)
  * @param radius Vector of ranges (optional)
  */
-void Tensor::setRotationAnglesAndRadius(const VectorDouble& angles, const VectorDouble& radius)
+void Tensor::setRotationAnglesAndRadius(const constvect angles,
+                                        const constvect radius)
 {
   if (! angles.empty())
   {
@@ -181,7 +182,7 @@ void Tensor::setRotationAnglesAndRadius(const VectorDouble& angles, const Vector
        if (ABS(r) < EPSILON20)
          my_throw ("Radius cannot be null");
      }
-     _radius = radius;
+     _radius = {radius.begin(), radius.end()};
      _updateIsotropic();
 
   }

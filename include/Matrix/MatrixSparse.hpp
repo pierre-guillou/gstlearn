@@ -89,7 +89,7 @@ public:
                       const VectorDouble& tab,
                       bool flagCheck=true) override;
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab, bool flagCheck=true) override;
+  virtual void setDiagonal(const constvect tab, bool flagCheck=true) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
   virtual void setDiagonalToConstant(double value = 1.) override;
   /*! Transpose the matrix and return it as a copy*/
@@ -135,7 +135,7 @@ public:
                                  const MatrixSparse *y,
                                  double cx = 1.,
                                  double cy = 1.);
-  static MatrixSparse* diagVec(const VectorDouble& vec,
+  static MatrixSparse* diagVec(const constvect vec,
                                int opt_eigen = -1);
   static MatrixSparse* diagConstant(int number, double value = 1.,
                                     int opt_eigen = -1);
@@ -220,7 +220,6 @@ public:
 #ifndef SWIG
   public :
   void setDiagonal(const Eigen::Map<const Eigen::VectorXd>& tab);
-  void setDiagonal(const constvect tab);
 #endif
 protected:
   /// Interface for AMatrix

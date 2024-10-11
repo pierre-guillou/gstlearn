@@ -367,13 +367,13 @@ void CovAniso::setAnisoAngle(int idim, double angle)
   _aniso.setRotationAngle(idim, angle);
 }
 
-void CovAniso::setRotationAnglesAndRadius(const VectorDouble &angles,
-                                          const VectorDouble &ranges,
-                                          const VectorDouble &scales)
+void CovAniso::setRotationAnglesAndRadius(const constvect angles,
+                                          const constvect ranges,
+                                          const constvect scales)
 {
   if (!hasRange()) return;
 
-  VectorDouble scales_local;
+  std::vector<double> scales_local;
 
   if (! scales.empty())
   {
@@ -396,7 +396,7 @@ void CovAniso::setRotationAnglesAndRadius(const VectorDouble &angles,
         return;
       }
     }
-    scales_local = scales;
+    scales_local = {scales.begin(), scales.end()};
   }
 
   if (! ranges.empty())
@@ -413,7 +413,7 @@ void CovAniso::setRotationAnglesAndRadius(const VectorDouble &angles,
         messerr("The range in Space dimension (%d) should not be too small", i);
       }
     }
-    scales_local = ranges;
+    scales_local  = {ranges.begin(), ranges.end()};
     double scadef = _cova->getScadef();
     VH::divideConstant(scales_local, scadef);
   }
@@ -1864,11 +1864,11 @@ void CovAniso::updateCovByMesh(int imesh,bool aniso)
 
   if (!isNoStatForAnisotropy()) return;
 
-  VectorDouble angles;
-  VectorDouble scales;
-  VectorDouble ranges;
+  std::vector<double> angles;
+  std::vector<double> scales;
+  std::vector<double> ranges;
 
-    // Define the angles (for all space dimensions)
+  // Define the angles (for all space dimensions)
   if (getNAngles() > 0)
   {
     angles = getAnisoAngles();
