@@ -139,28 +139,18 @@ String Rotation::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-void Rotation::rotateDirect(const VectorDouble& inv, VectorDouble& outv) const
-{
-  this->rotateDirect(inv.getVector(), outv.getVector());
-}
-
-void Rotation::rotateDirect(const std::vector<double>& inv, std::vector<double>& outv) const
+void Rotation::rotateDirect(const constvect inv, std::vector<double>& outv) const
 {
   if (!_flagRot)
-    outv = inv;
+    outv = {inv.begin(), inv.end()};
   else
    _rotMat.prodMatVecInPlace(inv, outv, false);
 }
 
-void Rotation::rotateInverse(const VectorDouble& inv, VectorDouble& outv) const
-{
-  this->rotateInverse(inv.getVector(), outv.getVector());
-}
-
-void Rotation::rotateInverse(const std::vector<double>& inv, std::vector<double>& outv) const
+void Rotation::rotateInverse(const constvect inv, std::vector<double>& outv) const
 {
   if (!_flagRot)
-    outv = inv;
+    outv = {inv.begin(), inv.end()};
   else
     _rotInv.prodMatVecInPlace(inv, outv, false);
 }

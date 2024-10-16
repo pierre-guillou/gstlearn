@@ -811,12 +811,12 @@ int MeshETurbo::initFromCova(const CovAniso& cova,
   const Rotation& rot = cova.getAnisoRotation();
 
   // Project the corners of the grid
-  VectorDouble extendMinRot(ndim, TEST);
-  VectorDouble extendMaxRot(ndim, TEST);
-  VectorDouble cornerRot(ndim);
+  std::vector<double> extendMinRot(ndim, TEST);
+  std::vector<double> extendMaxRot(ndim, TEST);
+  std::vector<double> cornerRot(ndim);
   VectorInt ic(ndim,0);
   VectorVectorDouble extremesData;
-  VectorDouble cornerRef(ndim,0.);
+  std::vector<double> cornerRef(ndim,0.);
   const DbGrid* fieldGrid = nullptr;
   if (field->isGrid())
   {
@@ -865,9 +865,9 @@ int MeshETurbo::initFromCova(const CovAniso& cova,
   }
 
   // Calculating the Mesh of the Grid
-  VectorInt    nx(ndim);
-  VectorDouble dx(ndim);
-  VectorDouble x0(ndim);
+  std::vector<int>    nx(ndim);
+  std::vector<double> dx(ndim);
+  std::vector<double> x0(ndim);
 
   double dxmin = 1.e30;
   int nxmax = 300;

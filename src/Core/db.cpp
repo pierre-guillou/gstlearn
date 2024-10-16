@@ -323,8 +323,8 @@ int db_grid_define_coordinates(DbGrid *db)
   int ndim = db->getNDim();
   int nech = db->getSampleNumber();
   VectorInt ntab(ndim, 0);
-  VectorDouble coor(ndim);
-  VectorDouble cbis(ndim);
+  std::vector<double> coor(ndim);
+  std::vector<double> cbis(ndim);
 
   /* Fill the coordinates */
 
@@ -747,8 +747,8 @@ int point_to_point(Db *db, const double *coor)
 int point_to_grid(const DbGrid *db, const double *coor, int flag_outside, int *indg)
 {
   int ndim = db->getNDim();
-  VectorDouble work1(ndim);
-  VectorDouble work2(ndim);
+  std::vector<double> work1(ndim);
+  std::vector<double> work2(ndim);
 
   /* Check if all coordinates are defined */
 
@@ -813,8 +813,8 @@ int point_to_grid(const DbGrid *db, const double *coor, int flag_outside, int *i
 int point_to_bench(const DbGrid *db, double *coor, int flag_outside, int *indb)
 {
   int ndim = db->getNDim();
-  VectorDouble work1(ndim);
-  VectorDouble work2(ndim);
+  std::vector<double> work1(ndim);
+  std::vector<double> work2(ndim);
   int idim0 = 2;
   (*indb) = -1;
 
@@ -930,8 +930,8 @@ int index_point_to_grid(const Db *dbin,
 int point_inside_grid(Db *db, int iech, const DbGrid *dbgrid)
 {
   int ndim = db->getNDim();
-  VectorDouble work1(ndim);
-  VectorDouble work2(ndim);
+  std::vector<double> work1(ndim);
+  std::vector<double> work2(ndim);
 
   /* Process the grid rotation (if any) */
 
