@@ -40,12 +40,8 @@ public:
   int setMatrixDirectVec(const VectorDouble& rotmat);
   int setAngles(const constvect angles);
   void setIdentity();
-  void rotateDirect(const VectorDouble& inv, VectorDouble& outv) const;
-  void rotateInverse(const VectorDouble& inv, VectorDouble& outv) const;
-#ifndef SWIG
-  void rotateDirect(const std::vector<double>& inv, std::vector<double>& outv) const;
-  void rotateInverse(const std::vector<double>& inv, std::vector<double>& outv) const;
-#endif // SWIG
+  void rotateDirect(const constvect inv, std::vector<double>& outv) const;
+  void rotateInverse(const constvect inv, std::vector<double>& outv) const;
   bool isIdentity() const { return !_flagRot; }
   bool isSame(const Rotation& rot) const;
 

@@ -1163,7 +1163,7 @@ bool Grid::sampleBelongsToCell(constvect coor,
   if (_rotation.isRotated())
   {
     // Convert Grid Node center into Grid coordinates
-    VectorDouble _work3 = _work1;
+    std::vector<double> _work3 = _work1;
     for (int idim = 0; idim < _nDim; idim++)
       _work1[idim] = center[idim] - _x0[idim];
     _rotation.rotateInverse(_work1, _work3);
@@ -1232,7 +1232,7 @@ bool Grid::sampleBelongsToCell(const VectorDouble &coor,
 
   if (_rotation.isRotated())
   {
-    VectorDouble _work3 = _work1;
+    std::vector<double> _work3 = _work1;
     for (int idim = 0; idim < _nDim; idim++)
       _work1[idim] = center[idim] - _x0[idim];
     _rotation.rotateInverse(_work1, _work3);
