@@ -94,7 +94,7 @@ jobs:
     - name: Install R dependencies
       uses: r-lib/actions/setup-r-dependencies@v2
       with:
-        packages: roxygen2
+        packages: roxygen2, nloptr
         install-pandoc: false
 
     - name: Install the customized SWIG from source

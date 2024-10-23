@@ -65,7 +65,7 @@ jobs:
     - name: Install roxygen2
       uses: r-lib/actions/setup-r-dependencies@v2
       with:
-        packages: roxygen2, pkgbuild
+        packages: roxygen2, nloptr, pkgbuild
         install-pandoc: false
 
     - name: Install the customized SWIG from source
