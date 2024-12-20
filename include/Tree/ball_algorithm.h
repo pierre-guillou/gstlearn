@@ -29,6 +29,8 @@ License: BSD 3-clause
 
 #include <Basic/VectorNumT.hpp>
 
+struct t_btree;
+
 struct t_nheap
 {
   VectorVectorDouble distances;
@@ -38,6 +40,11 @@ struct t_nheap
 
   t_nheap() = default;
   t_nheap(int n_pts, int n_nbrs);
+
+  double largest(const int row) const;
+  int    push(int row, double val, int i_val);
+  void   sort();
+  void   load(t_btree &b, const VectorVectorDouble &x);
 };
 
 struct t_nodedata
@@ -85,12 +92,3 @@ struct t_btree
 
 double manhattan_distance(const double* x1, const double* x2, int size);
 double euclidean_distance(const double* x1, const double* x2, int size);
-
-/*
-** neighbors_heap.c
-*/
-
-double   nheap_largest(const t_nheap &h, const int row);
-int		 nheap_push(t_nheap &h, int row, double val, int i_val);
-void     nheap_sort(t_nheap &h);
-void     nheap_load(t_nheap &heap, t_btree &b, const VectorVectorDouble &x);

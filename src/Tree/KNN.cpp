@@ -70,8 +70,8 @@ t_nheap KNN::_query(t_btree &tree,
     return {};
   }
   t_nheap heap(n_samples, n_neigh);
-  nheap_load(heap, tree, x);
-  nheap_sort(heap);
+  heap.load(tree, x);
+  heap.sort();
 
   return heap;
 }

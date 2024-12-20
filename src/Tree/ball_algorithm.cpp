@@ -219,7 +219,7 @@ int t_btree::query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &
   int i1, i2;
 
   // case 1: query point is outside node radius: trim it from the query
-  if (dist > nheap_largest(heap, i_pt))
+  if (dist > heap.largest(i_pt))
   {
     ;
   }
@@ -229,8 +229,8 @@ int t_btree::query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &
     for (int i = node_info.idx_start; i < node_info.idx_end; i++)
     {
       dist_pt = st_distance_function(pt, this->data[this->idx_array[i]].data(), this->n_features);
-      if (dist_pt < nheap_largest(heap, i_pt))
-        nheap_push(heap, i_pt, dist_pt, this->idx_array[i]);
+      if (dist_pt < heap.largest(i_pt))
+        heap.push(i_pt, dist_pt, this->idx_array[i]);
     }
   }
   // case 3: Node is not a leaf, Recursively query sub-nodes starting with the

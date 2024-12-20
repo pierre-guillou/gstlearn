@@ -49,28 +49,28 @@ t_nheap::t_nheap(int n_pts, int n_nbrs) : n_pts{n_pts}, n_nbrs{n_nbrs}
     this->indices[i].resize(n_nbrs);
 }
 
-void nheap_load(t_nheap &heap, t_btree &b, const VectorVectorDouble &x)
+void t_nheap::load(t_btree &b, const VectorVectorDouble &x)
 {
   double dist;
-  for (int i = 0; i < heap.n_pts; i++)
+  for (int i = 0; i < this->n_pts; i++)
   {
     dist = b.min_dist(0, x[i].data());
-    b.query_depth_first(0, x[i].data(), i, heap, dist);
+    b.query_depth_first(0, x[i].data(), i, *this, dist);
   }
 }
 
-double nheap_largest(const t_nheap &h, const int row)
+double t_nheap::largest(const int row) const
 {
-  return h.distances[row][0];
+  return this->distances[row][0];
 }
 
-int nheap_push(t_nheap &h, int row, double val, int i_val)
+int t_nheap::push(int row, double val, int i_val)
 {
   int ic1, ic2, i_swap;
 
-  int size         = h.n_nbrs;
-  double* dist_arr = h.distances[row].data();
-  int* ind_arr     = h.indices[row].data();
+  int size         = this->n_nbrs;
+  double* dist_arr = this->distances[row].data();
+  int* ind_arr     = this->indices[row].data();
 
   // if distance is already greater than the furthest element, don't push
   if (val > dist_arr[0]) return (0);
@@ -169,8 +169,8 @@ void simultaneous_sort(double* dist, int* idx, int size)
   }
 }
 
-void nheap_sort(t_nheap &h)
+void t_nheap::sort()
 {
-  for (int row = 0; row < h.n_pts; row++)
-    simultaneous_sort(h.distances[row].data(), h.indices[row].data(), h.n_nbrs);
+  for (int row = 0; row < this->n_pts; row++)
+    simultaneous_sort(this->distances[row].data(), this->indices[row].data(), this->n_nbrs);
 }
