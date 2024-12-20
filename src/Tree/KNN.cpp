@@ -46,58 +46,54 @@ KNN::~KNN()
 {
 }
 
-t_nheap* KNN::_query(t_btree* tree,
-                     const double** x,
-                     int n_samples,
-                     int n_features,
-                     int n_neigh)
+t_nheap KNN::_query(t_btree &tree,
+                    const VectorVectorDouble &x,
+                    int n_samples,
+                    int n_features,
+                    int n_neigh)
 {
-  t_nheap* heap = nullptr;
 
-  if (n_features != tree->n_features)
+  if (n_features != tree.n_features)
   {
     messerr(
       "query data dimension (%d) must match training data dimension (%d).",
-      n_features, tree->n_features);
+      n_features, tree.n_features);
     _n_samples = -1;
-    return heap;
+    return {};
   }
-  if (tree->n_samples < n_neigh)
+  if (tree.n_samples < n_neigh)
   {
     messerr("'n_neigh' (%d) must be less than or equal to the number of "
             "training points (%d).",
-            n_neigh, tree->n_samples);
+            n_neigh, tree.n_samples);
     _n_samples = -1;
-    return heap;
+    return {};
   }
-  heap = nheap_init(n_samples, n_neigh);
+  t_nheap heap(n_samples, n_neigh);
   nheap_load(heap, tree, x);
   nheap_sort(heap);
 
   return heap;
 }
 
-int KNN::btree_query(t_btree* tree,
-                     const double** x,
+int KNN::btree_query(t_btree &tree,
+                     const VectorVectorDouble &x,
                      int n_samples,
                      int n_features,
                      int n_neigh)
 {
-  t_nheap* heap = _query(tree, x, n_samples, n_features, n_neigh);
-  if (heap == nullptr) return 1;
+  t_nheap heap = _query(tree, x, n_samples, n_features, n_neigh);
 
-  _distances = copy_double_toVVD((const double**)heap->distances, heap->n_pts,
-                                 heap->n_nbrs);
-  _indices = copy_int_toVVI((const int**)heap->indices, heap->n_pts, heap->n_nbrs);
-  _n_samples   = heap->n_pts;
-  _n_neighbors = heap->n_nbrs;
-  heap = nheap_free(heap);
+  _distances = heap.distances;
+  _indices = heap.indices;
+  _n_samples   = heap.n_pts;
+  _n_neighbors = heap.n_nbrs;
 
   return 0;
 }
 
-int KNN::btree_query_inPlace(t_btree* tree,
-                             const double** x,
+int KNN::btree_query_inPlace(t_btree &tree,
+                             const VectorVectorDouble &x,
                              int n_samples,
                              int n_features,
                              int n_neigh,
@@ -107,18 +103,14 @@ int KNN::btree_query_inPlace(t_btree* tree,
 {
   if (rank < 0 || rank >= n_samples) return 1;
 
-  t_nheap* heap = _query(tree, x, n_samples, n_features, n_neigh);
-  if (heap != nullptr)
+  t_nheap heap = _query(tree, x, n_samples, n_features, n_neigh);
+  int number   = heap.n_nbrs;
+  indices.resize(number);
+  distances.resize(number);
+  for (int j = 0; j < number; j++)
   {
-    int number = heap->n_nbrs;
-    indices.resize(number);
-    distances.resize(number);
-    for (int j = 0; j < number; j++)
-    {
-      indices[j]   = heap->indices[rank][j];
-      distances[j] = heap->distances[rank][j];
-    }
-    heap = nheap_free(heap);
+    indices[j]   = heap.indices[rank][j];
+    distances[j] = heap.distances[rank][j];
   }
   return 0;
 }

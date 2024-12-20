@@ -31,13 +31,13 @@ public:
   void setNNeighbors(int n_neighbors) { _n_neighbors = n_neighbors; }
   void setNSamples(int n_samples) { _n_samples = n_samples; }
 
-  int btree_query(t_btree* tree,
-                  const double** x,
+  int btree_query(t_btree &tree,
+                  const VectorVectorDouble &x,
                   int n_samples,
                   int n_features,
                   int n_neigh);
-  int btree_query_inPlace(t_btree* tree,
-                          const double** x,
+  int btree_query_inPlace(t_btree &tree,
+                          const VectorVectorDouble &x,
                           int n_samples,
                           int n_features,
                           int n_neigh,
@@ -50,11 +50,11 @@ public:
   double getDistance(int rank = 0, int ineigh = 0) const;
 
 private:
-  t_nheap* _query(t_btree* tree,
-                  const double** x,
-                  int n_samples,
-                  int n_features,
-                  int n_neigh);
+  t_nheap _query(t_btree &tree,
+                 const VectorVectorDouble &x,
+                 int n_samples,
+                 int n_features,
+                 int n_neigh);
 
 private:
   VectorVectorDouble _distances;

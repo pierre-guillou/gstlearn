@@ -37,58 +37,40 @@ void dual_swap(double* darr, int* iarr, int i1, int i2)
   iarr[i2]    = itmp;
 }
 
-t_nheap* nheap_init(int n_pts, int n_nbrs)
+t_nheap::t_nheap(int n_pts, int n_nbrs) : n_pts{n_pts}, n_nbrs{n_nbrs}
 {
-  t_nheap* h   = (t_nheap*)malloc(sizeof(t_nheap));
-  h->n_pts     = n_pts;
-  h->n_nbrs    = n_nbrs;
-  h->distances = (double**)malloc(sizeof(double*) * n_pts);
+  this->distances.resize(n_pts);
   for (int i = 0; i < n_pts; i++)
   {
-    h->distances[i] = (double*)malloc(sizeof(double) * n_nbrs);
-    for (int j = 0; j < n_nbrs; j++) h->distances[i][j] = INFINITY;
+    this->distances[i].resize(n_nbrs, INFINITY);
   }
-  h->indices = (int**)malloc(sizeof(int*) * n_pts);
+  this->indices.resize(n_pts);
   for (int i = 0; i < n_pts; i++)
-    h->indices[i] = (int*)calloc(n_nbrs, sizeof(int));
-  return (h);
+    this->indices[i].resize(n_nbrs);
 }
 
-t_nheap* nheap_free(t_nheap* heap)
-{
-  if (heap == nullptr) return heap;
-  int n_pts = heap->n_pts;
-  for (int i = 0; i < n_pts; i++) free(heap->distances[i]);
-  free(heap->distances);
-  for (int i = 0; i < n_pts; i++) free(heap->indices[i]);
-  free(heap->indices);
-  free(heap);
-  heap = nullptr;
-  return heap;
-}
-
-void nheap_load(t_nheap* heap, t_btree* b, const double** x)
+void nheap_load(t_nheap &heap, t_btree &b, const VectorVectorDouble &x)
 {
   double dist;
-  for (int i = 0; i < heap->n_pts; i++)
+  for (int i = 0; i < heap.n_pts; i++)
   {
-    dist = min_dist(b, 0, x[i]);
-    query_depth_first(b, 0, x[i], i, heap, dist);
+    dist = min_dist(b, 0, x[i].data());
+    query_depth_first(b, 0, x[i].data(), i, heap, dist);
   }
 }
 
-double nheap_largest(t_nheap* h, int row)
+double nheap_largest(const t_nheap &h, const int row)
 {
-  return h->distances[row][0];
+  return h.distances[row][0];
 }
 
-int nheap_push(t_nheap* h, int row, double val, int i_val)
+int nheap_push(t_nheap &h, int row, double val, int i_val)
 {
   int ic1, ic2, i_swap;
 
-  int size         = h->n_nbrs;
-  double* dist_arr = h->distances[row];
-  int* ind_arr     = h->indices[row];
+  int size         = h.n_nbrs;
+  double* dist_arr = h.distances[row].data();
+  int* ind_arr     = h.indices[row].data();
 
   // if distance is already greater than the furthest element, don't push
   if (val > dist_arr[0]) return (0);
@@ -99,7 +81,7 @@ int nheap_push(t_nheap* h, int row, double val, int i_val)
 
   // descend the heap, swapping values until the max heap criterion is met
   int i = 0;
-  while (TRUE)
+  while (true)
   {
     ic1 = 2 * i + 1;
     ic2 = ic1 + 1;
@@ -187,8 +169,8 @@ void simultaneous_sort(double* dist, int* idx, int size)
   }
 }
 
-void nheap_sort(t_nheap* h)
+void nheap_sort(t_nheap &h)
 {
-  for (int row = 0; row < h->n_pts; row++)
-    simultaneous_sort(h->distances[row], h->indices[row], h->n_nbrs);
+  for (int row = 0; row < h.n_pts; row++)
+    simultaneous_sort(h.distances[row].data(), h.indices[row].data(), h.n_nbrs);
 }
