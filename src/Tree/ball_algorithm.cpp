@@ -29,27 +29,26 @@ License: BSD 3-clause
 #include "Tree/KNN.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Space/SpacePoint.hpp"
 
 int t_btree::init_node(int i_node, int idx_start, int idx_end)
 {
   int n_features = this->n_features;
   int n_points = idx_end - idx_start;
-  double* centroid = this->node_bounds[i_node].data();
+  auto centroid = this->node_bounds[i_node].getCoordRef();
 
   for (int j = 0; j < n_features; j++)
     centroid[j] = 0.0;
 
   for (int i = idx_start; i < idx_end; i++)
     for (int j = 0; j < n_features; j++)
-      centroid[j] += this->data[this->idx_array[i]][j];
+      centroid[j] += this->data[this->idx_array[i]].getCoord(j);
 
   for (int j = 0; j < n_features; j++)
     centroid[j] /= n_points;
 
   double radius = 0.0;
   for (int i = idx_start; i < idx_end; i++)
-    radius = fmax(radius, euclidean_distance(centroid, this->data[this->idx_array[i]].data(), n_features));
+    radius = fmax(radius, this->node_bounds[i_node].getDistance(this->data[this->idx_array[i]]));
 
   this->node_data[i_node].radius = radius;
   this->node_data[i_node].idx_start = idx_start;
@@ -57,7 +56,7 @@ int t_btree::init_node(int i_node, int idx_start, int idx_end)
   return (0);
 }
 
-int find_node_split_dim(VectorVectorDouble &data, const std::vector<int> &node_indices, int n_features, int n_points)
+int find_node_split_dim(std::vector<SpacePoint> &data, const std::vector<int> &node_indices, int n_features, int n_points)
 {
 	double	min_val, max_val, val, spread;
 
@@ -65,11 +64,11 @@ int find_node_split_dim(VectorVectorDouble &data, const std::vector<int> &node_i
 	double max_spread = 0;
 	for (int j = 0; j < n_features; j++)
 	{
-		max_val = data[node_indices[0]][j];
+        max_val = data[node_indices[0]].getCoord(j);
 		min_val = max_val;
 		for (int i = 1; i < n_points; i++)
 		{
-			val = data[node_indices[i]][j];
+			val = data[node_indices[i]].getCoord(j);
 			max_val = fmax(max_val, val);
 			min_val = fmin(min_val, val);
 		}
@@ -83,7 +82,7 @@ int find_node_split_dim(VectorVectorDouble &data, const std::vector<int> &node_i
 	return (j_max);
 }
 
-int partition_node_indices(VectorVectorDouble &data, int *node_indices, int split_dim, int n_points, int split_index)
+int partition_node_indices(std::vector<SpacePoint> &data, int *node_indices, int split_dim, int n_points, int split_index)
 {
   int   midindex;
   double  d1, d2;
@@ -94,10 +93,10 @@ int partition_node_indices(VectorVectorDouble &data, int *node_indices, int spli
   while (true)
   {
     midindex = left;
-    for (int i = left; i < right; i++)
+    for(int i = left; i < right; i++)
     {
-      d1 = data[node_indices[i]][split_dim];
-      d2 = data[node_indices[right]][split_dim];
+      d1 = data[node_indices[i]].getCoord(split_dim);
+      d2 = data[node_indices[right]].getCoord(split_dim);
       if (d1 < d2)
       {
         std::swap(node_indices[i], node_indices[midindex]);
@@ -155,10 +154,9 @@ t_btree::t_btree(const VectorVectorDouble &data,
   this->data.resize(data[0].size());
   for (size_t i = 0; i < this->data.size(); ++i)
   {
-    this->data[i].resize(data.size());
     for (size_t j = 0; j < data.size(); ++j)
     {
-      this->data[i][j] = data[j][i];
+      this->data[i].setCoord(j, data[j][i]);
     }
   }
 	this->leaf_size = leaf_size;
@@ -180,20 +178,16 @@ t_btree::t_btree(const VectorVectorDouble &data,
 		this->idx_array[i] = i;
 	this->node_data.resize(this->n_nodes);
 	this->node_bounds.resize(this->n_nodes);
-	for (int i = 0; i < this->n_nodes; i++)
-	{
-      this->node_bounds[i].resize(this->n_features);
-	}
 	this->recursive_build(0, 0, this->n_samples);
 }
 
-double t_btree::min_dist(int i_node, const double *pt)
+double t_btree::min_dist(int i_node, const SpacePoint &pt)
 {
-  double dist_pt = euclidean_distance(pt, this->node_bounds[i_node].data(), this->n_features);
+  double dist_pt = pt.getDistance(this->node_bounds[i_node]);
   return (fmax(0.0, dist_pt - this->node_data[i_node].radius));
 }
 
-int t_btree::query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &heap, double dist)
+int t_btree::query_depth_first(int i_node, const SpacePoint &pt, int i_pt, t_nheap &heap, double dist)
 {
   t_nodedata node_info = this->node_data[i_node];
   double dist_pt, dist1, dist2;
@@ -209,7 +203,7 @@ int t_btree::query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &
   {
     for (int i = node_info.idx_start; i < node_info.idx_end; i++)
     {
-      dist_pt = euclidean_distance(pt, this->data[this->idx_array[i]].data(), this->n_features);
+      dist_pt = pt.getDistance(this->data[this->idx_array[i]]);
       if (dist_pt < heap.largest(i_pt))
         heap.push(i_pt, dist_pt, this->idx_array[i]);
     }
@@ -250,7 +244,7 @@ void t_btree::display(int level) const
   for (int i_node = 0; i_node < this->n_nodes; i_node++)
   {
     const t_nodedata* info = &this->node_data[i_node];
-    const auto &centroid = this->node_bounds[i_node];
+    const auto centroid = this->node_bounds[i_node].getCoords();
 
     message("Node #%3d/%3d - Indices [%5d; %5d[ - Radius = %lf",
             i_node, this->n_nodes, info->idx_start, info->idx_end, info->radius);
@@ -261,7 +255,7 @@ void t_btree::display(int level) const
 
     if (level > 0)
     {
-      VH::display("Centroid = ", centroid, 0);
+      VH::display("Centroid = ", VectorDouble{centroid.begin(), centroid.end()}, 0);
 
       if (level > 1 && info->is_leaf)
       {
@@ -272,39 +266,4 @@ void t_btree::display(int level) const
       }
     }
   }
-}
-
-/**
- * Returns the Manhattan distance between two points
- * @param x1 Vector of coordinates for the first point
- * @param x2 Vector of coordinates for the second point
- * @param size Number of coordinates
- * @return
- */
-double manhattan_distance(const double* x1, const double* x2, int size)
-{
-  double delta;
-  double d1 = 0.;
-  for (int i = 0; i < size; i++)
-  {
-    delta = fabs(x1[i] - x2[i]);
-    d1 += delta;
-  }
-  return (d1);
-}
-
-/**
- * Returns the Standard distance between two points
- * @param x1 Vector of coordinates for the first point
- * @param x2 Vector of coordinates for the second point
- * @param size Number of coordinates
- * @return
- */
-double euclidean_distance(const double* x1, const double* x2, int size)
-{
-  SpacePoint p1;
-  SpacePoint p2;
-  p1.setCoords(x1, size);
-  p2.setCoords(x2, size);
-  return p1.getDistance(p2);
 }

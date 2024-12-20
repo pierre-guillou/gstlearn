@@ -49,13 +49,13 @@ t_nheap::t_nheap(int n_pts, int n_nbrs) : n_pts{n_pts}, n_nbrs{n_nbrs}
     this->indices[i].resize(n_nbrs);
 }
 
-void t_nheap::load(t_btree &b, const VectorVectorDouble &x)
+void t_nheap::load(t_btree &b, const std::vector<SpacePoint> &x)
 {
   double dist;
   for (int i = 0; i < this->n_pts; i++)
   {
-    dist = b.min_dist(0, x[i].data());
-    b.query_depth_first(0, x[i].data(), i, *this, dist);
+    dist = b.min_dist(0, x[i]);
+    b.query_depth_first(0, x[i], i, *this, dist);
   }
 }
 

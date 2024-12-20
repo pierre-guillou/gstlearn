@@ -32,12 +32,12 @@ public:
   void setNSamples(int n_samples) { _n_samples = n_samples; }
 
   int btree_query(t_btree &tree,
-                  const VectorVectorDouble &x,
+                  const std::vector<SpacePoint> &x,
                   int n_samples,
                   int n_features,
                   int n_neigh);
   int btree_query_inPlace(t_btree &tree,
-                          const VectorVectorDouble &x,
+                          const std::vector<SpacePoint> &x,
                           int n_samples,
                           int n_features,
                           int n_neigh,
@@ -51,7 +51,7 @@ public:
 
 private:
   t_nheap _query(t_btree &tree,
-                 const VectorVectorDouble &x,
+                 const std::vector<SpacePoint> &x,
                  int n_samples,
                  int n_features,
                  int n_neigh);

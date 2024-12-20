@@ -34,12 +34,11 @@ public:
             int leaf_size                     = 10,
             bool useSel                       = false);
 
-  KNN query(const VectorVectorDouble &test,
+  KNN query(const std::vector<SpacePoint> &test,
             int n_samples,
             int n_features,
             int n_neighbors = 1);
-  KNN queryAsVVD(const VectorVectorDouble& test, int n_neighbors = 1);
-  KNN queryOneAsVD(const VectorDouble& test, int n_neighbors = 1);
+  KNN queryAsVVD(const std::vector<SpacePoint>& test, int n_neighbors = 1);
   KNN queryOneAsVDFromSP(const SpacePoint& Pt, int n_neighbors = 1);
   VectorInt getIndices(const SpacePoint& Pt, int n_neighbors = 1);
   int queryClosest(const VectorDouble& test);

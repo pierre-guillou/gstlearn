@@ -28,6 +28,7 @@ License: BSD 3-clause
 #pragma once
 
 #include <Basic/VectorNumT.hpp>
+#include <Space/SpacePoint.hpp>
 
 struct t_btree;
 
@@ -44,7 +45,7 @@ struct t_nheap
   double largest(const int row) const;
   int    push(int row, double val, int i_val);
   void   sort();
-  void   load(t_btree &b, const VectorVectorDouble &x);
+  void   load(t_btree &b, const std::vector<SpacePoint> &x);
 };
 
 struct t_nodedata
@@ -57,10 +58,10 @@ struct t_nodedata
 
 struct t_btree
 {
-  VectorVectorDouble data;
+  std::vector<SpacePoint> data;
   VectorInt idx_array;
   std::vector<t_nodedata> node_data;
-  VectorVectorDouble node_bounds;
+  std::vector<SpacePoint> node_bounds;
 
   int n_samples{};
   int n_features{};
@@ -78,13 +79,6 @@ struct t_btree
   void display(int level = -1) const;
   int init_node(int i_node, int idx_start, int idx_end);
   void recursive_build(int i_node, int idx_start, int idx_end);
-  double min_dist(int i_node, const double *pt);
-  int query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &heap, double dist);
+  double min_dist(int i_node, const SpacePoint &pt);
+  int query_depth_first(int i_node, const SpacePoint &pt, int i_pt, t_nheap &heap, double dist);
 };
-
-/*
-** metrics.c
-*/
-
-double manhattan_distance(const double* x1, const double* x2, int size);
-double euclidean_distance(const double* x1, const double* x2, int size);
