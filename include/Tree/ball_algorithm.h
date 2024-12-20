@@ -73,11 +73,7 @@ struct t_btree
   t_btree(const VectorVectorDouble &data,
           int n_samples,
           int n_features,
-          double (*dist_function)(const double* x1,
-                                  const double* x2,
-                                  int size),
-          int leaf_size,
-          int default_distance_function);
+          int leaf_size);
 
   void display(int level = -1) const;
   int init_node(int i_node, int idx_start, int idx_end);

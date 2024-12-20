@@ -15,46 +15,31 @@
 #include "Space/SpacePoint.hpp"
 
 Ball::Ball(const VectorVectorDouble& data,
-           double (*dist_function)(const double* x1,
-                                   const double* x2,
-                                   int size),
-           int leaf_size,
-           int default_distance_function)
+           int leaf_size)
 {
   int n_samples     = (int)data[0].size();
   int n_features    = (int)data.size();
-  _tree = t_btree(data, n_samples, n_features,
-                  dist_function, leaf_size, default_distance_function);
+  _tree = t_btree(data, n_samples, n_features, leaf_size);
 }
 
 Ball::Ball(const Db* db,
-           double (*dist_function)(const double* x1,
-                                   const double* x2,
-                                   int size),
            int leaf_size,
-           int default_distance_function,
            bool useSel)
 {
   VectorVectorDouble data = db->getAllCoordinates(useSel);
   int n_samples           = (int)data[0].size();
   int n_features          = (int)data.size();
-  _tree = t_btree(data, n_samples, n_features,
-                     dist_function, leaf_size, default_distance_function);
+  _tree = t_btree(data, n_samples, n_features, leaf_size);
 }
 
 void Ball::init(const Db* db,
-                double (*dist_function)(const double* x1,
-                                        const double* x2,
-                                        int size),
                 int leaf_size,
-                int default_distance_function,
                 bool useSel)
 {
   VectorVectorDouble data = db->getAllCoordinates(useSel);
   int n_samples           = (int)data[0].size();
   int n_features          = (int)data.size();
-    _tree = t_btree(data, n_samples, n_features,
-                     dist_function, leaf_size, default_distance_function);
+    _tree = t_btree(data, n_samples, n_features, leaf_size);
 }
 
 Ball::~Ball()

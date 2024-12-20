@@ -1899,7 +1899,7 @@ int CalcMigrate::_expandPointToPointBall(Db *db1,
   // Establish the ball tree (on the grid)
 
   int leaf_size = 30;
-  Ball ball(db1, nullptr, leaf_size);
+  Ball ball(db1, leaf_size);
 
   // Loop on the sample points
 

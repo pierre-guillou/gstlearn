@@ -86,9 +86,6 @@ public:
   void setRankColCok(const VectorInt& rankColCok) { _rankColCok = rankColCok; }
 
   void setBallSearch(bool status, int leaf_size = 10);
-  void attachBall(double (*dist_function)(const double* x1,
-                                          const double* x2,
-                                          int size) = nullptr);
 
 protected:
   bool _isNbghMemoEmpty() const { return _nbghMemo.empty(); }

@@ -31,8 +31,6 @@ License: BSD 3-clause
 #include "Basic/VectorHelper.hpp"
 #include "Space/SpacePoint.hpp"
 
-static double (*st_distance_function)(const double*, const double*, int) = euclidean_distance;
-
 int t_btree::init_node(int i_node, int idx_start, int idx_end)
 {
   int n_features = this->n_features;
@@ -51,7 +49,7 @@ int t_btree::init_node(int i_node, int idx_start, int idx_end)
 
   double radius = 0.0;
   for (int i = idx_start; i < idx_end; i++)
-    radius = fmax(radius, st_distance_function(centroid, this->data[this->idx_array[i]].data(), n_features));
+    radius = fmax(radius, euclidean_distance(centroid, this->data[this->idx_array[i]].data(), n_features));
 
   this->node_data[i_node].radius = radius;
   this->node_data[i_node].idx_start = idx_start;
@@ -149,32 +147,10 @@ void t_btree::recursive_build(int i_node, int idx_start, int idx_end)
 	}
 }
 
-void define_dist_function(double (*dist_function)(const double* x1,
-                                                  const double* x2,
-                                                  int size),
-                          int default_distance_function)
-{
-  if (dist_function != nullptr)
-  {
-    st_distance_function = dist_function;
-  }
-  else
-  {
-    if (default_distance_function == 1)
-      st_distance_function = euclidean_distance;
-    if (default_distance_function == 2)
-      st_distance_function = manhattan_distance;
-  }
-}
-
 t_btree::t_btree(const VectorVectorDouble &data,
                  int n_samples,
                  int n_features,
-                 double (*dist_function)(const double* x1,
-                                         const double* x2,
-                                         int size),
-                 int leaf_size,
-                 int default_distance_function)
+                 int leaf_size)
 {
     this->data = data;
 	this->leaf_size = leaf_size;
@@ -184,9 +160,6 @@ t_btree::t_btree(const VectorVectorDouble &data,
 		messerr("leaf_size must be greater than or equal to 1\n");
 		return;
 	}
-
-  // Define the relevant distance function
-  define_dist_function(dist_function, default_distance_function);
 
 	this->n_samples = n_samples;
 	this->n_features = n_features;
@@ -208,7 +181,7 @@ t_btree::t_btree(const VectorVectorDouble &data,
 
 double t_btree::min_dist(int i_node, const double *pt)
 {
-  double dist_pt = st_distance_function(pt, this->node_bounds[i_node].data(), this->n_features);
+  double dist_pt = euclidean_distance(pt, this->node_bounds[i_node].data(), this->n_features);
   return (fmax(0.0, dist_pt - this->node_data[i_node].radius));
 }
 
@@ -228,7 +201,7 @@ int t_btree::query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &
   {
     for (int i = node_info.idx_start; i < node_info.idx_end; i++)
     {
-      dist_pt = st_distance_function(pt, this->data[this->idx_array[i]].data(), this->n_features);
+      dist_pt = euclidean_distance(pt, this->data[this->idx_array[i]].data(), this->n_features);
       if (dist_pt < heap.largest(i_pt))
         heap.push(i_pt, dist_pt, this->idx_array[i]);
     }

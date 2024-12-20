@@ -22,28 +22,16 @@ class GSTLEARN_EXPORT Ball
 {
 public:
   Ball(const VectorVectorDouble& data = {},
-       double (*dist_function)(const double* x1,
-                               const double* x2,
-                               int size) = nullptr,
-       int leaf_size                     = 10,
-       int default_distance_function     = 1);
+       int leaf_size                     = 10);
   Ball(const Db* db,
-       double (*dist_function)(const double* x1,
-                               const double* x2,
-                               int size) = nullptr,
        int leaf_size                     = 10,
-       int default_distance_function     = 1,
        bool useSel                       = false);
   Ball(const Ball& p)            = delete;
   Ball& operator=(const Ball& p) = delete;
   virtual ~Ball();
 
   void init(const Db* db,
-            double (*dist_function)(const double* x1,
-                                    const double* x2,
-                                    int size) = nullptr,
             int leaf_size                     = 10,
-            int default_distance_function     = 1,
             bool useSel                       = false);
 
   KNN query(const VectorVectorDouble &test,
