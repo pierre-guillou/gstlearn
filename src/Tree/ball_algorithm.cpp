@@ -152,7 +152,15 @@ t_btree::t_btree(const VectorVectorDouble &data,
                  int n_features,
                  int leaf_size)
 {
-    this->data = data;
+  this->data.resize(data[0].size());
+  for (size_t i = 0; i < this->data.size(); ++i)
+  {
+    this->data[i].resize(data.size());
+    for (size_t j = 0; j < data.size(); ++j)
+    {
+      this->data[i][j] = data[j][i];
+    }
+  }
 	this->leaf_size = leaf_size;
 	
 	if (leaf_size < 1)
