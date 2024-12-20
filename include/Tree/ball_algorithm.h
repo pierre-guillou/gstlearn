@@ -27,7 +27,6 @@ License: BSD 3-clause
 
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include <Basic/VectorNumT.hpp>
 
 struct t_nheap
@@ -74,6 +73,10 @@ struct t_btree
           int default_distance_function);
 
   void display(int level = -1) const;
+  int init_node(int i_node, int idx_start, int idx_end);
+  void recursive_build(int i_node, int idx_start, int idx_end);
+  double min_dist(int i_node, const double *pt);
+  int query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &heap, double dist);
 };
 
 /*
@@ -91,5 +94,3 @@ double   nheap_largest(const t_nheap &h, const int row);
 int		 nheap_push(t_nheap &h, int row, double val, int i_val);
 void     nheap_sort(t_nheap &h);
 void     nheap_load(t_nheap &heap, t_btree &b, const VectorVectorDouble &x);
-double   min_dist(t_btree &tree, int i_node, const double *pt);
-int      query_depth_first(t_btree &b, int i_node, const double *pt, int i_pt, t_nheap &heap, double dist);

@@ -54,8 +54,8 @@ void nheap_load(t_nheap &heap, t_btree &b, const VectorVectorDouble &x)
   double dist;
   for (int i = 0; i < heap.n_pts; i++)
   {
-    dist = min_dist(b, 0, x[i].data());
-    query_depth_first(b, 0, x[i].data(), i, heap, dist);
+    dist = b.min_dist(0, x[i].data());
+    b.query_depth_first(0, x[i].data(), i, heap, dist);
   }
 }
 

@@ -33,29 +33,29 @@ License: BSD 3-clause
 
 static double (*st_distance_function)(const double*, const double*, int) = euclidean_distance;
 
-int init_node(t_btree &b, int i_node, int idx_start, int idx_end)
+int t_btree::init_node(int i_node, int idx_start, int idx_end)
 {
-  int n_features = b.n_features;
+  int n_features = this->n_features;
   int n_points = idx_end - idx_start;
-  double* centroid = b.node_bounds[i_node].data();
+  double* centroid = this->node_bounds[i_node].data();
 
   for (int j = 0; j < n_features; j++)
     centroid[j] = 0.0;
 
   for (int i = idx_start; i < idx_end; i++)
     for (int j = 0; j < n_features; j++)
-      centroid[j] += b.data[b.idx_array[i]][j];
+      centroid[j] += this->data[this->idx_array[i]][j];
 
   for (int j = 0; j < n_features; j++)
     centroid[j] /= n_points;
 
   double radius = 0.0;
   for (int i = idx_start; i < idx_end; i++)
-    radius = fmax(radius, st_distance_function(centroid, b.data[b.idx_array[i]].data(), n_features));
+    radius = fmax(radius, st_distance_function(centroid, this->data[this->idx_array[i]].data(), n_features));
 
-  b.node_data[i_node].radius = radius;
-  b.node_data[i_node].idx_start = idx_start;
-  b.node_data[i_node].idx_end = idx_end;
+  this->node_data[i_node].radius = radius;
+  this->node_data[i_node].idx_start = idx_start;
+  this->node_data[i_node].idx_end = idx_end;
   return (0);
 }
 
@@ -118,34 +118,34 @@ int partition_node_indices(VectorVectorDouble &data, int *node_indices, int spli
   return (0);
 }
 
-void recursive_build(t_btree &b, int i_node, int idx_start, int idx_end)
+void t_btree::recursive_build(int i_node, int idx_start, int idx_end)
 {
 	int	imax;
-	int n_features = b.n_features;
+	int n_features = this->n_features;
 	int n_points = idx_end - idx_start;
 	int n_mid = n_points / 2;
 
 	//initialize the node data
-	init_node(b, i_node, idx_start, idx_end);
+	this->init_node(i_node, idx_start, idx_end);
 
-	if (2 * i_node + 1 >= b.n_nodes)
+	if (2 * i_node + 1 >= this->n_nodes)
 	{
-		b.node_data[i_node].is_leaf = true;
-		if (idx_end - idx_start > 2 * b.leaf_size)
+		this->node_data[i_node].is_leaf = true;
+		if (idx_end - idx_start > 2 * this->leaf_size)
 			messerr("Memory layout is flawed: not enough nodes allocated");
 	}
 	else if (idx_end - idx_start < 2)
 	{
 		messerr("Memory layout is flawed: too many nodes allocated");
-		b.node_data[i_node].is_leaf = true;
+		this->node_data[i_node].is_leaf = true;
 	}
 	else
 	{
-		b.node_data[i_node].is_leaf = false;
-		imax = find_node_split_dim(b.data, b.idx_array, n_features, n_points);
-		partition_node_indices(b.data, &b.idx_array[idx_start], imax, n_points, n_mid);
-		recursive_build(b, 2 * i_node + 1, idx_start, idx_start + n_mid);
-		recursive_build(b, 2 * i_node + 2, idx_start + n_mid, idx_end);
+		this->node_data[i_node].is_leaf = false;
+		imax = find_node_split_dim(this->data, this->idx_array, n_features, n_points);
+		partition_node_indices(this->data, &this->idx_array[idx_start], imax, n_points, n_mid);
+		this->recursive_build(2 * i_node + 1, idx_start, idx_start + n_mid);
+		this->recursive_build(2 * i_node + 2, idx_start + n_mid, idx_end);
 	}
 }
 
@@ -203,18 +203,18 @@ t_btree::t_btree(const VectorVectorDouble &data,
 	{
       this->node_bounds[i].resize(this->n_features);
 	}
-	recursive_build(*this, 0, 0, this->n_samples);
+	this->recursive_build(0, 0, this->n_samples);
 }
 
-double min_dist(t_btree &tree, int i_node, const double *pt)
+double t_btree::min_dist(int i_node, const double *pt)
 {
-  double dist_pt = st_distance_function(pt, tree.node_bounds[i_node].data(), tree.n_features);
-  return (fmax(0.0, dist_pt - tree.node_data[i_node].radius));
+  double dist_pt = st_distance_function(pt, this->node_bounds[i_node].data(), this->n_features);
+  return (fmax(0.0, dist_pt - this->node_data[i_node].radius));
 }
 
-int query_depth_first(t_btree &b, int i_node, const double *pt, int i_pt, t_nheap &heap, double dist)
+int t_btree::query_depth_first(int i_node, const double *pt, int i_pt, t_nheap &heap, double dist)
 {
-  t_nodedata node_info = b.node_data[i_node];
+  t_nodedata node_info = this->node_data[i_node];
   double dist_pt, dist1, dist2;
   int i1, i2;
 
@@ -228,9 +228,9 @@ int query_depth_first(t_btree &b, int i_node, const double *pt, int i_pt, t_nhea
   {
     for (int i = node_info.idx_start; i < node_info.idx_end; i++)
     {
-      dist_pt = st_distance_function(pt, b.data[b.idx_array[i]].data(), b.n_features);
+      dist_pt = st_distance_function(pt, this->data[this->idx_array[i]].data(), this->n_features);
       if (dist_pt < nheap_largest(heap, i_pt))
-        nheap_push(heap, i_pt, dist_pt, b.idx_array[i]);
+        nheap_push(heap, i_pt, dist_pt, this->idx_array[i]);
     }
   }
   // case 3: Node is not a leaf, Recursively query sub-nodes starting with the
@@ -239,17 +239,17 @@ int query_depth_first(t_btree &b, int i_node, const double *pt, int i_pt, t_nhea
   {
     i1    = 2 * i_node + 1;
     i2    = i1 + 1;
-    dist1 = min_dist(b, i1, pt); // implement min_rdist
-    dist2 = min_dist(b, i2, pt);
+    dist1 = this->min_dist(i1, pt); // implement min_rdist
+    dist2 = this->min_dist(i2, pt);
     if (dist1 <= dist2)
     {
-      query_depth_first(b, i1, pt, i_pt, heap, dist1);
-      query_depth_first(b, i2, pt, i_pt, heap, dist2);
+      this->query_depth_first(i1, pt, i_pt, heap, dist1);
+      this->query_depth_first(i2, pt, i_pt, heap, dist2);
     }
     else
     {
-      query_depth_first(b, i2, pt, i_pt, heap, dist2);
-      query_depth_first(b, i1, pt, i_pt, heap, dist1);
+      this->query_depth_first(i2, pt, i_pt, heap, dist2);
+      this->query_depth_first(i1, pt, i_pt, heap, dist1);
     }
   }
   return (0);
