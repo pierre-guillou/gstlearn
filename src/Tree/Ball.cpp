@@ -17,7 +17,7 @@
 Ball::Ball(const VectorVectorDouble& data,
            int leaf_size)
 {
-  int n_samples     = (int)data[0].size();
+  int n_samples     = data.empty() ? 0 : (int)data[0].size();
   int n_features    = (int)data.size();
   _tree = t_btree(data, n_samples, n_features, leaf_size);
 }
