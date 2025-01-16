@@ -113,6 +113,9 @@ if (USE_HDF5)
   # TODO : If HDF5 not found, fetch it from the web ?
 endif()
 
+find_package(PkgConfig)
+pkg_check_modules(netcdf-cxx4 REQUIRED netcdf-cxx4)
+
 # Shared and Static libraries
 add_library(shared                  SHARED ${SOURCES})
 add_library(static EXCLUDE_FROM_ALL STATIC ${SOURCES})
@@ -185,6 +188,10 @@ foreach(FLAVOR ${FLAVORS})
     target_link_libraries(${FLAVOR} PUBLIC hdf5::hdf5_cpp)
   endif()
   
+  # Link to NetCDF4
+  target_include_directories(${FLAVOR} SYSTEM PUBLIC ${netcdf-cxx4_INCLUDE_DIRS})
+  target_link_libraries(${FLAVOR} PUBLIC ${netcdf-cxx4_LINK_LIBRARIES})
+
   # Exclude [L]GPL features from Eigen
   #target_compile_definitions(${FLAVOR} PUBLIC EIGEN_MPL2_ONLY) 
 
