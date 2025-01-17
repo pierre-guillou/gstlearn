@@ -25,6 +25,10 @@
 #include "Calculators/CalcMigrate.hpp"
 #include "Space/SpaceTarget.hpp"
 
+#include <ncFile.h>
+#include <ncDim.h>
+#include <ncVar.h>
+
 #include <algorithm>
 #include <math.h>
 
@@ -802,6 +806,34 @@ bool DbGrid::_serialize(std::ostream& os, bool verbose) const
   /* Writing the tail of the file */
 
   ret && Db::_serialize(os, verbose);
+
+  return ret;
+}
+
+bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
+{
+  bool ret = true;
+
+  /* Writing the header */
+  auto db = grp.addGroup("DbGrid");
+
+  auto grch = db.addGroup("Grid characteristics");
+  auto sp   = grch.addDim("Space Dimension", getNDim());
+
+  /* Writing the grid characteristics */
+
+  auto nx = grch.addVar("NX", netCDF::NcType::nc_INT, sp);
+  nx.putVar(getNXs().data());
+  auto x0 = grch.addVar("X0", netCDF::NcType::nc_FLOAT, sp);
+  x0.putVar(getX0s().data());
+  auto dx = grch.addVar("DX", netCDF::NcType::nc_FLOAT, sp);
+  dx.putVar(getDXs().data());
+  auto ag = grch.addVar("ANGLE", netCDF::NcType::nc_FLOAT, sp);
+  ag.putVar(getAngles().data());
+
+  /* Writing the tail of the file */
+
+  ret&& Db::_serializeNC(db, verbose);
 
   return ret;
 }

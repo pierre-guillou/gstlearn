@@ -13,6 +13,8 @@
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
 
+#include <ncFile.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -88,6 +90,22 @@ bool ASerializable::dumpToNF(const String& neutralFilename, bool verbose) const
     }
     os.close();
   }
+  return ret;
+}
+
+bool ASerializable::dumpToNC(const String& netCDFFilename, bool verbose) const
+{
+  bool ret = true;
+  netCDF::NcFile file {netCDFFilename, netCDF::NcFile::FileMode::replace};
+
+  {
+    ret = _serializeNC(file, verbose);
+    if (!ret)
+    {
+      messerr("Problem writing in the netCDF File.");
+    }
+  }
+
   return ret;
 }
 

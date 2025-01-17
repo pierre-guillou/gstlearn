@@ -22,6 +22,11 @@
 #include <stdarg.h>
 #include <fstream>
 
+namespace netCDF
+{
+  class NcGroup;
+}
+
 class GSTLEARN_EXPORT ASerializable
 {
 public:
@@ -33,6 +38,7 @@ public:
   bool deserialize(std::istream& is, bool verbose = true);
   bool serialize(std::ostream& os,bool verbose = true) const;
   bool dumpToNF(const String& neutralFilename, bool verbose = false) const;
+  bool dumpToNC(const String& netCDFFilename, bool verbose = false) const;
 
   static String buildFileName(int status, const String& filename, bool ensureDirExist = false);
 
@@ -57,6 +63,12 @@ public:
 protected:
   virtual bool _deserialize(std::istream& is, bool verbose = false) = 0;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const = 0;
+  virtual bool _serializeNC([[maybe_unused]] netCDF::NcGroup& grp,
+                            [[maybe_unused]] bool verbose = false) const
+  {
+    // TODO virtual pure
+    return false;
+  }
   virtual String _getNFName() const = 0;
 
   bool _fileOpenWrite(const String& filename,

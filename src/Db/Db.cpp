@@ -35,6 +35,10 @@
 #include "Space/SpaceTarget.hpp"
 #include "Core/CSV.hpp"
 
+#include <ncFile.h>
+#include <ncDim.h>
+#include <ncVar.h>
+
 #include <math.h>
 #include <stdio.h>
 
@@ -4565,6 +4569,25 @@ bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
     ret = ret && _recordWriteVec<double>(os, "", vals);
   }
   return ret;
+}
+
+bool Db::_serializeNC(netCDF::NcGroup& grp, bool /*verbose*/) const
+{
+  auto db = grp.addGroup("Db");
+  auto dim = db.addDim("dim", getSampleNumber());
+
+  int ncol              = getColumnNumber();
+  VectorString locators = getLocators(true);
+  VectorString names    = getName("*");
+
+  for (int i = 0; i < ncol; ++i)
+  {
+    auto var = db.addVar(names[i], netCDF::NcType::nc_DOUBLE, dim);
+    var.putAtt("Locators", locators[i]);
+    var.putVar(getColumnByColIdx(i).data());
+  }
+
+  return true;
 }
 
 bool Db::_deserialize(std::istream& is, bool /*verbose*/)
