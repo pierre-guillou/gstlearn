@@ -815,7 +815,7 @@ bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
   bool ret = true;
 
   /* Writing the header */
-  auto db = grp.addGroup("DbGrid");
+  auto db = grp.addGroup(_getNFName());
 
   auto grch = db.addGroup("Grid characteristics");
   auto sp   = grch.addDim("Space Dimension", getNDim());

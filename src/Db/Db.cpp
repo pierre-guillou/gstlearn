@@ -4573,7 +4573,7 @@ bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
 
 bool Db::_serializeNC(netCDF::NcGroup& grp, bool /*verbose*/) const
 {
-  auto db = grp.addGroup("Db");
+  auto db = grp.addGroup(_getNFName());
   auto dim = db.addDim("dim", getSampleNumber());
 
   int ncol              = getColumnNumber();
