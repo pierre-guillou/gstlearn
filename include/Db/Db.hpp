@@ -889,6 +889,7 @@ public:
 protected:
   /// Interface for ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
+  bool _deserializeNC(netCDF::NcGroup& grp, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os,bool verbose = false) const override;
   bool _serializeNC(netCDF::NcGroup& grp, bool verbose = false) const override;
   String _getNFName() const override { return "Db"; }

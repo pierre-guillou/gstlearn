@@ -62,6 +62,12 @@ public:
 
 protected:
   virtual bool _deserialize(std::istream& is, bool verbose = false) = 0;
+  virtual bool _deserializeNC([[maybe_unused]] netCDF::NcGroup& grp,
+                              [[maybe_unused]] bool verbose = false)
+  {
+    // TODO virtual pure
+    return false;
+  }
   virtual bool _serialize(std::ostream& os, bool verbose = false) const = 0;
   virtual bool _serializeNC([[maybe_unused]] netCDF::NcGroup& grp,
                             [[maybe_unused]] bool verbose = false) const

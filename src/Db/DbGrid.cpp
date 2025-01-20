@@ -783,6 +783,47 @@ bool DbGrid::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
+bool DbGrid::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
+{
+  VectorInt nx;
+  VectorString locators;
+  VectorString names;
+  VectorDouble x0;
+  VectorDouble dx;
+  VectorDouble angles;
+  VectorDouble values;
+  VectorDouble allvalues;
+
+  /* Initializations */
+  auto db = grp.getGroup(_getNFName());
+  auto grch = db.getGroup("Grid characteristics");
+
+  auto sp = grch.getDim("Space Dimension");
+  const auto ndim = sp.getSize();
+  bool ret = true;
+
+  /* Core allocation */
+
+  nx.resize(ndim);
+  dx.resize(ndim);
+  x0.resize(ndim);
+  angles.resize(ndim);
+
+  /* Read the grid characteristics */
+
+  grch.getVar("NX").getVar(nx.data());
+  grch.getVar("X0").getVar(x0.data());
+  grch.getVar("DX").getVar(dx.data());
+  grch.getVar("ANGLE").getVar(angles.data());
+
+  // Create the Grid characteristics
+  (void) gridDefine(nx, dx, x0, angles);
+
+  ret && Db::_deserializeNC(db, verbose);
+
+  return ret;
+}
+
 bool DbGrid::_serialize(std::ostream& os, bool verbose) const
 {
   bool ret = true;
@@ -871,6 +912,20 @@ DbGrid* DbGrid::createFromNF(const String& neutralFilename, bool verbose)
     success = dbgrid->deserialize(is, verbose);
   }
   if (! success)
+  {
+    delete dbgrid;
+    dbgrid = nullptr;
+  }
+  return dbgrid;
+}
+
+DbGrid* DbGrid::createFromNC(const String& netCDFFilename, bool verbose)
+{
+  auto* dbgrid = new DbGrid;
+  netCDF::NcFile file {netCDFFilename, netCDF::NcFile::FileMode::read};
+
+  bool success = dbgrid->_deserializeNC(file, verbose);
+  if (!success)
   {
     delete dbgrid;
     dbgrid = nullptr;

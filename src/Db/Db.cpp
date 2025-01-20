@@ -4645,6 +4645,63 @@ bool Db::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
+bool Db::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
+{
+  VectorString locators;
+  VectorString names;
+
+  // Read the file
+  auto db = grp.getGroup(_getNFName());
+
+  const auto dim  = db.getDim("dim");
+  const auto nech = dim.getSize();
+  const auto ncol = db.getVarCount();
+
+  bool ret = true;
+  if (ncol > 0)
+  {
+    locators.resize(ncol);
+    db.getVar("Locators").getVar(locators.data());
+    names.resize(ncol);
+    db.getVar("Names").getVar(names.data());
+  }
+
+  VectorDouble allvalues(nech * ncol);
+  for (int i = 0; i < ncol; ++i)
+  {
+    db.getVar(names[i]).getVar(&allvalues[i * nech]);
+  }
+
+  if (ret)
+  {
+    // Decode the locators
+    std::vector<ELoc> tabloc;
+    VectorInt tabnum;
+    int inum = 0, mult = 0;
+    ELoc iloc;
+    for (const auto& loc: locators)
+    {
+      if (locatorIdentify(loc, &iloc, &inum, &mult) != 0) return true;
+      tabloc.push_back(iloc);
+      tabnum.push_back(inum);
+    }
+
+    // Initialize the Db
+    resetDims(ncol, nech);
+
+    // Load the values
+    _loadData(ELoadBy::SAMPLE, false, allvalues);
+
+    // Update the column names and locators
+    for (int i = 0; i < ncol; i++)
+    {
+      setNameByUID(i, names[i]);
+      setLocatorByUID(i, tabloc[i], tabnum[i]);
+    }
+  }
+  return ret;
+}
+
 void Db::_loadData(const ELoadBy& order,
                    bool flagAddSampleRank,
                    const VectorDouble& tab)
