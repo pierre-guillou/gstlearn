@@ -4573,15 +4573,21 @@ bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
 
 bool Db::_serializeNC(netCDF::NcGroup& grp, bool /*verbose*/) const
 {
-  auto db = grp.addGroup(_getNFName());
+  auto db = grp.addGroup("Db");
   auto dim = db.addDim("dim", getSampleNumber());
 
   int ncol              = getColumnNumber();
   VectorString locators = getLocators(true);
   VectorString names    = getName("*");
 
+  auto colsdim = db.addDim("Columns", ncol);
+  auto locsVar = db.addVar("Locators", netCDF::NcType::nc_STRING, colsdim);
+  auto namesVar = db.addVar("Names", netCDF::NcType::nc_STRING, colsdim);
+
   for (int i = 0; i < ncol; ++i)
   {
+    locsVar.putVar({static_cast<size_t>(i)}, locators[i]);
+    namesVar.putVar({static_cast<size_t>(i)}, names[i]);
     auto var = db.addVar(names[i], netCDF::NcType::nc_DOUBLE, dim);
     var.putAtt("Locators", locators[i]);
     var.putVar(getColumnByColIdx(i).data());
@@ -4651,7 +4657,7 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
   VectorString names;
 
   // Read the file
-  auto db = grp.getGroup(_getNFName());
+  auto db = grp.getGroup("Db");
 
   const auto dim  = db.getDim("dim");
   const auto nech = dim.getSize();

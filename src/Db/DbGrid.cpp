@@ -795,7 +795,7 @@ bool DbGrid::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
   VectorDouble allvalues;
 
   /* Initializations */
-  auto db = grp.getGroup(_getNFName());
+  auto db = grp.getGroup("DbGrid");
   auto grch = db.getGroup("Grid characteristics");
 
   auto sp = grch.getDim("Space Dimension");
@@ -856,7 +856,7 @@ bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
   bool ret = true;
 
   /* Writing the header */
-  auto db = grp.addGroup(_getNFName());
+  auto db = grp.addGroup("DbGrid");
 
   auto grch = db.addGroup("Grid characteristics");
   auto sp   = grch.addDim("Space Dimension", getNDim());
