@@ -4574,20 +4574,16 @@ bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
 bool Db::_serializeNC(netCDF::NcGroup& grp, bool /*verbose*/) const
 {
   auto db = grp.addGroup("Db");
-  auto dim = db.addDim("dim", getSampleNumber());
+  auto dim = db.addDim("dim", getNSample());
 
-  int ncol              = getColumnNumber();
+  int ncol              = getNColumn();
   VectorString locators = getLocators(true);
   VectorString names    = getName("*");
 
   auto colsdim = db.addDim("Columns", ncol);
-  auto locsVar = db.addVar("Locators", netCDF::NcType::nc_STRING, colsdim);
-  auto namesVar = db.addVar("Names", netCDF::NcType::nc_STRING, colsdim);
 
   for (int i = 0; i < ncol; ++i)
   {
-    locsVar.putVar({static_cast<size_t>(i)}, locators[i]);
-    namesVar.putVar({static_cast<size_t>(i)}, names[i]);
     auto var = db.addVar(names[i], netCDF::NcType::nc_DOUBLE, dim);
     var.putAtt("Locators", locators[i]);
     var.putVar(getColumnByColIdx(i).data());
@@ -4667,15 +4663,21 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
   if (ncol > 0)
   {
     locators.resize(ncol);
-    db.getVar("Locators").getVar(locators.data());
     names.resize(ncol);
-    db.getVar("Names").getVar(names.data());
   }
 
-  VectorDouble allvalues(nech * ncol);
-  for (int i = 0; i < ncol; ++i)
+  // Initialize the Db
+  resetDims(ncol, nech);
+
+  auto map = db.getVars();
+  size_t i {};
+  for (const auto& p: map)
   {
-    db.getVar(names[i]).getVar(&allvalues[i * nech]);
+    names[i]       = p.first;
+    const auto att = p.second.getAtt("Locators");
+    att.getValues(locators[i]);
+    db.getVar(p.first).getVar(&_array[_getAddress(0, i)]);
+    i++;
   }
 
   if (ret)
@@ -4691,12 +4693,6 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
       tabloc.push_back(iloc);
       tabnum.push_back(inum);
     }
-
-    // Initialize the Db
-    resetDims(ncol, nech);
-
-    // Load the values
-    _loadData(ELoadBy::SAMPLE, false, allvalues);
 
     // Update the column names and locators
     for (int i = 0; i < ncol; i++)
