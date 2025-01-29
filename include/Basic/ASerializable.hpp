@@ -66,6 +66,7 @@ protected:
                               [[maybe_unused]] bool verbose = false)
   {
     // TODO virtual pure
+    messerr("Not implemented yet");
     return false;
   }
   virtual bool _serialize(std::ostream& os, bool verbose = false) const = 0;
@@ -73,6 +74,7 @@ protected:
                             [[maybe_unused]] bool verbose = false) const
   {
     // TODO virtual pure
+    messerr("Not implemented yet");
     return false;
   }
   virtual String _getNFName() const = 0;
