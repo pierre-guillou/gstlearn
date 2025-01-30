@@ -11,6 +11,7 @@
 #include "Basic/ASerializable.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/SerializeNetCDF.hpp"
+#include "Basic/SerializeNeutralFile.hpp"
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
 
@@ -80,7 +81,7 @@ bool ASerializable::dumpToNF(const String& neutralFilename, bool verbose) const
 {
   std::ofstream os;
   bool ret = true;
-  if (_fileOpenWrite(neutralFilename, os, true))
+  if (SerializeNeutralFile::_fileOpenWrite(*this, neutralFilename, os, true))
   {
     ret = _serialize(os, verbose);
     if (! ret)
@@ -108,61 +109,19 @@ bool ASerializable::_fileOpenWrite(const String& filename,
                                    std::ofstream& os,
                                    bool verbose) const
 {
-  // Close the stream if opened
-  if (os.is_open()) os.close();
-  // Build the multi-platform filename
-  String filepath = buildFileName(2, filename, true);
-  // Open new stream
-  os.open(filepath, std::ios::out | std::ios::trunc);
-  if (!os.is_open())
-  {
-    if (verbose) messerr("Error while opening %s", filepath.c_str());
-    return false;
-  }
-  // Write the file type (class name)
-  os << _getNFName() << std::endl;
-  return os.good();
+  return SerializeNeutralFile::_fileOpenWrite(*this, filename, os, verbose);
 }
 
 bool ASerializable::_fileOpenRead(const String& filename,
                                   std::ifstream& is,
                                   bool verbose) const
 {
-  // Close the stream if opened
-  if (is.is_open()) is.close();
-  // Build the multi-platform filename
-  String filepath = buildFileName(1, filename, true);
-  // Open new stream
-  is.open(filepath, std::ios::in);
-  if (!is.is_open())
-  {
-    if (verbose) messerr("Error while opening %s", filepath.c_str());
-    return false;
-  }
-  // Read and check the file type (class name)
-  String type;
-  is >> type;
-  if (type != _getNFName())
-  {
-    if (verbose)
-      messerr("The file %s has the wrong type (read: %s, expected: %s)",
-              filepath.c_str(), type.c_str(), _getNFName().c_str());
-    is.close();
-    return false;
-  }
-  return is.good(); // Cannot be "end of file" already
+  return SerializeNeutralFile::_fileOpenRead(*this, filename, is,verbose);
 }
 
 bool ASerializable::_commentWrite(std::ostream& os, const String& comment)
 {
-  if (os.good())
-  {
-    if (comment.empty())
-      os << std::endl;
-    else
-      os << "# " << comment << std::endl;
-  }
-  return os.good();
+  return SerializeNeutralFile::_commentWrite(os, comment);
 }
 
 bool ASerializable::_tableWrite(std::ostream& os,
@@ -170,11 +129,7 @@ bool ASerializable::_tableWrite(std::ostream& os,
                                 int ntab,
                                 const VectorDouble& tab)
 {
-  bool ret = true;
-  VectorDouble loctab(ntab);
-  for (int i = 0; i < ntab; i++) loctab[i] = tab[i];
-  ret = ret && _recordWriteVec<double>(os, string, loctab);
-  return ret;
+  return SerializeNeutralFile::_tableWrite(os, string, ntab, tab);
 }
 
 bool ASerializable::_tableRead(std::istream &is,
@@ -182,22 +137,7 @@ bool ASerializable::_tableRead(std::istream &is,
                                int ntab,
                                double *tab)
 {
-  bool ret = true;
-  VectorDouble loctab(ntab);
-  ret = ret && _recordReadVec<double>(is, string, loctab, ntab);
-  if (!ret) return 1;
-  for (int i = 0; i < ntab; i++) tab[i] = loctab[i];
-  return ret;
-}
-
-bool ASerializable::_onlyBlanks(char *string)
-{
-  int number = static_cast<int>(strlen(string));
-  for (int i = 0; i < number; i++)
-  {
-    if (string[i] != ' ') return false;
-  }
-  return true;
+  return SerializeNeutralFile::_tableRead(is, string, ntab, tab);
 }
 
 /**
