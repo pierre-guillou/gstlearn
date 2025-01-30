@@ -94,7 +94,7 @@ bool ASerializable::dumpToNF(const String& neutralFilename, bool verbose) const
 
 bool ASerializable::dumpToNC(const String& netCDFFilename, bool verbose) const
 {
-  auto file = SerializeNetCDF::createFileWrite(netCDFFilename);
+  auto file = SerializeNetCDF::_fileOpenWrite(netCDFFilename);
   bool ret  = _serializeNC(file, verbose);
   if (!ret)
   {

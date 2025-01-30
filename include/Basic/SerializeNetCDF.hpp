@@ -40,11 +40,11 @@ namespace SerializeNetCDF
     return netCDF::NcType::nc_STRING;
   }
 
-  inline netCDF::NcFile createFileRead(const String& fname)
+  inline netCDF::NcFile _fileOpenRead(const String& fname)
   {
     return netCDF::NcFile {fname, netCDF::NcFile::FileMode::read};
   }
-  inline netCDF::NcFile createFileWrite(const String& fname)
+  inline netCDF::NcFile _fileOpenWrite(const String& fname)
   {
     return netCDF::NcFile {fname, netCDF::NcFile::FileMode::replace};
   }

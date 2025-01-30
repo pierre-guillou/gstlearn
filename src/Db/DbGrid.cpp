@@ -898,7 +898,7 @@ DbGrid* DbGrid::createFromNF(const String& neutralFilename, bool verbose)
 DbGrid* DbGrid::createFromNC(const String& netCDFFilename, bool verbose)
 {
   auto* dbgrid = new DbGrid;
-  auto file = SerializeNetCDF::createFileRead(netCDFFilename);
+  auto file = SerializeNetCDF::_fileOpenRead(netCDFFilename);
 
   bool success = dbgrid->_deserializeNC(file, verbose);
   if (!success)
