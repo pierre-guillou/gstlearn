@@ -1,0 +1,183 @@
+/******************************************************************************/
+/*                                                                            */
+/*                            gstlearn C++ Library                            */
+/*                                                                            */
+/* Copyright (c) (2025) MINES Paris / ARMINES                                 */
+/* Authors: gstlearn Team                                                     */
+/* Website: https://gstlearn.org                                              */
+/* License: BSD 3-clause                                                      */
+/*                                                                            */
+/******************************************************************************/
+#pragma once
+
+#include "geoslib_define.h"
+
+#include "Basic/AStringable.hpp"
+#include "Basic/VectorT.hpp"
+
+#include <ncDim.h>
+#include <ncFile.h>
+#include <ncGroup.h>
+#include <ncType.h>
+#include <ncVar.h>
+
+namespace SerializeNetCDF
+{
+  inline netCDF::NcType getNetCDFType([[maybe_unused]] const int a)
+  {
+    return netCDF::NcType::nc_INT;
+  }
+  inline netCDF::NcType getNetCDFType([[maybe_unused]] const double a)
+  {
+    return netCDF::NcType::nc_DOUBLE;
+  }
+  inline netCDF::NcType getNetCDFType([[maybe_unused]] const long a)
+  {
+    return netCDF::NcType::nc_INT64;
+  }
+  inline netCDF::NcType getNetCDFType([[maybe_unused]] const std::string& a)
+  {
+    return netCDF::NcType::nc_STRING;
+  }
+
+  inline netCDF::NcFile createFileRead(const String& fname)
+  {
+    return netCDF::NcFile {fname, netCDF::NcFile::FileMode::read};
+  }
+  inline netCDF::NcFile createFileWrite(const String& fname)
+  {
+    return netCDF::NcFile {fname, netCDF::NcFile::FileMode::replace};
+  }
+
+  template<typename T>
+  bool _readVec(const netCDF::NcGroup& grp, const String& title, VectorT<T>& vec);
+  template<>
+  inline bool
+  _readVec(const netCDF::NcGroup& grp, const String& title, VectorString& vec);
+
+  template<typename T>
+  bool _writeVec(netCDF::NcGroup& grp,
+                 const String& title,
+                 const VectorT<T>& vec,
+                 const netCDF::NcDim& dim);
+  template<>
+  inline bool _writeVec(netCDF::NcGroup& grp,
+                        const String& title,
+                        const VectorString& vec,
+                        const netCDF::NcDim& dim);
+}; // namespace SerializeNetCDF
+
+template<typename T>
+bool SerializeNetCDF::_readVec(const netCDF::NcGroup& grp,
+                               const String& title,
+                               VectorT<T>& vec)
+{
+  const auto var = grp.getVar(title);
+  if (var.isNull())
+  {
+    messerr("Cannot read NetCDF Variable of name %s in group %s", title.c_str(),
+            grp.getName().c_str());
+    return false;
+  }
+
+  // Assume variable is of dim 1
+  if (var.getDimCount() != 1)
+  {
+    messerr("NetCDF Variable of name %s in group %s has %ul dims, but we expect only 1",
+            title.c_str(), grp.getName().c_str(), var.getDimCount());
+    return false;
+  }
+
+  const auto dim = var.getDim(0);
+  vec.resize(dim.getSize());
+
+  var.getVar(vec.data());
+
+  return true;
+}
+
+template<>
+bool SerializeNetCDF::_readVec(const netCDF::NcGroup& grp,
+                               const String& title,
+                               VectorString& vec)
+{
+  const auto var = grp.getVar(title);
+  if (var.isNull())
+  {
+    messerr("Cannot read NetCDF String Variable of name %s in group %s", title.c_str(),
+            grp.getName().c_str());
+    return false;
+  }
+
+  // Assume variable is of dim 1
+  if (var.getDimCount() != 1)
+  {
+    messerr(
+      "NetCDF String Variable of name %s in group %s has %ul dims, but we expect only 1",
+      title.c_str(), grp.getName().c_str(), var.getDimCount());
+    return false;
+  }
+
+  const auto dim = var.getDim(0);
+  vec.resize(dim.getSize());
+
+  // Use a vector of char* managed by netCDF to read string data
+  std::vector<char*> data_ptr(dim.getSize());
+  var.getVar(data_ptr.data());
+
+  // copy char pointers into gstlearn managed string vector
+  for (size_t i = 0; i < data_ptr.size(); ++i)
+  {
+    vec[i] = data_ptr[i];
+  }
+
+  return true;
+}
+
+template<typename T>
+bool SerializeNetCDF::_writeVec(netCDF::NcGroup& grp,
+                                const String& title,
+                                const VectorT<T>& vec,
+                                const netCDF::NcDim& dim)
+{
+  if (vec.size() < dim.getSize())
+  {
+    messerr("Vector %s has size %ul, which is lesser than requested netCDF dim %ul",
+            title.c_str(), vec.size(), dim.getSize());
+    return false;
+  }
+
+  // assume vectors of dim 1 (only one NcDim)
+
+  const auto var = grp.addVar(title, getNetCDFType(vec[0]), dim);
+  var.putVar(vec.constData());
+  return true;
+}
+
+template<>
+bool SerializeNetCDF::_writeVec(netCDF::NcGroup& grp,
+                                const String& title,
+                                const VectorString& vec,
+                                const netCDF::NcDim& dim)
+{
+  if (vec.size() < dim.getSize())
+  {
+    messerr(
+      "String Vector %s has size %ul, which is lesser than requested netCDF dim %ul",
+      title.c_str(), vec.size(), dim.getSize());
+    return false;
+  }
+
+  // generate a vector of char * to feed netCDF
+  std::vector<const char*> data_ptr(vec.size());
+  for (size_t i = 0; i < vec.size(); ++i)
+  {
+    data_ptr[i] = vec[i].c_str();
+  }
+
+  // assume vectors of dim 1 (only one NcDim)
+
+  const auto var = grp.addVar(title, getNetCDFType(vec[0]), dim);
+  var.putVar(data_ptr.data());
+  return true;
+}
