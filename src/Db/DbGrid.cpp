@@ -17,6 +17,7 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "Basic/SerializeNetCDF.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/Law.hpp"
@@ -24,10 +25,6 @@
 #include "Estimation/CalcImage.hpp"
 #include "Calculators/CalcMigrate.hpp"
 #include "Space/SpaceTarget.hpp"
-
-#include <ncFile.h>
-#include <ncDim.h>
-#include <ncVar.h>
 
 #include <algorithm>
 #include <math.h>
@@ -786,40 +783,26 @@ bool DbGrid::_deserialize(std::istream& is, bool verbose)
 bool DbGrid::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
 {
   VectorInt nx;
-  VectorString locators;
-  VectorString names;
   VectorDouble x0;
   VectorDouble dx;
   VectorDouble angles;
-  VectorDouble values;
-  VectorDouble allvalues;
 
   /* Initializations */
-  auto db = grp.getGroup("DbGrid");
+  auto db   = grp.getGroup("DbGrid");
   auto grch = db.getGroup("Grid characteristics");
 
-  auto sp = grch.getDim("Space Dimension");
-  const auto ndim = sp.getSize();
-  bool ret = true;
-
-  /* Core allocation */
-
-  nx.resize(ndim);
-  dx.resize(ndim);
-  x0.resize(ndim);
-  angles.resize(ndim);
-
   /* Read the grid characteristics */
-
-  grch.getVar("NX").getVar(nx.data());
-  grch.getVar("X0").getVar(x0.data());
-  grch.getVar("DX").getVar(dx.data());
-  grch.getVar("ANGLE").getVar(angles.data());
+  bool ret = true;
+  ret      = ret && SerializeNetCDF::_readVec(grch, "NX", nx);
+  ret      = ret && SerializeNetCDF::_readVec(grch, "X0", x0);
+  ret      = ret && SerializeNetCDF::_readVec(grch, "DX", dx);
+  ret      = ret && SerializeNetCDF::_readVec(grch, "ANGLE", angles);
 
   // Create the Grid characteristics
-  (void) gridDefine(nx, dx, x0, angles);
+  gridDefine(nx, dx, x0, angles);
 
-  ret && Db::_deserializeNC(db, verbose);
+  // Read the tail of the file
+  ret = ret && Db::_deserializeNC(db, verbose);
 
   return ret;
 }
@@ -853,8 +836,6 @@ bool DbGrid::_serialize(std::ostream& os, bool verbose) const
 
 bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
 {
-  bool ret = true;
-
   /* Writing the header */
   auto db = grp.addGroup("DbGrid");
 
@@ -862,19 +843,14 @@ bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
   auto sp   = grch.addDim("Space Dimension", getNDim());
 
   /* Writing the grid characteristics */
-
-  auto nx = grch.addVar("NX", netCDF::NcType::nc_INT, sp);
-  nx.putVar(getNXs().data());
-  auto x0 = grch.addVar("X0", netCDF::NcType::nc_FLOAT, sp);
-  x0.putVar(getX0s().data());
-  auto dx = grch.addVar("DX", netCDF::NcType::nc_FLOAT, sp);
-  dx.putVar(getDXs().data());
-  auto ag = grch.addVar("ANGLE", netCDF::NcType::nc_FLOAT, sp);
-  ag.putVar(getAngles().data());
+  bool ret = true;
+  ret      = ret && SerializeNetCDF::_writeVec(grch, "NX", getNXs(), sp);
+  ret      = ret && SerializeNetCDF::_writeVec(grch, "X0", getX0s(), sp);
+  ret      = ret && SerializeNetCDF::_writeVec(grch, "DX", getDXs(), sp);
+  ret      = ret && SerializeNetCDF::_writeVec(grch, "ANGLE", getAngles(), sp);
 
   /* Writing the tail of the file */
-
-  ret&& Db::_serializeNC(db, verbose);
+  ret = ret && Db::_serializeNC(db, verbose);
 
   return ret;
 }
@@ -922,7 +898,7 @@ DbGrid* DbGrid::createFromNF(const String& neutralFilename, bool verbose)
 DbGrid* DbGrid::createFromNC(const String& netCDFFilename, bool verbose)
 {
   auto* dbgrid = new DbGrid;
-  netCDF::NcFile file {netCDFFilename, netCDF::NcFile::FileMode::read};
+  auto file = SerializeNetCDF::createFileRead(netCDFFilename);
 
   bool success = dbgrid->_deserializeNC(file, verbose);
   if (!success)

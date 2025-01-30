@@ -23,6 +23,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/Limits.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "Basic/SerializeNetCDF.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/AException.hpp"
@@ -34,10 +35,6 @@
 #include "Space/SpacePoint.hpp"
 #include "Space/SpaceTarget.hpp"
 #include "Core/CSV.hpp"
-
-#include <ncFile.h>
-#include <ncDim.h>
-#include <ncVar.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -4647,7 +4644,7 @@ bool Db::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool Db::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
+bool Db::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
 {
   VectorString locators;
   VectorString names;

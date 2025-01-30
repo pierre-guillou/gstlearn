@@ -10,10 +10,9 @@
 /******************************************************************************/
 #include "Basic/ASerializable.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/SerializeNetCDF.hpp"
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
-
-#include <ncFile.h>
 
 #include <iostream>
 #include <fstream>
@@ -95,15 +94,11 @@ bool ASerializable::dumpToNF(const String& neutralFilename, bool verbose) const
 
 bool ASerializable::dumpToNC(const String& netCDFFilename, bool verbose) const
 {
-  bool ret = true;
-  netCDF::NcFile file {netCDFFilename, netCDF::NcFile::FileMode::replace};
-
+  auto file = SerializeNetCDF::createFileWrite(netCDFFilename);
+  bool ret  = _serializeNC(file, verbose);
+  if (!ret)
   {
-    ret = _serializeNC(file, verbose);
-    if (!ret)
-    {
-      messerr("Problem writing in the netCDF File.");
-    }
+    messerr("Problem writing in the netCDF File.");
   }
 
   return ret;
