@@ -98,6 +98,13 @@ bool SerializeNetCDF::_readVec(const netCDF::NcGroup& grp,
                                const String& title,
                                VectorT<T>& vec)
 {
+
+  if (grp.isNull())
+  {
+    messerr("Cannot read vector %s: container group is null", title.c_str());
+    return false;
+  }
+
   const auto var = grp.getVar(title);
   if (var.isNull())
   {
@@ -127,6 +134,13 @@ bool SerializeNetCDF::_readVec(const netCDF::NcGroup& grp,
                                const String& title,
                                VectorString& vec)
 {
+
+  if (grp.isNull())
+  {
+    messerr("Cannot read string vector %s: container group is null", title.c_str());
+    return false;
+  }
+
   const auto var = grp.getVar(title);
   if (var.isNull())
   {
@@ -173,6 +187,12 @@ bool SerializeNetCDF::_writeVec(netCDF::NcGroup& grp,
     return false;
   }
 
+  if (grp.isNull())
+  {
+    messerr("Cannot write vector %s: container group is null", title.c_str());
+    return false;
+  }
+
   // assume vectors of dim 1 (only one NcDim)
 
   const auto var = grp.addVar(title, getNetCDFType(vec[0]), dim);
@@ -191,6 +211,12 @@ bool SerializeNetCDF::_writeVec(netCDF::NcGroup& grp,
     messerr(
       "String Vector %s has size %ul, which is lesser than requested netCDF dim %ul",
       title.c_str(), vec.size(), dim.getSize());
+    return false;
+  }
+
+  if (grp.isNull())
+  {
+    messerr("Cannot write string vector %s: container group is null", title.c_str());
     return false;
   }
 
