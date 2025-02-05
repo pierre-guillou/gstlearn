@@ -42,11 +42,37 @@ namespace SerializeNetCDF
 
   inline netCDF::NcFile _fileOpenRead(const String& fname)
   {
+    netCDF::NcFile file {fname, netCDF::NcFile::FileMode::read};
+    auto metadata = file.getGroup("Gstlearn metadata");
+    if (metadata.isNull())
+    {
+      messerr("File %s doesn't contain Gstlearn metadata…", fname.c_str());
+    }
+    else
+    {
+      const auto att = metadata.getAtt("Format version");
+      std::string version;
+      att.getValues(version);
+      if (version != "1.0.0")
+      {
+        messerr("File %s has format version %s, expected 1.0.0", fname.c_str(),
+                version.c_str());
+      }
+    }
+    file.close();
+    // cannot return file directly as NcFile doesn't have a move constructor
     return netCDF::NcFile {fname, netCDF::NcFile::FileMode::read};
   }
   inline netCDF::NcFile _fileOpenWrite(const String& fname)
   {
-    return netCDF::NcFile {fname, netCDF::NcFile::FileMode::replace};
+    netCDF::NcFile file {fname, netCDF::NcFile::FileMode::replace};
+    auto metadata = file.addGroup("Gstlearn metadata");
+    metadata.putAtt("Description",
+                    "This file is used to serialize gstlearn's internal data structures");
+    metadata.putAtt("Format version", "1.0.0");
+    // cannot return file directly as NcFile doesn't have a move constructor
+    file.close();
+    return netCDF::NcFile {fname, netCDF::NcFile::FileMode::write};
   }
 
   template<typename T>
