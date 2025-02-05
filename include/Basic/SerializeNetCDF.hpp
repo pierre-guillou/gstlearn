@@ -23,6 +23,9 @@
 
 namespace SerializeNetCDF
 {
+  /**
+   * @brief Map values to corresponding netCDF types
+   */
   inline netCDF::NcType getNetCDFType([[maybe_unused]] const int a)
   {
     return netCDF::NcType::nc_INT;
@@ -40,6 +43,9 @@ namespace SerializeNetCDF
     return netCDF::NcType::nc_STRING;
   }
 
+  /**
+   * @brief Open netCDF file in read mode, check metadata
+   */
   inline netCDF::NcFile _fileOpenRead(const String& fname)
   {
     netCDF::NcFile file {fname, netCDF::NcFile::FileMode::read};
@@ -63,6 +69,10 @@ namespace SerializeNetCDF
     // cannot return file directly as NcFile doesn't have a move constructor
     return netCDF::NcFile {fname, netCDF::NcFile::FileMode::read};
   }
+
+  /**
+   * @brief Open netCDF file in write mode, write metadata
+   */
   inline netCDF::NcFile _fileOpenWrite(const String& fname)
   {
     netCDF::NcFile file {fname, netCDF::NcFile::FileMode::replace};
@@ -75,17 +85,53 @@ namespace SerializeNetCDF
     return netCDF::NcFile {fname, netCDF::NcFile::FileMode::write};
   }
 
+  /**
+   * @brief Read a named netCDF variable into a generic VectorT
+   *
+   * @param[in] grp netCDF group containing the variable to read
+   * @param[in] title Name of netCDF variable to read
+   * @param[out] vec Vector to be filled with netCDF data (will be resized)
+   * @return true if success
+   */
   template<typename T>
   bool _readVec(const netCDF::NcGroup& grp, const String& title, VectorT<T>& vec);
   template<>
+
+  /**
+   * @brief Read a named netCDF string variable into a VectorString
+   *
+   * @param[in] grp netCDF group containing the string variable to read
+   * @param[in] title Name of netCDF string variable to read
+   * @param[out] vec VectorString to be filled with netCDF data (will be resized)
+   * @return true if success
+   */
   inline bool
   _readVec(const netCDF::NcGroup& grp, const String& title, VectorString& vec);
 
+  /**
+   * @brief Write a generic VectorT into a named netCDF variable
+   *
+   * @param[in,out] grp netCDF group containing the variable to write
+   * @param[in] title Name of netCDF variable to write
+   * @param[in] vec Vector to write into netCDF
+   * @param[in] dim netCDF dimension of the vector to write
+   * @return true if success
+   */
   template<typename T>
   bool _writeVec(netCDF::NcGroup& grp,
                  const String& title,
                  const VectorT<T>& vec,
                  const netCDF::NcDim& dim);
+
+  /**
+   * @brief Write a VectorString into a named netCDF string variable
+   *
+   * @param[in,out] grp netCDF group containing the string variable to write
+   * @param[in] title Name of netCDF string variable to write
+   * @param[in] vec VectorString to write to netCDF
+   * @param[in] dim netCDF dimension of the vector to write
+   * @return true if success
+   */
   template<>
   inline bool _writeVec(netCDF::NcGroup& grp,
                         const String& title,
