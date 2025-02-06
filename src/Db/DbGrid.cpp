@@ -787,12 +787,17 @@ bool DbGrid::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
   VectorDouble dx;
   VectorDouble angles;
 
-  /* Initializations */
-  auto db   = grp.getGroup("DbGrid");
+  // we get the netCDF group that has the name of the current class
+  auto db = grp.getGroup("DbGrid");
+
+  // and we read it by re-using the layout (groups, vars) that we used
+  // in _serialize
   auto grch = db.getGroup("Grid characteristics");
 
   /* Read the grid characteristics */
   bool ret = true;
+  // deserialize vector members using SerializeNetCDF::_readVec
+  // (error handling is done in these methods)
   ret      = ret && SerializeNetCDF::_readVec(grch, "NX", nx);
   ret      = ret && SerializeNetCDF::_readVec(grch, "X0", x0);
   ret      = ret && SerializeNetCDF::_readVec(grch, "DX", dx);
@@ -801,7 +806,7 @@ bool DbGrid::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
   // Create the Grid characteristics
   gridDefine(nx, dx, x0, angles);
 
-  // Read the tail of the file
+  // call _deserialize on the parent class with the current class NcGroup
   ret = ret && Db::_deserializeNC(db, verbose);
 
   return ret;
@@ -836,20 +841,27 @@ bool DbGrid::_serialize(std::ostream& os, bool verbose) const
 
 bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
 {
-  /* Writing the header */
+  // create a new netCDF group every time we enter a _serialize method
+  // => easier to deserialize
   auto db = grp.addGroup("DbGrid");
 
+  // specific netCDF groups can also be created to group together
+  // common class members
   auto grch = db.addGroup("Grid characteristics");
-  auto sp   = grch.addDim("Space Dimension", getNDim());
 
-  /* Writing the grid characteristics */
+  // netCDF dimensions should be manually created and passed to
+  // SerializeNetCDF::_writeVec or directly to grp.addVar()
+  auto sp = grch.addDim("Space Dimension", getNDim());
+
   bool ret = true;
+  // serialize vector members using SerializeNetCDF::_writeVec
+  // (error handling is done in these methods)
   ret      = ret && SerializeNetCDF::_writeVec(grch, "NX", getNXs(), sp);
   ret      = ret && SerializeNetCDF::_writeVec(grch, "X0", getX0s(), sp);
   ret      = ret && SerializeNetCDF::_writeVec(grch, "DX", getDXs(), sp);
   ret      = ret && SerializeNetCDF::_writeVec(grch, "ANGLE", getAngles(), sp);
 
-  /* Writing the tail of the file */
+  // call _serialize on the parent class with the current class NcGroup
   ret = ret && Db::_serializeNC(db, verbose);
 
   return ret;

@@ -4570,18 +4570,30 @@ bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
 
 bool Db::_serializeNC(netCDF::NcGroup& grp, bool /*verbose*/) const
 {
+  // create a new netCDF group every time we enter a _serialize method
+  // => easier to deserialize
   auto db = grp.addGroup("Db");
+
+  // netCDF dimensions should be manually created and passed to
+  // SerializeNetCDF::_writeVec or directly to NcGroup::addVar()
+
+  // here the NcDim is the number of rows in the Db (number of
+  // samples) and every Db column corresponds to a NcVar
   auto dim = db.addDim("dim", getNSample());
 
   int ncol              = getNColumn();
   VectorString locators = getLocators(true);
   VectorString names    = getName("*");
 
-  auto colsdim = db.addDim("Columns", ncol);
-
   for (int i = 0; i < ncol; ++i)
   {
+    // here we create netCDF::NcVars by hand to augment them with
+    // attributes (NcAtt / putAtt)
     auto var = db.addVar(names[i], netCDF::NcType::nc_DOUBLE, dim);
+    // Locators are semantically close to Db columns and NcAtt has a
+    // nicer API than string NcVars. Putting Locators inside NcAtt
+    // also avoids checking array sizes during deserialization
+    // (Locators NcVar size vs. number of columns)
     var.putAtt("Locators", locators[i]);
     var.putVar(getColumnByColIdx(i).data());
   }
@@ -4649,11 +4661,13 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
   VectorString locators;
   VectorString names;
 
-  // Read the file
+  // we get the netCDF group that has the name of the current class
   auto db = grp.getGroup("Db");
 
+  // the NcDim contains the number of samples
   const auto dim  = db.getDim("dim");
   const auto nech = dim.getSize();
+  // one NcVars per Db column
   const auto ncol = db.getVarCount();
 
   bool ret = true;
@@ -4666,13 +4680,17 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
   // Initialize the Db
   resetDims(ncol, nech);
 
+  // we get a map column name -> column NcVar
   auto map = db.getVars();
   size_t i {};
   for (const auto& p: map)
   {
+    // read the column name from the map key
     names[i]       = p.first;
+    // read the column locator (NcAtt) from the map value (NcVar)
     const auto att = p.second.getAtt("Locators");
     att.getValues(locators[i]);
+    // read the column values from the map value (NcVar)
     db.getVar(p.first).getVar(&_array[_getAddress(0, i)]);
     i++;
   }
