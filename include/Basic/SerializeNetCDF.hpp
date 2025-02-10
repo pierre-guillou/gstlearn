@@ -49,7 +49,7 @@ namespace SerializeNetCDF
   inline netCDF::NcFile _fileOpenRead(const String& fname)
   {
     netCDF::NcFile file {fname, netCDF::NcFile::FileMode::read};
-    auto metadata = file.getGroup("Gstlearn metadata");
+    auto metadata = file.getGroup("gstlearn metadata");
     if (metadata.isNull())
     {
       messerr("File %s doesn't contain Gstlearn metadata…", fname.c_str());
@@ -76,7 +76,7 @@ namespace SerializeNetCDF
   inline netCDF::NcFile _fileOpenWrite(const String& fname)
   {
     netCDF::NcFile file {fname, netCDF::NcFile::FileMode::replace};
-    auto metadata = file.addGroup("Gstlearn metadata");
+    auto metadata = file.addGroup("gstlearn metadata");
     metadata.putAtt("Description",
                     "This file is used to serialize gstlearn's internal data structures");
     metadata.putAtt("Format version", "1.0.0");
