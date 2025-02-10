@@ -12,6 +12,7 @@
 
 #include "Geometry/Rotation.hpp"
 #include "Matrix/MatrixSquareGeneral.hpp"
+#include "Basic/SerializeNetCDF.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "geoslib_define.h"
@@ -106,7 +107,7 @@ Grid::Grid(int ndim,
 }
 
 Grid::Grid(const Grid &r)
-  : AStringable(r)
+  : AStringable(r), ASerializable()
 {
   _recopy(r);
 }
@@ -1277,4 +1278,109 @@ bool Grid::sampleBelongsToCell(const VectorDouble &coor,
      }
   }
   return true;
+}
+
+bool Grid::_deserialize(std::istream& is, [[maybe_unused]] bool verbose)
+{
+  int ndim = 0;
+  VectorInt nx;
+  VectorDouble x0;
+  VectorDouble dx;
+  VectorDouble angles;
+
+  /* Initializations */
+
+  bool ret = true;
+  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
+
+  /* Core allocation */
+
+  nx.resize(ndim);
+  dx.resize(ndim);
+  x0.resize(ndim);
+  angles.resize(ndim);
+
+  /* Read the grid characteristics */
+
+  for (int idim = 0; ret && idim < ndim; idim++)
+  {
+    ret = ret && _recordRead<int>(is, "Grid Number of Nodes", nx[idim]);
+    ret = ret && _recordRead<double>(is, "Grid Origin", x0[idim]);
+    ret = ret && _recordRead<double>(is, "Grid Mesh", dx[idim]);
+    ret = ret && _recordRead<double>(is, "Grid Angles", angles[idim]);
+  }
+
+  // reset the Grid
+  resetFromVector(nx, dx, x0, angles);
+
+  return ret;
+}
+
+bool Grid::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
+{
+  VectorInt nx;
+  VectorDouble x0;
+  VectorDouble dx;
+  VectorDouble angles;
+
+  // we get the netCDF group that has the name of the current class
+  auto gr = grp.getGroup("Grid");
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  // deserialize vector members using SerializeNetCDF::_readVec
+  // (error handling is done in these methods)
+  ret      = ret && SerializeNetCDF::_readVec(gr, "NX", nx);
+  ret      = ret && SerializeNetCDF::_readVec(gr, "X0", x0);
+  ret      = ret && SerializeNetCDF::_readVec(gr, "DX", dx);
+  ret      = ret && SerializeNetCDF::_readVec(gr, "ANGLE", angles);
+
+  // reset the Grid
+  resetFromVector(nx, dx, x0, angles);
+
+  return ret;
+}
+
+bool Grid::_serialize(std::ostream& os, [[maybe_unused]] bool verbose) const
+{
+  bool ret = true;
+
+  /* Writing the header */
+
+  ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+
+  /* Writing the grid characteristics */
+
+  ret = ret && _commentWrite(os, "Grid characteristics (NX,X0,DX,ANGLE)");
+  for (int idim = 0; ret && idim < getNDim(); idim++)
+  {
+    ret = ret && _recordWrite<int>(os, "", getNX(idim));
+    ret = ret && _recordWrite<double>(os, "", getX0(idim));
+    ret = ret && _recordWrite<double>(os, "", getDX(idim));
+    ret = ret && _recordWrite<double>(os, "", getRotAngle(idim));
+    ret = ret && _commentWrite(os, "");
+  }
+
+  return ret;
+}
+
+bool Grid::_serializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new netCDF group every time we enter a _serialize method
+  // => easier to deserialize
+  auto gr = grp.addGroup("Grid");
+
+  // netCDF dimensions should be manually created and passed to
+  // SerializeNetCDF::_writeVec or directly to grp.addVar()
+  auto sp = gr.addDim("Space Dimension", getNDim());
+
+  bool ret = true;
+  // serialize vector members using SerializeNetCDF::_writeVec
+  // (error handling is done in these methods)
+  ret      = ret && SerializeNetCDF::_writeVec(gr, "NX", getNXs(), sp);
+  ret      = ret && SerializeNetCDF::_writeVec(gr, "X0", getX0s(), sp);
+  ret      = ret && SerializeNetCDF::_writeVec(gr, "DX", getDXs(), sp);
+  ret      = ret && SerializeNetCDF::_writeVec(gr, "ANGLE", getRotAngles(), sp);
+
+  return ret;
 }
