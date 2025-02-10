@@ -740,42 +740,9 @@ bool DbGrid::isConsistent() const
 
 bool DbGrid::_deserialize(std::istream& is, bool verbose)
 {
-  int ndim = 0;
-  VectorInt nx;
-  VectorString locators;
-  VectorString names;
-  VectorDouble x0;
-  VectorDouble dx;
-  VectorDouble angles;
-  VectorDouble values;
-  VectorDouble allvalues;
-
-  /* Initializations */
-
   bool ret = true;
-  ret = ret && _recordRead<int>(is, "Space Dimension", ndim);
-
-  /* Core allocation */
-
-  nx.resize(ndim);
-  dx.resize(ndim);
-  x0.resize(ndim);
-  angles.resize(ndim);
-
-  /* Read the grid characteristics */
-
-  for (int idim = 0; ret && idim < ndim; idim++)
-  {
-    ret = ret && _recordRead<int>(is, "Grid Number of Nodes", nx[idim]);
-    ret = ret && _recordRead<double>(is, "Grid Origin", x0[idim]);
-    ret = ret && _recordRead<double>(is, "Grid Mesh", dx[idim]);
-    ret = ret && _recordRead<double>(is, "Grid Angles", angles[idim]);
-  }
-
-  // Create the Grid characteristics
-  (void) gridDefine(nx, dx, x0, angles);
-
-  ret && Db::_deserialize(is, verbose);
+  ret      = ret && _grid._deserialize(is, verbose);
+  ret      = ret && Db::_deserialize(is, verbose);
 
   return ret;
 }
@@ -790,21 +757,10 @@ bool DbGrid::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
   // we get the netCDF group that has the name of the current class
   auto db = grp.getGroup("DbGrid");
 
-  // and we read it by re-using the layout (groups, vars) that we used
-  // in _serialize
-  auto grch = db.getGroup("Grid characteristics");
-
-  /* Read the grid characteristics */
   bool ret = true;
-  // deserialize vector members using SerializeNetCDF::_readVec
-  // (error handling is done in these methods)
-  ret      = ret && SerializeNetCDF::_readVec(grch, "NX", nx);
-  ret      = ret && SerializeNetCDF::_readVec(grch, "X0", x0);
-  ret      = ret && SerializeNetCDF::_readVec(grch, "DX", dx);
-  ret      = ret && SerializeNetCDF::_readVec(grch, "ANGLE", angles);
 
-  // Create the Grid characteristics
-  gridDefine(nx, dx, x0, angles);
+  // call _deserialize on each member with the current class NcGroup
+  ret = ret && _grid._deserializeNC(db, verbose);
 
   // call _deserialize on the parent class with the current class NcGroup
   ret = ret && Db::_deserializeNC(db, verbose);
@@ -816,25 +772,13 @@ bool DbGrid::_serialize(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
-  /* Writing the header */
-
-  ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
-
   /* Writing the grid characteristics */
 
-  ret = ret && _commentWrite(os, "Grid characteristics (NX,X0,DX,ANGLE)");
-  for (int idim = 0; ret && idim < getNDim(); idim++)
-  {
-    ret = ret && _recordWrite<int>(os, "",  getNX(idim));
-    ret = ret && _recordWrite<double>(os, "", getX0(idim));
-    ret = ret && _recordWrite<double>(os, "", getDX(idim));
-    ret = ret && _recordWrite<double>(os, "", getAngle(idim));
-    ret = ret && _commentWrite(os, "");
-  }
+  ret = ret && _grid._serialize(os, verbose);
 
   /* Writing the tail of the file */
 
-  ret && Db::_serialize(os, verbose);
+  ret = ret && Db::_serialize(os, verbose);
 
   return ret;
 }
@@ -845,24 +789,12 @@ bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
   // => easier to deserialize
   auto db = grp.addGroup("DbGrid");
 
-  // specific netCDF groups can also be created to group together
-  // common class members
-  auto grch = db.addGroup("Grid characteristics");
-
-  // netCDF dimensions should be manually created and passed to
-  // SerializeNetCDF::_writeVec or directly to grp.addVar()
-  auto sp = grch.addDim("Space Dimension", getNDim());
-
   bool ret = true;
   // serialize vector members using SerializeNetCDF::_writeVec
   // (error handling is done in these methods)
 
-  // TODO Grid::_serializeNC(db, verbose);
-
-  ret      = ret && SerializeNetCDF::_writeVec(grch, "NX", getNXs(), sp);
-  ret      = ret && SerializeNetCDF::_writeVec(grch, "X0", getX0s(), sp);
-  ret      = ret && SerializeNetCDF::_writeVec(grch, "DX", getDXs(), sp);
-  ret      = ret && SerializeNetCDF::_writeVec(grch, "ANGLE", getAngles(), sp);
+  // call _serialize on each member with the current class NcGroup
+  ret = ret && _grid._serializeNC(db, verbose);
 
   // call _serialize on the parent class with the current class NcGroup
   ret = ret && Db::_serializeNC(db, verbose);
