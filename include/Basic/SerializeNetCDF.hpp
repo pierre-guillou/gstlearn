@@ -21,6 +21,8 @@
 #include <ncType.h>
 #include <ncVar.h>
 
+#include <optional>
+
 namespace SerializeNetCDF
 {
   /**
@@ -137,6 +139,27 @@ namespace SerializeNetCDF
                         const String& title,
                         const VectorString& vec,
                         const netCDF::NcDim& dim);
+
+  /**
+   * @brief Extract a group inside a parent group
+   *
+   * @param[in] parent Parent group
+   * @param[in] name Name of the group to find in parent
+   * @return Group if found else nullopt
+   */
+  inline std::optional<netCDF::NcGroup>
+  getGroup(const netCDF::NcGroup& parent, const String& name)
+  {
+    auto grp = parent.getGroup(name);
+    if (grp.isNull())
+    {
+      messerr("Cannot find group %s in parent group %s", name.c_str(),
+              parent.getName().c_str());
+      return std::nullopt;
+    }
+    return grp;
+  }
+
 }; // namespace SerializeNetCDF
 
 template<typename T>

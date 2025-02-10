@@ -1323,17 +1323,22 @@ bool Grid::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
   VectorDouble dx;
   VectorDouble angles;
 
-  // we get the netCDF group that has the name of the current class
-  auto gr = grp.getGroup("Grid");
+  // Call SerializeNetCDF::getGroup to get the subgroup of grp named
+  // "Grid" with some error handling
+  auto gr = SerializeNetCDF::getGroup(grp, "Grid");
+  if (!gr)
+  {
+    return false;
+  }
 
   /* Read the grid characteristics */
   bool ret = true;
   // deserialize vector members using SerializeNetCDF::_readVec
   // (error handling is done in these methods)
-  ret      = ret && SerializeNetCDF::_readVec(gr, "NX", nx);
-  ret      = ret && SerializeNetCDF::_readVec(gr, "X0", x0);
-  ret      = ret && SerializeNetCDF::_readVec(gr, "DX", dx);
-  ret      = ret && SerializeNetCDF::_readVec(gr, "ANGLE", angles);
+  ret      = ret && SerializeNetCDF::_readVec(*gr, "NX", nx);
+  ret      = ret && SerializeNetCDF::_readVec(*gr, "X0", x0);
+  ret      = ret && SerializeNetCDF::_readVec(*gr, "DX", dx);
+  ret      = ret && SerializeNetCDF::_readVec(*gr, "ANGLE", angles);
 
   // reset the Grid
   resetFromVector(nx, dx, x0, angles);

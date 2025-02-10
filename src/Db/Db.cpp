@@ -4663,14 +4663,19 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
 
   // we get the netCDF group that has the name of the current class
 
-  // TODO error handling
-  auto db = grp.getGroup("Db");
+  // Call SerializeNetCDF::getGroup to get the subgroup of grp named
+  // "Db" with some error handling
+  auto db = SerializeNetCDF::getGroup(grp, "Db");
+  if (!db)
+  {
+    return false;
+  }
 
   // the NcDim contains the number of samples
-  const auto dim  = db.getDim("dim");
+  const auto dim  = db->getDim("dim");
   const auto nech = dim.getSize();
   // one NcVars per Db column
-  const auto ncol = db.getVarCount();
+  const auto ncol = db->getVarCount();
 
   bool ret = true;
   if (ncol > 0)
@@ -4683,7 +4688,7 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
   resetDims(ncol, nech);
 
   // we get a map column name -> column NcVar
-  auto map = db.getVars();
+  auto map = db->getVars();
   size_t i {};
   for (const auto& p: map)
   {
@@ -4693,7 +4698,7 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
     const auto att = p.second.getAtt("Locators");
     att.getValues(locators[i]);
     // read the column values from the map value (NcVar)
-    db.getVar(p.first).getVar(&_array[_getAddress(0, i)]);
+    db->getVar(p.first).getVar(&_array[_getAddress(0, i)]);
     i++;
   }
 

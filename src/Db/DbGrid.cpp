@@ -754,16 +754,21 @@ bool DbGrid::_deserializeNC(netCDF::NcGroup& grp, bool verbose)
   VectorDouble dx;
   VectorDouble angles;
 
-  // we get the netCDF group that has the name of the current class
-  auto db = grp.getGroup("DbGrid");
+  // Call SerializeNetCDF::getGroup to get the subgroup of grp named
+  // "DbGrid" with some error handling
+  auto db = SerializeNetCDF::getGroup(grp, "DbGrid");
+  if (!db)
+  {
+    return false;
+  }
 
   bool ret = true;
 
   // call _deserialize on each member with the current class NcGroup
-  ret = ret && _grid._deserializeNC(db, verbose);
+  ret = ret && _grid._deserializeNC(*db, verbose);
 
   // call _deserialize on the parent class with the current class NcGroup
-  ret = ret && Db::_deserializeNC(db, verbose);
+  ret = ret && Db::_deserializeNC(*db, verbose);
 
   return ret;
 }
