@@ -189,8 +189,8 @@ foreach(FLAVOR ${FLAVORS})
   endif()
   
   # Link to NetCDF4
-  target_include_directories(${FLAVOR} SYSTEM PUBLIC ${netcdf-cxx4_INCLUDE_DIRS})
-  target_link_libraries(${FLAVOR} PUBLIC ${netcdf-cxx4_LINK_LIBRARIES})
+  target_include_directories(${FLAVOR} SYSTEM PRIVATE ${netcdf-cxx4_INCLUDE_DIRS})
+  target_link_libraries(${FLAVOR} PRIVATE ${netcdf-cxx4_LINK_LIBRARIES})
 
   # Exclude [L]GPL features from Eigen
   #target_compile_definitions(${FLAVOR} PUBLIC EIGEN_MPL2_ONLY) 
