@@ -4662,6 +4662,8 @@ bool Db::_deserializeNC(netCDF::NcGroup& grp, [[maybe_unused]] bool verbose)
   VectorString names;
 
   // we get the netCDF group that has the name of the current class
+
+  // TODO error handling
   auto db = grp.getGroup("Db");
 
   // the NcDim contains the number of samples

@@ -856,6 +856,9 @@ bool DbGrid::_serializeNC(netCDF::NcGroup& grp, bool verbose) const
   bool ret = true;
   // serialize vector members using SerializeNetCDF::_writeVec
   // (error handling is done in these methods)
+
+  // TODO Grid::_serializeNC(db, verbose);
+
   ret      = ret && SerializeNetCDF::_writeVec(grch, "NX", getNXs(), sp);
   ret      = ret && SerializeNetCDF::_writeVec(grch, "X0", getX0s(), sp);
   ret      = ret && SerializeNetCDF::_writeVec(grch, "DX", getDXs(), sp);
