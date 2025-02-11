@@ -42,6 +42,7 @@ jobs:
           libboost-dev \
           libeigen3-dev \
           libnlopt-dev \
+          libnetcdf-c++4-dev \
           libpng-dev \
           pandoc
 

@@ -41,6 +41,7 @@ jobs:
           libopenmpi-dev \
           libboost-dev \
           libeigen3-dev \
+          libnetcdf-c++4-dev \
           libnlopt-dev
 
     - name: Setup Python Version
