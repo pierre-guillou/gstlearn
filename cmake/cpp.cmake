@@ -113,8 +113,15 @@ if (USE_HDF5)
   # TODO : If HDF5 not found, fetch it from the web ?
 endif()
 
-find_package(PkgConfig)
-pkg_check_modules(netcdf-cxx4 REQUIRED netcdf-cxx4)
+# find FindNetCDF-CXX4.cmake in current directory
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}")
+
+find_package(NetCDF-CXX4 REQUIRED)
+if(NetCDF-CXX4_FOUND)
+  message(STATUS "Found NetCDF-cxx4 version ${netcdf-cxx4_VERSION} from ${NCXX4_CONFIG}")
+else()
+  message(FATAL_ERROR "NetCDF-cxx4 not found")
+endif()
 
 # Shared and Static libraries
 add_library(shared                  SHARED ${SOURCES})
@@ -189,8 +196,7 @@ foreach(FLAVOR ${FLAVORS})
   endif()
   
   # Link to NetCDF4
-  target_include_directories(${FLAVOR} SYSTEM PRIVATE ${netcdf-cxx4_INCLUDE_DIRS})
-  target_link_libraries(${FLAVOR} PRIVATE ${netcdf-cxx4_LINK_LIBRARIES})
+  target_link_libraries(${FLAVOR} PRIVATE NetCDF-CXX4)
 
   # Exclude [L]GPL features from Eigen
   #target_compile_definitions(${FLAVOR} PUBLIC EIGEN_MPL2_ONLY) 
