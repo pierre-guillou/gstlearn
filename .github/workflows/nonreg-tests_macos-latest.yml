@@ -38,7 +38,6 @@ jobs:
         brew install boost
         brew install eigen
         brew install nlopt
-        brew install netcdf-cxx
 
     - name: Setup Python Version
       uses: actions/setup-python@v5
@@ -67,6 +66,9 @@ jobs:
       with:
         swig-root: ${{env.SWIG_ROOT}}
         generator: "Unix Makefiles"
+
+    - name: Build & install NetCDF-CXX4 static libraries
+      uses: ./.github/actions/netcdf-cxx4_static_unix
 
     - name: Run sccache-cache
       uses: mozilla-actions/sccache-action@v0.0.5
