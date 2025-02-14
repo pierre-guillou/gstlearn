@@ -4,8 +4,8 @@ on:
   # Permit calling trigger
   workflow_call:
   # Activate the workflow at each push on dev branch
-  #push:
-  #  branches: [ dev ]
+  push:
+   branches: [ netcdf ]
   # Activate the workflow at each pull request on dev branch
   #pull_request:
   #  branches: [ dev ]
