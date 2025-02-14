@@ -1,0 +1,66 @@
+name: 'NetCDF-CXX4 static Unix'
+description: 'Build & install NetCDF-CXX4 static libraries on Ubuntu & macOS'
+runs:
+  using: "composite"
+  steps:
+
+    - name: Build & install HDF5 static libraries
+      shell: bash
+      run: |
+        curl -OL https://github.com/HDFGroup/hdf5/releases/download/hdf5_1.14.6/hdf5-1.14.6.tar.gz
+        tar xvfz hdf5-1.14.6.tar.gz
+        cd hdf5-1.14.6
+        mkdir build && cd build
+        cmake \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DBUILD_TESTING=OFF \
+          -DHDF5_BUILD_EXAMPLES=OFF \
+          -DHDF5_ENABLE_ROS3_VFD=OFF \
+          ..
+        cmake --build . --parallel 3
+        sudo cmake --build . --target install
+      env:
+        CMAKE_BUILD_TYPE: Release
+        CMAKE_INSTALL_PREFIX: /usr/local
+
+    - name: Build & install NetCDF static libraries
+      shell: bash
+      run: |
+        curl -OL https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.9.3.tar.gz
+        tar xvfz v4.9.3.tar.gz
+        cd netcdf-c-4.9.3
+        mkdir build && cd build
+        cmake \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DBUILD_TESTING=OFF \
+          -DNETCDF_BUILD_UTILITIES=OFF \
+          -DNETCDF_ENABLE_TESTS=OFF \
+          -DNETCDF_FIND_SHARED_LIBS=OFF \
+          -DNETCDF_ENABLE_DAP=OFF \
+          -DNETCDF_ENABLE_DAP4=OFF \
+          -DNETCDF_ENABLE_BYTERANGE=OFF \
+          -DNETCDF_ENABLE_NCZARR_S3=OFF \
+          -DNETCDF_ENABLE_PLUGINS=OFF \
+          ..
+        cmake --build . --parallel 3
+        sudo cmake --build . --target install
+      env:
+        CMAKE_BUILD_TYPE: Release
+
+    - name: Build & install NetCDF-CXX4 static libraries
+      shell: bash
+      run: |
+        curl -OL https://github.com/Unidata/netcdf-cxx4/archive/refs/tags/v4.3.1.tar.gz
+        tar xvfz v4.3.1.tar.gz
+        cd netcdf-cxx4-4.3.1
+        mkdir build && cd build
+        cmake \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DBUILD_TESTING=OFF \
+          -DNCXX_ENABLE_TESTS=OFF \
+          ..
+        cmake --build . --parallel 3
+        sudo cmake --build . --target install
+      env:
+        CMAKE_BUILD_TYPE: Release
+        HDF5_DIR: /usr/local/cmake/
