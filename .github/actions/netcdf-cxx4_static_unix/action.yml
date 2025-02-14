@@ -46,21 +46,3 @@ runs:
         sudo cmake --build . --target install
       env:
         CMAKE_BUILD_TYPE: Release
-
-    - name: Build & install NetCDF-CXX4 static libraries
-      shell: bash
-      run: |
-        curl -OL https://github.com/Unidata/netcdf-cxx4/archive/refs/tags/v4.3.1.tar.gz
-        tar xvfz v4.3.1.tar.gz
-        cd netcdf-cxx4-4.3.1
-        mkdir build && cd build
-        cmake \
-          -DBUILD_SHARED_LIBS=OFF \
-          -DBUILD_TESTING=OFF \
-          -DNCXX_ENABLE_TESTS=OFF \
-          ..
-        cmake --build . --parallel 3
-        sudo cmake --build . --target install
-      env:
-        CMAKE_BUILD_TYPE: Release
-        HDF5_DIR: /usr/local/cmake/
