@@ -235,8 +235,6 @@ public:
 
   /**@}*/
 
-  const std::vector<double>& getArrays() const { return _array; }
-
   /** @addtogroup DB_Names Manipulating Names of the variables contained in a Db
    * \ingroup DB
    *
