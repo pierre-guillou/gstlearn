@@ -85,7 +85,7 @@ class AAnam;
  * relative to the target pair of variables.
  *
  */
-class GSTLEARN_EXPORT Vario : public AVario, public ASerializable
+class GSTLEARN_EXPORT Vario : public TCloneable<AVario, Vario>, public ASerializable
 {
 public:
   Vario(const VarioParam& varioparam);
@@ -94,9 +94,6 @@ public:
   virtual ~Vario();
 
 public:
-  /// ICloneable interface
-  IMPLEMENT_CLONING(Vario)
-
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;
 
