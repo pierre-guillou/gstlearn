@@ -15,28 +15,22 @@
 
 /**
  * Inherits from this interface to make your class cloneable.
- * You must use IMPLEMENT_CLONING macro in concrete classes only.
  */
 class GSTLEARN_EXPORT ICloneable
 {
 public:
-  ICloneable() {};
-  virtual ~ICloneable() {};
+  ICloneable() = default;
+  virtual ~ICloneable() = default;
 
   virtual ICloneable* clone() const = 0;
 };
 
-// Thanks to here (macro way):
-// https://alfps.wordpress.com/2010/06/12/cppx-3-ways-to-mix-in-a-generic-cloning-implementation/
-#define IMPLEMENT_CLONING(Class)                   \
-public:                                            \
-  inline virtual Class* clone() const override     \
-  {                                                \
-    static_assert(                                 \
-      ! std::is_abstract<Class>::value,            \
-      "Class cannot be cloned as it is abstract"   \
-    );                                             \
-    assert(typeid(*this) == typeid(Class));        \
-    return (new Class(*this));                     \
+// from https://stackoverflow.com/questions/65916601/clone-derived-class-from-base-class-pointer
+template<typename Base, typename Derived>
+class TCloneable: public Base
+{
+  Base* clone() const override
+  {
+    return new Derived(*static_cast<Derived*>(this));
   }
-
+};
