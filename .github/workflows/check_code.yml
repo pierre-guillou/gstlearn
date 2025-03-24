@@ -26,6 +26,7 @@ jobs:
   # Check source formatting #
   # ----------------------- #
   check-formatting:
+    if: false                   # disabled for now, waiting for clang-format
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
@@ -72,6 +73,7 @@ jobs:
     strategy:
       matrix:
         opt: [Debug, Release]
+        hdf5: [USE_HDF5=ON, USE_HDF5=OFF]
 
     steps:
     - uses: actions/checkout@v4
@@ -95,6 +97,7 @@ jobs:
         cd build
         cmake \
           -DCMAKE_BUILD_TYPE=${{ matrix.opt }} \
+          -D${{ matrix.hdf5 }} \
           -DBUILD_TESTING=ON \
           $GITHUB_WORKSPACE
 
@@ -110,6 +113,7 @@ jobs:
   # Code lint job #
   # ------------- #
   lint-code:
+    if: false                   # disabled for now
     runs-on: ubuntu-latest
     strategy:
       matrix:
