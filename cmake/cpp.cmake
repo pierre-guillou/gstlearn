@@ -47,10 +47,8 @@ if(BUILD_ASAN AND MSVC)
   set(BUILD_ASAN OFF)
 endif()
 
-if(BUILD_ASAN)
-  add_compile_options(-fsanitize=address)
-  add_link_options(-fsanitize=address)
-endif()
+  add_compile_options(-fsanitize=thread)
+  add_link_options(-fsanitize=thread)
 
 # For valgrind usage (use Debug)
 #add_compile_options(-O0)
@@ -101,6 +99,7 @@ endif()
 find_package(Eigen3 REQUIRED) 
 if(Eigen3_FOUND) 
     message(STATUS "Found Eigen3 version ${Eigen3_VERSION} in ${Eigen3_DIR}")
+    add_compile_definitions(EIGEN_DONT_PARALLELIZE)
 endif()
 
 # Look for NLOPT

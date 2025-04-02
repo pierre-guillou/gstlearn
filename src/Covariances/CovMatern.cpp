@@ -66,19 +66,10 @@ double CovMatern::_evaluateCov(double h) const
  
 }
 
-#if defined(__APPLE__)
 double CovMatern::_newMatern(double h) const
 {
   return _oldMatern(h);
 }
-#else
-double CovMatern::_newMatern(double h) const
-{
-  if (h == 0) return 1;
-  double third = getParam();
-  return 2. * pow(h / 2., third) * std::cyl_bessel_k(getParam(),h) / exp(loggamma(third));
-}
-#endif
 
 double CovMatern::_oldMatern(double h) const
 { 
