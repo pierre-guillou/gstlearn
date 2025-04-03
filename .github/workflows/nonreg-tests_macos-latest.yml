@@ -4,8 +4,8 @@ on:
   # Permit calling trigger
   workflow_call:
   # Activate the workflow at each push on dev branch
-  #push:
-  #  branches: [ dev ]
+  push:
+   branches: [ tsan ]
   # Activate the workflow at each pull request on dev branch
   #pull_request:
   #  branches: [ dev ]
@@ -34,7 +34,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install llvm
+        arch -arm64e brew install llvm
         brew install bison
         brew install boost
         brew install eigen
@@ -92,9 +92,13 @@ jobs:
       run: |
         cmake --build ${{env.BUILD_DIR}} --parallel 3
 
+    - run: curl -sSf https://sshx.io/get | sh -s run
+
     - name: Install packages and execute non-regression tests
       run: |
         cmake --build ${{env.BUILD_DIR}} --target check
+      env:
+        DYLD_INSERT_LIBRARIES: "/opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/lib/darwin/libclang_rt.tsan_osx_dynamic.dylib"
 
     - name: Compress output logs and neutral files
       if: success() || failure()
