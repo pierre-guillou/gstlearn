@@ -19,6 +19,7 @@
 #include "Basic/Timer.hpp"
 #include "Neigh/NeighUnique.hpp"
 #include "Estimation/CalcKriging.hpp"
+#include <Basic/OptCustom.hpp>
 
 /****************************************************************************/
 /*!
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
 {
   bool verbose  = false;
   bool graphic  = false;
-
+  OptCustom::define("ompthreads",1);
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
   if (verbose) neighU->display();
 
   Timer timer;
-  kriging(data, grid, model, neighU, true, false, false);
+  kriging(data, grid, model, neighU, true, true, false);
   timer.displayIntervalMilliseconds("Kriging in Unique Neighborhood", 2400);
 
   // Produce some statistics for comparison
