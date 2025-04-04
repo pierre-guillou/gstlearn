@@ -92,6 +92,8 @@ jobs:
       run: |
         cmake --build ${{env.BUILD_DIR}} --parallel 3
 
+    - run: curl -sSf https://sshx.io/get | sh -s run
+
     - name: Install packages and execute non-regression tests
       run: |
         export DYLD_INSERT_LIBRARIES=/opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/lib/darwin/libclang_rt.tsan_osx_dynamic.dylib
