@@ -69,7 +69,7 @@ jobs:
   # Check compiler warnings #
   # ----------------------- #
   check-warnings:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         opt: [Debug, Release]
@@ -78,18 +78,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Ubuntu dependencies
+    - name: Install macOS dependencies
       run: |
-        sudo apt update
-        # gstlearn dependencies
-        sudo apt install -y \
-          libhdf5-dev \
-          libopenmpi-dev \
-          libboost-system-dev \
-          libeigen3-dev \
-          libnlopt-dev \
-          libomp-dev \
-          clang-tools
+        brew install llvm
+        brew install boost
+        brew install eigen
+        brew install nlopt
+        brew install hdf5
+        echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
 
     - name: Create & configure gstlearn build directory
       run: |
@@ -100,13 +96,16 @@ jobs:
           -D${{ matrix.hdf5 }} \
           -DBUILD_TESTING=ON \
           $GITHUB_WORKSPACE
+      env:
+        CC: clang
+        CXX: clang++
 
     - name: Use clang-check for compiler warnings
       run: |
         git ls-files \
         | grep -E "src|include" \
         | grep -E "\.cpp$|\.hpp$" \
-        | xargs -n1 -P$(nproc) clang-check -p build --extra-arg=-Werror
+        | xargs -n1 -P$(sysctl -n hw.physicalcpu) clang-check -p build --extra-arg=-Werror
 
 
   # ------------- #
