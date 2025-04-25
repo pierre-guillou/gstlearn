@@ -74,6 +74,7 @@ jobs:
         cmake `
           -B${{ env.BUILD_DIR }} `
           -DHDF5_USE_STATIC_LIBRARIES=ON `
+          -DCMAKE_COMPILE_WARNING_AS_ERROR=ON `
           -DBUILD_TESTING=ON `
           -DBUILD_PYTHON=ON
       env:
