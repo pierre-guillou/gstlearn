@@ -54,6 +54,7 @@ jobs:
       run: |
         pixi run cmake `
           -B${{ env.BUILD_DIR }} `
+          -DCMAKE_COMPILE_WARNING_AS_ERROR=ON `
           -DBUILD_TESTING=ON `
           -DBUILD_PYTHON=ON
       env:
