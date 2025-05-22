@@ -39,8 +39,8 @@ add_custom_target(check_py
 # Add dependency for check_py
 add_dependencies(check_py prepare_check_py)
 
-# Look for Python3 (needed here because Python3_EXECUTABLE not populated everywhere)
-find_package(Python3 REQUIRED)
+# Look for uv (needed here because UV not populated everywhere)
+find_program(UV NAMES uv REQUIRED DOC "Python package and project manager")
 # Python script test runner path
 cmake_path(APPEND CMAKE_SOURCE_DIR python run_test_py.py
            OUTPUT_VARIABLE RUN_TEST_SCRIPT)
@@ -57,7 +57,7 @@ foreach(TEST_SOURCE_FILE ${TEST_SOURCES})
                OUTPUT_VARIABLE TEST_SOURCE_FILE)
     # Run the test (and generate log in ${TEST_DST_DIR}) (use a test runner script for stdout redirection)
     add_test(NAME ${TEST_NAME}_py
-             COMMAND ${Python3_EXECUTABLE} ${RUN_TEST_SCRIPT} ${TEST_SOURCE_FILE} ${TEST_DST_DIR})
+             COMMAND ${UV} run ${RUN_TEST_SCRIPT} ${TEST_SOURCE_FILE} ${TEST_DST_DIR})
     # Compare the output result (diff output is shown when CTEST_OUTPUT_ON_FAILURE=1)
     set(REF_FILE ${CMAKE_CURRENT_SOURCE_DIR}/output/${TEST_NAME}.ref)
     # Use maybe a specific output log for the local computer
