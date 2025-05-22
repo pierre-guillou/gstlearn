@@ -244,8 +244,10 @@ endforeach()
 option(NO_INTERNET "Do not try to connect to Internet" OFF)
 message(STATUS "NO_INTERNET=" ${NO_INTERNET})
 
+find_program(UV NAMES uv REQUIRED DOC "Python package and project manager")
+
 if (NO_INTERNET)
-  set(NO_INTERNET_ARG "--no-build-isolation")
+  set(NO_INTERNET_ARG "--offline")
 else()
   set(NO_INTERNET_ARG "")
 endif()
@@ -253,8 +255,10 @@ endif()
 # Add a custom target for python package installation
 # TODO: Do also installation each time setup.py.in or README.md is modified
 add_custom_target(python_install
-  COMMAND ${Python3_EXECUTABLE} -m pip install ${NO_INTERNET_ARG} "${PYTHON_PACKAGE_ROOT_FOLDER}[plot,conv,doc]"
-  COMMENT "Installing python package"
+  COMMAND ${UV} venv
+  COMMAND ${UV} pip install ${NO_INTERNET_ARG} "${PYTHON_PACKAGE_ROOT_FOLDER}[plot,conv,doc]"
+  COMMENT "Installing python package in an uv venv"
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
  
 # Tell to CMake that python package must be built before installation [python_doc is optional]
