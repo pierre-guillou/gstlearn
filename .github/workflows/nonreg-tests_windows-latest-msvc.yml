@@ -40,9 +40,18 @@ jobs:
     - name: Install dependencies
       run: |
         pixi init
-        pixi add python==${{env.PYTHON_VERSION}}
-        pixi add pip numpy pandas scipy mlxtend
         pixi add libboost-devel eigen ninja hdf5 nlopt
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: ${{env.PYTHON_VERSION}}
+        activate-environment: true
+
+    - name: Install python dependencies
+      run: |
+        uv pip install numpy
+        uv pip install pandas scipy mlxtend
 
     - name: Run sccache-cache
       uses: mozilla-actions/sccache-action@v0.0.9
