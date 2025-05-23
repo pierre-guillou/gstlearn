@@ -255,12 +255,19 @@ endif()
 # Add a custom target for python package installation
 # TODO: Do also installation each time setup.py.in or README.md is modified
 add_custom_target(python_install
-  COMMAND ${UV} venv
   COMMAND ${UV} pip install ${NO_INTERNET_ARG} "${PYTHON_PACKAGE_ROOT_FOLDER}[plot,conv,doc]"
-  COMMENT "Installing python package in an uv venv"
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  COMMENT "Installing python package"
   )
  
 # Tell to CMake that python package must be built before installation [python_doc is optional]
 
 add_dependencies(python_install python_build)
+
+if(NOT DEFINED ENV{VIRTUAL_ENV})
+  add_custom_target(python_create_venv
+    COMMAND ${UV} venv
+    COMMENT "Creating a new venv with uv"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_dependencies(python_install python_create_venv)
+endif()
