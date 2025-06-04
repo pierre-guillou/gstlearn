@@ -206,7 +206,7 @@ String ASerializable::buildFileName(int status, const String& filename, bool ens
   }
   else
   {
-    fileLocal = std::filesystem::current_path() / "gstlearn_dir";
+    fileLocal = std::filesystem::current_path();
   }
 
   if (ensureDirExist)
