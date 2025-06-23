@@ -36,6 +36,7 @@ Vecchia::Vecchia(ModelGeneric* model,
   , _dbOnePoint(nullptr)
   , _Dmat()
 {
+  setAuthorizedAnalyticalGradients(false);
   _nt   = (db1 == nullptr) ? 0 : db1->getNSample();
   _nd   = (db2 == nullptr) ? 0 : db2->getNSample();
   _chol = new CholeskyDense();

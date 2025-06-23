@@ -9,7 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Model/ModelOptimVario.hpp"
-
+#include "Basic/OptCustom.hpp"
 #include "Model/AModelFitSills.hpp"
 #include "Model/ModelFitSillsVario.hpp"
 #include "geoslib_define.h"

@@ -33,7 +33,7 @@
 #include "Model/ModelOptimVario.hpp"
 #include "Model/ModelOptimVMap.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
-
+#include "Basic/OptCustom.hpp"
 #include "geoslib_define.h"
 #include "geoslib_old_f.h"
 

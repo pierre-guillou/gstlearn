@@ -9,6 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Estimation/Likelihood.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Db/RankHandler.hpp"
 #include "Estimation/ALikelihood.hpp"
 #include "Space/SpacePoint.hpp"

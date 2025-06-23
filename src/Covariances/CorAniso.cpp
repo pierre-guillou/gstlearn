@@ -841,9 +841,9 @@ void CorAniso::_initParamInfo()
     {
       for (int idim = 0; idim < getNDim(); idim++)
       {
-        String name  = "Scale_" + std::to_string(idim);
+        String name  = "logScale_" + std::to_string(idim);
         double value = _aniso.getRadius(idim);
-        ParamInfo pis(name, value, {0, INF}, "Scale in Dimension " + std::to_string(idim + 1));
+        ParamInfo pis(name, value, {-INF, INF}, "log Scale in Dimension " + std::to_string(idim + 1));
         _scales.push_back(pis);
 
         if (getNDim() > 2 || idim < 1)
@@ -863,9 +863,9 @@ void CorAniso::initParams(const MatrixSymmetric& vars, double href)
   DECLARE_UNUSED(vars);
   for (auto& sc: _scales)
   {
-    sc.increaseMin(5 * href * EPSILON2);
-    sc.decreaseMax(100 * href);
-    sc.setValue(href);
+    sc.increaseMin(log(5 * href * EPSILON2));
+    sc.decreaseMax(log(100 * href));
+    sc.setValue(log(href));
   }
 }
 
@@ -1595,7 +1595,7 @@ void CorAniso::appendParams(ListParams& listparams,
         double deriv = derivCache->get(this, p1, p2, ivar, jvar, mode);
         VectorDouble res(incr.size());
         this->_aniso.getRotation().rotateInverse(incr, res);
-        double result = -deriv * pow(res[i], 2) / pow(sc.getValue(), 3);
+        double result = -deriv * pow(res[i], 2) / pow(exp(sc.getValue()), 2);
         return result;
       });
     i++;
@@ -1663,7 +1663,7 @@ void CorAniso::updateCov()
       {
         _aniso.setRotationAngle(idim, _angles[idim].getValue());
       }
-      _aniso.setRadiusDir(idim, _scales[idim].getValue());
+      _aniso.setRadiusDir(idim, exp(_scales[idim].getValue()));
     }
   }
 }

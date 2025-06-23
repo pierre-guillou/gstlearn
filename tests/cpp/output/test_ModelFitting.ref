@@ -51,11 +51,11 @@ Number of drift equation(s)  = 0
 Covariance Part
 ---------------
 Nugget Effect
-- Sill         =      2.658
+- Sill         =      2.741
 Spherical
-- Sill         =      2.520
-- Range        =      1.000
-Total Sill     =      5.179
+- Sill         =      5.954
+- Range        =      2.718
+Total Sill     =      8.694
 Known Mean(s)     0.000
 
 Model fitting from Variogram (new version)
@@ -93,14 +93,14 @@ Number of drift equation(s)  = 0
 Covariance Part
 ---------------
 Nugget Effect
-- Sill         =      1.968
+- Sill         =      1.970
 Spherical
-- Sill         =      2.758
+- Sill         =      2.756
 - Ranges       =      0.222     0.258
-- Angles       =      0.001     0.000
+- Angles       =      7.592     0.000
 - Rotation Matrix
                [,  0]    [,  1]
-     [  0,]     1.000     0.000
-     [  1,]     0.000     1.000
-Total Sill     =      4.726
+     [  0,]     0.991    -0.132
+     [  1,]     0.132     0.991
+Total Sill     =      4.727
 Known Mean(s)     0.000

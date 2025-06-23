@@ -11,6 +11,7 @@
 
 #include "Basic/AStringable.hpp"
 #include "Basic/File.hpp"
+#include "Basic/OptCustom.hpp"
 #include "Db/Db.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Model/Model.hpp"
@@ -39,9 +40,10 @@ int main(int argc, char* argv[])
   int mode = 0;
   simtub(nullptr, db, model, nullptr, 1, 234555, 3000);
   bool verbose = false;
-  bool trace   = false;
+  bool trace   = true;
   if (mode == 0 || mode == 1)
   {
+    OptCustom::define("UseGradient", 0);
     message("Start Fitting Model with Vecchia Approximation\n");
     // Do not use 'verbose' for cross-platforms comparison
     modelfit1->fitNew(db, nullptr, nullptr, nullptr, ModelOptimParam(),
@@ -55,7 +57,7 @@ int main(int argc, char* argv[])
 
     message("Start Fitting Model with Likelihood\n");
     // Do not use 'verbose' for cross-platforms comparison
-
+    OptCustom::define("UseGradient", 1);
     modelfit2->fitNew(db, nullptr, nullptr, nullptr, ModelOptimParam(),
                       ITEST, verbose, trace);
 

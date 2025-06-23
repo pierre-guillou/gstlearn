@@ -10,16 +10,11 @@
 /******************************************************************************/
 #pragma once
 
-#include "Basic/AStringable.hpp"
 #include "Covariances/ACov.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Model/AModelFitSills.hpp"
 #include "Model/ModelGeneric.hpp"
-#include "Model/ModelCovList.hpp"
 #include "Basic/Optim.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/OptCustom.hpp"
-
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
@@ -29,170 +24,32 @@ class GSTLEARN_EXPORT AModelOptim
 {
 public:
   AModelOptim(ModelGeneric* model = nullptr,
-              bool verbose        = false)
-    : _model(model)
-    , _verbose(verbose)
-    , _trace(false)
-  {
-    if (_model == nullptr)
-      throw std::invalid_argument("Model cannot be null");
+              bool verbose        = false);
+  void setEnvironment(const MatrixSymmetric& vars, double href);
 
-    bool useGradient = (bool) OptCustom::query("UseGradient", 1);
-    _params          = _model->generateListParams();
+  AModelOptim& operator=(const AModelOptim& r);
 
-    int nvar                 = _model->getNVar();
-    MatrixSymmetric varsUnit = MatrixSymmetric(nvar);
-    for (int ivar = 0; ivar < nvar; ivar++) varsUnit.setValue(ivar, ivar, 1.);
-    _model->initParams(varsUnit, 1.);
-    _x    = _params->getOptimizableValues();
-    _xmin = _params->getMinValues();
-    _xmax = _params->getMaxValues();
-    if (useGradient)
-      _opt = new Optim(LBFGS, (int)_x.size());
-    else
-      _opt = new Optim(NELDERMEAD, (int)_x.size());
-    _opt->setLowerBounds(_xmin);
-    _opt->setUpperBounds(_xmax);
-    _opt->setXtolRel(EPSILON6);
-    _opt->setObjective([this](const std::vector<double>& x)
-                       { return this->eval(x); });
-    _opt->setGradient([this](vect grad)
-                      { this->evalGrad(grad); },
-                      _params->getDispatch(),
-                      _params->getDispatchIndex());
-    resetIter();
-  };
+  void setAuthorizedAnalyticalGradients(bool authorized);
 
-  void setEnvironment(const MatrixSymmetric& vars, double href)
-  {
-    _model->initParams(vars, href);
-    _x = _params->getOptimizableValues();
-  }
+  bool getAuthorizedAnalyticalGradients() const;
 
-  AModelOptim& operator=(const AModelOptim& r)
-  {
-    if (this != &r)
-    {
-      DECLARE_UNUSED(r)
-      messerr("Assignment operator not implemented for AModelOptim");
-    }
-    return *this;
-  }
+  virtual ~AModelOptim();
 
-  void setAuthorizedAnalyticalGradients(bool authorized)
-  {
-    if (_opt == nullptr)
-    {
-      messerr("Optimizer is not initialized");
-      return;
-    }
-    _opt->setAuthorizedAnalyticalGradients(authorized);
-  }
+  void setGradients(std::vector<std::function<double(const std::vector<double>&)>>& gradients);
 
-  bool getAuthorizedAnalyticalGradients() const
-  {
-    if (_opt == nullptr)
-    {
-      messerr("Optimizer is not initialized");
-      return false;
-    }
-    return _opt->getAuthorizedAnalyticalGradients();
-  }
+  void setVerbose(bool verbose = false, bool trace = false);
 
-  virtual ~AModelOptim()
-  {
-    delete _opt;
-  }
+  double eval(const std::vector<double>& x);
 
-  void setGradients(std::vector<std::function<double(const std::vector<double>&)>>& gradients)
-  {
-    if (_opt == nullptr)
-    {
-      messerr("Optimizer is not initialized");
-      return;
-    }
-    _opt->setGradientComponents(gradients);
-  }
-  void setVerbose(bool verbose = false, bool trace = false)
-  {
-    _verbose = verbose;
-    _trace   = trace;
-    if (trace) _verbose = true;
+  virtual void evalGrad(vect res);
+  void run();
 
-    // Export 'verbose' and 'trace' flags down to FitSill (if defined)
-    ModelCovList* mcv = dynamic_cast<ModelCovList*>(_model);
-    if (mcv != nullptr)
-    {
-      AModelFitSills* amf = mcv->getFitSills();
-      if (amf != nullptr)
-      {
-        // In this internal Fitting Sills procedure, the verbose flag is switched OFF
-        // in order to avoid intermediate printouts
-        amf->setVerbose(false);
-        amf->setTrace(trace);
-      }
-    }
+  void resetIter();
 
-    // In the verbose case, first print the list of parameters
-    if (verbose || trace)
-      _params->display();
-  }
-
-  double eval(const std::vector<double>& x)
-  {
-    _iter++;
-
-    // Set the current parameters inside the Model
-    _params->setValues(x);
-
-    // Update the different parameters of the Model
-    _model->updateModel();
-
-    // Calculate the cost
-    double result = computeCost(false);
-
-    if (_trace)
-    {
-      message("Iteration %4d - Cost = %lf", _iter, result);
-      VH::dump(" - Current parameters", x, false);
-    }
-
-    return result;
-  };
-
-  
-  
-  virtual void evalGrad(vect res) {
-    DECLARE_UNUSED(res)
-  };
-  void _printSummary(double minf, const std::vector<double>& x) const
-  {
-    message("Summary of Optimization procedure:\n");
-    message("Count of Iterations = %4d - Final Cost = %lf\n",
-            _iter, minf);
-    VH::dump("- Final parameters", x, false);
-    ModelCovList* mcv   = dynamic_cast<ModelCovList*>(_model);
-    AModelFitSills* amf = mcv->getFitSills();
-    if (amf != nullptr)
-    {
-      int nitergCum = mcv->getCovList()->getNitergCum();
-      amf->printFitSillSummary(nitergCum);
-    }
-  }
-
-  void run()
-  {
-    double minf = _opt->minimize(_x);
-
-    if (_verbose) _printSummary(minf, _x);
-  }
-
-  void resetIter()
-  {
-    _iter = 0;
-  }
-  
   virtual double computeCost(bool verbose = false) = 0;
+
+private:
+  void _printSummary(double minf, const std::vector<double>& x) const;
 
 protected:
   ModelGeneric* _model; // Pointer to the model being optimized
