@@ -56,4 +56,3 @@ unsigned long long getTotalSystemMemory()
   return avail_pages * page_size;
 }
 #endif
-
