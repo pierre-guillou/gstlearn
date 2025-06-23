@@ -1112,7 +1112,7 @@ void AModelFitSills::printFitSillSummary(int niter) const
   }
 }
 
-int AModelFitSills::_fitSills()
+int AModelFitSills::_fitSillMatrices()
 {
   int status = 0;
   score      = 0.;

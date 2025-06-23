@@ -9,6 +9,8 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Model/ModelCovList.hpp"
+#include "Model/ModelFitSillsVario.hpp"
+#include "Model/ModelFitSillsVMap.hpp"
 #include "Covariances/CovBase.hpp"
 
 ModelCovList::ModelCovList(const CovContext& ctxt)
@@ -63,3 +65,30 @@ void ModelCovList::addCov(const CovBase* cov)
   getCovListModify()->addCov(cov);
 }
 
+void ModelCovList::fitSills(Vario* vario,
+                            const DbGrid* dbmap,
+                            Constraints* constraints,
+                            const ModelOptimParam& mop,
+                            bool verbose,
+                            bool trace)
+{
+  if (vario != nullptr)
+  {
+    setFitSills(ModelFitSillsVario::createForOptim(vario, this, constraints, mop));
+  }
+  else if (dbmap != nullptr)
+  {
+    setFitSills(ModelFitSillsVMap::createForOptim(dbmap, this, constraints, mop));
+  }
+
+  AModelFitSills* amf = getFitSills();
+  if (amf == nullptr) return;
+
+  amf->setVerbose(verbose);
+  amf->setTrace(trace);
+
+  _cova->updateCov();
+
+  // Cancel the structure possibly used for Goulard (to be improved)
+  deleteFitSills();
+}

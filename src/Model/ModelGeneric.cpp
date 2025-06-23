@@ -316,6 +316,7 @@ std::shared_ptr<ListParams> ModelGeneric::generateListParams() const
 {
   auto listParams = std::make_shared<ListParams>();
   _gradFuncs.clear();
+
   // Add Covariance parameters
   if (_cova != nullptr)
   {
@@ -387,7 +388,5 @@ void ModelGeneric::fitNew(const Db* db,
   // Cancel the structure possibly used for Goulard (to be improved)
   ModelCovList* mcv = dynamic_cast<ModelCovList*>(this);
   if (mcv != nullptr)
-  {
     mcv->deleteFitSills();
-  }
 }

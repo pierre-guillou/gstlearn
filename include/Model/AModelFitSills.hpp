@@ -40,7 +40,7 @@ public:
   AModelFitSills& operator=(const AModelFitSills& m);
   virtual ~AModelFitSills();
 
-  virtual int fitSills() { return 0; }
+  virtual int fitSillMatrices() { return 0; }
   int  getNiter() const { return _iterg; }
   void printFitSillSummary(int niter) const;
   void setTrace(bool trace) { _trace = trace;}
@@ -49,7 +49,7 @@ public:
 protected:
   void _resetInitialSill(std::vector<MatrixSymmetric>& sill) const;
   void _allocateInternalArrays(bool flag_exp = true);
-  int  _fitSills();
+  int  _fitSillMatrices();
 
 private:
   int _sillFittingIntrinsic();

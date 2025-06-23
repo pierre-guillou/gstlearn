@@ -22,13 +22,11 @@ void ListParams::updateDispatch()
     {
       nmax = nmax + 1;
       _dispatch.push_back(nmax);
-
     }
     else
     {
       _dispatch.push_back(index);
     }
-    
   }
   makeDispatchIndexFromDispatch();
 }

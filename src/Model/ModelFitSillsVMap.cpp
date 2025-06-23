@@ -98,7 +98,7 @@ int ModelFitSillsVMap::_prepare()
  ** \return  Error return code
  **
  *****************************************************************************/
-int ModelFitSillsVMap::fitSills()
+int ModelFitSillsVMap::fitSillMatrices()
 {
 
   // Initialize Model-dependent quantities
@@ -107,7 +107,7 @@ int ModelFitSillsVMap::fitSills()
   // In this iterative manner of Fitting Sills, the verbose flag is switched OFF
   // in order to avoid intermediate printouts
   setVerbose(false);
-  int status =  _fitSills();
+  int status =  _fitSillMatrices();
 
   return status;
 }
@@ -160,9 +160,14 @@ void ModelFitSillsVMap::_computeVMap()
  *****************************************************************************/
 void ModelFitSillsVMap::_updateFromModel()
 {
-  VectorDouble d0(_ndim);
   MatrixSquare tab(_nvar);
+
+  VectorDouble d0(_ndim);
   _dbmap->rankToIndice(_nech / 2, _indg1);
+  for (int idim = 0; idim < _ndim; idim++)
+    d0[idim] = _indg1[idim] * _dbmap->getDX(idim);
+  SpacePoint origin(d0);
+  SpacePoint P = origin;
 
   /* Loop on the basic structures */
 
@@ -177,15 +182,15 @@ void ModelFitSillsVMap::_updateFromModel()
     {
       _dbmap->rankToIndice(ipadir, _indg2);
       for (int idim = 0; idim < _ndim; idim++)
-        d0[idim] = (_indg2[idim] - _indg1[idim]) * _dbmap->getDX(idim);
-      _model->evaluateMatInPlace(nullptr, d0, tab, true, 1., &_calcmode);
+        d0[idim] = _indg2[idim] * _dbmap->getDX(idim);
+      P.setCoords(d0);
 
       /* Loop on the variables */
 
       int ijvar = 0;
       for (int ivar = 0; ivar < _nvar; ivar++)
         for (int jvar = 0; jvar <= ivar; jvar++, ijvar++)
-          _ge[icov].setValue(ijvar, ipadir, tab.getValue(ivar, jvar));
+          _ge[icov].setValue(ijvar, ipadir, _model->evalCov(origin, P, ivar, jvar, &_calcmode));
     }
   }
 }
@@ -198,6 +203,7 @@ int ModelFitSillsVMap::_getDimensions()
   _nvar      = _dbmap->getNLoc(ELoc::Z);
   _ndim      = _dbmap->getNLoc(ELoc::X);
   _nvs2      = _nvar * (_nvar + 1) / 2;
+  _ncova     = _model->getNCov();
   _indg1.resize(_ndim);
   _indg2.resize(_ndim);
 

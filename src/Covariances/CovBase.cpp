@@ -545,7 +545,6 @@ void CovBase::_multiplyCorDerivativesBySills(int oldSize, std::vector<covmaptype
 void CovBase::appendParams(ListParams& listParams,
                            std::vector<covmaptype>* gradFuncs)
 {
-
   const auto oldSize = gradFuncs->size();
   _cor->appendParams(listParams, gradFuncs);
   _multiplyCorDerivativesBySills(oldSize, gradFuncs);

@@ -108,7 +108,7 @@ int ModelFitSillsVario::_prepare()
  ** \return  Error return code
  **
  *****************************************************************************/
-int ModelFitSillsVario::fitSills()
+int ModelFitSillsVario::fitSillMatrices()
 {
   // Initialize Model-dependent quantities
   _updateFromModel();
@@ -116,7 +116,7 @@ int ModelFitSillsVario::fitSills()
   // In this iterative manner of Fitting Sills, the verbose flag is switched OFF
   // in order to avoid intermediate printouts
   setVerbose(false);
-  int status = _fitSills();
+  int status = _fitSillMatrices();
 
   return status;
 }
@@ -274,8 +274,7 @@ void ModelFitSillsVario::_updateFromModel()
               d1[idim] = dist * _vario->getCodir(idir, idim);
 
             if (!_ge.empty())
-              _ge[icov].setValue(
-                ijvar, ipadir, cova->evalIvarIpas(1., d1, ivar, jvar, &_calcmode));
+              _ge[icov].setValue(ijvar, ipadir, cova->evalIvarIpas(1., d1, ivar, jvar, &_calcmode));
 
             if (!_dd.empty())
               for (int idim = 0; idim < _ndim; idim++)
@@ -327,8 +326,7 @@ void ModelFitSillsVario::_prepareGoulard()
           }
           else
           {
-            _ge[icov].setValue(
-              ijvar, ipadir, _model->evalIvarIpas(1., d0, ivar, jvar, &mode));
+            _ge[icov].setValue(ijvar, ipadir, _model->evalIvarIpas(1., d0, ivar, jvar, &mode));
           }
         }
     }
