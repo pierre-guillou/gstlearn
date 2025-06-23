@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
   model_simu->display();
 
   // Optimization tests
-  int mode     = 1;
+  int mode     = 0;
   bool verbose = true;
   bool trace   = false;
   Model* model_test;

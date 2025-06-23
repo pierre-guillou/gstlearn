@@ -206,7 +206,6 @@ void ModelOptimVMap::evalGrad(vect res)
 
   for (size_t i = 0, ngrad = gradcov.size(); i < ngrad; i++)
   {
-    res[i]        = 0.;
     double total  = 0.;
     for (int iech = 0; iech < _nech; iech++)
     {

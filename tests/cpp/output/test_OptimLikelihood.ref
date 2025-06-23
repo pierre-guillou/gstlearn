@@ -36,22 +36,20 @@ Model characteristics
 Space dimension              = 2
 Number of variable(s)        = 1
 Number of basic structure(s) = 1
-Number of drift function(s)  = 0
-Number of drift equation(s)  = 0
+Number of drift function(s)  = 1
+Number of drift equation(s)  = 1
 
 Covariance Part
 ---------------
 Exponential
-- Sill         =      2.088
-- Ranges       =      0.061     0.282
-- Theo. Ranges =      0.020     0.094
-- Angles       =     25.059     0.000
-- Rotation Matrix
-               [,  0]    [,  1]
-     [  0,]     0.906    -0.424
-     [  1,]     0.424     0.906
-Total Sill     =      2.088
-Known Mean(s)     0.000
+- Sill         =      0.020
+- Range        =      2.041
+- Theo. Range  =      0.681
+Total Sill     =      0.020
+
+Drift Part
+----------
+Universality_Condition
 Start Fitting Model with Likelihood
 
 Fitted Model
@@ -62,19 +60,22 @@ Model characteristics
 Space dimension              = 2
 Number of variable(s)        = 1
 Number of basic structure(s) = 1
-Number of drift function(s)  = 0
-Number of drift equation(s)  = 0
+Number of drift function(s)  = 1
+Number of drift equation(s)  = 1
 
 Covariance Part
 ---------------
 Exponential
-- Sill         =      2.086
-- Ranges       =      0.063     0.270
-- Theo. Ranges =      0.021     0.090
-- Angles       =     24.826     0.000
+- Sill         =      2.113
+- Ranges       =      0.075     0.257
+- Theo. Ranges =      0.025     0.086
+- Angles       =     25.240     0.000
 - Rotation Matrix
                [,  0]    [,  1]
-     [  0,]     0.908    -0.420
-     [  1,]     0.420     0.908
-Total Sill     =      2.086
-Known Mean(s)     0.000
+     [  0,]     0.905    -0.426
+     [  1,]     0.426     0.905
+Total Sill     =      2.113
+
+Drift Part
+----------
+Universality_Condition

@@ -864,6 +864,7 @@ void CorAniso::initParams(const MatrixSymmetric& vars, double href)
   for (auto& sc: _scales)
   {
     sc.increaseMin(5 * href * EPSILON2);
+    sc.decreaseMax(100 * href);
     sc.setValue(href);
   }
 }

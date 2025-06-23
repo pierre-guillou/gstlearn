@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
   int mode = 0;
   simtub(nullptr, db, model, nullptr, 1, 234555, 3000);
   bool verbose = false;
-  bool trace   = true;
+  bool trace   = false;
   if (mode == 0 || mode == 1)
   {
     message("Start Fitting Model with Vecchia Approximation\n");
