@@ -126,7 +126,9 @@ public:
       AModelFitSills* amf = mcv->getFitSills();
       if (amf != nullptr)
       {
-        amf->setVerbose(verbose);
+        // In this internal Fitting Sills procedure, the verbose flag is switched OFF
+        // in order to avoid intermediate printouts
+        amf->setVerbose(false);
         amf->setTrace(trace);
       }
     }

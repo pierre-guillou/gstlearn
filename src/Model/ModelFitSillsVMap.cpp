@@ -104,9 +104,6 @@ int ModelFitSillsVMap::fitSillMatrices()
   // Initialize Model-dependent quantities
   _updateFromModel();
 
-  // In this iterative manner of Fitting Sills, the verbose flag is switched OFF
-  // in order to avoid intermediate printouts
-  setVerbose(false);
   int status =  _fitSillMatrices();
 
   return status;
