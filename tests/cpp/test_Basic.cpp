@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
 
   int nlag = 25;
   double dlag = 2.;
+  angles = { 30., 120.};
   VarioParam* varioparam = VarioParam::createSeveral2D(angles, nlag, dlag);
   Vario* myvario = Vario::computeFromDb(*varioparam, mypoints);
   myvario->display();
