@@ -16,10 +16,12 @@
 #include "Model/AModelFitSills.hpp"
 #include "Model/ModelGeneric.hpp"
 #include "Model/ModelCovList.hpp"
-#include "geoslib_define.h"
-#include "gstlearn_export.hpp"
 #include "Basic/Optim.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/OptCustom.hpp"
+
+#include "geoslib_define.h"
+#include "gstlearn_export.hpp"
 
 class ModelGeneric;
 
@@ -35,7 +37,7 @@ public:
     if (_model == nullptr)
       throw std::invalid_argument("Model cannot be null");
 
-    bool useGradient = true;
+    bool useGradient = (bool) OptCustom::query("UseGradient", 1);
     _params          = _model->generateListParams();
 
     int nvar                 = _model->getNVar();
@@ -124,7 +126,9 @@ public:
       AModelFitSills* amf = mcv->getFitSills();
       if (amf != nullptr)
       {
-        amf->setVerbose(verbose);
+        // In this internal Fitting Sills procedure, the verbose flag is switched OFF
+        // in order to avoid intermediate printouts
+        amf->setVerbose(false);
         amf->setTrace(trace);
       }
     }
@@ -187,6 +191,7 @@ public:
   {
     _iter = 0;
   }
+  
   virtual double computeCost(bool verbose = false) = 0;
 
 protected:

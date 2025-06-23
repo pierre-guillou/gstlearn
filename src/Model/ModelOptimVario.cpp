@@ -30,7 +30,8 @@ ModelOptimVario::ModelOptimVario(ModelGeneric* model,
   , _vario()
   , _lags()
 {
-  setAuthorizedAnalyticalGradients(true);
+  bool useGradientsAnalytical = (bool) OptCustom::query("AnalyticalGradients",1);
+  setAuthorizedAnalyticalGradients(useGradientsAnalytical);
 }
 
 ModelOptimVario::ModelOptimVario(const ModelOptimVario& m)

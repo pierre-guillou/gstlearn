@@ -54,7 +54,15 @@ public:
   FORWARD_METHOD(getCovList, getTotalSills)
   FORWARD_METHOD(getCovList, isAllActiveCovList)
   FORWARD_METHOD(getCovList, getFitSills,nullptr)
+
   void setCovList(CovList* covs);
   virtual void addCov(const CovBase* cov);
   CovBase* getCovBase(int icov) const { return getCovListModify()->getCovModify(icov); }
+
+  void fitSills(Vario* vario = nullptr,
+                const DbGrid* dbmap = nullptr,
+                Constraints* constraints = nullptr,
+                const ModelOptimParam& mop = ModelOptimParam(),
+                bool verbose = false,
+                bool trace = false);
 };

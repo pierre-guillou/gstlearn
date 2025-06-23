@@ -159,21 +159,24 @@ double ModelOptimVMap::computeCost(bool verbose)
   DECLARE_UNUSED(verbose);
 
   // Evaluate the Cost function
-  double total = 0.;
   VectorDouble d0(_ndim);
   _dbmap->rankToIndice(_nech / 2, _indg1);
   for (int idim = 0; idim < _ndim; idim++)
     d0[idim] = _indg1[idim] * _dbmap->getDX(idim);
   SpacePoint origin(d0);
-  SpacePoint P;
+  SpacePoint P = origin;
 
   /* Loop on the experimental conditions */
+  double total = 0.;
   for (int iech = 0; iech < _nech; iech++)
   {
     _dbmap->rankToIndice(iech, _indg2);
     for (int idim = 0; idim < _ndim; idim++)
       d0[idim] = _indg2[idim] * _dbmap->getDX(idim);
     P.setCoords(d0);
+
+    double dist = distance_intra(_dbmap, _nech / 2, iech, NULL);
+    double wgt  = (dist > 0) ? 1. / dist : 0.;
 
     int ijvar = 0;
     for (int ivar = 0; ivar < _nvar; ivar++)
@@ -183,7 +186,7 @@ double ModelOptimVMap::computeCost(bool verbose)
         if (FFFF(vexp)) continue;
         double vtheo = _model->evalCov(origin, P, ivar, jvar, &_calcmode);
         double delta = vexp - vtheo;
-        total += delta * delta;
+        total  += wgt * delta * delta;
       }
   }
   return total;
@@ -191,26 +194,29 @@ double ModelOptimVMap::computeCost(bool verbose)
 
 void ModelOptimVMap::evalGrad(vect res)
 {
-
   VectorDouble d0(_ndim);
   _dbmap->rankToIndice(_nech / 2, _indg1);
   for (int idim = 0; idim < _ndim; idim++)
     d0[idim] = _indg1[idim] * _dbmap->getDX(idim);
   SpacePoint origin(d0);
-  SpacePoint P;
+  SpacePoint P = origin;
 
   /* Loop on the experimental conditions */
   auto gradcov = _model->getGradients();
 
-  for (size_t i = 0; i < gradcov.size(); i++)
+  for (size_t i = 0, ngrad = gradcov.size(); i < ngrad; i++)
   {
-    res[i] = 0.;
+    res[i]        = 0.;
+    double total  = 0.;
     for (int iech = 0; iech < _nech; iech++)
     {
       _dbmap->rankToIndice(iech, _indg2);
       for (int idim = 0; idim < _ndim; idim++)
         d0[idim] = _indg2[idim] * _dbmap->getDX(idim);
       P.setCoords(d0);
+
+      double dist = distance_intra(_dbmap, _nech / 2, iech, NULL);
+      double wgt  = (dist > 0) ? 1. / dist : 0.;
 
       int ijvar = 0;
       for (int ivar = 0; ivar < _nvar; ivar++)
@@ -220,9 +226,11 @@ void ModelOptimVMap::evalGrad(vect res)
           if (FFFF(vexp)) continue;
           double vtheo  = _model->evalCov(origin, P, ivar, jvar, &_calcmode);
           double dvtheo = gradcov[i](origin, P, ivar, jvar, &_calcmode);
-          res[i] += -2. * (vexp - vtheo) * dvtheo;
+          double delta  = vexp - vtheo;
+          total  += -2. * wgt * delta * dvtheo;
         }
     }
+    res[i] = total;  
   }
 }
 

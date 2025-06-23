@@ -23,6 +23,9 @@
 #include "Db/Db.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Model/ModelFitSillsVario.hpp"
+#include "Model/ModelFitSillsVMap.hpp"
+
 #include "geoslib_define.h"
 
 #include <math.h>
@@ -570,7 +573,7 @@ void CovList::updateCov()
 
   if (_modelFitSills)
   {
-    _modelFitSills->fitSills();
+    _modelFitSills->fitSillMatrices();
     _itergCum += _modelFitSills->getNiter();
   }
 }

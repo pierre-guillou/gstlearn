@@ -40,7 +40,7 @@ public:
 
   IMPLEMENT_CLONING(ModelFitSillsVario)
 
-  int fitSills() override;
+  int fitSillMatrices() override;
 
   static ModelFitSillsVario* createForOptim(const Vario* vario,
                                             ModelGeneric* model,

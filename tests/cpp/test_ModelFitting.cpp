@@ -49,15 +49,19 @@ static Vario* _computeVariogram(Db* db2D, const ECalcVario& calcul)
   return vario;
 }
 
-static void _firstTest(Db* db2D, Model* model, const ECalcVario& calcul, bool verbose)
+static void _firstTest(Db* db2D,
+                       Model* model,
+                       const ModelOptimParam& mop,
+                       const ECalcVario& calcul,
+                       bool verbose,
+                       bool trace)
 {
   DECLARE_UNUSED(verbose);
   mestitle(0, "Sill fitting from Variogram (old version)");
 
   Vario* vario = _computeVariogram(db2D, calcul);
-
-  (void) model_fitting_sills(vario, model);
-  (void)model->dumpToNF("Model_Sills.ascii");
+  model->fitSills(vario, nullptr, nullptr, mop, verbose, trace);
+  (void)model->dumpToNF("Sills.ascii");
   model->display();
 
   delete vario;
@@ -65,6 +69,7 @@ static void _firstTest(Db* db2D, Model* model, const ECalcVario& calcul, bool ve
 
 static void _secondTest(Db* db2D,
                         Model* model,
+                        const ModelOptimParam& mop,
                         const ECalcVario& calcul,
                         bool verbose,
                         bool trace)
@@ -72,12 +77,9 @@ static void _secondTest(Db* db2D,
   mestitle(0, "Model fitting from Variogram (new version)");
 
   Vario* vario = _computeVariogram(db2D, calcul);
-  ModelOptimParam mop = ModelOptimParam();
-  mop.setWmode(2);
-  mop.setFlagGoulard(true);
   model->fitNew(nullptr, vario, nullptr, nullptr, mop, ITEST,
                 verbose, trace);
-  (void)model->dumpToNF("Model_Vario.ascii");
+  (void)model->dumpToNF("FromVario.ascii");
   model->display();
 
   delete vario;
@@ -85,6 +87,7 @@ static void _secondTest(Db* db2D,
 
 static void _thirdTest(DbGrid* dbgrid,
                        Model* model,
+                       const ModelOptimParam& mop,
                        const ECalcVario& calcul,
                        bool verbose,
                        bool trace)
@@ -94,12 +97,9 @@ static void _thirdTest(DbGrid* dbgrid,
   DbGrid* dbmap = db_vmap(dbgrid, calcul, {50,50});
   (void) dbmap->dumpToNF("VMap.ascii");
 
-  ModelOptimParam mop = ModelOptimParam();
-  mop.setWmode(2);
-  mop.setFlagGoulard(true);
   model->fitNew(nullptr, nullptr, dbmap, nullptr, mop, ITEST,
                 verbose, trace);
-  (void)model->dumpToNF("Model_VMap.ascii");
+  (void)model->dumpToNF("FromVMap.ascii");
   model->display();
 
   delete dbmap;
@@ -156,25 +156,32 @@ int main(int argc, char* argv[])
   model_simu->display();
 
   // Optimization tests
-  int mode     = 2;
-  bool verbose = false;
-  bool trace = false;
+  int mode     = 1;
+  bool verbose = true;
+  bool trace   = false;
   Model* model_test;
+  ModelOptimParam mop = ModelOptimParam();
+  mop.setWmode(2);
+
+  OptCustom::define("UseGradient", 0);
+  OptCustom::define("AnalyticalGradients", 0);
 
   if (mode == 0 || mode == 1)
   {
     model_test = model_simu->clone();
-    _firstTest(db2D, model_test, calcul, verbose);
+    _firstTest(db2D, model_test, mop, calcul, verbose, trace);
   }
   if (mode == 0 || mode == 2)
   {
     model_test = model_simu->clone();
-    _secondTest(db2D, model_test, calcul, verbose, trace);
+    mop.setFlagGoulard(false);
+    _secondTest(db2D, model_test, mop, calcul, verbose, trace);
   }
   if (mode == 0 || mode == 3)
   {
     model_test = model_simu->clone();
-    _thirdTest(dbgrid, model_test, calcul, verbose, trace);
+    mop.setFlagGoulard(true);
+    _thirdTest(dbgrid, model_test, mop, calcul, verbose, trace);
   }
 
   delete db2D;

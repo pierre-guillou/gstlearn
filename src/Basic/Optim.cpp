@@ -43,7 +43,6 @@ void Optim::setGradient(std::function<void(vect)> gradient,
   }
   else 
   {
-
     _gradient = std::make_shared<std::function<void(vect)>>(
         [gradient, dispatch,dispatchIndex, this](vect grad_reduced)
         {
