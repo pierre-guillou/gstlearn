@@ -158,6 +158,8 @@ public:
     return result;
   };
 
+  
+  
   virtual void evalGrad(vect res) {
     DECLARE_UNUSED(res)
   };

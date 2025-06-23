@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
   // Optimization tests
   int mode     = 3;
   bool verbose = true;
-  bool trace   = true;
+  bool trace   = false;
   Model* model_test;
   ModelOptimParam mop = ModelOptimParam();
   mop.setWmode(2);
