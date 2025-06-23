@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
   model_simu->display();
 
   // Optimization tests
-  int mode     = 3;
+  int mode     = 1;
   bool verbose = true;
   bool trace   = false;
   Model* model_test;
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
   }
   if (mode == 0 || mode == 3)
   {
-    model_test       = model_simu->clone();
+    model_test = model_simu->clone();
     mop.setFlagGoulard(true);
     _thirdTest(dbgrid, model_test, mop, calcul, verbose, trace);
   }
