@@ -9,11 +9,14 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Estimation/ALikelihood.hpp"
+#include "Basic/LowerTriangularRange.hpp"
 #include "Db/Db.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Model/ModelGeneric.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Matrix/MatrixFactory.hpp"
 #include "LinearOp/CholeskyDense.hpp"
+#include "Space/SpacePoint.hpp"
 
 ALikelihood::ALikelihood(ModelGeneric* model,
                          const Db* db)
@@ -133,7 +136,7 @@ double ALikelihood::computeLogLikelihood(bool verbose)
 
   // Calculate t(L-1) %*% D-1 %*% L-1 applied to Y (L and D from Vecchia)
 
-  _computeCm1Z();
+  _computeCm1Y();
 
   // Calculate the log-determinant
 

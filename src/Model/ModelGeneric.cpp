@@ -89,7 +89,7 @@ double ModelGeneric::computeLogLikelihood(const Db* db, bool verbose)
 {
   auto* like = Likelihood::createForOptim(this, db);
   like->init(verbose);
-  return like->computeCost();
+  return like->computeLogLikelihood(verbose);
 }
 
 /**

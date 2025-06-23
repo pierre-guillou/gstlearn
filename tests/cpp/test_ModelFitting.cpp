@@ -74,7 +74,7 @@ static void _secondTest(Db* db2D,
   Vario* vario = _computeVariogram(db2D, calcul);
   ModelOptimParam mop = ModelOptimParam();
   mop.setWmode(2);
-  mop.setFlagGoulard(false);
+  mop.setFlagGoulard(true);
   model->fitNew(nullptr, vario, nullptr, nullptr, mop, ITEST,
                 verbose, trace);
   (void)model->dumpToNF("Model_Vario.ascii");

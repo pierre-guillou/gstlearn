@@ -9,19 +9,17 @@
 /*                                                                            */
 /******************************************************************************/
 
+#include "Basic/AStringable.hpp"
 #include "Basic/File.hpp"
 #include "Db/Db.hpp"
-#include "Estimation/CalcKriging.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Model/Model.hpp"
-#include "Estimation/CalcGlobal.hpp"
-#include "Neigh/NeighUnique.hpp"
-#include "Neigh/NeighMoving.hpp"
-#include "Variogram/Vario.hpp"
-#include "Variogram/VarioParam.hpp"
+#include "Simulation/CalcSimuTurningBands.hpp"
 
 /**
- * This file is meant to perform any test that needs to be coded for a quick trial
- * It will be compiled but not run nor diff'ed.
+ * This file is meant to parametrized the ModelGeneric in terms of ParamInfo
+ * and to fit the values of these parameters according to the Maximum LogLikelihood
+ * method and using the Vecchia approximation.
  */
 int main(int argc, char* argv[])
 {
@@ -29,39 +27,43 @@ int main(int argc, char* argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  int ndim = 2;
-  defineDefaultSpace(ESpaceType::RN, ndim);
+  Db* db           = Db::createFillRandom(100, 2, 0);
+  Model* model     = Model::createFromParam(ECov::EXPONENTIAL, TEST, 2., 1., {0.1, 0.3}, MatrixSymmetric(), {30., 0});
+  Model* modelfit1 = Model::createFromParam(ECov::EXPONENTIAL, TEST, 1, 1, {1., 1.}, MatrixSymmetric(), {0., 0});
+  Model* modelfit2 = modelfit1->clone();
+  mestitle(0, "Test fit likelihood");
 
-  Db* dat = Db::createFillRandom(20, 2, 2);
-  dat->display();
+  mestitle(1, "True Model");
+  model->display();
+  int mode = 2;
+  simtub(nullptr, db, model, nullptr, 1, 234555, 3000);
+  bool verbose = false;
+  bool trace   = true;
+  if (mode == 0 || mode == 1)
+  {
+    message("Start Fitting Model with Vecchia Approximation\n");
+    // Do not use 'verbose' for cross-platforms comparison
+    modelfit1->fitNew(db, nullptr, nullptr, nullptr, ModelOptimParam(),
+                      30, verbose, trace);
 
-  DbGrid* target = DbGrid::createFillRandom({10,10}, 1);
-  target->display();
-  dat->setLocators({"z-1", "z-2"}, ELoc::Z);
-  target->setLocators({"z"}, ELoc::Z);
+    mestitle(1, "Fitted Model");
+    modelfit1->display();
+  }
+  if (mode == 0 || mode == 2)
+  {
 
-  VarioParam* varioparam = VarioParam::createMultiple(2, 30, 10);
-  Vario vario_raw2dir    = Vario(*varioparam);
-  (void) vario_raw2dir.compute(dat);
+    message("Start Fitting Model with Likelihood\n");
+    // Do not use 'verbose' for cross-platforms comparison
 
-  Model fitmod_raw = Model();
-  (void) fitmod_raw.fit(&vario_raw2dir,
-                        {ECov::NUGGET, ECov::EXPONENTIAL, ECov::CUBIC, ECov::LINEAR});
-  fitmod_raw.setDriftIRF(0, 0);
-  fitmod_raw.display();
+    modelfit2->fitNew(db, nullptr, nullptr, nullptr, ModelOptimParam(),
+                      ITEST, verbose, trace);
 
-  KrigOpt krigopt          = KrigOpt();
-  NeighUnique* uniqueNeigh = NeighUnique::create();
-  NeighMoving* movingNeigh = NeighMoving::create(20, 100);
-
-  krigopt.setColCok({1, -1});
-
-  // this one throws an error
-  (void)kriging(dat, target, &fitmod_raw, uniqueNeigh,true,false,false,
-                krigopt, NamingConvention("COLCOK"));
-
-  // this one runs but results are not correct
-  (void)kriging(dat, target, &fitmod_raw, movingNeigh,true,false,false,
-                krigopt, NamingConvention("COLCOK"));
+    mestitle(1, "Fitted Model");
+    modelfit2->display();
+  }
+  delete db;
+  delete model;
+  delete modelfit1;
+  delete modelfit2;
   return (0);
 }

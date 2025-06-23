@@ -973,8 +973,8 @@ int AModelFitSills::_goulardWithoutConstraint(int niter,
         for (int icov = 0; icov < ncova; icov++)
           mp.setValue(ijvar, ipadir,
                       mp.getValue(ijvar, ipadir) +
-                        sill[icov].getValue(ivar, jvar) *
-                          ge[icov].getValue(ijvar, ipadir));
+                        (sill[icov].getValue(ivar, jvar) *
+                          ge[icov].getValue(ijvar, ipadir)));
       }
 
   for (int icov = 0; icov < ncova; icov++)
@@ -1019,8 +1019,8 @@ int AModelFitSills::_goulardWithoutConstraint(int niter,
           {
             mp.setValue(ijvar, ipadir,
                         mp.getValue(ijvar, ipadir) -
-                          sill[icov].getValue(ivar, jvar) *
-                            ge[icov].getValue(ijvar, ipadir));
+                          (sill[icov].getValue(ivar, jvar) *
+                            ge[icov].getValue(ijvar, ipadir)));
             sum += fk[icov].getValue(ijvar, ipadir) * mp.getValue(ijvar, ipadir);
           }
           coeff = aic[icov].getValue(ivar, jvar) -
@@ -1062,8 +1062,8 @@ int AModelFitSills::_goulardWithoutConstraint(int niter,
           for (int ipadir = 0; ipadir < npadir; ipadir++)
             mp.setValue(ijvar, ipadir,
                         mp.getValue(ijvar, ipadir) +
-                          sill[icov].getValue(ivar, jvar) *
-                            ge[icov].getValue(ijvar, ipadir));
+                          (sill[icov].getValue(ivar, jvar) *
+                            ge[icov].getValue(ijvar, ipadir)));
         }
     }
 

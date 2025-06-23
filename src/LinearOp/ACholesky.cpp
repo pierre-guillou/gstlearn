@@ -93,7 +93,7 @@ int ACholesky::solveMatrix(const MatrixDense& b, MatrixDense& x) const
   VectorDouble xcol(nrows);
   for (int icol = 0; icol < ncols; icol++)
   {
-    VectorDouble bcol = b.getColumn(icol);
+    auto bcol = b.getViewOnColumn(icol);
     solve(bcol, xcol);
     x.setColumn(icol, xcol);
   }

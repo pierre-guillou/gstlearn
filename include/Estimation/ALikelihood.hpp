@@ -40,7 +40,7 @@ private:
     DECLARE_UNUSED(verbose);
   }
   virtual void _computeCm1X()           = 0;
-  virtual void _computeCm1Z()           = 0;
+  virtual void _computeCm1Y()           = 0;
   virtual double _computeLogDet() const = 0;
   virtual void _init(bool verbose = false)
   {

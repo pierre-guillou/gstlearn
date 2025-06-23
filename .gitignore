@@ -44,6 +44,7 @@ doc/details/*.pdf
 .*~
 .metadata
 doc/details/*.aux
+doc/details/*.out
 doc/details/*.log
 doc/details/*.pdf
 doc/details/*.fdb_latexmk

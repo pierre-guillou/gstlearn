@@ -15,7 +15,7 @@
 
 Optim::Optim(opt_algorithm algo, int dim)
   : _opt(nlopt_create((nlopt_algorithm)algo, dim))
-  , _authorizedAnalyticalGradients(false)
+  , _authorizedAnalyticalGradients(true)
 {
   if (!_opt) throw std::runtime_error("Échec de création de l'optimiseur NLopt");
 }

@@ -1,0 +1,327 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{authblk}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\geometry{margin=1in}
+
+\title{Automatic fitting of a linear model of coregionalisation under constraints on the sum of the sills of the simple variograms}
+\author[1]{N. Desassis}
+\author[2]{D. Renard}
+\affil[1]{Université Paris Sciences et Lettres}
+\affil[2]{MINES ParisTech, PSL Research University}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+The aim of this note is to describe a new algorithm to fit a multivariate variogram by a linear model of coregionalisation (LMC) under some constraints on the sum of the sills of the simple variograms. This algorithm iterates a procedure on each coregionalisation matrix in order to decrease the least-square misfit function at each iteration, as for the initial algorithm proposed by Goulard and Voltz (1992) in the case of fitting without constraints. However, the constraints on the sum of the sills impose that when the sill of a given variable for a basic structure changes, the other sills of the same variable for the other basic structures also change. This is not compatible with the spirit of the usual Goulard and Voltz’s algorithm which works separately on each basic structure by letting the other coregionalization matrices unchanged. The solution proposed in this paper is to use auxiliary coregionalisation matrices.
+
+The note is organized as follows. In a first part, we establish the notations and briefly recall how the usual algorithm works for fitting the LMC without constraint. Then we describe the adaptation made for the new algorithm in the second part. The initialisation is also discussed.
+
+
+\section{Reminder on the Linear Model of Coregionalization (LMC) and its fitting}
+
+\subsection{The linear model of coregionalization}
+
+The aim is to model simultaneously the simple and cross-variograms $\hat{\gamma}_{ij}(h_k), i, j = 1, \ldots, N$ for a set of lags $h_k, k = 1, \ldots, K$ and a set of $N$ variables.
+
+To model the $\gamma_{ij}$, we consider $S$ basic structures $\gamma^{(u)}(\cdot; \theta_u)$, each one parameterized by a vector $\theta_u$ (for instance the range parameter, the anisotropy ratios and the rotation angles but not the sills) and we set for all $(i,j) \in \{1, \ldots, N\}^2$:
+
+\[
+\gamma_{ij}(h) = \sum_{u=1}^S t_{ij}^{(u)} \gamma^{(u)}(h; \theta_u)
+\]
+
+where the $t_{ij}^{(u)}$ are some real numbers collected in some matrices $T^{(u)}$ which are positive semi-definite.
+
+\subsection{Fitting the sills}
+
+To fit the sills, we suppose that the vector $\theta_u$ is known for $u = 1, \ldots, S$ (so, in this part we will write $\gamma^{(u)}(h)$ instead of $\gamma^{(u)}(h; \theta_u)$). Then, we try to find the matrices $T^{(u)}$ which must be positive semi-definite and which will provide the best fitting according to the least squares criterion. More precisely, the aim is to minimize the following cost function:
+
+\[
+W(T^{(1)}, \ldots, T^{(S)}) = \frac{1}{2} \sum_{i=1}^N \sum_{j=1}^N \sum_{k=1}^K w_{ijk} R_{ij}^2(h_k),
+\]
+
+where the $w_{ijk}$ are some known weights, and
+
+\[
+R_{ij}(h_k) = \hat{\gamma}_{ij}(h_k) - \gamma_{ij}(h_k)
+\]
+
+is the residual for lag $k$ and the pair of variables $(i, j)$. The classical method to solve this problem is the algorithm proposed by Goulard and Voltz (1992) which will be denoted GV algorithm in the sequel. It is an iterative algorithm on the basic structures. At a given iteration, we consider the $v$-th structure and let the $S - 1$ other ones fixed. We minimize the cost function $W$ with respect to $T^{(v)}$ under the positive semi-definite constraint.
+
+By differentiating $W$ with respect to the elements of $T^{(v)}$ and equating the derivative to zero, we obtain for each $(i,j) \in \{1, \ldots, N\}$
+
+\[
+\hat{t}_{ij}^{(v)} = \frac{\sum_{k=1}^K w_{ijk} R_{ij}^{(v)}(h_k) \gamma^{(v)}(h_k)}{N_{ij}^{(v)}}
+\]
+
+where
+
+\[
+N_{ij}^{(v)} = \sum_{k=1}^K w_{ijk} \gamma^{(v)}(h_k)^2,
+\]
+
+and $R_{ij}^{(v)}(h_k)$ is the residual associated to the $v$-th structure:
+
+\[
+R_{ij}^{(v)}(h_k) = \hat{\gamma}_{ij}(h_k) - \sum_{\substack{u=1 \\ u \neq v}}^S t_{ij}^{(u)} \gamma^{(u)}(h_k).
+\]
+
+The spectral decomposition of $T^{(v)}$ is then computed:
+
+\[
+T^{(v)} = U^T \Omega U
+\]
+
+where $U$ is the eigenvectors matrix of $T^{(v)}$, $U^T$ is the transpose matrix of $U$ and $\Omega$ is the diagonal matrix containing the eigenvalues of $T^{(v)}$.
+
+Then we set:
+
+\[
+T^{(v)+} = U^T \Omega^+ U
+\]
+
+where $\Omega^+$ is the matrix $\Omega$ where the negative eigenvalues have been replaced by 0.
+
+\subsection{Initialization}
+
+In order to increase the convergence speed, Oman and Vakulenko-Lagun (2009) propose to take as initial values the matrices $T^{(u)}$ obtained by the simultaneous minimization of $W$ without the positive semi-definite constraint (in that case, minimizing $W$ with respect to the $T^{(u)}$ is equivalent to solving a classical linear model). Then, if necessary, the matrices $T^{(u)}$ are turned into positive semi-definite ones by truncating their negative eigenvalues to zero. More precisely, we have to solve the following systems for all $(i,j) \in \{1,\ldots,N\}^2$ with $i \leq j$:
+
+\[
+H^{(i,j)} T^{(i,j)} = b^{(i,j)}
+\]
+
+where
+
+\begin{itemize}
+    \item $T^{(i,j)}$ stands for the unknown vector of size $S$ with components $t_{ij}^{(v)}$
+    \item $H^{(i,j)}$ is the $S \times S$ matrix with $(u,v)$-th element:
+    \[
+    H^{(i,j)}_{u,v} = \sum_{k=1}^K w_{ijk} \gamma^{(u)}(h_k) \gamma^{(v)}(h_k)
+    \]
+    \item $b^{(i,j)}$ is the vector of size $S$ with components:
+    \[
+    b^{(i,j)}_v = \sum_{k=1}^K w_{ijk} \hat{\gamma}_{ij}(h_k) \gamma^{(v)}(h_k)
+    \]
+\end{itemize}
+
+If all the resulting coregionalization matrices $T^{(u)}$ are positive semi-definite, then this is the optimal solution and nothing has to be done anymore. If some of them are not, we apply the procedure explained above to make them positive semi-definite and then we iterate the GV algorithm until convergence, which is guaranteed as proved by Oman and Vakulenko-Lagun (2009).
+
+\subsection{Fitting the non-linear parameters}
+
+To estimate the other parameters (range, third parameter, anisotropies ratio and angles, etc.), the hybrid method described in Desassis and Renard (2013) is used. This method reduces the dimension of the problem by treating the sills as some implicit parameters.
+
+\section{Adaptation to the constrained case}
+
+In this paper, we consider that for a set of indexes $C \subset \{1,\ldots,N\}$, we impose for all $r \in C$
+\[
+\sum_{u=1}^S t_{rr}^{(u)} = \sigma_r^2
+\]
+where the $\sigma_r^2$ are given by the user. We will denote $\bar{C} = \{1, \ldots, N\} \setminus C$.
+
+This problem has a unique solution. Indeed, as already stated by Oman and Vakulenko-Lagun (2009), without these new constraints, the problem has a unique solution since it is a minimization problem of a strictly convex and continuous function over a closed convex set. Adding linear constraints on the sum of the sills maintains the set closed and convex as the intersection of two closed and convex sets.
+
+The algorithm proposed in this paper works successively on each structure as in the original version of the GV algorithm. Nevertheless, it is not possible to change only the coefficient of the current basic structure for the simple variogram because of the constraints linking the sill coefficients of the different structures.
+
+To deal with these constraints, we write all the coefficients $t_{ij}^{(u)}$ as follows:
+\[
+t_{ij}^{(u)} = x_i x_j \alpha_{ij}^{(u)}
+\]
+where
+\[
+x_i = \frac{\sigma_i}{\sqrt{S_i}}, \quad S_i = \sum_{u=1}^S \alpha_{ii}^{(u)}
+\]
+
+Note that the formulation above always exists but is not unique\footnote{One way to define them is to choose the $\alpha_{rr}^{(1)} \in \mathbb{R}_+^*$ for each $r$, then the $\alpha_{rr}^{(u)}$ for $u > 1$ are given by:
+\[
+\alpha_{rr}^{(u)} = \frac{\alpha_{rr}^{(1)} t_{rr}^{(u)}}{t_{rr}^{(1)}}
+\]
+The $\alpha_{rj}^{(u)}$ for $r \ne j$ are determined from the $\alpha_{rr}^{(u)}$.}.
+
+Nevertheless, the updating equations of the proposed algorithm will unambiguously define the sequence of $\alpha_{rj}^{(u)}$.
+
+The principle of the algorithm is to successively minimize the cost-function (1) with respect to the current structure coefficients $\alpha_{rr}^{(v)}$ for each $v \in \{1,\ldots,S\}$ and each $r \in \{1,\ldots,N\}$. By this way, if $v$ is the current structure, then for $u \ne v$, the coefficients $\alpha_{rj}^{(u)}$ remain unchanged but the coefficients $t_{rj}^{(u)}$ move together with $\alpha_{rr}^{(v)}$. The procedure is iterated on each $r \in \{1,\ldots,N\}$ and each $u \in \{1,\ldots,S\}$.
+
+Suppose that we work on the $v$-th structure and on the $r$-th variable.
+
+The non-diagonal elements $t_{rj}^{(v)}$ for $j \ne r$ (and so the $\alpha_{rj}^{(v)}$) which minimize the cost-function defined in (1) can be computed by using (2). They only depend on the $\alpha_{ij}^{(u)}$ for $u \ne v$ and on $\alpha_{rr}^{(v)}$ and $\alpha_{jj}^{(v)}$. So, we minimize (1) for each $r$ with respect to the diagonal elements $\alpha_{rr}^{(v)}$ along the solutions given by (2). That means that we minimize the profiled cost-function noted $W^{(v)}$ which is nothing but the cost-function (1) in which the $t_{rj}^{(v)}$ for $j \ne r$ have been replaced by their expression $\hat{t}_{rj}^{(v)}$ given in (2). In other words, the only variable of the profiled cost-function is the current $\alpha_{rr}^{(v)}$ with respect to which the minimization of $W$ is performed. Unlike the classical GV algorithm, we work successively on each $r$ and the final matrix $T^{(v)}$ is not the one for which $W$ is minimum since it was not possible to obtain an analytical expression for such a $T^{(v)}$.
+
+For each variable, let’s consider the profiled cost-function as the sum of three terms:
+\[
+W^{(v)} = D_r + 2E_r^{(v)} + F_r
+\]
+
+where
+
+\[
+D_r = \sum_{\substack{i=1\\i \ne r}}^N \sum_{\substack{j=1\\j \ne r}}^N \sum_{k=1}^K w_{ijk} R_{ij}^2(h_k)
+\]
+
+\[
+E_r^{(v)} = \sum_{\substack{i=1\\i \ne r}}^N \sum_{k=1}^K w_{irk} \left( \hat{\gamma}_{ir}(h_k) - \sum_{\substack{u=1\\u \ne v}}^S x_i x_r \alpha_{ir}^{(u)} \gamma^{(u)}(h_k) - \hat{t}_{ir}^{(v)} \gamma^{(v)}(h_k) \right)^2
+\]
+
+\[
+F_r = \sum_{k=1}^K w_{rrk} R_{rr}^2(h_k)
+\]
+
+Next, we rewrite $E_r^{(v)}$ by replacing $\hat{t}_{ir}^{(v)}$ using equation (2), and derive an explicit form for $W^{(v)}$ as a 4th-degree polynomial in $x_r$.
+
+Let us express $\gamma_{rr}$ as a function of $x_r$ only (i.e., with no occurrence of $\alpha_{rr}^{(v)}$):
+
+\[
+\gamma_{rr}(h) = x_r^2 \sum_{u=1}^S \alpha_{rr}^{(u)} \gamma^{(u)}(h) = x_r^2 \left( \sum_{\substack{u=1\\u \ne v}}^S \alpha_{rr}^{(u)} \gamma^{(u)}(h) + \alpha_{rr}^{(v)} \gamma^{(v)}(h) \right)
+\]
+
+Since the constraint imposes:
+\[
+\sum_{u=1}^S t_{rr}^{(u)} = \sigma_r^2 \Rightarrow x_r^2 \sum_{u=1}^S \alpha_{rr}^{(u)} = \sigma_r^2 \Rightarrow \alpha_{rr}^{(v)} = \frac{\sigma_r^2}{x_r^2} - \sum_{\substack{u=1\\u \ne v}}^S \alpha_{rr}^{(u)}
+\]
+
+We define:
+\[
+M_{rr}^{(v)}(h) = \sum_{\substack{u=1\\u \ne v}}^S \alpha_{rr}^{(u)} \left( \gamma^{(u)}(h) - \gamma^{(v)}(h) \right)
+\]
+
+\[
+C_{rrk}^{(v)} = \hat{\gamma}_{rr}(h_k) - \sigma_r^2 \gamma^{(v)}(h_k)
+\]
+
+So the final expression for $F_r$ becomes:
+\[
+F_r = \sum_{k=1}^K w_{rrk} \left( C_{rrk}^{(v)} - x_r^2 M_{rr}^{(v)}(h_k) \right)^2
+\]
+
+And $E_r^{(v)}$ is also re-written in terms of $x_r$ and known constants. Thus, the full cost $W^{(v)}$ can be written as a 4th-degree polynomial:
+
+\[
+W^{(v)}(x_r) = a x_r^4 + c x_r^2 + d x_r + e
+\]
+
+with constants $a$, $c$, $d$, $e$ defined from the above components.
+
+We minimize this polynomial with respect to $x_r \in [0, x_{\max}]$, where:
+
+\[
+x_{\max} = \frac{\sigma_r}{\sqrt{\sum_{\substack{u=1\\u \ne v}}^S \alpha_{rr}^{(u)}}}
+\]
+
+Once the minimizing $x_r$ is found, we recover:
+\[
+\alpha_{rr}^{(v)} = \frac{\sigma_r^2}{x_r^2} - \sum_{\substack{u=1\\u \ne v}}^S \alpha_{rr}^{(u)}
+\]
+
+Then all $T^{(u)}$ are updated accordingly.
+
+To ensure positive semi-definiteness of $T^{(v)}$, we perform a projection as in the unconstrained case, but preserve diagonal elements $t_{ii}^{(v)}$ for $i \in C$. This is done by:
+
+\begin{enumerate}
+  \item Storing $d_{ii} = t_{ii}^{(v)}$ if $i \in C$, otherwise $d_{ii} = 1$
+  \item Computing standard projection $T^{(v)+}$ using eigenvalue truncation
+  \item Rescaling all entries as:
+  \[
+  t_{ij}^{(v)+} \leftarrow t_{ij}^{(v)+} \sqrt{ \frac{d_{ii} d_{jj}}{t_{ii}^{(v)+} t_{jj}^{(v)+}} }
+  \]
+\end{enumerate}
+
+\subsection{Initialization}
+
+We apply a procedure similar to the unconstrained case. We minimize $W$ without the positive semi-definite constraint but under the constraints:
+
+\[
+t_{ii}^{(u)} \geq 0 \quad \text{for all } i \in \{1,\ldots,N\}, \quad \text{and} \quad \sum_{u=1}^S t_{ii}^{(u)} = \sigma_i^2 \quad \text{if } \sigma_i^2 \text{ is given}
+\]
+
+This is a quadratic problem under linear equality and inequality constraints, solved by the active set algorithm (see e.g. Madsen et al., 2004).
+
+If any matrix is not PSD, we truncate negative eigenvalues to zero, keeping the diagonal elements in $C$ unchanged.
+
+The initial $\alpha_{ij}^{(u)}$ are set equal to the corresponding $t_{ij}^{(u)}$ values.
+
+\subsection{Fitting the non-linear parameters}
+
+Same hybrid method is used in the constrained case to estimate range, anisotropy, and angles.
+
+\subsection{Pseudo-code and comments}
+
+\textbf{(0) Initialization:}
+
+The matrices $\Xi^{(u)}$ are given for all $u = 1, \ldots, S$.
+
+Set $W \leftarrow W(T^{(1)}, \ldots, T^{(S)})$ as in equation (1)
+
+For each $r \in \{1, \ldots, N\}$:
+
+\begin{itemize}
+  \item If $\sigma_r^2$ is not defined, set $x_r \leftarrow 1$
+  \item Else, set $x_r \leftarrow \dfrac{\sigma_r}{\sqrt{\sum_{u=1}^S \alpha_{rr}^{(u)}}}$
+\end{itemize}
+
+Set \texttt{continue = TRUE}
+
+\textbf{(i) While continue:}
+
+\begin{itemize}
+  \item For each $v = 1, \ldots, S$
+  \begin{itemize}
+    \item For each $r \in C$:
+    \begin{enumerate}
+      \item Set $S^{(-v)} = \sum_{\substack{u=1\\u \ne v}}^S \alpha_{rr}^{(u)}$
+      \item If $S^{(-v)} > 0$:
+      \begin{itemize}
+        \item Compute $x_r$ minimizing $W^{(v)}$ on $[0, x_{\max}]$
+        \item If $x_r = 0$:
+        \begin{itemize}
+          \item Set $x_r \leftarrow 1$
+          \item For all $j$, for all $u \ne v$, set $\alpha_{rj}^{(u)} = 0$
+        \end{itemize}
+        \item Update $\alpha_{rr}^{(v)} = \dfrac{\sigma_r^2}{x_r^2} - S^{(-v)}$
+      \end{itemize}
+      \item For all $j$, for all $u$:
+      \begin{itemize}
+        \item If $u \ne v$, set $t_{rj}^{(u)} = t_{jr}^{(u)} \leftarrow \dfrac{\alpha_{rj}^{(u)}}{x_r x_j}$
+        \item Else:
+        \begin{itemize}
+          \item If $j = r$ and $\sigma_r^2$ is defined: $t_{rr}^{(v)} \leftarrow x_r^2 \alpha_{rr}^{(v)}$
+          \item Else: compute $t_{rj}^{(v)}$ and $t_{jr}^{(v)}$ using (2)
+        \end{itemize}
+      \end{itemize}
+      \item If $T^{(v)}$ not PSD, compute $T^{(v)+}$ while preserving diagonals for $j \in C$
+      \item For each $j$, if $j \ne r$ or $\sigma_r^2$ is not defined:
+      \[
+      \alpha_{rj}^{(v)} = \alpha_{jr}^{(v)} \leftarrow t_{rj}^{(v)} / (x_r x_j)
+      \]
+    \end{enumerate}
+  \end{itemize}
+\end{itemize}
+
+Set $W_{\text{old}} \leftarrow W$
+
+Compute $W = W(T^{(1)}, \ldots, T^{(S)})$
+
+If $(W_{\text{old}} - W)/W_{\text{old}} < \varepsilon$, set \texttt{continue = FALSE}
+
+\section*{References}
+
+\begin{itemize}
+  \item Desassis N., Renard D. (2013). Automatic Variogram Modeling by Iterative Least Squares: Univariate and Multivariate Cases. \textit{Mathematical Geosciences}, 45:453–470.
+
+  \item Goulard M., Voltz M. (1992). Linear coregionalization model: tools for estimation and choice of cross-variogram matrix. \textit{Mathematical Geology}, 24(3):269–286.
+
+  \item Madsen K., Nielsen H. B., Tingleff O. (2004). Optimization with Constraints, 2nd edn. Tech. rep., Informatics and Mathematical Modeling, Technical University of Denmark.
+
+  \item Oman S. D., Vakulenko-Lagun B. (2009). Estimation of sill matrices in the linear model of coregionalization. \textit{Mathematical Geosciences}, 41(1):15–27.
+\end{itemize}
+
+\end{document}
+
+\end{document}
+
+
+

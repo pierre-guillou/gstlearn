@@ -388,7 +388,7 @@ void Vecchia::_computeCm1X()
   productMatVecchia(_X, _Cm1X);
 }
 
-void Vecchia::_computeCm1Z()
+void Vecchia::_computeCm1Y()
 {
   _Cm1Y.resize(_Y.size());
   productVecchia(_Y, _Cm1Y);

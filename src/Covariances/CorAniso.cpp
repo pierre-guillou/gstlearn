@@ -48,6 +48,56 @@ static int COVWGT[4][5] = {{2, -2, 0, 0, 0},
                            {20, -30, 12, -2, 0},
                            {70, -112, 56, -16, 2}};
 
+struct DerivCache
+{
+  mutable const SpacePoint* cachedP1ptr = nullptr;
+  mutable const SpacePoint* cachedP2ptr = nullptr;
+  mutable SpacePoint cachedP1;
+  mutable SpacePoint cachedP2 ;
+  mutable double deriv               = 0.0;
+  mutable std::vector<double> angles = {};
+  mutable bool isInitialized         = false;
+
+  double get(CorAniso* cor,
+             const SpacePoint& p1,
+             const SpacePoint& p2,
+             int ivar,
+             int jvar,
+             const CovCalcMode* mode) const
+  {
+    if (!VH::isEqual(angles, cor->getAnisoAngles()))
+    {
+      if (!cor->getParamInfoAngles().empty())
+        cor->getAniso().getRotation().getDerivativesInPlace(cor->getDRot());
+      angles = cor->getAnisoAngles();
+    }
+
+    bool useCache = cachedP1ptr == &p1 && cachedP2ptr == &p2;
+    if (useCache) // check coordinates
+    {
+      auto incr1  = cachedP1.getIncrement(p1);
+      bool equal1 = std::all_of(incr1.begin(), incr1.end(),
+                                [](double val)
+                                { return val == 0.0; });
+      auto incr2  = cachedP2.getIncrement(p2);
+      bool equal2 = std::all_of(incr2.begin(), incr2.end(),
+                                [](double val)
+                                { return val == 0.0; });
+      useCache    = equal1 && equal2;
+    }
+
+    if (!useCache)
+    {
+      deriv    = cor->evalDerivativeBasis(p1, p2, ivar, jvar, mode);
+      cachedP1ptr = &p1;
+      cachedP2ptr = &p2;
+      cachedP1 = p1; // copy to cachedP1
+      cachedP2 = p2; // copy to cachedP2
+    }
+    return deriv;
+  }
+};
+
 CorAniso::CorAniso(const ECov& type, const CovContext& ctxt)
   : ACov(ctxt)
   , /// TODO : shared pointer
@@ -813,7 +863,7 @@ void CorAniso::initParams(const MatrixSymmetric& vars, double href)
   DECLARE_UNUSED(vars);
   for (auto& sc: _scales)
   {
-    sc.increaseMin(5* href * EPSILON2);
+    sc.increaseMin(5 * href * EPSILON2);
     sc.setValue(href);
   }
 }

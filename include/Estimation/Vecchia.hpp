@@ -60,7 +60,7 @@ private:
   void _init(bool verbose = false) override;
   void _updateModel(bool verbose = false) override;
   void _computeCm1X() override;
-  void _computeCm1Z() override;
+  void _computeCm1Y() override;
   double _computeLogDet() const override;
 
 private:

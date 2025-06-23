@@ -54,7 +54,7 @@ class GSTLEARN_EXPORT ModelOptimParam: public AStringable
                                  bool flag_intrinsic = false,
                                  int wmode           = 2,
                                  int maxiter         = 1000,
-                                 double tolred       = EPSILON6);
+                                 double tolred       = EPSILON10);
 
   bool getAuthAniso() const { return _auth_aniso; }
   void setAuthAniso(bool authAniso) { _auth_aniso = authAniso; }
