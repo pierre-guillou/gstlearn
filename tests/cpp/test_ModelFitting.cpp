@@ -157,14 +157,14 @@ int main(int argc, char* argv[])
 
   // Optimization tests
   int mode     = 0;
-  bool verbose = true;
+  bool verbose = false;
   bool trace   = false;
   Model* model_test;
   ModelOptimParam mop = ModelOptimParam();
   mop.setWmode(2);
 
-  OptCustom::define("UseGradient", 0);
-  OptCustom::define("AnalyticalGradients", 0);
+  OptCustom::define("UseGradient", 1);
+  OptCustom::define("AnalyticalGradients", 1);
 
   if (mode == 0 || mode == 1)
   {

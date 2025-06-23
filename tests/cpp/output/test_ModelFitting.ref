@@ -39,9 +39,6 @@ Known Mean(s)     0.000
 
 Sill fitting from Variogram (old version)
 =========================================
-  Summary of Sill Fitting - Count of Iterations =   22 - Final Cost = 0.070827
-  - Covariance 1: Final parameters = 2.658454 
-  - Covariance 2: Final parameters = 2.520249 
 
 Model characteristics
 =====================
@@ -64,24 +61,6 @@ Known Mean(s)     0.000
 Model fitting from Variogram (new version)
 ==========================================
 
-List of Parameters:
--------------------
-1 - Term of the Cholesky decomposition of the sill matrix
-    Value: 1.427176
-    Absolute Bounds: -inf inf 
-    User Bounds: -inf inf 
-2 - Scale in Dimension 1
-    Value: 0.314065
-    Absolute Bounds: 0 inf 
-    User Bounds: 0.025 31.4065 
-3 - Term of the Cholesky decomposition of the sill matrix
-    Value: 1.427176
-    Absolute Bounds: -inf inf 
-    User Bounds: -inf inf 
-Summary of Optimization procedure:
-Count of Iterations =  151 - Final Cost = 0.015039
-- Final parameters:     1.270     0.291     1.610
-
 Model characteristics
 =====================
 Space dimension              = 2
@@ -103,27 +82,6 @@ Known Mean(s)     0.000
 Sill Fitting from Variogram Map (new version)
 =============================================
 
-List of Parameters:
--------------------
-1 - Scale in Dimension 1
-    Value: 0.707107
-    Absolute Bounds: 0 inf 
-    User Bounds: 0.0353553 50 
-2 - Scale in Dimension 2
-    Value: 0.707107
-    Absolute Bounds: 0 inf 
-    User Bounds: 0.0353553 50 
-3 - Angle in Dimension 1
-    Value: 0.000000
-    Absolute Bounds: -inf inf 
-    User Bounds: -inf inf 
-Summary of Optimization procedure:
-Count of Iterations =  245 - Final Cost = 3901.009434
-- Final parameters:     0.222     0.259     7.608
-  Summary of Sill Fitting - Count of Iterations = 3064 - Final Cost = 3901.009434
-  - Covariance 1: Final parameters = 1.969373 
-  - Covariance 2: Final parameters = 2.757649 
-
 Model characteristics
 =====================
 Space dimension              = 2
@@ -135,14 +93,14 @@ Number of drift equation(s)  = 0
 Covariance Part
 ---------------
 Nugget Effect
-- Sill         =      1.969
+- Sill         =      1.968
 Spherical
 - Sill         =      2.758
-- Ranges       =      0.222     0.259
-- Angles       =      7.608     0.000
+- Ranges       =      0.222     0.258
+- Angles       =      0.001     0.000
 - Rotation Matrix
                [,  0]    [,  1]
-     [  0,]     0.991    -0.132
-     [  1,]     0.132     0.991
-Total Sill     =      4.727
+     [  0,]     1.000     0.000
+     [  1,]     0.000     1.000
+Total Sill     =      4.726
 Known Mean(s)     0.000
