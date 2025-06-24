@@ -14,6 +14,7 @@
 
 #include "geoslib_define.h"
 
+#include "Basic/ASerializable.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorT.hpp"
 
@@ -79,11 +80,14 @@ namespace SerializeHDF5
    */
   inline H5::H5File fileOpenRead(const String& fname)
   {
-    H5::H5File file {fname, H5F_ACC_RDONLY};
+    // Build the multi-platform filename
+    const auto filepath = ASerializable::buildFileName(1, fname, true);
+
+    H5::H5File file {filepath, H5F_ACC_RDONLY};
 
     if (!file.nameExists("gstlearn metadata"))
     {
-      messerr("File %s doesn't contain Gstlearn metadata…", fname.c_str());
+      messerr("File %s doesn't contain Gstlearn metadata…", filepath.c_str());
       return file;
     }
 
@@ -91,7 +95,7 @@ namespace SerializeHDF5
     const auto version = readAttribute(metadata, "Format version");
     if (version != "1.0.0")
     {
-      messerr("File %s has format version %s, expected 1.0.0", fname.c_str(),
+      messerr("File %s has format version %s, expected 1.0.0", filepath.c_str(),
               version.c_str());
     }
 
@@ -103,7 +107,10 @@ namespace SerializeHDF5
    */
   inline H5::H5File fileOpenWrite(const String& fname)
   {
-    H5::H5File file {fname, H5F_ACC_TRUNC};
+    // Build the multi-platform filename
+    const auto filepath = ASerializable::buildFileName(2, fname, true);
+
+    H5::H5File file {filepath, H5F_ACC_TRUNC};
     auto metadata = file.createGroup("gstlearn metadata");
     createAttribute(
       metadata, "Description",
