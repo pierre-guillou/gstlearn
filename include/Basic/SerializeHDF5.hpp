@@ -44,16 +44,22 @@ namespace SerializeHDF5
     return H5::StrType {0, H5T_VARIABLE};
   }
 
-  inline void
-  createAttribute(H5::H5Object& obj, const std::string& key, const std::string& value)
+  template<typename T>
+  void
+  createAttribute(H5::H5Object& obj, const std::string& key, const T& value)
   {
     try
     {
-      const auto strtype = H5::StrType {0, H5T_VARIABLE};
-      const hsize_t dim  = 1;
+      const auto type   = getHDF5Type(value);
+      const hsize_t dim = 1;
       const H5::DataSpace ds {1, &dim};
-      auto attr = obj.createAttribute(key, strtype, ds);
-      attr.write(strtype, value);
+      auto attr = obj.createAttribute(key, type, ds);
+      if constexpr (std::is_same<T, std::string>::value)
+        attr.write(type, value);
+      else if constexpr (std::is_convertible<T, std::string>::value)
+        attr.write(type, std::string {value});
+      else
+        attr.write(type, &value);
     }
     catch (H5::AttributeIException& e)
     {
@@ -61,7 +67,8 @@ namespace SerializeHDF5
     }
   }
 
-  inline std::string readAttribute(const H5::H5Object& obj, const std::string& key)
+  template<typename T = std::string>
+  T readAttribute(const H5::H5Object& obj, const std::string& key)
   {
     if (!obj.attrExists(key))
     {
@@ -70,8 +77,11 @@ namespace SerializeHDF5
     }
 
     const auto attr = obj.openAttribute(key);
-    std::string res;
-    attr.read(H5::StrType {0, H5T_VARIABLE}, res);
+    T res;
+    if constexpr (std::is_same<T, std::string>::value)
+      attr.read(getHDF5Type(res), res);
+    else
+      attr.read(getHDF5Type(res), &res);
     return res;
   }
 
