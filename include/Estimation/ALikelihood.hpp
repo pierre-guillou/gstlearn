@@ -12,7 +12,7 @@
 
 #include "Basic/VectorNumT.hpp"
 #include "Matrix/MatrixDense.hpp"
-#include "Estimation/AModelOptimNew.hpp"
+#include "Estimation/AModelOptim.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
@@ -21,7 +21,7 @@
 class Db;
 class ModelGeneric;
 
-class GSTLEARN_EXPORT ALikelihood: public AModelOptimNew
+class GSTLEARN_EXPORT ALikelihood: public AModelOptim
 {
 public:
   ALikelihood(ModelGeneric* model,
@@ -32,6 +32,7 @@ public:
 
   void init(bool verbose = false);
   double computeCost(bool verbose = false) override;
+  double computeLogLikelihood(bool verbose = false);
 
 private:
   virtual void _updateModel(bool verbose = false)
@@ -39,7 +40,7 @@ private:
     DECLARE_UNUSED(verbose);
   }
   virtual void _computeCm1X()           = 0;
-  virtual void _computeCm1Z()           = 0;
+  virtual void _computeCm1Y()           = 0;
   virtual double _computeLogDet() const = 0;
   virtual void _init(bool verbose = false)
   {

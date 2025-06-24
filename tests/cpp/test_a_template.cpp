@@ -9,14 +9,17 @@
 /*                                                                            */
 /******************************************************************************/
 
+#include "Basic/AStringable.hpp"
 #include "Basic/File.hpp"
 #include "Db/Db.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Model/Model.hpp"
-#include "Estimation/CalcGlobal.hpp"
+#include "Simulation/CalcSimuTurningBands.hpp"
 
 /**
- * This file is meant to perform any test that needs to be coded for a quick trial
- * It will be compiled but not run nor diff'ed.
+ * This file is meant to parametrized the ModelGeneric in terms of ParamInfo
+ * and to fit the values of these parameters according to the Maximum LogLikelihood
+ * method and using the Vecchia approximation.
  */
 int main(int argc, char* argv[])
 {
@@ -24,20 +27,43 @@ int main(int argc, char* argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  Db myDb = Db();
-  myDb.addColumns({0, 1}, "longitude", ELoc::X, 0);
-  myDb.addColumns({0, 1}, "latitude", ELoc::X, 1);
-  myDb.addColumns({3, 7}, "density", ELoc::Z, 0);
-  myDb.display();
+  Db* db           = Db::createFillRandom(100, 2, 0);
+  Model* model     = Model::createFromParam(ECov::EXPONENTIAL, TEST, 2., 1., {0.1, 0.3}, MatrixSymmetric(), {30., 0});
+  Model* modelfit1 = Model::createFromParam(ECov::EXPONENTIAL, TEST, 1, 1, {1., 1.}, MatrixSymmetric(), {0., 0});
+  Model* modelfit2 = modelfit1->clone();
+  mestitle(0, "Test fit likelihood");
 
-  DbGrid* myGrid = DbGrid::create({10, 10});
-  myGrid->display();
+  mestitle(1, "True Model");
+  model->display();
+  int mode = 2;
+  simtub(nullptr, db, model, nullptr, 1, 234555, 3000);
+  bool verbose = false;
+  bool trace   = true;
+  if (mode == 0 || mode == 1)
+  {
+    message("Start Fitting Model with Vecchia Approximation\n");
+    // Do not use 'verbose' for cross-platforms comparison
+    modelfit1->fitNew(db, nullptr, nullptr, nullptr, ModelOptimParam(),
+                      30, verbose, trace);
 
-  Model* myModel = Model::createFromParam(ECov::LINEAR, 10, 1);
+    mestitle(1, "Fitted Model");
+    modelfit1->display();
+  }
+  if (mode == 0 || mode == 2)
+  {
 
-  Global_Result res = global_kriging(&myDb, myGrid, myModel, 0, true);
+    message("Start Fitting Model with Likelihood\n");
+    // Do not use 'verbose' for cross-platforms comparison
 
-  delete myGrid;
-  delete myModel;
+    modelfit2->fitNew(db, nullptr, nullptr, nullptr, ModelOptimParam(),
+                      ITEST, verbose, trace);
+
+    mestitle(1, "Fitted Model");
+    modelfit2->display();
+  }
+  delete db;
+  delete model;
+  delete modelfit1;
+  delete modelfit2;
   return (0);
 }

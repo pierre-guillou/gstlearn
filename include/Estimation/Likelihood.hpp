@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Estimation/ALikelihood.hpp"
+#include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "gstlearn_export.hpp"
@@ -27,14 +28,20 @@ public:
   virtual ~Likelihood();
 
   static Likelihood* createForOptim(ModelGeneric* model, const Db* db);
+  void evalGrad(vect res) override;
 
 private:
+  void _fillGradCovMat(RankHandler & rkh, covmaptype& gradcov);
   void _updateModel(bool verbose = false) override;
   void _computeCm1X() override;
-  void _computeCm1Z() override;
+  void _computeCm1Y() override;
   double _computeLogDet() const override;
 
 private:
   MatrixSymmetric _cov;
   CholeskyDense _covChol;
+  MatrixSymmetric _gradCovMat;
+  VectorDouble _temp;
+  MatrixSquare _gradCovMatTimesInvCov;
+
 };

@@ -18,24 +18,6 @@
 
 #include "math.h"
 
-CovExponential::CovExponential(const CovContext& ctxt)
-: ACovFunc(ECov::EXPONENTIAL, ctxt)
-{
-}
-
-CovExponential::CovExponential(const CovExponential &r)
-: ACovFunc(r)
-{
-}
-
-CovExponential& CovExponential::operator=(const CovExponential &r)
-{
-  if (this != &r)
-  {
-    ACovFunc::operator =(r);
-  }
-  return *this;
-}
 
 CovExponential::~CovExponential()
 {
@@ -46,12 +28,6 @@ double CovExponential::getScadef() const
   return (2.995732);
 }
 
-double CovExponential::_evaluateCov(double h) const
-{
-  if (h > MAX_EXP) return (0.);
-  double cov = exp(-h);
-  return (cov);
-}
 
 String CovExponential::getFormula() const
 {
@@ -113,3 +89,10 @@ VectorDouble CovExponential::_evaluateSpectrumOnSphere(int n, double scale) cons
 
   return sp;
 }
+
+// double CovExponential::_evaluateCovDerivative(double h) const
+// {
+//   if (h > MAX_EXP) return (0.);
+//   double cov = -exp(-h);
+//   return (cov);
+// }

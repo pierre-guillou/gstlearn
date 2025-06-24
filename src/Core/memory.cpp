@@ -62,7 +62,7 @@ static void st_mem_update(int size)
  ** Reset the Memory Leak processing structure
  **
  *****************************************************************************/
-void memory_leak_reset(void)
+static void st_memory_leak_reset(void)
 {
   if (!MEMORY_LEAK) return;
 
@@ -98,7 +98,7 @@ static void st_memory_leak_add(const char *call_file,
   if (chunk == NULL)
   {
     messerr("Memory problem: Memory Leak procedure is interrupted");
-    memory_leak_reset();
+    st_memory_leak_reset();
     return;
   }
   (void) gslStrncpy(chunk->call_file, call_file, STORE_NAME_LENGTH);
@@ -115,7 +115,7 @@ static void st_memory_leak_add(const char *call_file,
   if (MemLeak == NULL)
   {
     messerr("Memory problem: Memory Leak procedure is interrupted");
-    memory_leak_reset();
+    st_memory_leak_reset();
     return;
   }
   MemLeak[NB_MEM_CHUNK] = chunk;
@@ -169,83 +169,6 @@ static void st_memory_leak_delete(const char *call_file,
     realloc((char*)MemLeak, (NB_MEM_CHUNK - 1) * sizeof(MemChunk*));
   MemLeak = (MemChunk**)placeholder;
   NB_MEM_CHUNK--;
-}
-
-/****************************************************************************/
-/*!
- ** Report Memory Leak
- **
- *****************************************************************************/
-void memory_leak_report(void)
-{
-  MemChunk *chunk;
-  int total;
-
-  if (!MEMORY_LEAK) return;
-
-  if (NB_MEM_CHUNK <= 0)
-  {
-    message("No Memory Leak\n");
-  }
-  else
-  {
-    total = 0;
-    for (int i = 0; i < NB_MEM_CHUNK; i++)
-    {
-      chunk = MemLeak[i];
-      message("Leak %s (line:%d) : %d words\n", chunk->call_file,
-              chunk->call_line, chunk->size);
-      total += static_cast<int>(chunk->size);
-    }
-    message("Total leak = %d\n", total);
-  }
-}
-
-/****************************************************************************/
-/*!
- ** Set the status of the memory
- **
- ** \param[in]  flag      Activiation flag
- **
- *****************************************************************************/
-void mem_debug_set(int flag)
-{
-  MEMORY_DEBUG = flag;
-}
-
-/****************************************************************************/
-/*!
- ** Set the memory leak mechanism
- **
- ** \param[in]  flag      Activation flag
- **
- *****************************************************************************/
-void memory_leak_set(int flag)
-{
-  MEMORY_LEAK = flag;
-  if (flag == 1)
-    memory_leak_reset();
-  else
-    memory_leak_report();
-}
-
-/****************************************************************************/
-/*!
- ** Print the status of the memory
- **
- ** \param[in] title   Title printed when checking memory
- **
- *****************************************************************************/
-void memory_status(const char *title)
-
-{
-  if (!MEMORY_DEBUG) return;
-  if (title == NULL)
-    message("Memory currently allocated: %d (Max: %d)\n", MEMORY_TOTAL,
-            MEMORY_MAX);
-  else
-    message("Memory currently allocated in %s: %d (Max: %d)\n", title,
-            MEMORY_TOTAL, MEMORY_MAX);
 }
 
 /****************************************************************************/

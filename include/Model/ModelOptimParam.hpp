@@ -54,7 +54,7 @@ class GSTLEARN_EXPORT ModelOptimParam: public AStringable
                                  bool flag_intrinsic = false,
                                  int wmode           = 2,
                                  int maxiter         = 1000,
-                                 double tolred       = EPSILON6);
+                                 double tolred       = EPSILON10);
 
   bool getAuthAniso() const { return _auth_aniso; }
   void setAuthAniso(bool authAniso) { _auth_aniso = authAniso; }
@@ -83,12 +83,12 @@ class GSTLEARN_EXPORT ModelOptimParam: public AStringable
    * @param wmode       type of weighting function (0, 1, 2 or 3, see above)
    * @note The default value for wmode is 2
    */
-  int getWmode() const { return _wmode; }
-  void setWmode(int wmode) { _wmode = wmode; }
-  int getMaxiter() const { return _maxiter; }
-  void setMaxiter(int maxiter) { _maxiter = maxiter; }
+  int    getWmode() const { return _wmode; }
+  void   setWmode(int wmode) { _wmode = wmode; }
+  int    getMaxiter() const { return _maxiter; }
+  void   setMaxiter(int maxiter) { _maxiter = maxiter; }
   double getTolred() const { return _tolred; }
-  void setTolred(double tolred) { _tolred = tolred; }
+  void   setTolred(double tolred) { _tolred = tolred; }
 
 private:
   bool _auth_aniso;        /* Authorize the anisotropy */
@@ -99,7 +99,7 @@ private:
   bool _lock_iso2d;        /* Lock isotropy for 2-D */
   bool _flag_goulard;      /* True if Goulard must be used (for sills) */
   bool _flag_intrinsic;    /* Ask for an intrinsic model */
-  int _wmode;              /* Weighting option (used in Goulard) */
-  int _maxiter;            /* Maximum number of iterations */
+  int  _wmode;             /* Weighting option (used in Goulard) */
+  int  _maxiter;           /* Maximum number of iterations */
   double _tolred;          /* Scaled tolerance (used in calculations) */
 };

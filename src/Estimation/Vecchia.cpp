@@ -19,6 +19,7 @@
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Matrix/MatrixT.hpp"
 #include "Model/ModelGeneric.hpp"
+#include "Stats/Classical.hpp"
 #include "geoslib_define.h"
 
 Vecchia::Vecchia(ModelGeneric* model,
@@ -35,6 +36,7 @@ Vecchia::Vecchia(ModelGeneric* model,
   , _dbOnePoint(nullptr)
   , _Dmat()
 {
+  setAuthorizedAnalyticalGradients(false);
   _nt   = (db1 == nullptr) ? 0 : db1->getNSample();
   _nd   = (db2 == nullptr) ? 0 : db2->getNSample();
   _chol = new CholeskyDense();
@@ -375,6 +377,9 @@ Vecchia* Vecchia::createForOptim(ModelGeneric* model,
                                  int nb_neigh)
 {
   auto* vec = new Vecchia(model, nb_neigh, db, nullptr);
+  MatrixSymmetric vars = dbVarianceMatrix(db);
+  double hmax          = db->getExtensionDiagonal();
+  vec->setEnvironment(vars, hmax);
   vec->init();
   return vec;
 }
@@ -384,7 +389,7 @@ void Vecchia::_computeCm1X()
   productMatVecchia(_X, _Cm1X);
 }
 
-void Vecchia::_computeCm1Z()
+void Vecchia::_computeCm1Y()
 {
   _Cm1Y.resize(_Y.size());
   productVecchia(_Y, _Cm1Y);
