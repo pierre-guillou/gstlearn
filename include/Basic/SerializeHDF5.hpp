@@ -350,7 +350,7 @@ bool SerializeHDF5::readValue(const H5::Group& grp, const String& name, T& value
     return false;
   }
 
-  attr.read(getHDF5Type(value), value);
+  attr.read(getHDF5Type(value), &value);
   return true;
 }
 
@@ -363,7 +363,7 @@ bool SerializeHDF5::writeValue(H5::Group& grp, const String& name, const T& valu
   const hsize_t dim = 1;
   const H5::DataSpace ds {1, &dim};
   auto attr = grp.createAttribute(name, getHDF5Type(value), ds);
-  attr.write(getHDF5Type(value), value);
+  attr.write(getHDF5Type(value), &value);
 
   return true;
 }
