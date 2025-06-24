@@ -11,7 +11,9 @@ mymodel$display()
 
 #We perform one non-conditional simulation using the Turning Band method (the number of bands is set to 1000). This results in adding a field (commonly referred to as a variable) in mygrid which is called Data. Typing the name of the grid data base is an easy way to get a summary of its contents.
 
-err = simtub(NULL, mygrid, mymodel, nbtuba=1000, namconv=NamingConvention("Data"))
+nbtuba = 1000
+seed = 14341
+err = simtub(NULL, mygrid, mymodel, nbtuba=nbtuba, namconv=NamingConvention("Data"), seed=seed)
 mygrid$display()
 
 # We sample the grid on a set of 100 samples randomly located within the area covered by the grid. Typing the name of the newly created data base (mypoints) give the list of variables already stored in this data base.
