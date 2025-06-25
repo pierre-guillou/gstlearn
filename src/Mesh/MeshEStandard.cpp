@@ -13,6 +13,7 @@
 #include "Mesh/MeshEStandard.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Basic/AException.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 MeshEStandard::MeshEStandard()
   : AMesh()
@@ -489,3 +490,59 @@ void MeshEStandard::_defineBoundingBox(void)
   (void) _setExtend(extendmin,extendmax);
 }
 
+#ifdef HDF5
+bool MeshEStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "MeshEStandard" with some error handling
+  auto meshG = SerializeHDF5::getGroup(grp, "MeshEStandard");
+  if (!meshG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+  int napices = 0;
+  int npermesh = 0;
+  int nmeshes = 0;
+  VectorDouble apices;
+  VectorInt meshes;
+
+  ret = ret && SerializeHDF5::readValue(*meshG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NApices", napices);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NPerMesh", npermesh);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NMeshes", nmeshes);
+  ret = ret && SerializeHDF5::readVec(*meshG, "Apices", apices);
+  ret = ret && SerializeHDF5::readVec(*meshG, "Meshes", meshes);
+
+  if (ret)
+  {
+    _apices = MatrixDense(napices, ndim);
+    _apices.setValues(apices);
+
+    _meshes = MatrixInt(nmeshes, npermesh);
+    _meshes.setValues(meshes);
+  }
+
+  return ret;
+}
+
+bool MeshEStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto meshG = grp.createGroup("MeshEStandard");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NDim", getNDim());
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NApices", getNApices());
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NPerMesh", getNApexPerMesh());
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NMeshes", getNMeshes());
+  ret      = ret && SerializeHDF5::writeVec(meshG, "Apices", _apices.getValues());
+  ret      = ret && SerializeHDF5::writeVec(meshG, "Meshes", _meshes.getValues());
+
+  return ret;
+}
+#endif

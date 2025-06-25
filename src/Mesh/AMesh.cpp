@@ -17,6 +17,7 @@
 #include "Db/Db.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Tree/Ball.hpp"
 
@@ -894,3 +895,37 @@ VectorDouble AMesh::_defineUnits(void) const
     units[imesh] = getMeshSize(imesh);
   return units;
 }
+#ifdef HDF5
+bool AMesh::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "AMesh" with some error handling
+  auto ameshG = SerializeHDF5::getGroup(grp, "AMesh");
+  if (!ameshG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  ret      = ret && SerializeHDF5::readValue(*ameshG, "NDim", _nDim);
+  ret = ret && SerializeHDF5::readVec(*ameshG, "ExtendMin", _extendMin);
+  ret = ret && SerializeHDF5::readVec(*ameshG, "ExtendMax", _extendMax);
+
+  return ret;
+}
+
+bool AMesh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto ameshG = grp.createGroup("AMesh");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(ameshG, "NDim", getNDim());
+  ret      = ret && SerializeHDF5::writeVec(ameshG, "ExtendMin", _extendMin);
+  ret      = ret && SerializeHDF5::writeVec(ameshG, "ExtendMax", _extendMax);
+
+  return ret;
+}
+#endif

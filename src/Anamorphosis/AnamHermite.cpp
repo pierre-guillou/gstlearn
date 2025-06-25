@@ -14,6 +14,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Model/Model.hpp"
 #include "Polynomials/Hermite.hpp"
@@ -906,3 +907,51 @@ double AnamHermite::evalSupportCoefficient(int option,
   messerr("The argument 'option'(%d) should be 1 or 2",option);
   return TEST;
 }
+#ifdef HDF5
+bool AnamHermite::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "AnamHermite" with some error handling
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamHermite");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double r = 0.;
+  int nbpoly = 0;
+  VectorDouble hermite;
+
+  ret = ret && AnamContinuous::_deserializeH5(*anamG, verbose);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Support", r);
+  ret = ret && SerializeHDF5::readValue(*anamG, "NbPoly", nbpoly);
+  ret = ret && SerializeHDF5::readVec(*anamG, "Hermite", hermite);
+
+  if (ret)
+  {
+    setPsiHns(hermite);
+    setRCoef(r);
+  }
+
+  return ret;
+}
+
+bool AnamHermite::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto anamG = grp.createGroup("AnamHermite");
+
+  bool ret = true;
+
+  ret      = ret && AnamContinuous::_serializeH5(anamG, verbose);
+  ret      = ret && SerializeHDF5::writeValue(anamG, "Support", getRCoef());
+  ret      = ret && SerializeHDF5::writeValue(anamG, "NbPoly", getNbPoly());
+  ret      = ret && SerializeHDF5::writeVec(anamG, "Hermite", getPsiHns());
+
+  return ret;
+}
+#endif

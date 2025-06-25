@@ -18,6 +18,7 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Basic/Grid.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Geometry/Rotation.hpp"
 
 #include <math.h>
@@ -1032,7 +1033,6 @@ bool MeshETurbo::_serialize(std::ostream& os, bool /*verbose*/) const
   if (ngrid_mask > 0)
     ret = ret && _recordWriteVec<int>(os, "Grid Masking", _gridIndirect.getRelRanks());
 
-  // Dumping the Grid Masking map
   return ret;
 }
 
@@ -1052,3 +1052,98 @@ bool isTurbo(const VectorMeshes& meshes)
   }
   return true;
 }
+#ifdef HDF5
+bool MeshETurbo::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "MeshETurbo" with some error handling
+  auto meshG = SerializeHDF5::getGroup(grp, "MeshETurbo");
+  if (!meshG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+  int flag_polarized = 0;
+  int mode = 0;
+  VectorInt nx;
+  VectorDouble dx;
+  VectorDouble x0;
+  VectorDouble rotmat;
+
+  ret = ret && SerializeHDF5::readValue(*meshG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readVec(*meshG, "NX", nx);
+  ret = ret && SerializeHDF5::readVec(*meshG, "DX", dx);
+  ret = ret && SerializeHDF5::readVec(*meshG, "X0", x0);
+  ret = ret && SerializeHDF5::readVec(*meshG, "Rotation", rotmat);
+  ret = ret && SerializeHDF5::readValue(*meshG, "Polarization", _isPolarized);
+  ret = ret && SerializeHDF5::readValue(*meshG, "Mode",mode);
+
+  if (ret)
+  {
+    _meshIndirect.setMode(mode);
+    _gridIndirect.setMode(mode);
+    (void)initFromGridByMatrix(nx, dx, x0, rotmat, VectorDouble(), (bool)flag_polarized, 0);
+  }
+
+  int nmesh_active = 0;
+  int nmesh_mask = 0;
+  VectorInt nmesh_ranks;
+  ret = ret && SerializeHDF5::readValue(*meshG, "MeshCountActive", nmesh_active);
+  ret = ret && SerializeHDF5::readValue(*meshG, "MeshCountMask", nmesh_mask);
+  if (nmesh_mask > 0)
+    ret = ret && SerializeHDF5::readVec(*meshG, "MeshMask", nmesh_ranks);
+
+  if (ret) _meshIndirect.buildFromRankRInA(nmesh_ranks, _nmeshInCompleteGrid());
+
+  int ngrid_active = 0;
+  int ngrid_mask = 0;
+  VectorInt ngrid_ranks;
+
+  ret = ret && SerializeHDF5::readValue(*meshG, "GridCountActive", ngrid_active);
+  ret = ret && SerializeHDF5::readValue(*meshG, "GridCountMask", ngrid_mask);
+  if (ngrid_mask > 0)
+    ret = ret && SerializeHDF5::readVec(*meshG, "GridMask", ngrid_ranks);
+
+  if (ret) _gridIndirect.buildFromRankRInA(ngrid_ranks, _grid.getNTotal());
+
+  return ret;
+}
+
+bool MeshETurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto meshG = grp.createGroup("MeshETurbo");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(meshG, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeVec(meshG, "NX", _grid.getNXs());
+  ret = ret && SerializeHDF5::writeVec(meshG, "DX", _grid.getDXs());
+  ret = ret && SerializeHDF5::writeVec(meshG, "X0", _grid.getX0s());
+  ret = ret && SerializeHDF5::writeVec(meshG, "Rotation", _grid.getRotMat());
+  ret = ret && SerializeHDF5::writeValue(meshG, "Polarization", _isPolarized);
+  ret = ret && SerializeHDF5::writeValue(meshG, "Mode", _meshIndirect.getMode());
+
+  // Dumping the Mesh Masking map
+  int nmesh_mask = (int)_meshIndirect.getRelRanks().size();
+
+  ret = ret && SerializeHDF5::writeValue(meshG, "MeshCountActive", getNMeshes());
+  ret = ret && SerializeHDF5::writeValue(meshG, "MeshCountMask", nmesh_mask);
+  if (nmesh_mask > 0)
+    ret = ret && SerializeHDF5::writeVec(meshG, "MeshMask", _meshIndirect.getRelRanks());
+
+  // Dumping the Grid Masking map
+  int ngrid_mask = (int)_gridIndirect.getRelRanks().size();
+
+  ret = ret && SerializeHDF5::writeValue(meshG, "GridCountActive", getNApices());
+  ret = ret && SerializeHDF5::writeValue(meshG, "GridCountMask", ngrid_mask);
+  if (ngrid_mask > 0)
+    ret = ret && SerializeHDF5::writeVec(meshG, "GridMask", _gridIndirect.getRelRanks());
+
+  return ret;
+}
+#endif

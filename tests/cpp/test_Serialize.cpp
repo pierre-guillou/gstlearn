@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   // Next flag indicates if the format is NF (true) or H5 (false)
   bool flagNeutral = false;
   bool verbose     = false;
-  int mode         = 0;
+  int mode         = 4;
 
   // =================
   // Preliminary tasks

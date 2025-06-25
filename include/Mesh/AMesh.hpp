@@ -122,7 +122,11 @@ protected:
   /// Interface for ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
-  String _getNFName() const override { return typeid(this).name(); }
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
+ String _getNFName() const override{return typeid(this).name(); }
 
 private:
   bool _isSpaceDimensionValid(int idim) const;
