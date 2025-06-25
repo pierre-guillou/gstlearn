@@ -127,7 +127,7 @@ public:
 
   static MatrixDense* create(const MatrixDense* mat);
   static MatrixDense* create(int nrow, int ncol);
-
+  static double traceProd(const MatrixDense& a, MatrixDense& b); // Warning: b is modified to reduce memory allocation
   static MatrixDense* createFromVVD(const VectorVectorDouble& X);
   static MatrixDense* createFromVD(const VectorDouble& X,
                                    int nrow,
