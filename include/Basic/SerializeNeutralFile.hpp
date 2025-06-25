@@ -32,6 +32,7 @@ namespace SerializeNeutralFile
                     bool verbose = false);
 
   bool commentWrite(std::ostream& os, const String& comment);
+
   template<typename T>
   bool recordWrite(std::ostream& os, const String& title, const T& val);
   template<typename T>

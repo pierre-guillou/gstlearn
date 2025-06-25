@@ -83,7 +83,7 @@ protected:
   /// Interface for ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
-  String _getNFName() const override { return "AnamDiscrete"; }
+  String _getNFName() const override { return typeid(this).name(); }
 
   bool _isClassValid(int iclass) const;
   void _resize();

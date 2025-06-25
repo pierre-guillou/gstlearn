@@ -76,7 +76,7 @@ protected:
   /// Interface for ASerializable
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  String _getNFName() const override { return "RuleShift"; }
+  String _getNFName() const override { return typeid(this).name(); }
 
 private:
   int _st_shift_on_grid(Db *db, int ndim, int flag_grid_check) const;

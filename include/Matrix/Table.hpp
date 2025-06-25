@@ -75,7 +75,7 @@ protected:
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
- String _getNFName() const override{return "Table"; }
+  String _getNFName() const override { return typeid(this).name(); }
 
 private:
   void _clearDecoration();

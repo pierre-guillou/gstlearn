@@ -72,7 +72,7 @@ protected:
   /// Interface for ASerializable
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  String _getNFName() const override { return "RuleShadow"; }
+  String _getNFName() const override { return typeid(this).name(); }
 
 private:
   void _st_shadow_max(const Db *dbprop,
