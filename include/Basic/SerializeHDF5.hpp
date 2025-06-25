@@ -14,6 +14,7 @@
 
 #include "geoslib_define.h"
 
+#include "Basic/ASerializable.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorT.hpp"
 
@@ -43,16 +44,22 @@ namespace SerializeHDF5
     return H5::StrType {0, H5T_VARIABLE};
   }
 
-  inline void
-  createAttribute(H5::H5Object& obj, const std::string& key, const std::string& value)
+  template<typename T>
+  void
+  createAttribute(H5::H5Object& obj, const std::string& key, const T& value)
   {
     try
     {
-      const auto strtype = H5::StrType {0, H5T_VARIABLE};
-      const hsize_t dim  = 1;
+      const auto type   = getHDF5Type(value);
+      const hsize_t dim = 1;
       const H5::DataSpace ds {1, &dim};
-      auto attr = obj.createAttribute(key, strtype, ds);
-      attr.write(strtype, value);
+      auto attr = obj.createAttribute(key, type, ds);
+      if constexpr (std::is_same<T, std::string>::value)
+        attr.write(type, value);
+      else if constexpr (std::is_convertible<T, std::string>::value)
+        attr.write(type, std::string {value});
+      else
+        attr.write(type, &value);
     }
     catch (H5::AttributeIException& e)
     {
@@ -60,7 +67,8 @@ namespace SerializeHDF5
     }
   }
 
-  inline std::string readAttribute(const H5::H5Object& obj, const std::string& key)
+  template<typename T = std::string>
+  T readAttribute(const H5::H5Object& obj, const std::string& key)
   {
     if (!obj.attrExists(key))
     {
@@ -69,8 +77,11 @@ namespace SerializeHDF5
     }
 
     const auto attr = obj.openAttribute(key);
-    std::string res;
-    attr.read(H5::StrType {0, H5T_VARIABLE}, res);
+    T res;
+    if constexpr (std::is_same<T, std::string>::value)
+      attr.read(getHDF5Type(res), res);
+    else
+      attr.read(getHDF5Type(res), &res);
     return res;
   }
 
@@ -79,11 +90,14 @@ namespace SerializeHDF5
    */
   inline H5::H5File fileOpenRead(const String& fname)
   {
-    H5::H5File file {fname, H5F_ACC_RDONLY};
+    // Build the multi-platform filename
+    const auto filepath = ASerializable::buildFileName(1, fname, true);
+
+    H5::H5File file {filepath, H5F_ACC_RDONLY};
 
     if (!file.nameExists("gstlearn metadata"))
     {
-      messerr("File %s doesn't contain Gstlearn metadata…", fname.c_str());
+      messerr("File %s doesn't contain Gstlearn metadata…", filepath.c_str());
       return file;
     }
 
@@ -91,7 +105,7 @@ namespace SerializeHDF5
     const auto version = readAttribute(metadata, "Format version");
     if (version != "1.0.0")
     {
-      messerr("File %s has format version %s, expected 1.0.0", fname.c_str(),
+      messerr("File %s has format version %s, expected 1.0.0", filepath.c_str(),
               version.c_str());
     }
 
@@ -103,7 +117,10 @@ namespace SerializeHDF5
    */
   inline H5::H5File fileOpenWrite(const String& fname)
   {
-    H5::H5File file {fname, H5F_ACC_TRUNC};
+    // Build the multi-platform filename
+    const auto filepath = ASerializable::buildFileName(2, fname, true);
+
+    H5::H5File file {filepath, H5F_ACC_TRUNC};
     auto metadata = file.createGroup("gstlearn metadata");
     createAttribute(
       metadata, "Description",
@@ -343,7 +360,7 @@ bool SerializeHDF5::readValue(const H5::Group& grp, const String& name, T& value
     return false;
   }
 
-  attr.read(getHDF5Type(value), value);
+  attr.read(getHDF5Type(value), &value);
   return true;
 }
 
@@ -356,7 +373,7 @@ bool SerializeHDF5::writeValue(H5::Group& grp, const String& name, const T& valu
   const hsize_t dim = 1;
   const H5::DataSpace ds {1, &dim};
   auto attr = grp.createAttribute(name, getHDF5Type(value), ds);
-  attr.write(getHDF5Type(value), value);
+  attr.write(getHDF5Type(value), &value);
 
   return true;
 }

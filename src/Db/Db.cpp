@@ -4836,6 +4836,9 @@ bool Db::_serializeH5(H5::Group& grp, bool /*verbose*/) const
     // also avoids checking array sizes during deserialization
     // (Locators DataSet size vs. number of columns)
     SerializeHDF5::createAttribute(data, "Locators", locators[i]);
+    // Use H5::Attribute to store column index (H5::Datasets are
+    // sorted by name in h5 file)
+    SerializeHDF5::createAttribute(data, "ColId", i);
     data.write(getColumnByColIdx(i).data(), H5::PredType::NATIVE_DOUBLE);
   }
 
@@ -4846,6 +4849,7 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
   VectorString locators;
   VectorString names;
+  VectorInt colIds;
 
   // we get the H5::Group that has the name of the current class
 
@@ -4880,6 +4884,7 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   if (ncol > 0)
   {
     locators.resize(ncol);
+    colIds.resize(ncol);
   }
 
   // Initialize the Db
@@ -4890,8 +4895,10 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
     const auto data = db->openDataSet(names[i]);
     // read the column locator (H5::Attribute)
     locators[i] = SerializeHDF5::readAttribute(data, "Locators");
+    // read the column index (H5::Attribute)
+    colIds[i] = SerializeHDF5::readAttribute<int>(data, "ColId");
     // read the column values from H5::DataSet
-    data.read(&_array[_getAddress(0, i)], H5::PredType::NATIVE_DOUBLE);
+    data.read(&_array[_getAddress(0, colIds[i])], H5::PredType::NATIVE_DOUBLE);
   }
 
   if (ret)
@@ -4911,8 +4918,8 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
     // Update the column names and locators
     for (int i = 0; i < ncol; i++)
     {
-      setNameByUID(i, names[i]);
-      setLocatorByUID(i, tabloc[i], tabnum[i]);
+      setNameByUID(colIds[i], names[i]);
+      setLocatorByUID(colIds[i], tabloc[i], tabnum[i]);
     }
   }
   return ret;
