@@ -1460,6 +1460,7 @@ bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
     CovAniso cova(ECov::fromValue(vartype), _ctxt);
     cova.setParam(param);
+    cova.setSill(sills);
     if (flag_aniso)
     {
       for (int idim = 0; idim < ndim; idim++)

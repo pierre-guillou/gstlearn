@@ -254,3 +254,33 @@ Line Vertex Coordinates
      [  5,]    -0.188     0.048
      [  6,]    -1.087     1.010
 (Nrows=7[from 100])
+
+Moving Neighborhood
+===================
+Minimum number of samples           = 2
+Maximum number of samples           = 20
+Number of angular sectors           = 5
+Maximum number of points per sector = 3
+Anisotropic Ranges :     8.000    12.000
+Anisotropy Rotation :
+               [,  0]    [,  1]
+     [  0,]     0.906    -0.423
+     [  1,]     0.423     0.906
+
+Moving Neighborhood
+===================
+Minimum number of samples           = 2
+Maximum number of samples           = 20
+Number of angular sectors           = 5
+Maximum number of points per sector = 3
+Anisotropic Ranges :     8.000    12.000
+Anisotropy Rotation :
+               [,  0]    [,  1]
+     [  0,]     0.906    -0.423
+     [  1,]     0.423     0.906
+
+Unique Neighborhood
+===================
+
+Unique Neighborhood
+===================
