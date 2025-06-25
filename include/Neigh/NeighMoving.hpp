@@ -87,6 +87,9 @@ public:
                              int leaf_size = 10,
                              const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighMoving* createFromNF(const String& NFFilename, bool verbose = true);
+#ifdef HDF5
+  static NeighMoving* createFromH5(const String& H5Filename, bool verbose = true);
+#endif
 
   void addBiTargetCheck(ABiTargetCheck* abpc);
 
@@ -120,6 +123,10 @@ protected:
   /// Interface for ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "NeighMoving"; }
 
 private:

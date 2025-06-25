@@ -8,10 +8,11 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Neigh/NeighUnique.hpp"
-#include "Basic/OptDbg.hpp"
 #include "geoslib_old_f.h"
 
+#include "Neigh/NeighUnique.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Neigh/ANeigh.hpp"
 #include "Neigh/NeighMoving.hpp"
 #include "Neigh/NeighBench.hpp"
@@ -447,3 +448,35 @@ void ANeigh::_neighCompress(VectorInt& ranks) {
     if (ranks[i] >= 0) ranks[necr++] = i;
   ranks.resize(necr);
 }
+#ifdef HDF5
+bool ANeigh::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "ANeigh" with some error handling
+  auto aneighG = SerializeHDF5::getGroup(grp, "ANeigh");
+  if (!aneighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+  ret      = ret && SerializeHDF5::readValue(*aneighG, "NDim", ndim);
+  if (ret) setNDim(ndim);
+
+  return ret;
+}
+
+bool ANeigh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto aneighG = grp.createGroup("ANeigh");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(aneighG, "NDim", (int) getNDim());
+
+  return ret;
+}
+#endif

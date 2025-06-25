@@ -11,6 +11,7 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Neigh/NeighMoving.hpp"
+#include "Neigh/NeighUnique.hpp"
 #include "Variogram/VarioParam.hpp"
 #include "Variogram/Vario.hpp"
 #include "Matrix/Table.hpp"
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
   // Next flag indicates if the format is NF (true) or H5 (false)
   bool flagNeutral = false;
   bool verbose     = false;
-  int mode         = 9;
+  int mode         = 10;
 
   // =================
   // Preliminary tasks
@@ -316,14 +317,45 @@ int main(int argc, char *argv[])
     neigh1->display();
 
     // Serialize
-    flagNeutral = true;
     if (flagNeutral)
       (void)neigh1->dumpToNF("Neutral.NeighMoving.ascii");
+    else
+      (void)neigh1->dumpToH5("Neutral.NeighMoving.h5");
 
     // Deserialize
     NeighMoving* neigh2 = nullptr;
     if (flagNeutral)
       neigh2 = NeighMoving::createFromNF("Neutral.NeighMoving.ascii", verbose);
+    else
+      neigh2 = NeighMoving::createFromH5("Neutral.NeighMoving.h5", verbose);
+    neigh2->display();
+
+    delete neigh1;
+    delete neigh2;
+  }
+
+  // ============================
+  // Checking Unique Neighborhood
+  // ============================
+
+  if (mode == 0 || mode == 10)
+  {
+    NeighUnique* neigh1 = NeighUnique::create();
+    neigh1->display();
+    flagNeutral = true;
+
+    // Serialize
+    if (flagNeutral)
+      (void)neigh1->dumpToNF("Neutral.NeighUnique.ascii");
+    else
+      (void)neigh1->dumpToH5("Neutral.NeighUnique.h5");
+
+    // Deserialize
+    NeighUnique* neigh2 = nullptr;
+    if (flagNeutral)
+      neigh2 = NeighUnique::createFromNF("Neutral.NeighUnique.ascii", verbose);
+    else
+      neigh2 = NeighUnique::createFromH5("Neutral.NeighUnique.h5", verbose);
     neigh2->display();
 
     delete neigh1;

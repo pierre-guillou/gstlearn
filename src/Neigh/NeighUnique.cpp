@@ -11,6 +11,7 @@
 #include "Neigh/NeighUnique.hpp"
 #include "Mesh/AMesh.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Space/ASpace.hpp"
 
@@ -91,6 +92,22 @@ NeighUnique* NeighUnique::createFromNF(const String& NFFilename, bool verbose)
   return neigh;
 }
 
+#ifdef HDF5
+NeighUnique* NeighUnique::createFromH5(const String& H5Filename, bool verbose)
+{
+  auto* neigh = new NeighUnique;
+  auto file   = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = neigh->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete neigh;
+    neigh = nullptr;
+  }
+  return neigh;
+}
+#endif
+
 /**
  * Given a Db, returns the maximum number of samples per NeighUniqueborhood
  * @param db Pointer to the target Db
@@ -163,3 +180,37 @@ void NeighUnique::_unique(int iech_out, VectorInt& ranks)
   }
 }
 
+#ifdef HDF5
+bool NeighUnique::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "NeighUnique" with some error handling
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighUnique");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+  
+  return ret;
+}
+
+bool NeighUnique::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto neighG = grp.createGroup("NeigUnique");
+
+  bool ret = true;
+
+  /* Writing the tail of the file */
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif
