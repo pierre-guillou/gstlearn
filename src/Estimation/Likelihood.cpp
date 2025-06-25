@@ -12,6 +12,7 @@
 #include "Basic/VectorHelper.hpp"
 #include "Db/RankHandler.hpp"
 #include "Estimation/ALikelihood.hpp"
+#include "Matrix/MatrixDense.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Tree/Ball.hpp"
 #include "Db/Db.hpp"
@@ -101,6 +102,7 @@ void Likelihood::evalGrad(vect res)
 
   _temp.resize(_Y.size());
   _gradCovMatTimesInvCov.resize(_Y.size(), _Y.size());
+  auto invcov = _covChol.inverse();
   RankHandler rkh(_db);
   rkh.defineSampleRanks();
   auto gradcov = _model->getGradients();
@@ -110,8 +112,8 @@ void Likelihood::evalGrad(vect res)
     _fillGradCovMat(rkh, gradcov[iparam]);
     _gradCovMat.prodMatVecInPlace(_Cm1Y, _temp);
     double dquad = -VH::innerProduct(_Cm1Y, _temp);
-    _covChol.solveMatInPlace(_gradCovMat, _gradCovMatTimesInvCov);
-    double dlogdet = _gradCovMatTimesInvCov.trace();
+    double dlogdet = MatrixDense::traceProd(invcov, _gradCovMat); // Warning: _gradCovMat is modified so the line
+    // has to be after _gradCovMat.prodMatVecInPlace(_Cm1Y, _temp);
     res[iparam] = 0.5 * (dlogdet + dquad);
   }
 }
