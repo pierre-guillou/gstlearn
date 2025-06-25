@@ -66,8 +66,7 @@ public:
                             const VectorDouble& angles = VectorDouble(),
                             bool flag_polarized = false,
                             bool verbose = false);
-  static MeshETurbo* createFromNF(const String &neutralFilename,
-                                  bool verbose = true);
+  static MeshETurbo* createFromNF(const String &NFFilename, bool verbose = true);
   static MeshETurbo* createFromGrid(const DbGrid *dbgrid,
                                     bool flag_polarized = false,
                                     bool verbose = false,

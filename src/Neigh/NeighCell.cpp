@@ -103,17 +103,17 @@ NeighCell* NeighCell::create(bool flag_xvalid,
 
 /**
  * Create a Neighborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighCell* NeighCell::createFromNF(const String& neutralFilename, bool verbose)
+NeighCell* NeighCell::createFromNF(const String& NFFilename, bool verbose)
 {
   NeighCell* neigh = nullptr;
   std::ifstream is;
   neigh = new NeighCell();
   bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
+  if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  neigh->deserialize(is, verbose);
   }

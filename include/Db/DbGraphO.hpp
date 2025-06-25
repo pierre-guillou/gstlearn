@@ -84,8 +84,7 @@ public:
                                     const VectorString& locatorNames = VectorString(),
                                     bool flagAddSampleRank           = true);
 
-  static DbGraphO* createFromNF(const String& neutralFilename,
-                                bool verbose = true);
+  static DbGraphO* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getNArc() const;
   int getNNode() const;

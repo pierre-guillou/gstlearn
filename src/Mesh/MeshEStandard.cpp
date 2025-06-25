@@ -257,16 +257,16 @@ String MeshEStandard::toString(const AStringFormat* strfmt) const
 /**
  * Create a MeshEStandard by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (MeshEStandard format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (MeshEStandard format)
+ * @param verbose    Verbose
  */
-MeshEStandard* MeshEStandard::createFromNF(const String& neutralFilename, bool verbose)
+MeshEStandard* MeshEStandard::createFromNF(const String& NFFilename, bool verbose)
 {
   MeshEStandard* mesh = nullptr;
   std::ifstream is;
   mesh = new MeshEStandard;
   bool success = false;
-  if (mesh->_fileOpenRead(neutralFilename, is, verbose))
+  if (mesh->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  mesh->deserialize(is, verbose);
   }

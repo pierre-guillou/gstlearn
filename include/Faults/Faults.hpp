@@ -29,7 +29,7 @@ public:
   /// Interface for AStringable
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static Faults* createFromNF(const String& neutralFilename, bool verbose = true);
+  static Faults* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getNFaults() const { return (int) _faults.size(); }
   void addFault(const PolyLine2D& fault);

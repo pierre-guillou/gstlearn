@@ -166,18 +166,18 @@ bool DbMeshStandard::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a DbMesh by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (DbMesh format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (DbMesh format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbMeshStandard* DbMeshStandard::createFromNF(const String& neutralFilename, bool verbose)
+DbMeshStandard* DbMeshStandard::createFromNF(const String& NFFilename, bool verbose)
 {
   DbMeshStandard* dbmesh = new DbMeshStandard;
   std::ifstream is;
   bool success = false;
-  if (dbmesh->_fileOpenRead(neutralFilename, is, verbose))
+  if (dbmesh->_fileOpenRead(NFFilename, is, verbose))
   {
     success = dbmesh->deserialize(is, verbose);
   }

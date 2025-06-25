@@ -64,7 +64,7 @@ public:
                             bool useBallTree             = false,
                             int leaf_size                = 10,
                             const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static NeighBench* createFromNF(const String& neutralFilename, bool verbose = true);
+  static NeighBench* createFromNF(const String& NFFilename, bool verbose = true);
 
   double getWidth() const { return _width; }
 

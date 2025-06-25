@@ -112,17 +112,17 @@ NeighBench* NeighBench::create(bool flag_xvalid,
 
 /**
  * Create a Neighborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighBench* NeighBench::createFromNF(const String& neutralFilename, bool verbose)
+NeighBench* NeighBench::createFromNF(const String& NFFilename, bool verbose)
 {
   NeighBench* neigh = nullptr;
   std::ifstream is;
   neigh = new NeighBench();
   bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
+  if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  neigh->deserialize(is, verbose);
   }

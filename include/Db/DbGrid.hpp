@@ -83,8 +83,7 @@ public:
   void resetDims(int ncol, int nech) override;
   bool isConsistent() const override;
 
-  static DbGrid* createFromNF(const String& neutralFilename,
-                              bool verbose = true);
+  static DbGrid* createFromNF(const String& NFFilename,bool verbose = true);
 #ifdef HDF5
   static DbGrid* createFromH5(const String& H5Filename, bool verbose = true);
 #endif

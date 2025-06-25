@@ -35,7 +35,7 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// ASerializable Interface
-  static AnamDiscreteDD* createFromNF(const String& neutralFilename, bool verbose = true);
+  static AnamDiscreteDD* createFromNF(const String& NFFilename, bool verbose = true);
 
   /// AAnam Interface
   const EAnam&  getType() const override { return EAnam::fromKey("DISCRETE_DD"); }

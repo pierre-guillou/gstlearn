@@ -41,8 +41,7 @@ public:
   void    getEmbeddedCoorPerApex(int iapex, VectorDouble& coords) const override;
   void    getBarycenterInPlace(int imesh, VectorDouble& coord) const override;
 
-  static MeshSpherical* createFromNF(const String& neutralFilename,
-                                     bool verbose = true);
+  static MeshSpherical* createFromNF(const String& NFFilename, bool verbose = true);
   static MeshSpherical* create(const MatrixDense& apices = MatrixDense(),
                                const MatrixInt& meshes         = MatrixInt());
 

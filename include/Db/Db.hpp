@@ -163,8 +163,10 @@ public:
    *  @{
    */
   static Db* create();
-  static Db* createFromNF(const String& neutralFilename,
-                          bool verbose = true);
+  static Db* createFromNF(const String& NFFilename, bool verbose = true);
+#ifdef HDF5
+  static Db* createFromH5(const String& H5Filename, bool verbose = true);
+#endif
   static Db* createFromSamples(int nech,
                                const ELoadBy& order             = ELoadBy::fromKey("SAMPLE"),
                                const VectorDouble& tab          = VectorDouble(),

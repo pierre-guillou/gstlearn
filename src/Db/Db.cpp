@@ -4710,12 +4710,12 @@ int Db::getSimRank(int isimu, int ivar, int icase, int nbsimu, int nvar)
   return (isimu + nbsimu * (ivar + nvar * icase));
 }
 
-Db* Db::createFromNF(const String& neutralFilename, bool verbose)
+Db* Db::createFromNF(const String& NFFilename, bool verbose)
 {
   Db* db = nullptr;
   std::ifstream is;
   db = new Db;
-  if (db->_fileOpenRead(neutralFilename, is, verbose))
+  if (db->_fileOpenRead(NFFilename, is, verbose))
   {
     if (!db->deserialize(is, verbose))
     {
@@ -4730,6 +4730,22 @@ Db* Db::createFromNF(const String& neutralFilename, bool verbose)
   }
   return db;
 }
+
+#ifdef HDF5
+Db* Db::createFromH5(const String& H5Filename, bool verbose)
+{
+  auto* db  = new Db;
+  auto file = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = db->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete db;
+    db = nullptr;
+  }
+  return db;
+}
+#endif
 
 bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
 {
@@ -4812,7 +4828,7 @@ bool Db::_serializeH5(H5::Group& grp, bool /*verbose*/) const
 {
   // create a new Group every time we enter a _serialize method
   // => easier to deserialize
-  auto db = grp.createGroup("Db");
+  auto dbG = grp.createGroup("Db");
 
   // HDF5 DataSpace should be manually created and passed to
   // SerializeHDF5::writeVec or directly to Group::createDataSet()
@@ -4830,7 +4846,7 @@ bool Db::_serializeH5(H5::Group& grp, bool /*verbose*/) const
   {
     // here we create H5::DataSet by hand to augment them with
     // attributes
-    auto data = db.createDataSet(names[i], H5::PredType::NATIVE_DOUBLE, ds);
+    auto data = dbG.createDataSet(names[i], H5::PredType::NATIVE_DOUBLE, ds);
     // Locators are semantically close to Db columns and H5::Attribute has a
     // nicer API than string H5::DataSets. Putting Locators inside Attribute
     // also avoids checking array sizes during deserialization
@@ -4855,27 +4871,27 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   // Call SerializeHDF5::getGroup to get the subgroup of grp named
   // "Db" with some error handling
-  auto db = SerializeHDF5::getGroup(grp, "Db");
-  if (!db)
+  auto dbG = SerializeHDF5::getGroup(grp, "Db");
+  if (!dbG)
   {
     return false;
   }
 
   // a DataSet == a Db column
   int ncol {};
-  for (hsize_t i = 0; i < db->getNumObjs(); ++i)
+  for (hsize_t i = 0; i < dbG->getNumObjs(); ++i)
   {
-    if (db->getObjTypeByIdx(i) == H5G_DATASET)
+    if (dbG->getObjTypeByIdx(i) == H5G_DATASET)
     {
       ncol++;
-      names.push_back(db->getObjnameByIdx(i));
+      names.push_back(dbG->getObjnameByIdx(i));
     }
   }
 
   // assume every DataSet has the same DataSpace
   hsize_t nech {};
   {
-    const auto data = db->openDataSet(names.front());
+    const auto data = dbG->openDataSet(names.front());
     const auto ds   = data.getSpace();
     ds.getSimpleExtentDims(&nech);
   }
@@ -4892,7 +4908,7 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   for (size_t i = 0; i < names.size(); ++i)
   {
-    const auto data = db->openDataSet(names[i]);
+    const auto data = dbG->openDataSet(names[i]);
     // read the column locator (H5::Attribute)
     locators[i] = SerializeHDF5::readAttribute(data, "Locators");
     // read the column index (H5::Attribute)

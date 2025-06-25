@@ -38,8 +38,7 @@ public:
   double  getCoor(int imesh, int rank, int idim) const override;
   double  getApexCoor(int i, int idim) const override;
   double  getMeshSize(int imesh) const override;
-  static MeshEStandard* createFromNF(const String& neutralFilename,
-                                     bool verbose = true);
+  static MeshEStandard* createFromNF(const String& NFFilename, bool verbose = true);
   static MeshEStandard* createFromExternal(const MatrixDense& apices,
                                            const MatrixInt& meshes,
                                            bool verbose = false);

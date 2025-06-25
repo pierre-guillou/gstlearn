@@ -12,6 +12,7 @@
 
 #include "Basic/PolyLine2D.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Geometry/GeometryHelper.hpp"
 #include "Stats/Classical.hpp"
 #include "Stats/Regression.hpp"
@@ -87,13 +88,13 @@ String PolyLine2D::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-PolyLine2D* PolyLine2D::createFromNF(const String& neutralFilename, bool verbose)
+PolyLine2D* PolyLine2D::createFromNF(const String& NFFilename, bool verbose)
 {
   PolyLine2D* line2D = nullptr;
   std::ifstream is;
   line2D = new PolyLine2D();
   bool success = false;
-  if (line2D->_fileOpenRead(neutralFilename, is, verbose))
+  if (line2D->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  line2D->deserialize(is, verbose);
   }
@@ -104,6 +105,22 @@ PolyLine2D* PolyLine2D::createFromNF(const String& neutralFilename, bool verbose
   }
   return line2D;
 }
+
+#ifdef HDF5
+PolyLine2D* PolyLine2D::createFromH5(const String& H5Filename, bool verbose)
+{
+  auto* polyline2D = new PolyLine2D;
+  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = polyline2D->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete polyline2D;
+    polyline2D = nullptr;
+  }
+  return polyline2D;
+}
+#endif
 
 /**
  * Serialization (by Point rather than by Coordinate)
@@ -699,3 +716,35 @@ double distanceBetweenPolylines(const PolyLine2D& poly1,
   coor2[1] = poly2.getY(pldist2.rank);
   return ut_distance(2, coor1.data(), coor2.data());
 }
+
+#ifdef HDF5
+bool PolyLine2D::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "PolyLone2D" with some error handling
+  auto polyline2DG = SerializeHDF5::getGroup(grp, "PolyLine2D");
+  if (!polyline2DG)
+  {
+    return false;
+  }
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::readVec(*polyline2DG, "X", _x);
+  ret      = ret && SerializeHDF5::readVec(*polyline2DG, "Y", _y);
+
+  return ret;
+}
+
+bool PolyLine2D::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5 group every time we enter a _serialize method
+  // => easier to deserialize
+  auto polyline2DG = grp.createGroup("PolyLine2D");
+
+  bool ret = true;
+  ret = ret && SerializeHDF5::writeVec(polyline2DG, "X", _x);
+  ret = ret && SerializeHDF5::writeVec(polyline2DG, "Y", _y);
+
+  return ret;
+}
+#endif

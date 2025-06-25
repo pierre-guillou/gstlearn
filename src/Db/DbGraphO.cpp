@@ -258,18 +258,18 @@ bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a Db by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (Db format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (Db format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbGraphO* DbGraphO::createFromNF(const String& neutralFilename, bool verbose)
+DbGraphO* DbGraphO::createFromNF(const String& NFFilename, bool verbose)
 {
   DbGraphO* dbgraphO = new DbGraphO;
   std::ifstream is;
   bool success = false;
-  if (dbgraphO->_fileOpenRead(neutralFilename, is, verbose))
+  if (dbgraphO->_fileOpenRead(NFFilename, is, verbose))
   {
     success = dbgraphO->deserialize(is, verbose);
   }

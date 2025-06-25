@@ -119,8 +119,10 @@ public:
                                         const ASpaceSharedPtr& space = ASpaceSharedPtr(),
                                         bool flagRange               = true);
   static Model* createFromDb(const Db* db);
-  static Model* createFromNF(const String& neutralFilename,
-                             bool verbose = true);
+  static Model* createFromNF(const String& NFFilename, bool verbose = true);
+#ifdef HDF5
+  static Model* createFromH5(const String& H5Filename, bool verbose = true);
+#endif
   static Model* createFromVario(Vario* vario,
                                 const VectorECov& types        = ECov::fromKeys({"SPHERICAL"}),
                                 const Constraints& constraints = Constraints(),
@@ -255,6 +257,10 @@ protected:
   /// Interface to ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "Model"; }
 
 private:

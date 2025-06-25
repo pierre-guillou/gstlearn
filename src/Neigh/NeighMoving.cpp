@@ -259,17 +259,17 @@ NeighMoving* NeighMoving::create(bool flag_xvalid,
 
 /**
  * Create a NeighMovingborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighMoving* NeighMoving::createFromNF(const String& neutralFilename, bool verbose)
+NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
 {
   NeighMoving* neigh = nullptr;
   std::ifstream is;
   neigh = new NeighMoving();
   bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
+  if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  neigh->deserialize(is, verbose);
   }

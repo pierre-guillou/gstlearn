@@ -57,13 +57,13 @@ AnamDiscreteDD::~AnamDiscreteDD()
 
 }
 
-AnamDiscreteDD* AnamDiscreteDD::createFromNF(const String& neutralFilename, bool verbose)
+AnamDiscreteDD* AnamDiscreteDD::createFromNF(const String& NFFilename, bool verbose)
 {
   AnamDiscreteDD* anam = nullptr;
   std::ifstream is;
   anam = new AnamDiscreteDD();
   bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
+  if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
     success = anam->deserialize(is, verbose);
   }

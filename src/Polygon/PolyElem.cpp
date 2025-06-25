@@ -12,6 +12,7 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/PolyLine2D.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 PolyElem::PolyElem(const VectorDouble& x,
                  const VectorDouble& y,
@@ -135,13 +136,13 @@ PolyElem* PolyElem::create()
   return new PolyElem();
 }
 
-PolyElem* PolyElem::createFromNF(const String& neutralFilename, bool verbose)
+PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
 {
   PolyElem* polyelem = nullptr;
   std::ifstream is;
   polyelem = new PolyElem();
   bool success = false;
-  if (polyelem->_fileOpenRead(neutralFilename, is, verbose))
+  if (polyelem->_fileOpenRead(NFFilename, is, verbose))
   {
     success = polyelem->deserialize(is, verbose);
   }
@@ -153,6 +154,22 @@ PolyElem* PolyElem::createFromNF(const String& neutralFilename, bool verbose)
   }
   return polyelem;
 }
+
+#ifdef HDF5
+PolyElem* PolyElem::createFromH5(const String& H5Filename, bool verbose)
+{
+  auto* polyelem = new PolyElem;
+  auto file      = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = polyelem->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete polyelem;
+    polyelem = nullptr;
+  }
+  return polyelem;
+} 
+#endif
 
 bool PolyElem::_isClosed() const
 {
@@ -298,3 +315,40 @@ PolyElem PolyElem::reduceComplexity(double distmin) const
   }
   return newpolyelem;
 }
+
+#ifdef HDF5
+bool PolyElem::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "PolyElem" with some error handling
+  auto polyelemG = SerializeHDF5::getGroup(grp, "PolyElem");
+  if (!polyelemG)
+  {
+    return false;
+  }
+
+  // Read the local characteristics
+  bool ret = true;
+  ret      = ret && SerializeHDF5::readValue(*polyelemG, "zmin", _zmin);
+  ret      = ret && SerializeHDF5::readValue(*polyelemG, "zmax", _zmax);
+
+  ret      = ret && PolyLine2D::_deserializeH5(*polyelemG, verbose);
+
+  return ret;
+}
+
+bool PolyElem::_serializeH5(H5::Group& grp, bool verbose) const
+{
+  // create a new H5 group every time we enter a _serialize method
+  // => easier to deserialize
+  auto polyelemG = grp.createGroup("PolyElem");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(polyelemG, "zmin", _zmin);
+  ret      = ret && SerializeHDF5::writeValue(polyelemG, "zmax", _zmax);
+
+  ret      = ret && PolyLine2D::_serializeH5(polyelemG, verbose);
+
+  return ret;
+}
+#endif

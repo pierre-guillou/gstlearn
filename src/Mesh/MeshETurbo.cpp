@@ -370,16 +370,16 @@ void MeshETurbo::_buildMaskInMeshing(const VectorDouble& sel)
 /**
  * Create a MeshETurbo by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (MeshEStandard format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (MeshEStandard format)
+ * @param verbose    Verbose
  */
-MeshETurbo* MeshETurbo::createFromNF(const String& neutralFilename, bool verbose)
+MeshETurbo* MeshETurbo::createFromNF(const String& NFFilename, bool verbose)
 {
   MeshETurbo* mesh = nullptr;
   std::ifstream is;
   mesh = new MeshETurbo;
   bool success = false;
-  if (mesh->_fileOpenRead(neutralFilename, is, verbose))
+  if (mesh->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  mesh->deserialize(is, verbose);
   }

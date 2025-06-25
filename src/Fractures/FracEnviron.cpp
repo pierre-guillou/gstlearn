@@ -70,16 +70,16 @@ FracEnviron::~FracEnviron()
 /**
  * Create a Environ by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose
  */
-FracEnviron* FracEnviron::createFromNF(const String& neutralFilename, bool verbose)
+FracEnviron* FracEnviron::createFromNF(const String& NFFilename, bool verbose)
 {
   FracEnviron* envir = nullptr;
   std::ifstream is;
   envir = new FracEnviron();
   bool success = false;
-  if (envir->_fileOpenRead(neutralFilename, is, verbose))
+  if (envir->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  envir->deserialize(is, verbose);
   }

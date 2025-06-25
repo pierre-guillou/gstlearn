@@ -22,6 +22,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/AException.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Stats/Classical.hpp"
@@ -155,13 +156,13 @@ Vario* Vario::create(const VarioParam& varioparam)
   return new Vario(varioparam);
 }
 
-Vario* Vario::createFromNF(const String& neutralFilename, bool verbose)
+Vario* Vario::createFromNF(const String& NFFilename, bool verbose)
 {
   std::ifstream is;
   VarioParam varioparam = VarioParam();
   Vario* vario = new Vario(varioparam);
   bool success = false;
-  if (vario->_fileOpenRead(neutralFilename, is, verbose))
+  if (vario->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  vario->deserialize(is, verbose);
   }
@@ -172,6 +173,23 @@ Vario* Vario::createFromNF(const String& neutralFilename, bool verbose)
   }
   return vario;
 }
+
+#ifdef HDF5
+Vario* Vario::createFromH5(const String& H5Filename, bool verbose)
+{
+  VarioParam varioparam = VarioParam();
+  auto* vario = new Vario(varioparam);
+  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = vario->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete vario;
+    vario = nullptr;
+  }
+  return vario;
+}
+#endif
 
 Vario* Vario::computeFromDb(const VarioParam& varioparam,
                             Db* db,
@@ -1022,8 +1040,8 @@ String Vario::toString(const AStringFormat* strfmt) const
 
   // Print the variance matrix
 
-  sstr << toMatrix("Variance-Covariance Matrix",VectorString(),VectorString(),
-                    0,_nVar,_nVar,getVars());
+  sstr << toMatrix("Variance-Covariance Matrix", VectorString(), VectorString(),
+                   0, _nVar, _nVar, getVars());
 
   /* Loop on the directions (only if the resulting arrays have been defined) */
 
@@ -1823,7 +1841,7 @@ bool Vario::_isAddressValid(int idir, int i, bool flagCheck) const
 
 bool Vario::_deserialize(std::istream& is, bool /*verbose*/)
 {
-  int flag_calcul = 0;
+  int flag_calcul = 2;
   int ndim = 0;
   int nvar = 0;
   int ndir = 0;
@@ -1945,7 +1963,7 @@ bool Vario::_deserialize(std::istream& is, bool /*verbose*/)
 bool Vario::_serialize(std::ostream& os, bool /*verbose*/) const
 {
   double value;
-  static int flag_calcul = 2;
+  int flag_calcul = 1;
 
   /* Write the Vario structure */
 
@@ -5108,3 +5126,165 @@ VectorDouble Vario::computeWeightsFromVario(int wmode) const
   }
   return wt;
 }
+
+#ifdef HDF5
+bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "Vario" with some error handling
+  auto varioG = SerializeHDF5::getGroup(grp, "Vario");
+  if (!varioG)
+  {
+    return false;
+  }
+
+  bool ret = true;
+  int nvar = 0;
+  int ndir = 0;
+  int flag_calcul = 1;
+  VectorString varnames;
+
+  // Read the Global structure
+  ret = ret && SerializeHDF5::readValue(*varioG, "NVar", nvar);
+  ret = ret && SerializeHDF5::readValue(*varioG, "NDir", ndir);
+  ret = ret && SerializeHDF5::readVec(*varioG, "Names", varnames);
+  ret = ret && SerializeHDF5::readValue(*varioG, "Calcul", flag_calcul);
+
+  setNVar(nvar);
+  internalDirectionResize(ndir, false);
+  internalVariableResize();
+  setVariableNames(varnames);
+
+  // Reading Direction global description
+  int ndim = 0;
+  double scale = 0.;
+  auto varioparamG = SerializeHDF5::getGroup(grp, "VarioParam");
+  if (!varioparamG) return false;
+  ret              = ret && SerializeHDF5::readValue(*varioparamG, "NDim", ndim);
+  ret              = ret && SerializeHDF5::readValue(*varioparamG, "Scale", scale);
+  setCalculByName("vg"); // TODO: read this information from NF file and treat accordingly
+  setScale(scale);
+
+  if (flag_calcul)
+  {
+    VectorDouble vars;
+    ret = ret && SerializeHDF5::readVec(*varioG, "Variances", vars);
+    if ((int) vars.size() != nvar * nvar) return false;
+    setVars(vars);
+  }
+
+  // Loop on the directions
+  for (int idir = 0; idir < ndir; idir++)
+  {
+    String locName = "Direction_" + std::to_string(idir);
+    auto dirG      = SerializeHDF5::getGroup(grp, locName);
+    if (!dirG) return false;
+
+    int nlag       = 0;
+    int optionCode = 0;
+    double tolcode = 0.;
+    double dlag    = 0.;
+    double toldist = 0.;
+    double tolang  = 0.;
+    bool flagGrid  = false;
+    VectorInt grincr;
+    VectorDouble codir;
+
+    ret = ret && SerializeHDF5::readValue(*dirG, "NLag", nlag);
+    ret = ret && SerializeHDF5::readValue(*dirG, "Code", optionCode);
+    ret = ret && SerializeHDF5::readValue(*dirG, "TolCode", tolcode);
+    ret = ret && SerializeHDF5::readValue(*dirG, "Lag", dlag);
+    ret = ret && SerializeHDF5::readValue(*dirG, "TolDist", toldist);
+    ret = ret && SerializeHDF5::readValue(*dirG, "GridDef", flagGrid);
+
+    if (!flagGrid)
+    {
+      ret = ret && SerializeHDF5::readValue(*dirG, "TolAng", tolang);
+    }
+    else
+    {
+      ret = ret && SerializeHDF5::readVec(*dirG, "GrIncr", grincr);
+    }
+    ret = ret && SerializeHDF5::readVec(*dirG, "Codir", codir);
+
+    auto space        = SpaceRN::create(ndim);
+    DirParam dirparam = DirParam(nlag, dlag, toldist, tolang, optionCode, 0,
+                                 TEST, TEST, tolcode, VectorDouble(), codir, TEST,
+                                 space);
+    if (flagGrid) dirparam.setGrincr(grincr);
+
+    _varioparam.addDir(dirparam);
+    _directionResize(idir);
+
+    if (!flag_calcul) continue;
+    VectorDouble sw;
+    VectorDouble hh;
+    VectorDouble gg;
+    ret = ret && SerializeHDF5::readVec(*dirG, "SW", sw);
+    ret = ret && SerializeHDF5::readVec(*dirG, "HH", hh);
+    ret = ret && SerializeHDF5::readVec(*dirG, "GG", gg);
+    fill(idir, sw, gg, hh);
+  }
+  return ret;
+} 
+
+bool Vario::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  int flag_calcul = 1;
+
+  // create a new H5 group every time we enter a _serialize method
+  // => easier to deserialize
+  auto varioG = grp.createGroup("Vario");
+
+  bool ret = true;
+
+  // Write the Vario global structure 
+  ret = ret && SerializeHDF5::writeValue(varioG, "NVar", getNVar());
+  ret = ret && SerializeHDF5::writeValue(varioG, "NDir", getNDir());
+  ret = ret && SerializeHDF5::writeVec(varioG, "Names", _variableNames);
+  ret = ret && SerializeHDF5::writeValue(varioG, "Calcul", flag_calcul);
+
+  // Writing Direction global description
+  auto varioparamG = grp.createGroup("VarioParam");
+  ret              = ret && SerializeHDF5::writeValue(varioparamG, "NDim",
+                                                      _varioparam.getNDim());
+  ret              = ret && SerializeHDF5::writeValue(varioparamG, "Scale",
+                                                      _varioparam.getScale());
+
+  // Dumping the Variances (optional)
+  if (flag_calcul)
+    ret = ret && SerializeHDF5::writeVec(varioG, "Variances", getVarMatrix().getValues());
+
+  /* Loop on the directions */
+
+  for (int idir = 0; ret && idir < getNDir(); idir++)
+  {
+    const DirParam dirparam = _varioparam.getDirParam(idir);
+    String locName          = "Direction_" + std::to_string(idir);
+    auto dirG               = grp.createGroup(locName);
+
+    ret = ret && SerializeHDF5::writeValue(dirG, "NLag", dirparam.getNLag());
+    ret = ret && SerializeHDF5::writeValue(dirG, "Code", dirparam.getOptionCode());
+    ret = ret && SerializeHDF5::writeValue(dirG, "TolCode", dirparam.getTolCode());
+    ret = ret && SerializeHDF5::writeValue(dirG, "Lag", dirparam.getDPas());
+    ret = ret && SerializeHDF5::writeValue(dirG, "TolDist", dirparam.getTolDist());
+    ret = ret && SerializeHDF5::writeValue(dirG, "GridDef", dirparam.isDefinedForGrid());
+
+    if (!dirparam.isDefinedForGrid())
+    {
+      ret = ret && SerializeHDF5::writeValue(dirG, "TolAng", dirparam.getTolAngle());
+    }
+    else
+    {
+      ret = ret && SerializeHDF5::writeVec(dirG, "GrIncr", dirparam.getGrincrs());
+    }
+    ret = ret && SerializeHDF5::writeVec(dirG, "Codir", dirparam.getCodirs());
+
+    if (!flag_calcul) continue;
+    ret = ret && SerializeHDF5::writeVec(dirG, "SW", getAllSw(idir));
+    ret = ret && SerializeHDF5::writeVec(dirG, "HH", getAllHh(idir));
+    ret = ret && SerializeHDF5::writeVec(dirG, "GG", getAllGg(idir));
+  }
+  return ret;
+}
+#endif

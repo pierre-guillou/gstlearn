@@ -80,8 +80,7 @@ public:
                                        const VectorString& names = VectorString(),
                                        const VectorString& locatorNames = VectorString(),
                                        bool flagAddSampleRank           = true);
-  static DbLine* createFromNF(const String& neutralFilename,
-                              bool verbose = true);
+  static DbLine* createFromNF(const String& NFFilename, bool verbose = true);
   static DbLine* createFillRandom(int ndim,
                                   int nbline,
                                   int nperline,

@@ -771,8 +771,8 @@ bool DbGrid::_deserializeH5(H5::Group& grp, bool verbose)
 {
   // Call SerializeHDF5::getGroup to get the subgroup of grp named
   // "DbGrid" with some error handling
-  auto db = SerializeHDF5::getGroup(grp, "DbGrid");
-  if (!db)
+  auto dbgridG = SerializeHDF5::getGroup(grp, "DbGrid");
+  if (!dbgridG)
   {
     return false;
   }
@@ -780,10 +780,10 @@ bool DbGrid::_deserializeH5(H5::Group& grp, bool verbose)
   bool ret = true;
 
   // call _deserialize on each member with the current class Group
-  ret = ret && _grid._deserializeH5(*db, verbose);
+  ret = ret && _grid._deserializeH5(*dbgridG, verbose);
 
   // call _deserialize on the parent class with the current class Group
-  ret = ret && Db::_deserializeH5(*db, verbose);
+  ret = ret && Db::_deserializeH5(*dbgridG, verbose);
 
   return ret;
 }
@@ -792,17 +792,17 @@ bool DbGrid::_serializeH5(H5::Group& grp, bool verbose) const
 {
   // create a new H5 group every time we enter a _serialize method
   // => easier to deserialize
-  auto db = grp.createGroup("DbGrid");
+  auto dbgridG = grp.createGroup("DbGrid");
 
   bool ret = true;
   // serialize vector members using SerializeHDF5::writeVec
   // (error handling is done in these methods)
 
   // call _serialize on each member with the current class Group
-  ret = ret && _grid._serializeH5(db, verbose);
+  ret = ret && _grid._serializeH5(dbgridG, verbose);
 
   // call _serialize on the parent class with the current class Group
-  ret = ret && Db::_serializeH5(db, verbose);
+  ret = ret && Db::_serializeH5(dbgridG, verbose);
 
   return ret;
 }
@@ -824,19 +824,19 @@ int DbGrid::gridDefine(const VectorInt& nx,
 /**
  * Create a Db by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (Db format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (Db format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbGrid* DbGrid::createFromNF(const String& neutralFilename, bool verbose)
+DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
 {
   DbGrid* dbgrid = nullptr;
   std::ifstream is;
   dbgrid = new DbGrid;
   bool success = false;
-  if (dbgrid->_fileOpenRead(neutralFilename, is, verbose))
+  if (dbgrid->_fileOpenRead(NFFilename, is, verbose))
   {
     success = dbgrid->deserialize(is, verbose);
   }

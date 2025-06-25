@@ -94,13 +94,13 @@ String AnamEmpirical::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-AnamEmpirical* AnamEmpirical::createFromNF(const String& neutralFilename, bool verbose)
+AnamEmpirical* AnamEmpirical::createFromNF(const String& NFFilename, bool verbose)
 {
   AnamEmpirical* anam = nullptr;
   std::ifstream is;
   anam = new AnamEmpirical();
   bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
+  if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  anam->deserialize(is, verbose);
   }

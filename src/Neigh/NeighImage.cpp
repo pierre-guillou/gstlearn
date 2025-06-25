@@ -95,17 +95,17 @@ NeighImage* NeighImage::create(const VectorInt& radius, int skip, const ASpaceSh
 
 /**
  * Create a NeighImageborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighImage* NeighImage::createFromNF(const String& neutralFilename, bool verbose)
+NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
 {
   NeighImage* neigh = nullptr;
   std::ifstream is;
   neigh = new NeighImage();
   bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
+  if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  neigh->deserialize(is, verbose);
   }

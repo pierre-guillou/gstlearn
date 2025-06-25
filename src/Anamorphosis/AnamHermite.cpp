@@ -80,13 +80,13 @@ String AnamHermite::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-AnamHermite* AnamHermite::createFromNF(const String& neutralFilename, bool verbose)
+AnamHermite* AnamHermite::createFromNF(const String& NFFilename, bool verbose)
 {
   AnamHermite* anam = nullptr;
   std::ifstream is;
   anam = new AnamHermite();
   bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
+  if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
     success = anam->deserialize(is, verbose);
   }

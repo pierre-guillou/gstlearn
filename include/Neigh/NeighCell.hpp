@@ -67,7 +67,7 @@ public:
                            bool useBallTree             = false,
                            int leaf_size                = 10,
                            const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static NeighCell* createFromNF(const String& neutralFilename, bool verbose = true);
+  static NeighCell* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getNMini() const { return _nMini; }
 

@@ -86,7 +86,7 @@ public:
                              bool useBallTree = false,
                              int leaf_size = 10,
                              const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static NeighMoving* createFromNF(const String& neutralFilename, bool verbose = true);
+  static NeighMoving* createFromNF(const String& NFFilename, bool verbose = true);
 
   void addBiTargetCheck(ABiTargetCheck* abpc);
 

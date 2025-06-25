@@ -42,7 +42,10 @@ public:
   static Table* create(int nrow = 0, int ncol = 0);
   static Table* createFromNames(const VectorString &rownames,
                                 const VectorString &colnames);
-  static Table* createFromNF(const String& neutralFilename, bool verbose = true);
+  static Table* createFromNF(const String& NFFilename, bool verbose = true);
+#ifdef HDF5
+  static Table* createFromH5(const String& H5Filename, bool verbose = true);
+#endif
   static Table* createFromTable(const Table& table);
 
   VectorDouble getRange(int icol) const;
@@ -68,7 +71,11 @@ protected:
   /// Interface for ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
-  String _getNFName() const override { return "Table"; }
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
+ String _getNFName() const override{return "Table"; }
 
 private:
   void _clearDecoration();

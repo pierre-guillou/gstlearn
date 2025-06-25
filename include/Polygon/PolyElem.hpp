@@ -29,8 +29,10 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static PolyElem* create();
-  static PolyElem* createFromNF(const String& neutralFilename, bool verbose = true);
-
+  static PolyElem* createFromNF(const String& NFFilename, bool verbose = true);
+#ifdef HDF5
+  static PolyElem* createFromH5(const String& H5Filename, bool verbose = true);
+#endif
   const VectorDouble& getX() const { return PolyLine2D::getX(); }
   const VectorDouble& getY() const { return PolyLine2D::getY(); }
   double getX(int i) const { return PolyLine2D::getX(i); }
@@ -57,6 +59,10 @@ protected:
   /// Interface for ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "PolyElem"; }
 
 private:

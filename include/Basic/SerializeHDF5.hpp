@@ -180,14 +180,15 @@ namespace SerializeHDF5
    * @param[in] name Name of the group to find in parent
    * @return Group if found else nullopt
    */
-  inline std::optional<H5::Group> getGroup(const H5::Group& parent, const String& name)
+  inline std::optional<H5::Group> getGroup(const H5::Group& parent, const String& name, bool verbose = true)
   {
     if (!parent.nameExists(name) || parent.childObjType(name) != H5O_TYPE_GROUP)
     {
       std::string parent_name;
       parent.getObjName(parent_name);
-      messerr("Cannot find group %s in parent group %s", name.c_str(),
-              parent_name.c_str());
+      if (verbose)
+        messerr("Cannot find group %s in parent group %s", name.c_str(),
+                parent_name.c_str());
       return std::nullopt;
     }
 
@@ -286,7 +287,7 @@ bool SerializeHDF5::readVec(const H5::Group& grp, const String& title, VectorStr
 
   // Use a vector of char* managed by HDF5 to read string data
   std::vector<char*> data_ptr(dim);
-  data.read(vec.data(), H5::StrType {0, H5T_VARIABLE});
+  data.read(data_ptr.data(), H5::StrType {0, H5T_VARIABLE});
 
   // copy char pointers into gstlearn managed string vector
   for (size_t i = 0; i < data_ptr.size(); ++i)

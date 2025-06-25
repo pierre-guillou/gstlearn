@@ -16,6 +16,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/File.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Basic/CSVformat.hpp"
 #include "Polygon/Polygons.hpp"
 
@@ -374,18 +375,18 @@ Polygons* Polygons::create()
 
 /**
  * Create a Polygon by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */  VectorDouble _emptyVec; // dummy
  PolyElem     _emptyElem; // dummy
-Polygons* Polygons::createFromNF(const String& neutralFilename, bool verbose)
+Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
 {
   Polygons* polygons = nullptr;
   std::ifstream is;
   polygons = new Polygons();
   bool success = false;
-  if (polygons->_fileOpenRead(neutralFilename, is, verbose))
+  if (polygons->_fileOpenRead(NFFilename, is, verbose))
   {
     success = polygons->deserialize(is, verbose);
   }
@@ -396,6 +397,22 @@ Polygons* Polygons::createFromNF(const String& neutralFilename, bool verbose)
   }
   return polygons;
 }
+
+#ifdef HDF5
+Polygons* Polygons::createFromH5(const String& H5Filename, bool verbose)
+{
+  auto* polygons = new Polygons;
+  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = polygons->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete polygons;
+    polygons = nullptr;
+  }
+  return polygons;
+}
+#endif
 
 Polygons* Polygons::createFromCSV(const String& filename,
                                   const CSVformat& csv,
@@ -1039,3 +1056,51 @@ int db_selhull(Db *db1,
   return 0;
 }
 
+#ifdef HDF5
+bool Polygons::_deserializeH5(H5::Group& grp, bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "Polygons" with some error handling
+  auto polygonsG = SerializeHDF5::getGroup(grp, "Polygons");
+  if (!polygonsG)
+  {
+    return false;
+  }
+
+  _polyelems.clear();
+
+  bool ret = true;
+  int ipol = 0;
+  PolyElem polyOne;
+  while(1)
+  {
+    String locname = "PolyElem_" + std::to_string(ipol);
+    auto polyelemG = SerializeHDF5::getGroup(*polygonsG, locname, false);
+    if (!polyelemG) break;
+    ret = ret && polyOne._deserializeH5(*polyelemG, verbose);
+    _polyelems.push_back(polyOne);
+    ipol++;
+  }
+  return ret;
+}
+
+bool Polygons::_serializeH5(H5::Group& grp, bool verbose) const
+{
+  // create a new H5 group every time we enter a _serialize method
+  // => easier to deserialize
+  auto polygonsG = grp.createGroup("Polygons");
+
+  auto npol = _polyelems.size();
+  if (npol == 0) return true;
+
+  bool ret = true;
+  for (size_t ipol = 0; ret && ipol < npol; ipol++)
+  {
+    String locname = "PolyElem_" + std::to_string(ipol);
+    auto polyelemG = polygonsG.createGroup(locname);
+    ret            = ret && _polyelems[ipol]._serializeH5(polyelemG, verbose);
+  }
+
+  return ret;
+}
+#endif

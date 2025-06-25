@@ -50,7 +50,7 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighUnique* create(bool flag_xvalid = false, const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static NeighUnique* createFromNF(const String& neutralFilename, bool verbose = true);
+  static NeighUnique* createFromNF(const String& NFFilename, bool verbose = true);
 
 protected:
   /// Interface for ASerializable

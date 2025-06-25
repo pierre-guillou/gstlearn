@@ -1361,20 +1361,18 @@ bool Grid::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   // Call SerializeHDF5::getGroup to get the subgroup of grp named
   // "Grid" with some error handling
-  auto gr = SerializeHDF5::getGroup(grp, "Grid");
-  if (!gr)
+  auto gridG = SerializeHDF5::getGroup(grp, "Grid");
+  if (!gridG)
   {
     return false;
   }
 
   /* Read the grid characteristics */
   bool ret = true;
-  // deserialize vector members using SerializeHDF5::readVec
-  // (error handling is done in these methods)
-  ret = ret && SerializeHDF5::readVec(*gr, "NX", nx);
-  ret = ret && SerializeHDF5::readVec(*gr, "X0", x0);
-  ret = ret && SerializeHDF5::readVec(*gr, "DX", dx);
-  ret = ret && SerializeHDF5::readVec(*gr, "ANGLE", angles);
+  ret = ret && SerializeHDF5::readVec(*gridG, "NX", nx);
+  ret = ret && SerializeHDF5::readVec(*gridG, "X0", x0);
+  ret = ret && SerializeHDF5::readVec(*gridG, "DX", dx);
+  ret = ret && SerializeHDF5::readVec(*gridG, "ANGLE", angles);
 
   // reset the Grid
   resetFromVector(nx, dx, x0, angles);
@@ -1386,15 +1384,13 @@ bool Grid::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
   // create a new H5::Group every time we enter a _serialize method
   // => easier to deserialize
-  auto gr = grp.createGroup("Grid");
+  auto gridG = grp.createGroup("Grid");
 
   bool ret = true;
-  // serialize vector members using SerializeHDF5::writeVec
-  // (error handling is done in these methods)
-  ret = ret && SerializeHDF5::writeVec(gr, "NX", getNXs());
-  ret = ret && SerializeHDF5::writeVec(gr, "X0", getX0s());
-  ret = ret && SerializeHDF5::writeVec(gr, "DX", getDXs());
-  ret = ret && SerializeHDF5::writeVec(gr, "ANGLE", getRotAngles());
+  ret = ret && SerializeHDF5::writeVec(gridG, "NX", getNXs());
+  ret = ret && SerializeHDF5::writeVec(gridG, "X0", getX0s());
+  ret = ret && SerializeHDF5::writeVec(gridG, "DX", getDXs());
+  ret = ret && SerializeHDF5::writeVec(gridG, "ANGLE", getRotAngles());
 
   return ret;
 }

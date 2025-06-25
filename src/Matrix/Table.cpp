@@ -14,6 +14,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 Table::Table(int nrow, int ncol, bool skip_title, bool skip_description)
   : MatrixDense(nrow, ncol),
@@ -86,13 +87,13 @@ Table* Table::createFromNames(const VectorString &rownames,
   return table;
 }
 
-Table* Table::createFromNF(const String& neutralFilename, bool verbose)
+Table* Table::createFromNF(const String& NFFilename, bool verbose)
 {
   Table* table = nullptr;
   std::ifstream is;
   table = new Table();
   bool success = false;
-  if (table->_fileOpenRead(neutralFilename, is, verbose))
+  if (table->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  table->deserialize(is, verbose);
   }
@@ -103,6 +104,22 @@ Table* Table::createFromNF(const String& neutralFilename, bool verbose)
   }
   return table;
 }
+
+#ifdef HDF5
+Table* Table::createFromH5(const String& H5Filename, bool verbose)
+{
+  auto* table = new Table;
+  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = table->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete table;
+    table = nullptr;
+  }
+  return table;
+}
+#endif
 
 Table* Table::createFromTable(const Table& table)
 {
@@ -298,3 +315,48 @@ String Table::getRowName(int irow) const
   if (! _isRowValid(irow)) return String();
   return _rowNames[irow];
 }
+#ifdef HDF5
+bool Table::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "Table" with some error handling
+  auto tableG = SerializeHDF5::getGroup(grp, "Table");
+  if (!tableG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  int ncols = 0;
+  int nrows = 0;
+  VectorDouble values;
+
+  ret = ret && SerializeHDF5::readValue(*tableG, "NCols", ncols);
+  ret = ret && SerializeHDF5::readValue(*tableG, "NRows", nrows);
+  ret = ret && SerializeHDF5::readVec(*tableG, "Values", values);
+  if (ret)
+  {
+    reset(nrows, ncols);
+    setValues(values);
+  }
+
+  return ret;
+}
+
+bool Table::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto tableG = grp.createGroup("Table");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(tableG, "NCols", getNCols());
+  ret = ret && SerializeHDF5::writeValue(tableG, "NRows", getNRows());
+  ret = ret && SerializeHDF5::writeVec(tableG, "Values", getValues());
+
+  return ret;
+}
+#endif

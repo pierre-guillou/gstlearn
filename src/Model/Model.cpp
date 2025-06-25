@@ -9,6 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Basic/AStringable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Model/ModelCovList.hpp"
 #include "Space/ASpace.hpp"
 #include "Space/ASpaceObject.hpp"
@@ -230,13 +231,13 @@ Model* Model::createFromDb(const Db* db)
   return model;
 }
 
-Model* Model::createFromNF(const String &neutralFilename, bool verbose)
+Model* Model::createFromNF(const String &NFFilename, bool verbose)
 {
   Model* model = nullptr;
   std::ifstream is;
   model = new Model();
   bool success = false;
-  if (model->_fileOpenRead(neutralFilename, is, verbose))
+  if (model->_fileOpenRead(NFFilename, is, verbose))
   {
     success = model->deserialize(is, verbose);
   }
@@ -248,6 +249,22 @@ Model* Model::createFromNF(const String &neutralFilename, bool verbose)
   }
   return model;
 }
+
+#ifdef HDF5
+Model* Model::createFromH5(const String& H5Filename, bool verbose)
+{
+  auto* model           = new Model();
+  auto file             = SerializeHDF5::fileOpenRead(H5Filename);
+
+  bool success = model->_deserializeH5(file, verbose);
+  if (!success)
+  {
+    delete model;
+    model = nullptr;
+  }
+  return model;
+}
+#endif
 
 Model* Model::createFromVario(Vario* vario,
                               const VectorECov& types,
@@ -1369,3 +1386,184 @@ Model* Model::createFillRandom(int ndim,
   }
   return model;
 }
+
+#ifdef HDF5
+bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "Model" with some error handling
+  auto modelG = SerializeHDF5::getGroup(grp, "Model");
+  if (!modelG)
+  {
+    return false;
+  }
+
+  bool ret     = true;
+
+  // General characteristics
+  int ndim     = 0;
+  int nvar     = 0;
+  int ncov     = 0;
+  int ndrift   = 0;
+  double field = 0.;
+
+  ret = ret && SerializeHDF5::readValue(*modelG, "NDim",   ndim);
+  ret = ret && SerializeHDF5::readValue(*modelG, "NVar",   nvar);
+  ret = ret && SerializeHDF5::readValue(*modelG, "Field",  field);
+  ret = ret && SerializeHDF5::readValue(*modelG, "NCov",   ncov);
+  ret = ret && SerializeHDF5::readValue(*modelG, "NDrift", ndrift);
+  if (!ret) return ret;
+
+  // Process the Context
+  _ctxt = CovContext(nvar, ndim);
+  _ctxt.setField(field);
+  _clear();
+  _create();
+
+  // Process the Covariances
+  CovAnisoList covs(_ctxt);
+  for (int icov = 0; ret && icov < ncov; icov++)
+  {
+    String locName       = "Covariance" + std::to_string(icov);
+    auto covG     = SerializeHDF5::getGroup(grp, locName);
+    if (!covG) return false;
+
+    // General characteristics
+    int vartype = 0;
+    double range = 0.;
+    double param = 0.;
+    int flag_aniso = 0;
+    int flag_rotation = 0;
+    VectorDouble aniso_ranges;
+    VectorDouble aniso_rotmat;
+    VectorDouble sills;
+
+    ret = ret && SerializeHDF5::readValue(*covG, "Type", vartype);
+    ret = ret && SerializeHDF5::readValue(*covG, "Range", range);
+    ret = ret && SerializeHDF5::readValue(*covG, "Param", param);
+
+    // Anisotropy
+    ret = ret && SerializeHDF5::readValue(*covG, "FlagAniso", flag_aniso);
+    if (flag_aniso)
+    {
+      ret = ret && SerializeHDF5::readVec(*covG, "Aniso", aniso_ranges);
+
+      // Rotation
+      ret = ret && SerializeHDF5::readValue(*covG, "FlagRotation", flag_rotation);
+      if (flag_rotation)
+        ret = ret && SerializeHDF5::readVec(*covG, "Rotation", aniso_rotmat);
+    }
+
+    // Sills
+    ret = ret && SerializeHDF5::readVec(*covG, "Sills", sills);
+    if (!ret) return ret;
+
+    CovAniso cova(ECov::fromValue(vartype), _ctxt);
+    cova.setParam(param);
+    if (flag_aniso)
+    {
+      for (int idim = 0; idim < ndim; idim++)
+        aniso_ranges[idim] *= range;
+      cova.setRanges(aniso_ranges);
+      if (flag_rotation) cova.setAnisoRotation(aniso_rotmat);
+    }
+    else
+      cova.setRangeIsotropic(range);
+    covs.addCov(&cova);
+  }
+  setCovAnisoList(&covs);
+
+  // Process the drift part
+  DriftList drifts(_ctxt);
+  ADrift* drift;
+  for (int ibfl = 0; ret && ibfl < ndrift; ibfl++)
+  {
+    String locName      = "Drift" + std::to_string(ibfl);
+    auto driftG         = SerializeHDF5::getGroup(grp, locName);
+    if (!driftG) return false;
+
+    String driftname;
+    ret   = ret && SerializeHDF5::readValue(*driftG, "Name", driftname);
+
+    drift = DriftFactory::createDriftByIdentifier(driftname);
+    drifts.addDrift(drift);
+    delete drift;
+  }
+  setDriftList(&drifts);
+
+  // Process the Means
+  if (ndrift <= 0)
+  {
+    VectorDouble means;
+    ret = ret && SerializeHDF5::readVec(*modelG, "Means", means);
+    setMeans(means);
+  }
+
+  // Process the covariance matrix
+  VectorDouble covar0s;
+  ret = ret && SerializeHDF5::readVec(*modelG, "Covar", covar0s);
+  setCovar0s(covar0s);
+
+  return ret;
+}
+
+bool Model::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5 group every time we enter a _serialize method
+  // => easier to deserialize
+  auto modelG = grp.createGroup("Model");
+
+  bool ret = true;
+  ret = ret && SerializeHDF5::writeValue(modelG, "NDim",   (int) getNDim());
+  ret = ret && SerializeHDF5::writeValue(modelG, "NVar",   getNVar());
+  ret = ret && SerializeHDF5::writeValue(modelG, "Field",  getField());
+  ret = ret && SerializeHDF5::writeValue(modelG, "NCov",   getNCov());
+  ret = ret && SerializeHDF5::writeValue(modelG, "NDrift", getNDrift());
+
+  // Writing the covariance part
+  for (int icov = 0, ncov = getNCov(); ret && icov < ncov; icov++)
+  {
+    const CovAniso* cova = getCovAniso(icov);
+    String locName       = "Covariance" + std::to_string(icov);
+    auto covG            = grp.createGroup(locName);
+
+    // General characteristics
+    ret = ret && SerializeHDF5::writeValue(covG, "Type", cova->getType().getValue());
+    ret = ret && SerializeHDF5::writeValue(covG, "Range", cova->getRangeIso());
+    ret = ret && SerializeHDF5::writeValue(covG, "Param", cova->getParam());
+
+    // Anisotropy
+    ret = ret && SerializeHDF5::writeValue(covG, "FlagAniso", (int)cova->getFlagAniso());
+    if (cova->getFlagAniso())
+    {
+      ret = ret && SerializeHDF5::writeVec(covG, "Aniso", cova->getAnisoCoeffs());
+
+      ret = ret && SerializeHDF5::writeValue(covG, "FlagRotation", (int)cova->getFlagRotation());
+      if (cova->getFlagRotation())
+        ret = ret && SerializeHDF5::writeVec(covG, "Rotation", cova->getAnisoRotMat().getValues());
+    }
+
+    // Sills
+    ret = ret && SerializeHDF5::writeVec(covG, "Sills", cova->getSill().getValues());
+  }
+
+  // Writing the drift part
+  for (int ibfl = 0, nbfl = getNDrift(); ret && ibfl < nbfl; ibfl++)
+  {
+    const ADrift* drift = getDrift(ibfl);
+    String locName      = "Drift" + std::to_string(ibfl);
+    auto driftG         = grp.createGroup(locName);
+
+    ret = ret && SerializeHDF5::writeValue(driftG, "Name", drift->getDriftName());
+  }
+
+  // Writing the matrix of means (if nbfl <= 0) 
+  if (getNDrift() <= 0)
+    ret = ret && SerializeHDF5::writeVec(modelG, "Means", getMeans());
+
+  /// Writing the variance-covariance at the origin (optional) 
+  ret = ret && SerializeHDF5::writeVec(modelG, "Covar", getCovar0());
+
+  return ret;
+}
+#endif

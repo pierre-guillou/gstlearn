@@ -85,13 +85,13 @@ bool Faults::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-Faults* Faults::createFromNF(const String& neutralFilename, bool verbose)
+Faults* Faults::createFromNF(const String& NFFilename, bool verbose)
 {
   Faults* faults = nullptr;
   std::ifstream is;
   faults = new Faults();
   bool success = false;
-  if (faults->_fileOpenRead(neutralFilename, is, verbose))
+  if (faults->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  faults->deserialize(is, verbose);
   }

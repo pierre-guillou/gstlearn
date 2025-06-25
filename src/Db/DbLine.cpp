@@ -396,19 +396,19 @@ bool DbLine::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a Db by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (Db format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (Db format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbLine* DbLine::createFromNF(const String& neutralFilename, bool verbose)
+DbLine* DbLine::createFromNF(const String& NFFilename, bool verbose)
 {
   DbLine* dbLine = nullptr;
   std::ifstream is;
   dbLine = new DbLine;
   bool success = false;
-  if (dbLine->_fileOpenRead(neutralFilename, is, verbose))
+  if (dbLine->_fileOpenRead(NFFilename, is, verbose))
   {
     success = dbLine->deserialize(is, verbose);
   }

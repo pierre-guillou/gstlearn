@@ -37,7 +37,7 @@ public:
 
   bool deserialize(std::istream& is, bool verbose = true);
   bool serialize(std::ostream& os,bool verbose = true) const;
-  bool dumpToNF(const String& neutralFilename, bool verbose = false) const;
+  bool dumpToNF(const String& NFFilename, bool verbose = false) const;
 #ifdef HDF5
   bool dumpToH5(const String& H5Filename, bool verbose = false) const;
 #endif

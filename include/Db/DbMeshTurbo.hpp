@@ -67,8 +67,7 @@ public:
                              const VectorString& locatorNames = VectorString(),
                              bool flag_polarized              = false,
                              bool verbose                     = false);
-  static DbMeshTurbo* createFromNF(const String& neutralFilename,
-                                   bool verbose = true);
+  static DbMeshTurbo* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getNApices() const { return _mesh.getNApices(); }
   int getNMeshes() const { return _mesh.getNMeshes(); }

@@ -69,17 +69,17 @@ NeighUnique* NeighUnique::create(bool flag_xvalid, const ASpaceSharedPtr& space)
 
 /**
  * Create a NeighUniqueborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighUnique* NeighUnique::createFromNF(const String& neutralFilename, bool verbose)
+NeighUnique* NeighUnique::createFromNF(const String& NFFilename, bool verbose)
 {
   NeighUnique* neigh = nullptr;
   std::ifstream is;
   neigh = new NeighUnique;
   bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
+  if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
     success =  neigh->deserialize(is, verbose);
   }

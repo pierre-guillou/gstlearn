@@ -56,7 +56,7 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighImage* create(const VectorInt& radius, int skip = 0, const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static NeighImage* createFromNF(const String& neutralFilename, bool verbose = true);
+  static NeighImage* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getSkip() const { return _skip; }
   const VectorInt& getImageRadius() const { return _imageRadius; }

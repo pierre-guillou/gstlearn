@@ -49,7 +49,7 @@ public:
                    const VectorDouble &wt = VectorDouble()) override;
 
   /// ASerializable Interface
-  static AnamHermite* createFromNF(const String& neutralFilename, bool verbose = true);
+  static AnamHermite* createFromNF(const String& NFFilename, bool verbose = true);
 
   /// AnamContinuous Interface
   double rawToTransformValue(double z) const override;

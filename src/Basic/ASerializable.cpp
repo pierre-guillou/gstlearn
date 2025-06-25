@@ -53,11 +53,11 @@ bool ASerializable::serialize(std::ostream& os, bool verbose) const
   return _serialize(os, verbose);
 }
 
-bool ASerializable::dumpToNF(const String& neutralFilename, bool verbose) const
+bool ASerializable::dumpToNF(const String& NFFilename, bool verbose) const
 {
   std::ofstream os;
   bool ret = true;
-  if (SerializeNeutralFile::fileOpenWrite(*this, neutralFilename, os, true))
+  if (SerializeNeutralFile::fileOpenWrite(*this, NFFilename, os, true))
   {
     ret = _serialize(os, verbose);
     if (! ret)

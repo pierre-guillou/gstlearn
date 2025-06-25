@@ -62,8 +62,7 @@ public:
          const VectorString& names        = VectorString(),
          const VectorString& locatorNames = VectorString(),
          bool verbose                     = false);
-  static DbMeshStandard* createFromNF(const String& neutralFilename,
-                                      bool verbose = true);
+  static DbMeshStandard* createFromNF(const String& NFFilename, bool verbose = true);
   static DbMeshStandard*
   createFromExternal(const MatrixDense& apices,
                      const MatrixInt& meshes,
