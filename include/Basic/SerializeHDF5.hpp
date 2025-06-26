@@ -39,7 +39,15 @@ namespace SerializeHDF5
   {
     return H5::PredType::NATIVE_LONG;
   }
-  inline H5::DataType getHDF5Type([[maybe_unused]] const std::string& a)
+  inline H5::DataType getHDF5Type([[maybe_unused]] const bool a)
+  {
+    return H5::PredType::NATIVE_HBOOL;
+  }
+  inline H5::DataType getHDF5Type([[maybe_unused]] const std::string &a)
+  {
+    return H5::StrType {0, H5T_VARIABLE};
+  }
+  inline H5::DataType getHDF5Type([[maybe_unused]] const char a[])
   {
     return H5::StrType {0, H5T_VARIABLE};
   }
@@ -80,6 +88,8 @@ namespace SerializeHDF5
     T res;
     if constexpr (std::is_same<T, std::string>::value)
       attr.read(getHDF5Type(res), res);
+    else if constexpr (std::is_convertible<T, std::string>::value)
+      attr.read(getHDF5Type(res), std::string{res});
     else
       attr.read(getHDF5Type(res), &res);
     return res;
@@ -287,7 +297,7 @@ bool SerializeHDF5::readVec(const H5::Group& grp, const String& title, VectorStr
 
   // Use a vector of char* managed by HDF5 to read string data
   std::vector<char*> data_ptr(dim);
-  data.read(data_ptr.data(), H5::StrType {0, H5T_VARIABLE});
+  data.read(static_cast<void *>(data_ptr.data()), H5::StrType {0, H5T_VARIABLE});
 
   // copy char pointers into gstlearn managed string vector
   for (size_t i = 0; i < data_ptr.size(); ++i)
@@ -337,7 +347,7 @@ bool SerializeHDF5::writeVec(H5::Group& grp,
   H5::DataSpace ds {1, &dim};
 
   const auto var = grp.createDataSet(title, H5::StrType {0, H5T_VARIABLE}, ds);
-  var.write(data_ptr.data(), H5::StrType {0, H5T_VARIABLE});
+  var.write(static_cast<void *>(data_ptr.data()), H5::StrType {0, H5T_VARIABLE});
   return true;
 }
 
@@ -348,7 +358,7 @@ bool SerializeHDF5::readValue(const H5::Group& grp, const String& name, T& value
 
   if (!grp.attrExists(name))
   {
-    messerr("Could not read value %s in group %s: attribute does not exist", name,
+    messerr("Could not read value %s in group %s: attribute does not exist", name.c_str(),
             grp_name.data());
     return false;
   }
@@ -356,7 +366,7 @@ bool SerializeHDF5::readValue(const H5::Group& grp, const String& name, T& value
   const auto attr = grp.openAttribute(name);
   if (attr.getDataType() != getHDF5Type(value))
   {
-    messerr("Could not read value %s in group %s: mismatch in datatypes", name,
+    messerr("Could not read value %s in group %s: mismatch in datatypes", name.c_str(),
             grp_name.data());
     return false;
   }
