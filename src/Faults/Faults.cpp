@@ -13,6 +13,7 @@
 #include "Geometry/GeometryHelper.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 
@@ -167,3 +168,54 @@ bool Faults::isSplitByFault(double xt1,double yt1, double xt2, double yt2) const
   }
   return false;
 }
+
+#ifdef HDF5
+bool Faults::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "Faults" with some error handling
+  auto faultG = SerializeHDF5::getGroup(grp, "Faults");
+  if (!faultG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int nfaults = 0;
+
+  ret = ret && SerializeHDF5::readValue(*faultG, "NFaults", nfaults);
+
+  for (int i = 0; ret && i < nfaults; i++)
+  {
+    String locName = "Line" + std::to_string(i);
+    auto lineG      = SerializeHDF5::getGroup(grp, locName);
+    if (!lineG) return false;
+
+    PolyLine2D fault;
+    ret = ret && fault._deserializeH5(*lineG, verbose);
+    addFault(fault);
+  }
+  return ret;
+}
+
+bool Faults::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto faultG = grp.createGroup("Faults");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(faultG, "NFaults", getNFaults());
+
+  for (int i = 0; ret && i < getNFaults(); i++)
+  {
+    String locName          = "Line" + std::to_string(i);
+    auto lineG               = grp.createGroup(locName);
+
+    ret = ret && _faults[i]._serializeH5(lineG, verbose);
+  }
+
+  return ret;
+}
+#endif

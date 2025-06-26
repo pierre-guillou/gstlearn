@@ -11,6 +11,7 @@
 #include "Anamorphosis/AnamDiscreteIR.hpp"
 #include "Db/Db.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 #include <math.h>
 
@@ -616,3 +617,44 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
   }
   return (0);
 }
+
+#ifdef HDF5
+bool AnamDiscreteIR::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "AnamDiscreteIR" with some error handling
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamDiscreteIR");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double r = 0.;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "R", r);
+
+  ret = ret && AnamDiscrete::_deserializeH5(*anamG, verbose);
+
+  if (ret) 
+    setRCoef(r);
+
+  return ret;
+}
+
+bool AnamDiscreteIR::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto anamG = grp.createGroup("AnamDiscreteIR");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "R", getRCoef());
+
+  ret = ret && AnamDiscrete::_serializeH5(anamG, verbose);
+
+  return ret;
+}
+#endif

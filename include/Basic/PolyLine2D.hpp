@@ -74,7 +74,7 @@ public:
                             const VectorDouble &target,
                             int nb_neigh) const;
 
-protected:
+public:
   /// Interface for ASerializable
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
@@ -82,6 +82,8 @@ protected:
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
+
+protected:
   String _getNFName() const override { return typeid(this).name(); }
 
 private:

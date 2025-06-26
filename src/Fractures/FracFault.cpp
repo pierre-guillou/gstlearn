@@ -11,6 +11,7 @@
 #include "Fractures/FracFault.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 #include <math.h>
 
@@ -134,3 +135,49 @@ bool FracFault::_serialize(std::ostream& os, bool /*verbose*/) const
   ret = ret && _recordWriteVec<double>(os, "Decrease Range on the right", _ranger);
   return ret;
 }
+
+#ifdef HDF5
+bool FracFault::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "FracFault" with some error handling
+  auto faultG = SerializeHDF5::getGroup(grp, "FracFault");
+  if (!faultG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int nfamilies;
+
+  ret = ret && SerializeHDF5::readValue(*faultG, "Abscissa", _coord);
+  ret = ret && SerializeHDF5::readValue(*faultG, "Orientation", _orient);
+  ret = ret && SerializeHDF5::readValue(*faultG, "NFamilies", nfamilies);
+  ret = ret && SerializeHDF5::readVec(*faultG, "MaxDensityLeft", _thetal);
+  ret = ret && SerializeHDF5::readVec(*faultG, "MaxDensityRight", _thetar);
+  ret = ret && SerializeHDF5::readVec(*faultG, "DecreaseRangeLeft", _rangel);
+  ret = ret && SerializeHDF5::readVec(*faultG, "DecreaseRangeRight", _ranger);
+
+  return ret;
+}
+
+bool FracFault::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto faultG = grp.createGroup("FracFault");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(faultG, "Abscissa", _coord);
+  ret = ret && SerializeHDF5::writeValue(faultG, "Orientation", _orient);
+  ret = ret && SerializeHDF5::writeValue(faultG, "NFamilies", getNFamilies());
+  ret = ret && SerializeHDF5::writeVec(faultG, "MaxDensityLeft", _thetal);
+  ret = ret && SerializeHDF5::writeVec(faultG, "MaxDensityRight", _thetar);
+  ret = ret && SerializeHDF5::writeVec(faultG, "DecreaseRangeLeft", _rangel);
+  ret = ret && SerializeHDF5::writeVec(faultG, "DecreaseRangeRight", _ranger);
+
+  return ret;
+}
+#endif

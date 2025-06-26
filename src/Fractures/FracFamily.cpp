@@ -11,6 +11,7 @@
 #include "Fractures/FracFamily.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 FracFamily::FracFamily(double orient,
                        double dorient,
@@ -127,3 +128,52 @@ bool FracFamily::_serialize(std::ostream& os, bool /*verbose*/) const
   return ret;
 }
 
+#ifdef HDF5
+bool FracFamily::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "FracFamily" with some error handling
+  auto famG = SerializeHDF5::getGroup(grp, "FracFamily");
+  if (!famG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::readValue(*famG, "Orient", _orient);
+  ret = ret && SerializeHDF5::readValue(*famG, "TolOrient", _dorient);
+  ret = ret && SerializeHDF5::readValue(*famG, "Intensity", _theta0);
+  ret = ret && SerializeHDF5::readValue(*famG, "Power", _alpha);
+  ret = ret && SerializeHDF5::readValue(*famG, "Ratio", _ratcst);
+  ret = ret && SerializeHDF5::readValue(*famG, "Surv_cste", _prop1);
+  ret = ret && SerializeHDF5::readValue(*famG, "Surv_length", _prop2);
+  ret = ret && SerializeHDF5::readValue(*famG, "Surv_cumExp", _aterm);
+  ret = ret && SerializeHDF5::readValue(*famG, "Surv_thickExp", _bterm);
+  ret = ret && SerializeHDF5::readValue(*famG, "Repulsion", _range);
+
+  return ret;
+}
+
+bool FracFamily::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto famG = grp.createGroup("FracFamily");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(famG, "Orient", _orient);
+  ret      = ret && SerializeHDF5::writeValue(famG, "TolOrient", _dorient);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Intensity", _theta0);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Power", _alpha);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Ratio", _ratcst);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Surv_cste", _prop1);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Surv_length", _prop2);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Surv_cumExp", _aterm);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Surv_thickExp", _bterm);
+  ret      = ret && SerializeHDF5::writeValue(famG, "Repulsion", _range);
+
+  return ret;
+}
+#endif

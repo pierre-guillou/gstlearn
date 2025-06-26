@@ -15,6 +15,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 #include <math.h>
 
@@ -497,3 +498,56 @@ bool AnamEmpirical::_deserialize(std::istream& is, bool verbose)
   }
   return ret;
 }
+#ifdef HDF5
+bool AnamEmpirical::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "AnamEmpirical" with some error handling
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamEmpirical");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndisc = 0;
+  double sigma2e = 0.;
+  VectorDouble zdisc;
+  VectorDouble ydisc;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "NDiscs", ndisc);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Variance", sigma2e);
+  ret = ret && SerializeHDF5::readVec(*anamG, "ZDisc", zdisc);
+  ret = ret && SerializeHDF5::readVec(*anamG, "YDisc", ydisc);
+
+  ret = ret && AnamContinuous::_deserializeH5(*anamG, verbose);
+
+  if (ret)
+  {
+    setNDisc(ndisc);
+    setSigma2e(sigma2e);
+    setDisc(zdisc, ydisc);
+  }
+
+  return ret;
+}
+
+bool AnamEmpirical::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto anamG = grp.createGroup("anamEmpirical");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "NDiscs", getNDisc());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Variance", getSigma2e());
+  ret = ret && SerializeHDF5::writeVec(anamG, "ZDisc", getZDisc());
+  ret = ret && SerializeHDF5::writeVec(anamG, "YDisc", getYDisc());
+
+  ret = ret && AnamContinuous::_serializeH5(anamG, verbose);
+
+  return ret;
+}
+#endif

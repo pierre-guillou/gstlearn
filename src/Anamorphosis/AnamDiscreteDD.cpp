@@ -11,6 +11,7 @@
 #include "geoslib_old_f.h"
 #include "Anamorphosis/AnamDiscreteDD.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Stats/Selectivity.hpp"
 #include "LinearOp/CholeskyDense.hpp"
@@ -979,3 +980,66 @@ int AnamDiscreteDD::factor2Selectivity(Db *db,
   return 0;
 }
 
+#ifdef HDF5
+bool AnamDiscreteDD::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "AnamDiscreteDD" with some error handling
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamDiscreteDD");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double s = 0.;
+  double mu = 0.;
+  VectorDouble z2f;
+  VectorDouble f2z;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "S", s);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Mu", mu);
+  ret = ret && SerializeHDF5::readVec(*anamG, "Z2F", z2f);
+  ret = ret && SerializeHDF5::readVec(*anamG, "F2Z", f2z);
+
+  ret = ret && AnamDiscrete::_deserializeH5(*anamG, verbose);
+
+
+  if (ret)
+  {
+    int ncut = getNCut();
+
+    setRCoef(s);
+    setMu(mu);
+
+    MatrixSquare pcaz2f;
+    pcaz2f.resetFromVD(ncut, ncut, z2f);
+    setPcaZ2F(pcaz2f);
+    
+    MatrixSquare pcaf2z;
+    pcaf2z.resetFromVD(ncut, ncut, f2z);
+    setPcaF2Z(pcaf2z);
+  }
+
+  return ret;
+}
+
+bool AnamDiscreteDD::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto anamG = grp.createGroup("AnamDiscreteDD");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "S", getSCoef());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Mu", getMu());
+  ret = ret && SerializeHDF5::writeVec(anamG, "Z2F", getPcaZ2Fs().getValues());
+  ret = ret && SerializeHDF5::writeVec(anamG, "F2Z", getPcaF2Zs().getValues());
+
+  ret = ret && AnamDiscrete::_serializeH5(anamG, verbose);
+
+  return ret;
+}
+#endif

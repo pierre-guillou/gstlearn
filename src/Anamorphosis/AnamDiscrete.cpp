@@ -10,8 +10,9 @@
 /******************************************************************************/
 #include "Anamorphosis/AnamDiscrete.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Matrix/MatrixDense.hpp"
-#include <Stats/Selectivity.hpp>
+#include "Stats/Selectivity.hpp"
 
 #include <math.h>
 
@@ -302,3 +303,56 @@ void AnamDiscrete::setStats(const VectorDouble& stats)
   }
   _stats.setValues(stats);
 }
+#ifdef HDF5
+bool AnamDiscrete::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "AnamDiscrete" with some error handling
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamDiscrete");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ncut = 0;
+  int nclass = 0;
+  int nelem = 0;
+  VectorDouble zcuts;
+  VectorDouble stats;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "NCut", ncut);
+  ret = ret && SerializeHDF5::readValue(*anamG, "NClass", nclass);
+  ret = ret && SerializeHDF5::readValue(*anamG, "NElem", nelem);
+  ret = ret && SerializeHDF5::readVec(*anamG, "Cuts", zcuts);
+  ret = ret && SerializeHDF5::readVec(*anamG, "Stats", stats);
+
+  if (ret)
+  {
+    setNCut(ncut);
+    setNElem(nelem);
+    setZCut(zcuts);
+    setStats(stats);
+  }
+
+  return ret;
+}
+
+bool AnamDiscrete::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto anamG = grp.createGroup("AnamDiscrete");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "NCut", getNCut());
+  ret = ret && SerializeHDF5::writeValue(anamG, "NClass", getNClass());
+  ret = ret && SerializeHDF5::writeValue(anamG, "NElem", getNElem());
+  ret = ret && SerializeHDF5::writeVec(anamG, "Cuts", getZCut());
+  ret = ret && SerializeHDF5::writeVec(anamG, "Stats", getStats().getValues());
+
+  return ret;
+}
+#endif

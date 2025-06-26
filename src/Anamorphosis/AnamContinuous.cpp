@@ -10,6 +10,7 @@
 /******************************************************************************/
 #include "Anamorphosis/AnamContinuous.hpp"
 #include "Db/Db.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 AnamContinuous::AnamContinuous()
     : AAnam(),
@@ -218,3 +219,83 @@ bool AnamContinuous::_deserialize(std::istream& is, bool /*verbose*/)
 
   return ret;
 }
+#ifdef HDF5
+bool AnamContinuous::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "AnalContinuous" with some error handling
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamContinuous");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double azmin = 0.;
+  double azmax = 0.;
+  double aymin = 0.;
+  double aymax = 0.;
+  double pzmin = 0.;
+  double pzmax = 0.;
+  double pymin = 0.;
+  double pymax = 0.;
+  double mean = 0.;
+  double variance = 0.;
+
+  // ret      = ret && SerializeHDF5::readVec(*anamG, "NX", nx);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Azmin", azmin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Azmax", azmax);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Aymin", aymin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Aymax", aymax);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pzmin", pzmin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pzmax", pzmax);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pymin", pymin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pymax", pymax);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Mean", mean);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Variance", variance);
+
+  if (ret)
+  {
+    setPymin(pymin);
+    setPzmin(pzmin);
+    setPymax(pymax);
+    setPzmax(pzmax);
+    setAymin(aymin);
+    setAzmin(azmin);
+    setAymax(aymax);
+    setAzmax(azmax);
+    setMean(mean);
+    setVariance(variance);
+  }
+
+  return ret;
+}
+
+bool AnamContinuous::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto anamG = grp.createGroup("AnamContinuous");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "Azmin", getAzmin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Azmax", getAzmax());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Aymin", getAymin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Aymax", getAymax());
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pzmin", getPzmin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pzmax", getPzmax());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pymin", getPymin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pymax", getPymax());
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "Mean", getMean());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Variance", getVariance());
+
+  return ret;
+}
+#endif

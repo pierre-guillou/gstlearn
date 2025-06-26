@@ -13,6 +13,7 @@
 #include "Db/DbStringFormat.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 DbMeshTurbo::DbMeshTurbo(const VectorInt& nx,
                          const VectorDouble& dx,
@@ -178,3 +179,48 @@ bool DbMeshTurbo::isConsistent() const
   }
   return true;
 }
+#ifdef HDF5
+bool DbMeshTurbo::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "DbMeshTurbo" with some error handling
+  auto dbg = SerializeHDF5::getGroup(grp, "DbMeshTurbo");
+  if (!dbg)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+
+  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
+
+  // Writing the Meshing information
+  ret = ret && _mesh._deserializeH5(*dbg, verbose);
+
+  /* Writing the tail of the file */
+  ret = ret && DbGrid::_deserializeH5(*dbg, verbose);
+
+  return ret;
+}
+
+bool DbMeshTurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto dbg = grp.createGroup("DbMeshTurbo");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(dbg, "NDim", getNDim());
+
+  // Writing the Meshing information
+  ret = ret && _mesh._serializeH5(dbg, verbose);
+
+  /* Writing the tail of the file */
+  ret = ret && DbGrid::_serializeH5(dbg, verbose);
+
+  return ret;
+}
+#endif
