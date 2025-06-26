@@ -14,6 +14,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "LithoRule/RuleShadow.hpp"
 #include "LithoRule/Rule.hpp"
 #include "LithoRule/Node.hpp"
@@ -122,7 +123,7 @@ bool RuleShadow::_deserialize(std::istream& is, bool /*verbose*/)
 
 bool RuleShadow::_serialize(std::ostream& os, bool /*verbose*/) const
 {
-  double slope = (FFFF(_slope)) ? 0. : _slope;
+  double slope  = (FFFF(_slope))  ? 0. : _slope;
   double shdown = (FFFF(_shDown)) ? 0. : _shDown;
   double shdsup = (FFFF(_shDsup)) ? 0. : _shDsup;
   VectorDouble shiftloc = _shift;
@@ -696,3 +697,53 @@ void RuleShadow::_normalizeShift()
 {
   if (!_shift.empty()) VH::normalize(_shift);
 }
+#ifdef HDF5
+bool RuleShadow::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "RuleShadow" with some error handling
+  auto ruleG = SerializeHDF5::getGroup(grp, "RuleShadow");
+  if (!ruleG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  _shift.resize(3);
+
+  // ret      = ret && SerializeHDF5::readVec(*ruleG, "NX", nx);
+  ret = ret && SerializeHDF5::readValue(*ruleG, "Slope", _slope);
+  ret = ret && SerializeHDF5::readValue(*ruleG, "ShDown", _shDown);
+  ret = ret && SerializeHDF5::readValue(*ruleG, "ShDsup", _shDsup);
+  ret = ret && SerializeHDF5::readVec(*ruleG, "ShiftLoc", _shift);
+
+  ret = ret && Rule::_deserializeH5(*ruleG, verbose);
+
+  return ret;
+}
+
+bool RuleShadow::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto ruleG = grp.createGroup("RuleShadow");
+
+  bool ret = true;
+
+  double slope          = (FFFF(_slope))  ? 0. : _slope;
+  double shdown         = (FFFF(_shDown)) ? 0. : _shDown;
+  double shdsup         = (FFFF(_shDsup)) ? 0. : _shDsup;
+  VectorDouble shiftloc = _shift;
+  shiftloc.resize(3);
+
+  ret = ret && SerializeHDF5::writeValue(ruleG, "Slope", slope);
+  ret = ret && SerializeHDF5::writeValue(ruleG, "ShDown", shdown);
+  ret = ret && SerializeHDF5::writeValue(ruleG, "ShDsup", shdsup);
+  ret = ret && SerializeHDF5::writeVec(ruleG, "ShiftLoc", shiftloc);
+
+  ret = ret && Rule::_serializeH5(ruleG, verbose);
+
+  return ret;
+}
+#endif

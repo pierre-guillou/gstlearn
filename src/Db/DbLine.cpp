@@ -20,6 +20,7 @@
 #include "Polygon/Polygons.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Stats/Classical.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Enum/ELoc.hpp"
@@ -783,3 +784,66 @@ DbLine* DbLine::createMarkersFromGrid(const DbGrid& grid,
 
   return dbline;
 }
+#ifdef HDF5
+bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "DbLine" with some error handling
+  auto dbg = SerializeHDF5::getGroup(grp, "DbLine");
+  if (!dbg)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+  int nbline = 0;
+  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*dbg, "NLines", nbline);
+
+  _lineAdds.resize(nbline);
+  for (int iline = 0; iline < nbline; iline++)
+  {
+    String locName = "Line" + std::to_string(iline);
+    auto lineg      = SerializeHDF5::getGroup(grp, locName);
+    if (!lineg) return false;
+
+    int nsample = 0;
+    ret = ret && SerializeHDF5::readValue(*lineg, "NSamples", nsample);
+    ret = ret && SerializeHDF5::readVec(*lineg, "Samples", _lineAdds[iline]);
+  }
+
+  /* Writing the tail of the file */
+
+  ret = ret && Db::_deserializeH5(*dbg, verbose);
+
+  return ret;
+}
+
+bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto dbg = grp.createGroup("Dbline");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(dbg, "NDim", getNDim());
+  ret      = ret && SerializeHDF5::writeValue(dbg, "NLines", getNLine());
+
+  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+  {
+    String locName = "Line" + std::to_string(iline);
+    auto dirG      = grp.createGroup(locName);
+
+    ret = ret && SerializeHDF5::writeValue(dbg, "NSamples", getNSamplePerLine(iline));
+    ret = ret && SerializeHDF5::writeVec(dbg, "Samples", _lineAdds[iline]);
+  }
+
+  /* Writing the tail of the file */
+
+  ret = ret && Db::_serializeH5(dbg, verbose);
+
+  return ret;
+}
+#endif

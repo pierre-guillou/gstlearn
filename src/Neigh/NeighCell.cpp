@@ -12,6 +12,7 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 NeighCell::NeighCell(bool flag_xvalid, int nmini, bool useBallTree, int leaf_size, const ASpaceSharedPtr& space)
   : ANeigh(space)
@@ -208,3 +209,38 @@ int NeighCell::_cell(int iech_out, VectorInt& ranks)
   return (nsel < getNMini());
 }
 
+#ifdef HDF5
+bool NeighCell::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "neighG" with some error handling
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighCell");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::readValue(*neighG, "NMini", _nMini);
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+
+  return ret;
+}
+
+bool NeighCell::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto neighG = grp.createGroup("NeighCell");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(neighG, "NMini", getNMini());
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif

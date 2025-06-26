@@ -13,6 +13,7 @@
 #include "Db/DbStringFormat.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 DbMeshStandard::DbMeshStandard(int ndim,
                                int napexpermesh,
@@ -135,7 +136,7 @@ bool DbMeshStandard::_deserialize(std::istream& is, bool verbose)
 
   // Reading the meshing information
 
-  ret      = ret && _mesh.deserialize(is);
+  ret      = ret && _mesh._deserialize(is);
 
   // Reading the Db information
 
@@ -154,7 +155,7 @@ bool DbMeshStandard::_serialize(std::ostream& os, bool verbose) const
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh.serialize(os);
+  ret      = ret && _mesh._serialize(os);
 
   /* Writing the tail of the file */
 
@@ -240,3 +241,42 @@ VectorDouble DbMeshStandard::getCoordinatesPerMesh(int imesh, int idim, bool fla
 
   return vec;
 }
+#ifdef HDF5 
+bool DbMeshStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "DbMeshStandard" with some error handling
+  auto dbg = SerializeHDF5::getGroup(grp, "DbMeshStandard");
+  if (!dbg)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
+
+  ret = ret && _mesh._deserializeH5(*dbg, verbose);
+
+  ret = ret && Db::_deserializeH5(*dbg, verbose);
+
+  return ret;
+}
+
+bool DbMeshStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto dbg = grp.createGroup("DbMeshStandard");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(dbg, "NDim", getNDim());
+
+  ret = ret && _mesh._serializeH5(dbg, verbose);
+
+  ret = ret && Db::_serializeH5(dbg, verbose);
+
+  return ret;
+}
+#endif

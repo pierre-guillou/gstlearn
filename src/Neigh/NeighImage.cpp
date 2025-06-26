@@ -11,6 +11,7 @@
 #include "Neigh/NeighImage.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Mesh/AMesh.hpp"
@@ -246,3 +247,43 @@ DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, int seed) const
 
   return dbsub;
 }
+#ifdef HDF5
+bool NeighImage::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "NeighImage" with some error handling
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighImage");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int skip = 0;
+
+  ret = ret && SerializeHDF5::readValue(*neighG, "Skip", skip);
+
+  ret = ret && SerializeHDF5::readVec(*neighG, "Radius", _imageRadius);
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+
+  return ret;
+}
+
+bool NeighImage::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto neighG = grp.createGroup("NeighImage");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(neighG, "Skip", getSkip());
+  ret = ret && SerializeHDF5::writeVec(neighG, "Radius", getImageRadius());
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif

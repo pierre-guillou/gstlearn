@@ -107,7 +107,7 @@ bool DbMeshTurbo::_deserialize(std::istream& is, bool verbose)
 
   // Reading the meshing information
 
-  ret      = ret && _mesh.deserialize(is);
+  ret      = ret && _mesh._deserialize(is);
 
   // Reading the Db information
 
@@ -126,7 +126,7 @@ bool DbMeshTurbo::_serialize(std::ostream& os, bool verbose) const
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh.serialize(os);
+  ret      = ret && _mesh._serialize(os);
 
   /* Writing the tail of the file */
 

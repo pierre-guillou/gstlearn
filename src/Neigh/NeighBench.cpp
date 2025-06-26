@@ -9,10 +9,11 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Neigh/NeighBench.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 NeighBench::NeighBench(bool flag_xvalid,
                        double width,
@@ -263,3 +264,41 @@ void NeighBench::_bench(int iech_out, VectorInt& ranks)
   }
 }
 
+#ifdef HDF5
+bool NeighBench::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  // Call SerializeHDF5::getGroup to get the subgroup of grp named
+  // "NeighBench" with some error handling
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighBench");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double width = 0.;
+
+  ret = ret && SerializeHDF5::readValue(*neighG, "Bench", width);
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+
+  _biPtBench = BiTargetCheckBench::create(-1, width); // idim_bench will be updated in 'attach'
+
+  return ret;
+}
+
+bool NeighBench::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  // create a new H5::Group every time we enter a _serialize method
+  // => easier to deserialize
+  auto neighG = grp.createGroup("NeighBench");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(neighG, "Bench", _biPtBench->getWidth());
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif
