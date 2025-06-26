@@ -93,7 +93,7 @@ protected:
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-  String _getNFName() const override { return typeid(this).name(); }
+  String _getNFName() const override { return "AnamDiscreteDD"; }
 
 private:
   int _stats(int nech, const VectorDouble& tab);

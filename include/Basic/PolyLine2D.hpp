@@ -84,7 +84,7 @@ public:
 #endif
 
 protected:
-  String _getNFName() const override { return typeid(this).name(); }
+  String _getNFName() const override { return "PolyLine2D"; }
 
 private:
   static void _shiftPoint(const VectorDouble& xy1,

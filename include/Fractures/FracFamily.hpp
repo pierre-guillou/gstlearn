@@ -65,7 +65,7 @@ public:
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
 protected:
-  String _getNFName() const override { return typeid(this).name(); }
+  String _getNFName() const override { return "Family"; }
 
 private:
   double _orient;              //!< Mean orientation

@@ -154,7 +154,7 @@ public:
 #endif
 
 protected:
-  String _getNFName() const override { return typeid(this).name(); }
+  String _getNFName() const override { return "MeshETurbo"; }
 
 private:
   Grid  _grid;

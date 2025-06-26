@@ -88,7 +88,7 @@ protected:
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-  String _getNFName() const override { return typeid(this).name(); }
+  String _getNFName() const override { return "Polygon"; }
 
 private:
   static PolyElem _extractFromTab(int ideb, int ifin, int ncol, const VectorDouble& tab);

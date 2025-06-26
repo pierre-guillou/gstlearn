@@ -80,8 +80,7 @@ protected:
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-
-  String _getNFName() const override { return typeid(this).name(); }
+  String _getNFName() const override { return "RuleShift"; }
 
 private:
   int _st_shift_on_grid(Db *db, int ndim, int flag_grid_check) const;
