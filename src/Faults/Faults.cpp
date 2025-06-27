@@ -67,7 +67,7 @@ bool Faults::_serialize(std::ostream& os, bool verbose) const
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of Faults", getNFaults());
   for (int i = 0; ret && i < getNFaults(); i++)
-    ret = ret && _faults[i].serialize(os, verbose);
+    ret = ret && _faults[i]._serialize(os, verbose);
   return ret;
 }
 

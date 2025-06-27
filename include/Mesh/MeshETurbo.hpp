@@ -144,16 +144,13 @@ private:
                             bool flag_polarized,
                             bool verbose);
 
-public:
-  /// Interface for ASerializable
+protected:
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os,bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-
-protected:
   String _getNFName() const override { return "MeshETurbo"; }
 
 private:
@@ -164,11 +161,13 @@ private:
   Indirection _gridIndirect;
 
   /// factor allocations
-  mutable std::vector<int> _indg;
-  mutable std::vector<int> _indices;
+  mutable std::vector<int>    _indg;
+  mutable std::vector<int>    _indices;
   mutable std::vector<double> _lambdas;
   mutable std::vector<double> _rhs;
-  mutable std::vector<int> _indgg;
+  mutable std::vector<int>    _indgg;
+
+  friend class DbMeshTurbo;
 };
 
 GSTLEARN_EXPORT bool isTurbo(const VectorMeshes& meshes);

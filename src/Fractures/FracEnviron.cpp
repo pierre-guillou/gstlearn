@@ -184,7 +184,7 @@ bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
   {
     ret = ret && _commentWrite(os, "Characteristics of family");
     const FracFamily& family = getFamily(ifam);
-    ret = ret && family.serialize(os, verbose);
+    ret = ret && family._serialize(os, verbose);
   }
 
   /* Loop on the main faults */
@@ -193,7 +193,7 @@ bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
   {
     ret = ret && _commentWrite(os, "Characteristics of main fault");
     const FracFault& fault = getFault(ifault);
-    ret = ret && fault.serialize(os, verbose);
+    ret = ret && fault._serialize(os, verbose);
   }
   return ret;
 }

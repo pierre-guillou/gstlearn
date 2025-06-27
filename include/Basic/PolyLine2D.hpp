@@ -74,8 +74,7 @@ public:
                             const VectorDouble &target,
                             int nb_neigh) const;
 
-public:
-  /// Interface for ASerializable
+protected:
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
@@ -99,6 +98,8 @@ private:
 private:
   VectorDouble _x;
   VectorDouble _y;
+
+  friend class Faults;
 };
 
 double distanceBetweenPolylines(const PolyLine2D& poly1,

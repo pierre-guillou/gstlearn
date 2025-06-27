@@ -59,16 +59,13 @@ public:
   const MatrixDense& getApices() const { return _apices; }
   const MatrixInt& getMeshes() const { return _meshes; }
 
-public:
-  /// Interface for ASerializable
+protected:
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os,bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-
-protected:
   String _getNFName() const override { return "MeshEStandard"; }
   void _defineBoundingBox(void);
 
@@ -86,4 +83,6 @@ private:
 private:
   MatrixDense _apices; // Dimension: NRow=napices; Ncol=Ndim
   MatrixInt   _meshes; // Dimension: Nrow=Nmesh; Ncol=NApexPerMesh
+
+  friend class DbMeshStandard;
 };

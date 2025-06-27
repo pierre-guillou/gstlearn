@@ -50,15 +50,13 @@ public:
   void setThetal(const VectorDouble& thetal) { _thetal = thetal; }
   void setThetar(const VectorDouble& thetar) { _thetar = thetar; }
 
-public:
-  /// Interface for ASerializable
+protected:
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os,bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-protected:
   String _getNFName() const override { return "FracFault"; }
 
 private:
@@ -68,4 +66,6 @@ private:
   VectorDouble _thetar;         //!< Maximum density on right
   VectorDouble _rangel;         //!< Decrease range on left
   VectorDouble _ranger;         //!< Decrease range on right
+
+  friend class FracEnviron;
 };

@@ -56,16 +56,14 @@ public:
   double getTheta0() const { return _theta0; }
   void setTheta0(double theta0) { _theta0 = theta0; }
 
-public:
-  /// Interface for ASerializable
+protected:
   virtual bool _deserialize(std::istream& is, bool verbose = false) override;
   virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-protected:
-  String _getNFName() const override { return "Family"; }
+  String _getNFName() const override { return "FracFamily"; }
 
 private:
   double _orient;              //!< Mean orientation
@@ -78,4 +76,6 @@ private:
   double _aterm;               //!< Survival probability (cumulative length term)
   double _bterm;               //!< Survival probability (layer thickness term)
   double _range;               //!< Range of fracture repulsion area
+
+  friend class FracEnviron;
 };

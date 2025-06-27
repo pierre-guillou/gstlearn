@@ -66,7 +66,7 @@ protected:
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-  String _getNFName() const override { return "Fracture Environ"; }
+  String _getNFName() const override { return "FracEnviron"; }
 
 private:
   double _xmax;                 //!< Maximum horizontal distance
