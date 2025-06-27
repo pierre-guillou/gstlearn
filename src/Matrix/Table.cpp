@@ -95,7 +95,7 @@ Table* Table::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (table->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  table->_deserialize(is, verbose);
+    success =  table->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -151,7 +151,7 @@ VectorDouble Table::getAllRange() const
   return limits;
 }
 
-bool Table::_serialize(std::ostream& os, bool /*verbose*/) const
+bool Table::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of Columns", getNCols());
@@ -170,7 +170,7 @@ bool Table::_serialize(std::ostream& os, bool /*verbose*/) const
   return ret;
 }
 
-bool Table::_deserialize(std::istream& is, bool /*verbose*/)
+bool Table::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int nrows = 0;
   int ncols = 0;

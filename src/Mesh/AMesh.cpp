@@ -598,7 +598,7 @@ void AMesh::dumpNeighborhood(std::vector<VectorInt>& Vmesh, int nline_max)
   }
 }
 
-bool AMesh::_deserialize(std::istream& is, bool /*verbose*/)
+bool AMesh::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
   ret = ret && _recordRead<int>(is, "Space Dimension", _nDim);
@@ -607,7 +607,7 @@ bool AMesh::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool AMesh::_serialize(std::ostream& os, bool /*verbose*/) const
+bool AMesh::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());

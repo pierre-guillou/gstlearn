@@ -103,7 +103,7 @@ AnamEmpirical* AnamEmpirical::createFromNF(const String& NFFilename, bool verbos
   bool success = false;
   if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  anam->_deserialize(is, verbose);
+    success =  anam->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -460,10 +460,10 @@ int AnamEmpirical::fitFromArray(const VectorDouble& tab,
   return 0;
 }
 
-bool AnamEmpirical::_serialize(std::ostream& os, bool verbose) const
+bool AnamEmpirical::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && AnamContinuous::_serialize(os, verbose);
+  ret = ret && AnamContinuous::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<int>(os, "Number of Discretization lags", getNDisc());
   ret = ret && _recordWrite<double>(os, "additional variance", getSigma2e());
   ret = ret && _tableWrite(os, "Z Values", getNDisc(), getZDisc());
@@ -471,14 +471,14 @@ bool AnamEmpirical::_serialize(std::ostream& os, bool verbose) const
   return ret;
 }
 
-bool AnamEmpirical::_deserialize(std::istream& is, bool verbose)
+bool AnamEmpirical::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndisc = 0;
   double sigma2e = TEST;
   VectorDouble zdisc, ydisc;
 
   bool ret = true;
-  ret = ret && AnamContinuous::_deserialize(is, verbose);
+  ret = ret && AnamContinuous::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<int>(is, "Number of Discretization classes", ndisc);
   ret = ret && _recordRead<double>(is, "Experimental Error Variance", sigma2e);
 

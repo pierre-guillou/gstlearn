@@ -114,7 +114,7 @@ MeshSpherical* MeshSpherical::createFromNF(const String& NFFilename, bool verbos
   bool success = false;
   if (mesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  mesh->_deserialize(is, verbose);
+    success =  mesh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -332,7 +332,7 @@ int MeshSpherical::_recopy(const MeshSpherical &m)
   return(0);
 }
 
-bool MeshSpherical::_deserialize(std::istream& is, bool /*verbose*/)
+bool MeshSpherical::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int ndim = 0;
   int napices = 0;
@@ -363,7 +363,7 @@ bool MeshSpherical::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool MeshSpherical::_serialize(std::ostream& os, bool /*verbose*/) const
+bool MeshSpherical::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());

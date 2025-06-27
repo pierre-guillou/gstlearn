@@ -96,7 +96,7 @@ String FracFamily::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-bool FracFamily::_deserialize(std::istream& is, bool /*verbose*/)
+bool FracFamily::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
   ret = ret && _recordRead<double>(is, "Mean orientation", _orient);
@@ -112,7 +112,7 @@ bool FracFamily::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool FracFamily::_serialize(std::ostream& os, bool /*verbose*/) const
+bool FracFamily::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<double>(os, "Mean orientation", _orient);

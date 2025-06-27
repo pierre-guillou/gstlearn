@@ -163,7 +163,7 @@ AnamContinuousFit AnamContinuous::sample(int ndisc, double aymin, double aymax)
   return retfit;
 }
 
-bool AnamContinuous::_serialize(std::ostream& os, bool /*verbose*/) const
+bool AnamContinuous::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<double>(os,"", getAzmin());
@@ -180,7 +180,7 @@ bool AnamContinuous::_serialize(std::ostream& os, bool /*verbose*/) const
   return ret;
 }
 
-bool AnamContinuous::_deserialize(std::istream& is, bool /*verbose*/)
+bool AnamContinuous::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   double azmin = 0.;
   double azmax = 0.;

@@ -110,24 +110,24 @@ double PolyElem::getSurface() const
   return(surface);
 }
 
-bool PolyElem::_serialize(std::ostream& os, bool verbose) const
+bool PolyElem::_serializeAscii(std::ostream& os, bool verbose) const
 {
   if (getNPoints() <= 0) return false;
   bool ret = true;
   ret = ret && _recordWrite<double>(os, "Z-Minimum", _zmin);
   ret = ret && _recordWrite<double>(os, "Z-Maximum", _zmax);
-  ret = ret && PolyLine2D::_serialize(os, verbose);
+  ret = ret && PolyLine2D::_serializeAscii(os, verbose);
   return ret;
 }
 
-bool PolyElem::_deserialize(std::istream& is, bool verbose)
+bool PolyElem::_deserializeAscii(std::istream& is, bool verbose)
 {
   _zmin = TEST;
   _zmax = TEST;
   bool ret = true;
   ret = ret && _recordRead<double>(is, "Z-Minimum", _zmin);
   ret = ret && _recordRead<double>(is, "Z-Maximum", _zmax);
-  ret = ret && PolyLine2D::_deserialize(is, verbose);
+  ret = ret && PolyLine2D::_deserializeAscii(is, verbose);
   return ret;
 }
 
@@ -144,7 +144,7 @@ PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (polyelem->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = polyelem->_deserialize(is, verbose);
+    success = polyelem->_deserializeAscii(is, verbose);
   }
 
   if (! success)

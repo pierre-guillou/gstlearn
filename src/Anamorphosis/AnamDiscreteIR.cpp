@@ -53,7 +53,7 @@ AnamDiscreteIR* AnamDiscreteIR::createFromNF(const String& NFFilename, bool verb
   bool success = false;
   if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  anam->_deserialize(is, verbose);
+    success =  anam->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -320,20 +320,20 @@ double AnamDiscreteIR::_getResidual(int iclass, double z) const
   return (retval);
 }
 
-bool AnamDiscreteIR::_serialize(std::ostream& os, bool verbose) const
+bool AnamDiscreteIR::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && AnamDiscrete::_serialize(os, verbose);
+  ret = ret && AnamDiscrete::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os, "Change of support coefficient", getRCoef());
   return ret;
 }
 
-bool AnamDiscreteIR::_deserialize(std::istream& is, bool verbose)
+bool AnamDiscreteIR::_deserializeAscii(std::istream& is, bool verbose)
 {
   double r = TEST;
 
   bool ret = true;
-  ret = ret && AnamDiscrete::_deserialize(is, verbose);
+  ret = ret && AnamDiscrete::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Anamorphosis 'r' coefficient", r);
   if (ret) setRCoef(r);
   return ret;

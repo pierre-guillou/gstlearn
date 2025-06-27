@@ -164,7 +164,7 @@ Vario* Vario::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (vario->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  vario->_deserialize(is, verbose);
+    success =  vario->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -1839,7 +1839,7 @@ bool Vario::_isAddressValid(int idir, int i, bool flagCheck) const
   return (i >= 0 && i < getDirSize(idir));
 }
 
-bool Vario::_deserialize(std::istream& is, bool /*verbose*/)
+bool Vario::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int flag_calcul = 2;
   int ndim = 0;
@@ -1960,7 +1960,7 @@ bool Vario::_deserialize(std::istream& is, bool /*verbose*/)
 }
 
 // TODO: add the type of calculation which has been performed
-bool Vario::_serialize(std::ostream& os, bool /*verbose*/) const
+bool Vario::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   double value;
   int flag_calcul = 1;

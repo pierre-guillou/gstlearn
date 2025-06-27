@@ -97,7 +97,7 @@ DbMeshTurbo* DbMeshTurbo::create(const VectorInt& nx,
   return dbmesh;
 }
 
-bool DbMeshTurbo::_deserialize(std::istream& is, bool verbose)
+bool DbMeshTurbo::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndim = 0;
   bool ret = true;
@@ -108,16 +108,16 @@ bool DbMeshTurbo::_deserialize(std::istream& is, bool verbose)
 
   // Reading the meshing information
 
-  ret      = ret && _mesh._deserialize(is);
+  ret      = ret && _mesh._deserializeAscii(is);
 
   // Reading the Db information
 
-  ret      = ret && DbGrid::_deserialize(is, verbose);
+  ret      = ret && DbGrid::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbMeshTurbo::_serialize(std::ostream& os, bool verbose) const
+bool DbMeshTurbo::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
@@ -127,11 +127,11 @@ bool DbMeshTurbo::_serialize(std::ostream& os, bool verbose) const
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh._serialize(os);
+  ret      = ret && _mesh._serializeAscii(os);
 
   /* Writing the tail of the file */
 
-  ret      = ret && DbGrid::_serialize(os, verbose);
+  ret      = ret && DbGrid::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -152,7 +152,7 @@ DbMeshTurbo* DbMeshTurbo::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbmesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbmesh->_deserialize(is, verbose);
+    success = dbmesh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

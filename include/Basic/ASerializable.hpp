@@ -50,14 +50,14 @@ public:
   virtual String _getNFName() const = 0;
 
 protected:
-  virtual bool _deserialize(std::istream& is, bool verbose = false) = 0;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) = 0;
   virtual bool _deserializeH5(H5::Group& /*grp*/, bool /*verbose*/ = false)
   {
     // TODO virtual pure
     messerr("Not implemented yet");
     return false;
   }
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const = 0;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const = 0;
   virtual bool _serializeH5(H5::Group& /*grp*/, bool /*verbose*/ = false) const
   {
     // TODO virtual pure

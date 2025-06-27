@@ -62,16 +62,16 @@ String Faults::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool Faults::_serialize(std::ostream& os, bool verbose) const
+bool Faults::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of Faults", getNFaults());
   for (int i = 0; ret && i < getNFaults(); i++)
-    ret = ret && _faults[i]._serialize(os, verbose);
+    ret = ret && _faults[i]._serializeAscii(os, verbose);
   return ret;
 }
 
-bool Faults::_deserialize(std::istream& is, bool verbose)
+bool Faults::_deserializeAscii(std::istream& is, bool verbose)
 {
   int nfaults = 0;
   bool ret = true;
@@ -80,7 +80,7 @@ bool Faults::_deserialize(std::istream& is, bool verbose)
   for (int i = 0; ret && i < nfaults; i++)
   {
     PolyLine2D fault;
-    ret = ret && fault._deserialize(is, verbose);
+    ret = ret && fault._deserializeAscii(is, verbose);
     addFault(fault);
   }
   return ret;
@@ -94,7 +94,7 @@ Faults* Faults::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (faults->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  faults->_deserialize(is, verbose);
+    success =  faults->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

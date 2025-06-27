@@ -677,7 +677,7 @@ int Rule::setProportions(const VectorDouble& proportions) const
   return(0);
 }
 
-bool Rule::_deserialize(std::istream& is, bool /*verbose*/)
+bool Rule::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   /* Create the Rule structure */
 
@@ -714,7 +714,7 @@ bool Rule::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool Rule::_serialize(std::ostream& os, bool /*verbose*/) const
+bool Rule::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   int nb_node, nfacies, nmax_tot, ny1_tot, ny2_tot, rank;
   double prop_tot;
@@ -1048,7 +1048,7 @@ Rule* Rule::createFromNF(const String& NFFilename, bool verbose)
   if (rule->_fileOpenRead(NFFilename, is, verbose))
   {
     rule->setModeRule(ERule::STD);
-    success = rule->_deserialize(is, verbose);
+    success = rule->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

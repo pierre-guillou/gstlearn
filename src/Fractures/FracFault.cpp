@@ -109,7 +109,7 @@ void FracFault::addFaultPerFamily(double thetal,
   _ranger[nfam] = ranger;
 }
 
-bool FracFault::_deserialize(std::istream& is, bool /*verbose*/)
+bool FracFault::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
   int nfam = getNFamilies();
@@ -123,7 +123,7 @@ bool FracFault::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool FracFault::_serialize(std::ostream& os, bool /*verbose*/) const
+bool FracFault::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<double>(os, "Abscissa of the first Fault point", _coord);

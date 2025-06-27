@@ -96,7 +96,7 @@ PolyLine2D* PolyLine2D::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (line2D->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  line2D->_deserialize(is, verbose);
+    success =  line2D->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -129,7 +129,7 @@ PolyLine2D* PolyLine2D::createFromH5(const String& H5Filename, bool verbose)
  * @param verbose Verbose flag
  * @return
  */
-bool PolyLine2D::_serialize(std::ostream& os, bool /*verbose*/) const
+bool PolyLine2D::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   if (getNPoints() <= 0) return false;
   bool ret = true;
@@ -151,7 +151,7 @@ bool PolyLine2D::_serialize(std::ostream& os, bool /*verbose*/) const
  * @param verbose Verbose flag
  * @return
  */
-bool PolyLine2D::_deserialize(std::istream& is, bool /*verbose*/)
+bool PolyLine2D::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int np = 0;
   bool ret = true;

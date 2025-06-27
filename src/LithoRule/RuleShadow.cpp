@@ -105,12 +105,12 @@ RuleShadow::~RuleShadow()
 {
 }
 
-bool RuleShadow::_deserialize(std::istream& is, bool /*verbose*/)
+bool RuleShadow::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
   _shift.resize(3);
 
-  ret = ret && Rule::_deserialize(is);
+  ret = ret && Rule::_deserializeAscii(is);
 
   ret = ret && _recordRead<double>(is, "Slope for Shadow Rule", _slope);
   ret = ret && _recordRead<double>(is, "Lower Threshold for Shadow Rule", _shDown);
@@ -121,7 +121,7 @@ bool RuleShadow::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool RuleShadow::_serialize(std::ostream& os, bool /*verbose*/) const
+bool RuleShadow::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   double slope  = (FFFF(_slope))  ? 0. : _slope;
   double shdown = (FFFF(_shDown)) ? 0. : _shDown;
@@ -131,7 +131,7 @@ bool RuleShadow::_serialize(std::ostream& os, bool /*verbose*/) const
 
   bool ret = true;
 
-  ret = ret && Rule::_serialize(os);
+  ret = ret && Rule::_serializeAscii(os);
 
   ret = ret && _recordWrite<double>(os, "", slope);
   ret = ret && _recordWrite<double>(os, "", shdown);

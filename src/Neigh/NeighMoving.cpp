@@ -151,10 +151,10 @@ String NeighMoving::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighMoving::_deserialize(std::istream& is, bool verbose)
+bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   if (! ret) return ret;
 
   int ndim = getNDim();
@@ -203,10 +203,10 @@ bool NeighMoving::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool NeighMoving::_serialize(std::ostream& os, bool verbose) const
+bool NeighMoving::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<int>(os, "Use angular sectors", getFlagSector());
   ret = ret && _recordWrite<int>(os, "", getNMini());
   ret = ret && _recordWrite<int>(os, "", getNMaxi());
@@ -268,7 +268,7 @@ NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  neigh->_deserialize(is, verbose);
+    success =  neigh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

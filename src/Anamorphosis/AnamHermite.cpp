@@ -89,7 +89,7 @@ AnamHermite* AnamHermite::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = anam->_deserialize(is, verbose);
+    success = anam->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -617,17 +617,17 @@ int AnamHermite::_data_sort(int nech,
   return(ncl);
 }
 
-bool AnamHermite::_serialize(std::ostream& os, bool verbose) const
+bool AnamHermite::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret && ret && AnamContinuous::_serialize(os, verbose);
+  ret && ret && AnamContinuous::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os,"Change of support coefficient", getRCoef());
   ret = ret && _recordWrite<int>(os, "Number of Hermite Polynomials", getNbPoly());
   ret = ret && _tableWrite(os, "Hermite Polynomial", getNbPoly(), getPsiHns());
   return ret;
 }
 
-bool AnamHermite::_deserialize(std::istream& is, bool verbose)
+bool AnamHermite::_deserializeAscii(std::istream& is, bool verbose)
 {
   VectorDouble hermite;
   double r = TEST;
@@ -635,7 +635,7 @@ bool AnamHermite::_deserialize(std::istream& is, bool verbose)
 
   bool ret = true;
 
-  ret = ret && AnamContinuous::_deserialize(is, verbose);
+  ret = ret && AnamContinuous::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Change of Support Coefficient", r);
   ret = ret && _recordRead<int>(is, "Number of Hermite Polynomials", nbpoly);
   if (ret) hermite.resize(nbpoly);

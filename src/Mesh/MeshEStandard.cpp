@@ -269,7 +269,7 @@ MeshEStandard* MeshEStandard::createFromNF(const String& NFFilename, bool verbos
   bool success = false;
   if (mesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  mesh->_deserialize(is, verbose);
+    success =  mesh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -379,7 +379,7 @@ void MeshEStandard::_checkConsistency() const
     }
 }
 
-bool MeshEStandard::_deserialize(std::istream& is, bool verbose)
+bool MeshEStandard::_deserializeAscii(std::istream& is, bool verbose)
 {
   DECLARE_UNUSED(verbose);
   int ndim = 0;
@@ -411,7 +411,7 @@ bool MeshEStandard::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool MeshEStandard::_serialize(std::ostream& os, bool /*verbose*/) const
+bool MeshEStandard::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
 

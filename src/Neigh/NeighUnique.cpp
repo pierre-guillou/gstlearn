@@ -49,17 +49,17 @@ String NeighUnique::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighUnique::_deserialize(std::istream& is, bool verbose)
+bool NeighUnique::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   return ret;
 }
 
-bool NeighUnique::_serialize(std::ostream& os, bool verbose) const
+bool NeighUnique::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   return ret;
 }
 
@@ -82,7 +82,7 @@ NeighUnique* NeighUnique::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  neigh->_deserialize(is, verbose);
+    success =  neigh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

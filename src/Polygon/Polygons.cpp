@@ -323,7 +323,7 @@ PolyElem Polygons::_extractFromWKT(const CSVformat& csv, String& polye)
 }
 
 
-bool Polygons::_deserialize(std::istream& is, bool verbose)
+bool Polygons::_deserializeAscii(std::istream& is, bool verbose)
 {
   int npol = 0;
 
@@ -341,7 +341,7 @@ bool Polygons::_deserialize(std::istream& is, bool verbose)
   for (int ipol = 0; ret && ipol < npol; ipol++)
   {
     PolyElem polyelem;
-    ret = ret && polyelem._deserialize(is, verbose);
+    ret = ret && polyelem._deserializeAscii(is, verbose);
     if (ret)
     {
       addPolyElem(polyelem); // TODO : Prevent copy (optimization)
@@ -353,7 +353,7 @@ bool Polygons::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool Polygons::_serialize(std::ostream& os, bool verbose) const
+bool Polygons::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of Polygons", getNPolyElem());
@@ -363,7 +363,7 @@ bool Polygons::_serialize(std::ostream& os, bool verbose) const
   for (int ipol = 0; ret && ipol < getNPolyElem(); ipol++)
   {
     const PolyElem& polyelem = getPolyElem(ipol);
-    ret = ret && polyelem._serialize(os, verbose);
+    ret = ret && polyelem._serializeAscii(os, verbose);
   }
   return ret;
 }
@@ -388,7 +388,7 @@ Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (polygons->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = polygons->_deserialize(is, verbose);
+    success = polygons->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

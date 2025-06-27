@@ -66,7 +66,7 @@ AnamDiscreteDD* AnamDiscreteDD::createFromNF(const String& NFFilename, bool verb
   bool success = false;
   if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = anam->_deserialize(is, verbose);
+    success = anam->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -606,10 +606,10 @@ MatrixSquare AnamDiscreteDD::chi2I(const VectorDouble& chi, int mode)
   return chi2i;
 }
 
-bool AnamDiscreteDD::_serialize(std::ostream& os, bool verbose) const
+bool AnamDiscreteDD::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && AnamDiscrete::_serialize(os, verbose);
+  ret = ret && AnamDiscrete::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os, "Change of support coefficient", getSCoef());
   ret = ret && _recordWrite<double>(os, "Additional Mu coefficient", getMu());
   ret = ret && _tableWrite(os, "PCA Z2Y", getNCut() * getNCut(), getPcaZ2Fs().getValues());
@@ -617,14 +617,14 @@ bool AnamDiscreteDD::_serialize(std::ostream& os, bool verbose) const
   return ret;
 }
 
-bool AnamDiscreteDD::_deserialize(std::istream& is, bool verbose)
+bool AnamDiscreteDD::_deserializeAscii(std::istream& is, bool verbose)
 {
   MatrixSquare pcaf2z, pcaz2f;
   double s = TEST;
   double mu = TEST;
 
   bool ret = true;
-  ret = ret && AnamDiscrete::_deserialize(is, verbose);
+  ret = ret && AnamDiscrete::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Anamorphosis 's' coefficient", s);
   ret = ret && _recordRead<double>(is, "Anamorphosis 'mu' coefficient", mu);
 

@@ -56,13 +56,13 @@ void AnamUser::calculateMeanAndVariance()
   messerr("AnamUser: This funtion does not make sense");
 }
 
-bool AnamUser::_deserialize(std::istream& /*is*/, bool /*verbose*/)
+bool AnamUser::_deserializeAscii(std::istream& /*is*/, bool /*verbose*/)
 {
   messerr("AnamUser: Cannot be deserialized");
   return false;
 }
 
-bool AnamUser::_serialize(std::ostream& /*os*/, bool /*verbose*/) const
+bool AnamUser::_serializeAscii(std::ostream& /*os*/, bool /*verbose*/) const
 {
   messerr("AnamUser: Cannot be serialized");
   return false;

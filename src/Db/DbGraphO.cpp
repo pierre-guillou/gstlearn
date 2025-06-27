@@ -194,7 +194,7 @@ int DbGraphO::resetFromMatrix(int nech,
   return (!isConsistent());
 }
 
-bool DbGraphO::_deserialize(std::istream& is, bool verbose)
+bool DbGraphO::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndim = 0;
   int narcs = 0;
@@ -222,12 +222,12 @@ bool DbGraphO::_deserialize(std::istream& is, bool verbose)
 
   // Writing the set of addresses for Line organization
 
-  ret = ret && Db::_deserialize(is, verbose);
+  ret = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
+bool DbGraphO::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
@@ -251,7 +251,7 @@ bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_serialize(os, verbose);
+  ret = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -272,7 +272,7 @@ DbGraphO* DbGraphO::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbgraphO->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbgraphO->_deserialize(is, verbose);
+    success = dbgraphO->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

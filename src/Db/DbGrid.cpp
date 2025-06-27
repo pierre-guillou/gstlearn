@@ -742,26 +742,26 @@ bool DbGrid::isConsistent() const
   return _grid.getNTotal() == getNSample();
 }
 
-bool DbGrid::_deserialize(std::istream& is, bool verbose)
+bool DbGrid::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret      = ret && _grid._deserialize(is, verbose);
-  ret      = ret && Db::_deserialize(is, verbose);
+  ret      = ret && _grid._deserializeAscii(is, verbose);
+  ret      = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbGrid::_serialize(std::ostream& os, bool verbose) const
+bool DbGrid::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
   /* Writing the grid characteristics */
 
-  ret = ret && _grid._serialize(os, verbose);
+  ret = ret && _grid._serializeAscii(os, verbose);
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_serialize(os, verbose);
+  ret = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -779,10 +779,10 @@ bool DbGrid::_deserializeH5(H5::Group& grp, bool verbose)
 
   bool ret = true;
 
-  // call _deserialize on each member with the current class Group
+  // call _deserializeAscii on each member with the current class Group
   ret = ret && _grid._deserializeH5(*dbgridG, verbose);
 
-  // call _deserialize on the parent class with the current class Group
+  // call _deserializeAscii on the parent class with the current class Group
   ret = ret && Db::_deserializeH5(*dbgridG, verbose);
 
   return ret;
@@ -794,10 +794,10 @@ bool DbGrid::_serializeH5(H5::Group& grp, bool verbose) const
 
   bool ret = true;
 
-  // call _serialize on each member with the current class Group
+  // call _serializeAscii on each member with the current class Group
   ret = ret && _grid._serializeH5(dbgridG, verbose);
 
-  // call _serialize on the parent class with the current class Group
+  // call _serializeAscii on the parent class with the current class Group
   ret = ret && Db::_serializeH5(dbgridG, verbose);
 
   return ret;
@@ -834,7 +834,7 @@ DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbgrid->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbgrid->_deserialize(is, verbose);
+    success = dbgrid->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

@@ -341,7 +341,7 @@ int DbLine::resetFromSamplesById(int nech,
   return 0;
 }
 
-bool DbLine::_deserialize(std::istream& is, bool verbose)
+bool DbLine::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndim = 0;
   int nbline = 0;
@@ -365,12 +365,12 @@ bool DbLine::_deserialize(std::istream& is, bool verbose)
     ret = ret && _recordRead<int>(is, "Number of Samples", number);
     ret = ret && _recordReadVec<int>(is, "", _lineAdds[iline], number);
   }
-  ret = ret && Db::_deserialize(is, verbose);
+  ret = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbLine::_serialize(std::ostream& os, bool verbose) const
+bool DbLine::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
@@ -389,7 +389,7 @@ bool DbLine::_serialize(std::ostream& os, bool verbose) const
 
   /* Writing the tail of the file */
 
-  ret && Db::_serialize(os, verbose);
+  ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -411,7 +411,7 @@ DbLine* DbLine::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbLine->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbLine->_deserialize(is, verbose);
+    success = dbLine->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

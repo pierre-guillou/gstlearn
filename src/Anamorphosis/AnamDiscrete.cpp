@@ -227,7 +227,7 @@ bool AnamDiscrete::_isClassValid(int iclass) const
   return checkArg("Class Index", iclass, getNClass());
 }
 
-bool AnamDiscrete::_serialize(std::ostream& os, bool /*verbose*/) const
+bool AnamDiscrete::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of Cuttofs", getNCut());
@@ -238,7 +238,7 @@ bool AnamDiscrete::_serialize(std::ostream& os, bool /*verbose*/) const
   return ret;
 }
 
-bool AnamDiscrete::_deserialize(std::istream& is, bool /*verbose*/)
+bool AnamDiscrete::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   VectorDouble zCut, stats;
   int nCut = 0;

@@ -1292,7 +1292,7 @@ bool Grid::sampleBelongsToCell(const VectorDouble &coor,
   return true;
 }
 
-bool Grid::_deserialize(std::istream& is, [[maybe_unused]] bool verbose)
+bool Grid::_deserializeAscii(std::istream& is, [[maybe_unused]] bool verbose)
 {
   int ndim = 0;
   VectorInt nx;
@@ -1328,7 +1328,7 @@ bool Grid::_deserialize(std::istream& is, [[maybe_unused]] bool verbose)
   return ret;
 }
 
-bool Grid::_serialize(std::ostream& os, [[maybe_unused]] bool verbose) const
+bool Grid::_serializeAscii(std::ostream& os, [[maybe_unused]] bool verbose) const
 {
   bool ret = true;
 

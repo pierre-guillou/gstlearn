@@ -416,7 +416,7 @@ bool ANeigh::_isDimensionValid(int idim) const
   return true;
 }
 
-bool ANeigh::_deserialize(std::istream& is, bool /*verbose*/)
+bool ANeigh::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int ndim = 0;
 
@@ -426,7 +426,7 @@ bool ANeigh::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool ANeigh::_serialize(std::ostream& os, bool /*verbose*/) const
+bool ANeigh::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());

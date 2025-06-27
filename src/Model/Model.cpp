@@ -239,7 +239,7 @@ Model* Model::createFromNF(const String &NFFilename, bool verbose)
   bool success = false;
   if (model->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = model->_deserialize(is, verbose);
+    success = model->_deserializeAscii(is, verbose);
   }
 
   if (! success)
@@ -754,7 +754,7 @@ int Model::fitFromVMap(DbGrid* dbmap,
   return vmap_auto_fit(dbmap, this, verbose, mauto, constraints, optvar);
 }
 
-bool Model::_deserialize(std::istream& is, bool /*verbose*/)
+bool Model::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int ndim = 0;
   int nvar = 0;
@@ -889,7 +889,7 @@ bool Model::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool Model::_serialize(std::ostream& os, bool /*verbose*/) const
+bool Model::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
 

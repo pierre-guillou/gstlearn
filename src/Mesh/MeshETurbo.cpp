@@ -382,7 +382,7 @@ MeshETurbo* MeshETurbo::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (mesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  mesh->_deserialize(is, verbose);
+    success =  mesh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -957,7 +957,7 @@ int MeshETurbo::initFromCova(const CovAniso& cova,
   return 0;
 }
 
-bool MeshETurbo::_deserialize(std::istream& is, bool /*verbose*/)
+bool MeshETurbo::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int ndim = 0;
   VectorInt nx;
@@ -1008,7 +1008,7 @@ bool MeshETurbo::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool MeshETurbo::_serialize(std::ostream& os, bool /*verbose*/) const
+bool MeshETurbo::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());

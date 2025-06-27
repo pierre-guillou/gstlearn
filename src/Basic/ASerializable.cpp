@@ -47,7 +47,7 @@ bool ASerializable::dumpToNF(const String& NFFilename, bool verbose) const
   bool ret = true;
   if (SerializeNeutralFile::fileOpenWrite(*this, NFFilename, os, true))
   {
-    ret = _serialize(os, verbose);
+    ret = _serializeAscii(os, verbose);
     if (! ret)
     {
       messerr("Problem writing in the Neutral File.");

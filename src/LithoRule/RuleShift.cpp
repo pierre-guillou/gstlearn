@@ -113,12 +113,12 @@ int RuleShift::resetFromNumericalCoding(const VectorInt& n_type,
   return 0;
 }
 
-bool RuleShift::_deserialize(std::istream& is, bool /*verbose*/)
+bool RuleShift::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   _shift.resize(3);
   bool ret = true;
 
-  ret = ret && Rule::_deserialize(is);
+  ret = ret && Rule::_deserializeAscii(is);
 
   ret = ret && _recordRead<double>(is, "Slope for Shadow Rule", _slope);
   ret = ret && _recordRead<double>(is, "Lower Threshold for Shadow Rule", _shDown);
@@ -129,7 +129,7 @@ bool RuleShift::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool RuleShift::_serialize(std::ostream& os, bool /*verbose*/) const
+bool RuleShift::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   double slope  = (FFFF(_slope)) ? 0. : _slope;
   double shdown = (FFFF(_shDown)) ? 0. : _shDown;
@@ -139,7 +139,7 @@ bool RuleShift::_serialize(std::ostream& os, bool /*verbose*/) const
 
   bool ret = true;
 
-  ret = ret && Rule::_serialize(os);
+  ret = ret && Rule::_serializeAscii(os);
 
   ret = ret && _recordWrite<double>(os, "Slope for Shadow Rule", slope);
   ret = ret && _recordWrite<double>(os, "Lower Threshold for Shadow Rule", shdown);

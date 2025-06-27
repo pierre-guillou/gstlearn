@@ -61,11 +61,11 @@ String NeighImage::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighImage::_deserialize(std::istream& is, bool verbose)
+bool NeighImage::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
 
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<int>(is, "Skipping factor", _skip);
   for (int idim = 0; ret && idim < (int) getNDim(); idim++)
   {
@@ -78,10 +78,10 @@ bool NeighImage::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool NeighImage::_serialize(std::ostream& os, bool verbose) const
+bool NeighImage::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<int>(os, "", getSkip());
   for (int idim = 0; ret && idim < (int) getNDim(); idim++)
     ret = ret && _recordWrite<double>(os, "", (double) getImageRadius(idim));
@@ -108,7 +108,7 @@ NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  neigh->_deserialize(is, verbose);
+    success =  neigh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

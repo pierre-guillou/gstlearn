@@ -82,11 +82,11 @@ String NeighBench::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighBench::_deserialize(std::istream& is, bool verbose)
+bool NeighBench::_deserializeAscii(std::istream& is, bool verbose)
 {
   double width = 0.;
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Bench Width", width);
 
   _biPtBench = BiTargetCheckBench::create(-1, width); // idim_bench will be updated in 'attach'
@@ -94,10 +94,10 @@ bool NeighBench::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool NeighBench::_serialize(std::ostream& os, bool verbose) const
+bool NeighBench::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os, "Bench Width", _biPtBench->getWidth());
   return ret;
 }
@@ -125,7 +125,7 @@ NeighBench* NeighBench::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  neigh->_deserialize(is, verbose);
+    success =  neigh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {

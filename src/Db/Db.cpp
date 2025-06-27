@@ -4717,7 +4717,7 @@ Db* Db::createFromNF(const String& NFFilename, bool verbose)
   db = new Db;
   if (db->_fileOpenRead(NFFilename, is, verbose))
   {
-    if (!db->_deserialize(is, verbose))
+    if (!db->_deserializeAscii(is, verbose))
     {
       delete db;
       db = nullptr;
@@ -4747,7 +4747,7 @@ Db* Db::createFromH5(const String& H5Filename, bool verbose)
 }
 #endif
 
-bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
+bool Db::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   int ncol              = getNColumn();
   VectorString locators = getLocators(true);
@@ -4768,7 +4768,7 @@ bool Db::_serialize(std::ostream& os, bool /*verbose*/) const
   return ret;
 }
 
-bool Db::_deserialize(std::istream& is, bool /*verbose*/)
+bool Db::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int ncol = 0;
   int nech = 0;

@@ -125,7 +125,7 @@ DbMeshStandard::createFromExternal(const MatrixDense& apices,
   return dbmesh;
 }
 
-bool DbMeshStandard::_deserialize(std::istream& is, bool verbose)
+bool DbMeshStandard::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndim = 0;
   bool ret = true;
@@ -136,16 +136,16 @@ bool DbMeshStandard::_deserialize(std::istream& is, bool verbose)
 
   // Reading the meshing information
 
-  ret      = ret && _mesh._deserialize(is);
+  ret      = ret && _mesh._deserializeAscii(is);
 
   // Reading the Db information
 
-  ret      = ret && Db::_deserialize(is, verbose);
+  ret      = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbMeshStandard::_serialize(std::ostream& os, bool verbose) const
+bool DbMeshStandard::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
@@ -155,11 +155,11 @@ bool DbMeshStandard::_serialize(std::ostream& os, bool verbose) const
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh._serialize(os);
+  ret      = ret && _mesh._serializeAscii(os);
 
   /* Writing the tail of the file */
 
-  ret      = ret && Db::_serialize(os, verbose);
+  ret      = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -180,7 +180,7 @@ DbMeshStandard* DbMeshStandard::createFromNF(const String& NFFilename, bool verb
   bool success = false;
   if (dbmesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbmesh->_deserialize(is, verbose);
+    success = dbmesh->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -269,7 +269,8 @@ bool DbMeshStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   auto dbG = grp.createGroup("DbMeshStandard");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
 
   ret = ret && _mesh._serializeH5(dbG, verbose);
 

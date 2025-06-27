@@ -82,7 +82,7 @@ FracEnviron* FracEnviron::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (envir->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  envir->_deserialize(is, verbose);
+    success =  envir->_deserializeAscii(is, verbose);
   }
   if (! success)
   {
@@ -137,7 +137,7 @@ String FracEnviron::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool FracEnviron::_deserialize(std::istream& is, bool verbose)
+bool FracEnviron::_deserializeAscii(std::istream& is, bool verbose)
 {
   int nfamilies = 0;
   int nfaults = 0;
@@ -155,20 +155,20 @@ bool FracEnviron::_deserialize(std::istream& is, bool verbose)
   for (int ifam = 0; ret && ifam < nfamilies; ifam++)
   {
     FracFamily family;
-    ret = ret && family._deserialize(is, verbose);
+    ret = ret && family._deserializeAscii(is, verbose);
     if (ret) addFamily(family);
   }
 
   for (int ifault = 0; ret && ifault < nfaults; ifault++)
   {
     FracFault fault;
-    ret = ret && fault._deserialize(is, verbose);
+    ret = ret && fault._deserializeAscii(is, verbose);
     if (ret) addFault(fault);
   }
   return ret;
 }
 
-bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
+bool FracEnviron::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of families", getNFamilies());
@@ -184,7 +184,7 @@ bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
   {
     ret = ret && _commentWrite(os, "Characteristics of family");
     const FracFamily& family = getFamily(ifam);
-    ret = ret && family._serialize(os, verbose);
+    ret = ret && family._serializeAscii(os, verbose);
   }
 
   /* Loop on the main faults */
@@ -193,7 +193,7 @@ bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
   {
     ret = ret && _commentWrite(os, "Characteristics of main fault");
     const FracFault& fault = getFault(ifault);
-    ret = ret && fault._serialize(os, verbose);
+    ret = ret && fault._serializeAscii(os, verbose);
   }
   return ret;
 }
