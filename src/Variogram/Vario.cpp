@@ -164,7 +164,7 @@ Vario* Vario::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (vario->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  vario->deserialize(is, verbose);
+    success =  vario->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -5232,8 +5232,6 @@ bool Vario::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
   int flag_calcul = 1;
 
-  // create a new H5 group every time we enter a _serialize method
-  // => easier to deserialize
   auto varioG = grp.createGroup("Vario");
 
   bool ret = true;

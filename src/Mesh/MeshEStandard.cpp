@@ -269,7 +269,7 @@ MeshEStandard* MeshEStandard::createFromNF(const String& NFFilename, bool verbos
   bool success = false;
   if (mesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  mesh->deserialize(is, verbose);
+    success =  mesh->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -531,8 +531,6 @@ bool MeshEStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose
 
 bool MeshEStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto meshG = grp.createGroup("MeshEStandard");
 
   bool ret = true;

@@ -114,7 +114,7 @@ MeshSpherical* MeshSpherical::createFromNF(const String& NFFilename, bool verbos
   bool success = false;
   if (mesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  mesh->deserialize(is, verbose);
+    success =  mesh->_deserialize(is, verbose);
   }
   if (! success)
   {

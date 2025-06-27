@@ -41,18 +41,6 @@ ASerializable::ASerializable(ASerializable&&) noexcept            = default;
 ASerializable& ASerializable::operator=(ASerializable&&) noexcept = default;
 ASerializable::~ASerializable()                                   = default;
 
-bool ASerializable::deserialize(std::istream& is, bool verbose)
-{
-  bool ret = _deserialize(is, verbose);
-  if (verbose && !ret) messerr("Problem when reading the Neutral File.");
-  return ret;
-}
-
-bool ASerializable::serialize(std::ostream& os, bool verbose) const
-{
-  return _serialize(os, verbose);
-}
-
 bool ASerializable::dumpToNF(const String& NFFilename, bool verbose) const
 {
   std::ofstream os;

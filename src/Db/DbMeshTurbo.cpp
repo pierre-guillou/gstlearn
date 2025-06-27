@@ -152,7 +152,7 @@ DbMeshTurbo* DbMeshTurbo::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbmesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbmesh->deserialize(is, verbose);
+    success = dbmesh->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -207,19 +207,17 @@ bool DbMeshTurbo::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool DbMeshTurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
-  auto dbg = grp.createGroup("DbMeshTurbo");
+  auto dbG = grp.createGroup("DbMeshTurbo");
 
   bool ret = true;
 
-  ret = ret && SerializeHDF5::writeValue(dbg, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
 
   // Writing the Meshing information
-  ret = ret && _mesh._serializeH5(dbg, verbose);
+  ret = ret && _mesh._serializeH5(dbG, verbose);
 
   /* Writing the tail of the file */
-  ret = ret && DbGrid::_serializeH5(dbg, verbose);
+  ret = ret && DbGrid::_serializeH5(dbG, verbose);
 
   return ret;
 }

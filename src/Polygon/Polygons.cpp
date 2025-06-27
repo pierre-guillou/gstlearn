@@ -388,7 +388,7 @@ Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (polygons->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = polygons->deserialize(is, verbose);
+    success = polygons->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -1086,8 +1086,6 @@ bool Polygons::_deserializeH5(H5::Group& grp, bool verbose)
 
 bool Polygons::_serializeH5(H5::Group& grp, bool verbose) const
 {
-  // create a new H5 group every time we enter a _serialize method
-  // => easier to deserialize
   auto polygonsG = grp.createGroup("Polygons");
 
   auto npol = _polyelems.size();

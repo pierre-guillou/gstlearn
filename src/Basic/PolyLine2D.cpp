@@ -96,7 +96,7 @@ PolyLine2D* PolyLine2D::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (line2D->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  line2D->deserialize(is, verbose);
+    success =  line2D->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -737,8 +737,6 @@ bool PolyLine2D::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool PolyLine2D::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5 group every time we enter a _serialize method
-  // => easier to deserialize
   auto polyline2DG = grp.createGroup("PolyLine2D");
 
   bool ret = true;

@@ -35,8 +35,6 @@ public:
   ASerializable& operator=(ASerializable&& r) noexcept;
   virtual ~ASerializable();
 
-  bool deserialize(std::istream& is, bool verbose = true);
-  bool serialize(std::ostream& os,bool verbose = true) const;
   bool dumpToNF(const String& NFFilename, bool verbose = false) const;
 #ifdef HDF5
   bool dumpToH5(const String& H5Filename, bool verbose = false) const;

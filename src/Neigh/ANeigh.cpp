@@ -470,8 +470,6 @@ bool ANeigh::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool ANeigh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto aneighG = grp.createGroup("ANeigh");
 
   bool ret = true;

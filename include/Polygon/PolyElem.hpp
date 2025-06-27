@@ -72,5 +72,5 @@ private:
   double _zmin;
   double _zmax;
 
-  friend class Polygons; // TODO: to be improved (make serialize public)
+  friend class Polygons;
 };

@@ -268,7 +268,7 @@ NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  neigh->deserialize(is, verbose);
+    success =  neigh->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -840,8 +840,6 @@ bool NeighMoving::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool NeighMoving::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto neighG = grp.createGroup("NeighMoving");
 
   bool ret = true;

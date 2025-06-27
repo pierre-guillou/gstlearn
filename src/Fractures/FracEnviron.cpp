@@ -82,7 +82,7 @@ FracEnviron* FracEnviron::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (envir->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  envir->deserialize(is, verbose);
+    success =  envir->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -155,14 +155,14 @@ bool FracEnviron::_deserialize(std::istream& is, bool verbose)
   for (int ifam = 0; ret && ifam < nfamilies; ifam++)
   {
     FracFamily family;
-    ret = ret && family.deserialize(is, verbose);
+    ret = ret && family._deserialize(is, verbose);
     if (ret) addFamily(family);
   }
 
   for (int ifault = 0; ret && ifault < nfaults; ifault++)
   {
     FracFault fault;
-    ret = ret && fault.deserialize(is, verbose);
+    ret = ret && fault._deserialize(is, verbose);
     if (ret) addFault(fault);
   }
   return ret;
@@ -256,8 +256,6 @@ bool FracEnviron::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool FracEnviron::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto fracG = grp.createGroup("FracEnviron");
 
   bool ret = true;

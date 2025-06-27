@@ -180,7 +180,7 @@ DbMeshStandard* DbMeshStandard::createFromNF(const String& NFFilename, bool verb
   bool success = false;
   if (dbmesh->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbmesh->deserialize(is, verbose);
+    success = dbmesh->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -266,16 +266,14 @@ bool DbMeshStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbos
 
 bool DbMeshStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
-  auto dbg = grp.createGroup("DbMeshStandard");
+  auto dbG = grp.createGroup("DbMeshStandard");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(dbg, "NDim", getNDim());
+  ret      = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
 
-  ret = ret && _mesh._serializeH5(dbg, verbose);
+  ret = ret && _mesh._serializeH5(dbG, verbose);
 
-  ret = ret && Db::_serializeH5(dbg, verbose);
+  ret = ret && Db::_serializeH5(dbG, verbose);
 
   return ret;
 }

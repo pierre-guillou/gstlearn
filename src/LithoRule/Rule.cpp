@@ -1048,7 +1048,7 @@ Rule* Rule::createFromNF(const String& NFFilename, bool verbose)
   if (rule->_fileOpenRead(NFFilename, is, verbose))
   {
     rule->setModeRule(ERule::STD);
-    success = rule->deserialize(is, verbose);
+    success = rule->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -1149,8 +1149,6 @@ bool Rule::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool Rule::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto ruleG = grp.createGroup("Rule");
 
   VectorInt nodes = getNodes();

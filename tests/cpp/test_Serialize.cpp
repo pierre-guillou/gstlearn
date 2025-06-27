@@ -26,7 +26,7 @@
 
 /****************************************************************************/
 /*!
-** Main Program for testing serialize/deserialize
+** Main Program for testing Serialize/Deserialize
 ** in Neutral or HDF5 format
 **
 *****************************************************************************/

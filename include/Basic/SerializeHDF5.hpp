@@ -134,7 +134,7 @@ namespace SerializeHDF5
     auto metadata = file.createGroup("gstlearn metadata");
     createAttribute(
       metadata, "Description",
-      "This file is used to serialize gstlearn's internal data structures");
+      "This file is used to Serialize gstlearn's internal data structures");
     createAttribute(metadata, "Format version", "1.0.0");
     return file;
   }

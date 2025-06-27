@@ -492,8 +492,6 @@ bool RuleShift::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool RuleShift::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto ruleG = grp.createGroup("RuleShift");
 
   bool ret = true;

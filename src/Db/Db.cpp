@@ -4717,7 +4717,7 @@ Db* Db::createFromNF(const String& NFFilename, bool verbose)
   db = new Db;
   if (db->_fileOpenRead(NFFilename, is, verbose))
   {
-    if (!db->deserialize(is, verbose))
+    if (!db->_deserialize(is, verbose))
     {
       delete db;
       db = nullptr;
@@ -4826,8 +4826,6 @@ bool Db::_deserialize(std::istream& is, bool /*verbose*/)
 #ifdef HDF5
 bool Db::_serializeH5(H5::Group& grp, bool /*verbose*/) const
 {
-  // create a new Group every time we enter a _serialize method
-  // => easier to deserialize
   auto dbG = grp.createGroup("Db");
 
   // HDF5 DataSpace should be manually created and passed to

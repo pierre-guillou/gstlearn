@@ -89,7 +89,7 @@ AnamHermite* AnamHermite::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (anam->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = anam->deserialize(is, verbose);
+    success = anam->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -941,8 +941,6 @@ bool AnamHermite::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool AnamHermite::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto anamG = grp.createGroup("AnamHermite");
 
   bool ret = true;

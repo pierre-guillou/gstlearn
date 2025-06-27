@@ -790,13 +790,9 @@ bool DbGrid::_deserializeH5(H5::Group& grp, bool verbose)
 
 bool DbGrid::_serializeH5(H5::Group& grp, bool verbose) const
 {
-  // create a new H5 group every time we enter a _serialize method
-  // => easier to deserialize
   auto dbgridG = grp.createGroup("DbGrid");
 
   bool ret = true;
-  // serialize vector members using SerializeHDF5::writeVec
-  // (error handling is done in these methods)
 
   // call _serialize on each member with the current class Group
   ret = ret && _grid._serializeH5(dbgridG, verbose);
@@ -838,7 +834,7 @@ DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbgrid->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbgrid->deserialize(is, verbose);
+    success = dbgrid->_deserialize(is, verbose);
   }
   if (! success)
   {

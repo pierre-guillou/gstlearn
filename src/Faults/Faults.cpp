@@ -80,7 +80,7 @@ bool Faults::_deserialize(std::istream& is, bool verbose)
   for (int i = 0; ret && i < nfaults; i++)
   {
     PolyLine2D fault;
-    ret = ret && fault.deserialize(is, verbose);
+    ret = ret && fault._deserialize(is, verbose);
     addFault(fault);
   }
   return ret;
@@ -94,7 +94,7 @@ Faults* Faults::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (faults->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  faults->deserialize(is, verbose);
+    success =  faults->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -201,8 +201,6 @@ bool Faults::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool Faults::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto faultG = grp.createGroup("Faults");
 
   bool ret = true;

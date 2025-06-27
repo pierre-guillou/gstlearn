@@ -12,7 +12,7 @@ int test_NF(const DbGrid& db)
   }
   else
   {
-    messerr("Cannot deserialize `dbgrid.nf'");
+    messerr("Cannot Deserialize `dbgrid.nf'");
     return 1;
   }
   tm.displayIntervalMilliseconds("Serialize + Deserialize + Serialize Neutral File",
@@ -31,7 +31,7 @@ int test_HDF5(const DbGrid& db)
   }
   else
   {
-    messerr("Cannot deserialize `dbgrid.h5'");
+    messerr("Cannot Deserialize `dbgrid.h5'");
     return 1;
   }
   tm.displayIntervalMilliseconds("Serialize + Deserialize + Serialize HDF5", 80);

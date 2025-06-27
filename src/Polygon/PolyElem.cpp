@@ -144,7 +144,7 @@ PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (polyelem->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = polyelem->deserialize(is, verbose);
+    success = polyelem->_deserialize(is, verbose);
   }
 
   if (! success)
@@ -339,8 +339,6 @@ bool PolyElem::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool PolyElem::_serializeH5(H5::Group& grp, bool verbose) const
 {
-  // create a new H5 group every time we enter a _serialize method
-  // => easier to deserialize
   auto polyelemG = grp.createGroup("PolyElem");
 
   bool ret = true;

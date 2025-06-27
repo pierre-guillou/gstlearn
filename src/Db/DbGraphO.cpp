@@ -272,7 +272,7 @@ DbGraphO* DbGraphO::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbgraphO->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbgraphO->deserialize(is, verbose);
+    success = dbgraphO->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -624,17 +624,15 @@ bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool DbGraphO::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
-  auto dbg = grp.createGroup("DbGraphO");
+  auto dbG = grp.createGroup("DbGraphO");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(dbg, "NDim", getNDim());
+  ret      = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
 
   // Writing the set of arcs for the Oriented Graph organization
 
   NF_Triplet nft = _downArcs.getMatrixToTriplet();
-  ret            = ret && SerializeHDF5::writeValue(dbg, "Narcs", getNArc());
+  ret            = ret && SerializeHDF5::writeValue(dbG, "Narcs", getNArc());
 
   VectorDouble tab(3);
   for (int i = 0, n = getNArc(); i < n; i++)
@@ -650,7 +648,7 @@ bool DbGraphO::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_serializeH5(dbg, verbose);
+  ret = ret && Db::_serializeH5(dbG, verbose);
 
   return ret;
 }

@@ -239,7 +239,7 @@ Model* Model::createFromNF(const String &NFFilename, bool verbose)
   bool success = false;
   if (model->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = model->deserialize(is, verbose);
+    success = model->_deserialize(is, verbose);
   }
 
   if (! success)
@@ -1510,8 +1510,6 @@ bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool Model::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5 group every time we enter a _serialize method
-  // => easier to deserialize
   auto modelG = grp.createGroup("Model");
 
   bool ret = true;

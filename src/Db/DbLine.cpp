@@ -411,7 +411,7 @@ DbLine* DbLine::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (dbLine->_fileOpenRead(NFFilename, is, verbose))
   {
-    success = dbLine->deserialize(is, verbose);
+    success = dbLine->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -823,26 +823,24 @@ bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
-  auto dbg = grp.createGroup("Dbline");
+  auto dbG = grp.createGroup("Dbline");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(dbg, "NDim", getNDim());
-  ret      = ret && SerializeHDF5::writeValue(dbg, "NLines", getNLine());
+  ret      = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+  ret      = ret && SerializeHDF5::writeValue(dbG, "NLines", getNLine());
 
   for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
   {
     String locName = "Line" + std::to_string(iline);
     auto dirG      = grp.createGroup(locName);
 
-    ret = ret && SerializeHDF5::writeValue(dbg, "NSamples", getNSamplePerLine(iline));
-    ret = ret && SerializeHDF5::writeVec(dbg, "Samples", _lineAdds[iline]);
+    ret = ret && SerializeHDF5::writeValue(dbG, "NSamples", getNSamplePerLine(iline));
+    ret = ret && SerializeHDF5::writeVec(dbG, "Samples", _lineAdds[iline]);
   }
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_serializeH5(dbg, verbose);
+  ret = ret && Db::_serializeH5(dbG, verbose);
 
   return ret;
 }

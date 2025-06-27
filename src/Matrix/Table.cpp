@@ -95,7 +95,7 @@ Table* Table::createFromNF(const String& NFFilename, bool verbose)
   bool success = false;
   if (table->_fileOpenRead(NFFilename, is, verbose))
   {
-    success =  table->deserialize(is, verbose);
+    success =  table->_deserialize(is, verbose);
   }
   if (! success)
   {
@@ -347,8 +347,6 @@ bool Table::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool Table::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  // create a new H5::Group every time we enter a _serialize method
-  // => easier to deserialize
   auto tableG = grp.createGroup("Table");
 
   bool ret = true;
