@@ -1,3 +1,4 @@
+#include "Enum/EFormatNF.hpp"
 #include <Basic/Timer.hpp>
 #include <Db/DbGrid.hpp>
 
@@ -23,11 +24,11 @@ int test_NF(const DbGrid& db)
 int test_HDF5(const DbGrid& db)
 {
   Timer tm;
-  db.dumpToH5("dbgrid.h5");
+  db.dumpToNF("dbgrid.h5", EFormatNF::H5);
   auto db2 = std::unique_ptr<DbGrid>(DbGrid::createFromH5("dbgrid.h5"));
   if (db2 != nullptr)
   {
-    db2->dumpToH5("dbgrid2.h5");
+    db2->dumpToNF("dbgrid2.h5", EFormatNF::H5);
   }
   else
   {

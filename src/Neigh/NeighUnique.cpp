@@ -76,9 +76,8 @@ NeighUnique* NeighUnique::create(bool flag_xvalid, const ASpaceSharedPtr& space)
  */
 NeighUnique* NeighUnique::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighUnique* neigh = nullptr;
+  auto* neigh = new NeighUnique;
   std::ifstream is;
-  neigh = new NeighUnique;
   bool success = false;
   if (neigh->_fileOpenRead(NFFilename, is, verbose))
   {

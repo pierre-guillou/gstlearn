@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)db1->dumpToNF("Neutral.Db.ascii");
+      (void)db1->dumpToNF("Neutral.Db.ascii", EFormatNF::ASCII);
     else
-      (void)db1->dumpToH5("Neutral.Db.h5");
+      (void)db1->dumpToNF("Neutral.Db.h5", EFormatNF::H5);
 
     // Deserialize
     Db* db2 = nullptr;
@@ -100,9 +100,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)dbg1->dumpToNF("Neutral.Dbg.ascii");
+      (void)dbg1->dumpToNF("Neutral.Dbg.ascii", EFormatNF::ASCII);
     else
-      (void)dbg1->dumpToH5("Neutral.Dbg.h5");
+      (void)dbg1->dumpToNF("Neutral.Dbg.h5", EFormatNF::H5);
 
     // Deserialize
     Db* dbg2 = nullptr;
@@ -131,9 +131,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)poly1->dumpToNF("Neutral.Polygon.ascii");
+      (void)poly1->dumpToNF("Neutral.Polygon.ascii", EFormatNF::ASCII);
     else
-      (void)poly1->dumpToH5("Neutral.Polygon.h5");
+      (void)poly1->dumpToNF("Neutral.Polygon.h5", EFormatNF::H5);
 
     // Deserialize
     Polygons* poly2 = nullptr;
@@ -163,9 +163,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)vario1.dumpToNF("Neutral.Vario.ascii");
+      (void)vario1.dumpToNF("Neutral.Vario.ascii", EFormatNF::ASCII);
     else
-      (void)vario1.dumpToH5("Neutral.Vario.h5");
+      (void)vario1.dumpToNF("Neutral.Vario.h5", EFormatNF::H5);
 
     // Deserialize
     Vario* vario2 = nullptr;
@@ -189,9 +189,9 @@ int main(int argc, char *argv[])
 
     // Serialize model1
     if (flagNeutral)
-      (void)model1->dumpToNF("Neutral.Model.ascii");
+      (void)model1->dumpToNF("Neutral.Model.ascii", EFormatNF::ASCII);
     else
-      (void)model1->dumpToH5("Neutral.Model.h5");
+      (void)model1->dumpToNF("Neutral.Model.h5", EFormatNF::H5);
 
     // Deserialize model2
     Model* model2 = nullptr;
@@ -222,9 +222,9 @@ int main(int argc, char *argv[])
 
     // Serialize table
     if (flagNeutral)
-      (void)table1->dumpToNF("Neutral.Table.ascii");
+      (void)table1->dumpToNF("Neutral.Table.ascii", EFormatNF::ASCII);
     else
-      (void)table1->dumpToH5("Neutral.Table.h5");
+      (void)table1->dumpToNF("Neutral.Table.h5", EFormatNF::H5);
 
     // Deserialize table1
     Table* table2 = nullptr;
@@ -249,9 +249,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)rule1->dumpToNF("Neutral.Rule.ascii");
+      (void)rule1->dumpToNF("Neutral.Rule.ascii", EFormatNF::ASCII);
     else
-      (void)rule1->dumpToH5("Neutral.Rule.h5");
+      (void)rule1->dumpToNF("Neutral.Rule.h5", EFormatNF::H5);
 
     // Deserialize
     Rule* rule2 = nullptr;
@@ -280,9 +280,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)polyline1->dumpToNF("Neutral.Polyline.ascii");
+      (void)polyline1->dumpToNF("Neutral.Polyline.ascii", EFormatNF::ASCII);
     else
-      (void)polyline1->dumpToH5("Neutral.Polyline.h5");
+      (void)polyline1->dumpToNF("Neutral.Polyline.h5", EFormatNF::H5);
 
     // Deserialize
     PolyLine2D* polyline2 = nullptr;
@@ -318,9 +318,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)neigh1->dumpToNF("Neutral.NeighMoving.ascii");
+      (void)neigh1->dumpToNF("Neutral.NeighMoving.ascii", EFormatNF::ASCII);
     else
-      (void)neigh1->dumpToH5("Neutral.NeighMoving.h5");
+      (void)neigh1->dumpToNF("Neutral.NeighMoving.h5", EFormatNF::H5);
 
     // Deserialize
     NeighMoving* neigh2 = nullptr;
@@ -345,9 +345,9 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)neigh1->dumpToNF("Neutral.NeighUnique.ascii");
+      (void)neigh1->dumpToNF("Neutral.NeighUnique.ascii", EFormatNF::ASCII);
     else
-      (void)neigh1->dumpToH5("Neutral.NeighUnique.h5");
+      (void)neigh1->dumpToNF("Neutral.NeighUnique.h5", EFormatNF::H5);
 
     // Deserialize
     NeighUnique* neigh2 = nullptr;

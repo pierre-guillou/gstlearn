@@ -14,6 +14,7 @@
 #include "Basic/SerializeNeutralFile.hpp"
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
+#include "Enum/EFormatNF.hpp"
 
 #include <iostream>
 #include <filesystem>
@@ -32,6 +33,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+static EFormatNF _defaultFormat = EFormatNF::ASCII;
+
 String ASerializable::_myPrefixName = String();
 
 ASerializable::ASerializable()                                    = default;
@@ -41,35 +44,63 @@ ASerializable::ASerializable(ASerializable&&) noexcept            = default;
 ASerializable& ASerializable::operator=(ASerializable&&) noexcept = default;
 ASerializable::~ASerializable()                                   = default;
 
-bool ASerializable::dumpToNF(const String& NFFilename, bool verbose) const
+void ASerializable::defineDefaultFormatNF(const EFormatNF& format)
 {
-  std::ofstream os;
-  bool ret = true;
-  if (SerializeNeutralFile::fileOpenWrite(*this, NFFilename, os, true))
-  {
-    ret = _serializeAscii(os, verbose);
-    if (! ret)
-    {
-      messerr("Problem writing in the Neutral File.");
-    }
-    os.close();
-  }
-  return ret;
+  _defaultFormat = format;
 }
+
+/**
+ * @brief Dump the contents of an object into an Output File
+ * using a given Output NF Format
+ *
+ * @param NFFilename Name of the Output File
+ * @param format Choice of the format (see remarks)
+ * @param verbose Verbose flag
+ * @return true or false
+ *
+ * @remarks In the argument 'format', the user can select the format for encoding
+ * the contents of the output file.
+ * If the value DEFAULT is used, the package uses the Format currently defined
+ * as the defaulted one. This default value can be updated using the method
+ * ASerializable::defineDefaultFormatNF()
+ */
+bool ASerializable::dumpToNF(const String& NFFilename,
+                             const EFormatNF& format, 
+                             bool verbose) const
+{
+  bool ret = true;
+
+  EFormatNF formatLocal = format;
+  if (format == EFormatNF::DEFAULT)
+    formatLocal = _defaultFormat;
+
+  if (formatLocal == EFormatNF::ASCII)
+  {
+    std::ofstream os;
+    if (SerializeNeutralFile::fileOpenWrite(*this, NFFilename, os, true))
+    {
+      ret = _serializeAscii(os, verbose);
+      if (! ret)
+        messerr("Problem writing in the Neutral File.");
+      os.close();
+    }
+    return ret;
+  }
 
 #ifdef HDF5
-bool ASerializable::dumpToH5(const String& H5Filename, bool verbose) const
-{
-  auto file = SerializeHDF5::fileOpenWrite(*this, H5Filename);
-  bool ret  = _serializeH5(file, verbose);
-  if (!ret)
+  if (formatLocal == EFormatNF::H5)
   {
-    messerr("Problem writing in the HDF5 file.");
+    auto file = SerializeHDF5::fileOpenWrite(*this, NFFilename);
+    bool ret  = _serializeH5(file, verbose);
+    if (!ret)
+      messerr("Problem writing in the HDF5 file.");
+    return ret;
   }
+  #endif
 
-  return ret;
+  messerr("Aserializable::dumpToNF : No Format is defined");
+  return false;
 }
-#endif
 
 bool ASerializable::_fileOpenWrite(const String& filename,
                                    std::ofstream& os,

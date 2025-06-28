@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Basic/SerializeNeutralFile.hpp"
+#include "Enum/EFormatNF.hpp"
 #include "gstlearn_export.hpp"
 #include "geoslib_define.h"
 
@@ -35,10 +36,9 @@ public:
   ASerializable& operator=(ASerializable&& r) noexcept;
   virtual ~ASerializable();
 
-  bool dumpToNF(const String& NFFilename, bool verbose = false) const;
-#ifdef HDF5
-  bool dumpToH5(const String& H5Filename, bool verbose = false) const;
-#endif
+  bool dumpToNF(const String& NFFilename,
+                const EFormatNF& format = EFormatNF::fromKey("DEFAULT"),
+                bool verbose            = false) const;
 
   static String buildFileName(int status, const String& filename, bool ensureDirExist = false);
 
@@ -46,6 +46,7 @@ public:
   static void setPrefixName(const String& prefixName);
   static void unsetPrefixName();
   static const String& getPrefixName();
+  static void defineDefaultFormatNF(const EFormatNF& format);
 
   virtual String _getNFName() const = 0;
 

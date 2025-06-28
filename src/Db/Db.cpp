@@ -4712,9 +4712,8 @@ int Db::getSimRank(int isimu, int ivar, int icase, int nbsimu, int nvar)
 
 Db* Db::createFromNF(const String& NFFilename, bool verbose)
 {
-  Db* db = nullptr;
+  auto* db = new Db;
   std::ifstream is;
-  db = new Db;
   if (db->_fileOpenRead(NFFilename, is, verbose))
   {
     if (!db->_deserializeAscii(is, verbose))
