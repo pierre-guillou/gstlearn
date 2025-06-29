@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 #include "Covariances/ACovFunc.hpp"
+
 #include <boost/math/differentiation/autodiff.hpp>
 
 using namespace boost::math::differentiation;
