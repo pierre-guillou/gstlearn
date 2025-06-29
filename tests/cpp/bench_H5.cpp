@@ -23,7 +23,9 @@ int test_NF(const DbGrid& db)
 
 int test_HDF5(const DbGrid& db)
 {
+#ifdef HDF5
   Timer tm;
+
   db.dumpToNF("dbgrid.h5", EFormatNF::H5);
   auto db2 = std::unique_ptr<DbGrid>(DbGrid::createFromH5("dbgrid.h5"));
   if (db2 != nullptr)
@@ -36,7 +38,7 @@ int test_HDF5(const DbGrid& db)
     return 1;
   }
   tm.displayIntervalMilliseconds("Serialize + Deserialize + Serialize HDF5", 80);
-
+#endif
   return 0;
 }
 

@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-
 #include "Basic/AStringable.hpp"
 #include "Basic/File.hpp"
 #include "Db/Db.hpp"

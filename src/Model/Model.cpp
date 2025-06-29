@@ -983,7 +983,6 @@ void Model::_create()
   delete _driftList;
   _driftList = new DriftList(_ctxt);
   setCovAnisoList(&tmp);
-
 }
 
 void Model::addCovAniso(const CovAniso* cov)
