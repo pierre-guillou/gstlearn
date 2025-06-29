@@ -828,9 +828,8 @@ int DbGrid::gridDefine(const VectorInt& nx,
  */
 DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
 {
-  DbGrid* dbgrid = nullptr;
+  auto* dbgrid = new DbGrid;
   std::ifstream is;
-  dbgrid = new DbGrid;
   bool success = false;
   if (dbgrid->_fileOpenRead(NFFilename, is, verbose))
   {

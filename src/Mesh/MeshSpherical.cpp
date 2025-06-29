@@ -18,6 +18,7 @@
 #include "Tree/Ball.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpaceSN.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 MeshSpherical::MeshSpherical(const MatrixDense &apices,
                              const MatrixInt &meshes)
@@ -413,3 +414,55 @@ void MeshSpherical::getBarycenterInPlace(int imesh, VectorDouble& coord) const
   GH::convertCart2Sph(centerE[0], centerE[1], centerE[2],
                       &coord.at(0), &coord.at(1), TEST);
 }
+
+#ifdef HDF5
+bool MeshSpherical::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto meshG = SerializeHDF5::getGroup(grp, "MeshSpherical");
+  if (!meshG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret     = true;
+  int ndim     = 0;
+  int napices  = 0;
+  int npermesh = 0;
+  int nmeshes  = 0;
+  VectorDouble apices;
+  VectorInt meshes;
+
+  ret = ret && SerializeHDF5::readValue(*meshG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NApices", napices);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NPerMesh", npermesh);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NMeshes", nmeshes);
+  ret = ret && SerializeHDF5::readVec(*meshG, "Apices", apices);
+  ret = ret && SerializeHDF5::readVec(*meshG, "Meshes", meshes);
+
+  if (ret)
+  {
+    _apices = MatrixDense(napices, ndim);
+    _apices.setValues(apices);
+    _meshes = MatrixInt(nmeshes, npermesh);
+    _meshes.setValues(meshes);
+  }
+  return ret;
+}
+
+bool MeshSpherical::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto meshG = grp.createGroup("MeshSpherical");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(meshG, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeValue(meshG, "NApices", getNApices());
+  ret = ret && SerializeHDF5::writeValue(meshG, "NPerMesh", getNApexPerMesh());
+  ret = ret && SerializeHDF5::writeValue(meshG, "NMeshes", getNMeshes());
+  ret = ret && SerializeHDF5::writeVec(meshG, "Apices", _apices.getValues());
+  ret = ret && SerializeHDF5::writeVec(meshG, "Meshes", _meshes.getValues());
+
+  return ret;
+}
+#endif

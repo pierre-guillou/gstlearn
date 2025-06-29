@@ -60,6 +60,10 @@ public:
 protected:
   virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
   virtual bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "MeshSpherical"; }
 
 private:
