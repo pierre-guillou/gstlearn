@@ -111,6 +111,7 @@ protected:
 
 private:
   static String _myPrefixName;
+  static EFormatNF _defaultFormatNF;
 };
 
 template<typename T>

@@ -33,9 +33,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-EFormatNF _defaultFormat = EFormatNF::ASCII;
-
 String ASerializable::_myPrefixName = String();
+EFormatNF ASerializable::_defaultFormatNF = EFormatNF::ASCII;
 
 ASerializable::ASerializable()                                    = default;
 ASerializable::ASerializable(const ASerializable&)                = default;
@@ -46,7 +45,7 @@ ASerializable::~ASerializable()                                   = default;
 
 void ASerializable::defineDefaultFormatNF(const EFormatNF& format)
 {
-  _defaultFormat = format;
+  _defaultFormatNF = format;
 }
 
 /**
@@ -72,7 +71,7 @@ bool ASerializable::dumpToNF(const String& NFFilename,
 
   EFormatNF formatLocal = format;
   if (format == EFormatNF::DEFAULT)
-    formatLocal = _defaultFormat;
+    formatLocal = _defaultFormatNF;
 
   // Check if H5 format is available: otherwise force ASCII
   bool canUseH5 = false;
