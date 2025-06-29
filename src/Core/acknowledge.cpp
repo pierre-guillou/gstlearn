@@ -19,12 +19,11 @@
  *
  ****************************************************************************/
 void acknowledge_gstlearn(void)
-
 {
   // Print the header 
 
   message("gstlearn Library (Version: %s - Date: %s - Commit: %s)",
-          GSTLEARN_VERSION, GSTLEARN_DATE, GSTLEARN_COMMIT);
+          GSTLEARN_FULL_VERSION, GSTLEARN_DATE, GSTLEARN_COMMIT);
 
   // Print the list of authors
 

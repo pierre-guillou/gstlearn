@@ -163,7 +163,7 @@ foreach(FLAVOR ${FLAVORS})
   set_target_properties(${FLAVOR} PROPERTIES DEBUG_POSTFIX "d")
   
   # Set library version
-  set_target_properties(${FLAVOR} PROPERTIES VERSION ${PROJECT_VERSION})
+  set_target_properties(${FLAVOR} PROPERTIES VERSION ${PROJECT_FULL_VERSION})
 
   if(USE_BOOST_SPAN)
     target_compile_definitions(${FLAVOR} PUBLIC USE_BOOST_SPAN)
