@@ -94,6 +94,8 @@ jobs:
           -DBUILD_PYTHON=ON \
           -DBUILD_R=OFF \
           -DBUILD_DOC=ON
+      env:
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
     - name : Build the package
       run : |
