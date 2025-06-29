@@ -74,6 +74,13 @@ bool ASerializable::dumpToNF(const String& NFFilename,
   if (format == EFormatNF::DEFAULT)
     formatLocal = _defaultFormat;
 
+  // Check if H5 format is available: otherwise force ASCII
+  bool canUseH5 = false;
+  #ifdef HDF5
+    canUseH5 = true;
+  #endif
+  if (! canUseH5) formatLocal = EFormatNF::ASCII;
+
   if (formatLocal == EFormatNF::ASCII)
   {
     std::ofstream os;
@@ -96,7 +103,7 @@ bool ASerializable::dumpToNF(const String& NFFilename,
       messerr("Problem writing in the HDF5 file.");
     return ret;
   }
-  #endif
+#endif
 
   messerr("Aserializable::dumpToNF : No Format is defined");
   return false;
