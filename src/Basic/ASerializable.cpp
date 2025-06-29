@@ -33,7 +33,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-static EFormatNF _defaultFormat = EFormatNF::ASCII;
+EFormatNF _defaultFormat = EFormatNF::ASCII;
 
 String ASerializable::_myPrefixName = String();
 

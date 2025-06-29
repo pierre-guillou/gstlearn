@@ -445,7 +445,6 @@ void mes_process(const char *string, int ntot, int iech)
   quant_memo = quant;
 }
 
-
 /**
  * Print a message and underlines it with various formats
  * @param level  Level of the title
