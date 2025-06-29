@@ -79,8 +79,6 @@ bool ASerializable::dumpToNF(const String& NFFilename,
     canUseH5 = true;
   #endif
   if (! canUseH5) formatLocal = EFormatNF::ASCII;
-  // TODO: message temporarily printed to help debugging on Windows
-  message("Dump to NF is using the Format %s\n", formatLocal.getKey());
 
   if (formatLocal == EFormatNF::ASCII)
   {
