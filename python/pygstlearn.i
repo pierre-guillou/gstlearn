@@ -762,6 +762,50 @@
 //                Specific additionnal typemaps             //
 //////////////////////////////////////////////////////////////
 
+
+// Typemap IN pour accepter un pandas.DataFrame
+%typemap(in) std::map<std::string, std::vector<double, std::allocator<double> > > *  {
+  if (!PyObject_HasAttrString($input, "columns") || !PyObject_HasAttrString($input, "__getitem__")) {
+      PyErr_SetString(PyExc_TypeError, "Expected a pandas.DataFrame");
+      return NULL;
+  }
+
+  $1 = new std::map<std::string, std::vector<double>>();
+
+  PyObject *columns = PyObject_GetAttrString($input, "columns");
+  PyObject *iter = PyObject_GetIter(columns);
+  if (!iter) {
+      PyErr_SetString(PyExc_TypeError, "Could not iterate DataFrame columns");
+      Py_DECREF(columns);
+      return NULL;
+  }
+
+  PyObject *col;
+  while ((col = PyIter_Next(iter))) {
+      const char *colname = PyUnicode_AsUTF8(col);
+      PyObject *series = PyObject_GetItem($input, col);
+      PyObject *values = PyObject_GetAttrString(series, "values");
+
+      Py_ssize_t len = PyObject_Length(values);
+      std::vector<double> vec;
+      for (Py_ssize_t i = 0; i < len; ++i) {
+          PyObject *item = PySequence_GetItem(values, i);
+          double val = PyFloat_AsDouble(item);
+          Py_DECREF(item);
+          vec.push_back(val);
+      }
+
+      (*$1)[colname] = vec;
+
+      Py_DECREF(values);
+      Py_DECREF(series);
+      Py_DECREF(col);
+  }
+
+  Py_DECREF(iter);
+  Py_DECREF(columns);
+}
+
 // This for automatically converting R string to NamingConvention
 
 %typemap(in) NamingConvention, NamingConvention &, const NamingConvention, const NamingConvention &

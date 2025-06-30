@@ -42,5 +42,6 @@ public:
                              const DbGrid* dbmap,
                              Constraints* constraints,
                              const ModelOptimParam& mop,
-                             int nb_neighVecchia = ITEST);
+                             int nb_neighVecchia = ITEST,
+                             bool reml = false);
 };

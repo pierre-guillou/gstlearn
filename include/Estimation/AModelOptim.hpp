@@ -60,7 +60,5 @@ private:
   bool _verbose;
   bool _trace;
   std::vector<double> _x;
-  std::vector<double> _xmin;
-  std::vector<double> _xmax;
   int _iter;
 };

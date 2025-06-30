@@ -11,7 +11,7 @@
 
 #include "Covariances/CovBase.hpp"
 #include "Basic/ListParams.hpp"
-#include "Basic/LowerTriangularRange.hpp"
+#include "Basic/Iterators.hpp"
 #include "Basic/ParamInfo.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
@@ -586,16 +586,18 @@ void CovBase::appendParams(ListParams& listParams,
         for (int i = jvard; i < this->getNVar(); i++)
         {
           double val = this->_cholSillsInfo.getValue(i, jvard).getValue();
-          if (i == (int)ivard)
+          if (i == (int)jvard)
           {
             double grad_softplus = softplusDerivative(val);
             val = grad_softplus * softplus(val); // Apply softplus to ensure positive values
+          }
+          if (i == (int)ivard)
+          {
             val *= 2; // Derivative of the diagonal element is 2
           }
           dSillDChol.setValue(i, ivard, val);
           dSillDChol.setValue(ivard, i, val);
         }
-
         double cor = this->_eval(p1, p2, ivar, jvar, mode);
         return dSillDChol.getValue(ivar, jvar) * cor;
       });

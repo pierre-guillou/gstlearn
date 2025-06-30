@@ -22,12 +22,12 @@ class ModelGeneric;
 class GSTLEARN_EXPORT Likelihood: public ALikelihood
 {
 public:
-  Likelihood(ModelGeneric* model, const Db* db);
+  Likelihood(ModelGeneric* model, const Db* db, bool reml = false);
   Likelihood(const Likelihood& r);
   Likelihood& operator=(const Likelihood& r);
   virtual ~Likelihood();
 
-  static Likelihood* createForOptim(ModelGeneric* model, const Db* db);
+  static Likelihood* createForOptim(ModelGeneric* model, const Db* db, bool reml = false);
   void evalGrad(vect res) override;
 
 private:

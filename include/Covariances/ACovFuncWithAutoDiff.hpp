@@ -10,9 +10,9 @@
 /******************************************************************************/
 #pragma once
 #include "Covariances/ACovFunc.hpp"
-
+#ifndef SWIG
 #include <boost/math/differentiation/autodiff.hpp>
-
+#endif
 using namespace boost::math::differentiation;
 
 

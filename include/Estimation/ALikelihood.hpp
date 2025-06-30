@@ -13,6 +13,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "Matrix/MatrixDense.hpp"
 #include "Estimation/AModelOptim.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
@@ -25,7 +26,8 @@ class GSTLEARN_EXPORT ALikelihood: public AModelOptim
 {
 public:
   ALikelihood(ModelGeneric* model,
-              const Db* db);
+              const Db* db,
+              bool reml = false);
   ALikelihood(const ALikelihood& r);
   ALikelihood& operator=(const ALikelihood& r);
   virtual ~ALikelihood();
@@ -54,4 +56,6 @@ protected:
   VectorDouble _beta;
   MatrixDense _Cm1X;
   VectorDouble _Cm1Y;
+  MatrixSymmetric _XtCm1X; // X^T * C^{-1} * X
+  bool _reml;
 };
