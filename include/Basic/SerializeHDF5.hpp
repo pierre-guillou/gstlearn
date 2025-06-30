@@ -52,51 +52,31 @@ namespace SerializeHDF5
     return H5::StrType {0, H5T_VARIABLE};
   }
 
+  /**
+   * @brief Read individual value (primitive type) from group
+   *
+   * @param[in] grp HDF5 Group from which to read value
+   * @param[in] name Value name
+   * @param[out] value Return value
+   * @return True if success
+   */
   template<typename T>
-  void
-  createAttribute(H5::H5Object& obj, const std::string& key, const T& value)
-  {
-    try
-    {
-      const auto type   = getHDF5Type(value);
-      const hsize_t dim = 1;
-      const H5::DataSpace ds {1, &dim};
-      auto attr = obj.createAttribute(key, type, ds);
-      if constexpr (std::is_same<T, std::string>::value)
-        attr.write(type, value);
-      else if constexpr (std::is_convertible<T, std::string>::value)
-        attr.write(type, std::string {value});
-      else
-        attr.write(type, &value);
-    }
-    catch (H5::AttributeIException& e)
-    {
-      messerr("Could not write attribute %s: %s", key.c_str(), e.getCDetailMsg());
-    }
-  }
+  bool readValue(const H5::H5Object& grp, const String& name, T& value);
 
-  template<typename T = std::string>
-  T readAttribute(const H5::H5Object& obj, const std::string& key)
-  {
-    if (!obj.attrExists(key))
-    {
-      messerr("Could not read attribute '%s': attribute does not exist", key.c_str());
-      return {};
-    }
-
-    auto attr = obj.openAttribute(key);
-    T res;
-
-    if constexpr (std::is_same<T, std::string>::value)
-      attr.read(getHDF5Type(res), res);
-    else if constexpr (std::is_convertible<T, std::string>::value)
-      attr.read(getHDF5Type(res), std::string{res});
-    else
-      attr.read(getHDF5Type(res), &res);
-
-    attr.close();
-    return res;
-  }
+  /**
+   * @brief Write individual value (primitive type) to group
+   *
+   * Here we make use of H5::Attributes to store individual values
+   * (e.g.  class members of primitive types). Prefer _createAttribute
+   * for strings.
+   *
+   * @param[in,out] grp HDF5 Group in which to write value
+   * @param[in] name Value name
+   * @param[out] value Value to write
+   * @return True if success
+   */
+  template<typename T>
+  bool writeValue(H5::H5Object& grp, const String& name, const T& value);
 
   /**
    * @brief Open HDF5 file in read mode, check metadata
@@ -114,8 +94,9 @@ namespace SerializeHDF5
       return file;
     }
 
-    auto metadata      = file.openGroup("gstlearn metadata");
-    const auto version = readAttribute(metadata, "Format version");
+    auto metadata = file.openGroup("gstlearn metadata");
+    String version;
+    readValue(metadata, "Format version", version);
     if (version != "1.0.0")
     {
       messerr("File %s has format version %s, expected 1.0.0", filepath.c_str(),
@@ -138,7 +119,8 @@ namespace SerializeHDF5
     if (verbose)
       message("Metadata:\n");
 
-    const auto version = readAttribute(metadata, "Format version");
+    String version;
+    readValue(metadata, "Format version", version);
     if (version != "1.0.0")
     {
       messerr("File %s has format version %s, expected 1.0.0", filepath.c_str(),
@@ -148,7 +130,8 @@ namespace SerializeHDF5
     if (verbose)
       message("- Version = %s\n", version.c_str());
 
-    const auto classType = readAttribute(metadata, "Class_Type");
+    String classType;
+    readValue(metadata, "Class_Type", classType);
     if (verbose)
       message("- Class_Type = %s\n", classType.c_str());
 
@@ -166,12 +149,10 @@ namespace SerializeHDF5
 
     H5::H5File file {filepath, H5F_ACC_TRUNC};
     auto metadata = file.createGroup("gstlearn metadata");
-    createAttribute(metadata, "Description",
-                    "This file is used to Serialize gstlearn's internal data structures");
-    createAttribute(metadata, "Format version",
-                    "1.0.0");
-    createAttribute(metadata, "Class_Type",
-                    parent._getNFName());
+    writeValue(metadata, "Description",
+               "This file is used to Serialize gstlearn's internal data structures");
+    writeValue(metadata, "Format version", "1.0.0");
+    writeValue(metadata, "Class_Type", parent._getNFName());
     return file;
   }
 
@@ -241,33 +222,6 @@ namespace SerializeHDF5
     auto grp = parent.openGroup(name);
     return grp;
   }
-
-  /**
-   * @brief Read individual value (primitive type) from group
-   *
-   * @param[in] grp HDF5 Group from which to read value
-   * @param[in] name Value name
-   * @param[out] value Return value
-   * @return True if success
-   */
-  template<typename T>
-  bool readValue(const H5::Group& grp, const String& name, T& value);
-
-  /**
-   * @brief Write individual value (primitive type) to group
-   *
-   * Here we make use of H5::Attributes to store individual values
-   * (e.g.  class members of primitive types). Prefer _createAttribute
-   * for strings.
-   *
-   * @param[in,out] grp HDF5 Group in which to write value
-   * @param[in] name Value name
-   * @param[out] value Value to write
-   * @return True if success
-   */
-  template<typename T>
-  bool writeValue(H5::Group& grp, const String& name, const T& value);
-
 }; // namespace SerializeHDF5
 
 template<typename T>
@@ -382,7 +336,7 @@ bool SerializeHDF5::writeVec(H5::Group& grp,
 }
 
 template<typename T>
-bool SerializeHDF5::readValue(const H5::Group& grp, const String& name, T& value)
+bool SerializeHDF5::readValue(const H5::H5Object& grp, const String& name, T& value)
 {
   const auto grp_name = grp.getObjName();
 
@@ -401,21 +355,33 @@ bool SerializeHDF5::readValue(const H5::Group& grp, const String& name, T& value
     return false;
   }
 
-  attr.read(getHDF5Type(value), &value);
+  const auto type = getHDF5Type(value);
+  if constexpr (std::is_same<T, std::string>::value)
+    attr.read(type, value);
+  else if constexpr (std::is_convertible<T, std::string>::value)
+    attr.read(type, std::string {value});
+  else
+    attr.read(type, &value);
   attr.close();
   return true;
 }
 
 template<typename T>
-bool SerializeHDF5::writeValue(H5::Group& grp, const String& name, const T& value)
+bool SerializeHDF5::writeValue(H5::H5Object& grp, const String& name, const T& value)
 {
   std::string grp_name;
   grp.getObjName(grp_name);
 
   const hsize_t dim = 1;
   const H5::DataSpace ds {1, &dim};
-  auto attr = grp.createAttribute(name, getHDF5Type(value), ds);
-  attr.write(getHDF5Type(value), &value);
+  auto attr       = grp.createAttribute(name, getHDF5Type(value), ds);
+  const auto type = getHDF5Type(value);
+  if constexpr (std::is_same<T, std::string>::value)
+    attr.write(type, value);
+  else if constexpr (std::is_convertible<T, std::string>::value)
+    attr.write(type, std::string {value});
+  else
+    attr.write(type, &value);
 
   return true;
 }

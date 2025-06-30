@@ -4820,10 +4820,10 @@ bool Db::_serializeH5(H5::Group& grp, bool /*verbose*/) const
     // nicer API than string H5::DataSets. Putting Locators inside Attribute
     // also avoids checking array sizes during deserialization
     // (Locators DataSet size vs. number of columns)
-    SerializeHDF5::createAttribute(data, "Locators", locators[i]);
+    SerializeHDF5::writeValue(data, "Locators", locators[i]);
     // Use H5::Attribute to store column index (H5::Datasets are
     // sorted by name in h5 file)
-    SerializeHDF5::createAttribute(data, "ColId", i);
+    SerializeHDF5::writeValue(data, "ColId", i);
     data.write(getColumnByColIdx(i).data(), H5::PredType::NATIVE_DOUBLE);
   }
 
@@ -4874,9 +4874,9 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   {
     const auto data = dbG->openDataSet(names[i]);
     // read the column locator (H5::Attribute)
-    locators[i] = SerializeHDF5::readAttribute(data, "Locators");
+    SerializeHDF5::readValue(data, "Locators", locators[i]);
     // read the column index (H5::Attribute)
-    colIds[i] = SerializeHDF5::readAttribute<int>(data, "ColId");
+    SerializeHDF5::readValue<int>(data, "ColId", colIds[i]);
     // read the column values from H5::DataSet
     data.read(&_array[_getAddress(0, colIds[i])], H5::PredType::NATIVE_DOUBLE);
   }
