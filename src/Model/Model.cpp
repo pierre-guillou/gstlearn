@@ -526,13 +526,17 @@ void Model::switchToGradient()
   // If no covariance has been defined yet: do nothing
   if (_cova == nullptr)
   {
-    ModelCovList::setCovList(new CovLMGradient(_ctxt));
+    CovLMGradient* covg  = new CovLMGradient(_ctxt);
+    ModelCovList::setCovList(covg);
+    delete covg;
   }
   else
   {
     const CovAnisoList* covalist = castInCovAnisoListConst();
     if (covalist == nullptr) return;
-    ModelCovList::setCovList(new CovLMGradient(*covalist));
+    CovLMGradient* covg = new CovLMGradient(*covalist);
+    ModelCovList::setCovList(covg);
+    delete covg;
   }
 }
 
