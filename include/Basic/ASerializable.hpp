@@ -46,7 +46,7 @@ public:
   static void setPrefixName(const String& prefixName);
   static void unsetPrefixName();
   static const String& getPrefixName();
-  static void setDefaultFormatNF(const EFormatNF& format);
+  void setDefaultFormatNF(const EFormatNF& format);
 
   virtual String _getNFName() const = 0;
 
@@ -112,7 +112,7 @@ protected:
 
 private:
   static String _myPrefixName;
-  static EFormatNF _defaultFormatNF;
+  EFormatNF _defaultFormatNF{EFormatNF::H5};
 };
 
 template<typename T>

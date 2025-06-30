@@ -34,7 +34,6 @@
 #include <sys/types.h>
 
 String ASerializable::_myPrefixName = String();
-EFormatNF ASerializable::_defaultFormatNF = EFormatNF::H5;
 
 ASerializable::ASerializable()                                    = default;
 ASerializable::ASerializable(const ASerializable&)                = default;
@@ -71,14 +70,14 @@ bool ASerializable::dumpToNF(const String& NFFilename,
 
   EFormatNF formatLocal = format;
   if (format == EFormatNF::DEFAULT)
+  {
     formatLocal = _defaultFormatNF;
+  }
 
   // Check if H5 format is available: otherwise force ASCII
-  bool canUseH5 = false;
-  #ifdef HDF5
-    canUseH5 = true;
-  #endif
-  if (! canUseH5) formatLocal = EFormatNF::ASCII;
+#ifndef HDF5
+  formatLocal = EFormatNF::ASCII;
+#endif
 
   if (formatLocal == EFormatNF::ASCII)
   {
@@ -104,7 +103,7 @@ bool ASerializable::dumpToNF(const String& NFFilename,
   }
 #endif
 
-  messerr("Aserializable::dumpToNF : No Format is defined");
+  messerr("Aserializable::dumpToNF: No Format is defined (enum value: %d)", formatLocal.getValue());
   return false;
 }
 
