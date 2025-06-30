@@ -12,6 +12,7 @@
 
 #include "gstlearn_export.hpp"
 #include <assert.h>
+#include <memory>
 
 /**
  * Inherits from this interface to make your class cloneable.
@@ -24,6 +25,12 @@ public:
   virtual ~ICloneable() {};
 
   virtual ICloneable* clone() const = 0;
+  #ifndef SWIG
+  std::shared_ptr<ICloneable> cloneShared() const
+  {
+    return std::shared_ptr<ICloneable>(clone());
+  }
+  #endif
 };
 
 // Thanks to here (macro way):

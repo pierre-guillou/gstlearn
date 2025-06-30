@@ -33,7 +33,7 @@ ModelGeneric::ModelGeneric(const CovContext& ctxt)
 
 ModelGeneric::ModelGeneric(const ModelGeneric& r)
 {
-  _cova      = (r._cova != nullptr) ? (ACov*)r._cova->clone() : nullptr;
+  _cova      = (r._cova != nullptr) ? std::dynamic_pointer_cast<ACov>(r._cova->cloneShared()) : nullptr;
   _driftList = (r._driftList != nullptr) ? r._driftList->clone() : nullptr;
   _ctxt      = r._ctxt;
 }
@@ -42,7 +42,7 @@ ModelGeneric& ModelGeneric::operator=(const ModelGeneric& r)
 {
   if (this != &r)
   {
-    _cova      = (r._cova != nullptr) ? (ACov*)r._cova->clone() : nullptr;
+    _cova      = (r._cova != nullptr) ? std::dynamic_pointer_cast<ACov>(r._cova->cloneShared()) : nullptr;
     _driftList = (r._driftList != nullptr) ? r._driftList->clone() : nullptr;
     _ctxt      = r._ctxt;
   }
@@ -51,7 +51,6 @@ ModelGeneric& ModelGeneric::operator=(const ModelGeneric& r)
 
 ModelGeneric::~ModelGeneric()
 {
-  delete _cova;
   _cova = nullptr;
   delete _driftList;
   _driftList = nullptr;
@@ -108,7 +107,7 @@ void ModelGeneric::setDriftList(const DriftList* driftlist)
   _driftList->copyCovContext(_ctxt);
 }
 
-void ModelGeneric::setCov(ACov* cova)
+void ModelGeneric::setCov(const ACov* cova)
 {
   if (cova == nullptr) return;
 
@@ -122,8 +121,7 @@ void ModelGeneric::setCov(ACov* cova)
       return;
     }
   }
-  delete _cova;
-  _cova = (ACov*)cova->clone();
+  _cova = (std::dynamic_pointer_cast<ACov>)(cova->cloneShared());
 
   _ctxt = cova->getContext();
 }

@@ -33,7 +33,7 @@ ModelCovList& ModelCovList:: operator= (const ModelCovList &m)
   return *this;
 }
 
-void ModelCovList::setCovList(CovList* covs)
+void ModelCovList::setCovList(const CovList* covs)
 {
   setCov(covs);
 }
