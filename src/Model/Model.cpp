@@ -1363,14 +1363,9 @@ Model* Model::createFillRandom(int ndim,
 bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
   auto modelG = SerializeHDF5::getGroup(grp, "Model");
-  if (!modelG)
-  {
-    return false;
-  }
+  if (!modelG) return false;
 
   bool ret     = true;
-
-  // General characteristics
   int ndim     = 0;
   int nvar     = 0;
   int ncov     = 0;
@@ -1391,11 +1386,13 @@ bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   _create();
 
   // Process the Covariances
+  auto covsG = SerializeHDF5::getGroup(*modelG, "Covs");
+  if (!covsG) return false;
   CovAnisoList covs(_ctxt);
   for (int icov = 0; ret && icov < ncov; icov++)
   {
-    String locName       = "Covariance" + std::to_string(icov);
-    auto covG     = SerializeHDF5::getGroup(grp, locName);
+    String locName = "Covariance" + std::to_string(icov);
+    auto covG      = SerializeHDF5::getGroup(*covsG, locName);
     if (!covG) return false;
 
     // General characteristics
@@ -1445,15 +1442,17 @@ bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   setCovAnisoList(&covs);
 
   // Process the drift part
+  auto driftsG = SerializeHDF5::getGroup(*modelG, "Drifts");
+  if (!driftsG) return false;
   DriftList drifts(_ctxt);
   ADrift* drift;
+  String driftname;
   for (int ibfl = 0; ret && ibfl < ndrift; ibfl++)
   {
-    String locName      = "Drift" + std::to_string(ibfl);
-    auto driftG         = SerializeHDF5::getGroup(grp, locName);
+    String locName = "Drift" + std::to_string(ibfl);
+    auto driftG    = SerializeHDF5::getGroup(*driftsG, locName);
     if (!driftG) return false;
 
-    String driftname;
     ret   = ret && SerializeHDF5::readValue(*driftG, "Name", driftname);
 
     drift = DriftFactory::createDriftByIdentifier(driftname);
@@ -1490,11 +1489,12 @@ bool Model::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   ret = ret && SerializeHDF5::writeValue(modelG, "NDrift", getNDrift());
 
   // Writing the covariance part
+  auto covsG = modelG.createGroup("Covs");
   for (int icov = 0, ncov = getNCov(); ret && icov < ncov; icov++)
   {
     const CovAniso* cova = getCovAniso(icov);
     String locName       = "Covariance" + std::to_string(icov);
-    auto covG            = grp.createGroup(locName);
+    auto covG            = covsG.createGroup(locName);
 
     // General characteristics
     ret = ret && SerializeHDF5::writeValue(covG, "Type", cova->getType().getValue());
@@ -1517,11 +1517,12 @@ bool Model::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   }
 
   // Writing the drift part
+  auto driftsG = modelG.createGroup("Drifts");
   for (int ibfl = 0, nbfl = getNDrift(); ret && ibfl < nbfl; ibfl++)
   {
     const ADrift* drift = getDrift(ibfl);
     String locName      = "Drift" + std::to_string(ibfl);
-    auto driftG         = grp.createGroup(locName);
+    auto driftG         = driftsG.createGroup(locName);
 
     ret = ret && SerializeHDF5::writeValue(driftG, "Name", drift->getDriftName());
   }

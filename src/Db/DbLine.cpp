@@ -777,25 +777,24 @@ DbLine* DbLine::createMarkersFromGrid(const DbGrid& grid,
 #ifdef HDF5
 bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  auto dbg = SerializeHDF5::getGroup(grp, "DbLine");
-  if (!dbg)
-  {
-    return false;
-  }
+  auto dbG = SerializeHDF5::getGroup(grp, "DbLine");
+  if (!dbG) return false;
 
   /* Read the grid characteristics */
   bool ret   = true;
   int ndim   = 0;
   int nbline = 0;
 
-  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
-  ret = ret && SerializeHDF5::readValue(*dbg, "NLines", nbline);
+  ret = ret && SerializeHDF5::readValue(*dbG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*dbG, "NLines", nbline);
 
+  auto linesG = SerializeHDF5::getGroup(*dbG, "Lines");
+  if (!linesG) return false;
   _lineAdds.resize(nbline);
   for (int iline = 0; iline < nbline; iline++)
   {
     String locName = "Line" + std::to_string(iline);
-    auto lineg      = SerializeHDF5::getGroup(grp, locName);
+    auto lineg      = SerializeHDF5::getGroup(*linesG, locName);
     if (!lineg) return false;
 
     int nsample = 0;
@@ -805,26 +804,28 @@ bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_deserializeH5(*dbg, verbose);
+  ret = ret && Db::_deserializeH5(*dbG, verbose);
 
   return ret;
 }
 
 bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  auto dbG = grp.createGroup("Dbline");
+  auto dbG = grp.createGroup("DbLine");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
-  ret      = ret && SerializeHDF5::writeValue(dbG, "NLines", getNLine());
 
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeValue(dbG, "NLines", getNLine());
+
+  auto linesG = dbG.createGroup("Lines");
   for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
   {
     String locName = "Line" + std::to_string(iline);
-    auto dirG      = grp.createGroup(locName);
+    auto lineG      = linesG.createGroup(locName);
 
-    ret = ret && SerializeHDF5::writeValue(dbG, "NSamples", getNSamplePerLine(iline));
-    ret = ret && SerializeHDF5::writeVec(dbG, "Samples", _lineAdds[iline]);
+    ret = ret && SerializeHDF5::writeValue(lineG, "NSamples", getNSamplePerLine(iline));
+    ret = ret && SerializeHDF5::writeVec(lineG, "Samples", _lineAdds[iline]);
   }
 
   /* Writing the tail of the file */

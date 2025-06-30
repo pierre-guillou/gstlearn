@@ -1034,21 +1034,23 @@ int db_selhull(Db *db1,
 bool Polygons::_deserializeH5(H5::Group& grp, bool verbose)
 {
   auto polygonsG = SerializeHDF5::getGroup(grp, "Polygons");
-  if (!polygonsG)
-  {
-    return false;
-  }
+  if (!polygonsG) return false;
 
   _polyelems.clear();
 
   bool ret = true;
+
+  auto polylineG = SerializeHDF5::getGroup(*polygonsG, "PolyLines");
+  if (!polylineG) return false;
   int ipol = 0;
+
   PolyElem polyOne;
   while(1)
   {
     String locname = "PolyElem_" + std::to_string(ipol);
-    auto polyelemG = SerializeHDF5::getGroup(*polygonsG, locname, false);
+    auto polyelemG = SerializeHDF5::getGroup(*polylineG, locname, false);
     if (!polyelemG) break;
+
     ret = ret && polyOne._deserializeH5(*polyelemG, verbose);
     _polyelems.push_back(polyOne);
     ipol++;
@@ -1064,10 +1066,13 @@ bool Polygons::_serializeH5(H5::Group& grp, bool verbose) const
   if (npol == 0) return true;
 
   bool ret = true;
+
+  auto polylineG = polygonsG.createGroup("PolyLines");
   for (size_t ipol = 0; ret && ipol < npol; ipol++)
   {
     String locname = "PolyElem_" + std::to_string(ipol);
-    auto polyelemG = polygonsG.createGroup(locname);
+    auto polyelemG = polylineG.createGroup(locname);
+
     ret            = ret && _polyelems[ipol]._serializeH5(polyelemG, verbose);
   }
 

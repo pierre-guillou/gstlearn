@@ -196,10 +196,7 @@ double FracEnviron::getXextend() const
 bool FracEnviron::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
   auto fracG = SerializeHDF5::getGroup(grp, "FracEnviron");
-  if (!fracG)
-  {
-    return false;
-  }
+  if (!fracG) return false;
 
   /* Read the grid characteristics */
   bool ret      = true;
@@ -219,7 +216,7 @@ bool FracEnviron::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   for (int ifam = 0; ret && ifam < getNFamilies(); ifam++)
   {
     String locName = "Family" + std::to_string(ifam);
-    auto famG      = SerializeHDF5::getGroup(grp, locName);
+    auto famG      = SerializeHDF5::getGroup(*fracG, locName);
     if (!famG) return false;
 
     FracFamily family;
@@ -231,7 +228,7 @@ bool FracEnviron::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   for (int ifault = 0; ret && ifault < getNFaults(); ifault++)
   {
     String locName = "Fault" + std::to_string(ifault);
-    auto faultG    = SerializeHDF5::getGroup(grp, locName);
+    auto faultG    = SerializeHDF5::getGroup(*fracG, locName);
     if (!faultG) return false;
 
     FracFault fault;
@@ -258,21 +255,23 @@ bool FracEnviron::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
   ret = ret && SerializeHDF5::writeValue(fracG, "Stdev", _stdev);
 
   // Loop on the families
-  for (int ifam = 0; ret && ifam < getNFamilies(); ifam++)
+  auto famsG = fracG.createGroup("Families");
+  for (int ifam = 0, nfam = getNFamilies(); ret && ifam < nfam; ifam++)
   {
     const FracFamily& family = getFamily(ifam);
     String locName           = "Family" + std::to_string(ifam);
-    auto famG                = grp.createGroup(locName);
-    ret                      = ret && family._serializeH5(famG, verbose);
+    auto famG                = famsG.createGroup(locName);
+    ret                      = ret && family._serializeH5(famsG, verbose);
   }
 
   // Loop on the main faults
-  for (int ifault = 0; ret && ifault < getNFaults(); ifault++)
+  auto faultsG = fracG.createGroup("Fauts");
+  for (int ifault = 0, nfault = getNFaults(); ret && ifault < nfault; ifault++)
   {
     const FracFault& fault = getFault(ifault);
     String locName         = "Fault" + std::to_string(ifault);
-    auto faultG            = grp.createGroup(locName);
-    ret                    = ret && fault._serializeH5(faultG, verbose);
+    auto faultG            = faultsG.createGroup(locName);
+    ret                    = ret && fault._serializeH5(faultsG, verbose);
   }
 
   return ret;

@@ -5105,10 +5105,7 @@ VectorDouble Vario::computeWeightsFromVario(int wmode) const
 bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
   auto varioG = SerializeHDF5::getGroup(grp, "Vario");
-  if (!varioG)
-  {
-    return false;
-  }
+  if (!varioG) return false;
 
   bool ret = true;
   int nvar = 0;
@@ -5146,10 +5143,13 @@ bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   }
 
   // Loop on the directions
+  auto dirsG = SerializeHDF5::getGroup(*varioG, "Directions");
+  if (!dirsG) return false;
+
   for (int idir = 0; idir < ndir; idir++)
   {
     String locName = "Direction_" + std::to_string(idir);
-    auto dirG      = SerializeHDF5::getGroup(grp, locName);
+    auto dirG      = SerializeHDF5::getGroup(*dirsG, locName);
     if (!dirG) return false;
 
     int nlag       = 0;
@@ -5227,11 +5227,12 @@ bool Vario::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 
   /* Loop on the directions */
 
+  auto dirsG = varioG.createGroup("Directions");
   for (int idir = 0; ret && idir < getNDir(); idir++)
   {
     const DirParam dirparam = _varioparam.getDirParam(idir);
     String locName          = "Direction_" + std::to_string(idir);
-    auto dirG               = grp.createGroup(locName);
+    auto dirG               = dirsG.createGroup(locName);
 
     ret = ret && SerializeHDF5::writeValue(dirG, "NLag", dirparam.getNLag());
     ret = ret && SerializeHDF5::writeValue(dirG, "Code", dirparam.getOptionCode());

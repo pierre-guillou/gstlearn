@@ -576,28 +576,26 @@ void DbGraphO::setArcLine(const VectorInt& nodes, double value)
 #ifdef HDF5
 bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  auto dbg = SerializeHDF5::getGroup(grp, "DbGraphO");
-  if (!dbg)
-  {
-    return false;
-  }
+  auto dbG = SerializeHDF5::getGroup(grp, "DbGraphO");
+  if (!dbG) return false;
 
   /* Read the grid characteristics */
-  bool ret = true;
-  int ndim = 0;
+  bool ret  = true;
+  int ndim  = 0;
+  int narcs = 0;
 
-  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*dbG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*dbG, "Narcs", narcs);
 
   // Reading the set of arcs for the Oriented Graph organization
-  int narcs = 0;
-  ret       = ret && SerializeHDF5::readValue(*dbg, "Narcs", narcs);
-
+  auto dbgs = SerializeHDF5::getGroup(*dbG, "Arcs");
+  if (!dbgs) return false;
   NF_Triplet nft;
   VectorDouble tab(3);
   for (int i = 0; i < narcs; i++)
   {
     String locName = "Arc" + std::to_string(i);
-    auto arcg      = SerializeHDF5::getGroup(grp, locName);
+    auto arcg      = SerializeHDF5::getGroup(*dbgs, locName);
     if (!arcg) return false;
 
     ret = ret && SerializeHDF5::readVec(*arcg, "Arc", tab);
@@ -607,7 +605,7 @@ bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   // Writing the set of addresses for Line organization
 
-  ret = ret && Db::_deserializeH5(*dbg, verbose);
+  ret = ret && Db::_deserializeH5(*dbG, verbose);
 
   return ret;
 }
@@ -617,23 +615,25 @@ bool DbGraphO::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   auto dbG = grp.createGroup("DbGraphO");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeValue(dbG, "Narcs", getNArc());
 
   // Writing the set of arcs for the Oriented Graph organization
 
+  auto dbGs = dbG.createGroup("Arcs");
+
   NF_Triplet nft = _downArcs.getMatrixToTriplet();
-  ret            = ret && SerializeHDF5::writeValue(dbG, "Narcs", getNArc());
-
   VectorDouble tab(3);
-  for (int i = 0, n = getNArc(); i < n; i++)
+  for (int iarc = 0, narcs = getNArc(); iarc < narcs; iarc++)
   {
-    String locName = "Arc" + std::to_string(i);
-    auto arcg      = grp.createGroup(locName);
+    String locName = "Arc" + std::to_string(iarc);
+    auto arcG      = dbGs.createGroup(locName);
 
-    tab[0] = nft.getRow(i);
-    tab[1] = nft.getCol(i);
-    tab[2] = nft.getValue(i);
-    ret    = ret && SerializeHDF5::writeVec(arcg, "Arc", tab);
+    tab[0] = nft.getRow(iarc);
+    tab[1] = nft.getCol(iarc);
+    tab[2] = nft.getValue(iarc);
+    ret    = ret && SerializeHDF5::writeVec(arcG, "Arc", tab);
   }
 
   /* Writing the tail of the file */

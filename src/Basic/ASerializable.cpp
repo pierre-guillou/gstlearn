@@ -34,7 +34,7 @@
 #include <sys/types.h>
 
 String ASerializable::_myPrefixName = String();
-EFormatNF ASerializable::_defaultFormatNF = EFormatNF::ASCII;
+EFormatNF ASerializable::_defaultFormatNF = EFormatNF::H5;
 
 ASerializable::ASerializable()                                    = default;
 ASerializable::ASerializable(const ASerializable&)                = default;
@@ -111,14 +111,18 @@ bool ASerializable::dumpToNF(const String& NFFilename,
 bool ASerializable::_fileOpenAndDeserialize(const String& filename,
                                             bool verbose)
 {
+  // Check that the file exists
+  String filepath = ASerializable::buildFileName(1, filename, true);
+  std::ifstream file(filepath);
+  if (!file.good()) return false;
+
   // Try to open it according to HDF5 format
 #ifdef HDF5
-  String filepath = ASerializable::buildFileName(1, filename, true);
   if (H5::H5File::isHdf5(filepath))
   {
     auto file = SerializeHDF5::fileOpenRead(filename);
 
-    if (_deserializeH5(file, verbose)) return true;
+    return _deserializeH5(file, verbose);
   }
 #endif
 
@@ -126,7 +130,7 @@ bool ASerializable::_fileOpenAndDeserialize(const String& filename,
   std::ifstream is;
   if (SerializeNeutralFile::fileOpenRead(*this, filename, is, verbose))
   {
-    if (_deserializeAscii(is, verbose)) return true;
+    return _deserializeAscii(is, verbose);
   }
 
   if (verbose)

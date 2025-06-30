@@ -5,15 +5,15 @@
 int test_NF(const DbGrid& db)
 {
   Timer tm;
-  db.dumpToNF("dbgrid.nf");
-  auto db2 = std::unique_ptr<DbGrid>(DbGrid::createFromNF("dbgrid.nf"));
+  db.dumpToNF("dbgrid.ascii", EFormatNF::ASCII);
+  auto db2 = std::unique_ptr<DbGrid>(DbGrid::createFromNF("dbgrid.ascii"));
   if (db2 != nullptr)
   {
-    db2->dumpToNF("dbgrid2.nf");
+    db2->dumpToNF("dbgrid2.ascii", EFormatNF::ASCII);
   }
   else
   {
-    messerr("Cannot Deserialize `dbgrid.nf'");
+    messerr("Cannot Deserialize `dbgrid.ascii'");
     return 1;
   }
   tm.displayIntervalMilliseconds("Serialize + Deserialize + Serialize Neutral File",

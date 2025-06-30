@@ -131,7 +131,7 @@ bool FracFamily::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 #ifdef HDF5
 bool FracFamily::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  auto famG = SerializeHDF5::getGroup(grp, "FracFamily");
+  auto famG = SerializeHDF5::getGroup(grp, "Families");
   if (!famG)
   {
     return false;

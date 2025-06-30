@@ -54,10 +54,10 @@ int main(int argc, char *argv[])
   dbline->display();
 
   // Dump into a Neutral File
-  dbline->dumpToNF("Line.ascii");
+  dbline->dumpToNF("Line.NF");
 
   // Read from the Neutral File and print contents again
-  DbLine* dbline2 = DbLine::createFromNF("Line.ascii");
+  DbLine* dbline2 = DbLine::createFromNF("Line.NF");
   mestitle(1, "DbLine after Serialization / Deserialization");
   dbline2->display();
     

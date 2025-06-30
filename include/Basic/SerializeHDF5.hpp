@@ -347,11 +347,8 @@ bool SerializeHDF5::readVec(const H5::Group& grp, const String& title, VectorStr
 template<typename T>
 bool SerializeHDF5::writeVec(H5::Group& grp, const String& title, const VectorT<T>& vec)
 {
-  if (vec.empty())
-  {
-    messerr("Cannot write empty vector");
-    return false;
-  }
+  // Allow processing empty string: nothing is done
+  if (vec.empty()) return true;
 
   hsize_t dim = vec.size();
   H5::DataSpace ds {1, &dim};
@@ -366,11 +363,8 @@ bool SerializeHDF5::writeVec(H5::Group& grp,
                              const String& title,
                              const VectorString& vec)
 {
-  if (vec.empty())
-  {
-    messerr("Cannot write empty vector");
-    return false;
-  }
+  // Allow processing empty vector: nothing is done
+  if (vec.empty()) return true;
 
   // generate a vector of char * to feed HDF5
   std::vector<const char*> data_ptr(vec.size());

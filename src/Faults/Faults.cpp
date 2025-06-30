@@ -163,10 +163,7 @@ bool Faults::isSplitByFault(double xt1,double yt1, double xt2, double yt2) const
 bool Faults::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
   auto faultG = SerializeHDF5::getGroup(grp, "Faults");
-  if (!faultG)
-  {
-    return false;
-  }
+  if (!faultG) return false;
 
   /* Read the grid characteristics */
   bool ret = true;
@@ -174,10 +171,12 @@ bool Faults::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   ret = ret && SerializeHDF5::readValue(*faultG, "NFaults", nfaults);
 
+  auto faultsG = SerializeHDF5::getGroup(*faultG, "Lines");
+  if (!faultsG) return false;
   for (int i = 0; ret && i < nfaults; i++)
   {
     String locName = "Line" + std::to_string(i);
-    auto lineG      = SerializeHDF5::getGroup(grp, locName);
+    auto lineG      = SerializeHDF5::getGroup(*faultsG, locName);
     if (!lineG) return false;
 
     PolyLine2D fault;
@@ -192,14 +191,16 @@ bool Faults::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   auto faultG = grp.createGroup("Faults");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(faultG, "NFaults", getNFaults());
 
-  for (int i = 0; ret && i < getNFaults(); i++)
+  ret = ret && SerializeHDF5::writeValue(faultG, "NFaults", getNFaults());
+
+  auto faultsG = faultG.createGroup("Lines");
+  for (int ifault = 0, nfaults = getNFaults(); ret && ifault < nfaults; ifault++)
   {
-    String locName          = "Line" + std::to_string(i);
-    auto lineG               = grp.createGroup(locName);
+    String locName = "Line" + std::to_string(ifault);
+    auto lineG     = faultsG.createGroup(locName);
 
-    ret = ret && _faults[i]._serializeH5(lineG, verbose);
+    ret = ret && _faults[ifault]._serializeH5(lineG, verbose);
   }
 
   return ret;
