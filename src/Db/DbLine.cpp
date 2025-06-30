@@ -405,20 +405,10 @@ bool DbLine::_serializeAscii(std::ostream& os, bool verbose) const
  */
 DbLine* DbLine::createFromNF(const String& NFFilename, bool verbose)
 {
-  DbLine* dbLine = nullptr;
-  std::ifstream is;
-  dbLine = new DbLine;
-  bool success = false;
-  if (dbLine->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = dbLine->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbLine;
-    dbLine = nullptr;
-  }
-  return dbLine;
+  DbLine* dbline = new DbLine;
+  if (dbline->_fileOpenAndDeserialize(NFFilename, verbose)) return dbline;
+  delete dbline;
+  return nullptr;
 }
 
 /**

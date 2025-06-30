@@ -376,20 +376,10 @@ void MeshETurbo::_buildMaskInMeshing(const VectorDouble& sel)
  */
 MeshETurbo* MeshETurbo::createFromNF(const String& NFFilename, bool verbose)
 {
-  MeshETurbo* mesh = nullptr;
-  std::ifstream is;
-  mesh = new MeshETurbo;
-  bool success = false;
-  if (mesh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  mesh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete mesh;
-    mesh = nullptr;
-  }
-  return mesh;
+  MeshETurbo* mesh = new MeshETurbo;
+  if (mesh->_fileOpenAndDeserialize(NFFilename, verbose)) return mesh;
+  delete mesh;
+  return nullptr;
 }
 
 MeshETurbo* MeshETurbo::create(const VectorInt& nx,

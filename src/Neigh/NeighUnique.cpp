@@ -77,18 +77,9 @@ NeighUnique* NeighUnique::create(bool flag_xvalid, const ASpaceSharedPtr& space)
 NeighUnique* NeighUnique::createFromNF(const String& NFFilename, bool verbose)
 {
   auto* neigh = new NeighUnique;
-  std::ifstream is;
-  bool success = false;
-  if (neigh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  neigh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 #ifdef HDF5

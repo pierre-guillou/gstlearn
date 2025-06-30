@@ -148,18 +148,9 @@ bool DbMeshTurbo::_serializeAscii(std::ostream& os, bool verbose) const
 DbMeshTurbo* DbMeshTurbo::createFromNF(const String& NFFilename, bool verbose)
 {
   DbMeshTurbo* dbmesh = new DbMeshTurbo;
-  std::ifstream is;
-  bool success = false;
-  if (dbmesh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = dbmesh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbmesh;
-    dbmesh = nullptr;
-  }
-  return dbmesh;
+  if (dbmesh->_fileOpenAndDeserialize(NFFilename, verbose)) return dbmesh;
+  delete dbmesh;
+  return nullptr;
 }
 
 /**

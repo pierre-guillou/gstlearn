@@ -268,18 +268,9 @@ bool DbGraphO::_serializeAscii(std::ostream& os, bool verbose) const
 DbGraphO* DbGraphO::createFromNF(const String& NFFilename, bool verbose)
 {
   DbGraphO* dbgraphO = new DbGraphO;
-  std::ifstream is;
-  bool success = false;
-  if (dbgraphO->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = dbgraphO->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbgraphO;
-    dbgraphO = nullptr;
-  }
-  return dbgraphO;
+  if (dbgraphO->_fileOpenAndDeserialize(NFFilename, verbose)) return dbgraphO;
+  delete dbgraphO;
+  return nullptr;
 }
 
 /**

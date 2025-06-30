@@ -97,20 +97,9 @@ String AnamEmpirical::toString(const AStringFormat* /*strfmt*/) const
 
 AnamEmpirical* AnamEmpirical::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamEmpirical* anam = nullptr;
-  std::ifstream is;
-  anam = new AnamEmpirical();
-  bool success = false;
-  if (anam->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  anam->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete anam;
-    anam = nullptr;
-  }
-  return anam;
+  AnamEmpirical* anam = new AnamEmpirical();
+  if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
+  return nullptr;
 }
 
 void AnamEmpirical::reset(int ndisc,

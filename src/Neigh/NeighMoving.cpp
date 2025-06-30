@@ -262,20 +262,10 @@ NeighMoving* NeighMoving::create(bool flag_xvalid,
  */
 NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighMoving* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighMoving();
-  bool success = false;
-  if (neigh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  neigh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighMoving* neigh = new NeighMoving();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 #ifdef HDF5

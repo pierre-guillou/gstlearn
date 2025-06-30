@@ -102,20 +102,10 @@ NeighImage* NeighImage::create(const VectorInt& radius, int skip, const ASpaceSh
  */
 NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighImage* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighImage();
-  bool success = false;
-  if (neigh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  neigh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighImage* neigh = new NeighImage();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 /**

@@ -88,20 +88,10 @@ bool Faults::_deserializeAscii(std::istream& is, bool verbose)
 
 Faults* Faults::createFromNF(const String& NFFilename, bool verbose)
 {
-  Faults* faults = nullptr;
-  std::ifstream is;
-  faults = new Faults();
-  bool success = false;
-  if (faults->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  faults->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete faults;
-    faults = nullptr;
-  }
-  return faults;
+  Faults* faults = new Faults();
+  if (faults->_fileOpenAndDeserialize(NFFilename, verbose)) return faults;
+  delete faults;
+  return nullptr;
 }
 
 void Faults::addFault(const PolyLine2D& fault)

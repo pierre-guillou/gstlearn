@@ -90,20 +90,10 @@ String PolyLine2D::toString(const AStringFormat* strfmt) const
 
 PolyLine2D* PolyLine2D::createFromNF(const String& NFFilename, bool verbose)
 {
-  PolyLine2D* line2D = nullptr;
-  std::ifstream is;
-  line2D = new PolyLine2D();
-  bool success = false;
-  if (line2D->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  line2D->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete line2D;
-    line2D = nullptr;
-  }
-  return line2D;
+  PolyLine2D* line2D = new PolyLine2D();
+  if (line2D->_fileOpenAndDeserialize(NFFilename, verbose)) return line2D;
+  delete line2D;
+  return nullptr;
 }
 
 #ifdef HDF5

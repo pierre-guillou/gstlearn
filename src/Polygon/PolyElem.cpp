@@ -138,21 +138,10 @@ PolyElem* PolyElem::create()
 
 PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
 {
-  PolyElem* polyelem = nullptr;
-  std::ifstream is;
-  polyelem = new PolyElem();
-  bool success = false;
-  if (polyelem->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = polyelem->_deserializeAscii(is, verbose);
-  }
-
-  if (! success)
-  {
-    delete polyelem;
-    polyelem = nullptr;
-  }
-  return polyelem;
+  PolyElem* polyelem = new PolyElem();
+  if (polyelem->_fileOpenAndDeserialize(NFFilename, verbose)) return polyelem;
+  delete polyelem;
+  return nullptr;
 }
 
 #ifdef HDF5

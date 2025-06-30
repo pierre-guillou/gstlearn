@@ -110,20 +110,10 @@ NeighCell* NeighCell::create(bool flag_xvalid,
  */
 NeighCell* NeighCell::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighCell* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighCell();
-  bool success = false;
-  if (neigh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  neigh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighCell* neigh = new NeighCell();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 bool NeighCell::hasChanged(int iech_out) const

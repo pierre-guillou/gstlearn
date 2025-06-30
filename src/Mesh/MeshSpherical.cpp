@@ -109,20 +109,10 @@ String MeshSpherical::toString(const AStringFormat* strfmt) const
  */
 MeshSpherical* MeshSpherical::createFromNF(const String& NFFilename, bool verbose)
 {
-  MeshSpherical* mesh = nullptr;
-  std::ifstream is;
-  mesh = new MeshSpherical;
-  bool success = false;
-  if (mesh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  mesh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete mesh;
-    mesh = nullptr;
-  }
-  return mesh;
+  MeshSpherical* mesh = new MeshSpherical;
+  if (mesh->_fileOpenAndDeserialize(NFFilename, verbose)) return mesh;
+  delete mesh;
+  return nullptr;
 }
 
 MeshSpherical* MeshSpherical::create(const MatrixDense &apices,

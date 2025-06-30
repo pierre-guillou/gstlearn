@@ -380,23 +380,13 @@ Polygons* Polygons::create()
  * @return
  */  VectorDouble _emptyVec; // dummy
  PolyElem     _emptyElem; // dummy
-Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
-{
-  Polygons* polygons = nullptr;
-  std::ifstream is;
-  polygons = new Polygons();
-  bool success = false;
-  if (polygons->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = polygons->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete polygons;
-    polygons = nullptr;
-  }
-  return polygons;
-}
+ Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
+ {
+   Polygons* polygons = new Polygons();
+   if (polygons->_fileOpenAndDeserialize(NFFilename, verbose)) return polygons;
+   delete polygons;
+   return nullptr;
+ }
 
 #ifdef HDF5
 Polygons* Polygons::createFromH5(const String& H5Filename, bool verbose)

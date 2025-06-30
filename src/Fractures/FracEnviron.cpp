@@ -76,20 +76,10 @@ FracEnviron::~FracEnviron()
  */
 FracEnviron* FracEnviron::createFromNF(const String& NFFilename, bool verbose)
 {
-  FracEnviron* envir = nullptr;
-  std::ifstream is;
-  envir = new FracEnviron();
-  bool success = false;
-  if (envir->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  envir->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete envir;
-    envir = nullptr;
-  }
-  return envir;
+  FracEnviron* envir = new FracEnviron();
+  if (envir->_fileOpenAndDeserialize(NFFilename, verbose)) return envir;
+  delete envir;
+  return nullptr;
 }
 
 FracEnviron* FracEnviron::create(double xmax,

@@ -72,9 +72,10 @@ protected:
   bool _fileOpenRead(const String& filename,
                      std::ifstream& is,
                      bool verbose = false) const;
+  bool _fileOpenAndDeserialize(const String& filename, bool verbose);
 
   static bool _commentWrite(std::ostream& os,
-                             const String& comment);
+                            const String& comment);
   template <typename T>
   static bool _recordWrite(std::ostream& os,
                             const String& title,

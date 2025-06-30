@@ -89,20 +89,10 @@ Table* Table::createFromNames(const VectorString &rownames,
 
 Table* Table::createFromNF(const String& NFFilename, bool verbose)
 {
-  Table* table = nullptr;
-  std::ifstream is;
-  table = new Table();
-  bool success = false;
-  if (table->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  table->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete table;
-    table = nullptr;
-  }
-  return table;
+  Table* table = new Table();
+  if (table->_fileOpenAndDeserialize(NFFilename, verbose)) return table;
+  delete table;
+  return nullptr;
 }
 
 #ifdef HDF5

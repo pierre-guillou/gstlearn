@@ -108,6 +108,17 @@ bool ASerializable::dumpToNF(const String& NFFilename,
   return false;
 }
 
+bool ASerializable::_fileOpenAndDeserialize(const String& filename,
+                                            bool verbose)
+{
+  std::ifstream is;
+  if (SerializeNeutralFile::fileOpenRead(*this, filename, is, verbose))
+  {
+    if (_deserializeAscii(is, verbose)) return true;
+  }
+  return false;
+}
+
 bool ASerializable::_fileOpenWrite(const String& filename,
                                    std::ofstream& os,
                                    bool verbose) const

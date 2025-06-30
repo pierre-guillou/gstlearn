@@ -829,18 +829,9 @@ int DbGrid::gridDefine(const VectorInt& nx,
 DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
 {
   auto* dbgrid = new DbGrid;
-  std::ifstream is;
-  bool success = false;
-  if (dbgrid->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = dbgrid->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbgrid;
-    dbgrid = nullptr;
-  }
-  return dbgrid;
+  if (dbgrid->_fileOpenAndDeserialize(NFFilename, verbose)) return dbgrid;
+  delete dbgrid;
+  return nullptr;
 }
 
 #ifdef HDF5

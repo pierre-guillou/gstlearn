@@ -231,23 +231,12 @@ Model* Model::createFromDb(const Db* db)
   return model;
 }
 
-Model* Model::createFromNF(const String &NFFilename, bool verbose)
+Model* Model::createFromNF(const String& NFFilename, bool verbose)
 {
-  Model* model = nullptr;
-  std::ifstream is;
-  model = new Model();
-  bool success = false;
-  if (model->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = model->_deserializeAscii(is, verbose);
-  }
-
-  if (! success)
-  {
-    delete model;
-    model = nullptr;
-  }
-  return model;
+  Model* model = new Model();
+  if (model->_fileOpenAndDeserialize(NFFilename, verbose)) return model;
+  delete model;
+  return nullptr;
 }
 
 #ifdef HDF5

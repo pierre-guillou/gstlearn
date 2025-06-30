@@ -158,20 +158,11 @@ Vario* Vario::create(const VarioParam& varioparam)
 
 Vario* Vario::createFromNF(const String& NFFilename, bool verbose)
 {
-  std::ifstream is;
   VarioParam varioparam = VarioParam();
-  Vario* vario = new Vario(varioparam);
-  bool success = false;
-  if (vario->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  vario->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete vario;
-    vario = nullptr;
-  }
-  return vario;
+  Vario* vario          = new Vario(varioparam);
+  if (vario->_fileOpenAndDeserialize(NFFilename, verbose)) return vario;
+  delete vario;
+  return nullptr;
 }
 
 #ifdef HDF5

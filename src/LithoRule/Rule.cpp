@@ -1041,21 +1041,10 @@ Rule* Rule::create(double rho)
 
 Rule* Rule::createFromNF(const String& NFFilename, bool verbose)
 {
-  Rule* rule = nullptr;
-  std::ifstream is;
-  rule = new Rule;
-  bool success = false;
-  if (rule->_fileOpenRead(NFFilename, is, verbose))
-  {
-    rule->setModeRule(ERule::STD);
-    success = rule->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete rule;
-    rule = nullptr;
-  }
-  return rule;
+  Rule* rule = new Rule;
+  if (rule->_fileOpenAndDeserialize(NFFilename, verbose)) return rule;
+  delete rule;
+  return nullptr;
 }
 
 #ifdef HDF5

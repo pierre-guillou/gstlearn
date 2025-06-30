@@ -119,20 +119,10 @@ NeighBench* NeighBench::create(bool flag_xvalid,
  */
 NeighBench* NeighBench::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighBench* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighBench();
-  bool success = false;
-  if (neigh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  neigh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighBench* neigh = new NeighBench();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 /**

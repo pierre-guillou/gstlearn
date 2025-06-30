@@ -83,20 +83,10 @@ String AnamHermite::toString(const AStringFormat* strfmt) const
 
 AnamHermite* AnamHermite::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamHermite* anam = nullptr;
-  std::ifstream is;
-  anam = new AnamHermite();
-  bool success = false;
-  if (anam->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success = anam->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete anam;
-    anam = nullptr;
-  }
-  return anam;
+  AnamHermite* anam = new AnamHermite();
+  if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
+  delete anam;
+  return nullptr;
 }
 
 AnamHermite* AnamHermite::create(int nbpoly, bool flagBound, double rCoef)

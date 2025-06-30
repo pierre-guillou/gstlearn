@@ -263,20 +263,10 @@ String MeshEStandard::toString(const AStringFormat* strfmt) const
  */
 MeshEStandard* MeshEStandard::createFromNF(const String& NFFilename, bool verbose)
 {
-  MeshEStandard* mesh = nullptr;
-  std::ifstream is;
-  mesh = new MeshEStandard;
-  bool success = false;
-  if (mesh->_fileOpenRead(NFFilename, is, verbose))
-  {
-    success =  mesh->_deserializeAscii(is, verbose);
-  }
-  if (! success)
-  {
-    delete mesh;
-    mesh = nullptr;
-  }
-  return mesh;
+  MeshEStandard* mesh = new MeshEStandard;
+  if (mesh->_fileOpenAndDeserialize(NFFilename, verbose)) return mesh;
+  delete mesh;
+  return nullptr;
 }
 
 MeshEStandard* MeshEStandard::createFromExternal(const MatrixDense &apices,

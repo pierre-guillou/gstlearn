@@ -4713,21 +4713,9 @@ int Db::getSimRank(int isimu, int ivar, int icase, int nbsimu, int nvar)
 Db* Db::createFromNF(const String& NFFilename, bool verbose)
 {
   auto* db = new Db;
-  std::ifstream is;
-  if (db->_fileOpenRead(NFFilename, is, verbose))
-  {
-    if (!db->_deserializeAscii(is, verbose))
-    {
-      delete db;
-      db = nullptr;
-    }
-  }
-  else
-  {
-    delete db;
-    db = nullptr;
-  }
-  return db;
+  if (db->_fileOpenAndDeserialize(NFFilename, verbose)) return db;
+  delete db;
+  return nullptr;
 }
 
 #ifdef HDF5
