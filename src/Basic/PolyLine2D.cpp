@@ -96,22 +96,6 @@ PolyLine2D* PolyLine2D::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-PolyLine2D* PolyLine2D::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* polyline2D = new PolyLine2D;
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = polyline2D->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete polyline2D;
-    polyline2D = nullptr;
-  }
-  return polyline2D;
-}
-#endif
-
 /**
  * Serialization (by Point rather than by Coordinate)
  * This is maintained for all classes using this interface for serialization

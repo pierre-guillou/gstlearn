@@ -165,23 +165,6 @@ Vario* Vario::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-Vario* Vario::createFromH5(const String& H5Filename, bool verbose)
-{
-  VarioParam varioparam = VarioParam();
-  auto* vario = new Vario(varioparam);
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = vario->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete vario;
-    vario = nullptr;
-  }
-  return vario;
-}
-#endif
-
 Vario* Vario::computeFromDb(const VarioParam& varioparam,
                             Db* db,
                             const ECalcVario& calcul,

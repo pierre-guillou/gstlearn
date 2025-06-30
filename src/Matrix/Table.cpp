@@ -95,22 +95,6 @@ Table* Table::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-Table* Table::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* table = new Table;
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = table->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete table;
-    table = nullptr;
-  }
-  return table;
-}
-#endif
-
 Table* Table::createFromTable(const Table& table)
 {
   return new Table(table);

@@ -120,9 +120,6 @@ public:
                                         bool flagRange               = true);
   static Model* createFromDb(const Db* db);
   static Model* createFromNF(const String& NFFilename, bool verbose = true);
-#ifdef HDF5
-  static Model* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
   static Model* createFromVario(Vario* vario,
                                 const VectorECov& types        = ECov::fromKeys({"SPHERICAL"}),
                                 const Constraints& constraints = Constraints(),

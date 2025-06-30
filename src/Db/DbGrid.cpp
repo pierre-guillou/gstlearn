@@ -834,22 +834,6 @@ DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-DbGrid* DbGrid::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* dbgrid = new DbGrid;
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = dbgrid->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete dbgrid;
-    dbgrid = nullptr;
-  }
-  return dbgrid;
-}
-#endif
-
 VectorDouble DbGrid::getColumnSubGrid(const String& name,
                                      int idim0,
                                      int rank,

@@ -43,9 +43,6 @@ public:
   static Table* createFromNames(const VectorString &rownames,
                                 const VectorString &colnames);
   static Table* createFromNF(const String& NFFilename, bool verbose = true);
-#ifdef HDF5
-  static Table* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
   static Table* createFromTable(const Table& table);
 
   VectorDouble getRange(int icol) const;

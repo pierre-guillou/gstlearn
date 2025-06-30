@@ -144,22 +144,6 @@ PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-PolyElem* PolyElem::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* polyelem = new PolyElem;
-  auto file      = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = polyelem->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete polyelem;
-    polyelem = nullptr;
-  }
-  return polyelem;
-} 
-#endif
-
 bool PolyElem::_isClosed() const
 {
   int nvert = getNPoints();

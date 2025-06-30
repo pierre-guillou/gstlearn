@@ -388,22 +388,6 @@ Polygons* Polygons::create()
    return nullptr;
  }
 
-#ifdef HDF5
-Polygons* Polygons::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* polygons = new Polygons;
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = polygons->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete polygons;
-    polygons = nullptr;
-  }
-  return polygons;
-}
-#endif
-
 Polygons* Polygons::createFromCSV(const String& filename,
                                   const CSVformat& csv,
                                   int verbose,

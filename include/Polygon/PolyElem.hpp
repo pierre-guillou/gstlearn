@@ -30,9 +30,6 @@ public:
 
   static PolyElem* create();
   static PolyElem* createFromNF(const String& NFFilename, bool verbose = true);
-#ifdef HDF5
-  static PolyElem* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
   const VectorDouble& getX() const { return PolyLine2D::getX(); }
   const VectorDouble& getY() const { return PolyLine2D::getY(); }
   double getX(int i) const { return PolyLine2D::getX(i); }

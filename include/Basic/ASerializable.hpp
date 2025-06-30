@@ -46,7 +46,7 @@ public:
   static void setPrefixName(const String& prefixName);
   static void unsetPrefixName();
   static const String& getPrefixName();
-  static void defineDefaultFormatNF(const EFormatNF& format);
+  static void setDefaultFormatNF(const EFormatNF& format);
 
   virtual String _getNFName() const = 0;
 

@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       db2 = Db::createFromNF("Neutral.Db.ascii", verbose);
     else
-      db2 = Db::createFromH5("Neutral.Db.h5", verbose);
+      db2 = Db::createFromNF("Neutral.Db.h5", verbose);
     db2->display();
 
     delete db1;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       dbg2 = DbGrid::createFromNF("Neutral.Dbg.ascii", verbose);
     else
-      dbg2 = DbGrid::createFromH5("Neutral.Dbg.h5", verbose);
+      dbg2 = DbGrid::createFromNF("Neutral.Dbg.h5", verbose);
     dbg2->display();
 
     delete dbg1;
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       poly2 = Polygons::createFromNF("Neutral.Polygon.ascii", verbose);
     else
-      poly2 = Polygons::createFromH5("Neutral.Polygon.h5", verbose);
+      poly2 = Polygons::createFromNF("Neutral.Polygon.h5", verbose);
     poly2->display();
 
     delete polyb;
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       vario2 = Vario::createFromNF("Neutral.Vario.ascii", verbose);
     else
-      vario2 = Vario::createFromH5("Neutral.Vario.h5", verbose);
+      vario2 = Vario::createFromNF("Neutral.Vario.h5", verbose);
     vario2->display();
 
     delete vario2;
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       model2 = Model::createFromNF("Neutral.Model.ascii", verbose);
     else
-      model2 = Model::createFromH5("Neutral.Model.h5", verbose);
+      model2 = Model::createFromNF("Neutral.Model.h5", verbose);
     model2->display();
 
     delete model1;
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       table2 = Table::createFromNF("Neutral.Table.ascii", verbose);
     else
-      table2 = Table::createFromH5("Neutral.Table.h5", verbose);
+      table2 = Table::createFromNF("Neutral.Table.h5", verbose);
     table2->display();
 
     delete table1;
@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       rule2 = Rule::createFromNF("Neutral.Rule.ascii", verbose);
     else
-      rule2 = Rule::createFromH5("Neutral.Rule.h5", verbose);
+      rule2 = Rule::createFromNF("Neutral.Rule.h5", verbose);
     rule2->display();
 
     delete rule1;
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       polyline2 = PolyLine2D::createFromNF("Neutral.Polyline.ascii", verbose);
     else
-      polyline2 = PolyLine2D::createFromH5("Neutral.Polyline.h5", verbose);
+      polyline2 = PolyLine2D::createFromNF("Neutral.Polyline.h5", verbose);
     polyline2->display(&afmt);
 
     delete polyline1;
@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       neigh2 = NeighMoving::createFromNF("Neutral.NeighMoving.ascii", verbose);
     else
-      neigh2 = NeighMoving::createFromH5("Neutral.NeighMoving.h5", verbose);
+      neigh2 = NeighMoving::createFromNF("Neutral.NeighMoving.h5", verbose);
     neigh2->display();
 
     delete neigh1;
@@ -354,7 +354,7 @@ int main(int argc, char *argv[])
     if (flagNeutral)
       neigh2 = NeighUnique::createFromNF("Neutral.NeighUnique.ascii", verbose);
     else
-      neigh2 = NeighUnique::createFromH5("Neutral.NeighUnique.h5", verbose);
+      neigh2 = NeighUnique::createFromNF("Neutral.NeighUnique.h5", verbose);
     neigh2->display();
 
     delete neigh1;

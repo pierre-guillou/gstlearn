@@ -51,9 +51,6 @@ public:
 
   static NeighUnique* create(bool flag_xvalid = false, const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighUnique* createFromNF(const String& NFFilename, bool verbose = true);
-#ifdef HDF5
-  static NeighUnique* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
 
 protected:
   virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;

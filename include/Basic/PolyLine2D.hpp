@@ -40,9 +40,6 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static PolyLine2D* createFromNF(const String &NFFilename, bool verbose = true);
-#ifdef HDF5
-  static PolyLine2D* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
   static PolyLine2D* create(const VectorDouble& x = VectorDouble(),
                             const VectorDouble& y = VectorDouble());
 

@@ -45,9 +45,6 @@ public:
 
   static Polygons* create();
   static Polygons* createFromNF(const String& NFFilename, bool verbose = false);
-#ifdef HDF5
-  static Polygons* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
  static Polygons* createFromCSV(const String& filename,
                                  const CSVformat& csv = CSVformat(),
                                  int verbose = false,

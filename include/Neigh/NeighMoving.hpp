@@ -87,9 +87,6 @@ public:
                              int leaf_size = 10,
                              const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighMoving* createFromNF(const String& NFFilename, bool verbose = true);
-#ifdef HDF5
-  static NeighMoving* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
 
   void addBiTargetCheck(ABiTargetCheck* abpc);
 

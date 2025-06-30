@@ -4718,22 +4718,6 @@ Db* Db::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-Db* Db::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* db  = new Db;
-  auto file = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = db->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete db;
-    db = nullptr;
-  }
-  return db;
-}
-#endif
-
 bool Db::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   int ncol              = getNColumn();

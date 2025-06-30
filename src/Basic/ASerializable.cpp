@@ -43,7 +43,7 @@ ASerializable::ASerializable(ASerializable&&) noexcept            = default;
 ASerializable& ASerializable::operator=(ASerializable&&) noexcept = default;
 ASerializable::~ASerializable()                                   = default;
 
-void ASerializable::defineDefaultFormatNF(const EFormatNF& format)
+void ASerializable::setDefaultFormatNF(const EFormatNF& format)
 {
   _defaultFormatNF = format;
 }
@@ -61,7 +61,7 @@ void ASerializable::defineDefaultFormatNF(const EFormatNF& format)
  * the contents of the output file.
  * If the value DEFAULT is used, the package uses the Format currently defined
  * as the defaulted one. This default value can be updated using the method
- * ASerializable::defineDefaultFormatNF()
+ * ASerializable::DefaultFormatNF()
  */
 bool ASerializable::dumpToNF(const String& NFFilename,
                              const EFormatNF& format, 
@@ -111,11 +111,26 @@ bool ASerializable::dumpToNF(const String& NFFilename,
 bool ASerializable::_fileOpenAndDeserialize(const String& filename,
                                             bool verbose)
 {
+  // Try to open it according to HDF5 format
+#ifdef HDF5
+  String filepath = ASerializable::buildFileName(1, filename, true);
+  if (H5::H5File::isHdf5(filepath))
+  {
+    auto file = SerializeHDF5::fileOpenRead(filename);
+
+    if (_deserializeH5(file, verbose)) return true;
+  }
+#endif
+
+  // Try to open it according to ASCII format
   std::ifstream is;
   if (SerializeNeutralFile::fileOpenRead(*this, filename, is, verbose))
   {
     if (_deserializeAscii(is, verbose)) return true;
   }
+
+  if (verbose)
+    messerr("Opening the file %s failed", filename.c_str());
   return false;
 }
 

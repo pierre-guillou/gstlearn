@@ -268,22 +268,6 @@ NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-NeighMoving* NeighMoving::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* neigh = new NeighMoving;
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = neigh->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
-}
-#endif
-
 /**
  * Given a Db, returns the maximum number of samples per NeighMovingborhood
  * @param db Pointer to the target Db

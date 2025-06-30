@@ -41,9 +41,6 @@ public:
 
   static Rule* create(double rho = 0.);
   static Rule* createFromNF(const String& NFFilename, bool verbose = true);
-#ifdef HDF5
-  static Rule* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
   static Rule* createFromNames(const VectorString& nodnames, double rho = 0.);
   static Rule* createFromCodes(const VectorInt& nodes, double rho = 0.);
   static Rule* createFromNumericalCoding(const VectorInt& n_type,

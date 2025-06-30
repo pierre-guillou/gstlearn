@@ -27,7 +27,7 @@ int test_HDF5(const DbGrid& db)
   Timer tm;
 
   db.dumpToNF("dbgrid.h5", EFormatNF::H5);
-  auto db2 = std::unique_ptr<DbGrid>(DbGrid::createFromH5("dbgrid.h5"));
+  auto db2 = std::unique_ptr<DbGrid>(DbGrid::createFromNF("dbgrid.h5"));
   if (db2 != nullptr)
   {
     db2->dumpToNF("dbgrid2.h5", EFormatNF::H5);

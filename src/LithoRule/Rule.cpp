@@ -1047,22 +1047,6 @@ Rule* Rule::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-Rule* Rule::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* rule = new Rule;
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = rule->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete rule;
-    rule = nullptr;
-  }
-  return rule;
-}
-#endif
-
 Rule* Rule::createFromNames(const VectorString& nodnames,double rho)
 {
   Rule* rule = new Rule();

@@ -239,22 +239,6 @@ Model* Model::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-#ifdef HDF5
-Model* Model::createFromH5(const String& H5Filename, bool verbose)
-{
-  auto* model           = new Model();
-  auto file             = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = model->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete model;
-    model = nullptr;
-  }
-  return model;
-}
-#endif
-
 Model* Model::createFromVario(Vario* vario,
                               const VectorECov& types,
                               const Constraints& constraints,

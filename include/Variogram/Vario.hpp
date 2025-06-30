@@ -118,9 +118,6 @@ public:
 
   static Vario* create(const VarioParam& varioparam);
   static Vario* createFromNF(const String& NFFilename, bool verbose = true);
-#ifdef HDF5
-  static Vario* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
   static Vario* createRegularizeFromModel(const Model& model,
                                           const VarioParam& varioparam,
                                           const VectorDouble& ext,
