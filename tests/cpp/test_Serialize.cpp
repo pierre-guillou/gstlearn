@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setPrefixName("TS-");
+  ASerializable::setPrefixName("Neutral-");
 
   // Next flag indicates if the format is NF (true) or H5 (false)
   bool flagNeutral = false;
@@ -73,16 +73,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)db1->dumpToNF("Neutral.Db.ascii", EFormatNF::ASCII);
+      (void)db1->dumpToNF("Db.NF.ascii", EFormatNF::ASCII);
     else
-      (void)db1->dumpToNF("Neutral.Db.h5", EFormatNF::H5);
+      (void)db1->dumpToNF("Db.NF.h5", EFormatNF::H5);
 
     // Deserialize
     Db* db2 = nullptr;
     if (flagNeutral)
-      db2 = Db::createFromNF("Neutral.Db.ascii", verbose);
+      db2 = Db::createFromNF("Db.NF.ascii", verbose);
     else
-      db2 = Db::createFromNF("Neutral.Db.h5", verbose);
+      db2 = Db::createFromNF("Db.NF.h5", verbose);
     db2->display();
 
     delete db1;
@@ -100,16 +100,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)dbg1->dumpToNF("Neutral.Dbg.ascii", EFormatNF::ASCII);
+      (void)dbg1->dumpToNF("Dbg.NF.ascii", EFormatNF::ASCII);
     else
-      (void)dbg1->dumpToNF("Neutral.Dbg.h5", EFormatNF::H5);
+      (void)dbg1->dumpToNF("Dbg.NF.h5", EFormatNF::H5);
 
     // Deserialize
     Db* dbg2 = nullptr;
     if (flagNeutral)
-      dbg2 = DbGrid::createFromNF("Neutral.Dbg.ascii", verbose);
+      dbg2 = DbGrid::createFromNF("Dbg.NF.ascii", verbose);
     else
-      dbg2 = DbGrid::createFromNF("Neutral.Dbg.h5", verbose);
+      dbg2 = DbGrid::createFromNF("Dbg.NF.h5", verbose);
     dbg2->display();
 
     delete dbg1;
@@ -131,16 +131,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)poly1->dumpToNF("Neutral.Polygon.ascii", EFormatNF::ASCII);
+      (void)poly1->dumpToNF("Polygon.NF.ascii", EFormatNF::ASCII);
     else
-      (void)poly1->dumpToNF("Neutral.Polygon.h5", EFormatNF::H5);
+      (void)poly1->dumpToNF("Polygon.NF.h5", EFormatNF::H5);
 
     // Deserialize
     Polygons* poly2 = nullptr;
     if (flagNeutral)
-      poly2 = Polygons::createFromNF("Neutral.Polygon.ascii", verbose);
+      poly2 = Polygons::createFromNF("Polygon.NF.ascii", verbose);
     else
-      poly2 = Polygons::createFromNF("Neutral.Polygon.h5", verbose);
+      poly2 = Polygons::createFromNF("Polygon.NF.h5", verbose);
     poly2->display();
 
     delete polyb;
@@ -163,16 +163,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)vario1.dumpToNF("Neutral.Vario.ascii", EFormatNF::ASCII);
+      (void)vario1.dumpToNF("Vario.NF.ascii", EFormatNF::ASCII);
     else
-      (void)vario1.dumpToNF("Neutral.Vario.h5", EFormatNF::H5);
+      (void)vario1.dumpToNF("Vario.NF.h5", EFormatNF::H5);
 
     // Deserialize
     Vario* vario2 = nullptr;
     if (flagNeutral)
-      vario2 = Vario::createFromNF("Neutral.Vario.ascii", verbose);
+      vario2 = Vario::createFromNF("Vario.NF.ascii", verbose);
     else
-      vario2 = Vario::createFromNF("Neutral.Vario.h5", verbose);
+      vario2 = Vario::createFromNF("Vario.NF.h5", verbose);
     vario2->display();
 
     delete vario2;
@@ -189,16 +189,16 @@ int main(int argc, char *argv[])
 
     // Serialize model1
     if (flagNeutral)
-      (void)model1->dumpToNF("Neutral.Model.ascii", EFormatNF::ASCII);
+      (void)model1->dumpToNF("Model.NF.ascii", EFormatNF::ASCII);
     else
-      (void)model1->dumpToNF("Neutral.Model.h5", EFormatNF::H5);
+      (void)model1->dumpToNF("Model.NF.h5", EFormatNF::H5);
 
     // Deserialize model2
     Model* model2 = nullptr;
     if (flagNeutral)
-      model2 = Model::createFromNF("Neutral.Model.ascii", verbose);
+      model2 = Model::createFromNF("Model.NF.ascii", verbose);
     else
-      model2 = Model::createFromNF("Neutral.Model.h5", verbose);
+      model2 = Model::createFromNF("Model.NF.h5", verbose);
     model2->display();
 
     delete model1;
@@ -222,16 +222,16 @@ int main(int argc, char *argv[])
 
     // Serialize table
     if (flagNeutral)
-      (void)table1->dumpToNF("Neutral.Table.ascii", EFormatNF::ASCII);
+      (void)table1->dumpToNF("Table.NF.ascii", EFormatNF::ASCII);
     else
-      (void)table1->dumpToNF("Neutral.Table.h5", EFormatNF::H5);
+      (void)table1->dumpToNF("Table.NF.h5", EFormatNF::H5);
 
     // Deserialize table1
     Table* table2 = nullptr;
     if (flagNeutral)
-      table2 = Table::createFromNF("Neutral.Table.ascii", verbose);
+      table2 = Table::createFromNF("Table.NF.ascii", verbose);
     else
-      table2 = Table::createFromNF("Neutral.Table.h5", verbose);
+      table2 = Table::createFromNF("Table.NF.h5", verbose);
     table2->display();
 
     delete table1;
@@ -249,16 +249,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)rule1->dumpToNF("Neutral.Rule.ascii", EFormatNF::ASCII);
+      (void)rule1->dumpToNF("Rule.NF.ascii", EFormatNF::ASCII);
     else
-      (void)rule1->dumpToNF("Neutral.Rule.h5", EFormatNF::H5);
+      (void)rule1->dumpToNF("Rule.NF.h5", EFormatNF::H5);
 
     // Deserialize
     Rule* rule2 = nullptr;
     if (flagNeutral)
-      rule2 = Rule::createFromNF("Neutral.Rule.ascii", verbose);
+      rule2 = Rule::createFromNF("Rule.NF.ascii", verbose);
     else
-      rule2 = Rule::createFromNF("Neutral.Rule.h5", verbose);
+      rule2 = Rule::createFromNF("Rule.NF.h5", verbose);
     rule2->display();
 
     delete rule1;
@@ -280,16 +280,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)polyline1->dumpToNF("Neutral.Polyline.ascii", EFormatNF::ASCII);
+      (void)polyline1->dumpToNF("Polyline.NF.ascii", EFormatNF::ASCII);
     else
-      (void)polyline1->dumpToNF("Neutral.Polyline.h5", EFormatNF::H5);
+      (void)polyline1->dumpToNF("Polyline.NF.h5", EFormatNF::H5);
 
     // Deserialize
     PolyLine2D* polyline2 = nullptr;
     if (flagNeutral)
-      polyline2 = PolyLine2D::createFromNF("Neutral.Polyline.ascii", verbose);
+      polyline2 = PolyLine2D::createFromNF("Polyline.NF.ascii", verbose);
     else
-      polyline2 = PolyLine2D::createFromNF("Neutral.Polyline.h5", verbose);
+      polyline2 = PolyLine2D::createFromNF("Polyline.NF.h5", verbose);
     polyline2->display(&afmt);
 
     delete polyline1;
@@ -318,16 +318,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)neigh1->dumpToNF("Neutral.NeighMoving.ascii", EFormatNF::ASCII);
+      (void)neigh1->dumpToNF("NeighMoving.NF.ascii", EFormatNF::ASCII);
     else
-      (void)neigh1->dumpToNF("Neutral.NeighMoving.h5", EFormatNF::H5);
+      (void)neigh1->dumpToNF("NeighMoving.NF.h5", EFormatNF::H5);
 
     // Deserialize
     NeighMoving* neigh2 = nullptr;
     if (flagNeutral)
-      neigh2 = NeighMoving::createFromNF("Neutral.NeighMoving.ascii", verbose);
+      neigh2 = NeighMoving::createFromNF("NeighMoving.NF.ascii", verbose);
     else
-      neigh2 = NeighMoving::createFromNF("Neutral.NeighMoving.h5", verbose);
+      neigh2 = NeighMoving::createFromNF("NeighMoving.NF.h5", verbose);
     neigh2->display();
 
     delete neigh1;
@@ -345,16 +345,16 @@ int main(int argc, char *argv[])
 
     // Serialize
     if (flagNeutral)
-      (void)neigh1->dumpToNF("Neutral.NeighUnique.ascii", EFormatNF::ASCII);
+      (void)neigh1->dumpToNF("NeighUnique.NF.ascii", EFormatNF::ASCII);
     else
-      (void)neigh1->dumpToNF("Neutral.NeighUnique.h5", EFormatNF::H5);
+      (void)neigh1->dumpToNF("NeighUnique.NF.h5", EFormatNF::H5);
 
     // Deserialize
     NeighUnique* neigh2 = nullptr;
     if (flagNeutral)
-      neigh2 = NeighUnique::createFromNF("Neutral.NeighUnique.ascii", verbose);
+      neigh2 = NeighUnique::createFromNF("NeighUnique.NF.ascii", verbose);
     else
-      neigh2 = NeighUnique::createFromNF("Neutral.NeighUnique.h5", verbose);
+      neigh2 = NeighUnique::createFromNF("NeighUnique.NF.h5", verbose);
     neigh2->display();
 
     delete neigh1;

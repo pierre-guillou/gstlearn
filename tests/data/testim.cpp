@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Enum/EFormatNF.hpp"
 #include "geoslib_f.h"
 #include "geoslib_old_f.h"
 
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
     vario->compute(dbin, ECalcVario::VARIOGRAM);
     vario->display();
     ascii_filename("Vario",0,1,filename);
-    if (! vario->dumpToNF(filename,verbose))
+    if (! vario->dumpToNF(filename,EFormatNF::DEFAULT,verbose))
       messageAbort("ascii_vario_write");
   }
 
@@ -148,7 +149,7 @@ int main(int argc, char *argv[])
   {
     if (model_fitting_sills(vario,model,constraints)) goto label_end;
     ascii_filename("Model",0,1,filename);
-    if (! model->dumpToNF(filename,verbose))
+    if (! model->dumpToNF(filename,EFormatNF::DEFAULT,verbose))
       messageAbort("ascii_model_write");
   }
   new_model = st_modify(model,dbin);
@@ -196,7 +197,7 @@ int main(int argc, char *argv[])
         messageAbort("Simulations");
       dbfmt.setFlags(true, false, true, true, true);
       dbout->display(&dbfmt);
-      dbout->dumpToNF("Simu.out",verbose);
+      dbout->dumpToNF("Simu.out",EFormatNF::DEFAULT,verbose);
     }
     else
     {
@@ -218,7 +219,7 @@ int main(int argc, char *argv[])
                     1,1,0)) messageAbort("kriging");
         dbfmt.setFlags(true, false, true, true, true);
         dbout->display(&dbfmt);
-        dbout->dumpToNF("Krige.out",verbose);
+        dbout->dumpToNF("Krige.out",EFormatNF::DEFAULT,verbose);
       }
     }
   }

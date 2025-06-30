@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   DbStringFormat dbfmt;
   dbfmt.setFlags(true, true, true, true, true);
   dbgrid->display(&dbfmt);
-  (void) dbgrid->dumpToNF("pgs.ascii");
+  (void) dbgrid->dumpToNF("pgs.NF");
   
   delete dbgrid;
   delete model;

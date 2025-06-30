@@ -101,9 +101,8 @@ int main(int argc, char *argv[])
                                ndisc, verbose);
 
   grid->display(&dbfmt);
-  (void) grid->dumpToNF("Grid.ascii");
+  (void) grid->dumpToNF("Grid.NF");
 
-  // ====================== Free pointers ==================================
   delete grid;
 
   return (0);

@@ -549,7 +549,7 @@ double SpatialIndices::getMicroStructure(const String& name,
     g0 += value * value;
   }
   g0 *= maille;
-  grid->dumpToNF("coucou.ascii");
+  grid->dumpToNF("grid.NF");
   grid->display();
 
   // Prepare the variogram map calculation
@@ -559,7 +559,7 @@ double SpatialIndices::getMicroStructure(const String& name,
   message("nrow=%d ncol=%d dx=%lf dy=%lf maille=%lf\n", nrow, ncol, dx, dy, maille);
   DbGrid* vmap =
     db_vmap(grid, ECalcVario::E_COVARIOGRAM, {nlag, nlag}, {dx, dy});
-  vmap->dumpToNF("vmap.ascii");
+  vmap->dumpToNF("vmap.NF");
 
   // Calculate the Microstructure index
   int icenter = nrow * ncol / 2;
