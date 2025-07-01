@@ -2950,27 +2950,24 @@ int bayes_simulate(Model *model,
                    const VectorDouble& rcov,
                    VectorDouble& smean)
 {
-  double *trimat, *rndmat;
-  int nfeq, il, isimu, nftri, error, rank, memo;
+  int nfeq, il, isimu, nftri, rank, memo;
+  VectorDouble trimat;
+  VectorDouble rndmat;
 
   /* Initializations */
 
-  error = 1;
   nfeq = model->getNDriftEquation();
   nftri = nfeq * (nfeq + 1) / 2;
-  trimat = rndmat = nullptr;
   memo = law_get_random_seed();
 
   /* Core allocation */
 
-  trimat = (double*) mem_alloc(sizeof(double) * nftri, 0);
-  if (trimat == nullptr) goto label_end;
-  rndmat = (double*) mem_alloc(sizeof(double) * nfeq, 0);
-  if (rndmat == nullptr) goto label_end;
+  trimat.resize(nftri);
+  rndmat.resize(nfeq);
 
   /* Cholesky decomposition */
 
-  rank = matrix_cholesky_decompose(rcov.data(), trimat, nfeq);
+  rank = matrix_cholesky_decompose(rcov.data(), trimat.data(), nfeq);
   if (rank > 0)
   {
     messerr("Error in the Cholesky Decomposition of the covariance matrix");
@@ -2994,7 +2991,8 @@ int bayes_simulate(Model *model,
 
     /* Product of the Lower triangular matrix by the random vector */
 
-    matrix_cholesky_product(1, nfeq, 1, trimat, rndmat, &SMEAN(0, isimu));
+    matrix_cholesky_product(1, nfeq, 1, trimat.data(), rndmat.data(),
+                            &SMEAN(0, isimu));
 
     /* Add the mean */
 
@@ -3017,15 +3015,8 @@ int bayes_simulate(Model *model,
     }
   }
 
-  /* Set the returned error code */
-
-  error = 0;
-
-  label_end:
-  mem_free((char* ) trimat);
-  mem_free((char* ) rndmat);
   law_set_random_seed(memo);
-  return (error);
+  return 0;
 }
 
 /****************************************************************************/
@@ -4840,11 +4831,15 @@ int inhomogeneous_kriging(Db *dbdat,
 {
   int error, np, ip, ns, ng, nvar, neq, nred, nfeq, nbfl;
   double *covss, *distps, *distgs, *covpp, *covgp, *prodps, *prodgs;
-  double *data, *lambda, *driftp, *ymat, *zmat, *mu, *maux, *rhs;
+  double *driftp, *ymat, *zmat, *rhs;
   double estim, stdev, auxval;
   VectorInt nbgh_ranks;
   VectorDouble driftg;
   VectorDouble covgg;
+  VectorDouble lambda;
+  VectorDouble data;
+  VectorDouble mu;
+  VectorDouble maux;
 
   /* Preliminary checks */
 
@@ -4855,8 +4850,8 @@ int inhomogeneous_kriging(Db *dbdat,
   FLAG_STD = true;
   distps = distgs = prodgs = prodps = nullptr;
   covss = covpp = covgp = nullptr;
-  lambda = data = driftp = nullptr;
-  ymat = zmat = mu = maux = nullptr;
+  driftp = nullptr;
+  ymat = zmat = nullptr;
   if (st_check_environment(1, 1, model_dat)) goto label_end;
 
   /* Preliminary checks */
@@ -4892,10 +4887,8 @@ int inhomogeneous_kriging(Db *dbdat,
 
   /* Core allocation */
 
-  lambda = (double*) mem_alloc(sizeof(double) * np, 0);
-  if (lambda == nullptr) goto label_end;
-  data = (double*) mem_alloc(sizeof(double) * np, 0);
-  if (data == nullptr) goto label_end;
+  lambda.resize(np);
+  data.resize(np);
 
   /* Pre-calculations */
 
@@ -4950,10 +4943,8 @@ int inhomogeneous_kriging(Db *dbdat,
 
   if (nbfl > 0)
   {
-    mu = (double*) mem_alloc(sizeof(double) * nbfl, 0);
-    if (mu == nullptr) goto label_end;
-    maux = (double*) mem_alloc(sizeof(double) * nbfl, 0);
-    if (maux == nullptr) goto label_end;
+    mu.resize(nbfl);
+    maux.resize(nbfl);
 
     driftp = st_calcul_drfmat("Drift P", dbdat, 1, model_dat);
     if (driftp == nullptr) goto label_end;
@@ -5015,9 +5006,10 @@ int inhomogeneous_kriging(Db *dbdat,
 
     /* Calculate the Kriging weights */
 
-    matrix_product_safe(np, np, 1, covpp, rhs, lambda);
+    matrix_product_safe(np, np, 1, covpp, rhs, lambda.data());
     if (OptDbg::force())
-      krige_wgt_print(0, nvar, nvar, nfeq, nbgh_ranks, nred, -1, NULL, lambda);
+      krige_wgt_print(0, nvar, nvar, nfeq, nbgh_ranks, nred, -1, NULL,
+                      lambda.data());
 
     /* Update vector of weights in presence of drift */
 
@@ -5030,19 +5022,20 @@ int inhomogeneous_kriging(Db *dbdat,
 
       /* Update the kriging weights */
 
-      st_drift_update(np, nbfl, rhs, driftg.data(), ymat, zmat, maux, lambda, mu);
+      st_drift_update(np, nbfl, rhs, driftg.data(), ymat, zmat,
+                      maux.data(), lambda.data(), mu.data());
     }
 
     /* Perform the estimation */
 
-    matrix_product_safe(1, np, 1, data, lambda, &estim);
-    matrix_product_safe(1, np, 1, rhs, lambda, &stdev);
+    matrix_product_safe(1, np, 1, data.data(), lambda.data(), &estim);
+    matrix_product_safe(1, np, 1, rhs, lambda.data(), &stdev);
 
     /* Update the variance in presence of drift */
 
     if (nbfl > 0)
     {
-      matrix_product_safe(1, nbfl, 1, mu, maux, &auxval);
+      matrix_product_safe(1, nbfl, 1, mu.data(), maux.data(), &auxval);
       stdev += auxval;
     }
 
@@ -5078,10 +5071,6 @@ int inhomogeneous_kriging(Db *dbdat,
   mem_free((char* ) covgp);
   mem_free((char* ) ymat);
   mem_free((char* ) zmat);
-  mem_free((char* ) maux);
-  mem_free((char* ) mu);
-  mem_free((char* ) data);
-  mem_free((char* ) lambda);
   (void) st_model_manage(-1, model_dat);
   (void) st_krige_manage(-1, 1, model_dat, neighU);
   (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
