@@ -24,7 +24,6 @@
 #include "Neigh/ANeigh.hpp"
 #include "Matrix/MatrixFactory.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
-#include "Basic/Memory.hpp"
 
 #include <math.h>
 #include <string.h>
@@ -2900,13 +2899,13 @@ int potential_kriging(Db *dbiso,
   Pot_Ext pot_ext;
   VectorDouble zval;
   VectorDouble zdual;
+  VectorDouble potval;
   MatrixDense rhs;
   MatrixSymmetric lhs;
 
   // Initialization
 
   error = 1;
-  double* potval = nullptr;
   st_potenv_manage(&pot_env, flag_pot, flag_grad, flag_trans, opt_part, verbose);
   st_potext_manage(0, &pot_ext, 0, 0., NULL);
   st_potenv_define(&pot_env, &pot_ext, dbiso, dbgrd, dbtgt, dbout);
@@ -2946,8 +2945,7 @@ int potential_kriging(Db *dbiso,
   zval.resize(nequa);
   zdual.resize(nequa);
   rhs.resize(nequa, 4);
-  potval = (double*) mem_alloc(sizeof(double) * pot_env.nlayers, 0);
-  if (potval == nullptr) goto label_end;
+  potval.resize(pot_env.nlayers);
 
   // Establish the cokriging system
 
@@ -2985,12 +2983,12 @@ int potential_kriging(Db *dbiso,
   // Get the Potential value at the iso-potential samples
 
   st_evaluate_potval(&pot_env, &pot_ext, dbiso, dbgrd, dbtgt, dbout,
-                     model, refpot, -1, 0, zdual, rhs, potval);
+                     model, refpot, -1, 0, zdual, rhs, potval.data());
 
   // Perform the estimation
 
   st_estimate_result(&pot_env, &pot_ext, flag_grad, dbiso,
-                     dbgrd, dbtgt, dbout, model, refpot, zdual, rhs, potval);
+                     dbgrd, dbtgt, dbout, model, refpot, zdual, rhs, potval.data());
   if (flag_save_data)
   {
     st_estimate_data(&pot_env, &pot_ext, dbiso, dbgrd, dbtgt, dbout,
@@ -3011,7 +3009,6 @@ int potential_kriging(Db *dbiso,
   label_end:
   st_potext_manage(-1, &pot_ext, 0, 0., NULL);
   (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
-  mem_free((char* ) potval);
   return (error);
 }
 
@@ -3096,6 +3093,8 @@ int potential_simulate(Db *dbiso,
   VectorInt uid_tgt_pot, uid_tgt_grad;
   VectorDouble zval;
   VectorDouble zdual;
+  VectorDouble potsim;
+  VectorDouble potval;
   MatrixDense zvals;
   MatrixDense zduals;
   MatrixDense rhs;
@@ -3104,8 +3103,6 @@ int potential_simulate(Db *dbiso,
   // Initialization
 
   int error = 1;
-  double* potsim = nullptr;
-  double* potval = nullptr;
   st_potenv_manage(&pot_env, true, false, flag_trans, 0, verbose);
   st_potext_manage(0, &pot_ext, 0, 0., NULL);
   st_potenv_define(&pot_env, &pot_ext, dbiso, dbgrd, dbtgt, dbout);
@@ -3159,10 +3156,8 @@ int potential_simulate(Db *dbiso,
   zvals.resize(nequa, nbsimu);
   zduals.resize(nequa, nbsimu);
   rhs.resize(nequa, 4);
-  potsim = (double*) mem_alloc(sizeof(double) * nlayers * nbsimu, 0);
-  if (potsim == nullptr) goto label_end;
-  potval = (double*) mem_alloc(sizeof(double) * nlayers, 0);
-  if (potval == nullptr) goto label_end;
+  potsim.resize(nlayers * nbsimu);
+  potval.resize(nlayers);
   if (flag_tempere) zdual.resize(nequa);
 
   // Establish the cokriging system
@@ -3196,12 +3191,12 @@ int potential_simulate(Db *dbiso,
     // Get the Estimated Potential value at the iso-potential samples
 
     st_evaluate_potval(&pot_env, &pot_ext, dbiso, dbgrd, dbtgt, dbout, model,
-                       refpot, -1, 0, zdual, rhs, potval);
+                       refpot, -1, 0, zdual, rhs, potval.data());
 
     // Perform the estimation 
 
     st_estimate_result(&pot_env, &pot_ext, 0, dbiso, dbgrd, dbtgt, dbout, model,
-                       refpot, zdual, rhs, potval);
+                       refpot, zdual, rhs, potval.data());
 
     // Transform the Estimation variable into a distance to the isoline
     if (st_distance_to_isoline(dbout)) goto label_end;
@@ -3236,13 +3231,13 @@ int potential_simulate(Db *dbiso,
 
     st_evaluate_potval(&pot_env, &pot_ext, dbiso, dbgrd, dbtgt, dbout, model,
                        refpot, isimu, nbsimu, zdual_loc, rhs,
-                       &POTSIM(isimu, 0));
+                       &potsim[isimu * nlayers]);
   }
 
   // Perform the conditional simulations on the grid
 
   st_simcond(&pot_env, &pot_ext, dist_tempere, flag_trans, nbsimu, dbiso, dbgrd,
-             dbtgt, dbout, model, refpot, potsim, zdual, zduals, rhs);
+             dbtgt, dbout, model, refpot, potsim.data(), zdual, zduals, rhs);
 
   // Set the error return code
 
@@ -3251,8 +3246,6 @@ int potential_simulate(Db *dbiso,
   label_end: if (flag_tempere) dbout->deleteColumnsByLocator(ELoc::Z);
   st_potext_manage(-1, &pot_ext, 0, 0., NULL);
   (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
-  mem_free((char* ) potval);
-  mem_free((char* ) potsim);
   return (error);
 }
 

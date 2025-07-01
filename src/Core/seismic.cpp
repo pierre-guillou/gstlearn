@@ -50,10 +50,10 @@ typedef struct
   int nactive;
   int n_v1;
   int n_v2;
-  int *ix_ngh;
-  int *iz_ngh;
-  double *v1_ngh;
-  double *v2_ngh;
+  VectorInt ix_ngh;
+  VectorInt iz_ngh;
+  VectorDouble v1_ngh;
+  VectorDouble v2_ngh;
 } ST_Seismic_Neigh;
 
 /****************************************************************************/
@@ -1511,8 +1511,12 @@ static void st_seismic_convolve(int nx,
 int seismic_z2t_convert(DbGrid *db_z, int iatt_v, DbGrid *db_t)
 {
   DbGrid *db_v;
-  double *tz, *zt, *az, *at, z0, z1, t0, t1, dz, dt;
+  double  z0, z1, t0, t1, dz, dt;
   int nz, nt, ndim, natt, iatt_t, iatt_z, error;
+  VectorDouble zt;
+  VectorDouble tz;
+  VectorDouble az;
+  VectorDouble at;
 
   /* Initializations */
 
@@ -1529,7 +1533,6 @@ int seismic_z2t_convert(DbGrid *db_z, int iatt_v, DbGrid *db_t)
   dt = db_t->getDX(ndim - 1);
   t1 = t0 + (nt - 1) * dt;
   z1 = z0 + (nz - 1) * dz;
-  zt = tz = az = at = nullptr;
 
   /* Create the output variables */
 
@@ -1539,29 +1542,23 @@ int seismic_z2t_convert(DbGrid *db_z, int iatt_v, DbGrid *db_t)
 
   /* Core allocation */
 
-  zt = (double*) mem_alloc(nt * sizeof(double), 0);
-  if (zt == nullptr) goto label_end;
-  tz = (double*) mem_alloc(nz * sizeof(double), 0);
-  if (tz == nullptr) goto label_end;
-  az = (double*) mem_alloc(nz * sizeof(double), 0);
-  if (az == nullptr) goto label_end;
-  at = (double*) mem_alloc(nt * sizeof(double), 0);
-  if (at == nullptr) goto label_end;
+  zt.resize(nt);
+  tz.resize(nz);
+  az.resize(nz);
+  at.resize(nt);
 
   /* Perform the conversion from Depth to Time */
 
   st_seismic_z2t_convert(db_z, iatt_z, nz, z0, z1, dz, db_t, iatt_t, nt, t0, t1,
-                         dt, db_v, iatt_v, natt, tz, zt, at, az);
+                         dt, db_v, iatt_v, natt, 
+                         tz.data(), zt.data(), 
+                         at.data(), az.data());
 
   /* Set the error return code */
 
   error = 0;
 
   label_end:
-  mem_free((char* ) zt);
-  mem_free((char* ) tz);
-  mem_free((char* ) az);
-  mem_free((char* ) at);
   return (error);
 }
 
@@ -1583,8 +1580,12 @@ int seismic_z2t_convert(DbGrid *db_z, int iatt_v, DbGrid *db_t)
 int seismic_t2z_convert(DbGrid *db_t, int iatt_v, DbGrid *db_z)
 {
   DbGrid *db_v;
-  double *zt, *tz, *az, *at, z0, z1, t0, t1, dz, dt;
+  double  z0, z1, t0, t1, dz, dt;
   int nz, nt, ndim, natt, iatt_z, iatt_t, error;
+  VectorDouble zt;
+  VectorDouble tz;
+  VectorDouble az;
+  VectorDouble at;
 
   /* Initializations */
 
@@ -1601,7 +1602,6 @@ int seismic_t2z_convert(DbGrid *db_t, int iatt_v, DbGrid *db_z)
   dt = db_t->getDX(ndim - 1);
   t1 = t0 + (nt - 1) * dt;
   z1 = z0 + (nz - 1) * dz;
-  zt = tz = az = at = nullptr;
 
   /* Create the output variables */
 
@@ -1611,29 +1611,23 @@ int seismic_t2z_convert(DbGrid *db_t, int iatt_v, DbGrid *db_z)
 
   /* Core allocation */
 
-  zt = (double*) mem_alloc(nt * sizeof(double), 0);
-  if (zt == nullptr) goto label_end;
-  tz = (double*) mem_alloc(nz * sizeof(double), 0);
-  if (tz == nullptr) goto label_end;
-  az = (double*) mem_alloc(nz * sizeof(double), 0);
-  if (az == nullptr) goto label_end;
-  at = (double*) mem_alloc(nt * sizeof(double), 0);
-  if (at == nullptr) goto label_end;
+  zt.resize(nt);
+  tz.resize(nz);
+  az.resize(nz);
+  at.resize(nt);
 
   /* Perform the conversion from Time to Depth */
 
   st_seismic_t2z_convert(db_t, iatt_t, nt, t0, t1, dt, db_z, iatt_z, nz, z0, z1,
-                         dz, db_v, iatt_v, natt, tz, zt, at, az);
+                         dz, db_v, iatt_v, natt, 
+                         tz.data(), zt.data(), 
+                         at.data(), az.data());
 
   /* Set the error return code */
 
   error = 0;
 
   label_end:
-  mem_free((char* ) tz);
-  mem_free((char* ) zt);
-  mem_free((char* ) az);
-  mem_free((char* ) at);
   return (error);
 }
 
@@ -1810,12 +1804,14 @@ int seismic_convolve(DbGrid *db,
                      double *wavelet)
 {
   int ndim, iatt, natt, itrace, iz, nz, iatt_in, iatt_out, error, size, shift;
-  double *tab0, *tab1, *tab2, dz;
+  double dz;
+  VectorDouble tab0;
+  VectorDouble tab1;
+  VectorDouble tab2;
 
   /* Initializations */
 
   if (st_match(db, nullptr)) return (1);
-  tab0 = tab1 = tab2 = nullptr;
   ndim = db->getNDim();
   natt = db->getNLoc(ELoc::Z);
   nz = db->getNX(ndim - 1);
@@ -1845,12 +1841,9 @@ int seismic_convolve(DbGrid *db,
   shift = (option > 0) ? ntw :
                          0;
   size = nz + 2 * shift;
-  tab0 = (double*) mem_alloc(size * sizeof(double), 0);
-  if (tab0 == nullptr) goto label_end;
-  tab1 = (double*) mem_alloc(size * sizeof(double), 0);
-  if (tab1 == nullptr) goto label_end;
-  tab2 = (double*) mem_alloc(size * sizeof(double), 0);
-  if (tab2 == nullptr) goto label_end;
+  tab0.resize(size);
+  tab1.resize(size);
+  tab2.resize(size);
 
   /* Loop on the attributes */
 
@@ -1864,7 +1857,7 @@ int seismic_convolve(DbGrid *db,
 
       /* Perform the constrast (if required) */
 
-      if (flag_contrast) st_seismic_contrast(nz, tab0);
+      if (flag_contrast) st_seismic_contrast(nz, tab0.data());
 
       /* Set the padding values, if needed */
 
@@ -1876,13 +1869,13 @@ int seismic_convolve(DbGrid *db,
 
       /* Load the input attribute */
 
-      st_seismic_affect(db, nz, shift, val_before, val_middle, val_after, tab0,
-                        tab1);
+      st_seismic_affect(db, nz, shift, val_before, val_middle, val_after,
+                        tab0.data(), tab1.data());
 
       /* Perform the convolution */
 
-      st_seismic_convolve(2 * ntw + 1, -ntw, wavelet, size, 0, tab1, size, 0,
-                          tab2);
+      st_seismic_convolve(2 * ntw + 1, -ntw, wavelet, size, 0, tab1.data(), size, 0,
+                          tab2.data());
 
       /* In case of edge erosion, set the edge to FFFF */
 
@@ -1893,8 +1886,7 @@ int seismic_convolve(DbGrid *db,
 
       for (iz = 0; iz < nz; iz++)
         TR_OUT(db, iatt_out, iatt, itrace, iz,
-               (FFFF(TR_IN(db, iatt_in, iatt, itrace, iz))) ? TEST :
-                                                              tab2[iz + shift]);
+               (FFFF(TR_IN(db, iatt_in, iatt, itrace, iz))) ? TEST : tab2[iz + shift]);
     }
   }
 
@@ -1903,9 +1895,6 @@ int seismic_convolve(DbGrid *db,
   error = 0;
 
   label_end:
-  mem_free((char* ) tab0);
-  mem_free((char* ) tab1);
-  mem_free((char* ) tab2);
   if (type >= 0) mem_free((char* ) wavelet);
   return (error);
 }
@@ -2109,30 +2098,21 @@ static ST_Seismic_Neigh* st_estimate_neigh_management(int mode,
     ngh->nactive = 0;
     ngh->n_v1 = 0;
     ngh->n_v2 = 0;
-    ngh->ix_ngh = nullptr;
-    ngh->iz_ngh = nullptr;
-    ngh->v1_ngh = nullptr;
-    ngh->v2_ngh = nullptr;
 
-    ngh->ix_ngh = (int*) mem_alloc(sizeof(int) * nvois, 0);
-    if (ngh->ix_ngh == nullptr) goto label_free;
-    ngh->iz_ngh = (int*) mem_alloc(sizeof(int) * nvois, 0);
-    if (ngh->iz_ngh == nullptr) goto label_free;
-    ngh->v1_ngh = (double*) mem_alloc(sizeof(double) * nvois, 0);
-    if (ngh->v1_ngh == nullptr) goto label_free;
-    ngh->v2_ngh = (double*) mem_alloc(sizeof(double) * nvois, 0);
-    if (ngh->v2_ngh == nullptr) goto label_free;
+    ngh->ix_ngh.resize(nvois);
+    ngh->iz_ngh.resize(nvois);
+    ngh->v1_ngh.resize(nvois);
+    ngh->v2_ngh.resize(nvois);
 
     st_estimate_neigh_init(ngh);
   }
   else
   {
-    label_free:
     if (ngh == nullptr) return (ngh);
-    mem_free((char* ) ngh->ix_ngh);
-    mem_free((char* ) ngh->iz_ngh);
-    mem_free((char* ) ngh->v1_ngh);
-    mem_free((char* ) ngh->v2_ngh);
+    ngh->ix_ngh.clear();
+    ngh->iz_ngh.clear();
+    ngh->v1_ngh.clear();
+    ngh->v2_ngh.clear();
     mem_free((char* ) ngh);
   }
   return (ngh);
@@ -2934,17 +2914,9 @@ static void st_simulate_result(DbGrid *db,
  *****************************************************************************/
 static int st_estimate_sort(const int *presence, int *rank)
 {
-  double *dist, distmin, distval;
+  double distmin, distval;
   int ix, jx;
-
-  /* Initializations */
-
-  dist = nullptr;
-
-  /* Core allocation */
-
-  dist = (double*) mem_alloc(sizeof(double) * NX, 0);
-  if (dist == nullptr) return (1);
+  VectorDouble dist(NX);
 
   /* Sort the traces */
   for (ix = 0; ix < NX; ix++)
@@ -2959,11 +2931,8 @@ static int st_estimate_sort(const int *presence, int *rank)
     }
     dist[ix] = distmin;
   }
-  ut_sort_double(1, NX, rank, dist);
+  ut_sort_double(1, NX, rank, dist.data());
 
-  /* Core deallocation */
-
-  mem_free((char* ) dist);
   return (0);
 }
 
@@ -2995,18 +2964,21 @@ int seismic_estimate_XZ(DbGrid *db,
                         int flag_sort,
                         int flag_stat)
 {
-  int *flag, *rank, *presence[2], npres[2], iatt_est[2], iatt_std[2];
+  int *presence[2], npres[2], iatt_est[2], iatt_std[2];
   int i, ix0, jx0, iz0, nvois, size, error, nred, nfeq, iatt_z1, iatt_z2;
   int nb_total, nb_process, nb_calcul;
-  double *lhs, *rhs, *wgt, *var0;
   ST_Seismic_Neigh *ngh_cur, *ngh_old;
+  VectorDouble lhs;
+  VectorDouble rhs;
+  VectorDouble wgt;
+  VectorDouble var0;
+  VectorInt flag;
+  VectorInt rank;
 
   /* Initializations */
 
   error = 1;
   nvois = nred = nb_total = nb_process = nb_calcul = 0;
-  lhs = rhs = wgt = var0 = nullptr;
-  flag = rank = nullptr;
   nfeq = (flag_ks) ? 0 : 1;
   ngh_cur = ngh_old = nullptr;
   for (i = 0; i < 2; i++)
@@ -3070,21 +3042,13 @@ int seismic_estimate_XZ(DbGrid *db,
   ngh_old = st_estimate_neigh_management(1, nvois, ngh_old);
   if (ngh_old == nullptr) goto label_end;
   covtab = MatrixSquare(NVAR);
-  lhs = (double*) mem_alloc(sizeof(double) * size * size, 0);
-  if (lhs == nullptr) goto label_end;
-  rhs = (double*) mem_alloc(sizeof(double) * size * NVAR, 0);
-  if (rhs == nullptr) goto label_end;
-  wgt = (double*) mem_alloc(sizeof(double) * size * NVAR, 0);
-  if (wgt == nullptr) goto label_end;
-  flag = (int*) mem_alloc(sizeof(int) * size, 0);
-  if (flag == nullptr) goto label_end;
-  rank = (int*) mem_alloc(sizeof(int) * NX, 0);
-  if (rank == nullptr) goto label_end;
+  lhs.resize(size * size);
+  rhs.resize(size * NVAR);
+  wgt.resize(size * NVAR);
+  flag.resize(size);
+  rank.resize(NX);
   if (flag_std)
-  {
-    var0 = (double*) mem_alloc(sizeof(double) * NVAR, 0);
-    if (var0 == nullptr) goto label_end;
-  }
+    var0.resize(NVAR);
 
   /* Add the resulting variables */
 
@@ -3101,18 +3065,17 @@ int seismic_estimate_XZ(DbGrid *db,
 
   /* Calculate the constant terms for the variances */
 
-  if (flag_std) st_estimate_var0(model, var0);
+  if (flag_std) st_estimate_var0(model, var0.data());
 
   /* Calculate the order of the columns to be treated */
 
-  if (st_estimate_sort(presence[0], rank)) goto label_end;
+  if (st_estimate_sort(presence[0], rank.data())) goto label_end;
 
   /* Loop on the grid nodes */
 
   for (jx0 = 0; jx0 < NX; jx0++)
   {
-    ix0 = (flag_sort) ? rank[jx0] :
-                        jx0;
+    ix0 = (flag_sort) ? rank[jx0] : jx0;
     for (iz0 = 0; iz0 < NZ; iz0++)
     {
       nb_total++;
@@ -3133,26 +3096,27 @@ int seismic_estimate_XZ(DbGrid *db,
 
         /* Establish the flag */
 
-        st_estimate_flag(ngh_cur, nfeq, flag, &nred);
+        st_estimate_flag(ngh_cur, nfeq, flag.data(), &nred);
 
         /* Establish the kriging L.H.S. */
 
-        st_estimate_lhs(ngh_cur, model, nfeq, nred, flag, lhs);
+        st_estimate_lhs(ngh_cur, model, nfeq, nred, flag.data(), lhs.data());
 
         /* Establish the kriging R.H.S. */
 
-        st_estimate_rhs(ngh_cur, model, nfeq, nred, flag, rhs);
+        st_estimate_rhs(ngh_cur, model, nfeq, nred, flag.data(), rhs.data());
 
         /* Derive the kriging weights */
 
-        if (st_estimate_wgt(ngh_cur, model, nred, flag, lhs, rhs, wgt))
-          continue;
+        if (st_estimate_wgt(ngh_cur, model, nred, flag.data(),
+                            lhs.data(), rhs.data(), wgt.data())) continue;
       }
 
       /* Perform the estimation */
 
-      st_estimate_result(db, ngh_cur, flag_std, nfeq, nred, flag, wgt, rhs,
-                         var0, iatt_est, iatt_std);
+      st_estimate_result(db, ngh_cur, flag_std, nfeq, nred,
+                         flag.data(), wgt.data(), rhs.data(),
+                         var0.data(), iatt_est, iatt_std);
 
       /* Save the neighborhood */
 
@@ -3180,11 +3144,6 @@ int seismic_estimate_XZ(DbGrid *db,
     if (error && iatt_std[i] >= 0) db->deleteColumnByUID(iatt_std[i]);
   }
   (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
-  mem_free((char* ) flag);
-  mem_free((char* ) lhs);
-  mem_free((char* ) rhs);
-  mem_free((char* ) wgt);
-  mem_free((char* ) var0);
   st_estimate_neigh_management(-1, nvois, ngh_cur);
   st_estimate_neigh_management(-1, nvois, ngh_old);
 
@@ -3258,20 +3217,22 @@ int seismic_simulate_XZ(DbGrid *db,
                         int flag_sort,
                         int flag_stat)
 {
-  int *flag, *rank, *presence[2], npres[2], iatt_sim[2];
+  int *presence[2], npres[2], iatt_sim[2];
   int i, isimu, ix0, iz0, nvois, size, error, nred, nfeq, jx0;
   int nb_total, nb_process, nb_calcul;
-  double *lhs, *rhs, *wgt, *c00;
   ST_Seismic_Neigh *ngh_cur, *ngh_old;
+  VectorDouble lhs;
+  VectorDouble rhs;
+  VectorDouble wgt;
+  VectorDouble c00;
+  VectorInt flag;
+  VectorInt rank;
 
   /* Initializations */
 
   error = 1;
   nvois = nred = nb_total = nb_process = nb_calcul = 0;
-  lhs = rhs = wgt = c00 = nullptr;
-  flag = rank = nullptr;
-  nfeq = (flag_ks) ? 0 :
-                     1;
+  nfeq = (flag_ks) ? 0 : 1;
   ngh_cur = ngh_old = nullptr;
   for (i = 0; i < 2; i++)
   {
@@ -3331,18 +3292,12 @@ int seismic_simulate_XZ(DbGrid *db,
   ngh_old = st_estimate_neigh_management(1, nvois, ngh_old);
   if (ngh_old == nullptr) goto label_end;
   covtab = MatrixSquare(NVAR);
-  lhs = (double*) mem_alloc(sizeof(double) * size * size, 0);
-  if (lhs == nullptr) goto label_end;
-  rhs = (double*) mem_alloc(sizeof(double) * size * NVAR, 0);
-  if (rhs == nullptr) goto label_end;
-  wgt = (double*) mem_alloc(sizeof(double) * size * NVAR, 0);
-  if (wgt == nullptr) goto label_end;
-  flag = (int*) mem_alloc(sizeof(int) * size, 0);
-  if (flag == nullptr) goto label_end;
-  c00 = (double*) mem_alloc(sizeof(double) * NVAR * NVAR, 0);
-  if (c00 == nullptr) goto label_end;
-  rank = (int*) mem_alloc(sizeof(int) * NX, 0);
-  if (rank == nullptr) goto label_end;
+  lhs.resize(size * size);
+  rhs.resize(size * NVAR);
+  wgt.resize(size * NVAR);
+  flag.resize(size);
+  c00.resize(NVAR * NVAR);
+  rank.resize(NX);
 
   /* Add the resulting variables */
 
@@ -3358,18 +3313,17 @@ int seismic_simulate_XZ(DbGrid *db,
 
   /* Calculate the constant terms for the variances */
 
-  st_estimate_c00(model, c00);
+  st_estimate_c00(model, c00.data());
 
   /* Calculate the order of the columns to be treated */
 
-  if (st_estimate_sort(presence[0], rank)) goto label_end;
+  if (st_estimate_sort(presence[0], rank.data())) goto label_end;
 
   /* Loop on the grid nodes */
 
   for (jx0 = 0; jx0 < NX; jx0++)
   {
-    ix0 = (flag_sort) ? rank[jx0] :
-                        jx0;
+    ix0 = (flag_sort) ? rank[jx0] : jx0;
     for (iz0 = 0; iz0 < NZ; iz0++)
     {
       nb_total++;
@@ -3391,26 +3345,27 @@ int seismic_simulate_XZ(DbGrid *db,
 
         /* Establish the flag */
 
-        st_estimate_flag(ngh_cur, nfeq, flag, &nred);
+        st_estimate_flag(ngh_cur, nfeq, flag.data(), &nred);
 
         /* Establish the kriging L.H.S. */
 
-        st_estimate_lhs(ngh_cur, model, nfeq, nred, flag, lhs);
+        st_estimate_lhs(ngh_cur, model, nfeq, nred, flag.data(), lhs.data());
 
         /* Establish the kriging R.H.S. */
 
-        st_estimate_rhs(ngh_cur, model, nfeq, nred, flag, rhs);
+        st_estimate_rhs(ngh_cur, model, nfeq, nred, flag.data(), rhs.data());
 
         /* Derive the kriging weights */
 
-        if (st_estimate_wgt(ngh_cur, model, nred, flag, lhs, rhs, wgt))
-          continue;
+        if (st_estimate_wgt(ngh_cur, model, nred, flag.data(),
+                            lhs.data(), rhs.data(), wgt.data())) continue;
       }
 
       /* Perform the estimation */
 
-      st_simulate_result(db, ix0, iz0, ngh_cur, nbsimu, nfeq, nred, flag, wgt,
-                         rhs, c00, iatt_sim);
+      st_simulate_result(db, ix0, iz0, ngh_cur, nbsimu, nfeq, nred,
+                         flag.data(), wgt.data(),
+                         rhs.data(), c00.data(), iatt_sim);
 
       /* Save the neighborhood */
 
@@ -3438,12 +3393,6 @@ int seismic_simulate_XZ(DbGrid *db,
     if (error) for (isimu = 0; isimu < nbsimu; isimu++)
       db->deleteColumnByUID(iatt_sim[i] + isimu);
   }
-  mem_free((char* ) flag);
-  mem_free((char* ) rank);
-  mem_free((char* ) lhs);
-  mem_free((char* ) rhs);
-  mem_free((char* ) wgt);
-  mem_free((char* ) c00);
   st_estimate_neigh_management(-1, nvois, ngh_cur);
   st_estimate_neigh_management(-1, nvois, ngh_old);
 
