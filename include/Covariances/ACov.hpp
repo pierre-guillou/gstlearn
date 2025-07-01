@@ -68,7 +68,7 @@ public:
   void setContext(const CovContext& ctxt);
   void updateFromContext() { _updateFromContext(); }
   virtual void copyCovContext(const CovContext& ctxt) { _copyCovContext(ctxt); }
-  void initFromContext() { _initFromContext(); }
+  void initFromContext();
   CovContext getContextCopy() const { return CovContext(_ctxt); }
   /// Calculate the covariance between two variables for 0-distance (stationary case)
   virtual double eval0(int ivar                = 0,

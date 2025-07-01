@@ -287,6 +287,10 @@ MatrixSymmetric ACov::eval0Mat(const CovCalcMode* mode) const
   return mat;
 }
 
+void ACov::initFromContext()
+{
+  _initFromContext();
+}
 /**
  * Calculate the Matrix of covariance for zero distance
  * @param mat   Covariance matrix (Dimension: nvar * nvar)

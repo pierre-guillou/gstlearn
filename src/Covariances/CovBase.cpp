@@ -168,6 +168,7 @@ void CovBase::_initFromContext()
   _cor->initFromContext();
   _sillCur.reset(_ctxt.getNVar(), _ctxt.getNVar());
   setOptimEnabled(true);
+  _ctxt.setSpace(_cor->getSpace());
 }
 void CovBase::initSill(double value)
 {
