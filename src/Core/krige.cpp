@@ -3914,8 +3914,8 @@ static void st_declustering_stats(int mode, int method, Db *db, int iptr)
   double mean, var, zval, coeff, mini, maxi, sumwgt;
 
   mean = var = sumwgt = 0.;
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
   for (int iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;

@@ -1940,7 +1940,7 @@ static void st_potential_to_layer(Pot_Env *pot_env,
                                   const double *potval,
                                   VectorDouble& result)
 {
-  double minval = -1.e30;
+  double minval = MINIMUM_BIG;
   double potref = POTVAL(isimu, 0);
 
   int ilayer = -1;

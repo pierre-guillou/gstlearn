@@ -176,8 +176,8 @@ int CalcSimuTurningBands::_generateDirections(const Db* dbout)
     _setCodirAng(ibs, 0, cos(2. * GV_PI * x[0]) * sqr);
     _setCodirAng(ibs, 1, sin(2. * GV_PI * x[0]) * sqr);
     _setCodirAng(ibs, 2, x[1]);
-    _setCodirTmin(ibs, 1.e30);
-    _setCodirTmax(ibs,-1.e30);
+    _setCodirTmin(ibs, MAXIMUM_BIG);
+    _setCodirTmax(ibs, MINIMUM_BIG);
     _setCodirScale(ibs, 1.);
   }
 

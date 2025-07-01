@@ -13,6 +13,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/MathFunc.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "geoslib_define.h"
 
 #include <math.h>
 #include <random>
@@ -1084,8 +1085,8 @@ VectorDouble law_exp_sample(const double* tabin,
   VectorDouble temp(nvar1, 0.);
   VectorDouble mean(nvarin, 0.);
   VectorDouble stdv(nvarin, 0.);
-  VectorDouble mini(nvarin, 1.e30);
-  VectorDouble maxi(nvarin, -1.e30);
+  VectorDouble mini(nvarin, MAXIMUM_BIG);
+  VectorDouble maxi(nvarin, MINIMUM_BIG);
 
   /* Count the number of active isotopic samples */
 

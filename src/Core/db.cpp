@@ -710,7 +710,7 @@ int point_to_point(Db* db, const double* coor)
   /* Loop on the input structure */
 
   iechmin = 0;
-  distmin = 1.e30;
+  distmin = MAXIMUM_BIG;
   for (iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
@@ -1003,8 +1003,8 @@ void db_monostat(Db* db,
 
   /* Initializations */
 
-  (*mini) = 1.e30;
-  (*maxi) = -1.e30;
+  (*mini) = MAXIMUM_BIG;
+  (*maxi) = MINIMUM_BIG;
   (*wtot) = (*mean) = (*var) = 0.;
 
   /* Loop on the data */
@@ -1544,15 +1544,15 @@ double* db_distances_general(Db* db1,
 
   /* Loop on the second point */
 
-  dist_min = 1.e30;
-  dist_max = -1.e30;
+  dist_min = MAXIMUM_BIG;
+  dist_max = MINIMUM_BIG;
   ecr = nvalid = 0;
   for (iech2 = 0; iech2 < nech2; iech2++)
   {
     if (!db2->isActive(iech2)) continue;
     if (!db2->isIsotopic(iech2, niso)) continue;
     nvalid++;
-    dlocmin = 1.e30;
+    dlocmin = MAXIMUM_BIG;
 
     /* Loop on the first point */
 
@@ -1782,8 +1782,8 @@ int db_gradient_component_to_modang(Db* db,
 
   /* Modify the local anisotropy */
 
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
   for (int iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;

@@ -102,7 +102,7 @@ GSTLEARN_EXPORT void ut_classify(int nech,
                                  int *ntest,
                                  int *nout,
                                  int *classe);
-GSTLEARN_EXPORT double ut_median(double *tab, int ntab);
+GSTLEARN_EXPORT double ut_median(VectorDouble& tab, int ntab);
 GSTLEARN_EXPORT double ut_cnp(int n, int k);
 GSTLEARN_EXPORT MatrixSquare ut_pascal(int ndim);
 GSTLEARN_EXPORT int* ut_combinations(int n, int maxk, int *ncomb);

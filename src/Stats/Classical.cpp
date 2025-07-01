@@ -24,6 +24,7 @@
 #include "Variogram/Vario.hpp"
 #include "Polygon/Polygons.hpp"
 #include "Enum/EStatOption.hpp"
+#include "geoslib_define.h"
 
 #include <math.h>
 #include <Matrix/Table.hpp>
@@ -397,8 +398,8 @@ void dbStatisticsVariables(Db *db,
     double stdv = 0.;
     double sum = 0.;
     double metal = 0.;
-    double mini = 1.e30;
-    double maxi = -1.e30;
+    double mini = MAXIMUM_BIG;
+    double maxi = MINIMUM_BIG;
     for (int iuid = 0; iuid < niuid; iuid++)
     {
       int juid = iuids[iuid];
@@ -522,8 +523,8 @@ Table dbStatisticsMono(Db *db,
     double stdv = 0.;
     double sum = 0.;
     double metal = 0.;
-    double mini = 1.e30;
-    double maxi = -1.e30;
+    double mini = MAXIMUM_BIG;
+    double maxi = MINIMUM_BIG;
     double median = TEST;
     VectorDouble valmed;
 
@@ -1156,8 +1157,8 @@ void dbStatisticsPrint(const Db *db,
   for (int icol = 0; icol < ncol; icol++)
   {
     mean[icol] = var[icol] = num[icol] = 0.;
-    mini[icol] = 1.e30;
-    maxi[icol] = -1.e30;
+    mini[icol] = MAXIMUM_BIG;
+    maxi[icol] = MINIMUM_BIG;
     if (flagCorrel)
       for (int jcol = 0; jcol < ncol; jcol++, ijcol++)
         cov[ijcol] = 0.;
@@ -1658,8 +1659,8 @@ Table dbStatisticsMulti(Db *db,
   {
     num[i] = m1[i] = m2[i] = v1[i] = v2[i] = v12[i] = 0.;
     plus[i] = moins[i] = zero[i] = 0;
-    mini[i] = 1.e30;
-    maxi[i] = -1.e30;
+    mini[i] = MAXIMUM_BIG;
+    maxi[i] = MINIMUM_BIG;
   }
 
   /* Loop on the samples */
@@ -1986,7 +1987,7 @@ int dbStatisticsInGridTool(Db *db,
       for (int i = 0; i < nxyz; i++)
       {
         double value = dbgrid->getArray(i, iptr);
-        if (value == 1.e30) dbgrid->setArray(i, iptr, TEST);
+        if (value == MAXIMUM_BIG) dbgrid->setArray(i, iptr, TEST);
       }
     }
     else if (oper == EStatOption::MAXI)
@@ -1994,7 +1995,7 @@ int dbStatisticsInGridTool(Db *db,
       for (int i = 0; i < nxyz; i++)
       {
         double value = dbgrid->getArray(i, iptr);
-        if (value == -1.e30) dbgrid->setArray(i, iptr, TEST);
+        if (value == MINIMUM_BIG) dbgrid->setArray(i, iptr, TEST);
       }
     }
   }

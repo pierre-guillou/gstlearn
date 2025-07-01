@@ -430,8 +430,8 @@ static void st_print_upscale(const char *title, int *nxyz, const double *valtab)
   double mini, maxi, value;
   int lec, ndef;
 
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
   lec = ndef = 0;
   for (int iz = 0; iz < nxyz[2]; iz++)
     for (int iy = 0; iy < nxyz[1]; iy++)

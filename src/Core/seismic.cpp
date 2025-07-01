@@ -81,10 +81,10 @@ static int st_velocity_minmax(int nech,
   int i, number;
   double vvdef, delta;
 
-  (*v0) = 1.e30;
-  (*v1) = 1.e30;
-  (*vmin) = 1.e30;
-  (*vmax) = -1.e30;
+  (*v0) = MAXIMUM_BIG;
+  (*v1) = MAXIMUM_BIG;
+  (*vmin) = MAXIMUM_BIG;
+  (*vmax) = MINIMUM_BIG;
 
   /* Check the extreme (defined) values */
 
@@ -2950,7 +2950,7 @@ static int st_estimate_sort(const int *presence, int *rank)
   for (ix = 0; ix < NX; ix++)
   {
     rank[ix] = ix;
-    distmin = 1.e30;
+    distmin = MAXIMUM_BIG;
     for (jx = 0; jx < NX; jx++)
     {
       if (presence[jx] <= 0) continue;

@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "geoslib_define.h"
 #include "geoslib_old_f.h"
 
 #include "Basic/Utilities.hpp"
@@ -211,8 +212,8 @@ static void st_mima_init(double mima[2][3], int *nundefs)
   (*nundefs) = 0;
   for (int idim = 0; idim < 3; idim++)
   {
-    mima[0][idim] = +1.e30;
-    mima[1][idim] = -1.e30;
+    mima[0][idim] = MAXIMUM_BIG;
+    mima[1][idim] = MINIMUM_BIG;
   }
 }
 

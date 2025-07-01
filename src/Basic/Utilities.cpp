@@ -14,6 +14,7 @@
 #include "Basic/VectorHelper.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/Memory.hpp"
+#include "geoslib_define.h"
 
 #include <cmath>
 #include <map>
@@ -421,8 +422,8 @@ StatResults ut_statistics(int nech, const double *tab, const double *sel, const 
 
   /* Initializations */
 
-  double tmin =  1.e30;
-  double tmax = -1.e30;
+  double tmin = MAXIMUM_BIG;
+  double tmax = MINIMUM_BIG;
   double num = 0.;
   double mm = 0.;
   double vv = 0.;
@@ -617,7 +618,7 @@ void ut_classify(int nech,
  ** \param[in]  ntab      Number of samples
  **
  *****************************************************************************/
-double ut_median(double *tab, int ntab)
+double ut_median(VectorDouble& tab, int ntab)
 {
   int i, j, k, nr, nl, even, lo, hi, loop, mid;
   double result, xlo, xhi, temp, xmin, xmax;

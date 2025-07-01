@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "geoslib_define.h"
 #include "geoslib_old_f.h"
 
 #include "Basic/PolyLine2D.hpp"
@@ -215,7 +216,7 @@ PolyPoint2D PolyLine2D::getPLIndex(const VectorDouble &xy0) const
 
   /* Dispatch */
 
-  double dmin = 1.e30;
+  double dmin = MAXIMUM_BIG;
   for (int i = 0; i < nvert - 1; i++)
   {
     dist = GH::distancePointToSegment(xy0[0], xy0[1], getX(i), getY(i), getX(i + 1),
@@ -292,7 +293,7 @@ double PolyLine2D::distanceBetweenPoints(double ap,
 
   /* Calculate the minimum distance */
 
-  dist = 1.e30;
+  dist = MAXIMUM_BIG;
   dv = 0.;
   d1 = pldist1.dist;
   d2 = pldist2.dist;

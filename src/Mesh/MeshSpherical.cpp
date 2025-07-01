@@ -298,8 +298,8 @@ void MeshSpherical::_defineBoundingBox(void)
   // Loop on the Space dimensions
   for (int idim=0; idim<ndim; idim++)
   {
-    mini =  1.e30;
-    maxi = -1.e30;
+    mini = MAXIMUM_BIG;
+    maxi = MINIMUM_BIG;
 
     // Loop on the apices
     for (int i=0; i<getNApices(); i++)

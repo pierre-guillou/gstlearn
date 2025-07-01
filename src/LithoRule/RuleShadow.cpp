@@ -183,7 +183,7 @@ int RuleShadow::particularities(Db *db,
   double sh_dsup_max, sh_down_max;
   int ndim = (model != nullptr) ? model->getNDim() : 0;
 
-  _incr = 1.e30;
+  _incr = MAXIMUM_BIG;
   for (int idim = 0; idim < ndim; idim++)
     if (_shift[idim] != 0) _incr = MIN(_incr, db->getUnit(idim));
 

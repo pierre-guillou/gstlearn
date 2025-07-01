@@ -196,7 +196,7 @@ int AnamDiscreteDD::_stats(int nech, const VectorDouble& tab)
     for (int iclass=0; iclass<nclass; iclass++)
     {
       zmin = (iclass ==        0) ? 0     : getZCut(iclass-1);
-      zmax = (iclass == nclass-1) ? 1.e30 : getZCut(iclass);
+      zmax = (iclass == nclass-1) ? MAXIMUM_BIG : getZCut(iclass);
       if (tab[iech] <  zmin || tab[iech] >= zmax) continue;
       setDDStatProp(iclass, getDDStatProp(iclass) + 1.);
       setDDStatZmoy(iclass, getDDStatZmoy(iclass) + tab[iech]);
@@ -446,7 +446,7 @@ VectorDouble AnamDiscreteDD::z2factor(double z, const VectorInt& ifacs) const
     double value = 0.;
     for (int iclass=0; iclass<nclass; iclass++)
     {
-      double zmax   = (iclass == nclass-1) ? 1.e30 : getZCut(iclass);
+      double zmax   = (iclass == nclass-1) ? MAXIMUM_BIG : getZCut(iclass);
       value += _i2Chi.getValue(iclass,ifacs[ifac]);
       if (zmax > z) break;
     }
