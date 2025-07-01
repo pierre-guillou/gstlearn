@@ -41,8 +41,7 @@ public:
   void    getEmbeddedCoorPerApex(int iapex, VectorDouble& coords) const override;
   void    getBarycenterInPlace(int imesh, VectorDouble& coord) const override;
 
-  static MeshSpherical* createFromNF(const String& neutralFilename,
-                                     bool verbose = true);
+  static MeshSpherical* createFromNF(const String& NFFilename, bool verbose = true);
   static MeshSpherical* create(const MatrixDense& apices = MatrixDense(),
                                const MatrixInt& meshes         = MatrixInt());
 
@@ -59,9 +58,12 @@ public:
   VectorVectorInt getMeshesAsVVI() const {return _meshes.getMatrix();}
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "MeshSpherical"; }
 
 private:

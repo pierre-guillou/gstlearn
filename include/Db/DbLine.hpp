@@ -80,8 +80,7 @@ public:
                                        const VectorString& names = VectorString(),
                                        const VectorString& locatorNames = VectorString(),
                                        bool flagAddSampleRank           = true);
-  static DbLine* createFromNF(const String& neutralFilename,
-                              bool verbose = true);
+  static DbLine* createFromNF(const String& NFFilename, bool verbose = true);
   static DbLine* createFillRandom(int ndim,
                                   int nbline,
                                   int nperline,
@@ -112,10 +111,12 @@ public:
   int getLineSampleRank(int iline, int isample) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,
-                          bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "DbLine"; }
 
 private:

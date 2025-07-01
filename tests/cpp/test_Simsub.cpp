@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
   subparam.setFlagOrient(true);
   (void) substitution(grid, subparam, seed, false);
 
-  (void) grid->dumpToNF("grid.ascii");
+  (void) grid->dumpToNF("grid.NF");
 
   delete grid;
 

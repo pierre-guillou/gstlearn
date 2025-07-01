@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
   (void) fluid_propagation(grid,"Facies","Fluid","","",nfacies,nfluids,1,speeds);
 
   grid->display(&dbfmt);
-  (void) grid->dumpToNF("Grid.ascii");
+  (void) grid->dumpToNF("Grid.NF");
 
   delete grid;
   delete model;

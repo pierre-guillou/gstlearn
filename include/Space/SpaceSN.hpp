@@ -14,7 +14,6 @@
 
 #include "Space/ASpace.hpp"
 #include "Basic/VectorNumT.hpp"
-#include <memory>
 
 class SpacePoint;
 

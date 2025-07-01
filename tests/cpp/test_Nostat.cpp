@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   DbStringFormat dbfmt(FLAG_STATS,{"Simu"});
   workingDbc->display(&dbfmt);
 
-  (void) workingDbc->dumpToNF("spirale.ascii");
+  (void) workingDbc->dumpToNF("spirale.NF");
 
   message("Test performed successfully\n");
 

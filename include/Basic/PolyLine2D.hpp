@@ -39,8 +39,7 @@ public:
   /// Interface of AStringable
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static PolyLine2D* createFromNF(const String &neutralFilename,
-                                  bool verbose = true);
+  static PolyLine2D* createFromNF(const String &NFFilename, bool verbose = true);
   static PolyLine2D* create(const VectorDouble& x = VectorDouble(),
                             const VectorDouble& y = VectorDouble());
 
@@ -73,9 +72,12 @@ public:
                             int nb_neigh) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "PolyLine2D"; }
 
 private:
@@ -91,6 +93,8 @@ private:
 private:
   VectorDouble _x;
   VectorDouble _y;
+
+  friend class Faults;
 };
 
 double distanceBetweenPolylines(const PolyLine2D& poly1,

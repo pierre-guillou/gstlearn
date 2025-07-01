@@ -14,6 +14,7 @@
 #include "Enum/ERule.hpp"
 
 #include "Basic/Utilities.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "LithoRule/RuleShift.hpp"
 #include "LithoRule/Rule.hpp"
 #include "LithoRule/Node.hpp"
@@ -112,12 +113,12 @@ int RuleShift::resetFromNumericalCoding(const VectorInt& n_type,
   return 0;
 }
 
-bool RuleShift::_deserialize(std::istream& is, bool /*verbose*/)
+bool RuleShift::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   _shift.resize(3);
   bool ret = true;
 
-  ret = ret && Rule::_deserialize(is);
+  ret = ret && Rule::_deserializeAscii(is);
 
   ret = ret && _recordRead<double>(is, "Slope for Shadow Rule", _slope);
   ret = ret && _recordRead<double>(is, "Lower Threshold for Shadow Rule", _shDown);
@@ -128,7 +129,7 @@ bool RuleShift::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool RuleShift::_serialize(std::ostream& os, bool /*verbose*/) const
+bool RuleShift::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   double slope  = (FFFF(_slope)) ? 0. : _slope;
   double shdown = (FFFF(_shDown)) ? 0. : _shDown;
@@ -138,7 +139,7 @@ bool RuleShift::_serialize(std::ostream& os, bool /*verbose*/) const
 
   bool ret = true;
 
-  ret = ret && Rule::_serialize(os);
+  ret = ret && Rule::_serializeAscii(os);
 
   ret = ret && _recordWrite<double>(os, "Slope for Shadow Rule", slope);
   ret = ret && _recordWrite<double>(os, "Lower Threshold for Shadow Rule", shdown);
@@ -464,3 +465,49 @@ RuleShift* RuleShift::createFromNumericalCoding(const VectorInt& n_type,
   }
   return ruleshift;
 }
+#ifdef HDF5
+bool RuleShift::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto ruleG = SerializeHDF5::getGroup(grp, "RuleShift");
+  if (!ruleG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  _shift.resize(3);
+
+  ret = ret && SerializeHDF5::readValue(*ruleG, "Slope", _slope);
+  ret = ret && SerializeHDF5::readValue(*ruleG, "ShDown", _shDown);
+  ret = ret && SerializeHDF5::readValue(*ruleG, "ShDsup", _shDsup);
+  ret = ret && SerializeHDF5::readVec(*ruleG, "Shift", _shift);
+
+  ret = ret && Rule::_deserializeH5(*ruleG, verbose);
+
+  return ret;
+}
+
+bool RuleShift::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto ruleG = grp.createGroup("RuleShift");
+
+  bool ret = true;
+
+
+  double slope          = (FFFF(_slope)) ? 0. : _slope;
+  double shdown         = (FFFF(_shDown)) ? 0. : _shDown;
+  double shdsup         = (FFFF(_shDsup)) ? 0. : _shDsup;
+  VectorDouble shiftloc = _shift;
+  shiftloc.resize(3);
+
+  ret = ret && SerializeHDF5::writeValue(ruleG, "Slope", slope);
+  ret = ret && SerializeHDF5::writeValue(ruleG, "ShDown", shdown);
+  ret = ret && SerializeHDF5::writeValue(ruleG, "ShDsup", shdsup);
+  ret = ret && SerializeHDF5::writeVec(ruleG, "Shift", shiftloc);
+
+  ret = ret && Rule::_serializeH5(ruleG, verbose);
+
+  return ret;
+}
+#endif

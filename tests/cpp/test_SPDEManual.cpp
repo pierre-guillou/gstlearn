@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
   DbStringFormat dsf(FLAG_RESUME | FLAG_STATS);
   workingDbc->display(&dsf);
-  (void) workingDbc->dumpToNF("spde.ascii");
+  (void) workingDbc->dumpToNF("spde.NF");
 
   delete dat;
   delete workingDbc;

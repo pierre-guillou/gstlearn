@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Enum/EFormatNF.hpp"
 #include "Enum/ESpaceType.hpp"
 #include "Space/ASpaceObject.hpp"
 
@@ -44,12 +45,12 @@ int main(int argc, char *argv[])
 
    // Saving as a Neutral file
    timer.reset();
-   db1->dumpToNF("Db.ascii");
+   db1->dumpToNF("Db.NF.ascii", EFormatNF::ASCII);
    timer.displayIntervalMilliseconds("Dump into NF");
 
    // Reading the neutral file
    timer.reset();
-   Db* db2 = Db::createFromNF("Db.ascii");
+   Db* db2 = Db::createFromNF("Db.NF.ascii");
    db2->display();
    timer.displayIntervalMilliseconds("Load from NF");
 

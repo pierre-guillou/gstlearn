@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
   bool verbose = false;
   bool trace   = false;
   bool use_gradient;
+
   if (mode == 0 || mode == 1)
   {
     use_gradient = false;

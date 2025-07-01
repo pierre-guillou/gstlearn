@@ -9,6 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Anamorphosis/AnamUser.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 AnamUser::AnamUser()
     : AnamContinuous(),
@@ -55,13 +56,13 @@ void AnamUser::calculateMeanAndVariance()
   messerr("AnamUser: This funtion does not make sense");
 }
 
-bool AnamUser::_deserialize(std::istream& /*is*/, bool /*verbose*/)
+bool AnamUser::_deserializeAscii(std::istream& /*is*/, bool /*verbose*/)
 {
   messerr("AnamUser: Cannot be deserialized");
   return false;
 }
 
-bool AnamUser::_serialize(std::ostream& /*os*/, bool /*verbose*/) const
+bool AnamUser::_serializeAscii(std::ostream& /*os*/, bool /*verbose*/) const
 {
   messerr("AnamUser: Cannot be serialized");
   return false;
@@ -78,3 +79,18 @@ double AnamUser::rawToTransformValue(double h) const
   if (_z2y_function == nullptr) return TEST;
   return _z2y_function(h);
 }
+#ifdef HDF5
+bool AnamUser::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  DECLARE_UNUSED(grp);
+  messerr("AnamUser: Cannot be deserialized");
+  return false;
+}
+
+bool AnamUser::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  DECLARE_UNUSED(grp);
+  messerr("AnamUser: Cannot be serialized");
+  return false;
+}
+#endif

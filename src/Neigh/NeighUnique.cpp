@@ -11,6 +11,7 @@
 #include "Neigh/NeighUnique.hpp"
 #include "Mesh/AMesh.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Space/ASpace.hpp"
 
@@ -48,17 +49,17 @@ String NeighUnique::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighUnique::_deserialize(std::istream& is, bool verbose)
+bool NeighUnique::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   return ret;
 }
 
-bool NeighUnique::_serialize(std::ostream& os, bool verbose) const
+bool NeighUnique::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   return ret;
 }
 
@@ -69,26 +70,16 @@ NeighUnique* NeighUnique::create(bool flag_xvalid, const ASpaceSharedPtr& space)
 
 /**
  * Create a NeighUniqueborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighUnique* NeighUnique::createFromNF(const String& neutralFilename, bool verbose)
+NeighUnique* NeighUnique::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighUnique* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighUnique;
-  bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  neigh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  auto* neigh = new NeighUnique;
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 /**
@@ -163,3 +154,33 @@ void NeighUnique::_unique(int iech_out, VectorInt& ranks)
   }
 }
 
+#ifdef HDF5
+bool NeighUnique::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighUnique");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+  
+  return ret;
+}
+
+bool NeighUnique::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto neighG = grp.createGroup("NeighUnique");
+
+  bool ret = true;
+
+  /* Writing the tail of the file */
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif

@@ -16,6 +16,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/File.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Basic/CSVformat.hpp"
 #include "Polygon/Polygons.hpp"
 
@@ -322,7 +323,7 @@ PolyElem Polygons::_extractFromWKT(const CSVformat& csv, String& polye)
 }
 
 
-bool Polygons::_deserialize(std::istream& is, bool verbose)
+bool Polygons::_deserializeAscii(std::istream& is, bool verbose)
 {
   int npol = 0;
 
@@ -340,7 +341,7 @@ bool Polygons::_deserialize(std::istream& is, bool verbose)
   for (int ipol = 0; ret && ipol < npol; ipol++)
   {
     PolyElem polyelem;
-    ret = ret && polyelem._deserialize(is, verbose);
+    ret = ret && polyelem._deserializeAscii(is, verbose);
     if (ret)
     {
       addPolyElem(polyelem); // TODO : Prevent copy (optimization)
@@ -352,7 +353,7 @@ bool Polygons::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool Polygons::_serialize(std::ostream& os, bool verbose) const
+bool Polygons::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of Polygons", getNPolyElem());
@@ -362,7 +363,7 @@ bool Polygons::_serialize(std::ostream& os, bool verbose) const
   for (int ipol = 0; ret && ipol < getNPolyElem(); ipol++)
   {
     const PolyElem& polyelem = getPolyElem(ipol);
-    ret = ret && polyelem._serialize(os, verbose);
+    ret = ret && polyelem._serializeAscii(os, verbose);
   }
   return ret;
 }
@@ -374,28 +375,18 @@ Polygons* Polygons::create()
 
 /**
  * Create a Polygon by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */  VectorDouble _emptyVec; // dummy
  PolyElem     _emptyElem; // dummy
-Polygons* Polygons::createFromNF(const String& neutralFilename, bool verbose)
-{
-  Polygons* polygons = nullptr;
-  std::ifstream is;
-  polygons = new Polygons();
-  bool success = false;
-  if (polygons->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = polygons->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete polygons;
-    polygons = nullptr;
-  }
-  return polygons;
-}
+ Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
+ {
+   Polygons* polygons = new Polygons();
+   if (polygons->_fileOpenAndDeserialize(NFFilename, verbose)) return polygons;
+   delete polygons;
+   return nullptr;
+ }
 
 Polygons* Polygons::createFromCSV(const String& filename,
                                   const CSVformat& csv,
@@ -1039,3 +1030,52 @@ int db_selhull(Db *db1,
   return 0;
 }
 
+#ifdef HDF5
+bool Polygons::_deserializeH5(H5::Group& grp, bool verbose)
+{
+  auto polygonsG = SerializeHDF5::getGroup(grp, "Polygons");
+  if (!polygonsG) return false;
+
+  _polyelems.clear();
+
+  bool ret = true;
+
+  auto polylineG = SerializeHDF5::getGroup(*polygonsG, "PolyLines");
+  if (!polylineG) return false;
+  int ipol = 0;
+
+  PolyElem polyOne;
+  while(1)
+  {
+    String locname = "PolyElem_" + std::to_string(ipol);
+    auto polyelemG = SerializeHDF5::getGroup(*polylineG, locname, false);
+    if (!polyelemG) break;
+
+    ret = ret && polyOne._deserializeH5(*polyelemG, verbose);
+    _polyelems.push_back(polyOne);
+    ipol++;
+  }
+  return ret;
+}
+
+bool Polygons::_serializeH5(H5::Group& grp, bool verbose) const
+{
+  auto polygonsG = grp.createGroup("Polygons");
+
+  auto npol = _polyelems.size();
+  if (npol == 0) return true;
+
+  bool ret = true;
+
+  auto polylineG = polygonsG.createGroup("PolyLines");
+  for (size_t ipol = 0; ret && ipol < npol; ipol++)
+  {
+    String locname = "PolyElem_" + std::to_string(ipol);
+    auto polyelemG = polylineG.createGroup(locname);
+
+    ret            = ret && _polyelems[ipol]._serializeH5(polyelemG, verbose);
+  }
+
+  return ret;
+}
+#endif

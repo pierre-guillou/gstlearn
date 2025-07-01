@@ -11,6 +11,7 @@
 #include "Neigh/NeighImage.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Mesh/AMesh.hpp"
@@ -60,11 +61,11 @@ String NeighImage::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighImage::_deserialize(std::istream& is, bool verbose)
+bool NeighImage::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
 
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<int>(is, "Skipping factor", _skip);
   for (int idim = 0; ret && idim < (int) getNDim(); idim++)
   {
@@ -77,10 +78,10 @@ bool NeighImage::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool NeighImage::_serialize(std::ostream& os, bool verbose) const
+bool NeighImage::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<int>(os, "", getSkip());
   for (int idim = 0; ret && idim < (int) getNDim(); idim++)
     ret = ret && _recordWrite<double>(os, "", (double) getImageRadius(idim));
@@ -95,26 +96,16 @@ NeighImage* NeighImage::create(const VectorInt& radius, int skip, const ASpaceSh
 
 /**
  * Create a NeighImageborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighImage* NeighImage::createFromNF(const String& neutralFilename, bool verbose)
+NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighImage* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighImage();
-  bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  neigh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighImage* neigh = new NeighImage();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 /**
@@ -246,3 +237,39 @@ DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, int seed) const
 
   return dbsub;
 }
+#ifdef HDF5
+bool NeighImage::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighImage");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int skip = 0;
+
+  ret = ret && SerializeHDF5::readValue(*neighG, "Skip", skip);
+
+  ret = ret && SerializeHDF5::readVec(*neighG, "Radius", _imageRadius);
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+
+  return ret;
+}
+
+bool NeighImage::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto neighG = grp.createGroup("NeighImage");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(neighG, "Skip", getSkip());
+  ret = ret && SerializeHDF5::writeVec(neighG, "Radius", getImageRadius());
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif

@@ -66,8 +66,7 @@ public:
                             const VectorDouble& angles = VectorDouble(),
                             bool flag_polarized = false,
                             bool verbose = false);
-  static MeshETurbo* createFromNF(const String &neutralFilename,
-                                  bool verbose = true);
+  static MeshETurbo* createFromNF(const String &NFFilename, bool verbose = true);
   static MeshETurbo* createFromGrid(const DbGrid *dbgrid,
                                     bool flag_polarized = false,
                                     bool verbose = false,
@@ -146,9 +145,12 @@ private:
                             bool verbose);
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "MeshETurbo"; }
 
 private:
@@ -159,11 +161,13 @@ private:
   Indirection _gridIndirect;
 
   /// factor allocations
-  mutable std::vector<int> _indg;
-  mutable std::vector<int> _indices;
+  mutable std::vector<int>    _indg;
+  mutable std::vector<int>    _indices;
   mutable std::vector<double> _lambdas;
   mutable std::vector<double> _rhs;
-  mutable std::vector<int> _indgg;
+  mutable std::vector<int>    _indgg;
+
+  friend class DbMeshTurbo;
 };
 
 GSTLEARN_EXPORT bool isTurbo(const VectorMeshes& meshes);

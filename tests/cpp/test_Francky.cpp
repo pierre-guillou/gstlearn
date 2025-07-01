@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   (void)simulateSPDE(nullptr, dat, model, 1, useCholesky,
                      VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(),
                      NamingConvention("Data", true, false));
-  (void)dat->dumpToNF("Data.ascii");
+  (void)dat->dumpToNF("Data.NF");
 
   // Testing Kriging (traditional method)
   (void)kriging(dat, grid, model, neighU, true, false);
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
   (void)krigingSPDE(dat, grid, model, true, false, useCholesky);
 
   // Printout (optional)
-  (void) grid->dumpToNF("Grid.ascii");
+  (void) grid->dumpToNF("Grid.NF");
   grid->display(&dbfmt);
 
   message("Test performed successfully\n");

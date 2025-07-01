@@ -13,6 +13,7 @@
 #include "Geometry/GeometryHelper.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 
@@ -61,16 +62,16 @@ String Faults::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool Faults::_serialize(std::ostream& os, bool verbose) const
+bool Faults::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of Faults", getNFaults());
   for (int i = 0; ret && i < getNFaults(); i++)
-    ret = ret && _faults[i].serialize(os, verbose);
+    ret = ret && _faults[i]._serializeAscii(os, verbose);
   return ret;
 }
 
-bool Faults::_deserialize(std::istream& is, bool verbose)
+bool Faults::_deserializeAscii(std::istream& is, bool verbose)
 {
   int nfaults = 0;
   bool ret = true;
@@ -79,28 +80,18 @@ bool Faults::_deserialize(std::istream& is, bool verbose)
   for (int i = 0; ret && i < nfaults; i++)
   {
     PolyLine2D fault;
-    ret = ret && fault.deserialize(is, verbose);
+    ret = ret && fault._deserializeAscii(is, verbose);
     addFault(fault);
   }
   return ret;
 }
 
-Faults* Faults::createFromNF(const String& neutralFilename, bool verbose)
+Faults* Faults::createFromNF(const String& NFFilename, bool verbose)
 {
-  Faults* faults = nullptr;
-  std::ifstream is;
-  faults = new Faults();
-  bool success = false;
-  if (faults->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  faults->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete faults;
-    faults = nullptr;
-  }
-  return faults;
+  Faults* faults = new Faults();
+  if (faults->_fileOpenAndDeserialize(NFFilename, verbose)) return faults;
+  delete faults;
+  return nullptr;
 }
 
 void Faults::addFault(const PolyLine2D& fault)
@@ -167,3 +158,51 @@ bool Faults::isSplitByFault(double xt1,double yt1, double xt2, double yt2) const
   }
   return false;
 }
+
+#ifdef HDF5
+bool Faults::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto faultG = SerializeHDF5::getGroup(grp, "Faults");
+  if (!faultG) return false;
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int nfaults = 0;
+
+  ret = ret && SerializeHDF5::readValue(*faultG, "NFaults", nfaults);
+
+  auto faultsG = SerializeHDF5::getGroup(*faultG, "Lines");
+  if (!faultsG) return false;
+  for (int i = 0; ret && i < nfaults; i++)
+  {
+    String locName = "Line" + std::to_string(i);
+    auto lineG      = SerializeHDF5::getGroup(*faultsG, locName);
+    if (!lineG) return false;
+
+    PolyLine2D fault;
+    ret = ret && fault._deserializeH5(*lineG, verbose);
+    addFault(fault);
+  }
+  return ret;
+}
+
+bool Faults::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto faultG = grp.createGroup("Faults");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(faultG, "NFaults", getNFaults());
+
+  auto faultsG = faultG.createGroup("Lines");
+  for (int ifault = 0, nfaults = getNFaults(); ret && ifault < nfaults; ifault++)
+  {
+    String locName = "Line" + std::to_string(ifault);
+    auto lineG     = faultsG.createGroup(locName);
+
+    ret = ret && _faults[ifault]._serializeH5(lineG, verbose);
+  }
+
+  return ret;
+}
+#endif

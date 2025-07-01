@@ -13,6 +13,7 @@
 #include "Mesh/MeshEStandard.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Basic/AException.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 MeshEStandard::MeshEStandard()
   : AMesh()
@@ -257,25 +258,15 @@ String MeshEStandard::toString(const AStringFormat* strfmt) const
 /**
  * Create a MeshEStandard by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (MeshEStandard format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (MeshEStandard format)
+ * @param verbose    Verbose
  */
-MeshEStandard* MeshEStandard::createFromNF(const String& neutralFilename, bool verbose)
+MeshEStandard* MeshEStandard::createFromNF(const String& NFFilename, bool verbose)
 {
-  MeshEStandard* mesh = nullptr;
-  std::ifstream is;
-  mesh = new MeshEStandard;
-  bool success = false;
-  if (mesh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  mesh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete mesh;
-    mesh = nullptr;
-  }
-  return mesh;
+  MeshEStandard* mesh = new MeshEStandard;
+  if (mesh->_fileOpenAndDeserialize(NFFilename, verbose)) return mesh;
+  delete mesh;
+  return nullptr;
 }
 
 MeshEStandard* MeshEStandard::createFromExternal(const MatrixDense &apices,
@@ -378,7 +369,7 @@ void MeshEStandard::_checkConsistency() const
     }
 }
 
-bool MeshEStandard::_deserialize(std::istream& is, bool verbose)
+bool MeshEStandard::_deserializeAscii(std::istream& is, bool verbose)
 {
   DECLARE_UNUSED(verbose);
   int ndim = 0;
@@ -410,7 +401,7 @@ bool MeshEStandard::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool MeshEStandard::_serialize(std::ostream& os, bool /*verbose*/) const
+bool MeshEStandard::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
 
@@ -489,3 +480,55 @@ void MeshEStandard::_defineBoundingBox(void)
   (void) _setExtend(extendmin,extendmax);
 }
 
+#ifdef HDF5
+bool MeshEStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto meshG = SerializeHDF5::getGroup(grp, "MeshEStandard");
+  if (!meshG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+  int napices = 0;
+  int npermesh = 0;
+  int nmeshes = 0;
+  VectorDouble apices;
+  VectorInt meshes;
+
+  ret = ret && SerializeHDF5::readValue(*meshG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NApices", napices);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NPerMesh", npermesh);
+  ret = ret && SerializeHDF5::readValue(*meshG, "NMeshes", nmeshes);
+  ret = ret && SerializeHDF5::readVec(*meshG, "Apices", apices);
+  ret = ret && SerializeHDF5::readVec(*meshG, "Meshes", meshes);
+
+  if (ret)
+  {
+    _apices = MatrixDense(napices, ndim);
+    _apices.setValues(apices);
+
+    _meshes = MatrixInt(nmeshes, npermesh);
+    _meshes.setValues(meshes);
+  }
+
+  return ret;
+}
+
+bool MeshEStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto meshG = grp.createGroup("MeshEStandard");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NDim", getNDim());
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NApices", getNApices());
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NPerMesh", getNApexPerMesh());
+  ret      = ret && SerializeHDF5::writeValue(meshG, "NMeshes", getNMeshes());
+  ret      = ret && SerializeHDF5::writeVec(meshG, "Apices", _apices.getValues());
+  ret      = ret && SerializeHDF5::writeVec(meshG, "Meshes", _meshes.getValues());
+
+  return ret;
+}
+#endif

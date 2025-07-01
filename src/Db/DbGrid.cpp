@@ -742,26 +742,28 @@ bool DbGrid::isConsistent() const
   return _grid.getNTotal() == getNSample();
 }
 
-bool DbGrid::_deserialize(std::istream& is, bool verbose)
+bool DbGrid::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret      = ret && _grid._deserialize(is, verbose);
-  ret      = ret && Db::_deserialize(is, verbose);
+
+  ret      = ret && _grid._deserializeAscii(is, verbose);
+  
+  ret      = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbGrid::_serialize(std::ostream& os, bool verbose) const
+bool DbGrid::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
   /* Writing the grid characteristics */
 
-  ret = ret && _grid._serialize(os, verbose);
+  ret = ret && _grid._serializeAscii(os, verbose);
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_serialize(os, verbose);
+  ret = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -769,40 +771,34 @@ bool DbGrid::_serialize(std::ostream& os, bool verbose) const
 #ifdef HDF5
 bool DbGrid::_deserializeH5(H5::Group& grp, bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "DbGrid" with some error handling
-  auto db = SerializeHDF5::getGroup(grp, "DbGrid");
-  if (!db)
+  auto dbgridG = SerializeHDF5::getGroup(grp, "DbGrid");
+  if (!dbgridG)
   {
     return false;
   }
 
   bool ret = true;
 
-  // call _deserialize on each member with the current class Group
-  ret = ret && _grid._deserializeH5(*db, verbose);
+  // call _deserializeAscii on each member with the current class Group
+  ret = ret && _grid._deserializeH5(*dbgridG, verbose);
 
-  // call _deserialize on the parent class with the current class Group
-  ret = ret && Db::_deserializeH5(*db, verbose);
+  // call _deserializeAscii on the parent class with the current class Group
+  ret = ret && Db::_deserializeH5(*dbgridG, verbose);
 
   return ret;
 }
 
 bool DbGrid::_serializeH5(H5::Group& grp, bool verbose) const
 {
-  // create a new H5 group every time we enter a _serialize method
-  // => easier to deserialize
-  auto db = grp.createGroup("DbGrid");
+  auto dbgridG = grp.createGroup("DbGrid");
 
   bool ret = true;
-  // serialize vector members using SerializeHDF5::writeVec
-  // (error handling is done in these methods)
 
-  // call _serialize on each member with the current class Group
-  ret = ret && _grid._serializeH5(db, verbose);
+  // call _serializeAscii on each member with the current class Group
+  ret = ret && _grid._serializeH5(dbgridG, verbose);
 
-  // call _serialize on the parent class with the current class Group
-  ret = ret && Db::_serializeH5(db, verbose);
+  // call _serializeAscii on the parent class with the current class Group
+  ret = ret && Db::_serializeH5(dbgridG, verbose);
 
   return ret;
 }
@@ -824,45 +820,19 @@ int DbGrid::gridDefine(const VectorInt& nx,
 /**
  * Create a Db by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (Db format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (Db format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbGrid* DbGrid::createFromNF(const String& neutralFilename, bool verbose)
-{
-  DbGrid* dbgrid = nullptr;
-  std::ifstream is;
-  dbgrid = new DbGrid;
-  bool success = false;
-  if (dbgrid->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = dbgrid->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbgrid;
-    dbgrid = nullptr;
-  }
-  return dbgrid;
-}
-
-#ifdef HDF5
-DbGrid* DbGrid::createFromH5(const String& H5Filename, bool verbose)
+DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
 {
   auto* dbgrid = new DbGrid;
-  auto file    = SerializeHDF5::fileOpenRead(H5Filename);
-
-  bool success = dbgrid->_deserializeH5(file, verbose);
-  if (!success)
-  {
-    delete dbgrid;
-    dbgrid = nullptr;
-  }
-  return dbgrid;
+  if (dbgrid->_fileOpenAndDeserialize(NFFilename, verbose)) return dbgrid;
+  delete dbgrid;
+  return nullptr;
 }
-#endif
 
 VectorDouble DbGrid::getColumnSubGrid(const String& name,
                                      int idim0,

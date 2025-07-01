@@ -29,8 +29,7 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static PolyElem* create();
-  static PolyElem* createFromNF(const String& neutralFilename, bool verbose = true);
-
+  static PolyElem* createFromNF(const String& NFFilename, bool verbose = true);
   const VectorDouble& getX() const { return PolyLine2D::getX(); }
   const VectorDouble& getY() const { return PolyLine2D::getY(); }
   double getX(int i) const { return PolyLine2D::getX(i); }
@@ -54,9 +53,12 @@ public:
   PolyElem reduceComplexity(double distmin) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "PolyElem"; }
 
 private:
@@ -66,5 +68,5 @@ private:
   double _zmin;
   double _zmax;
 
-  friend class Polygons; // TODO: to be improved (make serialize public)
+  friend class Polygons;
 };

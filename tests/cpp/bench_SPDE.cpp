@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
     DbStringFormat *dbfmt = DbStringFormat::createFromFlags(false, false, false, false, true);
     grid->display(dbfmt);
   }
-  (void) grid->dumpToNF("Grid.ascii");
+  (void) grid->dumpToNF("Grid.NF");
 
   delete dat ;
   delete grid;

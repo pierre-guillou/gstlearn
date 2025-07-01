@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
    dbgraphO->display();
 
   // Dump into a Neutral File
-  dbgraphO->dumpToNF("GraphO.ascii");
+  dbgraphO->dumpToNF("GraphO.NF");
 
   // Read from the Neutral File and print contents again
-  DbGraphO* dbgraphO2 = DbGraphO::createFromNF("GraphO.ascii");
+  DbGraphO* dbgraphO2 = DbGraphO::createFromNF("GraphO.NF");
   mestitle(1, "DbGraphO after Serialization / Deserialization");
   OptCst::define(ECst::NTROW, -1);
   OptCst::define(ECst::NTCOL, -1);

@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
   grid->display(&dbfmt);
 
-  (void) grid->dumpToNF("grid.ascii");
+  (void) grid->dumpToNF("grid.NF");
 
   delete grid;
   delete data;

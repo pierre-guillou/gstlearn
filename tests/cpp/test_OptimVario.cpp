@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   double dlag = diagonal / 2. / nlag;
   VarioParam* varioparam = VarioParam::createMultiple(4, nlag, dlag);
   Vario* vario = Vario::computeFromDb(*varioparam, db);
-  vario->dumpToNF("vario.ascii");
+  vario->dumpToNF("vario.NF");
 
   mestitle(1, "Initial Model");
   modelfit->display();
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
   mestitle(1, "Fitted Model");
   modelfit->display();
-  modelfit->dumpToNF("model.ascii");
+  modelfit->dumpToNF("model.NF");
 
   delete db;
   delete vario;

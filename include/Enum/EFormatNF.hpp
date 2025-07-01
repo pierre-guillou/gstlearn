@@ -8,19 +8,13 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Model/Model.hpp"
-#include "Simulation/CalcSimuTurningBands.hpp"
+#pragma once
 
-/**
- * This file is meant to parametrized the ModelGeneric in terms of ParamInfo
- * and to fit the values of these parameters according to the Maximum LogLikelihood
- * method and using the Vecchia approximation.
- */
-int main(int argc, char* argv[])
-{
-  DECLARE_UNUSED(argc);
-  DECLARE_UNUSED(argv);
-  Model* model = new Model();
-  delete model;
-  return (0);
-}
+#include "Enum/AEnum.hpp"
+
+#define ENUM_FORMATNF EFormatNF, DEFAULT,\
+                  DEFAULT,     0,  "Using the Defaulted Format", \
+                  ASCII,       1,  "Using ASCII Format", \
+                  H5,          2,  "Using the HDF5 Format"
+
+ENUM_DECLARE(ENUM_FORMATNF)

@@ -163,8 +163,7 @@ public:
    *  @{
    */
   static Db* create();
-  static Db* createFromNF(const String& neutralFilename,
-                          bool verbose = true);
+  static Db* createFromNF(const String& NFFilename, bool verbose = true);
   static Db* createFromSamples(int nech,
                                const ELoadBy& order             = ELoadBy::fromKey("SAMPLE"),
                                const VectorDouble& tab          = VectorDouble(),
@@ -921,9 +920,8 @@ public:
   void dumpGeometry(int iech, int jech) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

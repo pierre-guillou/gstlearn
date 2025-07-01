@@ -65,6 +65,7 @@
 %include Enum/ECalcMember.hpp
 %include Enum/EPostUpscale.hpp
 %include Enum/EPostStat.hpp
+%include Enum/EFormatNF.hpp
 
 %include Basic/ArgumentTest.hpp
 %include Basic/AStringable.hpp
