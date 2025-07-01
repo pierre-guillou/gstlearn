@@ -1059,8 +1059,6 @@ int db_selhull(Db *db1,
 #ifdef HDF5
 bool Polygons::_deserializeH5(H5::Group& grp, bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "Polygons" with some error handling
   auto polygonsG = SerializeHDF5::getGroup(grp, "Polygons");
   if (!polygonsG)
   {

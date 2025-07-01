@@ -67,7 +67,6 @@ public:
                          int iptr0);
 
 protected:
-  /// Interface for ASerializable
   virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
   virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5

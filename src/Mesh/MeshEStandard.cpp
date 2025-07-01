@@ -493,8 +493,6 @@ void MeshEStandard::_defineBoundingBox(void)
 #ifdef HDF5
 bool MeshEStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "MeshEStandard" with some error handling
   auto meshG = SerializeHDF5::getGroup(grp, "MeshEStandard");
   if (!meshG)
   {

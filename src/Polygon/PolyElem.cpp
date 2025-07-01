@@ -319,8 +319,6 @@ PolyElem PolyElem::reduceComplexity(double distmin) const
 #ifdef HDF5
 bool PolyElem::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "PolyElem" with some error handling
   auto polyelemG = SerializeHDF5::getGroup(grp, "PolyElem");
   if (!polyelemG)
   {

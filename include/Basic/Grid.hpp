@@ -165,7 +165,7 @@ public:
   int getMirrorIndex(int idim, int ix) const;
   bool isInside(const VectorInt& indices) const;
 
-  /// Interface for ASerializable
+protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;
   bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
@@ -198,5 +198,5 @@ private:
   mutable VectorInt _dummy;
   // Some working vectors, defined in order to avoid too many allocations
 
-
+  friend class DbGrid;
 };

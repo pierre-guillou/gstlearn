@@ -40,15 +40,16 @@ fileaux = ""
 if nargs > 2:
     fileaux = args[2]
 ranks = args[2:nargs]
+verbose = False
 
 # Get the Type of the File and stop if returned empty (file not found)
-filetype = gl.ASerializable.getFileIdentity(filename, False)
+filetype = gl.ASerializable.getFileIdentity(filename, verbose)
 if filetype == "":
     exit()
-filetaux = gl.ASerializable.getFileIdentity(fileaux, False)
+filetaux = gl.ASerializable.getFileIdentity(fileaux, verbose)
 
 if filetype == "Db":
-    db = gl.Db.createFromNF(filename,False)
+    db = gl.Db.createFromNF(filename, verbose)
     checkValidPointer(db)
     if len(ranks) > 0:
         varnames = getVariableNames(db, ranks)

@@ -1354,13 +1354,6 @@ bool Grid::_serializeAscii(std::ostream& os, [[maybe_unused]] bool verbose) cons
 #ifdef HDF5
 bool Grid::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  VectorInt nx;
-  VectorDouble x0;
-  VectorDouble dx;
-  VectorDouble angles;
-
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "Grid" with some error handling
   auto gridG = SerializeHDF5::getGroup(grp, "Grid");
   if (!gridG)
   {
@@ -1369,6 +1362,11 @@ bool Grid::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   /* Read the grid characteristics */
   bool ret = true;
+  VectorInt nx;
+  VectorDouble x0;
+  VectorDouble dx;
+  VectorDouble angles;
+
   ret = ret && SerializeHDF5::readVec(*gridG, "NX", nx);
   ret = ret && SerializeHDF5::readVec(*gridG, "X0", x0);
   ret = ret && SerializeHDF5::readVec(*gridG, "DX", dx);

@@ -116,7 +116,6 @@ public:
   void updateShift() const;
 
 protected:
-  /// Interface for ASerializable
   virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
   virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
 #ifdef HDF5

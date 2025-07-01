@@ -787,8 +787,6 @@ DbLine* DbLine::createMarkersFromGrid(const DbGrid& grid,
 #ifdef HDF5
 bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "DbLine" with some error handling
   auto dbg = SerializeHDF5::getGroup(grp, "DbLine");
   if (!dbg)
   {
@@ -796,9 +794,10 @@ bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   }
 
   /* Read the grid characteristics */
-  bool ret = true;
-  int ndim = 0;
+  bool ret   = true;
+  int ndim   = 0;
   int nbline = 0;
+
   ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
   ret = ret && SerializeHDF5::readValue(*dbg, "NLines", nbline);
 

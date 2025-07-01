@@ -745,7 +745,9 @@ bool DbGrid::isConsistent() const
 bool DbGrid::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
+
   ret      = ret && _grid._deserializeAscii(is, verbose);
+  
   ret      = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
@@ -769,8 +771,6 @@ bool DbGrid::_serializeAscii(std::ostream& os, bool verbose) const
 #ifdef HDF5
 bool DbGrid::_deserializeH5(H5::Group& grp, bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "DbGrid" with some error handling
   auto dbgridG = SerializeHDF5::getGroup(grp, "DbGrid");
   if (!dbgridG)
   {

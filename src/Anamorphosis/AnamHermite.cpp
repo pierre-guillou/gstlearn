@@ -910,8 +910,6 @@ double AnamHermite::evalSupportCoefficient(int option,
 #ifdef HDF5
 bool AnamHermite::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "AnamHermite" with some error handling
   auto anamG = SerializeHDF5::getGroup(grp, "AnamHermite");
   if (!anamG)
   {

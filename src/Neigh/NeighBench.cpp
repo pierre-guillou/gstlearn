@@ -267,8 +267,6 @@ void NeighBench::_bench(int iech_out, VectorInt& ranks)
 #ifdef HDF5
 bool NeighBench::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "NeighBench" with some error handling
   auto neighG = SerializeHDF5::getGroup(grp, "NeighBench");
   if (!neighG)
   {

@@ -183,8 +183,6 @@ void NeighUnique::_unique(int iech_out, VectorInt& ranks)
 #ifdef HDF5
 bool NeighUnique::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "NeighUnique" with some error handling
   auto neighG = SerializeHDF5::getGroup(grp, "NeighUnique");
   if (!neighG)
   {
@@ -201,7 +199,7 @@ bool NeighUnique::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
 bool NeighUnique::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 {
-  auto neighG = grp.createGroup("NeigUnique");
+  auto neighG = grp.createGroup("NeighUnique");
 
   bool ret = true;
 

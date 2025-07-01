@@ -585,8 +585,6 @@ void DbGraphO::setArcLine(const VectorInt& nodes, double value)
 #ifdef HDF5
 bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "DbGraphO" with some error handling
   auto dbg = SerializeHDF5::getGroup(grp, "DbGraphO");
   if (!dbg)
   {
@@ -596,11 +594,12 @@ bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   /* Read the grid characteristics */
   bool ret = true;
   int ndim = 0;
-  ret      = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
+
+  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
 
   // Reading the set of arcs for the Oriented Graph organization
   int narcs = 0;
-  ret = ret && SerializeHDF5::readValue(*dbg, "Narcs", narcs);
+  ret       = ret && SerializeHDF5::readValue(*dbg, "Narcs", narcs);
 
   NF_Triplet nft;
   VectorDouble tab(3);

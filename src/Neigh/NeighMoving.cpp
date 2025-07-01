@@ -791,8 +791,6 @@ void NeighMoving::_movingSelect(int nsel, VectorInt& ranks)
 #ifdef HDF5
 bool NeighMoving::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "NeighMoving" with some error handling
   auto neighG = SerializeHDF5::getGroup(grp, "NeighMoving");
   if (!neighG)
   {
@@ -848,7 +846,7 @@ bool NeighMoving::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
 
   ret = ret && ANeigh::_serializeH5(neighG, verbose);
 
-  ret = ret && SerializeHDF5::writeValue(neighG, "UseSectors", getFlagSector());
+  ret = ret && SerializeHDF5::writeValue(neighG, "UseSectors", (int) getFlagSector());
   ret = ret && SerializeHDF5::writeValue(neighG, "NMini", getNMini());
   ret = ret && SerializeHDF5::writeValue(neighG, "NMaxi", getNMaxi());
   ret = ret && SerializeHDF5::writeValue(neighG, "NSect", getNSect());

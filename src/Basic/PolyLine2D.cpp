@@ -720,8 +720,6 @@ double distanceBetweenPolylines(const PolyLine2D& poly1,
 #ifdef HDF5
 bool PolyLine2D::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "PolyLone2D" with some error handling
   auto polyline2DG = SerializeHDF5::getGroup(grp, "PolyLine2D");
   if (!polyline2DG)
   {
@@ -729,8 +727,9 @@ bool PolyLine2D::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   }
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::readVec(*polyline2DG, "X", _x);
-  ret      = ret && SerializeHDF5::readVec(*polyline2DG, "Y", _y);
+
+  ret = ret && SerializeHDF5::readVec(*polyline2DG, "X", _x);
+  ret = ret && SerializeHDF5::readVec(*polyline2DG, "Y", _y);
 
   return ret;
 }

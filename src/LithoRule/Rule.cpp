@@ -1123,8 +1123,6 @@ Rule* Rule::createFromFaciesCount(int nfacies, double rho)
 #ifdef HDF5
 bool Rule::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "Rule" with some error handling
   auto ruleG = SerializeHDF5::getGroup(grp, "Rule");
   if (!ruleG)
   {

@@ -60,7 +60,7 @@ bool ASerializable::dumpToNF(const String& NFFilename, bool verbose) const
 #ifdef HDF5
 bool ASerializable::dumpToH5(const String& H5Filename, bool verbose) const
 {
-  auto file = SerializeHDF5::fileOpenWrite(H5Filename);
+  auto file = SerializeHDF5::fileOpenWrite(*this, H5Filename);
   bool ret  = _serializeH5(file, verbose);
   if (!ret)
   {
@@ -162,36 +162,65 @@ String ASerializable::buildFileName(int status, const String& filename, bool ens
 String ASerializable::getFileIdentity(const String& filename, bool verbose)
 {
   // Preliminary check (no message if string is empty ... even in verbose)
-  if (filename.empty())
-  {
-    return String();
-  }
-
+  if (filename.empty()) return String();
   if (verbose)
     message("Input File Name = %s\n", filename.c_str());
 
-  // Open the File
-  std::ifstream file(filename);
-  if (!file.is_open())
+  // Build the multi-platform filename
+  const auto filepath = ASerializable::buildFileName(1, filename, true);
+  if (verbose)
+    message("Input File Path = %s\n", filepath.c_str());
+
+  // Open the file according to various formats
+  int ret_type = -1;
+  String classType;
+
+#ifdef HDF5
+  if (ret_type < 0)
   {
-    if (verbose) messerr("Could not open the Neutral File %s", filename.c_str());
-    return String();
+    // Check if the file is written at format HDF5
+    if (H5::H5File::isHdf5(filepath))
+    {
+
+      // Attempt to open according to a H5 format
+      H5::H5File file {filepath, H5F_ACC_RDONLY};
+
+      if (!file.nameExists("gstlearn metadata"))
+      {
+        messerr("File %s doesn't contain Gstlearn metadata…", filepath.c_str());
+        return String();
+      }
+      ret_type = 1;
+
+      // Read the class type
+      classType = SerializeHDF5::getFileClass(filepath, verbose);
+    }
+  }
+#endif
+
+  if (ret_type < 0)
+  {
+
+    // Attempt to open according to the ASCII format
+    std::ifstream file(filepath);
+    if (!file.is_open())
+    {
+      if (verbose) messerr("Could not open the Neutral File %s", filepath.c_str());
+      return String();
+    }
+    ret_type = 0;
+
+    // Read the Class Type
+    gslSafeGetline(file, classType);
+    classType = trimRight(classType);
+
+    // Close the file
+    file.clear();
   }
 
-  // Read the File Header
-  String filetype;
-  //std::getline(file, filetype);
-  gslSafeGetline(file, filetype);
+  if (verbose) message("Decoded Type = %s\n", classType.c_str());
 
-  // Suppress trailing blanks
-  filetype = trimRight(filetype);
-
-  // Close the file
-  file.clear();
-
-  if (verbose) message("Decoded Type = %s\n", filetype.c_str());
-
-  return filetype;
+  return classType;
 }
 
 void ASerializable::setPrefixName(const String& prefixName)

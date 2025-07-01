@@ -205,8 +205,6 @@ double FracEnviron::getXextend() const
 #ifdef HDF5
 bool FracEnviron::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "FracEnviron" with some error handling
   auto fracG = SerializeHDF5::getGroup(grp, "FracEnviron");
   if (!fracG)
   {

@@ -56,14 +56,16 @@ public:
   double getTheta0() const { return _theta0; }
   void setTheta0(double theta0) { _theta0 = theta0; }
 
-protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+public:
+  /// Interface for ASerializable
+  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
+  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
 #endif
-  String _getNFName() const override { return "FracFamily"; }
+protected:
+  String _getNFName() const override { return "Family"; }
 
 private:
   double _orient;              //!< Mean orientation

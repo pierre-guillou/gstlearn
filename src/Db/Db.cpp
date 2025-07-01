@@ -4861,14 +4861,6 @@ bool Db::_serializeH5(H5::Group& grp, bool /*verbose*/) const
 
 bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  VectorString locators;
-  VectorString names;
-  VectorInt colIds;
-
-  // we get the H5::Group that has the name of the current class
-
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "Db" with some error handling
   auto dbG = SerializeHDF5::getGroup(grp, "Db");
   if (!dbG)
   {
@@ -4876,6 +4868,9 @@ bool Db::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   }
 
   // a DataSet == a Db column
+  VectorString locators;
+  VectorString names;
+  VectorInt colIds;
   int ncol {};
   for (hsize_t i = 0; i < dbG->getNumObjs(); ++i)
   {

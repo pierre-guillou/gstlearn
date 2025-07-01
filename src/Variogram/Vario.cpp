@@ -5130,8 +5130,6 @@ VectorDouble Vario::computeWeightsFromVario(int wmode) const
 #ifdef HDF5
 bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "Vario" with some error handling
   auto varioG = SerializeHDF5::getGroup(grp, "Vario");
   if (!varioG)
   {

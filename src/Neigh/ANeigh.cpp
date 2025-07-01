@@ -451,8 +451,6 @@ void ANeigh::_neighCompress(VectorInt& ranks) {
 #ifdef HDF5
 bool ANeigh::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "ANeigh" with some error handling
   auto aneighG = SerializeHDF5::getGroup(grp, "ANeigh");
   if (!aneighG)
   {
@@ -462,7 +460,9 @@ bool ANeigh::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   /* Read the grid characteristics */
   bool ret = true;
   int ndim = 0;
-  ret      = ret && SerializeHDF5::readValue(*aneighG, "NDim", ndim);
+
+  ret = ret && SerializeHDF5::readValue(*aneighG, "NDim", ndim);
+
   if (ret) setNDim(ndim);
 
   return ret;
@@ -473,7 +473,8 @@ bool ANeigh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   auto aneighG = grp.createGroup("ANeigh");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(aneighG, "NDim", (int) getNDim());
+
+  ret = ret && SerializeHDF5::writeValue(aneighG, "NDim", (int)getNDim());
 
   return ret;
 }

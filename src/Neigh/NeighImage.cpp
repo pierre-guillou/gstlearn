@@ -250,8 +250,6 @@ DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, int seed) const
 #ifdef HDF5
 bool NeighImage::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "NeighImage" with some error handling
   auto neighG = SerializeHDF5::getGroup(grp, "NeighImage");
   if (!neighG)
   {

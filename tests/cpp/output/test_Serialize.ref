@@ -1,4 +1,96 @@
 
+Data Base Characteristics
+=========================
+
+Data Base Summary
+-----------------
+File is organized as a set of isolated points
+Space dimension              = 2
+Number of Columns            = 5
+Total number of samples      = 20
+
+Variables
+---------
+Column = 0 - Name = rank - Locator = NA
+Column = 1 - Name = x-1 - Locator = x1
+Column = 2 - Name = x-2 - Locator = x2
+Column = 3 - Name = myvar1 - Locator = z1
+Column = 4 - Name = myvar2 - Locator = NA
+
+Data Base Characteristics
+=========================
+
+Data Base Summary
+-----------------
+File is organized as a set of isolated points
+Space dimension              = 2
+Number of Columns            = 5
+Total number of samples      = 20
+
+Variables
+---------
+Column = 0 - Name = rank - Locator = NA
+Column = 1 - Name = x-1 - Locator = x1
+Column = 2 - Name = x-2 - Locator = x2
+Column = 3 - Name = myvar1 - Locator = z1
+Column = 4 - Name = myvar2 - Locator = NA
+
+Data Base Grid Characteristics
+==============================
+
+Data Base Summary
+-----------------
+File is organized as a regular grid
+Space dimension              = 2
+Number of Columns            = 5
+Total number of samples      = 120
+
+Grid characteristics:
+---------------------
+Origin :      0.200     0.400
+Mesh   :      0.100     0.300
+Number :         12        10
+
+Variables
+---------
+Column = 0 - Name = rank - Locator = NA
+Column = 1 - Name = x1 - Locator = x1
+Column = 2 - Name = x2 - Locator = x2
+Column = 3 - Name = myvar1 - Locator = z1
+Column = 4 - Name = myvar2 - Locator = z2
+
+Data Base Grid Characteristics
+==============================
+
+Data Base Summary
+-----------------
+File is organized as a regular grid
+Space dimension              = 2
+Number of Columns            = 5
+Total number of samples      = 120
+
+Grid characteristics:
+---------------------
+Origin :      0.200     0.400
+Mesh   :      0.100     0.300
+Number :         12        10
+
+Variables
+---------
+Column = 0 - Name = rank - Locator = NA
+Column = 1 - Name = x1 - Locator = x1
+Column = 2 - Name = x2 - Locator = x2
+Column = 3 - Name = myvar1 - Locator = z1
+Column = 4 - Name = myvar2 - Locator = z2
+
+Polygons
+--------
+Number of Polygon Sets = 2
+
+Polygons
+--------
+Number of Polygon Sets = 2
+
 Variogram characteristics
 =========================
 Number of variable(s)       = 1
@@ -56,3 +148,139 @@ For variable 1
          7     4.000     0.133     1.158
          8     5.000     0.158     0.158
          9     2.000     0.179     0.912
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 1
+Number of basic structure(s) = 1
+Number of drift function(s)  = 0
+Number of drift equation(s)  = 0
+
+Covariance Part
+---------------
+Exponential
+- Sill         =      0.200
+- Range        =      0.300
+- Theo. Range  =      0.100
+Total Sill     =      0.200
+Known Mean(s)     0.000
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 1
+Number of basic structure(s) = 1
+Number of drift function(s)  = 0
+Number of drift equation(s)  = 0
+
+Covariance Part
+---------------
+Exponential
+- Sill         =      0.200
+- Range        =      0.300
+- Theo. Range  =      0.100
+Total Sill     =      0.200
+Known Mean(s)     0.000
+- Number of Rows    = 10
+- Number of Columns = 3
+
+      0.093      0.811      0.117
+      0.295      0.979      0.758
+      0.608      0.803      0.315
+      0.075      0.894      0.838
+      0.993      0.248      0.992
+      0.120      0.604      0.369
+      0.775      0.427      0.874
+      0.723      0.900      0.482
+      0.660      0.288      0.254
+      0.693      0.753      0.088
+- Number of Rows    = 10
+- Number of Columns = 3
+
+      0.093      0.811      0.117
+      0.295      0.979      0.758
+      0.608      0.803      0.315
+      0.075      0.894      0.838
+      0.993      0.248      0.992
+      0.120      0.604      0.369
+      0.775      0.427      0.874
+      0.723      0.900      0.482
+      0.660      0.288      0.254
+      0.693      0.753      0.088
+
+Lithotype Rule
+==============
+- Number of nodes               = 7
+- Number of facies              = 4
+- Number of thresholds along G1 = 2
+- Number of thresholds along G2 = 1
+
+Node F1 - Facies 1
+Node F2 - Facies 2
+Node F3 - Facies 3
+Node F4 - Facies 4
+
+Lithotype Rule
+==============
+- Number of nodes               = 7
+- Number of facies              = 4
+- Number of thresholds along G1 = 2
+- Number of thresholds along G2 = 1
+
+Node F1 - Facies 1
+Node F2 - Facies 2
+Node F3 - Facies 3
+Node F4 - Facies 4
+Number of Vertices = 100
+Line Vertex Coordinates
+               [,  0]    [,  1]
+     [  0,]     1.274     0.946
+     [  1,]     0.451     0.111
+     [  2,]     1.174    -0.710
+     [  3,]     0.268    -0.154
+     [  4,]    -0.532    -0.343
+     [  5,]    -0.188     0.048
+     [  6,]    -1.087     1.010
+(Nrows=7[from 100])
+Number of Vertices = 100
+Line Vertex Coordinates
+               [,  0]    [,  1]
+     [  0,]     1.274     0.946
+     [  1,]     0.451     0.111
+     [  2,]     1.174    -0.710
+     [  3,]     0.268    -0.154
+     [  4,]    -0.532    -0.343
+     [  5,]    -0.188     0.048
+     [  6,]    -1.087     1.010
+(Nrows=7[from 100])
+
+Moving Neighborhood
+===================
+Minimum number of samples           = 2
+Maximum number of samples           = 20
+Number of angular sectors           = 5
+Maximum number of points per sector = 3
+Anisotropic Ranges :     8.000    12.000
+Anisotropy Rotation :
+               [,  0]    [,  1]
+     [  0,]     0.906    -0.423
+     [  1,]     0.423     0.906
+
+Moving Neighborhood
+===================
+Minimum number of samples           = 2
+Maximum number of samples           = 20
+Number of angular sectors           = 5
+Maximum number of points per sector = 3
+Anisotropic Ranges :     8.000    12.000
+Anisotropy Rotation :
+               [,  0]    [,  1]
+     [  0,]     0.906    -0.423
+     [  1,]     0.423     0.906
+
+Unique Neighborhood
+===================
+
+Unique Neighborhood
+===================

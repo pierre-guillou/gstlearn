@@ -139,8 +139,6 @@ bool FracFault::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 #ifdef HDF5
 bool FracFault::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "FracFault" with some error handling
   auto faultG = SerializeHDF5::getGroup(grp, "FracFault");
   if (!faultG)
   {

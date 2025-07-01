@@ -100,7 +100,7 @@ protected:
   bool _isDimensionValid(int idim) const;
   Ball& getBall() { return _ball; }
 
-  // Interface for ASerializable
+protected:
   virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
   virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5

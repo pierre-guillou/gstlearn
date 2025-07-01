@@ -318,8 +318,6 @@ String Table::getRowName(int irow) const
 #ifdef HDF5
 bool Table::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "Table" with some error handling
   auto tableG = SerializeHDF5::getGroup(grp, "Table");
   if (!tableG)
   {

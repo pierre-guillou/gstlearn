@@ -501,8 +501,6 @@ bool AnamEmpirical::_deserializeAscii(std::istream& is, bool verbose)
 #ifdef HDF5
 bool AnamEmpirical::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "AnamEmpirical" with some error handling
   auto anamG = SerializeHDF5::getGroup(grp, "AnamEmpirical");
   if (!anamG)
   {

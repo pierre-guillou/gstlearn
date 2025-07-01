@@ -182,8 +182,6 @@ bool DbMeshTurbo::isConsistent() const
 #ifdef HDF5
 bool DbMeshTurbo::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "DbMeshTurbo" with some error handling
   auto dbg = SerializeHDF5::getGroup(grp, "DbMeshTurbo");
   if (!dbg)
   {

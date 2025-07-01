@@ -1055,8 +1055,6 @@ bool isTurbo(const VectorMeshes& meshes)
 #ifdef HDF5
 bool MeshETurbo::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "MeshETurbo" with some error handling
   auto meshG = SerializeHDF5::getGroup(grp, "MeshETurbo");
   if (!meshG)
   {

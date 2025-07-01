@@ -40,8 +40,10 @@ bool SerializeNeutralFile::fileOpenRead(const ASerializable& parent,
 {
   // Close the stream if opened
   if (is.is_open()) is.close();
+
   // Build the multi-platform filename
   String filepath = ASerializable::buildFileName(1, filename, true);
+  
   // Open new stream
   is.open(filepath, std::ios::in);
   if (!is.is_open())

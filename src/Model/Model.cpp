@@ -1390,8 +1390,6 @@ Model* Model::createFillRandom(int ndim,
 #ifdef HDF5
 bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "Model" with some error handling
   auto modelG = SerializeHDF5::getGroup(grp, "Model");
   if (!modelG)
   {

@@ -983,8 +983,6 @@ int AnamDiscreteDD::factor2Selectivity(Db *db,
 #ifdef HDF5
 bool AnamDiscreteDD::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "AnamDiscreteDD" with some error handling
   auto anamG = SerializeHDF5::getGroup(grp, "AnamDiscreteDD");
   if (!anamG)
   {

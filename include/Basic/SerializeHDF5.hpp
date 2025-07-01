@@ -80,18 +80,21 @@ namespace SerializeHDF5
   {
     if (!obj.attrExists(key))
     {
-      messerr("Could not read attribute %s: attributo does not exist", key.c_str());
+      messerr("Could not read attribute '%s': attribute does not exist", key.c_str());
       return {};
     }
 
-    const auto attr = obj.openAttribute(key);
+    auto attr = obj.openAttribute(key);
     T res;
+
     if constexpr (std::is_same<T, std::string>::value)
       attr.read(getHDF5Type(res), res);
     else if constexpr (std::is_convertible<T, std::string>::value)
       attr.read(getHDF5Type(res), std::string{res});
     else
       attr.read(getHDF5Type(res), &res);
+
+    attr.close();
     return res;
   }
 
@@ -118,24 +121,57 @@ namespace SerializeHDF5
       messerr("File %s has format version %s, expected 1.0.0", filepath.c_str(),
               version.c_str());
     }
-
     return file;
+  }
+
+  inline String getFileClass(const String& filepath, bool verbose = false)
+  {
+    H5::H5File file {filepath, H5F_ACC_RDONLY};
+
+    if (!file.nameExists("gstlearn metadata"))
+    {
+      messerr("File %s doesn't contain Gstlearn metadata…", filepath.c_str());
+      return String();
+    }
+
+    auto metadata = file.openGroup("gstlearn metadata");
+    if (verbose)
+      message("Metadata:\n");
+
+    const auto version = readAttribute(metadata, "Format version");
+    if (version != "1.0.0")
+    {
+      messerr("File %s has format version %s, expected 1.0.0", filepath.c_str(),
+              version.c_str());
+      return String();
+    }
+    if (verbose)
+      message("- Version = %s\n", version.c_str());
+
+    const auto classType = readAttribute(metadata, "Class_Type");
+    if (verbose)
+      message("- Class_Type = %s\n", classType.c_str());
+
+    return classType;
   }
 
   /**
    * @brief Open HDF5 file in write mode, write metadata
    */
-  inline H5::H5File fileOpenWrite(const String& fname)
+  inline H5::H5File fileOpenWrite(const ASerializable& parent,
+                                  const String& fname)
   {
     // Build the multi-platform filename
     const auto filepath = ASerializable::buildFileName(2, fname, true);
 
     H5::H5File file {filepath, H5F_ACC_TRUNC};
     auto metadata = file.createGroup("gstlearn metadata");
-    createAttribute(
-      metadata, "Description",
-      "This file is used to Serialize gstlearn's internal data structures");
-    createAttribute(metadata, "Format version", "1.0.0");
+    createAttribute(metadata, "Description",
+                    "This file is used to Serialize gstlearn's internal data structures");
+    createAttribute(metadata, "Format version",
+                    "1.0.0");
+    createAttribute(metadata, "Class_Type",
+                    parent._getNFName());
     return file;
   }
 
@@ -358,20 +394,21 @@ bool SerializeHDF5::readValue(const H5::Group& grp, const String& name, T& value
 
   if (!grp.attrExists(name))
   {
-    messerr("Could not read value %s in group %s: attribute does not exist", name.c_str(),
+    messerr("Could not read value '%s' in group '%s': attribute does not exist", name.c_str(),
             grp_name.data());
     return false;
   }
 
-  const auto attr = grp.openAttribute(name);
+  auto attr = grp.openAttribute(name);
   if (attr.getDataType() != getHDF5Type(value))
   {
-    messerr("Could not read value %s in group %s: mismatch in datatypes", name.c_str(),
+    messerr("Could not read value '%s' in group '%s': mismatch in datatypes", name.c_str(),
             grp_name.data());
     return false;
   }
 
   attr.read(getHDF5Type(value), &value);
+  attr.close();
   return true;
 }
 

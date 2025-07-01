@@ -244,8 +244,6 @@ VectorDouble DbMeshStandard::getCoordinatesPerMesh(int imesh, int idim, bool fla
 #ifdef HDF5 
 bool DbMeshStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "DbMeshStandard" with some error handling
   auto dbg = SerializeHDF5::getGroup(grp, "DbMeshStandard");
   if (!dbg)
   {
@@ -255,6 +253,7 @@ bool DbMeshStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbos
   /* Read the grid characteristics */
   bool ret = true;
   int ndim = 0;
+
   ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
 
   ret = ret && _mesh._deserializeH5(*dbg, verbose);

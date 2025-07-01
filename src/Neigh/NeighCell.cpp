@@ -212,8 +212,6 @@ int NeighCell::_cell(int iech_out, VectorInt& ranks)
 #ifdef HDF5
 bool NeighCell::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
-  // Call SerializeHDF5::getGroup to get the subgroup of grp named
-  // "neighG" with some error handling
   auto neighG = SerializeHDF5::getGroup(grp, "NeighCell");
   if (!neighG)
   {
