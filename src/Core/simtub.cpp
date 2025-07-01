@@ -41,7 +41,6 @@
 #include "Simulation/CalcSimuRefine.hpp"
 #include "Simulation/CalcSimuEden.hpp"
 #include "Simulation/CalcSimuFFT.hpp"
-#include "Basic/Memory.hpp"
 #include "Core/Keypair.hpp"
 
 #include <math.h>
@@ -1724,17 +1723,18 @@ int simtub_constraints(Db* dbin,
                                          double percent,
                                          VectorDouble& tab))
 {
-  int *nx, iatt, retval, nbtest;
+  int iatt, retval, nbtest;
   int error, nbsimu, nvalid, isimu, ndim, iter, nech, flag_grid, i;
-  double *dx, *x0, percent;
+  double percent;
   VectorDouble tab;
+  VectorDouble dx;
+  VectorDouble x0;
+  VectorInt nx;
 
   /* Initializations */
 
   error = 1;
   law_set_random_seed(seed);
-  nx = nullptr;
-  dx = x0 = nullptr;
   cols.clear();
 
   /* Preliminary check */
@@ -1746,12 +1746,9 @@ int simtub_constraints(Db* dbin,
   if (flag_grid)
   {
     DbGrid* dbgrid = dynamic_cast<DbGrid*>(dbout);
-    nx = (int*) mem_alloc(sizeof(int) * ndim, 0);
-    if (nx == nullptr) goto label_end;
-    dx = (double*) mem_alloc(sizeof(double) * ndim, 0);
-    if (dx == nullptr) goto label_end;
-    x0 = (double*) mem_alloc(sizeof(double) * ndim, 0);
-    if (x0 == nullptr) goto label_end;
+    nx.resize(ndim);
+    dx.resize(ndim);
+    x0.resize(ndim);
 
     for (i = 0; i < ndim; i++)
     {
@@ -1787,7 +1784,8 @@ int simtub_constraints(Db* dbin,
       /* Check if the simulation is valid */
 
       percent = 100. * nvalid / nbsimu_min;
-      retval = func_valid(flag_grid, ndim, nech, nx, dx, x0, TEST, percent, tab);
+      retval  = func_valid(flag_grid, ndim, nech,
+                           nx.data(), dx.data(), x0.data(), TEST, percent, tab);
       if (retval == 0)
       {
 
@@ -1836,9 +1834,6 @@ int simtub_constraints(Db* dbin,
   error = 0;
 
   label_end:
-  mem_free((char* ) nx);
-  mem_free((char* ) dx);
-  mem_free((char* ) x0);
   return (error);
 }
 
@@ -2104,14 +2099,16 @@ int simRI(Db *dbout,
           int nbtuba,
           int verbose)
 {
-  double *pres, *pton, *sort, cumul, simval, proba, seuil;
+  double cumul, simval, proba, seuil;
   int icut, error, iptrg, iptrs, nech, iech, count, total;
+  VectorDouble sort;
+  VectorDouble pton;
+  VectorDouble pres;
 
   /* Initializations */
 
   error = 1;
   iptrg = iptrs = -1;
-  pres = pton = sort = nullptr;
   nech = dbout->getNSample();
   law_set_random_seed(seed);
   if (st_check_simtub_environment(NULL, dbout, model, NULL)) goto label_end;
@@ -2130,12 +2127,9 @@ int simRI(Db *dbout,
 
   /* Add the attributes for storing the results */
 
-  sort = (double*) mem_alloc(sizeof(double) * nech, 0);
-  if (sort == nullptr) goto label_end;
-  pton = (double*) mem_alloc(sizeof(double) * ncut, 0);
-  if (pton == nullptr) goto label_end;
-  pres = (double*) mem_alloc(sizeof(double) * (ncut - 1), 0);
-  if (pres == nullptr) goto label_end;
+  sort.resize(nech);
+  pton.resize(ncut);
+  pres.resize(ncut - 1);
   if (db_locator_attribute_add(dbout, ELoc::SEL, 1, 0, 0., &iptrs))
     goto label_end;
   if (db_locator_attribute_add(dbout, ELoc::SIMU, 1, 0, 0., &iptrg))
@@ -2192,7 +2186,7 @@ int simRI(Db *dbout,
     /* Look for the quantile */
 
     proba = 1. - pres[icut];
-    seuil = (icut < ncut - 1) ? st_quantile(dbout, proba, sort) : TEST;
+    seuil = (icut < ncut - 1) ? st_quantile(dbout, proba, sort.data()) : TEST;
 
     /* Update the current selection */
 
@@ -2227,9 +2221,6 @@ int simRI(Db *dbout,
   error = 0;
 
   label_end:
-  mem_free((char* ) sort);
-  mem_free((char* ) pton);
-  mem_free((char* ) pres);
   if (iptrs >= 0) dbout->deleteColumnByUID(iptrs);
   return (error);
 }
