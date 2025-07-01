@@ -64,7 +64,7 @@ CovBase::CovBase(const CovBase& r)
   _cholSills     = r._cholSills;
   _sillCur       = r._sillCur;
   _workMat       = r._workMat;
-  _cor           = (ACov*)r._cor->clone();
+  _cor           = std::dynamic_pointer_cast<ACov>(r._cor->cloneShared());
 
 }
 
@@ -76,7 +76,7 @@ CovBase& CovBase::operator=(const CovBase& r)
     _cholSills     = r._cholSills;
     _sillCur       = r._sillCur;
     _workMat       = r._workMat;
-    _cor           = (ACov*)r._cor->clone();
+    _cor           = std::dynamic_pointer_cast<ACov>(r._cor->cloneShared());
     _itRange       = LowerTriangularRange(r._cholSills.getNRows());
   }
   return *this;
@@ -88,7 +88,7 @@ CovBase::~CovBase()
 
 void CovBase::setCor(ACov* cor)
 {
-  _cor     = cor;
+  _cor     = std::dynamic_pointer_cast<ACov>(cor->cloneShared());
   int nvar = getNVar();
   if (cor != nullptr)
   {

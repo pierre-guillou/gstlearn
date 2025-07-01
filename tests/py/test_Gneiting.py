@@ -8,9 +8,13 @@ coords1 = [12,3,1]
 coords2 = [4,5,2]
 space1D = gl.SpaceRN.create(1)
 sep = 1
-covtemp = gl.Model.createFromParam(gl.ECov.EXPONENTIAL,ranges =scaleT,flagRange = False, space = space1D).getCovAniso(0)
-covspat = gl.Model.createFromParam(gl.ECov.EXPONENTIAL,ranges =scales,flagRange = False).getCovAniso(0)
-gneiting = gl.CorGneiting(covspat.getCorAniso(),covtemp.getCorAniso(),sep)
+covtemp = gl.Model.createFromParam(gl.ECov.EXPONENTIAL,ranges =scaleT,flagRange = False, space = space1D)
+ct = covtemp.getCovAniso(0)
+ct0 = ct.getCorAniso()
+covspat = gl.Model.createFromParam(gl.ECov.EXPONENTIAL,ranges =scales,flagRange = False)
+cs = covspat.getCovAniso(0)
+cs0 = cs.getCorAniso()
+gneiting = gl.CorGneiting(cs0,ct0,sep)
 p1 = gl.SpacePoint(gneiting.getSpace())
 p2 = gl.SpacePoint(gneiting.getSpace())
 p1.setCoords(coords1)
@@ -37,24 +41,24 @@ print("Displaying the last coordinate (temporal) of the second space point")
 
 p2_1.display()
 
-ct = covtemp.evalCov(p1_1,p2_1) 
-print("Difference for temporal covariance " + str(ct - np.exp(-np.abs(coords1[2]-coords2[2])/scaleT)))
+covt = covtemp.evalCov(p1_1,p2_1) 
+print("Difference for temporal covariance " + str(covt - np.exp(-np.abs(coords1[2]-coords2[2])/scaleT)))
 
 al = sep/2
 
-covspatCopy = gl.CovAniso(covspat)
-covspatCopy.setScaleDim(0,covspat.getScale(0)/ct**al)
-covspatCopy.setScaleDim(1,covspat.getScale(1)/ct**al)
+covspatCopy = gl.CovAniso(cs)
+covspatCopy.setScaleDim(0,cs.getScale(0)/covt**al)
+covspatCopy.setScaleDim(1,cs.getScale(1)/covt**al)
 
-cs = covspatCopy.evalCov(p1_0,p2_0)
+covs = covspatCopy.evalCov(p1_0,p2_0)
+
 
 delta = [np.abs(coords1[0]-coords2[0]),np.abs(coords1[1]-coords2[1])]
-diff = cs - np.exp(-np.sqrt((ct**al * delta[0]/scales[0])**2 
-                         +  (ct**al * delta[1]/scales[1])**2))
+diff = covs - np.exp(-np.sqrt((covt**al * delta[0]/scales[0])**2 
+                         +  (covt**al * delta[1]/scales[1])**2))
 print("Difference for spatial covariance (corrected) " 
       + str(np.round(diff,dig)))
 
-print("Difference for Gneiting cov " +str(cres - cs * ct))
-
+print("Difference for Gneiting cov " +str(cres - covs * covt))
 
 

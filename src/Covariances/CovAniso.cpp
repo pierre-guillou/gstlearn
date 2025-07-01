@@ -99,7 +99,6 @@ CovAniso& CovAniso::operator=(const CovAniso& r)
 
 CovAniso::~CovAniso()
 {
-  delete getCorAniso();
 }
 
 CorAniso* CovAniso::getCorAniso()

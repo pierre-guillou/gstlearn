@@ -11,16 +11,18 @@
 
 #include "Covariances/CorGneiting.hpp"
 #include "Basic/AStringable.hpp"
+#include "Covariances/CorAniso.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Space/ASpace.hpp"
 #include "Space/SpaceComposite.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Covariances/CovCalcMode.hpp"
+#include <memory>
 
 CorGneiting::CorGneiting(const CorAniso* covS, const CorAniso* covTemp, double separability)
   : ACov()
-  , _covS(covS)
-  , _covTemp(covTemp)
+  , _covS(std::shared_ptr<const CorAniso>(std::dynamic_pointer_cast<const CorAniso>((covS->cloneShared()))))
+  , _covTemp(std::shared_ptr<const CorAniso>(std::dynamic_pointer_cast<const CorAniso>((covTemp->cloneShared()))))
   , _separability(separability)
   , _covSCopy(*covS)
 {
