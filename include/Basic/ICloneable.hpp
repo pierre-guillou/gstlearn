@@ -30,6 +30,10 @@ public:
   {
     return std::shared_ptr<ICloneable>(clone());
   }
+  std::unique_ptr<ICloneable> cloneUnique() const
+  {
+    return std::unique_ptr<ICloneable>(clone());
+  }
   #endif
 };
 
