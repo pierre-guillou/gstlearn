@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
   // Creating the Rule
   Rule* rule = Rule::createFromNames({"S","T","F1","F2","F3"});
   RuleProp* ruleprop = RuleProp::createFromRule(rule, props);
-  rule->dumpToNF("rule.ascii");
+  rule->dumpToNF("rule.NF");
 
   auto ndata = 100;
   Db* dat = Db::createFromBox(ndata, {0.,0.}, {100.,100.}, 32432);
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
   DbStringFormat dbfmt(FLAG_STATS,{"Facies"});
   grid->display(&dbfmt);
-  (void) grid->dumpToNF("pgs.ascii");
+  (void) grid->dumpToNF("pgs.NF");
 
   delete db;
   delete grid;

@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Enum/EFormatNF.hpp"
 #include "Enum/ESpaceType.hpp"
 
 #include "Space/ASpaceObject.hpp"
@@ -180,14 +181,14 @@ int main(int argc, char *argv[])
   grid_res = grid->clone();
   simtub(data, grid_res, model, neighM, nbsimu);
   grid_res->display(&dbfmt);
-  (void) grid_res->dumpToNF("Moving.ascii",verbose);
+  (void) grid_res->dumpToNF("Moving.NF",EFormatNF::DEFAULT,verbose);
 
   message("\n<----- Simulation (Unique Neighborhood) ----->\n");
   delete grid_res;
   grid_res = grid->clone();
   simtub(data, grid_res, model, neighU, nbsimu);
   grid_res->display(&dbfmt);
-  (void) grid_res->dumpToNF("Unique.ascii",verbose);
+  (void) grid_res->dumpToNF("Unique.NF",EFormatNF::DEFAULT,verbose);
 
   timer.displayIntervalMilliseconds("Turning Band Simulations", 773);
 

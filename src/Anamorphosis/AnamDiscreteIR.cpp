@@ -11,6 +11,7 @@
 #include "Anamorphosis/AnamDiscreteIR.hpp"
 #include "Db/Db.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 #include <math.h>
 
@@ -44,22 +45,12 @@ AnamDiscreteIR::~AnamDiscreteIR()
 
 }
 
-AnamDiscreteIR* AnamDiscreteIR::createFromNF(const String& neutralFilename, bool verbose)
+AnamDiscreteIR* AnamDiscreteIR::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamDiscreteIR* anam = nullptr;
-  std::ifstream is;
-  anam = new AnamDiscreteIR();
-  bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  anam->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete anam;
-    anam = nullptr;
-  }
-  return anam;
+  AnamDiscreteIR* anam = new AnamDiscreteIR();
+  if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
+  delete anam;
+  return nullptr;
 }
 
 AnamDiscreteIR* AnamDiscreteIR::create(double rcoef)
@@ -319,20 +310,20 @@ double AnamDiscreteIR::_getResidual(int iclass, double z) const
   return (retval);
 }
 
-bool AnamDiscreteIR::_serialize(std::ostream& os, bool verbose) const
+bool AnamDiscreteIR::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && AnamDiscrete::_serialize(os, verbose);
+  ret = ret && AnamDiscrete::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os, "Change of support coefficient", getRCoef());
   return ret;
 }
 
-bool AnamDiscreteIR::_deserialize(std::istream& is, bool verbose)
+bool AnamDiscreteIR::_deserializeAscii(std::istream& is, bool verbose)
 {
   double r = TEST;
 
   bool ret = true;
-  ret = ret && AnamDiscrete::_deserialize(is, verbose);
+  ret = ret && AnamDiscrete::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Anamorphosis 'r' coefficient", r);
   if (ret) setRCoef(r);
   return ret;
@@ -616,3 +607,40 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
   }
   return (0);
 }
+
+#ifdef HDF5
+bool AnamDiscreteIR::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamDiscreteIR");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double r = 0.;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "R", r);
+
+  ret = ret && AnamDiscrete::_deserializeH5(*anamG, verbose);
+
+  if (ret) 
+    setRCoef(r);
+
+  return ret;
+}
+
+bool AnamDiscreteIR::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto anamG = grp.createGroup("AnamDiscreteIR");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "R", getRCoef());
+
+  ret = ret && AnamDiscrete::_serializeH5(anamG, verbose);
+
+  return ret;
+}
+#endif

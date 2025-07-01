@@ -16,6 +16,7 @@
 #include "Db/DbStringFormat.hpp"
 #include "Polygon/Polygons.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Stats/Classical.hpp"
 
@@ -193,7 +194,7 @@ int DbGraphO::resetFromMatrix(int nech,
   return (!isConsistent());
 }
 
-bool DbGraphO::_deserialize(std::istream& is, bool verbose)
+bool DbGraphO::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndim = 0;
   int narcs = 0;
@@ -204,7 +205,7 @@ bool DbGraphO::_deserialize(std::istream& is, bool verbose)
 
     /* Initializations */
 
-    bool ret = true;
+  bool ret = true;
   ret = ret && _recordRead<int>(is, "Space Dimension", ndim);
 
   // Reading the set of arcs for the Oriented Graph organization
@@ -221,12 +222,12 @@ bool DbGraphO::_deserialize(std::istream& is, bool verbose)
 
   // Writing the set of addresses for Line organization
 
-  ret = ret && Db::_deserialize(is, verbose);
+  ret = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
+bool DbGraphO::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
@@ -250,7 +251,7 @@ bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_serialize(os, verbose);
+  ret = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -258,27 +259,18 @@ bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a Db by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (Db format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (Db format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbGraphO* DbGraphO::createFromNF(const String& neutralFilename, bool verbose)
+DbGraphO* DbGraphO::createFromNF(const String& NFFilename, bool verbose)
 {
   DbGraphO* dbgraphO = new DbGraphO;
-  std::ifstream is;
-  bool success = false;
-  if (dbgraphO->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = dbgraphO->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbgraphO;
-    dbgraphO = nullptr;
-  }
-  return dbgraphO;
+  if (dbgraphO->_fileOpenAndDeserialize(NFFilename, verbose)) return dbgraphO;
+  delete dbgraphO;
+  return nullptr;
 }
 
 /**
@@ -580,3 +572,74 @@ void DbGraphO::setArcLine(const VectorInt& nodes, double value)
     _downArcs.setValue(i1, i2, value);
   }
 }
+
+#ifdef HDF5
+bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto dbG = SerializeHDF5::getGroup(grp, "DbGraphO");
+  if (!dbG) return false;
+
+  /* Read the grid characteristics */
+  bool ret  = true;
+  int ndim  = 0;
+  int narcs = 0;
+
+  ret = ret && SerializeHDF5::readValue(*dbG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*dbG, "Narcs", narcs);
+
+  // Reading the set of arcs for the Oriented Graph organization
+  auto dbgs = SerializeHDF5::getGroup(*dbG, "Arcs");
+  if (!dbgs) return false;
+  NF_Triplet nft;
+  VectorDouble tab(3);
+  for (int i = 0; i < narcs; i++)
+  {
+    String locName = "Arc" + std::to_string(i);
+    auto arcg      = SerializeHDF5::getGroup(*dbgs, locName);
+    if (!arcg) return false;
+
+    ret = ret && SerializeHDF5::readVec(*arcg, "Arc", tab);
+    nft.add((int)tab[0], (int)tab[1], tab[2]);
+  }
+  _downArcs.resetFromTriplet(nft);
+
+  // Writing the set of addresses for Line organization
+
+  ret = ret && Db::_deserializeH5(*dbG, verbose);
+
+  return ret;
+}
+
+bool DbGraphO::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto dbG = grp.createGroup("DbGraphO");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeValue(dbG, "Narcs", getNArc());
+
+  // Writing the set of arcs for the Oriented Graph organization
+
+  auto dbGs = dbG.createGroup("Arcs");
+
+  NF_Triplet nft = _downArcs.getMatrixToTriplet();
+  VectorDouble tab(3);
+  for (int iarc = 0, narcs = getNArc(); iarc < narcs; iarc++)
+  {
+    String locName = "Arc" + std::to_string(iarc);
+    auto arcG      = dbGs.createGroup(locName);
+
+    tab[0] = nft.getRow(iarc);
+    tab[1] = nft.getCol(iarc);
+    tab[2] = nft.getValue(iarc);
+    ret    = ret && SerializeHDF5::writeVec(arcG, "Arc", tab);
+  }
+
+  /* Writing the tail of the file */
+
+  ret = ret && Db::_serializeH5(dbG, verbose);
+
+  return ret;
+}
+#endif

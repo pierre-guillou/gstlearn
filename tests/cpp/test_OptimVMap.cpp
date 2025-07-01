@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-
 #include "Basic/AStringable.hpp"
 #include "Basic/File.hpp"
 #include "Db/Db.hpp"
@@ -43,11 +42,11 @@ int main(int argc, char* argv[])
   double dx      = 1. / nx;
   DbGrid* dbgrid = DbGrid::create({nx, nx}, {dx, dx});
   (void)simtub(nullptr, dbgrid, model);
-  (void)dbgrid->dumpToNF("dbgrid.ascii");
+  (void)dbgrid->dumpToNF("dbgrid.NF");
 
   // Calculating the experimental variogram Map
   DbGrid* dbmap = db_vmap(dbgrid, ECalcVario::VARIOGRAM, {50, 50});
-  (void)dbmap->dumpToNF("VMap.ascii");
+  (void)dbmap->dumpToNF("VMap.NF");
 
   mestitle(1, "Initial Model");
   modelfit->display();
@@ -63,7 +62,7 @@ int main(int argc, char* argv[])
   // Fitting procedure
   mestitle(1, "Fitted Model");
   modelfit->display();
-  modelfit->dumpToNF("model.ascii");
+  modelfit->dumpToNF("model.NF");
 
   delete dbgrid;
   delete dbmap;

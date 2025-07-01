@@ -33,8 +33,7 @@ public:
   /// Interface to AStringable
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static FracEnviron* createFromNF(const String& neutralFilename,
-                                   bool verbose = true);
+  static FracEnviron* createFromNF(const String& NFFilename, bool verbose = true);
   static FracEnviron* create(double xmax = 0.,
                              double ymax = 0.,
                              double deltax = 0.,
@@ -60,10 +59,13 @@ public:
   void addFault(const FracFault& fault) { _faults.push_back(fault); }
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,bool verbose = false) const override;
-  String _getNFName() const override { return "Fracture Environ"; }
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
+  String _getNFName() const override { return "FracEnviron"; }
 
 private:
   double _xmax;                 //!< Maximum horizontal distance

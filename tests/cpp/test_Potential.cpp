@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
   (void) potential_kriging(dbiso, dbgrd, dbtgt, grid, model, neighU,
                            0., 0., true, false, false, false, 0, true);
 
-  (void) grid->dumpToNF("Grid2D.ascii");
+  (void) grid->dumpToNF("Grid2D.NF");
 
   // ====================== Free pointers ==================================
   delete dbiso;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
   OptDbg::setReference(-1);
 
   // Visualize the results
-  (void) grid->dumpToNF("Grid1D.ascii");
+  (void) grid->dumpToNF("Grid1D.NF");
 
   // Cross-validation
   (void) potential_xvalid(dbiso, dbgrd, nullptr, model, neighU,

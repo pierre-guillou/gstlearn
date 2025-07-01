@@ -9,10 +9,11 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Neigh/NeighBench.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 NeighBench::NeighBench(bool flag_xvalid,
                        double width,
@@ -81,11 +82,11 @@ String NeighBench::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighBench::_deserialize(std::istream& is, bool verbose)
+bool NeighBench::_deserializeAscii(std::istream& is, bool verbose)
 {
   double width = 0.;
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Bench Width", width);
 
   _biPtBench = BiTargetCheckBench::create(-1, width); // idim_bench will be updated in 'attach'
@@ -93,10 +94,10 @@ bool NeighBench::_deserialize(std::istream& is, bool verbose)
   return ret;
 }
 
-bool NeighBench::_serialize(std::ostream& os, bool verbose) const
+bool NeighBench::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os, "Bench Width", _biPtBench->getWidth());
   return ret;
 }
@@ -112,26 +113,16 @@ NeighBench* NeighBench::create(bool flag_xvalid,
 
 /**
  * Create a Neighborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighBench* NeighBench::createFromNF(const String& neutralFilename, bool verbose)
+NeighBench* NeighBench::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighBench* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighBench();
-  bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  neigh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighBench* neigh = new NeighBench();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 /**
@@ -263,3 +254,37 @@ void NeighBench::_bench(int iech_out, VectorInt& ranks)
   }
 }
 
+#ifdef HDF5
+bool NeighBench::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighBench");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double width = 0.;
+
+  ret = ret && SerializeHDF5::readValue(*neighG, "Bench", width);
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+
+  _biPtBench = BiTargetCheckBench::create(-1, width); // idim_bench will be updated in 'attach'
+
+  return ret;
+}
+
+bool NeighBench::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto neighG = grp.createGroup("NeighBench");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(neighG, "Bench", _biPtBench->getWidth());
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif

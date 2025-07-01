@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Enum/EFormatNF.hpp"
 #include "geoslib_f.h"
 
 #include "Core/Ascii.hpp"
@@ -155,7 +156,7 @@ int main(int argc, char *argv[])
       vario->compute(dbin, ECalcVario::VARIOGRAM);
       vario->display();
       ascii_filename("Vario",0,1,filename);
-      if (! vario->dumpToNF(filename,verbose))
+      if (! vario->dumpToNF(filename,EFormatNF::DEFAULT,verbose))
         messageAbort("ascii_vario_write");
       
       /* Delete the indicator variables */

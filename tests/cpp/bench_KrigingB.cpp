@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   delete dbfmt;
 
   if (graphic)
-    (void) grid->dumpToNF("Grid.ascii");
+    (void) grid->dumpToNF("Grid.NF");
   delete neighB;
   delete data;
   delete grid;

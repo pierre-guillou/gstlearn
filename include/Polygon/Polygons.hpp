@@ -44,8 +44,8 @@ public:
                    int nrow_max = -1);
 
   static Polygons* create();
-  static Polygons* createFromNF(const String& neutralFilename, bool verbose = false);
-  static Polygons* createFromCSV(const String& filename,
+  static Polygons* createFromNF(const String& NFFilename, bool verbose = false);
+ static Polygons* createFromCSV(const String& filename,
                                  const CSVformat& csv = CSVformat(),
                                  int verbose = false,
                                  int ncol_max = -1,
@@ -78,9 +78,12 @@ public:
   Polygons reduceComplexity(double distmin) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "Polygon"; }
 
 private:

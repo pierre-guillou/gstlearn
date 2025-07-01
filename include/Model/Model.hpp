@@ -100,7 +100,7 @@ public:
   static Model* create(const CovContext& ctxt = CovContext());
   static Model* createFromEnvironment(int nvar, int ndim = 2);
   static Model* createNugget(int nvar, int ndim = 2, double sill = 1.);
-  static Model* createFromParam(const ECov& type                   = ECov::fromKey("NUGGET"),
+  static Model* createFromParam(const ECov& type = ECov::fromKey("NUGGET"),
                   double range                       = 1.,
                   double sill                        = 1.,
                   double param                       = 1.,
@@ -119,8 +119,7 @@ public:
                                         const ASpaceSharedPtr& space = ASpaceSharedPtr(),
                                         bool flagRange               = true);
   static Model* createFromDb(const Db* db);
-  static Model* createFromNF(const String& neutralFilename,
-                             bool verbose = true);
+  static Model* createFromNF(const String& NFFilename, bool verbose = true);
   static Model* createFromVario(Vario* vario,
                                 const VectorECov& types        = ECov::fromKeys({"SPHERICAL"}),
                                 const Constraints& constraints = Constraints(),
@@ -253,8 +252,12 @@ public:
 
 protected:
   /// Interface to ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "Model"; }
 
 private:

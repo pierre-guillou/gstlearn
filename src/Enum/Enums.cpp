@@ -41,6 +41,7 @@
 #include "Enum/EGaussInv.hpp"
 #include "Enum/EPostUpscale.hpp"
 #include "Enum/EPostStat.hpp"
+#include "Enum/EFormatNF.hpp"
 
 ENUM_DEFINE(ENUM_LOAD_BY)
 ENUM_DEFINE(ENUM_NEIGH)
@@ -75,3 +76,4 @@ ENUM_DEFINE(ENUM_DIRGEN)
 ENUM_DEFINE(ENUM_GAUSSINV)
 ENUM_DEFINE(ENUM_POST_UPSCALE)
 ENUM_DEFINE(ENUM_POST_STAT)
+ENUM_DEFINE(ENUM_FORMATNF)

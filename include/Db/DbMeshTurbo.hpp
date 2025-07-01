@@ -67,8 +67,7 @@ public:
                              const VectorString& locatorNames = VectorString(),
                              bool flag_polarized              = false,
                              bool verbose                     = false);
-  static DbMeshTurbo* createFromNF(const String& neutralFilename,
-                                   bool verbose = true);
+  static DbMeshTurbo* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getNApices() const { return _mesh.getNApices(); }
   int getNMeshes() const { return _mesh.getNMeshes(); }
@@ -95,10 +94,12 @@ public:
   }
   
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,
-                          bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "DbMeshTurbo"; }
 
 private:

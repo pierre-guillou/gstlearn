@@ -49,7 +49,7 @@ public:
                    const VectorDouble &wt = VectorDouble()) override;
 
   /// ASerializable Interface
-  static AnamHermite* createFromNF(const String& neutralFilename, bool verbose = true);
+  static AnamHermite* createFromNF(const String& NFFilename, bool verbose = true);
 
   /// AnamContinuous Interface
   double rawToTransformValue(double z) const override;
@@ -96,9 +96,12 @@ public:
   VectorDouble cumulateVarianceRatio(double chh) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "AnamHermite"; }
 
 private:

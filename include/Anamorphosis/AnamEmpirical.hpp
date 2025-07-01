@@ -55,8 +55,7 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// ASerializable Interface
-  static AnamEmpirical* createFromNF(const String& neutralFilename,
-                                     bool verbose = true);
+  static AnamEmpirical* createFromNF(const String& NFFilename, bool verbose = true);
 
   void reset(int ndisc,
              double pymin,
@@ -98,9 +97,12 @@ public:
   void setFlagGaussian(bool flagGaussian) { _flagGaussian = flagGaussian; }
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "AnamEmpirical"; }
 
 private:

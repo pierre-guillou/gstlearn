@@ -40,9 +40,9 @@ public:
   int resetFromFaciesCount(int nfacies, double rho = 0.);
 
   static Rule* create(double rho = 0.);
-  static Rule* createFromNF(const String& neutralFilename, bool verbose = true);
-  static Rule* createFromNames(const VectorString& nodnames,double rho = 0.);
-  static Rule* createFromCodes(const VectorInt& nodes,double rho = 0.);
+  static Rule* createFromNF(const String& NFFilename, bool verbose = true);
+  static Rule* createFromNames(const VectorString& nodnames, double rho = 0.);
+  static Rule* createFromCodes(const VectorInt& nodes, double rho = 0.);
   static Rule* createFromNumericalCoding(const VectorInt& n_type,
                                          const VectorInt& n_facs,
                                          double rho = 0.);
@@ -108,15 +108,18 @@ public:
 #endif
   VectorDouble getThreshFromRectangle(int rect, int *facies);
   int getFaciesFromGaussian(double y1, double y2) const;
+  VectorInt getNodes() const;
 
   void updateShift() const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  String _getNFName() const override { return "Rule"; } // TODO To be chamged by next line
-//  String _getNFName() const override { return typeid(this).name(); }
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
+  String _getNFName() const override { return "Rule"; } 
 
   void setMainNodeFromNodNames(const VectorInt& n_type,
                                const VectorInt& n_facs);

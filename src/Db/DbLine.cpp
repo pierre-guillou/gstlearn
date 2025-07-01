@@ -20,6 +20,7 @@
 #include "Polygon/Polygons.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Stats/Classical.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Enum/ELoc.hpp"
@@ -340,7 +341,7 @@ int DbLine::resetFromSamplesById(int nech,
   return 0;
 }
 
-bool DbLine::_deserialize(std::istream& is, bool verbose)
+bool DbLine::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndim = 0;
   int nbline = 0;
@@ -364,12 +365,12 @@ bool DbLine::_deserialize(std::istream& is, bool verbose)
     ret = ret && _recordRead<int>(is, "Number of Samples", number);
     ret = ret && _recordReadVec<int>(is, "", _lineAdds[iline], number);
   }
-  ret = ret && Db::_deserialize(is, verbose);
+  ret = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbLine::_serialize(std::ostream& os, bool verbose) const
+bool DbLine::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
@@ -388,7 +389,7 @@ bool DbLine::_serialize(std::ostream& os, bool verbose) const
 
   /* Writing the tail of the file */
 
-  ret && Db::_serialize(os, verbose);
+  ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -396,28 +397,18 @@ bool DbLine::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a Db by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (Db format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (Db format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbLine* DbLine::createFromNF(const String& neutralFilename, bool verbose)
+DbLine* DbLine::createFromNF(const String& NFFilename, bool verbose)
 {
-  DbLine* dbLine = nullptr;
-  std::ifstream is;
-  dbLine = new DbLine;
-  bool success = false;
-  if (dbLine->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = dbLine->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbLine;
-    dbLine = nullptr;
-  }
-  return dbLine;
+  DbLine* dbline = new DbLine;
+  if (dbline->_fileOpenAndDeserialize(NFFilename, verbose)) return dbline;
+  delete dbline;
+  return nullptr;
 }
 
 /**
@@ -783,3 +774,64 @@ DbLine* DbLine::createMarkersFromGrid(const DbGrid& grid,
 
   return dbline;
 }
+#ifdef HDF5
+bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto dbG = SerializeHDF5::getGroup(grp, "DbLine");
+  if (!dbG) return false;
+
+  /* Read the grid characteristics */
+  bool ret   = true;
+  int ndim   = 0;
+  int nbline = 0;
+
+  ret = ret && SerializeHDF5::readValue(*dbG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*dbG, "NLines", nbline);
+
+  auto linesG = SerializeHDF5::getGroup(*dbG, "Lines");
+  if (!linesG) return false;
+  _lineAdds.resize(nbline);
+  for (int iline = 0; iline < nbline; iline++)
+  {
+    String locName = "Line" + std::to_string(iline);
+    auto lineg      = SerializeHDF5::getGroup(*linesG, locName);
+    if (!lineg) return false;
+
+    int nsample = 0;
+    ret = ret && SerializeHDF5::readValue(*lineg, "NSamples", nsample);
+    ret = ret && SerializeHDF5::readVec(*lineg, "Samples", _lineAdds[iline]);
+  }
+
+  /* Writing the tail of the file */
+
+  ret = ret && Db::_deserializeH5(*dbG, verbose);
+
+  return ret;
+}
+
+bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto dbG = grp.createGroup("DbLine");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeValue(dbG, "NLines", getNLine());
+
+  auto linesG = dbG.createGroup("Lines");
+  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+  {
+    String locName = "Line" + std::to_string(iline);
+    auto lineG      = linesG.createGroup(locName);
+
+    ret = ret && SerializeHDF5::writeValue(lineG, "NSamples", getNSamplePerLine(iline));
+    ret = ret && SerializeHDF5::writeVec(lineG, "Samples", _lineAdds[iline]);
+  }
+
+  /* Writing the tail of the file */
+
+  ret = ret && Db::_serializeH5(dbG, verbose);
+
+  return ret;
+}
+#endif

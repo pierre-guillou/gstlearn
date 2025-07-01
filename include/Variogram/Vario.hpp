@@ -117,7 +117,7 @@ public:
                   double value) override;
 
   static Vario* create(const VarioParam& varioparam);
-  static Vario* createFromNF(const String& neutralFilename, bool verbose = true);
+  static Vario* createFromNF(const String& NFFilename, bool verbose = true);
   static Vario* createRegularizeFromModel(const Model& model,
                                           const VarioParam& varioparam,
                                           const VectorDouble& ext,
@@ -367,9 +367,12 @@ public:
   VectorDouble computeWeightsFromVario(int wmode) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "Vario"; }
 
 private:
@@ -474,14 +477,14 @@ private:
   bool _flag_UK;
   int  _niter_UK;
 
-  VectorString                _variableNames;
-  mutable Model*              _model;  // Model pointer (not to be deleted) for drift removal
-  mutable VectorDouble        _BETA;
-  mutable VectorDouble        _DRFDIAG;
+  VectorString          _variableNames;
+  mutable Model*        _model;  // Model pointer (not to be deleted) for drift removal
+  mutable VectorDouble  _BETA;
+  mutable VectorDouble  _DRFDIAG;
   mutable MatrixDense   _DRFXA;
   mutable MatrixDense   _DRFGX;
   mutable MatrixDense   _DRFTAB;
-  mutable MatrixSquare _DRFXGX;
+  mutable MatrixSquare  _DRFXGX;
 };
 
 GSTLEARN_EXPORT Vario_Order*

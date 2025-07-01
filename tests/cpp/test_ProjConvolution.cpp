@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
   int uid_in = grid_data->getLastUID();
 
   // Save the initial grid in a NF
-  (void) grid_data->dumpToNF("Initial.ascii");
+  (void) grid_data->dumpToNF("Initial.NF");
 
   // Operate the convolution
   ProjConvolution Aproj(convolution, grid_seismic);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
   grid_seismic->addColumns(seismic,"Seismic",ELoc::Z);
 
   // Save the final grid in a NF
-  (void) grid_seismic->dumpToNF("Seismic.ascii");
+  (void) grid_seismic->dumpToNF("Seismic.NF");
 
   // Perform convolution back-transform
   VectorDouble data2 = VectorDouble(grid_data->getNSample());
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
   grid_data->addColumns(data2,"Data",ELoc::Z);
 
   // Save the final grid in a NF
-  (void) grid_data->dumpToNF("Point.ascii");
+  (void) grid_data->dumpToNF("Point.NF");
 
   delete grid_data;
   delete grid_seismic;

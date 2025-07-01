@@ -11,6 +11,7 @@
 #include "geoslib_old_f.h"
 #include "Anamorphosis/AnamDiscreteDD.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Stats/Selectivity.hpp"
 #include "LinearOp/CholeskyDense.hpp"
@@ -57,22 +58,12 @@ AnamDiscreteDD::~AnamDiscreteDD()
 
 }
 
-AnamDiscreteDD* AnamDiscreteDD::createFromNF(const String& neutralFilename, bool verbose)
+AnamDiscreteDD* AnamDiscreteDD::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamDiscreteDD* anam = nullptr;
-  std::ifstream is;
-  anam = new AnamDiscreteDD();
-  bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = anam->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete anam;
-    anam = nullptr;
-  }
-  return anam;
+  AnamDiscreteDD* anam = new AnamDiscreteDD();
+  if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
+  delete anam;
+  return nullptr;
 }
 
 AnamDiscreteDD* AnamDiscreteDD::create(double mu, double scoef)
@@ -605,10 +596,10 @@ MatrixSquare AnamDiscreteDD::chi2I(const VectorDouble& chi, int mode)
   return chi2i;
 }
 
-bool AnamDiscreteDD::_serialize(std::ostream& os, bool verbose) const
+bool AnamDiscreteDD::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && AnamDiscrete::_serialize(os, verbose);
+  ret = ret && AnamDiscrete::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os, "Change of support coefficient", getSCoef());
   ret = ret && _recordWrite<double>(os, "Additional Mu coefficient", getMu());
   ret = ret && _tableWrite(os, "PCA Z2Y", getNCut() * getNCut(), getPcaZ2Fs().getValues());
@@ -616,14 +607,14 @@ bool AnamDiscreteDD::_serialize(std::ostream& os, bool verbose) const
   return ret;
 }
 
-bool AnamDiscreteDD::_deserialize(std::istream& is, bool verbose)
+bool AnamDiscreteDD::_deserializeAscii(std::istream& is, bool verbose)
 {
   MatrixSquare pcaf2z, pcaz2f;
   double s = TEST;
   double mu = TEST;
 
   bool ret = true;
-  ret = ret && AnamDiscrete::_deserialize(is, verbose);
+  ret = ret && AnamDiscrete::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Anamorphosis 's' coefficient", s);
   ret = ret && _recordRead<double>(is, "Anamorphosis 'mu' coefficient", mu);
 
@@ -979,3 +970,62 @@ int AnamDiscreteDD::factor2Selectivity(Db *db,
   return 0;
 }
 
+#ifdef HDF5
+bool AnamDiscreteDD::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamDiscreteDD");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double s = 0.;
+  double mu = 0.;
+  VectorDouble z2f;
+  VectorDouble f2z;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "S", s);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Mu", mu);
+  ret = ret && SerializeHDF5::readVec(*anamG, "Z2F", z2f);
+  ret = ret && SerializeHDF5::readVec(*anamG, "F2Z", f2z);
+
+  ret = ret && AnamDiscrete::_deserializeH5(*anamG, verbose);
+
+
+  if (ret)
+  {
+    int ncut = getNCut();
+
+    setRCoef(s);
+    setMu(mu);
+
+    MatrixSquare pcaz2f;
+    pcaz2f.resetFromVD(ncut, ncut, z2f);
+    setPcaZ2F(pcaz2f);
+    
+    MatrixSquare pcaf2z;
+    pcaf2z.resetFromVD(ncut, ncut, f2z);
+    setPcaF2Z(pcaf2z);
+  }
+
+  return ret;
+}
+
+bool AnamDiscreteDD::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto anamG = grp.createGroup("AnamDiscreteDD");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "S", getSCoef());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Mu", getMu());
+  ret = ret && SerializeHDF5::writeVec(anamG, "Z2F", getPcaZ2Fs().getValues());
+  ret = ret && SerializeHDF5::writeVec(anamG, "F2Z", getPcaF2Zs().getValues());
+
+  ret = ret && AnamDiscrete::_serializeH5(anamG, verbose);
+
+  return ret;
+}
+#endif

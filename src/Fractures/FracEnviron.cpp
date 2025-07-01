@@ -11,6 +11,7 @@
 #include "Fractures/FracEnviron.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 FracEnviron::FracEnviron(double xmax,
                          double ymax,
@@ -70,25 +71,15 @@ FracEnviron::~FracEnviron()
 /**
  * Create a Environ by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose
  */
-FracEnviron* FracEnviron::createFromNF(const String& neutralFilename, bool verbose)
+FracEnviron* FracEnviron::createFromNF(const String& NFFilename, bool verbose)
 {
-  FracEnviron* envir = nullptr;
-  std::ifstream is;
-  envir = new FracEnviron();
-  bool success = false;
-  if (envir->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  envir->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete envir;
-    envir = nullptr;
-  }
-  return envir;
+  FracEnviron* envir = new FracEnviron();
+  if (envir->_fileOpenAndDeserialize(NFFilename, verbose)) return envir;
+  delete envir;
+  return nullptr;
 }
 
 FracEnviron* FracEnviron::create(double xmax,
@@ -136,7 +127,7 @@ String FracEnviron::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool FracEnviron::_deserialize(std::istream& is, bool verbose)
+bool FracEnviron::_deserializeAscii(std::istream& is, bool verbose)
 {
   int nfamilies = 0;
   int nfaults = 0;
@@ -154,20 +145,20 @@ bool FracEnviron::_deserialize(std::istream& is, bool verbose)
   for (int ifam = 0; ret && ifam < nfamilies; ifam++)
   {
     FracFamily family;
-    ret = ret && family.deserialize(is, verbose);
+    ret = ret && family._deserializeAscii(is, verbose);
     if (ret) addFamily(family);
   }
 
   for (int ifault = 0; ret && ifault < nfaults; ifault++)
   {
     FracFault fault;
-    ret = ret && fault.deserialize(is, verbose);
+    ret = ret && fault._deserializeAscii(is, verbose);
     if (ret) addFault(fault);
   }
   return ret;
 }
 
-bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
+bool FracEnviron::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret = ret && _recordWrite<int>(os, "Number of families", getNFamilies());
@@ -183,7 +174,7 @@ bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
   {
     ret = ret && _commentWrite(os, "Characteristics of family");
     const FracFamily& family = getFamily(ifam);
-    ret = ret && family.serialize(os, verbose);
+    ret = ret && family._serializeAscii(os, verbose);
   }
 
   /* Loop on the main faults */
@@ -192,7 +183,7 @@ bool FracEnviron::_serialize(std::ostream& os, bool verbose) const
   {
     ret = ret && _commentWrite(os, "Characteristics of main fault");
     const FracFault& fault = getFault(ifault);
-    ret = ret && fault.serialize(os, verbose);
+    ret = ret && fault._serializeAscii(os, verbose);
   }
   return ret;
 }
@@ -201,3 +192,88 @@ double FracEnviron::getXextend() const
 {
   return _xmax + 2. * _deltax;
 }
+#ifdef HDF5
+bool FracEnviron::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto fracG = SerializeHDF5::getGroup(grp, "FracEnviron");
+  if (!fracG) return false;
+
+  /* Read the grid characteristics */
+  bool ret      = true;
+  int nfamilies = 0;
+  int nfaults   = 0;
+
+  ret = ret && SerializeHDF5::readValue(*fracG, "NFamilies", nfamilies);
+  ret = ret && SerializeHDF5::readValue(*fracG, "NFaults", nfaults);
+  ret = ret && SerializeHDF5::readValue(*fracG, "Xmax", _xmax);
+  ret = ret && SerializeHDF5::readValue(*fracG, "Ymax", _ymax);
+  ret = ret && SerializeHDF5::readValue(*fracG, "Deltax", _deltax);
+  ret = ret && SerializeHDF5::readValue(*fracG, "Deltay", _deltay);
+  ret = ret && SerializeHDF5::readValue(*fracG, "Mean", _mean);
+  ret = ret && SerializeHDF5::readValue(*fracG, "Stdev", _stdev);
+
+  // Loop on the families
+  for (int ifam = 0; ret && ifam < getNFamilies(); ifam++)
+  {
+    String locName = "Family" + std::to_string(ifam);
+    auto famG      = SerializeHDF5::getGroup(*fracG, locName);
+    if (!famG) return false;
+
+    FracFamily family;
+    ret = ret && family._deserializeH5(*famG, verbose);
+    if (ret) addFamily(family);
+  }
+
+  // Loop on the main faults
+  for (int ifault = 0; ret && ifault < getNFaults(); ifault++)
+  {
+    String locName = "Fault" + std::to_string(ifault);
+    auto faultG    = SerializeHDF5::getGroup(*fracG, locName);
+    if (!faultG) return false;
+
+    FracFault fault;
+    ret = ret && fault._deserializeH5(*faultG, verbose);
+    if (ret) addFault(fault);
+  }
+
+  return ret;
+}
+
+bool FracEnviron::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto fracG = grp.createGroup("FracEnviron");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(fracG, "NFamilies", getNFamilies());
+  ret = ret && SerializeHDF5::writeValue(fracG, "NFaults", getNFaults());
+  ret = ret && SerializeHDF5::writeValue(fracG, "Xmax", _xmax);
+  ret = ret && SerializeHDF5::writeValue(fracG, "Ymax", _ymax);
+  ret = ret && SerializeHDF5::writeValue(fracG, "Deltax", _deltax);
+  ret = ret && SerializeHDF5::writeValue(fracG, "Deltay", _deltay);
+  ret = ret && SerializeHDF5::writeValue(fracG, "Mean", _mean);
+  ret = ret && SerializeHDF5::writeValue(fracG, "Stdev", _stdev);
+
+  // Loop on the families
+  auto famsG = fracG.createGroup("Families");
+  for (int ifam = 0, nfam = getNFamilies(); ret && ifam < nfam; ifam++)
+  {
+    const FracFamily& family = getFamily(ifam);
+    String locName           = "Family" + std::to_string(ifam);
+    auto famG                = famsG.createGroup(locName);
+    ret                      = ret && family._serializeH5(famsG, verbose);
+  }
+
+  // Loop on the main faults
+  auto faultsG = fracG.createGroup("Fauts");
+  for (int ifault = 0, nfault = getNFaults(); ret && ifault < nfault; ifault++)
+  {
+    const FracFault& fault = getFault(ifault);
+    String locName         = "Fault" + std::to_string(ifault);
+    auto faultG            = faultsG.createGroup(locName);
+    ret                    = ret && fault._serializeH5(faultsG, verbose);
+  }
+
+  return ret;
+}
+#endif

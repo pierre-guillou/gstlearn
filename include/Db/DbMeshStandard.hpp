@@ -62,8 +62,7 @@ public:
          const VectorString& names        = VectorString(),
          const VectorString& locatorNames = VectorString(),
          bool verbose                     = false);
-  static DbMeshStandard* createFromNF(const String& neutralFilename,
-                                      bool verbose = true);
+  static DbMeshStandard* createFromNF(const String& NFFilename, bool verbose = true);
   static DbMeshStandard*
   createFromExternal(const MatrixDense& apices,
                      const MatrixInt& meshes,
@@ -83,10 +82,12 @@ public:
   VectorDouble getCoordinatesPerMesh(int imesh, int idim, bool flagClose = false) const;
   
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,
-                          bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "DbMeshStandard"; }
 
 private:

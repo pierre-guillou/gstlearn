@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
                      VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(), 
                      NamingConvention("CDS-spirale"));
 
-  (void) grid->dumpToNF("grid.ascii");
+  (void) grid->dumpToNF("grid.NF");
   DbStringFormat dbfmt(FLAG_STATS,{"spde*"});
   // To prevent diff between some platforms (round to 10^-2)
   OptCst::define(ECst::NTDEC, 2);

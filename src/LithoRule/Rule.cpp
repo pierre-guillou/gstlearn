@@ -13,6 +13,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/String.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Model/Model.hpp"
 #include "LithoRule/Rule.hpp"
@@ -607,6 +608,25 @@ int Rule::getFaciesFromGaussian(double y1, double y2) const
   return((int) facies);
 }
 
+VectorInt Rule::getNodes() const
+{
+  VectorInt nodes;
+  if (_mainNode == nullptr) return nodes;
+
+  int nb_node     = 0;
+  int nfac_tot    = 0;
+  int ny1_tot     = 0;
+  int ny2_tot     = 0;
+  double prop_tot = 0.;
+  _mainNode->getStatistics(&nb_node, &nfac_tot, &ny1_tot, &ny2_tot, &prop_tot);
+
+  if (nb_node <= 0) return nodes;
+  nodes.resize(6 * nb_node);
+
+  _mainNode->getInfo(nodes.data());
+  return nodes;
+}
+
 /**
  * Define constant proportions
  * @param proportions The vector of constant proportions.
@@ -657,7 +677,7 @@ int Rule::setProportions(const VectorDouble& proportions) const
   return(0);
 }
 
-bool Rule::_deserialize(std::istream& is, bool /*verbose*/)
+bool Rule::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   /* Create the Rule structure */
 
@@ -694,7 +714,7 @@ bool Rule::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool Rule::_serialize(std::ostream& os, bool /*verbose*/) const
+bool Rule::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   int nb_node, nfacies, nmax_tot, ny1_tot, ny2_tot, rank;
   double prop_tot;
@@ -1019,23 +1039,12 @@ Rule* Rule::create(double rho)
   return new Rule(rho);
 }
 
-Rule* Rule::createFromNF(const String& neutralFilename, bool verbose)
+Rule* Rule::createFromNF(const String& NFFilename, bool verbose)
 {
-  Rule* rule = nullptr;
-  std::ifstream is;
-  rule = new Rule;
-  bool success = false;
-  if (rule->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    rule->setModeRule(ERule::STD);
-    success = rule->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete rule;
-    rule = nullptr;
-  }
-  return rule;
+  Rule* rule = new Rule;
+  if (rule->_fileOpenAndDeserialize(NFFilename, verbose)) return rule;
+  delete rule;
+  return nullptr;
 }
 
 Rule* Rule::createFromNames(const VectorString& nodnames,double rho)
@@ -1084,3 +1093,43 @@ Rule* Rule::createFromFaciesCount(int nfacies, double rho)
   }
   return rule;
 }
+#ifdef HDF5
+bool Rule::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto ruleG = SerializeHDF5::getGroup(grp, "Rule");
+  if (!ruleG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  int type;
+  double rho;
+  VectorInt nodes;
+
+  ret = ret && SerializeHDF5::readValue(*ruleG, "Type", type);
+  ret = ret && SerializeHDF5::readValue(*ruleG, "Rho", rho);
+  ret = ret && SerializeHDF5::readVec(*ruleG, "Nodes", nodes);
+
+  if (ret) setMainNodeFromNodNames(nodes);
+
+  return ret;
+}
+
+bool Rule::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto ruleG = grp.createGroup("Rule");
+
+  VectorInt nodes = getNodes();
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(ruleG, "Type", getModeRule().getValue());
+  ret = ret && SerializeHDF5::writeValue(ruleG, "Rho", getRho());
+  ret = ret && SerializeHDF5::writeVec(ruleG, "Nodes", nodes);
+
+  return ret;
+}
+#endif

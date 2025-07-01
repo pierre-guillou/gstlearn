@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
   Db* data = Db::createFillRandom(100, 3, 1, 0,0,0,0,VectorDouble(),{0,0,0}, {100,100,100});
 
   if (graphic)
-    (void) data->dumpToNF("Data.ascii");
+    (void) data->dumpToNF("Data.NF");
 
   // Generate the output grid
   VectorInt nx = {100,100,100};
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   delete gridfmt;
 
   if (graphic)
-    (void) grid->dumpToNF("Grid.ascii");
+    (void) grid->dumpToNF("Grid.NF");
 
   delete neighU;
   delete data;

@@ -35,24 +35,6 @@ Column = 2 - Name = x-2 - Locator = x2
 Column = 3 - Name = myvar1 - Locator = z1
 Column = 4 - Name = myvar2 - Locator = NA
 
-Data Base Characteristics
-=========================
-
-Data Base Summary
------------------
-File is organized as a set of isolated points
-Space dimension              = 2
-Number of Columns            = 5
-Total number of samples      = 20
-
-Variables
----------
-Column = 0 - Name = rank - Locator = NA
-Column = 1 - Name = x-1 - Locator = x1
-Column = 2 - Name = x-2 - Locator = x2
-Column = 3 - Name = myvar1 - Locator = z1
-Column = 4 - Name = myvar2 - Locator = NA
-
 Data Base Grid Characteristics
 ==============================
 
@@ -272,3 +254,33 @@ Line Vertex Coordinates
      [  5,]    -0.188     0.048
      [  6,]    -1.087     1.010
 (Nrows=7[from 100])
+
+Moving Neighborhood
+===================
+Minimum number of samples           = 2
+Maximum number of samples           = 20
+Number of angular sectors           = 5
+Maximum number of points per sector = 3
+Anisotropic Ranges :     8.000    12.000
+Anisotropy Rotation :
+               [,  0]    [,  1]
+     [  0,]     0.906    -0.423
+     [  1,]     0.423     0.906
+
+Moving Neighborhood
+===================
+Minimum number of samples           = 2
+Maximum number of samples           = 20
+Number of angular sectors           = 5
+Maximum number of points per sector = 3
+Anisotropic Ranges :     8.000    12.000
+Anisotropy Rotation :
+               [,  0]    [,  1]
+     [  0,]     0.906    -0.423
+     [  1,]     0.423     0.906
+
+Unique Neighborhood
+===================
+
+Unique Neighborhood
+===================
