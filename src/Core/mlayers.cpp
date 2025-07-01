@@ -1981,8 +1981,7 @@ int multilayers_kriging(Db* dbin,
                         int verbose)
 {
   int nlayers, ilayer, nechmax, nech, iech, neq, nvar, npar, error;
-  double *a, *b2, *dual, *c00, *wgt;
-  double *acov, *atot, *a0, *cc, *ss, *gs, *post_mean, *post_S;
+  double *a;
   MatrixSquare covtab;
   bool flag_created;
   ELoc ptime;
@@ -1993,16 +1992,25 @@ int multilayers_kriging(Db* dbin,
   VectorDouble fftab;
   VectorDouble baux;
   VectorDouble b;
+  VectorDouble b2;
+  VectorDouble atot;
+  VectorDouble acov;
+  VectorDouble dual;
+  VectorDouble wgt;
+  VectorDouble c00;
+  VectorDouble a0;
+  VectorDouble cc;
+  VectorDouble ss;
+  VectorDouble gs;
+  VectorDouble post_S;
+  VectorDouble post_mean;
   LMlayers *lmlayers;
 
   /* Preliminary checks */
 
   error = 1;
   flag_created = false;
-  a = b2 = dual = nullptr;
-  c00 = wgt = nullptr;
-  acov = atot = nullptr;
-  a0 = cc = ss = gs = post_mean = post_S = nullptr;
+  a = nullptr;
   lmlayers = nullptr;
   nlayers = model->getNVar();
   nechmax = dbin->getNSample();
@@ -2117,34 +2125,35 @@ int multilayers_kriging(Db* dbin,
 
   npar = lmlayers->npar;
   neq = lmlayers->nech + npar;
-  atot = (double*) mem_alloc(sizeof(double) * neq * neq, 1);
-  acov = (double*) mem_alloc(sizeof(double) * nech * nech, 1);
-  b2 = (double*) mem_alloc(sizeof(double) * neq, 1);
+  atot.resize(neq * neq);
+  acov.resize(nech * nech);
+  b2.resize(neq);
   b.resize(neq);
   baux.resize(neq);
   zval.resize(neq);
-  dual = (double*) mem_alloc(sizeof(double) * neq, 1);
-  wgt = (double*) mem_alloc(sizeof(double) * neq, 1);
+  dual.resize(neq);
+  wgt.resize(neq);
   covtab = MatrixSquare(nlayers);
-  c00 = (double*) mem_alloc(sizeof(double) * nlayers, 1);
+  c00.resize(nlayers);
   if (flag_bayes)
   {
     fftab.resize(nech * npar, 0);
-    a0 = (double*) mem_alloc(sizeof(double) * nech * npar, 1);
-    cc = (double*) mem_alloc(sizeof(double) * nech * nech, 1);
-    ss = (double*) mem_alloc(sizeof(double) * nech * npar, 1);
-    gs = (double*) mem_alloc(sizeof(double) * npar * npar, 1);
-    post_S = (double*) mem_alloc(sizeof(double) * npar * npar, 1);
-    post_mean = (double*) mem_alloc(sizeof(double) * npar, 1);
+    a0.resize(nech * npar);
+    cc.resize(nech * nech);
+    ss.resize(nech * npar);
+    gs.resize(npar * npar);
+    post_S.resize(npar * npar);
+    post_mean.resize(npar);
   }
   lmlayers->neq = neq;
   if (verbose) lmlayers_print(lmlayers);
 
   /* Establish the kriging matrix */
 
-  st_lhs(lmlayers, dbin, dbout, model, seltab, prop1, prop2, covtab, atot, acov);
+  st_lhs(lmlayers, dbin, dbout, model, seltab, prop1, prop2, covtab,
+         atot.data(), acov.data());
   if (OptDbg::isReferenceDefined() || OptDbg::query(EDbg::KRIGING))
-    krige_lhs_print(nech, neq, neq, NULL, atot);
+    krige_lhs_print(nech, neq, neq, NULL, atot.data());
 
   /* Establish the data vector */
 
@@ -2159,7 +2168,7 @@ int multilayers_kriging(Db* dbin,
 
   /* Assign the Variance-Covariance matrix */
 
-  a = (flag_bayes) ? acov : atot;
+  a = (flag_bayes) ? acov.data() : atot.data();
 
   /* Calculate the Posterior in the Bayesian case */
 
@@ -2167,20 +2176,23 @@ int multilayers_kriging(Db* dbin,
   {
     if (st_drift_data(lmlayers, dbin, dbout, seltab, prop1, fftab)) goto label_end;
     if (st_drift_bayes(lmlayers, verbose, prior_mean, prior_vars, a, zval,
-                       fftab, a0, cc, ss, gs, post_mean, post_S))
+                       fftab, a0.data(), cc.data(), ss.data(), gs.data(), 
+                       post_mean.data(), post_S.data()))
       goto label_end;
   }
   else
   {
     if (matrix_invert(a, neq, -1)) goto label_end;
-    matrix_product_safe(neq, neq, 1, a, zval.data(), dual);
+    matrix_product_safe(neq, neq, 1, a, zval.data(), dual.data());
   }
 
   /* Perform the estimation over the grid nodes */
 
   st_estimate(lmlayers, dbin, dbout, model, seltab, flag_bayes, flag_std, a,
-              zval, dual, prop1, prop2, covtab, b, b2, baux, wgt, c00, fftab,
-              a0, cc, ss, gs, prior_mean, post_mean);
+              zval, dual.data(), prop1, prop2, covtab, b, b2.data(), 
+              baux, wgt.data(), c00.data(), fftab,
+              a0.data(), cc.data(), ss.data(), gs.data(), 
+              prior_mean, post_mean.data());
 
   /* Reconstitute the surfaces (optional) */
 
@@ -2193,18 +2205,6 @@ int multilayers_kriging(Db* dbin,
   label_end:
   (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
   (void) manageExternalInformation(-1, ELoc::F, dbin, dbout, &flag_created);
-  mem_free((char* ) dual);
-  mem_free((char* ) atot);
-  mem_free((char* ) acov);
-  mem_free((char* ) b2);
-  mem_free((char* ) c00);
-  mem_free((char* ) wgt);
-  mem_free((char* ) a0);
-  mem_free((char* ) cc);
-  mem_free((char* ) ss);
-  mem_free((char* ) gs);
-  mem_free((char* ) post_S);
-  mem_free((char* ) post_mean);
   lmlayers = lmlayers_free(lmlayers);
   return (error);
 }
@@ -2334,17 +2334,19 @@ static int st_varioexp_chh(LMlayers *lmlayers,
                            int idir,
                            Vario *vario)
 {
-  double *atab, *btab, *sill, distsum;
-  int *stat, error, nlayers, iadlag, nhalf, nhalf2, nval;
+  double distsum;
+  int error, nlayers, iadlag, nhalf, nhalf2, nval;
   int ilag, number, ifirst, ilast, ilayer, jlayer, ijl;
   VectorDouble phia;
   VectorDouble phib;
+  VectorDouble btab;
+  VectorDouble atab;
+  VectorDouble sill;
+  VectorInt stat;
 
   /* Initializations */
 
   error = 1;
-  sill = atab = btab = nullptr;
-  stat = nullptr;
   nlayers = lmlayers->nlayers;
   nhalf = nlayers * (nlayers + 1) / 2;
   nhalf2 = nhalf * nhalf;
@@ -2353,14 +2355,10 @@ static int st_varioexp_chh(LMlayers *lmlayers,
 
   phia.resize(nlayers);
   phib.resize(nlayers);
-  btab = (double*) mem_alloc(sizeof(double) * nhalf, 0);
-  if (btab == nullptr) goto label_end;
-  atab = (double*) mem_alloc(sizeof(double) * nhalf2, 0);
-  if (atab == nullptr) goto label_end;
-  sill = (double*) mem_alloc(sizeof(double) * nhalf, 0);
-  if (sill == nullptr) goto label_end;
-  stat = (int*) mem_alloc(sizeof(int) * nlayers * nlayers, 0);
-  if (stat == nullptr) goto label_end;
+  btab.resize(nhalf);
+  atab.resize(nhalf2);
+  sill.resize(nhalf);
+  stat.resize(nlayers * nlayers);
 
   /* Loop on the lags */
 
@@ -2373,40 +2371,41 @@ static int st_varioexp_chh(LMlayers *lmlayers,
     /* Loop on the pairs contributing to the lag */
 
     if (st_evaluate_lag(lmlayers, dbin, dbout, vorder, nlayers, ifirst, ilast,
-                        zval, &nval, &distsum, stat, phia, phib, atab, btab))
+                        zval, &nval, &distsum, stat.data(), phia, phib, 
+                        atab.data(), btab.data()))
       goto label_end;
 
     if (OptDbg::query(EDbg::VARIOGRAM))
     {
       message("Lag %d\n", ilag + 1);
-      print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab);
-      print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab);
+      print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab.data());
+      print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab.data());
     }
 
-    if (matrix_invert(atab, nhalf, -2))
+    if (matrix_invert(atab.data(), nhalf, -2))
     {
       messerr("--> Inversion problem for lag %d", ilag + 1);
       if (verbose)
       {
         /* Matrix must be evaluated (as it has been destroyed by inversion) */
         (void) st_evaluate_lag(lmlayers, dbin, dbout, vorder, nlayers, ifirst,
-                               ilast, zval, &nval, &distsum, stat, phia, phib,
-                               atab, btab);
+                               ilast, zval, &nval, &distsum, stat.data(), phia, phib,
+                               atab.data(), btab.data());
         messerr("Number of pairs  = %d", nval);
         messerr("Average distance = %lf", distsum);
         print_imatrix("Number of samples per layer", 0, 1, nlayers, nlayers,
-        NULL,
-                      stat);
-        print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab);
-        print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab);
+                      NULL, stat.data());
+        print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab.data());
+        print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab.data());
       }
       continue;
     }
-    matrix_product_safe(1, nhalf, nhalf, btab, atab, sill);
+    matrix_product_safe(1, nhalf, nhalf, btab.data(), atab.data(), sill.data());
 
     /* Optional printout */
 
-    if (OptDbg::query(EDbg::VARIOGRAM)) print_trimat("C(h)", 2, nlayers, sill);
+    if (OptDbg::query(EDbg::VARIOGRAM)) 
+      print_trimat("C(h)", 2, nlayers, sill.data());
 
     /* Store the covariance values */
 
@@ -2430,10 +2429,6 @@ static int st_varioexp_chh(LMlayers *lmlayers,
   error = 0;
 
   label_end:
-  mem_free((char* ) atab);
-  mem_free((char* ) btab);
-  mem_free((char* ) sill);
-  mem_free((char* ) stat);
   return (error);
 }
 
