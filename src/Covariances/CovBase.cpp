@@ -25,6 +25,7 @@
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include <cstddef>
+#include <memory>
 
 ParamInfo CovBase::createParamInfoForCholSill()
 {
@@ -39,7 +40,7 @@ CovBase::CovBase(ACov* cor,
   , _cholSillsInfo(MatrixT<ParamInfo>(sill.getNRows(), sill.getNCols(), createParamInfoForCholSill()))
   , _cholSills(MatrixDense(sill.getNRows(), sill.getNCols()))
   , _sillCur(sill)
-  , _cor(cor)
+  , _cor(std::dynamic_pointer_cast<ACov>(cor->cloneShared()))
   , _itRange(sill.getNRows())
 {
 
