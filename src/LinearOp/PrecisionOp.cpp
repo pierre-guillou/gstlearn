@@ -66,7 +66,7 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
                          bool stencil,
                          bool verbose)
   : _shiftOp(nullptr)
-  , _cova(cova)
+  , _cova(cova->clone())
   , _polynomials()
   , _verbose(verbose)
   , _training(false)
@@ -154,6 +154,8 @@ PrecisionOp& PrecisionOp::operator=(const PrecisionOp& pmat)
 void PrecisionOp::_purge()
 {
   _polynomials.clear();
+  delete _cova;
+  _cova = nullptr;
 }
 
 PrecisionOp::~PrecisionOp()
