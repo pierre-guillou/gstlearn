@@ -48,7 +48,7 @@ CovLMGradient::CovLMGradient(const CovAnisoList& r)
   }
   for (auto &e: _covs)
   {
-    ((CovAniso*)e)->setOptimEnabled(false);
+    ((CovAniso*)e.get())->setOptimEnabled(false);
   }
 }
 
@@ -79,7 +79,7 @@ void CovLMGradient::evalZAndGradients(const SpacePoint& p1,
 
   for (unsigned int i = 0, n = getNCov(); i < n; i++)
   {
-    ACovGradient* covloc = dynamic_cast<ACovGradient *>(_covs[i]);
+    ACovGradient* covloc = dynamic_cast<ACovGradient *>(_covs[i].get());
     if (covloc != nullptr)
       covloc->evalZAndGradients(p1, p2, covVal, covGp, covGG, mode, flagGrad);
   }

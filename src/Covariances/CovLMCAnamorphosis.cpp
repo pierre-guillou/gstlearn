@@ -78,7 +78,7 @@ int CovLMCAnamorphosis::init(const VectorInt& anam_strcnt)
 {
   for (auto &e: _covs)
   {
-    ((CovAniso*)e)->setOptimEnabled(false);
+    ((CovAniso*)e.get())->setOptimEnabled(false);
   }
   if (_anam == nullptr)
   {

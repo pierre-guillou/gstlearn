@@ -49,9 +49,9 @@ CovList::CovList(const CovContext& ctxt)
 CovList::CovList(const CovList& r)
   : ACov(r)
 {
-  for (const auto* e: r._covs)
+  for (const auto &e: r._covs)
   {
-    _covs.push_back((CovBase*)e->clone());
+    _covs.push_back(std::dynamic_pointer_cast<CovBase>(e->cloneShared()));
   }
   _filtered         = r._filtered;
   _allActiveCov     = r._allActiveCov;
@@ -68,9 +68,9 @@ CovList& CovList::operator=(const CovList& r)
   if (this != &r)
   {
     ACov::operator=(r);
-    for (const auto* e: r._covs)
+    for (const auto& e: r._covs)
     {
-      _covs.push_back((CovBase*)e->clone());
+      _covs.push_back(std::dynamic_pointer_cast<CovBase>(e->cloneShared()));
     }
     _filtered         = r._filtered;
     _allActiveCov     = r._allActiveCov;
@@ -115,7 +115,7 @@ void CovList::addCov(const CovBase* cov)
       return;
     }
   }
-  _covs.push_back((CovBase*)cov->clone());
+  _covs.push_back(std::dynamic_pointer_cast<CovBase>(cov->cloneShared()));
   _filtered.push_back(false);
   _updateLists();
 }
@@ -135,7 +135,6 @@ void CovList::_updateLists()
 void CovList::delCov(int icov)
 {
   if (!_isCovarianceIndexValid(icov)) return;
-  delete _covs[icov];
   _covs.erase(_covs.begin() + icov);
   _filtered.erase(_filtered.begin() + icov);
   _delCov(icov);
@@ -144,10 +143,6 @@ void CovList::delCov(int icov)
 
 void CovList::delAllCov()
 {
-  for (auto& e: _covs)
-  {
-    delete e;
-  }
   _covs.clear();
   _filtered.clear();
   _allActiveCovList.clear();
@@ -357,20 +352,19 @@ bool CovList::isAllActiveCovList() const
 const CovBase* CovList::getCov(int icov) const
 {
   if (!_isCovarianceIndexValid(icov)) return nullptr;
-  return _covs[icov];
+  return _covs[icov].get();
 }
 
 CovBase* CovList::getCovModify(int icov)
 {
   if (!_isCovarianceIndexValid(icov)) return nullptr;
-  return _covs[icov];
+  return _covs[icov].get();
 }
 
 void CovList::setCov(int icov, const CovBase* covs)
 {
   if (!_isCovarianceIndexValid(icov)) return;
-  delete _covs[icov];
-  _covs[icov] = (CovBase*)covs->clone();
+  _covs[icov] = std::dynamic_pointer_cast<CovBase>(covs->cloneShared());
 }
 
 const ECov& CovList::getCovType(int icov) const

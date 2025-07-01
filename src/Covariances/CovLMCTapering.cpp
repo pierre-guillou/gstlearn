@@ -54,7 +54,7 @@ int CovLMCTapering::init(const ETape& tapetype, double taperange)
 {
   for (auto &e: _covs)
   {
-    ((CovAniso*)e)->setOptimEnabled(false);
+    ((CovAniso*)e.get())->setOptimEnabled(false);
   }
   /* Preliminary check */
 
