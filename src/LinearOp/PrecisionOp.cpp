@@ -43,7 +43,7 @@ PrecisionOp::PrecisionOp(AShiftOp* shiftop,
                          const CovAniso* cova,
                          bool verbose)
   : _shiftOp(shiftop)
-  , _cova(cova)
+  , _cova(cova->clone())
   , _polynomials()
   , _verbose(verbose)
   , _training(false)
@@ -102,8 +102,7 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
 
 PrecisionOp::PrecisionOp(const PrecisionOp& pmat)
   : _shiftOp(nullptr)
-  , _cova(pmat._cova)
-  // , _polynomials(pmat._polynomials)
+  , _cova(pmat._cova->clone())
   , _verbose(pmat._verbose)
   , _training(false)
   , _destroyShiftOp(pmat._destroyShiftOp)
@@ -126,8 +125,7 @@ PrecisionOp& PrecisionOp::operator=(const PrecisionOp& pmat)
 {
   if (this != &pmat)
   {
-    _cova = pmat._cova;
-    //  _polynomials = pmat._polynomials;
+    _cova = pmat._cova->clone();
     _verbose        = pmat._verbose;
     _training       = pmat._training;
     _destroyShiftOp = pmat._destroyShiftOp;
