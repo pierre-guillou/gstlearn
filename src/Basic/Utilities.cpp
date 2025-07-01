@@ -870,7 +870,7 @@ int* ut_combinations(int n, int maxk, int *ncomb)
  ** \param[in,out] tab    Array to be suffled
  **
  *****************************************************************************/
-void ut_shuffle_array(int nrow, int ncol, double *tab)
+void ut_shuffle_array(int nrow, int ncol, VectorDouble& tab)
 {
   int jrow;
 
