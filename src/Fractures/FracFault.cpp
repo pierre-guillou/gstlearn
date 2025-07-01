@@ -11,6 +11,7 @@
 #include "Fractures/FracFault.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 #include <math.h>
 
@@ -108,7 +109,7 @@ void FracFault::addFaultPerFamily(double thetal,
   _ranger[nfam] = ranger;
 }
 
-bool FracFault::_deserialize(std::istream& is, bool /*verbose*/)
+bool FracFault::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
   int nfam = getNFamilies();
@@ -122,7 +123,7 @@ bool FracFault::_deserialize(std::istream& is, bool /*verbose*/)
   return ret;
 }
 
-bool FracFault::_serialize(std::ostream& os, bool /*verbose*/) const
+bool FracFault::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<double>(os, "Abscissa of the first Fault point", _coord);
@@ -134,3 +135,45 @@ bool FracFault::_serialize(std::ostream& os, bool /*verbose*/) const
   ret = ret && _recordWriteVec<double>(os, "Decrease Range on the right", _ranger);
   return ret;
 }
+
+#ifdef HDF5
+bool FracFault::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto faultG = SerializeHDF5::getGroup(grp, "Faults");
+  if (!faultG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int nfamilies;
+
+  ret = ret && SerializeHDF5::readValue(*faultG, "Abscissa", _coord);
+  ret = ret && SerializeHDF5::readValue(*faultG, "Orientation", _orient);
+  ret = ret && SerializeHDF5::readValue(*faultG, "NFamilies", nfamilies);
+  ret = ret && SerializeHDF5::readVec(*faultG, "MaxDensityLeft", _thetal);
+  ret = ret && SerializeHDF5::readVec(*faultG, "MaxDensityRight", _thetar);
+  ret = ret && SerializeHDF5::readVec(*faultG, "DecreaseRangeLeft", _rangel);
+  ret = ret && SerializeHDF5::readVec(*faultG, "DecreaseRangeRight", _ranger);
+
+  return ret;
+}
+
+bool FracFault::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto faultG = grp.createGroup("FracFault");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(faultG, "Abscissa", _coord);
+  ret = ret && SerializeHDF5::writeValue(faultG, "Orientation", _orient);
+  ret = ret && SerializeHDF5::writeValue(faultG, "NFamilies", getNFamilies());
+  ret = ret && SerializeHDF5::writeVec(faultG, "MaxDensityLeft", _thetal);
+  ret = ret && SerializeHDF5::writeVec(faultG, "MaxDensityRight", _thetar);
+  ret = ret && SerializeHDF5::writeVec(faultG, "DecreaseRangeLeft", _rangel);
+  ret = ret && SerializeHDF5::writeVec(faultG, "DecreaseRangeRight", _ranger);
+
+  return ret;
+}
+#endif

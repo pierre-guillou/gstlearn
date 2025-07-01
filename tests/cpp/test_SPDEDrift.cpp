@@ -10,6 +10,7 @@
 /******************************************************************************/
 
 #include "Basic/File.hpp"
+#include "Enum/EFormatNF.hpp"
 #include "Model/ConsItem.hpp"
 #include "Model/Constraints.hpp"
 #include "Model/Model.hpp"
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
   /// Traditional Kriging
   kriging(temperatures, grid, model, neighU);
 
-  (void) grid->dumpToNF("Grid.ascii",verbose);
+  (void) grid->dumpToNF("Grid.ascii",EFormatNF::DEFAULT,verbose);
 
   DbStringFormat dbfmt(FLAG_STATS,{"spde*estim"});
   grid->display(&dbfmt);

@@ -13,6 +13,7 @@
 #include "Db/DbStringFormat.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 DbMeshStandard::DbMeshStandard(int ndim,
                                int napexpermesh,
@@ -124,7 +125,7 @@ DbMeshStandard::createFromExternal(const MatrixDense& apices,
   return dbmesh;
 }
 
-bool DbMeshStandard::_deserialize(std::istream& is, bool verbose)
+bool DbMeshStandard::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndim = 0;
   bool ret = true;
@@ -135,16 +136,16 @@ bool DbMeshStandard::_deserialize(std::istream& is, bool verbose)
 
   // Reading the meshing information
 
-  ret      = ret && _mesh.deserialize(is);
+  ret      = ret && _mesh._deserializeAscii(is);
 
   // Reading the Db information
 
-  ret      = ret && Db::_deserialize(is, verbose);
+  ret      = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbMeshStandard::_serialize(std::ostream& os, bool verbose) const
+bool DbMeshStandard::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
@@ -154,11 +155,11 @@ bool DbMeshStandard::_serialize(std::ostream& os, bool verbose) const
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh.serialize(os);
+  ret      = ret && _mesh._serializeAscii(os);
 
   /* Writing the tail of the file */
 
-  ret      = ret && Db::_serialize(os, verbose);
+  ret      = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -166,27 +167,18 @@ bool DbMeshStandard::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a DbMesh by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (DbMesh format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (DbMesh format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbMeshStandard* DbMeshStandard::createFromNF(const String& neutralFilename, bool verbose)
+DbMeshStandard* DbMeshStandard::createFromNF(const String& NFFilename, bool verbose)
 {
   DbMeshStandard* dbmesh = new DbMeshStandard;
-  std::ifstream is;
-  bool success = false;
-  if (dbmesh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = dbmesh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbmesh;
-    dbmesh = nullptr;
-  }
-  return dbmesh;
+  if (dbmesh->_fileOpenAndDeserialize(NFFilename, verbose)) return dbmesh;
+  delete dbmesh;
+  return nullptr;
 }
 
 /**
@@ -240,3 +232,40 @@ VectorDouble DbMeshStandard::getCoordinatesPerMesh(int imesh, int idim, bool fla
 
   return vec;
 }
+#ifdef HDF5 
+bool DbMeshStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto dbg = SerializeHDF5::getGroup(grp, "DbMeshStandard");
+  if (!dbg)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndim = 0;
+
+  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
+
+  ret = ret && _mesh._deserializeH5(*dbg, verbose);
+
+  ret = ret && Db::_deserializeH5(*dbg, verbose);
+
+  return ret;
+}
+
+bool DbMeshStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto dbG = grp.createGroup("DbMeshStandard");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+
+  ret = ret && _mesh._serializeH5(dbG, verbose);
+
+  ret = ret && Db::_serializeH5(dbG, verbose);
+
+  return ret;
+}
+#endif

@@ -14,6 +14,7 @@
 #include "Basic/SerializeNeutralFile.hpp"
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
+#include "Enum/EFormatNF.hpp"
 
 #include <iostream>
 #include <filesystem>
@@ -41,47 +42,100 @@ ASerializable::ASerializable(ASerializable&&) noexcept            = default;
 ASerializable& ASerializable::operator=(ASerializable&&) noexcept = default;
 ASerializable::~ASerializable()                                   = default;
 
-bool ASerializable::deserialize(std::istream& is, bool verbose)
+void ASerializable::setDefaultFormatNF(const EFormatNF& format)
 {
-  bool ret = _deserialize(is, verbose);
-  if (verbose && !ret) messerr("Problem when reading the Neutral File.");
-  return ret;
+  _defaultFormatNF = format;
 }
 
-bool ASerializable::serialize(std::ostream& os, bool verbose) const
+/**
+ * @brief Dump the contents of an object into an Output File
+ * using a given Output NF Format
+ *
+ * @param NFFilename Name of the Output File
+ * @param format Choice of the format (see remarks)
+ * @param verbose Verbose flag
+ * @return true or false
+ *
+ * @remarks In the argument 'format', the user can select the format for encoding
+ * the contents of the output file.
+ * If the value DEFAULT is used, the package uses the Format currently defined
+ * as the defaulted one. This default value can be updated using the method
+ * ASerializable::DefaultFormatNF()
+ */
+bool ASerializable::dumpToNF(const String& NFFilename,
+                             const EFormatNF& format, 
+                             bool verbose) const
 {
-  return _serialize(os, verbose);
-}
-
-bool ASerializable::dumpToNF(const String& neutralFilename, bool verbose) const
-{
-  std::ofstream os;
   bool ret = true;
-  if (SerializeNeutralFile::fileOpenWrite(*this, neutralFilename, os, true))
+
+  EFormatNF formatLocal = format;
+  if (format == EFormatNF::DEFAULT)
   {
-    ret = _serialize(os, verbose);
-    if (! ret)
-    {
-      messerr("Problem writing in the Neutral File.");
-    }
-    os.close();
+    formatLocal = _defaultFormatNF;
   }
-  return ret;
-}
+
+  // Check if H5 format is available: otherwise force ASCII
+#ifndef HDF5
+  formatLocal = EFormatNF::ASCII;
+#endif
+
+  if (formatLocal == EFormatNF::ASCII)
+  {
+    std::ofstream os;
+    if (SerializeNeutralFile::fileOpenWrite(*this, NFFilename, os, true))
+    {
+      ret = _serializeAscii(os, verbose);
+      if (! ret)
+        messerr("Problem writing in the Neutral File.");
+      os.close();
+    }
+    return ret;
+  }
 
 #ifdef HDF5
-bool ASerializable::dumpToH5(const String& H5Filename, bool verbose) const
-{
-  auto file = SerializeHDF5::fileOpenWrite(H5Filename);
-  bool ret  = _serializeH5(file, verbose);
-  if (!ret)
+  if (formatLocal == EFormatNF::H5)
   {
-    messerr("Problem writing in the HDF5 file.");
+    auto file = SerializeHDF5::fileOpenWrite(*this, NFFilename);
+    bool ret  = _serializeH5(file, verbose);
+    if (!ret)
+      messerr("Problem writing in the HDF5 file.");
+    return ret;
+  }
+#endif
+
+  messerr("Aserializable::dumpToNF: No Format is defined (enum value: %d)", formatLocal.getValue());
+  return false;
+}
+
+bool ASerializable::_fileOpenAndDeserialize(const String& filename,
+                                            bool verbose)
+{
+  // Check that the file exists
+  String filepath = ASerializable::buildFileName(1, filename, true);
+  std::ifstream file(filepath);
+  if (!file.good()) return false;
+
+  // Try to open it according to HDF5 format
+#ifdef HDF5
+  if (H5::H5File::isHdf5(filepath))
+  {
+    auto file = SerializeHDF5::fileOpenRead(filename);
+
+    return _deserializeH5(file, verbose);
+  }
+#endif
+
+  // Try to open it according to ASCII format
+  std::ifstream is;
+  if (SerializeNeutralFile::fileOpenRead(*this, filename, is, verbose))
+  {
+    return _deserializeAscii(is, verbose);
   }
 
-  return ret;
+  if (verbose)
+    messerr("Opening the file %s failed", filename.c_str());
+  return false;
 }
-#endif
 
 bool ASerializable::_fileOpenWrite(const String& filename,
                                    std::ofstream& os,
@@ -174,36 +228,65 @@ String ASerializable::buildFileName(int status, const String& filename, bool ens
 String ASerializable::getFileIdentity(const String& filename, bool verbose)
 {
   // Preliminary check (no message if string is empty ... even in verbose)
-  if (filename.empty())
-  {
-    return String();
-  }
-
+  if (filename.empty()) return String();
   if (verbose)
     message("Input File Name = %s\n", filename.c_str());
 
-  // Open the File
-  std::ifstream file(filename);
-  if (!file.is_open())
+  // Build the multi-platform filename
+  const auto filepath = ASerializable::buildFileName(1, filename, true);
+  if (verbose)
+    message("Input File Path = %s\n", filepath.c_str());
+
+  // Open the file according to various formats
+  int ret_type = -1;
+  String classType;
+
+#ifdef HDF5
+  if (ret_type < 0)
   {
-    if (verbose) messerr("Could not open the Neutral File %s", filename.c_str());
-    return String();
+    // Check if the file is written at format HDF5
+    if (H5::H5File::isHdf5(filepath))
+    {
+
+      // Attempt to open according to a H5 format
+      H5::H5File file {filepath, H5F_ACC_RDONLY};
+
+      if (!file.nameExists("gstlearn metadata"))
+      {
+        messerr("File %s doesn't contain Gstlearn metadata…", filepath.c_str());
+        return String();
+      }
+      ret_type = 1;
+
+      // Read the class type
+      classType = SerializeHDF5::getFileClass(filepath, verbose);
+    }
+  }
+#endif
+
+  if (ret_type < 0)
+  {
+
+    // Attempt to open according to the ASCII format
+    std::ifstream file(filepath);
+    if (!file.is_open())
+    {
+      if (verbose) messerr("Could not open the Neutral File %s", filepath.c_str());
+      return String();
+    }
+    ret_type = 0;
+
+    // Read the Class Type
+    gslSafeGetline(file, classType);
+    classType = trimRight(classType);
+
+    // Close the file
+    file.clear();
   }
 
-  // Read the File Header
-  String filetype;
-  //std::getline(file, filetype);
-  gslSafeGetline(file, filetype);
+  if (verbose) message("Decoded Type = %s\n", classType.c_str());
 
-  // Suppress trailing blanks
-  filetype = trimRight(filetype);
-
-  // Close the file
-  file.clear();
-
-  if (verbose) message("Decoded Type = %s\n", filetype.c_str());
-
-  return filetype;
+  return classType;
 }
 
 void ASerializable::setPrefixName(const String& prefixName)

@@ -68,12 +68,12 @@ int main(int argc, char *argv[])
   double range1 = 0.2;
   Model* model1 = Model::createFromParam(ECov::MATERN,range1,1.,1.);
   model1->display();
-  (void) model1->dumpToNF("truemodel1.ascii");
+  (void) model1->dumpToNF("truemodel1.NF");
 
   double range2 = 0.3;
   Model* model2 = Model::createFromParam(ECov::EXPONENTIAL,range2,1.,1.);
   model2->display();
-  (void) model2->dumpToNF("truemodel2.ascii");
+  (void) model2->dumpToNF("truemodel2.NF");
 
   // Creating the Neighborhood
   NeighUnique* neighU = NeighUnique::create();
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   // Creating the Rule
   Rule* rule = Rule::createFromNames({"S","T","F1","F2","F3"});
   rule->display();
-  (void) rule->dumpToNF("truerule.ascii");
+  (void) rule->dumpToNF("truerule.NF");
   RuleProp* ruleprop;
   if (flagStationary)
     ruleprop = RuleProp::createFromRule(rule, props);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
   // Perform a non-conditional simulation on the Db
   error = simpgs(nullptr,db,ruleprop,model1,model2,neighU);
   db->setLocator(db->getLastName(),ELoc::Z, 0);
-  (void) db->dumpToNF("simupgs.ascii");
+  (void) db->dumpToNF("simupgs.NF");
   db->display(&dbfmt);
 
   // Design of several VarioParams
@@ -126,14 +126,14 @@ int main(int argc, char *argv[])
   modelPGS1.fit(&vario1,covs,constraints);
   modelPGS1.display();
 
-  (void) vario1.dumpToNF("variopgs1.ascii");
-  (void) modelPGS1.dumpToNF("modelfitpgs1.ascii");
+  (void) vario1.dumpToNF("variopgs1.NF");
+  (void) modelPGS1.dumpToNF("modelfitpgs1.NF");
 
   modelPGS2.fit(&vario2,covs,constraints);
   modelPGS2.display();
 
-  (void) vario2.dumpToNF("variopgs2.ascii");
-  (void) modelPGS2.dumpToNF("modelfitpgs2.ascii");
+  (void) vario2.dumpToNF("variopgs2.NF");
+  (void) modelPGS2.dumpToNF("modelfitpgs2.NF");
 
   RuleProp* ruleprop2;
   if (flagStationary)
@@ -142,17 +142,17 @@ int main(int argc, char *argv[])
     ruleprop2 = RuleProp::createFromDb(dbprop, VectorDouble());
   error = ruleprop2->fit(db, &varioparam2, 2, true);
   ruleprop2->getRule()->display();
-  (void) ruleprop2->getRule()->dumpToNF("ruleFit.ascii");
+  (void) ruleprop2->getRule()->dumpToNF("ruleFit.NF");
 
   modelPGS1.display();
   Vario* varioDerived = model_pgs(db, &varioparam1, ruleprop2, &modelPGS1, &modelPGS2);
   modelPGS1.display();
-  varioDerived->dumpToNF("modelpgs.ascii");
+  varioDerived->dumpToNF("modelpgs.NF");
   varioDerived->display();
 
   Vario varioIndic = Vario(varioparam1);
   varioIndic.computeIndic(db, ECalcVario::VARIOGRAM);
-  (void) varioIndic.dumpToNF("varioindic.ascii");
+  (void) varioIndic.dumpToNF("varioindic.NF");
 
   modelPGS1.display();
 

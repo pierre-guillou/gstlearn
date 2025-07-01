@@ -76,5 +76,5 @@ dbfmt = gl.DbStringFormat()
 dbfmt.setFlags(flag_stats=True)
 workingDb.display(dbfmt)
 
-resultDb.dumpToNF("spirale-param.ascii")
-workingDb.dumpToNF("spirale.ascii")
+resultDb.dumpToNF("spirale-param.NF")
+workingDb.dumpToNF("spirale.NF")

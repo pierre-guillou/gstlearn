@@ -12,6 +12,7 @@
 
 #include "Basic/PolyLine2D.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Geometry/GeometryHelper.hpp"
 #include "Stats/Classical.hpp"
 #include "Stats/Regression.hpp"
@@ -87,22 +88,12 @@ String PolyLine2D::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-PolyLine2D* PolyLine2D::createFromNF(const String& neutralFilename, bool verbose)
+PolyLine2D* PolyLine2D::createFromNF(const String& NFFilename, bool verbose)
 {
-  PolyLine2D* line2D = nullptr;
-  std::ifstream is;
-  line2D = new PolyLine2D();
-  bool success = false;
-  if (line2D->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  line2D->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete line2D;
-    line2D = nullptr;
-  }
-  return line2D;
+  PolyLine2D* line2D = new PolyLine2D();
+  if (line2D->_fileOpenAndDeserialize(NFFilename, verbose)) return line2D;
+  delete line2D;
+  return nullptr;
 }
 
 /**
@@ -112,7 +103,7 @@ PolyLine2D* PolyLine2D::createFromNF(const String& neutralFilename, bool verbose
  * @param verbose Verbose flag
  * @return
  */
-bool PolyLine2D::_serialize(std::ostream& os, bool /*verbose*/) const
+bool PolyLine2D::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   if (getNPoints() <= 0) return false;
   bool ret = true;
@@ -134,7 +125,7 @@ bool PolyLine2D::_serialize(std::ostream& os, bool /*verbose*/) const
  * @param verbose Verbose flag
  * @return
  */
-bool PolyLine2D::_deserialize(std::istream& is, bool /*verbose*/)
+bool PolyLine2D::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   int np = 0;
   bool ret = true;
@@ -699,3 +690,32 @@ double distanceBetweenPolylines(const PolyLine2D& poly1,
   coor2[1] = poly2.getY(pldist2.rank);
   return ut_distance(2, coor1.data(), coor2.data());
 }
+
+#ifdef HDF5
+bool PolyLine2D::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto polyline2DG = SerializeHDF5::getGroup(grp, "PolyLine2D");
+  if (!polyline2DG)
+  {
+    return false;
+  }
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::readVec(*polyline2DG, "X", _x);
+  ret = ret && SerializeHDF5::readVec(*polyline2DG, "Y", _y);
+
+  return ret;
+}
+
+bool PolyLine2D::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto polyline2DG = grp.createGroup("PolyLine2D");
+
+  bool ret = true;
+  ret = ret && SerializeHDF5::writeVec(polyline2DG, "X", _x);
+  ret = ret && SerializeHDF5::writeVec(polyline2DG, "Y", _y);
+
+  return ret;
+}
+#endif

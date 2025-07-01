@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
   covs1.addCov(&cova1);
   model1.setCovAnisoList(&covs1);
   model1.display();
-  (void) model1.dumpToNF("PGSmodel1.ascii");
+  (void) model1.dumpToNF("PGSmodel1.NF");
 
   Model model2(ctxt);
   CovAnisoList covs2(ctxt);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   covs2.addCov(&cova2);
   model2.setCovAnisoList(&covs2);
   model2.display();
-  (void) model2.dumpToNF("PGSmodel2.ascii");
+  (void) model2.dumpToNF("PGSmodel2.NF");
 
   Model model3(ctxt);
   CovAnisoList covs3(ctxt);
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
   covs3.addCov(&cova3);
   model3.setCovAnisoList(&covs3);
   model3.display();
-  (void) model3.dumpToNF("PGSmodel3.ascii");
+  (void) model3.dumpToNF("PGSmodel3.NF");
 
   Model model4(ctxt);
   CovAnisoList covs4(ctxt);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
   covs4.addCov(&cova4);
   model4.setCovAnisoList(&covs4);
   model4.display();
-  (void) model4.dumpToNF("PGSmodel4.ascii");
+  (void) model4.dumpToNF("PGSmodel4.NF");
 
   // Creating the Neighborhood
   NeighUnique* neighU = NeighUnique::create();
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
   // Creating the Rules
   Rule* rule1 = Rule::createFromNames({"S","S","F1","F2","F3"});
   rule1->display();
-  (void) rule1->dumpToNF("PGSrule1.ascii");
+  (void) rule1->dumpToNF("PGSrule1.NF");
 
   // Creating the RuleProp structure for simPGS
   RuleProp* ruleprop1 = RuleProp::createFromRule(rule1, props1);
@@ -112,13 +112,13 @@ int main(int argc, char *argv[])
   dbgrid->setNameByLocator(ELoc::FACIES,"PGS-Facies");
   dbfmt = DbStringFormat(FLAG_STATS,{"PGS-Facies*"});
   dbgrid->display(&dbfmt);
-  (void) dbgrid->dumpToNF("simupgs.ascii");
+  (void) dbgrid->dumpToNF("simupgs.NF");
 
   // Creating the RuleProp for simBiPGS
   VectorDouble props2({0.1, 0.2, 0.1, 0.3, 0.1, 0.2});
   Rule* rule2 = Rule::createFromNames({"S","F1","F2"});
   rule2->display();
-  (void) rule2->dumpToNF("PGSrule2.ascii");
+  (void) rule2->dumpToNF("PGSrule2.NF");
   RuleProp* rulepropbi = RuleProp::createFromRules(rule1, rule2, props2);
 
   // Perform a non-conditional BiPGS simulation on a grid
@@ -127,14 +127,14 @@ int main(int argc, char *argv[])
   dbgrid->setNameByLocator(ELoc::FACIES,"BiPGS-Facies");
   dbfmt = DbStringFormat(FLAG_STATS,{"BiPGS-Facies*"});
   dbgrid->display(&dbfmt);
-  (void) dbgrid->dumpToNF("simubipgs.ascii");
+  (void) dbgrid->dumpToNF("simubipgs.NF");
 
   // Performing a PGS simulation using Shift
   VectorDouble shift = {0.2, 0.3};
   VectorDouble propshift = { 0.1, 0.2, 0.3, 0.4 };
   RuleShift* ruleshift = RuleShift::createFromNames({"S","S","S","F1","F2","F3","F4"},shift);
   ruleshift->display();
-  (void) ruleshift->dumpToNF("PGSruleshift.ascii");
+  (void) ruleshift->dumpToNF("PGSruleshift.NF");
 
   RuleProp* rulepropshift = RuleProp::createFromRule(ruleshift, propshift);
 
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
   dbgrid->setNameByLocator(ELoc::FACIES,"PGS-Shift-Facies");
   dbfmt = DbStringFormat(FLAG_STATS,{"PGS-Shift-Facies*"});
   dbgrid->display(&dbfmt);
-  (void) dbgrid->dumpToNF("simushiftpgs.ascii");
+  (void) dbgrid->dumpToNF("simushiftpgs.NF");
 
   // Performing a PGS simulation using Shadow
   double slope = 0.5;
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
   double shdsup = +0.5;
   RuleShadow* ruleshadow = new RuleShadow(slope,shdsup,shdown,shift);
   ruleshadow->display();
-  (void) ruleshadow->dumpToNF("PGSruleshadow.ascii");
+  (void) ruleshadow->dumpToNF("PGSruleshadow.NF");
 
   VectorDouble propshadow = { 0.4, 0.2, 0.3 };
   RuleProp* rulepropshadow = RuleProp::createFromRule(ruleshadow, propshadow);
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
   dbgrid->setNameByLocator(ELoc::FACIES,"PGS-Shadow-Facies");
   dbfmt = DbStringFormat(FLAG_STATS,{"PGS-Shadow-Facies*"});
   dbgrid->display(&dbfmt);
-  (void) dbgrid->dumpToNF("simushadowpgs.ascii");
+  (void) dbgrid->dumpToNF("simushadowpgs.NF");
 
   delete dbgrid;
   delete rule1;

@@ -84,8 +84,7 @@ public:
                                     const VectorString& locatorNames = VectorString(),
                                     bool flagAddSampleRank           = true);
 
-  static DbGraphO* createFromNF(const String& neutralFilename,
-                                bool verbose = true);
+  static DbGraphO* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getNArc() const;
   int getNNode() const;
@@ -107,10 +106,12 @@ public:
   void setArcLine(const VectorInt& nodes, double value = 1.);
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,
-                          bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "DbGraphO"; }
 
 private:

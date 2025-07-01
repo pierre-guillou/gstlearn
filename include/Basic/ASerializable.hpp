@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Basic/SerializeNeutralFile.hpp"
+#include "Enum/EFormatNF.hpp"
 #include "gstlearn_export.hpp"
 #include "geoslib_define.h"
 
@@ -35,12 +36,9 @@ public:
   ASerializable& operator=(ASerializable&& r) noexcept;
   virtual ~ASerializable();
 
-  bool deserialize(std::istream& is, bool verbose = true);
-  bool serialize(std::ostream& os,bool verbose = true) const;
-  bool dumpToNF(const String& neutralFilename, bool verbose = false) const;
-#ifdef HDF5
-  bool dumpToH5(const String& H5Filename, bool verbose = false) const;
-#endif
+  bool dumpToNF(const String& NFFilename,
+                const EFormatNF& format = EFormatNF::fromKey("DEFAULT"),
+                bool verbose            = false) const;
 
   static String buildFileName(int status, const String& filename, bool ensureDirExist = false);
 
@@ -48,18 +46,19 @@ public:
   static void setPrefixName(const String& prefixName);
   static void unsetPrefixName();
   static const String& getPrefixName();
+  void setDefaultFormatNF(const EFormatNF& format);
 
   virtual String _getNFName() const = 0;
 
 protected:
-  virtual bool _deserialize(std::istream& is, bool verbose = false) = 0;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) = 0;
   virtual bool _deserializeH5(H5::Group& /*grp*/, bool /*verbose*/ = false)
   {
     // TODO virtual pure
     messerr("Not implemented yet");
     return false;
   }
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const = 0;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const = 0;
   virtual bool _serializeH5(H5::Group& /*grp*/, bool /*verbose*/ = false) const
   {
     // TODO virtual pure
@@ -73,9 +72,10 @@ protected:
   bool _fileOpenRead(const String& filename,
                      std::ifstream& is,
                      bool verbose = false) const;
+  bool _fileOpenAndDeserialize(const String& filename, bool verbose);
 
   static bool _commentWrite(std::ostream& os,
-                             const String& comment);
+                            const String& comment);
   template <typename T>
   static bool _recordWrite(std::ostream& os,
                             const String& title,
@@ -112,6 +112,7 @@ protected:
 
 private:
   static String _myPrefixName;
+  EFormatNF _defaultFormatNF{EFormatNF::H5};
 };
 
 template<typename T>

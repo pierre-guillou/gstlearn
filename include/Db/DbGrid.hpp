@@ -83,11 +83,7 @@ public:
   void resetDims(int ncol, int nech) override;
   bool isConsistent() const override;
 
-  static DbGrid* createFromNF(const String& neutralFilename,
-                              bool verbose = true);
-#ifdef HDF5
-  static DbGrid* createFromH5(const String& H5Filename, bool verbose = true);
-#endif
+  static DbGrid* createFromNF(const String& NFFilename,bool verbose = true);
   static DbGrid* create(const VectorInt& nx,
                         const VectorDouble& dx = VectorDouble(),
                         const VectorDouble& x0 = VectorDouble(),
@@ -385,9 +381,8 @@ public:
                                    const VectorDouble& radius = VectorDouble());
   void initThread() const override;
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

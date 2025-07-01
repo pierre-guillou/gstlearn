@@ -14,6 +14,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Model/Model.hpp"
 #include "Polynomials/Hermite.hpp"
@@ -80,22 +81,12 @@ String AnamHermite::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-AnamHermite* AnamHermite::createFromNF(const String& neutralFilename, bool verbose)
+AnamHermite* AnamHermite::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamHermite* anam = nullptr;
-  std::ifstream is;
-  anam = new AnamHermite();
-  bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = anam->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete anam;
-    anam = nullptr;
-  }
-  return anam;
+  AnamHermite* anam = new AnamHermite();
+  if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
+  delete anam;
+  return nullptr;
 }
 
 AnamHermite* AnamHermite::create(int nbpoly, bool flagBound, double rCoef)
@@ -616,17 +607,17 @@ int AnamHermite::_data_sort(int nech,
   return(ncl);
 }
 
-bool AnamHermite::_serialize(std::ostream& os, bool verbose) const
+bool AnamHermite::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret && ret && AnamContinuous::_serialize(os, verbose);
+  ret && ret && AnamContinuous::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<double>(os,"Change of support coefficient", getRCoef());
   ret = ret && _recordWrite<int>(os, "Number of Hermite Polynomials", getNbPoly());
   ret = ret && _tableWrite(os, "Hermite Polynomial", getNbPoly(), getPsiHns());
   return ret;
 }
 
-bool AnamHermite::_deserialize(std::istream& is, bool verbose)
+bool AnamHermite::_deserializeAscii(std::istream& is, bool verbose)
 {
   VectorDouble hermite;
   double r = TEST;
@@ -634,7 +625,7 @@ bool AnamHermite::_deserialize(std::istream& is, bool verbose)
 
   bool ret = true;
 
-  ret = ret && AnamContinuous::_deserialize(is, verbose);
+  ret = ret && AnamContinuous::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<double>(is, "Change of Support Coefficient", r);
   ret = ret && _recordRead<int>(is, "Number of Hermite Polynomials", nbpoly);
   if (ret) hermite.resize(nbpoly);
@@ -906,3 +897,47 @@ double AnamHermite::evalSupportCoefficient(int option,
   messerr("The argument 'option'(%d) should be 1 or 2",option);
   return TEST;
 }
+#ifdef HDF5
+bool AnamHermite::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamHermite");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double r = 0.;
+  int nbpoly = 0;
+  VectorDouble hermite;
+
+  ret = ret && AnamContinuous::_deserializeH5(*anamG, verbose);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Support", r);
+  ret = ret && SerializeHDF5::readValue(*anamG, "NbPoly", nbpoly);
+  ret = ret && SerializeHDF5::readVec(*anamG, "Hermite", hermite);
+
+  if (ret)
+  {
+    setPsiHns(hermite);
+    setRCoef(r);
+  }
+
+  return ret;
+}
+
+bool AnamHermite::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto anamG = grp.createGroup("AnamHermite");
+
+  bool ret = true;
+
+  ret      = ret && AnamContinuous::_serializeH5(anamG, verbose);
+  ret      = ret && SerializeHDF5::writeValue(anamG, "Support", getRCoef());
+  ret      = ret && SerializeHDF5::writeValue(anamG, "NbPoly", getNbPoly());
+  ret      = ret && SerializeHDF5::writeVec(anamG, "Hermite", getPsiHns());
+
+  return ret;
+}
+#endif

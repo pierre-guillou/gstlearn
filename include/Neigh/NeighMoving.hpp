@@ -86,7 +86,7 @@ public:
                              bool useBallTree = false,
                              int leaf_size = 10,
                              const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static NeighMoving* createFromNF(const String& neutralFilename, bool verbose = true);
+  static NeighMoving* createFromNF(const String& NFFilename, bool verbose = true);
 
   void addBiTargetCheck(ABiTargetCheck* abpc);
 
@@ -117,9 +117,12 @@ public:
   VectorVectorDouble getZoomLimits(const VectorDouble& target, double percent=20) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "NeighMoving"; }
 
 private:

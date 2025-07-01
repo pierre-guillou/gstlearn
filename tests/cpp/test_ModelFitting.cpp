@@ -44,7 +44,7 @@ static Vario* _computeVariogram(Db* db2D, const ECalcVario& calcul)
   double dlag            = hmax / 2. / nlag;
   VarioParam* varioparam = VarioParam::createOmniDirection(nlag, dlag);
   Vario* vario           = Vario::computeFromDb(*varioparam, db2D, calcul);
-  (void)vario->dumpToNF("Vario.ascii");
+  (void)vario->dumpToNF("Vario.NF");
   delete varioparam;
   return vario;
 }
@@ -61,7 +61,7 @@ static void _firstTest(Db* db2D,
 
   Vario* vario = _computeVariogram(db2D, calcul);
   model->fitSills(vario, nullptr, nullptr, mop, verbose, trace);
-  (void)model->dumpToNF("Sills.ascii");
+  (void)model->dumpToNF("Sills.NF");
   model->display();
 
   delete vario;
@@ -79,7 +79,7 @@ static void _secondTest(Db* db2D,
   Vario* vario = _computeVariogram(db2D, calcul);
   model->fitNew(nullptr, vario, nullptr, nullptr, mop, ITEST,
                 verbose, trace);
-  (void)model->dumpToNF("FromVario.ascii");
+  (void)model->dumpToNF("FromVario.NF");
   model->display();
 
   delete vario;
@@ -95,11 +95,11 @@ static void _thirdTest(DbGrid* dbgrid,
   mestitle(0, "Sill Fitting from Variogram Map (new version)");
 
   DbGrid* dbmap = db_vmap(dbgrid, calcul, {50,50});
-  (void) dbmap->dumpToNF("VMap.ascii");
+  (void) dbmap->dumpToNF("VMap.NF");
 
   model->fitNew(nullptr, nullptr, dbmap, nullptr, mop, ITEST,
                 verbose, trace);
-  (void)model->dumpToNF("FromVMap.ascii");
+  (void)model->dumpToNF("FromVMap.NF");
   model->display();
 
   delete dbmap;
@@ -136,20 +136,20 @@ int main(int argc, char* argv[])
                               VectorDouble(), sill1);
   message("Model used for simulating the Data\n");
   model_simu->display();
-  model_simu->dumpToNF("Model_Ref.ascii");
+  model_simu->dumpToNF("Model_Ref.NF");
 
   // Data set
   int nech = 100;
   Db* db2D = Db::createFromBox(nech, {0., 0.}, {1., 1.});
   (void)simtub(nullptr, db2D, model_simu);
-  (void)db2D->dumpToNF("db.ascii");
+  (void)db2D->dumpToNF("db.NF");
 
   // Grid Data set
   int nx         = 100;
   double dx      = 1. / nx;
   DbGrid* dbgrid = DbGrid::create({nx, nx}, {dx, dx});
   (void)simtub(nullptr, dbgrid, model_simu);
-  (void)dbgrid->dumpToNF("dbgrid.ascii");
+  (void)dbgrid->dumpToNF("dbgrid.NF");
 
   // Creating the testing Model
   message("Initial Model used for Test\n");

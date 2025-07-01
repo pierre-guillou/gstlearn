@@ -16,6 +16,7 @@
 #include "Basic/OptDbg.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include <math.h>
@@ -150,10 +151,10 @@ String NeighMoving::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighMoving::_deserialize(std::istream& is, bool verbose)
+bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   if (! ret) return ret;
 
   int ndim = getNDim();
@@ -179,7 +180,7 @@ bool NeighMoving::_deserialize(std::istream& is, bool verbose)
     nbgh_coeffs.resize(ndim);
     for (int idim = 0; ret && idim < ndim; idim++)
       ret = ret && _recordRead<double>(is, "Anisotropy Coefficient", nbgh_coeffs[idim]);
-    ret = ret && _recordRead<int>(is, "Flag for Anisotropy Rotation", flag_rotation);
+    ret = ret && _recordRead<int>(is, "Anisotropy Rotation Flag", flag_rotation);
     if (flag_rotation)
     {
       nbgh_rotmat.resize(ndim*ndim);
@@ -191,24 +192,21 @@ bool NeighMoving::_deserialize(std::istream& is, bool verbose)
   }
   if (! ret) return ret;
 
-  if (!nbgh_coeffs.empty() && ! FFFF(dmax))
-    for (int idim = 0; idim < ndim; idim++)
-      nbgh_coeffs[idim] *= dmax;
-
   setNSect((getFlagSector()) ? MAX(_nSect, 1) : 1);
 
   delete _biPtDist;
   _biPtDist = BiTargetCheckDistance::create(dmax, nbgh_coeffs);
+  _biPtDist->setFlagRotation(flag_rotation);
   if (! nbgh_rotmat.empty())
     _biPtDist->setAnisoRotMat(nbgh_rotmat);
 
   return ret;
 }
 
-bool NeighMoving::_serialize(std::ostream& os, bool verbose) const
+bool NeighMoving::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<int>(os, "Use angular sectors", getFlagSector());
   ret = ret && _recordWrite<int>(os, "", getNMini());
   ret = ret && _recordWrite<int>(os, "", getNMaxi());
@@ -226,8 +224,7 @@ bool NeighMoving::_serialize(std::ostream& os, bool verbose) const
     for (int idim = 0; ret && idim < ndim; idim++)
       ret = ret && _recordWrite<double>(os, "", _biPtDist->getAnisoCoeff(idim));
     ret = ret && _commentWrite(os, "Anisotropy Coefficients");
-    ret = ret
-        && _recordWrite<int>(os, "Anisotropy Rotation Flag",
+    ret = ret && _recordWrite<int>(os, "Anisotropy Rotation Flag",
                              _biPtDist->getFlagRotation());
     if (_biPtDist->getFlagRotation())
     {
@@ -259,26 +256,16 @@ NeighMoving* NeighMoving::create(bool flag_xvalid,
 
 /**
  * Create a NeighMovingborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighMoving* NeighMoving::createFromNF(const String& neutralFilename, bool verbose)
+NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighMoving* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighMoving();
-  bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  neigh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighMoving* neigh = new NeighMoving();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 /**
@@ -774,3 +761,82 @@ void NeighMoving::_movingSelect(int nsel, VectorInt& ranks)
     }
   }
 }
+
+#ifdef HDF5
+bool NeighMoving::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighMoving");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+
+  int flag_aniso    = 0;
+  int flag_rotation = 0;
+  int flag_sector   = 0;
+  double dmax       = 0.;
+  VectorDouble nbgh_coeffs;
+  VectorDouble nbgh_rotmat;
+
+  ret = ret && SerializeHDF5::readValue(*neighG, "UseSectors", flag_sector);
+  ret = ret && SerializeHDF5::readValue(*neighG, "NMini", _nMini);
+  ret = ret && SerializeHDF5::readValue(*neighG, "NMaxi", _nMaxi);
+  ret = ret && SerializeHDF5::readValue(*neighG, "NSect", _nSect);
+  ret = ret && SerializeHDF5::readValue(*neighG, "NSMax", _nSMax);
+
+  // Store information from the Bipoint Checker based on distances
+  ret = ret && SerializeHDF5::readValue(*neighG, "Radius", dmax);
+  ret = ret && SerializeHDF5::readValue(*neighG, "AnisoFlag", flag_aniso);
+
+  if (flag_aniso)
+  {
+    ret = ret && SerializeHDF5::readVec(*neighG, "AnisoCoeff", nbgh_coeffs);
+    ret = ret && SerializeHDF5::readValue(*neighG, "RotationFlag", flag_rotation);
+    if (flag_rotation)
+      ret = ret && SerializeHDF5::readVec(*neighG, "AnisoRotmat", nbgh_rotmat);
+  }
+
+  delete _biPtDist;
+  _biPtDist = BiTargetCheckDistance::create(dmax, nbgh_coeffs);
+  _biPtDist->setFlagRotation(flag_rotation);
+  if (!nbgh_rotmat.empty())
+    _biPtDist->setAnisoRotMat(nbgh_rotmat);
+
+  return ret;
+}
+
+bool NeighMoving::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto neighG = grp.createGroup("NeighMoving");
+
+  bool ret = true;
+
+  /* Writing the tail of the file */
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  ret = ret && SerializeHDF5::writeValue(neighG, "UseSectors", (int) getFlagSector());
+  ret = ret && SerializeHDF5::writeValue(neighG, "NMini", getNMini());
+  ret = ret && SerializeHDF5::writeValue(neighG, "NMaxi", getNMaxi());
+  ret = ret && SerializeHDF5::writeValue(neighG, "NSect", getNSect());
+  ret = ret && SerializeHDF5::writeValue(neighG, "NSMax", getNSMax());
+
+  // Store information from the Bipoint Checker based on distances
+  ret = ret && SerializeHDF5::writeValue(neighG, "Radius", _biPtDist->getRadius());
+  ret = ret && SerializeHDF5::writeValue(neighG, "AnisoFlag", _biPtDist->getFlagAniso());
+
+  if (_biPtDist->getFlagAniso())
+  {
+    ret = ret && SerializeHDF5::writeVec(neighG, "AnisoCoeff", _biPtDist->getAnisoCoeffs());
+    ret = ret && SerializeHDF5::writeValue(neighG, "RotationFlag", _biPtDist->getFlagRotation());
+    if (_biPtDist->getFlagRotation())
+      ret = ret && SerializeHDF5::writeVec(neighG, "AnisoRotmat", _biPtDist->getAnisoRotMats());
+  }
+  return ret;
+}
+#endif

@@ -12,6 +12,7 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 NeighCell::NeighCell(bool flag_xvalid, int nmini, bool useBallTree, int leaf_size, const ASpaceSharedPtr& space)
   : ANeigh(space)
@@ -75,19 +76,19 @@ String NeighCell::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighCell::_deserialize(std::istream& is, bool verbose)
+bool NeighCell::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<int>(is, "Minimum Number of samples", _nMini);
 
   return ret;
 }
 
-bool NeighCell::_serialize(std::ostream& os, bool verbose) const
+bool NeighCell::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<int>(os, "", getNMini());
   return ret;
 }
@@ -103,26 +104,16 @@ NeighCell* NeighCell::create(bool flag_xvalid,
 
 /**
  * Create a Neighborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighCell* NeighCell::createFromNF(const String& neutralFilename, bool verbose)
+NeighCell* NeighCell::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighCell* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighCell();
-  bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  neigh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  NeighCell* neigh = new NeighCell();
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 bool NeighCell::hasChanged(int iech_out) const
@@ -208,3 +199,34 @@ int NeighCell::_cell(int iech_out, VectorInt& ranks)
   return (nsel < getNMini());
 }
 
+#ifdef HDF5
+bool NeighCell::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighCell");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::readValue(*neighG, "NMini", _nMini);
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+
+  return ret;
+}
+
+bool NeighCell::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto neighG = grp.createGroup("NeighCell");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(neighG, "NMini", getNMini());
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif

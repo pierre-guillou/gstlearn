@@ -29,7 +29,7 @@ public:
   /// Interface for AStringable
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static Faults* createFromNF(const String& neutralFilename, bool verbose = true);
+  static Faults* createFromNF(const String& NFFilename, bool verbose = true);
 
   int getNFaults() const { return (int) _faults.size(); }
   void addFault(const PolyLine2D& fault);
@@ -41,9 +41,12 @@ public:
   bool isSplitByFaultSP(const SpacePoint& P1, const SpacePoint& P2) const;
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "Faults"; }
 
 private:

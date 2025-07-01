@@ -158,8 +158,8 @@ int main(int argc, char *argv[])
   data->addColumns(diff, "Diff_P2Py");
 
   // Produce some neutral file
-  (void) data->dumpToNF("data.ascii");
-  (void) grid->dumpToNF("grid.ascii");
+  (void) data->dumpToNF("data.NF");
+  (void) grid->dumpToNF("grid.NF");
 
   // Printout some stats
   if (flag_stat)

@@ -15,6 +15,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
 #include <math.h>
 
@@ -94,22 +95,11 @@ String AnamEmpirical::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-AnamEmpirical* AnamEmpirical::createFromNF(const String& neutralFilename, bool verbose)
+AnamEmpirical* AnamEmpirical::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamEmpirical* anam = nullptr;
-  std::ifstream is;
-  anam = new AnamEmpirical();
-  bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  anam->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete anam;
-    anam = nullptr;
-  }
-  return anam;
+  AnamEmpirical* anam = new AnamEmpirical();
+  if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
+  return nullptr;
 }
 
 void AnamEmpirical::reset(int ndisc,
@@ -459,10 +449,10 @@ int AnamEmpirical::fitFromArray(const VectorDouble& tab,
   return 0;
 }
 
-bool AnamEmpirical::_serialize(std::ostream& os, bool verbose) const
+bool AnamEmpirical::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && AnamContinuous::_serialize(os, verbose);
+  ret = ret && AnamContinuous::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<int>(os, "Number of Discretization lags", getNDisc());
   ret = ret && _recordWrite<double>(os, "additional variance", getSigma2e());
   ret = ret && _tableWrite(os, "Z Values", getNDisc(), getZDisc());
@@ -470,14 +460,14 @@ bool AnamEmpirical::_serialize(std::ostream& os, bool verbose) const
   return ret;
 }
 
-bool AnamEmpirical::_deserialize(std::istream& is, bool verbose)
+bool AnamEmpirical::_deserializeAscii(std::istream& is, bool verbose)
 {
   int ndisc = 0;
   double sigma2e = TEST;
   VectorDouble zdisc, ydisc;
 
   bool ret = true;
-  ret = ret && AnamContinuous::_deserialize(is, verbose);
+  ret = ret && AnamContinuous::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<int>(is, "Number of Discretization classes", ndisc);
   ret = ret && _recordRead<double>(is, "Experimental Error Variance", sigma2e);
 
@@ -497,3 +487,52 @@ bool AnamEmpirical::_deserialize(std::istream& is, bool verbose)
   }
   return ret;
 }
+#ifdef HDF5
+bool AnamEmpirical::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamEmpirical");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  int ndisc = 0;
+  double sigma2e = 0.;
+  VectorDouble zdisc;
+  VectorDouble ydisc;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "NDiscs", ndisc);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Variance", sigma2e);
+  ret = ret && SerializeHDF5::readVec(*anamG, "ZDisc", zdisc);
+  ret = ret && SerializeHDF5::readVec(*anamG, "YDisc", ydisc);
+
+  ret = ret && AnamContinuous::_deserializeH5(*anamG, verbose);
+
+  if (ret)
+  {
+    setNDisc(ndisc);
+    setSigma2e(sigma2e);
+    setDisc(zdisc, ydisc);
+  }
+
+  return ret;
+}
+
+bool AnamEmpirical::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto anamG = grp.createGroup("anamEmpirical");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "NDiscs", getNDisc());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Variance", getSigma2e());
+  ret = ret && SerializeHDF5::writeVec(anamG, "ZDisc", getZDisc());
+  ret = ret && SerializeHDF5::writeVec(anamG, "YDisc", getYDisc());
+
+  ret = ret && AnamContinuous::_serializeH5(anamG, verbose);
+
+  return ret;
+}
+#endif
