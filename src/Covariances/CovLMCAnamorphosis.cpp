@@ -223,7 +223,7 @@ double CovLMCAnamorphosis::_evalHermite(int ivar,
   modeloc.setAsVario(false);
 
   double rho = 1.;
-  if (getDistance(p1, p2) > 0.)
+  if (getSpace()->getDistance(p1, p2) > 0.)
     rho = CovAnisoList::_eval(p1, p2, ivar, jvar, &modeloc);
   double r = 1.;
   if (anamH->isChangeSupportDefined()) r = anamH->getRCoef();
@@ -363,7 +363,7 @@ double CovLMCAnamorphosis::_evalDiscreteDD(int ivar,
   int iclass = getActiveFactor();
 
   double gamma = 0.;
-  if (getDistance(p1, p2) > 0.)
+  if (getSpace()->getDistance(p1, p2) > 0.)
   {
     gamma = CovAnisoList::_eval(p1, p1, ivar, jvar, mode) -
             CovAnisoList::_eval(p1, p2, ivar, jvar, mode);

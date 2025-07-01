@@ -40,8 +40,7 @@
 #include <math.h>
 
 ACov::ACov(const CovContext& ctxt)
-  : ASpaceObject(ctxt.getSpace())
-  , _ctxt(ctxt)
+  : _ctxt(ctxt)
   , _optimEnabled(false)
   , _optimPreProcessedData(false)
   , _p1As()
@@ -54,7 +53,7 @@ ACov::ACov(const CovContext& ctxt)
 }
 
 ACov::ACov(const ACov& r)
-  : ASpaceObject(r)
+  : AStringable(r)
   , _ctxt(r._ctxt)
   , _optimEnabled(r._optimEnabled)
   , _optimPreProcessedData(r._optimPreProcessedData)
@@ -72,7 +71,6 @@ ACov& ACov::operator=(const ACov& r)
 {
   if (this != &r)
   {
-    ASpaceObject::operator=(r);
     _ctxt                  = r._ctxt;
     _optimEnabled          = r._optimEnabled;
     _optimPreProcessedData = r._optimPreProcessedData;
@@ -431,8 +429,8 @@ double ACov::evalIvarIpasIncr(const VectorDouble& dincr,
                               const CovCalcMode* mode) const
 {
   // Define the point in the ACov space (center will be checked)
-  SpacePoint p1(VectorDouble(_space->getNDim()), -1, getSpace());
-  SpacePoint p2(VectorDouble(_space->getNDim()), -1, getSpace());
+  SpacePoint p1(VectorDouble(getSpace()->getNDim()), -1, getSpace());
+  SpacePoint p2(VectorDouble(getSpace()->getNDim()), -1, getSpace());
   p2.move(dincr);
   return evalCov(p1, p2, ivar, jvar, mode); // pure virtual method
 }
@@ -505,8 +503,8 @@ double ACov::evalIsoIvarIpas(double step,
                              const CovCalcMode* mode) const
 {
   /// TODO : Not true whatever the space
-  VectorDouble center = getOrigin();
-  VectorDouble dir    = getUnitaryVector();
+  VectorDouble center = getSpace()->getOrigin();
+  VectorDouble dir    = getSpace()->getUnitaryVector();
   return evalIvarIpas(step, dir, ivar, jvar, mode);
 }
 
@@ -525,7 +523,7 @@ VectorDouble ACov::evalIsoIvarNlag(const VectorDouble& vec_step,
                                    const CovCalcMode* mode) const
 {
   VectorDouble vec;
-  VectorDouble dir = getUnitaryVector();
+  VectorDouble dir = getSpace()->getUnitaryVector();
   for (const auto& h: vec_step)
     vec.push_back(evalIvarIpas(h, dir, ivar, jvar, mode));
   return vec;
@@ -542,7 +540,7 @@ MatrixSquare ACov::evalIsoNvarIpas(double step,
                                    const CovCalcMode* mode) const
 {
   int nvar         = getNVar();
-  VectorDouble dir = getUnitaryVector();
+  VectorDouble dir = getSpace()->getUnitaryVector();
   MatrixSquare mat(nvar);
   for (int ivar = 0; ivar < nvar; ivar++)
     for (int jvar = 0; jvar < nvar; jvar++)

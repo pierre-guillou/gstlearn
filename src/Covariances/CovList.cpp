@@ -204,12 +204,6 @@ void CovList::makeSillNoStatFunctional(int icov, const AFunctional* func, int iv
   getCovModify(icov)->makeSillNoStatFunctional(func, ivar, jvar);
 }
 
-bool CovList::isConsistent(const ASpace* /*space*/) const
-{
-  /// TODO : CovList::isConsistent
-  return true;
-}
-
 int CovList::getNVar() const
 {
   if (getNCov() > 0)

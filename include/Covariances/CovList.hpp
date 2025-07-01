@@ -47,9 +47,6 @@ public:
   CovList& operator=(const CovList& r);
   virtual ~CovList();
 
-  /// Interface for ASpaceObject
-  virtual bool isConsistent(const ASpace* space) const override;
-
   /// Interface for ACov
   virtual int getNVar() const override;
   virtual bool isIndexable() const override { return true; }

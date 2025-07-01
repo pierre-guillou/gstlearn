@@ -52,7 +52,7 @@ class ListParams;
  *
  * It is mainly implemented in CovAniso.hpp or CovAnisoList.hpp
  */
-class GSTLEARN_EXPORT ACov: public ASpaceObject, public ICloneable
+class GSTLEARN_EXPORT ACov: public ICloneable, public AStringable
 {
 public:
   ACov(const CovContext& ctxt = CovContext());
@@ -98,6 +98,7 @@ public:
     DECLARE_UNUSED(mode);
     return TEST;
   }
+
   virtual VectorDouble evalSpectrumOnSphere(int n,
                                             bool flagNormDistance = false,
                                             bool flagCumul        = false) const
@@ -127,6 +128,12 @@ public:
 
   void attachNoStatDb(const Db* db);
 
+  ASpaceSharedPtr getSpace() const { return _ctxt.getSpace(); }
+  virtual bool isConsistent(const ASpace* space) const
+   {
+    DECLARE_UNUSED(space)
+    return true; 
+  }
   /////////////////////////////////////////////////////////////////////////////////
   /// Functions linked to Optimization during Covariance calculations
   virtual bool isOptimEnabled() const { return _isOptimEnabled(); }

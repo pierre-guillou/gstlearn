@@ -40,7 +40,7 @@ CorGneiting::CorGneiting(const CorAniso* covS, const CorAniso* covTemp, double s
   auto space = SpaceComposite::create();
   space->addSpaceComponent(covS->getSpace());
   space->addSpaceComponent(covTemp->getSpace());
-  _space = space;
+  _ctxt.setSpace(space);
 
   int nvar = covS->getNVar();
   CovContext ctxt    = CovContext(nvar, space);
