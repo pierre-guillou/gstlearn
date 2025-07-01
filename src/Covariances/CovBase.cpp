@@ -40,7 +40,7 @@ CovBase::CovBase(ACov* cor,
   , _cholSillsInfo(MatrixT<ParamInfo>(sill.getNRows(), sill.getNCols(), createParamInfoForCholSill()))
   , _cholSills(MatrixDense(sill.getNRows(), sill.getNCols()))
   , _sillCur(sill)
-  , _cor(std::dynamic_pointer_cast<ACov>(cor->cloneShared()))
+  , _cor(std::dynamic_pointer_cast<ACov>(cor==nullptr? nullptr :cor->cloneShared()))
   , _itRange(sill.getNRows())
 {
 
