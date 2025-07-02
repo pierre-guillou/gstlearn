@@ -8,15 +8,13 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
-#include "Polygon/Polygons.hpp"
-#include "Basic/Utilities.hpp"
-#include "Basic/Grid.hpp"
 #include "Db/Db.hpp"
-#include "Db/DbGrid.hpp"
+#include "Basic/Grid.hpp"
 #include "Basic/Memory.hpp"
-
+#include "Basic/Utilities.hpp"
+#include "Db/DbGrid.hpp"
+#include "Polygon/Polygons.hpp"
+#include "geoslib_old_f.h"
 #include <math.h>
 
 /****************************************************************************/
@@ -35,7 +33,7 @@
  ** \remarks The opposite is not correct.
  **
  *****************************************************************************/
-int compat_NDIM(Db *db1, Db *db2)
+int compat_NDIM(Db* db1, Db* db2)
 {
   if (db1->getNDim() <= db2->getNDim()) return (1);
   messerr("The Space Dimension of the First Db (%d)", db1->getNDim());
@@ -51,7 +49,7 @@ int compat_NDIM(Db *db1, Db *db2)
  ** \param[in]  db  Pointer to the Db structure (organized as a grid)
  **
  *****************************************************************************/
-void db_grid_print(Db *db)
+void db_grid_print(Db* db)
 {
   if (db->isGrid()) message(db->toString().c_str());
 }
@@ -66,7 +64,7 @@ void db_grid_print(Db *db)
  ** \param[in]  locatorType Rank of the pointer (ELoc)
  **
  *****************************************************************************/
-int get_LOCATOR_NITEM(const Db *db, const ELoc& locatorType)
+int get_LOCATOR_NITEM(const Db* db, const ELoc& locatorType)
 {
   if (db == nullptr) return (0);
   if (db->isGrid() && locatorType == ELoc::X)
@@ -93,11 +91,11 @@ int get_LOCATOR_NITEM(const Db *db, const ELoc& locatorType)
  ** \remark: The returned array 'vect' must be dimension to that value
  **
  *****************************************************************************/
-double distance_inter(const Db *db1,
-                      const Db *db2,
+double distance_inter(const Db* db1,
+                      const Db* db2,
                       int iech1,
                       int iech2,
-                      double *dist_vect)
+                      double* dist_vect)
 {
   double v1, v2, *tab1, *tab2;
   int idim, ndim;
@@ -131,7 +129,7 @@ double distance_inter(const Db *db1,
  **                        Returns the distance as a vector
  **
  *****************************************************************************/
-double distance_intra(const Db *db, int iech1, int iech2, double *dist_vect)
+double distance_intra(const Db* db, int iech1, int iech2, double* dist_vect)
 {
   double v1, v2, *tab1, *tab2;
   int idim, ndim;
@@ -166,11 +164,11 @@ double distance_intra(const Db *db, int iech1, int iech2, double *dist_vect)
  **                         Returns the distance as a vector
  **
  *****************************************************************************/
-double distance_grid(DbGrid *db,
+double distance_grid(DbGrid* db,
                      int flag_moins1,
                      int iech1,
                      int iech2,
-                     double *dist_vect)
+                     double* dist_vect)
 {
   int ndim = db->getNDim();
   VectorInt iwork1(ndim);
@@ -180,8 +178,9 @@ double distance_grid(DbGrid *db,
 
   if (iech1 == iech2)
   {
-    if (dist_vect != nullptr) for (int idim = 0; idim < db->getNDim(); idim++)
-      dist_vect[idim] = 0.;
+    if (dist_vect != nullptr)
+      for (int idim = 0; idim < db->getNDim(); idim++)
+        dist_vect[idim] = 0.;
     return (0.);
   }
 
@@ -252,21 +251,21 @@ void db_sample_print(Db* db,
   {
     for (int ierr = 0; ierr < db->getNLoc(ELoc::V); ierr++)
     {
-      double value = db->getLocVariable(ELoc::V,iech, ierr);
+      double value = db->getLocVariable(ELoc::V, iech, ierr);
       if (FFFF(value))
         message("Variance   #%d = NA\n", ierr + 1);
       else
         message("Variance   #%d = %lf\n", ierr + 1,
-                db->getLocVariable(ELoc::V,iech, ierr));
+                db->getLocVariable(ELoc::V, iech, ierr));
     }
   }
   if (db->hasLocVariable(ELoc::C))
   {
-    double value = db->getLocVariable(ELoc::C,iech,0);
+    double value = db->getLocVariable(ELoc::C, iech, 0);
     if (FFFF(value))
       message("Code          = NA\n");
     else
-      message("Code          = %d\n", (int) value);
+      message("Code          = %d\n", (int)value);
   }
   if (flag_blk != 0)
   {
@@ -644,7 +643,12 @@ int db_grid_copy(DbGrid* db1,
  **
  *****************************************************************************/
 int db_grid_copy_dilate(
-  DbGrid* db1, int iatt1, DbGrid* db2, int iatt2, int mode, const int* nshift)
+  DbGrid* db1,
+  int iatt1,
+  DbGrid* db2,
+  int iatt2,
+  int mode,
+  const int* nshift)
 {
   double value;
 
@@ -907,7 +911,11 @@ int point_to_bench(const DbGrid* db, double* coor, int flag_outside, int* indb)
  **
  *****************************************************************************/
 int index_point_to_grid(
-  const Db* dbin, int iech, int flag_outside, const DbGrid* dbout, double* coor)
+  const Db* dbin,
+  int iech,
+  int flag_outside,
+  const DbGrid* dbout,
+  double* coor)
 {
   int ndim = dbin->getNDim();
   int nech = dbin->getNSample();
@@ -1045,7 +1053,11 @@ void db_monostat(Db* db,
  **
  *****************************************************************************/
 int db_proportion(
-  Db* db, DbGrid* dbgrid, int nfac1max, int nfac2max, int* nclout)
+  Db* db,
+  DbGrid* dbgrid,
+  int nfac1max,
+  int nfac2max,
+  int* nclout)
 {
   int nval, mini, invalid;
 
@@ -1684,7 +1696,12 @@ label_end:
  **
  *****************************************************************************/
 int db_gradient_modang_to_component(
-  Db* db, int ang_conv, int iad_mod, int iad_ang, int iad_gx, int iad_gy)
+  Db* db,
+  int ang_conv,
+  int iad_mod,
+  int iad_ang,
+  int iad_gx,
+  int iad_gy)
 {
   double angdeg, angrad, modulus;
 
@@ -1815,7 +1832,12 @@ int db_gradient_component_to_modang(Db* db,
  **
  *****************************************************************************/
 double get_grid_value(
-  DbGrid* dbgrid, int iptr, VectorInt& indg, int ix, int iy, int iz)
+  DbGrid* dbgrid,
+  int iptr,
+  VectorInt& indg,
+  int ix,
+  int iy,
+  int iz)
 {
   int ndim, iad;
   double value;

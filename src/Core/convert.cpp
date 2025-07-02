@@ -8,49 +8,47 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_define.h"
-
-#include "Core/CSV.hpp"
 #include "Basic/AException.hpp"
-#include "Basic/Utilities.hpp"
 #include "Basic/File.hpp"
-#include "Basic/String.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Basic/Memory.hpp"
+#include "Basic/String.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Core/CSV.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "OutputFormat/AOF.hpp"
+#include "OutputFormat/FileLAS.hpp"
+#include "OutputFormat/FileVTK.hpp"
+#include "OutputFormat/GridArcGis.hpp"
+#include "OutputFormat/GridBmp.hpp"
 #include "OutputFormat/GridEclipse.hpp"
+#include "OutputFormat/GridF2G.hpp"
 #include "OutputFormat/GridIfpEn.hpp"
+#include "OutputFormat/GridIrap.hpp"
 #include "OutputFormat/GridXYZ.hpp"
 #include "OutputFormat/GridZycor.hpp"
-#include "OutputFormat/GridIrap.hpp"
-#include "OutputFormat/GridBmp.hpp"
-#include "OutputFormat/GridArcGis.hpp"
-#include "OutputFormat/GridF2G.hpp"
-#include "OutputFormat/FileVTK.hpp"
-#include "OutputFormat/FileLAS.hpp"
 #include "OutputFormat/vtk.h"
-
-#include <string.h>
+#include "geoslib_define.h"
 #include <sstream>
-#include <string>
 #include <stdio.h>
+#include <string.h>
+#include <string>
 
 /*! \cond */
 
 struct CSV_Encoding
 {
-  FILE *file;                // Stream used for writing into CSV file
-  int nitem;                 // Number of items per line
-  int current;               // Rank of the current item
-  int nlines;                // Number of lines printed
-  bool flagInteger;          // true for Integer encoding
-  char char_sep;             // Separator between consecutive fields
-  String na_string;          // Substitute for NA
+  FILE* file;       // Stream used for writing into CSV file
+  int nitem;        // Number of items per line
+  int current;      // Rank of the current item
+  int nlines;       // Number of lines printed
+  bool flagInteger; // true for Integer encoding
+  char char_sep;    // Separator between consecutive fields
+  String na_string; // Substitute for NA
 };
 
-static CSV_Encoding *CSV_ENCODE = NULL;
+static CSV_Encoding* CSV_ENCODE = NULL;
 
 /*! \endcond */
 
@@ -61,19 +59,19 @@ static CSV_Encoding *CSV_ENCODE = NULL;
  ** \return  Error return code
  **
  *****************************************************************************/
-int db_grid_write_XYZ(const char *filename, DbGrid *db, int icol)
+int db_grid_write_XYZ(const char* filename, DbGrid* db, int icol)
 {
   GridXYZ aof(filename, db);
   aof.setCol(icol);
-  if (! aof.isAuthorized()) return 1;
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
-int db_grid_write_zycor(const char *filename, DbGrid *db, int icol)
+int db_grid_write_zycor(const char* filename, DbGrid* db, int icol)
 {
   GridZycor aof(filename, db);
   aof.setCol(icol);
-  if (! aof.isAuthorized()) return 1;
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
@@ -83,11 +81,11 @@ DbGrid* db_grid_read_zycor(const char* filename, int /* verbose*/)
   DbGrid* dbgrid = aof.readGridFromFile();
   return dbgrid;
 }
-int db_grid_write_arcgis(const char *filename, DbGrid *db, int icol)
+int db_grid_write_arcgis(const char* filename, DbGrid* db, int icol)
 {
   GridArcGis aof(filename, db);
   aof.setCol(icol);
-  if (! aof.isAuthorized()) return 1;
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
@@ -118,9 +116,9 @@ int db_grid_write_bmp(const char* filename,
                       int high_green,
                       int high_blue)
 {
-  VectorInt reds = VH::initVInt(red, ncolor);
+  VectorInt reds   = VH::initVInt(red, ncolor);
   VectorInt greens = VH::initVInt(green, ncolor);
-  VectorInt blues = VH::initVInt(blue, ncolor);
+  VectorInt blues  = VH::initVInt(blue, ncolor);
 
   GridBmp aof(filename, db);
   aof.setCol(icol);
@@ -134,10 +132,10 @@ int db_grid_write_bmp(const char* filename,
   aof.setValmax(valmax);
   aof.setMask(mask_red, mask_green, mask_blue);
   aof.setFFFF(ffff_red, ffff_green, ffff_blue);
-  aof.setLow (low_red,  low_green,  low_blue);
+  aof.setLow(low_red, low_green, low_blue);
   aof.setHigh(high_red, high_green, high_blue);
   aof.setColors(reds, greens, blues);
-  if (! aof.isAuthorized()) return 1;
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
@@ -149,8 +147,8 @@ DbGrid* db_grid_read_bmp(const char* filename, int /*verbose*/)
   return dbgrid;
 }
 
-int db_grid_write_irap(const char *filename,
-                       DbGrid *db,
+int db_grid_write_irap(const char* filename,
+                       DbGrid* db,
                        int icol,
                        int nsamplex,
                        int nsampley)
@@ -159,15 +157,15 @@ int db_grid_write_irap(const char *filename,
   aof.setCol(icol);
   aof.setNsamplex(nsamplex);
   aof.setNsampley(nsampley);
-  if (! aof.isAuthorized()) return 1;
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
-int db_grid_write_ifpen(const char *filename, DbGrid *db, int ncol, int *icols)
+int db_grid_write_ifpen(const char* filename, DbGrid* db, int ncol, int* icols)
 {
   GridIfpEn aof(filename, db);
-  aof.setCols(ncol,icols);
-  if (! aof.isAuthorized()) return 1;
+  aof.setCols(ncol, icols);
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
@@ -177,25 +175,25 @@ DbGrid* db_grid_read_ifpen(const char* filename, int /*verbose*/)
   DbGrid* dbgrid = aof.readGridFromFile();
   return dbgrid;
 }
-int db_grid_write_eclipse(const char *filename, DbGrid *db, int icol)
+int db_grid_write_eclipse(const char* filename, DbGrid* db, int icol)
 {
   GridEclipse aof(filename, db);
   aof.setCol(icol);
-  if (! aof.isAuthorized()) return 1;
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
-int db_write_vtk(const char *filename,
-                 DbGrid *db,
-                 const VectorInt &cols)
+int db_write_vtk(const char* filename,
+                 DbGrid* db,
+                 const VectorInt& cols)
 {
   FileVTK aof(filename, db);
   aof.setCols(cols);
-  if (! aof.isAuthorized()) return 1;
+  if (!aof.isAuthorized()) return 1;
   if (aof.writeInFile()) return 1;
   return 0;
 }
-Db* db_well_read_las(const char *filename,
+Db* db_well_read_las(const char* filename,
                      double xwell,
                      double ywell,
                      double cwell,
@@ -225,20 +223,20 @@ DbGrid* db_grid_read_f2g(const char* filename, int /* verbose*/)
  ** \remark: which must have been initiated beforehand
  **
  *****************************************************************************/
-static void st_csv_print_string(const char *string)
+static void st_csv_print_string(const char* string)
 {
   if (CSV_ENCODE == NULL)
     my_throw_impossible("You must initiate CSV_ENCODING first");
 
-  (void) fprintf(CSV_ENCODE->file, "%s", string);
+  (void)fprintf(CSV_ENCODE->file, "%s", string);
   if (CSV_ENCODE->current < CSV_ENCODE->nitem - 1)
   {
-    (void) fprintf(CSV_ENCODE->file, "%c", CSV_ENCODE->char_sep);
+    (void)fprintf(CSV_ENCODE->file, "%c", CSV_ENCODE->char_sep);
     CSV_ENCODE->current++;
   }
   else
   {
-    (void) fprintf(CSV_ENCODE->file, "\n");
+    (void)fprintf(CSV_ENCODE->file, "\n");
     CSV_ENCODE->nlines++;
     CSV_ENCODE->current = 0;
   }
@@ -256,7 +254,7 @@ static void st_csv_print_eol(void)
 {
   if (CSV_ENCODE->current <= 0) return;
 
-  (void) fprintf(CSV_ENCODE->file, "\n");
+  (void)fprintf(CSV_ENCODE->file, "\n");
   CSV_ENCODE->current = 0;
   CSV_ENCODE->nlines++;
 }
@@ -277,22 +275,22 @@ void csv_print_double(double value)
     my_throw_impossible("You must initiate CSV_ENCODING first");
 
   if (FFFF(value))
-    (void) fprintf(CSV_ENCODE->file, "%s", CSV_ENCODE->na_string.c_str());
+    (void)fprintf(CSV_ENCODE->file, "%s", CSV_ENCODE->na_string.c_str());
   else
   {
     if (CSV_ENCODE->flagInteger)
-      (void) fprintf(CSV_ENCODE->file, "%d", (int) value);
+      (void)fprintf(CSV_ENCODE->file, "%d", (int)value);
     else
-      (void) fprintf(CSV_ENCODE->file, "%lf", value);
+      (void)fprintf(CSV_ENCODE->file, "%lf", value);
   }
   if (CSV_ENCODE->current < CSV_ENCODE->nitem - 1)
   {
-    (void) fprintf(CSV_ENCODE->file, "%c", CSV_ENCODE->char_sep);
+    (void)fprintf(CSV_ENCODE->file, "%c", CSV_ENCODE->char_sep);
     CSV_ENCODE->current++;
   }
   else
   {
-    (void) fprintf(CSV_ENCODE->file, "\n");
+    (void)fprintf(CSV_ENCODE->file, "\n");
     CSV_ENCODE->nlines++;
     CSV_ENCODE->current = 0;
   }
@@ -317,14 +315,14 @@ void csv_print_double(double value)
  ** \remark: Do not forget to use csv_manage(-1,...) to close the file
  **
  *****************************************************************************/
-int csv_manage(const char *filename,
+int csv_manage(const char* filename,
                const CSVformat& csv,
                int mode,
                int nitem,
                bool flagInteger,
                bool verbose)
 {
-  char char_sep = csv.getCharSep();
+  char char_sep    = csv.getCharSep();
   String na_string = csv.getNaString();
 
   // Dispatch
@@ -334,21 +332,21 @@ int csv_manage(const char *filename,
     // Initiate the CSV_ENCODE structure
 
     if (CSV_ENCODE != NULL)
-      CSV_ENCODE = (CSV_Encoding*) mem_free((char* ) CSV_ENCODE);
-    CSV_ENCODE = (CSV_Encoding*) mem_alloc(sizeof(CSV_Encoding), 1);
+      CSV_ENCODE = (CSV_Encoding*)mem_free((char*)CSV_ENCODE);
+    CSV_ENCODE       = (CSV_Encoding*)mem_alloc(sizeof(CSV_Encoding), 1);
     CSV_ENCODE->file = gslFopen(filename, "w");
     if (CSV_ENCODE->file == nullptr)
     {
       messerr("Error when opening the CSV file %s for writing", filename);
-      (void) csv_manage(filename, csv, -1, nitem, flagInteger);
+      (void)csv_manage(filename, csv, -1, nitem, flagInteger);
       return 1;
     }
-    CSV_ENCODE->nitem = nitem;
-    CSV_ENCODE->current = 0;
-    CSV_ENCODE->nlines = 0;
+    CSV_ENCODE->nitem       = nitem;
+    CSV_ENCODE->current     = 0;
+    CSV_ENCODE->nlines      = 0;
     CSV_ENCODE->flagInteger = flagInteger;
-    CSV_ENCODE->char_sep = char_sep;
-    CSV_ENCODE->na_string = na_string;
+    CSV_ENCODE->char_sep    = char_sep;
+    CSV_ENCODE->na_string   = na_string;
 
     // Optional printout
 
@@ -383,7 +381,7 @@ int csv_manage(const char *filename,
     }
 
     if (CSV_ENCODE != NULL)
-      CSV_ENCODE = (CSV_Encoding*) mem_free((char* ) CSV_ENCODE);
+      CSV_ENCODE = (CSV_Encoding*)mem_free((char*)CSV_ENCODE);
   }
   return 0;
 }
@@ -404,18 +402,18 @@ int csv_manage(const char *filename,
  ** \remarks: This procedure dumps the Z-variables and optionally the X-variables
  **
  *****************************************************************************/
-int db_write_csv(Db *db,
-                 const char *filename,
+int db_write_csv(Db* db,
+                 const char* filename,
                  const CSVformat& csvfmt,
                  int flag_allcol,
                  int flag_coor,
                  bool flagInteger)
 {
   if (db == nullptr) return 1;
-  int ncol = db->getNColumn();
-  int ndim = db->getNDim();
-  int nech = db->getNSample();
-  int nvar = db->getNLoc(ELoc::Z);
+  int ncol         = db->getNColumn();
+  int ndim         = db->getNDim();
+  int nech         = db->getNSample();
+  int nvar         = db->getNLoc(ELoc::Z);
   bool flag_header = csvfmt.getFlagHeader();
 
   // Count the number of items per line
@@ -443,16 +441,17 @@ int db_write_csv(Db *db,
     {
       for (int rank = 0; rank < ncol; rank++)
       {
-          st_csv_print_string(db->getNameByUID(rank).c_str());
+        st_csv_print_string(db->getNameByUID(rank).c_str());
       }
     }
     else
     {
-      if (flag_coor) for (int idim = 0; idim < ndim; idim++)
-      {
-        int iatt = db->getUIDByLocator(ELoc::X, idim);
-        st_csv_print_string(db->getNameByUID(iatt).c_str());
-      }
+      if (flag_coor)
+        for (int idim = 0; idim < ndim; idim++)
+        {
+          int iatt = db->getUIDByLocator(ELoc::X, idim);
+          st_csv_print_string(db->getNameByUID(iatt).c_str());
+        }
       for (int ivar = 0; ivar < nvar; ivar++)
       {
         int iatt = db->getUIDByLocator(ELoc::Z, ivar);
@@ -474,11 +473,12 @@ int db_write_csv(Db *db,
     }
     else
     {
-      if (flag_coor) for (int idim = 0; idim < ndim; idim++)
-      {
-        int iatt = db->getUIDByLocator(ELoc::X, idim);
-        csv_print_double(db->getCoordinate(iech, iatt));
-      }
+      if (flag_coor)
+        for (int idim = 0; idim < ndim; idim++)
+        {
+          int iatt = db->getUIDByLocator(ELoc::X, idim);
+          csv_print_double(db->getCoordinate(iech, iatt));
+        }
       for (int ivar = 0; ivar < nvar; ivar++)
       {
         int iatt = db->getUIDByLocator(ELoc::Z, ivar);
@@ -489,7 +489,7 @@ int db_write_csv(Db *db,
 
   // Close the file
 
-  (void) csv_manage(filename, csvfmt, -1, nitem, flagInteger);
+  (void)csv_manage(filename, csvfmt, -1, nitem, flagInteger);
 
   return 0;
 }
@@ -514,20 +514,20 @@ int db_write_csv(Db *db,
  ** \remarks The returned array 'tab' is organized by sample
  **
  *****************************************************************************/
-int csv_table_read(const String &filename,
+int csv_table_read(const String& filename,
                    const CSVformat& csvfmt,
                    int verbose,
                    int ncol_max,
                    int nrow_max,
-                   int *ncol_arg,
-                   int *nrow_arg,
-                   VectorString &names,
-                   VectorDouble &tab)
+                   int* ncol_arg,
+                   int* nrow_arg,
+                   VectorString& names,
+                   VectorDouble& tab)
 {
   bool flag_header = csvfmt.getFlagHeader();
-  int nskip = csvfmt.getNSkip();
-  char char_sep = csvfmt.getCharSep();
-  char char_dec = csvfmt.getCharDec();
+  int nskip        = csvfmt.getNSkip();
+  char char_sep    = csvfmt.getCharSep();
+  char char_dec    = csvfmt.getCharDec();
   String na_string = csvfmt.getNaString();
 
   String line;
@@ -535,7 +535,7 @@ int csv_table_read(const String &filename,
   std::ifstream file;
   file.open(filename, std::ios::in);
 
-//  std::ifstream file(filename.c_str());
+  //  std::ifstream file(filename.c_str());
   if (!file.is_open())
   {
     messerr("Error when opening the CSV file %s for reading", filename.c_str());
@@ -551,7 +551,7 @@ int csv_table_read(const String &filename,
   // Define the variable names
   if (flag_header)
   {
-    //std::getline(file, line);
+    // std::getline(file, line);
     gslSafeGetline(file, line);
     if (!line.empty())
     {
@@ -578,7 +578,7 @@ int csv_table_read(const String &filename,
     int iskip = 0;
     while (iskip < nskip && !file.eof())
     {
-      //std::getline(file, line);
+      // std::getline(file, line);
       gslSafeGetline(file, line);
       iskip++;
     }
@@ -586,10 +586,10 @@ int csv_table_read(const String &filename,
 
   // Read the values:
   int ncol2 = 0;
-  int nrow = 0;
+  int nrow  = 0;
   while (!file.eof())
   {
-    //std::getline(file, line);
+    // std::getline(file, line);
     gslSafeGetline(file, line);
     if (!line.empty())
     {
@@ -625,4 +625,3 @@ int csv_table_read(const String &filename,
 
   return 0;
 }
-

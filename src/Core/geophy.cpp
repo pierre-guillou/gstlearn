@@ -11,7 +11,6 @@
 #include "geoslib_old_f.h"
 #include "geoslib_define.h"
 #include "Basic/AStringable.hpp"
-
 #include <math.h>
 
 /*---------------------------------------------------------------------------*/

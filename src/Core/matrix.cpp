@@ -8,48 +8,46 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
-#include "Basic/Utilities.hpp"
 #include "Basic/Memory.hpp"
-
-#include <math.h>
+#include "Basic/Utilities.hpp"
+#include "geoslib_old_f.h"
 #include <cmath>
+#include <math.h>
 
 /*! \cond */
 #define TRI(i)        (((i) * ((i) + 1)) / 2)
-#define SQ(i,j,neq)   ((j) * neq + (i))
-#define VECTOR(i,j)    vector[SQ(i,j,neq)]
-#define A(i,j)         a[SQ(i,j,neq)]
-#define ILS(i,j)       ils[SQ(i,j,neq)]
-#define B(i,j)         b[SQ(i,j,neq)]
-#define C(i,j)         c[SQ(i,j,neqm1)]
-#define X(i,j)         x[SQ(i,j,neq)]
-#define AMT(i,j)       amat[SQ(i,j,neq)]
-#define HMT(i,j)       hmat[SQ(i,j,neq)]
-#define AIMT(i,j)      aimat[SQ(i,j,neq)]
-#define HA(i,j)        ha[SQ(i,j,neq)]
-#define AI(i,j)        ai[SQ(i,j,neq)]
-#define TEMP(i,j)      temp[SQ(i,j,na)]
-#define AS(i,j)        a[SQ(i,j,neq)]
-#define AT(i,j)        at[TRI(j)+(i)] /* for j >= i */
-#define BS(i,j)        b[SQ(i,j,neq)] // Proposition a valider: c'etait j,i
-#define XS(i,j)        x[SQ(i,j,neq)] // Proposition a valider: c'etait j,i
-#define V1(i,j)        v1[SQ(i,j,n1)]
-#define V2(i,j)        v2[SQ(i,j,n2)]
-#define V3(i,j)        v3[SQ(i,j,n1)] /* Warning not to change the last argument: major bug */
-#define V4(i,j)        v4[SQ(i,j,n1)]
-#define TU(i,j)        tu[TRI(i) + (j)]       /* for i >= j */
-#define TL(i,j)        tl[SQ(i,j,neq)-TRI(j)] /* for i >= j */
-#define XL(i,j)        xl[SQ(i,j,neq)-TRI(j)] /* for i >= j */
-#define AL(i,j)        al[SQ(i,j,neq)-TRI(j)] /* for i >= j */
-#define TABEMT(i,j)    tabemat[SQ(i,j,neq)]
-#define TABIMT(i,j)    tabimat[SQ(i,j,neq)]
-#define TABOUT(i,j)    tabout[SQ(i,j,neq)]
-#define EIGVEC(i,j)    eigvec[SQ(j,i,neq)]
-#define A2(i,j)        a2[SQ(i,j,2 * neq)]
-#define U(i,j)         u[SQ(j,i,neq)]
-#define V(i,j)         v[SQ(j,i,neq)]
+#define SQ(i, j, neq) ((j) * neq + (i))
+#define VECTOR(i, j)  vector[SQ(i, j, neq)]
+#define A(i, j)       a[SQ(i, j, neq)]
+#define ILS(i, j)     ils[SQ(i, j, neq)]
+#define B(i, j)       b[SQ(i, j, neq)]
+#define C(i, j)       c[SQ(i, j, neqm1)]
+#define X(i, j)       x[SQ(i, j, neq)]
+#define AMT(i, j)     amat[SQ(i, j, neq)]
+#define HMT(i, j)     hmat[SQ(i, j, neq)]
+#define AIMT(i, j)    aimat[SQ(i, j, neq)]
+#define HA(i, j)      ha[SQ(i, j, neq)]
+#define AI(i, j)      ai[SQ(i, j, neq)]
+#define TEMP(i, j)    temp[SQ(i, j, na)]
+#define AS(i, j)      a[SQ(i, j, neq)]
+#define AT(i, j)      at[TRI(j) + (i)] /* for j >= i */
+#define BS(i, j)      b[SQ(i, j, neq)] // Proposition a valider: c'etait j,i
+#define XS(i, j)      x[SQ(i, j, neq)] // Proposition a valider: c'etait j,i
+#define V1(i, j)      v1[SQ(i, j, n1)]
+#define V2(i, j)      v2[SQ(i, j, n2)]
+#define V3(i, j)      v3[SQ(i, j, n1)] /* Warning not to change the last argument: major bug */
+#define V4(i, j)      v4[SQ(i, j, n1)]
+#define TU(i, j)      tu[TRI(i) + (j)]           /* for i >= j */
+#define TL(i, j)      tl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
+#define XL(i, j)      xl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
+#define AL(i, j)      al[SQ(i, j, neq) - TRI(j)] /* for i >= j */
+#define TABEMT(i, j)  tabemat[SQ(i, j, neq)]
+#define TABIMT(i, j)  tabimat[SQ(i, j, neq)]
+#define TABOUT(i, j)  tabout[SQ(i, j, neq)]
+#define EIGVEC(i, j)  eigvec[SQ(j, i, neq)]
+#define A2(i, j)      a2[SQ(i, j, 2 * neq)]
+#define U(i, j)       u[SQ(j, i, neq)]
+#define V(i, j)       v[SQ(j, i, neq)]
 /*! \endcond */
 
 static double _getTolInvert()
@@ -418,14 +416,15 @@ int matrix_prod_norme(int transpose, int n1, int n2, const double* v1, const dou
           for (i1 = 0; i1 < n1; i1++)
           {
             vi = V1(i1, i2);
-            if (! isZero(vi)) for (j1 = 0; j1 < n1; j1++)
-            {
-              if (a != nullptr)
-                vala = AS(i1, j1);
-              else
-                vala = (i1 == j1);
-              value += vi * vala * V1(j1, j2);
-            }
+            if (!isZero(vi))
+              for (j1 = 0; j1 < n1; j1++)
+              {
+                if (a != nullptr)
+                  vala = AS(i1, j1);
+                else
+                  vala = (i1 == j1);
+                value += vi * vala * V1(j1, j2);
+              }
           }
           w[ecr++] = value;
         }
@@ -440,14 +439,15 @@ int matrix_prod_norme(int transpose, int n1, int n2, const double* v1, const dou
           for (i2 = 0; i2 < n2; i2++)
           {
             vi = V1(i1, i2);
-            if (! isZero(vi)) for (j2 = 0; j2 < n2; j2++)
-            {
-              if (a != nullptr)
-                vala = AS(i2, j2);
-              else
-                vala = (i2 == j2);
-              value += vi * vala * V1(j1, j2);
-            }
+            if (!isZero(vi))
+              for (j2 = 0; j2 < n2; j2++)
+              {
+                if (a != nullptr)
+                  vala = AS(i2, j2);
+                else
+                  vala = (i2 == j2);
+                value += vi * vala * V1(j1, j2);
+              }
           }
           w[ecr++] = value;
         }
@@ -498,7 +498,7 @@ void matrix_transpose(int n1, int n2, VectorDouble& v1, VectorDouble& w1)
  ** \remark  It is unnecessary to edit a message if inversion problem occurs
  **
  *****************************************************************************/
-int matrix_invert(double *a, int neq, int rank)
+int matrix_invert(double* a, int neq, int rank)
 {
   for (int k = 0; k < neq; k++)
   {
@@ -514,20 +514,20 @@ int matrix_invert(double *a, int neq, int rank)
     }
 
     for (int i = 0; i < neq; i++)
-      if (i != k) A(i,k)= -A(i,k) / biga;
+      if (i != k) A(i, k) = -A(i, k) / biga;
 
     for (int i = 0; i < neq; i++)
     {
       double hold = A(i, k);
       if (i != k)
         for (int j = 0; j < neq; j++)
-          if (j != k) A(i,j)+= hold * A(k,j);
+          if (j != k) A(i, j) += hold * A(k, j);
     }
 
     for (int j = 0; j < neq; j++)
-      if (j != k) A(k,j)/= biga;
+      if (j != k) A(k, j) /= biga;
 
-    A(k,k)= 1. / biga;
+    A(k, k) = 1. / biga;
   }
 
   return (0);
@@ -548,38 +548,33 @@ double matrix_determinant(int neq, const VectorDouble& b)
   switch (neq)
   {
     case 1:
-      return B(0,0);
+      return B(0, 0);
 
     case 2:
-      return (B(0,0)* B(1,1) - B(1,0) * B(0,1));
+      return (B(0, 0) * B(1, 1) - B(1, 0) * B(0, 1));
 
     case 3:
-      return ((B(0,0) * B(1,1) * B(2,2)
-          + B(0,1) * B(1,2) * B(2,0)
-          + B(1,0) * B(2,1) * B(0,2)
-          - B(2,0) * B(1,1) * B(0,2)
-          - B(1,0) * B(0,1) * B(2,2)
-          - B(2,1) * B(1,2) * B(0,0)));
+      return ((B(0, 0) * B(1, 1) * B(2, 2) + B(0, 1) * B(1, 2) * B(2, 0) + B(1, 0) * B(2, 1) * B(0, 2) - B(2, 0) * B(1, 1) * B(0, 2) - B(1, 0) * B(0, 1) * B(2, 2) - B(2, 1) * B(1, 2) * B(0, 0)));
 
     default:
       /* Core allocation */
       double deter = 0.;
-      int neqm1 = neq - 1;
-      VectorDouble c(neqm1 * neqm1,0.);
+      int neqm1    = neq - 1;
+      VectorDouble c(neqm1 * neqm1, 0.);
 
-      for (int j1=0; j1<neq; j1++)
+      for (int j1 = 0; j1 < neq; j1++)
       {
-        for (int i=1; i<neq; i++)
+        for (int i = 1; i < neq; i++)
         {
           int j2 = 0;
-          for (int j=0; j<neq; j++)
+          for (int j = 0; j < neq; j++)
           {
             if (j == j1) continue;
-            C(i-1,j2) = B(i,j);
+            C(i - 1, j2) = B(i, j);
             j2++;
           }
         }
-        deter += pow(-1.0,j1+2.0) * B(0,j1) * matrix_determinant(neqm1,c);
+        deter += pow(-1.0, j1 + 2.0) * B(0, j1) * matrix_determinant(neqm1, c);
       }
       return deter;
   }
@@ -601,30 +596,30 @@ double matrix_determinant(int neq, const VectorDouble& b)
  ** \remark  the matrix a[] is destroyed during the calculations
  **
  *****************************************************************************/
-int matrix_cholesky_decompose(const double *a, double *tl, int neq)
+int matrix_cholesky_decompose(const double* a, double* tl, int neq)
 {
   double prod;
   int ip, jp, kp;
 
   for (ip = 0; ip < neq; ip++)
     for (jp = 0; jp <= ip; jp++)
-      TL(ip,jp) = AS(ip,jp);
+      TL(ip, jp) = AS(ip, jp);
 
   for (ip = 0; ip < neq; ip++)
   {
     prod = TL(ip, ip);
     for (kp = 0; kp < ip; kp++)
-      prod -= TL(ip,kp) * TL(ip,kp);
+      prod -= TL(ip, kp) * TL(ip, kp);
     if (prod < 0.) return (ip + 1);
-    TL(ip,ip) = sqrt(prod);
+    TL(ip, ip) = sqrt(prod);
 
     for (jp = ip + 1; jp < neq; jp++)
     {
       prod = TL(jp, ip);
       for (kp = 0; kp < ip; kp++)
-        prod -= TL(ip,kp) * TL(jp,kp);
-      if (TL(ip,ip)<= 0.) return(ip+1);
-      TL(jp,ip) = prod / TL(ip,ip);
+        prod -= TL(ip, kp) * TL(jp, kp);
+      if (TL(ip, ip) <= 0.) return (ip + 1);
+      TL(jp, ip) = prod / TL(ip, ip);
     }
   }
   return (0);
@@ -653,9 +648,9 @@ int matrix_cholesky_decompose(const double *a, double *tl, int neq)
 void matrix_cholesky_product(int mode,
                              int neq,
                              int nrhs,
-                             const double *tl,
-                             const double *a,
-                             double *x)
+                             const double* tl,
+                             const double* a,
+                             double* x)
 {
   int irhs, i, j, n1, n2;
   double val, *v2;
@@ -745,7 +740,7 @@ void matrix_cholesky_product(int mode,
  ** \param[out] xl   lower triangular inverted matrix defined by column
  **
  *****************************************************************************/
-void matrix_cholesky_invert(int neq, const double *tl, double *xl)
+void matrix_cholesky_invert(int neq, const double* tl, double* xl)
 {
   for (int i = 0; i < neq; i++)
   {
@@ -753,10 +748,10 @@ void matrix_cholesky_invert(int neq, const double *tl, double *xl)
     {
       double sum = 0.;
       for (int l = j; l < i; l++)
-        sum += TL(i,l) * XL(l,j);
-      XL(i,j) = - sum / TL(i,i);
+        sum += TL(i, l) * XL(l, j);
+      XL(i, j) = -sum / TL(i, i);
     }
-    XL(i,i) = 1. / TL(i,i);
+    XL(i, i) = 1. / TL(i, i);
   }
 }
 
@@ -780,10 +775,10 @@ void matrix_cholesky_invert(int neq, const double *tl, double *xl)
  *****************************************************************************/
 void matrix_combine(int nval,
                     double coeffa,
-                    const double *a,
+                    const double* a,
                     double coeffb,
-                    const double *b,
-                    double *c)
+                    const double* b,
+                    double* c)
 {
   int i;
   double value;
@@ -816,20 +811,20 @@ void matrix_combine(int nval,
  ** \remark and zero only when both factors are zero
  **
  *****************************************************************************/
-int matrix_eigen_tridiagonal(const double *vecdiag,
-                             const double *vecinf,
-                             const double *vecsup,
+int matrix_eigen_tridiagonal(const double* vecdiag,
+                             const double* vecinf,
+                             const double* vecsup,
                              int neq,
-                             double *eigvec,
-                             double *eigval)
+                             double* eigvec,
+                             double* eigval)
 {
   double *b, *e, h;
   int i, j;
 
   /* Initializations */
 
-  e = (double*) mem_alloc(sizeof(double) * neq, 1);
-  b = (double*) mem_alloc(sizeof(double) * neq * neq, 1);
+  e = (double*)mem_alloc(sizeof(double) * neq, 1);
+  b = (double*)mem_alloc(sizeof(double) * neq * neq, 1);
 
   for (i = 1; i < neq; i++)
   {
@@ -837,7 +832,7 @@ int matrix_eigen_tridiagonal(const double *vecdiag,
     if (h < 0) return (1);
     if (isZero(h))
     {
-      if (! isZero(vecinf[i]) || ! isZero(vecsup[i - 1])) return (2);
+      if (!isZero(vecinf[i]) || !isZero(vecsup[i - 1])) return (2);
       e[i] = 0.;
     }
     else
@@ -850,8 +845,8 @@ int matrix_eigen_tridiagonal(const double *vecdiag,
     b[i] = 0.;
   for (i = 0; i < neq; i++)
   {
-    B(i,i)= vecdiag[i];
-    if (i > 0) B(i,i-1) = B(i-1,i) = e[i];
+    B(i, i) = vecdiag[i];
+    if (i > 0) B(i, i - 1) = B(i - 1, i) = e[i];
   }
 
   /* Compute the eigen eigval and eigen eigvec */
@@ -861,18 +856,18 @@ int matrix_eigen_tridiagonal(const double *vecdiag,
   e[0] = 1.;
   for (i = 1; i < neq; i++)
   {
-    if (! isZero(e[i]))
+    if (!isZero(e[i]))
       e[i] *= e[i - 1] / vecsup[i - 1];
     else
       e[i] = 1.;
   }
   for (i = 0; i < neq; i++)
     for (j = 1; j < neq; j++)
-      EIGVEC(i,j)*= e[j];
+      EIGVEC(i, j) *= e[j];
 
-      /* Core deallocation */
+  /* Core deallocation */
 
-  mem_free((char* ) b);
-  mem_free((char* ) e);
+  mem_free((char*)b);
+  mem_free((char*)e);
   return (0);
 }

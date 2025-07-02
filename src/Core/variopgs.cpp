@@ -12,7 +12,6 @@
 #include "geoslib_old_f.h"
 #include "geoslib_define.h"
 #include "geoslib_f_private.h"
-
 #include "Variogram/Vario.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/Law.hpp"
@@ -32,7 +31,6 @@
 #include "Basic/Memory.hpp"
 #include "Core/Keypair.hpp"
 #include "Core/CTables.hpp"
-
 #include <math.h>
 #include <string.h>
 

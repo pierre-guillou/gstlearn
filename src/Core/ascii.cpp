@@ -9,23 +9,23 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Core/Ascii.hpp"
-#include "Core/io.hpp"
-#include "Core/CSV.hpp"
 #include "Anamorphosis/AAnam.hpp"
 #include "Anamorphosis/AnamDiscreteIR.hpp"
 #include "Anamorphosis/AnamHermite.hpp"
-#include "Basic/String.hpp"
+#include "Basic/Memory.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/String.hpp"
+#include "Core/CSV.hpp"
+#include "Core/io.hpp"
 #include "Db/Db.hpp"
 #include "LithoRule/Rule.hpp"
 #include "Model/Model.hpp"
-#include "Basic/Memory.hpp"
 
 /*! \cond */
 #define OLD 0
 #define NEW 1
 
-#define NODES(inode,i)   (nodes[6 * (inode) + (i)])
+#define NODES(inode, i)  (nodes[6 * (inode) + (i)])
 #define FROM_TYPE(inode) (nodes[6 * (inode) + 0])
 #define FROM_RANK(inode) (nodes[6 * (inode) + 1])
 #define FROM_VERS(inode) (nodes[6 * (inode) + 2])
@@ -34,27 +34,27 @@
 #define FACIES(inode)    (nodes[6 * (inode) + 5])
 
 static int ASCII_BUFFER_LENGTH = 0;
-static int ASCII_BUFFER_QUANT = 1000;
-static char *ASCII_BUFFER = NULL;
-static FILE *FILE_MEM = NULL;
+static int ASCII_BUFFER_QUANT  = 1000;
+static char* ASCII_BUFFER      = NULL;
+static FILE* FILE_MEM          = NULL;
 static char FILE_NAME_MEM[BUFFER_LENGTH];
 
 /*! \endcond */
 
 static char STUDY[BUFFER_LENGTH] = "./";
-static char EXT_DAT[]         = "dat";
-static char EXT_OUT[]         = "out";
-static char Fichier_environ[] = "Environ";
-static char Fichier_donnees[] = "Data";
-static char Fichier_grid[]    = "Grid";
-static char Fichier_vario[]   = "Vario";
-static char Fichier_model[]   = "Model";
-static char Fichier_neigh[]   = "Neigh";
-static char Fichier_polygon[] = "Polygon";
-static char Fichier_option[]  = "Option";
-static char Fichier_rule[]    = "Rule";
-static char Fichier_simu[]    = "Simu";
-static char Fichier_frac[]    = "Frac";
+static char EXT_DAT[]            = "dat";
+static char EXT_OUT[]            = "out";
+static char Fichier_environ[]    = "Environ";
+static char Fichier_donnees[]    = "Data";
+static char Fichier_grid[]       = "Grid";
+static char Fichier_vario[]      = "Vario";
+static char Fichier_model[]      = "Model";
+static char Fichier_neigh[]      = "Neigh";
+static char Fichier_polygon[]    = "Polygon";
+static char Fichier_option[]     = "Option";
+static char Fichier_rule[]       = "Rule";
+static char Fichier_simu[]       = "Simu";
+static char Fichier_frac[]       = "Frac";
 
 /****************************************************************************/
 /*!
@@ -67,7 +67,7 @@ static char Fichier_frac[]    = "Frac";
  ** \param[in]  ...        Value to be written
  **
  *****************************************************************************/
-static int st_record_read(const char *title, const char *format, ...)
+static int st_record_read(const char* title, const char* format, ...)
 {
   va_list ap;
 
@@ -101,7 +101,7 @@ static int st_record_read(const char *title, const char *format, ...)
  ** \param[in]  ...        Value to be written
  **
  *****************************************************************************/
-static void st_record_write(const char *format, ...)
+static void st_record_write(const char* format, ...)
 {
   va_list ap;
   char buf[1000];
@@ -116,14 +116,13 @@ static void st_record_write(const char *format, ...)
   {
     _buffer_write(buf, format, ap);
     long1 = static_cast<int>(strlen(buf));
-    long2 = (ASCII_BUFFER != NULL) ? static_cast<int>(strlen(ASCII_BUFFER)) :
-                                     0;
+    long2 = (ASCII_BUFFER != NULL) ? static_cast<int>(strlen(ASCII_BUFFER)) : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
       ASCII_BUFFER = mem_realloc(ASCII_BUFFER, ASCII_BUFFER_LENGTH, 1);
     }
-    (void) gslStrcat(ASCII_BUFFER, buf);
+    (void)gslStrcat(ASCII_BUFFER, buf);
   }
 
   va_end(ap);
@@ -146,25 +145,25 @@ static void st_record_write(const char *format, ...)
  ** \remark  Otherwise the rank is combined in the name
  **
  *****************************************************************************/
-static void st_filename_patch(const char *ref_name,
+static void st_filename_patch(const char* ref_name,
                               int rank,
                               int mode,
-                              char *file_name)
+                              char* file_name)
 {
   if (rank == 0)
   {
     switch (mode)
     {
       case 0:
-        (void) gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_DAT);
+        (void)gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_DAT);
         break;
 
       case 1:
-        (void) gslSPrintf(file_name, "%s.%s", ref_name, EXT_OUT);
+        (void)gslSPrintf(file_name, "%s.%s", ref_name, EXT_OUT);
         break;
 
       case -1:
-        (void) gslSPrintf(file_name, "%s", ref_name);
+        (void)gslSPrintf(file_name, "%s", ref_name);
         break;
     }
   }
@@ -173,57 +172,57 @@ static void st_filename_patch(const char *ref_name,
     switch (mode)
     {
       case 0:
-        (void) gslSPrintf(file_name, "%s/%s%1d.%s",  STUDY, ref_name, rank,
-                          EXT_DAT);
+        (void)gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
+                         EXT_DAT);
         break;
 
       case 1:
-        (void) gslSPrintf(file_name, "%s%1d.%s",  ref_name, rank,
-                          EXT_OUT);
+        (void)gslSPrintf(file_name, "%s%1d.%s", ref_name, rank,
+                         EXT_OUT);
         break;
 
       case -1:
-        (void) gslSPrintf(file_name, "%s%1d",  ref_name, rank);
+        (void)gslSPrintf(file_name, "%s%1d", ref_name, rank);
         break;
     }
   }
-//  if (rank == 0)
-//  {
-//    switch (mode)
-//    {
-//      case 0:
-//        (void) gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_DAT);
-//        break;
-//
-//      case 1:
-//        (void) gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_OUT);
-//        break;
-//
-//      case -1:
-//        (void) gslSPrintf(file_name, "%s/%s", STUDY, ref_name);
-//        break;
-//    }
-//  }
-//  else
-//  {
-//    switch (mode)
-//    {
-//      case 0:
-//        (void) gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
-//                          EXT_DAT);
-//        break;
-//
-//      case 1:
-//        (void) gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
-//                          EXT_OUT);
-//        break;
-//
-//      case -1:
-//        (void) gslSPrintf(file_name, "%s/%s%1d", STUDY, ref_name, rank);
-//        break;
-//    }
-//  }
-//
+  //  if (rank == 0)
+  //  {
+  //    switch (mode)
+  //    {
+  //      case 0:
+  //        (void) gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_DAT);
+  //        break;
+  //
+  //      case 1:
+  //        (void) gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_OUT);
+  //        break;
+  //
+  //      case -1:
+  //        (void) gslSPrintf(file_name, "%s/%s", STUDY, ref_name);
+  //        break;
+  //    }
+  //  }
+  //  else
+  //  {
+  //    switch (mode)
+  //    {
+  //      case 0:
+  //        (void) gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
+  //                          EXT_DAT);
+  //        break;
+  //
+  //      case 1:
+  //        (void) gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
+  //                          EXT_OUT);
+  //        break;
+  //
+  //      case -1:
+  //        (void) gslSPrintf(file_name, "%s/%s%1d", STUDY, ref_name, rank);
+  //        break;
+  //    }
+  //  }
+  //
 }
 
 /****************************************************************************/
@@ -237,7 +236,7 @@ static void st_filename_patch(const char *ref_name,
  ** \param[out] filename  Output filename
  **
  *****************************************************************************/
-void ascii_filename(const char *type, int rank, int mode, char *filename)
+void ascii_filename(const char* type, int rank, int mode, char* filename)
 {
   if (!strcmp(type, "Environ"))
     st_filename_patch(Fichier_environ, rank, mode, filename);
@@ -274,10 +273,10 @@ void ascii_filename(const char *type, int rank, int mode, char *filename)
  ** \param[in]  study Local name of the study
  **
  *****************************************************************************/
-void ascii_study_define(const char *study)
+void ascii_study_define(const char* study)
 
 {
-  (void) gslStrcpy(STUDY, study);
+  (void)gslStrcpy(STUDY, study);
 }
 
 /****************************************************************************/
@@ -287,7 +286,7 @@ void ascii_study_define(const char *study)
  ** \param[in]  file       FILE structure to be close
  **
  *****************************************************************************/
-static void st_file_close(FILE *file)
+static void st_file_close(FILE* file)
 {
   FILE_MEM = NULL;
   fclose(file);
@@ -305,18 +304,18 @@ static void st_file_close(FILE *file)
  ** \param[in]  verbose  Verbose option if the file cannot be opened
  **
  *****************************************************************************/
-static FILE* st_file_open(const char *filename,
-                          const char *filetype,
+static FILE* st_file_open(const char* filename,
+                          const char* filetype,
                           int mode,
                           int verbose)
 {
-  FILE *file;
+  FILE* file;
   char idtype[LONG_SIZE];
 
   /* Open the file */
 
   file = FILE_MEM = _file_open(filename, mode);
-  (void) gslStrcpy(FILE_NAME_MEM, filename);
+  (void)gslStrcpy(FILE_NAME_MEM, filename);
 
   if (file == nullptr)
   {
@@ -339,7 +338,7 @@ static FILE* st_file_open(const char *filename,
     if (strcmp(idtype, filetype) != 0)
     {
       messerr("Error: in the File (%s), its Type (%s) does not match the requested one (%s)",
-          filename, idtype, filetype);
+              filename, idtype, filetype);
       FILE_MEM = NULL;
       return (NULL);
     }
@@ -364,10 +363,10 @@ static FILE* st_file_open(const char *filename,
  ** \param[in] verbose    Verbose option if the file cannot be opened
  **
  *****************************************************************************/
-void ascii_environ_read(char *file_name, int verbose)
+void ascii_environ_read(char* file_name, int verbose)
 
 {
-  FILE *file;
+  FILE* file;
   char name[10];
   int debug;
 
@@ -405,19 +404,19 @@ label_end:
  ** \param[out]  seed      Seed for the random number generator
  **
  *****************************************************************************/
-void ascii_simu_read(char *file_name,
+void ascii_simu_read(char* file_name,
                      int verbose,
-                     int *nbsimu,
-                     int *nbtuba,
-                     int *seed)
+                     int* nbsimu,
+                     int* nbtuba,
+                     int* seed)
 {
-  FILE *file;
+  FILE* file;
 
   /* Initializations */
 
   (*nbsimu) = 0;
   (*nbtuba) = 100;
-  (*seed) = 0;
+  (*seed)   = 0;
 
   /* Opening the Simulation Definition file */
 
@@ -450,13 +449,13 @@ void ascii_simu_read(char *file_name,
  ** \param[out]  answer      Answer
  **
  *****************************************************************************/
-int ascii_option_defined(const char *file_name,
+int ascii_option_defined(const char* file_name,
                          int verbose,
-                         const char *option_name,
+                         const char* option_name,
                          int type,
-                         void *answer)
+                         void* answer)
 {
-  FILE *file;
+  FILE* file;
   char keyword[100], keyval[100];
   double rval;
   int lrep, ival;
@@ -483,27 +482,26 @@ int ascii_option_defined(const char *file_name,
     {
       case 0:
         ival = 0;
-        if (!strcmp(keyval, "Y") || !strcmp(keyval, "YES")
-            || !strcmp(keyval, "y") || !strcmp(keyval, "yes")
-            || atoi(keyval) == 1) ival = 1;
-        *((int*) answer) = ival;
+        if (!strcmp(keyval, "Y") || !strcmp(keyval, "YES") || !strcmp(keyval, "y") || !strcmp(keyval, "yes") || atoi(keyval) == 1) ival = 1;
+        *((int*)answer) = ival;
         break;
 
       case 1:
-        ival = atoi(keyval);
-        *((int*) answer) = ival;
+        ival            = atoi(keyval);
+        *((int*)answer) = ival;
         break;
 
       case 2:
-        rval = atof(keyval);
-        *((double*) answer) = rval;
+        rval               = atof(keyval);
+        *((double*)answer) = rval;
         break;
     }
     lrep = 1;
     goto label_end;
   }
 
-  label_end: st_file_close(file);
+label_end:
+  st_file_close(file);
   return (lrep);
 }
 
@@ -521,14 +519,14 @@ int ascii_option_defined(const char *file_name,
  ** \param[in]  flagAddSampleRank True To add the rank number
  **
  *****************************************************************************/
-Db* db_read_csv(const char *file_name,
+Db* db_read_csv(const char* file_name,
                 const CSVformat& csvfmt,
                 int verbose,
                 int ncol_max,
                 int nrow_max,
                 bool flagAddSampleRank)
 {
-  Db *db;
+  Db* db;
   int ncol, nrow;
   VectorString names;
   VectorDouble tab;
@@ -545,7 +543,7 @@ Db* db_read_csv(const char *file_name,
   /* Creating the Db */
 
   db = Db::createFromSamples(nrow, ELoadBy::SAMPLE, tab, VectorString(),
-                                 VectorString(), flagAddSampleRank);
+                             VectorString(), flagAddSampleRank);
   if (db == nullptr) goto label_end;
 
   /* Loading the names */
@@ -558,5 +556,6 @@ Db* db_read_csv(const char *file_name,
 
   /* Core deallocation */
 
-  label_end: return (db);
+label_end:
+  return (db);
 }
