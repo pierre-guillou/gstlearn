@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-
 #include "Covariances/CovProportional.hpp"
 #include "Basic/AStringable.hpp"
 #include "Covariances/ACov.hpp"
@@ -17,9 +16,8 @@
 
 namespace gstlrn
 {
-CovProportional::CovProportional(ACov* cor,
-                const MatrixSymmetric &sill)
-: CovBase(cor,sill)
+CovProportional::CovProportional(ACov* cor, const MatrixSymmetric& sill)
+  : CovBase(cor, sill)
 {
   _ctxt.setNVar(sill.getNCols());
   _workMat.resize(_ctxt.getNVar(), _ctxt.getNVar());
@@ -27,20 +25,20 @@ CovProportional::CovProportional(ACov* cor,
   if (cor != nullptr)
     if (cor->getNVar() != 1)
     {
-        messerr("Correlation function should have only 1 variable");
-        messerr("You should use CovBase instead of CovProportional");
-        messerr("Undefined behaviour");
-        return;
+      messerr("Correlation function should have only 1 variable");
+      messerr("You should use CovBase instead of CovProportional");
+      messerr("Undefined behaviour");
+      return;
     }
 }
 
-CovProportional::CovProportional(const CovProportional &r)
-: CovBase(r)
+CovProportional::CovProportional(const CovProportional& r)
+  : CovBase(r)
 {
   _workMat = r._workMat;
 }
 
-CovProportional& CovProportional::operator=(const CovProportional &r)
+CovProportional& CovProportional::operator=(const CovProportional& r)
 {
   if (this != &r)
   {
@@ -52,7 +50,6 @@ CovProportional& CovProportional::operator=(const CovProportional &r)
 
 CovProportional::~CovProportional()
 {
-
 }
 
 void CovProportional::setCor(ACov* cor)
@@ -65,12 +62,11 @@ void CovProportional::setCor(ACov* cor)
   CovBase::setCor(cor);
 }
 
-
-double CovProportional::_eval(const SpacePoint& p1, 
-  const SpacePoint& p2,
-  int ivar, 
-  int jvar, 
-  const CovCalcMode* mode) const
+double CovProportional::_eval(const SpacePoint& p1,
+                              const SpacePoint& p2,
+                              int ivar,
+                              int jvar,
+                              const CovCalcMode* mode) const
 {
 return _sillCur.getValue(ivar,jvar) * getCor()->evalCov(p1, p2,0, 0, mode);
 }

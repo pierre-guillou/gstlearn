@@ -44,8 +44,8 @@ CorGneiting::CorGneiting(const CorAniso* covS, const CorAniso* covTemp, double s
   space->addSpaceComponent(covTemp->getSpace());
   _ctxt.setSpace(space);
 
-  int nvar = covS->getNVar();
-  CovContext ctxt    = CovContext(nvar, space);
+  int nvar        = covS->getNVar();
+  CovContext ctxt = CovContext(nvar, space);
   setContext(ctxt);
 }
 
@@ -56,7 +56,6 @@ CorGneiting::CorGneiting(const CorGneiting& r)
   , _separability(r._separability)
   , _covSCopy(*r._covS)
 {
-
 }
 
 CorGneiting& CorGneiting::operator=(const CorGneiting& r)

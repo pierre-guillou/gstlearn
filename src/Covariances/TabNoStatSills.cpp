@@ -1,3 +1,13 @@
+/******************************************************************************/
+/*                                                                            */
+/*                            gstlearn C++ Library                            */
+/*                                                                            */
+/* Copyright (c) (2023) MINES Paris / ARMINES                                 */
+/* Authors: gstlearn Team                                                     */
+/* Website: https://gstlearn.org                                              */
+/* License: BSD 3-clause                                                      */
+/*                                                                            */
+/******************************************************************************/
 #include "Covariances/TabNoStatSills.hpp"
 #include "Covariances/ParamId.hpp"
 #include "Covariances/TabNoStat.hpp"
@@ -13,7 +23,6 @@ TabNoStatSills::TabNoStatSills()
 TabNoStatSills::TabNoStatSills(const TabNoStatSills& m)
   : TabNoStat(m)
 {
-
 }
 
 TabNoStatSills& TabNoStatSills::operator=(const TabNoStatSills& m)
@@ -51,7 +60,7 @@ String TabNoStatSills::toStringInside(const AStringFormat* strfmt, int i) const
 
 bool TabNoStatSills::isDefinedForVariance() const
 {
- return !empty();
+  return !empty();
 }
 
 int TabNoStatSills::getNSills() const

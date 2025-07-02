@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-
 #include "Covariances/CovBase.hpp"
 #include "Basic/ListParams.hpp"
 #include "Basic/Iterators.hpp"
@@ -16,12 +15,12 @@
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Covariances/NoStatArray.hpp"
 #include "Covariances/TabNoStatSills.hpp"
+#include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
-#include "Db/Db.hpp"
-#include "Covariances/NoStatArray.hpp"
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include <cstddef>

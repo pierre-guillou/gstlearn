@@ -11,26 +11,25 @@
 #include "Covariances/CovGCspline.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Simulation/TurningBandOperate.hpp"
-
 #include <math.h>
 
 namespace gstlrn
 {
 CovGCspline::CovGCspline(const CovContext& ctxt)
-: ACovFunc(ECov::SPLINE_GC, ctxt)
+  : ACovFunc(ECov::SPLINE_GC, ctxt)
 {
 }
 
-CovGCspline::CovGCspline(const CovGCspline &r)
-: ACovFunc(r)
+CovGCspline::CovGCspline(const CovGCspline& r)
+  : ACovFunc(r)
 {
 }
 
-CovGCspline& CovGCspline::operator=(const CovGCspline &r)
+CovGCspline& CovGCspline::operator=(const CovGCspline& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -41,10 +40,10 @@ CovGCspline::~CovGCspline()
 
 double CovGCspline::_evaluateCov(double h) const
 {
-  int ndim = getContext().getNDim();
-  double r = getContext().getField();
-  double r2 = r * r;
-  double h2 = h * h;
+  int ndim      = getContext().getNDim();
+  double r      = getContext().getField();
+  double r2     = r * r;
+  double h2     = h * h;
   double logval = (r < 10.e-5 || h < r * 10.e-5) ? 0. : log(h / r);
 
   // Code for the first 3 Space dimensions
@@ -59,7 +58,7 @@ double CovGCspline::_evaluateCov(double h) const
   return (cov);
 }
 
-double CovGCspline::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovGCspline::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.cosineOne(t0);
 }

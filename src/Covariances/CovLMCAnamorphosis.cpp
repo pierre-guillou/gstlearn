@@ -8,21 +8,19 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Covariances/CovLMCAnamorphosis.hpp"
+#include "Anamorphosis/AAnam.hpp"
+#include "Anamorphosis/AnamDiscreteDD.hpp"
+#include "Anamorphosis/AnamDiscreteIR.hpp"
+#include "Anamorphosis/AnamHermite.hpp"
+#include "Covariances/CovAniso.hpp"
 #include "Covariances/CovAnisoList.hpp"
+#include "Covariances/CovCalcMode.hpp"
+#include "Covariances/CovFactory.hpp"
 #include "Enum/EAnam.hpp"
 #include "Enum/ECalcMember.hpp"
-
-#include "Space/ASpace.hpp"
 #include "Model/Model.hpp"
-#include "Covariances/CovLMCAnamorphosis.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Covariances/CovFactory.hpp"
-#include "Covariances/CovCalcMode.hpp"
-#include "Anamorphosis/AAnam.hpp"
-#include "Anamorphosis/AnamHermite.hpp"
-#include "Anamorphosis/AnamDiscreteIR.hpp"
-#include "Anamorphosis/AnamDiscreteDD.hpp"
-
+#include "Space/ASpace.hpp"
 #include <math.h>
 
 namespace gstlrn

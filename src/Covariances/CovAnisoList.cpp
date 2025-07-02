@@ -9,23 +9,22 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovAnisoList.hpp"
-#include "Basic/ParamInfo.hpp"
-#include "Enum/EModelProperty.hpp"
-
+#include "Anamorphosis/AnamHermite.hpp"
 #include "Basic/ListParams.hpp"
-#include "Covariances/CovCalcMode.hpp"
-#include "Covariances/CovContext.hpp"
-#include "Covariances/CovList.hpp"
-#include "Space/ASpace.hpp"
+#include "Basic/ParamInfo.hpp"
 #include "Basic/Utilities.hpp"
 #include "Covariances/CovAniso.hpp"
+#include "Covariances/CovCalcMode.hpp"
+#include "Covariances/CovContext.hpp"
 #include "Covariances/CovFactory.hpp"
-#include "Covariances/CovLMGradient.hpp"
+#include "Covariances/CovLMCAnamorphosis.hpp"
 #include "Covariances/CovLMCConvolution.hpp"
 #include "Covariances/CovLMCTapering.hpp"
-#include "Covariances/CovLMCAnamorphosis.hpp"
+#include "Covariances/CovLMGradient.hpp"
+#include "Covariances/CovList.hpp"
 #include "Db/Db.hpp"
-#include "Anamorphosis/AnamHermite.hpp"
+#include "Enum/EModelProperty.hpp"
+#include "Space/ASpace.hpp"
 #include "geoslib_define.h"
 
 #include <cstddef>

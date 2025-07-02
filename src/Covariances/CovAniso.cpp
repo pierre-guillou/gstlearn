@@ -32,6 +32,7 @@
 
 #include <functional>
 #include <math.h>
+#include <math.h>
 #include <ostream>
 
 namespace gstlrn

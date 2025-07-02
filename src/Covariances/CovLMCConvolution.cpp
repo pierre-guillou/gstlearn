@@ -8,64 +8,62 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Covariances/CovContext.hpp"
-#include "Enum/EConvDir.hpp"
-#include "Enum/EConvType.hpp"
-
-#include "Space/ASpace.hpp"
-#include "Model/Model.hpp"
 #include "Covariances/CovLMCConvolution.hpp"
 #include "Covariances/CovAniso.hpp"
+#include "Covariances/CovContext.hpp"
 #include "Covariances/CovFactory.hpp"
+#include "Enum/EConvDir.hpp"
+#include "Enum/EConvType.hpp"
 #include "Matrix/MatrixDense.hpp"
-
+#include "Model/Model.hpp"
+#include "Space/ASpace.hpp"
 #include <math.h>
 
 namespace gstlrn
 {
 CovLMCConvolution::CovLMCConvolution(const EConvType& conv_type,
-                                     const EConvDir&  conv_dir,
+                                     const EConvDir& conv_dir,
                                      double conv_range,
                                      int conv_ndisc,
                                      const CovContext& ctxt)
-    : CovAnisoList(ctxt),
-      _convType(conv_type),
-      _convDir(conv_dir),
-      _convDiscNumber(conv_ndisc),
-      _convRange(conv_range),
-      _convNumber(0),
-      _convIncr(),
-      _convWeight()
+  : CovAnisoList(ctxt)
+  , _convType(conv_type)
+  , _convDir(conv_dir)
+  , _convDiscNumber(conv_ndisc)
+  , _convRange(conv_range)
+  , _convNumber(0)
+  , _convIncr()
+  , _convWeight()
 {
   init(conv_type, conv_dir, conv_range, conv_ndisc);
 }
 
-CovLMCConvolution::CovLMCConvolution(const CovLMCConvolution &r)
-    : CovAnisoList(r),
-      _convType(r._convType),
-      _convDir(r._convDir),
-      _convDiscNumber(r._convDiscNumber),
-      _convRange(r._convRange),
-      _convNumber(r._convNumber),
-      _convIncr(r._convIncr),
-      _convWeight(r._convWeight)
+CovLMCConvolution::CovLMCConvolution(const CovLMCConvolution& r)
+  : CovAnisoList(r)
+  , _convType(r._convType)
+  , _convDir(r._convDir)
+  , _convDiscNumber(r._convDiscNumber)
+  , _convRange(r._convRange)
+  , _convNumber(r._convNumber)
+  , _convIncr(r._convIncr)
+  , _convWeight(r._convWeight)
 {
 }
 
-CovLMCConvolution& CovLMCConvolution::operator=(const CovLMCConvolution &r)
+CovLMCConvolution& CovLMCConvolution::operator=(const CovLMCConvolution& r)
 {
   if (this != &r)
   {
     CovAnisoList::operator=(r);
-    _convType = r._convType;
-    _convDir = r._convDir;
+    _convType       = r._convType;
+    _convDir        = r._convDir;
     _convDiscNumber = r._convDiscNumber;
-    _convRange = r._convRange;
-    _convNumber = r._convNumber;
-    _convIncr = r._convIncr;
-    _convWeight = r._convWeight;
+    _convRange      = r._convRange;
+    _convNumber     = r._convNumber;
+    _convIncr       = r._convIncr;
+    _convWeight     = r._convWeight;
   }
-{
+  {
   }
   return *this;
 }
@@ -75,11 +73,11 @@ CovLMCConvolution::~CovLMCConvolution()
 }
 
 int CovLMCConvolution::init(const EConvType& conv_type,
-                            const EConvDir&  conv_idir,
+                            const EConvDir& conv_idir,
                             double conv_range,
                             int conv_ndisc)
 {
-  for (auto &e: _covs)
+  for (auto& e: _covs)
   {
     ((CovAniso*)e.get())->setOptimEnabled(false);
   }
@@ -96,11 +94,11 @@ int CovLMCConvolution::init(const EConvType& conv_type,
 
   /* Load the CovLMCConvolution parameters */
 
-  int ndim = getNDim();
-  _convType = conv_type;
-  _convDir  = conv_idir;
+  int ndim        = getNDim();
+  _convType       = conv_type;
+  _convDir        = conv_idir;
   _convDiscNumber = conv_ndisc;
-  _convRange = conv_range;
+  _convRange      = conv_range;
   double diameter = _convRange * D_CONV(_convType.getValue()).convScale;
 
   /* Calculate the discretization points */
@@ -144,11 +142,11 @@ int CovLMCConvolution::init(const EConvType& conv_type,
   for (int i = 0; i < 3; i++)
     _convNumber *= 2 * navail[i] + 1;
 
-  _convIncr = MatrixDense(ndim,_convNumber);
+  _convIncr = MatrixDense(ndim, _convNumber);
   _convWeight.resize(_convNumber);
 
   double delta, weight;
-  int ecr = 0;
+  int ecr      = 0;
   double total = 0.;
   for (int ix = -navail[0]; ix <= navail[0]; ix++)
     for (int iy = -navail[1]; iy <= navail[1]; iy++)
@@ -164,14 +162,14 @@ int CovLMCConvolution::init(const EConvType& conv_type,
         }
         if (ndim >= 2)
         {
-          delta = diameter * iy / (2 * conv_ndisc + 1);
+          delta  = diameter * iy / (2 * conv_ndisc + 1);
           weight = D_CONV(_convType.getValue()).convFunc(delta);
           _convIncr.setValue(1, ecr, delta);
           local *= weight;
         }
         if (ndim >= 3)
         {
-          delta = diameter * iz / (2 * conv_ndisc + 1);
+          delta  = diameter * iz / (2 * conv_ndisc + 1);
           weight = D_CONV(_convType.getValue()).convFunc(delta);
           _convIncr.setValue(2, ecr, delta);
           local *= weight;
@@ -191,49 +189,48 @@ int CovLMCConvolution::init(const EConvType& conv_type,
 Def_Convolution& D_CONV(int rank)
 {
   static Def_Convolution DEF_CONVS[] =
-  {
-   {"Uniform"     , 1.,       _conv_uniform     },
-   {"Exponential" , 2.995732, _conv_exponential },
-   {"Gaussian"    , 1.730818, _conv_gaussian    },
-   {"Sincard"     , 20.371,   _conv_sincard     }
-  };
+    {
+      {"Uniform", 1., _conv_uniform},
+      {"Exponential", 2.995732, _conv_exponential},
+      {"Gaussian", 1.730818, _conv_gaussian},
+      {"Sincard", 20.371, _conv_sincard}};
   return DEF_CONVS[rank];
 }
 
 double _conv_uniform(double /* v */)
 {
   double dp = 1.;
-  return(dp);
+  return (dp);
 }
 
 double _conv_exponential(double v)
 {
   double dp = exp(-v);
-  return(dp);
+  return (dp);
 }
 
 double _conv_gaussian(double v)
 {
-  double dp = exp(-v*v/2.);
-  return(dp);
+  double dp = exp(-v * v / 2.);
+  return (dp);
 }
 
 double _conv_sincard(double v)
 {
-  double dp,v2,dv;
+  double dp, v2, dv;
 
-  v = GV_PI * v;
+  v  = GV_PI * v;
   v2 = v * v;
   if (v < 1.0e-10)
   {
-    dp = 1. - v2/3;
+    dp = 1. - v2 / 3;
   }
   else
   {
     dv = sin(v) / v;
     dp = dv * dv;
   }
-  return(dp);
+  return (dp);
 }
 
 String CovLMCConvolution::toString(const AStringFormat* strfmt) const
@@ -243,7 +240,7 @@ String CovLMCConvolution::toString(const AStringFormat* strfmt) const
   sstr << CovAnisoList::toString(strfmt);
 
   sstr << "Convolution type      = " << _convType.getDescr() << std::endl;
-  sstr << "Convolution direction = " << _convDir.getDescr()   << std::endl;
+  sstr << "Convolution direction = " << _convDir.getDescr() << std::endl;
   sstr << "Nb. discretization    = " << _convDiscNumber << std::endl;
   sstr << "Convolution Scale     = " << _convRange << std::endl;
 
@@ -293,8 +290,8 @@ double CovLMCConvolution::_eval(const SpacePoint& p1,
   }
 
   double cov = 0.;
-  p11 = p1;
-  p22 = p2;
+  p11        = p1;
+  p22        = p2;
   for (int i1 = 0; i1 < _convNumber; i1++)
   {
     double w1 = _convWeight[i1];
@@ -315,8 +312,8 @@ double CovLMCConvolution::_eval(const SpacePoint& p1,
   if (asVario)
   {
     double cov0 = 0.;
-    p11 = p1;
-    p22 = p1;
+    p11         = p1;
+    p22         = p1;
     for (int i1 = 0; i1 < _convNumber; i1++)
     {
       double w1 = _convWeight[i1];
@@ -335,7 +332,7 @@ double CovLMCConvolution::_eval(const SpacePoint& p1,
         cov0 += covloc * w1 * w2;
       }
     }
-    cov = cov0 -cov;
+    cov = cov0 - cov;
   }
   return cov;
 }
