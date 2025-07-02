@@ -27,7 +27,7 @@ def find_function_return_type_in_file(method_name, header_path):
     pour une méthode dans un fichier header donné.
     """
     if not os.path.isfile(header_path):
-        print(f"❌ Fichier non trouvé : {header_path}")
+        print(f"Error: Fichier non trouvé : {header_path}")
         return None
 
     with open(header_path, 'r', encoding='utf-8') as f:
@@ -46,7 +46,7 @@ def find_function_return_type_in_file(method_name, header_path):
                 break
 
     if not buffer:
-        print(f"❌ Méthode {method_name} introuvable dans {header_path}")
+        print(f"Error: Méthode {method_name} introuvable dans {header_path}")
         return None
 
     # Nettoyage
@@ -64,7 +64,7 @@ def find_function_return_type_in_file(method_name, header_path):
         return_type = return_type.strip()
         return return_type
 
-    print(f"❓ Signature non reconnue pour {method_name} dans {header_path}")
+    print(f"Warning: Signature non reconnue pour {method_name} dans {header_path}")
     return None
 
 def find_include_folder_in_file(classname, file_path):
@@ -73,7 +73,7 @@ def find_include_folder_in_file(classname, file_path):
     et retourne `Folder`.
     """
     if not os.path.isfile(file_path):
-        print(f"❌ Fichier non trouvé : {file_path}")
+        print(f"Error: Fichier non trouvé : {file_path}")
         return None
 
     pattern = re.compile(rf'#include\s+"([^"]*\/{re.escape(classname)}\.hpp)"')
@@ -85,7 +85,7 @@ def find_include_folder_in_file(classname, file_path):
                 include_path = match.group(1)  # Ex. "Covariances/ACov.hpp"
                 return os.path.dirname(include_path)  # Ex. "Covariances"
 
-    print(f"❌ Ligne d'#include pour {classname}.hpp non trouvée dans {file_path}")
+    print(f"Error: Ligne d'#include pour {classname}.hpp non trouvée dans {file_path}")
     return None
    
 
@@ -170,14 +170,14 @@ def find_method_in_class_or_bases(class_name, method_name, root_folder, visited=
 
     header_path = find_header_for_class(class_name, root_folder)
     if not header_path:
-        print(f"[INFO] Header not found for class {class_name}")
+        print(f"Warning: Header not found for class {class_name}")
         return None
 
     # 1. Cherche la méthode dans le header direct
     signature = find_method_signature_in_header(method_name, header_path)
     if signature:
         if depth > 0 and verbose:
-            print(f"[INFO] Méthode '{method_name}' trouvée dans la base '{class_name}'")
+            print(f"Warning: Méthode '{method_name}' trouvée dans la base '{class_name}'")
         return signature
 
     # 2. Si non trouvée, cherche dans les bases
