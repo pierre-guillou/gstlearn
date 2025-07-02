@@ -52,7 +52,6 @@ jobs:
 
     - name: Install Python dependencies
       run: |
-        uv pip install --upgrade pip
         uv pip install numpy
         uv pip install jupyter
         uv pip install notebook==6.1.6
@@ -77,11 +76,9 @@ jobs:
         CMAKE_CC_COMPILER_LAUNCHER: sccache
         CMAKE_CXX_COMPILER_LAUNCHER: sccache
 
-    - name: Build and Install the package
+    - name: Build the package
       run: |
         cmake --build ${{env.BUILD_DIR}} --parallel 3 --target python_build
-
-    #- run: curl -sSf https://sshx.io/get | sh -s run
 
     - name: Execute Python demos and courses
       run: |

@@ -261,10 +261,9 @@ endif()
 add_custom_target(python_install
   COMMAND ${UV} pip install ${NO_INTERNET_ARG} "${PYTHON_PACKAGE_ROOT_FOLDER}[plot,conv,doc]"
   COMMENT "Installing python package"
-  )
- 
-# Tell to CMake that python package must be built before installation [python_doc is optional]
+)
 
+# Tell to CMake that python package must be built before installation [python_doc is optional]
 add_dependencies(python_install python_build)
 
 if(NOT DEFINED ENV{VIRTUAL_ENV})

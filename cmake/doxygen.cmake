@@ -9,6 +9,7 @@ find_package(Doxygen REQUIRED)
 
 set(DOXYGEN_OUTPUT_DIRECTORY doxygen)
 set(DOXYGEN_PROJECT_BRIEF "Geostatistics & Machine Learning toolbox | <a href=https://gstlearn.org>https://gstlearn.org</a>")
+set(DOXYGEN_PROJECT_NUMBER ${PROJECT_FULL_VERSION})
 set(DOXYGEN_PROJECT_LOGO ${CMAKE_SOURCE_DIR}/doc/logos/gstlearn_logo_blue_th.png)
 set(DOXYGEN_MULTILINE_CPP_IS_BRIEF YES)
 set(DOXYGEN_EXTRACT_ALL YES)
@@ -19,9 +20,10 @@ set(DOXYGEN_EXCLUDE ${CMAKE_SOURCE_DIR}/include/geoslib_old_f.h
                     ${CMAKE_SOURCE_DIR}/include/geoslib_f_private.h
                     ${CMAKE_SOURCE_DIR}/include/geoslib_d_private.h)
 set(DOXYGEN_EXCLUDE_SYMBOLS "FORWARD_METHOD_NON_CONST"
-                             "FORWARD_METHOD_CONST")
+                            "FORWARD_METHOD_CONST")
 
 set(DOXYGEN_VERBATIM_HEADERS NO)
+set(DOXYGEN_SHOW_FILES NO)
 set(DOXYGEN_GENERATE_HTML YES)
 set(DOXYGEN_HTML_TIMESTAMP YES)
 set(DOXYGEN_HTML_HEADER ${CMAKE_SOURCE_DIR}/cmake/doxygen.header.html)

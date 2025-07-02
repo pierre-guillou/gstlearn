@@ -37,6 +37,9 @@ jobs:
 
   build:
     runs-on: windows-2022
+    outputs:
+      # https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
+      cran_path: ${{ steps.define_cran_path.outputs.CRAN_PATH }}
     strategy:
       matrix:
         # Last releases from here https://cran.r-project.org/src/base/R-4/
@@ -101,6 +104,20 @@ jobs:
         $PKG_PATH = Get-ChildItem -Path "${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.zip" -File
         echo "MY_PKG=$PKG_PATH" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Define the CRAN path on our server
+      id: define_cran_path
+      shell: powershell
+      run: |
+        $versionOutput = cmake --build ${{env.BUILD_DIR}} --target print_version
+        $projectVersion = $versionOutput | Select-String "PROJECT_VERSION" | ForEach-Object {($_ -split "=")[1].Trim()}
+        $projectFullVersion = $versionOutput | Select-String "PROJECT_FULL_VERSION" | ForEach-Object {($_ -split "=")[1].Trim()}
+        if ($projectVersion -eq $projectFullVersion) {
+            $cranPath = "/var/www/html/cran"
+        } else {
+            $cranPath = "/var/www/html/cran/prerelease"
+        }
+        "CRAN_PATH=$cranPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
     - name : Always show r_doc log
       if: success() || failure()
       run: |
@@ -157,15 +174,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Publish packages to our CRAN
-    - uses: fabien-ors/cran-publish-action@v4
-      with:
-        host: ${{secrets.CG_HOST}}
-        username: ${{secrets.CG_USR}}
-        password: ${{secrets.CG_PWD}}
-        repo-path: "/var/www/html/cran"
+      - env:
+          CRAN_PATH: ${{needs.build.outputs.cran_path}}
 
-    # Delete the artifacts (for freeing storage space under github)
-    - uses: geekyeggo/delete-artifact@v5
-      with:
-        name: windows-r-package-*
+        # Publish packages to our CRAN
+        uses: fabien-ors/cran-publish-action@v4
+        with:
+          host: ${{secrets.CG_HOST}}
+          username: ${{secrets.CG_USR}}
+          password: ${{secrets.CG_PWD}}
+          repo-path: ${{env.CRAN_PATH}}
+
+        # Delete the artifacts (for freeing storage space under github)
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: windows-r-package-*
