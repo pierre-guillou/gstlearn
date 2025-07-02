@@ -77,7 +77,7 @@ void CovAnisoList::addCov(const CovBase* cov)
 const CovAniso* CovAnisoList::_getCovAniso(int icov) const
 {
   if (!_isCovarianceIndexValid(icov)) return nullptr;
-  const CovAniso* covaniso = dynamic_cast<const CovAniso*>(_covs[icov]);
+  const CovAniso* covaniso = dynamic_cast<const CovAniso*>(_covs[icov].get());
   if (covaniso == nullptr)
   {
     messerr("The element 'icov' is not a CovAniso");
@@ -88,12 +88,12 @@ const CovAniso* CovAnisoList::_getCovAniso(int icov) const
 CovAniso* CovAnisoList::_getCovAnisoModify(int icov)
 {
   if (!_isCovarianceIndexValid(icov)) return nullptr;
-  CovAniso* covaniso = dynamic_cast<CovAniso*>(_covs[icov]);
+  auto covaniso = std::dynamic_pointer_cast<CovAniso>(_covs[icov]);
   if (covaniso == nullptr)
   {
     messerr("The element 'icov' is not a CovAniso");
   }
-  return covaniso;
+  return covaniso.get();
 }
 
 bool CovAnisoList::isConsistent(const ASpace* /*space*/) const

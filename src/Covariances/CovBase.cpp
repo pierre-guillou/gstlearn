@@ -25,6 +25,7 @@
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include <cstddef>
+#include <memory>
 
 ParamInfo CovBase::createParamInfoForCholSill()
 {
@@ -39,7 +40,7 @@ CovBase::CovBase(ACov* cor,
   , _cholSillsInfo(MatrixT<ParamInfo>(sill.getNRows(), sill.getNCols(), createParamInfoForCholSill()))
   , _cholSills(MatrixDense(sill.getNRows(), sill.getNCols()))
   , _sillCur(sill)
-  , _cor(cor)
+  , _cor(std::dynamic_pointer_cast<ACov>(cor==nullptr? nullptr :cor->cloneShared()))
   , _itRange(sill.getNRows())
 {
 
@@ -64,7 +65,7 @@ CovBase::CovBase(const CovBase& r)
   _cholSills     = r._cholSills;
   _sillCur       = r._sillCur;
   _workMat       = r._workMat;
-  _cor           = (ACov*)r._cor->clone();
+  _cor           = std::dynamic_pointer_cast<ACov>(r._cor->cloneShared());
 
 }
 
@@ -76,7 +77,7 @@ CovBase& CovBase::operator=(const CovBase& r)
     _cholSills     = r._cholSills;
     _sillCur       = r._sillCur;
     _workMat       = r._workMat;
-    _cor           = (ACov*)r._cor->clone();
+    _cor           = std::dynamic_pointer_cast<ACov>(r._cor->cloneShared());
     _itRange       = LowerTriangularRange(r._cholSills.getNRows());
   }
   return *this;
@@ -88,7 +89,7 @@ CovBase::~CovBase()
 
 void CovBase::setCor(ACov* cor)
 {
-  _cor     = cor;
+  _cor     = std::dynamic_pointer_cast<ACov>(cor->cloneShared());
   int nvar = getNVar();
   if (cor != nullptr)
   {
@@ -167,6 +168,7 @@ void CovBase::_initFromContext()
   _cor->initFromContext();
   _sillCur.reset(_ctxt.getNVar(), _ctxt.getNVar());
   setOptimEnabled(true);
+  _ctxt.setSpace(_cor->getSpace());
 }
 void CovBase::initSill(double value)
 {

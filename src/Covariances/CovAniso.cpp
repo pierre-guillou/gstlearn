@@ -35,9 +35,10 @@
 #include <ostream>
 
 CovAniso::CovAniso(const ECov& type, const CovContext& ctxt)
-  : CovProportional(new CorAniso(type, ctxt), MatrixSymmetric(ctxt.getNVar()))
+  : CovProportional(nullptr, MatrixSymmetric(ctxt.getNVar()))
 {
-  CovProportional::setCor(getCorAniso());
+  auto tempcor = CorAniso(type, ctxt);
+  CovProportional::setCor(&tempcor);
   _initFromContext();
 }
 
@@ -46,7 +47,6 @@ CovAniso::CovAniso(const String& symbol, const CovContext& ctxt)
 {
   ECov covtype = CovFactory::identifyCovariance(symbol, ctxt);
   _initFromContext();
-
 }
 
 CovAniso::CovAniso(const ECov& type,
@@ -55,8 +55,10 @@ CovAniso::CovAniso(const ECov& type,
                    double sill,
                    const CovContext& ctxt,
                    bool flagRange)
-  : CovProportional(new CorAniso(type, range, param, ctxt, flagRange), MatrixSymmetric(ctxt.getNVar()))
+  : CovProportional(nullptr, MatrixSymmetric(ctxt.getNVar()))
 {
+  auto temp = CorAniso(type, range, param, ctxt, flagRange);
+  setCor(&temp);
   _initFromContext();
 
   // Sill
@@ -91,15 +93,14 @@ CovAniso& CovAniso::operator=(const CovAniso& r)
   if (this != &r)
   {
     setCor(new CorAniso(*r.getCorAniso()));
-    _ctxt         = r._ctxt;
-    _sillCur      = r._sillCur;
+    _ctxt    = r._ctxt;
+    _sillCur = r._sillCur;
   }
   return *this;
 }
 
 CovAniso::~CovAniso()
 {
-  delete getCorAniso();
 }
 
 CorAniso* CovAniso::getCorAniso()
@@ -189,7 +190,7 @@ String CovAniso::toString(const AStringFormat* strfmt) const
     if (getNVar() > 1)
     {
       MatrixSquare slopes = _sillCur;
-      double range               = getRange(0);
+      double range        = getRange(0);
       for (int ivar = 0; ivar < getNVar(); ivar++)
         for (int jvar = 0; jvar < getNVar(); jvar++)
           slopes.setValue(ivar, jvar, _sillCur.getValue(ivar, jvar) / range);

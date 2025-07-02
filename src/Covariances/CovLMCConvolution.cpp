@@ -80,7 +80,7 @@ int CovLMCConvolution::init(const EConvType& conv_type,
 {
   for (auto &e: _covs)
   {
-    ((CovAniso*)e)->setOptimEnabled(false);
+    ((CovAniso*)e.get())->setOptimEnabled(false);
   }
   if (conv_ndisc < 1)
   {

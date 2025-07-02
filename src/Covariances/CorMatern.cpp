@@ -159,7 +159,7 @@ double CorMatern::_eval(const SpacePoint& p1,
     VectorDouble scales = _corRef->getScales();
   
     double correcScale = computeScale(ivar, jvar);
-    for (int idim = 0; idim < (int)_space->getNDim(); idim++)
+    for (int idim = 0; idim < (int)getSpace()->getNDim(); idim++)
     {
         scales[idim] *= correcScale;
     }

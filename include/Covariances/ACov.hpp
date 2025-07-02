@@ -52,7 +52,7 @@ class ListParams;
  *
  * It is mainly implemented in CovAniso.hpp or CovAnisoList.hpp
  */
-class GSTLEARN_EXPORT ACov: public ASpaceObject, public ICloneable
+class GSTLEARN_EXPORT ACov: public ICloneable, public AStringable
 {
 public:
   ACov(const CovContext& ctxt = CovContext());
@@ -68,7 +68,7 @@ public:
   void setContext(const CovContext& ctxt);
   void updateFromContext() { _updateFromContext(); }
   virtual void copyCovContext(const CovContext& ctxt) { _copyCovContext(ctxt); }
-  void initFromContext() { _initFromContext(); }
+  void initFromContext();
   CovContext getContextCopy() const { return CovContext(_ctxt); }
   /// Calculate the covariance between two variables for 0-distance (stationary case)
   virtual double eval0(int ivar                = 0,
@@ -98,6 +98,7 @@ public:
     DECLARE_UNUSED(mode);
     return TEST;
   }
+
   virtual VectorDouble evalSpectrumOnSphere(int n,
                                             bool flagNormDistance = false,
                                             bool flagCumul        = false) const
@@ -127,6 +128,12 @@ public:
 
   void attachNoStatDb(const Db* db);
 
+  ASpaceSharedPtr getSpace() const { return _ctxt.getSpace(); }
+  virtual bool isConsistent(const ASpace* space) const
+   {
+    DECLARE_UNUSED(space)
+    return true; 
+  }
   /////////////////////////////////////////////////////////////////////////////////
   /// Functions linked to Optimization during Covariance calculations
   virtual bool isOptimEnabled() const { return _isOptimEnabled(); }

@@ -18,6 +18,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "LinearOp/AShiftOp.hpp"
 #include <map>
+#include <memory>
 
 class APolynomial;
 class AMesh;
@@ -27,7 +28,8 @@ class AMesh;
 // Note that if the model is multivariate, the precision is built with a constant sill = 1.
 // Therefore it has to be used only through the PrecisionOpMulti class
 // which handles the sills matrix (possibly non stationary)
-class GSTLEARN_EXPORT PrecisionOp : public ASimulable {
+class GSTLEARN_EXPORT PrecisionOp: public ASimulable
+{
 
 public:
   PrecisionOp();
@@ -38,32 +40,32 @@ public:
               CovAniso* cova,
               bool stencil = false,
               bool verbose = false);
-  PrecisionOp(const PrecisionOp &pmat);
-  PrecisionOp& operator=(const PrecisionOp &pmat);
+  PrecisionOp(const PrecisionOp& pmat);
+  PrecisionOp& operator=(const PrecisionOp& pmat);
   virtual ~PrecisionOp();
 
   // Interface functions for using PrecisionOp
 
-  #ifndef SWIG
+#ifndef SWIG
   virtual void evalInverse(const constvect vecin, std::vector<double>& vecout);
 #endif
 
-  virtual std::pair<double,double> getRangeEigenVal(int ndiscr = 100);
+  virtual std::pair<double, double> getRangeEigenVal(int ndiscr = 100);
 
-  static PrecisionOp* createFromShiftOp(AShiftOp *shiftop = nullptr,
-                                        const CovAniso *cova = nullptr,
-                                        bool verbose = false);
+  static PrecisionOp* createFromShiftOp(AShiftOp* shiftop    = nullptr,
+                                        const CovAniso* cova = nullptr,
+                                        bool verbose         = false);
   static PrecisionOp* create(const AMesh* mesh,
                              CovAniso* cova,
                              bool stencil = false,
                              bool verbose = false);
 
-  int reset(const AShiftOp *shiftop,
-            const CovAniso *cova = nullptr,
-            bool verbose = false);
+  int reset(const AShiftOp* shiftop,
+            const CovAniso* cova = nullptr,
+            bool verbose         = false);
 
   virtual double getLogDeterminant(int nMC = 1);
-  #ifndef SWIG
+#ifndef SWIG
   virtual void gradYQX(const constvect /*X*/,
                        const constvect /*Y*/,
                        vect /*result*/,
@@ -83,14 +85,14 @@ public:
                               const EPowerPT& /*power*/) {};
   VectorVectorDouble simulate(int nbsimu = 1);
 
-  #endif
-  
-//  virtual void evalDerivPoly(const Eigen::VectorXd& /*inv*/,
-//                             Eigen::VectorXd& /*outv*/,
-//                             int /*iapex*/,
-//                             int /*igparam*/){};
+#endif
 
-  #ifndef SWIG
+  //  virtual void evalDerivPoly(const Eigen::VectorXd& /*inv*/,
+  //                             Eigen::VectorXd& /*outv*/,
+  //                             int /*iapex*/,
+  //                             int /*igparam*/){};
+
+#ifndef SWIG
   void evalPower(const constvect inm,
                  vect outm,
                  const EPowerPT& power = EPowerPT::fromKey("ONE"));
@@ -98,9 +100,9 @@ public:
   VectorDouble computeCov(int imesh);
   VectorDouble simulateOne();
 
-  int  getSize() const override { return _shiftOp->getSize(); }
-  bool getTraining() const {return _training;}
-  void setTraining(bool tr){ _training = tr;}
+  int getSize() const override { return _shiftOp->getSize(); }
+  bool getTraining() const { return _training; }
+  void setTraining(bool tr) { _training = tr; }
   AShiftOp* getShiftOp() const { return _shiftOp; }
   VectorDouble getPolyCoeffs(const EPowerPT& power);
   void setPolynomialFromPoly(APolynomial* polynomial);
@@ -110,17 +112,17 @@ public:
   virtual VectorDouble extractDiag() const;
 
 protected:
-  APolynomial*     getPoly(const EPowerPT& power);
+  APolynomial* getPoly(const EPowerPT& power);
 
 #ifndef SWIG
 
 public:
-  void evalPower(const VectorDouble &inv, VectorDouble &outv, const EPowerPT& power = EPowerPT::fromKey("ONE"));
+  void evalPower(const VectorDouble& inv, VectorDouble& outv, const EPowerPT& power = EPowerPT::fromKey("ONE"));
 
 protected:
-int _addEvalPoly(const EPowerPT& power,
-                 const constvect inv,
-                 vect outv) const;
+  int _addEvalPoly(const EPowerPT& power,
+                   const constvect inv,
+                   vect outv) const;
   virtual int _addToDest(const constvect inv, vect outv) const override;
   virtual int _addSimulateToDest(const constvect whitenoise,
                                  vect outv) const override;
@@ -129,31 +131,31 @@ int _addEvalPoly(const EPowerPT& power,
 #endif
 
 private:
-  int  _preparePoly(const EPowerPT& power,bool force = false) const;
-  int  _prepareChebychev(const EPowerPT& power) const;
-  int  _preparePrecisionPoly() const;
+  int _preparePoly(const EPowerPT& power, bool force = false) const;
+  int _prepareChebychev(const EPowerPT& power) const;
+  int _preparePrecisionPoly() const;
 #ifndef SWIG
-  int  _evalPoly(const EPowerPT& power, const constvect inv, vect outv) const;
+  int _evalPoly(const EPowerPT& power, const constvect inv, vect outv) const;
 #endif
   void _purge();
 
 private:
-  mutable AShiftOp*                        _shiftOp;
-  const CovAniso*                          _cova; // Not to be deleted
-  mutable std::map<EPowerPT, APolynomial*> _polynomials;
-  bool                                     _verbose;
-  bool                                     _training;
-  bool                                     _destroyShiftOp;
-  bool                                     _userPoly;
+  mutable AShiftOp* _shiftOp;
+  const CovAniso* _cova; // Not to be deleted
+  mutable std::map<EPowerPT, std::unique_ptr<APolynomial>> _polynomials;
+  bool _verbose;
+  bool _training;
+  bool _destroyShiftOp;
+  bool _userPoly;
 
 #ifndef SWIG
-protected :
-  mutable std::vector<double>              _work;
-  mutable std::vector<double>              _work2;
-  mutable std::vector<double>              _work3;
-  mutable std::vector<double>              _work4;
-  mutable std::vector<double>              _work5;
+
+protected:
+  mutable std::vector<double> _work;
+  mutable std::vector<double> _work2;
+  mutable std::vector<double> _work3;
+  mutable std::vector<double> _work4;
+  mutable std::vector<double> _work5;
   mutable std::vector<std::vector<double>> _workPoly;
 #endif
-
 };

@@ -53,7 +53,7 @@ public:
   virtual ~ModelGeneric();
 
   //getters for member pointers
-  const ACov*       getCov()             const { return  _cova;     }
+  const ACov*       getCov()             const { return  _cova.get();     }
   const CovContext* getContext()         const { return &_ctxt;     }
   const DriftList*  getDriftList()       const { return  _driftList;}
 
@@ -61,7 +61,7 @@ public:
   /// ICloneable interface
   IMPLEMENT_CLONING(ModelGeneric)
 
-  ACov*       _getCovModify() { return _cova; }
+  ACov*       _getCovModify() { return _cova.get(); }
   CovContext* _getContextModify() { return &_ctxt; }
   DriftList*  _getDriftListModify() { return _driftList; }
   std::vector<covmaptype>& getGradients()
@@ -182,7 +182,7 @@ public:
   void setField(double field);
   bool isValid() const;
 
-  void setCov(ACov* cova);
+  void setCov(const ACov* cova);
   
   void setDriftList(const DriftList* driftlist);
   void setDriftIRF(int order = 0, int nfex = 0);
@@ -209,7 +209,7 @@ private:
   virtual bool _isValid() const;
 
 protected:               // TODO : pass into private to finish clean
-  ACov* _cova;           /* Generic Covariance structure */
+  std::shared_ptr<ACov> _cova;           /* Generic Covariance structure */
   mutable std::vector<covmaptype> _gradFuncs;
   DriftList* _driftList; /* Series of Drift functions */
   CovContext _ctxt;      /* Context */

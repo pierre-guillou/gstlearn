@@ -119,6 +119,7 @@ public:
                            VectorDouble& ptemp,
                            int ispace = -1) const;
 
+VectorDouble getUnitaryVector() const;
   /// Project the coordinates in the given space
   virtual VectorDouble projCoord(const VectorDouble& coord,
                                  int ispace = -1) const;

@@ -179,6 +179,13 @@ void ASpace::move(SpacePoint& p1, const VectorDouble& vec) const
   _move(p1, vec);
 }
 
+VectorDouble ASpace::getUnitaryVector() const
+{
+  VectorDouble uni;
+  uni.resize(getNDim(), 0.);
+  uni[0] = 1;
+  return uni;
+}
 /// Return the distance between two space points
 double ASpace::getDistance(const SpacePoint &p1,
                            const SpacePoint &p2,

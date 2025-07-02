@@ -55,7 +55,7 @@ public:
   FORWARD_METHOD(getCovList, isAllActiveCovList)
   FORWARD_METHOD(getCovList, getFitSills,nullptr)
 
-  void setCovList(CovList* covs);
+  void setCovList(const CovList* covs);
   virtual void addCov(const CovBase* cov);
   CovBase* getCovBase(int icov) const { return getCovListModify()->getCovModify(icov); }
 

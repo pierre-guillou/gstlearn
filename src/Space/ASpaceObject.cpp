@@ -59,10 +59,7 @@ String ASpaceObject::toString(const AStringFormat* /*strfmt*/) const
 
 VectorDouble ASpaceObject::getUnitaryVector() const
 {
-  VectorDouble uni;
-  uni.resize(getNDim(), 0.);
-  uni[0] = 1;
-  return uni;
+  return _space->getUnitaryVector();
 }
 
 unsigned int ASpaceObject::getNDim(int ispace) const

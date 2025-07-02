@@ -47,9 +47,6 @@ public:
   CovList& operator=(const CovList& r);
   virtual ~CovList();
 
-  /// Interface for ASpaceObject
-  virtual bool isConsistent(const ASpace* space) const override;
-
   /// Interface for ACov
   virtual int getNVar() const override;
   virtual bool isIndexable() const override { return true; }
@@ -164,7 +161,7 @@ private:
 
 #ifndef SWIG
 protected:
-  std::vector<CovBase*> _covs;         /// Vector of elementary covariances
+  std::vector<std::shared_ptr<CovBase>> _covs;         /// Vector of elementary covariances
   VectorBool _filtered;                /// Vector of filtered flags (size is nb. cova)
   mutable bool _allActiveCov;          /*! True if all covariances are active */
   mutable VectorInt _allActiveCovList; /*! List of indices of all covariances */

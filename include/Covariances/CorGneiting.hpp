@@ -55,8 +55,8 @@ protected:
   //void _optimizationPostProcess() const override;
 
 private:
-  const CorAniso* _covS;
-  const CorAniso* _covTemp;
+  std::shared_ptr<const CorAniso> _covS;
+  std::shared_ptr<const CorAniso> _covTemp;
   double _separability;
   mutable CorAniso _covSCopy;
 };

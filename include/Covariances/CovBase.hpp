@@ -52,7 +52,7 @@ public:
 
   const MatrixSymmetric& getSill() const { return _sillCur; }
   virtual void setCor(ACov* cor);
-  const ACov* getCor() const { return _cor; }
+  const ACov* getCor() const { return _cor.get(); }
 
   double getSill(int ivar, int jvar) const;
 
@@ -157,6 +157,6 @@ void _multiplyCorDerivativesBySills(int oldSize, std::vector<covmaptype>* gradFu
   mutable MatrixSquare _workMat;
 
 private:
-  ACov* _cor;
+  std::shared_ptr<ACov> _cor;
   LowerTriangularRange _itRange;
 };
