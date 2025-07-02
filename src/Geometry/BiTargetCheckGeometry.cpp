@@ -9,56 +9,56 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Geometry/BiTargetCheckGeometry.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Geometry/GeometryHelper.hpp"
 #include "Space/SpaceTarget.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/Utilities.hpp"
 
 BiTargetCheckGeometry::BiTargetCheckGeometry(int ndim,
-                                             const VectorDouble &codir,
+                                             const VectorDouble& codir,
                                              double tolang,
                                              double bench,
                                              double cylrad,
                                              bool flagasym)
-    : ABiTargetCheck(),
-      _ndim(ndim),
-      _codir(codir),
-      _tolAng(tolang),
-      _bench(bench),
-      _cylrad(cylrad),
-      _flagAsym(flagasym),
-      _psmin(0.),
-      _dist(0.)
+  : ABiTargetCheck()
+  , _ndim(ndim)
+  , _codir(codir)
+  , _tolAng(tolang)
+  , _bench(bench)
+  , _cylrad(cylrad)
+  , _flagAsym(flagasym)
+  , _psmin(0.)
+  , _dist(0.)
 {
   _psmin = GH::getCosineAngularTolerance(tolang);
 }
 
-BiTargetCheckGeometry::BiTargetCheckGeometry(const BiTargetCheckGeometry &r)
-    : ABiTargetCheck(r),
-      _ndim(r._ndim),
-      _codir(r._codir),
-      _tolAng(r._tolAng),
-      _bench(r._bench),
-      _cylrad(r._cylrad),
-      _flagAsym(r._flagAsym),
-      _psmin(r._psmin),
-      _dist(r._dist)
+BiTargetCheckGeometry::BiTargetCheckGeometry(const BiTargetCheckGeometry& r)
+  : ABiTargetCheck(r)
+  , _ndim(r._ndim)
+  , _codir(r._codir)
+  , _tolAng(r._tolAng)
+  , _bench(r._bench)
+  , _cylrad(r._cylrad)
+  , _flagAsym(r._flagAsym)
+  , _psmin(r._psmin)
+  , _dist(r._dist)
 {
 }
 
-BiTargetCheckGeometry& BiTargetCheckGeometry::operator=(const BiTargetCheckGeometry &r)
+BiTargetCheckGeometry& BiTargetCheckGeometry::operator=(const BiTargetCheckGeometry& r)
 {
   if (this != &r)
   {
     ABiTargetCheck::operator=(r);
-    _ndim = r._ndim;
-    _codir = r._codir;
-    _tolAng = r._tolAng;
-    _bench = r._bench;
-    _cylrad = r._cylrad;
+    _ndim     = r._ndim;
+    _codir    = r._codir;
+    _tolAng   = r._tolAng;
+    _bench    = r._bench;
+    _cylrad   = r._cylrad;
     _flagAsym = r._flagAsym;
-    _psmin = r._psmin;
-    _dist = r._dist;
+    _psmin    = r._psmin;
+    _dist     = r._dist;
   }
   return *this;
 }
@@ -68,7 +68,7 @@ BiTargetCheckGeometry::~BiTargetCheckGeometry()
 }
 
 BiTargetCheckGeometry* BiTargetCheckGeometry::create(int ndim,
-                                                     const VectorDouble &codir,
+                                                     const VectorDouble& codir,
                                                      double tolang,
                                                      double bench,
                                                      double cylrad,
@@ -91,7 +91,7 @@ String BiTargetCheckGeometry::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-bool BiTargetCheckGeometry::isOK(const SpaceTarget &T1, const SpaceTarget &T2) const
+bool BiTargetCheckGeometry::isOK(const SpaceTarget& T1, const SpaceTarget& T2) const
 {
   // Calculate the distance between the two samples
   _dist = T1.getDistance(T2);
@@ -105,16 +105,16 @@ bool BiTargetCheckGeometry::isOK(const SpaceTarget &T1, const SpaceTarget &T2) c
 
   // Check if the angle of the pair matches the Calculation direction (up to angular tolerance)
   double dproj = 0.;
-  double dn1 = 0.;
-  double dn2 = 0.;
+  double dn1   = 0.;
+  double dn2   = 0.;
   for (int idim = 0; idim < _ndim; idim++)
   {
-    dproj +=  _delta[idim] * _codir[idim];
-    dn1   +=  _delta[idim] *  _delta[idim];
-    dn2   += _codir[idim] * _codir[idim];
+    dproj += _delta[idim] * _codir[idim];
+    dn1 += _delta[idim] * _delta[idim];
+    dn2 += _codir[idim] * _codir[idim];
   }
   double prod = dn1 * dn2;
-  double ps = 1.;
+  double ps   = 1.;
   if (prod > 0.) ps = dproj / sqrt(prod);
   if (ABS(ps) < _psmin) return false;
 
@@ -129,7 +129,7 @@ bool BiTargetCheckGeometry::isOK(const SpaceTarget &T1, const SpaceTarget &T2) c
   // Check for vertical slicing test
   if (!FFFF(_bench) && _bench > 0.)
   {
-    double dvect = ABS(_delta[_ndim-1]);
+    double dvect = ABS(_delta[_ndim - 1]);
     if (dvect > _bench) return false;
   }
 

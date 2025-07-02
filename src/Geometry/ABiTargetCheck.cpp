@@ -11,20 +11,20 @@
 #include "Geometry/ABiTargetCheck.hpp"
 
 ABiTargetCheck::ABiTargetCheck()
-    : AStringable()
+  : AStringable()
 {
 }
 
-ABiTargetCheck::ABiTargetCheck(const ABiTargetCheck &r)
-    : AStringable(r)
+ABiTargetCheck::ABiTargetCheck(const ABiTargetCheck& r)
+  : AStringable(r)
 {
 }
 
-ABiTargetCheck& ABiTargetCheck::operator=(const ABiTargetCheck &r)
+ABiTargetCheck& ABiTargetCheck::operator=(const ABiTargetCheck& r)
 {
   if (this != &r)
   {
-    AStringable::operator =(r);
+    AStringable::operator=(r);
   }
   return *this;
 }

@@ -8,16 +8,14 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
 #include "Gibbs/GibbsUMulti.hpp"
-#include "Model/Model.hpp"
-#include "Db/Db.hpp"
 #include "Basic/OptDbg.hpp"
-
+#include "Db/Db.hpp"
+#include "Model/Model.hpp"
+#include "geoslib_old_f.h"
 #include <math.h>
 
-#define COVMAT(i,j)              (_covmat[(i) * neq + (j)])
+#define COVMAT(i, j) (_covmat[(i) * neq + (j)])
 
 GibbsUMulti::GibbsUMulti()
   : GibbsMulti()
@@ -31,13 +29,13 @@ GibbsUMulti::GibbsUMulti(Db* db, Model* model)
 {
 }
 
-GibbsUMulti::GibbsUMulti(const GibbsUMulti &r)
+GibbsUMulti::GibbsUMulti(const GibbsUMulti& r)
   : GibbsMulti(r)
   , _covmat(r._covmat)
 {
 }
 
-GibbsUMulti& GibbsUMulti::operator=(const GibbsUMulti &r)
+GibbsUMulti& GibbsUMulti::operator=(const GibbsUMulti& r)
 {
   if (this != &r)
   {
@@ -65,12 +63,12 @@ int GibbsUMulti::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 {
   // Initialization
 
-  if (verbose) mestitle(1,"Gibbs using Unique Neighborhood");
-  Db* db = getDb();
+  if (verbose) mestitle(1, "Gibbs using Unique Neighborhood");
+  Db* db       = getDb();
   Model* model = getModel();
-  int nvar = model->getNVar();
-  int nact = _getSampleRankNumber();
-  int neq  = nvar * nact;
+  int nvar     = model->getNVar();
+  int nact     = _getSampleRankNumber();
+  int neq      = nvar * nact;
 
   // Establish Covariance Matrix
 
@@ -83,7 +81,7 @@ int GibbsUMulti::covmatAlloc(bool verbose, bool /*verboseTimer*/)
   // Invert Covariance Matrix
 
   if (verbose) message("Invert Covariance matrix\n");
-  if (matrix_invert(_covmat.data(),neq,-1))
+  if (matrix_invert(_covmat.data(), neq, -1))
   {
     messerr("Error during the covariance matrix inversion");
     return 1;
@@ -105,7 +103,7 @@ int GibbsUMulti::_getSize() const
 
 double GibbsUMulti::_getVariance(int iecr) const
 {
-  int neq  = _getSize();
+  int neq = _getSize();
   return (1. / COVMAT(iecr, iecr));
 }
 
@@ -149,14 +147,14 @@ void GibbsUMulti::update(VectorVectorDouble& y,
   /* Print the title */
 
   if (OptDbg::query(EDbg::CONVERGE))
-    mestitle(1,"Iterative Conditional Expectation (GS:%d - Simu:%d)",
-             ipgs+1,isimu+1);
+    mestitle(1, "Iterative Conditional Expectation (GS:%d - Simu:%d)",
+             ipgs + 1, isimu + 1);
 
   /* Loop on the target */
 
   for (int ivar = 0, iecr = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs,ivar);
+    int icase = getRank(ipgs, ivar);
     for (int iact = 0; iact < nact; iact++, iecr++)
     {
       if (!_isConstraintTight(icase, iact, &valsim))

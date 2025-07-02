@@ -9,95 +9,98 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Gibbs/AGibbs.hpp"
-
-#include "Basic/Timer.hpp"
-#include "Basic/Utilities.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/Timer.hpp"
+#include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Db/Db.hpp"
 #include "geoslib_define.h"
-
 #include <math.h>
 
 AGibbs::AGibbs()
-    : AStringable(),
-      _npgs(1),
-      _nvar(1),
-      _nburn(1),
-      _niter(1),
-      _flagOrder(true),
-      _flagDecay(true),
-      _optionStats(0),
-      _ranks(),
-      _db(nullptr),
-      _stats()
+  : AStringable()
+  , _npgs(1)
+  , _nvar(1)
+  , _nburn(1)
+  , _niter(1)
+  , _flagOrder(true)
+  , _flagDecay(true)
+  , _optionStats(0)
+  , _ranks()
+  , _db(nullptr)
+  , _stats()
 {
 }
 
 AGibbs::AGibbs(Db* db)
-    : AStringable(),
-      _npgs(1),
-      _nvar(1),
-      _nburn(1),
-      _niter(1),
-      _flagOrder(true),
-      _flagDecay(true),
-      _optionStats(0),
-      _ranks(),
-      _db(db),
-      _stats()
+  : AStringable()
+  , _npgs(1)
+  , _nvar(1)
+  , _nburn(1)
+  , _niter(1)
+  , _flagOrder(true)
+  , _flagDecay(true)
+  , _optionStats(0)
+  , _ranks()
+  , _db(db)
+  , _stats()
 {
 }
 
 AGibbs::AGibbs(Db* db,
-               int npgs, int nvar, int nburn, int niter, int seed,
-               int flag_order, bool flag_decay)
-    : AStringable(),
-      _npgs(1),
-      _nvar(1),
-      _nburn(1),
-      _niter(1),
-      _flagOrder(false),
-      _flagDecay(true),
-      _optionStats(0),
-      _ranks(),
-      _db(db),
-      _stats()
+               int npgs,
+               int nvar,
+               int nburn,
+               int niter,
+               int seed,
+               int flag_order,
+               bool flag_decay)
+  : AStringable()
+  , _npgs(1)
+  , _nvar(1)
+  , _nburn(1)
+  , _niter(1)
+  , _flagOrder(false)
+  , _flagDecay(true)
+  , _optionStats(0)
+  , _ranks()
+  , _db(db)
+  , _stats()
 {
   init(npgs, nvar, nburn, niter, seed, flag_order, flag_decay);
 }
 
-AGibbs::AGibbs(const AGibbs &r)
-    : AStringable(r),
-      _npgs(r._npgs),
-      _nvar(r._nvar),
-      _nburn(r._nburn),
-      _niter(r._niter),
-      _flagOrder(r._flagOrder),
-      _flagDecay(r._flagDecay),
-      _optionStats(r._optionStats),
-      _ranks(r._ranks),
-      _db(r._db),
-      _stats(r._stats)
+AGibbs::AGibbs(const AGibbs& r)
+  : AStringable(r)
+  , _npgs(r._npgs)
+  , _nvar(r._nvar)
+  , _nburn(r._nburn)
+  , _niter(r._niter)
+  , _flagOrder(r._flagOrder)
+  , _flagDecay(r._flagDecay)
+  , _optionStats(r._optionStats)
+  , _ranks(r._ranks)
+  , _db(r._db)
+  , _stats(r._stats)
 {
 }
 
-AGibbs& AGibbs::operator=(const AGibbs &r)
+AGibbs& AGibbs::operator=(const AGibbs& r)
 {
   if (this != &r)
   {
     AStringable::operator=(r);
-    _npgs = r._npgs;
-    _nvar = r._nvar;
-    _nburn = r._nburn;
-    _niter = r._niter;
-    _flagOrder = r._flagOrder;
-    _flagDecay = r._flagDecay;
+    _npgs        = r._npgs;
+    _nvar        = r._nvar;
+    _nburn       = r._nburn;
+    _niter       = r._niter;
+    _flagOrder   = r._flagOrder;
+    _flagDecay   = r._flagDecay;
     _optionStats = r._optionStats;
-    _ranks = r._ranks;
-    _db = r._db;
-    _stats = r._stats;
+    _ranks       = r._ranks;
+    _db          = r._db;
+    _stats       = r._stats;
   }
   return *this;
 }
@@ -114,10 +117,10 @@ void AGibbs::init(int npgs,
                   int flag_order,
                   bool flag_decay)
 {
-  _npgs = npgs;
-  _nvar = nvar;
-  _nburn = nburn;
-  _niter = niter;
+  _npgs      = npgs;
+  _nvar      = nvar;
+  _nburn     = nburn;
+  _niter     = niter;
   _flagOrder = flag_order;
   _flagDecay = flag_decay;
 
@@ -147,19 +150,19 @@ void AGibbs::init(int npgs,
 int AGibbs::_boundsCheck(int ipgs,
                          int ivar,
                          int iact,
-                         double *vmin_arg,
-                         double *vmax_arg) const
+                         double* vmin_arg,
+                         double* vmax_arg) const
 {
   const Db* db = getDb();
-  int icase = getRank(ipgs, ivar);
-  int iech  = getSampleRank(iact);
-  double vmin = db->getLocVariable(ELoc::L,iech,icase);
-  double vmax = db->getLocVariable(ELoc::U,iech,icase);
+  int icase    = getRank(ipgs, ivar);
+  int iech     = getSampleRank(iact);
+  double vmin  = db->getLocVariable(ELoc::L, iech, icase);
+  double vmax  = db->getLocVariable(ELoc::U, iech, icase);
 
-  if (! FFFF(vmin) && ! FFFF(vmax) && (vmin) > (vmax))
+  if (!FFFF(vmin) && !FFFF(vmax) && (vmin) > (vmax))
   {
     messerr("Sample %d: Bounds are wrongly ordered: Vmin(%lf) > Vmax(%lf)",
-            iech+1,vmin,vmax);
+            iech + 1, vmin, vmax);
     return 1;
   }
 
@@ -185,7 +188,7 @@ void AGibbs::_printInequalities(int iact,
                                 double vmin,
                                 double vmax) const
 {
-  int flag_min,flag_max,idim;
+  int flag_min, flag_max, idim;
 
   /* Initializations */
 
@@ -198,26 +201,26 @@ void AGibbs::_printInequalities(int iact,
   /* Print the simulated value */
 
   message("Sample (%3d/%3d) - Variable (%3d/%3d) = %8.4lf in ",
-          iech+1,_db->getNSample(),ivar+1,nvar,simval);
+          iech + 1, _db->getNSample(), ivar + 1, nvar, simval);
 
   /* Print the bounds */
 
-  if (! flag_min)
+  if (!flag_min)
     message("[      NA,");
   else
-    message("[%8.4lf,",vmin);
-  if (! flag_max)
+    message("[%8.4lf,", vmin);
+  if (!flag_max)
     message("      NA]");
   else
-    message("%8.4lf]",vmax);
+    message("%8.4lf]", vmax);
 
   /* Print the coordinates */
 
   message(" at point (");
-  for (idim=0; idim<_db->getNDim(); idim++)
+  for (idim = 0; idim < _db->getNDim(); idim++)
   {
     if (idim != 0) message(",");
-    message("%8.4lf",_db->getCoordinate(iech,idim));
+    message("%8.4lf", _db->getCoordinate(iech, idim));
   }
   message(")");
 
@@ -257,17 +260,17 @@ void AGibbs::_displayCurrentVector(bool flag_init,
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    mestitle(2,"Variable %d",ivar+1);
+    mestitle(2, "Variable %d", ivar + 1);
     int icase = getRank(ipgs, ivar);
 
     /* Loop on the samples */
 
     for (int iact = 0; iact < nact; iact++)
     {
-      int iech = getSampleRank(iact);
-      double vmin = _db->getLocVariable(ELoc::L,iech, icase);
-      double vmax = _db->getLocVariable(ELoc::U,iech, icase);
-      _printInequalities(iact,ivar,y[icase][iact], vmin, vmax);
+      int iech    = getSampleRank(iact);
+      double vmin = _db->getLocVariable(ELoc::L, iech, icase);
+      double vmax = _db->getLocVariable(ELoc::U, iech, icase);
+      _printInequalities(iact, ivar, y[icase][iact], vmin, vmax);
     }
   }
 }
@@ -292,9 +295,9 @@ int AGibbs::getRank(int ipgs, int ivar) const
  */
 VectorVectorDouble AGibbs::allocY() const
 {
-  int nact  = _getSampleRankNumber();
+  int nact = _getSampleRankNumber();
   VectorVectorDouble y(_getDimension());
-  for (int i = 0, nsize = (int) y.size(); i < nsize; i++)
+  for (int i = 0, nsize = (int)y.size(); i < nsize; i++)
     y[i].resize(nact);
   return y;
 }
@@ -322,12 +325,12 @@ void AGibbs::storeResult(const VectorVectorDouble& y,
     int icase = getRank(ipgs, ivar);
     int rank  = icase + nsize * isimu;
 
-      /* Loop on the samples */
+    /* Loop on the samples */
 
     for (int iact = 0; iact < nact; iact++)
     {
       int iech = getSampleRank(iact);
-      _db->setFromLocator(ELoc::GAUSFAC, iech,  rank,  y[icase][iact]);
+      _db->setFromLocator(ELoc::GAUSFAC, iech, rank, y[icase][iact]);
     }
   }
 
@@ -343,7 +346,7 @@ void AGibbs::storeResult(const VectorVectorDouble& y,
 VectorInt AGibbs::_calculateSampleRanks() const
 {
 
-  if (! _db->hasLocVariable(ELoc::SEL))
+  if (!_db->hasLocVariable(ELoc::SEL))
     return VH::sequence(_db->getNSample());
 
   VectorInt ranks;
@@ -393,23 +396,23 @@ void AGibbs::_updateStats(const VectorVectorDouble& y,
 
     int jcol;
     double result;
-    int icol = getRank(ipgs, ivar);
+    int icol      = getRank(ipgs, ivar);
     double residu = 1. - amort;
-    double oldw   = (1. - pow(amort, (double) iter))   / residu;
-    double neww   = (1. - pow(amort, (double) iter+1)) / residu;
+    double oldw   = (1. - pow(amort, (double)iter)) / residu;
+    double neww   = (1. - pow(amort, (double)iter + 1)) / residu;
 
     // The mean
-    jcol = _getColRankStats(ipgs, ivar, 0);
-    double oldmean = (iter < 1) ? 0. : _stats.getValue(iter-1, jcol);
+    jcol           = _getColRankStats(ipgs, ivar, 0);
+    double oldmean = (iter < 1) ? 0. : _stats.getValue(iter - 1, jcol);
     double newmean = VH::mean(y[icol]);
-    result = (oldmean * oldw * amort + newmean) / neww;
+    result         = (oldmean * oldw * amort + newmean) / neww;
     _stats.setValue(iter, jcol, result);
 
     // The standard deviation
-    jcol = _getColRankStats(ipgs, ivar, 1);
-    double oldvar = (iter < 1) ? 0. : _stats.getValue(iter-1,jcol);
+    jcol          = _getColRankStats(ipgs, ivar, 1);
+    double oldvar = (iter < 1) ? 0. : _stats.getValue(iter - 1, jcol);
     double newvar = VH::variance(y[icol]);
-    result = (oldvar * oldw * amort + newvar) / neww;
+    result        = (oldvar * oldw * amort + newvar) / neww;
     _stats.setValue(iter, jcol, result);
   }
 }
@@ -463,14 +466,14 @@ int AGibbs::_getColRankStats(int ipgs, int ivar, int mode) const
  */
 bool AGibbs::_isConstraintTight(int icase,
                                 int iact,
-                                double *value) const
+                                double* value) const
 {
   int iech = getSampleRank(iact);
 
-  double vmin = _db->getLocVariable(ELoc::L,iech, icase);
-  double vmax = _db->getLocVariable(ELoc::U,iech, icase);
+  double vmin = _db->getLocVariable(ELoc::L, iech, icase);
+  double vmax = _db->getLocVariable(ELoc::U, iech, icase);
 
-  bool isActive = !FFFF(vmin) && !FFFF(vmax) && isEqual(vmin,vmax);
+  bool isActive = !FFFF(vmin) && !FFFF(vmax) && isEqual(vmin, vmax);
   if (isActive)
     *value = vmin;
   else
@@ -491,14 +494,14 @@ void AGibbs::_statsInit()
  * @param vmin: Lower bound (in/out)
  * @param vmax: Upper bound (in/out)
  */
-void AGibbs::_getBoundsDecay(int iter, double *vmin, double *vmax) const
+void AGibbs::_getBoundsDecay(int iter, double* vmin, double* vmax) const
 {
   // Do not modify the bounds if no Decay is defined
-  if (! _flagDecay) return;
+  if (!_flagDecay) return;
   // Do not modify the bounds after the burning stage
   if (iter > _nburn) return;
 
-  double ratio = (double) iter / (double) _nburn;
+  double ratio = (double)iter / (double)_nburn;
   if (!FFFF(*vmin))
     *vmin = THRESH_INF + ((*vmin) - THRESH_INF) * ratio;
   if (!FFFF(*vmax))
@@ -583,5 +586,4 @@ String AGibbs::toString(const AStringFormat* /*strfmt*/) const
     sstr << "Statistics on Trajectories are stored in Neutral File" << std::endl;
 
   return sstr.str();
-
 }

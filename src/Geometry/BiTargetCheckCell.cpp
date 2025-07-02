@@ -13,18 +13,18 @@
 #include "Space/SpaceTarget.hpp"
 
 BiTargetCheckCell::BiTargetCheckCell(const DbGrid* dbgrid)
-    : ABiTargetCheck(),
-      _dbgrid(dbgrid)
+  : ABiTargetCheck()
+  , _dbgrid(dbgrid)
 {
 }
 
-BiTargetCheckCell::BiTargetCheckCell(const BiTargetCheckCell &r)
-    : ABiTargetCheck(r),
-      _dbgrid(r._dbgrid)
+BiTargetCheckCell::BiTargetCheckCell(const BiTargetCheckCell& r)
+  : ABiTargetCheck(r)
+  , _dbgrid(r._dbgrid)
 {
 }
 
-BiTargetCheckCell& BiTargetCheckCell::operator=(const BiTargetCheckCell &r)
+BiTargetCheckCell& BiTargetCheckCell::operator=(const BiTargetCheckCell& r)
 {
   if (this != &r)
   {
@@ -52,8 +52,8 @@ String BiTargetCheckCell::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-bool BiTargetCheckCell::isOK(const SpaceTarget &T1,
-                             const SpaceTarget &T2) const
+bool BiTargetCheckCell::isOK(const SpaceTarget& T1,
+                             const SpaceTarget& T2) const
 {
   // Check if the sample belongs to the cell
   bool valOK = _dbgrid->getGrid().sampleBelongsToCell(T2.getCoords(), T1.getCoords(), T1.getExtend());
@@ -63,7 +63,7 @@ bool BiTargetCheckCell::isOK(const SpaceTarget &T1,
 bool BiTargetCheckCell::isValid(const Db* dbin, const Db* dbout)
 {
   DECLARE_UNUSED(dbin);
-  if (! dbout->isGrid()) return false;
+  if (!dbout->isGrid()) return false;
   _dbgrid = dynamic_cast<const DbGrid*>(dbout);
   return true;
 }

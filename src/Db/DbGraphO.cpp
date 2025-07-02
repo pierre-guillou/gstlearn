@@ -8,18 +8,16 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Matrix/NF_Triplet.hpp"
-#include "geoslib_define.h"
-
-#include "Db/Db.hpp"
 #include "Db/DbGraphO.hpp"
-#include "Db/DbStringFormat.hpp"
-#include "Polygon/Polygons.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/SerializeHDF5.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbStringFormat.hpp"
+#include "Matrix/NF_Triplet.hpp"
+#include "Polygon/Polygons.hpp"
 #include "Stats/Classical.hpp"
-
+#include "geoslib_define.h"
 #include <math.h>
 
 DbGraphO::DbGraphO()
@@ -57,7 +55,6 @@ String DbGraphO::toString(const AStringFormat* strfmt) const
   DbStringFormat dsf;
   if (dbfmt != nullptr) dsf = *dbfmt;
 
-
   sstr << toTitle(0, "Data Base Oriented Graph Characteristics");
 
   sstr << _toStringCommon(&dsf);
@@ -82,7 +79,7 @@ DbGraphO* DbGraphO::createFromSamples(int nech,
 {
   DbGraphO* dbgraphO = new DbGraphO;
   if (dbgraphO->resetFromSamples(nech, order, tab, NF_arcs, names, locatorNames,
-                               flagAddSampleRank))
+                                 flagAddSampleRank))
   {
     messerr("Error when creating DbGraphO from Samples");
     delete dbgraphO;
@@ -107,8 +104,8 @@ DbGraphO* DbGraphO::createFromMatrix(int nech,
     delete dbgraphO;
     return nullptr;
   }
-  //message("arcs\n");
-  //message("nrows=%d ncols=%d\n", MatArcs.getNRows(), MatArcs.getNCols());
+  // message("arcs\n");
+  // message("nrows=%d ncols=%d\n", MatArcs.getNRows(), MatArcs.getNCols());
   return dbgraphO;
 }
 
@@ -142,12 +139,12 @@ void DbGraphO::_checkForceDimension(int nech)
  * @return int Error returned code
  */
 int DbGraphO::resetFromSamples(int nech,
-                             const ELoadBy& order,
-                             const VectorDouble& tab,
-                             NF_Triplet& NF_arcs,
-                             const VectorString& names,
-                             const VectorString& locatorNames,
-                             bool flagAddSampleRank)
+                               const ELoadBy& order,
+                               const VectorDouble& tab,
+                               NF_Triplet& NF_arcs,
+                               const VectorString& names,
+                               const VectorString& locatorNames,
+                               bool flagAddSampleRank)
 {
   if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
                            flagAddSampleRank) != 0)
@@ -174,12 +171,12 @@ int DbGraphO::resetFromSamples(int nech,
  * @return int Error returned code
  */
 int DbGraphO::resetFromMatrix(int nech,
-                               const ELoadBy& order,
-                               const VectorDouble& tab,
-                               const MatrixSparse& MatArcs,
-                               const VectorString& names,
-                               const VectorString& locatorNames,
-                               bool flagAddSampleRank)
+                              const ELoadBy& order,
+                              const VectorDouble& tab,
+                              const MatrixSparse& MatArcs,
+                              const VectorString& names,
+                              const VectorString& locatorNames,
+                              bool flagAddSampleRank)
 {
   if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
                            flagAddSampleRank) != 0)
@@ -196,17 +193,17 @@ int DbGraphO::resetFromMatrix(int nech,
 
 bool DbGraphO::_deserializeAscii(std::istream& is, bool verbose)
 {
-  int ndim = 0;
+  int ndim  = 0;
   int narcs = 0;
   VectorString locators;
   VectorString names;
   VectorDouble values;
   VectorDouble allvalues;
 
-    /* Initializations */
+  /* Initializations */
 
   bool ret = true;
-  ret = ret && _recordRead<int>(is, "Space Dimension", ndim);
+  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
 
   // Reading the set of arcs for the Oriented Graph organization
 
@@ -216,7 +213,7 @@ bool DbGraphO::_deserializeAscii(std::istream& is, bool verbose)
   for (int i = 0; i < narcs; i++)
   {
     ret = ret && _recordReadVec<double>(is, "", tab, 3);
-    nft.add((int) tab[0], (int) tab[1], tab[2]);
+    nft.add((int)tab[0], (int)tab[1], tab[2]);
   }
   _downArcs.resetFromTriplet(nft);
 
@@ -349,7 +346,7 @@ bool DbGraphO::_isValidNode(int node) const
   if (node >= nodeNumber)
   {
     messerr("Argument 'node' (%d) should be smaller than Number of Samples (%d)",
-      node, nodeNumber);
+            node, nodeNumber);
     return false;
   }
   return true;
@@ -493,7 +490,7 @@ VectorInt DbGraphO::getOrderDown(int node) const
   if (!_isValidNode(node)) return VectorInt();
   int nech = getNNode();
 
-  VectorInt order(nech,0);
+  VectorInt order(nech, 0);
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
   v2[node] = 1.;
@@ -526,10 +523,10 @@ VectorInt DbGraphO::_getNoneZeroIndices(const VectorDouble& v)
 
 /**
  * @brief Local recursive function for finding cumul
- * 
+ *
  * @param inds  List of indices of nodes connceted downwards
  * @param cumul Array contaiing the cumulative values per node
- * @param v1    Working array  
+ * @param v1    Working array
  * @param v2    Working array
  */
 void DbGraphO::_iterateCumul(const VectorInt& inds,

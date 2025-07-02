@@ -10,15 +10,15 @@
 /******************************************************************************/
 #include "Estimation/Likelihood.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
 #include "Db/RankHandler.hpp"
 #include "Estimation/ALikelihood.hpp"
-#include "Space/SpacePoint.hpp"
-#include "Tree/Ball.hpp"
-#include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Model/ModelGeneric.hpp"
+#include "Space/SpacePoint.hpp"
 #include "Stats/Classical.hpp"
+#include "Tree/Ball.hpp"
 #include "geoslib_define.h"
 
 Likelihood::Likelihood(ModelGeneric* model,
@@ -112,7 +112,7 @@ void Likelihood::evalGrad(vect res)
     double dquad = -VH::innerProduct(_Cm1Y, _temp);
     _covChol.solveMatInPlace(_gradCovMat, _gradCovMatTimesInvCov);
     double dlogdet = _gradCovMatTimesInvCov.trace();
-    res[iparam] = 0.5 * (dlogdet + dquad);
+    res[iparam]    = 0.5 * (dlogdet + dquad);
   }
 }
 

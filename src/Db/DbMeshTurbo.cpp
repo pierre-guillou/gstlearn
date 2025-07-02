@@ -8,12 +8,12 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/Db.hpp"
 #include "Db/DbMeshTurbo.hpp"
-#include "Db/DbStringFormat.hpp"
 #include "Basic/AStringable.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/SerializeHDF5.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbStringFormat.hpp"
 
 DbMeshTurbo::DbMeshTurbo(const VectorInt& nx,
                          const VectorDouble& dx,
@@ -104,15 +104,15 @@ bool DbMeshTurbo::_deserializeAscii(std::istream& is, bool verbose)
 
   // Reading the header
 
-  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
+  ret = ret && _recordRead<int>(is, "Space Dimension", ndim);
 
   // Reading the meshing information
 
-  ret      = ret && _mesh._deserializeAscii(is);
+  ret = ret && _mesh._deserializeAscii(is);
 
   // Reading the Db information
 
-  ret      = ret && DbGrid::_deserializeAscii(is, verbose);
+  ret = ret && DbGrid::_deserializeAscii(is, verbose);
 
   return ret;
 }
@@ -123,15 +123,15 @@ bool DbMeshTurbo::_serializeAscii(std::ostream& os, bool verbose) const
 
   /* Writing the header */
 
-  ret      = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+  ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh._serializeAscii(os);
+  ret = ret && _mesh._serializeAscii(os);
 
   /* Writing the tail of the file */
 
-  ret      = ret && DbGrid::_serializeAscii(os, verbose);
+  ret = ret && DbGrid::_serializeAscii(os, verbose);
 
   return ret;
 }

@@ -12,48 +12,46 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/String.hpp"
 #include "Basic/Utilities.hpp"
-
-#include <string.h>
 #include <sstream>
+#include <string.h>
 
 typedef struct
 {
-  char SREF[LOCAL_SIZE]; /* Name of the Locator */
-  int  IREF; /* Unicity of the locator */
+  char SREF[LOCAL_SIZE];       /* Name of the Locator */
+  int IREF;                    /* Unicity of the locator */
   char COMMENT[STRING_LENGTH]; /* Meaning */
 } Def_Locator;
 
 // TODO : DEF_LOCATOR static table refactoring. Sync with ELoc
-static Def_Locator DEF_LOCATOR[] = { { "x",       0, "Coordinate" },
-                                     { "z",       0, "Variable" },
-                                     { "v",       0, "Variance of measurement error" },
-                                     { "f",       0, "External Drift" },
-                                     { "g",       0, "Gradient component" },
-                                     { "lower",   0, "Lower bound of an inequality" },
-                                     { "upper",   0, "Upper bound of an inequality" },
-                                     { "p",       0, "Proportion" },
-                                     { "w",       1, "Weight" },
-                                     { "code",    1, "Code" },
-                                     { "sel",     1, "Selection" },
-                                     { "dom",     1, "Domain selection" },
-                                     { "dblk",    0, "Block Extension" },
-                                     { "adir",    1, "Dip direction angle" },
-                                     { "adip",    1, "Dip angle" },
-                                     { "size",    1, "Object height" },
-                                     { "bu",      1, "Fault UP termination" },
-                                     { "bd",      1, "Fault DOWN termination" },
-                                     { "time",    0, "Time variable" },
-                                     { "layer",   1, "Layer rank" },
-                                     { "nostat",  0, "Non-stationary parameter" },
-                                     { "tangent", 0, "Tangent" },
-                                     { "ncsimu",  0, "Non-conditional simulation" },
-                                     { "facies",  0, "Facies simulated" },
-                                     { "gausfac", 0, "Gaussian value for Facies" },
-                                     { "date",    1, "Date" },
-                                     { "rklow",   0, "Disc. rank for Lower bound" },
-                                     { "rkup",    0, "Disc. rank for Upper bound" },
-                                     { "sum",     0, "Constraints on the sum" }
-  };
+static Def_Locator DEF_LOCATOR[] = {{"x", 0, "Coordinate"},
+                                    {"z", 0, "Variable"},
+                                    {"v", 0, "Variance of measurement error"},
+                                    {"f", 0, "External Drift"},
+                                    {"g", 0, "Gradient component"},
+                                    {"lower", 0, "Lower bound of an inequality"},
+                                    {"upper", 0, "Upper bound of an inequality"},
+                                    {"p", 0, "Proportion"},
+                                    {"w", 1, "Weight"},
+                                    {"code", 1, "Code"},
+                                    {"sel", 1, "Selection"},
+                                    {"dom", 1, "Domain selection"},
+                                    {"dblk", 0, "Block Extension"},
+                                    {"adir", 1, "Dip direction angle"},
+                                    {"adip", 1, "Dip angle"},
+                                    {"size", 1, "Object height"},
+                                    {"bu", 1, "Fault UP termination"},
+                                    {"bd", 1, "Fault DOWN termination"},
+                                    {"time", 0, "Time variable"},
+                                    {"layer", 1, "Layer rank"},
+                                    {"nostat", 0, "Non-stationary parameter"},
+                                    {"tangent", 0, "Tangent"},
+                                    {"ncsimu", 0, "Non-conditional simulation"},
+                                    {"facies", 0, "Facies simulated"},
+                                    {"gausfac", 0, "Gaussian value for Facies"},
+                                    {"date", 1, "Date"},
+                                    {"rklow", 0, "Disc. rank for Lower bound"},
+                                    {"rkup", 0, "Disc. rank for Upper bound"},
+                                    {"sum", 0, "Constraints on the sum"}};
 
 void PtrGeos::clear()
 {
@@ -77,7 +75,7 @@ String PtrGeos::dumpLocator(int rank, const ELoc& locatorType) const
   std::stringstream sstr;
 
   int i = locatorType.getValue();
-  sstr << rank+1 << " - Locator: " << DEF_LOCATOR[i].SREF << std::endl;
+  sstr << rank + 1 << " - Locator: " << DEF_LOCATOR[i].SREF << std::endl;
   sstr << "- Attributes = ";
   for (int locatorIndex = 0; locatorIndex < getNLoc(); locatorIndex++)
     sstr << _r[locatorIndex] << " ";
@@ -149,9 +147,9 @@ int getLocatorTypeFromName(const String& name_type)
   {
     if (*it != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
-      unsigned int lng = static_cast<unsigned int> (strlen(DEF_LOCATOR[i].SREF));
-      if (name_type.compare(0,lng,DEF_LOCATOR[i].SREF) == 0) return i;
+      int i            = it.getValue();
+      unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[i].SREF));
+      if (name_type.compare(0, lng, DEF_LOCATOR[i].SREF) == 0) return i;
     }
     it.toNext();
   }
@@ -168,12 +166,12 @@ int getLocatorTypeFromName(const String& name_type)
  */
 int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex, int* ret_mult)
 {
-  *ret_locatorType   = ELoc::UNKNOWN;
-  *ret_locatorIndex  = -1;
-  *ret_mult     =  1;
-  int  inum  = -1;
-  int  found = -1;
-  bool mult  =  0;
+  *ret_locatorType  = ELoc::UNKNOWN;
+  *ret_locatorIndex = -1;
+  *ret_mult         = 1;
+  int inum          = -1;
+  int found         = -1;
+  bool mult         = 0;
 
   // Transform the input argument into lower case for comparison
   String string_loc = string;
@@ -184,9 +182,9 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
   {
     if (*it != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
-      unsigned int lng = static_cast<unsigned int> (strlen(DEF_LOCATOR[i].SREF));
-      if (string_loc.compare(0,lng,DEF_LOCATOR[i].SREF) == 0) found = i;
+      int i            = it.getValue();
+      unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[i].SREF));
+      if (string_loc.compare(0, lng, DEF_LOCATOR[i].SREF) == 0) found = i;
     }
     it.toNext();
   }
@@ -195,15 +193,15 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
     // The locator has not been matched. It is returned as UNKNOWN
     *ret_locatorType  = ELoc::UNKNOWN;
     *ret_locatorIndex = 0;
-    *ret_mult   = 0;
+    *ret_mult         = 0;
     return 0;
   }
 
   // Decode the remaining characteristics
-  unsigned int lng = static_cast<unsigned int> (strlen(DEF_LOCATOR[found].SREF));
+  unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[found].SREF));
   if (string_loc.size() > lng) inum = atoi(&string_loc[lng]);
   mult = (DEF_LOCATOR[found].IREF == 0);
-  if (! mult && inum > 1)
+  if (!mult && inum > 1)
   {
     // The locator has an index larger than 1 but the Locator should be Unique. Error
     string = STRING_NA;
@@ -213,8 +211,8 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
   /* Returning arguments */
 
   *ret_locatorType  = ELoc::fromValue(found);
-  *ret_locatorIndex = MAX(inum-1, 0);
-  *ret_mult   = mult;
+  *ret_locatorIndex = MAX(inum - 1, 0);
+  *ret_mult         = mult;
   return 0;
 }
 

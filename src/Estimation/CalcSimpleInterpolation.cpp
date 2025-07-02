@@ -8,32 +8,31 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
+#include "Estimation/CalcSimpleInterpolation.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "Basic/OptDbg.hpp"
-#include "Estimation/CalcSimpleInterpolation.hpp"
-#include "Neigh/NeighMoving.hpp"
-#include "Db/DbGrid.hpp"
 #include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "Drifts/DriftFactory.hpp"
 #include "Model/Model.hpp"
+#include "Neigh/NeighMoving.hpp"
+#include "geoslib_old_f.h"
 
 CalcSimpleInterpolation::CalcSimpleInterpolation()
-    : ACalcInterpolator(),
-      _flagEst(true),
-      _flagStd(false),
-      _iattEst(-1),
-      _iattStd(-1),
-      _flagMovAve(false),
-      _flagMovMed(false),
-      _flagInvDist(false),
-      _flagLstSqr(false),
-      _flagNearest(false),
-      _exponent(2.),
-      _flagExpand(true),
-      _dmax(TEST),
-      _order(0)
+  : ACalcInterpolator()
+  , _flagEst(true)
+  , _flagStd(false)
+  , _iattEst(-1)
+  , _iattStd(-1)
+  , _flagMovAve(false)
+  , _flagMovMed(false)
+  , _flagInvDist(false)
+  , _flagLstSqr(false)
+  , _flagNearest(false)
+  , _exponent(2.)
+  , _flagExpand(true)
+  , _dmax(TEST)
+  , _order(0)
 {
 }
 
@@ -43,10 +42,10 @@ CalcSimpleInterpolation::~CalcSimpleInterpolation()
 
 bool CalcSimpleInterpolation::_check()
 {
-  if (! ACalcInterpolator::_check()) return false;
+  if (!ACalcInterpolator::_check()) return false;
 
-  if (! hasDbin()) return false;
-  if (! hasDbout()) return false;
+  if (!hasDbin()) return false;
+  if (!hasDbout()) return false;
 
   if (_getNVar() != 1)
   {
@@ -57,13 +56,13 @@ bool CalcSimpleInterpolation::_check()
   // Some simple interpolators require a Neighborhood
   if (_flagMovAve || _flagMovMed || _flagLstSqr)
   {
-    if (! hasNeigh()) return false;
+    if (!hasNeigh()) return false;
   }
 
   // Model is required if the variance is demanded
   if (_flagStd)
   {
-    if (! hasModel())
+    if (!hasModel())
     {
       messerr("A Model is required for calculation of option 'St. Dev.'");
       return false;
@@ -75,7 +74,7 @@ bool CalcSimpleInterpolation::_check()
 bool CalcSimpleInterpolation::_preprocess()
 {
   if (!ACalcInterpolator::_preprocess()) return false;
-  
+
   if (_flagEst)
   {
     _iattEst = _addVariableDb(2, 1, ELoc::UNKNOWN, 0, 1, 0.);
@@ -124,9 +123,9 @@ bool CalcSimpleInterpolation::_run()
   }
 
   if (_flagLstSqr)
-   {
-     if (_lstsqr(getDbin(), getDbout(), getNeigh())) return false;
-   }
+  {
+    if (_lstsqr(getDbin(), getDbout(), getNeigh())) return false;
+  }
 
   if (_flagInvDist)
   {
@@ -158,15 +157,15 @@ bool CalcSimpleInterpolation::_run()
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-int inverseDistance(Db *dbin,
-                    Db *dbout,
+int inverseDistance(Db* dbin,
+                    Db* dbout,
                     double exponent,
                     bool flag_expand,
                     double dmax,
                     bool flag_est,
                     bool flag_std,
                     Model* model,
-                    const NamingConvention &namconv)
+                    const NamingConvention& namconv)
 {
   CalcSimpleInterpolation interpol;
   interpol.setDbin(dbin);
@@ -201,13 +200,13 @@ int inverseDistance(Db *dbin,
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-GSTLEARN_EXPORT int movingAverage(Db *dbin,
-                                  Db *dbout,
-                                  ANeigh *neigh,
+GSTLEARN_EXPORT int movingAverage(Db* dbin,
+                                  Db* dbout,
+                                  ANeigh* neigh,
                                   bool flag_est,
                                   bool flag_std,
-                                  Model *model,
-                                  const NamingConvention &namconv)
+                                  Model* model,
+                                  const NamingConvention& namconv)
 {
   CalcSimpleInterpolation interpol;
   interpol.setDbin(dbin);
@@ -240,13 +239,13 @@ GSTLEARN_EXPORT int movingAverage(Db *dbin,
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-GSTLEARN_EXPORT int movingMedian(Db *dbin,
-                                 Db *dbout,
-                                 ANeigh *neigh,
+GSTLEARN_EXPORT int movingMedian(Db* dbin,
+                                 Db* dbout,
+                                 ANeigh* neigh,
                                  bool flag_est,
                                  bool flag_std,
                                  Model* model,
-                                 const NamingConvention &namconv)
+                                 const NamingConvention& namconv)
 {
   CalcSimpleInterpolation interpol;
   interpol.setDbin(dbin);
@@ -278,12 +277,12 @@ GSTLEARN_EXPORT int movingMedian(Db *dbin,
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-GSTLEARN_EXPORT int nearestNeighbor(Db *dbin,
-                                    Db *dbout,
+GSTLEARN_EXPORT int nearestNeighbor(Db* dbin,
+                                    Db* dbout,
                                     bool flag_est,
                                     bool flag_std,
                                     Model* model,
-                                    const NamingConvention &namconv)
+                                    const NamingConvention& namconv)
 {
   CalcSimpleInterpolation interpol;
   interpol.setDbin(dbin);
@@ -316,11 +315,11 @@ GSTLEARN_EXPORT int nearestNeighbor(Db *dbin,
  ** \param[in]  namconv     Naming Convention
  **
  *****************************************************************************/
-GSTLEARN_EXPORT int leastSquares(Db *dbin,
-                                 Db *dbout,
-                                 ANeigh *neigh,
+GSTLEARN_EXPORT int leastSquares(Db* dbin,
+                                 Db* dbout,
+                                 ANeigh* neigh,
                                  int order,
-                                 const NamingConvention &namconv)
+                                 const NamingConvention& namconv)
 {
   CalcSimpleInterpolation interpol;
   interpol.setDbin(dbin);
@@ -334,7 +333,6 @@ GSTLEARN_EXPORT int leastSquares(Db *dbin,
   // Run the calculator
   int error = (interpol.run()) ? 0 : 1;
   return error;
-
 }
 
 /****************************************************************************/
@@ -348,9 +346,9 @@ GSTLEARN_EXPORT int leastSquares(Db *dbin,
  ** \param[in]  neigh       ANeigh structure
  **
  *****************************************************************************/
-int CalcSimpleInterpolation::_nearest(Db *dbin,
-                                      Db *dbout,
-                                      ANeigh *neigh)
+int CalcSimpleInterpolation::_nearest(Db* dbin,
+                                      Db* dbout,
+                                      ANeigh* neigh)
 {
   VectorInt nbgh;
 
@@ -360,8 +358,7 @@ int CalcSimpleInterpolation::_nearest(Db *dbin,
   {
     mes_process("Estimation by Nearest Neighbor", dbout->getNSample(), iech);
     if (!dbout->isActive(iech)) continue;
-    if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH)
-        || OptDbg::query(EDbg::RESULTS))
+    if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
       mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
@@ -406,8 +403,7 @@ int CalcSimpleInterpolation::_movave(Db* dbin, Db* dbout, ANeigh* neigh)
     mes_process("Estimation by Moving Average", dbout->getNSample(), iech);
     if (!dbout->isActive(iech)) continue;
     OptDbg::setCurrentIndex(iech + 1);
-    if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH)
-        || OptDbg::query(EDbg::RESULTS))
+    if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
       mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
@@ -418,9 +414,9 @@ int CalcSimpleInterpolation::_movave(Db* dbin, Db* dbout, ANeigh* neigh)
     neigh->select(iech, nbgh);
 
     // Perform the estimation
-    for (int i = 0; i < (int) nbgh.size(); i++)
+    for (int i = 0; i < (int)nbgh.size(); i++)
     {
-      double value = dbin->getZVariable( nbgh[i], 0);
+      double value = dbin->getZVariable(nbgh[i], 0);
       if (FFFF(value))
       {
         nbgh.clear();
@@ -453,32 +449,32 @@ int CalcSimpleInterpolation::_movmed(Db* dbin, Db* dbout, ANeigh* neigh)
 
   /* Loop on the targets to be processed */
 
-   for (int iech = 0; iech < dbout->getNSample(); iech++)
-   {
-     mes_process("Estimation by Moving Median", dbout->getNSample(), iech);
-     if (!dbout->isActive(iech)) continue;
-     OptDbg::setCurrentIndex(iech + 1);
-     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
-     {
-       mestitle(1, "Target location");
-       db_sample_print(dbout, iech, 1, 0, 0, 0);
-     }
-     VectorDouble weights;
-     VectorInt nbghmed;
+  for (int iech = 0; iech < dbout->getNSample(); iech++)
+  {
+    mes_process("Estimation by Moving Median", dbout->getNSample(), iech);
+    if (!dbout->isActive(iech)) continue;
+    OptDbg::setCurrentIndex(iech + 1);
+    if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
+    {
+      mestitle(1, "Target location");
+      db_sample_print(dbout, iech, 1, 0, 0, 0);
+    }
+    VectorDouble weights;
+    VectorInt nbghmed;
 
-     // Find the neighborhood
-     neigh->select(iech, nbgh);
+    // Find the neighborhood
+    neigh->select(iech, nbgh);
 
-     // Perform the estimation
-     if (nbgh.size() > 0)
-     {
-       int rank = (int) nbgh.size() / 2;
-       nbghmed.push_back(nbgh[rank]);
-       weights.push_back(1.);
-     }
+    // Perform the estimation
+    if (nbgh.size() > 0)
+    {
+      int rank = (int)nbgh.size() / 2;
+      nbghmed.push_back(nbgh[rank]);
+      weights.push_back(1.);
+    }
 
-     // Save the results
-     _saveResults(dbin, dbout, nbghmed, iech, weights);
+    // Save the results
+    _saveResults(dbin, dbout, nbghmed, iech, weights);
   }
   return 0;
 }
@@ -500,65 +496,65 @@ int CalcSimpleInterpolation::_lstsqr(Db* dbin, Db* dbout, ANeigh* neigh) const
   VectorInt nbgh;
   CovContext ctxt(1, ndim);
   const DriftList* drft = DriftFactory::createDriftListFromIRF(_order, 0, ctxt);
-  int ndrift = drft->getNDrift();
+  int ndrift            = drft->getNDrift();
   VectorDouble X(ndrift);
   VectorDouble B(ndrift);
   MatrixSymmetric A(ndrift);
 
   /* Loop on the targets to be processed */
 
-   for (int iech = 0; iech < dbout->getNSample(); iech++)
-   {
-     mes_process("Estimation by Inverse distance", dbout->getNSample(), iech);
-     OptDbg::setCurrentIndex(iech + 1);
-     if (!dbout->isActive(iech)) continue;
-     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
-     {
-       mestitle(1, "Target location");
-       db_sample_print(dbout, iech, 1, 0, 0, 0);
-     }
+  for (int iech = 0; iech < dbout->getNSample(); iech++)
+  {
+    mes_process("Estimation by Inverse distance", dbout->getNSample(), iech);
+    OptDbg::setCurrentIndex(iech + 1);
+    if (!dbout->isActive(iech)) continue;
+    if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
+    {
+      mestitle(1, "Target location");
+      db_sample_print(dbout, iech, 1, 0, 0, 0);
+    }
 
-     // Find the neighborhood
-     neigh->select(iech, nbgh);
-     int nSize = (int) nbgh.size();
-     if (nSize < ndrift)
-     {
-       dbout->setArray(iech, _iattEst, TEST);
-       continue;
-     }
+    // Find the neighborhood
+    neigh->select(iech, nbgh);
+    int nSize = (int)nbgh.size();
+    if (nSize < ndrift)
+    {
+      dbout->setArray(iech, _iattEst, TEST);
+      continue;
+    }
 
-     // Evaluate the least square system
-     A.fill(0.);
-     for (int i = 0; i < ndrift; i++) B[i] = 0.;
-     for (int jech = 0; jech < nSize; jech++)
-     {
-       int jech1 = nbgh[jech];
-       double zval = dbin->getZVariable(jech1, 0);
-       if (FFFF(zval)) continue;
-       VectorDouble Vdata = drft->evalDriftBySample(dbin, jech1);
+    // Evaluate the least square system
+    A.fill(0.);
+    for (int i = 0; i < ndrift; i++) B[i] = 0.;
+    for (int jech = 0; jech < nSize; jech++)
+    {
+      int jech1   = nbgh[jech];
+      double zval = dbin->getZVariable(jech1, 0);
+      if (FFFF(zval)) continue;
+      VectorDouble Vdata = drft->evalDriftBySample(dbin, jech1);
 
-       // Double loop on the drift terms
-       for (int id1 = 0; id1 < ndrift; id1++)
-       {
-         B[id1] += zval * Vdata[id1];
-         for (int id2 = 0; id2 <= id1; id2++)
-         {
-           A.addValue(id1,  id2, Vdata[id1] * Vdata[id2]);
-         }
-       }
-     }
+      // Double loop on the drift terms
+      for (int id1 = 0; id1 < ndrift; id1++)
+      {
+        B[id1] += zval * Vdata[id1];
+        for (int id2 = 0; id2 <= id1; id2++)
+        {
+          A.addValue(id1, id2, Vdata[id1] * Vdata[id2]);
+        }
+      }
+    }
 
-     // Solve the system
-     if (A.solve(B, X) > 0) continue;
+    // Solve the system
+    if (A.solve(B, X) > 0) continue;
 
-     // Evaluate the vector of drift terms at target
-     VectorDouble Vtarget = drft->evalDriftBySample(dbout,  iech);
+    // Evaluate the vector of drift terms at target
+    VectorDouble Vtarget = drft->evalDriftBySample(dbout, iech);
 
-     // Perform the estimation
-     double result = VH::innerProduct(X, Vtarget);
+    // Perform the estimation
+    double result = VH::innerProduct(X, Vtarget);
 
-     // Assign the result
-     dbout->setArray(iech, _iattEst, result);
+    // Assign the result
+    dbout->setArray(iech, _iattEst, result);
   }
   return 0;
 }
@@ -573,9 +569,9 @@ int CalcSimpleInterpolation::_lstsqr(Db* dbin, Db* dbout, ANeigh* neigh) const
  ** \param[in]  dbout       Output Db structure
  **
  *****************************************************************************/
-int CalcSimpleInterpolation::_invdist(Db *dbin, Db *dbout)
+int CalcSimpleInterpolation::_invdist(Db* dbin, Db* dbout)
 {
-  if (! dbin->isGrid())
+  if (!dbin->isGrid())
   {
     _pointInvdist(dbin, dbout);
   }
@@ -595,9 +591,9 @@ int CalcSimpleInterpolation::_invdist(Db *dbin, Db *dbout)
  ** \param[in]  dbout       Output Db
  **
  *****************************************************************************/
-void CalcSimpleInterpolation::_pointInvdist(Db *dbin, Db *dbout)
+void CalcSimpleInterpolation::_pointInvdist(Db* dbin, Db* dbout)
 {
-  int ndim = dbin->getNDim();
+  int ndim    = dbin->getNDim();
   double dmin = dbout->getExtensionDiagonal() / 1.e5;
   VectorDouble coor(ndim);
   VectorDouble cooref(ndim);
@@ -657,11 +653,11 @@ void CalcSimpleInterpolation::_pointInvdist(Db *dbin, Db *dbout)
  ** \param[in]  dbout       Output Db
  **
  *****************************************************************************/
-void CalcSimpleInterpolation::_gridInvdist(DbGrid *dbin, Db *dbout)
+void CalcSimpleInterpolation::_gridInvdist(DbGrid* dbin, Db* dbout)
 {
-  int ndim = dbin->getNDim();
-  int maxneigh = (int) pow(2., (double) ndim);
-  double dmin = dbout->getExtensionDiagonal() / 1.e5;
+  int ndim     = dbin->getNDim();
+  int maxneigh = (int)pow(2., (double)ndim);
+  double dmin  = dbout->getExtensionDiagonal() / 1.e5;
 
   VectorDouble coor(ndim);
   VectorDouble cooref(ndim);
@@ -739,7 +735,7 @@ void CalcSimpleInterpolation::_gridInvdist(DbGrid *dbin, Db *dbout)
       /* Check the value */
 
       int iech_neigh   = dbin->indiceToRank(indg);
-      double val_neigh = dbin->getZVariable( iech_neigh, 0);
+      double val_neigh = dbin->getZVariable(iech_neigh, 0);
       if (FFFF(val_neigh))
       {
         nbgh.clear();
@@ -769,9 +765,9 @@ void CalcSimpleInterpolation::_gridInvdist(DbGrid *dbin, Db *dbout)
   }
 }
 
-double CalcSimpleInterpolation::_estimCalc(const Db *dbin,
-                                           const VectorInt &nbgh,
-                                           const VectorDouble &weights)
+double CalcSimpleInterpolation::_estimCalc(const Db* dbin,
+                                           const VectorInt& nbgh,
+                                           const VectorDouble& weights)
 {
 
   double result = 0.;
@@ -817,11 +813,11 @@ double CalcSimpleInterpolation::_stdevCalc(Db* dbin,
 
   // Vector of Covariances between Data and Target
   getModel()->evalPointToDb(M0x, pout, dbin, 0, 0, true, nbgh);
-  double c0x       = VH::innerProduct(M0x, weights);
+  double c0x = VH::innerProduct(M0x, weights);
 
   // Covariance between Data and Data
   MatrixDense Mxx = getModel()->evalCovMat(dbin, dbin, 0, 0, nbgh, nbgh);
-  double cxx = Mxx.quadraticMatrix(weights, weights);
+  double cxx      = Mxx.quadraticMatrix(weights, weights);
 
   double result = sqrt(c00 - 2. * c0x + cxx);
   if (OptDbg::query(EDbg::RESULTS)) message("St Dev = %f\n", result);
@@ -836,7 +832,7 @@ void CalcSimpleInterpolation::_saveResults(Db* dbin,
                                            VectorDouble& weights) const
 {
   double result = TEST;
-  double stdev = TEST;
+  double stdev  = TEST;
   if (nbgh.size() > 0)
   {
     VH::normalize(weights, 1);

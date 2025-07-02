@@ -12,6 +12,7 @@
 #include "Basic/MathFunc.hpp"
 #include "Basic/Memory.hpp"
 #include "Basic/Utilities.hpp"
+#include "geoslib_d.h"
 
 /*! \cond */
 #define INTRESX(ic, i)        (ctables->CT[ic]->res[(i)])

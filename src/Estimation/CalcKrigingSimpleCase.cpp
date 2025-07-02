@@ -8,17 +8,16 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Estimation/CalcKrigingSimpleCase.hpp"
+#include "Basic/OptCustom.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Db/Db.hpp"
-#include "Estimation/CalcKrigingSimpleCase.hpp"
 #include "Estimation/KrigingAlgebraSimpleCase.hpp"
 #include "Estimation/KrigingSystem.hpp"
 #include "Estimation/KrigingSystemSimpleCase.hpp"
-#include "Basic/OptCustom.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/ANeigh.hpp"
 #include "Neigh/NeighUnique.hpp"
-
 #include <math.h>
 #include <omp.h>
 
@@ -52,8 +51,8 @@ bool CalcKrigingSimpleCase::_check()
   {
     if (getModel()->isNoStat())
     {
-      messerr("Variance of Estimator is limited to Stationary Covariance"); //Why?
-      messerr("Variance of Estimator is limited to Stationary Covariance"); //Why?
+      messerr("Variance of Estimator is limited to Stationary Covariance"); // Why?
+      messerr("Variance of Estimator is limited to Stationary Covariance"); // Why?
       return false;
     }
   }
@@ -134,7 +133,6 @@ bool CalcKrigingSimpleCase::_run()
   if (ksys.updKrigOptEstim(_iptrEst, _iptrStd, _iptrVarZ)) return false;
   VectorDouble tabwork(getDbin()->getNSample());
   if (!ksys.isReady(tabwork)) return false;
-  
 
   /***************************************/
   /* Loop on the targets to be processed */
@@ -151,11 +149,11 @@ bool CalcKrigingSimpleCase::_run()
   ModelGeneric model(*ksys.getModel());
   int ndim                        = getModel()->getSpace()->getNDim();
   const VectorVectorDouble coords = getDbout()->getAllCoordinates();
-  static ANeigh* neigh = nullptr;
+  static ANeigh* neigh            = nullptr;
 #pragma omp threadprivate(neigh)
 #pragma omp parallel for firstprivate(pin, pout, tabwork, algebra, model) schedule(guided) if (use_parallel)
   for (int iech_out = 0; iech_out < nech_out; iech_out++)
-  {  
+  {
     if (!getDbout()->isActive(iech_out)) continue;
     if (neigh == nullptr)
     {
@@ -171,7 +169,7 @@ bool CalcKrigingSimpleCase::_run()
     {
       pin.setCoord(idim, coords[idim][iech_out]);
     }
-      ksys.estimate(iech_out, pin, pout, tabwork, algebra, model, neigh);
+    ksys.estimate(iech_out, pin, pout, tabwork, algebra, model, neigh);
 
     // Store the results in an API structure (only if flagSingleTarget)
     if (_iechSingleTarget >= 0) _storeResultsForExport(ksys, algebra, iech_out);

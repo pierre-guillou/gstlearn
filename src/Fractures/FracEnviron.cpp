@@ -9,8 +9,8 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Fractures/FracEnviron.hpp"
-#include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
 FracEnviron::FracEnviron(double xmax,
@@ -19,30 +19,30 @@ FracEnviron::FracEnviron(double xmax,
                          double deltay,
                          double mean,
                          double stdev)
-  : AStringable(),
-    ASerializable(),
-    _xmax(xmax),
-    _ymax(ymax),
-    _deltax(deltax),
-    _deltay(deltay),
-    _mean(mean),
-    _stdev(stdev),
-    _families(),
-    _faults()
+  : AStringable()
+  , ASerializable()
+  , _xmax(xmax)
+  , _ymax(ymax)
+  , _deltax(deltax)
+  , _deltay(deltay)
+  , _mean(mean)
+  , _stdev(stdev)
+  , _families()
+  , _faults()
 {
 }
 
 FracEnviron::FracEnviron(const FracEnviron& r)
-    : AStringable(r),
-      ASerializable(r),
-      _xmax(r._xmax),
-      _ymax(r._ymax),
-      _deltax(r._deltax),
-      _deltay(r._deltay),
-      _mean(r._mean),
-      _stdev(r._stdev),
-      _families(r._families),
-      _faults(r._faults)
+  : AStringable(r)
+  , ASerializable(r)
+  , _xmax(r._xmax)
+  , _ymax(r._ymax)
+  , _deltax(r._deltax)
+  , _deltay(r._deltay)
+  , _mean(r._mean)
+  , _stdev(r._stdev)
+  , _families(r._families)
+  , _faults(r._faults)
 {
 }
 
@@ -52,14 +52,14 @@ FracEnviron& FracEnviron::operator=(const FracEnviron& r)
   {
     AStringable::operator=(r);
     ASerializable::operator=(r);
-    _xmax = r._xmax;
-    _ymax = r._ymax;
-    _deltax = r._deltax;
-    _deltay = r._deltay;
-    _mean = r._mean;
-    _stdev = r._stdev;
+    _xmax     = r._xmax;
+    _ymax     = r._ymax;
+    _deltax   = r._deltax;
+    _deltay   = r._deltay;
+    _mean     = r._mean;
+    _stdev    = r._stdev;
     _families = r._families;
-    _faults = r._faults;
+    _faults   = r._faults;
   }
   return *this;
 }
@@ -130,17 +130,17 @@ String FracEnviron::toString(const AStringFormat* strfmt) const
 bool FracEnviron::_deserializeAscii(std::istream& is, bool verbose)
 {
   int nfamilies = 0;
-  int nfaults = 0;
-  bool ret = true;
-  ret = ret && _recordRead<int>(is, "Number of families", nfamilies);
-  ret = ret && _recordRead<int>(is, "Number of main faults", nfaults);
-  ret = ret && _recordRead<double>(is, "Maximum horizontal distance", _xmax);
-  ret = ret && _recordRead<double>(is, "Maximum vertical distance", _ymax);
-  ret = ret && _recordRead<double>(is, "Dilation along the horizontal axis", _deltax);
-  ret = ret && _recordRead<double>(is, "Dilation along the vertical axis", _deltay);
-  ret = ret && _recordRead<double>(is, "Mean of thickness distribution", _mean);
-  ret = ret && _recordRead<double>(is, "Stdev of thickness distribution", _stdev);
-  if (! ret) return ret;
+  int nfaults   = 0;
+  bool ret      = true;
+  ret           = ret && _recordRead<int>(is, "Number of families", nfamilies);
+  ret           = ret && _recordRead<int>(is, "Number of main faults", nfaults);
+  ret           = ret && _recordRead<double>(is, "Maximum horizontal distance", _xmax);
+  ret           = ret && _recordRead<double>(is, "Maximum vertical distance", _ymax);
+  ret           = ret && _recordRead<double>(is, "Dilation along the horizontal axis", _deltax);
+  ret           = ret && _recordRead<double>(is, "Dilation along the vertical axis", _deltay);
+  ret           = ret && _recordRead<double>(is, "Mean of thickness distribution", _mean);
+  ret           = ret && _recordRead<double>(is, "Stdev of thickness distribution", _stdev);
+  if (!ret) return ret;
 
   for (int ifam = 0; ret && ifam < nfamilies; ifam++)
   {
@@ -161,29 +161,29 @@ bool FracEnviron::_deserializeAscii(std::istream& is, bool verbose)
 bool FracEnviron::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && _recordWrite<int>(os, "Number of families", getNFamilies());
-  ret = ret && _recordWrite<int>(os, "Number of main faults", getNFaults());
-  ret = ret && _recordWrite<double>(os, "Maximum horizontal distance", _xmax);
-  ret = ret && _recordWrite<double>(os, "Maximum vertical distance", _ymax);
-  ret = ret && _recordWrite<double>(os, "Dilation along the horizontal axis", _deltax);
-  ret = ret && _recordWrite<double>(os, "Dilation along the vertical axis", _deltay);
-  ret = ret && _recordWrite<double>(os, "Mean of thickness distribution", _mean);
-  ret = ret && _recordWrite<double>(os, "Stdev of thickness distribution", _stdev);
+  ret      = ret && _recordWrite<int>(os, "Number of families", getNFamilies());
+  ret      = ret && _recordWrite<int>(os, "Number of main faults", getNFaults());
+  ret      = ret && _recordWrite<double>(os, "Maximum horizontal distance", _xmax);
+  ret      = ret && _recordWrite<double>(os, "Maximum vertical distance", _ymax);
+  ret      = ret && _recordWrite<double>(os, "Dilation along the horizontal axis", _deltax);
+  ret      = ret && _recordWrite<double>(os, "Dilation along the vertical axis", _deltay);
+  ret      = ret && _recordWrite<double>(os, "Mean of thickness distribution", _mean);
+  ret      = ret && _recordWrite<double>(os, "Stdev of thickness distribution", _stdev);
 
   for (int ifam = 0; ret && ifam < getNFamilies(); ifam++)
   {
-    ret = ret && _commentWrite(os, "Characteristics of family");
+    ret                      = ret && _commentWrite(os, "Characteristics of family");
     const FracFamily& family = getFamily(ifam);
-    ret = ret && family._serializeAscii(os, verbose);
+    ret                      = ret && family._serializeAscii(os, verbose);
   }
 
   /* Loop on the main faults */
 
   for (int ifault = 0; ret && ifault < getNFaults(); ifault++)
   {
-    ret = ret && _commentWrite(os, "Characteristics of main fault");
+    ret                    = ret && _commentWrite(os, "Characteristics of main fault");
     const FracFault& fault = getFault(ifault);
-    ret = ret && fault._serializeAscii(os, verbose);
+    ret                    = ret && fault._serializeAscii(os, verbose);
   }
   return ret;
 }

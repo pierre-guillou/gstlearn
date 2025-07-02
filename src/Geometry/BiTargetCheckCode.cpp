@@ -12,20 +12,20 @@
 #include "Space/SpaceTarget.hpp"
 
 BiTargetCheckCode::BiTargetCheckCode(int optcode, double tolcode)
-    : ABiTargetCheck(),
-      _optCode(optcode),
-      _tolCode(tolcode)
+  : ABiTargetCheck()
+  , _optCode(optcode)
+  , _tolCode(tolcode)
 {
 }
 
-BiTargetCheckCode::BiTargetCheckCode(const BiTargetCheckCode &r)
-    : ABiTargetCheck(r),
-      _optCode(r._optCode),
-      _tolCode(r._tolCode)
+BiTargetCheckCode::BiTargetCheckCode(const BiTargetCheckCode& r)
+  : ABiTargetCheck(r)
+  , _optCode(r._optCode)
+  , _tolCode(r._tolCode)
 {
 }
 
-BiTargetCheckCode& BiTargetCheckCode::operator=(const BiTargetCheckCode &r)
+BiTargetCheckCode& BiTargetCheckCode::operator=(const BiTargetCheckCode& r)
 {
   if (this != &r)
   {
@@ -57,7 +57,7 @@ String BiTargetCheckCode::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-bool BiTargetCheckCode::isOK(const SpaceTarget &T1, const SpaceTarget &T2) const
+bool BiTargetCheckCode::isOK(const SpaceTarget& T1, const SpaceTarget& T2) const
 {
   double code1 = T1.getCode();
   double code2 = T2.getCode();

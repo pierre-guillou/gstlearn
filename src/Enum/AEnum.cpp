@@ -11,7 +11,8 @@
 #include "Enum/AEnum.hpp"
 #include "Basic/AStringable.hpp"
 
-void AEnum::printEnum() const {
+void AEnum::printEnum() const
+{
   _printMsg("  %2d - %11s : %s\n", _value, _key.data(), _descr.data());
 }
 
@@ -21,8 +22,8 @@ void AEnum::printEnum() const {
  * @param format Printing format
  * @param args   Variable list of arguments
  */
-template<typename ... Args>
-void AEnum::_printMsg(const char *format, Args... args)
+template<typename... Args>
+void AEnum::_printMsg(const char* format, Args... args)
 {
   message(format, args...);
 }

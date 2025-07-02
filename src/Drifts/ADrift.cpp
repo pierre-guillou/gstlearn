@@ -12,16 +12,16 @@
 #include "Drifts/DriftFactory.hpp"
 
 ADrift::ADrift()
-    : AStringable()
+  : AStringable()
 {
 }
 
-ADrift::ADrift(const ADrift &r)
-    : AStringable(r)
+ADrift::ADrift(const ADrift& r)
+  : AStringable(r)
 {
 }
 
-ADrift& ADrift::operator=(const ADrift &r)
+ADrift& ADrift::operator=(const ADrift& r)
 {
   if (this != &r)
   {

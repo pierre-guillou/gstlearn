@@ -9,65 +9,65 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/ALinearOpMulti.hpp"
-#include "Basic/AStringable.hpp"
 #include "Basic/AException.hpp"
-#include "Basic/Timer.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/Timer.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
 #include <vector>
 
 ALinearOpMulti::ALinearOpMulti(int nitermax, double eps)
-    : _nIterMax(nitermax),
-      _nIterRestart(0),
-      _eps(eps),
-      _precondStatus(false),
-      _userInitialValue(false),
-      _precond(nullptr),
-      _initialized(false),
-      _r(std::vector<std::vector<double>>()),
-      _temp(),
-      _p(),
-      _z(),
-      _nb(getNA<double>()),
-      _logStats()
+  : _nIterMax(nitermax)
+  , _nIterRestart(0)
+  , _eps(eps)
+  , _precondStatus(false)
+  , _userInitialValue(false)
+  , _precond(nullptr)
+  , _initialized(false)
+  , _r(std::vector<std::vector<double>>())
+  , _temp()
+  , _p()
+  , _z()
+  , _nb(getNA<double>())
+  , _logStats()
 {
 }
 
-ALinearOpMulti::ALinearOpMulti(const ALinearOpMulti &m)
-    : _nIterMax(m._nIterMax),
-      _nIterRestart(0),
-      _eps(m._eps),
-      _precondStatus(m._precondStatus),
-      _userInitialValue(m._userInitialValue),
-      _precond(m._precond),
-      _initialized(m._initialized),
-      _r(m._r),
-      _temp(m._temp),
-      _p(m._p),
-      _z(m._z),
-      _nb(m._nb),
-      _logStats(m._logStats)
+ALinearOpMulti::ALinearOpMulti(const ALinearOpMulti& m)
+  : _nIterMax(m._nIterMax)
+  , _nIterRestart(0)
+  , _eps(m._eps)
+  , _precondStatus(m._precondStatus)
+  , _userInitialValue(m._userInitialValue)
+  , _precond(m._precond)
+  , _initialized(m._initialized)
+  , _r(m._r)
+  , _temp(m._temp)
+  , _p(m._p)
+  , _z(m._z)
+  , _nb(m._nb)
+  , _logStats(m._logStats)
 {
 }
 
-ALinearOpMulti& ALinearOpMulti::operator=(const ALinearOpMulti &m)
+ALinearOpMulti& ALinearOpMulti::operator=(const ALinearOpMulti& m)
 {
   if (this != &m)
   {
-    _nIterMax = m._nIterMax;
-    _nIterRestart = m._nIterRestart;
-    _eps = m._eps;
-    _precondStatus = m._precondStatus;
+    _nIterMax         = m._nIterMax;
+    _nIterRestart     = m._nIterRestart;
+    _eps              = m._eps;
+    _precondStatus    = m._precondStatus;
     _userInitialValue = m._userInitialValue;
-    _precond = m._precond;
-    _initialized = m._initialized;
-    _r = m._r;
-    _temp = m._temp;
-    _p = m._p;
-    _z = m._z;
-    _nb = m._nb;
-    _logStats = m ._logStats;
+    _precond          = m._precond;
+    _initialized      = m._initialized;
+    _r                = m._r;
+    _temp             = m._temp;
+    _p                = m._p;
+    _z                = m._z;
+    _nb               = m._nb;
+    _logStats         = m._logStats;
   }
   return *this;
 }
@@ -86,7 +86,7 @@ void ALinearOpMulti::prepare() const
   if (_initialized) return;
 
   _initialized = true;
-  int ns = sizes();
+  int ns       = sizes();
   _r.resize(ns);
   _p.resize(ns);
   _temp.resize(ns);
@@ -111,14 +111,14 @@ void ALinearOpMulti::prepare() const
  ** \param[out] outv    Array of output values
  **
  *****************************************************************************/
-void ALinearOpMulti::evalDirect(const std::vector<std::vector<double>> &inv,
-                                std::vector<std::vector<double>> &outv) const
+void ALinearOpMulti::evalDirect(const std::vector<std::vector<double>>& inv,
+                                std::vector<std::vector<double>>& outv) const
 {
   try
   {
     _evalDirect(inv, outv);
   }
-  catch(const std::string& str)
+  catch (const std::string& str)
   {
     // TODO : Check if std::exception can be used
     messerr("%s", str.c_str());
@@ -135,8 +135,8 @@ void ALinearOpMulti::evalDirect(const std::vector<std::vector<double>> &inv,
  **                    _userInitialValue is true.
  **
  *****************************************************************************/
-void ALinearOpMulti::evalInverse(const std::vector<std::vector<double>> &vecin,
-                                 std::vector<std::vector<double>> &vecout) const
+void ALinearOpMulti::evalInverse(const std::vector<std::vector<double>>& vecin,
+                                 std::vector<std::vector<double>>& vecout) const
 {
   prepare();
   int n = sizes();
@@ -149,15 +149,15 @@ void ALinearOpMulti::evalInverse(const std::vector<std::vector<double>> &vecin,
 
   Timer time;
   nb = 0.;
-  for (const auto &e:vecin)
+  for (const auto& e: vecin)
   {
     nb += VH::norm(e);
   }
 
   if (_userInitialValue)
   {
-    evalDirect(vecout, _temp); //temp = Ax0 (x0 est stocké dans outv)
-    VectorHelper::subtractInPlace(_temp, vecin, _r);    // r=b-Ax0
+    evalDirect(vecout, _temp);                       // temp = Ax0 (x0 est stocké dans outv)
+    VectorHelper::subtractInPlace(_temp, vecin, _r); // r=b-Ax0
     nb = VectorHelper::innerProduct(_r, _r);
 
     // If _nb is not set, then initialize the internal state from scratch.
@@ -171,12 +171,12 @@ void ALinearOpMulti::evalInverse(const std::vector<std::vector<double>> &vecin,
   }
   else
   {
-    for (auto &e:vecout)
-      std::fill(e.begin(),e.end(),0.);
-    for (auto &e :_temp)
-      std::fill(e.begin(),e.end(),0.); // temp = Ax0=0
-  
-    VectorHelper::copy(vecin, _r);   // r = b
+    for (auto& e: vecout)
+      std::fill(e.begin(), e.end(), 0.);
+    for (auto& e: _temp)
+      std::fill(e.begin(), e.end(), 0.); // temp = Ax0=0
+
+    VectorHelper::copy(vecin, _r); // r = b
   }
 
   if (OptDbg::query(EDbg::CONVERGE))
@@ -184,14 +184,14 @@ void ALinearOpMulti::evalInverse(const std::vector<std::vector<double>> &vecin,
 
   if (_precondStatus)
   {
-    _precond->evalDirect(_r, _temp); //z=Mr
-    VectorHelper::copy(_temp, _p); //p=z
+    _precond->evalDirect(_r, _temp);               // z=Mr
+    VectorHelper::copy(_temp, _p);                 // p=z
     rsold = VectorHelper::innerProduct(_r, _temp); //<r, z>
-    crit = VectorHelper::innerProduct(_r, _r);  //<r,r>
+    crit  = VectorHelper::innerProduct(_r, _r);    //<r,r>
   }
   else if (!_userInitialValue || isNA(_nb)) // _p, rsold and crit are already set (see above)
   {
-    VectorHelper::copy(_r, _p); //p=r (=z)
+    VectorHelper::copy(_r, _p); // p=r (=z)
     crit = rsold = VectorHelper::innerProduct(_r, _r);
   }
 
@@ -202,30 +202,30 @@ void ALinearOpMulti::evalInverse(const std::vector<std::vector<double>> &vecin,
   while (niter < _nIterMax && crit > _eps)
   {
     niter++;
-    evalDirect(_p, _temp);                                // temp = Ap
-    alpha = rsold / VectorHelper::innerProduct(_temp, _p);          // r'r/p'Ap
-    VectorHelper::linearCombinationVVDInPlace(1., vecout, alpha, _p, vecout);     // x = x + alpha * p
+    evalDirect(_p, _temp);                                                    // temp = Ap
+    alpha = rsold / VectorHelper::innerProduct(_temp, _p);                    // r'r/p'Ap
+    VectorHelper::linearCombinationVVDInPlace(1., vecout, alpha, _p, vecout); // x = x + alpha * p
 
     if (_nIterRestart > 0 && (niter + 1) % _nIterRestart == 0)
     {
-      evalDirect(vecout, _temp);               // temp = Ax
-      VectorHelper::subtractInPlace(_temp, vecin, _r);   // r = b - Ax
+      evalDirect(vecout, _temp);                       // temp = Ax
+      VectorHelper::subtractInPlace(_temp, vecin, _r); // r = b - Ax
       if (OptDbg::query(EDbg::CONVERGE))
         message("Recomputing exact residuals after %d iterations (max=%d)\n", niter, _nIterMax);
     }
     else
-      VectorHelper::linearCombinationVVDInPlace(1., _r, -alpha, _temp, _r);         // r = r - alpha * Ap
+      VectorHelper::linearCombinationVVDInPlace(1., _r, -alpha, _temp, _r); // r = r - alpha * Ap
 
     if (_precondStatus)
     {
-      _precond->evalDirect(_r, _temp);                     // z = Mr
-      rsnew = VectorHelper::innerProduct(_r, _temp);                 // r'z
+      _precond->evalDirect(_r, _temp);                                             // z = Mr
+      rsnew = VectorHelper::innerProduct(_r, _temp);                               // r'z
       VectorHelper::linearCombinationVVDInPlace(1., _temp, rsnew / rsold, _p, _p); // p = z+beta p
     }
     else
     {
       rsnew = VectorHelper::innerProduct(_r, _r);
-      VectorHelper::linearCombinationVVDInPlace(1., _r, rsnew / rsold, _p, _p);    // p = r+beta p
+      VectorHelper::linearCombinationVVDInPlace(1., _r, rsnew / rsold, _p, _p); // p = r+beta p
     }
     crit = rsnew / nb;
 
@@ -246,19 +246,19 @@ void ALinearOpMulti::evalInverse(const std::vector<std::vector<double>> &vecin,
   getLogStats().incrementStatsInverseCG(niter, time.getIntervalSeconds());
 }
 
-void ALinearOpMulti::initLk(const std::vector<std::vector<double>> &inv,
-                            std::vector<std::vector<double>> &outv) const
+void ALinearOpMulti::initLk(const std::vector<std::vector<double>>& inv,
+                            std::vector<std::vector<double>>& outv) const
 {
   prepare();
   int n = sizes();
   if (n <= 0) my_throw("ALinearOpMulti size not defined. Call setSize before");
 
-  for (auto &e: outv)
-    std::fill(e.begin(),e.end(),0.);
-  for (auto &e : _temp)
-    std::fill(e.begin(),e.end(),0.);    // temp = Ax0=0
-  VH::copy(inv,_p);     // p = r (=z)
-  evalDirect(_p,_temp); // temp = Ap
+  for (auto& e: outv)
+    std::fill(e.begin(), e.end(), 0.);
+  for (auto& e: _temp)
+    std::fill(e.begin(), e.end(), 0.); // temp = Ax0=0
+  VH::copy(inv, _p);                   // p = r (=z)
+  evalDirect(_p, _temp);               // temp = Ap
 }
 
 /*****************************************************************************/
@@ -275,13 +275,13 @@ void ALinearOpMulti::initLk(const std::vector<std::vector<double>> &inv,
  **
  *****************************************************************************/
 void ALinearOpMulti::setPrecond(const ALinearOpMulti* precond, int status)
-{ 
-  _precond = precond; 
+{
+  _precond       = precond;
   _precondStatus = status;
   if (_precond == nullptr) _precondStatus = false;
 }
 
-void ALinearOpMulti::_updated()const
+void ALinearOpMulti::_updated() const
 {
   _initialized = false;
 }

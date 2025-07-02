@@ -9,9 +9,9 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovStable.hpp"
-#include <math.h>
 #include "Covariances/CovContext.hpp"
 #include "Simulation/TurningBandOperate.hpp"
+#include <math.h>
 
 CovStable::CovStable(const CovContext& ctxt)
   : ACovFunc(ECov::STABLE, ctxt)

@@ -8,37 +8,33 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/AStringable.hpp"
-#include "Covariances/CovLMCAnamorphosis.hpp"
-#include "geoslib_define.h"
-#include "geoslib_old_f.h"
-
 #include "Estimation/KrigingSystem.hpp"
-
-#include "Enum/EKrigOpt.hpp"
-#include "Enum/ECalcMember.hpp"
-#include "Enum/ELoc.hpp"
-#include "Enum/ENeigh.hpp"
-
+#include "Anamorphosis/AnamHermite.hpp"
+#include "Basic/AStringable.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Calculators/CalcMigrate.hpp"
+#include "Covariances/CovLMCAnamorphosis.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
+#include "Enum/ECalcMember.hpp"
+#include "Enum/EKrigOpt.hpp"
+#include "Enum/ELoc.hpp"
+#include "Enum/ENeigh.hpp"
+#include "Estimation/KrigOpt.hpp"
+#include "Estimation/KrigingAlgebra.hpp"
 #include "Model/Model.hpp"
 #include "Model/ModelGeneric.hpp"
 #include "Neigh/ANeigh.hpp"
-#include "Neigh/NeighMoving.hpp"
 #include "Neigh/NeighImage.hpp"
+#include "Neigh/NeighMoving.hpp"
 #include "Neigh/NeighUnique.hpp"
-#include "Basic/Utilities.hpp"
-#include "Basic/OptDbg.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Polynomials/Hermite.hpp"
-#include "Anamorphosis/AnamHermite.hpp"
-#include "Calculators/CalcMigrate.hpp"
 #include "Space/SpaceRN.hpp"
-#include "Estimation/KrigingAlgebra.hpp"
-#include "Estimation/KrigOpt.hpp"
-
+#include "geoslib_define.h"
+#include "geoslib_old_f.h"
 #include <math.h>
 
 KrigingSystem::KrigingSystem(Db* dbin,
@@ -113,7 +109,7 @@ KrigingSystem::KrigingSystem(Db* dbin,
   , _flagNoStat(false)
 {
   // _model is a copy of input model to allow modification (still used???)
-  if (model != nullptr) _model = (ModelGeneric*) model->clone();
+  if (model != nullptr) _model = (ModelGeneric*)model->clone();
 
   if (model != nullptr)
     _flagNoStat = _model->isNoStat();
@@ -123,7 +119,7 @@ KrigingSystem::KrigingSystem(Db* dbin,
     neigh->reset();
 
   // Define local constants
-  _flagVerr    = _dbin->hasLocVariable(ELoc::V);
+  _flagVerr = _dbin->hasLocVariable(ELoc::V);
 
   _resetMemoryGeneral();
 }
@@ -139,7 +135,7 @@ KrigingSystem::~KrigingSystem()
   {
     if (!_dbinUidToBeDeleted.empty())
     {
-      (void) _dbin->deleteColumnsByUID(_dbinUidToBeDeleted);
+      (void)_dbin->deleteColumnsByUID(_dbinUidToBeDeleted);
     }
   }
 
@@ -212,10 +208,10 @@ void KrigingSystem::_resetMemoryGeneral()
 {
   _setInternalShortCutVariablesGeneral();
 
-  _space = _model->getSpace();
-  _p0 = SpacePoint(_space);
-  _p1 = SpacePoint(_space);
-  _p2 = SpacePoint(_space);
+  _space   = _model->getSpace();
+  _p0      = SpacePoint(_space);
+  _p1      = SpacePoint(_space);
+  _p2      = SpacePoint(_space);
   _p0_memo = SpacePoint(_space);
 }
 
@@ -229,7 +225,7 @@ void KrigingSystem::_resetMemoryGeneral()
  *****************************************************************************/
 bool KrigingSystem::_isAuthorized() const
 {
-  int ncov = getCovSize();
+  int ncov   = getCovSize();
   int ndrift = getDriftSize();
   return ncov > 0 && ncov >= ndrift;
 }
@@ -253,7 +249,7 @@ bool KrigingSystem::_isAuthorized() const
  ** \remarks where _iechOut is the rank of the target sample in _dbout
  **
  *****************************************************************************/
-double KrigingSystem::_continuousMultiplier(int rank1,int rank2, double eps)
+double KrigingSystem::_continuousMultiplier(int rank1, int rank2, double eps)
 {
   if (_neigh == nullptr) return (0.);
   if (_neigh->getType() != ENeigh::MOVING) return (0.);
@@ -414,7 +410,7 @@ void KrigingSystem::_estimateCalcul(int status)
       {
         if (status != 0) continue;
         double wgt = _algebra.getLambda()->getValue(jech, ivarCL);
-        int iech = _nbgh[jech];
+        int iech   = _nbgh[jech];
         if (_flagSet)
           _dbin->setArray(iech, _iptrWeights + ivarCL, wgt);
         else
@@ -426,7 +422,7 @@ void KrigingSystem::_estimateCalcul(int status)
 
 void KrigingSystem::_neighCalcul(int status, const VectorDouble& tab)
 {
-  int ntab = (int) tab.size();
+  int ntab = (int)tab.size();
   for (int i = 0; i < ntab; i++)
   {
 
@@ -440,11 +436,11 @@ void KrigingSystem::_neighCalcul(int status, const VectorDouble& tab)
   {
     mestitle(0, "Neighborhood Parameters");
 
-    message("Number of selected samples          = %d\n", (int) tab[0]);
+    message("Number of selected samples          = %d\n", (int)tab[0]);
     message("Maximum neighborhood distance       = %lf\n", tab[1]);
     message("Minimum neighborhood distance       = %lf\n", tab[2]);
-    message("Number of non-empty sectors         = %d\n", (int) tab[3]);
-    message("Number of consecutive empty sectors = %d\n", (int) tab[4]);
+    message("Number of non-empty sectors         = %d\n", (int)tab[3]);
+    message("Number of consecutive empty sectors = %d\n", (int)tab[4]);
   }
 }
 
@@ -461,7 +457,7 @@ void KrigingSystem::_estimateEstim(int status)
   if (!status)
   {
     local = _algebra.getEstimation();
-    if ((int) local.size() < _nvarCL) return;
+    if ((int)local.size() < _nvarCL) return;
   }
   for (int ivarCL = 0; ivarCL < _nvarCL; ivarCL++)
     _dbout->setArray(_iechOut, _iptrEst + ivarCL, local[ivarCL]);
@@ -513,7 +509,7 @@ int KrigingSystem::resetData()
   if (_model->evalCovMatSymInPlaceFromIdx(_Sigma, _dbin, _sampleRanks, &calcmode, false)) return 1;
   if (_model->evalDriftMatByRanksInPlace(_X, _dbin, _sampleRanks, ECalcMember::LHS)) return 1;
 
-  if (! _isAuthorized()) return 1;
+  if (!_isAuthorized()) return 1;
   _algebra.resetNewData();
   if (_algebra.setData(&_Z, &_sampleRanks, &_meansTarget)) return 1;
   if (_algebra.setLHS(&_Sigma, &_X)) return 1;
@@ -533,7 +529,7 @@ bool KrigingSystem::isReady()
   if (!_krigopt.isCorrect(_dbout, _neigh, _model)) return false;
 
   // Define the means of each variable
-  _means       = _model->getMeans();
+  _means = _model->getMeans();
   // Possible adjust the means in case of presence of 'matLC'
   _meansTarget = _means;
   if (_krigopt.hasMatLC()) _meansTarget = _krigopt.getMatLC()->prodMatVec(_means);
@@ -541,7 +537,7 @@ bool KrigingSystem::isReady()
   if ((_neigh != nullptr && _neigh->getType() == ENeigh::UNIQUE) || _flagBayes)
   {
     _sampleRanks = _dbin->getSampleRanks();
-    _Z           = _dbin->getValuesByRanks(_sampleRanks, 
+    _Z           = _dbin->getValuesByRanks(_sampleRanks,
                                            _means, !_model->hasDrift());
     if (_algebra.setData(&_Z, &_sampleRanks, &_meansTarget)) return false;
 
@@ -591,7 +587,7 @@ void KrigingSystem::conclusion()
  */
 int KrigingSystem::estimate(int iech_out)
 {
-  if (! _isReady)
+  if (!_isReady)
   {
     messerr("You must call 'isReady' before launching 'estimate'");
     return 1;
@@ -612,7 +608,7 @@ int KrigingSystem::estimate(int iech_out)
   int status = 0;
   if (skipCalculAll) goto label_store;
 
-  if (! _dbout->isActive(_iechOut)) return 0;
+  if (!_dbout->isActive(_iechOut)) return 0;
   OptDbg::setCurrentIndex(_iechOut + 1);
   if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
   {
@@ -624,7 +620,7 @@ int KrigingSystem::estimate(int iech_out)
     }
 
     mestitle(1, "Target location");
-    if (! _krigopt.hasColcok())
+    if (!_krigopt.hasColcok())
       db_sample_print(_dbout, _iechOut, 1, 0, 0, 0);
     else
       db_sample_print(_dbout, _iechOut, 1, 1, 0, 0);
@@ -707,7 +703,7 @@ int KrigingSystem::estimate(int iech_out)
 
   /* Perform the final estimation */
 
-  label_store:
+label_store:
   // If status is not zero, cancel the current Neighborhood search status
   if (status) _neigh->setIsChanged();
 
@@ -718,13 +714,13 @@ int KrigingSystem::estimate(int iech_out)
     VectorDouble tab = _neigh->summary(_iechOut);
     _neighCalcul(status, tab);
   }
-  else 
+  else
   {
     // Unique Neighborhood case
 
     if (_flagSimu)
       _simulateCalcul(status);
-    else 
+    else
       _estimateCalcul(status);
   }
 
@@ -752,7 +748,7 @@ int KrigingSystem::_updateForColCokMoving()
   // If the target coincides with a data point, do not do anything
   // (otherwise the new CoKriging system will be regular)
   VectorDouble coor = _dbout->getSampleCoordinates(_iechOut);
-  for (int jech = 0, nech = (int) _nbgh.size(); jech < nech; jech++)
+  for (int jech = 0, nech = (int)_nbgh.size(); jech < nech; jech++)
   {
     int iech          = _nbgh[jech];
     bool flagCoincide = true;
@@ -781,14 +777,14 @@ int KrigingSystem::_updateForColCokMoving()
   int newSize = oldSize + nAdd;
 
   // Create the indexing vector (>0 for actual samples, <0 for additional sample)
-  // Indices are 1-based values (to allow negative and positive distinction) 
+  // Indices are 1-based values (to allow negative and positive distinction)
   VectorInt adds(newSize);
   int ecr = 0;
   for (int ivar = 0, lec = 0; ivar < nvar; ivar++)
   {
     for (int i = 0, n = (int)_sampleRanks[ivar].size(); i < n; i++, lec++)
       adds[ecr++] = 1 + lec;
-    if (! FFFF(newValues[ivar])) adds[ecr++] = -1 - ivar;
+    if (!FFFF(newValues[ivar])) adds[ecr++] = -1 - ivar;
   }
 
   // Update _sampleRanks
@@ -796,7 +792,7 @@ int KrigingSystem::_updateForColCokMoving()
   for (int ivar = 0; ivar < nvar; ivar++)
   {
     newVVI[ivar] = _sampleRanks[ivar];
-    if (! FFFF(newValues[ivar])) newVVI[ivar].push_back(-1);
+    if (!FFFF(newValues[ivar])) newVVI[ivar].push_back(-1);
   }
   _sampleRanks = newVVI;
 
@@ -871,7 +867,7 @@ int KrigingSystem::_updateForColCokMoving()
  * @brief Identify the list of equations involving the target sample
  *        within the vector of vector of data indices.
  *        THis is used to mask off equations in the cross_validation in Unique Neighborhood
- * 
+ *
  * @return VectorInt Vector of indices to be masked in the Co-Kriging system due to XValid
  */
 VectorInt KrigingSystem::_xvalidUniqueIndices() const
@@ -880,7 +876,7 @@ VectorInt KrigingSystem::_xvalidUniqueIndices() const
   int lec = 0;
   for (int ivar = 0, nvar = (int)_sampleRanks.size(); ivar < nvar; ivar++)
   {
-    for (int i = 0, n = (int) _sampleRanks[ivar].size(); i < n; i++, lec++)
+    for (int i = 0, n = (int)_sampleRanks[ivar].size(); i < n; i++, lec++)
       if (_sampleRanks[ivar][i] == _iechOut) ranks.push_back(lec);
   }
   return ranks;
@@ -962,7 +958,7 @@ void KrigingSystem::_dumpKrigingResults(int status)
           tab_printg(" - Std. deviation    = ", sigma);
           message("\n");
           tab_printg(" - Normalized Error  = ", sterr);
-         message("\n");
+          message("\n");
         }
       }
     }
@@ -1062,7 +1058,7 @@ int KrigingSystem::updKrigOptNeighOnly(int iptrNeigh)
     messerr("UID for storing Neighborhood variable must be defined");
     return 1;
   }
-  _iptrNeigh = iptrNeigh;
+  _iptrNeigh     = iptrNeigh;
   _flagNeighOnly = true;
   return 0;
 }
@@ -1078,7 +1074,7 @@ int KrigingSystem::setKrigOptDataWeights(int iptrWeights, bool flagSet)
   }
   _iptrWeights = iptrWeights;
   _flagWeights = true;
-  _flagSet = flagSet;
+  _flagSet     = flagSet;
   return 0;
 }
 
@@ -1118,7 +1114,7 @@ int KrigingSystem::setKrigOptXValid(bool flag_xvalid,
                                     bool optionXValidVarZ)
 {
   _isReady = false;
-  if (! flag_xvalid)
+  if (!flag_xvalid)
   {
     _neigh->setFlagXvalid(false);
     _neigh->setFlagKFold(false);
@@ -1133,7 +1129,7 @@ int KrigingSystem::setKrigOptXValid(bool flag_xvalid,
         messerr("K-FOLD is not available in Unique Neighborhood");
         return 1;
       }
-      if (! _dbin->hasLocVariable(ELoc::C))
+      if (!_dbin->hasLocVariable(ELoc::C))
         messerr("The K-FOLD option is ignored as no Code is defined");
     }
     _neigh->setFlagKFold(flag_kfold);
@@ -1152,8 +1148,8 @@ int KrigingSystem::setKrigOptBayes(bool flag_bayes,
   int nfeq = _getNFeq();
   if (flag_bayes)
   {
-    VectorDouble local_mean = prior_mean;
-    MatrixSymmetric local_cov  = prior_cov;
+    VectorDouble local_mean   = prior_mean;
+    MatrixSymmetric local_cov = prior_cov;
 
     if (local_mean.empty())
       local_mean.resize(nfeq, 0.);
@@ -1161,17 +1157,17 @@ int KrigingSystem::setKrigOptBayes(bool flag_bayes,
     {
       local_cov.resetFromValue(nfeq, nfeq, 0.);
       for (int i = 0; i < nfeq; i++)
-        local_cov.setValue(i,i, 1.);
+        local_cov.setValue(i, i, 1.);
     }
-    if ((int) local_mean.size() != nfeq)
+    if ((int)local_mean.size() != nfeq)
     {
-      messerr("Size of argument 'prior_mean'(%d)",(int) local_mean.size());
-      messerr("should be equal to the Number of Drift Equations(%d)",nfeq);
+      messerr("Size of argument 'prior_mean'(%d)", (int)local_mean.size());
+      messerr("should be equal to the Number of Drift Equations(%d)", nfeq);
       return 1;
     }
-    if ((int) local_cov.size() != nfeq * nfeq)
+    if ((int)local_cov.size() != nfeq * nfeq)
     {
-      messerr("Size of argument 'prior_cov'(%d)",(int) local_cov.size());
+      messerr("Size of argument 'prior_cov'(%d)", (int)local_cov.size());
       messerr("should be equal to the Number of Drift Equations (squared) (%d)",
               nfeq * nfeq);
       return 1;
@@ -1197,12 +1193,12 @@ int KrigingSystem::setKrigOptBayes(bool flag_bayes,
 
 int KrigingSystem::setKrigOptFlagSimu(bool flagSimu, int nbsimu, int rankPGS)
 {
-  _isReady = false;
- _flagSimu = flagSimu;
- _nbsimu = nbsimu;
- _rankPGS = rankPGS;
- _neigh->setFlagSimu(flagSimu);
- return 0;
+  _isReady  = false;
+  _flagSimu = flagSimu;
+  _nbsimu   = nbsimu;
+  _rankPGS  = rankPGS;
+  _neigh->setFlagSimu(flagSimu);
+  return 0;
 }
 
 int KrigingSystem::setKrigOptFlagGlobal(bool flag_global)
@@ -1222,7 +1218,7 @@ int KrigingSystem::setKrigOptFlagGlobal(bool flag_global)
 
 int KrigingSystem::setKrigOptFlagLTerm(bool flag_lterm)
 {
-  _isReady = false;
+  _isReady   = false;
   _flagLTerm = flag_lterm;
   return 0;
 }
@@ -1259,19 +1255,19 @@ int KrigingSystem::setKrigOptAnamophosis(AAnam* anam)
   double total = model_old->getTotalSill(0, 0);
   if (total > 1.)
   {
-    messerr("This procedure requires the Sill of the Model (%lf)",total);
+    messerr("This procedure requires the Sill of the Model (%lf)", total);
     messerr("to be smaller than 1.");
     return 1;
   }
   _flagAnam = true;
-  _anam = anam;
+  _anam     = anam;
   return 0;
 }
 
 int KrigingSystem::setKrigOptFactorKriging(bool flag_factor_kriging)
 {
   _isReady = false;
-  if (! flag_factor_kriging)
+  if (!flag_factor_kriging)
   {
     _flagFactorKriging = false;
   }
@@ -1295,7 +1291,7 @@ int KrigingSystem::setKrigOptFactorKriging(bool flag_factor_kriging)
 
 int KrigingSystem::updKrigOptIclass(int index_class, int nclasses)
 {
-  if (! _flagFactorKriging)
+  if (!_flagFactorKriging)
   {
     messerr("Setting the Class Index only makes sense if 'flagFactorKriging' is ON");
     messerr("Use 'setKrigOptFactorKriging()' beforehand");
@@ -1373,7 +1369,7 @@ bool KrigingSystem::_isCorrect()
   /****************************/
 
   int nvar = 0;
-  if (_dbin != nullptr && ! _flagSimu)
+  if (_dbin != nullptr && !_flagSimu)
   {
     if (nvar > 0 && nvar != _dbin->getNLoc(ELoc::Z))
     {
@@ -1408,7 +1404,7 @@ bool KrigingSystem::_isCorrect()
   /* Checking the Validity of the Model */
   /**************************************/
 
-  if (_model != nullptr && ! _model->isValid()) return false;
+  if (_model != nullptr && !_model->isValid()) return false;
 
   /******************************************/
   /* Checking the Number of External Drifts */
@@ -1465,8 +1461,8 @@ bool KrigingSystem::_isCorrect()
   {
     VectorDouble db_mini;
     VectorDouble db_maxi;
-    db_mini.resize(ndim,TEST);
-    db_maxi.resize(ndim,TEST);
+    db_mini.resize(ndim, TEST);
+    db_maxi.resize(ndim, TEST);
 
     /* Input Db structure */
 
@@ -1498,9 +1494,9 @@ bool KrigingSystem::_isCorrect()
 
     if (_neigh->getType() == ENeigh::UNIQUE && _neigh->getFlagXvalid() && nvar > 1)
     {
-     messerr("The algorithm for Cross-Validation in Unique Neighborhood");
-     messerr("is restricted to a single variable");
-     return false;
+      messerr("The algorithm for Cross-Validation in Unique Neighborhood");
+      messerr("is restricted to a single variable");
+      return false;
     }
   }
 
@@ -1660,7 +1656,7 @@ void KrigingSystem::_bayesPreSimulate()
 void KrigingSystem::_transformGaussianToRaw()
 {
   if (_anam == nullptr) return;
-  const AnamHermite *anam_hermite = dynamic_cast<const AnamHermite*>(_anam);
+  const AnamHermite* anam_hermite = dynamic_cast<const AnamHermite*>(_anam);
 
   /* Get the estimation */
 
@@ -1685,7 +1681,7 @@ void KrigingSystem::_setInternalShortCutVariablesModel()
 {
   _nvar = _getNVar();
   _nfeq = _getNFeq();
-  _neq  =  _getNeq(); // reset as it depends on nech and Model
+  _neq  = _getNeq(); // reset as it depends on nech and Model
 }
 /**
  * Assign the values to local variables used as shortcuts

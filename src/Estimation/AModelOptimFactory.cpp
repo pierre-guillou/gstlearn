@@ -9,23 +9,22 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Estimation/AModelOptimFactory.hpp"
-
 #include "Covariances/CorAniso.hpp"
+#include "Covariances/CovAniso.hpp"
+#include "Covariances/CovLMCAnamorphosis.hpp"
+#include "Db/DbGrid.hpp"
 #include "Enum/EConsElem.hpp"
 #include "Enum/EConsType.hpp"
-#include "Estimation/Vecchia.hpp"
-#include "Estimation/Likelihood.hpp"
 #include "Estimation/AModelOptim.hpp"
-#include "Model/Constraints.hpp"
+#include "Estimation/Likelihood.hpp"
+#include "Estimation/Vecchia.hpp"
 #include "Model/ConsItem.hpp"
+#include "Model/Constraints.hpp"
 #include "Model/Model.hpp"
+#include "Model/ModelCovList.hpp"
 #include "Model/ModelOptimVMap.hpp"
 #include "Model/ModelOptimVario.hpp"
-#include "Model/ModelCovList.hpp"
-#include "Covariances/CovLMCAnamorphosis.hpp"
-#include "Covariances/CovAniso.hpp"
 #include "Variogram/Vario.hpp"
-#include "Db/DbGrid.hpp"
 #include "geoslib_define.h"
 
 static void _modifyMopForAnam(ModelGeneric* model,
@@ -56,7 +55,7 @@ static int _modifyMopForVMap(const DbGrid* dbmap,
                              Constraints* constraints,
                              ModelOptimParam& mop)
 {
-  // Clever setting of options 
+  // Clever setting of options
   mop.setAuthAniso(true);
   mop.setAuthRotation(true);
   mop.setLockNo3d(dbmap->getNDim() <= 2);
@@ -71,7 +70,7 @@ static int _modifyMopForVMap(const DbGrid* dbmap,
     if (modify_constraints_on_sill(*constraints)) return (1);
   }
 
-  // Return an error if Goulard is not used in multivariate case 
+  // Return an error if Goulard is not used in multivariate case
   if (model->getNVar() > 1 && !mop.getFlagGoulard())
   {
     messerr("In Multivariate case, Goulard option is mandatory");
@@ -214,9 +213,9 @@ static int _modifyModelForConstraints(Constraints* constraints,
     int iv1                  = consitem->getIV1();
     int iv2                  = consitem->getIV2();
 
-    CovBase* covbase = mcv->getCovBase(icov);
+    CovBase* covbase   = mcv->getCovBase(icov);
     CovAniso* covaniso = dynamic_cast<CovAniso*>(covbase);
-    ParamInfo* param = nullptr;
+    ParamInfo* param   = nullptr;
 
     if (igrf != 0)
     {
@@ -262,7 +261,7 @@ static int _modifyModelForConstraints(Constraints* constraints,
       }
       if (iv1 != 0 && iv2 != 0)
       {
-        messerr("Setting Sill(%d,%d) not possible as nvar = %d", iv1, iv2, nvar); 
+        messerr("Setting Sill(%d,%d) not possible as nvar = %d", iv1, iv2, nvar);
         return 1;
       }
       param = &covbase->getParamInfoCholSills(iv1, iv2);
@@ -359,7 +358,7 @@ static int _modifyModelForMop(const ModelOptimParam& mop,
         _fixAllAnglesFromIndex(coraniso, 0, false);
       }
     }
-    else 
+    else
     {
 
       // Anisotropy forbidden

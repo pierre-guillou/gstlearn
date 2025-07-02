@@ -8,11 +8,11 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/DbGrid.hpp"
-#include "Db/Db.hpp"
-#include "Estimation/KrigingSystem.hpp"
 #include "Estimation/CalcKrigingFactors.hpp"
 #include "Anamorphosis/AAnam.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
+#include "Estimation/KrigingSystem.hpp"
 #include "Model/Model.hpp"
 
 CalcKrigingFactors::CalcKrigingFactors(bool flag_est, bool flag_std)
@@ -37,12 +37,12 @@ bool CalcKrigingFactors::_check()
   getDbin()->clearLocators(ELoc::Z);
   getDbin()->setLocatorByUID(_iuidFactors[0], ELoc::Z, 0);
 
-  if (! ACalcInterpolator::_check()) return false;
+  if (!ACalcInterpolator::_check()) return false;
 
-  if (! hasDbin()) return false;
-  if (! hasDbout()) return false;
-  if (! hasModel()) return false;
-  if (! hasNeigh()) return false;
+  if (!hasDbin()) return false;
+  if (!hasDbout()) return false;
+  if (!hasModel()) return false;
+  if (!hasNeigh()) return false;
 
   if (getNeigh()->getType() == ENeigh::IMAGE)
   {
@@ -61,7 +61,7 @@ bool CalcKrigingFactors::_check()
     messerr("This application is limited to the monovariate Model case");
     return false;
   }
-  if (! _modelLocal->hasAnam())
+  if (!_modelLocal->hasAnam())
   {
     messerr("Argument 'model' should has an Anamorphosis attached");
     return false;
@@ -70,7 +70,7 @@ bool CalcKrigingFactors::_check()
   // the calculation option (EKrigOpt) should be set to POINT
   // in order to avoid additional block randomization
   if (getKrigopt().getCalcul() == EKrigOpt::BLOCK &&
-      ! getKrigopt().hasDiscs())
+      !getKrigopt().hasDiscs())
   {
     messerr("For Block estimate, you must specify the discretization");
     return false;
@@ -90,7 +90,7 @@ bool CalcKrigingFactors::_hasChangeSupport() const
 bool CalcKrigingFactors::_preprocess()
 {
   if (!ACalcInterpolator::_preprocess()) return false;
-  
+
   // Centering the information (only when a change of support is defined)
   if (_hasChangeSupport())
   {
@@ -100,21 +100,21 @@ bool CalcKrigingFactors::_preprocess()
       messerr("Due to change of support, 'dbout' should be a Grid");
       return false;
     }
-    if (! getKrigopt().hasDiscs())
+    if (!getKrigopt().hasDiscs())
     {
       // Center the information in the blocks of the output grid
       // Duplicating the coordinate variable names before centering
       _nameCoord = getDbin()->getNamesByLocator(ELoc::X);
-      int error = _centerDataToGrid(dbgrid);
+      int error  = _centerDataToGrid(dbgrid);
       if (error) return false;
     }
     if (getKrigopt().hasDiscs())
     {
       // Center the information in sub-blocks when the output grid defines panels
       VectorInt ndiscs = getKrigopt().getDiscs();
-      DbGrid* dbsmu = DbGrid::createDivider(dbgrid, ndiscs, 1);
-      _nameCoord = getDbin()->getNamesByLocator(ELoc::X);
-      int error = _centerDataToGrid(dbsmu);
+      DbGrid* dbsmu    = DbGrid::createDivider(dbgrid, ndiscs, 1);
+      _nameCoord       = getDbin()->getNamesByLocator(ELoc::X);
+      int error        = _centerDataToGrid(dbsmu);
       delete dbsmu;
       if (error) return false;
     }
@@ -145,7 +145,7 @@ bool CalcKrigingFactors::_postprocess()
   _renameVariable(2, VectorString(), ELoc::Z, nfactor, _iptrEst, "estim", 1);
 
   // Centering the information (only when a change of support is defined)
-  if (_hasChangeSupport() && ! _nameCoord.empty())
+  if (_hasChangeSupport() && !_nameCoord.empty())
     getDbin()->setLocators(_nameCoord, ELoc::X, 0);
 
   return true;
@@ -158,7 +158,7 @@ void CalcKrigingFactors::_rollback()
 
 int CalcKrigingFactors::_getNFactors() const
 {
-  return (int) _iuidFactors.size();
+  return (int)_iuidFactors.size();
 }
 
 /****************************************************************************/
@@ -173,12 +173,12 @@ bool CalcKrigingFactors::_run()
   KrigingSystem ksys(getDbin(), getDbout(), getModel(), getNeigh(), getKrigopt());
   if (ksys.updKrigOptEstim(_iptrEst, _iptrStd, -1)) return 1;
   if (ksys.setKrigOptFactorKriging(true)) return 1;
-  if (! ksys.isReady()) return 1;
+  if (!ksys.isReady()) return 1;
 
   // Loop on the targets to be processed
 
   int ntotal = getDbout()->getNSample() * _getNFactors();
-  int iproc = 0;
+  int iproc  = 0;
   for (int iclass = 1; iclass <= _getNFactors(); iclass++)
   {
     int jptr_est = (_flagEst) ? _iptrEst + iclass - 1 : -1;
@@ -220,14 +220,14 @@ bool CalcKrigingFactors::_run()
  ** \remark have to be defined
  **
  *****************************************************************************/
-int krigingFactors(Db *dbin,
-                   Db *dbout,
-                   Model *model,
-                   ANeigh *neigh,
+int krigingFactors(Db* dbin,
+                   Db* dbout,
+                   Model* model,
+                   ANeigh* neigh,
                    bool flag_est,
                    bool flag_std,
                    const KrigOpt& krigopt,
-                   const NamingConvention &namconv)
+                   const NamingConvention& namconv)
 {
   CalcKrigingFactors krige(flag_est, flag_std);
   krige.setDbin(dbin);

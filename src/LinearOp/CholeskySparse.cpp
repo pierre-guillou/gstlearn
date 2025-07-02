@@ -9,12 +9,10 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/CholeskySparse.hpp"
+#include "Core/SparseInv.hpp"
 #include "LinearOp/CholeskySparseInv.hpp"
-#include "Matrix/AMatrix.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixSparse.hpp"
-#include "Core/SparseInv.hpp"
-
 #include "csparse_f.h"
 #include <Eigen/src/Core/Matrix.h>
 #include <vector>

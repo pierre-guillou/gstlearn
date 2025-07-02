@@ -14,24 +14,24 @@ DbStringFormat::DbStringFormat(unsigned char params,
                                const VectorString& names,
                                const VectorInt& cols,
                                bool useSel)
-    : AStringable(),
-      AStringFormat(1),
-      _params(params),
-      _cols(cols),
-      _names(names),
-      _useSel(useSel),
-      _mode(1)
+  : AStringable()
+  , AStringFormat(1)
+  , _params(params)
+  , _cols(cols)
+  , _names(names)
+  , _useSel(useSel)
+  , _mode(1)
 {
 }
 
 DbStringFormat::DbStringFormat(const DbStringFormat& r)
-    : AStringable(r),
-      AStringFormat(r),
-      _params(r._params),
-      _cols(r._cols),
-      _names(r._names),
-      _useSel(r._useSel),
-      _mode(r._mode)
+  : AStringable(r)
+  , AStringFormat(r)
+  , _params(r._params)
+  , _cols(r._cols)
+  , _names(r._names)
+  , _useSel(r._useSel)
+  , _mode(r._mode)
 {
 }
 
@@ -42,10 +42,10 @@ DbStringFormat& DbStringFormat::operator=(const DbStringFormat& r)
     AStringable::operator=(r);
     AStringFormat::operator=(r);
     _params = r._params;
-    _cols = r._cols;
-    _names = r._names;
+    _cols   = r._cols;
+    _names  = r._names;
     _useSel = r._useSel;
-    _mode = r._mode;
+    _mode   = r._mode;
   }
   return *this;
 }
@@ -75,10 +75,10 @@ String DbStringFormat::toString(const AStringFormat* strfmt) const
   if (_matchFlag(FLAG_LOCATOR))
     sstr << "- Locator Assignments" << std::endl;
 
-  if (! _cols.empty())
+  if (!_cols.empty())
     sstr << "- Statistics on following columns:" << _cols.toString() << std::endl;
 
-  if (! _names.empty())
+  if (!_names.empty())
     sstr << "- Statistics on following variables:" << _names.toString() << std::endl;
 
   if (_useSel)
@@ -99,16 +99,16 @@ bool DbStringFormat::_matchFlag(int flag) const
 }
 
 DbStringFormat* DbStringFormat::create(unsigned char params,
-                                       const VectorString &names,
-                                       const VectorInt &cols,
+                                       const VectorString& names,
+                                       const VectorInt& cols,
                                        bool useSel)
 {
   return new DbStringFormat(params, names, cols, useSel);
 }
 
 DbStringFormat* DbStringFormat::createFromKeys(unsigned char params,
-                                               const VectorString &names,
-                                               const VectorInt &cols,
+                                               const VectorString& names,
+                                               const VectorInt& cols,
                                                bool useSel)
 {
   return new DbStringFormat(params, names, cols, useSel);
@@ -120,11 +120,11 @@ DbStringFormat* DbStringFormat::createFromFlags(bool flag_resume,
                                                 bool flag_stats,
                                                 bool flag_array,
                                                 bool flag_locator,
-                                                const VectorString &names,
-                                                const VectorInt &cols,
+                                                const VectorString& names,
+                                                const VectorInt& cols,
                                                 bool useSel)
 {
-  DbStringFormat *dbfmt = new DbStringFormat();
+  DbStringFormat* dbfmt = new DbStringFormat();
   dbfmt->setFlags(flag_resume, flag_vars, flag_extend, flag_stats, flag_array,
                   flag_locator, names, cols, useSel);
   return dbfmt;
@@ -140,16 +140,15 @@ void DbStringFormat::setFlags(bool flag_resume,
                               const VectorInt& cols,
                               bool useSel)
 {
-  _cols = cols;
-  _names = names;
+  _cols   = cols;
+  _names  = names;
   _useSel = useSel;
 
   _params = 0;
-  if (flag_resume)  _params = _params | FLAG_RESUME;
-  if (flag_vars)    _params = _params | FLAG_VARS;
-  if (flag_extend)  _params = _params | FLAG_EXTEND;
-  if (flag_stats)   _params = _params | FLAG_STATS;
-  if (flag_array)   _params = _params | FLAG_ARRAY;
+  if (flag_resume) _params = _params | FLAG_RESUME;
+  if (flag_vars) _params = _params | FLAG_VARS;
+  if (flag_extend) _params = _params | FLAG_EXTEND;
+  if (flag_stats) _params = _params | FLAG_STATS;
+  if (flag_array) _params = _params | FLAG_ARRAY;
   if (flag_locator) _params = _params | FLAG_LOCATOR;
 }
-

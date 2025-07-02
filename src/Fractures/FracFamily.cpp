@@ -9,8 +9,8 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Fractures/FracFamily.hpp"
-#include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
 FracFamily::FracFamily(double orient,
@@ -23,34 +23,34 @@ FracFamily::FracFamily(double orient,
                        double aterm,
                        double bterm,
                        double range)
-    : AStringable(),
-      ASerializable(),
-      _orient(orient),
-      _dorient(dorient),
-      _theta0(theta0),
-      _alpha(alpha),
-      _ratcst(ratcst),
-      _prop1(prop1),
-      _prop2(prop2),
-      _aterm(aterm),
-      _bterm(bterm),
-      _range(range)
+  : AStringable()
+  , ASerializable()
+  , _orient(orient)
+  , _dorient(dorient)
+  , _theta0(theta0)
+  , _alpha(alpha)
+  , _ratcst(ratcst)
+  , _prop1(prop1)
+  , _prop2(prop2)
+  , _aterm(aterm)
+  , _bterm(bterm)
+  , _range(range)
 {
 }
 
 FracFamily::FracFamily(const FracFamily& r)
-    : AStringable(r),
-      ASerializable(r),
-      _orient(r._orient),
-      _dorient(r._dorient),
-      _theta0(r._theta0),
-      _alpha(r._alpha),
-      _ratcst(r._ratcst),
-      _prop1(r._prop1),
-      _prop2(r._prop2),
-      _aterm(r._aterm),
-      _bterm(r._bterm),
-      _range(r._range)
+  : AStringable(r)
+  , ASerializable(r)
+  , _orient(r._orient)
+  , _dorient(r._dorient)
+  , _theta0(r._theta0)
+  , _alpha(r._alpha)
+  , _ratcst(r._ratcst)
+  , _prop1(r._prop1)
+  , _prop2(r._prop2)
+  , _aterm(r._aterm)
+  , _bterm(r._bterm)
+  , _range(r._range)
 {
 }
 
@@ -60,16 +60,16 @@ FracFamily& FracFamily::operator=(const FracFamily& r)
   {
     AStringable::operator=(r);
     ASerializable::operator=(r);
-    _orient = r._orient;
-    _dorient =r ._dorient;
-    _theta0 = r._theta0;
-    _alpha = r._alpha;
-    _ratcst = r._ratcst;
-    _prop1 = r._prop1;
-    _prop2 = r._prop2;
-    _aterm = r._aterm;
-    _bterm = r._bterm;
-    _range = r._range;
+    _orient  = r._orient;
+    _dorient = r._dorient;
+    _theta0  = r._theta0;
+    _alpha   = r._alpha;
+    _ratcst  = r._ratcst;
+    _prop1   = r._prop1;
+    _prop2   = r._prop2;
+    _aterm   = r._aterm;
+    _bterm   = r._bterm;
+    _range   = r._range;
   }
   return *this;
 }
@@ -99,32 +99,32 @@ String FracFamily::toString(const AStringFormat* /*strfmt*/) const
 bool FracFamily::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
-  ret = ret && _recordRead<double>(is, "Mean orientation", _orient);
-  ret = ret && _recordRead<double>(is, "Tolerance for orientation", _dorient);
-  ret = ret && _recordRead<double>(is, "Reference Poisson intensity", _theta0);
-  ret = ret && _recordRead<double>(is, "Power dependency between layer and intensity", _alpha);
-  ret = ret && _recordRead<double>(is, "Ratio of constant vs. shaped intensity", _ratcst);
-  ret = ret && _recordRead<double>(is, "Survival probability (constant term)", _prop1);
-  ret = ret && _recordRead<double>(is, "Survival probability (length dependent term)", _prop2);
-  ret = ret && _recordRead<double>(is, "Survival probability (cumulative length exponent)", _aterm);
-  ret = ret && _recordRead<double>(is, "Survival probability (layer thickness exponent", _bterm);
-  ret = ret && _recordRead<double>(is, "Fracture repulsion area Range", _range);
+  ret      = ret && _recordRead<double>(is, "Mean orientation", _orient);
+  ret      = ret && _recordRead<double>(is, "Tolerance for orientation", _dorient);
+  ret      = ret && _recordRead<double>(is, "Reference Poisson intensity", _theta0);
+  ret      = ret && _recordRead<double>(is, "Power dependency between layer and intensity", _alpha);
+  ret      = ret && _recordRead<double>(is, "Ratio of constant vs. shaped intensity", _ratcst);
+  ret      = ret && _recordRead<double>(is, "Survival probability (constant term)", _prop1);
+  ret      = ret && _recordRead<double>(is, "Survival probability (length dependent term)", _prop2);
+  ret      = ret && _recordRead<double>(is, "Survival probability (cumulative length exponent)", _aterm);
+  ret      = ret && _recordRead<double>(is, "Survival probability (layer thickness exponent", _bterm);
+  ret      = ret && _recordRead<double>(is, "Fracture repulsion area Range", _range);
   return ret;
 }
 
 bool FracFamily::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
-  ret = ret && _recordWrite<double>(os, "Mean orientation", _orient);
-  ret = ret && _recordWrite<double>(os, "Tolerance for orientation", _dorient);
-  ret = ret && _recordWrite<double>(os, "Reference Poisson intensity", _theta0);
-  ret = ret && _recordWrite<double>(os, "Power dependency between layer and intensity", _alpha);
-  ret = ret && _recordWrite<double>(os, "Ratio of constant vs. shaped intensity", _ratcst);
-  ret = ret && _recordWrite<double>(os, "Survival probability (constant term)", _prop1);
-  ret = ret && _recordWrite<double>(os, "Survival probability (length dependent term)", _prop2);
-  ret = ret && _recordWrite<double>(os, "Survival probability (cumulative length exponent)", _aterm);
-  ret = ret && _recordWrite<double>(os, "Survival probability (layer thickness exponent)", _bterm);
-  ret = ret && _recordWrite<double>(os, "Fracture repulsion area Range", _range);
+  ret      = ret && _recordWrite<double>(os, "Mean orientation", _orient);
+  ret      = ret && _recordWrite<double>(os, "Tolerance for orientation", _dorient);
+  ret      = ret && _recordWrite<double>(os, "Reference Poisson intensity", _theta0);
+  ret      = ret && _recordWrite<double>(os, "Power dependency between layer and intensity", _alpha);
+  ret      = ret && _recordWrite<double>(os, "Ratio of constant vs. shaped intensity", _ratcst);
+  ret      = ret && _recordWrite<double>(os, "Survival probability (constant term)", _prop1);
+  ret      = ret && _recordWrite<double>(os, "Survival probability (length dependent term)", _prop2);
+  ret      = ret && _recordWrite<double>(os, "Survival probability (cumulative length exponent)", _aterm);
+  ret      = ret && _recordWrite<double>(os, "Survival probability (layer thickness exponent)", _bterm);
+  ret      = ret && _recordWrite<double>(os, "Fracture repulsion area Range", _range);
   return ret;
 }
 

@@ -22,7 +22,9 @@ ACholesky::ACholesky(const AMatrix* mat)
 ACholesky::ACholesky(const ACholesky& m)
   : _mat(m._mat)
   , _size(m._size)
-  , _ready(m._ready){}
+  , _ready(m._ready)
+{
+}
 
 ACholesky& ACholesky::operator=(const ACholesky& m)
 {
@@ -37,7 +39,7 @@ ACholesky& ACholesky::operator=(const ACholesky& m)
 
 int ACholesky::_addToDest(const constvect vecin, vect vecout) const
 {
-  if (! isReady()) return 1;
+  if (!isReady()) return 1;
   return addLX(vecin, vecout);
 }
 
@@ -100,11 +102,10 @@ int ACholesky::solveMatrix(const MatrixDense& b, MatrixDense& x) const
   return 0;
 }
 
-
 VectorDouble ACholesky::invLtX(const VectorDouble& vecin) const
 {
   constvect spin(vecin);
-  VectorDouble vecout(_size,0);
+  VectorDouble vecout(_size, 0);
   vect spout(vecout);
   addInvLtX(spin, spout);
   return vecout;
@@ -113,7 +114,7 @@ VectorDouble ACholesky::invLtX(const VectorDouble& vecin) const
 VectorDouble ACholesky::LtX(const VectorDouble& vecin) const
 {
   constvect spin(vecin);
-  VectorDouble vecout(_size,0);
+  VectorDouble vecout(_size, 0);
   vect spout(vecout);
   addLtX(spin, spout);
   return vecout;
@@ -122,7 +123,7 @@ VectorDouble ACholesky::LtX(const VectorDouble& vecin) const
 VectorDouble ACholesky::LX(const VectorDouble& vecin) const
 {
   constvect spin(vecin);
-  VectorDouble vecout(_size,0);
+  VectorDouble vecout(_size, 0);
   vect spout(vecout);
   addLX(spin, spout);
   return vecout;
@@ -131,7 +132,7 @@ VectorDouble ACholesky::LX(const VectorDouble& vecin) const
 VectorDouble ACholesky::invLX(const VectorDouble& vecin) const
 {
   constvect spin(vecin);
-  VectorDouble vecout(_size,0);
+  VectorDouble vecout(_size, 0);
   vect spout(vecout);
   addInvLX(spin, spout);
   return vecout;
@@ -139,7 +140,7 @@ VectorDouble ACholesky::invLX(const VectorDouble& vecin) const
 VectorDouble ACholesky::solveX(const VectorDouble& vecin) const
 {
   constvect spin(vecin);
-  VectorDouble vecout(_size,0);
+  VectorDouble vecout(_size, 0);
   vect spout(vecout);
   addSolveX(spin, spout);
   return vecout;

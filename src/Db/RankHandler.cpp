@@ -9,10 +9,9 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Db/RankHandler.hpp"
-
+#include "Basic/VectorHelper.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Db/Db.hpp"
-#include "Basic/VectorHelper.hpp"
 #include <memory>
 
 RankHandler::RankHandler(const Db* db,
@@ -91,14 +90,14 @@ void RankHandler::_initElligible()
       // Check against a possible selection
       if (_iptrSel >= 0)
       {
-        value                  = _db->getValueByColIdx((int) iabs, _iptrSel);
+        value = _db->getValueByColIdx((int)iabs, _iptrSel);
         _elligible.setValue(ivar, iabs, value > 0);
       }
 
       // Check against validity of the Variance of Measurement Error variable
       if (!_iptrVerr.empty())
       {
-        value                  = _db->getValueByColIdx((int) iabs, _iptrVerr[ivar]);
+        value = _db->getValueByColIdx((int)iabs, _iptrVerr[ivar]);
         _elligible.setValue(ivar, iabs, !FFFF(value) && (value > 0));
       }
 
@@ -108,7 +107,7 @@ void RankHandler::_initElligible()
         bool valid = true;
         for (int iext = 0; iext < _nExtD && valid; iext++)
         {
-          value = _db->getValueByColIdx((int) iabs, _iptrExtD[iext]);
+          value = _db->getValueByColIdx((int)iabs, _iptrExtD[iext]);
           if (FFFF(value)) valid = false;
         }
         _elligible.setValue(ivar, iabs, valid);
@@ -117,7 +116,7 @@ void RankHandler::_initElligible()
       // Check against the existence of a target variable
       if (!_iptrZ.empty())
       {
-        value                  = _db->getValueByColIdx((int) iabs, _iptrZ[ivar]);
+        value = _db->getValueByColIdx((int)iabs, _iptrZ[ivar]);
         _elligible.setValue(ivar, iabs, !FFFF(value));
       }
     }
@@ -139,28 +138,29 @@ RankHandler::RankHandler(const RankHandler& r)
   , _index(r._index)
   , _Zflatten(std::make_shared<VectorDouble>())
   , _db(r._db)
-  , _workNbgh(r._workNbgh){
+  , _workNbgh(r._workNbgh)
+{
 }
 
 RankHandler& RankHandler::operator=(const RankHandler& r)
 {
   if (this != &r)
   {
-    _useSel   = r._useSel;
-    _useZ     = r._useZ;
-    _useVerr  = r._useVerr;
-    _useExtD  = r._useExtD;
-    _nvar     = r._nvar;
-    _nExtD    = r._nExtD;
-    _iptrSel  = r._iptrSel;
-    _iptrZ    = r._iptrZ;
-    _iptrVerr = r._iptrVerr;
-    _iptrExtD = r._iptrExtD;
-    _nbgh     = r._nbgh;
-    _index    = r._index;
-    _Zflatten = r._Zflatten;
-    _db       = r._db;
-    _workNbgh = r._workNbgh;
+    _useSel    = r._useSel;
+    _useZ      = r._useZ;
+    _useVerr   = r._useVerr;
+    _useExtD   = r._useExtD;
+    _nvar      = r._nvar;
+    _nExtD     = r._nExtD;
+    _iptrSel   = r._iptrSel;
+    _iptrZ     = r._iptrZ;
+    _iptrVerr  = r._iptrVerr;
+    _iptrExtD  = r._iptrExtD;
+    _nbgh      = r._nbgh;
+    _index     = r._index;
+    _Zflatten  = r._Zflatten;
+    _db        = r._db;
+    _workNbgh  = r._workNbgh;
     _elligible = r._elligible;
   }
   return *this;
@@ -204,7 +204,7 @@ void RankHandler::defineSampleRanks(const VectorInt& nbgh)
     for (int irel = 0; irel < nech; irel++)
     {
       int iabs = _nbgh[irel];
-      if (!_elligible.getValue(ivar,iabs)) continue;
+      if (!_elligible.getValue(ivar, iabs)) continue;
 
       value = zadd[iabs];
       _Zflatten->push_back(value);
