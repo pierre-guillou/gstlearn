@@ -10,6 +10,7 @@
 /******************************************************************************/
 #include "LinearOp/CholeskySparse.hpp"
 #include "LinearOp/CholeskySparseInv.hpp"
+#include "Matrix/AMatrix.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include "Core/SparseInv.hpp"
@@ -370,9 +371,9 @@ int CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
 
 /**
  * @brief Compute the inverse of the 'this' matrix
- * 
+ *
  * @param vcur Storing the diagonal of the inverse matrix
- * @return int 
+ * @return int
  *
  * @note: The method 'partial_inverse' used assumes a LTT decomposition
  * (which is not the decomposition of _factor [LDLT]). Hence a local
@@ -390,6 +391,6 @@ int CholeskySparse::_stdevEigen(VectorDouble& vcur) const
   llt.compute(a);
 
   Eigen::SparseMatrix Qinv = partial_inverse(llt, a);
-  vcurm = Qinv.diagonal();
+  vcurm                    = Qinv.diagonal();
   return 0;
 }

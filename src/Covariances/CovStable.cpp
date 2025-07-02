@@ -9,28 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovStable.hpp"
-
 #include <math.h>
 #include "Covariances/CovContext.hpp"
 #include "Simulation/TurningBandOperate.hpp"
-#include "Basic/Law.hpp"
 
 CovStable::CovStable(const CovContext& ctxt)
-: ACovFunc(ECov::STABLE, ctxt)
+  : ACovFunc(ECov::STABLE, ctxt)
 {
   setParam(1);
 }
 
-CovStable::CovStable(const CovStable &r)
-: ACovFunc(r)
+CovStable::CovStable(const CovStable& r)
+  : ACovFunc(r)
 {
 }
 
-CovStable& CovStable::operator=(const CovStable &r)
+CovStable& CovStable::operator=(const CovStable& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -52,10 +50,9 @@ double CovStable::_evaluateCov(double h) const
   return (cov);
 }
 
-double CovStable::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovStable::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   if (getParam() > 1)
     return operTB.cosineOne(t0);
-  else
-    return operTB.spectralOne(t0);
+  return operTB.spectralOne(t0);
 }

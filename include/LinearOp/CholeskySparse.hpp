@@ -17,9 +17,9 @@
 #include "Basic/VectorNumT.hpp"
 
 #ifndef SWIG
-  #include <Eigen/Core>
-  #include <Eigen/Dense>
-  #include <Eigen/src/Core/Matrix.h>
+#  include <Eigen/Core>
+#  include <Eigen/Dense>
+#  include <Eigen/src/Core/Matrix.h>
 #endif
 
 #ifndef SWIG
@@ -27,7 +27,7 @@ DISABLE_WARNING_PUSH
 DISABLE_WARNING_COND_EXPR_CONSTANT
 DISABLE_WARNING_UNUSED_BUT_SET_VARIABLE
 DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
-#include <Eigen/Sparse>
+#  include <Eigen/Sparse>
 DISABLE_WARNING_POP
 #endif
 
@@ -63,9 +63,9 @@ private:
   bool _flagEigen;
 
   // Old-style storage
-  mutable css *_S; // Cholesky decomposition (for Old-style Csparse storage)
+  mutable css* _S; // Cholesky decomposition (for Old-style Csparse storage)
   mutable csn* _N; // Cholesky decomposition (for Old-style Csparse storage)
 
   // Eigen storage
-  mutable Eigen::SimplicialLDLT<Eigen::SparseMatrix<double> > *_factor;
+  mutable Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>* _factor;
 };

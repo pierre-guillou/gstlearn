@@ -1179,7 +1179,7 @@ int krigingSPDE(Db* dbin,
   {
     int seedLocal = params.getSeedMC();
     int nMC       = params.getNMC();
-    result   = spdeop->stdev(Z, nMC, seedLocal);
+    result        = spdeop->stdev(Z, nMC, seedLocal);
     int iuid      = dbout->addColumns(result, "stdev", ELoc::UNKNOWN, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                                 "stdev");
