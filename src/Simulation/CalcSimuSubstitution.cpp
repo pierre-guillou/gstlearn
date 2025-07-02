@@ -135,8 +135,8 @@ bool CalcSimuSubstitution::_simulate()
   /* Determination of the extreme values */
   /***************************************/
 
-  double vmin =  1.e30;
-  double vmax = -1.e30;
+  double vmin = MAXIMUM_BIG;
+  double vmax = MINIMUM_BIG;
   for (int iech = 0; iech < dbgrid->getNSample(); iech++)
   {
     if (!dbgrid->isActive(iech)) continue;

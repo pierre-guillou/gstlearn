@@ -88,8 +88,11 @@ GSTLEARN_EXPORT void ut_vandercorput(int n,
                                      int flag_sym,
                                      int flag_rot,
                                      int *ntri_arg,
-                                     double **coor_arg);
-GSTLEARN_EXPORT int ut_icosphere(int n, int flag_rot, int *ntri_arg, double **coor_arg);
+                                     VectorDouble& coord);
+GSTLEARN_EXPORT int ut_icosphere(int n,
+                                 int flag_rot,
+                                 int* ntri_arg,
+                                 VectorDouble& coord);
 GSTLEARN_EXPORT double ut_factorial(int k);
 GSTLEARN_EXPORT void ut_log_factorial(int nbpoly, double *factor);
 GSTLEARN_EXPORT MatrixDense* vanDerCorput(int n, int nd);

@@ -1004,34 +1004,29 @@ static int st_subtract_optimal_drift(LMlayers *lmlayers,
                                      VectorInt& seltab,
                                      VectorDouble& zval)
 {
-  double *atab, *btab, *coeff, drext, coor[2];
+  double drext, coor[2];
   int nlayers, error, iech, iiech, ifois, ilayer, nbfl, neq, ipos;
   int flag_subtract = 1;
   VectorDouble props;
   VectorDouble drift;
+  VectorDouble coeff;
+  VectorDouble atab;
+  VectorDouble btab;
 
   /* Initializations */
 
   error = 1;
   nlayers = lmlayers->nlayers;
-  atab = btab = coeff = nullptr;
   nbfl = lmlayers->nbfl;
   neq = nbfl * nlayers;
 
   /* Core allocation */
 
-  coeff = (double*) mem_alloc(sizeof(double) * neq, 0);
-  if (coeff == nullptr) goto label_end;
+  coeff.resize(neq);
   drift.resize(neq, 0);
   props.resize(nlayers);
-  atab = (double*) mem_alloc(sizeof(double) * neq * neq, 0);
-  if (atab == nullptr) goto label_end;
-  btab = (double*) mem_alloc(sizeof(double) * neq, 0);
-  if (btab == nullptr) goto label_end;
-  for (int i = 0; i < neq; i++)
-    btab[i] = 0.;
-  for (int i = 0; i < neq * neq; i++)
-    atab[i] = 0.;
+  atab.resize(neq * neq, 0.);
+  btab.resize(neq, 0.);
 
   /* Find the vector of optimal mean values */
 
@@ -1075,13 +1070,13 @@ static int st_subtract_optimal_drift(LMlayers *lmlayers,
 
   /* Find the optimal drift coefficients */
 
-  if (matrix_invert(atab, neq, -1)) goto label_end;
-  matrix_product_safe(neq, neq, 1, atab, btab, coeff);
+  if (matrix_invert(atab.data(), neq, -1)) goto label_end;
+  matrix_product_safe(neq, neq, 1, atab.data(), btab.data(), coeff.data());
 
   /* Optional printout of the result */
 
   if (verbose)
-    print_matrix("Estimated Drift", 0, 1, nlayers, nbfl, NULL, coeff);
+    print_matrix("Estimated Drift", 0, 1, nlayers, nbfl, NULL, coeff.data());
 
   /* Subtract the optimal mean */
 
@@ -1119,7 +1114,7 @@ static int st_subtract_optimal_drift(LMlayers *lmlayers,
 
       /* Save the results of the optimal drift */
 
-      set_keypair("Optim_Drift_Coeffs", 1, 1, ipos, coeff);
+      set_keypair("Optim_Drift_Coeffs", 1, 1, ipos, coeff.data());
 
       /* Print the residuals (optional) */
 
@@ -1134,8 +1129,6 @@ static int st_subtract_optimal_drift(LMlayers *lmlayers,
   error = 0;
 
   label_end:
-  mem_free((char* ) atab);
-  mem_free((char* ) btab);
   return (error);
 }
 
@@ -1341,8 +1334,11 @@ static void st_estimate_bayes(LMlayers *lmlayers,
                               double *estim,
                               double *stdev)
 {
-  double *rhs, *ff0, *temp, *fsf0, *c2, estim1, estim2, stdv;
+  double *rhs, *ff0, estim1, estim2, stdv;
   int nech, npar;
+  VectorDouble temp;
+  VectorDouble fsf0;
+  VectorDouble c2;
 
   /* Initializations */
 
@@ -1354,16 +1350,16 @@ static void st_estimate_bayes(LMlayers *lmlayers,
 
   /* Core allocation */
 
-  temp = (double*) mem_alloc(sizeof(double) * npar, 1);
-  fsf0 = (double*) mem_alloc(sizeof(double) * nech, 1);
-  c2 = (double*) mem_alloc(sizeof(double) * nech, 1);
+  temp.resize(npar);
+  fsf0.resize(nech);
+  c2.resize(nech);
 
   /* Perform the estimation */
 
-  matrix_product_safe(nech, npar, 1, a0, ff0, fsf0);
+  matrix_product_safe(nech, npar, 1, a0, ff0, fsf0.data());
   for (int iech = 0; iech < nech; iech++)
     c2[iech] = rhs[iech] + fsf0[iech];
-  matrix_product_safe(nech, nech, 1, cc, c2, wgt);
+  matrix_product_safe(nech, nech, 1, cc, c2.data(), wgt);
 
   matrix_product_safe(1, nech, 1, wgt, zval.data(), &estim1);
   matrix_product_safe(1, npar, 1, ff0, post_mean, &estim2);
@@ -1373,7 +1369,7 @@ static void st_estimate_bayes(LMlayers *lmlayers,
 
   if (flag_std)
   {
-    matrix_product_safe(1, nech, npar, rhs, ss, temp);
+    matrix_product_safe(1, nech, npar, rhs, ss, temp.data());
     for (int ipar = 0; ipar < npar; ipar++)
       temp[ipar] -= ff0[ipar];
 
@@ -1390,12 +1386,6 @@ static void st_estimate_bayes(LMlayers *lmlayers,
                         0.;
     *stdev = stdv;
   }
-
-  /* Core deallocation */
-
-  mem_free((char* ) temp);
-  mem_free((char* ) fsf0);
-  mem_free((char* ) c2);
 }
 
 /****************************************************************************/
@@ -1817,8 +1807,12 @@ static int st_drift_bayes(LMlayers *lmlayers,
                           double *post_mean,
                           double *post_S)
 {
-  double *ffc, *fm1z, *gg, *invH, *invS;
   int error, npar, nech, npar2, nech2;
+  VectorDouble ffc;
+  VectorDouble fm1z;
+  VectorDouble gg;
+  VectorDouble invH;
+  VectorDouble invS;
 
   /* Initializations */
 
@@ -1827,21 +1821,15 @@ static int st_drift_bayes(LMlayers *lmlayers,
   npar = lmlayers->npar;
   npar2 = npar * npar;
   nech2 = nech * nech;
-  ffc = fm1z = gg = invH = invS = nullptr;
 
   /* Core allocation */
 
   VectorDouble fft(npar * nech, 0);
-  ffc = (double*) mem_alloc(sizeof(double) * npar * nech, 0);
-  if (ffc == nullptr) goto label_end;
-  fm1z = (double*) mem_alloc(sizeof(double) * npar, 0);
-  if (fm1z == nullptr) goto label_end;
-  gg = (double*) mem_alloc(sizeof(double) * npar * npar, 0);
-  if (gg == nullptr) goto label_end;
-  invH = (double*) mem_alloc(sizeof(double) * npar * npar, 0);
-  if (invH == nullptr) goto label_end;
-  invS = (double*) mem_alloc(sizeof(double) * npar * npar, 0);
-  if (invS == nullptr) goto label_end;
+  ffc.resize(npar * nech);
+  fm1z.resize(npar);
+  gg.resize(npar * npar);
+  invH.resize(npar * npar);
+  invS.resize(npar * npar);
 
   /* Constitute the prior Variance-Covariance matrix */
 
@@ -1854,7 +1842,7 @@ static int st_drift_bayes(LMlayers *lmlayers,
   if (verbose)
   {
     print_matrix("Prior Mean", 0, 1, lmlayers->nlayers, lmlayers->nbfl, NULL, prior_mean);
-    print_matrix("Prior Variance", 0, 1, lmlayers->npar, lmlayers->npar, NULL, invS);
+    print_matrix("Prior Variance", 0, 1, lmlayers->npar, lmlayers->npar, NULL, invS.data());
   }
 
   /* Invert the Data Variance-Covariance matrix */
@@ -1866,19 +1854,19 @@ static int st_drift_bayes(LMlayers *lmlayers,
   /* Invert the prior Variance-Covariance matrix */
 
   if (get_keypone("Bayes_Debug_Flag", 0))
-    set_keypair("Bayes_S_Matrix", 1, npar, npar, invS);
-  if (matrix_invert(invS, npar, -1)) goto label_end;
+    set_keypair("Bayes_S_Matrix", 1, npar, npar, invS.data());
+  if (matrix_invert(invS.data(), npar, -1)) goto label_end;
 
   /* Auxiliary calculations */
 
-  matrix_product_safe(npar, nech, nech, fftab.data(), acov, ffc);
+  matrix_product_safe(npar, nech, nech, fftab.data(), acov, ffc.data());
   matrix_transpose(npar, nech, fftab, fft);
-  matrix_product_safe(npar, nech, npar, ffc, fft.data(), invH);
-  matrix_product_safe(npar, nech, 1, ffc, zval.data(), fm1z);
+  matrix_product_safe(npar, nech, npar, ffc.data(), fft.data(), invH.data());
+  matrix_product_safe(npar, nech, 1, ffc.data(), zval.data(), fm1z.data());
   if (get_keypone("Bayes_Debug_Flag", 0))
-    set_keypair("Bayes_InvH_Matrix", 1, npar, npar, invH);
+    set_keypair("Bayes_InvH_Matrix", 1, npar, npar, invH.data());
   if (get_keypone("Bayes_Debug_Flag", 0))
-    set_keypair("Bayes_Fm1z_Matrix", 1, npar, 1, fm1z);
+    set_keypair("Bayes_Fm1z_Matrix", 1, npar, 1, fm1z.data());
 
   /* Calculate the Posterior Variance-Covariance matrix */
 
@@ -1890,10 +1878,10 @@ static int st_drift_bayes(LMlayers *lmlayers,
 
   /* Calculate the Posterior Mean vector */
 
-  matrix_product_safe(npar, npar, 1, invS, prior_mean, post_mean);
+  matrix_product_safe(npar, npar, 1, invS.data(), prior_mean, post_mean);
   for (int i = 0; i < npar; i++)
     fm1z[i] += post_mean[i];
-  matrix_product_safe(npar, npar, 1, post_S, fm1z, post_mean);
+  matrix_product_safe(npar, npar, 1, post_S, fm1z.data(), post_mean);
   if (get_keypone("Bayes_Debug_Flag", 0))
     set_keypair("Bayes_Post_Mean_Matrix", 1, npar, 1, post_mean);
 
@@ -1919,14 +1907,14 @@ static int st_drift_bayes(LMlayers *lmlayers,
   matrix_product_safe(nech, nech, npar, acov, fft.data(), ss);
   for (int i = 0; i < npar2; i++)
     invS[i] = post_S[i];
-  if (matrix_invert(invS, npar, -1)) goto label_end;
+  if (matrix_invert(invS.data(), npar, -1)) goto label_end;
   for (int i = 0; i < npar2; i++)
     gg[i] = invH[i] + invS[i];
-  if (matrix_invert(gg, npar, -1)) goto label_end;
+  if (matrix_invert(gg.data(), npar, -1)) goto label_end;
   if (get_keypone("Bayes_Debug_Flag", 0))
-    set_keypair("Mlayers_GG_Matrix", 1, npar, npar, gg);
+    set_keypair("Mlayers_GG_Matrix", 1, npar, npar, gg.data());
 
-  matrix_prod_norme(1, nech, npar, ss, gg, cc);
+  matrix_prod_norme(1, nech, npar, ss, gg.data(), cc);
   for (int i = 0; i < nech2; i++)
     cc[i] = acov[i] - cc[i];
   for (int i = 0; i < npar2; i++)
@@ -1940,11 +1928,6 @@ static int st_drift_bayes(LMlayers *lmlayers,
   error = 0;
 
   label_end:
-  mem_free((char* ) ffc);
-  mem_free((char* ) fm1z);
-  mem_free((char* ) gg);
-  mem_free((char* ) invH);
-  mem_free((char* ) invS);
   return (error);
 }
 
@@ -1998,8 +1981,7 @@ int multilayers_kriging(Db* dbin,
                         int verbose)
 {
   int nlayers, ilayer, nechmax, nech, iech, neq, nvar, npar, error;
-  double *a, *b2, *dual, *c00, *wgt;
-  double *acov, *atot, *a0, *cc, *ss, *gs, *post_mean, *post_S;
+  double *a;
   MatrixSquare covtab;
   bool flag_created;
   ELoc ptime;
@@ -2010,16 +1992,25 @@ int multilayers_kriging(Db* dbin,
   VectorDouble fftab;
   VectorDouble baux;
   VectorDouble b;
+  VectorDouble b2;
+  VectorDouble atot;
+  VectorDouble acov;
+  VectorDouble dual;
+  VectorDouble wgt;
+  VectorDouble c00;
+  VectorDouble a0;
+  VectorDouble cc;
+  VectorDouble ss;
+  VectorDouble gs;
+  VectorDouble post_S;
+  VectorDouble post_mean;
   LMlayers *lmlayers;
 
   /* Preliminary checks */
 
   error = 1;
   flag_created = false;
-  a = b2 = dual = nullptr;
-  c00 = wgt = nullptr;
-  acov = atot = nullptr;
-  a0 = cc = ss = gs = post_mean = post_S = nullptr;
+  a = nullptr;
   lmlayers = nullptr;
   nlayers = model->getNVar();
   nechmax = dbin->getNSample();
@@ -2134,34 +2125,35 @@ int multilayers_kriging(Db* dbin,
 
   npar = lmlayers->npar;
   neq = lmlayers->nech + npar;
-  atot = (double*) mem_alloc(sizeof(double) * neq * neq, 1);
-  acov = (double*) mem_alloc(sizeof(double) * nech * nech, 1);
-  b2 = (double*) mem_alloc(sizeof(double) * neq, 1);
+  atot.resize(neq * neq);
+  acov.resize(nech * nech);
+  b2.resize(neq);
   b.resize(neq);
   baux.resize(neq);
   zval.resize(neq);
-  dual = (double*) mem_alloc(sizeof(double) * neq, 1);
-  wgt = (double*) mem_alloc(sizeof(double) * neq, 1);
+  dual.resize(neq);
+  wgt.resize(neq);
   covtab = MatrixSquare(nlayers);
-  c00 = (double*) mem_alloc(sizeof(double) * nlayers, 1);
+  c00.resize(nlayers);
   if (flag_bayes)
   {
     fftab.resize(nech * npar, 0);
-    a0 = (double*) mem_alloc(sizeof(double) * nech * npar, 1);
-    cc = (double*) mem_alloc(sizeof(double) * nech * nech, 1);
-    ss = (double*) mem_alloc(sizeof(double) * nech * npar, 1);
-    gs = (double*) mem_alloc(sizeof(double) * npar * npar, 1);
-    post_S = (double*) mem_alloc(sizeof(double) * npar * npar, 1);
-    post_mean = (double*) mem_alloc(sizeof(double) * npar, 1);
+    a0.resize(nech * npar);
+    cc.resize(nech * nech);
+    ss.resize(nech * npar);
+    gs.resize(npar * npar);
+    post_S.resize(npar * npar);
+    post_mean.resize(npar);
   }
   lmlayers->neq = neq;
   if (verbose) lmlayers_print(lmlayers);
 
   /* Establish the kriging matrix */
 
-  st_lhs(lmlayers, dbin, dbout, model, seltab, prop1, prop2, covtab, atot, acov);
+  st_lhs(lmlayers, dbin, dbout, model, seltab, prop1, prop2, covtab,
+         atot.data(), acov.data());
   if (OptDbg::isReferenceDefined() || OptDbg::query(EDbg::KRIGING))
-    krige_lhs_print(nech, neq, neq, NULL, atot);
+    krige_lhs_print(nech, neq, neq, NULL, atot.data());
 
   /* Establish the data vector */
 
@@ -2176,7 +2168,7 @@ int multilayers_kriging(Db* dbin,
 
   /* Assign the Variance-Covariance matrix */
 
-  a = (flag_bayes) ? acov : atot;
+  a = (flag_bayes) ? acov.data() : atot.data();
 
   /* Calculate the Posterior in the Bayesian case */
 
@@ -2184,20 +2176,23 @@ int multilayers_kriging(Db* dbin,
   {
     if (st_drift_data(lmlayers, dbin, dbout, seltab, prop1, fftab)) goto label_end;
     if (st_drift_bayes(lmlayers, verbose, prior_mean, prior_vars, a, zval,
-                       fftab, a0, cc, ss, gs, post_mean, post_S))
+                       fftab, a0.data(), cc.data(), ss.data(), gs.data(), 
+                       post_mean.data(), post_S.data()))
       goto label_end;
   }
   else
   {
     if (matrix_invert(a, neq, -1)) goto label_end;
-    matrix_product_safe(neq, neq, 1, a, zval.data(), dual);
+    matrix_product_safe(neq, neq, 1, a, zval.data(), dual.data());
   }
 
   /* Perform the estimation over the grid nodes */
 
   st_estimate(lmlayers, dbin, dbout, model, seltab, flag_bayes, flag_std, a,
-              zval, dual, prop1, prop2, covtab, b, b2, baux, wgt, c00, fftab,
-              a0, cc, ss, gs, prior_mean, post_mean);
+              zval, dual.data(), prop1, prop2, covtab, b, b2.data(), 
+              baux, wgt.data(), c00.data(), fftab,
+              a0.data(), cc.data(), ss.data(), gs.data(), 
+              prior_mean, post_mean.data());
 
   /* Reconstitute the surfaces (optional) */
 
@@ -2210,18 +2205,6 @@ int multilayers_kriging(Db* dbin,
   label_end:
   (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
   (void) manageExternalInformation(-1, ELoc::F, dbin, dbout, &flag_created);
-  mem_free((char* ) dual);
-  mem_free((char* ) atot);
-  mem_free((char* ) acov);
-  mem_free((char* ) b2);
-  mem_free((char* ) c00);
-  mem_free((char* ) wgt);
-  mem_free((char* ) a0);
-  mem_free((char* ) cc);
-  mem_free((char* ) ss);
-  mem_free((char* ) gs);
-  mem_free((char* ) post_S);
-  mem_free((char* ) post_mean);
   lmlayers = lmlayers_free(lmlayers);
   return (error);
 }
@@ -2351,17 +2334,19 @@ static int st_varioexp_chh(LMlayers *lmlayers,
                            int idir,
                            Vario *vario)
 {
-  double *atab, *btab, *sill, distsum;
-  int *stat, error, nlayers, iadlag, nhalf, nhalf2, nval;
+  double distsum;
+  int error, nlayers, iadlag, nhalf, nhalf2, nval;
   int ilag, number, ifirst, ilast, ilayer, jlayer, ijl;
   VectorDouble phia;
   VectorDouble phib;
+  VectorDouble btab;
+  VectorDouble atab;
+  VectorDouble sill;
+  VectorInt stat;
 
   /* Initializations */
 
   error = 1;
-  sill = atab = btab = nullptr;
-  stat = nullptr;
   nlayers = lmlayers->nlayers;
   nhalf = nlayers * (nlayers + 1) / 2;
   nhalf2 = nhalf * nhalf;
@@ -2370,14 +2355,10 @@ static int st_varioexp_chh(LMlayers *lmlayers,
 
   phia.resize(nlayers);
   phib.resize(nlayers);
-  btab = (double*) mem_alloc(sizeof(double) * nhalf, 0);
-  if (btab == nullptr) goto label_end;
-  atab = (double*) mem_alloc(sizeof(double) * nhalf2, 0);
-  if (atab == nullptr) goto label_end;
-  sill = (double*) mem_alloc(sizeof(double) * nhalf, 0);
-  if (sill == nullptr) goto label_end;
-  stat = (int*) mem_alloc(sizeof(int) * nlayers * nlayers, 0);
-  if (stat == nullptr) goto label_end;
+  btab.resize(nhalf);
+  atab.resize(nhalf2);
+  sill.resize(nhalf);
+  stat.resize(nlayers * nlayers);
 
   /* Loop on the lags */
 
@@ -2390,40 +2371,41 @@ static int st_varioexp_chh(LMlayers *lmlayers,
     /* Loop on the pairs contributing to the lag */
 
     if (st_evaluate_lag(lmlayers, dbin, dbout, vorder, nlayers, ifirst, ilast,
-                        zval, &nval, &distsum, stat, phia, phib, atab, btab))
+                        zval, &nval, &distsum, stat.data(), phia, phib, 
+                        atab.data(), btab.data()))
       goto label_end;
 
     if (OptDbg::query(EDbg::VARIOGRAM))
     {
       message("Lag %d\n", ilag + 1);
-      print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab);
-      print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab);
+      print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab.data());
+      print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab.data());
     }
 
-    if (matrix_invert(atab, nhalf, -2))
+    if (matrix_invert(atab.data(), nhalf, -2))
     {
       messerr("--> Inversion problem for lag %d", ilag + 1);
       if (verbose)
       {
         /* Matrix must be evaluated (as it has been destroyed by inversion) */
         (void) st_evaluate_lag(lmlayers, dbin, dbout, vorder, nlayers, ifirst,
-                               ilast, zval, &nval, &distsum, stat, phia, phib,
-                               atab, btab);
+                               ilast, zval, &nval, &distsum, stat.data(), phia, phib,
+                               atab.data(), btab.data());
         messerr("Number of pairs  = %d", nval);
         messerr("Average distance = %lf", distsum);
         print_imatrix("Number of samples per layer", 0, 1, nlayers, nlayers,
-        NULL,
-                      stat);
-        print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab);
-        print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab);
+                      NULL, stat.data());
+        print_matrix("L.H.S.", 0, 1, nhalf, nhalf, NULL, atab.data());
+        print_matrix("R.H.S.", 0, 1, 1, nhalf, NULL, btab.data());
       }
       continue;
     }
-    matrix_product_safe(1, nhalf, nhalf, btab, atab, sill);
+    matrix_product_safe(1, nhalf, nhalf, btab.data(), atab.data(), sill.data());
 
     /* Optional printout */
 
-    if (OptDbg::query(EDbg::VARIOGRAM)) print_trimat("C(h)", 2, nlayers, sill);
+    if (OptDbg::query(EDbg::VARIOGRAM)) 
+      print_trimat("C(h)", 2, nlayers, sill.data());
 
     /* Store the covariance values */
 
@@ -2447,10 +2429,6 @@ static int st_varioexp_chh(LMlayers *lmlayers,
   error = 0;
 
   label_end:
-  mem_free((char* ) atab);
-  mem_free((char* ) btab);
-  mem_free((char* ) sill);
-  mem_free((char* ) stat);
   return (error);
 }
 

@@ -102,11 +102,11 @@ GSTLEARN_EXPORT void ut_classify(int nech,
                                  int *ntest,
                                  int *nout,
                                  int *classe);
-GSTLEARN_EXPORT double ut_median(double *tab, int ntab);
+GSTLEARN_EXPORT double ut_median(VectorDouble& tab, int ntab);
 GSTLEARN_EXPORT double ut_cnp(int n, int k);
 GSTLEARN_EXPORT MatrixSquare ut_pascal(int ndim);
 GSTLEARN_EXPORT int* ut_combinations(int n, int maxk, int *ncomb);
-GSTLEARN_EXPORT void ut_shuffle_array(int nrow, int ncol, double *tab);
+GSTLEARN_EXPORT void ut_shuffle_array(int nrow, int ncol, VectorDouble& tab);
 
 GSTLEARN_EXPORT VectorInt getListActiveToAbsolute(const VectorDouble &sel);
 GSTLEARN_EXPORT std::map<int, int> getMapAbsoluteToRelative(const VectorDouble &sel,

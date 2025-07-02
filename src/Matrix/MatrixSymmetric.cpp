@@ -614,7 +614,7 @@ int MatrixSymmetric::minimizeWithConstraintsInPlace(const VectorDouble& gmat,
       /* Find an admissible solution between previous and new candidates */
 
       first = -1;
-      omin = 1.e30;
+      omin = MAXIMUM_BIG;
       for (int i = 0; i < nai; i++)
       {
         if (active[i] != 0) continue;

@@ -142,7 +142,6 @@ set(SRC
   Core/foxleg.cpp
   Core/util.cpp
   Core/ascii.cpp
-  Core/pile.cpp
   Core/mlayers.cpp
   Core/thresh.cpp
   Core/fft.cpp

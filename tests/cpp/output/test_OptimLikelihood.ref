@@ -27,6 +27,7 @@ Exponential
 Total Sill     =      2.000
 Known Mean(s)     0.000
 Start Fitting Model with Vecchia Approximation
+(Gradient Option is 0)
 
 Fitted Model
 ------------
@@ -56,6 +57,7 @@ Drift Part
 ----------
 Universality_Condition
 Start Fitting Model with Likelihood
+(Gradient Option is 1)
 
 Fitted Model
 ------------

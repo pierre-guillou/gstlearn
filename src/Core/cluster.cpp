@@ -24,11 +24,9 @@ License: BSD 3-clause
 
 #include "geoslib_old_f.h"
 #include "Basic/Law.hpp"
-#include "Basic/Memory.hpp"
 
 #include <limits.h>
 
-#define DBL_MAXIMUM 1.e30
 #define DATA(iech,ivar)         (data[(iech)    * nvar + (ivar)])
 #define DATA1(iech,ivar)        (data1[(iech)   * nvar + (ivar)])
 #define DATA2(iech,ivar)        (data2[(iech)   * nvar + (ivar)])
@@ -47,8 +45,8 @@ License: BSD 3-clause
  **
  *****************************************************************************/
 static double st_distance(int nvar,
-                          const double *data1,
-                          const double *data2,
+                          const VectorDouble& data1,
+                          const VectorDouble& data2,
                           int index1,
                           int index2)
 {
@@ -76,7 +74,9 @@ static double st_distance(int nvar,
  ** \param[out] clusterid Array of cluster number for each sample
  **
  *****************************************************************************/
-static void st_randomassign(int nclusters, int nech, int *clusterid)
+static void st_randomassign(int nclusters,
+                            int nech,
+                            VectorInt& clusterid)
 {
   int i, j;
   int k = 0;
@@ -120,7 +120,9 @@ static void st_randomassign(int nclusters, int nech, int *clusterid)
  ** \param[in]  clusterid Array of cluster number for each sample
  **
  *****************************************************************************/
-static void st_printclusterlist(int nclusters, int nech, int *clusterid)
+static void st_printclusterlist(int nclusters,
+                                int nech,
+                                const VectorInt& clusterid)
 {
   message("Population of %d clusters\n", nclusters);
   for (int i = 0; i < nech; i++)
@@ -136,7 +138,9 @@ static void st_printclusterlist(int nclusters, int nech, int *clusterid)
  ** \param[in]  clusterid Array of cluster number for each sample
  **
  *****************************************************************************/
-static void st_printclustercount(int nclusters, int nech, const int *clusterid)
+static void st_printclustercount(int nclusters,
+                                 int nech,
+                                 const VectorInt& clusterid)
 {
   int j, count;
 
@@ -167,13 +171,13 @@ static void st_printclustercount(int nclusters, int nech, const int *clusterid)
  ** \param[out] cmask     Array containing the number of sample per cluster
  **
  *****************************************************************************/
-static void st_getclustermeans(const double *data,
+static void st_getclustermeans(const VectorDouble& data,
                                int nvar,
                                int nech,
                                int nclusters,
-                               const int *clusterid,
-                               double *cdata,
-                               int *cmask)
+                               const VectorInt& clusterid,
+                               VectorDouble& cdata,
+                               VectorInt& cmask)
 {
   int i, j, k;
 
@@ -211,13 +215,13 @@ static void st_getclustermeans(const double *data,
  ** \param[out] cache     Array for storing data of a cluster
  **
  *****************************************************************************/
-static void st_getclustermedian(const double *data,
+static void st_getclustermedian(const VectorDouble& data,
                                 int nvar,
                                 int nech,
                                 int nclusters,
-                                const int *clusterid,
-                                double *cdata,
-                                double *cache)
+                                const VectorInt& clusterid,
+                                VectorDouble& cdata,
+                                VectorDouble& cache)
 {
   int i, j, k, count;
 
@@ -250,27 +254,23 @@ static void st_getclustermedian(const double *data,
  ** \param[in]  nvar      Number of samples
  ** \param[in]  nech      Number of variables
  **
+ ** \param[out] distmatrix Matrix of distances
+ **
  *****************************************************************************/
-static double* st_get_distmatrix(double *data, int nvar, int nech)
+static void st_get_distmatrix(const VectorDouble& data,
+                              int nvar,
+                              int nech,
+                              VectorDouble& distmatrix)
 {
-  double *distmatrix;
-
-  /* Initializations */
-
-  distmatrix = nullptr;
-
   /* Core allocation */
 
-  distmatrix = (double*) mem_alloc(sizeof(double) * nech * nech, 0);
-  if (distmatrix == nullptr) return (distmatrix);
+  distmatrix.resize(nech * nech);
 
   /* Calculate the distance matrix */
 
   for (int i = 0; i < nech; i++)
     for (int j = 0; j < i; j++)
       DISTMATRIX(i,j) = st_distance(nvar, data, data, i, j);
-
-  return (distmatrix);
 }
 
 /*****************************************************************************/
@@ -288,16 +288,16 @@ static double* st_get_distmatrix(double *data, int nvar, int nech)
  *****************************************************************************/
 static void st_getclustermedoids(int nech,
                                  int nclusters,
-                                 const double *distmatrix,
-                                 const int *clusterid,
-                                 int *centroids,
-                                 double *errors)
+                                 const VectorDouble& distmatrix,
+                                 const VectorInt& clusterid,
+                                 VectorInt& centroids,
+                                 VectorDouble& errors)
 {
   double d;
   int j;
 
   for (int i = 0; i < nclusters; i++)
-    errors[i] = DBL_MAXIMUM;
+    errors[i] = MAXIMUM_BIG;
 
   for (int i = 0; i < nech; i++)
   {
@@ -306,8 +306,7 @@ static void st_getclustermedoids(int nech,
     for (int k = 0; k < nech; k++)
     {
       if (i == k || clusterid[k] != j) continue;
-      d += (i < k ? DISTMATRIX(k, i) :
-                    DISTMATRIX(i, k));
+      d += (i < k ? DISTMATRIX(k, i) : DISTMATRIX(i, k));
       if (d > errors[j]) break;
     }
     if (d < errors[j])
@@ -334,24 +333,27 @@ static void st_getclustermedoids(int nech,
  ** \param[in]  verbose   Verbose option
  **
  ****************************************************************************/
-double* kclusters(double *data,
-                  int nvar,
-                  int nech,
-                  int nclusters,
-                  int npass,
-                  int mode,
-                  int verbose)
+VectorDouble kclusters(const VectorDouble& data,
+                       int nvar,
+                       int nech,
+                       int nclusters,
+                       int npass,
+                       int mode,
+                       int verbose)
 {
-  int i, j, k, ifound, error, niter, period, flag_same;
-  int *clusterid, *tclusterid, *counts, *cmask, *mapping, *saved;
-  double *cdata, *cache, total, previous, distance, tdistance, distot;
+  int i, j, k, niter, period, flag_same;
+  double total, previous, distance, tdistance, distot;
+  VectorInt clusterid;
+  VectorInt tclusterid;
+  VectorInt counts;
+  VectorInt saved;
+  VectorInt cmask;
+  VectorInt mapping;
+  VectorDouble cache;
+  VectorDouble cdata;
 
   /* Initializations */
 
-  error = 1;
-  ifound = 0;
-  clusterid = tclusterid = saved = counts = cmask = mapping = nullptr;
-  cdata = cache = nullptr;
   if (nclusters >= nech)
   {
     messerr(
@@ -362,32 +364,21 @@ double* kclusters(double *data,
 
   /* Core allocation */
 
-  clusterid = (int*) mem_alloc(sizeof(int) * nech, 0);
-  if (clusterid == nullptr) goto label_end;
-  tclusterid = (int*) mem_alloc(sizeof(int) * nech, 0);
-  if (tclusterid == nullptr) goto label_end;
-  saved = (int*) mem_alloc(sizeof(int) * nech, 0);
-  if (saved == nullptr) goto label_end;
-  cache = (double*) mem_alloc(sizeof(double) * nech, 0);
-  if (cache == nullptr) goto label_end;
-  counts = (int*) mem_alloc(sizeof(int) * nclusters, 0);
-  if (counts == nullptr) goto label_end;
-  cmask = (int*) mem_alloc(sizeof(int) * nclusters, 0);
-  if (cmask == nullptr) goto label_end;
-  mapping = (int*) mem_alloc(sizeof(int) * nclusters, 0);
-  if (mapping == nullptr) goto label_end;
-  cdata = (double*) mem_alloc(sizeof(double) * nclusters * nvar, 0);
-  if (cdata == nullptr) goto label_end;
-  for (i = 0; i < nech; i++)
-    clusterid[i] = 0;
+  clusterid.resize(nech, 0);
+  tclusterid.resize(nech);
+  saved.resize(nech);
+  cache.resize(nech);
+  counts.resize(nclusters);
+  cmask.resize(nclusters);
+  mapping.resize(nclusters);
+  cdata.resize(nclusters * nvar);
 
-  ifound = 1;
-  distot = DBL_MAXIMUM;
+  distot = MAXIMUM_BIG;
 
   for (int ipass = 0; ipass < npass; ipass++)
   {
     if (verbose) message("Pass #%d\n", ipass + 1);
-    total = DBL_MAXIMUM;
+    total = MAXIMUM_BIG;
     niter = 0;
     period = 10;
 
@@ -473,7 +464,6 @@ double* kclusters(double *data,
       {
         if (total < distot)
         {
-          ifound = 1;
           distot = total;
           for (j = 0; j < nech; j++)
             clusterid[j] = tclusterid[j];
@@ -481,7 +471,6 @@ double* kclusters(double *data,
         break;
       }
     }
-    if (i == nech) ifound++;
   }
 
   /* Final printout (optional) */
@@ -495,17 +484,7 @@ double* kclusters(double *data,
 
   /* Set the error return code */
 
-  error = 0;
-
-  label_end: if (error || ifound <= 0)
-    cdata = (double*) mem_free((char* ) cdata);
-  mem_free((char* ) clusterid);
-  mem_free((char* ) tclusterid);
-  mem_free((char* ) saved);
-  mem_free((char* ) counts);
-  mem_free((char* ) cmask);
-  mem_free((char* ) mapping);
-  mem_free((char* ) cache);
+  label_end: 
   return (cdata);
 }
 
@@ -524,23 +503,24 @@ double* kclusters(double *data,
  ** \param[in]  verbose   Verbose option
  **
  *****************************************************************************/
-int* kmedoids(double *data,
-                              int nvar,
-                              int nech,
-                              int nclusters,
-                              int npass,
-                              int verbose)
+VectorInt kmedoids(const VectorDouble& data,
+                   int nvar,
+                   int nech,
+                   int nclusters,
+                   int npass,
+                   int verbose)
 {
-  int i, j, error, niter, ifound, period, flag_same;
-  int *clusterid, *tclusterid, *saved, *centroids;
-  double *errors, *distmatrix, distot, total, previous, distance;
+  int i, j, niter, period, flag_same;
+  double distot, total, previous, distance;
+  VectorDouble distmatrix;
+  VectorInt clusterid;
+  VectorInt centroids;
+  VectorInt saved;
+  VectorInt tclusterid;
+  VectorDouble errors;
 
   /* Initializations */
 
-  error = 1;
-  ifound = 0;
-  saved = centroids = tclusterid = clusterid = nullptr;
-  errors = distmatrix = nullptr;
   if (nclusters >= nech)
   {
     messerr(
@@ -551,31 +531,21 @@ int* kmedoids(double *data,
 
   /* Core allocation */
 
-  clusterid = (int*) mem_alloc(sizeof(int) * nech, 0);
-  if (clusterid == nullptr) goto label_end;
-  tclusterid = (int*) mem_alloc(sizeof(int) * nech, 0);
-  if (tclusterid == nullptr) goto label_end;
-  saved = (int*) mem_alloc(sizeof(int) * nech, 0);
-  if (saved == nullptr) goto label_end;
-  centroids = (int*) mem_alloc(sizeof(int) * nclusters, 0);
-  if (centroids == nullptr) goto label_end;
-  errors = (double*) mem_alloc(sizeof(double) * nclusters, 0);
-  if (errors == nullptr) goto label_end;
-  for (i = 0; i < nech; i++)
-    clusterid[i] = 0;
+  clusterid.resize(nech, 0);
+  tclusterid.resize(nech);
+  saved.resize(nech);
+  centroids.resize(nclusters);
+  errors.resize(nclusters);
 
   /* Calculate the distance matrix */
 
-  distmatrix = st_get_distmatrix(data, nvar, nech);
-  if (distmatrix == nullptr) goto label_end;
-
-  ifound = 1;
-  distot = DBL_MAXIMUM;
+  st_get_distmatrix(data, nvar, nech, distmatrix);
+  distot = MAXIMUM_BIG;
 
   for (int ipass = 0; ipass < npass; ipass++)
   {
     if (verbose) message("Pass #%d\n", ipass + 1);
-    total = DBL_MAXIMUM;
+    total = MAXIMUM_BIG;
     niter = 0;
     period = 10;
 
@@ -605,7 +575,7 @@ int* kmedoids(double *data,
       {
         /* Calculate the distance */
 
-        distance = DBL_MAXIMUM;
+        distance = MAXIMUM_BIG;
         for (int icluster = 0; icluster < nclusters; icluster++)
         {
           double tdistance;
@@ -616,8 +586,7 @@ int* kmedoids(double *data,
             tclusterid[i] = icluster;
             break;
           }
-          tdistance = (i > j) ? DISTMATRIX(i, j) :
-                                DISTMATRIX(j, i);
+          tdistance = (i > j) ? DISTMATRIX(i, j) : DISTMATRIX(j, i);
           if (tdistance < distance)
           {
             distance = tdistance;
@@ -639,7 +608,6 @@ int* kmedoids(double *data,
 
     if (npass <= 1)
     {
-      ifound = 1;
       distot = total;
       for (j = 0; j < nech; j++)
       {
@@ -654,7 +622,6 @@ int* kmedoids(double *data,
       {
         if (total < distot)
         {
-          ifound = 1;
           distot = total;
           for (j = 0; j < nech; j++)
           {
@@ -664,18 +631,10 @@ int* kmedoids(double *data,
         break;
       }
     }
-    if (i == nech) ifound++;
   }
 
   /* Set the error return code */
 
-  error = 0;
-
   label_end:
-  if (error || ifound <= 0) free(tclusterid);
-  mem_free((char* ) centroids);
-  mem_free((char* ) saved);
-  mem_free((char* ) errors);
-  mem_free((char* ) distmatrix);
   return (clusterid);
 }

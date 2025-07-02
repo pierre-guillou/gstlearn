@@ -559,7 +559,7 @@ int dbPolygonDistance(Db *db,
 
   if (scale != 0 || polin != 0)
   {
-    distmin = 1.e30;
+    distmin = MAXIMUM_BIG;
     distmax = 0.;
     for (int iech = 0; iech < nech; iech++)
     {

@@ -749,14 +749,14 @@ int CalcAnamTransform::_uniformConditioning(Db* db,
 
   /* Computing S and Y on panels */
 
-  double vv_min = 1.e30;
-  double zv_min = 1.e30;
-  double vv_max = -1.e30;
-  double zv_max = -1.e30;
-  double sv_min = 1.e30;
-  double yv_min = 1.e30;
-  double sv_max = -1.e30;
-  double yv_max = -1.e30;
+  double vv_min = MAXIMUM_BIG;
+  double zv_min = MAXIMUM_BIG;
+  double vv_max = MINIMUM_BIG;
+  double zv_max = MINIMUM_BIG;
+  double sv_min = MAXIMUM_BIG;
+  double yv_min = MAXIMUM_BIG;
+  double sv_max = MINIMUM_BIG;
+  double yv_max = MINIMUM_BIG;
 
   for (int iech = 0; iech < db->getNSample(); iech++)
   {

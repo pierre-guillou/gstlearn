@@ -19,6 +19,7 @@
 #include "Calculators/CalcMigrate.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Variogram/VMap.hpp"
+#include "geoslib_define.h"
 
 SpatialIndices::SpatialIndices(Db* db)
   : _db(db)
@@ -500,10 +501,10 @@ double SpatialIndices::getMicroStructure(const String& name,
 
   // Calculate the Field extension 
   int number = 0;
-  double xmin = +1.e30;
-  double xmax = -1.e30;
-  double ymin = +1.e30;
-  double ymax = -1.e30;
+  double xmin = MAXIMUM_BIG;
+  double xmax = MINIMUM_BIG;
+  double ymin = MAXIMUM_BIG;
+  double ymax = MINIMUM_BIG;
   for (int iech = 0, nech = _db->getNSample(); iech < nech; iech++)
   {
     if (_discardData(flag_w, iech, name, coor, &value, &weight, &wvalue))
@@ -726,7 +727,7 @@ std::vector<SpacePoint> SpatialIndices::getPatches(const String &name,
 
     // Find which gravity center the current point aggregates to
     int found = -1;
-    double dmin = 1.e30;
+    double dmin = MAXIMUM_BIG;
     for (int ic = 0, ncenter = (int)centers.size(); ic < ncenter; ic++)
     {
       double dist = current.getDistance(centers[ic]);

@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "geoslib_define.h"
 #include "geoslib_old_f.h"
 
 #include "Enum/ELoc.hpp"
@@ -1202,7 +1203,7 @@ int expandPointToGrid(Db *db_point,
   if (ndim_min >= 2 && iatt_scalev >= 0) flag_aniso = 1;
   if (ndim_min >= 3 && iatt_scalew >= 0) flag_aniso = 1;
   int idim_ref = ndim_min - 1;
-  double dmax_ref = 1.e30;
+  double dmax_ref = MAXIMUM_BIG;
   if (! dmax.empty()) dmax_ref = dmax[idim_ref];
 
   // Core allocation
@@ -1350,7 +1351,7 @@ int expandPointToCoor(const Db *db1,
 
     /* Loop on the input structure */
 
-    double distmin = 1.e30;
+    double distmin = MAXIMUM_BIG;
     int iechmin = -1;
     for (int iech1 = 0; iech1 < db1->getNSample(); iech1++)
     {
@@ -1635,7 +1636,7 @@ int expand_point_to_coor(const Db *db1,
 
     /* Loop on the input structure */
 
-    double distmin = 1.e30;
+    double distmin = MAXIMUM_BIG;
     int iechmin = -1;
     for (int iech1 = 0; iech1 < db1->getNSample(); iech1++)
     {
@@ -1954,7 +1955,7 @@ int CalcMigrate::_migrateGridToGrid(DbGrid *db_gridin,
 
   VectorDouble coor(ndim_max);
   VectorDouble dvect(ndim_max);
-  VectorDouble dist(db_gridout->getNSample(), 1.e30);
+  VectorDouble dist(db_gridout->getNSample(), MAXIMUM_BIG);
 
   // Initialize 'coor' as the first target sample
   db_gridout->rankToCoordinatesInPlace(0, coor);
@@ -2027,7 +2028,7 @@ int CalcMigrate::_expandPointToPoint(Db *db1,
 
     /* Loop on the input structure */
 
-    double distmin = 1.e30;
+    double distmin = MAXIMUM_BIG;
     int iechmin = -1;
     for (int iech1 = 0; iech1 < db1->getNSample(); iech1++)
     {
@@ -2090,7 +2091,7 @@ int CalcMigrate::_expandGridToGrid(DbGrid *db_gridin,
   VectorDouble dvect(ndim_max);
   VectorDouble dist(db_gridout->getNSample());
   for (int jech = 0; jech < db_gridout->getNSample(); jech++)
-    dist[jech] = 1.e30;
+    dist[jech] = MAXIMUM_BIG;
 
   /* Loop on the output grid nodes */
 

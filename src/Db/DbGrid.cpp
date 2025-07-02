@@ -2157,8 +2157,8 @@ void DbGrid::clean3DFromSurfaces(const VectorString& names,
 
   int ndim  = 3;
   int idim0 = ndim - 1;
-  double top = +1.e30;
-  double bot = -1.e30;
+  double top = MAXIMUM_BIG;
+  double bot = MINIMUM_BIG;
   double z0 = getX0(idim0);
   double dz = getDX(idim0);
   int nz    = getNX(idim0);

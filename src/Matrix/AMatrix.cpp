@@ -1288,7 +1288,7 @@ double AMatrix::getMeanByColumn(int icol) const
 
 double AMatrix::getMinimum() const
 {
-  double minimum = 1.e30;
+  double minimum = MAXIMUM_BIG;
   for (int icol = 0; icol < getNCols(); icol++)
     for (int irow = 0; irow < getNRows(); irow++)
     {
@@ -1297,13 +1297,13 @@ double AMatrix::getMinimum() const
       if (FFFF(value)) continue;
       if (value < minimum) minimum = value;
     }
-  if (isEqual(minimum,1.e30)) minimum = TEST;
+  if (isEqual(minimum,MAXIMUM_BIG)) minimum = TEST;
   return minimum;
 }
 
 double AMatrix::getMaximum() const
 {
-  double maximum = -1.e30;
+  double maximum = MINIMUM_BIG;
   for (int icol = 0; icol < getNCols(); icol++)
     for (int irow = 0; irow < getNRows(); irow++)
     {
@@ -1312,7 +1312,7 @@ double AMatrix::getMaximum() const
       if (FFFF(value)) continue;
       if (value > maximum) maximum = value;
     }
-  if (isEqual(maximum,-1.e30)) maximum = TEST;
+  if (isEqual(maximum,MINIMUM_BIG)) maximum = TEST;
   return maximum;
 }
 

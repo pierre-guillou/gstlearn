@@ -70,7 +70,7 @@ static double *PT_SPILL = nullptr;
 static double st_htop_evaluate()
 {
   double value;
-  double high = -SIGNE * 1.e30;
+  double high = -SIGNE * MAXIMUM_BIG;
   for (int iy = 0; iy < SY; iy++)
     for (int ix = 0; ix < SX; ix++)
     {
@@ -520,14 +520,14 @@ static void st_print()
 static void st_final_stats(double hspill, int ix0, int iy0)
 {
   int num_inside = 0;
-  double min_inside  =  1.e30;
-  double max_inside  = -1.e30;
+  double min_inside  = MAXIMUM_BIG;
+  double max_inside  = MINIMUM_BIG;
   int num_outside = 0;
-  double min_outside =  1.e30;
-  double max_outside = -1.e30;
+  double min_outside = MAXIMUM_BIG;
+  double max_outside = MINIMUM_BIG;
   int num_else = 0;
-  double min_else    =  1.e30;
-  double max_else    = -1.e30;
+  double min_else    = MAXIMUM_BIG;
+  double max_else    = MINIMUM_BIG;
 
   for (int iy = 0; iy < SY; iy++)
     for (int ix = 0; ix < SX; ix++)
@@ -648,7 +648,7 @@ int spill_point(DbGrid* dbgrid,
   hspill = TEST;
   HMAX = hmax;
   SIGNE = (flag_up) ? 1 : -1;
-  BIGVAL = (flag_up) ? 1.e30 : -1.e30;
+  BIGVAL = (flag_up) ? MAXIMUM_BIG : MINIMUM_BIG;
   VERBOSE_STEP = verbose_step;
   OPTION = option;
   DB = dbgrid;

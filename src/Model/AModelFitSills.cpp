@@ -845,7 +845,7 @@ int AModelFitSills::_combineVariables(int ivar0, int jvar0)
 int AModelFitSills::_sillFittingIntrinsic()
 {
   score           = 0.;
-  double crit_mem = 1.e30;
+  double crit_mem = MAXIMUM_BIG;
   for (int icov = 0; icov < _ncova; icov++) _alphau[icov] = 1. / (double)_ncova;
 
   /* Iterative procedure */

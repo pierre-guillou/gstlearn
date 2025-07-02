@@ -982,7 +982,7 @@ static double st_func_search_stat(double correl, void *user_data)
       up[1] = STAT_THRESH(ifac2, igrf, 1);
       double proba = st_get_proba_ind(correl, low, up, iconf0);
 
-      double logp = (proba <= 0.) ? -1.e30 : log(proba);
+      double logp = (proba <= 0.) ? MINIMUM_BIG : log(proba);
       int iad = vario->getDirAddress(idir, ifac1, ifac2, ilag, false, 1);
       double sw = vario->getSwByIndex(idir, iad);
       double gg = vario->getGgByIndex(idir, iad);
@@ -1062,8 +1062,7 @@ static double st_func_search_nostat(double correl, void *user_data)
       if (local_pgs->flag_stat)
       STAT_PROBA(ifac1,ifac2) = STAT_PROBA(ifac2,ifac1) = proba;
     }
-    logp = (proba <= 0.) ? -1.e30 :
-                           log(proba);
+    logp = (proba <= 0.) ? MINIMUM_BIG : log(proba);
     sum -= w1 * w2 * logp;
   }
   return (0.5 * sum);

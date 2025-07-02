@@ -904,7 +904,7 @@ int MeshETurbo::initFromCova(const CovAniso& cova,
   VectorDouble dx(ndim);
   VectorDouble x0(ndim);
 
-  double dxmin = 1.e30;
+  double dxmin = MAXIMUM_BIG;
   for (int idim = 0; idim < ndim; idim++)
   {
     double delta = extendMaxRot[idim] - extendMinRot[idim];

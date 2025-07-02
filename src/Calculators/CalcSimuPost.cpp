@@ -238,9 +238,9 @@ void CalcSimuPost::_upscaleFunction(const VectorVectorDouble& Y_p_k_s, VectorDou
   // Initialization values
   double valinit;
   if (_upscale == EPostUpscale::MINI)
-    valinit = 1.e30;
+    valinit = MAXIMUM_BIG;
   else if (_upscale == EPostUpscale::MAXI)
-    valinit = -1.e30;
+    valinit = MINIMUM_BIG;
   else
     valinit = 0.;
 

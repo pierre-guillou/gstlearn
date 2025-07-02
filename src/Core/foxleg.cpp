@@ -15,7 +15,6 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/String.hpp"
 #include "Basic/OptDbg.hpp"
-#include "Core/Keypair.hpp"
 
 #include <math.h>
 
@@ -465,8 +464,8 @@ static void st_minimum(VectorInt& /*ind_util*/,
                        VectorDouble& hgnadm)
 {
   int jparac = -1;
-  double bordval = -1.e30;
-  double alpha_inf = 1.e30;
+  double bordval = MINIMUM_BIG;
+  double alpha_inf = MAXIMUM_BIG;
 
   int iparac2 = 0;
   for (int ic = 0; ic < 2; ic++)
