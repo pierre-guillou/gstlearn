@@ -16,7 +16,6 @@
 #include "Db/DbGrid.hpp"
 #include "Skin/Skin.hpp"
 #include "Basic/Law.hpp"
-#include "Basic/Memory.hpp"
 #include "Core/Keypair.hpp"
 
 static DbGrid *DB_GRID_FILL;
@@ -694,12 +693,14 @@ int DbHelper::normalizeVariables(Db *db,
                                  double stdv)
 {
   int jcol, ndef, iptr;
-  double *num, *mm, *vv, proptot, value;
+  double proptot, value;
+  VectorDouble num;
+  VectorDouble mm;
+  VectorDouble vv;
 
   /* Initializations */
 
   int nech = db->getNSample();
-  num = mm = vv = nullptr;
   int ncol = (int) cols.size();
 
   /* Check that all variables are defined */
@@ -716,12 +717,9 @@ int DbHelper::normalizeVariables(Db *db,
 
   /* Core allocation */
 
-  num = (double*) mem_alloc(sizeof(double) * ncol, 0);
-  if (num == nullptr) goto label_end;
-  mm = (double*) mem_alloc(sizeof(double) * ncol, 0);
-  if (mm == nullptr) goto label_end;
-  vv = (double*) mem_alloc(sizeof(double) * ncol, 0);
-  if (vv == nullptr) goto label_end;
+  num.resize(ncol);
+  mm.resize(ncol);
+  vv.resize(ncol);
 
   /* Initializations */
 
@@ -848,13 +846,7 @@ int DbHelper::normalizeVariables(Db *db,
       }
     }
   }
-
-  label_end:
-  mem_free((char* ) num);
-  mem_free((char* ) mm);
-  mem_free((char* ) vv);
-
-  return (0);
+  return 0;
 }
 
 /****************************************************************************/
@@ -883,9 +875,10 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
                              const NamingConvention &namconv)
 {
   Skin *skin = nullptr;
-  double *tabval;
-  int *tabind, error, rank, ipos, ndim, count, nech;
+  int error, rank, ipos, ndim, count, nech;
   LocalSkin SKF;
+  VectorDouble tabval;
+  VectorInt tabind;
 
   /* Initializations */
 
@@ -927,17 +920,13 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
 
   DB_GRID_FILL = dbgrid;
   skin = nullptr;
-  tabval = nullptr;
-  tabind = nullptr;
   count = (int) pow(2. * radius + 1., (double) ndim) - 1;
 
   /* Core allocation */
 
   law_set_random_seed(seed);
-  tabval = (double*) mem_alloc(sizeof(double) * count, 0);
-  if (tabval == nullptr) goto label_end;
-  tabind = (int*) mem_alloc(sizeof(int) * count, 0);
-  if (tabind == nullptr) goto label_end;
+  tabval.resize(count);
+  tabind.resize(count);
 
   skin = new Skin(&SKF, dbgrid);
 
@@ -958,11 +947,11 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
 
     /* Find the neighborhood */
 
-    st_grid_fill_neigh(ipos, ndim, radius, &nech, tabind, tabval);
+    st_grid_fill_neigh(ipos, ndim, radius, &nech, tabind.data(), tabval.data());
 
     /* Calculate the extrapolated value */
 
-    if (st_grid_fill_calculate(ipos, mode, nech, tabind, tabval)) continue;
+    if (st_grid_fill_calculate(ipos, mode, nech, tabind.data(), tabval.data())) continue;
 
     /* Deduce the initial influence of the central cell */
 
@@ -980,8 +969,6 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
 
   label_end:
   delete skin;
-  tabval = (double*) mem_free((char* ) tabval);
-  tabind = (int*) mem_free((char* ) tabind);
   return (error);
 }
 
@@ -1077,23 +1064,21 @@ int DbHelper::db_compositional_transform(Db *db,
                                          int *iatt_out,
                                          int *numout)
 {
-  int error, nech, number1, iech, ivar, jvar;
-  double *tabin, *tabout, sum, eps;
+  int nech, number1, iech, ivar, jvar;
+  double sum, eps;
+  VectorDouble tabin;
+  VectorDouble tabout;
 
   /* Initializations */
 
-  error = 1;
   nech = db->getNSample();
-  tabin = tabout = nullptr;
   eps = get_keypone("CompositionalEps", EPSILON3);
 
   /* Core allocation (may be one more than needed, but general) */
 
   number1 = number + 1;
-  tabin = (double*) mem_alloc(sizeof(double) * number1, 0);
-  if (tabin == nullptr) goto label_end;
-  tabout = (double*) mem_alloc(sizeof(double) * number1, 0);
-  if (tabout == nullptr) goto label_end;
+  tabin.resize(number1);
+  tabout.resize(number1);
 
   /* Verbose output */
 
@@ -1115,14 +1100,13 @@ int DbHelper::db_compositional_transform(Db *db,
       for (iech = 0; iech < nech; iech++)
       {
         if (!db->isActive(iech)) continue;
-        (void) st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin);
+        (void) st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data());
         sum = 0.;
         for (ivar = 0; ivar < (*numout); ivar++)
           sum += tabin[ivar];
         for (ivar = 0; ivar < (*numout); ivar++)
-          tabout[ivar] = (sum > 0) ? tabin[ivar] / sum :
-                                     TEST;
-        st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          tabout[ivar] = (sum > 0) ? tabin[ivar] / sum : TEST;
+        st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
       }
       break;
 
@@ -1136,12 +1120,12 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data()))
           {
             for (ivar = 0; ivar < (*numout); ivar++)
               tabout[ivar] = log(tabin[ivar] / tabin[(*numout)]);
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       else
@@ -1153,7 +1137,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin.data()))
           {
             sum = 1.;
             for (ivar = 0; ivar < number; ivar++)
@@ -1165,7 +1149,7 @@ int DbHelper::db_compositional_transform(Db *db,
               tabout[ivar] /= sum;
             tabout[number] = 1 / sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       break;
@@ -1180,7 +1164,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data()))
           {
             sum = 0.;
             for (ivar = 0; ivar < number; ivar++)
@@ -1191,7 +1175,7 @@ int DbHelper::db_compositional_transform(Db *db,
             for (ivar = 0; ivar < number; ivar++)
               tabout[ivar] = tabout[ivar] - 0.5 * sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       else
@@ -1203,7 +1187,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin.data()))
           {
             sum = 0.;
             for (ivar = 0; ivar < number; ivar++)
@@ -1214,11 +1198,10 @@ int DbHelper::db_compositional_transform(Db *db,
             for (ivar = 0; ivar < number; ivar++)
               tabout[ivar] /= sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       break;
-
     case 3: /* Isometric Logratio */
       if (mode > 0)
       {
@@ -1229,7 +1212,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data()))
           {
             for (ivar = 0; ivar < number; ivar++)
               tabin[ivar] = log(tabin[ivar]);
@@ -1241,7 +1224,7 @@ int DbHelper::db_compositional_transform(Db *db,
                   * sqrt((ivar + 1.) / (ivar + 2.));
             }
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       else
@@ -1253,7 +1236,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin.data()))
           {
             tabin[number] = 0.;
             for (ivar = 0; ivar < (*numout); ivar++)
@@ -1275,19 +1258,13 @@ int DbHelper::db_compositional_transform(Db *db,
             for (ivar = 0; ivar < (*numout); ivar++)
               tabout[ivar] /= sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       break;
   }
 
-  /* Set the error return code */
-
-  error = 0;
-
-  label_end: tabin = (double*) mem_free((char* ) tabin);
-  tabout = (double*) mem_free((char* ) tabout);
-  return (error);
+  return 0;
 }
 
 /*****************************************************************************/

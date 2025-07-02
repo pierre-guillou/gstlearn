@@ -53,7 +53,7 @@ int GridZycor::writeInFile()
   double buff[5]; /* Size = nbyline */
   char card[100]; /* Size = nbyline * 20 */
   static int nbyline = 5;
-  static double testval = 1.e30;
+  static double testval = MAXIMUM_BIG;
 
   /* Open the file */
 

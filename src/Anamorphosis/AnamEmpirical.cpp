@@ -235,8 +235,8 @@ int AnamEmpirical::_getStatistics(const VectorDouble &tab,
   int number = 0;
   double dmean  = 0.;
   double dmean2 = 0.;
-  double dmaxi  = -1.e30;
-  double dmini  =  1.e30;
+  double dmaxi  = MINIMUM_BIG;
+  double dmini  = MAXIMUM_BIG;
   for (int iech = 0; iech < nech; iech++)
   {
     double value = tab[iech];
@@ -429,10 +429,10 @@ int AnamEmpirical::fitFromArray(const VectorDouble& tab,
 
   /* Evaluate the bounds */
 
-  double pzmin =  1.e30;
-  double pymin =  1.e30;
-  double pzmax = -1.e30;
-  double pymax = -1.e30;
+  double pzmin = MAXIMUM_BIG;
+  double pymin = MAXIMUM_BIG;
+  double pzmax = MINIMUM_BIG;
+  double pymax = MINIMUM_BIG;
   for (int idisc=0; idisc<_nDisc; idisc++)
   {
     if (_ZDisc[idisc] < pzmin) pzmin = _ZDisc[idisc];

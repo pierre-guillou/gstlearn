@@ -13,6 +13,7 @@
 #include "Basic/Interval.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "geoslib_define.h"
 
 Limits::Limits()
     : AStringable(),
@@ -462,15 +463,15 @@ int Limits::_computeIndicator(Db *db,
 
   /* Find extrema of all classes to sort too small or too large samples */
 
-  double zmini =  1.e30;
-  double zmaxi = -1.e30;
+  double zmini = MAXIMUM_BIG;
+  double zmaxi = MINIMUM_BIG;
   for (int iclass = 0; iclass < nclass; iclass++)
   {
     if (!FFFF(minival[iclass])) zmini = MIN(zmini, minival[iclass]);
     if (!FFFF(maxival[iclass])) zmaxi = MAX(zmaxi, maxival[iclass]);
   }
-  if (FFFF(zmini)) zmini = -1.e30;
-  if (FFFF(zmaxi)) zmaxi =  1.e30;
+  if (FFFF(zmini)) zmini = MINIMUM_BIG;
+  if (FFFF(zmaxi)) zmaxi = MAXIMUM_BIG;
 
   /* Create the variables */
 
@@ -681,15 +682,15 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
 
   /* Find extrema of all classes to sort too small or too large samples */
 
-  double zmini =  1.e30;
-  double zmaxi = -1.e30;
+  double zmini = MAXIMUM_BIG;
+  double zmaxi = MINIMUM_BIG;
   for (int iclass = 0; iclass < nclass; iclass++)
   {
     if (!FFFF(minival[iclass])) zmini = MIN(zmini, minival[iclass]);
     if (!FFFF(maxival[iclass])) zmaxi = MAX(zmaxi, maxival[iclass]);
   }
-  if (FFFF(zmini)) zmini = -1.e30;
-  if (FFFF(zmaxi)) zmaxi =  1.e30;
+  if (FFFF(zmini)) zmini = MINIMUM_BIG;
+  if (FFFF(zmaxi)) zmaxi = MAXIMUM_BIG;
 
   /* Loop on the samples */
 

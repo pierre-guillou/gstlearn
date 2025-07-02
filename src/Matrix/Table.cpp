@@ -114,8 +114,8 @@ VectorDouble Table::getAllRange() const
 {
   int ncols = getNCols();
   VectorDouble limits(2);
-  limits[0] =  1.e30;
-  limits[1] = -1.e30;
+  limits[0] = MAXIMUM_BIG;
+  limits[1] = MINIMUM_BIG;
   for (int icol = 0; icol < ncols; icol++)
   {
     VectorDouble local = getRange(icol);

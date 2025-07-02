@@ -6550,8 +6550,8 @@ static void st_m2d_stats_init(M2D_Environ *m2denv,
 
   nech = dbin->getNSample();
   nb = mm = vv = 0.;
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
 
   /* Loop on the layers */
 
@@ -6653,8 +6653,8 @@ static void st_m2d_stats_updt(M2D_Environ *m2denv,
 
   nech = dbc->getNSample();
   nb = mm = vv = 0.;
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
 
   /* Loop on the layers */
 
@@ -7073,8 +7073,8 @@ static int st_m2d_drift_fitting(M2D_Environ *m2denv,
 
     numb = 0;
     mean = ffmean = stdv = 0.;
-    mini = ffmini = 1.e30;
-    maxi = ffmaxi = -1.e30;
+    mini = ffmini = MAXIMUM_BIG;
+    maxi = ffmaxi = MINIMUM_BIG;
     for (int i = 0; i < nbfl; i++)
       b[i] = 0.;
     for (int i = 0; i < nbfl * nbfl; i++)

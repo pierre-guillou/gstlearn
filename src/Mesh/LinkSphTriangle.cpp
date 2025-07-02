@@ -210,13 +210,13 @@ int meshes_2D_sph_from_points(int nech, double *x, double *y, SphTriangle *t)
 int meshes_2D_sph_from_auxiliary(const String &triswitch, SphTriangle *t)
 {
   int error, npoint, ecr, found_close, nech, nold, ndecode, flag_reg, flag_vdc;
-  double *coord, c1[3], c2[3], dist;
+  double c1[3], c2[3], dist;
   static double eps = 1.e-3;
 
   /* Initializations */
 
   error = 1;
-  coord = nullptr;
+  VectorDouble coord;
   nold = t->n_nodes;
   ndecode = flag_vdc = flag_reg = npoint = 0;
 
@@ -251,11 +251,11 @@ int meshes_2D_sph_from_auxiliary(const String &triswitch, SphTriangle *t)
 
   if (flag_vdc)
   {
-    ut_vandercorput(ndecode, 1, 1, &npoint, &coord);
+    ut_vandercorput(ndecode, 1, 1, &npoint, coord);
   }
   else if (flag_reg)
   {
-    if (ut_icosphere(ndecode, 1, &npoint, &coord)) goto label_end;
+    if (ut_icosphere(ndecode, 1, &npoint, coord)) goto label_end;
   }
 
   /* Reallocate to maximum size */
@@ -319,7 +319,6 @@ int meshes_2D_sph_from_auxiliary(const String &triswitch, SphTriangle *t)
   error = 0;
 
   label_end:
-  mem_free((char* ) coord);
   if (error) meshes_2D_sph_free(t, 0);
   return (error);
 }

@@ -187,25 +187,24 @@ void model_covupdt(Model *model,
 {
   /// TODO : dead code ?
   CovAniso *cova;
-  double *silltot, *range, diff;
+  double diff;
   int i, icov, jcov, nvar, ncova, rank_nugget, rank_exceed, ivar, jvar;
-  int *rank, flag_update, flag_rescale;
+  int flag_update, flag_rescale;
+  VectorInt rank;
+  VectorDouble range;
+  VectorDouble silltot;
 
   /* Initializations */
 
-  silltot = range = nullptr;
-  rank = nullptr;
   nvar = model->getNVar();
   ncova = model->getNCov();
   flag_update = 0;
 
   /* Core allocation */
 
-  rank = (int*) mem_alloc(sizeof(int) * ncova, 1);
-  range = (double*) mem_alloc(sizeof(double) * ncova, 1);
-  silltot = (double*) mem_alloc(sizeof(double) * nvar * nvar, 1);
-  for (i = 0; i < nvar * nvar; i++)
-    silltot[i] = 0.;
+  rank.resize(ncova);
+  range.resize(ncova);
+  silltot.resize(nvar * nvar, 0.);
 
   /* Sort the basic structures by increasing range */
   rank_nugget = -1;
@@ -216,7 +215,7 @@ void model_covupdt(Model *model,
     rank[icov] = icov;
     range[icov] = cova->getRangeIso();
   }
-  ut_sort_double(0, ncova, rank, range);
+  ut_sort_double(0, ncova, rank.data(), range.data());
 
   /* Loop on the basic structures, in order to : */
   /* - cumulate the sills (excluding the nugget effect component) */
@@ -304,9 +303,6 @@ void model_covupdt(Model *model,
 
   /* Returning arguments */
 
-  mem_free((char* ) rank);
-  mem_free((char* ) range);
-  mem_free((char* ) silltot);
   *flag_nugget = flag_update && (rank_nugget < 0);
   if (flag_verbose && (*flag_nugget))
   {
@@ -516,22 +512,22 @@ int model_covmat_inchol(int verbose,
                         const CovCalcMode*  mode)
 {
   int *pvec, i, j, npivot, jstar, nech, error, flag_incr;
-  double *G, *Gmatrix, *diag, *crit, g, residual, maxdiag, tol, b, c00;
+  double *G, *Gmatrix, g, residual, maxdiag, tol, b, c00;
   VectorDouble d1;
+  VectorDouble diag;
+  VectorDouble crit;
 
   error = 1;
   nech = db->getNSample();
   pvec = nullptr;
-  diag = crit = G = Gmatrix = nullptr;
+  G = Gmatrix = nullptr;
   flag_incr = (center != nullptr);
 
   if (npivot_max <= 0) npivot_max = nech;
   npivot_max = MIN(npivot_max, nech);
   d1.resize(db->getNDim());
-  diag = (double*) mem_alloc(sizeof(double) * nech, 0);
-  if (diag == nullptr) goto label_end;
-  crit = (double*) mem_alloc(sizeof(double) * (1 + nech), 0);
-  if (crit == nullptr) goto label_end;
+  diag.resize(nech);
+  crit.resize(1 + nech);
   pvec = (int*) mem_alloc(sizeof(int) * nech, 0);
   if (pvec == nullptr) goto label_end;
   c00 = model->evaluateOneGeneric(nullptr, VectorDouble(), 1., mode);
@@ -718,7 +714,7 @@ int model_covmat_inchol(int verbose,
   {
     message("Number of pivots = %d\n", npivot);
     print_imatrix("Order", 0, 1, 1, npivot, NULL, pvec);
-    print_matrix("Criterion", 0, 1, 1, npivot, NULL, crit);
+    print_matrix("Criterion", 0, 1, 1, npivot, NULL, crit.data());
   }
 
   /* Set the error return code */
@@ -728,8 +724,6 @@ int model_covmat_inchol(int verbose,
   /* Core deallocation */
 
   label_end:
-  mem_free((char* ) diag);
-  mem_free((char* ) crit);
   mem_free((char* ) G);
   return (error);
 }

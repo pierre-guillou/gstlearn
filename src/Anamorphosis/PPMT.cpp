@@ -231,7 +231,7 @@ void PPMT::_iterationFit(AMatrix *Y, const VectorDouble& N0)
   VectorDouble Yi(np, TEST);
   VectorInt    R0(np, ITEST);
   int    idmax = -1;
-  double ddmax = -1.e30;
+  double ddmax = MINIMUM_BIG;
 
   // Loop on directions
 

@@ -1187,7 +1187,7 @@ int FracList::fractureToBlock(DbGrid *dbgrid,
     messerr("This application is limited to 2-D grid");
     return 1;
   }
-  double dmin = 1.e30;
+  double dmin = MAXIMUM_BIG;
   for (int idim = 0; idim < dbgrid->getNDim(); idim++)
   {
     if (dbgrid->getDX(idim) < dmin) dmin = dbgrid->getDX(idim);
@@ -1561,7 +1561,7 @@ int FracList::fractureWellToBlock(DbGrid *dbgrid,
     messerr("This application is limited to 2-D grid");
     return 1;
   }
-  double dmin = 1.e30;
+  double dmin = MAXIMUM_BIG;
   for (int idim = 0; idim < dbgrid->getNDim(); idim++)
   {
     if (dbgrid->getDX(idim) < dmin) dmin = dbgrid->getDX(idim);

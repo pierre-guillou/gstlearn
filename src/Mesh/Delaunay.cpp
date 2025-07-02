@@ -720,8 +720,8 @@ void mesh_stats(int ndim, int ncorner, int nmesh, const int* meshes, const doubl
   VectorDouble maxi(ndim, 0.);
   for (int i = 0; i < ndim; i++)
   {
-    mini[i] = +1.e30;
-    maxi[i] = -1.e30;
+    mini[i] = MAXIMUM_BIG;
+    maxi[i] = MINIMUM_BIG;
   }
   int imin = 10000000;
   int imax = -1;

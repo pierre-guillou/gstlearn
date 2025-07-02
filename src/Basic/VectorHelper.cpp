@@ -182,8 +182,8 @@ void VectorHelper::dumpStats(const String& title, constvect vect, int nmax)
   int number  = 0;
   double mean = 0.;
   double stdv = 0.;
-  double mini = 1.e30;
-  double maxi = -1.e30;
+  double mini = MAXIMUM_BIG;
+  double maxi = MINIMUM_BIG;
 
   for (int i = 0; i < ntotal; i++)
   {
@@ -232,8 +232,8 @@ void VectorHelper::dumpRange(const String& title, constvect vect, int nmax)
   int ntotal = (int)vect.size();
   if (nmax > 0 && nmax < ntotal) ntotal = nmax;
   int number = 0;
-  double mini = 1.e30;
-  double maxi = -1.e30;
+  double mini = MAXIMUM_BIG;
+  double maxi = MINIMUM_BIG;
 
   for (int i = 0; i < ntotal; i++)
   {
@@ -376,7 +376,7 @@ double VectorHelper::maximum(const VectorDouble &vec, bool flagAbs, const Vector
   if (vec.empty()) return TEST;
   int size = (int) vec.size();
   bool flagAux = (! aux.empty() && (int) aux.size() == size);
-  double max = -1.e30;
+  double max = MINIMUM_BIG;
 
   if (! flagAux)
   {
@@ -437,7 +437,7 @@ double VectorHelper::minimum(const VectorDouble &vec, bool flagAbs, const Vector
   if (vec.empty()) return TEST;
   int size = (int) vec.size();
   bool flagAux = (! aux.empty() && (int) aux.size() == size);
-  double min = 1.e30;
+  double min = MAXIMUM_BIG;
 
   if (! flagAux)
   {
@@ -2778,7 +2778,7 @@ void VectorHelper::squeezeAndStretchInPlaceBackward(const VectorDouble &vecin,
 int VectorHelper::whereMinimum(const VectorDouble& tab)
 {
   int ibest = -1;
-  double vbest = 1.e30;
+  double vbest = MAXIMUM_BIG;
   for (int i = 0, ntab = (int) tab.size(); i < ntab; i++)
   {
     if (FFFF(tab[i])) continue;
@@ -2801,7 +2801,7 @@ int VectorHelper::whereMinimum(const VectorDouble& tab)
 int VectorHelper::whereMaximum(const VectorDouble& tab)
 {
   int ibest = -1;
-  double vbest = -1.e30;
+  double vbest = MINIMUM_BIG;
   for (int i = 0, ntab = (int) tab.size(); i < ntab; i++)
   {
     if (FFFF(tab[i])) continue;

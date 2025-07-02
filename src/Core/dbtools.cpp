@@ -107,7 +107,7 @@ int surface(Db *db_point,
 
   /* Preliminary calculations */
 
-  double d2max = (FFFF(dlim)) ? 1.e30 : dlim * dlim;
+  double d2max = (FFFF(dlim)) ? MAXIMUM_BIG : dlim * dlim;
   double maille = db_grid->getCellSize();
   for (int iech = 0; iech < db_point->getNSample(); iech++)
     dtab[iech] = 0.;
@@ -716,7 +716,7 @@ void ut_trace_sample(Db *db,
     /* Loop on the discretized samples */
 
     ipmin = -1;
-    ddmin = 1.e30;
+    ddmin = MAXIMUM_BIG;
     for (ip = 0; ip < np; ip++)
     {
       delx = xx - xp[ip];
@@ -832,7 +832,7 @@ static VectorDouble st_point_init_homogeneous(int number,
 
       // Calculate the shortest distance with the previous samples
 
-      double ddmin = 1.e30;
+      double ddmin = MAXIMUM_BIG;
       for (int jp = 0; jp < ip; jp++)
       {
         for (int idim = 0; idim < ndim; idim++)

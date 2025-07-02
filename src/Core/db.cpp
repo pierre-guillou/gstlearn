@@ -437,23 +437,18 @@ int db_gradient_update(Db* db)
  ** \param[out] tabout Output array
  **
  *****************************************************************************/
-int db_selref(
-  int ndim, const int* nx, const int* ref, const double* tabin, double* tabout)
+int db_selref(int ndim,
+              const int* nx,
+              const int* ref,
+              const double* tabin,
+              double* tabout)
 {
-  int *rank, *ind1, idim, jdim, ntotal, nval, lec, ecr, iech, ival, error,
-    neff_ndim;
+  int idim, jdim, ntotal, nval, lec, ecr, iech, ival, neff_ndim;
 
   /* Initializations */
 
-  error = 1;
-  rank = ind1 = nullptr;
-
-  /* Core allocation */
-
-  rank = (int*)mem_alloc(sizeof(int) * ndim, 0);
-  if (rank == nullptr) goto label_end;
-  ind1 = (int*)mem_alloc(sizeof(int) * ndim, 0);
-  if (ind1 == nullptr) goto label_end;
+  VectorInt rank(ndim);
+  VectorInt ind1(ndim);
 
   /* Set the indices */
 
@@ -504,16 +499,9 @@ int db_selref(
     tabout[ecr] = tabin[lec];
   }
 
-  /* Set the error code */
-
-  error = 0;
-
   /* Core deallocation */
 
-label_end:
-  mem_free((char*)rank);
-  mem_free((char*)ind1);
-  return (error);
+  return 0;
 }
 
 /****************************************************************************/
@@ -710,7 +698,7 @@ int point_to_point(Db* db, const double* coor)
   /* Loop on the input structure */
 
   iechmin = 0;
-  distmin = 1.e30;
+  distmin = MAXIMUM_BIG;
   for (iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
@@ -1003,8 +991,8 @@ void db_monostat(Db* db,
 
   /* Initializations */
 
-  (*mini) = 1.e30;
-  (*maxi) = -1.e30;
+  (*mini) = MAXIMUM_BIG;
+  (*maxi) = MINIMUM_BIG;
   (*wtot) = (*mean) = (*var) = 0.;
 
   /* Loop on the data */
@@ -1544,15 +1532,15 @@ double* db_distances_general(Db* db1,
 
   /* Loop on the second point */
 
-  dist_min = 1.e30;
-  dist_max = -1.e30;
+  dist_min = MAXIMUM_BIG;
+  dist_max = MINIMUM_BIG;
   ecr = nvalid = 0;
   for (iech2 = 0; iech2 < nech2; iech2++)
   {
     if (!db2->isActive(iech2)) continue;
     if (!db2->isIsotopic(iech2, niso)) continue;
     nvalid++;
-    dlocmin = 1.e30;
+    dlocmin = MAXIMUM_BIG;
 
     /* Loop on the first point */
 
@@ -1782,8 +1770,8 @@ int db_gradient_component_to_modang(Db* db,
 
   /* Modify the local anisotropy */
 
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
   for (int iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
@@ -2086,15 +2074,16 @@ int db_grid_patch(DbGrid* ss_grid,
 {
   int error, ndim, jech, nused, noused, nout, nundef, nmask, ndef, nbnomask,
     flag_save;
-  double *coor1, *coor2, value, rank;
+  double value, rank;
   VectorInt indg;
   VectorInt indg0;
+  VectorDouble coor1;
+  VectorDouble coor2;
 
   /* Initializations */
 
   error = 1;
   ndim  = ss_grid->getNDim();
-  coor1 = coor2 = nullptr;
 
   /* Check that the two grids are compatible */
 
@@ -2104,10 +2093,8 @@ int db_grid_patch(DbGrid* ss_grid,
 
   /* Core allocation */
 
-  coor1 = (double*)mem_alloc(sizeof(double) * ndim, 0);
-  if (coor1 == nullptr) goto label_end;
-  coor2 = (double*)mem_alloc(sizeof(double) * ndim, 0);
-  if (coor2 == nullptr) goto label_end;
+  coor1.resize(ndim);
+  coor2.resize(ndim);
   indg0.resize(ndim);
   indg.resize(ndim);
 
@@ -2115,8 +2102,8 @@ int db_grid_patch(DbGrid* ss_grid,
    * grid */
 
   for (int idim = 0; idim < ndim; idim++) coor1[idim] = ss_grid->getX0(idim);
-  (void)point_to_grid(db_grid, coor1, -1, indg0.data());
-  if (point_to_grid(db_grid, coor1, -1, indg0.data()) == -1)
+  (void)point_to_grid(db_grid, coor1.data(), -1, indg0.data());
+  if (point_to_grid(db_grid, coor1.data(), -1, indg0.data()) == -1)
   {
     messerr("Subgrid origin does not lie within the main grid");
     db_grid_print(db_grid);
@@ -2236,8 +2223,6 @@ int db_grid_patch(DbGrid* ss_grid,
   error = 0;
 
 label_end:
-  mem_free((char*)coor1);
-  mem_free((char*)coor2);
   return (error);
 }
 

@@ -40,6 +40,9 @@ typedef unsigned char UChar;
 
 #define EPSGRAD    1.e-5
 
+#define MINIMUM_BIG -1.e30
+#define MAXIMUM_BIG +1.e30
+
 // Macro for preventing warning : unused variable.
 // To be used like: DECLARE_UNUSED(a, b, c)
 #define DECLARE_UNUSED_(x) (void)x;

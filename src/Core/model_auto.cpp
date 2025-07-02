@@ -3307,7 +3307,7 @@ static int st_sill_fitting_intrinsic(Model* model,
   int nvar = model->getNVar();
   int ncova = model->getNCov();
   int nvs2 = nvar * (nvar + 1) / 2;
-  double crit_mem = 1.e30;
+  double crit_mem = MAXIMUM_BIG;
   for (int icov = 0; icov < ncova; icov++)
     alphau[icov] = 1. / (double) ncova;
 

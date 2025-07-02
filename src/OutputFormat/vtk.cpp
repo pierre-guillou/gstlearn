@@ -51,7 +51,6 @@ Website: https://gstlearn.org
 License: BSD 3-clause
 */
 
- 
 /* ************************************************************************* //
 //                             visit_writer.c                                //
 // ************************************************************************* */
@@ -60,7 +59,6 @@ License: BSD 3-clause
 #include "Basic/AStringable.hpp"
 #include "Basic/String.hpp"
 #include "Basic/File.hpp"
-#include "Basic/Memory.hpp"
 
 #include <string.h>
 
@@ -663,7 +661,7 @@ void write_point_mesh(const char* filename,
 {
   int   i;
   char  str[128];
-  int  *centering = NULL;
+  VectorInt centering;
  
   useBinary = ub;
   open_file(filename);
@@ -696,11 +694,8 @@ void write_point_mesh(const char* filename,
     end_line();
   }
  
-  centering = (int *) mem_alloc(sizeof(int) * nvars,1);
-  for (i = 0 ; i < nvars ; i++)
-    centering[i] = 1;
-  write_variables(nvars, vardim, centering, varnames, vars, npts, npts);
-  centering = (int *) mem_free((char *) centering);
+  centering.resize(nvars, 1);
+  write_variables(nvars, vardim, centering.data(), varnames, vars, npts, npts);
  
   close_file();
 }
@@ -972,9 +967,9 @@ void write_regular_mesh(const char* filename,
 {
   int  i;
  
-  float *x = (float *) mem_alloc(sizeof(float) * dims[0],1);
-  float *y = (float *) mem_alloc(sizeof(float) * dims[1],1);
-  float *z = (float *) mem_alloc(sizeof(float) * dims[2],1);
+  VectorFloat x(dims[0]);
+  VectorFloat y(dims[1]);
+  VectorFloat z(dims[2]);
  
   for (i = 0 ; i < dims[0] ; i++)
     x[i] = (float) i;
@@ -982,15 +977,11 @@ void write_regular_mesh(const char* filename,
     y[i] = (float) i;
   for (i = 0 ; i < dims[2] ; i++)
     z[i] = (float) i;
- 
-  write_rectilinear_mesh(filename, ub, dims, x, y, z, nvars, vardim,
-                         centering, varnames, vars);
- 
-  mem_free((char *) x);
-  mem_free((char *) y);
-  mem_free((char *) z);
+
+  write_rectilinear_mesh(filename, ub, dims, x.data(), y.data(), z.data(),
+                         nvars, vardim, centering, varnames, vars);
+
 }
- 
  
 /* ****************************************************************************
 //  Function: write_curvilinear_mesh

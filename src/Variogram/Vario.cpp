@@ -917,8 +917,8 @@ VectorDouble Vario::getHRange(int ivar, int jvar, int idir) const
   VectorInt idb = _getDirectionInterval(idir);
 
   VectorDouble vec(2);
-  vec[0] =  1.e30;
-  vec[1] = -1.e30;
+  vec[0] = MAXIMUM_BIG;
+  vec[1] = MINIMUM_BIG;
   for (int id = idb[0]; id < idb[1]; id++)
     for (int iv = ivb[0]; iv < ivb[1]; iv++)
       for (int jv = jvb[0]; jv < jvb[1]; jv++)
@@ -970,8 +970,8 @@ VectorDouble Vario::getGRange(int ivar,
   VectorInt idb = _getDirectionInterval(idir);
 
   VectorDouble vec(2);
-  vec[0] =  1.e30;
-  vec[1] = -1.e30;
+  vec[0] = MAXIMUM_BIG;
+  vec[1] = MINIMUM_BIG;
 
   for (int id = idb[0]; id < idb[1]; id++)
     for (int iv = ivb[0]; iv < ivb[1]; iv++)
@@ -3131,7 +3131,7 @@ int Vario::_updateVerr(Db *db, int idir, Vario_Order *vorder, int verr_mode)
 
       case 2:
         nfois = 0;
-        diff = 1.e30;
+        diff = MAXIMUM_BIG;
         while (diff > tol && nfois < maxiter)
         {
           nfois++;
@@ -3157,7 +3157,7 @@ int Vario::_updateVerr(Db *db, int idir, Vario_Order *vorder, int verr_mode)
 
       case 3:
         nfois = 0;
-        diff = 1.e30;
+        diff = MAXIMUM_BIG;
         while (diff > tol && nfois < maxiter)
         {
           g_old = getGg(idir, 0, 0, ilag);
@@ -3959,8 +3959,8 @@ void Vario::getExtension(int ivar,
 
   (*hmin) = 0.;
   (*gmin) = 0.;
-  (*hmax) = -1.e30;
-  (*gmax) = -1.e30;
+  (*hmax) = MINIMUM_BIG;
+  (*gmax) = MINIMUM_BIG;
   if (getFlagAsym())
   {
     *c0 = getGgByIndex(0, getDirAddress(0, ivar, jvar, 0, false, 0));

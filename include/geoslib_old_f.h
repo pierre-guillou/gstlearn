@@ -849,17 +849,16 @@ GSTLEARN_EXPORT int db_trisurf(Db *db,
 /******************************************/
 /* Prototyping the functions in cluster.c */
 /******************************************/
-GSTLEARN_EXPORT double* kclusters(double *data,
-                                  int nvar,
-                                  int nech,
-                                  int nclusters,
-                                  int npass,
-                                  int mode,
-                                  int verbose);
-GSTLEARN_EXPORT int* kmedoids(double *data,
-                              int nvar,
-                              int nech,
-                              int nclusters,
-                              int npass,
-                              int verbose);
-
+GSTLEARN_EXPORT VectorDouble kclusters(const VectorDouble& data,
+                                       int nvar,
+                                       int nech,
+                                       int nclusters,
+                                       int npass,
+                                       int mode,
+                                       int verbose);
+GSTLEARN_EXPORT VectorInt kmedoids(const VectorDouble& data,
+                                   int nvar,
+                                   int nech,
+                                   int nclusters,
+                                   int npass,
+                                   int verbose);

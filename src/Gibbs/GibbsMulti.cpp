@@ -190,8 +190,8 @@ int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
       int iech = getSampleRank(iact);
       double vmin = db->getLocVariable(ELoc::L,iech,icase);
       double vmax = db->getLocVariable(ELoc::U,iech,icase);
-      if (FFFF(vmin)) vmin = -1.e30;
-      if (FFFF(vmax)) vmax =  1.e30;
+      if (FFFF(vmin)) vmin = MINIMUM_BIG;
+      if (FFFF(vmax)) vmax = MAXIMUM_BIG;
 
       /* Read the gaussian value */
 

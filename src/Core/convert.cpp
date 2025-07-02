@@ -15,7 +15,6 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
-#include "Basic/ASerializable.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/Memory.hpp"
 #include "Db/Db.hpp"

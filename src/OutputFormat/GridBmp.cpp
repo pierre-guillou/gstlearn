@@ -171,8 +171,8 @@ int GridBmp::writeInFile()
 
   /* Calculate the statistics */
 
-  double vmin =  1.e30;
-  double vmax = -1.e30;
+  double vmin = MAXIMUM_BIG;
+  double vmax = MINIMUM_BIG;
   for (int i = 0; i < nx * ny; i++)
   {
     if (! _dbgrid->isActive(i)) continue;

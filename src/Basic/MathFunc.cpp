@@ -2853,7 +2853,7 @@ static void st_init_rotation(double *ct, double *st, double *a)
  ** \param[in]  flag_rot  Perform a random rotation
  **
  ** \param[out] ntri_arg  Number of points
- ** \param[out] coor_arg  Array of point coordinates
+ ** \param[out] coord     Array of point coordinates
  **                       (Dimension: 3*ntri)
  **
  *****************************************************************************/
@@ -2861,15 +2861,15 @@ void ut_vandercorput(int n,
                      int flag_sym,
                      int flag_rot,
                      int *ntri_arg,
-                     double **coor_arg)
+                     VectorDouble &coord)
 {
   int i, j, ri, nb, ntri;
-  double *coord, base, u, v, ct, st, a[3];
+  double base, u, v, ct, st, a[3];
 
   /* Core allocation */
 
   ntri = 2 * n;
-  coord = (double*) mem_alloc(sizeof(double) * 3 * ntri, 1);
+  coord.resize(3 * ntri);
 
   /* Processing */
 
@@ -2933,7 +2933,6 @@ void ut_vandercorput(int n,
   /* Returning arguments */
 
   *ntri_arg = 2 * n;
-  *coor_arg = coord;
 }
 
 static void st_addTriangle(const double v1[3],
@@ -3004,7 +3003,7 @@ void st_subdivide(double v1[3],
 static int st_already_present(Reg_Coor* R_coor,
                               int i0,
                               int ntri,
-                              const double* coord,
+                              const VectorDouble& coord,
                               double eps = EPSILON3)
 {
   if (ntri <= 0) return (0);
@@ -3029,14 +3028,14 @@ static int st_already_present(Reg_Coor* R_coor,
  ** \param[in]  flag_rot  Perform a random rotation
  **
  ** \param[out] ntri_arg  Number of points
- ** \param[out] coor_arg  Array of point coordinates
+ ** \param[out] coord     Array of point coordinates
  **                       (Dimension: 3*ntri)
  **
  ** \remarks As random number are used in this function, a specific seed
  ** \remarks is fixed here
  **
  *****************************************************************************/
-int ut_icosphere(int n, int flag_rot, int *ntri_arg, double **coor_arg)
+int ut_icosphere(int n, int flag_rot, int *ntri_arg, VectorDouble& coord)
 {
   Reg_Coor R_coor;
 #define X 0.525731112119133696
@@ -3086,7 +3085,7 @@ int ut_icosphere(int n, int flag_rot, int *ntri_arg, double **coor_arg)
   /* Recopy while suppressing repeated triangle vertices */
 
   int ntri = 0;
-  double* coord = (double*) mem_alloc(sizeof(double) * 3 * R_coor.ntri, 1);
+  coord.resize(3 * R_coor.ntri);
   for (int i = 0; i < R_coor.ntri; i++)
   {
     if (st_already_present(&R_coor, i, ntri, coord)) continue;
@@ -3097,7 +3096,7 @@ int ut_icosphere(int n, int flag_rot, int *ntri_arg, double **coor_arg)
 
   /* Final resize */
 
-  coord = (double*) mem_realloc((char* ) coord, sizeof(double) * 3 * ntri, 1);
+  coord.resize(3 * ntri);
 
   /* Random rotation */
 
@@ -3116,7 +3115,6 @@ int ut_icosphere(int n, int flag_rot, int *ntri_arg, double **coor_arg)
   /* Returning arguments */
 
   *ntri_arg = ntri;
-  *coor_arg = coord;
   law_set_random_seed(seed_memo);
 
   /* Free the Reg_Coor structure */

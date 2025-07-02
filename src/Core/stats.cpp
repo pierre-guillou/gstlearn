@@ -19,7 +19,6 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Stats/Classical.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/Grid.hpp"
 #include "Core/Keypair.hpp"
 
@@ -430,8 +429,8 @@ static void st_print_upscale(const char *title, int *nxyz, const double *valtab)
   double mini, maxi, value;
   int lec, ndef;
 
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
   lec = ndef = 0;
   for (int iz = 0; iz < nxyz[2]; iz++)
     for (int iy = 0; iy < nxyz[1]; iy++)
@@ -662,14 +661,18 @@ static int st_is_subgrid(int verbose,
  *****************************************************************************/
 int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
 {
-  double *valtab0, *valtab1, *valtab2, *numtab0, *numtab1, *numtab2;
   double result1, result2, result, probtot;
   int error, ndim, ind0[3], nxyz[3], iech, iptr, ntot, ncol;
   int flag_save, iech_save;
+  VectorDouble numtab0;
+  VectorDouble numtab1;
+  VectorDouble numtab2;
+  VectorDouble valtab0;
+  VectorDouble valtab1;
+  VectorDouble valtab2;
 
   /* Initializations */
 
-  valtab0 = valtab1 = valtab2 = numtab0 = numtab1 = numtab2 = nullptr;
   error = 1;
   iech_save = (int)get_keypone("Upscale.Converge.Block", 0);
   int ndim2 = dbgrid2->getNDim();
@@ -706,18 +709,12 @@ int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
 
   /* Core allocation */
 
-  numtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab0 == nullptr) goto label_end;
-  numtab1 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab1 == nullptr) goto label_end;
-  numtab2 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab2 == nullptr) goto label_end;
-  valtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab0 == nullptr) goto label_end;
-  valtab1 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab1 == nullptr) goto label_end;
-  valtab2 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab2 == nullptr) goto label_end;
+  numtab0.resize(ntot);
+  numtab1.resize(ntot);
+  numtab2.resize(ntot);
+  valtab0.resize(ntot);
+  valtab1.resize(ntot);
+  valtab2.resize(ntot);
 
   /* Loop on the cells of the Output Grid */
 
@@ -733,16 +730,18 @@ int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
       /* Load the subgrid to be upscaled */
 
       probtot = st_extract_subgrid(verbose, 0, iech, dbgrid2->getNSample(),
-                                   ntot, dbgrid1, ind0, ixyz.data(), nxyz, numtab0,
-                                   valtab0);
+                                   ntot, dbgrid1, ind0, ixyz.data(), nxyz, 
+                                   numtab0.data(), valtab0.data());
 
       if (probtot > 0)
       {
 
         /* Upscale the corresponding subgrid of the Input Grid */
 
-        st_upscale(orient, nxyz, flag_save, numtab0, numtab1, numtab2, valtab0,
-                   valtab1, valtab2, &result1, &result2);
+        st_upscale(orient, nxyz, flag_save,
+                   numtab0.data(), numtab1.data(), numtab2.data(), 
+                   valtab0.data(), valtab1.data(), valtab2.data(), 
+                   &result1, &result2);
         result = sqrt(result1 * result2);
       }
       else
@@ -762,13 +761,8 @@ int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
 
   error = 0;
 
-  label_end: OptDbg::setCurrentIndex(0);
-  mem_free((char* ) numtab0);
-  mem_free((char* ) numtab1);
-  mem_free((char* ) numtab2);
-  mem_free((char* ) valtab0);
-  mem_free((char* ) valtab1);
-  mem_free((char* ) valtab2);
+  label_end: 
+  OptDbg::setCurrentIndex(0);
   return (error);
 }
 
@@ -1254,18 +1248,23 @@ int db_diffusion(DbGrid *dbgrid1,
                  int seed,
                  int verbose)
 {
-  double *valtab0, *numtab0, *valwrk, *cvdist2, *cvsave, *trsave;
   double diff_coeff, pmid, probtot;
   int error, ndim, ind0[3], nxyz[3], iech, nech, iptr, opt_center;
-  int ntot, iech_save, flag_save, opt_morpho, flag_traj;
-  int *tabini, *tabcur, *tabwrk, *numrank, n_nbgh;
+  int ntot, iech_save, flag_save, opt_morpho, flag_traj, n_nbgh;
   char name[40];
   VectorInt nbgh;
+  VectorInt tabini;
+  VectorInt tabcur;
+  VectorInt tabwrk;
+  VectorDouble numtab0;
+  VectorDouble valtab0;
+  VectorDouble cvdist2;
+  VectorDouble cvsave;
+  VectorDouble trsave;
+  VectorDouble valwrk;
 
   /* Initializations */
 
-  valtab0 = valwrk = numtab0 = cvdist2 = cvsave = trsave = nullptr;
-  tabini = tabcur = tabwrk = numrank = nullptr;
   error = 1;
   iech_save = (int) get_keypone("Diffusion.Converge.Block", 0);
   opt_morpho = (int) get_keypone("Diffusion.Converge.Morpho", 1);
@@ -1305,34 +1304,21 @@ int db_diffusion(DbGrid *dbgrid1,
 
   /* Core allocation */
 
-  tabini = (int*) mem_alloc(sizeof(int) * ndim * nseed, 0);
-  if (tabini == nullptr) goto label_end;
-  tabcur = (int*) mem_alloc(sizeof(int) * ndim * nseed, 0);
-  if (tabcur == nullptr) goto label_end;
-  tabwrk = (int*) mem_alloc(sizeof(int) * ndim, 0);
-  if (tabwrk == nullptr) goto label_end;
-  numrank = (int*) mem_alloc(sizeof(int) * ndim * nseed, 0);
-  if (numrank == nullptr) goto label_end;
-  numtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab0 == nullptr) goto label_end;
-  valtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab0 == nullptr) goto label_end;
-  cvdist2 = (double*) mem_alloc(sizeof(double) * niter, 0);
-  if (cvdist2 == nullptr) goto label_end;
-  cvsave = (double*) mem_alloc(sizeof(double) * niter * 3, 0);
-  if (cvsave == nullptr) goto label_end;
+  tabini.resize(ndim * nseed);
+  tabcur.resize(ndim * nseed);
+  tabwrk.resize(ndim);
+  numtab0.resize(ntot);
+  valtab0.resize(ntot);
+  cvdist2.resize(niter);
+  cvsave.resize(niter * 3);
   if (flag_traj)
-  {
-    trsave = (double*) mem_alloc(sizeof(double) * niter * nseed * ndim, 0);
-    if (trsave == nullptr) goto label_end;
-  }
+    trsave.resize(niter * nseed * ndim);
 
   /* Allocate the neighboring displacement array */
 
   nbgh = gridcell_neigh(ndim, opt_morpho, 1, opt_center, verbose);
   n_nbgh = (int) nbgh.size() / ndim;
-  valwrk = (double*) mem_alloc(sizeof(double) * n_nbgh, 0);
-  if (valwrk == nullptr) goto label_end;
+  valwrk.resize(n_nbgh);
 
   /* Create the new variable in the output file */
 
@@ -1353,7 +1339,8 @@ int db_diffusion(DbGrid *dbgrid1,
       /* Load the subgrid to be upscaled */
 
       probtot = st_extract_subgrid(verbose, 1, iech, nech, ntot, dbgrid1, ind0,
-                                   ixyz.data(), nxyz, numtab0, valtab0);
+                                   ixyz.data(), nxyz, numtab0.data(), 
+                                   valtab0.data());
 
       if (probtot > 0)
       {
@@ -1361,17 +1348,18 @@ int db_diffusion(DbGrid *dbgrid1,
         /* Upscale the diffusion */
 
         st_updiff(orient, ndim, ntot, nseed, niter, n_nbgh, flag_save, probtot,
-                  nxyz, nbgh.data(), tabini, tabcur, tabwrk, valwrk, valtab0,
-                  verbose, cvdist2, trsave);
+                  nxyz, nbgh.data(), tabini.data(), tabcur.data(), 
+                  tabwrk.data(), valwrk.data(), valtab0.data(),
+                  verbose, cvdist2.data(), trsave.data());
 
         /* Derive the diffusion coefficient */
 
-        diff_coeff = st_get_diff_coeff(niter, verbose, pmid, flag_save, cvdist2,
-                                       cvsave);
+        diff_coeff = st_get_diff_coeff(niter, verbose, pmid, flag_save,
+                                       cvdist2.data(), cvsave.data());
 
         /* Save the trajectory (optional) */
 
-        if (flag_save && trsave != nullptr)
+        if (flag_save && ! trsave.empty())
         {
           for (int iseed = 0; iseed < nseed; iseed++)
           {
@@ -1395,17 +1383,8 @@ int db_diffusion(DbGrid *dbgrid1,
 
   error = 0;
 
-  label_end: OptDbg::setCurrentIndex(0);
-  mem_free((char* ) tabini);
-  mem_free((char* ) tabcur);
-  mem_free((char* ) tabwrk);
-  mem_free((char* ) numrank);
-  mem_free((char* ) valwrk);
-  mem_free((char* ) numtab0);
-  mem_free((char* ) valtab0);
-  mem_free((char* ) cvdist2);
-  mem_free((char* ) cvsave);
-  mem_free((char* ) trsave);
+  label_end: 
+  OptDbg::setCurrentIndex(0);
   return (error);
 }
 
