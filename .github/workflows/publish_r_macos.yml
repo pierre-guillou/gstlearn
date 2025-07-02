@@ -30,6 +30,9 @@ env:
 jobs:
   build:
     runs-on: ${{matrix.arch.os}}
+    outputs:
+      # https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
+      cran_path: ${{ steps.define_cran_path.outputs.CRAN_PATH }}
     strategy:
       matrix:
         # Last releases from here https://cran.r-project.org/src/base/R-4/
@@ -104,6 +107,18 @@ jobs:
       run : |
         cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install
         echo "MY_PKG=$(ls ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.tgz)" >> "$GITHUB_ENV"
+
+    - name: Define the CRAN path on our server
+      id: define_cran_path
+      run: |
+        PROJECT_VERSION=$(cmake --build ${{env.BUILD_DIR}} --target print_version | grep PROJECT_VERSION | cut -d "=" -f2 | xargs)
+        PROJECT_FULL_VERSION=$(cmake --build ${{env.BUILD_DIR}} --target print_version | grep PROJECT_FULL_VERSION | cut -d "=" -f2 | xargs)
+        if [ "${PROJECT_VERSION}" == "${PROJECT_FULL_VERSION}" ]; then
+          CRAN_PATH=/var/www/html/cran
+        else
+          CRAN_PATH=/var/www/html/cran/prerelease
+        fi
+        echo "CRAN_PATH=${CRAN_PATH}" >> "$GITHUB_OUTPUT"
 
     - name : Always show r_doc log
       if: success() || failure()
@@ -180,15 +195,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Publish packages to our CRAN
-    - uses: fabien-ors/cran-publish-action@v4
-      with:
-        host: ${{secrets.CG_HOST}}
-        username: ${{secrets.CG_USR}}
-        password: ${{secrets.CG_PWD}}
-        repo-path: "/var/www/html/cran"
+      - env:
+          CRAN_PATH: ${{needs.build.outputs.cran_path}}
 
-    # Delete the artifacts (for freeing storage space under github)
-    - uses: geekyeggo/delete-artifact@v5
-      with:
-        name: macos-r-package-*
+        # Publish packages to our CRAN
+        uses: fabien-ors/cran-publish-action@v4
+        with:
+          host: ${{secrets.CG_HOST}}
+          username: ${{secrets.CG_USR}}
+          password: ${{secrets.CG_PWD}}
+          repo-path: ${{env.CRAN_PATH}}
+
+        # Delete the artifacts (for freeing storage space under github)
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: macos-r-package-*

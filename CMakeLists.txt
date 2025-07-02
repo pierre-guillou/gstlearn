@@ -7,10 +7,10 @@ project(gstlearn
         DESCRIPTION  "Geostatistics & Machine Learning toolbox"
         HOMEPAGE_URL "https://gstlearn.org"
         LANGUAGES    C CXX) # Enable C language for third party libraries
-#set (PROJECT_VERSION_SUFFIX )   # Release
-#set (PROJECT_VERSION_SUFFIX a1)  # Alpha1
-#set (PROJECT_VERSION_SUFFIX b1)  # Beta1
-set (PROJECT_VERSION_SUFFIX rc1) # Release Candidate1
+# Use one of the following lines if you want to deliver a pre-release
+set (PROJECT_VERSION_SUFFIX a1)  # Alpha (new feature not yet stable)
+#set (PROJECT_VERSION_SUFFIX b1)  # Beta (new feature finished to be tested)
+#set (PROJECT_VERSION_SUFFIX rc1) # Release Candidate (only small bugs to be fixed before the release)
 
 # Build the full version
 set (PROJECT_FULL_VERSION "${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX}")
@@ -53,7 +53,6 @@ execute_process(
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UP)
 
 # Fix version.h automatically
-# Define a numerical version number (usable in e.g. #if ( VERSION >= ...))
 configure_file(version.h.in version.h)
 
 # Detect presence of multi configuration generators

@@ -32,6 +32,12 @@ For using this Python package you only need Python 3.8 (or higher) (with numpy, 
 pip install gstlearn
 ```
 
+For installing a prerelease version:
+
+```
+pip install --pre --force-reinstall gstlearn
+```
+
 The `gstlearn.plot` Python module requires additional dependencies,
 those can be installed alongside gstlearn with the following command:
 

@@ -18,7 +18,32 @@ on:
         required: false
         default: false
 
+env:
+  BUILD_DIR : build
+
 jobs:
+  define_cran_path:
+    runs-on: ubuntu-latest
+    outputs:
+      # https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
+      cran_path: ${{ steps.main_step.outputs.CRAN_PATH }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Define CRAN path on our server
+      id: main_step
+      run: |
+        cmake -B${{env.BUILD_DIR}} -DBUILD_PYTHON=OFF -DBUILD_R=OFF
+        PROJECT_VERSION=$(cmake --build ${{env.BUILD_DIR}} --target print_version | grep PROJECT_VERSION | cut -d "=" -f2 | xargs)
+        PROJECT_FULL_VERSION=$(cmake --build ${{env.BUILD_DIR}} --target print_version | grep PROJECT_FULL_VERSION | cut -d "=" -f2 | xargs)
+        if [ "${PROJECT_VERSION}" == "${PROJECT_FULL_VERSION}" ]; then
+          CRAN_PATH=/var/www/html/cran
+        else
+          CRAN_PATH=/var/www/html/cran/prerelease
+        fi
+        echo "CRAN_PATH=${CRAN_PATH}" >> "$GITHUB_OUTPUT"
+
   call-python-macos:
     uses: ./.github/workflows/publish_python_macos.yml
     secrets: inherit
@@ -39,7 +64,7 @@ jobs:
     secrets: inherit
 
   call-python-publish:
-    needs: [call-python-macos, call-python-windows, call-python-linux, call-r-macos, call-r-windows, call-r-linux]
+    needs: [define_cran_path, call-python-macos, call-python-windows, call-python-linux, call-r-macos, call-r-windows, call-r-linux]
     if: ${{ (inputs.dry_publish == false) && (github.event_name != 'schedule') }}
 
     runs-on: ubuntu-latest
@@ -58,21 +83,24 @@ jobs:
           name: "*python-package*"
 
   call-r-publish:
-    needs: [call-python-macos, call-python-windows, call-python-linux, call-r-macos, call-r-windows, call-r-linux]
+    needs: [define_cran_path, call-python-macos, call-python-windows, call-python-linux, call-r-macos, call-r-windows, call-r-linux]
     if: ${{ (inputs.dry_publish == false) && (github.event_name != 'schedule') }}
     
     # Only ubuntu can upload to CRAN easily (ssh)
     runs-on: ubuntu-latest
     
     steps:
-      - uses: fabien-ors/cran-publish-action@v4
+      - env:
+          CRAN_PATH: ${{needs.define_cran_path.outputs.cran_path}}
+
+        uses: fabien-ors/cran-publish-action@v4
         with:
           host: ${{secrets.CG_HOST}}
           username: ${{secrets.CG_USR}}
           password: ${{secrets.CG_PWD}}
-          repo-path: "/var/www/html/cran"
+          repo-path: ${{env.CRAN_PATH}}
           pattern: "*r-package*"
-  
+
       # Delete the artifacts (for freeing storage space under github)
       - uses: geekyeggo/delete-artifact@v5
         with:
