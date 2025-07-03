@@ -198,9 +198,6 @@ foreach(FLAVOR ${FLAVORS})
     target_link_libraries(${FLAVOR} PRIVATE ${HDF5_LIBRARIES})
   endif()
   
-  # Exclude [L]GPL features from Eigen
-  #target_compile_definitions(${FLAVOR} PUBLIC EIGEN_MPL2_ONLY) 
-
   # Link to specific libraries (only for Microsoft Visual Studio)
   if (MSVC)
     target_link_libraries(${FLAVOR} PUBLIC iphlpapi rpcrt4)
