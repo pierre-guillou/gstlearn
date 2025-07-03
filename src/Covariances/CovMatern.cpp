@@ -19,6 +19,8 @@
 #include "math.h"
 
 #define MAXTAB 100
+namespace gstlrn
+{ 
 static bool bessel_Old_Style = false;
 
 CovMatern::CovMatern(const CovContext& ctxt)
@@ -200,4 +202,5 @@ VectorDouble CovMatern::_evaluateSpectrumOnSphere(int n, double scale) const
 void bessel_set_old_style(bool style)
 {
   bessel_Old_Style = style;
+}
 }

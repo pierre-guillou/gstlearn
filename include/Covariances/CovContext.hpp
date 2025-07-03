@@ -13,8 +13,11 @@
 #include "Space/ASpaceObject.hpp"
 #include "Space/ASpace.hpp"
 
-class Vario;
+
+namespace gstlrn
+{
 class Db;
+class Vario;
 
 class GSTLEARN_EXPORT CovContext : public ASpaceObject
 {
@@ -64,3 +67,4 @@ private:
   int  _getIndex(int ivar, int jvar) const;
   void _update();
 };
+}

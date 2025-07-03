@@ -12,6 +12,8 @@
 #include "Db/Db.hpp"
 #include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 BiTargetCheckBench::BiTargetCheckBench(int idim_bench, double width)
     : ABiTargetCheck(),
       _idimBench(idim_bench),
@@ -68,4 +70,5 @@ bool BiTargetCheckBench::isOK(const SpaceTarget &T1,
   /* Discard sample located outside the bench */
 
   return (ABS(T1.getCoord(_idimBench) - T2.getCoord(_idimBench)) <= _width);
+}
 }

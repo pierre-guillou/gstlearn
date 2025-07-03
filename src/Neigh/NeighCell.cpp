@@ -14,6 +14,8 @@
 #include "Basic/OptDbg.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 NeighCell::NeighCell(bool flag_xvalid, int nmini, bool useBallTree, int leaf_size, const ASpaceSharedPtr& space)
   : ANeigh(space)
   , _nMini(nmini)
@@ -230,3 +232,4 @@ bool NeighCell::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) cons
   return ret;
 }
 #endif
+}

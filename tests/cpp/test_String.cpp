@@ -16,6 +16,8 @@
 #include "Basic/String.hpp"
 #include "Basic/AStringable.hpp"
 
+using namespace gstlrn;
+
 int main(int argc, char *argv[])
 {
   std::stringstream sfn;

@@ -15,6 +15,8 @@
 #include "Basic/VectorHelper.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT AArray : public AStringable
 {
 public:
@@ -43,3 +45,4 @@ protected:
 private:
   VectorInt _ndims;
 };
+}

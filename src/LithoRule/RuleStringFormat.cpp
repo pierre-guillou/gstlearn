@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "LithoRule/RuleStringFormat.hpp"
 
+namespace gstlrn
+{
 RuleStringFormat::RuleStringFormat(int level)
     : AStringFormat(level),
       _flagProp(false),
@@ -42,4 +44,5 @@ RuleStringFormat& RuleStringFormat::operator=(const RuleStringFormat& r)
 
 RuleStringFormat::~RuleStringFormat()
 {
+}
 }

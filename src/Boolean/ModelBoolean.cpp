@@ -12,6 +12,8 @@
 #include "Boolean/AShape.hpp"
 #include "Basic/Law.hpp"
 
+namespace gstlrn
+{
 ModelBoolean::ModelBoolean(double thetaCst, bool flagStat)
     : AStringable(),
       _flagStat(flagStat),
@@ -121,4 +123,5 @@ String ModelBoolean::toString(const AStringFormat* strfmt) const
     sstr << _shapes[itok]->toString(strfmt);
   }
   return sstr.str();
+}
 }

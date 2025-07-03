@@ -21,6 +21,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
   SimuSpectral::  SimuSpectral(const Model* model)
     : _ndim(0),
       _ns(0),
@@ -618,4 +620,5 @@ int simuSpectral(Db *dbin,
   namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, 1, dbout, iuid, "", nbsimu);
 
   return 0;
+}
 }

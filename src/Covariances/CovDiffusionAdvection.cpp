@@ -16,6 +16,8 @@
 #include <cmath>
 #include <complex>
 
+namespace gstlrn
+{
 CovDiffusionAdvection::CovDiffusionAdvection()
 :   _markovL(nullptr)
   , _markovR(nullptr)
@@ -216,4 +218,5 @@ Array CovDiffusionAdvection::evalCovFFT(const VectorDouble& hmax, double time, i
          { return evalSpatialSpectrum(freq, time);};
 
  return evalCovFFTTimeSlice(hmax, time, N, funcSpectrum);
+}
 }

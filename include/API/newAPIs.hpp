@@ -17,6 +17,8 @@
 #include "Db/Db.hpp"
 #include "vector"
 
+namespace gstlrn {
+
 class GaussianProcess;
 class Db;
 class ECov;
@@ -30,3 +32,4 @@ GSTLEARN_EXPORT GaussianProcess* createModelFromData(const Db* dat,
                                                      const VectorString& variables,
                                                      const std::vector<ECov>& structs,
                                                      bool addMeasurementError = false);
+}

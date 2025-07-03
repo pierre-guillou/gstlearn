@@ -17,6 +17,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{ 
 MatrixSquare::MatrixSquare(int nrow)
   : MatrixDense(nrow, nrow)
 {
@@ -477,4 +479,5 @@ MatrixSquare* prodNormMat(const MatrixDense& a, const VectorDouble& vec, bool tr
   MatrixSquare* mat = new MatrixSquare(nsym);
   mat->prodNormMatVecInPlace(a, vec, transpose);
   return mat;
+}
 }

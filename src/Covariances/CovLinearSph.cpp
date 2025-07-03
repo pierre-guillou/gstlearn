@@ -16,6 +16,8 @@
 #include "Basic/Law.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovLinearSph::CovLinearSph(const CovContext &ctxt)
     : ACovFunc(ECov::LINEARSPH, ctxt)
 {
@@ -67,4 +69,5 @@ VectorDouble CovLinearSph::_evaluateSpectrumOnSphere(int n, double scale) const
   VH::normalize(sp, 1);
 
   return sp;
+}
 }

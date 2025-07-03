@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT GridIfpEn: public AOF
@@ -38,3 +40,4 @@ private:
                   const char *combis);
   int _readLine(int mode, const char *comment, int *valint, double *valrel);
 };
+}

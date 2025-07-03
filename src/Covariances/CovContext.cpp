@@ -17,6 +17,8 @@
 #include "Variogram/Vario.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 /**
  * Create a covariances context giving the number dimensions of a predefined space RN
  *
@@ -221,4 +223,5 @@ const CovContext* CovContext::createReduce(const VectorInt &validVars) const
 
   CovContext* newctxt = new CovContext(nvar, ndim, covar0);
   return newctxt;
+}
 }

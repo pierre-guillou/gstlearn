@@ -41,6 +41,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{ 
 KrigingSystem::KrigingSystem(Db* dbin,
                              Db* dbout,
                              const ModelGeneric* model,
@@ -1714,4 +1716,5 @@ MatrixDense KrigingSystem::getMu() const
   const MatrixDense* mu = _algebra.getMu();
   if (mu == nullptr) return MatrixDense();
   return *mu;
+}
 }

@@ -12,6 +12,8 @@
 #include "Covariances/CovAniso.hpp"
 #include <math.h>
 
+using namespace gstlrn;
+
 AShiftOp::AShiftOp(CovAniso* cova, int napices)
 : _Lambda()
 , _napices(napices)

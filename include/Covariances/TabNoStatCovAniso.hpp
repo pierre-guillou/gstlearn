@@ -15,6 +15,9 @@
 
 class NoStatElem;
 
+namespace gstlrn
+{
+ 
 class GSTLEARN_EXPORT TabNoStatCovAniso : public TabNoStat
 {
   IMPLEMENT_CLONING(TabNoStatCovAniso)
@@ -51,3 +54,4 @@ class GSTLEARN_EXPORT TabNoStatCovAniso : public TabNoStat
     bool _definedForTensor;
 
 };
+}

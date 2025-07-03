@@ -21,6 +21,9 @@
 #include "Basic/NamingConvention.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{ 
+
 /**
  * This particular Multivariate Simulation post_processing considers each simulated variable as a thickness
  * of ordered layers (define in R_N). For each cell of the output grid (defined in R_{N+1}, we calculate the
@@ -60,3 +63,4 @@ GSTLEARN_EXPORT int simuPostPropByLayer(Db *dbin,
                                         const VectorInt& check_targets = VectorInt(),
                                         int check_level = 0,
                                         const NamingConvention &namconv = NamingConvention("Prop"));
+}

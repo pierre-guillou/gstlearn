@@ -13,6 +13,8 @@
 #include <math.h>
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovStorkey::CovStorkey(const CovContext& ctxt)
 : ACovFunc(ECov::STORKEY, ctxt)
 {
@@ -45,3 +47,4 @@ double CovStorkey::_evaluateCov(double h) const
   return (cov);
 }
 
+}

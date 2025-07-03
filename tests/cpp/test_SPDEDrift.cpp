@@ -23,6 +23,8 @@
 #include "Estimation/CalcKriging.hpp"
 #include "utils.hpp"
 
+using namespace gstlrn;
+
 int main(int argc, char *argv[])
 {
   std::stringstream sfn;
@@ -35,21 +37,21 @@ int main(int argc, char *argv[])
 
   String filename;
 
-  filename = gstlearn::getTestData("Scotland","temperatures.ascii");
+  filename = getTestData("Scotland","temperatures.ascii");
   Db* temperatures = Db::createFromNF(filename,verbose);
   temperatures->setLocator("January_temp", ELoc::Z, 0);
   temperatures->display();
 
-  filename = gstlearn::getTestData("Scotland","grid.ascii");
+  filename = getTestData("Scotland","grid.ascii");
   DbGrid* grid = DbGrid::createFromNF(filename,verbose);
   grid->display();
 
-  filename = gstlearn::getTestData("Scotland","model.ascii");
+  filename = getTestData("Scotland","model.ascii");
   Model* model = Model::createFromNF(filename,verbose);
 
   model->display();
 
-  filename = gstlearn::getTestData("Scotland","vario.ascii");
+  filename = getTestData("Scotland","vario.ascii");
   Vario* vario = Vario::createFromNF(filename,verbose);
 
   vario->display();

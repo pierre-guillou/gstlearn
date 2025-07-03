@@ -52,6 +52,8 @@
 #define V(i,j)         v[SQ(j,i,neq)]
 /*! \endcond */
 
+namespace gstlrn
+{
 static double _getTolInvert()
 {
   return 1.e-25;
@@ -875,4 +877,5 @@ int matrix_eigen_tridiagonal(const double *vecdiag,
   mem_free((char* ) b);
   mem_free((char* ) e);
   return (0);
+}
 }

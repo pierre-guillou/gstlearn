@@ -33,6 +33,8 @@ static int LARGE = 9999999;
 #define COMPNUM(i,j,k)      (compnum[GRID_ADD(i,j,k)])
 /*! \endcond */
 
+namespace gstlrn
+{
 /*****************************************************************************/
 /*!
  **  Defines the image radius (global variables)
@@ -1173,4 +1175,6 @@ Spill_Res spillPoint(DbGrid *dbgrid,
   res.iy0 = iy0;
 
   return res;
+}
+
 }

@@ -14,6 +14,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 FracDesc::FracDesc()
   : AStringable(),
     _family(0),
@@ -101,3 +103,4 @@ double FracDesc::fractureExtension(double cote, double dcote) const
   return (dist);
 }
 
+}

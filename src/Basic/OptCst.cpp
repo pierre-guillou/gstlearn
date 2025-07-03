@@ -19,6 +19,8 @@
 #include <iomanip>
 #include <map>
 
+namespace gstlrn
+{
 /**
  * Setting the default values for the parameters
  */
@@ -93,4 +95,5 @@ void OptCst::display()
   sstr << "Use 'OptCst::define' to modify the previous values" << std::endl;
 
   messageFlush(sstr.str());
+}
 }

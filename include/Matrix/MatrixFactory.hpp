@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 
+namespace gstlrn
+{
 class AMatrix;
 class MatrixSquare;
 
@@ -87,3 +89,4 @@ T* MatrixFactory::prodMatMat(const AMatrix *x,
   return res;
 }
 
+}

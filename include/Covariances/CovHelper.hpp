@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Basic/VectorT.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT CovHelper
 {
 public:
@@ -28,3 +30,4 @@ public:
                                         bool flagSimuSpectral = false);
 };
 
+}

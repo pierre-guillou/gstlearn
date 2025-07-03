@@ -11,6 +11,8 @@
 #include "Model/CovInternal.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 CovInternal::CovInternal()
     : _icas1(-1),
       _iech1(-1),
@@ -151,4 +153,5 @@ void CovInternal::_calculateCoordinates()
         _x2[idim] = _db2->getCoordinate(_iech2, idim);
     }
   }
+}
 }

@@ -12,8 +12,14 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Basic/ArgumentTest.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixSquare.hpp"
+
 
 ENUM_DEFINE(ENUM_TESTS)
+
+namespace gstlrn
+{
 
 void _endOfLine()
 {
@@ -344,4 +350,5 @@ MatrixSparse argumentReturnMatrixSparse(int nrows,
   mat.fillRandom(seed, zeroPercent);
   mat.display();
   return mat;
+}
 }

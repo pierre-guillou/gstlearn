@@ -25,6 +25,8 @@
 #include "Basic/String.hpp"
 #include "Basic/File.hpp"
 #include "Covariances/CovMatern.hpp"
+
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for testing the sparse matrix algebra

@@ -13,6 +13,8 @@
 #include "Basic/AStringable.hpp"
 #include <nlopt.h>
 
+namespace gstlrn
+{
 Optim::Optim(opt_algorithm algo, int dim)
   : _opt(nlopt_create((nlopt_algorithm)algo, dim))
   , _authorizedAnalyticalGradients(true)
@@ -129,4 +131,5 @@ double Optim::callback(unsigned n, const double* x, double* grad, void* f_data)
   }
   
   return result;
+}
 }

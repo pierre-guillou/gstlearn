@@ -25,11 +25,14 @@
 #include "Model/Constraints.hpp"
 #include "Model/ModelOptimParam.hpp"
 
-class Model;
+namespace gstlrn
+{
 class Db;
 
 class DbGrid;
 class CovCalcMode;
+class Model;
+
 /**
  * \brief
  * Class containing the Model Information describing the formal Spatial (or Temporal) Characteristics
@@ -44,7 +47,7 @@ class CovCalcMode;
  * - the field extension: this information is needed to get a *stationary* version to any covariance
  * - the experimental mean vector and the variance-covariance matrix (used to calibrate the Model)
  */
-class GSTLEARN_EXPORT ModelGeneric: public ICloneable
+class GSTLEARN_EXPORT ModelGeneric : public ICloneable
 {
 public:
   ModelGeneric(const CovContext& ctxt = CovContext());
@@ -234,3 +237,4 @@ GSTLEARN_EXPORT int computeDriftMatSVCRHSInPlace(MatrixDense& mat,
                                                  int type                 = 1,
                                                  int idx                  = 0,
                                                  bool flagCenteredFactors = true);
+}

@@ -42,7 +42,8 @@ namespace
 }
 #endif
 
-
+namespace gstlrn
+{
 FileLAS::FileLAS(const char* filename, const Db* db)
   : AOF(filename, db)
   , _xwell(0.)
@@ -257,4 +258,5 @@ void FileLAS::_stringToUppercase(char *string)
   for (int i = 0; i < n; i++)
     if (string[i] >= 'a' && string[i] <= 'z')
       string[i] = ('A' + string[i] - 'a');
+}
 }

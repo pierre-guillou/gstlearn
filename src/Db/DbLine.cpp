@@ -13,20 +13,22 @@
 #include "Enum/ELoadBy.hpp"
 #include "geoslib_define.h"
 
-#include "Db/Db.hpp"
-#include "Db/DbLine.hpp"
-#include "Db/DbGrid.hpp"
-#include "Db/DbStringFormat.hpp"
-#include "Polygon/Polygons.hpp"
 #include "Basic/AStringable.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/SerializeHDF5.hpp"
-#include "Stats/Classical.hpp"
-#include "Space/SpacePoint.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
+#include "Db/DbLine.hpp"
+#include "Db/DbStringFormat.hpp"
 #include "Enum/ELoc.hpp"
+#include "Polygon/Polygons.hpp"
+#include "Space/SpacePoint.hpp"
+#include "Stats/Classical.hpp"
 
 #include <math.h>
 
+namespace gstlrn
+{
 DbLine::DbLine()
   : Db()
   , _lineAdds()
@@ -56,7 +58,7 @@ DbLine::~DbLine()
 
 /**
  * @brief Check if the target Line number 'iline' (0-based) is valid or not
- * 
+ *
  * @param iline Target Line number
  * @return true If the Line rank is valid
  * @return false otherwise
@@ -80,13 +82,13 @@ bool DbLine::_isLineNumberValid(int iline) const
 int DbLine::getNLine() const
 {
   if (_lineAdds.empty()) return 0;
-  return (int) _lineAdds.size();
+  return (int)_lineAdds.size();
 }
 
 int DbLine::getNSamplePerLine(int iline) const
 {
-  if (! _isLineNumberValid(iline)) return -1;
-  return (int) _lineAdds[iline].size();
+  if (!_isLineNumberValid(iline)) return -1;
+  return (int)_lineAdds[iline].size();
 }
 
 int DbLine::getNTotal() const
@@ -229,7 +231,7 @@ int DbLine::_lineLinkageById(const VectorInt& linesId,
   if ((int)ranksPerId.size() != nech)
   {
     messerr("Dimension of 'ranksPerId' (%d) should match Number of samples (%d)",
-      (int)ranksPerId.size(), nech);
+            (int)ranksPerId.size(), nech);
     return 1;
   }
 
@@ -253,10 +255,10 @@ int DbLine::_lineLinkageById(const VectorInt& linesId,
       iadds.push_back(iech);
     }
 
-    VectorInt sortedRanks  = VH::orderRanks(ranks);
-    _lineAdds[iline]       = VH::reorder(iadds, sortedRanks);
+    VectorInt sortedRanks = VH::orderRanks(ranks);
+    _lineAdds[iline]      = VH::reorder(iadds, sortedRanks);
   }
-  return (int) !isConsistent();
+  return (int)!isConsistent();
 }
 
 /**
@@ -343,7 +345,7 @@ int DbLine::resetFromSamplesById(int nech,
 
 bool DbLine::_deserializeAscii(std::istream& is, bool verbose)
 {
-  int ndim = 0;
+  int ndim   = 0;
   int nbline = 0;
   int number = 0;
   VectorString locators;
@@ -354,11 +356,11 @@ bool DbLine::_deserializeAscii(std::istream& is, bool verbose)
   /* Initializations */
 
   bool ret = true;
-  ret = ret && _recordRead<int>(is, "Space Dimension", ndim);
+  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
 
   // Writing the set of addresses for Line organization
 
-  ret      = ret && _recordRead<int>(is, "Number of Lines", nbline);
+  ret = ret && _recordRead<int>(is, "Number of Lines", nbline);
   _lineAdds.resize(nbline);
   for (int iline = 0; iline < nbline; iline++)
   {
@@ -380,7 +382,7 @@ bool DbLine::_serializeAscii(std::ostream& os, bool verbose) const
 
   // Writing the set of addresses for Line organization
 
-  ret      = ret && _recordWrite<int>(os, "Number of Lines", getNLine());
+  ret = ret && _recordWrite<int>(os, "Number of Lines", getNLine());
   for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
   {
     ret = ret && _recordWrite<int>(os, "Number of Samples", getNSamplePerLine(iline));
@@ -389,7 +391,7 @@ bool DbLine::_serializeAscii(std::ostream& os, bool verbose) const
 
   /* Writing the tail of the file */
 
-  ret && Db::_serializeAscii(os, verbose);
+  ret&& Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -438,7 +440,7 @@ DbLine* DbLine::createFillRandom(int ndim,
   VectorDouble d = delta;
   if (d.empty()) d.resize(ndim, 1.);
   VectorDouble shift = d;
-  shift[0] = 0.;
+  shift[0]           = 0.;
   VectorVectorDouble coor0(nbline, 0.);
   VectorVectorDouble incr0(nbline, 0.);
   for (int iline = 0; iline < nbline; iline++)
@@ -447,7 +449,8 @@ DbLine* DbLine::createFillRandom(int ndim,
     for (int idim = 0; idim < ndim; idim++)
     {
       coor0[iline][idim] = (idim == 0)
-          ? deltaX * iline + deltaX * law_uniform(1. - unifDelta, 1. + unifDelta) : 0.;
+                           ? deltaX * iline + deltaX * law_uniform(1. - unifDelta, 1. + unifDelta)
+                           : 0.;
     }
   }
 
@@ -471,9 +474,9 @@ DbLine* DbLine::createFillRandom(int ndim,
       }
   }
 
-  VectorString names = generateMultipleNames("x", ndim);
-  VectorString locnames = generateMultipleNames(String{ELoc::X.getKey()}, ndim, "");
-  DbLine* dbline = createFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts, names, locnames);
+  VectorString names    = generateMultipleNames("x", ndim);
+  VectorString locnames = generateMultipleNames(String {ELoc::X.getKey()}, ndim, "");
+  DbLine* dbline        = createFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts, names, locnames);
 
   return dbline;
 }
@@ -520,7 +523,7 @@ bool DbLine::isConsistent() const
 
 /**
  * @brief Returns the rank of the line containing the target address
- * 
+ *
  * @param iech Target address
  * @return int Returne line number
  */
@@ -540,7 +543,7 @@ VectorDouble DbLine::_getHeaderCoordinate(int idim) const
   VectorDouble vec(nbline);
   for (int iline = 0; iline < nbline; iline++)
   {
-    int iech = _lineAdds[iline][0];
+    int iech   = _lineAdds[iline][0];
     vec[iline] = getCoordinate(iech, idim);
   }
   return vec;
@@ -570,13 +573,13 @@ VectorDouble DbLine::getCoordinatesPerLine(int iline, int idim) const
 Db* DbLine::createStatToHeader() const
 {
   // Create the resulting output Db
-  Db* db     = new Db();
+  Db* db = new Db();
 
   // Glue the coordinates
   for (int idim = 0, ndim = getNDim(); idim < ndim; idim++)
   {
     VectorDouble tab = _getHeaderCoordinate(idim);
-    String name = concatenateString("x", idim+1);
+    String name      = concatenateString("x", idim + 1);
     db->addColumns(tab, name, ELoc::X, idim);
   }
 
@@ -629,7 +632,7 @@ DbLine* DbLine::createVerticalFromGrid(const DbGrid& grid,
   {
     messerr("This method is coded to extract wells from a 3-D Grid only");
     return nullptr;
-    }
+  }
   if ((int)xranks.size() != (int)yranks.size())
   {
     messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
@@ -648,14 +651,14 @@ DbLine* DbLine::createVerticalFromGrid(const DbGrid& grid,
 
   // Loop on the wells
   int nech = 0;
-  int ecr = 0;
+  int ecr  = 0;
   for (int iwell = 0; iwell < nwells; iwell++)
   {
     indg[0] = xranks[iwell];
     indg[1] = yranks[iwell];
 
     // Loop on the samples
-    for (int iz = 0; iz < nbywell; iz++) 
+    for (int iz = 0; iz < nbywell; iz++)
     {
       indg[2] = iz * byZ;
 
@@ -692,11 +695,11 @@ DbLine* DbLine::createMarkersFromGrid(const DbGrid& grid,
 {
   // Preliminary checks
   int ndim = grid.getNDim();
-  if (ndim != 3) 
-    {
-      messerr("This method is coded to extract wells from a 3-D Grid only");
-      return nullptr;
-    }
+  if (ndim != 3)
+  {
+    messerr("This method is coded to extract wells from a 3-D Grid only");
+    return nullptr;
+  }
   if ((int)xranks.size() != (int)yranks.size())
   {
     messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
@@ -794,12 +797,12 @@ bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   for (int iline = 0; iline < nbline; iline++)
   {
     String locName = "Line" + std::to_string(iline);
-    auto lineg      = SerializeHDF5::getGroup(*linesG, locName);
+    auto lineg     = SerializeHDF5::getGroup(*linesG, locName);
     if (!lineg) return false;
 
     int nsample = 0;
-    ret = ret && SerializeHDF5::readValue(*lineg, "NSamples", nsample);
-    ret = ret && SerializeHDF5::readVec(*lineg, "Samples", _lineAdds[iline]);
+    ret         = ret && SerializeHDF5::readValue(*lineg, "NSamples", nsample);
+    ret         = ret && SerializeHDF5::readVec(*lineg, "Samples", _lineAdds[iline]);
   }
 
   /* Writing the tail of the file */
@@ -822,7 +825,7 @@ bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
   {
     String locName = "Line" + std::to_string(iline);
-    auto lineG      = linesG.createGroup(locName);
+    auto lineG     = linesG.createGroup(locName);
 
     ret = ret && SerializeHDF5::writeValue(lineG, "NSamples", getNSamplePerLine(iline));
     ret = ret && SerializeHDF5::writeVec(lineG, "Samples", _lineAdds[iline]);
@@ -835,3 +838,4 @@ bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

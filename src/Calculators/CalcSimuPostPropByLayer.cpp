@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include <Calculators/CalcSimuPostPropByLayer.hpp>
 
+namespace gstlrn
+{
 CalcSimuPostPropByLayer::CalcSimuPostPropByLayer()
     : CalcSimuPost(),
       _dbgrid(nullptr)
@@ -221,4 +223,5 @@ int simuPostPropByLayer(Db *dbin,
 
   int error = (calcul.run()) ? 0 : 1;
   return error;
+}
 }

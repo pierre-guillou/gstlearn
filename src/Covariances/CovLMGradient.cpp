@@ -14,6 +14,8 @@
 #include "Covariances/CovAnisoList.hpp"
 #include "Covariances/CovGradientFunctional.hpp"
 
+namespace gstlrn
+{
 CovLMGradient::CovLMGradient(const CovContext& ctxt)
 : CovAnisoList(ctxt)
 {
@@ -128,4 +130,5 @@ void CovLMGradient::_initGradients(double& covVal,
   for (int i = 0; i < 3; i++) covGp[i] = 0.;
   if (flagGrad)
     for (int i = 0; i < 9; i++) covGG[i] = 0.;
+}
 }

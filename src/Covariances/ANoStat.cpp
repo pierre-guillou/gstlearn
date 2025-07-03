@@ -4,6 +4,8 @@
 #include "Db/Db.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{   
 ANoStat::ANoStat()
 {
 
@@ -106,4 +108,4 @@ void ANoStat::_informDb(const Db* db, VectorDouble &res, bool verbose)
     VectorVectorDouble coords = db->getAllCoordinates(false);
     informField(coords, res, verbose);
 }
-
+}

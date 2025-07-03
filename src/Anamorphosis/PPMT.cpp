@@ -22,6 +22,9 @@
 
 #include <math.h>
 
+namespace gstlrn 
+{
+
 PPMT::PPMT(int ndir,
            bool flagPreprocessing,
            const EDirGen& methodDir,
@@ -590,4 +593,5 @@ VectorDouble PPMT::getSerieScore(bool flagLog) const
     vec.push_back(value);
   }
   return vec;
+}
 }

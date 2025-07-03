@@ -43,6 +43,8 @@
 
 static int DEBUG = 0;
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Load the subgrid from the Input Db
@@ -1505,4 +1507,5 @@ int stats_residuals(int verbose,
   (*nsorted) = nactive;
   (*mean) = moyenne;
   return (0);
+}
 }

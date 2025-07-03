@@ -18,9 +18,12 @@
 #include "Basic/Law.hpp"
 #include "Core/Keypair.hpp"
 
-static DbGrid *DB_GRID_FILL;
 
 #define R(i,j)              (R[(i) * n + (j)])
+
+namespace gstlrn
+{
+static DbGrid *DB_GRID_FILL;
 
 class LocalSkin: public ISkinFunctions
 {
@@ -1423,3 +1426,4 @@ int DbHelper::db_grid1D_fill(DbGrid *dbgrid,
   return 0;
 }
 
+}

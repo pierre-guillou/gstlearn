@@ -17,10 +17,13 @@
 
 #include "Calculators/ACalcInterpolator.hpp"
 
+
+namespace gstlrn
+{
+
 class Db;
 class DbGrid;
 class KrigingSystem;
-
 class GSTLEARN_EXPORT Global_Result
 {
 public:
@@ -82,3 +85,4 @@ GSTLEARN_EXPORT Global_Result global_kriging(Db *dbin,
                                              ModelGeneric *model,
                                              int ivar0,
                                              bool verbose);
+}

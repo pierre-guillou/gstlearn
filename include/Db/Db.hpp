@@ -26,12 +26,16 @@
 #include "Basic/ICloneable.hpp"
 #include "Basic/Limits.hpp"
 
+
+
+namespace gstlrn
+{
 class ASpace;
 class DbGrid;
 class Interval;
 class SpacePoint;
 class SpaceTarget;
-
+  
 /**
  * \brief
  * Class containing the Data Information.
@@ -1002,3 +1006,4 @@ private:
   /// factor allocations
   mutable VectorInt _uids;
 };
+}

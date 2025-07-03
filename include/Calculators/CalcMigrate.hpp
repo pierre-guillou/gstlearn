@@ -17,6 +17,10 @@
 #include "geoslib_define.h"
 
 
+
+
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 class EStatOption;
@@ -199,3 +203,4 @@ GSTLEARN_EXPORT int expandPointToCoor(const Db *db1,
                                       const VectorVectorDouble &coords,
                                       VectorDouble &tab);
 
+}

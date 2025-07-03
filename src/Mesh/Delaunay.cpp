@@ -27,6 +27,8 @@
 
 /*! \endcond */
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Returns the shift value for the apex('icorn')
@@ -854,3 +856,4 @@ AMesh* meshes_turbo_1D_grid_build(DbGrid *dbgrid)
   return amesh;
 }
 
+}

@@ -43,6 +43,9 @@
 
 #include <math.h>
 
+namespace gstlrn
+{ 
+
 KrigingSystemSimpleCase::KrigingSystemSimpleCase(Db* dbin,
                                                  Db* dbout,
                                                  const ModelGeneric* model,
@@ -874,4 +877,5 @@ MatrixDense KrigingSystemSimpleCase::getMu(KrigingAlgebraSimpleCase& algebra)
   const MatrixDense* mu = algebra.getMu();
   if (mu == nullptr) return MatrixDense();
   return *mu;
+}
 }

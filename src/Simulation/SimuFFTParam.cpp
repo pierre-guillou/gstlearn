@@ -13,6 +13,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 SimuFFTParam::SimuFFTParam(bool flag_aliasing,
                            double percent)
     : AStringable(),
@@ -52,4 +54,5 @@ String SimuFFTParam::toString(const AStringFormat* /*strfmt*/) const
   sstr << "Percentage of Covariance used for field extension" << std::endl;
 
   return sstr.str();
+}
 }

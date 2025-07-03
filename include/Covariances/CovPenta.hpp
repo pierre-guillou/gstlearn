@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+ 
 class CovContext;
 
 class GSTLEARN_EXPORT CovPenta : public ACovFunc
@@ -32,4 +35,4 @@ public:
 protected:
   double _evaluateCov(double h) const override;
 };
-
+}

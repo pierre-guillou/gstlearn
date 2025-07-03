@@ -17,6 +17,8 @@
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SpaceTarget : public SpacePoint
 {
 public:
@@ -65,3 +67,4 @@ protected:
   double _code;
   double _date;
 };
+}

@@ -13,6 +13,8 @@
 #include <math.h>
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovCosinus::CovCosinus(const CovContext& ctxt)
 : ACovFunc(ECov::COSINUS, ctxt)
 {
@@ -40,4 +42,5 @@ double CovCosinus::_evaluateCov(double h) const
 {
   double cov = cos(2. * GV_PI * h);
   return (cov);
+}
 }

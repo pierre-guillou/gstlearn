@@ -15,6 +15,9 @@
 #include "Basic/Grid.hpp"
 #include "Calculators/CalcGridToGrid.hpp"
 
+namespace gstlrn
+{ 
+
 CalcGridToGrid::CalcGridToGrid()
     : ACalcDbToDb(),
       _iattOut(-1),
@@ -430,4 +433,5 @@ bool CalcGridToGrid::_loadExtrema(int nvar,
     if (FFFF(coor[ivar])) return false;
   }
   return true;
+}
 }

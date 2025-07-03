@@ -24,6 +24,8 @@
 #include "Stats/Selectivity.hpp"
 #include "Variogram/DirParam.hpp"
 
+namespace gstlrn
+{
 class CovAniso;
 class Db;
 class Vario;
@@ -210,3 +212,4 @@ GSTLEARN_EXPORT int gibbs_sampler(Db *dbin,
                                   bool verbose = false,
                                   const NamingConvention& namconv = NamingConvention("Gibbs"));
 
+}

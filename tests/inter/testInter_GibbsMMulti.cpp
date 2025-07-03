@@ -26,6 +26,7 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program

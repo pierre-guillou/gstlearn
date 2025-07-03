@@ -14,6 +14,7 @@
 #include "Basic/VectorHelper.hpp"
 #include "Matrix/MatrixSquare.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

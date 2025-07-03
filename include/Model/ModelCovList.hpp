@@ -15,6 +15,9 @@
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
+
 /**
  * \brief
  * Class containing the ModelCovList Information describing the formal Spatial (or Temporal) Characteristics
@@ -66,3 +69,4 @@ public:
                 bool verbose = false,
                 bool trace = false);
 };
+}

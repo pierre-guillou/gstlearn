@@ -15,6 +15,8 @@
 #include "Db/DbGrid.hpp"
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BiTargetCheckCell: public ABiTargetCheck
 {
 public:
@@ -38,3 +40,4 @@ public:
 private:
   const DbGrid* _dbgrid;
 };
+}

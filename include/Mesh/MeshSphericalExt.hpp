@@ -13,6 +13,9 @@
 #include "Mesh/LinkSphTriangle.hpp"
 #include "Mesh/MeshSpherical.hpp"
 
+namespace gstlrn
+{
+
 /**
  * Meshing defined in the Euclidean space
  */
@@ -38,3 +41,4 @@ private:
   static AMesh* _load2DSph(bool verbose, Db *dbin, Db *dbout, const String &triswitch);
   void _meshesSphLoadVertices(SphTriangle *t);
 };
+}

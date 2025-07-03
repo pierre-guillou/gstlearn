@@ -15,6 +15,8 @@
 #include "LinearOp/IProj.hpp"
 #include <vector>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ProjMulti : public IProj, public AStringable
 {
 public:
@@ -62,3 +64,4 @@ bool _silent;
 mutable std::vector<double> _work;
 mutable std::vector<double> _workmesh;
 };
+}

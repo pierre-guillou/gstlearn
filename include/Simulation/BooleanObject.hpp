@@ -17,6 +17,8 @@
 
 #include <array>
 
+namespace gstlrn
+{
 class AShape;
 class Db;
 class DbGrid;
@@ -92,3 +94,4 @@ private:
   std::array<double, 3> _values;     // List of additional arguments
   std::array<std::array<double, 2>, 3> _box;  // Bounding Box containing the object
 };
+}

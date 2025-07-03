@@ -12,6 +12,8 @@
 #include "Basic/AException.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 ACalculator::ACalculator()
 {
 }
@@ -51,4 +53,5 @@ bool ACalculator::run()
     return false;
   }
   return true;
+}
 }

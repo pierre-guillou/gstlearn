@@ -27,6 +27,8 @@
 
 #define DEBUG 0
 
+namespace gstlrn
+{
 /*****************************************************************************/
 /*!
  **  Initialize the structure for triangles on a sphere
@@ -475,3 +477,4 @@ int meshes_2D_sph_create(int verbose, SphTriangle *t)
   return (error);
 }
 
+}

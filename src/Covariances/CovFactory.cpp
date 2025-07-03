@@ -46,6 +46,8 @@
 
 #include <cctype>
 
+namespace gstlrn
+{
 bool _isValid(ACovFunc* cova, const CovContext& ctxt)
 {
   return (int)cova->getMaxNDim() <= 0 ||
@@ -223,4 +225,5 @@ double CovFactory::getScaleFactor(const ECov &type, double param)
   double scadef = cova->getScadef();
   delete cova;
   return scadef;
+}
 }

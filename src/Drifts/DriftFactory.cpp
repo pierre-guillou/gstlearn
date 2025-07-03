@@ -17,6 +17,8 @@
 #include "Drifts/DriftM.hpp"
 #include "Drifts/DriftF.hpp"
 
+namespace gstlrn
+{ 
 /**
  * This Drift identification is used for interpreting old serialized files
  * where the drift function was encoded by its rank.
@@ -304,4 +306,5 @@ DriftList* DriftFactory::createDriftListForGradients(const DriftList* olddrifts,
   }
 
   return newdrifts;
+}
 }

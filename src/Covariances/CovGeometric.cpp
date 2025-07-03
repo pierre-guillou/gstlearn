@@ -14,6 +14,8 @@
 #include "Basic/VectorHelper.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovGeometric::CovGeometric(const CovContext& ctxt)
 : ACovFunc(ECov::GEOMETRIC, ctxt)
 {
@@ -62,4 +64,5 @@ VectorDouble CovGeometric::_evaluateSpectrumOnSphere(int n, double scale) const
   VH::normalize(sp, 1);
 
   return sp;
+}
 }

@@ -23,6 +23,7 @@
 #  include <unsupported/Eigen/IterativeSolvers>
 #endif
 
+namespace gstlrn{
 class ALinearOpCGSolver
 {
 public:
@@ -43,6 +44,7 @@ public:
                               Eigen::Map<Eigen::VectorXd>& out) = 0;
 #endif
 };
+
 
 template<typename TLinOP>
 class LinearOpCGSolver : public ALinearOpCGSolver
@@ -71,7 +73,9 @@ private:
                            Eigen::IdentityPreconditioner> cg;
 #endif
 };
+}
 
+using namespace gstlrn;
 #ifndef SWIG
 template<typename TLinOP>
 LinearOpCGSolver<TLinOP>::LinearOpCGSolver(const TLinOP* linop) : ALinearOpCGSolver()
@@ -85,16 +89,16 @@ LinearOpCGSolver<TLinOP>::LinearOpCGSolver(const TLinOP* linop) : ALinearOpCGSol
 template<typename TLinOP>
 void LinearOpCGSolver<TLinOP>::solve(const VectorDouble& rhs, VectorDouble& out)
 {
-  Eigen::Map<const Eigen::VectorXd> myRhs(rhs.data(), rhs.size());
-  Eigen::Map<Eigen::VectorXd> myOut(out.data(), out.size());
+  ::Eigen::Map<const ::Eigen::VectorXd> myRhs(rhs.data(), rhs.size());
+  ::Eigen::Map<::Eigen::VectorXd> myOut(out.data(), out.size());
   // Assume outv has the good size
   solve(myRhs, myOut);
 }
 
 template<typename TLinOP>
 void LinearOpCGSolver<TLinOP>::solve(
-  const Eigen::Map<const Eigen::VectorXd>& rhs,
-  Eigen::Map<Eigen::VectorXd>& out)
+  const ::Eigen::Map<const ::Eigen::VectorXd>& rhs,
+  ::Eigen::Map<Eigen::VectorXd>& out)
 {
   out = cg.solve(rhs);
 }
@@ -120,9 +124,9 @@ void LinearOpCGSolver<TLinOP>::solveWithGuess(const constvect rhs,
                                               const constvect guess,
                                               vect out)
 {
-  Eigen::Map<const Eigen::VectorXd> rhsm(rhs.data(),rhs.size());
-  Eigen::Map<const Eigen::VectorXd> guessm(guess.data(),guess.size());
-  Eigen::Map<Eigen::VectorXd> outm(out.data(),out.size());
+  ::Eigen::Map<const Eigen::VectorXd> rhsm(rhs.data(),rhs.size());
+  ::Eigen::Map<const Eigen::VectorXd> guessm(guess.data(),guess.size());
+  ::Eigen::Map<Eigen::VectorXd> outm(out.data(),out.size());
   outm = cg.solveWithGuess(rhsm,guessm);
 }
 

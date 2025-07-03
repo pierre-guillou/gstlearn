@@ -18,6 +18,9 @@
 #include "Anamorphosis/AnamHermite.hpp"
 #include "Stats/Selectivity.hpp"
 
+
+namespace gstlrn
+{ 
 class Db;
 
 class GSTLEARN_EXPORT CalcAnamTransform: public ACalcDbVarCreator
@@ -188,3 +191,4 @@ GSTLEARN_EXPORT int anamPointToBlock(AAnam* anam,
                                      double cvv,
                                      double coeff,
                                      double mu);
+}

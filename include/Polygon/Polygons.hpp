@@ -18,6 +18,8 @@
 #include "Basic/ASerializable.hpp"
 #include "Basic/CSVformat.hpp"
 
+namespace gstlrn 
+{
 class Db;
 
 class GSTLEARN_EXPORT Polygons: public AStringable, public ASerializable
@@ -123,3 +125,4 @@ GSTLEARN_EXPORT int db_selhull(Db *db1,
                                bool verbose = false,
                                const NamingConvention& namconv = NamingConvention("Hull", true, true, true,
                                                                                   ELoc::fromKey("SEL")));
+}

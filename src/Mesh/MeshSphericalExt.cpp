@@ -20,6 +20,8 @@
 
 // External library /// TODO : Dependency to gmtsph to be removed
 
+namespace gstlrn
+{
 MeshSphericalExt::MeshSphericalExt()
   : MeshSpherical()
 {
@@ -235,4 +237,5 @@ AMesh* MeshSphericalExt::_load2DSph(bool verbose,
   meshes_2D_sph_free(&in, 0);
 
   return amesh;
+}
 }

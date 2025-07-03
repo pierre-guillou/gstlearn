@@ -23,6 +23,8 @@
 #define COLOR_UPPER  -4
 #define N_SAMPLE(nx,nsample) ((int) ((nx-1) / nsample) + 1)
 
+namespace gstlrn
+{
 GridBmp::GridBmp(const char* filename, const Db* db)
   : AOF(filename, db)
   , _nsamplex(1)
@@ -609,3 +611,4 @@ void GridBmp::_rgb2num(int red,
   *c = (unsigned char) value;
 }
 
+}

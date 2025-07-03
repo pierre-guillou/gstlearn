@@ -12,19 +12,19 @@
 // Export VectorXXX classes
 %include Basic/VectorT.hpp
 %include Basic/VectorNumT.hpp
-%template(VectorTInt)         VectorT< int >;
-%template(VectorTDouble)      VectorT< double >;
-%template(VectorTFloat)       VectorT< float >;
-%template(VectorBool)         VectorT< UChar >; // See VectorT.hpp
-%template(VectorString)       VectorT< String >;
-%template(VectorInt)          VectorNumT< int >;
-%template(VectorDouble)       VectorNumT< double >;
-%template(VectorFloat)        VectorNumT< float >;
-%template(VectorUChar)        VectorNumT< UChar >;
-%template(VectorVectorInt)    VectorT< VectorNumT< int > >;
-%template(VectorVectorDouble) VectorT< VectorNumT< double > >;
-%template(VectorVectorFloat)  VectorT< VectorNumT< float > >;
-
+%template(VectorTInt)         gstlrn::VectorT< int >;
+%template(VectorTDouble)      gstlrn::VectorT< double >;
+%template(VectorTFloat)       gstlrn::VectorT< float >;
+%template(VectorBool)         gstlrn::VectorT< UChar >; // See VectorT.hpp
+%template(VectorString)       gstlrn::VectorT< String >;
+%template(VectorInt)          gstlrn::VectorNumT< int >;
+%template(VectorDouble)       gstlrn::VectorNumT< double >;
+%template(VectorFloat)        gstlrn::VectorNumT< float >;
+%template(VectorUChar)        gstlrn::VectorNumT< UChar >;
+%template(VectorVectorInt)    gstlrn::VectorT< VectorNumT< int > >;
+%template(VectorVectorDouble) gstlrn::VectorT< VectorNumT< double > >;
+%template(VectorVectorFloat)  gstlrn::VectorT< VectorNumT< float > >;
+//}
 %include Basic/ICloneable.hpp
 %include Basic/RepeatMacro.hpp
 %include Basic/RepeatMacroSwig.hpp
@@ -356,6 +356,7 @@
 %include Estimation/Vecchia.hpp
 %include Estimation/Likelihood.hpp
 
+
 %include OutputFormat/AOF.hpp
 %include OutputFormat/FileLAS.hpp
 %include OutputFormat/FileVTK.hpp
@@ -415,4 +416,3 @@
 
 %template(LinearOpCGSolver) LinearOpCGSolver< ScaleOp >;
 %template(LinearSPDEOpCGSolver) LinearOpCGSolver< SPDEOp >;
-

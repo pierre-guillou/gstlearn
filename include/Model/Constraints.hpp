@@ -19,6 +19,8 @@
 
 #include <vector>
 
+namespace gstlrn
+{ 
 class ConsItem;
 
 class GSTLEARN_EXPORT Constraints : public AStringable
@@ -74,3 +76,4 @@ GSTLEARN_EXPORT double constraints_get(const Constraints& constraints,
 GSTLEARN_EXPORT void constraints_print(const Constraints& constraints);
 GSTLEARN_EXPORT int modify_constraints_on_sill(Constraints& constraints);
 GSTLEARN_EXPORT int add_unit_sill_constraints(Constraints& constraints);
+}

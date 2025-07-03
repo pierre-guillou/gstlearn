@@ -27,6 +27,8 @@
 #include "Estimation/CalcKriging.hpp"
 #include "Estimation/KrigingAlgebra.hpp"
 
+using namespace gstlrn;
+
 static Db* _dataComplement(Db* data, Db* target, const VectorDouble& valuesTarget)
 {
   // Complement the Data Set

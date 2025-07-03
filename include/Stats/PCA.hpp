@@ -18,10 +18,14 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/NamingConvention.hpp"
 
+
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT PCA: public AStringable
 {
+
 public:
   PCA(int nvar = 0);
   PCA(const PCA &m);
@@ -139,3 +143,4 @@ private:
   MatrixSquare   _Z2F;
   MatrixSquare   _F2Z;
 };
+}

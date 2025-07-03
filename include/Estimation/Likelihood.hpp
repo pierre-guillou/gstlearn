@@ -16,6 +16,8 @@
 #include "LinearOp/CholeskyDense.hpp"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{ 
 class Db;
 class ModelGeneric;
 
@@ -45,3 +47,4 @@ private:
   MatrixSquare _gradCovMatTimesInvCov;
 
 };
+}

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT FileVTK: public AOF
@@ -42,3 +44,4 @@ private:
   int _factz;
   float _factvar;
 };
+}

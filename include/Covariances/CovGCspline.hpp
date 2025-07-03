@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 /* Be careful ! This is not a real covariance */
 
 class CovContext;
@@ -38,3 +40,4 @@ protected:
   double _evaluateCov(double h) const override;
 };
 
+}

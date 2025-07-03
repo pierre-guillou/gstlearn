@@ -22,6 +22,8 @@
 #include "Basic/VectorHelper.hpp"
 #include <math.h>
 
+namespace gstlrn 
+{
 OptimCostBinary::OptimCostBinary()
     : IOptimCost(),
       _isInitialized(false),
@@ -468,4 +470,5 @@ void OptimCostBinary::_contributeSeismicDerivative(const VectorDouble& lambda)
   _projSeis->point2mesh(_works, _workv);
   for (int i=0; i<_projSeis->getNApex(); i++) 
     _workv[i] *= law_df_gaussian(lambda[i]);
+}
 }

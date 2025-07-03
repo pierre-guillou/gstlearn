@@ -16,10 +16,13 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ICloneable.hpp"
 
-/// TODO : Transform into template for storing something else than double
+namespace gstlrn
+{
 
 class NF_Triplet;
 class EOperator;
+
+/// TODO : Transform into template for storing something else than double
 
 /**
  * This class is the root of the Matrix organization in gstlearn
@@ -297,3 +300,4 @@ private:
 GSTLEARN_EXPORT void setMultiThread(int nthreads);
 GSTLEARN_EXPORT int  getMultiThread();
 GSTLEARN_EXPORT bool isMultiThread();
+}

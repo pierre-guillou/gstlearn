@@ -18,8 +18,12 @@
 #include "Calculators/ACalcInterpolator.hpp"
 
 #include "Estimation/CalcKriging.hpp"
+
+namespace gstlrn
+{
 class Db;
 class DbGrid;
+
 class KrigingSystemSimpleCase;
 
 // TODO : Create KrigingParam which inherits from InterpolatorParam
@@ -58,3 +62,4 @@ private:
 
   Krigtest_Res _ktest;
 };
+}

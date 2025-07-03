@@ -39,6 +39,8 @@
 
 /*! \cond */
 
+namespace gstlrn
+{
 struct CSV_Encoding
 {
   FILE *file;                // Stream used for writing into CSV file
@@ -626,3 +628,4 @@ int csv_table_read(const String &filename,
   return 0;
 }
 
+}

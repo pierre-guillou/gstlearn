@@ -13,6 +13,8 @@
 #include "Simulation/TurningBandOperate.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovCubic::CovCubic(const CovContext& ctxt)
 : ACovFunc(ECov::CUBIC, ctxt)
 {
@@ -74,4 +76,5 @@ String CovCubic::getFormula() const
 double CovCubic::simulateTurningBand(double t0, TurningBandOperate &operTB) const
 {
   return operTB.shotNoiseCubicOne(t0);
+}
 }

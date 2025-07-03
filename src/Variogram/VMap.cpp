@@ -29,6 +29,8 @@ static int IPTV, IPTW;
 #define ADD(ix,iy,iz,nx)    ((iz) + nx[2] * ((iy) + nx[1] * (ix)))
 #define OPP(idim,i)         (dims[idim] - i - 1)
 
+namespace gstlrn
+{
 VMap::VMap(DbGrid* dbmap)
     : AVario(),
       _dbmap(dbmap)
@@ -1184,3 +1186,4 @@ String VMap::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
+}

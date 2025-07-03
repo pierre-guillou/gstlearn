@@ -14,11 +14,13 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
 
+
+namespace gstlrn
+{
 class MatrixDense;
 class ProjMatrix;
 class MatrixInt;
 class Db;
-
 class GSTLEARN_EXPORT AMesh : public AStringable, public ASerializable
 {
 
@@ -145,3 +147,4 @@ private:
 };
 
 typedef std::vector<const AMesh*> VectorMeshes;
+}

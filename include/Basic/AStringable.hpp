@@ -16,6 +16,8 @@
 #include "Enum/EJustify.hpp"
 #include "Basic/AStringFormat.hpp"
 
+namespace gstlrn
+{
 class AMatrix;
 
 class GSTLEARN_EXPORT AStringable
@@ -165,3 +167,4 @@ GSTLEARN_EXPORT void print_ivector(const char *title,
                                    int flag_limit,
                                    int ntab,
                                    const VectorInt &itab);
+}

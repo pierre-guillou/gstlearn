@@ -15,6 +15,8 @@
 #include "Basic/VectorHelper.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 RankHandler::RankHandler(const Db* db,
                          bool useSel,
                          bool useZ,
@@ -307,4 +309,5 @@ void RankHandler::dump(bool flagFull) const
       message("- Sample= %2d : Variable value= %lf\n", _index[ivar][i], (*_Zflatten)[lec]);
     message("\n");
   }
+}
 }

@@ -29,6 +29,9 @@
 #include <algorithm>
 #include <math.h>
 
+namespace gstlrn
+{
+
 DbGrid::DbGrid()
     : Db()
     , _grid()
@@ -2505,4 +2508,5 @@ VectorDouble DbGrid::getDistanceToOrigin(const VectorInt& origin,
     distvec[iech] = sqrt(dist);
   }
   return distvec;
+}
 }

@@ -16,6 +16,8 @@
 #include "Db/DbLine.hpp"
 #include "Db/DbStringFormat.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

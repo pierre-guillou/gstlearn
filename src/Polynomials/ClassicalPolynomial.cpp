@@ -16,6 +16,7 @@
 #include "Matrix/NF_Triplet.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn {
 ClassicalPolynomial::ClassicalPolynomial()
 {
   // TODO Auto-generated constructor stub
@@ -347,3 +348,4 @@ void ClassicalPolynomial::evalOpTraining(
 //   //   VectorEigen::addInPlace(temp1, temp2, outv);
 //   //}
 // }
+}

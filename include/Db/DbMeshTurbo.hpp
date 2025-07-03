@@ -16,6 +16,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Mesh/MeshETurbo.hpp"
 
+namespace gstlrn
+{
 /**
  * \brief
  * Class containing the Data Information organized as a Turbo Meshing
@@ -105,3 +107,4 @@ protected:
 private:
   MeshETurbo _mesh;
 };
+}

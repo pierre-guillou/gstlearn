@@ -18,6 +18,9 @@
 #include "Simulation/SimuSubstitutionParam.hpp"
 #include "Basic/Plane.hpp"
 
+namespace gstlrn
+{ 
+
 class Db;
 class DbGrid;
 
@@ -57,3 +60,4 @@ GSTLEARN_EXPORT int substitution(DbGrid *dbgrid,
                                  int seed = 43242,
                                  int verbose = false,
                                  const NamingConvention& namconv = NamingConvention("SimSub"));
+}

@@ -12,6 +12,8 @@
 #include "Space/SpaceTarget.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 BiTargetCheckDate::BiTargetCheckDate(double deltamin, double deltamax)
     : ABiTargetCheck(),
       _deltaMin(deltamin),
@@ -66,4 +68,5 @@ bool BiTargetCheckDate::isOK(const SpaceTarget &T1, const SpaceTarget &T2) const
   if (delta <  _deltaMin) return false;
   if (delta >= _deltaMax) return false;
   return true;
+}
 }

@@ -18,6 +18,8 @@
 #include <math.h>
 #include <functional>
 
+namespace gstlrn
+{
 Chebychev::Chebychev()
   : _ncMax(10001)
   , _nDisc(100)
@@ -384,3 +386,4 @@ void Chebychev::_addEvalOp(ALinearOp* Op, const constvect inv, vect outv) const
 }
 
 #endif
+}

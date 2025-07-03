@@ -24,6 +24,8 @@
 #define LHS(i,j) (lhs[(i) * neq + (j)])
 #define RHS(i)   (rhs[(i)])
 
+namespace gstlrn
+{
 CalcSimuRefine::CalcSimuRefine(int nbsimu, int seed)
   : ACalcSimulation(nbsimu, seed)
   , _param()
@@ -587,4 +589,5 @@ DbGrid* simulation_refine(DbGrid* dbin,
   simfine.setParam(param);
 
   return (simfine.run()) ? simfine.getResultingGrid() : nullptr;
+}
 }

@@ -16,6 +16,10 @@
 
 #include "Calculators/ACalcInterpolator.hpp"
 
+
+namespace gstlrn
+{
+
 class Db;
 class DbGrid;
 class Model;
@@ -126,4 +130,4 @@ GSTLEARN_EXPORT int leastSquares(Db *dbin,
                                  int order = 0,
                                  const NamingConvention &namconv = NamingConvention(
                                      "LstSqr"));
-
+}

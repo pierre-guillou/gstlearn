@@ -24,6 +24,8 @@
 #include "Estimation/Likelihood.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 ModelGeneric::ModelGeneric(const CovContext& ctxt)
   : _cova(nullptr)
   , _driftList(nullptr)
@@ -389,4 +391,5 @@ void ModelGeneric::fitNew(const Db* db,
   ModelCovList* mcv = dynamic_cast<ModelCovList*>(this);
   if (mcv != nullptr)
     mcv->deleteFitSills();
+}
 }

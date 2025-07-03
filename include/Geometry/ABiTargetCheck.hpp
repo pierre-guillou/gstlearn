@@ -15,6 +15,8 @@
 #include "Basic/AStringable.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{ 
 class Db;
 /**
  * This class performs the test between two Space Points (usually the target point first and the tentative point second)
@@ -45,3 +47,4 @@ public:
 #endif
 */
 };
+}

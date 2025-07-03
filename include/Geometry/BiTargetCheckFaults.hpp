@@ -15,6 +15,8 @@
 #include "Geometry/ABiTargetCheck.hpp"
 #include "Faults/Faults.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT BiTargetCheckFaults: public ABiTargetCheck
 {
 public:
@@ -37,3 +39,4 @@ public:
 private:
   const Faults* _faults;
 };
+}

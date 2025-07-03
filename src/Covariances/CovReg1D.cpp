@@ -12,6 +12,8 @@
 
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovReg1D::CovReg1D(const CovContext& ctxt)
 : ACovFunc(ECov::REG1D, ctxt)
 {
@@ -54,3 +56,4 @@ double CovReg1D::_evaluateCov(double h) const
   return (cov);
 }
 
+}

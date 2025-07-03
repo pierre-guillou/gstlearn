@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT GridF2G: public AOF
@@ -29,3 +31,4 @@ public:
   bool mustBeForRotation(int mode) const override { return mode <= 1; }
   DbGrid* readGridFromFile() override;
 };
+}

@@ -18,6 +18,9 @@
 #include "Basic/NamingConvention.hpp"
 #include "Basic/ICloneable.hpp"
 
+namespace gstlrn 
+{
+
 /**
  * \brief
  * Class containing the Data Information organized as a Oriented Graph
@@ -134,3 +137,4 @@ private:
   // corresponding matrix value is non zero.
   MatrixSparse _downArcs;
 };
+}

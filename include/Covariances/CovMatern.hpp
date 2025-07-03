@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+
 class CovContext;
 class TurningBandOperate;
 class MatrixDense;
@@ -66,3 +69,4 @@ private:
 };
 
 GSTLEARN_EXPORT void bessel_set_old_style(bool style);
+}

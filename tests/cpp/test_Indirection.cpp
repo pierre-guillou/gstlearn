@@ -17,6 +17,7 @@
 #include "Basic/Indirection.hpp"
 #include "Mesh/MeshETurbo.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

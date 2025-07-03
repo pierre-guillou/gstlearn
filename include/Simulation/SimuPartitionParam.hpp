@@ -15,6 +15,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SimuPartitionParam: public AStringable
 {
 public:
@@ -41,3 +43,4 @@ private:
   double _intensity;
   VectorDouble _dilate;
 };
+}

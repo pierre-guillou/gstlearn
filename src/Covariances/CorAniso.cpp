@@ -48,6 +48,8 @@ static int COVWGT[4][5] = {{2, -2, 0, 0, 0},
                            {20, -30, 12, -2, 0},
                            {70, -112, 56, -16, 2}};
 
+namespace gstlrn
+{
 struct DerivCache
 {
   mutable const SpacePoint* cachedP1ptr = nullptr;
@@ -1666,4 +1668,5 @@ void CorAniso::updateCov()
       _aniso.setRadiusDir(idim, exp(_scales[idim].getValue()));
     }
   }
+}
 }

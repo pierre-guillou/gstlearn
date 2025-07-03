@@ -12,6 +12,8 @@
 
 #include <sstream>
 
+namespace gstlrn
+{
 TestInheritance::TestInheritance()
  : _iproj(nullptr)
 {
@@ -35,4 +37,5 @@ String TestInheritance::toString(const AStringFormat* strfmt) const
     sstr << "Projection Matrix not yet defined!";
   }
   return sstr.str();
+}
 }

@@ -14,6 +14,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 Plane::Plane()
     : AStringable(),
       _coor(3),
@@ -128,4 +130,5 @@ void Plane::setCoor(int idim, double value)
 {
   if (idim < (int) _coor.size())
     _coor[idim] = value;
+}
 }

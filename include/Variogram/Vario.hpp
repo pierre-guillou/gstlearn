@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "Anamorphosis/AAnam.hpp"
 #include "gstlearn_export.hpp"
 #include "geoslib_define.h"
 
@@ -20,6 +21,8 @@
 #include "Basic/ASerializable.hpp"
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 typedef struct
 {
   int nalloc;
@@ -38,7 +41,6 @@ typedef struct
 class Db;
 class Model;
 class DirParam;
-class AAnam;
 
 /**
  * \brief
@@ -85,6 +87,8 @@ class AAnam;
  * relative to the target pair of variables.
  *
  */
+
+
 class GSTLEARN_EXPORT Vario : public AVario, public ASerializable
 {
 public:
@@ -511,3 +515,4 @@ GSTLEARN_EXPORT int vario_order_add(Vario_Order* vorder,
                                     int ilag,
                                     int idir,
                                     double dist);
+}

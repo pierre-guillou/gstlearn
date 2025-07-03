@@ -16,9 +16,12 @@
 #include "Simulation/ACalcSimulation.hpp"
 #include "Simulation/SimuRefineParam.hpp"
 
+
+
+namespace gstlrn
+{
 class Db;
 class DbGrid;
-
 class GSTLEARN_EXPORT CalcSimuRefine: public ACalcSimulation
 {
 public:
@@ -73,3 +76,4 @@ GSTLEARN_EXPORT DbGrid* simulation_refine(DbGrid* dbin,
                                           const SimuRefineParam& param,
                                           int seed                        = 432432,
                                           const NamingConvention& namconv = NamingConvention("Refine"));
+}

@@ -14,6 +14,8 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{ 
 class Db;
 
 class GSTLEARN_EXPORT CovInternal
@@ -73,3 +75,4 @@ private:
   mutable VectorDouble _x1;
   mutable VectorDouble _x2;
 };
+}

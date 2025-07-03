@@ -22,6 +22,8 @@
 #include <math.h>
 #include <algorithm>
 
+namespace gstlrn
+{
 ANeigh::ANeigh(const ASpaceSharedPtr& space)
   : ASpaceObject(space)
   , ASerializable()
@@ -479,3 +481,4 @@ bool ANeigh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

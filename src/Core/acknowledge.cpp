@@ -13,6 +13,8 @@
 
 #include "version.h"
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  *  Acknowledgment of the authors for gstlearn Library
@@ -37,3 +39,4 @@ void acknowledge_gstlearn(void)
   message("Mike PEREIRA     (mike.pereira@minesparis.psl.eu)\n");
 }
 
+}

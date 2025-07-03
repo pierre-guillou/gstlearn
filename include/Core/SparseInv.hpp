@@ -12,6 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
+namespace gstlrn 
+{
 GSTLEARN_EXPORT int sparseinv(int n,
                               int* Lp,
                               int* Li,
@@ -26,3 +28,4 @@ GSTLEARN_EXPORT int sparseinv(int n,
                               double* z,
                               int* Zdiagp,
                               int* Lmunch);
+}

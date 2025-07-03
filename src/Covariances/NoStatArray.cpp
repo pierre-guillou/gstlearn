@@ -7,6 +7,9 @@
 #include "geoslib_define.h"
 #include <memory>
 
+namespace gstlrn
+{
+
 NoStatArray::NoStatArray(std::shared_ptr<const Db> dbref,
                          const String& colname)
   : _dbNoStat(std::move(dbref))
@@ -82,4 +85,5 @@ void NoStatArray::_informField(const VectorVectorDouble& coords,
                      "Statistics for Non-Stationary Parameter on Mesh");
     VH::dumpStats(str, tab);
   }
+}
 }

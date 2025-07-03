@@ -36,6 +36,8 @@
 #include <math.h>
 #include <string.h>
 
+namespace gstlrn
+{
 /*! \cond */
 typedef struct
 {
@@ -5419,4 +5421,5 @@ Rule* _rule_auto(Db *db,
   delete vario;
   if (error) rule = rule_free(rule);
   return (rule);
+}
 }

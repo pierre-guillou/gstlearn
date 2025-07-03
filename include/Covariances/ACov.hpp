@@ -33,15 +33,18 @@
 
 #include <vector>
 
+namespace gstlrn
+{
 typedef std::function<double(const SpacePoint&, const SpacePoint&, int, int, const CovCalcMode* calcmode)> covmaptype;
 class Db;
 class DbGrid;
 class MatrixSquare;
-class MatrixSparse;
 class TabNoStat;
 class AFunctional;
 class CovInternal;
 class ListParams;
+class MatrixSparse;
+
 /**
  * \brief
  * Class containing the Covariance part of the Model.
@@ -588,3 +591,4 @@ protected:
   mutable SpacePoint* _pw2;
   TabNoStat* _tabNoStat;
 };
+}

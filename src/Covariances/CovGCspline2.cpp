@@ -13,6 +13,8 @@
 #include <math.h>
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovGCspline2::CovGCspline2(const CovContext& ctxt)
 : ACovFunc(ECov::SPLINE2_GC, ctxt)
 {
@@ -69,4 +71,5 @@ double CovGCspline2::_evaluateCovDerivative(int degree, double h) const
   }
 
   return (cov);
+}
 }

@@ -38,6 +38,8 @@ License: BSD 3-clause
 
 #include "Core/SparseInv.hpp"
 
+namespace gstlrn
+{ 
 int sparseinv /* returns -1 on error, or flop count if OK */
 (
 /* inputs, not modified on output: */
@@ -175,4 +177,5 @@ int sparseinv /* returns -1 on error, or flop count if OK */
     }
   }
   return (flops);
+}
 }

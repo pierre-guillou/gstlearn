@@ -17,6 +17,8 @@
 
 #define SKIN_QUANT  1000
 
+namespace gstlrn
+{
 static int ndir[4] = { 0, 2, 4, 6 };
 static int invdir[6] = { 1, 0, 3, 2, 5, 4 };
 static int id[6][3] = { { 1, 0, 0 },
@@ -428,4 +430,5 @@ int Skin::_getNDim() const
   if (_dbgrid != nullptr)
     return _dbgrid->getNDim();
   return 0;
+}
 }

@@ -14,6 +14,9 @@
 #include <assert.h>
 #include <memory>
 
+namespace gstlrn
+{
+
 /**
  * Inherits from this interface to make your class cloneable.
  * You must use IMPLEMENT_CLONING macro in concrete classes only.
@@ -50,4 +53,4 @@ public:                                            \
     assert(typeid(*this) == typeid(Class));        \
     return (new Class(*this));                     \
   }
-
+}

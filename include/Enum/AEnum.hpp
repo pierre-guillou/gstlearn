@@ -21,6 +21,8 @@
 #include <map>
 #include <string_view>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT AEnum
 {
 public:
@@ -75,7 +77,7 @@ private:
   int    _value;
   std::string_view _descr;
 };
-
+}
 #define ENUM_ITEM(NAME, x,y,z) E_ ## x = y,
 #define ENUM_ITEMS(NAME, ...) EXPAND(REPEAT3(ENUM_ITEM, NAME, __VA_ARGS__))
 
@@ -89,9 +91,11 @@ private:
 //      ENUM DECLARE
 // ######################
 #define ENUM_DECLARE_(NAME, DEFAULT, ...)\
+namespace gstlrn\
+{\
 class NAME;\
 \
-typedef std::map<int, NAME*> NAME ## Map;\
+typedef ::std::map<int, NAME*> NAME ## Map;\
 \
 class GSTLEARN_EXPORT NAME ## Iterator\
 {\
@@ -158,12 +162,14 @@ public:\
 \
   EXPAND(ENUM_DECLS(NAME, __VA_ARGS__))\
 };\
+}\
 \
-
 // ######################
 //       ENUM DEFINE
 // ######################
 #define ENUM_DEFINE_(NAME, DEFAULT, ...)\
+namespace gstlrn\
+{\
 NAME ## Map NAME::_map = NAME ## Map();\
 NAME ## Iterator NAME::_iterator = NAME ## Iterator(&NAME::_map);\
 \
@@ -350,6 +356,7 @@ const std::string_view NAME ## Iterator::getKey() const\
 const std::string_view NAME ## Iterator::getDescr() const\
 {\
   return (_stditer->second->getDescr());\
+}\
 }\
 \
 

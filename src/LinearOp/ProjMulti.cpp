@@ -15,6 +15,8 @@
 #include "LinearOp/IProj.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
 
+namespace gstlrn
+{
 int ProjMulti::findFirstNoNullOnRow(int j) const
 {
   int i = 0;
@@ -265,4 +267,5 @@ String ProjMulti::toString(const AStringFormat* /*strfmt*/) const
 
 
   return sstr.str();
+}
 }

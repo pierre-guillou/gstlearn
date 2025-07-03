@@ -19,6 +19,9 @@
 #include "Drifts/DriftFactory.hpp"
 #include "Model/Model.hpp"
 
+namespace gstlrn 
+{
+
 CalcSimpleInterpolation::CalcSimpleInterpolation()
     : ACalcInterpolator(),
       _flagEst(true),
@@ -847,4 +850,6 @@ void CalcSimpleInterpolation::_saveResults(Db* dbin,
   // Assign the result
   if (_flagEst) dbout->setArray(iech, _iattEst, result);
   if (_flagStd) dbout->setArray(iech, _iattStd, stdev);
+}
+
 }

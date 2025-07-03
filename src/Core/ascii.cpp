@@ -56,6 +56,8 @@ static char Fichier_rule[]    = "Rule";
 static char Fichier_simu[]    = "Simu";
 static char Fichier_frac[]    = "Frac";
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Read the next record
@@ -559,4 +561,5 @@ Db* db_read_csv(const char *file_name,
   /* Core deallocation */
 
   label_end: return (db);
+}
 }

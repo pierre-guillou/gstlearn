@@ -12,4 +12,7 @@
 
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT void acknowledge_gstlearn(void);
+}

@@ -16,6 +16,8 @@
 #include "Db/DbGrid.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Skin
 {
 public:
@@ -52,3 +54,4 @@ private:
   VectorInt _address;
   VectorDouble _energy;
 };
+}

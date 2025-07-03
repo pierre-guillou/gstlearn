@@ -16,6 +16,7 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <unsupported/Eigen/IterativeSolvers>
 
+using namespace gstlrn;
 int main(int argc, char *argv[])
 {
   std::stringstream sfn;

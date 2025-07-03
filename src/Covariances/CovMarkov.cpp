@@ -16,6 +16,8 @@
 
 #define MAXTAB 100
 
+namespace gstlrn
+{
 CovMarkov::CovMarkov(const CovContext &ctxt)
     : ACovFunc(ECov::MARKOV, ctxt),
       _markovCoeffs(),
@@ -107,4 +109,5 @@ double CovMarkov::evaluateSpectrum(double freq) const
     s += _markovCoeffs[i] * pow(freq,i);
   }
   return 1. /  s;
+}
 }

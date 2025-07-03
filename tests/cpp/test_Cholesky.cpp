@@ -19,6 +19,7 @@
 #include "Basic/File.hpp"
 #include "Basic/Utilities.hpp"
 
+using  namespace gstlrn;
 MatrixSparse* _createSparseMatrix(int n, double proba)
 {
   // We create a square matrix

@@ -14,6 +14,9 @@
 
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+  
 class CovContext;
 
 class GSTLEARN_EXPORT CovMarkov : public ACovFunc
@@ -52,3 +55,4 @@ private :
   VectorDouble _markovCoeffs;
   double _correc;
 };
+}

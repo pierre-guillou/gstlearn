@@ -16,6 +16,8 @@
 #include "Covariances/CovCalcMode.hpp"
 #include "Matrix/MatrixDense.hpp"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 class ANeigh;
@@ -96,3 +98,4 @@ private:
 
   mutable const DbGrid* _dbgrid; // Pointer to the DbGrid (not to be deleted)
 };
+}

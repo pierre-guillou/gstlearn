@@ -19,6 +19,8 @@
 
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
 class Db;
 class ModelGeneric;
 
@@ -59,3 +61,4 @@ protected:
   MatrixSymmetric _XtCm1X; // X^T * C^{-1} * X
   bool _reml;
 };
+}

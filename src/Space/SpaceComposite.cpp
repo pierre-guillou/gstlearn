@@ -18,6 +18,8 @@
 #include <sstream>
 #include <vector>
 
+namespace gstlrn
+{
 SpaceComposite::SpaceComposite(const std::vector<ASpaceSharedPtr>& vectspace)
   : ASpace(0)
   , _comps()
@@ -255,4 +257,5 @@ void SpaceComposite::_getIncrementInPlace(const SpacePoint& p1,
     ptemp.resize(_comps[ispace]->getNDim());
     _comps[ispace]->getIncrementInPlace(p1, p2, ptemp);
   }
+}
 }

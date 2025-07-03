@@ -16,6 +16,8 @@
 
 #define NBSIMU_DEF 1000
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT double integralGaussHermite(double yc,
                                             double r,
                                             const VectorDouble &psi);
@@ -76,3 +78,4 @@ GSTLEARN_EXPORT double MCMetalStdElement(double yc,
                                          double krigstd,
                                          const VectorDouble &psi,
                                          int nbsimu = NBSIMU_DEF);
+}

@@ -15,6 +15,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 ACovFunc::ACovFunc(const ECov& type, const CovContext& ctxt)
 : AStringable(),
   _type(type),
@@ -345,3 +347,4 @@ void ACovFunc::computeCorrec(int ndim)
   setCorrec(correc);
 }
 
+}

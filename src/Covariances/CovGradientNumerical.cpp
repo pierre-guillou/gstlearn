@@ -17,6 +17,8 @@
 
 #define TR(i,j)                (Tr[(i) * 3 + (j)])
 
+namespace gstlrn
+{
 CovGradientNumerical::CovGradientNumerical(const ECov& type,
                                            double ballRadius,
                                            const CovContext& ctxt)
@@ -232,3 +234,4 @@ double CovGradientNumerical::_eval(const SpacePoint& p1,
   return cov;
 }
 
+}

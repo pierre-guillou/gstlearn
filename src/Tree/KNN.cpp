@@ -12,6 +12,8 @@
 #include "Tree/ball_algorithm.h"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 KNN::KNN()
   : _distances(),
     _indices(),
@@ -147,4 +149,5 @@ double KNN::getDistance(int rank, int ineigh) const
   if (rank < 0 || rank >= _n_samples) return ITEST;
   if (ineigh < 0 || ineigh >= _n_neighbors) return ITEST;
   return _distances[rank][ineigh];
+}
 }

@@ -16,6 +16,8 @@
 
 class Db;
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT NoStatArray: public ANoStat
 {
 public:
@@ -35,3 +37,4 @@ private:
   std::shared_ptr<const Db> _dbNoStat;
   const String _colName;
 };
+}

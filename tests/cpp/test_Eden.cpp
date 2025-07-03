@@ -24,6 +24,8 @@
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "Simulation/CalcSimuEden.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

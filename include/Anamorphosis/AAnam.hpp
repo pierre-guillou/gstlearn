@@ -20,6 +20,9 @@
 #include "Basic/ICloneable.hpp"
 #include "Basic/NamingConvention.hpp"
 
+
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT AAnam : public AStringable, public ASerializable, public ICloneable
@@ -91,3 +94,4 @@ private:
 private:
   bool _flagFitted;
 };
+}

@@ -21,6 +21,8 @@
 #include "Basic/NamingConvention.hpp"
 #include "Matrix/MatrixInt.hpp"
 
+namespace gstlrn
+{
 class Db;
 class AAnam;
 
@@ -172,3 +174,4 @@ GSTLEARN_EXPORT int dbSelectivity(Db *db,
                                   const VectorDouble& zcuts,
                                   const NamingConvention &namconv = NamingConvention(
                                       "Selectivity"));
+}

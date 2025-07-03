@@ -39,6 +39,9 @@
 #include <vector>
 #include <math.h>
 
+namespace gstlrn 
+{
+
 ACov::ACov(const CovContext& ctxt)
   : _ctxt(ctxt)
   , _optimEnabled(false)
@@ -2478,4 +2481,5 @@ void ACov::setContext(const CovContext& ctxt)
 {
   _ctxt = ctxt;
   _setContext(ctxt);
+}
 }

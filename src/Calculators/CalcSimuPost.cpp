@@ -18,6 +18,8 @@
 #include "Calculators/CalcSimuPost.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{
 CalcSimuPost::CalcSimuPost()
     : ACalcDbToDb(),
       _verbose(false),
@@ -690,4 +692,5 @@ int simuPost(Db *dbin,
 
   int error = (calcul.run()) ? 0 : 1;
   return error;
+}
 }

@@ -10,7 +10,10 @@
 /******************************************************************************/
 #include "Basic/AFunction.hpp"
 
+namespace gstlrn
+{
 AFunction::AFunction()
 {
 
+}
 }

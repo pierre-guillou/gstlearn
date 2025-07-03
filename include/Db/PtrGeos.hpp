@@ -15,6 +15,8 @@
 
 #include "Enum/ELoc.hpp"
 
+namespace gstlrn
+{
 
 /**
  * Gives the Rank of the Attribute for:
@@ -52,3 +54,4 @@ GSTLEARN_EXPORT String getLocatorName(const ELoc& locatorType, int locatorIndex=
 GSTLEARN_EXPORT void   printLocatorList();
 GSTLEARN_EXPORT VectorString getLocatorNames();
 GSTLEARN_EXPORT VectorInt    getLocatorMultiples();
+}

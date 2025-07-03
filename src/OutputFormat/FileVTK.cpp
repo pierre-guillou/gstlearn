@@ -15,6 +15,8 @@
 #include "Db/DbGrid.hpp"
 #include "Basic/Memory.hpp"
 
+namespace gstlrn
+{
 FileVTK::FileVTK(const char* filename, const Db* db)
   : AOF(filename, db)
   , _flagBinary(false)
@@ -201,4 +203,5 @@ int FileVTK::writeInFile()
 
   _fileClose();
   return 0;
+}
 }

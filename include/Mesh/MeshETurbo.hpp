@@ -17,10 +17,14 @@
 #include "Basic/Grid.hpp"
 #include "Mesh/AMesh.hpp"
 
-class DbGrid;
-class CovAniso;
+
+
+namespace gstlrn
+{
 class cs;
 
+class DbGrid;
+class CovAniso;
 /**
  * Meshing defined as a Turbo based on a Regular Grid
  * It actually avoids storing all the meshing information
@@ -171,3 +175,4 @@ private:
 };
 
 GSTLEARN_EXPORT bool isTurbo(const VectorMeshes& meshes);
+}

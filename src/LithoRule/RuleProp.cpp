@@ -16,6 +16,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{
 RuleProp::RuleProp()
     : AStringable(),
       _flagStat(true),
@@ -400,4 +402,5 @@ RuleProp* RuleProp::createFromRulesAndDb(const Rule* rule1,
     return nullptr;
   }
   return ruleprop;
+}
 }

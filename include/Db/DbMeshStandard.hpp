@@ -16,6 +16,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Mesh/MeshEStandard.hpp"
 
+namespace gstlrn
+{
 /**
  * \brief
  * Class containing the Data Information organized as a General Meshing
@@ -93,3 +95,4 @@ protected:
 private:
   MeshEStandard _mesh;
 };
+}

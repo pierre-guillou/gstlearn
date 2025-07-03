@@ -17,6 +17,8 @@
 #include "Neigh/ANeigh.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{
 ACalcInterpolator::ACalcInterpolator()
   : ACalcDbToDb()
   , _model(nullptr)
@@ -252,4 +254,5 @@ int ACalcInterpolator::_centerDataToGrid(DbGrid* dbgrid)
     getDbin()->setLocatorByUID(iuid_out + idim, ELoc::X, idim);
   }
   return DbH::centerPointToGrid(getDbin(), dbgrid, 0.);
+}
 }

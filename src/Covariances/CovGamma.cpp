@@ -13,6 +13,8 @@
 #include "math.h"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovGamma::CovGamma(const CovContext& ctxt)
 : ACovFunc(ECov::GAMMA, ctxt)
 {
@@ -55,4 +57,5 @@ double CovGamma::_evaluateCov(double h) const
 String CovGamma::getFormula() const
 {
   return "C(h)=\\frac{1}{\\left( 1+ \\frac{h}{a_t} \\right)^\\alpha";
+}
 }

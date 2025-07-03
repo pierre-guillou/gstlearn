@@ -18,6 +18,8 @@
 #include "Covariances/ACovGradient.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 class Rotation;
 
 /**
@@ -50,3 +52,4 @@ private:
                          VectorDouble& trttr) const;
 };
 
+}

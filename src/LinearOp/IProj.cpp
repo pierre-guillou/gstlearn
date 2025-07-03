@@ -13,6 +13,8 @@
 
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 int IProj::mesh2point(const VectorDouble& inv,
                       VectorDouble& outv) const
 {
@@ -47,4 +49,5 @@ int IProj::point2mesh(const constvect inv, vect outv) const
 {
   std::fill(outv.begin(), outv.end(), 0.);
   return _addPoint2mesh(inv, outv);
+}
 }

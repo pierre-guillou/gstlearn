@@ -26,6 +26,8 @@
 #include "Covariances/CovAniso.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
 ** Main Program for testing the sparse matrix algebra

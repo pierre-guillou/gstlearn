@@ -98,7 +98,7 @@ gstlearn_to_sf <- function(x, crs = NA)
     stop("Package 'sf' is mandatory to use this function!")
 
   val = NULL
-  if (class(x)[1] == "_p_Polygons") {
+  if (class(x)[1] == "_p_gstlrn__Polygons") {
       lp = list()
       for (i in 0:(x$getNPolyElem()-1)) {
         lp[[1+length(lp)]] <- list(matrix(c(x$getX(i), x$getY(i)),
@@ -108,7 +108,7 @@ gstlearn_to_sf <- function(x, crs = NA)
       st_set_crs(val, crs)
   }
   
-  if (class(x)[1] == "_p_Db") {
+  if (class(x)[1] == "_p_gstlrn__Db") {
     df <- x[]
     val <- st_as_sf(df, coords = x$getNamesByLocator(ELoc_X()))
     st_set_crs(val, crs)

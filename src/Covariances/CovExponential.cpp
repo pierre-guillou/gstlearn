@@ -18,7 +18,8 @@
 
 #include "math.h"
 
-
+namespace gstlrn
+{
 CovExponential::~CovExponential()
 {
 }
@@ -96,3 +97,5 @@ VectorDouble CovExponential::_evaluateSpectrumOnSphere(int n, double scale) cons
 //   double cov = -exp(-h);
 //   return (cov);
 // }
+
+}

@@ -281,20 +281,20 @@
     return myres;
   }
 
-  int matrixDenseToCpp(PyObject* obj, MatrixDense& mat)
+  int matrixDenseToCpp(PyObject* obj, gstlrn::MatrixDense& mat)
   {
     mat.resize(0, 0);
     if (obj == NULL) return SWIG_TypeError;
     if (obj == Py_None) return SWIG_NullReferenceError;
 
     // Conversion
-    VectorVectorDouble vvec;
+    gstlrn::VectorVectorDouble vvec;
     int myres = SWIG_OK;
     int size = (int)PySequence_Length(obj);
     if (size < 0)
     {
       // Not a sequence
-      VectorDouble vec;
+      gstlrn::VectorDouble vec;
       // Clear Python error indicator
       PyErr_Restore(NULL, NULL, NULL);
       // Try to convert
@@ -307,7 +307,7 @@
       for (int i = 0; i < size && SWIG_IsOK(myres); i++)
       {
         PyObject* item = PySequence_GetItem(obj, i);
-        VectorDouble vec;
+        gstlrn::VectorDouble vec;
         myres = vectorToCpp(item, vec);
         if (SWIG_IsOK(myres))
           vvec.push_back(vec);
@@ -364,7 +364,7 @@
     Py_XDECREF(indices_array);
   }
 
-  int matrixSparseToCpp(PyObject* obj, MatrixSparse& mat)
+  int matrixSparseToCpp(PyObject* obj, gstlrn::MatrixSparse& mat)
   {
     if (obj == NULL) return SWIG_TypeError;
     if (obj == Py_None) return SWIG_NullReferenceError;
@@ -404,13 +404,13 @@
 
     // Reading 'row' and 'col' or 'indices' and 'indptr' information
     // And build rows and cols indices vectors for creating triplets
-    VectorInt rows(nnz);
-    VectorInt cols(nnz);
+    gstlrn::VectorInt rows(nnz);
+    gstlrn::VectorInt cols(nnz);
     if (strcmp(format_str, "coo") != 0) 
     {
       // The format is CSC or CSR
-      VectorInt vindc;
-      VectorInt viptr;
+      gstlrn::VectorInt vindc;
+      gstlrn::VectorInt viptr;
       PyObject* indices_obj = PyObject_GetAttrString(obj, "indices");
       PyObject* indptr_obj  = PyObject_GetAttrString(obj, "indptr");
       
@@ -460,6 +460,9 @@
 
 %typecheck(SWIG_TYPECHECK_UINT8) UChar {}
 
+namespace gstlrn
+{
+ 
 // Add numerical vector typecheck typemaps for dispatching functions
 %typemap(typecheck, noblock=1, fragment="ToCpp", precedence=SWIG_TYPECHECK_DOUBLE_ARRAY) const VectorInt&,    VectorInt,
                                                                                          const VectorDouble&, VectorDouble,
@@ -671,7 +674,7 @@
     return myres;
   }
 
-  int matrixDenseFromCpp(PyObject** obj, const MatrixDense& mat)
+  int matrixDenseFromCpp(PyObject** obj, const gstlrn::MatrixDense& mat)
   {
     // Conversion to a 2D numpy array
     npy_intp dims[2] = { mat.getNRows(), mat.getNCols() };
@@ -690,14 +693,14 @@
     return SWIG_OK;
   }
 
-  int matrixDenseFromCppCreate(PyObject** obj, const MatrixDense& mat)
+  int matrixDenseFromCppCreate(PyObject** obj, const gstlrn::MatrixDense& mat)
   {
-    *obj = SWIG_NewPointerObj((void*) new MatrixDense(mat), SWIGTYPE_p_MatrixDense, 0);
+    *obj = SWIG_NewPointerObj((void*) new gstlrn::MatrixDense(mat), SWIGTYPE_p_gstlrn__MatrixDense, 0);
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
 
-  int matrixSparseFromCpp(PyObject** obj, const MatrixSparse& mat)
+  int matrixSparseFromCpp(PyObject** obj, const gstlrn::MatrixSparse& mat)
   {
     if (mat.empty()) 
       return SWIG_OK;
@@ -750,9 +753,9 @@
     return SWIG_OK;
   }
 
-  int matrixSparseFromCppCreate(PyObject** obj, const MatrixSparse& mat)
+  int matrixSparseFromCppCreate(PyObject** obj, const gstlrn::MatrixSparse& mat)
   {
-    *obj = SWIG_NewPointerObj((void*) new MatrixSparse(mat), SWIGTYPE_p_MatrixSparse, 0);
+    *obj = SWIG_NewPointerObj((void*) new gstlrn::MatrixSparse(mat), SWIGTYPE_p_gstlrn__MatrixSparse, 0);
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
@@ -823,7 +826,7 @@
   }
   else
   {
-    myres = SWIG_ConvertPtr($input, (void **)(&localNC), SWIGTYPE_p_NamingConvention,  0  | 0);
+    myres = SWIG_ConvertPtr($input, (void **)(&localNC), SWIGTYPE_p_gstlrn__NamingConvention,  0  | 0);
     if (!SWIG_IsOK(myres)) {
       %argument_fail(myres, "$type", $symname, $argnum);
     }
@@ -837,7 +840,7 @@
 %typemap(typecheck, precedence=SWIG_TYPECHECK_STRING) const std::string_view {
   $1 = PyString_Check($input) ? 1 : 0;
 }
-
+}//namespace gstlrn
 //////////////////////////////////////////////////////////////
 //         C++ library SWIG includes and typemaps           //
 //////////////////////////////////////////////////////////////
@@ -891,6 +894,8 @@ void exit_f(void)
   redefine_exit(exit_f);
 %}
 
+namespace gstlrn {
+
 // Do not use VectorInt here
 %extend VectorT<String> {
   std::string __repr__() {  return $self->toString(); }
@@ -913,6 +918,8 @@ void exit_f(void)
 %extend VectorT<VectorNumT<double> >{
   std::string __repr__() {  return $self->toString(); }
 }
+
+} // namespace gstlrn
 
 %include ../swig/toString.i
 %include ../swig/generated_python.i

@@ -21,6 +21,9 @@
 
 #include "Space/ASpace.hpp"
 
+namespace gstlrn 
+{
+
 class SpacePoint;
 class CovAniso;
 class Model;
@@ -93,3 +96,4 @@ private:
   MatrixDense _convIncr; /* Discretization lags */
   VectorDouble      _convWeight; /* Weights for convolution */
 };
+}

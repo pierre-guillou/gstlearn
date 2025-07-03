@@ -21,6 +21,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 static double _getRadius(double radius_arg)
 {
   double radius = radius_arg;
@@ -1908,4 +1910,5 @@ VectorVectorDouble GeometryHelper::getEllipse(const VectorDouble& center,
   coords[0][count] = coords[0][0];
   coords[1][count] = coords[1][0];
   return coords;
+}
 }

@@ -16,6 +16,9 @@
 
 #include <map>
 
+namespace gstlrn
+{
+
 /**
  * Operate the list of Constant options.
  * These options correspond to various keywords chosen from a close list (see ECst.hpp).
@@ -42,3 +45,4 @@ private:
 //  static std::map<const ECst, double> _cst;
   static std::map<int, double> _cst;
 };
+}

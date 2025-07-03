@@ -25,6 +25,8 @@
 #include <cmath>
 #include <vector>
 
+namespace gstlrn
+{
 CorMatern::CorMatern(const VectorDouble &ranges,
                      const VectorDouble &angles,
                      const VectorDouble& coeffScales, 
@@ -167,3 +169,4 @@ double CorMatern::_eval(const SpacePoint& p1,
     return _corMax.getValue(ivar, jvar) * _corMatern.evalCov(p1, p2, 0 , 0 , mode);
 }
 
+}

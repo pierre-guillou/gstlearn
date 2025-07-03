@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Stats/PCAStringFormat.hpp"
 
+namespace gstlrn
+{
 PCAStringFormat::PCAStringFormat(int level)
     : AStringFormat(level),
       _flagCenter(true),
@@ -42,4 +44,5 @@ PCAStringFormat& PCAStringFormat::operator=(const PCAStringFormat& r)
 
 PCAStringFormat::~PCAStringFormat()
 {
+}
 }

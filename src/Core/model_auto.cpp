@@ -73,6 +73,8 @@
    isZero(vario->getSwByIndex(idir, k)) ||                                     \
    FFFF(vario->getSwByIndex(idir, k)) || FFFF(vario->getGgByIndex(idir, k)))
 
+namespace gstlrn
+{
 typedef struct
 {
   int npadir;
@@ -4992,4 +4994,5 @@ int vmap_auto_fit(const DbGrid* dbmap,
   label_end:
   st_model_auto_strmod_free(strmod);
   return (error);
+}
 }

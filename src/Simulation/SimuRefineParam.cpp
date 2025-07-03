@@ -13,6 +13,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 SimuRefineParam::SimuRefineParam(int nmult, bool flag_SK)
     : AStringable(),
       _nmult(nmult),
@@ -55,3 +57,4 @@ String SimuRefineParam::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
+}

@@ -22,6 +22,8 @@
 #include <math.h>
 #include <omp.h>
 
+namespace gstlrn
+{
 CalcKrigingSimpleCase::CalcKrigingSimpleCase(bool flag_est, bool flag_std, bool flag_varZ)
   : ACalcInterpolator()
   , _flagEst(flag_est)
@@ -185,4 +187,5 @@ bool CalcKrigingSimpleCase::_run()
   ksys.conclusion();
 
   return true;
+}
 }

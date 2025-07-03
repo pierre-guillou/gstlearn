@@ -15,6 +15,8 @@
 #include "Basic/VectorNumT.hpp"
 #include <stdio.h>
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 
@@ -107,3 +109,4 @@ GSTLEARN_EXPORT Db* db_well_read_las(const char* filename,
                                      double ywell,
                                      double cwell,
                                      int verbose = 0);
+}

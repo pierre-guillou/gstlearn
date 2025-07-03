@@ -17,6 +17,8 @@
 #include "Covariances/CovAniso.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 Db* createDbFromDataFrame(const DataFrame* dat,
                           const VectorString& coordinates)
 {
@@ -61,4 +63,5 @@ GaussianProcess* createModelFromData(const Db* dat,
   auto data = gp->getData();
   data->setLocators(variables, ELoc::Z);
   return gp;
+}
 }

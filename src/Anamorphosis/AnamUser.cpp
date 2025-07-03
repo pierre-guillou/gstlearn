@@ -11,6 +11,8 @@
 #include "Anamorphosis/AnamUser.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 AnamUser::AnamUser()
     : AnamContinuous(),
       _y2z_function(nullptr),
@@ -94,3 +96,4 @@ bool AnamUser::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return false;
 }
 #endif
+}

@@ -3,10 +3,9 @@
 import sys
 import os
 import utils
-    
-    
-#This script generates specific documentations when macros FORWARD_METHOD and FORWARD_METHOD_NON_CONST are used.
+import textwrap
 
+# This script generates specific documentations when macros FORWARD_METHOD and FORWARD_METHOD_NON_CONST are used.
 
 if __name__ == "__main__":
     folder = sys.argv[1]
@@ -49,17 +48,20 @@ if __name__ == "__main__":
                     if signature is None:
                         signature = utils.find_method_in_class_or_bases(classname, method_name, os.path.join(os.pardir, "include"))
                         if signature is None:
-                            print(f"⚠️ Méthode non trouvée ({file}): {method_name}")
+                            print(f" Method not found ({file}): {method_name}")
                             continue
 
                     doc = f"/**\n * @brief Call the method \\ref {classname}::{method_name} of the object \\ref {classname}.\n */"
                     signatures_by_file[file]["signatures"].append(doc + "\n" + signature)
 
-    # Génération finale
+    # Génération finale avec namespace gstlrn
     for file, content in signatures_by_file.items():
         output_path = os.path.join(folder, file)
         with open(output_path, "w") as f:
+            f.write("namespace gstlrn {\n\n")
             f.write(f"class {content['class_name']} {{\npublic:\n")
             for sig in content["signatures"]:
-                f.write(sig + "\n\n")
-            f.write("};\n")
+                f.write(textwrap.indent(sig + "\n\n", "  "))
+            f.write("};\n\n")
+            f.write("} // namespace gstlrn\n")
+

@@ -24,6 +24,7 @@
 #include "Fractures/FracFault.hpp"
 #include "Fractures/FracList.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

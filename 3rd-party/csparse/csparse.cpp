@@ -42,11 +42,14 @@ Website: https://gstlearn.org
 #include "csparse_f.h"
 
 #define LONG_SIZE     10000
+namespace gstlrn
+{
 /**
  * Print Error st_cs_message
  * @param format Output format
  * @param ...    Additional arguments
  */
+
 static void st_cs_messerr(const char *format, ...)
 {
   char str[1000];
@@ -2556,4 +2559,5 @@ int cs_utsolve(const cs *U, double *x)
     x[j] /= Ux[p];
   }
   return (1);
+}
 }

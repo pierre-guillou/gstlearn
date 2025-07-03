@@ -12,6 +12,8 @@
 
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovNugget::CovNugget(const CovContext& ctxt)
 : ACovFunc(ECov::NUGGET, ctxt)
 {
@@ -45,4 +47,5 @@ double CovNugget::_evaluateCov(double h) const
 String CovNugget::getFormula() const
 {
   return "C(h)=\\delta(h)";
+}
 }

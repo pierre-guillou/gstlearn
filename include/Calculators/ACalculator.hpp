@@ -12,6 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ACalculator
 {
 public:
@@ -30,3 +32,4 @@ protected:
   virtual bool _postprocess() { return true; }
   virtual void _rollback() { }
 };
+}

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Drifts/ADrift.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT DriftF : public ADrift
 {
 public:
@@ -39,3 +41,4 @@ public:
 private:
   int _rankFex;       /* Rank of the external drift */
 };
+}

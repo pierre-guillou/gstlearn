@@ -15,6 +15,8 @@
 #include "Basic/VectorHelper.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 NeighBench::NeighBench(bool flag_xvalid,
                        double width,
                        bool useBallTree,
@@ -288,3 +290,4 @@ bool NeighBench::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
+}

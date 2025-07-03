@@ -30,6 +30,8 @@
 #define NODE_RANK(inode)     (nodes[6 * (inode) + 4])
 #define FACIES(inode)        (nodes[6 * (inode) + 5])
 
+namespace gstlrn
+{ 
 static const VectorString symbol = {"F","S","T"};
 
 Node::Node(const String& nodnam, int orient, int facies)
@@ -821,4 +823,5 @@ void Node::getInfo(int *nodes) const
   int n_y1 = 0;
   int n_y2 = 0;
   _getInfo(nodes, 0, 0, 0, &rank, &n_fac, &n_y1, &n_y2);
+}
 }

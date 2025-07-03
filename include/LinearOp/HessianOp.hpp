@@ -18,14 +18,18 @@
   #include <Eigen/src/Core/Matrix.h>
 #endif
 
+namespace gstlrn
+{
 class PrecisionOp;
-
+}
 #ifndef SWIG
 #  include "LinearOp/ALinearOpEigenCG.hpp"
 DECLARE_EIGEN_TRAITS(HessianOp)
 #else
 #  include "LinearOp/ALinearOp.hpp"
 #endif
+
+using namespace gstlrn;
 
 class GSTLEARN_EXPORT HessianOp:
 #ifndef SWIG

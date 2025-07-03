@@ -7,6 +7,9 @@
 #include <memory>
 #include "Db/Db.hpp"
 
+namespace gstlrn 
+{
+
 TabNoStat::TabNoStat()
   : _items()
   , _dbNoStatRef(nullptr)
@@ -209,4 +212,5 @@ void TabNoStat::informDbOut(const Db* dbout, const EConsElem& econs) const
 
 TabNoStat::~TabNoStat()
 {
+}
 }

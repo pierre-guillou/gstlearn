@@ -14,6 +14,8 @@
 // Use corners <> for other include files
 #include <iostream>
 
+namespace gstlrn
+{
 /**
  * Default constructor
  *
@@ -143,4 +145,5 @@ int Style::_increment(int arg, bool verbose)
     std::cout << "Coucou" << std::endl;
   arg++;
   return arg;
+}
 }

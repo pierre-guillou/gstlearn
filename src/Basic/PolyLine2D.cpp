@@ -20,6 +20,8 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 
+namespace gstlrn
+{
 PolyLine2D::PolyLine2D(const VectorDouble& x,
                const VectorDouble& y)
     : AStringable(),
@@ -720,3 +722,4 @@ bool PolyLine2D::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
+}

@@ -15,6 +15,8 @@
 #include "LithoRule/Node.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class PropDef;
 class DbGrid;
 
@@ -102,3 +104,4 @@ private:
   mutable VectorInt    _ind1;
   mutable VectorInt    _ind2;
 };
+}

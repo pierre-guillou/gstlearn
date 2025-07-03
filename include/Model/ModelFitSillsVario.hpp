@@ -16,6 +16,8 @@
 #include "Model/AModelFitSills.hpp"
 #include "Model/ModelOptimParam.hpp"
 
+namespace gstlrn
+{
 class ModelGeneric;
 class Vario;
 class Constraints;
@@ -58,3 +60,4 @@ private:
 private:
   const Vario* _vario;
 };
+}

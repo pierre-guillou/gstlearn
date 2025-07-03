@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Simulation/SimuSphericalParam.hpp"
 
+namespace gstlrn
+{
 SimuSphericalParam::SimuSphericalParam(int special,
                                        int nbf,
                                        int nfmax,
@@ -76,4 +78,6 @@ String SimuSphericalParam::toString(const AStringFormat* /*strfmt*/) const
   sstr << "Spectrum Tolerance        = " << _tol << std::endl;
 
   return sstr.str();
+}
+
 }

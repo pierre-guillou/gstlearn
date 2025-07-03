@@ -17,6 +17,8 @@
 #include "Space/ASpaceObject.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 
@@ -44,6 +46,8 @@ class DbGrid;
  *
  * In the case, the Db correspond to a grid, the lag is defined as an increment on the grid meshes (**grincr**)
  */
+
+
 class GSTLEARN_EXPORT DirParam : public ASpaceObject
 {
 public:
@@ -179,4 +183,4 @@ private:
   VectorDouble _codir;
   VectorInt    _grincr;
 };
-
+}

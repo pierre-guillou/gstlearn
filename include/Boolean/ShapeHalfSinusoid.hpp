@@ -16,6 +16,8 @@
 
 #include "Boolean/AShape.hpp"
 
+namespace gstlrn
+{
 class BooleanObject;
 
 class GSTLEARN_EXPORT ShapeHalfSinusoid: public AShape
@@ -41,3 +43,4 @@ public:
   BooleanObject* generateObject(int ndim = 3) override;
   bool belongObject(const VectorDouble& coor, const BooleanObject* object) const override;
 };
+}

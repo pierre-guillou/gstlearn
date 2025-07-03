@@ -14,6 +14,8 @@
 
 #include "geoslib_define.h"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT AStringFormat
 {
 public:
@@ -33,3 +35,4 @@ private:
   int _level;
   String _title;
 };
+}

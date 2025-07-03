@@ -19,6 +19,9 @@
 #include "Basic/ICloneable.hpp"
 #include "Model/CovParamId.hpp"
 
+namespace gstlrn
+{
+
 /**
  * This class is used:
  * - to define the constraints for the Model Automatic Fitting (authAssign true)
@@ -101,3 +104,4 @@ private:
   EConsType  _type;       /* 0: Parameter; -1: Lower; 1: Upper; 2: Equal */
   double     _value;      /* Assigned value */
 };
+}

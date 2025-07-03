@@ -17,6 +17,7 @@
 #include "Basic/VectorHelper.hpp"
 #include <vector>
 
+namespace gstlrn{
 ALinearOpMulti::ALinearOpMulti(int nitermax, double eps)
     : _nIterMax(nitermax),
       _nIterRestart(0),
@@ -284,4 +285,5 @@ void ALinearOpMulti::setPrecond(const ALinearOpMulti* precond, int status)
 void ALinearOpMulti::_updated()const
 {
   _initialized = false;
+}
 }

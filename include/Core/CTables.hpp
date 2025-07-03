@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "geoslib_d.h"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT CTables* ct_tables_manage(int mode,
                                           int verbose,
                                           int flag_cumul,
@@ -32,3 +34,4 @@ GSTLEARN_EXPORT double ct_tableone_calculate_by_rank(CTables* ctables,
                                                      double* rkups);
 GSTLEARN_EXPORT double ct_INTRES2(CTables* ctables, int iconf0, int idisc0, int jdisc0);
 GSTLEARN_EXPORT double ct_INTRES3(CTables* ctables, int iconf0, int idisc0, int jdisc0, int kdisc0);
+}

@@ -13,6 +13,8 @@
 #include "Simulation/TurningBandOperate.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovGC5::CovGC5(const CovContext& ctxt)
 : ACovFunc(ECov::ORDER5_GC, ctxt)
 {
@@ -60,4 +62,5 @@ double CovGC5::_evaluateCov(double h) const
 double CovGC5::simulateTurningBand(double t0, TurningBandOperate &operTB) const
 {
   return operTB.IRFProcessOne(t0);
+}
 }

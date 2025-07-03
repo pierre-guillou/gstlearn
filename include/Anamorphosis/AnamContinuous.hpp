@@ -18,6 +18,8 @@
 /**
  * Output structure
  */
+
+namespace gstlrn{
 class AnamContinuousFit
 {
   private:
@@ -117,3 +119,4 @@ protected:
   double _mean;
   double _variance;
 };
+}

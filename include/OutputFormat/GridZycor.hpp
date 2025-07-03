@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT GridZycor: public AOF
@@ -30,3 +32,4 @@ public:
   int  writeInFile() override;
   DbGrid* readGridFromFile() override;
 };
+}

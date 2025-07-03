@@ -12,6 +12,8 @@
 
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovTriangle::CovTriangle(const CovContext& ctxt)
 : ACovFunc(ECov::TRIANGLE, ctxt)
 {
@@ -41,3 +43,4 @@ double CovTriangle::_evaluateCov(double h) const
   return (cov);
 }
 
+}

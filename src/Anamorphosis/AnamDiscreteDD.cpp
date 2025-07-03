@@ -22,6 +22,8 @@
 #define CHI(i,j)         chi[(i)*nclass+(j)]
 #define C_S(i,j)         c_s[(i)*nclass+(j)]
 
+namespace gstlrn
+{
 AnamDiscreteDD::AnamDiscreteDD(double mu, double scoef)
     : AnamDiscrete(),
       _mu(mu),
@@ -1029,3 +1031,4 @@ bool AnamDiscreteDD::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   return ret;
 }
 #endif
+}

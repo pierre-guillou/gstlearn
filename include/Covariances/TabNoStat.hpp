@@ -21,6 +21,9 @@
 #include <memory>
 #include <unordered_map>
 
+namespace gstlrn
+{
+
 typedef std::unordered_map<ParamId, std::shared_ptr<ANoStat>, ParamIdHash, ParamIdEqual> mapNoStat;
 
 class GSTLEARN_EXPORT TabNoStat: public AStringable, public ICloneable
@@ -78,3 +81,4 @@ private:
   mapNoStat _items;
   std::shared_ptr<const Db> _dbNoStatRef;
 };
+}

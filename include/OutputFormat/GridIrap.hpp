@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT GridIrap: public AOF
@@ -38,3 +40,4 @@ private:
   int _nsamplex;
   int _nsampley;
 };
+}

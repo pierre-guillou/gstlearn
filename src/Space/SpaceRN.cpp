@@ -17,6 +17,8 @@
 #include <math.h>
 #include <memory>
 
+namespace gstlrn
+{
 SpaceRN::SpaceRN(unsigned int ndim)
   : ASpace(ndim)
 {
@@ -155,4 +157,5 @@ void SpaceRN::getDistancePointVectInPlace(const SpacePoint& p1,
 
     *ptr++ = sqrt(s);
   }
+}
 }

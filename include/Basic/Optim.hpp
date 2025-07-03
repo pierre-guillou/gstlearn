@@ -16,6 +16,10 @@
 #include <functional>
 #include <memory>
 
+struct nlopt_opt_s;
+
+namespace gstlrn
+{
 typedef enum
 {
   /* Naming conventions:
@@ -100,7 +104,6 @@ typedef enum
 
 } opt_algorithm;
 
-struct nlopt_opt_s;
 
 class GSTLEARN_EXPORT Optim
 {
@@ -139,3 +142,4 @@ private:
   mutable std::vector<double> _gradBuffer; // Buffer for gradient evaluation
   bool _authorizedAnalyticalGradients;
 };
+}

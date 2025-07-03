@@ -14,6 +14,8 @@
 
 #include "Gibbs/GibbsMultiMono.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -45,3 +47,4 @@ private:
   double _rval;
   double _eps;
 };
+}

@@ -19,10 +19,14 @@
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Anamorphosis/AAnam.hpp"
 
+
+
+namespace gstlrn
+{
+class KrigingSystem;
 class Db;
 class DbGrid;
-class KrigingSystem;
-
+ 
 class GSTLEARN_EXPORT Krigtest_Res
 {
 public:
@@ -168,3 +172,4 @@ GSTLEARN_EXPORT int test_neigh(Db* dbin,
                                ModelGeneric* model,
                                ANeigh* neigh,
                                const NamingConvention& namconv = NamingConvention("Neigh"));
+}

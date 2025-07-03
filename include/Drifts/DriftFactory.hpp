@@ -14,6 +14,8 @@
 
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 class ADrift;
 class DriftList;
 
@@ -29,3 +31,4 @@ public:
   static DriftList* createDriftListForGradients(const DriftList* olddrifts,
                                                 const CovContext& ctxt = CovContext());
 };
+}

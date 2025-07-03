@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "LinearOp/IProj.hpp"
 
+namespace gstlrn
+{
+
 class GSTLEARN_EXPORT ProjZero : public IProj
 {
 public:
@@ -33,3 +36,4 @@ public:
 private:
   int _npoint, _napex;
 };
+}

@@ -14,6 +14,9 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
+
 /**
  * This class defines the options and parameters used during the Variogram Fitting.
  * All the parameters described hereafter are either available in the construction,
@@ -75,3 +78,4 @@ private:
   double _tolsigma;  /* Percentage of variance below which a structure is discarded */
   double _initdelta; /* Initial radius of the trusting area */
 };
+}

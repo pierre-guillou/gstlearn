@@ -19,6 +19,8 @@
 #define TL(i,j)        tl[SQ(i,j,neq)-TRI(j)] /* for i >= j */
 #define HA(i,j)        ha[SQ(i,j,neq)]
 
+namespace gstlrn
+{
 MatrixSymmetric::MatrixSymmetric(int nrow)
   : MatrixSquare(nrow)
 {
@@ -910,4 +912,5 @@ MatrixSymmetric MatrixSymmetric::compress0MatLC(const MatrixDense& matLC)
       mat.setValue(ivarCL, jvarCL, value);
     }
   return mat;
+}
 }

@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "Anamorphosis/AAnam.hpp"
 #include "Anamorphosis/AnamHermite.hpp"
 #include "Enum/EModelProperty.hpp"
 #include "gstlearn_export.hpp"
@@ -21,14 +22,18 @@
 #include "Covariances/CovList.hpp"
 #include "Covariances/CovCalcMode.hpp"
 
+
+
+namespace gstlrn {
+class AAnam;  // Forward declaration
+class CovAniso;
+class CovContext;
+class AnamHermite;
 class ASpace;
 class SpacePoint;
 class MatrixSquare;
-class CovAniso;
-class CovContext;
+
 class AStringFormat;
-class AAnam;
-class AnamHermite;
 class EModelProperty;
 
 /**
@@ -141,3 +146,4 @@ protected:
 private:
   bool _sameRotation;
 };
+}

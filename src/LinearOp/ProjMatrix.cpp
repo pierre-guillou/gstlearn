@@ -13,6 +13,8 @@
 #include "Mesh/AMesh.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
 
+namespace gstlrn
+{
 ProjMatrix::ProjMatrix()
   : MatrixSparse()
 {
@@ -186,4 +188,5 @@ void ProjMatrix::dumpVerticesUsed(int npmax) const
     }
     message("\n");
   }
+}
 }

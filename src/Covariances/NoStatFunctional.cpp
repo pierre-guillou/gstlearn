@@ -2,6 +2,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 NoStatFunctional::NoStatFunctional(const AFunctional* func)
 :_func(func)
 {
@@ -42,4 +44,5 @@ String NoStatFunctional::toString(const AStringFormat* strfmt) const
     if (sf.getLevel() > 0)
         sstr << "Functional" << std::endl;
     return sstr.str();
+}
 }

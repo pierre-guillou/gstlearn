@@ -10,11 +10,15 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/VectorNumT.hpp"
 #include "LinearOp/AShiftOp.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 class CovAniso;
 class MeshETurbo;
+class AMesh;
 
 /**
  * @brief This is an implementation of ShiftOp dedicated to case where:
@@ -70,3 +74,4 @@ private:
   bool _useModifiedShift;
   const MeshETurbo* _mesh; // not to be deleted
 };
+}

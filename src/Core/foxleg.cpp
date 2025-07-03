@@ -34,9 +34,11 @@ static int NPAR, NPAR2, NPARAC, NPARAC2, NDAT, NCONT, NPCT, NPCT2;
 static int ITERATION, SOUSITER;
 static void (*FUNC_EVALUATE)(int ndat,
                              int npar,
-                             VectorDouble &param,
-                             VectorDouble &work);
+                             gstlrn::VectorDouble &param,
+                             gstlrn::VectorDouble &work);
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Calculate the gradient
@@ -1359,3 +1361,4 @@ int foxleg_f(int ndat,
   }
 }
 
+}

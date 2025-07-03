@@ -16,6 +16,8 @@
 
 #include "Enum/ELoc.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -169,3 +171,4 @@ private:
   ELoc   _locatorOutType; //!< Type of locator assigned (if 'flagLocator' is TRUE)
   bool   _cleanSameLocator; //!< Clean variables with the same locator beforehand
 };
+}

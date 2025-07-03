@@ -36,6 +36,8 @@ Website: https://gstlearn.org
 #ifndef _CS_D_H
 #define _CS_D_H
 
+namespace gstlrn
+{
 /* --- primary CSparse routines and data structures ------------------------- */
 class cs // cs_sparse    /* matrix in compressed-column or triplet form */
 {
@@ -82,5 +84,5 @@ public:
     int rr [5] ;        /* coarse row decomposition */
     int cc [5] ;        /* coarse column decomposition */
 };
-
+}
 #endif

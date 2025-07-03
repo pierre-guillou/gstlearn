@@ -9,7 +9,6 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Basic/VectorHelper.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/AException.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/Law.hpp"
@@ -22,6 +21,8 @@
 #include <math.h>
 #include <vector>
 
+namespace gstlrn
+{
 VectorInt VectorHelper::initVInt(int nval, int value)
 {
   VectorInt tab(nval, value);
@@ -1462,10 +1463,7 @@ void VectorHelper::addInPlace(const std::vector<std::vector<double>> &in1,
   }
 }
 /**
- * Return a vector containing vecb - veca
- * @param veca Input Vector
- * @param vecb Input Vector
- * @return
+ ** @overload
  */
 VectorDouble VectorHelper::subtract(const VectorDouble &veca,
                                     const VectorDouble &vecb)
@@ -2219,11 +2217,7 @@ VectorInt VectorHelper::orderRanks(const VectorInt& vecin, bool ascending, int s
 }
 
 /**
- * Returns the permutation which rearranges the input vector into any order
- * @param vecin Input vector
- * @param ascending True for ascending order; False otherwise
- * @param size Optional vector dimension
- * @return Vector of orders
+ * @overload
  */
 VectorInt VectorHelper::orderRanks(const VectorDouble& vecin, bool ascending, int size)
 {
@@ -2296,8 +2290,8 @@ VectorInt VectorHelper::revert(const VectorInt &vecin) {
 
 /*****************************************************************************/
 /*!
- **  Sorts the (double) array value() and the array ranks() if provided
- **
+ ** Sorts the (double) array value() and the array ranks() if provided
+ *  @brief Arrange values in place (VectorDouble version)
  ** \param[in]  safe   1 if the value array if preserved
  **                    0 if the value array is also sorted
  ** \param[in]  ascending Sorting order
@@ -2333,20 +2327,9 @@ void VectorHelper::arrangeInPlace(int safe,
 
 /*****************************************************************************/
 /*!
- **  Sorts the (int) array value() and the array ranks() if provided
- **
- ** \param[in]  safe   1 if the value array if preserved
- **                    0 if the value array is also sorted
- ** \param[in] ascending True for ascending order; False for descending order
- ** \param[in] size    Optional size
- **
- ** \param[out] ranks  intput and output int array
- ** \param[out] values input and output int array
- **
- ** \remark  If ranks = NULL, ranks is ignored
- ** \remark  When using 'size', the remaining part of arrays is unchanged
- **
- *****************************************************************************/
+ ** Sorts the (int) array value() and the array ranks() if provided
+ ** @overload
+ **/
 void VectorHelper::arrangeInPlace(int safe,
                                   VectorInt &ranks,
                                   VectorInt &values,
@@ -3000,4 +2983,6 @@ bool VectorHelper::isIsotropic(const VectorVectorInt& sampleRanks)
   for (int ivar = 1; ivar < nvar; ivar++)
     if (refSize != (int)sampleRanks[ivar].size()) return false;
   return true;
+}
+
 }

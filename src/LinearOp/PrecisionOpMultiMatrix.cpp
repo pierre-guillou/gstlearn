@@ -16,6 +16,8 @@
 #include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 
+namespace gstlrn{
+
 PrecisionOpMultiMatrix::PrecisionOpMultiMatrix(Model* model,
                                    const VectorMeshes& meshes)
   : PrecisionOpMulti(model,meshes,false,false)
@@ -143,4 +145,5 @@ int PrecisionOpMultiMatrix::_addToDest(const constvect vecin,
                                        vect vecout) const
 {
   return getQ()->addToDest(vecin, vecout);
+}
 }

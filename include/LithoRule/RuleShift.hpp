@@ -15,6 +15,8 @@
 #include "LithoRule/Node.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class DbGrid;
 
 class GSTLEARN_EXPORT RuleShift: public Rule
@@ -95,3 +97,4 @@ private:
   mutable VectorInt    _ind1;
   mutable VectorInt    _ind2;
 };
+}

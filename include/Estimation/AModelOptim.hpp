@@ -18,6 +18,8 @@
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
 class ModelGeneric;
 
 class GSTLEARN_EXPORT AModelOptim
@@ -62,3 +64,4 @@ private:
   std::vector<double> _x;
   int _iter;
 };
+}

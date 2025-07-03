@@ -14,6 +14,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Interval : public AStringable
 {
 public:
@@ -62,3 +64,4 @@ private:
   bool _minIncluded;
   bool _maxIncluded;
 };
+}

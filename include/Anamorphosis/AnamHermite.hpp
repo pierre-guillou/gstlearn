@@ -16,6 +16,9 @@
 
 #include "Anamorphosis/AnamContinuous.hpp"
 
+
+namespace gstlrn
+{
 class Db;
 class Selectivity;
 class Model;
@@ -128,3 +131,4 @@ private:
 
   friend class Selectivity;
 };
+}

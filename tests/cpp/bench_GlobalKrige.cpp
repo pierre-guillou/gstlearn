@@ -27,6 +27,8 @@
 
 #include "Estimation/CalcGlobal.hpp"
 
+using namespace gstlrn;
+
 int main(int argc, char* argv[])
 {
   std::stringstream sfn;

@@ -20,6 +20,8 @@
 #define _WT(ijvar, ipadir)   _wt[IJDIR(ijvar, ipadir)]
 #define _GG(ijvar, ipadir)   _gg[IJDIR(ijvar, ipadir)]
 
+namespace gstlrn
+{
 ModelOptimVMap::ModelOptimVMap(ModelGeneric* model,
                                const Constraints* constraints,
                                const ModelOptimParam& mop)
@@ -283,4 +285,5 @@ ModelOptimVMap* ModelOptimVMap::createForOptim(ModelGeneric* model,
   optim->_nech = dbmap->getNSample();
 
   return optim;
+}
 }

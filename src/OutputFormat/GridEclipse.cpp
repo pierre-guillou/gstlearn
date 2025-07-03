@@ -13,6 +13,8 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 
+namespace gstlrn
+{
 GridEclipse::GridEclipse(const char* filename, const Db* db)
   : AOF(filename, db)
 {
@@ -78,4 +80,5 @@ int GridEclipse::writeInFile()
 
   _fileClose();
   return 0;
+}
 }

@@ -21,7 +21,7 @@
 #  define CMAKE_SOURCE_DIR gslGetEnv("GSTLEAR_DIR")
 #endif // CMAKE_SOURCE_DIR
 
-namespace gstlearn
+namespace gstlrn
 {
   /**
    * This method returns the absolute path to a Test Data file
@@ -38,4 +38,4 @@ namespace gstlearn
     return (p / "doc" / "data" / subdir / filename).string();
   }
 
-} // namespace gstlearn
+} 

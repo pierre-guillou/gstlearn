@@ -18,6 +18,8 @@
 #include "Model/ModelGeneric.hpp"
 #include "Model/Model.hpp"
 
+namespace gstlrn
+{
 KrigOpt::KrigOpt(const EKrigOpt& calcul)
   : _calcul(calcul)
   , _mode()
@@ -393,4 +395,5 @@ void KrigOpt::dumpOptions() const
     }
   }
   message("\n");
+}
 }

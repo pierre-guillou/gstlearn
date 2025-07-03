@@ -21,6 +21,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 CalcGlobal::CalcGlobal(int ivar0, bool verbose)
   : ACalcInterpolator()
   , _flagArithmetic(false)
@@ -355,3 +357,4 @@ Global_Result global_kriging(Db *dbin,
   return gres;
 }
 
+}

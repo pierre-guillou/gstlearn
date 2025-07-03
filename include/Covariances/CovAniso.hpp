@@ -24,10 +24,13 @@
 #include "Arrays/Array.hpp"
 #include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 class Rotation;
 class MatrixSquare;
 class MatrixDense;
 class CovInternal;
+
 /**
  * \brief
  * This class describes an **elementary covariance**.
@@ -207,8 +210,7 @@ public:
 
   double getSlope(int ivar, int jvar) const;
   const Rotation& getAnisoRotation() const { return getCorAniso()->getAniso().getRotation(); }
-  const CorAniso* getCorAniso() const { return dynamic_cast<const CorAniso*>(getCor()); }
-
+  const CorAniso* getCorAniso() const;
   bool getFlagAniso() const { return !isIsotropic(); }
   bool getFlagRotation() const { return hasRotation(); }
   const VectorDouble& getAnisoAngles() const { return getCorAniso()->getAniso().getAngles(); }
@@ -254,3 +256,4 @@ public:
 
 GSTLEARN_EXPORT double scale2range(const ECov& type, double scale, double param = 1.);
 GSTLEARN_EXPORT double range2scale(const ECov& type, double range, double param = 1.);
+}

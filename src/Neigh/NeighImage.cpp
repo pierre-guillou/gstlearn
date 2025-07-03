@@ -18,6 +18,8 @@
 
 #include "geoslib_old_f.h"
 
+namespace gstlrn
+{
 NeighImage::NeighImage(const VectorInt& radius, int skip, const ASpaceSharedPtr& space)
     : ANeigh(space),
       _skip(skip),
@@ -273,3 +275,4 @@ bool NeighImage::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
+}

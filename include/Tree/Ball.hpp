@@ -15,6 +15,8 @@
 #include "Tree/ball_algorithm.h"
 #include "Matrix/MatrixT.hpp"
 
+namespace gstlrn
+{
 class Db;
 class AMesh;
 class SpacePoint;
@@ -111,3 +113,4 @@ GSTLEARN_EXPORT MatrixT<int> findNN(const Db* dbin,
                                                             int n_features) = nullptr,
                                     int leaf_size                           = 10,
                                     int default_distance_function           = 1);
+  }

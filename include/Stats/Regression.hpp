@@ -15,6 +15,8 @@
 
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -72,3 +74,4 @@ GSTLEARN_EXPORT VectorDouble regressionDeming(const VectorDouble &x,
                                               const VectorDouble &y,
                                               double delta = 1);
 
+}

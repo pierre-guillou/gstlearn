@@ -23,6 +23,8 @@
 #define NBYFRAC 7
 #define NBYWOUT 8
 
+namespace gstlrn
+{
 class DbGrid;
 
 class GSTLEARN_EXPORT FracList: public AStringable
@@ -195,3 +197,4 @@ private:
   double _eps;
   bool _verbose;
 };
+}

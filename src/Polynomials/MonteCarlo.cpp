@@ -13,7 +13,8 @@
 #include "Basic/Law.hpp"
 
 #include <math.h>
-
+namespace gstlrn
+{
 /**
  * Calculate: int phi(r*y + u * sqrt(1-r^2)) g(u) du
  *
@@ -297,3 +298,4 @@ double MCMetalStdElement(double yc,
   return metstd;
 }
 
+}

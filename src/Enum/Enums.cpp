@@ -43,6 +43,7 @@
 #include "Enum/EPostStat.hpp"
 #include "Enum/EFormatNF.hpp"
 
+
 ENUM_DEFINE(ENUM_LOAD_BY)
 ENUM_DEFINE(ENUM_NEIGH)
 ENUM_DEFINE(ENUM_LOC)

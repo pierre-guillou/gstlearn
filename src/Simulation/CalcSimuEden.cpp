@@ -24,7 +24,11 @@
 #define NO_FLUID      -1
 #define UNDEF_FLUID    0
 
+namespace gstlrn
+{ 
 static int invdir[6] = { 1, 0, 3, 2, 5, 4 };
+
+
 
 CalcSimuEden::CalcSimuEden(int nfacies, int nfluids, int niter, int nbsimu, int seed, bool verbose)
     : ACalcSimulation(nbsimu, seed),
@@ -1113,4 +1117,6 @@ int fluid_propagation(DbGrid *dbgrid,
   // Run the calculator
   int error = (seden.run()) ? 0 : 1;
   return error;
+}
+
 }

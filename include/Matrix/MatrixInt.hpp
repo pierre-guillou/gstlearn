@@ -14,6 +14,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 /**
  * Rectangular matrices are stored by columns
  */
@@ -81,3 +83,4 @@ private:
   int _nCols;
   VectorInt _rectMatrix;
 };
+}

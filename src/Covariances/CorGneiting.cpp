@@ -19,6 +19,8 @@
 #include "Covariances/CovCalcMode.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 CorGneiting::CorGneiting(const CorAniso* covS, const CorAniso* covTemp, double separability)
   : ACov()
   , _covS(std::shared_ptr<const CorAniso>(std::dynamic_pointer_cast<const CorAniso>((covS->cloneShared()))))
@@ -115,4 +117,5 @@ double CorGneiting::_eval(const SpacePoint& p1,
   double cs = _covSCopy.evalCov(p1_S, p2_S, ivar, jvar, mode);
 
   return cs * ct;
+}
 }

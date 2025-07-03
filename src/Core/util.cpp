@@ -28,6 +28,8 @@
 #define MATTAB(ip,i) (mattab[(ip) * ncolor + (i)])
 /*! \endcond */
 
+namespace gstlrn
+{
 typedef struct
 {
   char keyword[STRING_LENGTH];
@@ -1039,3 +1041,4 @@ char* convert(const std::string &s)
   return pc;
 }
 
+}

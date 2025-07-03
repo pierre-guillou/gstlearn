@@ -15,6 +15,8 @@
 
 #include "Anamorphosis/AnamContinuous.hpp"
 
+namespace gstlrn {
+ 
 class GSTLEARN_EXPORT AnamUser: public AnamContinuous
 {
 private:
@@ -54,3 +56,4 @@ protected:
 #endif
   String _getNFName() const override { return "AnamUser"; }
 };
+}

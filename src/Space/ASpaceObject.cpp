@@ -16,6 +16,8 @@
 #include "Space/SpaceSN.hpp"
 #include "Basic/AException.hpp"
 
+namespace gstlrn
+{
 /// Unique default global space
 static ASpaceSharedPtr defaultSpace = nullptr;
 
@@ -183,4 +185,5 @@ ASpaceSharedPtr getDefaultSpaceSh()
 bool isDefaultSpaceSphere()
 {
   return (getDefaultSpaceType() == ESpaceType::SN);
+}
 }

@@ -11,6 +11,8 @@
 #include "Boolean/AShape.hpp"
 #include "Basic/AException.hpp"
 
+namespace gstlrn
+{ 
 AShape::AShape()
     : AStringable(),
       _factorX2Y(0.),
@@ -148,4 +150,4 @@ bool AShape::_isValidParamIndex(int ipar) const
   }
   return true;
 }
-
+}

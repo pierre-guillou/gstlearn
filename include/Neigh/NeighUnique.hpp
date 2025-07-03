@@ -18,6 +18,9 @@
 
 #include "Neigh/ANeigh.hpp"
 #include "Space/ASpace.hpp"
+
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -64,3 +67,4 @@ protected:
 private:
   void _unique(int iech_out, VectorInt& ranks);
 };
+}

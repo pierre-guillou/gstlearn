@@ -32,6 +32,9 @@
 #include <memory>
 #include <vector>
 
+namespace gstlrn 
+{
+
 CovList::CovList(const CovContext& ctxt)
   : ACov(ctxt)
   , _covs()
@@ -586,4 +589,5 @@ void CovList::setFitSills(AModelFitSills* amopts) const
 AModelFitSills* CovList::getFitSills() const
 {
   return _modelFitSills;
+}
 }

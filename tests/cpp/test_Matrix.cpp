@@ -23,6 +23,7 @@
 #include "Basic/File.hpp"
 #include "Basic/OptCst.hpp"
 
+using namespace gstlrn;
 void st_invgen()
 {
   MatrixSymmetric aaa(4);

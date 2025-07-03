@@ -22,12 +22,17 @@
 #include "Matrix/MatrixDense.hpp"
 #include "Estimation/KrigOpt.hpp"
 
+
+
+namespace gstlrn
+{
 class ASpace;
 class SpacePoint;
 class Db;
-class ELoc;
 class CovCalcMode;
 class ListParams;
+class ELoc;
+
 
 /**
  * \brief
@@ -201,3 +206,4 @@ protected:
   VectorDouble         _mean;         /*  Mean vector */
 #endif
 };
+}

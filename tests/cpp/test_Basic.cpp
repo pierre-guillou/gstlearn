@@ -18,6 +18,7 @@
 #include "Estimation/CalcKriging.hpp"
 #include "Basic/Law.hpp"
 
+using namespace gstlrn;
 /**
  * This file is used as a demonstration showing the versatility of 'gstlearn'.
  * It also exists in RMarkdown and Jupyter-notebook formats.

@@ -20,6 +20,8 @@
 #include "Neigh/ANeigh.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -88,3 +90,4 @@ private:
   mutable SpaceTarget _T1;
   mutable SpaceTarget _T2;
 };
+}

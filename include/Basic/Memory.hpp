@@ -18,6 +18,8 @@
 #define mem_realloc(tab, a, b) mem_realloc_(__FILE__, __LINE__, tab, a, b)
 #define mem_copy(tab, a, b)    mem_copy_(__FILE__, __LINE__, tab, a, b)
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT char* mem_alloc_(const char* call_file,
                                  unsigned int call_line,
                                  int size,
@@ -41,3 +43,4 @@ GSTLEARN_EXPORT char*mem_free_(const char* call_file, unsigned int call_line, ch
 GSTLEARN_EXPORT double** mem_tab_free(double** tab, int nvar);
 GSTLEARN_EXPORT double** mem_tab_alloc(int nvar, int size, int flag_fatal);
 GSTLEARN_EXPORT unsigned long long getTotalSystemMemory();
+}

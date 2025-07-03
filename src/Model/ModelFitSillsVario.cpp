@@ -24,6 +24,8 @@
 #define TAB(ijvar, ipadir)      tabin[IJDIR(ijvar, ipadir)]
 #define DD(idim, ijvar, ipadir) _dd[idim][IJDIR(ijvar, ipadir)]
 
+namespace gstlrn
+{
 ModelFitSillsVario::ModelFitSillsVario(const Vario* vario,
                                        ModelCovList* model,
                                        const Constraints* constraints,
@@ -357,4 +359,4 @@ void ModelFitSillsVario::_compressArray(const VectorDouble& tabin,
         }
     }
 }
-
+}

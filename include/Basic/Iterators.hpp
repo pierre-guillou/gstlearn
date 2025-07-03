@@ -13,6 +13,8 @@
 #include <utility> // std::pair
 #include <tuple>   // structured bindings
 
+namespace gstlrn
+{
 class LowerTriangularRange {
 public:
     class Iterator {
@@ -81,4 +83,5 @@ auto enumerate(T& container) {
     };
 
     return iterable_wrapper{container};
+}
 }

@@ -16,6 +16,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ElemNostat: public AStringable
 {
 public:
@@ -47,3 +49,4 @@ private:
   double _val1; /* Value at the first point */
   double _val2; /* Value at the second point */
 };
+}

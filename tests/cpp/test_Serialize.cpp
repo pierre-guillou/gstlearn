@@ -24,6 +24,7 @@
 #include "Polygon/Polygons.hpp"
 #include "LithoRule/Rule.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for testing Serialize/Deserialize

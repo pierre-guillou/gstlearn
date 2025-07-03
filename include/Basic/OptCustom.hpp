@@ -14,7 +14,9 @@
 
 #include "Basic/String.hpp"
 #include <map>
-
+namespace gstlrn
+{
+  
 /**
  * Operate the list of Constant options (defined by the user within an open list)
  */
@@ -29,3 +31,4 @@ public:
 private:
   static std::map<const String, double> _cst;
 };
+}

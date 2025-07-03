@@ -24,6 +24,9 @@
 #include "Anamorphosis/AnamHermite.hpp"
 #include "Polygon/Polygons.hpp"
 
+namespace gstlrn
+{
+  
 static int IPTR;
 static Polygons* POLYGON = nullptr;
 static VectorDouble IDS;
@@ -368,4 +371,5 @@ String VCloud::toString(const AStringFormat* strfmt) const
   // TODO: to be completed
 
   return sstr.str();
+}
 }

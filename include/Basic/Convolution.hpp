@@ -14,6 +14,8 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class DbGrid;
 class MatrixDense;
 
@@ -41,3 +43,4 @@ private:
 private:
   DbGrid* _dbgrid; // Pointer to external DbGrid: do not delete
 };
+}

@@ -13,6 +13,8 @@
 #include "Simulation/TurningBandOperate.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovSpherical::CovSpherical(const CovContext& ctxt)
 : ACovFunc(ECov::SPHERICAL, ctxt)
 {
@@ -58,4 +60,5 @@ String CovSpherical::getFormula() const
 double CovSpherical::simulateTurningBand(double t0, TurningBandOperate &operTB) const
 {
   return operTB.shotNoiseAffineOne(t0);
+}
 }

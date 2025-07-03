@@ -12,6 +12,9 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
+
 ACovGradient::ACovGradient(const ECov& type, const CovContext& ctxt)
     : CovAniso(type, ctxt)
 {
@@ -39,4 +42,4 @@ ACovGradient& ACovGradient::operator=(const ACovGradient &r)
 ACovGradient::~ACovGradient()
 {
 }
-
+}

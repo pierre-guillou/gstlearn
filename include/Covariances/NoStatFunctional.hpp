@@ -15,6 +15,8 @@
 #include "Basic/AFunctional.hpp"
 #include "Covariances/ANoStat.hpp"
 
+namespace gstlrn
+{
 /**
  * This class concerns the non-stationarity defined as a function (hence its name).
  */
@@ -35,3 +37,4 @@ private :
 private:
   const AFunctional* _func;
 };
+}

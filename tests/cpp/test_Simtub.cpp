@@ -28,6 +28,8 @@
 #include "Estimation/CalcKriging.hpp"
 #include "Stats/Classical.hpp"
 
+using namespace gstlrn;
+
 static Db* createLocalDb(int nech, int ndim, int nvar)
 {
   // Coordinates

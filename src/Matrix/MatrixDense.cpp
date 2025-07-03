@@ -20,6 +20,8 @@
 #include <math.h>
 #include <omp.h>
 
+namespace gstlrn
+{
 MatrixDense::MatrixDense(int nrow, int ncol)
   : AMatrix(nrow, ncol)
   , _flagEigenDecompose(false)
@@ -863,4 +865,6 @@ void MatrixDense::sum(const MatrixDense* mat1,
                       MatrixDense* mat3)
 {
   mat3->getEigenMat().noalias() = mat1->getEigenMat() + mat2->getEigenMat();
+}
+
 }

@@ -14,6 +14,8 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT IOptimCost {
 
 public:
@@ -23,3 +25,4 @@ public:
                                  const VectorDouble& sval,
                                  double* normgrad) = 0;
 };
+}

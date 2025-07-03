@@ -11,6 +11,8 @@
 #include "LinearOp/LogStats.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 LogStats::LogStats(bool mustPrint)
     : _mustPrint(mustPrint),
       _directNumber(0),
@@ -138,3 +140,4 @@ void LogStats::statsShow(void) const
             _simulateNumber, _simulateTime);
 }
 
+}

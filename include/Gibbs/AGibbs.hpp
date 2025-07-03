@@ -15,7 +15,8 @@
 #include "../Matrix/Table.hpp"
 #include "Basic/AStringable.hpp"
 
-
+namespace gstlrn
+{ 
 class Db;
 
 class GSTLEARN_EXPORT AGibbs : public AStringable
@@ -133,3 +134,4 @@ private:
   // Optional Table used to store performance statistics (see _optionStats)
   Table _stats;
 };
+}

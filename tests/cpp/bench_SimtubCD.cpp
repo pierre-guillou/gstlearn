@@ -25,6 +25,7 @@
 #include "Neigh/NeighUnique.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for bench marking the non-conditional simulation using Turning Bands

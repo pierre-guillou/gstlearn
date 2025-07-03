@@ -14,6 +14,8 @@
 
 #include "Enum/ECov.hpp"
 
+namespace gstlrn
+{ 
 class CovAniso;
 class ACovFunc;
 class CovContext;
@@ -29,3 +31,4 @@ public:
                                          const CovContext& ctxt);
   static double       getScaleFactor(const ECov &type, double param);
 };
+}

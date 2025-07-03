@@ -18,6 +18,8 @@
 #include "Simulation/SimuPartitionParam.hpp"
 #include "Simulation/CalcSimuPartition.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program
