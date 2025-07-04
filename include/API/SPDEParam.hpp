@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/AStringable.hpp"
 #include "LinearOp/CGParam.hpp"
 
 class ALinearOp;
@@ -28,7 +29,8 @@ class ALinearOp;
  *
  * cgparams Parameters for the Conjugate Gradient method
  */
-class GSTLEARN_EXPORT SPDEParam {
+class GSTLEARN_EXPORT SPDEParam: public AStringable
+{
 
 public:
   SPDEParam(int refineK             = 11,
@@ -45,6 +47,9 @@ public:
   SPDEParam& operator=(const SPDEParam& m);
   virtual ~SPDEParam();
 
+  /// AStringable Interface
+  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+
   static SPDEParam* create(int refineK             = 11,
                            int refineS             = 18,
                            int border              = 8,
@@ -56,17 +61,17 @@ public:
                            int seedMC              = 134341,
                            const CGParam& cgparams = CGParam());
 
-  int     getBorder() const { return _border; }
+  int getBorder() const { return _border; }
   CGParam getCGparams() const { return _CGparams; }
-  double  getEpsNugget() const { return _epsNugget; }
-  int     getRefineK() const { return _refineK; }
-  int     getRefineS() const { return _refineS; }
-  bool    isPolarized() const { return _flagPolarized; }
-  void    setPolarized(bool flagPolarized) { _flagPolarized = flagPolarized; }
-  int     getNxMax() const { return _nxmax; }
-  bool    getUseStencil() const { return _useStencil; }
-  int     getNMC() const { return _nMC; }
-  int     getSeedMC() const { return _seedMC; }
+  double getEpsNugget() const { return _epsNugget; }
+  int getRefineK() const { return _refineK; }
+  int getRefineS() const { return _refineS; }
+  bool isPolarized() const { return _flagPolarized; }
+  void setPolarized(bool flagPolarized) { _flagPolarized = flagPolarized; }
+  int getNxMax() const { return _nxmax; }
+  bool getUseStencil() const { return _useStencil; }
+  int getNMC() const { return _nMC; }
+  int getSeedMC() const { return _seedMC; }
 
   void setBorder(int border) { _border = border; }
   void setCGparams(const CGParam& CGparams) { _CGparams = CGparams; }
@@ -79,14 +84,14 @@ public:
   void setSeedMC(int seedMC) { _seedMC = seedMC; }
 
 private:
-  int     _refineK;
-  int     _refineS;
-  int     _border;
-  bool    _flagPolarized;
-  int     _nxmax;
-  double  _epsNugget;
-  bool    _useStencil;
-  int     _nMC; // Number of Monte-Carlo simulations
-  int     _seedMC; // Seed for the random number generator
+  int _refineK;
+  int _refineS;
+  int _border;
+  bool _flagPolarized;
+  int _nxmax;
+  double _epsNugget;
+  bool _useStencil;
+  int _nMC;    // Number of Monte-Carlo simulations
+  int _seedMC; // Seed for the random number generator
   CGParam _CGparams;
 };

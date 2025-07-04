@@ -11,7 +11,8 @@
 #include "LinearOp/CGParam.hpp"
 
 CGParam::CGParam(int nitermax, double eps)
-  : _nIterMax(nitermax)
+  : AStringable()
+  , _nIterMax(nitermax)
   , _eps(eps)
   , _x0()
   , _precondStatus(0)
@@ -20,7 +21,8 @@ CGParam::CGParam(int nitermax, double eps)
 }
 
 CGParam::CGParam(const CGParam& m)
-  : _nIterMax(m._nIterMax)
+  : AStringable(m)
+  , _nIterMax(m._nIterMax)
   , _eps(m._eps)
   , _x0(m._x0)
   , _precondStatus(m._precondStatus)
@@ -32,6 +34,7 @@ CGParam& CGParam::operator=(const CGParam& m)
 {
   if (this != &m)
   {
+    AStringable::operator=(m);
     _nIterMax      = m._nIterMax;
     _eps           = m._eps;
     _x0            = m._x0;
@@ -63,4 +66,16 @@ void CGParam::setPrecond(const ALinearOp* precond, int status)
   _precond       = precond;
   _precondStatus = status;
   if (precond == NULL) _precondStatus = 0;
+}
+
+String CGParam::toString(const AStringFormat* strfmt) const
+{
+  DECLARE_UNUSED(strfmt);
+  std::stringstream sstr;
+
+  sstr << "Maximum number of Conjugate Gradient iterations = " << _nIterMax << std::endl;
+  sstr << "Numerical tolerance = " << _eps << std::endl;
+  sstr << "Initial value = " << _x0 << std::endl;
+  sstr << "Using a Pre-conditioner = " << _precondStatus << std::endl;
+  return sstr.str();
 }

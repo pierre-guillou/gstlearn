@@ -14,6 +14,7 @@ ndim = 2
 nvar = 2
 order = 1
 gl.OptCst.defineByKey("NTROW", -1)
+gl.ASerializable.setPrefixName("test_SPDECoKriging-")
 exts = [".estim", ".stdev"]
 params = gl.SPDEParam()
 params.setNMC(100)
@@ -88,9 +89,11 @@ for iext in exts:
     for ivar in range(nvar):
         name1 = getName("Kriging", ivar, iext)
         name2 = getName("KF", ivar, iext)
-        print("Difference with", name1, "(matrix) = " +
+        print("Difference with", name1, " = " +
               str(np.round(np.max(np.abs(grid[name1]-grid[name2]))/totalSill,5)))
 
+grid.dumpToNF("grid.NF")
+        
 ###############
 # Various plots
 ###############
@@ -101,7 +104,7 @@ if flag_plot:
         for ivar in range(nvar):
             fig, ax = gp.init(flagEqual=True)
             gp.raster(grid, getName("Kriging", ivar,  iext))
-            gp.decoration(title = getName("Kriging", ivar, iext)+" (Traditional)")
+            gp.decoration(title = getName("Kriging", ivar, iext) + " (Traditional)")
             gp.close()
     
     # Display the result per variable for SPDE Kriging (matrix)
@@ -109,7 +112,7 @@ if flag_plot:
         for ivar in range(nvar):
             fig, ax = gp.init(flagEqual=True)
             gp.raster(grid, getName("KM", ivar, iext))
-            gp.decoration(title = getName("KM", ivar, iext)+" (SPDE Matrix)")
+            gp.decoration(title = getName("KM", ivar, iext) + " (SPDE Matrix)")
             gp.close()
     
     # Display the result per variable for SPDE Kriging (matrix-free)
@@ -117,7 +120,7 @@ if flag_plot:
         for ivar in range(nvar):
             fig, ax = gp.init(flagEqual=True)
             gp.raster(grid, getName("KF", ivar, iext))
-            gp.decoration(title = getName("KF", ivar, iext)+" (SPDE Matrix-Free)")
+            gp.decoration(title = getName("KF", ivar, iext) + " (SPDE Matrix-Free)")
             gp.close()
     
     # Comparing the Krigings
@@ -127,10 +130,9 @@ if flag_plot:
             gp.correlation(grid,
                            getName("KM", ivar, iext),
                            getName("KF", ivar, iext),
-                           regrLine=True, regrColor="black",
                            bissLine=True, bissColor="blue",
                            bins=100, cmin=1)
-            gp.decoration(title = "Comparing Kriging" + iext,
+            gp.decoration(title = "Comparing Kriging" + iext + " - Variable " + str(ivar+1),
                           xlabel = "SPDE (Matrix)",
                           ylabel = "SPDE (Matrix-Free)")
             gp.close()
@@ -141,10 +143,9 @@ if flag_plot:
             gp.correlation(grid,
                            getName("KM", ivar, iext),
                            getName("Kriging", ivar, iext),
-                           regrLine=True, regrColor="black",
                            bissLine=True, bissColor="blue",
                            bins=100, cmin=1)
-            gp.decoration(title = "Comparing Kriging" + iext,
+            gp.decoration(title = "Comparing Kriging" + iext + " - Variable " + str(ivar+1),
                       xlabel = "SPDE (Matrix)",
                       ylabel = "Traditional")
             gp.close()
@@ -155,10 +156,9 @@ if flag_plot:
             gp.correlation(grid,
                            getName("KF", ivar, iext),
                            getName("Kriging", ivar, iext),
-                           regrLine=True, regrColor="black",
                            bissLine=True, bissColor="blue",
                            bins=100, cmin=1)
-            gp.decoration(title = "Comparing Kriging" + iext,
+            gp.decoration(title = "Comparing Kriging" + iext + " - Variable " + str(ivar+1),
                       xlabel = "SPDE (Matrix-Free)",
                       ylabel = "Traditional")
             gp.close()

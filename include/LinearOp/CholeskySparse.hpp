@@ -12,9 +12,9 @@
 
 #include "gstlearn_export.hpp"
 
+#include "Basic/VectorNumT.hpp"
 #include "Basic/WarningMacro.hpp"
 #include "LinearOp/ACholesky.hpp"
-#include "Basic/VectorNumT.hpp"
 
 #ifndef SWIG
 #  include <Eigen/Core>
@@ -44,7 +44,10 @@ public:
   virtual ~CholeskySparse();
 
   int setMatrix(const MatrixSparse* mat);
-  int stdev(VectorDouble& vcur, bool flagStDev = false) const;
+  int stdev(VectorDouble& vcur,
+            const MatrixSparse* proj,
+            const Eigen::SparseMatrix<double>* pattern,
+            bool flagStDev = false) const;
 
   double computeLogDeterminant() const override;
   int addSolveX(const constvect vecin, vect vecout) const override;
@@ -57,7 +60,9 @@ private:
   void _clean();
   int _prepare() const;
   int _stdevOld(VectorDouble& vcur) const;
-  int _stdevEigen(VectorDouble& vcur) const;
+  int _stdevEigen(VectorDouble& vcur,
+                  const MatrixSparse* proj,
+                  const Eigen::SparseMatrix<double>* pattern) const;
 
 private:
   bool _flagEigen;

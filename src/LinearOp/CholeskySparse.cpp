@@ -101,17 +101,20 @@ void CholeskySparse::_clean()
  **  Perform the calculation of the Standard Deviation of Estimation Error
  **
  ** \param[out] vcur     Output array
+ ** \param[out] proj Projection to the final output dimension
+ ** \param[in]  pattern Sparse matrix used as pattern for Inverse Cholesky
  ** \param[in]  flagStDev FALSE for a variance calculation, True for StDev.
  **
  *****************************************************************************/
-int CholeskySparse::stdev(VectorDouble& vcur, bool flagStDev) const
+int CholeskySparse::stdev(VectorDouble& vcur,
+                          const MatrixSparse* proj,
+                          const Eigen::SparseMatrix<double>* pattern,
+                          bool flagStDev) const
 {
   if (_mat == nullptr) return 1;
-  int ntarget = getSize();
-  vcur.resize(ntarget, 0);
   if (_flagEigen)
   {
-    if (_stdevEigen(vcur)) return 1;
+    if (_stdevEigen(vcur, proj, pattern)) return 1;
   }
   else
   {
@@ -119,7 +122,7 @@ int CholeskySparse::stdev(VectorDouble& vcur, bool flagStDev) const
   }
 
   if (flagStDev)
-    for (int iech = 0; iech < ntarget; iech++)
+    for (int iech = 0, ntarget = (int)vcur.size(); iech < ntarget; iech++)
       vcur[iech] = sqrt(vcur[iech]);
   return 0;
 }
@@ -371,24 +374,40 @@ int CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
  * @brief Compute the inverse of the 'this' matrix
  *
  * @param vcur Storing the diagonal of the inverse matrix
+ * @param proj Projection matrix
+ * @param pattern Pattern used to restrict the partial inverse
  * @return int
  *
  * @note: The method 'partial_inverse' used assumes a LTT decomposition
  * (which is not the decomposition of _factor [LDLT]). Hence a local
  * decomposition is performed again here.
+ * This should be optimally replaced by a more clever version of
+ * the original Takahashi algorithm (see sparseinv in old code)
  */
-int CholeskySparse::_stdevEigen(VectorDouble& vcur) const
+int CholeskySparse::_stdevEigen(VectorDouble& vcur,
+                                const MatrixSparse* proj,
+                                const Eigen::SparseMatrix<double>* pattern) const
 {
   Eigen::Map<Eigen::VectorXd> vcurm(vcur.data(), vcur.size());
 
   // Find the pointor on the initial matrix
+  // const auto a = dynamic_cast<const MatrixSparse*>(_mat)->getEigenMatrix();
   const auto a = dynamic_cast<const MatrixSparse*>(_mat)->getEigenMatrix();
 
   // Construct a SimplicialLLT matrix (instead of the LDLT stored in '_factor')
   Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> llt;
   llt.compute(a);
 
-  Eigen::SparseMatrix Qinv = partial_inverse(llt, a);
-  vcurm                    = Qinv.diagonal();
+  // Perform the inverse of Cholesky on sparse matrix
+  // and extract the resulting matrix matching the input pattern
+  Eigen::SparseMatrix Qinv = partial_inverse(llt, *pattern);
+
+  // If 'P' designates the projection matrix, perform Pt %*% Qinv %*% P
+  const Eigen::SparseMatrix<double>& P = proj->getEigenMatrix();
+  Eigen::SparseMatrix<double> Qp       = P * Qinv * P.transpose();
+
+  // Extract the diagonal of the resulting matrix
+  vcurm = Qp.diagonal();
+
   return 0;
 }
