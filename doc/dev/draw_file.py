@@ -155,7 +155,7 @@ elif filetype == "Polygon":
 elif filetype == "MeshETurbo":
     mesh = gl.MeshETurbo.createFromNF(filename, False)
     checkValidPointer(mesh)
-    gp.mesh(mesh)
+    gp.mesh(mesh, flagEdge=True, flagApex=True)
     plt.show()
  
 else:

@@ -403,11 +403,18 @@ int CholeskySparse::_stdevEigen(VectorDouble& vcur,
   Eigen::SparseMatrix Qinv = partial_inverse(llt, *pattern);
 
   // If 'P' designates the projection matrix, perform Pt %*% Qinv %*% P
-  const Eigen::SparseMatrix<double>& P = proj->getEigenMatrix();
-  Eigen::SparseMatrix<double> Qp       = P * Qinv * P.transpose();
-
-  // Extract the diagonal of the resulting matrix
-  vcurm = Qp.diagonal();
+  if (proj != nullptr)
+  {
+    const Eigen::SparseMatrix<double>& P = proj->getEigenMatrix();
+    Eigen::SparseMatrix<double> Qp       = P * Qinv * P.transpose();
+    // Extract the diagonal of the resulting matrix
+    vcurm = Qp.diagonal();
+  }
+  else
+  {
+    // Extract the diagonal of the resulting matrix
+    vcurm = Qinv.diagonal();
+  }
 
   return 0;
 }

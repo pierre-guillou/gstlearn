@@ -1355,7 +1355,7 @@ int Db::addColumnsByConstant(int nadd,
 
 /**
  * Create a set of new variables in an already existing Db and initialize
- * their contents as a ranom value (from Normal distribution)
+ * their contents as a random value (from Normal distribution)
  * @param nadd     Number of variables to be added
  * @param radix    Generic radix given to the newly created variables
  * @param locatorType Generic locator assigned to new variables
@@ -2367,13 +2367,18 @@ bool Db::hasLargerDimension(const Db* dbaux) const
   return retOK;
 }
 
+/**
+ * @brief Initiaze the contents of one or several columns with the Db
+ * with either a constant value or a value drawn at random (persample)
+ *
+ * @param ncol
+ * @param icol0
+ * @param flagCst
+ * @param valinit
+ */
 void Db::_columnInit(int ncol, int icol0, bool flagCst, double valinit)
 {
   double value;
-  if (flagCst)
-    value = valinit;
-  else
-    value = law_gaussian();
   for (int jcol = 0; jcol < ncol; jcol++)
   {
     int icol = jcol + icol0;
@@ -2381,7 +2386,7 @@ void Db::_columnInit(int ncol, int icol0, bool flagCst, double valinit)
     if (!GlobalEnvironment::getEnv()->isDomainReference() || !hasLocator(ELoc::DOM))
     {
       for (int iech = 0; iech < _nech; iech++)
-        _array[_getAddress(iech, icol)] = value;
+        _array[_getAddress(iech, icol)] = (flagCst) ? valinit : law_gaussian();
     }
     else
     {

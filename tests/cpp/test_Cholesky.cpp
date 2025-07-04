@@ -8,16 +8,16 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "LinearOp/CholeskySparse.hpp"
+#include "Basic/File.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "LinearOp/CholeskyDense.hpp"
+#include "LinearOp/CholeskySparse.hpp"
+#include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
-#include "Matrix/MatrixFactory.hpp"
 #include "Matrix/NF_Triplet.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/File.hpp"
-#include "Basic/Utilities.hpp"
 
 MatrixSparse* _createSparseMatrix(int n, double proba)
 {
@@ -62,15 +62,15 @@ MatrixSymmetric* _createDenseMatrix(int n, const MatrixSparse* Q)
 ** of sparse matrix
 **
 *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  int size                 = 10;
-  double proba             = 0.05;
-  MatrixSparse* Q          = _createSparseMatrix(size, proba);
+  int size           = 10;
+  double proba       = 0.05;
+  MatrixSparse* Q    = _createSparseMatrix(size, proba);
   MatrixSymmetric* M = _createDenseMatrix(size, Q);
 
   // Create a vector random gaussian values
@@ -156,7 +156,8 @@ int main(int argc, char *argv[])
   MatrixSparse* M2 = MatrixSparse::createFromTriplet(
     M->getMatrixToTriplet(), M->getNRows(), M->getNCols(), -1, 1);
   CholeskySparse Qchol(M2);
-  Qchol.stdev(vecout2, false);
+  const Eigen::SparseMatrix<double> pattern = M2->getEigenMatrix();
+  Qchol.stdev(vecout2, nullptr, &pattern, false);
 
   if (VH::isEqual(vecout1b, vecout2))
     message(">>> Function 'stdev' is validated\n");
@@ -184,5 +185,5 @@ int main(int argc, char *argv[])
   delete M;
   delete M2;
 
-  return(0);
+  return (0);
 }
