@@ -497,7 +497,7 @@ void Model::addCovFromParam(const ECov& type,
   _ctxt.setNVar(cov.getNVar());
   _copyCovContext();
   if (!angles.empty()) cov.setAnisoAngles(angles);
-  addCovAniso(&cov);
+  addCovAniso(cov);
 }
 
 double Model::evalCovFromIncr(const VectorDouble &incr,
@@ -962,7 +962,7 @@ void Model::_create()
   setCovAnisoList(&tmp);
 }
 
-void Model::addCovAniso(const CovAniso* cov)
+void Model::addCovAniso(const CovAniso& cov)
 {
   ModelCovList::addCov(cov);
 }

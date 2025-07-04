@@ -3359,7 +3359,7 @@ static int st_sampling_krige_data(Db *db,
       TUTIL(ecr,j) = UTAB(i, j);
     ecr++;
   }
-  mat_s = model->evalCovMat(db, db, -1, -1, rutil, rutil);
+  mat_s = model->evalCovMatSym(db, rutil, -1);
   if (matrix_prod_norme(-1, nutil, ntot, tutil, mat_s.getValues().data(), invsig)) goto label_end;
   if (matrix_invert(invsig, ntot, 0)) goto label_end;
   utab = (double*) mem_free((char* ) utab);

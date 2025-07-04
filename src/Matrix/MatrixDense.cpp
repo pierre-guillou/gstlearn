@@ -25,6 +25,7 @@ MatrixDense::MatrixDense(int nrow, int ncol)
   , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
+  , _maxSize(nrow * ncol)
   , _eigenMatrix()
 {
   _allocate();
@@ -35,6 +36,7 @@ MatrixDense::MatrixDense(const MatrixDense& r)
   , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
+  , _maxSize(r._maxSize)
   , _eigenMatrix()
 {
   _allocate();
@@ -46,6 +48,7 @@ MatrixDense::MatrixDense(const AMatrix& r)
   , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
+  , _maxSize(r.getNRows() * r.getNCols())
   , _eigenMatrix()
 {
   _allocate();
@@ -57,6 +60,7 @@ MatrixDense& MatrixDense::operator=(const MatrixDense& r)
   if (this != &r)
   {
     AMatrix::operator=(r);
+    _maxSize = r._maxSize;
     _allocate();
     _recopy(r);
   }

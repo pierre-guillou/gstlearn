@@ -90,17 +90,17 @@ CovList::~CovList()
   delAllCov();
 }
 
-void CovList::addCovList(const CovList* covs)
+void CovList::addCovList(const CovList& covs)
 {
-  for (int icov = 0, ncov = covs->getNCov(); icov < ncov; icov++)
-    addCov(covs->getCov(icov));
+  for (int icov = 0, ncov = covs.getNCov(); icov < ncov; icov++)
+    addCov(*covs.getCov(icov));
 }
 
-void CovList::addCov(const CovBase* cov)
+void CovList::addCov(const CovBase& cov)
 {
   if (getNCov() == 0)
   {
-    setNVar(cov->getNVar());
+    setNVar(cov.getNVar());
   }
   else
   {
@@ -108,14 +108,14 @@ void CovList::addCov(const CovBase* cov)
     // Check that the current Context is similar to the one of the newly
     // added covariance
 
-    if (!cov->getContext().isEqual(_covs[0]->getContext()))
+    if (!cov.getContext().isEqual(_covs[0]->getContext()))
     {
       messerr("Error: Covariances in the same CovList should share the same Context");
       messerr("Operation is cancelled");
       return;
     }
   }
-  _covs.push_back(std::dynamic_pointer_cast<CovBase>(cov->cloneShared()));
+  _covs.push_back(std::dynamic_pointer_cast<CovBase>(cov.cloneShared()));
   _filtered.push_back(false);
   _updateLists();
 }

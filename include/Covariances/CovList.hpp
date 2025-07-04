@@ -60,9 +60,9 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// CovList Interface
-  virtual void addCov(const CovBase* cov);
+  virtual void addCov(const CovBase& cov);
 
-  void addCovList(const CovList* covs);
+  void addCovList(const CovList& covs);
   // Remove an elementary covariance structure
   void delCov(int icov);
   // Remove all elementary covariance structures
