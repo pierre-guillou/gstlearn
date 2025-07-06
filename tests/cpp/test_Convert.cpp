@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   Model* model = Model::create(ctxt);
   CovAnisoList covs(ctxt);
   CovAniso cova(ECov::SPHERICAL, 25., 0., 2., ctxt);
-  covs.addCov(&cova);
+  covs.addCov(cova);
   model->setCovAnisoList(&covs);
 
   // Perform a non-conditional simulation
