@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/VectorNumT.hpp"
 #include "gstlearn_export.hpp"
 
 namespace gstlrn
