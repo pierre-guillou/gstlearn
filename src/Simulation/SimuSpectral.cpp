@@ -11,54 +11,54 @@
 #include "Simulation/SimuSpectral.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Stats/Classical.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Matrix/MatrixFactory.hpp"
-#include "Model/Model.hpp"
 #include "Covariances/CorAniso.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "Db/Db.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixFactory.hpp"
+#include "Model/Model.hpp"
+#include "Stats/Classical.hpp"
 
-#include <math.h>
+#include <cmath>
 
 namespace gstlrn
 {
-  SimuSpectral::  SimuSpectral(const Model* model)
-    : _ndim(0),
-      _ns(0),
-      _isPrepared(false),
-      _phi(),
-      _gamma(),
-      _omega(),
-      _spSims(),
-      _model(model)
+SimuSpectral::SimuSpectral(const Model* model)
+  : _ndim(0)
+  , _ns(0)
+  , _isPrepared(false)
+  , _phi()
+  , _gamma()
+  , _omega()
+  , _spSims()
+  , _model(model)
 {
 }
 
-  SimuSpectral::  SimuSpectral(const   SimuSpectral &r)
-    : _ndim(r._ndim),
-      _ns(r._ns),
-      _isPrepared(r._isPrepared),
-      _phi(r._phi),
-      _gamma(r._gamma),
-      _omega(r._omega),
-      _spSims(r._spSims),
-      _model(r._model)
+SimuSpectral::SimuSpectral(const SimuSpectral& r)
+  : _ndim(r._ndim)
+  , _ns(r._ns)
+  , _isPrepared(r._isPrepared)
+  , _phi(r._phi)
+  , _gamma(r._gamma)
+  , _omega(r._omega)
+  , _spSims(r._spSims)
+  , _model(r._model)
 {
 }
 
-  SimuSpectral&   SimuSpectral::operator=(const   SimuSpectral &r)
+SimuSpectral& SimuSpectral::operator=(const SimuSpectral& r)
 {
   if (this != &r)
   {
-    _ndim = r._ndim;
-    _ns = r._ns;
+    _ndim       = r._ndim;
+    _ns         = r._ns;
     _isPrepared = r._isPrepared;
-    _phi = r._phi;
-    _gamma = r._gamma;
-    _omega = r._omega;
-    _spSims = r._spSims;
-    _model = r._model;
+    _phi        = r._phi;
+    _gamma      = r._gamma;
+    _omega      = r._omega;
+    _spSims     = r._spSims;
+    _model      = r._model;
   }
   return *this;
 }
@@ -83,7 +83,7 @@ int SimuSpectral::simulate(int ns, int seed, bool verbose, int nd)
     messerr("A Model should be attached beforehand");
     return 1;
   }
-  if (! isValidForSpectral(_model)) return 1;
+  if (!isValidForSpectral(_model)) return 1;
   if (ns <= 0)
   {
     messerr("The number of simulated harmonic components should be positive");
@@ -96,17 +96,17 @@ int SimuSpectral::simulate(int ns, int seed, bool verbose, int nd)
   }
 
   _ndim = _model->getNDim();
-  _ns = ns;
+  _ns   = ns;
 
   // Cleaning any previously allocated memory
   _phi.clear();
   _gamma.clear();
-  _omega.reset(0,0);
+  _omega.reset(0, 0);
   _spSims.clear();
 
   if (seed > 0) law_set_random_seed(seed);
 
-  _phi = VectorDouble(_ns);
+  _phi       = VectorDouble(_ns);
   double pi2 = 2. * GV_PI;
   for (int is = 0; is < _ns; is++)
     _phi[is] = pi2 * law_uniform();
@@ -144,8 +144,8 @@ void SimuSpectral::_simulateOnSphere(int nd, bool verbose)
   VectorDouble spectrum = _model->getCovAniso(0)->evalSpectrumOnSphere(nd);
 
   // Simulate vector N
-  int n = 0;
-  double p = 0.;
+  int n       = 0;
+  double p    = 0.;
   VectorInt N = VectorInt(_ns, 0);
   while (p < maxU && n < _ns)
   {
@@ -165,7 +165,7 @@ void SimuSpectral::_simulateOnSphere(int nd, bool verbose)
   VectorInt Kabs = K;
   for (int is = 0; is < _ns; is++) Kabs[is] = ABS(Kabs[is]);
   VectorInt orders = VH::unique(Kabs);
-  int order_size = (int) orders.size();
+  int order_size   = (int)orders.size();
 
   // Loop on the orders
   _spSims.resize(order_size);
@@ -196,24 +196,24 @@ void SimuSpectral::_simulateOnSphere(int nd, bool verbose)
     }
 
     // Create the table of contingency
-    _spSims[kk]._k = kk;
+    _spSims[kk]._k      = kk;
     _spSims[kk]._countP = countP;
     _spSims[kk]._countM = countM;
-    _spSims[kk]._tab = contingencyTable2(Ns, Is);
+    _spSims[kk]._tab    = contingencyTable2(Ns, Is);
   }
 
   // Optional printout
   if (verbose) _printSpSims(1);
 }
 
-void SimuSpectral::_computeOnRn(Db *dbout, int iuid, bool verbose)
+void SimuSpectral::_computeOnRn(Db* dbout, int iuid, bool verbose)
 {
   int nech = dbout->getNSample(true);
 
   // Preparation
   MatrixSquare tensor = _model->getCovAniso(0)->getAniso().getTensorInverse();
-  double scale = sqrt(2. / _ns);
-  AMatrix *res = MatrixFactory::prodMatMat(&_omega, &tensor);
+  double scale        = sqrt(2. / _ns);
+  AMatrix* res        = MatrixFactory::prodMatMat(&_omega, &tensor);
 
   // Optional printout
   if (verbose)
@@ -254,13 +254,13 @@ void SimuSpectral::_computeOnRn(Db *dbout, int iuid, bool verbose)
  * @param verbose Verbose flag
  * @param namconv Naming convention (only used when 'iuid' == 0)
  */
-int SimuSpectral::compute(Db *dbout,
+int SimuSpectral::compute(Db* dbout,
                           int iuid,
                           bool verbose,
-                          const NamingConvention &namconv)
+                          const NamingConvention& namconv)
 {
-  int nech = dbout->getNSample(true);
-  int ndim = dbout->getNDim();
+  int nech             = dbout->getNSample(true);
+  int ndim             = dbout->getNDim();
   bool flagNewVariable = (iuid <= 0);
 
   if (ndim != _ndim)
@@ -274,7 +274,7 @@ int SimuSpectral::compute(Db *dbout,
     messerr("'dbout' must have a positive number of active samples");
     return 1;
   }
-  if (! _isPrepared)
+  if (!_isPrepared)
   {
     messerr("You should run 'simulate' beforehand");
     return 1;
@@ -378,8 +378,8 @@ void SimuSpectral::_printSpSims(int status)
 {
   int totalP = 0;
   int totalM = 0;
-  int ns = (int) _spSims.size();
-  mestitle(1,"List of Orders");
+  int ns     = (int)_spSims.size();
+  mestitle(1, "List of Orders");
   for (int is = 0; is < ns; is++)
   {
     _printSpSim(_spSims[is], status);
@@ -396,12 +396,12 @@ void SimuSpectral::_printSpSims(int status)
 
 void SimuSpectral::_computeOnSphere(Db* dbout, int iuid, bool verbose)
 {
-  int np   = dbout->getNSample(true);
+  int np = dbout->getNSample(true);
 
-  int nb = 0;
+  int nb    = 0;
   int N_max = -9999;
   VectorInt K_list;
-  for (int is = 0, size = (int) _spSims.size(); is < size; is++)
+  for (int is = 0, size = (int)_spSims.size(); is < size; is++)
   {
     nb += _spSims[is]._countP + _spSims[is]._countM;
     K_list.push_back(_spSims[is]._k);
@@ -421,7 +421,7 @@ void SimuSpectral::_computeOnSphere(Db* dbout, int iuid, bool verbose)
   }
 
   // Simulation
-  VectorDouble phi = dbout->getOneCoordinate(0);
+  VectorDouble phi   = dbout->getOneCoordinate(0);
   VectorDouble theta = dbout->getOneCoordinate(1);
   VectorDouble sim(np, 0.);
   VectorDouble x(np);
@@ -429,12 +429,12 @@ void SimuSpectral::_computeOnSphere(Db* dbout, int iuid, bool verbose)
   for (int i = 0; i < np; i++)
   {
     double cosval = cos(theta[i]);
-    x[i] = cosval;
-    w[i] = sqrt(1 - cosval * cosval);
+    x[i]          = cosval;
+    w[i]          = sqrt(1 - cosval * cosval);
   }
 
-  int K_idx = 0; // Index running in spectrum list
-  int jk = 0;    // Index running in components
+  int K_idx   = 0; // Index running in spectrum list
+  int jk      = 0; // Index running in components
   int cumComp = 0;
   VectorDouble val(np, 0.);
   VectorDouble Pmm(np, 0.);
@@ -456,8 +456,8 @@ void SimuSpectral::_computeOnSphere(Db* dbout, int iuid, bool verbose)
 
     if (VH::whereElement(K_list, m) >= 0)
     {
-      const spSim &spsimK = _spSims[K_idx++];
-      VectorInt N_list = _getKeys1(spsimK);
+      const spSim& spsimK = _spSims[K_idx++];
+      VectorInt N_list    = _getKeys1(spsimK);
 
       if (verbose)
         message(">>> Simulating order K = %d: component number = %d\n", m,
@@ -476,8 +476,7 @@ void SimuSpectral::_computeOnSphere(Db* dbout, int iuid, bool verbose)
         else
         {
           double a = sqrt((2. * n + 1.) * (2. * n - 1.) / (n - m) / (n + m));
-          double b = sqrt((2. * n + 1.) / (2. * n - 3.) * (n - 1. - m) / (n - m) * (n - 1. + m)
-              / (n + m));
+          double b = sqrt((2. * n + 1.) / (2. * n - 3.) * (n - 1. - m) / (n - m) * (n - 1. + m) / (n + m));
           for (int ip = 0; ip < np; ip++)
             Plm[ip] = a * x[ip] * P1[ip] - b * P2[ip];
           P2 = P1;
@@ -498,11 +497,11 @@ void SimuSpectral::_computeOnSphere(Db* dbout, int iuid, bool verbose)
                     cumComp, jk);
           }
 
-          for (int ii = 0, ncomp = (int) valComp.size(); ii < ncomp; ii++)
+          for (int ii = 0, ncomp = (int)valComp.size(); ii < ncomp; ii++)
           {
             if (nbrComp[ii] > 0)
             {
-              double s = valComp[ii];
+              double s   = valComp[ii];
               double fac = (s > 0) ? 1. : pow(-1., m);
 
               for (int ns = 0; ns < nbrComp[ii]; ns++)
@@ -548,7 +547,7 @@ bool SimuSpectral::isValidForSpectral(const Model* model)
   for (int is = 0; is < model->getNCov(); is++)
   {
     const CovAniso* cova = model->getCovAniso(is);
-    if (! cova->isValidForSpectral())
+    if (!cova->isValidForSpectral())
     {
       messerr("The current structure is not valid for Spectral Simulation on Rn");
       return false;
@@ -572,15 +571,15 @@ bool SimuSpectral::isValidForSpectral(const Model* model)
  *
  * @note The conditional version is not yet available
  */
-int simuSpectral(Db *dbin,
-                 Db *dbout,
-                 Model *model,
+int simuSpectral(Db* dbin,
+                 Db* dbout,
+                 Model* model,
                  int nbsimu,
                  int seed,
                  int ns,
                  int nd,
                  bool verbose,
-                 const NamingConvention &namconv)
+                 const NamingConvention& namconv)
 {
   if (dbin != nullptr)
   {
@@ -621,4 +620,4 @@ int simuSpectral(Db *dbin,
 
   return 0;
 }
-}
+} // namespace gstlrn
