@@ -111,13 +111,13 @@ void ParamInfo::setMinValue(double value)
 
 void ParamInfo::setValue(double value)
 {
-  // if (value < _userBounds[0] || value > _userBounds[1])
-  // {
-  //   messerr("Value is out of user bounds");
-  //   messerr("Setting the value to the closest bound");
-  //   _value = std::clamp(value, _userBounds[0], _userBounds[1]);
-  // }
-  // else
+  if (value < _userBounds[0] || value > _userBounds[1])
+  {
+    messerr("Value is out of user bounds");
+    messerr("Setting the value to the closest bound");
+    _value = std::clamp(value, _userBounds[0], _userBounds[1]);
+  }
+  else
   {
     _value = value;
   }
