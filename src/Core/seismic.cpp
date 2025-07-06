@@ -37,6 +37,14 @@
 #define IND(iech, ivar)   ((iech) + (ivar) * nech)
 #define LHS(i, iv, j, jv) (lhs[IND(i, iv) + neqmax * IND(j, jv)])
 #define RHS(i, iv, jv)    (rhs[IND(i, iv) + neqmax * (jv)])
+#define ARRAY(ix, iy)     (array[(iy) * NX + (ix)])
+#define LIMIT(ix, iy)     (limit[(iy) * NX + (ix)])
+#define VV(itr, iz)       (db_v->getArray(iatt_v, NTRACE * (iz) + itr) / VFACT)
+#define C00(ivar, jvar)   (c00[(jvar) * NVAR + (ivar)])
+#define LB(ivar, jvar)    (lb[(jvar) * NVAR + (ivar)])
+#define IND(iech, ivar)   ((iech) + (ivar) * nech)
+#define LHS(i, iv, j, jv) (lhs[IND(i, iv) + neqmax * IND(j, jv)])
+#define RHS(i, iv, jv)    (rhs[IND(i, iv) + neqmax * (jv)])
 /*! \endcond */
 
 namespace gstlrn
@@ -1342,27 +1350,25 @@ static int st_seismic_operate(Db* db,
  ** \param[in]  distort   wavelet distortion factor (Ricker)
  **
  *****************************************************************************/
-static double* st_seismic_wavelet(int verbose,
-                                  int type,
-                                  int ntw,
-                                  int tindex,
-                                  double dt,
-                                  double fpeak,
-                                  double period,
-                                  double amplitude,
-                                  double distort)
+static VectorDouble st_seismic_wavelet(int verbose,
+                                       int type,
+                                       int ntw,
+                                       int tindex,
+                                       double dt,
+                                       double fpeak,
+                                       double period,
+                                       double amplitude,
+                                       double distort)
 {
   int it, ntw2;
-  double *wavelet, t, t1, t0, tnorm, value, wsym;
+  double t, t1, t0, tnorm, value, wsym;
+  VectorDouble wavelet;
 
   /* Initializations */
 
-  ntw2    = 2 * ntw + 1;
-  t0      = ntw * dt;
-  wavelet = (double*)mem_alloc(sizeof(double) * ntw2, 0);
-  if (wavelet == nullptr) return (wavelet);
-  for (it = 0; it < ntw2; it++)
-    wavelet[it] = 0.;
+  ntw2 = 2 * ntw + 1;
+  t0   = ntw * dt;
+  wavelet.resize(ntw2, 0);
 
   /* Dispatch */
 
@@ -1422,7 +1428,7 @@ static double* st_seismic_wavelet(int verbose,
 
   if (verbose) print_vector("Wavelet", 0, ntw2, wavelet);
 
-  return (wavelet);
+  return wavelet;
 }
 
 /****************************************************************************/
@@ -1795,7 +1801,7 @@ int seismic_convolve(DbGrid* db,
                      double val_before,
                      double val_middle,
                      double val_after,
-                     double* wavelet)
+                     VectorDouble& wavelet)
 {
   int ndim, iatt, natt, itrace, iz, nz, iatt_in, iatt_out, error, size, shift;
   double dz;
@@ -1819,7 +1825,7 @@ int seismic_convolve(DbGrid* db,
     wavelet = st_seismic_wavelet(!flag_operate, type, ntw, tindex, dz, fpeak,
                                  period, amplitude, distort);
   }
-  if (wavelet == nullptr) goto label_end;
+  if (wavelet.empty()) goto label_end;
   if (!flag_operate) goto label_end;
 
   /* Create the output variables */
@@ -1867,7 +1873,7 @@ int seismic_convolve(DbGrid* db,
 
       /* Perform the convolution */
 
-      st_seismic_convolve(2 * ntw + 1, -ntw, wavelet, size, 0, tab1.data(), size, 0,
+      st_seismic_convolve(2 * ntw + 1, -ntw, wavelet.data(), size, 0, tab1.data(), size, 0,
                           tab2.data());
 
       /* In case of edge erosion, set the edge to FFFF */
@@ -1889,7 +1895,7 @@ int seismic_convolve(DbGrid* db,
   error = 0;
 
 label_end:
-  if (type >= 0) mem_free((char*)wavelet);
+  if (type >= 0) wavelet.clear();
   return (error);
 }
 
