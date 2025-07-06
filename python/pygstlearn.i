@@ -806,6 +806,9 @@
   Py_DECREF(columns);
 }
 
+%typemap(freearg) std::map<std::string, std::vector<double, std::allocator<double> > > * {
+  delete $1;
+}
 // This for automatically converting R string to NamingConvention
 
 %typemap(in) NamingConvention, NamingConvention &, const NamingConvention, const NamingConvention &
