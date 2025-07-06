@@ -90,13 +90,11 @@ VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) con
   if (_chol == nullptr)
     _chol = new CholeskySparse(&_QpAinvNoiseAt);
 
-  const Eigen::SparseMatrix<double> pattern = _QpAinvNoiseAt.getEigenMatrix();
-  const MatrixSparse* projmat               = nullptr;
-  const ProjMultiMatrix* proj               = dynamic_cast<const ProjMultiMatrix*>(_projOutKriging);
-  if (proj != nullptr) projmat = proj->getProj();
+  const ProjMultiMatrix* proj = dynamic_cast<const ProjMultiMatrix*>(_projOutKriging);
+  const MatrixSparse* projmat = proj->getProj();
 
   VectorDouble result(projmat->getNRows());
-  _chol->stdev(result, projmat, &pattern, true); // true for standard deviation
+  _chol->stdev(result, projmat, true); // true for standard deviation
 
   return result;
 }

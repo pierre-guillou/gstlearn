@@ -55,6 +55,7 @@ public:
                       MatrixSymmetric& b);
   void clear();
   bool empty() const;
+  
 private:
   void _clear();
   int _prepare() const;

@@ -156,8 +156,9 @@ int main(int argc, char* argv[])
   MatrixSparse* M2 = MatrixSparse::createFromTriplet(
     M->getMatrixToTriplet(), M->getNRows(), M->getNCols(), -1, 1);
   CholeskySparse Qchol(M2);
-  const Eigen::SparseMatrix<double> pattern = M2->getEigenMatrix();
-  Qchol.stdev(vecout2, nullptr, &pattern, false);
+  MatrixSparse* proj = MatrixSparse::Identity(M->getNRows());
+  Qchol.stdev(vecout2, proj, false);
+  delete proj;
 
   if (VH::isEqual(vecout1b, vecout2))
     message(">>> Function 'stdev' is validated\n");

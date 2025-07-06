@@ -34,6 +34,7 @@ DISABLE_WARNING_POP
 class css; /// TODO : Dependency to csparse to be removed
 class csn;
 class MatrixSparse;
+using Sp = Eigen::SparseMatrix<double>;
 
 class GSTLEARN_EXPORT CholeskySparse: public ACholesky
 {
@@ -46,7 +47,6 @@ public:
   int setMatrix(const MatrixSparse* mat);
   int stdev(VectorDouble& vcur,
             const MatrixSparse* proj,
-            const Eigen::SparseMatrix<double>* pattern,
             bool flagStDev = false) const;
 
   double computeLogDeterminant() const override;
@@ -60,9 +60,7 @@ private:
   void _clean();
   int _prepare() const;
   int _stdevOld(VectorDouble& vcur) const;
-  int _stdevEigen(VectorDouble& vcur,
-                  const MatrixSparse* proj,
-                  const Eigen::SparseMatrix<double>* pattern) const;
+  int _stdevEigen(VectorDouble& vcur, const MatrixSparse* proj) const;
 
 private:
   bool _flagEigen;
@@ -72,5 +70,5 @@ private:
   mutable csn* _N; // Cholesky decomposition (for Old-style Csparse storage)
 
   // Eigen storage
-  mutable Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>* _factor;
+  mutable Eigen::SimplicialLDLT<Sp>* _factor;
 };

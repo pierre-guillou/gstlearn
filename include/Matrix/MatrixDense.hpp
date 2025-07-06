@@ -13,8 +13,8 @@
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
-#include "Matrix/AMatrix.hpp"
 #include "Basic/WarningMacro.hpp"
+#include "Matrix/AMatrix.hpp"
 
 #ifndef SWIG
 DISABLE_WARNING_PUSH
@@ -56,7 +56,7 @@ public:
   IMPLEMENT_CLONING(MatrixDense)
 
   /// Interface for AMatrix
-  /*! Returns if the matrix belongs to the MatrixSparse class (avoids dynamic_cast) */
+  /*! Returns if the current matrix is Dense */
   bool isDense() const override { return true; }
   /*! Returns if the current matrix is Sparse */
   bool isSparse() const override { return false; }

@@ -9,7 +9,7 @@ def getName(radix, ivar, iext):
     return name
 
 # %% General parameters
-flag_plot = False
+flag_plot = True
 ndim = 2
 nvar = 2
 order = 1
@@ -50,8 +50,8 @@ if order == 1:
 grid = gl.DbGrid.create(nx=[50,50], dx=[2,2])
 
 # %% Meshing
-nx1 = [140,140]
-mesh1 = gl.MeshETurbo(nx1,[1.,1.],[-20,-20],[],False)
+nx1 = [70,70]
+mesh1 = gl.MeshETurbo(nx1,[2.,2.],[-20,-20],[],False)
 meshes = gl.VectorMeshes([mesh1,mesh1])
 
 ############################################
@@ -124,19 +124,6 @@ if flag_plot:
             gp.close()
     
     # Comparing the Krigings
-    for iext in exts:
-        for ivar in range(nvar):
-            fig, ax = gp.init()
-            gp.correlation(grid,
-                           getName("KM", ivar, iext),
-                           getName("KF", ivar, iext),
-                           bissLine=True, bissColor="blue",
-                           bins=100, cmin=1)
-            gp.decoration(title = "Comparing Kriging" + iext + " - Variable " + str(ivar+1),
-                          xlabel = "SPDE (Matrix)",
-                          ylabel = "SPDE (Matrix-Free)")
-            gp.close()
-
     for iext in exts:
         for ivar in range(nvar):
             fig, ax = gp.init()

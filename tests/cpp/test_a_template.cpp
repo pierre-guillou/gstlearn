@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 
   // Create a Model
   double range = 1. / 3.;
-  double sill  = 4.;
+  double sill  = 9.;
   Model* model = Model::createFromParam(ECov::MATERN, range, sill);
 
   // Perform Kriging using SPDE
