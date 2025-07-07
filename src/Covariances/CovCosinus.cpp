@@ -9,27 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovCosinus.hpp"
-
-#include <math.h>
 #include "Covariances/CovContext.hpp"
+#include <math.h>
 
 namespace gstlrn
 {
 CovCosinus::CovCosinus(const CovContext& ctxt)
-: ACovFunc(ECov::COSINUS, ctxt)
+  : ACovFunc(ECov::COSINUS, ctxt)
 {
 }
 
-CovCosinus::CovCosinus(const CovCosinus &r)
-: ACovFunc(r)
+CovCosinus::CovCosinus(const CovCosinus& r)
+  : ACovFunc(r)
 {
 }
 
-CovCosinus& CovCosinus::operator=(const CovCosinus &r)
+CovCosinus& CovCosinus::operator=(const CovCosinus& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }

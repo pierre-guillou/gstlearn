@@ -16,21 +16,21 @@
 namespace gstlrn
 {
 CovCauchy::CovCauchy(const CovContext& ctxt)
-: ACovFunc(ECov::CAUCHY, ctxt)
+  : ACovFunc(ECov::CAUCHY, ctxt)
 {
   setParam(1);
 }
 
-CovCauchy::CovCauchy(const CovCauchy &r)
-: ACovFunc(r)
+CovCauchy::CovCauchy(const CovCauchy& r)
+  : ACovFunc(r)
 {
 }
 
-CovCauchy& CovCauchy::operator=(const CovCauchy &r)
+CovCauchy& CovCauchy::operator=(const CovCauchy& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }

@@ -33,22 +33,22 @@ CovCalcMode::CovCalcMode(const CovCalcMode& r)
 {
 }
 
-CovCalcMode& CovCalcMode::operator=(const CovCalcMode &r)
+CovCalcMode& CovCalcMode::operator=(const CovCalcMode& r)
 {
   if (this != &r)
   {
     AStringable::operator=(r);
-    _member        = r._member;
-    _asVario       = r._asVario;
-    _unitary       = r._unitary;
-    _orderVario    = r._orderVario;
+    _member     = r._member;
+    _asVario    = r._asVario;
+    _unitary    = r._unitary;
+    _orderVario = r._orderVario;
   }
   return *this;
 }
 
 CovCalcMode::~CovCalcMode() {}
 
-CovCalcMode* CovCalcMode::create(const ECalcMember &member,
+CovCalcMode* CovCalcMode::create(const ECalcMember& member,
                                  bool asVario,
                                  bool unitary,
                                  int orderVario)

@@ -9,35 +9,34 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/ACov.hpp"
+#include "Basic/AException.hpp"
+#include "Basic/AStringable.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/ListParams.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Basic/VectorNumT.hpp"
 #include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Enum/ECalcMember.hpp"
-#include "Enum/EKrigOpt.hpp"
-#include "Matrix/MatrixSquare.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Matrix/MatrixSparse.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
-#include "Matrix/NF_Triplet.hpp"
-#include "Db/Db.hpp"
-#include "Geometry/GeometryHelper.hpp"
-#include "Db/DbGrid.hpp"
-#include "Basic/AException.hpp"
-#include "Basic/ListParams.hpp"
-#include "Basic/AStringable.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/Law.hpp"
-#include "Space/ASpace.hpp"
-#include "Space/SpacePoint.hpp"
-#include "geoslib_define.h"
 #include "Covariances/NoStatArray.hpp"
 #include "Covariances/NoStatFunctional.hpp"
-#include "Variogram/Vario.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
+#include "Enum/ECalcMember.hpp"
+#include "Enum/EKrigOpt.hpp"
 #include "Estimation/KrigOpt.hpp"
-
+#include "Geometry/GeometryHelper.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixSparse.hpp"
+#include "Matrix/MatrixSquare.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
+#include "Matrix/NF_Triplet.hpp"
+#include "Space/ASpace.hpp"
+#include "Space/SpacePoint.hpp"
+#include "Variogram/Vario.hpp"
+#include "geoslib_define.h"
 #include <cstddef>
-#include <vector>
 #include <math.h>
+#include <vector>
 
 namespace gstlrn 
 {
@@ -103,14 +102,14 @@ double ACov::evalCov(const SpacePoint& p1,
 }
 
 std::vector<double> ACov::evalCovGrad(const SpacePoint& p1,
-                         const SpacePoint& p2,
-                         int ivar,
-                         int jvar,
-                         const CovCalcMode* mode)
+                                      const SpacePoint& p2,
+                                      int ivar,
+                                      int jvar,
+                                      const CovCalcMode* mode)
 {
   std::vector<covmaptype> gradFuncs;
   auto listParams = std::make_shared<ListParams>();
-  appendParams(*listParams,&gradFuncs);
+  appendParams(*listParams, &gradFuncs);
   listParams->updateDispatch();
   updateCov();
   VectorDouble res(gradFuncs.size());

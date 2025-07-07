@@ -9,27 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovCubic.hpp"
-
-#include "Simulation/TurningBandOperate.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Simulation/TurningBandOperate.hpp"
 
 namespace gstlrn
 {
 CovCubic::CovCubic(const CovContext& ctxt)
-: ACovFunc(ECov::CUBIC, ctxt)
+  : ACovFunc(ECov::CUBIC, ctxt)
 {
 }
 
-CovCubic::CovCubic(const CovCubic &r)
-: ACovFunc(r)
+CovCubic::CovCubic(const CovCubic& r)
+  : ACovFunc(r)
 {
 }
 
-CovCubic& CovCubic::operator=(const CovCubic &r)
+CovCubic& CovCubic::operator=(const CovCubic& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -41,7 +40,7 @@ CovCubic::~CovCubic()
 double CovCubic::_evaluateCov(double h) const
 {
   double cov = 0.;
-  double h2 = h * h;
+  double h2  = h * h;
   if (h < 1) cov = 1. - h2 * (7. + h * (-8.75 + h2 * (3.5 - 0.75 * h2)));
   cov = MAX(0., cov);
   return (cov);
@@ -52,7 +51,7 @@ double CovCubic::_evaluateCovDerivative(int degree, double h) const
   double h2, res;
 
   res = 0.;
-  h2 = h * h;
+  h2  = h * h;
   if (h2 >= 1) return res;
 
   switch (degree)
@@ -73,7 +72,7 @@ String CovCubic::getFormula() const
   return "C(h)=1 - h^2 * \\left(7 + h * \\left(-8.75 + h^2 * \\left(3.5 - 0.75 * h^2 \\right) \\right) \\right)";
 }
 
-double CovCubic::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovCubic::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.shotNoiseCubicOne(t0);
 }

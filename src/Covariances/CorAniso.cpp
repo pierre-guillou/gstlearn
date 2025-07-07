@@ -8,37 +8,39 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Covariances/CorAniso.hpp"
+
 #include "Arrays/Array.hpp"
+#include "Basic/AException.hpp"
 #include "Basic/AFunctional.hpp"
 #include "Basic/AStringFormat.hpp"
+#include "Basic/AStringable.hpp"
+#include "Basic/FFT.hpp"
 #include "Basic/ListParams.hpp"
 #include "Basic/ParamInfo.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
-#include "Covariances/TabNoStatCovAniso.hpp"
-#include "Db/Db.hpp"
-#include "Covariances/NoStatArray.hpp"
-#include "Covariances/CorAniso.hpp"
+#include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovFactory.hpp"
 #include "Covariances/CovGradientNumerical.hpp"
-#include "Covariances/CovCalcMode.hpp"
+#include "Covariances/NoStatArray.hpp"
+#include "Covariances/TabNoStatCovAniso.hpp"
+#include "Db/Db.hpp"
 #include "Enum/EConsElem.hpp"
+#include "Geometry/GeometryHelper.hpp"
 #include "Matrix/MatrixSquare.hpp"
-#include "Basic/AStringable.hpp"
-#include "Basic/AException.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/FFT.hpp"
-#include "Basic/Utilities.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Space/ASpace.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Space/SpaceSN.hpp"
-#include "Geometry/GeometryHelper.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
+
 #include "geoslib_define.h"
 #include <algorithm>
-#include <math.h>
 #include <functional>
+#include <math.h>
 #include <vector>
 
 static int NWGT[4]      = {2, 3, 4, 5};
@@ -55,7 +57,7 @@ struct DerivCache
   mutable const SpacePoint* cachedP1ptr = nullptr;
   mutable const SpacePoint* cachedP2ptr = nullptr;
   mutable SpacePoint cachedP1;
-  mutable SpacePoint cachedP2 ;
+  mutable SpacePoint cachedP2;
   mutable double deriv               = 0.0;
   mutable std::vector<double> angles = {};
   mutable bool isInitialized         = false;
@@ -90,11 +92,11 @@ struct DerivCache
 
     if (!useCache)
     {
-      deriv    = cor->evalDerivativeBasis(p1, p2, ivar, jvar, mode);
+      deriv       = cor->evalDerivativeBasis(p1, p2, ivar, jvar, mode);
       cachedP1ptr = &p1;
       cachedP2ptr = &p2;
-      cachedP1 = p1; // copy to cachedP1
-      cachedP2 = p2; // copy to cachedP2
+      cachedP1    = p1; // copy to cachedP1
+      cachedP2    = p2; // copy to cachedP2
     }
     return deriv;
   }

@@ -1,11 +1,21 @@
+/******************************************************************************/
+/*                                                                            */
+/*                            gstlearn C++ Library                            */
+/*                                                                            */
+/* Copyright (c) (2023) MINES Paris / ARMINES                                 */
+/* Authors: gstlearn Team                                                     */
+/* Website: https://gstlearn.org                                              */
+/* License: BSD 3-clause                                                      */
+/*                                                                            */
+/******************************************************************************/
 #include "Covariances/TabNoStat.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ParamId.hpp"
+#include "Db/Db.hpp"
 #include "Enum/EConsElem.hpp"
 #include "geoslib_define.h"
 #include <memory>
-#include "Db/Db.hpp"
 
 namespace gstlrn 
 {
@@ -36,7 +46,7 @@ TabNoStat& TabNoStat::operator=(const TabNoStat& m)
 int TabNoStat::removeElem(const EConsElem& econs, int iv1, int iv2)
 {
   ParamId param(econs, iv1, iv2);
-  int res = (int) _items.erase(param);
+  int res = (int)_items.erase(param);
   updateDescription();
   return res;
 }
@@ -109,7 +119,7 @@ int TabNoStat::addElem(std::shared_ptr<ANoStat>& nostat, const EConsElem& econs,
   if (!isValid(econs))
     return 0;
   ParamId param(econs, iv1, iv2);
-  int res       = (int) _items.count(param);
+  int res       = (int)_items.count(param);
   _items[param] = nostat;
   if (res == 1)
   {
@@ -125,7 +135,7 @@ void TabNoStat::setDbNoStatRef(const Db* dbref)
 {
   if (dbref != nullptr)
   {
-    //Db* db       = dynamic_cast<Db*>(dbref->clone());
+    // Db* db       = dynamic_cast<Db*>(dbref->clone());
     _dbNoStatRef = std::shared_ptr<const Db>(dynamic_cast<Db*>(dbref->clone()));
   }
   else

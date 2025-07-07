@@ -9,26 +9,25 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovTriangle.hpp"
-
 #include "Covariances/CovContext.hpp"
 
 namespace gstlrn
 {
 CovTriangle::CovTriangle(const CovContext& ctxt)
-: ACovFunc(ECov::TRIANGLE, ctxt)
+  : ACovFunc(ECov::TRIANGLE, ctxt)
 {
 }
 
-CovTriangle::CovTriangle(const CovTriangle &r)
-: ACovFunc(r)
+CovTriangle::CovTriangle(const CovTriangle& r)
+  : ACovFunc(r)
 {
 }
 
-CovTriangle& CovTriangle::operator=(const CovTriangle &r)
+CovTriangle& CovTriangle::operator=(const CovTriangle& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }

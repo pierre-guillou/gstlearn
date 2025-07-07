@@ -9,29 +9,28 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGeometric.hpp"
-
-#include "math.h"
 #include "Basic/VectorHelper.hpp"
 #include "Covariances/CovContext.hpp"
+#include "math.h"
 
 namespace gstlrn
 {
 CovGeometric::CovGeometric(const CovContext& ctxt)
-: ACovFunc(ECov::GEOMETRIC, ctxt)
+  : ACovFunc(ECov::GEOMETRIC, ctxt)
 {
   setParam(1);
 }
 
-CovGeometric::CovGeometric(const CovGeometric &r)
-: ACovFunc(r)
+CovGeometric::CovGeometric(const CovGeometric& r)
+  : ACovFunc(r)
 {
 }
 
-CovGeometric& CovGeometric::operator=(const CovGeometric &r)
+CovGeometric& CovGeometric::operator=(const CovGeometric& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -52,7 +51,7 @@ double CovGeometric::_evaluateCovOnSphere(double alpha,
 VectorDouble CovGeometric::_evaluateSpectrumOnSphere(int n, double scale) const
 {
   double rho = scale;
-  VectorDouble sp(1+n, 0.);
+  VectorDouble sp(1 + n, 0.);
 
   double rhoprod = 1.;
   for (int k = 0; k <= n; k++)

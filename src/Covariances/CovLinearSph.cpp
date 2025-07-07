@@ -9,12 +9,9 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovLinearSph.hpp"
-
-#include "math.h"
 #include "Basic/VectorHelper.hpp"
-#include "Basic/MathFunc.hpp"
-#include "Basic/Law.hpp"
 #include "Covariances/CovContext.hpp"
+#include "math.h"
 
 namespace gstlrn
 {
@@ -24,16 +21,16 @@ CovLinearSph::CovLinearSph(const CovContext &ctxt)
   setParam(1);
 }
 
-CovLinearSph::CovLinearSph(const CovLinearSph &r)
-: ACovFunc(r)
+CovLinearSph::CovLinearSph(const CovLinearSph& r)
+  : ACovFunc(r)
 {
 }
 
-CovLinearSph& CovLinearSph::operator=(const CovLinearSph &r)
+CovLinearSph& CovLinearSph::operator=(const CovLinearSph& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -63,7 +60,7 @@ VectorDouble CovLinearSph::_evaluateSpectrumOnSphere(int n, double scale) const
     k += 2;
     if (k >= n + 1) break;
     double v = (k - 2.) / (k + 1.);
-    sp[k] = (2. * k + 1.) / (2. * k - 3.) * v * v * sp[k - 2];
+    sp[k]    = (2. * k + 1.) / (2. * k - 3.) * v * v * sp[k - 2];
   }
 
   VH::normalize(sp, 1);

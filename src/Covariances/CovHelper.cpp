@@ -8,11 +8,10 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Simulation/CalcSimuTurningBands.hpp"
 #include "Covariances/CovHelper.hpp"
+#include "Basic/VectorT.hpp"
 #include "Covariances/ACovFunc.hpp"
 #include "Covariances/CovFactory.hpp"
-#include "Basic/VectorT.hpp"
 #include "Enum/ECov.hpp"
 
 namespace gstlrn
@@ -25,11 +24,11 @@ bool _isSelected(ACovFunc *cov,
                  bool flagSimuSpectral)
 {
   if (cov == nullptr) return false;
-  if (ndim > (int) cov->getMaxNDim()) return false;
+  if (ndim > (int)cov->getMaxNDim()) return false;
   if (minorder < cov->getMinOrder()) return false;
-  if (hasrange && ! cov->hasRange()) return false;
-  if (flagSimtub && ! cov->isValidForTurningBand()) return false;
-  if (flagSimuSpectral && ! cov->isValidForSpectral()) return false;
+  if (hasrange && !cov->hasRange()) return false;
+  if (flagSimtub && !cov->isValidForTurningBand()) return false;
+  if (flagSimuSpectral && !cov->isValidForSpectral()) return false;
   return true;
 }
 
@@ -42,8 +41,8 @@ bool _isSelected(ACovFunc *cov,
  * @param flagSimtub Check that the Covariance can be simulated using Turning Band Method
  * @param flagSimuSpectral Check if the Covariance can be simulated using the Spectral Method
  */
-VectorString CovHelper::getAllCovariances(int  ndim,
-                                          int  minorder,
+VectorString CovHelper::getAllCovariances(int ndim,
+                                          int minorder,
                                           bool hasrange,
                                           bool flagSimtub,
                                           bool flagSimuSpectral)
@@ -51,18 +50,18 @@ VectorString CovHelper::getAllCovariances(int  ndim,
   VectorString vs;
 
   // Create the Context (using Space Dimension)
-  const CovContext ctxt = CovContext(1,ndim);
+  const CovContext ctxt = CovContext(1, ndim);
 
   // Loop on the basic structures
   auto it = ECov::getIterator();
   while (it.hasNext())
   {
     const ECov& covType = ECov::fromKey(it.getKey());
-    ACovFunc* cov = CovFactory::createCovFunc(covType, ctxt);
+    ACovFunc* cov       = CovFactory::createCovFunc(covType, ctxt);
 
     // Check if the covariance is valid
     if (_isSelected(cov, ndim, minorder, hasrange, flagSimtub, flagSimuSpectral))
-      vs.push_back(String{it.getKey()});
+      vs.push_back(String {it.getKey()});
 
     delete cov;
     it.toNext();
