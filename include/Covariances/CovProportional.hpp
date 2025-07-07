@@ -13,10 +13,12 @@
 #include "Covariances/CovBase.hpp"
 #include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
-class ACor;
+
+
+namespace gstlrn
+{ 
 class AFunctional;
 class CovInternal;
-
 class GSTLEARN_EXPORT CovProportional: public CovBase
 {
 public:
@@ -36,3 +38,4 @@ protected:
 protected:
     mutable MatrixSquare _workMat;
 };
+}

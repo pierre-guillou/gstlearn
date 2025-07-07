@@ -9,25 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGC5.hpp"
-
-#include "Simulation/TurningBandOperate.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Simulation/TurningBandOperate.hpp"
 
+namespace gstlrn
+{
 CovGC5::CovGC5(const CovContext& ctxt)
-: ACovFunc(ECov::ORDER5_GC, ctxt)
+  : ACovFunc(ECov::ORDER5_GC, ctxt)
 {
 }
 
-CovGC5::CovGC5(const CovGC5 &r)
-: ACovFunc(r)
+CovGC5::CovGC5(const CovGC5& r)
+  : ACovFunc(r)
 {
 }
 
-CovGC5& CovGC5::operator=(const CovGC5 &r)
+CovGC5& CovGC5::operator=(const CovGC5& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -39,8 +40,8 @@ CovGC5::~CovGC5()
 double CovGC5::_evaluateCov(double h) const
 {
   double cov;
-  double r = getContext().getField();
-  int ndim = getContext().getNDim();
+  double r  = getContext().getField();
+  int ndim  = getContext().getNDim();
   double h2 = h * h;
   double r2 = r * r;
   double h4 = h2 * h2;
@@ -49,15 +50,15 @@ double CovGC5::_evaluateCov(double h) const
   if (ndim == 1)
     cov = h4 * (h - 5. * r) + r3 * (20. * h2 - 16. * r2);
   else if (ndim == 2)
-    cov = h4 * (h - 225. * GV_PI * r / 128.)
-        + r3 * (75. * GV_PI * h2 / 8. - 15. * GV_PI * r2);
+    cov = h4 * (h - 225. * GV_PI * r / 128.) + r3 * (75. * GV_PI * h2 / 8. - 15. * GV_PI * r2);
   else
     cov = h4 * (h - 6. * r) + r3 * (40. * h2 - 96. * r2);
 
   return (-cov);
 }
 
-double CovGC5::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovGC5::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.IRFProcessOne(t0);
+}
 }

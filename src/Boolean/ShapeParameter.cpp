@@ -12,6 +12,8 @@
 #include "Boolean/ShapeParameter.hpp"
 #include "Basic/Law.hpp"
 
+namespace gstlrn
+{
 ShapeParameter::ShapeParameter(const ELaw& law, double value)
     : AStringable(),
       _law(law),
@@ -136,3 +138,4 @@ void ShapeParameter::setValarg(int iarg, double value)
   _valarg[iarg] = value;
 }
 
+}

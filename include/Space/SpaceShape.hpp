@@ -18,6 +18,8 @@
 /****************************************************************************
 **
 ****************************************************************************/
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ASpaceShape
 {
   public:
@@ -77,3 +79,4 @@ class GSTLEARN_EXPORT Pencil : public ASpaceShape
     double radius;
 };
 
+}

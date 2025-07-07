@@ -17,11 +17,15 @@
 #include "geoslib_define.h"
 
 
+
+
+namespace gstlrn 
+{
+
 class Db;
 class DbGrid;
 class EStatOption;
 class Model;
-
 class GSTLEARN_EXPORT CalcStatistics: public ACalcDbToDb
 {
 public:
@@ -78,3 +82,4 @@ GSTLEARN_EXPORT int dbRegression(Db *db1,
                                  Db *db2 = nullptr,
                                  const Model* model = nullptr,
                                  const NamingConvention &namconv = NamingConvention("Regr"));
+}

@@ -11,6 +11,8 @@
 #include "Basic/Indirection.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{ 
 Indirection::Indirection(int mode)
     : AStringable(),
       _defined(false),
@@ -193,4 +195,5 @@ int Indirection::_getMapAToR(int iabs) const
   if (_mapAToR.find(iabs) == _mapAToR.end()) return -1;
   int irel = _mapAToR.find(iabs)->second;
   return irel;
+}
 }

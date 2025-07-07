@@ -16,6 +16,7 @@
 #include "Space/SpacePoint.hpp"
 #include <iostream>
 
+using namespace gstlrn;
 /**
  * Demonstration of space composite features
  */

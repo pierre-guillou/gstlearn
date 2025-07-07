@@ -25,6 +25,7 @@
 #include "Variogram/Vario.hpp"
 #include "Variogram/VarioParam.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for testing Serialize/Deserialize

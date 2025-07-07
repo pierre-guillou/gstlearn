@@ -9,30 +9,33 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovBesselJ.hpp"
+#include "Basic/MathFunc.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Simulation/TurningBandOperate.hpp"
-#include "Basic/MathFunc.hpp"
 
 #include <math.h>
 
 #define MAXTAB 100
 
+namespace gstlrn
+{
+
 CovBesselJ::CovBesselJ(const CovContext& ctxt)
-: ACovFunc(ECov::BESSELJ, ctxt)
+  : ACovFunc(ECov::BESSELJ, ctxt)
 {
   setParam(1);
 }
 
-CovBesselJ::CovBesselJ(const CovBesselJ &r)
-: ACovFunc(r)
+CovBesselJ::CovBesselJ(const CovBesselJ& r)
+  : ACovFunc(r)
 {
 }
 
-CovBesselJ& CovBesselJ::operator=(const CovBesselJ &r)
+CovBesselJ& CovBesselJ::operator=(const CovBesselJ& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -45,9 +48,9 @@ double CovBesselJ::_evaluateCov(double h) const
 {
   static double TAB[MAXTAB];
 
-  double cov = 0.;
+  double cov   = 0.;
   double third = getParam();
-  int nb = (int) floor(third);
+  int nb       = (int)floor(third);
   double alpha = third - nb;
   if (third <= 0 || nb >= MAXTAB) return (cov);
   double coeff = (h > 0) ? pow(h / 2., third) : 1.;
@@ -66,7 +69,8 @@ String CovBesselJ::getFormula() const
   return "C(h)=2^\\alpha\\Gamma(\\alpha+1) \\frac{ J_\\alpha\\left( \\frac{h}{a_t} \\right) } {\\left( \\frac{h}{a_t} \\right)^\\alpha}";
 }
 
-double CovBesselJ::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovBesselJ::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.cosineOne(t0);
+}
 }

@@ -19,6 +19,8 @@
 #include "Calculators/CalcMigrate.hpp"
 #include "Tree/Ball.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

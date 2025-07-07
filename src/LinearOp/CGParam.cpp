@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "LinearOp/CGParam.hpp"
 
+namespace gstlrn
+{
 CGParam::CGParam(int nitermax, double eps)
   : AStringable()
   , _nIterMax(nitermax)
@@ -78,4 +80,5 @@ String CGParam::toString(const AStringFormat* strfmt) const
   sstr << "Initial value = " << _x0 << std::endl;
   sstr << "Using a Pre-conditioner = " << _precondStatus << std::endl;
   return sstr.str();
+}
 }

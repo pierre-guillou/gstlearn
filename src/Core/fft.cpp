@@ -81,6 +81,8 @@ static int* Perm  = NULL; /* Permutation vector */
 
 static int factor[NFACTOR];
 
+namespace gstlrn
+{
 /******************************************************************************/
 /*!
  *    Free the arrays allocated for FFT
@@ -1009,4 +1011,5 @@ Dimension_Error:
   (void)messerr("Error: fftn() - dimension error");
   fft_free(); /* free-up memory */
   return -1;
+}
 }

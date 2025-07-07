@@ -20,6 +20,8 @@
 #include "geoslib_define.h"
 #include <math.h>
 
+namespace gstlrn
+{
 DbGraphO::DbGraphO()
   : Db()
   , _downArcs()
@@ -640,3 +642,4 @@ bool DbGraphO::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

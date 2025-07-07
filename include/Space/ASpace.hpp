@@ -20,6 +20,8 @@
 #include "Basic/ICloneable.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 class SpacePoint;
 class Tensor;
 
@@ -185,3 +187,4 @@ protected:
 
 typedef std::shared_ptr<const ASpace> ASpaceSharedPtr;
 typedef std::vector<ASpaceSharedPtr> ASpaceSharedPtrVector; 
+}

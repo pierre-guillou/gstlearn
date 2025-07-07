@@ -24,6 +24,8 @@
 #include "geoslib_f_private.h"
 #include "geoslib_old_f.h"
 
+namespace gstlrn
+{
 CalcImage::CalcImage()
   : ACalcInterpolator()
   , _iattOut(-1)
@@ -440,4 +442,5 @@ GSTLEARN_EXPORT int dbMorpho(DbGrid* dbgrid,
   // Run the calculator
   int error = (image.run()) ? 0 : 1;
   return error;
+}
 }

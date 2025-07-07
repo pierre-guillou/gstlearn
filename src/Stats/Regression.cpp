@@ -12,6 +12,8 @@
 #include "Db/Db.hpp"
 #include "Model/Model.hpp"
 
+namespace gstlrn
+{
 Regression::Regression()
     : AStringable(),
       _count(0),
@@ -428,4 +430,5 @@ int Regression::apply(Db *db1,
     db1->setArray(iech, iptr0, value);
   }
   return 0;
+}
 }

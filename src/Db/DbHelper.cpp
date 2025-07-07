@@ -16,9 +16,12 @@
 #include "Skin/Skin.hpp"
 #include "geoslib_old_f.h"
 
-static DbGrid* DB_GRID_FILL;
 
-#define R(i, j) (R[(i) * n + (j)])
+#define R(i,j)              (R[(i) * n + (j)])
+
+namespace gstlrn
+{
+static DbGrid *DB_GRID_FILL;
 
 class LocalSkin: public ISkinFunctions
 {
@@ -1418,4 +1421,6 @@ int DbHelper::db_grid1D_fill(DbGrid* dbgrid,
   namconv.setNamesAndLocators(dbgrid, VectorString(), ELoc::Z, -1, dbgrid, iatt_out);
 
   return 0;
+}
+
 }

@@ -30,6 +30,8 @@
 #include "Neigh/NeighMoving.hpp"
 #include "Estimation/CalcKriging.hpp"
 
+using namespace gstlrn;
+
 int main(int argc, char* argv[])
 {
   std::stringstream sfn;

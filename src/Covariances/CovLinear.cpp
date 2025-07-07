@@ -9,25 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovLinear.hpp"
-
 #include "Covariances/CovContext.hpp"
 #include "Simulation/TurningBandOperate.hpp"
 
+namespace gstlrn
+{
 CovLinear::CovLinear(const CovContext& ctxt)
-: ACovFunc(ECov::LINEAR, ctxt)
+  : ACovFunc(ECov::LINEAR, ctxt)
 {
 }
 
-CovLinear::CovLinear(const CovLinear &r)
-: ACovFunc(r)
+CovLinear::CovLinear(const CovLinear& r)
+  : ACovFunc(r)
 {
 }
 
-CovLinear& CovLinear::operator=(const CovLinear &r)
+CovLinear& CovLinear::operator=(const CovLinear& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -53,7 +54,8 @@ double CovLinear::_evaluateCov(double h) const
   return (cov);
 }
 
-double CovLinear::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovLinear::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.IRFProcessOne(t0);
+}
 }

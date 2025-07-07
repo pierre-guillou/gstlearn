@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 ABiTargetCheck::ABiTargetCheck()
   : AStringable()
 {
@@ -31,4 +33,5 @@ ABiTargetCheck& ABiTargetCheck::operator=(const ABiTargetCheck& r)
 
 ABiTargetCheck::~ABiTargetCheck()
 {
+}
 }

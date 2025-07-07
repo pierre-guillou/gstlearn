@@ -18,6 +18,8 @@
 #include "geoslib_old_f.h"
 #include <math.h>
 
+namespace gstlrn
+{
 typedef struct
 {
   double xg;
@@ -779,4 +781,5 @@ label_end:
     db->deleteColumnByUID(iptr_proj[ndim - idim - 1]);
 
   return (error);
+}
 }

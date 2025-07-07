@@ -24,6 +24,8 @@
 #include "Db/DbGrid.hpp"
 #include "Db/DbStringFormat.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
 ** Main Program

@@ -17,6 +17,8 @@
 #include "geoslib_old_f.h"
 #include <math.h>
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Checks if Space Dimension of the first Db is at least equal
@@ -2419,4 +2421,5 @@ VectorInt grid_iterator_next(Grid* grid)
 {
   VectorInt indices = grid->iteratorNext();
   return (indices);
+}
 }

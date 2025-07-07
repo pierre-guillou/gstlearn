@@ -14,6 +14,8 @@
 
 #include "Gibbs/AGibbs.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -31,3 +33,4 @@ public:
                              double rho,
                              bool flag_propagation);
 };
+}

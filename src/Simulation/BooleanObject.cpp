@@ -19,6 +19,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 BooleanObject::BooleanObject(const AShape* ashape)
     : AStringable(),
       _mode(0),
@@ -570,4 +572,5 @@ void BooleanObject::projectToGrid(DbGrid *dbout,
             dbout->setArray(iad, iptr_rank, (double) (rank));
         }
       }
+}
 }

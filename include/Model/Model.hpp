@@ -39,15 +39,20 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ICloneable.hpp"
 
-class Model;
+namespace gstlrn {
+
+
 class Db;
 class CovLMCTapering;
 class CovLMCAnamorphosis;
 class CovLMGradient;
 class CovInternal;
 class CovCalcMode;
-class Vario;
+
 class ADrift;
+
+class Model;
+class Vario;
 class AnamContinuous;
 class AnamHermite;
 
@@ -266,3 +271,4 @@ private:
   void _create();
   void _copyCovContext();
 };
+}

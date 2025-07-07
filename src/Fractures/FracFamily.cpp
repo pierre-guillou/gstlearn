@@ -12,7 +12,8 @@
 #include "Basic/ASerializable.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/SerializeHDF5.hpp"
-
+namespace gstlrn
+{
 FracFamily::FracFamily(double orient,
                        double dorient,
                        double theta0,
@@ -173,3 +174,4 @@ bool FracFamily::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
+}

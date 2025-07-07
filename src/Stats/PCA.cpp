@@ -21,6 +21,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 PCA::PCA(int nvar)
   : AStringable(),
     _nVar(0),
@@ -873,3 +875,4 @@ VectorDouble PCA::mafOfIndex() const
   return maf_index;
 }
 
+}

@@ -21,6 +21,8 @@
 
 #define COOR(iech,idim)    (coor[(iech) * ndim + (idim)])
 
+namespace gstlrn
+{
 CalcSimuPartition::CalcSimuPartition(int mode,
                                      int nbsimu,
                                      int seed,
@@ -369,3 +371,4 @@ int tessellation_voronoi(DbGrid *dbgrid,
   return error;
 }
 
+}

@@ -20,6 +20,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 typedef struct
 {
   int curech;
@@ -1391,3 +1393,4 @@ bool Grid::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

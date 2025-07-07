@@ -15,6 +15,8 @@
 #include "Simulation/BooleanObject.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class AShape;
 
 class GSTLEARN_EXPORT ModelBoolean: public AStringable
@@ -45,3 +47,4 @@ private:
   double _thetaCst;
   std::vector<AShape*> _shapes; // List of the Token
 };
+}

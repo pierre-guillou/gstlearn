@@ -18,6 +18,8 @@
 #define STORE_NAME_LENGTH 10
 #define SHIFT()           ((MEMORY_DEBUG) ? (int)sizeof(int) : 0)
 
+namespace gstlrn
+{
 typedef struct
 {
   char call_name[STORE_NAME_LENGTH];
@@ -559,4 +561,5 @@ double** mem_tab_alloc(int nvar, int size, int flag_fatal)
       tab[ivar][i] = 0.;
   }
   return (tab);
+}
 }

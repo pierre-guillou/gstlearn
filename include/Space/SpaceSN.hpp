@@ -15,6 +15,8 @@
 #include "Space/ASpace.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class SpacePoint;
 
 class GSTLEARN_EXPORT SpaceSN: public ASpace
@@ -82,3 +84,4 @@ private:
   double _radius;
 };
 
+}

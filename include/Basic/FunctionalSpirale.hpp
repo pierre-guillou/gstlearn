@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Basic/AFunctional.hpp"
 
+namespace gstlrn
+{
 class MatrixSquare;
 class CovAniso;
 
@@ -41,3 +43,4 @@ private:
   double _xcenter;
   double _ycenter;
 };
+}

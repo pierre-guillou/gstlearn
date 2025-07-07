@@ -11,6 +11,8 @@
 #include "Geometry/BiTargetCheckCode.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{
 BiTargetCheckCode::BiTargetCheckCode(int optcode, double tolcode)
   : ABiTargetCheck()
   , _optCode(optcode)
@@ -73,4 +75,5 @@ bool BiTargetCheckCode::isOK(const SpaceTarget& T1, const SpaceTarget& T2) const
       break;
   }
   return true;
+}
 }

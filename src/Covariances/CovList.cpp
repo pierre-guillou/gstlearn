@@ -11,26 +11,27 @@
 #include "Covariances/CovList.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Iterators.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
 #include "Covariances/CovBase.hpp"
 #include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Enum/ECalcMember.hpp"
-#include "Space/ASpace.hpp"
 #include "Covariances/CovFactory.hpp"
 #include "Covariances/CovLMGradient.hpp"
 #include "Db/Db.hpp"
-#include "Space/SpacePoint.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Model/ModelFitSillsVario.hpp"
+#include "Enum/ECalcMember.hpp"
 #include "Model/ModelFitSillsVMap.hpp"
-
+#include "Model/ModelFitSillsVario.hpp"
+#include "Space/ASpace.hpp"
+#include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
-
 #include <math.h>
 #include <memory>
 #include <vector>
+
+namespace gstlrn 
+{
 
 CovList::CovList(const CovContext& ctxt)
   : ACov(ctxt)
@@ -44,7 +45,6 @@ CovList::CovList(const CovContext& ctxt)
 {
   _updateLists();
 }
-
 
 CovList::CovList(const CovList& r)
   : ACov(r)
@@ -536,18 +536,18 @@ void CovList::appendParams(ListParams& listParams,
 
 void CovList::initParams(const MatrixSymmetric& vars, double href)
 {
-  int ncov = getNCov();
+  int ncov                         = getNCov();
   MatrixSymmetric varsPerStructure = vars;
   LowerTriangularRange itRange(getNVar());
   for (const auto& [ivar, jvar]: itRange)
-      varsPerStructure.setValue(ivar, jvar, vars.getValue(ivar, jvar) / ncov);
+    varsPerStructure.setValue(ivar, jvar, vars.getValue(ivar, jvar) / ncov);
 
-  int jcov = 0;
-  int ntotal = getNCovNuggetExcluded();
+  int jcov      = 0;
+  int ntotal    = getNCovNuggetExcluded();
   double hlocal = href / ntotal / 2;
   for (int icov = 0, ncov = getNCov(); icov < ncov; icov++)
   {
-    if (getCovType(icov) != ECov::NUGGET) 
+    if (getCovType(icov) != ECov::NUGGET)
       jcov++;
     CovBase* cov = getCovModify(icov);
     cov->initParams(varsPerStructure, hlocal * jcov);
@@ -586,4 +586,5 @@ void CovList::setFitSills(AModelFitSills* amopts) const
 AModelFitSills* CovList::getFitSills() const
 {
   return _modelFitSills;
+}
 }

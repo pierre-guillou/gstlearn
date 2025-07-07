@@ -12,7 +12,8 @@
 
 #include "Polygon/Polygons.hpp"
 #include "Basic/AStringable.hpp"
-
+namespace gstlrn
+{
 Projection::Projection(bool flag_mean, double xcenter, double ycenter)
     : _flagMean(flag_mean),
       _xcenter(xcenter),
@@ -177,4 +178,5 @@ int Projection::operateOnPolygons(Polygons* poly) const
     poly->setY(ipol, yy);
   }
   return 0;
+}
 }

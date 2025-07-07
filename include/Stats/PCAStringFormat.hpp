@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Basic/AStringFormat.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT PCAStringFormat: public AStringFormat
 {
 public:
@@ -30,3 +32,4 @@ private:
   bool _flagCenter;
   bool _flagStats;
 };
+}

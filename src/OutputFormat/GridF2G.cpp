@@ -19,6 +19,8 @@
 
 #define F2G(ix,iy,iz,icol)  (tab[(ix) + nx[0] * ((iy) + nx[1] * ((iz) + nx[2] * (icol)))])
 
+namespace gstlrn
+{
 GridF2G::GridF2G(const char* filename, const Db* db)
   : AOF(filename, db)
 {
@@ -176,4 +178,5 @@ DbGrid* GridF2G::readGridFromFile()
   _fileClose();
 
   return dbgrid;
+}
 }

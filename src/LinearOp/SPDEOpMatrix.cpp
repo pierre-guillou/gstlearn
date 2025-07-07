@@ -14,6 +14,8 @@
 #include "LinearOp/ProjMultiMatrix.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
+namespace gstlrn
+{
 SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
                            const ProjMultiMatrix* A,
                            const MatrixSparse* invNoise,
@@ -97,4 +99,5 @@ VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) con
   _chol->stdev(result, projmat, true); // true for standard deviation
 
   return result;
+}
 }

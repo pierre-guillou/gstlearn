@@ -28,6 +28,7 @@
 #include "LithoRule/Rule.hpp"
 #include "LithoRule/RuleProp.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for testing the sparse matrix acovalistlgebra

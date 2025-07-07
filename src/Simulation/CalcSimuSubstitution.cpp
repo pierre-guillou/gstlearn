@@ -19,6 +19,10 @@
 
 #define TRANS(i,j)     (trans[(j) + nfacies * (i)])
 
+namespace gstlrn
+{ 
+
+
 CalcSimuSubstitution::CalcSimuSubstitution(int nbsimu, int seed, bool verbose)
     : ACalcSimulation(nbsimu, seed),
       _verbose(verbose),
@@ -408,4 +412,5 @@ int substitution(DbGrid *dbgrid,
   // Run the calculator
   int error = (simsub.run()) ? 0 : 1;
   return error;
+}
 }

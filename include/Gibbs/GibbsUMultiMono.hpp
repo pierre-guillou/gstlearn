@@ -15,6 +15,8 @@
 #include "GibbsMultiMono.hpp"
 #include "Gibbs/AGibbs.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -43,3 +45,4 @@ private:
 private:
   VectorVectorDouble _covmat; // One matrix per variable
 };
+}

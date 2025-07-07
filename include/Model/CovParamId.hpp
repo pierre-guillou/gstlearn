@@ -15,6 +15,9 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ICloneable.hpp"
 
+namespace gstlrn
+{
+
 /**
  * This class is used:
  * - to define the constraints for the Model Automatic Fitting (authAssign true)
@@ -67,3 +70,4 @@ private:
   int       _iv1;        /* Rank of the first variable */
   int       _iv2;        /* Rank of the second variable */
 };
+}

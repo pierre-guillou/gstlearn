@@ -15,11 +15,13 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/AStringable.hpp"
 
-class Db;
-class Model;
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Node: public AStringable
 {
+class Db;
+class Model;
 public:
   Node(const String& nodnam, int orient, int facies);
   Node(const String& nodnam,
@@ -131,3 +133,4 @@ private:
   double _cdf2min; /* CDF for Lower bound along second gaussian */
   double _cdf2max; /* CDF for Upper bound along second gaussian */
 };
+}

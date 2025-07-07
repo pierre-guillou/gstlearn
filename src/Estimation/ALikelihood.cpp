@@ -17,6 +17,8 @@
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Model/ModelGeneric.hpp"
 
+namespace gstlrn
+{
 ALikelihood::ALikelihood(ModelGeneric* model,
                          const Db* db,
                          bool reml)
@@ -171,4 +173,5 @@ double ALikelihood::computeLogLikelihood(bool verbose)
 double ALikelihood::computeCost(bool verbose)
 {
   return -computeLogLikelihood(verbose);
+}
 }

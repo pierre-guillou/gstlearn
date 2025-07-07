@@ -16,6 +16,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT CovCalcMode : public AStringable
 {
 public:
@@ -48,3 +50,4 @@ private:
   bool          _unitary;        /*! True to calculate covariance without sill (in Goulard) */
   int           _orderVario;     /*! Higher Variogram Order (0: standard) */
 };
+}

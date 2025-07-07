@@ -9,28 +9,30 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovAnisoList.hpp"
-#include "Basic/ParamInfo.hpp"
-#include "Enum/EModelProperty.hpp"
-
+#include "Anamorphosis/AnamHermite.hpp"
 #include "Basic/ListParams.hpp"
-#include "Covariances/CovCalcMode.hpp"
-#include "Covariances/CovContext.hpp"
-#include "Covariances/CovList.hpp"
-#include "Space/ASpace.hpp"
+#include "Basic/ParamInfo.hpp"
 #include "Basic/Utilities.hpp"
 #include "Covariances/CovAniso.hpp"
+#include "Covariances/CovCalcMode.hpp"
+#include "Covariances/CovContext.hpp"
 #include "Covariances/CovFactory.hpp"
-#include "Covariances/CovLMGradient.hpp"
+#include "Covariances/CovLMCAnamorphosis.hpp"
 #include "Covariances/CovLMCConvolution.hpp"
 #include "Covariances/CovLMCTapering.hpp"
-#include "Covariances/CovLMCAnamorphosis.hpp"
+#include "Covariances/CovLMGradient.hpp"
+#include "Covariances/CovList.hpp"
 #include "Db/Db.hpp"
-#include "Anamorphosis/AnamHermite.hpp"
+#include "Enum/EModelProperty.hpp"
+#include "Space/ASpace.hpp"
 #include "geoslib_define.h"
 
 #include <cstddef>
 #include <math.h>
 #include <vector>
+
+namespace gstlrn
+{
 
 CovAnisoList::CovAnisoList(const CovContext& ctxt)
   : CovList(ctxt)
@@ -452,11 +454,11 @@ bool CovAnisoList::isChangeSupportDefined() const
   return getAnam()->isChangeSupportDefined();
 }
 
-const AnamHermite* CovAnisoList::getAnamHermite() const
+const gstlrn::AnamHermite* CovAnisoList::getAnamHermite() const
 {
-  const AAnam* anam = getAnam();
+  const gstlrn::AAnam* anam = getAnam();
   if (anam == nullptr) return nullptr;
-  const AnamHermite* anamH = dynamic_cast<const AnamHermite*>(anam);
+  const gstlrn::AnamHermite* anamH = dynamic_cast<const gstlrn::AnamHermite*>(anam);
   return anamH;
 }
 
@@ -597,4 +599,5 @@ void CovAnisoList::appendParams(ListParams& listParams,
       }
     }
   }
+}
 }

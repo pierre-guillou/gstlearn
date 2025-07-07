@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "API/SPDEParam.hpp"
 
+namespace gstlrn
+{
 SPDEParam::SPDEParam(int refineK,
                      int refineS,
                      int border,
@@ -102,4 +104,5 @@ String SPDEParam::toString(const AStringFormat* strfmt) const
 
   sstr << _CGparams.toString() << std::endl;
   return sstr.str();
+}
 }

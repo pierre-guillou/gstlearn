@@ -39,6 +39,8 @@
 #include <stdio.h>
 #include <vector>
 
+namespace gstlrn
+{
 Db::Db()
   : AStringable()
   , ASerializable()
@@ -5886,4 +5888,6 @@ void Db::dumpGeometry(int iech, int jech) const
 
   VectorDouble angles = GH::rotationFromIncrements(incr, true);
   VH::dump("- Angles (deg) = ", angles, false);
+}
+
 }

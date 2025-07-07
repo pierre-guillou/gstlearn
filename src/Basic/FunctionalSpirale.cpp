@@ -18,6 +18,8 @@
 #include "Basic/AFunctional.hpp"
 #include <math.h>
 
+namespace gstlrn
+{
 FunctionalSpirale::FunctionalSpirale()
     : AFunctional(2),
       _a(0.),
@@ -152,4 +154,5 @@ VectorVectorDouble FunctionalSpirale::getFunctionVectors(const Db *db, const Cov
   }
 
   return vec;
+}
 }

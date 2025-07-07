@@ -18,6 +18,7 @@
 
 #include <math.h>
 
+using namespace gstlrn;
 HessianOp::HessianOp()
   : _isInitialized(false)
   , _flagSeismic(false)

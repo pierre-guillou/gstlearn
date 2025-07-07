@@ -19,6 +19,7 @@
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Matrix/NF_Triplet.hpp"
 
+using  namespace gstlrn;
 MatrixSparse* _createSparseMatrix(int n, double proba)
 {
   // We create a square matrix

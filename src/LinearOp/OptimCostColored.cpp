@@ -14,6 +14,8 @@
 #include "Basic/AException.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{
 OptimCostColored::OptimCostColored()
   : OptimCostBinary()
   , _nprop(0)
@@ -487,4 +489,5 @@ VectorVectorInt OptimCostColored::initSplit(int nfacies, bool verbose) const
   if (verbose) printSplits(splits);
 
   return splits;
+}
 }

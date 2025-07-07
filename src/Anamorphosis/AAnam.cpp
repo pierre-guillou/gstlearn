@@ -21,6 +21,8 @@
 #define QT_FLAG(j)                (QT_VARS(QT_EST,j) > 0 || \
                                    QT_VARS(QT_STD,j) > 0)
 
+namespace gstlrn{
+
 AAnam::AAnam()
     : AStringable(),
       ASerializable(),
@@ -421,4 +423,5 @@ int AAnam::rawToFactor(Db *db,
   // Run the calculator
   int error = (transfo.run()) ? 0 : 1;
   return error;
+}
 }

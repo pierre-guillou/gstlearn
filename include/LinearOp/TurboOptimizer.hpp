@@ -19,6 +19,8 @@
 #define TO_ncorner 3
 #define TO_npercell 2
 
+namespace gstlrn
+{ 
 typedef struct
 {
   VectorInt rows;
@@ -239,3 +241,4 @@ private:
                                              int col_end,
                                              const TripletND& triplet) const;
 };
+}

@@ -13,6 +13,9 @@
 #include "Covariances/ACovFuncWithAutoDiff.hpp"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
+  // Forward declaration
 class CovContext;
 class TurningBandOperate;
 
@@ -73,3 +76,4 @@ protected:
   VectorDouble _evaluateSpectrumOnSphere(int n, double scale = 1.) const override;
  // double _evaluateCovDerivative(double h) const override;
 };
+}

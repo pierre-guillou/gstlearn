@@ -15,6 +15,8 @@
 
 #include <string>
 
+namespace gstlrn
+{
 NamingConvention::NamingConvention(const String& prefix,
                                    bool flag_varname,
                                    bool flag_qualifier,
@@ -495,4 +497,5 @@ String NamingConvention::toString(const AStringFormat* /*strfmt*/) const
   sstr << "- Clean any other similar locator = " << _cleanSameLocator << std::endl;
 
   return sstr.str();
+}
 }

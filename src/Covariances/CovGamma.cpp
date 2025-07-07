@@ -9,26 +9,27 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGamma.hpp"
-
-#include "math.h"
 #include "Covariances/CovContext.hpp"
+#include "math.h"
 
+namespace gstlrn
+{
 CovGamma::CovGamma(const CovContext& ctxt)
-: ACovFunc(ECov::GAMMA, ctxt)
+  : ACovFunc(ECov::GAMMA, ctxt)
 {
   setParam(1);
 }
 
-CovGamma::CovGamma(const CovGamma &r)
-: ACovFunc(r)
+CovGamma::CovGamma(const CovGamma& r)
+  : ACovFunc(r)
 {
 }
 
-CovGamma& CovGamma::operator=(const CovGamma &r)
+CovGamma& CovGamma::operator=(const CovGamma& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -41,7 +42,7 @@ double CovGamma::getScadef() const
 {
   double param = getParam();
   if (param < 0.05) param = 1.; // This test is too avoid passing too small number to next line
-  double scadef = pow(20.,1. / param) - 1.;
+  double scadef = pow(20., 1. / param) - 1.;
   return (scadef);
 }
 
@@ -55,4 +56,5 @@ double CovGamma::_evaluateCov(double h) const
 String CovGamma::getFormula() const
 {
   return "C(h)=\\frac{1}{\\left( 1+ \\frac{h}{a_t} \\right)^\\alpha";
+}
 }

@@ -54,6 +54,8 @@
 
 /*! \endcond */
 
+namespace gstlrn{
+
 static double GIBBS_RHO, GIBBS_SQR;
 static Modif_Categorical ModCat = {0, {0, 0}, NULL, NULL};
 
@@ -2927,4 +2929,5 @@ MatrixDense fluid_extract(DbGrid* dbgrid,
     message("Total Volume of Cells in Time Slice = %lf\n", locvol);
   }
   return tab;
+}
 }

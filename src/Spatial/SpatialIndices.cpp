@@ -21,6 +21,9 @@
 #include "Variogram/VMap.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
+
 SpatialIndices::SpatialIndices(Db* db)
   : _db(db)
   , _center()
@@ -790,4 +793,5 @@ std::vector<SpacePoint> SpatialIndices::getPatches(const String &name,
 
   centers.push_back(globalCenter);
   return centers;
+}
 }

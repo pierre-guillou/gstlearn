@@ -14,6 +14,8 @@
 
 #include "Matrix/MatrixDense.hpp"
 
+namespace gstlrn
+{
 class Cheb_Elem;
 
 GSTLEARN_EXPORT int mvndst_infin(double low, double sup);
@@ -100,3 +102,4 @@ GSTLEARN_EXPORT MatrixDense fillLegendreMatrix(const VectorDouble &r,
                                                      int legendreOrder);
 GSTLEARN_EXPORT int solve_P2(double a, double b, double c, VectorDouble& x);
 GSTLEARN_EXPORT int solve_P3(double a, double b, double c, double d, VectorDouble& x);
+}

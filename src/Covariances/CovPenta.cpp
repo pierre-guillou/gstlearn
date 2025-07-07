@@ -9,24 +9,25 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovPenta.hpp"
-
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovPenta::CovPenta(const CovContext& ctxt)
-: ACovFunc(ECov::PENTA, ctxt)
+  : ACovFunc(ECov::PENTA, ctxt)
 {
 }
 
-CovPenta::CovPenta(const CovPenta &r)
-: ACovFunc(r)
+CovPenta::CovPenta(const CovPenta& r)
+  : ACovFunc(r)
 {
 }
 
-CovPenta& CovPenta::operator=(const CovPenta &r)
+CovPenta& CovPenta::operator=(const CovPenta& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -49,3 +50,4 @@ double CovPenta::_evaluateCov(double h) const
   return (cov);
 }
 
+}

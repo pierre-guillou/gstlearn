@@ -16,6 +16,8 @@
 #include "Covariances/ACovGradient.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 class Rotation;
 
 /**
@@ -79,3 +81,4 @@ private:
   double _ballRadius;   /*! Radius of the Ball for Numerical Gradient calculation */
 };
 
+}

@@ -23,6 +23,7 @@
 #include "Estimation/CalcKriging.hpp"
 #include <string>
 
+using namespace gstlrn;
 void st_bench_writing_in_matrix(int nrows, int ncols, Timer& timer)
 {
   mestitle(1, "Writing into the Rectangular Covariance Matrix");

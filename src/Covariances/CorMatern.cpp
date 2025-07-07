@@ -8,31 +8,32 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-
 #include "Covariances/CorMatern.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/MathFunc.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/CorAniso.hpp"
+#include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Space/ASpace.hpp"
 #include "Space/SpaceComposite.hpp"
 #include "Space/SpacePoint.hpp"
-#include "Covariances/CovCalcMode.hpp"
 #include "geoslib_define.h"
-#include "Basic/MathFunc.hpp"
 
 #include <cmath>
 #include <vector>
 
+namespace gstlrn
+{
 CorMatern::CorMatern(const VectorDouble &ranges,
                      const VectorDouble &angles,
                      const VectorDouble& coeffScales, 
                      const VectorDouble& params ,
                      bool flagRange)
   : ACov()
-  , _nVar((int) params.size())
-  , _corRef(CorAniso::createAnisotropic(CovContext(1, (int) ranges.size()),ECov::MATERN, ranges, params[0], angles, flagRange))
+  , _nVar((int)params.size())
+  , _corRef(CorAniso::createAnisotropic(CovContext(1, (int)ranges.size()), ECov::MATERN, ranges, params[0], angles, flagRange))
   , _corMatern(*_corRef)
   , _coeffScales(coeffScales)
   , _params(params)
@@ -43,10 +44,10 @@ CorMatern::CorMatern(const VectorDouble &ranges,
   {
     messerr("CorMatern: inconsistent size between coeffScales and params");
     messerr("CorMatern: coeffScales size = %d, params size = %d", _coeffScales.size(), _nVar);
-    _nVar = 0;
-    _corMax = MatrixSymmetric(0);
+    _nVar        = 0;
+    _corMax      = MatrixSymmetric(0);
     _coeffScales = VectorDouble();
-    _params = VectorDouble();
+    _params      = VectorDouble();
     return;
   }
   _coeffScales.push_front(1.);
@@ -57,19 +58,19 @@ CorMatern::CorMatern(const VectorDouble &ranges,
     _corMax.setValue(ivar, ivar, 1.);
     for (int jvar = ivar + 1; jvar < _nVar; jvar++)
     {
-      double scalei = _coeffScales[ivar];
-      double scalej = _coeffScales[jvar];
-      double scaleij = computeScale(ivar,jvar);
-      double nui = _params[ivar];
-      double nuj = _params[jvar];
-      double nuij = computeParam(ivar,jvar);
-      double gni =  exp(loggamma(nui));
-      double gnj =  exp(loggamma(nuj));
-      double gnij = exp(loggamma(nuij));
-      double ratioi = gni / pow(scalei, 2. * nui);
-      double ratioj = gnj / pow(scalej, 2. * nuj);
+      double scalei  = _coeffScales[ivar];
+      double scalej  = _coeffScales[jvar];
+      double scaleij = computeScale(ivar, jvar);
+      double nui     = _params[ivar];
+      double nuj     = _params[jvar];
+      double nuij    = computeParam(ivar, jvar);
+      double gni     = exp(loggamma(nui));
+      double gnj     = exp(loggamma(nuj));
+      double gnij    = exp(loggamma(nuij));
+      double ratioi  = gni / pow(scalei, 2. * nui);
+      double ratioj  = gnj / pow(scalej, 2. * nuj);
       double ratioij = gnij / pow(scaleij, 2. * nuij);
-      double val = ratioij / sqrt(ratioi * ratioj);
+      double val     = ratioij / sqrt(ratioi * ratioj);
       _corMax.setValue(ivar, jvar, val);
     }
   }
@@ -78,13 +79,13 @@ CorMatern::CorMatern(const VectorDouble &ranges,
 CorMatern::CorMatern(const CorMatern& r)
   : ACov(r)
   , _corMatern(r._corMatern)
-{   
-    _nVar = r._nVar;
-    _corRef = r._corRef;
-    _coeffScales = r._coeffScales;
-    _params = r._params;
-    _corMax = r._corMax;
-    _angles = r._angles;
+{
+  _nVar        = r._nVar;
+  _corRef      = r._corRef;
+  _coeffScales = r._coeffScales;
+  _params      = r._params;
+  _corMax      = r._corMax;
+  _angles      = r._angles;
 }
 
 CorMatern& CorMatern::operator=(const CorMatern& r)
@@ -92,27 +93,27 @@ CorMatern& CorMatern::operator=(const CorMatern& r)
   if (this != &r)
   {
     ACov::operator=(r);
-    _nVar = r._nVar;
-    _corMatern = r._corMatern;
+    _nVar        = r._nVar;
+    _corMatern   = r._corMatern;
     _coeffScales = r._coeffScales;
-    _params = r._params;
-    _corMax = r._corMax;
-    _angles = r._angles;
+    _params      = r._params;
+    _corMax      = r._corMax;
+    _angles      = r._angles;
   }
   return *this;
 }
 
 double CorMatern::computeScale(int ivar, int jvar) const
-{ 
-    if (ivar == jvar)
-    {
-        return  _coeffScales[ivar];
-    }
-    double ci2 =  _coeffScales[ivar] * _coeffScales[ivar];
-    double cj2 =  _coeffScales[jvar] * _coeffScales[jvar];
-   
-    return sqrt( 0.5 * (ci2+ cj2));
-} 
+{
+  if (ivar == jvar)
+  {
+    return _coeffScales[ivar];
+  }
+  double ci2 = _coeffScales[ivar] * _coeffScales[ivar];
+  double cj2 = _coeffScales[jvar] * _coeffScales[jvar];
+
+  return sqrt(0.5 * (ci2 + cj2));
+}
 
 double CorMatern::computeParam(int ivar, int jvar) const
 {
@@ -122,7 +123,7 @@ double CorMatern::computeParam(int ivar, int jvar) const
   }
 
   return 0.5 * (_params[ivar] + _params[jvar]);
-} 
+}
 
 CorMatern::~CorMatern()
 {
@@ -154,7 +155,7 @@ double CorMatern::_eval(const SpacePoint& p1,
                         int jvar,
                         const CovCalcMode* mode) const
 {
-    _corMatern.setParam(computeParam(ivar, jvar));
+  _corMatern.setParam(computeParam(ivar, jvar));
 
     VectorDouble scales = _corRef->getScales();
   
@@ -167,3 +168,4 @@ double CorMatern::_eval(const SpacePoint& p1,
     return _corMax.getValue(ivar, jvar) * _corMatern.evalCov(p1, p2, 0 , 0 , mode);
 }
 
+}

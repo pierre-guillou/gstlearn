@@ -23,6 +23,8 @@
 
 #include <algorithm>
 
+namespace gstlrn
+{
 AMesh::AMesh()
     : AStringable(),
       ASerializable(),
@@ -925,3 +927,4 @@ bool AMesh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

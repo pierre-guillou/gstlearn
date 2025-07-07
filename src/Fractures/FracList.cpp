@@ -29,6 +29,8 @@
 #define WELLOUT(is, i)    (wellout[NBYWOUT * (is) + (i)])
 #define TRAJ(ip, i)       (traj[2 * (ip) + (i)])
 
+namespace gstlrn
+{
 FracList::FracList(int ndisc, bool flag_check, double low0, double low1, double eps)
   : AStringable()
   , _descs()
@@ -1736,3 +1738,5 @@ void FracList::_plungeSegmentGradual(DbGrid* dbgrid,
     }
   }
 }
+}
+

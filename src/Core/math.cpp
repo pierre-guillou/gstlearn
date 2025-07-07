@@ -20,6 +20,8 @@
 #define NELEM(ctables)        ((ctables->flag_cumul) ? ctables->ndisc + 1 : ctables->ndisc)
 /*! \endcond */
 
+namespace gstlrn
+{
 /****************************************************************************
  **
  ** FUNCTION: st_tableone_manage
@@ -671,4 +673,5 @@ int ct_tableone_getrank_from_proba(CTables* ctables,
   iad = MIN(nelem, iad);
 
   return (iad);
+}
 }

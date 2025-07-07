@@ -10,6 +10,8 @@
 #include <vector>
 #include <functional>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ListParams: public AStringable
 {
 public:
@@ -49,3 +51,4 @@ private:
   std::vector<size_t> _dispatch;
   std::vector<size_t> _dispatchIndex; // Indexes for dispatching parameters
 };
+}

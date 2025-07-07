@@ -9,25 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovStorkey.hpp"
-
-#include <math.h>
 #include "Covariances/CovContext.hpp"
+#include <math.h>
 
+namespace gstlrn
+{
 CovStorkey::CovStorkey(const CovContext& ctxt)
-: ACovFunc(ECov::STORKEY, ctxt)
+  : ACovFunc(ECov::STORKEY, ctxt)
 {
 }
 
-CovStorkey::CovStorkey(const CovStorkey &r)
-: ACovFunc(r)
+CovStorkey::CovStorkey(const CovStorkey& r)
+  : ACovFunc(r)
 {
 }
 
-CovStorkey& CovStorkey::operator=(const CovStorkey &r)
+CovStorkey& CovStorkey::operator=(const CovStorkey& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -45,3 +46,4 @@ double CovStorkey::_evaluateCov(double h) const
   return (cov);
 }
 
+}

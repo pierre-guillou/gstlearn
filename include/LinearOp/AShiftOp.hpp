@@ -12,10 +12,9 @@
 
 #include "Enum/EPowerPT.hpp"
 #include "Basic/ICloneable.hpp"
-#include "Mesh/AMesh.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Basic/VectorT.hpp"
-
+#include "Mesh/AMesh.hpp"
 #include <memory>
 
 #ifndef SWIG
@@ -24,20 +23,24 @@
 #include <Eigen/Dense>
 #endif
 
-class CovAniso;
-class EConsElem;
-
-/**
- * \brief Shift Operator for performing the basic tasks of SPDE
- */
-
 #ifndef SWIG
 #  include "LinearOp/ALinearOpEigenCG.hpp"
-DECLARE_EIGEN_TRAITS(AShiftOp)
 #else
 #  include "LinearOp/ALinearOp.hpp"
 #endif
+namespace gstlrn {
+class CovAniso;
+class EConsElem;
+class ICloneable;
 
+}
+/**
+ * \brief Shift Operator for performing the basic tasks of SPDE
+ */
+using namespace gstlrn;
+#ifndef SWIG
+DECLARE_EIGEN_TRAITS(AShiftOp)
+#endif
 class GSTLEARN_EXPORT AShiftOp: public ICloneable,
 #ifndef SWIG
   public ALinearOpEigenCG<AShiftOp>

@@ -17,6 +17,7 @@
 #include "Basic/File.hpp"
 #include "Basic/Law.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

@@ -9,29 +9,29 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovPower.hpp"
+#include "Basic/MathFunc.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Simulation/TurningBandOperate.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/MathFunc.hpp"
-
 #include <math.h>
 
+namespace gstlrn
+{
 CovPower::CovPower(const CovContext& ctxt)
-: ACovFunc(ECov::POWER, ctxt)
+  : ACovFunc(ECov::POWER, ctxt)
 {
   setParam(1);
 }
 
-CovPower::CovPower(const CovPower &r)
-: ACovFunc(r)
+CovPower::CovPower(const CovPower& r)
+  : ACovFunc(r)
 {
 }
 
-CovPower& CovPower::operator=(const CovPower &r)
+CovPower& CovPower::operator=(const CovPower& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -44,11 +44,11 @@ double CovPower::_evaluateCov(double h) const
 {
   double a;
 
-  int ndim = getContext().getNDim();
+  int ndim     = getContext().getNDim();
   double alpha = getParam();
-  double r = getContext().getField();
-  double ra = pow(r, alpha);
-  double g1 = loggamma((alpha + 1.) / 2.) + loggamma(1. - alpha / 2.);
+  double r     = getContext().getField();
+  double ra    = pow(r, alpha);
+  double g1    = loggamma((alpha + 1.) / 2.) + loggamma(1. - alpha / 2.);
 
   if (ndim == 1)
     a = exp(g1) * ra / sqrt(GV_PI);
@@ -62,7 +62,8 @@ double CovPower::_evaluateCov(double h) const
   return (cov);
 }
 
-double CovPower::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovPower::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.cosineOne(t0);
+}
 }

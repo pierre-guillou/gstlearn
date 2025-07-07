@@ -17,6 +17,8 @@
 #include <vector>
 
 
+namespace gstlrn
+{
 class Chebychev;
 /**
  * Class to store objects for SPDE
@@ -91,3 +93,4 @@ private:
   mutable std::vector<std::vector<double>> _work2;
   mutable std::vector<std::vector<double>> _work3;
 };
+}

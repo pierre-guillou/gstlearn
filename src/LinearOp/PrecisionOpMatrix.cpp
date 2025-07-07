@@ -21,6 +21,8 @@
 #include "Mesh/AMesh.hpp"
 #include "Basic/AException.hpp"
 
+namespace gstlrn
+{
 PrecisionOpMatrix::PrecisionOpMatrix(ShiftOpMatrix* shiftop,
                                      const CovAniso* cova,
                                      bool verbose)
@@ -310,4 +312,5 @@ MatrixSparse* PrecisionOpMatrix::_build_Q()
 VectorDouble PrecisionOpMatrix::extractDiag() const
 {
   return _Q->extractDiag();
+}
 }

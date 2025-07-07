@@ -16,6 +16,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 class ACov;
 class CorAniso;
 /**
@@ -61,3 +63,4 @@ private:
   mutable CorAniso _covSCopy;
 };
 
+}

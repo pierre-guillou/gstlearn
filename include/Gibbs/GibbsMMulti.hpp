@@ -15,9 +15,12 @@
 #include "Gibbs/GibbsMulti.hpp"
 #include "LinearOp/CholeskySparse.hpp"
 
-class MatrixSparse;
+
+namespace gstlrn
+{
 class Db;
 class Model;
+class MatrixSparse;
 
 class GSTLEARN_EXPORT GibbsMMulti: public GibbsMulti
 {
@@ -65,3 +68,4 @@ private:
 
   mutable VectorDouble _weights;
 };
+}

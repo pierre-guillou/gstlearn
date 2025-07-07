@@ -18,8 +18,10 @@
 #include "Variogram/AVario.hpp"
 #include "Variogram/VarioParam.hpp"
 
-class Db;
+namespace gstlrn
+{
 class ECalcVario;
+class Db;
 
 /**
  * \brief
@@ -123,3 +125,4 @@ GSTLEARN_EXPORT DbGrid* db_vmap(Db *db,
                                 int radius = 0,
                                 bool flag_FFT = true,
                                 const NamingConvention &namconv = NamingConvention("VMAP"));
+}

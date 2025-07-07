@@ -22,6 +22,9 @@
 #define LSTACK    1000
 #define MINI        10
 
+namespace gstlrn 
+{
+
 static EDbg _debugOptions = EDbg::DB;
 static bool _internalDebug = false;
 
@@ -1247,4 +1250,5 @@ bool isEqualExtended(double v1,
     return false;
   }
   return true;
+}
 }

@@ -24,6 +24,8 @@
 
 /*! \endcond */
 
+namespace gstlrn
+{
 static char BUFFER[STRING_LENGTH];
 static char DEL_COM = '#';
 static char DEL_BLK = ' ';
@@ -46,6 +48,7 @@ static char* cur = NULL;
 #  define strncasecmp _strnicmp
 #  define strcasecmp  _stricmp
 #endif
+
 
 /****************************************************************************/
 /*!
@@ -1148,4 +1151,6 @@ int _record_read(FILE* file, const char* format, ...)
   error = _file_read(file, format, ap);
   va_end(ap);
   return (error);
+}
+
 }

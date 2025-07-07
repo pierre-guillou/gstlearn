@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Basic/VectorNumT.hpp"
 #include "Enum/ESpaceType.hpp"
 
 #include "Space/ASpaceObject.hpp"
@@ -18,8 +19,9 @@
 #include "Neigh/NeighMoving.hpp"
 #include "Tree/Ball.hpp"
 
-VectorDouble
-getSortedDistance(Db* data, const VectorInt& ranks, const SpaceTarget& Pt)
+using namespace gstlrn;
+
+VectorDouble getSortedDistance(Db* data, const VectorInt& ranks, const SpaceTarget& Pt)
 {
   int size = (int)ranks.size();
   SpaceTarget Dt;

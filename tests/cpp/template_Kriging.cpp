@@ -28,6 +28,8 @@
 #include "Estimation/KrigOpt.hpp"
 #include "Estimation/KrigingAlgebra.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

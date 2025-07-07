@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <memory>
 
+namespace gstlrn
+{
 PrecisionOp::PrecisionOp()
   : _shiftOp(nullptr)
   , _cova(nullptr)
@@ -572,4 +574,5 @@ VectorDouble PrecisionOp::extractDiag() const
     vec[i]        = _polynomials[power]->evalOpByRank(a->getS(), i) * lambda * lambda;
   }
   return vec;
+}
 }

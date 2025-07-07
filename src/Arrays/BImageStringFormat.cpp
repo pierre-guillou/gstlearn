@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Arrays/BImageStringFormat.hpp"
 
+namespace gstlrn
+{
 BImageStringFormat::BImageStringFormat(char zero,
                                        char one,
                                        const VectorInt& indMin,
@@ -58,4 +60,5 @@ int BImageStringFormat::getIndMax(int idim) const
 {
   if (idim < (int)_indMax.size()) return _indMax[idim];
   return ITEST;
+}
 }

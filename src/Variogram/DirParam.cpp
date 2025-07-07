@@ -20,6 +20,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 DirParam::DirParam(int nlag,
                    double dlag,
                    double toldis,
@@ -440,4 +442,5 @@ int DirParam::getLagRank(double dist) const
   if (ilag < 0 || ilag >= getNLag()) return (ITEST);
 
   return ilag;
+}
 }

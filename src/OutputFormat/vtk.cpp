@@ -66,6 +66,8 @@ License: BSD 3-clause
  * Globals.
  */
  
+ namespace gstlrn
+{
 static FILE *fp = NULL;
 static int useBinary = 0;
 static int numInColumn = 0;
@@ -1055,4 +1057,5 @@ void write_curvilinear_mesh(const char* filename,
   write_variables(nvars, vardim, centering, varnames, vars, npts, ncells);
  
   close_file();
+}
 }

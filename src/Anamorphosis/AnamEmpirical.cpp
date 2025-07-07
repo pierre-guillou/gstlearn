@@ -22,6 +22,9 @@
 #define ANAM_YMIN -10.
 #define ANAM_YMAX  10.
 
+namespace gstlrn
+{ 
+
 AnamEmpirical::AnamEmpirical(int ndisc, double sigma2e, bool flagDilution, bool flagGaussian)
     : AnamContinuous(),
       _flagDilution(flagDilution),
@@ -536,3 +539,4 @@ bool AnamEmpirical::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) 
   return ret;
 }
 #endif
+}

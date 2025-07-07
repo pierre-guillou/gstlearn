@@ -13,6 +13,8 @@
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{ 
 class AModelOptim;
 class ModelGeneric;
 class Db;
@@ -45,3 +47,4 @@ public:
                              int nb_neighVecchia = ITEST,
                              bool reml = false);
 };
+}

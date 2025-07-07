@@ -19,7 +19,10 @@
 #include <vector>
 
 class AShiftOp;
+
+namespace gstlrn {
 class ALinearOp;
+
 
 class GSTLEARN_EXPORT ClassicalPolynomial : public APolynomial
 {
@@ -76,3 +79,4 @@ private:
   mutable std::vector<double> _work2;
 #endif
 };
+}

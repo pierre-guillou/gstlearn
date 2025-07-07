@@ -11,6 +11,8 @@
 #include "Geometry/BiTargetCheckFaults.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{
 BiTargetCheckFaults::BiTargetCheckFaults(const Faults* faults)
   : ABiTargetCheck()
   , _faults(faults)
@@ -57,4 +59,5 @@ bool BiTargetCheckFaults::isOK(const SpaceTarget& T1,
 {
   if (_faults == nullptr) return true;
   return !_faults->isSplitByFaultSP(T1.getCoordAsSP(), T2.getCoordAsSP());
+}
 }

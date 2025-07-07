@@ -26,6 +26,8 @@ namespace H5
   class Group;
 };
 
+namespace gstlrn{
+
 class GSTLEARN_EXPORT ASerializable
 {
 public:
@@ -151,4 +153,5 @@ bool ASerializable::_recordReadVecInPlace(std::istream& is,
                                           int nvalues)
 {
   return SerializeNeutralFile::recordReadVecInPlace<T>(is, title, it, nvalues);
+}
 }

@@ -15,6 +15,8 @@
 #include "LinearOp/ProjMatrix.hpp"
 #include <vector>
 
+namespace gstlrn
+{
 ProjConvolution::ProjConvolution(const VectorDouble &convolution,
                                  const DbGrid *grid_point,
                                  const VectorInt& nodeRes2D,
@@ -330,4 +332,5 @@ int ProjConvolution::getNPoint() const
 {
   VectorInt nxs = _gridSeismic->getNXs();
   return VH::product(nxs);
+}
 }

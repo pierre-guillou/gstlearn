@@ -86,6 +86,8 @@
 #define YMEAN(ilayer,iech)   (ymean[(ilayer) * nech    + (iech)])
 #define DCOEF(ilayer)        (m2denv->dcoef[ilayer])
 
+namespace gstlrn
+{
 typedef struct
 {
   std::vector<SPDE_Matelem> Matelems;
@@ -8824,4 +8826,5 @@ int m2d_gibbs_spde(Db *dbin,
   if (error && iatt_out >= 0)
     dbout->deleteColumnsByUIDRange(iatt_out, nlayer);
   return (error);
+}
 }

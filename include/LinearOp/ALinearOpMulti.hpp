@@ -14,7 +14,9 @@
 #include <vector>
 #include "geoslib_define.h"
 
-class ALinearOpMulti;
+namespace gstlrn
+{
+  class LogStats;
 
 class GSTLEARN_EXPORT ALinearOpMulti {
 
@@ -76,3 +78,4 @@ public:
 protected:
   LogStats                   _logStats;
 };
+}

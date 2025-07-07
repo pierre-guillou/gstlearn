@@ -31,6 +31,7 @@
 #include "LinearOp/ShiftOpMatrix.hpp"
 #include "API/SPDE.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program
@@ -151,7 +152,7 @@ int main(int argc, char *argv[])
         law_set_random_seed(13243);
         SPDEParam params;
         params.setNMC(10);
-        (void)krigingSPDE(dat, grid, model, true, true, useCholesky,
+        (void)gstlrn::krigingSPDE(dat, grid, model, true, true, useCholesky,
                           VectorMeshes(), nullptr, VectorMeshes(), nullptr, params,
                           NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 400);
@@ -166,7 +167,7 @@ int main(int argc, char *argv[])
         namconv.append(option);
         namconv.append(sncov);
         law_set_random_seed(seed);
-        (void)simulateSPDE(nullptr, grid, model, nsim, useCholesky,
+        (void)gstlrn::simulateSPDE(nullptr, grid, model, nsim, useCholesky,
                            VectorMeshes(), nullptr, VectorMeshes(), nullptr,
                            SPDEParam(),
                            NamingConvention(namconv));
@@ -182,7 +183,7 @@ int main(int argc, char *argv[])
         namconv.append(option);
         namconv.append(sncov);
         law_set_random_seed(seed);
-        (void)simulateSPDE(dat, grid, model, nsim, useCholesky,
+        (void)gstlrn::simulateSPDE(dat, grid, model, nsim, useCholesky,
                            VectorMeshes(), nullptr, VectorMeshes(), nullptr, 
                            SPDEParam(),
                            NamingConvention(namconv));

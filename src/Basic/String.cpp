@@ -26,6 +26,8 @@
 #include <stdarg.h>
 #include <math.h>
 
+namespace gstlrn
+{ 
 /**
  * Protect the matching pattern against Crash which happens when the string
  * contains "*" without any preceding character
@@ -873,4 +875,4 @@ VectorInt decodeGridSorting(const String& string,
   }
   return (order);
 }
-
+}

@@ -17,6 +17,8 @@
 #include <Eigen/SparseCore>
 #include <Eigen/SparseCholesky>
 
+namespace gstlrn
+{
 typedef Eigen::SparseMatrix<double>::StorageIndex StorageIndex;
 
 template<typename SpMat>
@@ -166,4 +168,5 @@ typename SpChol::MatrixType partial_inverse(
   // elements of Q
   return Qinv;
   // return MatchPattern(Qinv, pattern)();
+}
 }

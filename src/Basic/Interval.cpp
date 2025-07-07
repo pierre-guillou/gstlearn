@@ -11,6 +11,8 @@
 #include "Basic/Interval.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{ 
 Interval::Interval(double vmin, double vmax, bool mininc, bool maxinc)
     : AStringable(),
       _vmin(vmin),
@@ -184,4 +186,5 @@ bool Interval::_isValidInterval(void) const
     return false;
   }
   return true;
+}
 }

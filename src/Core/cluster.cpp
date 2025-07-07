@@ -32,6 +32,8 @@ License: BSD 3-clause
 #define CDATA(icl, ivar)  (cdata[(icl) * nvar + (ivar)])
 #define DISTMATRIX(i, j)  (distmatrix[(i) * nech + (j)])
 
+namespace gstlrn
+{
 /*****************************************************************************/
 /*!
  **  Calculate the distance between two samples
@@ -635,4 +637,5 @@ VectorInt kmedoids(const VectorDouble& data,
 
 label_end:
   return (clusterid);
+}
 }

@@ -33,6 +33,8 @@
 #define MAT(i,j)            (mat[(i) * n + (j)])
 #define DEBUG 0
 
+namespace gstlrn
+{ 
 static int flagUpdateNonzero = 1;
 
 static int _cs_update_nonzero_value(int row, int col, double value)
@@ -3495,4 +3497,5 @@ void cs_gibbs(const cs* A, int iech, const VectorDouble& zcur, double* yk, doubl
     else
       *yk -= coeff * zcur[jech];
   }
+}
 }

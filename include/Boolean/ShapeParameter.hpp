@@ -15,6 +15,8 @@
 #include "Enum/ELaw.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 // TODO Will be replaced by future class"Law" or "Distribution" which does not
 // actually exist
 class GSTLEARN_EXPORT ShapeParameter: public AStringable
@@ -45,3 +47,4 @@ private:
   ELaw _law; /* Type of law */
   VectorDouble _valarg; /* Randomization arguments */
 };
+}

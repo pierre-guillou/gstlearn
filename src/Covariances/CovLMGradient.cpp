@@ -8,32 +8,33 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Space/ASpace.hpp"
-#include "Space/SpacePoint.hpp"
 #include "Covariances/CovLMGradient.hpp"
 #include "Covariances/CovAnisoList.hpp"
 #include "Covariances/CovGradientFunctional.hpp"
+#include "Space/ASpace.hpp"
+#include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 CovLMGradient::CovLMGradient(const CovContext& ctxt)
-: CovAnisoList(ctxt)
+  : CovAnisoList(ctxt)
 {
   setOptimEnabled(false);
 }
 
-
-CovLMGradient::CovLMGradient(const CovLMGradient &r)
-: CovAnisoList(r)
+CovLMGradient::CovLMGradient(const CovLMGradient& r)
+  : CovAnisoList(r)
 {
   setOptimEnabled(false);
 }
 
 CovLMGradient::CovLMGradient(const CovAnisoList& r)
-    : CovAnisoList(r.getContext())
+  : CovAnisoList(r.getContext())
 {
   setOptimEnabled(false);
-  for (int icov = r.getNCov()-1; icov >= 0; icov--)
+  for (int icov = r.getNCov() - 1; icov >= 0; icov--)
   {
-    const CovAniso *cov = r.getCovAniso(icov);
+    const CovAniso* cov = r.getCovAniso(icov);
     if (!cov->hasCovDerivative())
     {
       messerr("The covariance %s is not compatible with Gradients",
@@ -45,13 +46,13 @@ CovLMGradient::CovLMGradient(const CovAnisoList& r)
       addCov(newcov);
     }
   }
-  for (auto &e: _covs)
+  for (auto& e: _covs)
   {
     ((CovAniso*)e.get())->setOptimEnabled(false);
   }
 }
 
-CovLMGradient& CovLMGradient::operator=(const CovLMGradient &r)
+CovLMGradient& CovLMGradient::operator=(const CovLMGradient& r)
 {
   if (this != &r)
   {
@@ -128,4 +129,5 @@ void CovLMGradient::_initGradients(double& covVal,
   for (int i = 0; i < 3; i++) covGp[i] = 0.;
   if (flagGrad)
     for (int i = 0; i < 9; i++) covGG[i] = 0.;
+}
 }

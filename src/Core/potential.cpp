@@ -34,6 +34,8 @@
 #define POTVAL(isimu, il) (potval[(isimu) * pot_env->nlayers + (il)])
 #define POTSIM(isimu, il) (potsim[(isimu) * nlayers + (il)])
 
+namespace gstlrn
+{
 typedef struct
 {
   int ndim;                /* Space dimension */
@@ -3118,7 +3120,7 @@ int potential_simulate(Db* dbiso,
   /* Processing the non-conditional simulation over the iso-values */
 
   {
-    CalcSimuTurningBands situba_new(nbsimu, nbtuba, seed);
+    gstlrn::CalcSimuTurningBands situba_new(nbsimu, nbtuba, seed);
     if (situba_new.simulatePotential(dbiso, dbgrd, dbtgt, dbout, model, delta))
       goto label_end;
   }
@@ -3668,4 +3670,5 @@ int potential_cov(Model* model,
   if (VERBOSE) print_matrix("Covariance", 0, 1, n2, n1, NULL, covtab.data());
 
   return (0);
+}
 }

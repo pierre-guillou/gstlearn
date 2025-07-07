@@ -15,6 +15,8 @@
 #include "Basic/VectorNumT.hpp"
 #include <vector>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT VectorHelper
 {
 public:
@@ -346,3 +348,4 @@ public:
 //typedef VectorHelper VH;
 class VH: public VectorHelper {};
 
+}

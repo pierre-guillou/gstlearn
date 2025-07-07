@@ -15,6 +15,9 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
+
+namespace gstlrn
+{
 class ALinearOp;
 
 class GSTLEARN_EXPORT CGParam: public AStringable
@@ -48,3 +51,4 @@ private:
   int _precondStatus;
   const ALinearOp* _precond; // External Pointer
 };
+}

@@ -15,6 +15,9 @@
 #include"Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
+ 
 class DbGrid;
 
 class GSTLEARN_EXPORT Plane : public AStringable
@@ -46,3 +49,4 @@ private:
   double _value;
   double _rndval;
 };
+}

@@ -23,814 +23,818 @@
 #include "Space/SpacePoint.hpp"
 #include "Stats/Classical.hpp"
 #include "geoslib_define.h"
+
 #include <math.h>
 
-DbLine::DbLine()
-  : Db()
-  , _lineAdds()
+namespace gstlrn
 {
-  _clear();
-}
-
-DbLine::DbLine(const DbLine& r)
-  : Db(r)
-  , _lineAdds(r._lineAdds)
-{
-}
-
-DbLine& DbLine::operator=(const DbLine& r)
-{
-  if (this != &r)
+  DbLine::DbLine()
+    : Db()
+    , _lineAdds()
   {
-    Db::operator=(r);
-    _lineAdds = r._lineAdds;
+    _clear();
   }
-  return *this;
-}
 
-DbLine::~DbLine()
-{
-}
-
-/**
- * @brief Check if the target Line number 'iline' (0-based) is valid or not
- *
- * @param iline Target Line number
- * @return true If the Line rank is valid
- * @return false otherwise
- */
-bool DbLine::_isLineNumberValid(int iline) const
-{
-  if (iline < 0)
+  DbLine::DbLine(const DbLine& r)
+    : Db(r)
+    , _lineAdds(r._lineAdds)
   {
-    messerr("Argument 'iline' should be non negative");
-    return false;
   }
-  if (iline >= getNLine())
+
+  DbLine& DbLine::operator=(const DbLine& r)
   {
-    messerr("ilin' (%d) should be smaller than Number of Lines (%d)", iline,
-            getNLine());
-    return false;
+    if (this != &r)
+    {
+      Db::operator=(r);
+      _lineAdds = r._lineAdds;
+    }
+    return *this;
   }
-  return true;
-}
 
-int DbLine::getNLine() const
-{
-  if (_lineAdds.empty()) return 0;
-  return (int)_lineAdds.size();
-}
-
-int DbLine::getNSamplePerLine(int iline) const
-{
-  if (!_isLineNumberValid(iline)) return -1;
-  return (int)_lineAdds[iline].size();
-}
-
-int DbLine::getNTotal() const
-{
-  int ntotal = 0;
-  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
-    ntotal += getNSamplePerLine(iline);
-  return ntotal;
-}
-
-double DbLine::getLineLength(int iline) const
-{
-  if (!_isLineNumberValid(iline)) return TEST;
-  double total = 0.;
-  SpacePoint P1;
-  SpacePoint P2;
-  getSampleAsSPInPlace(P1, _lineAdds[iline][0]);
-  for (int iech = 1, nech = getNSamplePerLine(iline); iech < nech; iech++)
+  DbLine::~DbLine()
   {
-    getSampleAsSPInPlace(P2, _lineAdds[iline][iech]);
-    total += P2.getDistance(P1);
-    P1 = P2;
   }
-  return total;
-}
 
-VectorDouble DbLine::getLineLengths() const
-{
-  int nline = getNLine();
-  VectorDouble lengths(nline);
-  for (int iline = 0; iline < nline; iline++)
-    lengths[iline] = getLineLength(iline);
-  return lengths;
-}
-
-String DbLine::toString(const AStringFormat* strfmt) const
-{
-  std::stringstream sstr;
-
-  const DbStringFormat* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
-  DbStringFormat dsf;
-  if (dbfmt != nullptr) dsf = *dbfmt;
-
-  sstr << toTitle(0, "Data Base Line Characteristics");
-
-  sstr << "Number of Lines = " << getNLine() << std::endl;
-  sstr << "Number of samples = " << getNSample() << std::endl;
-  sstr << "Line length = ";
-  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+  /**
+   * @brief Check if the target Line number 'iline' (0-based) is valid or not
+   *
+   * @param iline Target Line number
+   * @return true If the Line rank is valid
+   * @return false otherwise
+   */
+  bool DbLine::_isLineNumberValid(int iline) const
   {
-    if (iline > 0) sstr << " / ";
-    sstr << getNSamplePerLine(iline);
+    if (iline < 0)
+    {
+      messerr("Argument 'iline' should be non negative");
+      return false;
+    }
+    if (iline >= getNLine())
+    {
+      messerr("ilin' (%d) should be smaller than Number of Lines (%d)", iline,
+              getNLine());
+      return false;
+    }
+    return true;
   }
-  sstr << std::endl;
 
-  sstr << _toStringCommon(&dsf);
-
-  return sstr.str();
-}
-
-DbLine* DbLine::createFromSamples(int nech,
-                                  const ELoadBy& order,
-                                  const VectorDouble& tab,
-                                  const VectorInt& lineCounts,
-                                  const VectorString& names,
-                                  const VectorString& locatorNames,
-                                  bool flagAddSampleRank)
-{
-  DbLine* dbline = new DbLine;
-  if (dbline->resetFromSamples(nech, order, tab, lineCounts, names, locatorNames,
-                               flagAddSampleRank))
+  int DbLine::getNLine() const
   {
-    messerr("Error when creating DbLine from Samples");
+    if (_lineAdds.empty()) return 0;
+    return (int)_lineAdds.size();
+  }
+
+  int DbLine::getNSamplePerLine(int iline) const
+  {
+    if (!_isLineNumberValid(iline)) return -1;
+    return (int)_lineAdds[iline].size();
+  }
+
+  int DbLine::getNTotal() const
+  {
+    int ntotal = 0;
+    for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+      ntotal += getNSamplePerLine(iline);
+    return ntotal;
+  }
+
+  double DbLine::getLineLength(int iline) const
+  {
+    if (!_isLineNumberValid(iline)) return TEST;
+    double total = 0.;
+    SpacePoint P1;
+    SpacePoint P2;
+    getSampleAsSPInPlace(P1, _lineAdds[iline][0]);
+    for (int iech = 1, nech = getNSamplePerLine(iline); iech < nech; iech++)
+    {
+      getSampleAsSPInPlace(P2, _lineAdds[iline][iech]);
+      total += P2.getDistance(P1);
+      P1 = P2;
+    }
+    return total;
+  }
+
+  VectorDouble DbLine::getLineLengths() const
+  {
+    int nline = getNLine();
+    VectorDouble lengths(nline);
+    for (int iline = 0; iline < nline; iline++)
+      lengths[iline] = getLineLength(iline);
+    return lengths;
+  }
+
+  String DbLine::toString(const AStringFormat* strfmt) const
+  {
+    std::stringstream sstr;
+
+    const DbStringFormat* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
+    DbStringFormat dsf;
+    if (dbfmt != nullptr) dsf = *dbfmt;
+
+    sstr << toTitle(0, "Data Base Line Characteristics");
+
+    sstr << "Number of Lines = " << getNLine() << std::endl;
+    sstr << "Number of samples = " << getNSample() << std::endl;
+    sstr << "Line length = ";
+    for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+    {
+      if (iline > 0) sstr << " / ";
+      sstr << getNSamplePerLine(iline);
+    }
+    sstr << std::endl;
+
+    sstr << _toStringCommon(&dsf);
+
+    return sstr.str();
+  }
+
+  DbLine* DbLine::createFromSamples(int nech,
+                                    const ELoadBy& order,
+                                    const VectorDouble& tab,
+                                    const VectorInt& lineCounts,
+                                    const VectorString& names,
+                                    const VectorString& locatorNames,
+                                    bool flagAddSampleRank)
+  {
+    DbLine* dbline = new DbLine;
+    if (dbline->resetFromSamples(nech, order, tab, lineCounts, names, locatorNames,
+                                 flagAddSampleRank))
+    {
+      messerr("Error when creating DbLine from Samples");
+      delete dbline;
+      return nullptr;
+    }
+    return dbline;
+  }
+
+  DbLine* DbLine::createFromSamplesById(int nech,
+                                        const ELoadBy& order,
+                                        const VectorDouble& tab,
+                                        const VectorInt& lineIds,
+                                        const VectorInt& ranksPerId,
+                                        const VectorString& names,
+                                        const VectorString& locatorNames,
+                                        bool flagAddSampleRank)
+  {
+    DbLine* dbline = new DbLine;
+    if (dbline->resetFromSamplesById(nech, order, tab, lineIds, ranksPerId, names,
+                                     locatorNames, flagAddSampleRank))
+    {
+      messerr("Error when creating DbLine from Samples By Ids");
+      delete dbline;
+      return nullptr;
+    }
+    return dbline;
+  }
+
+  int DbLine::_lineLinkage(const VectorInt& lineCounts)
+  {
+    // Prelimnary check
+    int nech = VH::cumul(lineCounts);
+    if (nech != getNSample())
+    {
+      messerr("Cumulated number of samples given by 'lineCounts' (%d) should "
+              "match the number of samples (%d)",
+              nech, getNSample());
+      return 1;
+    }
+
+    // Count the number of lines
+    int nbline = (int)lineCounts.size();
+
+    // Create the Linkage
+    _lineAdds.resize(nbline, 0);
+
+    // Loop over the lines
+    int start = 0;
+    for (int iline = 0; iline < nbline; iline++)
+    {
+      _lineAdds[iline] = VH::sequence(lineCounts[iline], start);
+      start += lineCounts[iline];
+    }
+    return 0;
+  }
+
+  int DbLine::_lineLinkageById(const VectorInt& linesId,
+                               const VectorInt& ranksPerId)
+  {
+    int nech = getNSample();
+
+    // Preliminary checks by dimensions
+    if ((int)linesId.size() != nech)
+    {
+      messerr("Dimension of 'linesId' (%d) should match Number of samples (%d)",
+              (int)linesId.size(), nech);
+      return 1;
+    }
+    if ((int)ranksPerId.size() != nech)
+    {
+      messerr("Dimension of 'ranksPerId' (%d) should match Number of samples (%d)",
+              (int)ranksPerId.size(), nech);
+      return 1;
+    }
+
+    // Find the number of lines
+    VectorInt allLines = VH::unique(linesId);
+    int nbline         = (int)allLines.size();
+
+    // Create the Linkage
+    _lineAdds.resize(nbline, 0);
+
+    for (int iline = 0; iline < nbline; iline++)
+    {
+      int refLineId = allLines[iline];
+
+      VectorInt ranks;
+      VectorInt iadds;
+      for (int iech = 0; iech < nech; iech++)
+      {
+        if (linesId[iech] != refLineId) continue;
+        ranks.push_back(ranksPerId[iech]);
+        iadds.push_back(iech);
+      }
+
+      VectorInt sortedRanks = VH::orderRanks(ranks);
+      _lineAdds[iline]      = VH::reorder(iadds, sortedRanks);
+    }
+    return (int)!isConsistent();
+  }
+
+  /**
+   * @brief Reset the contents of a DbLine from arguments (previous contents is
+   * cleared beforehand). The line contents is provided in 'lineCounts'.
+   *
+   * @param nech Number of samples to be loaded
+   * @param order Ordering mode used for storing in 'tab' (by column or by sample)
+   * @param tab Vector containing the values to be imported
+   * @param lineCounts Vector giving the number of samples per Line (see details)
+   * @param names Names given to the output variables
+   * @param locatorNames Name of the locators given to the output variables
+   * @param flagAddSampleRank When TRUE, the 'rank' variable is added
+   * @return int Error returned code
+   *
+   * @details: Argument 'lineCounts' give the number of samples per Line.
+   * @details: This assumes that samples of per line are ordered sequentially
+   * @details and that samples of Line 'j' are followed by those of Line 'j+1'.
+   */
+  int DbLine::resetFromSamples(int nech,
+                               const ELoadBy& order,
+                               const VectorDouble& tab,
+                               const VectorInt& lineCounts,
+                               const VectorString& names,
+                               const VectorString& locatorNames,
+                               bool flagAddSampleRank)
+  {
+    if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
+                             flagAddSampleRank) != 0)
+      return 1;
+
+    // Create the Line Linkage
+
+    if (_lineLinkage(lineCounts) != 0) return 1;
+
+    return 0;
+  }
+
+  /**
+   * @brief Reset the contents of a DbLine from arguments (previous contents is
+   * cleared beforehand). The line contents is provided in 'lineIds' and
+  'ranksPerId'
+   *
+   * @param nech Number of samples to be loaded
+   * @param order Ordering mode used for storing in 'tab' (by column or by sample)
+   * @param tab Vector containing the values to be imported
+   * @param lineIds Vector giving the LineId to which each sample belongs (see details)
+   * @param ranksPerId Vector giving the ordering of samples within Line (see details)
+   * @param names Names given to the output variables
+   * @param locatorNames Name of the locators given to the output variables
+   * @param flagAddSampleRank When TRUE, the 'rank' variable is added
+   * @return int Error returned code
+   *
+   * @details: Argument 'lineIds' is dimensioned to the total number of samples.
+   * @details: For each sample, it gives Id of Line to which the sample belongs.
+   * @details: LineId must be numeric: equzl for samples of the same line and
+   * @details: different for samples of different lines
+   *
+   * @details: Argument 'ranksPerId' is dimensionned to total number of samples.
+   * @details: Along the samples belonging to one line (sharing the same LineId)
+   * @details: it should provide the ordering of the samples.
+   * @details: For one line, the values of 'ranksPerId' must be numeric:
+   * @details: they do not need to be consecutive ... simply ordered.
+   */
+  int DbLine::resetFromSamplesById(int nech,
+                                   const ELoadBy& order,
+                                   const VectorDouble& tab,
+                                   const VectorInt& lineIds,
+                                   const VectorInt& ranksPerId,
+                                   const VectorString& names,
+                                   const VectorString& locatorNames,
+                                   bool flagAddSampleRank)
+  {
+    if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
+                             flagAddSampleRank) != 0)
+      return 1;
+
+    // Create the Line Linkage
+
+    if (_lineLinkageById(lineIds, ranksPerId) != 0) return 1;
+
+    return 0;
+  }
+
+  bool DbLine::_deserializeAscii(std::istream& is, bool verbose)
+  {
+    int ndim   = 0;
+    int nbline = 0;
+    int number = 0;
+    VectorString locators;
+    VectorString names;
+    VectorDouble values;
+    VectorDouble allvalues;
+
+    /* Initializations */
+
+    bool ret = true;
+    ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
+
+    // Writing the set of addresses for Line organization
+
+    ret = ret && _recordRead<int>(is, "Number of Lines", nbline);
+    _lineAdds.resize(nbline);
+    for (int iline = 0; iline < nbline; iline++)
+    {
+      ret = ret && _recordRead<int>(is, "Number of Samples", number);
+      ret = ret && _recordReadVec<int>(is, "", _lineAdds[iline], number);
+    }
+    ret = ret && Db::_deserializeAscii(is, verbose);
+
+    return ret;
+  }
+
+  bool DbLine::_serializeAscii(std::ostream& os, bool verbose) const
+  {
+    bool ret = true;
+
+    /* Writing the header */
+
+    ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+
+    // Writing the set of addresses for Line organization
+
+    ret = ret && _recordWrite<int>(os, "Number of Lines", getNLine());
+    for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+    {
+      ret = ret && _recordWrite<int>(os, "Number of Samples", getNSamplePerLine(iline));
+      ret = ret && _recordWriteVec<int>(os, "", _lineAdds[iline]);
+    }
+
+    /* Writing the tail of the file */
+
+    ret&& Db::_serializeAscii(os, verbose);
+
+    return ret;
+  }
+
+  /**
+   * Create a Db by loading the contents of a Neutral File
+   *
+   * @param NFFilename Name of the Neutral File (Db format)
+   * @param verbose    Verbose
+   *
+   * @remarks The name does not need to be completed in particular when defined by absolute path
+   * @remarks or read from the Data Directory (in the gstlearn distribution)
+   */
+  DbLine* DbLine::createFromNF(const String& NFFilename, bool verbose)
+  {
+    DbLine* dbline = new DbLine;
+    if (dbline->_fileOpenAndDeserialize(NFFilename, verbose)) return dbline;
     delete dbline;
     return nullptr;
   }
-  return dbline;
-}
 
-DbLine* DbLine::createFromSamplesById(int nech,
-                                      const ELoadBy& order,
-                                      const VectorDouble& tab,
-                                      const VectorInt& lineIds,
-                                      const VectorInt& ranksPerId,
-                                      const VectorString& names,
-                                      const VectorString& locatorNames,
-                                      bool flagAddSampleRank)
-{
-  DbLine* dbline = new DbLine;
-  if (dbline->resetFromSamplesById(nech, order, tab, lineIds, ranksPerId, names,
-                                   locatorNames, flagAddSampleRank))
+  /**
+   * @brief Create a DbLine from the following information provided as input
+  arguments
+   *
+   * @param ndim  Space dimension
+   * @param nbline Number of Lines
+   * @param nperline Average number of samples per line
+   * @param deltaX Average distance between Lines along first space dimension
+   * @param delta Average distances between samples along each line (in all directions)
+   * @param unifDelta 5half-) width of uniform distribution
+   * @param seed Seed used for the random number generator
+   * @return DbLine* Pointer to the newly created DbLine structure
+   */
+  DbLine* DbLine::createFillRandom(int ndim,
+                                   int nbline,
+                                   int nperline,
+                                   double deltaX,
+                                   const VectorDouble& delta,
+                                   double unifDelta,
+                                   int seed)
   {
-    messerr("Error when creating DbLine from Samples By Ids");
-    delete dbline;
-    return nullptr;
-  }
-  return dbline;
-}
+    law_set_random_seed(seed);
 
-int DbLine::_lineLinkage(const VectorInt& lineCounts)
-{
-  // Prelimnary check
-  int nech = VH::cumul(lineCounts);
-  if (nech != getNSample())
-  {
-    messerr("Cumulated number of samples given by 'lineCounts' (%d) should "
-            "match the number of samples (%d)",
-            nech, getNSample());
-    return 1;
-  }
-
-  // Count the number of lines
-  int nbline = (int)lineCounts.size();
-
-  // Create the Linkage
-  _lineAdds.resize(nbline, 0);
-
-  // Loop over the lines
-  int start = 0;
-  for (int iline = 0; iline < nbline; iline++)
-  {
-    _lineAdds[iline] = VH::sequence(lineCounts[iline], start);
-    start += lineCounts[iline];
-  }
-  return 0;
-}
-
-int DbLine::_lineLinkageById(const VectorInt& linesId,
-                             const VectorInt& ranksPerId)
-{
-  int nech = getNSample();
-
-  // Preliminary checks by dimensions
-  if ((int)linesId.size() != nech)
-  {
-    messerr("Dimension of 'linesId' (%d) should match Number of samples (%d)",
-            (int)linesId.size(), nech);
-    return 1;
-  }
-  if ((int)ranksPerId.size() != nech)
-  {
-    messerr("Dimension of 'ranksPerId' (%d) should match Number of samples (%d)",
-            (int)ranksPerId.size(), nech);
-    return 1;
-  }
-
-  // Find the number of lines
-  VectorInt allLines = VH::unique(linesId);
-  int nbline         = (int)allLines.size();
-
-  // Create the Linkage
-  _lineAdds.resize(nbline, 0);
-
-  for (int iline = 0; iline < nbline; iline++)
-  {
-    int refLineId = allLines[iline];
-
-    VectorInt ranks;
-    VectorInt iadds;
-    for (int iech = 0; iech < nech; iech++)
+    // Origin of the lines
+    VectorDouble d = delta;
+    if (d.empty()) d.resize(ndim, 1.);
+    VectorDouble shift = d;
+    shift[0]           = 0.;
+    VectorVectorDouble coor0(nbline, 0.);
+    VectorVectorDouble incr0(nbline, 0.);
+    for (int iline = 0; iline < nbline; iline++)
     {
-      if (linesId[iech] != refLineId) continue;
-      ranks.push_back(ranksPerId[iech]);
-      iadds.push_back(iech);
-    }
-
-    VectorInt sortedRanks = VH::orderRanks(ranks);
-    _lineAdds[iline]      = VH::reorder(iadds, sortedRanks);
-  }
-  return (int)!isConsistent();
-}
-
-/**
- * @brief Reset the contents of a DbLine from arguments (previous contents is
- * cleared beforehand). The line contents is provided in 'lineCounts'.
- *
- * @param nech Number of samples to be loaded
- * @param order Ordering mode used for storing in 'tab' (by column or by sample)
- * @param tab Vector containing the values to be imported
- * @param lineCounts Vector giving the number of samples per Line (see details)
- * @param names Names given to the output variables
- * @param locatorNames Name of the locators given to the output variables
- * @param flagAddSampleRank When TRUE, the 'rank' variable is added
- * @return int Error returned code
- *
- * @details: Argument 'lineCounts' give the number of samples per Line.
- * @details: This assumes that samples of per line are ordered sequentially
- * @details and that samples of Line 'j' are followed by those of Line 'j+1'.
- */
-int DbLine::resetFromSamples(int nech,
-                             const ELoadBy& order,
-                             const VectorDouble& tab,
-                             const VectorInt& lineCounts,
-                             const VectorString& names,
-                             const VectorString& locatorNames,
-                             bool flagAddSampleRank)
-{
-  if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
-                           flagAddSampleRank) != 0)
-    return 1;
-
-  // Create the Line Linkage
-
-  if (_lineLinkage(lineCounts) != 0) return 1;
-
-  return 0;
-}
-
-/**
- * @brief Reset the contents of a DbLine from arguments (previous contents is
- * cleared beforehand). The line contents is provided in 'lineIds' and
-'ranksPerId'
- *
- * @param nech Number of samples to be loaded
- * @param order Ordering mode used for storing in 'tab' (by column or by sample)
- * @param tab Vector containing the values to be imported
- * @param lineIds Vector giving the LineId to which each sample belongs (see details)
- * @param ranksPerId Vector giving the ordering of samples within Line (see details)
- * @param names Names given to the output variables
- * @param locatorNames Name of the locators given to the output variables
- * @param flagAddSampleRank When TRUE, the 'rank' variable is added
- * @return int Error returned code
- *
- * @details: Argument 'lineIds' is dimensioned to the total number of samples.
- * @details: For each sample, it gives Id of Line to which the sample belongs.
- * @details: LineId must be numeric: equzl for samples of the same line and
- * @details: different for samples of different lines
- *
- * @details: Argument 'ranksPerId' is dimensionned to total number of samples.
- * @details: Along the samples belonging to one line (sharing the same LineId)
- * @details: it should provide the ordering of the samples.
- * @details: For one line, the values of 'ranksPerId' must be numeric:
- * @details: they do not need to be consecutive ... simply ordered.
- */
-int DbLine::resetFromSamplesById(int nech,
-                                 const ELoadBy& order,
-                                 const VectorDouble& tab,
-                                 const VectorInt& lineIds,
-                                 const VectorInt& ranksPerId,
-                                 const VectorString& names,
-                                 const VectorString& locatorNames,
-                                 bool flagAddSampleRank)
-{
-  if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
-                           flagAddSampleRank) != 0)
-    return 1;
-
-  // Create the Line Linkage
-
-  if (_lineLinkageById(lineIds, ranksPerId) != 0) return 1;
-
-  return 0;
-}
-
-bool DbLine::_deserializeAscii(std::istream& is, bool verbose)
-{
-  int ndim   = 0;
-  int nbline = 0;
-  int number = 0;
-  VectorString locators;
-  VectorString names;
-  VectorDouble values;
-  VectorDouble allvalues;
-
-  /* Initializations */
-
-  bool ret = true;
-  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
-
-  // Writing the set of addresses for Line organization
-
-  ret = ret && _recordRead<int>(is, "Number of Lines", nbline);
-  _lineAdds.resize(nbline);
-  for (int iline = 0; iline < nbline; iline++)
-  {
-    ret = ret && _recordRead<int>(is, "Number of Samples", number);
-    ret = ret && _recordReadVec<int>(is, "", _lineAdds[iline], number);
-  }
-  ret = ret && Db::_deserializeAscii(is, verbose);
-
-  return ret;
-}
-
-bool DbLine::_serializeAscii(std::ostream& os, bool verbose) const
-{
-  bool ret = true;
-
-  /* Writing the header */
-
-  ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
-
-  // Writing the set of addresses for Line organization
-
-  ret = ret && _recordWrite<int>(os, "Number of Lines", getNLine());
-  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
-  {
-    ret = ret && _recordWrite<int>(os, "Number of Samples", getNSamplePerLine(iline));
-    ret = ret && _recordWriteVec<int>(os, "", _lineAdds[iline]);
-  }
-
-  /* Writing the tail of the file */
-
-  ret&& Db::_serializeAscii(os, verbose);
-
-  return ret;
-}
-
-/**
- * Create a Db by loading the contents of a Neutral File
- *
- * @param NFFilename Name of the Neutral File (Db format)
- * @param verbose    Verbose
- *
- * @remarks The name does not need to be completed in particular when defined by absolute path
- * @remarks or read from the Data Directory (in the gstlearn distribution)
- */
-DbLine* DbLine::createFromNF(const String& NFFilename, bool verbose)
-{
-  DbLine* dbline = new DbLine;
-  if (dbline->_fileOpenAndDeserialize(NFFilename, verbose)) return dbline;
-  delete dbline;
-  return nullptr;
-}
-
-/**
- * @brief Create a DbLine from the following information provided as input
-arguments
- *
- * @param ndim  Space dimension
- * @param nbline Number of Lines
- * @param nperline Average number of samples per line
- * @param deltaX Average distance between Lines along first space dimension
- * @param delta Average distances between samples along each line (in all directions)
- * @param unifDelta 5half-) width of uniform distribution
- * @param seed Seed used for the random number generator
- * @return DbLine* Pointer to the newly created DbLine structure
- */
-DbLine* DbLine::createFillRandom(int ndim,
-                                 int nbline,
-                                 int nperline,
-                                 double deltaX,
-                                 const VectorDouble& delta,
-                                 double unifDelta,
-                                 int seed)
-{
-  law_set_random_seed(seed);
-
-  // Origin of the lines
-  VectorDouble d = delta;
-  if (d.empty()) d.resize(ndim, 1.);
-  VectorDouble shift = d;
-  shift[0]           = 0.;
-  VectorVectorDouble coor0(nbline, 0.);
-  VectorVectorDouble incr0(nbline, 0.);
-  for (int iline = 0; iline < nbline; iline++)
-  {
-    coor0[iline].resize(ndim);
-    for (int idim = 0; idim < ndim; idim++)
-    {
-      coor0[iline][idim] = (idim == 0)
-                           ? deltaX * iline + deltaX * law_uniform(1. - unifDelta, 1. + unifDelta)
-                           : 0.;
-    }
-  }
-
-  // Creating the coordinates
-  int nech = 0;
-  VectorDouble tab;
-  VectorInt lineCounts;
-  for (int iline = 0; iline < nbline; iline++)
-  {
-    int nsample = nperline * law_uniform(1. - unifDelta, 1. + unifDelta);
-    nech += nsample;
-    lineCounts.push_back(nsample);
-
-    // Generate the coordinates along the line
-    for (int is = 0; is < nsample; is++)
+      coor0[iline].resize(ndim);
       for (int idim = 0; idim < ndim; idim++)
       {
-        double value = coor0[iline][idim] + is * shift[idim] +
-                       d[idim] * law_uniform(1 - unifDelta, 1. + unifDelta);
-        tab.push_back(value);
-      }
-  }
-
-  VectorString names    = generateMultipleNames("x", ndim);
-  VectorString locnames = generateMultipleNames(String {ELoc::X.getKey()}, ndim, "");
-  DbLine* dbline        = createFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts, names, locnames);
-
-  return dbline;
-}
-
-/**
- * @brief Check if the contents of private member of this class is compatible
- * with the number of samples stored in the Db
- * @return true if everything is OK; false if a problem occurs
- */
-bool DbLine::isConsistent() const
-{
-  // Check on the count of addresses
-  int nech = getNSample();
-  if (nech != getNTotal())
-  {
-    messerr("The number of samples contained in the Db (%d)",
-            getNSample());
-    messerr("is not equal to the number of addresses referenced in DbLine (%d)",
-            getNTotal());
-    return false;
-  }
-
-  // Check that all addresses are reached
-  VectorBool isReached(nech, false);
-  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
-  {
-    for (int i = 0, number = getNSamplePerLine(iline); i < number; i++)
-    {
-      int iadd = _lineAdds[iline][i];
-      if (isReached[iadd])
-      {
-        messerr("Sample %d is reached twice:", iadd);
-        messerr("- Line %d:", iline);
-        VH::dump("Adds_1", _lineAdds[iline]);
-        int jline = getLineBySample(iadd);
-        messerr("- Line %d:", jline);
-        VH::dump("Adds_1", _lineAdds[jline]);
-        return false;
+        coor0[iline][idim] = (idim == 0)
+                             ? deltaX * iline + deltaX * law_uniform(1. - unifDelta, 1. + unifDelta)
+                             : 0.;
       }
     }
-  }
-  return true;
-}
 
-/**
- * @brief Returns the rank of the line containing the target address
- *
- * @param iech Target address
- * @return int Returne line number
- */
-int DbLine::getLineBySample(int iech) const
-{
-  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
-  {
-    int rank = VH::whereElement(_lineAdds[iline], iech);
-    if (rank >= 0) return iline;
-  }
-  return -1;
-}
-
-VectorDouble DbLine::_getHeaderCoordinate(int idim) const
-{
-  int nbline = getNLine();
-  VectorDouble vec(nbline);
-  for (int iline = 0; iline < nbline; iline++)
-  {
-    int iech   = _lineAdds[iline][0];
-    vec[iline] = getCoordinate(iech, idim);
-  }
-  return vec;
-}
-
-VectorDouble DbLine::getCoordinatesPerLine(int iline, int idim) const
-{
-  VectorDouble vec;
-  if (!_isLineNumberValid(iline)) return vec;
-
-  int number = getNSamplePerLine(iline);
-  vec.resize(number);
-  for (int i = 0; i < number; i++)
-    vec[i] = getCoordinate(_lineAdds[iline][i], idim);
-
-  return vec;
-}
-
-/**
- * @brief This is an example for a future more sophisticated method
- * which will collect statistics calculated per line, and store them into a newly
- * created Db.
- * In the current version, the statistics only concerns the number of samples per Line
- *
- * @return Db* Resulting Db
- */
-Db* DbLine::createStatToHeader() const
-{
-  // Create the resulting output Db
-  Db* db = new Db();
-
-  // Glue the coordinates
-  for (int idim = 0, ndim = getNDim(); idim < ndim; idim++)
-  {
-    VectorDouble tab = _getHeaderCoordinate(idim);
-    String name      = concatenateString("x", idim + 1);
-    db->addColumns(tab, name, ELoc::X, idim);
-  }
-
-  // Add the line length as variable
-  int nbline = getNLine();
-  VectorDouble tab(nbline);
-  for (int iline = 0; iline < nbline; iline++)
-    tab[iline] = getNSamplePerLine(iline);
-  db->addColumns(tab, "Count");
-
-  return db;
-}
-
-/**
- * @brief Returns the absolute rank of the sample 'isample' or the line 'iline'
- * within the Db structure (ir -1 if an error occurs)
- *
- * @param iline Target line number
- * @param isample Target sample number within line
- * @return Rank of the sample
- */
-int DbLine::getLineSampleRank(int iline, int isample) const
-{
-  if (iline < 0 || iline >= getNLine())
-  {
-    messerr("Error in Line number (%d): it must lie within [0, %d]\n",
-            iline, getNLine());
-    return -1;
-  }
-  int nsample = getNSamplePerLine(iline);
-  if (isample < 0 || isample >= nsample)
-  {
-    messerr(
-      "Error in Sample number (%d) in line (%d): it must lie within [0, %d]\n",
-      isample, iline, nsample);
-    return -1;
-  }
-  return _lineAdds[iline][isample];
-}
-
-DbLine* DbLine::createVerticalFromGrid(const DbGrid& grid,
-                                       const VectorString& names,
-                                       const VectorInt& xranks,
-                                       const VectorInt& yranks,
-                                       int byZ)
-{
-  // Preliminary checks
-  int ndim = grid.getNDim();
-  if (ndim != 3)
-  {
-    messerr("This method is coded to extract wells from a 3-D Grid only");
-    return nullptr;
-  }
-  if ((int)xranks.size() != (int)yranks.size())
-  {
-    messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
-    return nullptr;
-  }
-  int nvar    = (int)names.size();
-  int nwells  = (int)xranks.size();
-  int nz      = grid.getNX(2);
-  int nbywell = nz / byZ;
-  int nsample = nwells * nbywell;
-  VectorDouble tab(nsample * (3 + nvar));
-  VectorInt lineCounts(nwells);
-
-  VectorDouble coor(3);
-  VectorInt indg(3);
-
-  // Loop on the wells
-  int nech = 0;
-  int ecr  = 0;
-  for (int iwell = 0; iwell < nwells; iwell++)
-  {
-    indg[0] = xranks[iwell];
-    indg[1] = yranks[iwell];
-
-    // Loop on the samples
-    for (int iz = 0; iz < nbywell; iz++)
+    // Creating the coordinates
+    int nech = 0;
+    VectorDouble tab;
+    VectorInt lineCounts;
+    for (int iline = 0; iline < nbline; iline++)
     {
-      indg[2] = iz * byZ;
+      int nsample = nperline * law_uniform(1. - unifDelta, 1. + unifDelta);
+      nech += nsample;
+      lineCounts.push_back(nsample);
 
-      // Assign the coordinates
-      grid.indicesToCoordinateInPlace(indg, coor);
-      for (int idim = 0; idim < ndim; idim++) tab[ecr++] = coor[idim];
-
-      // Assign the variable values
-      int rank = grid.indiceToRank(indg);
-      for (int ivar = 0; ivar < nvar; ivar++)
-        tab[ecr++] = grid.getValue(names[ivar], rank);
-      nech++;
-    }
-    lineCounts[iwell] = nbywell;
-  }
-
-  // Constitute the list of names
-  VectorString locnames = generateMultipleNames("x", ndim);
-  for (int ivar = 0; ivar < nvar; ivar++)
-    locnames.push_back((names[ivar]));
-
-  DbLine* dbline = new DbLine;
-  if (dbline->resetFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts, locnames))
-    return nullptr;
-
-  return dbline;
-}
-
-DbLine* DbLine::createMarkersFromGrid(const DbGrid& grid,
-                                      const String& name,
-                                      const VectorInt& xranks,
-                                      const VectorInt& yranks,
-                                      const VectorDouble& cuts)
-{
-  // Preliminary checks
-  int ndim = grid.getNDim();
-  if (ndim != 3)
-  {
-    messerr("This method is coded to extract wells from a 3-D Grid only");
-    return nullptr;
-  }
-  if ((int)xranks.size() != (int)yranks.size())
-  {
-    messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
-    return nullptr;
-  }
-  int ncuts  = (int)cuts.size();
-  int nwells = (int)xranks.size();
-  int nz     = grid.getNX(2);
-  VectorDouble tab;
-  VectorInt lineCounts(nwells);
-  VectorDouble coor(3);
-  VectorDouble cooriz(3);
-  VectorDouble coorjz(3);
-  VectorDouble well(nz);
-  VectorInt indg(3);
-
-  // Loop on the wells
-  int nech = 0;
-  for (int iwell = 0; iwell < nwells; iwell++)
-  {
-    indg[0] = xranks[iwell];
-    indg[1] = yranks[iwell];
-
-    // Loop on the samples
-    for (int iz = 0; iz < nz; iz++)
-    {
-      indg[2]  = iz;
-      int rank = grid.indiceToRank(indg);
-      well[iz] = grid.getValue(name, rank);
-    }
-
-    // Find the markers
-    int nmark = 0;
-    for (int iz = 1; iz < nz; iz++)
-    {
-      int jz = iz - 1;
-
-      // Loop on the cuts
-      for (int icut = 0; icut < ncuts; icut++)
-      {
-        double zcut  = cuts[icut];
-        double delta = zcut - well[jz];
-        if ((zcut - well[iz]) * delta > 0) continue;
-
-        // Define the marker by interpolation
-        double dist  = well[iz] - well[jz];
-        double ratio = (dist > 0) ? delta / dist : 0.;
-
-        // Interpolate the coordinates
-        indg[2] = jz;
-        grid.indicesToCoordinateInPlace(indg, coorjz);
-        indg[2] = iz;
-        grid.indicesToCoordinateInPlace(indg, cooriz);
+      // Generate the coordinates along the line
+      for (int is = 0; is < nsample; is++)
         for (int idim = 0; idim < ndim; idim++)
-          coor[idim] = coorjz[idim] * (1. - ratio) + cooriz[idim] * ratio;
+        {
+          double value = coor0[iline][idim] + is * shift[idim] +
+                         d[idim] * law_uniform(1 - unifDelta, 1. + unifDelta);
+          tab.push_back(value);
+        }
+    }
 
-        // Add the sample
-        for (int idim = 0; idim < ndim; idim++) tab.push_back(coor[idim]);
-        tab.push_back(zcut);
-        nech++;
-        nmark++;
+    VectorString names    = generateMultipleNames("x", ndim);
+    VectorString locnames = generateMultipleNames(String {ELoc::X.getKey()}, ndim, "");
+    DbLine* dbline        = createFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts, names, locnames);
+
+    return dbline;
+  }
+
+  /**
+   * @brief Check if the contents of private member of this class is compatible
+   * with the number of samples stored in the Db
+   * @return true if everything is OK; false if a problem occurs
+   */
+  bool DbLine::isConsistent() const
+  {
+    // Check on the count of addresses
+    int nech = getNSample();
+    if (nech != getNTotal())
+    {
+      messerr("The number of samples contained in the Db (%d)",
+              getNSample());
+      messerr("is not equal to the number of addresses referenced in DbLine (%d)",
+              getNTotal());
+      return false;
+    }
+
+    // Check that all addresses are reached
+    VectorBool isReached(nech, false);
+    for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+    {
+      for (int i = 0, number = getNSamplePerLine(iline); i < number; i++)
+      {
+        int iadd = _lineAdds[iline][i];
+        if (isReached[iadd])
+        {
+          messerr("Sample %d is reached twice:", iadd);
+          messerr("- Line %d:", iline);
+          VH::dump("Adds_1", _lineAdds[iline]);
+          int jline = getLineBySample(iadd);
+          messerr("- Line %d:", jline);
+          VH::dump("Adds_1", _lineAdds[jline]);
+          return false;
+        }
       }
     }
-    lineCounts[iwell] = nmark;
+    return true;
   }
 
-  // Constitute the list of names
-  VectorString locnames = generateMultipleNames("x", ndim);
-  VectorString auxnames = generateMultipleNames("cut", ncuts);
-  for (int icut = 0; icut < ncuts; icut++) locnames.push_back(auxnames[icut]);
+  /**
+   * @brief Returns the rank of the line containing the target address
+   *
+   * @param iech Target address
+   * @return int Returne line number
+   */
+  int DbLine::getLineBySample(int iech) const
+  {
+    for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+    {
+      int rank = VH::whereElement(_lineAdds[iline], iech);
+      if (rank >= 0) return iline;
+    }
+    return -1;
+  }
 
-  DbLine* dbline = new DbLine;
-  if (dbline->resetFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts,
-                               locnames)) return nullptr;
+  VectorDouble DbLine::_getHeaderCoordinate(int idim) const
+  {
+    int nbline = getNLine();
+    VectorDouble vec(nbline);
+    for (int iline = 0; iline < nbline; iline++)
+    {
+      int iech   = _lineAdds[iline][0];
+      vec[iline] = getCoordinate(iech, idim);
+    }
+    return vec;
+  }
 
-  return dbline;
-}
+  VectorDouble DbLine::getCoordinatesPerLine(int iline, int idim) const
+  {
+    VectorDouble vec;
+    if (!_isLineNumberValid(iline)) return vec;
+
+    int number = getNSamplePerLine(iline);
+    vec.resize(number);
+    for (int i = 0; i < number; i++)
+      vec[i] = getCoordinate(_lineAdds[iline][i], idim);
+
+    return vec;
+  }
+
+  /**
+   * @brief This is an example for a future more sophisticated method
+   * which will collect statistics calculated per line, and store them into a newly
+   * created Db.
+   * In the current version, the statistics only concerns the number of samples per Line
+   *
+   * @return Db* Resulting Db
+   */
+  Db* DbLine::createStatToHeader() const
+  {
+    // Create the resulting output Db
+    Db* db = new Db();
+
+    // Glue the coordinates
+    for (int idim = 0, ndim = getNDim(); idim < ndim; idim++)
+    {
+      VectorDouble tab = _getHeaderCoordinate(idim);
+      String name      = concatenateString("x", idim + 1);
+      db->addColumns(tab, name, ELoc::X, idim);
+    }
+
+    // Add the line length as variable
+    int nbline = getNLine();
+    VectorDouble tab(nbline);
+    for (int iline = 0; iline < nbline; iline++)
+      tab[iline] = getNSamplePerLine(iline);
+    db->addColumns(tab, "Count");
+
+    return db;
+  }
+
+  /**
+   * @brief Returns the absolute rank of the sample 'isample' or the line 'iline'
+   * within the Db structure (ir -1 if an error occurs)
+   *
+   * @param iline Target line number
+   * @param isample Target sample number within line
+   * @return Rank of the sample
+   */
+  int DbLine::getLineSampleRank(int iline, int isample) const
+  {
+    if (iline < 0 || iline >= getNLine())
+    {
+      messerr("Error in Line number (%d): it must lie within [0, %d]\n",
+              iline, getNLine());
+      return -1;
+    }
+    int nsample = getNSamplePerLine(iline);
+    if (isample < 0 || isample >= nsample)
+    {
+      messerr(
+        "Error in Sample number (%d) in line (%d): it must lie within [0, %d]\n",
+        isample, iline, nsample);
+      return -1;
+    }
+    return _lineAdds[iline][isample];
+  }
+
+  DbLine* DbLine::createVerticalFromGrid(const DbGrid& grid,
+                                         const VectorString& names,
+                                         const VectorInt& xranks,
+                                         const VectorInt& yranks,
+                                         int byZ)
+  {
+    // Preliminary checks
+    int ndim = grid.getNDim();
+    if (ndim != 3)
+    {
+      messerr("This method is coded to extract wells from a 3-D Grid only");
+      return nullptr;
+    }
+    if ((int)xranks.size() != (int)yranks.size())
+    {
+      messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
+      return nullptr;
+    }
+    int nvar    = (int)names.size();
+    int nwells  = (int)xranks.size();
+    int nz      = grid.getNX(2);
+    int nbywell = nz / byZ;
+    int nsample = nwells * nbywell;
+    VectorDouble tab(nsample * (3 + nvar));
+    VectorInt lineCounts(nwells);
+
+    VectorDouble coor(3);
+    VectorInt indg(3);
+
+    // Loop on the wells
+    int nech = 0;
+    int ecr  = 0;
+    for (int iwell = 0; iwell < nwells; iwell++)
+    {
+      indg[0] = xranks[iwell];
+      indg[1] = yranks[iwell];
+
+      // Loop on the samples
+      for (int iz = 0; iz < nbywell; iz++)
+      {
+        indg[2] = iz * byZ;
+
+        // Assign the coordinates
+        grid.indicesToCoordinateInPlace(indg, coor);
+        for (int idim = 0; idim < ndim; idim++) tab[ecr++] = coor[idim];
+
+        // Assign the variable values
+        int rank = grid.indiceToRank(indg);
+        for (int ivar = 0; ivar < nvar; ivar++)
+          tab[ecr++] = grid.getValue(names[ivar], rank);
+        nech++;
+      }
+      lineCounts[iwell] = nbywell;
+    }
+
+    // Constitute the list of names
+    VectorString locnames = generateMultipleNames("x", ndim);
+    for (int ivar = 0; ivar < nvar; ivar++)
+      locnames.push_back((names[ivar]));
+
+    DbLine* dbline = new DbLine;
+    if (dbline->resetFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts, locnames))
+      return nullptr;
+
+    return dbline;
+  }
+
+  DbLine* DbLine::createMarkersFromGrid(const DbGrid& grid,
+                                        const String& name,
+                                        const VectorInt& xranks,
+                                        const VectorInt& yranks,
+                                        const VectorDouble& cuts)
+  {
+    // Preliminary checks
+    int ndim = grid.getNDim();
+    if (ndim != 3)
+    {
+      messerr("This method is coded to extract wells from a 3-D Grid only");
+      return nullptr;
+    }
+    if ((int)xranks.size() != (int)yranks.size())
+    {
+      messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
+      return nullptr;
+    }
+    int ncuts  = (int)cuts.size();
+    int nwells = (int)xranks.size();
+    int nz     = grid.getNX(2);
+    VectorDouble tab;
+    VectorInt lineCounts(nwells);
+    VectorDouble coor(3);
+    VectorDouble cooriz(3);
+    VectorDouble coorjz(3);
+    VectorDouble well(nz);
+    VectorInt indg(3);
+
+    // Loop on the wells
+    int nech = 0;
+    for (int iwell = 0; iwell < nwells; iwell++)
+    {
+      indg[0] = xranks[iwell];
+      indg[1] = yranks[iwell];
+
+      // Loop on the samples
+      for (int iz = 0; iz < nz; iz++)
+      {
+        indg[2]  = iz;
+        int rank = grid.indiceToRank(indg);
+        well[iz] = grid.getValue(name, rank);
+      }
+
+      // Find the markers
+      int nmark = 0;
+      for (int iz = 1; iz < nz; iz++)
+      {
+        int jz = iz - 1;
+
+        // Loop on the cuts
+        for (int icut = 0; icut < ncuts; icut++)
+        {
+          double zcut  = cuts[icut];
+          double delta = zcut - well[jz];
+          if ((zcut - well[iz]) * delta > 0) continue;
+
+          // Define the marker by interpolation
+          double dist  = well[iz] - well[jz];
+          double ratio = (dist > 0) ? delta / dist : 0.;
+
+          // Interpolate the coordinates
+          indg[2] = jz;
+          grid.indicesToCoordinateInPlace(indg, coorjz);
+          indg[2] = iz;
+          grid.indicesToCoordinateInPlace(indg, cooriz);
+          for (int idim = 0; idim < ndim; idim++)
+            coor[idim] = coorjz[idim] * (1. - ratio) + cooriz[idim] * ratio;
+
+          // Add the sample
+          for (int idim = 0; idim < ndim; idim++) tab.push_back(coor[idim]);
+          tab.push_back(zcut);
+          nech++;
+          nmark++;
+        }
+      }
+      lineCounts[iwell] = nmark;
+    }
+
+    // Constitute the list of names
+    VectorString locnames = generateMultipleNames("x", ndim);
+    VectorString auxnames = generateMultipleNames("cut", ncuts);
+    for (int icut = 0; icut < ncuts; icut++) locnames.push_back(auxnames[icut]);
+
+    DbLine* dbline = new DbLine;
+    if (dbline->resetFromSamples(nech, ELoadBy::SAMPLE, tab, lineCounts,
+                                 locnames)) return nullptr;
+
+    return dbline;
+  }
 #ifdef HDF5
-bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
-{
-  auto dbG = SerializeHDF5::getGroup(grp, "DbLine");
-  if (!dbG) return false;
-
-  /* Read the grid characteristics */
-  bool ret   = true;
-  int ndim   = 0;
-  int nbline = 0;
-
-  ret = ret && SerializeHDF5::readValue(*dbG, "NDim", ndim);
-  ret = ret && SerializeHDF5::readValue(*dbG, "NLines", nbline);
-
-  auto linesG = SerializeHDF5::getGroup(*dbG, "Lines");
-  if (!linesG) return false;
-  _lineAdds.resize(nbline);
-  for (int iline = 0; iline < nbline; iline++)
+  bool DbLine::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   {
-    String locName = "Line" + std::to_string(iline);
-    auto lineg     = SerializeHDF5::getGroup(*linesG, locName);
-    if (!lineg) return false;
+    auto dbG = SerializeHDF5::getGroup(grp, "DbLine");
+    if (!dbG) return false;
 
-    int nsample = 0;
-    ret         = ret && SerializeHDF5::readValue(*lineg, "NSamples", nsample);
-    ret         = ret && SerializeHDF5::readVec(*lineg, "Samples", _lineAdds[iline]);
+    /* Read the grid characteristics */
+    bool ret   = true;
+    int ndim   = 0;
+    int nbline = 0;
+
+    ret = ret && SerializeHDF5::readValue(*dbG, "NDim", ndim);
+    ret = ret && SerializeHDF5::readValue(*dbG, "NLines", nbline);
+
+    auto linesG = SerializeHDF5::getGroup(*dbG, "Lines");
+    if (!linesG) return false;
+    _lineAdds.resize(nbline);
+    for (int iline = 0; iline < nbline; iline++)
+    {
+      String locName = "Line" + std::to_string(iline);
+      auto lineg     = SerializeHDF5::getGroup(*linesG, locName);
+      if (!lineg) return false;
+
+      int nsample = 0;
+      ret         = ret && SerializeHDF5::readValue(*lineg, "NSamples", nsample);
+      ret         = ret && SerializeHDF5::readVec(*lineg, "Samples", _lineAdds[iline]);
+    }
+
+    /* Writing the tail of the file */
+
+    ret = ret && Db::_deserializeH5(*dbG, verbose);
+
+    return ret;
   }
 
-  /* Writing the tail of the file */
-
-  ret = ret && Db::_deserializeH5(*dbG, verbose);
-
-  return ret;
-}
-
-bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
-{
-  auto dbG = grp.createGroup("DbLine");
-
-  bool ret = true;
-
-  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
-  ret = ret && SerializeHDF5::writeValue(dbG, "NLines", getNLine());
-
-  auto linesG = dbG.createGroup("Lines");
-  for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+  bool DbLine::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   {
-    String locName = "Line" + std::to_string(iline);
-    auto lineG     = linesG.createGroup(locName);
+    auto dbG = grp.createGroup("DbLine");
 
-    ret = ret && SerializeHDF5::writeValue(lineG, "NSamples", getNSamplePerLine(iline));
-    ret = ret && SerializeHDF5::writeVec(lineG, "Samples", _lineAdds[iline]);
+    bool ret = true;
+
+    ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+    ret = ret && SerializeHDF5::writeValue(dbG, "NLines", getNLine());
+
+    auto linesG = dbG.createGroup("Lines");
+    for (int iline = 0, nbline = getNLine(); iline < nbline; iline++)
+    {
+      String locName = "Line" + std::to_string(iline);
+      auto lineG     = linesG.createGroup(locName);
+
+      ret = ret && SerializeHDF5::writeValue(lineG, "NSamples", getNSamplePerLine(iline));
+      ret = ret && SerializeHDF5::writeVec(lineG, "Samples", _lineAdds[iline]);
+    }
+
+    /* Writing the tail of the file */
+
+    ret = ret && Db::_serializeH5(dbG, verbose);
+
+    return ret;
   }
-
-  /* Writing the tail of the file */
-
-  ret = ret && Db::_serializeH5(dbG, verbose);
-
-  return ret;
-}
 #endif
+} // namespace gstlrn

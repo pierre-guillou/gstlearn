@@ -9,15 +9,16 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovDiffusionAdvection.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Basic/FFT.hpp"
 #include "Basic/AException.hpp"
-
+#include "Basic/FFT.hpp"
+#include "Covariances/CovAniso.hpp"
 #include <cmath>
 #include <complex>
 
+namespace gstlrn
+{
 CovDiffusionAdvection::CovDiffusionAdvection()
-:   _markovL(nullptr)
+  : _markovL(nullptr)
   , _markovR(nullptr)
   , _scaleTime(1.)
   , _vel(VectorDouble())
@@ -30,11 +31,10 @@ CovDiffusionAdvection::CovDiffusionAdvection()
   , _markovRdefined(false)
   , _markovLdefined(false)
 {
-
 }
 
 CovDiffusionAdvection::CovDiffusionAdvection(const CovDiffusionAdvection& r)
-:   _markovL(r._markovL->clone())
+  : _markovL(r._markovL->clone())
   , _markovR(r._markovR->clone())
   , _scaleTime(r._scaleTime)
   , _vel(r._vel)
@@ -46,8 +46,6 @@ CovDiffusionAdvection::CovDiffusionAdvection(const CovDiffusionAdvection& r)
   , _markovRdefined(r._markovRdefined)
   , _markovLdefined(r._markovLdefined)
 {
-
-
 }
 
 CovDiffusionAdvection& CovDiffusionAdvection::operator=(const CovDiffusionAdvection& r)
@@ -65,8 +63,8 @@ CovDiffusionAdvection& CovDiffusionAdvection::operator=(const CovDiffusionAdvect
     _destroyMarkovR = true;
     _markovRdefined = r._markovRdefined;
     _markovLdefined = r._markovLdefined;
-   }
-   return *this;
+  }
+  return *this;
 }
 
 CovDiffusionAdvection::~CovDiffusionAdvection()
@@ -78,10 +76,9 @@ CovDiffusionAdvection::~CovDiffusionAdvection()
     delete _markovR;
 }
 
-
 CovDiffusionAdvection* CovDiffusionAdvection::create(CovAniso* markovL,
-                                                     CovAniso* markovR ,
-                                                     double scaleTime ,
+                                                     CovAniso* markovR,
+                                                     double scaleTime,
                                                      VectorDouble vel,
                                                      double sigma2)
 {
@@ -96,58 +93,56 @@ CovDiffusionAdvection* CovDiffusionAdvection::create(CovAniso* markovL,
   return cov;
 }
 
-
 void CovDiffusionAdvection::_init()
 {
-  if (_markovL == nullptr && _markovR==nullptr)
+  if (_markovL == nullptr && _markovR == nullptr)
   {
     my_throw("At least one of the covariances has to be defined to make a valid advection diffusion equation!");
   }
 
-  const CovAniso* cova =  _markovL == nullptr? _markovR : _markovL;
+  const CovAniso* cova = _markovL == nullptr ? _markovR : _markovL;
 
   double correcR = 1.;
   double correcL = 1.;
 
-  _ctxt = cova->getContext();
+  _ctxt    = cova->getContext();
   int ndim = cova->getNDim();
 
-  VectorDouble temp(ndim,1.);
+  VectorDouble temp(ndim, 1.);
   if (_markovL == nullptr)
   {
 
-    _markovL = CovAniso::createAnisotropic(_ctxt,ECov::MARKOV,temp ,1.,1.,temp,false);
+    _markovL        = CovAniso::createAnisotropic(_ctxt, ECov::MARKOV, temp, 1., 1., temp, false);
     _destroyMarkovL = true;
     _markovLdefined = false;
-    correcL = 1.;
+    correcL         = 1.;
   }
   else
   {
     _markovLdefined = true;
-    correcL = _markovL->getCorrec();
+    correcL         = _markovL->getCorrec();
   }
   if (_markovR == nullptr)
   {
-     _markovR = CovAniso::createAnisotropic(_ctxt,ECov::MARKOV,temp ,1.,1.,temp,false);
-     _destroyMarkovR = true;
-     _markovRdefined = false;
-     correcR = 1.;
+    _markovR        = CovAniso::createAnisotropic(_ctxt, ECov::MARKOV, temp, 1., 1., temp, false);
+    _destroyMarkovR = true;
+    _markovRdefined = false;
+    correcR         = 1.;
   }
   else
   {
     _markovRdefined = true;
-    correcR = _markovR->getCorrec();
+    correcR         = _markovR->getCorrec();
   }
 
-    _computeSpatialTrace();
+  _computeSpatialTrace();
 
-   _globalCorrec = _spatialTrace->getFullCorrec()/(correcR * correcL);
-
+  _globalCorrec = _spatialTrace->getFullCorrec() / (correcR * correcL);
 }
 
 void CovDiffusionAdvection::_computeSpatialTrace()
 {
-   delete _spatialTrace;
+  delete _spatialTrace;
 
   VectorDouble scales;
   VectorDouble angles;
@@ -162,30 +157,29 @@ void CovDiffusionAdvection::_computeSpatialTrace()
     angles = _markovR->getAnisoAngles();
   }
 
-   _spatialTrace = CovAniso::createAnisotropic(_ctxt,ECov::MARKOV, scales, _sigma2,1.,angles,false);
+  _spatialTrace = CovAniso::createAnisotropic(_ctxt, ECov::MARKOV, scales, _sigma2, 1., angles, false);
 
-   VectorDouble coeffsL = _markovL->getMarkovCoeffs();
-   VectorDouble coeffsR = _markovR->getMarkovCoeffs();
-   int degree = ((int) coeffsL.size() + (int) coeffsR.size() - 2);
-   VectorDouble coeffs;
-   coeffs.resize(degree + 1,0.);
+  VectorDouble coeffsL = _markovL->getMarkovCoeffs();
+  VectorDouble coeffsR = _markovR->getMarkovCoeffs();
+  int degree           = ((int)coeffsL.size() + (int)coeffsR.size() - 2);
+  VectorDouble coeffs;
+  coeffs.resize(degree + 1, 0.);
 
-   for(int i = 0; i<(int)coeffsR.size();i++)
-     for(int j = 0; j<(int)coeffsL.size();j++)
-     {
-       coeffs[i+j] += coeffsR[i] * coeffsL[j];
-     }
+  for (int i = 0; i < (int)coeffsR.size(); i++)
+    for (int j = 0; j < (int)coeffsL.size(); j++)
+    {
+      coeffs[i + j] += coeffsR[i] * coeffsL[j];
+    }
 
-    _spatialTrace->setMarkovCoeffs(coeffs);
+  _spatialTrace->setMarkovCoeffs(coeffs);
 }
-
 
 std::complex<double> CovDiffusionAdvection::evalSpatialSpectrum(VectorDouble freq, double time) const
 {
 
   double velinner = 0.;
 
-  for(int i = 0; i<(int) freq.size();i++)
+  for (int i = 0; i < (int)freq.size(); i++)
   {
     velinner += _vel[i] * freq[i];
   }
@@ -193,19 +187,18 @@ std::complex<double> CovDiffusionAdvection::evalSpatialSpectrum(VectorDouble fre
   double s1 = 1.;
 
   if (_markovLdefined)
-    s1 = 1./(_markovL->evalSpectrum(freq));
-
+    s1 = 1. / (_markovL->evalSpectrum(freq));
 
   double s2 = 1.;
 
   if (_markovRdefined)
-    s2 = 1./(_markovR->evalSpectrum(freq));
+    s2 = 1. / (_markovR->evalSpectrum(freq));
 
-  //std::complex<double> temp = _scaleTime * (-1i * velinner * time - abs(time * s1));
+  // std::complex<double> temp = _scaleTime * (-1i * velinner * time - abs(time * s1));
   std::complex<double> a(-_scaleTime * abs(time * s1), -_scaleTime * velinner * time);
   std::complex<double> temp = a;
 
-  double ratio =  _sigma2 / (_globalCorrec * s1 * s2 );
+  double ratio = _sigma2 / (_globalCorrec * s1 * s2);
   return ratio * exp(temp);
 }
 
@@ -213,7 +206,8 @@ Array CovDiffusionAdvection::evalCovFFT(const VectorDouble& hmax, double time, i
 {
   std::function<std::complex<double>(VectorDouble, double)> funcSpectrum;
   funcSpectrum = [this](VectorDouble freq, double time)
-         { return evalSpatialSpectrum(freq, time);};
+  { return evalSpatialSpectrum(freq, time); };
 
- return evalCovFFTTimeSlice(hmax, time, N, funcSpectrum);
+  return evalCovFFTTimeSlice(hmax, time, N, funcSpectrum);
+}
 }

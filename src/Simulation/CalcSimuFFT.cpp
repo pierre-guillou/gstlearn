@@ -23,6 +23,8 @@
 #define IND(ix,iy,iz) ((iz) + _dims[2] * ((iy) + _dims[1] * (ix)))
 #define U(ix,iy,iz)   (_u[IND(ix,iy,iz)])
 
+namespace gstlrn
+{
 CalcSimuFFT::CalcSimuFFT(int nbsimu, bool verbose, int seed)
     : ACalcSimulation(nbsimu, seed),
       _iattOut(-1),
@@ -1195,4 +1197,5 @@ VectorDouble getChangeSupport(DbGrid *db,
   simfft.setModel(model);
   simfft.setParam(param);
   return simfft.changeSupport(sigma);
+}
 }

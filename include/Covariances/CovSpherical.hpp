@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 class CovContext;
 class TurningBandOperate;
 
@@ -37,3 +39,4 @@ protected:
   double _evaluateCovDerivative(double h) const override;
 };
 
+}

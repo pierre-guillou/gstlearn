@@ -16,6 +16,8 @@
 /**
  * Square Matrix
  */
+namespace gstlrn
+{
 class GSTLEARN_EXPORT MatrixSquare : public MatrixDense {
 
 public:
@@ -87,3 +89,4 @@ GSTLEARN_EXPORT MatrixSquare* prodNormMatMat(const MatrixDense* a,
 GSTLEARN_EXPORT MatrixSquare* prodNormMat(const MatrixDense& a,
                                            const VectorDouble& vec = VectorDouble(),
                                            bool transpose          = false);
+}

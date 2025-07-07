@@ -21,14 +21,18 @@
 
 #include <vector>
 
+namespace gstlrn 
+{
 class ASpace;
 class SpacePoint;
 class MatrixSquare;
+
+class AStringFormat;
+class AModelFitSills;
+class AAnam;
 class CovBase;
 class CovContext;
-class AStringFormat;
-class AAnam;
-class AModelFitSills;
+
 /**
  * \brief
  * This class describes the **Covariance** as a list of elementary covariances (see CovBase.hpp for more details)
@@ -172,3 +176,4 @@ private:
   mutable AModelFitSills* _modelFitSills; /* Model fitting procedure for Sills */
   mutable int _itergCum;
 };
+}

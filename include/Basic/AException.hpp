@@ -15,6 +15,9 @@
 #include <exception>
 #include <string>
 
+namespace gstlrn
+{
+ 
 class GSTLEARN_EXPORT AException : public std::exception
 {
 public:
@@ -35,3 +38,4 @@ GSTLEARN_EXPORT void throw_exp(const std::string& msg = "",
 #define my_throw(msg) throw_exp(msg, __FILE__, __LINE__)
 
 #define my_throw_impossible(msg) throw_exp(msg, __FILE__, __LINE__)
+}

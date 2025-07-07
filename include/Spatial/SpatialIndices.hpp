@@ -17,9 +17,12 @@
 #include "Basic/AStringable.hpp"
 #include "Spatial/Projection.hpp"
 
+
+namespace gstlrn
+{ 
+
 class Db;
 class MatrixDense;
-
 class GSTLEARN_EXPORT SpatialIndices : public AStringable
 {
 public:
@@ -74,3 +77,4 @@ private:
   double _ra;
   double _rb;
   };
+}

@@ -15,6 +15,9 @@
 // WARNING: Make this include list as small as possible!
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
+
 /**
  * This class defines the options and parameters used during the Variogram Fitting.
  * All the parameters described hereafter are either available in the construction,
@@ -33,7 +36,6 @@
  * - maxiter: Maximum number of iterations
  * - tolred: Define the relative criterion used for stopping the iterations
  */
-
 class GSTLEARN_EXPORT ModelOptimParam: public AStringable
 {
  public:
@@ -103,3 +105,4 @@ private:
   int  _maxiter;           /* Maximum number of iterations */
   double _tolred;          /* Scaled tolerance (used in calculations) */
 };
+}

@@ -12,6 +12,8 @@
 #include "Db/Db.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 AnamContinuous::AnamContinuous()
     : AAnam(),
       _az(),
@@ -295,3 +297,4 @@ bool AnamContinuous::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   return ret;
 }
 #endif
+}

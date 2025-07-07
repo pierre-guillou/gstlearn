@@ -8,46 +8,46 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Space/ASpaceObject.hpp"
 #include "Covariances/ParamId.hpp"
+#include "Space/ASpaceObject.hpp"
 
+namespace gstlrn
+{
 ParamId::ParamId(const EConsElem& elem,
                  int iv1,
                  int iv2)
-    : AStringable(),
-      _elemType(elem),
-      _iv1(iv1),
-      _iv2(iv2)
+  : AStringable()
+  , _elemType(elem)
+  , _iv1(iv1)
+  , _iv2(iv2)
 {
 }
 
-ParamId::ParamId(const ParamId &m)
-    : AStringable(m),
-      _elemType(m._elemType),
-      _iv1(m._iv1),
-      _iv2(m._iv2)
+ParamId::ParamId(const ParamId& m)
+  : AStringable(m)
+  , _elemType(m._elemType)
+  , _iv1(m._iv1)
+  , _iv2(m._iv2)
 {
-
 }
 
-ParamId& ParamId::operator=(const ParamId &m)
+ParamId& ParamId::operator=(const ParamId& m)
 {
   if (this != &m)
   {
     AStringable::operator=(m);
     _elemType = m._elemType;
-    _iv1   = m._iv1;
-    _iv2   = m._iv2;
+    _iv1      = m._iv1;
+    _iv2      = m._iv2;
   }
   return *this;
 }
 
 ParamId::~ParamId()
 {
-
 }
 
-ParamId* ParamId::create(const EConsElem &elem,
+ParamId* ParamId::create(const EConsElem& elem,
                          int iv1,
                          int iv2)
 {
@@ -58,9 +58,9 @@ int ParamId::init(const EConsElem& type,
                   int v1,
                   int v2)
 {
-  _elemType  = type;
-  _iv1   = v1;
-  _iv2   = v2;
+  _elemType = type;
+  _iv1      = v1;
+  _iv2      = v2;
 
   // Check to avoid rotation of a Model defined on the sphere
   bool flag_sphere = (getDefaultSpaceType() == ESpaceType::SN);
@@ -132,4 +132,5 @@ String ParamId::toString(const AStringFormat* /*strfmt*/) const
   sstr << std::endl;
 
   return sstr.str();
+}
 }

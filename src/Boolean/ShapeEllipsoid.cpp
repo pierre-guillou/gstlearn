@@ -11,6 +11,8 @@
 #include "Boolean/ShapeEllipsoid.hpp"
 #include "Simulation/BooleanObject.hpp"
 
+namespace gstlrn
+{
 ShapeEllipsoid::ShapeEllipsoid(double proportion,
                                double xext,
                                double yext,
@@ -77,4 +79,5 @@ bool ShapeEllipsoid::belongObject(const VectorDouble& coor,
   double dy = (ndim >= 2) ? coor[1] / (object->getExtension(1) / 2.) : 0.;
   double dz = (ndim >= 3) ? coor[2] / (object->getExtension(2) / 2.) : 0.;
   return (dx * dx + dy * dy + dz * dz <= 1);
+}
 }

@@ -49,7 +49,7 @@ ENUM_DEFINE(ENUM_FRUIT)
 
 ENUM_DEFINE(ENUM_DAY)
 
-
+using namespace gstlrn;
 
 int main(int argc, char *argv[])
 {

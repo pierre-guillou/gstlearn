@@ -18,9 +18,10 @@
 #include "geoslib_define.h"
 
 #include <cmath>
-#include <iostream>
 #include <math.h>
 
+namespace gstlrn
+{
 SpacePoint::SpacePoint(const ASpaceSharedPtr& space)
   : ASpaceObject(space)
   , _coord()
@@ -212,7 +213,7 @@ double SpacePoint::getOrthogonalDistance(const SpacePoint &P2,
  * TODO : initialize coordinates from angles for more than 2D & valid only for space RN ?
  * To be kept ?
  */
-#include <iostream>
+
 void SpacePoint::setCoordFromAngle(const VectorDouble& angles)
 {
   if (getNDim() == 1 || angles.size() == 0)
@@ -234,3 +235,4 @@ void SpacePoint::setCoordFromAngle(const VectorDouble& angles)
   }
 }
 
+}

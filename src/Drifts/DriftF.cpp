@@ -14,6 +14,12 @@
 #include <iostream>
 #include <sstream>
 
+#include "Drifts/DriftF.hpp"
+#include "Drifts/ADrift.hpp"
+#include "Db/Db.hpp"
+
+namespace gstlrn
+{
 DriftF::DriftF(int rank_fex)
   : ADrift()
   , _rankFex(rank_fex)
@@ -61,4 +67,5 @@ DriftF* DriftF::createByIdentifier(const String& driftname)
   String string_rank = driftname.substr(substring.size(), driftname.size() - 1);
   int rank_fex       = atoi(string_rank.c_str());
   return new DriftF(rank_fex);
+}
 }

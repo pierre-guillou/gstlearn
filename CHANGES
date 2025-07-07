@@ -4,6 +4,7 @@ This file contains the logs between consecutive releases
 
 Release 1.8.0
 =============
+- Enclose the library in a namespace ("gstlrn")
 - Fix gstlearn_to_terra and terra_to_gstlearn (issue #566)
 - ACov* is now stored as a shared_ptr in ModelGeneric, CovList (vector) and CovBase.
 - ACov does not inherit from ASpaceObject anymore (and it becomes AStringable)

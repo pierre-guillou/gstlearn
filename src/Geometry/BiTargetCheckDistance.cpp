@@ -14,6 +14,8 @@
 #include "Space/SpaceTarget.hpp"
 #include "geoslib_old_f.h"
 
+namespace gstlrn
+{
 BiTargetCheckDistance::BiTargetCheckDistance(double radius,
                                              const VectorDouble& coeffs,
                                              const VectorDouble& angles)
@@ -181,4 +183,5 @@ bool BiTargetCheckDistance::isOK(const SpaceTarget& T1,
   _calculateDistance();
 
   return _dist <= _radius;
+}
 }

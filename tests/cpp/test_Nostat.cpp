@@ -24,6 +24,7 @@
 #define __USE_MATH_DEFINES
 #include <cmath>
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
 
   int useCholesky = 0;
   law_set_random_seed(13256);
-  (void)simulateSPDE(nullptr, workingDbc, model, 1, useCholesky,
+  (void)gstlrn::simulateSPDE(nullptr, workingDbc, model, 1, useCholesky,
                      VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(),
                      NamingConvention("Simu", true, false));
 

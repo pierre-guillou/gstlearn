@@ -17,6 +17,8 @@
 #include "Covariances/CovAniso.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 class Rotation;
 
 /**
@@ -40,3 +42,4 @@ public:
                                  const CovCalcMode* mode = nullptr,
                                  bool flagGrad = false) const = 0;
 };
+}

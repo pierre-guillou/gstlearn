@@ -20,6 +20,8 @@
 #include "Neigh/NeighImage.hpp"
 #include "Estimation/CalcImage.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

@@ -34,10 +34,12 @@
 #include "Mesh/MeshETurbo.hpp"
 #include "Model/Model.hpp"
 #include "geoslib_define.h"
-
+#include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include <math.h>
 #include <vector>
 
+namespace gstlrn
+{
 /**
  * Define if Cholesky must be used or not
  * @param useCholesky: 1 for YES; 0 for No; -1: set optimal default (according to NDim)
@@ -1681,4 +1683,5 @@ VectorMeshes defineMeshesFromDbs(const Db* dbin,
   if (isBuilt) delete domain;
 
   return meshes;
+}
 }

@@ -11,6 +11,8 @@
 #include "Boolean/ShapeParallelepiped.hpp"
 #include "Simulation/BooleanObject.hpp"
 
+namespace gstlrn
+{
 ShapeParallelepiped::ShapeParallelepiped(double proportion,
                                          double xext,
                                          double yext,
@@ -75,3 +77,4 @@ bool ShapeParallelepiped::belongObject(const VectorDouble& /*coor*/,
   return true;
 }
 
+}

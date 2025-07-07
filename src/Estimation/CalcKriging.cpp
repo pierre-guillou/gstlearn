@@ -22,6 +22,9 @@
 #include "Neigh/NeighUnique.hpp"
 #include <math.h>
 
+namespace gstlrn
+{
+
 CalcKriging::CalcKriging(bool flag_est, bool flag_std, bool flag_varZ)
   : ACalcInterpolator()
   , _flagEst(flag_est)
@@ -580,4 +583,6 @@ int test_neigh(Db* dbin,
   // Run the calculator
   int error = (krige.run()) ? 0 : 1;
   return error;
+}
+
 }

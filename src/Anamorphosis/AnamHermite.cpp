@@ -26,6 +26,8 @@
 #define ANAM_YMAX  10.
 #define YPAS       0.1
 
+namespace gstlrn
+{ 
 AnamHermite::AnamHermite(int nbpoly, bool flagBound, double rCoef)
     : AnamContinuous(),
       _flagBound(flagBound),
@@ -941,3 +943,4 @@ bool AnamHermite::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
   return ret;
 }
 #endif
+}

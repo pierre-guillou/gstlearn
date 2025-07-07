@@ -13,8 +13,6 @@
 #include "gstlearn_export.hpp"
 #include "Enum/AEnum.hpp"
 #include "Basic/Utilities.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
@@ -24,6 +22,13 @@
                    CASE2 , 2, "Enum test case 2"
 
 ENUM_DECLARE(ENUM_TESTS)
+
+namespace gstlrn
+{
+class MatrixDense;
+class MatrixSquare;
+class MatrixSparse;
+class MatrixSymmetric;
 
 class GSTLEARN_EXPORT argClass
 {
@@ -98,3 +103,4 @@ GSTLEARN_EXPORT MatrixSparse argumentReturnMatrixSparse(int nrows = 2,
                                                         int ncols = 3,
                                                         double zeroPercent = 0.1,
                                                         int seed = 1356);
+}

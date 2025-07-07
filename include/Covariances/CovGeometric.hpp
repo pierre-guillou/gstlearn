@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 class CovContext;
 
 class GSTLEARN_EXPORT CovGeometric : public ACovFunc
@@ -36,3 +38,4 @@ protected:
   VectorDouble _evaluateSpectrumOnSphere(int n, double scale = 1.) const override;
 };
 
+}

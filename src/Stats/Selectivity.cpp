@@ -31,6 +31,8 @@
 #define T_STD 5
 #define Q_STD 6
 
+namespace gstlrn
+{
 Selectivity::Selectivity(int ncut)
     : AStringable(),
       _Zcut(ncut),
@@ -1217,3 +1219,4 @@ int dbSelectivity(Db *db,
   return 0;
 }
 
+}

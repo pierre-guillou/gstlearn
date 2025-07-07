@@ -19,6 +19,8 @@
 /* Elementary Drift function
  * */
 
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -66,3 +68,4 @@ public:
   virtual int    getDriftNDimMax() const { return 0; }
   virtual bool   isDriftExternal() const { return false; }
 };
+}

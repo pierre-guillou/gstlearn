@@ -19,6 +19,9 @@
 #include "Basic/Plane.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
+
 class SimuFFTParam;
 class DbGrid;
 class Model;
@@ -97,3 +100,4 @@ GSTLEARN_EXPORT VectorDouble getChangeSupport(DbGrid *db,
                                               const VectorDouble &sigma = VectorDouble(),
                                               int seed = 14333,
                                               bool verbose = false);
+}

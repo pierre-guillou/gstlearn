@@ -20,6 +20,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 CalcStatistics::CalcStatistics()
     : ACalcDbToDb(),
       _iattOut(-1),
@@ -193,4 +195,5 @@ int dbRegression(Db *db1,
   // Run the calculator
   int error = (stats.run()) ? 0 : 1;
   return error;
+}
 }

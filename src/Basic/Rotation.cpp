@@ -16,6 +16,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{ 
 Rotation::Rotation(unsigned int ndim)
   : AStringable(),
     _nDim(ndim)
@@ -268,4 +270,5 @@ bool Rotation::isMatrixRotation(const MatrixSquare& rotmat, bool verbose)
     return false;
   }
   return true;
+}
 }

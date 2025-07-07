@@ -16,6 +16,7 @@
  * This test is meant to check the interactive questioning
  * @return
  */
+using namespace gstlrn;
 int main()
 {
   int ianswer;

@@ -21,9 +21,9 @@ DECLARE_EIGEN_TRAITS(ScaleOp)
 
 class GSTLEARN_EXPORT ScaleOp:
 #ifndef SWIG
-  public ALinearOpEigenCG<ScaleOp>
+  public gstlrn::ALinearOpEigenCG<ScaleOp>
 #else
-  public ALinearOp
+  public gstlrn::ALinearOp
 #endif
 {
 

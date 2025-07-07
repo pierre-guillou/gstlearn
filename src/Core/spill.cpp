@@ -16,6 +16,8 @@
 #include "geoslib_old_f.h"
 #include <string.h>
 
+namespace gstlrn
+{
 typedef struct
 {
   double* bitmap; /* pointer to pixels */
@@ -807,4 +809,5 @@ label_end:
   *h = hspill;
 
   return (error);
+}
 }

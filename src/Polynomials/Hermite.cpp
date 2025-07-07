@@ -16,6 +16,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{ 
 double _convert2u(double yc, double krigest, double krigstd)
 {
   if (ABS(krigstd) < EPSILON6) return ((yc >= krigest) ? +10. : -10.);
@@ -580,3 +582,4 @@ VectorDouble hermiteIndicatorLower(double y, int nbpoly)
   return coeff;
 }
 
+}

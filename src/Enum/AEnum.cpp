@@ -11,8 +11,9 @@
 #include "Enum/AEnum.hpp"
 #include "Basic/AStringable.hpp"
 
-void AEnum::printEnum() const
+namespace gstlrn
 {
+void AEnum::printEnum() const {
   _printMsg("  %2d - %11s : %s\n", _value, _key.data(), _descr.data());
 }
 
@@ -26,4 +27,5 @@ template<typename... Args>
 void AEnum::_printMsg(const char* format, Args... args)
 {
   message(format, args...);
+}
 }

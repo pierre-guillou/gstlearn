@@ -19,6 +19,8 @@
 #include "Space/SpacePoint.hpp"
 #include <vector>
 
+namespace gstlrn
+{
 class ACov;
 class CorAniso;
 /**
@@ -79,4 +81,5 @@ private:
   
 
 };
+}
 

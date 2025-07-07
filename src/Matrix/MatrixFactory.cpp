@@ -17,6 +17,8 @@
 
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Performs the product of two matrices: X * Y
@@ -310,4 +312,5 @@ AMatrix* MatrixFactory::createGlue(const AMatrix* a1,
     a = MatrixDense::glue(a1, a2, flagShiftRow, flagShiftCol);
   }
   return a;
+}
 }

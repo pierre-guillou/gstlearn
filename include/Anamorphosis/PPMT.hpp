@@ -21,6 +21,10 @@
 #include "Basic/ICloneable.hpp"
 #include "Basic/NamingConvention.hpp"
 
+
+
+namespace gstlrn {
+ 
 class Db;
 class MatrixSymmetric;
 class MatrixDense;
@@ -128,3 +132,4 @@ private:
   mutable MatrixDense* _initSphering;
 };
 
+}

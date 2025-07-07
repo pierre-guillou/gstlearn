@@ -16,6 +16,8 @@
 #include <iomanip>
 #include <map>
 
+namespace gstlrn
+{
 std::map<const String, double> OptCustom::_cst = std::map<const String, double>();
 
 double OptCustom::query(const String& name, double valdef)
@@ -67,4 +69,5 @@ void OptCustom::display(void)
         e.second << std::endl;
   }
   messageFlush(sstr.str());
+}
 }

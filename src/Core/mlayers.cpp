@@ -38,6 +38,8 @@
 #define VARS(n, i, j)      (vars[IAD(n, i, j)])
 /*! \endcond */
 
+namespace gstlrn
+{
 typedef struct
 {
   int flag_same;  /* 1 if input and output files coincide */
@@ -2826,4 +2828,5 @@ label_end:
     *vars = (double*)mem_free((char*)*vars);
   }
   return (error);
+}
 }

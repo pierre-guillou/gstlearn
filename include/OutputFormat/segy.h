@@ -19,6 +19,8 @@
 #include <cstring>
 #include <cmath>
 
+namespace gstlrn
+{
 class Grid;
 
 #ifndef SWIG
@@ -236,3 +238,4 @@ GSTLEARN_EXPORT int db_segy(const char *filesegy,
                             int codefmt = 1,
                             const NamingConvention& namconv = NamingConvention("SEGY"));
 
+}

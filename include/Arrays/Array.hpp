@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Arrays/AArray.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Array : public AArray
 {
 public:
@@ -33,3 +35,4 @@ private:
 private:
   VectorDouble _values;
 };
+}

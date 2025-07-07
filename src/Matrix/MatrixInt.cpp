@@ -11,6 +11,8 @@
 #include "Matrix/MatrixInt.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 MatrixInt::MatrixInt(int nrows, int ncols)
     : AStringable(),
       _nRows(nrows),
@@ -363,3 +365,4 @@ void MatrixInt::_transposeInPlace(int n1, int n2, const int *v1, int *w1)
       w1[ecr++] = V1(i1, i2);
 }
 
+}

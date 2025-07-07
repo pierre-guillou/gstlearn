@@ -16,6 +16,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 
@@ -67,3 +69,4 @@ public:
 
 //typedef VectorHelper VH;
 class DbH: public DbHelper {};
+}

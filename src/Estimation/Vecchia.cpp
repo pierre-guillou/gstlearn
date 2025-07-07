@@ -22,6 +22,8 @@
 #include "Tree/Ball.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{ 
 Vecchia::Vecchia(ModelGeneric* model,
                  int nb_neigh,
                  const Db* db1,
@@ -406,4 +408,5 @@ double Vecchia::_computeLogDet() const
 void Vecchia::_updateModel(bool verbose)
 {
   computeLower(_Ranks, verbose);
+}
 }

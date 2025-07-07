@@ -11,6 +11,8 @@
 #include "Model/Option_AutoFit.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 Option_AutoFit::Option_AutoFit()
     : AStringable(),
       _verbose(false),
@@ -77,4 +79,5 @@ String Option_AutoFit::toString(const AStringFormat* /*strfmt*/) const
 
 
   return sstr.str();
+}
 }

@@ -16,6 +16,8 @@
 #include "Db/DbStringFormat.hpp"
 #include "Db/RankHandler.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

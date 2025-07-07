@@ -13,6 +13,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 BImage::BImage(const VectorInt& ndims)
     : AArray(ndims),
       _values()
@@ -173,4 +175,5 @@ unsigned char BImage::getMaskoff(int i, int j, int k) const
 {
   static unsigned char CMaskoff[] = { 127, 191, 223, 239, 247, 251, 253, 254 };
   return CMaskoff[_residu(i,j,k)];
+}
 }

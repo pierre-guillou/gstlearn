@@ -20,6 +20,8 @@
 #include "Space/SpaceSN.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 MeshSpherical::MeshSpherical(const MatrixDense &apices,
                              const MatrixInt &meshes)
     : AMesh(),
@@ -456,3 +458,4 @@ bool MeshSpherical::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) 
   return ret;
 }
 #endif
+}

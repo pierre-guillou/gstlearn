@@ -21,6 +21,8 @@
 #define VERBOSE 0
 #define INTER 0
 
+using namespace gstlrn;
+
 static double deg(double a)
 {
   return(a * 180. / GV_PI);

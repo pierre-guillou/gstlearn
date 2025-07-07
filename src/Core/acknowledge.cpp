@@ -12,6 +12,8 @@
 #include "Basic/AStringable.hpp"
 #include "version.h"
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  *  Acknowledgment of the authors for gstlearn Library
@@ -34,4 +36,6 @@ void acknowledge_gstlearn(void)
   message("Pierre GUILLOU   (pierre.guillou@minesparis.psl.eu)\n");
   message("Xavier FREULON   (xavier.freulon@minesparis.psl.eu)\n");
   message("Mike PEREIRA     (mike.pereira@minesparis.psl.eu)\n");
+}
+
 }

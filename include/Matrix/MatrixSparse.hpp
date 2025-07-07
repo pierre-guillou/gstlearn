@@ -27,9 +27,14 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 DISABLE_WARNING_POP
 #endif
 
+
+
+namespace gstlrn {
+
 class cs;
 class EOperator;
-
+}
+namespace gstlrn{
 /**
  * Sparse Matrix
  *
@@ -318,3 +323,4 @@ GSTLEARN_EXPORT bool isGlobalFlagEigen();
 GSTLEARN_EXPORT Eigen::SparseMatrix<double> AtMA(const Eigen::SparseMatrix<double>& A,
                                                  const Eigen::SparseMatrix<double>& M);
 #endif
+}

@@ -19,6 +19,8 @@
 #include "Boolean/ModelBoolean.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class AShape;
 class BooleanObject;
 class DbGrid;
@@ -37,6 +39,8 @@ class Db;
  * (as Z Locator variable) and are set to 0 (pore) or 1 (grain)
  * If the proportion is variable, it uses Proportion locator in output DbGrid
  */
+
+
 class GSTLEARN_EXPORT SimuBoolean: public ACalcSimulation, public AStringable
 {
 public:
@@ -101,3 +105,4 @@ GSTLEARN_EXPORT int simbool(Db *dbin,
                             bool flag_rank = true,
                             bool verbose = false,
                             const NamingConvention& namconv = NamingConvention("Boolean"));
+}

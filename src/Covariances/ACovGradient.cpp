@@ -9,29 +9,31 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/ACovGradient.hpp"
-
 #include <math.h>
 
+namespace gstlrn
+{
+
 ACovGradient::ACovGradient(const ECov& type, const CovContext& ctxt)
-    : CovAniso(type, ctxt)
+  : CovAniso(type, ctxt)
 {
 }
 
-ACovGradient::ACovGradient(const ACovGradient &r)
-    : CovAniso(r)
+ACovGradient::ACovGradient(const ACovGradient& r)
+  : CovAniso(r)
 {
 }
 
-ACovGradient::ACovGradient(const CovAniso &r)
-    : CovAniso(r)
+ACovGradient::ACovGradient(const CovAniso& r)
+  : CovAniso(r)
 {
 }
 
-ACovGradient& ACovGradient::operator=(const ACovGradient &r)
+ACovGradient& ACovGradient::operator=(const ACovGradient& r)
 {
   if (this != &r)
   {
-    CovAniso::operator =(r);
+    CovAniso::operator=(r);
   }
   return *this;
 }
@@ -39,4 +41,4 @@ ACovGradient& ACovGradient::operator=(const ACovGradient &r)
 ACovGradient::~ACovGradient()
 {
 }
-
+}

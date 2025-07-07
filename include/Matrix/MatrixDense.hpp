@@ -27,6 +27,10 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 DISABLE_WARNING_POP
 #endif
 
+
+
+namespace gstlrn
+{
 class MatrixSquare;
 class MatrixSymmetric;
 class EOperator;
@@ -243,3 +247,4 @@ protected:
 private:
   int _maxSize;
 };
+}

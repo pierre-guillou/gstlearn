@@ -12,9 +12,11 @@
 #include "Db/Db.hpp"
 #include "Drifts/ADrift.hpp"
 
-DriftM::DriftM(const VectorInt& powers)
-  : ADrift()
-  , _monomialPower(powers)
+namespace gstlrn
+{
+DriftM::DriftM(const VectorInt &powers)
+    : ADrift(),
+      _monomialPower(powers)
 {
 }
 
@@ -157,4 +159,5 @@ DriftM* DriftM::createByIdentifier(const String& driftname)
   // Final Resizing
   powers.resize(rank_max);
   return new DriftM(powers);
+}
 }

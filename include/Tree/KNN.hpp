@@ -15,6 +15,8 @@
 #include "Tree/ball_algorithm.h"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 struct t_btree;
 struct t_nheap;
 
@@ -62,3 +64,4 @@ private:
   int _n_samples;
   int _n_neighbors;
 };
+}

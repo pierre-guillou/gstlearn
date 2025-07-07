@@ -16,6 +16,8 @@
 #include "Variogram/AVario.hpp"
 #include "Variogram/VarioParam.hpp"
 
+namespace gstlrn
+{
 class Db;
 class ECalcVario;
 class Polygons;
@@ -78,3 +80,4 @@ GSTLEARN_EXPORT DbGrid* db_vcloud(Db *db,
                                   int varnb = 100,
                                   const NamingConvention &namconv = NamingConvention("Cloud"));
 
+}

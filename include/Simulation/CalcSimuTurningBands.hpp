@@ -19,6 +19,9 @@
 
 #include "geoslib_define.h"
 
+
+namespace gstlrn
+{
 class Model;
 class ANeigh;
 class TurningBandOperate;
@@ -234,3 +237,4 @@ GSTLEARN_EXPORT int simbayes(Db *dbin,
                              int nbtuba = 100,
                              bool flag_check = false,
                              const NamingConvention& namconv = NamingConvention("SimBayes"));
+}

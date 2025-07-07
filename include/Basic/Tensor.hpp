@@ -16,6 +16,9 @@
 #include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 
+namespace gstlrn
+{ 
+
 class GSTLEARN_EXPORT Tensor : public AStringable /// TODO : public ASpaceObject
 {
 public:
@@ -84,3 +87,4 @@ private:
   bool _isotropic;                         /// True if the tensor is isotropic
   bool _flagDefinedBySquare;               /// True if Tensor has been defined using the squared elements (direct)
 };
+}

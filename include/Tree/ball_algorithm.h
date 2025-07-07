@@ -40,6 +40,8 @@ License: BSD 3-clause
 # define TRUE 1
 # define FALSE 0
 
+namespace gstlrn
+{
 struct t_nheap
 {
   double **distances;
@@ -118,3 +120,4 @@ void     nheap_sort(t_nheap *h);
 void     nheap_load(t_nheap *heap, t_btree *b, const double **x);
 double   min_dist(const t_btree *tree, int i_node, const double *pt);
 int      query_depth_first(const t_btree *b, int i_node, const double *pt, int i_pt, t_nheap *heap, double dist);
+}

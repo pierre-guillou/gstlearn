@@ -45,7 +45,9 @@
 #define Gmatrix(i, j)         (Gmatrix[(j) * nech + i])
 /*! \endcond */
 
-int NDIM_LOCAL        = 0;
+namespace gstlrn
+{
+int NDIM_LOCAL = 0;
 VectorDouble X1_LOCAL = VectorDouble();
 VectorDouble X2_LOCAL = VectorDouble();
 
@@ -724,4 +726,6 @@ int model_covmat_inchol(int verbose,
 label_end:
   mem_free((char*)G);
   return (error);
+}
+
 }

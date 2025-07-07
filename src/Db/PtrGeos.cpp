@@ -15,6 +15,8 @@
 #include <sstream>
 #include <string.h>
 
+namespace gstlrn
+{
 typedef struct
 {
   char SREF[LOCAL_SIZE];       /* Name of the Locator */
@@ -265,4 +267,5 @@ VectorInt getLocatorMultiples()
     it.toNext();
   }
   return mult;
+}
 }

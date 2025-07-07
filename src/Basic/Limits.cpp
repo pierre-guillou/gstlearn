@@ -15,6 +15,8 @@
 #include "Basic/NamingConvention.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 Limits::Limits()
     : AStringable(),
       _bounds()
@@ -850,3 +852,4 @@ int Limits::_check_bound_consistency(const VectorDouble &mini,
   return 0;
 }
 
+}

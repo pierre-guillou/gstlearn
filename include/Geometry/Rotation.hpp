@@ -17,6 +17,8 @@
 
 #include "Matrix/MatrixSquare.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Rotation: public AStringable /// TODO : public ASpaceObject
 {
 public:
@@ -66,3 +68,4 @@ private:
   MatrixSquare _rotInv;
   mutable VectorDouble _local;
 };
+}

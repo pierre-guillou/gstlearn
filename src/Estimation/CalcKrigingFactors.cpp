@@ -15,6 +15,8 @@
 #include "Estimation/KrigingSystem.hpp"
 #include "Model/Model.hpp"
 
+namespace gstlrn
+{
 CalcKrigingFactors::CalcKrigingFactors(bool flag_est, bool flag_std)
   : ACalcInterpolator()
   , _flagEst(flag_est)
@@ -242,4 +244,5 @@ int krigingFactors(Db* dbin,
   // Run the calculator
   int error = (krige.run()) ? 0 : 1;
   return error;
+}
 }

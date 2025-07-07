@@ -30,6 +30,8 @@
 #include <math.h>
 #include <memory>
 
+namespace gstlrn
+{
 ShiftOpMatrix::ShiftOpMatrix()
   : AShiftOp()
   , _TildeC()
@@ -1387,3 +1389,4 @@ void ShiftOpMatrix::_determineFlagNoStatByHH()
 //   _S->addMatInPlace(*T1, v1, v2);
 //   delete T1;  
 // }
+}

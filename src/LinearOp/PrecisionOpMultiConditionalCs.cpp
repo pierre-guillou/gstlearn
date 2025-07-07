@@ -18,6 +18,8 @@
 #include <math.h>
 #include <vector>
 
+namespace gstlrn
+{
 PrecisionOpMultiConditionalCs::PrecisionOpMultiConditionalCs()
     : _QpAtA(nullptr)
     , _chol(nullptr)
@@ -165,4 +167,5 @@ void PrecisionOpMultiConditionalCs::makeReady()
 {
   // Perform Cholesky decomposition (if not already performed)
   _buildQpAtA();
+}
 }

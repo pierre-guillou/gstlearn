@@ -13,6 +13,8 @@
 #include "Model/ModelFitSillsVMap.hpp"
 #include "Covariances/CovBase.hpp"
 
+namespace gstlrn
+{
 ModelCovList::ModelCovList(const CovContext& ctxt)
   : ModelGeneric(ctxt)
 {
@@ -86,4 +88,5 @@ void ModelCovList::fitSills(Vario* vario,
 
   // Cancel the structure possibly used for Goulard (to be improved)
   deleteFitSills();
+}
 }

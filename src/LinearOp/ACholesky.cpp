@@ -11,6 +11,7 @@
 #include "LinearOp/ACholesky.hpp"
 #include "Matrix/MatrixDense.hpp"
 
+namespace gstlrn{
 ACholesky::ACholesky(const AMatrix* mat)
   : _mat(mat)
   , _size(0)
@@ -144,4 +145,5 @@ VectorDouble ACholesky::solveX(const VectorDouble& vecin) const
   vect spout(vecout);
   addSolveX(spin, spout);
   return vecout;
+}
 }

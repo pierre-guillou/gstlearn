@@ -16,6 +16,11 @@
 
 #include "Calculators/ACalcInterpolator.hpp"
 
+
+
+namespace gstlrn
+{
+
 class Db;
 class DbGrid;
 class KrigingSystem;
@@ -63,3 +68,4 @@ GSTLEARN_EXPORT int krigingFactors(Db* dbin,
                                    bool flag_std                   = true,
                                    const KrigOpt& krigopt          = KrigOpt(),
                                    const NamingConvention& namconv = NamingConvention("KD"));
+}

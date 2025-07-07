@@ -10,12 +10,12 @@
 /******************************************************************************/
 #include "Covariances/CovMarkov.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Basic/MathFunc.hpp"
-
 #include "math.h"
 
 #define MAXTAB 100
 
+namespace gstlrn
+{
 CovMarkov::CovMarkov(const CovContext &ctxt)
     : ACovFunc(ECov::MARKOV, ctxt),
       _markovCoeffs(),
@@ -25,20 +25,20 @@ CovMarkov::CovMarkov(const CovContext &ctxt)
   _markovCoeffs.push_back(1.);
 }
 
-CovMarkov::CovMarkov(const CovMarkov &r)
-  : ACovFunc(r),
-    _markovCoeffs(r._markovCoeffs),
-    _correc(r._correc)
+CovMarkov::CovMarkov(const CovMarkov& r)
+  : ACovFunc(r)
+  , _markovCoeffs(r._markovCoeffs)
+  , _correc(r._correc)
 {
 }
 
-CovMarkov& CovMarkov::operator=(const CovMarkov &r)
+CovMarkov& CovMarkov::operator=(const CovMarkov& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
     _markovCoeffs = r._markovCoeffs;
-    _correc = r._correc;
+    _correc       = r._correc;
   }
   return *this;
 }
@@ -59,52 +59,51 @@ String CovMarkov::getFormula() const
 
 VectorDouble CovMarkov::_evaluateSpectrumOnSphere(int n, double scale) const
 {
-  auto sp = _evaluateSpectrumOnSphereWithoutNormalization(n,scale);
-  VH::normalize(sp,1);
+  auto sp = _evaluateSpectrumOnSphereWithoutNormalization(n, scale);
+  VH::normalize(sp, 1);
   return sp;
 }
 
 VectorDouble CovMarkov::_evaluateSpectrumOnSphereWithoutNormalization(int n, double scale) const
 {
-  VectorDouble sp(1+n, 0.);
+  VectorDouble sp(1 + n, 0.);
 
   for (int j = 0; j < (int)sp.size(); j++)
   {
-    double nnp1 = scale * scale * (double) j * ((double) j + 1.);
-    double s = 0.;
+    double nnp1 = scale * scale * (double)j * ((double)j + 1.);
+    double s    = 0.;
     for (int i = 0; i < (int)_markovCoeffs.size(); i++)
     {
-      s += _markovCoeffs[i] * pow(nnp1,i);
+      s += _markovCoeffs[i] * pow(nnp1, i);
     }
     sp[j] = (2. * j + 1.) / (4 * GV_PI * s);
   }
   return sp;
-
 }
 
-double CovMarkov::normalizeOnSphere(int n, double scale) const 
-{ 
-  auto sp = _evaluateSpectrumOnSphereWithoutNormalization(n,scale);
+double CovMarkov::normalizeOnSphere(int n, double scale) const
+{
+  auto sp  = _evaluateSpectrumOnSphereWithoutNormalization(n, scale);
   double s = 0.;
-  for (auto &e : sp)
+  for (auto& e: sp)
   {
     s += e;
   }
   return s;
 }
 
-
 double CovMarkov::evaluateSpectrum(double freq) const
 {
   double s = 0.;
-  int n = (int)_markovCoeffs.size();
+  int n    = (int)_markovCoeffs.size();
   if (n == 0)
   {
     return TEST;
   }
   for (int i = 0; i < n; i++)
   {
-    s += _markovCoeffs[i] * pow(freq,i);
+    s += _markovCoeffs[i] * pow(freq, i);
   }
   return 1. /  s;
+}
 }

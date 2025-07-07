@@ -16,6 +16,8 @@
 #include "Db/DbGrid.hpp"
 #include "Matrix/MatrixDense.hpp"
 
+namespace gstlrn
+{
 Convolution::Convolution(DbGrid* dbgrid)
   : _dbgrid(dbgrid)
 {
@@ -277,4 +279,5 @@ int Convolution::ConvolveFFT(int iatt,
     _dbgrid->setArrayByUID(result, iatt + ivar);
   }
   return 0;
+}
 }

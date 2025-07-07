@@ -19,6 +19,8 @@
 #include "Simulation/SimuFFTParam.hpp"
 #include "Simulation/CalcSimuFFT.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

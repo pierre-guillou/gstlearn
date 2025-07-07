@@ -33,6 +33,8 @@
 #include "Estimation/CalcImage.hpp"
 #include "Estimation/CalcGlobal.hpp"
 
+using namespace gstlrn;
+
 static Db* createLocalDb(int nech, int ndim, int nvar, int seed)
 {
   // Define seed

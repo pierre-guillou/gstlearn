@@ -15,6 +15,8 @@
 
 #include <chrono>
 
+namespace gstlrn
+{
 typedef std::chrono::high_resolution_clock hrc;
 typedef std::chrono::milliseconds ms;
 typedef std::chrono::duration<double> sec;
@@ -47,3 +49,4 @@ public:
 private:
   hrc::time_point _refTime;
 };
+}

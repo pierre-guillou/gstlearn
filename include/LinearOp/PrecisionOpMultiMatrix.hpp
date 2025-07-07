@@ -13,7 +13,9 @@
 #include "Matrix/MatrixSparse.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
 
+namespace gstlrn{
 class Model;
+
 /**
  * Class for the precision matrix of the latent field in SPDE (matricial form)
  */
@@ -42,3 +44,4 @@ private:
 private:
   MatrixSparse _Q;
 };
+}

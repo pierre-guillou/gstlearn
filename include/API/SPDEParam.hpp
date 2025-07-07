@@ -13,7 +13,11 @@
 #include "Basic/AStringable.hpp"
 #include "LinearOp/CGParam.hpp"
 
+namespace gstlrn
+{ 
 class ALinearOp;
+
+
 
 /**
  * @brief Definition of the parameters used within SPDE
@@ -95,3 +99,4 @@ private:
   int _seedMC; // Seed for the random number generator
   CGParam _CGparams;
 };
+}

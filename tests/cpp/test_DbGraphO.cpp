@@ -17,6 +17,7 @@
 #include "Db/DbGraphO.hpp"
 #include "Basic/OptCst.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

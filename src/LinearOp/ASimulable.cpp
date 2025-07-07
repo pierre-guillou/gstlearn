@@ -14,6 +14,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 VectorDouble ASimulable::evalSimulate(const VectorDouble& whitenoise) const
 {
   VectorDouble res;
@@ -54,4 +56,5 @@ double ASimulable::computeLogDet(int nMC) const
   DECLARE_UNUSED(nMC);
   messerr("computeLogDet not implemented in ASimulable");
   return TEST;
+}
 }

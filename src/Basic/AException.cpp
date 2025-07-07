@@ -13,6 +13,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace gstlrn
+{
 AException::AException(const std::string& msg)
 : std::exception()
 , _msg(msg)
@@ -42,4 +44,5 @@ void throw_exp(const std::string& msg,
   sstr << msg;
   std::cout << "Error: " << sstr.str() << std::endl;
   throw(AException(sstr.str()));
+}
 }

@@ -22,6 +22,8 @@
 #include "Neigh/NeighMoving.hpp"
 #include "Estimation/CalcKriging.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

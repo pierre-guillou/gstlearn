@@ -16,6 +16,8 @@
 #include "LinearOp/ProjMulti.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
+namespace gstlrn
+{
 static std::vector<std::vector<const IProj*>> castToBase(const std::vector<std::vector<const ProjMatrix*>>& vect)
 {
   std::vector<std::vector<const IProj*>> casted(vect.size());
@@ -205,4 +207,5 @@ int ProjMultiMatrix::_addMesh2point(const constvect inv, vect outv) const
 {
   _Proj.addProdMatVecInPlaceToDest(inv, outv, false);
   return 0;
+}
 }

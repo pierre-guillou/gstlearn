@@ -12,6 +12,8 @@
 
 #include <Basic/VectorNumT.hpp>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT IProj
 {
 public:
@@ -46,3 +48,4 @@ protected:
   }
   #endif
 };
+}

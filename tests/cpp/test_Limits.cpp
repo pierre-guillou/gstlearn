@@ -16,6 +16,8 @@
 #include "Model/Model.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

@@ -43,6 +43,8 @@
 
 #include <math.h>
 
+namespace gstlrn 
+{
 Model::Model(const CovContext &ctxt)
     : AStringable(),
       ASerializable(),
@@ -547,7 +549,7 @@ void Model::switchToGradient()
  * @param strcnt Array of covariance description used for IR case
  * @return
  */
-int Model::setAnam(const AAnam* anam, const VectorInt& strcnt)
+int Model::setAnam(const gstlrn::AAnam* anam, const VectorInt& strcnt)
 {
   if (anam == nullptr)
   {
@@ -1536,3 +1538,4 @@ bool Model::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

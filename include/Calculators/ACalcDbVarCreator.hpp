@@ -16,6 +16,8 @@
 #include "Db/Db.hpp"
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
 class ELoc;
 
 class GSTLEARN_EXPORT ACalcDbVarCreator: public ACalculator
@@ -60,3 +62,4 @@ private:
   VectorInt _listVariablePermDb;
   VectorInt _listVariableTempDb;
 };
+}

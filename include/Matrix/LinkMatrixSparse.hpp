@@ -16,11 +16,15 @@
 
 #ifndef SWIG
 
+
+namespace gstlrn
+{
+class MatrixSparse;
 class cs;
 class css;
 class csn;
 class csd;
-class MatrixSparse;
+
 class NF_Triplet;
 
 class GSTLEARN_EXPORT QChol
@@ -198,3 +202,4 @@ GSTLEARN_EXPORT void cs_gibbs(const cs* A,
                               double* yk, double* sk);
 
 #endif // SWIG
+}

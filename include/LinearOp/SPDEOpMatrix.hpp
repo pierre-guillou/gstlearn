@@ -15,9 +15,11 @@
 #include "LinearOp/SPDEOp.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
-class PrecisionOpMultiMatrix;
+namespace gstlrn
+{
 class ProjMultiMatrix;
 class MatrixSparse;
+class PrecisionOpMultiMatrix;
 
 class GSTLEARN_EXPORT SPDEOpMatrix : public SPDEOp
 {
@@ -42,3 +44,4 @@ private:
   mutable MatrixSparse _QpAinvNoiseAt; // mutable is required to perform the Cholesky decomposition
   mutable CholeskySparse* _chol;       // when needed, e.g in a const method.
 };
+}

@@ -11,6 +11,8 @@
 #include "Drifts/ADrift.hpp"
 #include "Drifts/DriftFactory.hpp"
 
+namespace gstlrn
+{
 ADrift::ADrift()
   : AStringable()
 {
@@ -39,4 +41,5 @@ String ADrift::toString(const AStringFormat* /*strfmt*/) const
   std::stringstream sstr;
   sstr << getDriftName();
   return sstr.str();
+}
 }

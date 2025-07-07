@@ -23,6 +23,7 @@
 #include "Tree/Ball.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

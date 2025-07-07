@@ -22,6 +22,7 @@
 #include "geoslib_define.h"
 #include "utils.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for testing MAF
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
   VarioParam* varioparam = VarioParam::createOmniDirection(nlag, lag);
 
   String filename;
-  filename = gstlearn::getTestData("MAF", "data_for_MAF.dat");
+  filename = getTestData("MAF", "data_for_MAF.dat");
   Db* data = Db::createFromNF(filename);
   data->display();
 

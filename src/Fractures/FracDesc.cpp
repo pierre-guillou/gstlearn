@@ -13,6 +13,8 @@
 #include "Basic/Utilities.hpp"
 #include <math.h>
 
+namespace gstlrn
+{
 FracDesc::FracDesc()
   : AStringable()
   , _family(0)
@@ -97,4 +99,6 @@ double FracDesc::fractureExtension(double cote, double dcote) const
     dist += sqrt(distx * distx + disty * disty);
   }
   return (dist);
+}
+
 }

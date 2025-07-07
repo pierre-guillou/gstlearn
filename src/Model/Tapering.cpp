@@ -14,6 +14,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 Tapering::Tapering()
   : AStringable(),
     _type(0)
@@ -178,4 +180,5 @@ String Tapering::toString(const AStringFormat* /*strfmt*/) const
   sstr << "Tapering Function     = " << _name << std::endl;
   sstr << "Tapering Scale        = " << _range << std::endl;
   return sstr.str();
+}
 }

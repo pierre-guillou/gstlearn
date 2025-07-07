@@ -20,6 +20,9 @@
 
 #include <math.h>
 
+namespace gstlrn
+{ 
+
 SimuBoolean::SimuBoolean(int nbsimu, int seed)
     : ACalcSimulation(nbsimu, seed),
       AStringable(),
@@ -500,3 +503,4 @@ int simbool(Db* dbin,
   return 0;
 }
 
+}

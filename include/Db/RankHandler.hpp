@@ -16,6 +16,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "memory"
 
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -75,3 +77,4 @@ private:
   const Db* _db;       // Pointer to Db
   VectorInt _workNbgh; // Vector of ellible sample absolute ranks
 };
+}

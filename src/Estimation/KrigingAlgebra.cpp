@@ -16,6 +16,8 @@
 #include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 
+namespace gstlrn
+{
 KrigingAlgebra::KrigingAlgebra(bool flagDual,
                                const VectorVectorInt* sampleRanks,
                                const VectorDouble* Z,
@@ -1700,4 +1702,5 @@ void KrigingAlgebra::dumpAux()
     tab_printg(NULL, _Beta[ibfl]);
     message("\n");
   }
+}
 }

@@ -27,6 +27,8 @@
 
 #include <iostream>
 
+using namespace gstlrn;
+
 // Function to minimize
 double myfunc2(const std::vector<double>& x)
 {

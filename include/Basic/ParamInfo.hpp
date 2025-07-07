@@ -14,6 +14,9 @@
 
 #define INF std::numeric_limits<double>::infinity()
 
+namespace gstlrn
+{
+
 /**
  * @brief Definition of the generic parameter
  * 
@@ -65,3 +68,4 @@ private:
   String _description;
   mutable size_t _address;
 };
+}

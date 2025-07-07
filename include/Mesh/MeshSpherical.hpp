@@ -14,6 +14,9 @@
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/MatrixInt.hpp"
 
+namespace gstlrn
+{
+
 /**
  * Meshing defined in the Spherical Space
  */
@@ -85,3 +88,4 @@ private:
   MatrixDense _apices; // Dimension: NRow=napices; Ncol=Ndim(=2)
   MatrixInt         _meshes; // Dimension: Nrow=Nmesh; Ncol=NApexPerMesh
 };
+}

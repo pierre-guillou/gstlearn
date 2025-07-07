@@ -15,6 +15,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SimuBooleanParam: public AStringable
 {
 public:
@@ -50,3 +52,4 @@ private:
   double _facies;
   VectorDouble _dilate;
 };
+}

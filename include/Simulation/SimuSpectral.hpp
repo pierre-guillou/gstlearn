@@ -16,6 +16,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
 typedef struct
 {
   int _k;
@@ -84,3 +86,4 @@ GSTLEARN_EXPORT int simuSpectral(Db *dbin = nullptr,
                                  int nd = 100,
                                  bool verbose = false,
                                  const NamingConvention &namconv = NamingConvention("Simu"));
+}

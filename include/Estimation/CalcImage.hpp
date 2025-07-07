@@ -17,11 +17,13 @@
 
 #include "Calculators/ACalcInterpolator.hpp"
 
+
+namespace gstlrn {
+
 class DbGrid;
 class ANeigh;
 class NeighImage;
 class ModelCovList;
-
 class GSTLEARN_EXPORT CalcImage: public ACalcInterpolator {
 public:
   CalcImage();
@@ -102,3 +104,4 @@ GSTLEARN_EXPORT int dbSmoother(DbGrid* dbgrid,
                                int type                        = 1,
                                double range                    = 1.,
                                const NamingConvention& namconv = NamingConvention("Smooth"));
+}

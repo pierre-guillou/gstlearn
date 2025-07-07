@@ -17,11 +17,14 @@
 
 #include <vector>
 
-class Db;
-class DbGrid;
-class Model;
-class SPDE;
-class RuleProp;
+
+
+namespace gstlrn {
+  class Db;
+  class DbGrid;
+  class Model;
+  class RuleProp;
+  class SPDE;  // Forward declaration
 
 class GSTLEARN_EXPORT PGSSPDE
 {
@@ -44,3 +47,4 @@ private:
   const RuleProp*    _ruleProp;
   ESPDECalcMode      _calcul;
 };
+}

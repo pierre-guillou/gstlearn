@@ -16,6 +16,8 @@
 #include "Model/AModelFitSills.hpp"
 #include "Model/ModelOptimParam.hpp"
 
+namespace gstlrn
+{
 class ModelGeneric;
 class DbGrid;
 class Constraints;
@@ -27,6 +29,7 @@ class MatrixSymmetric;
  * Class which, starting from an experimental variogram, enables fitting the
  * sills of all Covariance parts of a Model
  */
+
 class GSTLEARN_EXPORT ModelFitSillsVMap: public AModelFitSills
 {
 public:
@@ -59,3 +62,4 @@ private:
   VectorInt _indg2;
   int _nech;
 };
+}

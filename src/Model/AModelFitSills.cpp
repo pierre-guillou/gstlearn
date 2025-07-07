@@ -26,6 +26,8 @@
 #define TAB(ijvar, ipadir)      tabin[IJDIR(ijvar, ipadir)]
 #define DD(idim, ijvar, ipadir) _dd[idim][IJDIR(ijvar, ipadir)]
 
+namespace gstlrn
+{
 AModelFitSills::AModelFitSills(ModelCovList* model,
                                const Constraints* constraints,
                                const ModelOptimParam& mop)
@@ -1148,4 +1150,5 @@ int AModelFitSills::_fitSillMatrices()
   if (_verbose) printFitSillSummary(_iterg);
 
   return (status);
+}
 }

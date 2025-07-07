@@ -12,7 +12,8 @@
 #include "Simulation/BooleanObject.hpp"
 
 #include <math.h>
-
+namespace gstlrn
+{
 ShapeHalfSinusoid::ShapeHalfSinusoid(double proportion,
                                      double period,
                                      double amplitude,
@@ -88,4 +89,5 @@ bool ShapeHalfSinusoid::belongObject(const VectorDouble& coor,
   double dy = (ndim >= 2) ? (coor[1] - yloc) / (object->getValue(2) / 2.) :  0.;
 
   return (dx * dx + dy * dy + dz * dz <= 1);
+}
 }

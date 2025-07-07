@@ -21,6 +21,9 @@
 #define IJDIR(ijvar, ipadir) ((ijvar) * npadir + (ipadir))
 #define WT(ijvar, ipadir)    wt[IJDIR(ijvar, ipadir)]
 
+namespace gstlrn
+{ 
+
 ModelOptimVario::ModelOptimVario(ModelGeneric* model,
                                  const Constraints* constraints,
                                  const ModelOptimParam& mop)
@@ -274,4 +277,6 @@ void ModelOptimVario::evalGrad(vect res)
         res[i] += -2. * _resid[ilag] * dvtheo;
       }
     }
+}
+
 }

@@ -26,6 +26,8 @@
 #include <sstream>
 #include <math.h>
 
+namespace gstlrn
+{
 RuleShift::RuleShift()
     : Rule(),
       _shDsup(0.),
@@ -511,3 +513,4 @@ bool RuleShift::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) cons
   return ret;
 }
 #endif
+}

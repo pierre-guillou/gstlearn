@@ -18,6 +18,7 @@
 #include "Variogram/Vario.hpp"
 #include "Variogram/VarioParam.hpp"
 
+using namespace gstlrn;
 /**
  * This file is meant to parametrized the ModelGeneric in terms of ParamInfo
  * and to fit the values of these parameters starting from an experimental variogram

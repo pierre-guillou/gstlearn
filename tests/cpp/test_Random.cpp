@@ -19,6 +19,8 @@
 #include "Basic/OptCst.hpp"
 #include "Basic/MathFunc.hpp"
 
+using namespace gstlrn;
+
 void st_do_it(bool style, int seed)
 {
   if (style)

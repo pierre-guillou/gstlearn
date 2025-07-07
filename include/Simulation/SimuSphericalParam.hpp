@@ -14,6 +14,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SimuSphericalParam: public AStringable
 {
 public:
@@ -51,3 +53,4 @@ private:
   int _ndisc;   // Number of discretization
   double _tol;  // Spectrum tolerance
 };
+}

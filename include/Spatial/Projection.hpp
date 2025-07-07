@@ -15,6 +15,8 @@
 #include "Db/Db.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Polygons;
 
@@ -42,3 +44,4 @@ private:
   double _xcenter;
   double _ycenter;
 };
+}

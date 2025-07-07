@@ -14,6 +14,16 @@
 #include "Geometry/GeometryHelper.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{
+  // Forward declaration of the static method
+  BiTargetCheckGeometry* create(int ndim,
+                                const VectorDouble &codir,
+                                double tolang,
+                                double bench,
+                                double cylrad,
+                                bool flagasym);
+
 BiTargetCheckGeometry::BiTargetCheckGeometry(int ndim,
                                              const VectorDouble& codir,
                                              double tolang,
@@ -137,4 +147,5 @@ bool BiTargetCheckGeometry::isOK(const SpaceTarget& T1, const SpaceTarget& T2) c
   if (_flagAsym && ps < _psmin) _dist = -_dist;
 
   return true;
+}
 }

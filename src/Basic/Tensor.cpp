@@ -15,6 +15,8 @@
 #include "Basic/VectorHelper.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 Tensor::Tensor(unsigned int ndim)
     :
     AStringable(),
@@ -274,4 +276,5 @@ void Tensor::setTensorDirect2(const MatrixSymmetric& tensor)
   _tensorDirect2 = tensor;
   _direct2ToInverse2();
   _flagDefinedBySquare = true;
+}
 }

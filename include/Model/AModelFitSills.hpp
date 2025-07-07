@@ -20,6 +20,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Covariances/CovCalcMode.hpp"
 
+namespace gstlrn
+{
 class ModelCovList;
 class Constraints;
 class MatrixDense;
@@ -131,3 +133,4 @@ protected:
   ModelOptimParam    _mop;
   CovCalcMode        _calcmode;
 };
+}

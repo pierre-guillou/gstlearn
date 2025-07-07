@@ -26,14 +26,17 @@
 #define FLAG_ACTIVE(ic, iparac)    (flag_active[IADAC(ic, iparac)])
 /*! \endcond */
 
+namespace gstlrn
+{
 static int VERBOSE_GQO = 0;
 
 static int NPAR, NPAR2, NPARAC, NPARAC2, NDAT, NCONT, NPCT, NPCT2;
 static int ITERATION, SOUSITER;
 static void (*FUNC_EVALUATE)(int ndat,
                              int npar,
-                             VectorDouble& param,
-                             VectorDouble& work);
+                             VectorDouble &param,
+                             VectorDouble &work);
+
 
 /****************************************************************************/
 /*!
@@ -1357,4 +1360,6 @@ label_ok:
   {
     return 0;
   }
+}
+
 }

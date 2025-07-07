@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 /* Be careful ! This is not a real covariance */
 
 class CovContext;
@@ -36,3 +38,4 @@ protected:
   double _evaluateCovDerivative(int degree, double h) const override;
 };
 
+}

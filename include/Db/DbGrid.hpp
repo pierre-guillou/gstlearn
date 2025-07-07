@@ -20,11 +20,13 @@
 #include "Basic/ICloneable.hpp"
 #include <omp.h>
 
+namespace gstlrn
+{
+
 class Polygons;
 class EMorpho;
 class ANeigh;
 class SpaceTarget;
-
 /**
  * \brief
  * Class containing the Data Information organized as a Regular Grid
@@ -401,3 +403,4 @@ private:
 private:
   Grid _grid;                //!< Grid characteristics
 };
+}

@@ -21,6 +21,8 @@
 
 #define COVMAT(i, j) (covmat[(i) * neq + (j)])
 
+namespace gstlrn
+{ 
 GibbsMulti::GibbsMulti()
   : AGibbs()
   , _model()
@@ -221,4 +223,6 @@ int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
   if (nerror <= 0) message("No problem found\n");
 
   return nerror;
+}
+
 }

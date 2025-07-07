@@ -17,6 +17,8 @@
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "OutputFormat/AOF.hpp"
 
+using namespace gstlrn;
+
 /**
  * This file is meant to test the External Format Read /Write operations
  */

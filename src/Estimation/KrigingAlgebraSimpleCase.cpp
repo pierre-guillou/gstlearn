@@ -23,6 +23,8 @@
 #include <memory>
 #include <omp.h>
 
+namespace gstlrn
+{
 KrigingAlgebraSimpleCase::KrigingAlgebraSimpleCase(bool flagDual,
                                                    const RankHandler* rankHandler,
                                                    const VectorDouble* Z,
@@ -1361,4 +1363,6 @@ void KrigingAlgebraSimpleCase::dumpAux()
     tab_printg(NULL, _Beta->at(ibfl));
     message("\n");
   }
+}
+
 }

@@ -18,6 +18,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
+namespace gstlrn
+{
 /**
  * Projection matrix for vertical convolution
  */
@@ -81,3 +83,4 @@ private:
   mutable std::vector<double> _work;
 };
 
+}

@@ -15,10 +15,12 @@
 
 #include "Calculators/ACalcDbToDb.hpp"
 
-class ELoc;
-// class Model;
-class ANeigh;
 
+
+namespace gstlrn
+{
+class ELoc;
+class ANeigh;
 // TODO : Create InterpolatorParam ASpaceParam which inherits from ASPaceObject and AParam, which inherits from ASerializable, AStringable, IClonable
 class GSTLEARN_EXPORT ACalcInterpolator: public ACalcDbToDb
 {
@@ -53,3 +55,4 @@ private:
   KrigOpt _krigopt;
   int _ncova;
 };
+}

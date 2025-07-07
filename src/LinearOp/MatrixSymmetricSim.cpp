@@ -18,6 +18,8 @@
 #include "LinearOp/ACholesky.hpp"
 #include <Eigen/src/Core/Matrix.h>
 
+namespace gstlrn
+{
 MatrixSymmetricSim::MatrixSymmetricSim(const AMatrix* m,
                                        bool inverse)
   : ASimulable()
@@ -88,4 +90,5 @@ double MatrixSymmetricSim::computeLogDet(int nMC) const
   if (_factor == nullptr) return TEST;
   int sign = _inverse ? -1 : 1;
   return sign * _factor->computeLogDeterminant();
+}
 }

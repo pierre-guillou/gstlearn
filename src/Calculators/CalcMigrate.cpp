@@ -29,6 +29,8 @@
 
 #define RES(nval,idim)      (res[(idim) + (ndim+1) * (nval)])
 
+namespace gstlrn
+{
 // The next functions must be static as they ar called in GLOBAL functions
 // defined in this class
 
@@ -2155,4 +2157,5 @@ int CalcMigrate::_interpolateGridToPoint(DbGrid *db_grid,
     tab[iech] = st_multilinear_interpolation(db_grid, iatt, distType, dmax, coor);
   }
   return 0;
+}
 }

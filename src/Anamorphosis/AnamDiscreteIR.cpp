@@ -17,6 +17,8 @@
 
 #define RESIDUALS(icut,iech) (residuals[iech * ncut + icut])
 
+namespace gstlrn
+{
 AnamDiscreteIR::AnamDiscreteIR(double rcoef)
     : AnamDiscrete(),
       _sCoef(rcoef)
@@ -644,3 +646,4 @@ bool AnamDiscreteIR::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   return ret;
 }
 #endif
+}

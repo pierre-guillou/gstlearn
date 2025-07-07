@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Simulation/SimuBooleanParam.hpp"
 
+namespace gstlrn
+{
 SimuBooleanParam::SimuBooleanParam(int maxiter,
                                    double tmax,
                                    double background,
@@ -75,4 +77,5 @@ double SimuBooleanParam::getDilate(int idim) const
 {
   if (_dilate.empty()) return 0.;
   return _dilate[idim];
+}
 }

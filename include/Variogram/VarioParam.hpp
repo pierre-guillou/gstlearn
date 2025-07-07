@@ -19,6 +19,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -149,3 +151,4 @@ private:
 };
 
 GSTLEARN_EXPORT Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam);
+}

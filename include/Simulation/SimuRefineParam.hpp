@@ -14,6 +14,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SimuRefineParam: public AStringable
 {
 public:
@@ -34,3 +36,4 @@ private:
   int _nmult;
   bool _flagSK;
 };
+}

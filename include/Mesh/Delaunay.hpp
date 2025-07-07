@@ -16,6 +16,8 @@
 #include "Db/DbGrid.hpp"
 #include "Mesh/AMesh.hpp"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT VectorDouble get_db_extension(Db* dbin, Db* dbout, int* nout);
 GSTLEARN_EXPORT VectorDouble extend_grid(DbGrid* db, const VectorDouble& gext, int* nout);
 GSTLEARN_EXPORT VectorDouble extend_point(Db* db, const VectorDouble& gext, int* nout);
@@ -40,3 +42,4 @@ GSTLEARN_EXPORT void mesh_stats(int ndim,
                                 const int* meshes,
                                 const double* points);
                                 
+}

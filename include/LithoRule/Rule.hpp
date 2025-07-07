@@ -20,6 +20,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 class PropDef;
@@ -162,3 +164,4 @@ GSTLEARN_EXPORT int db_rule_shadow(Db* db,
                                    const VectorDouble& props,
                                    int flag_stat,
                                    int nfacies);
+}

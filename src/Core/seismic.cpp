@@ -39,6 +39,8 @@
 #define RHS(i,iv,jv)      (rhs [IND(i,iv) + neqmax * (jv)])
 /*! \endcond */
 
+namespace gstlrn
+{
 static MatrixSquare covtab;
 static double DX, DZ;
 static int NX, NY, NZ, NVAR, NTRACE;
@@ -3398,4 +3400,5 @@ int seismic_simulate_XZ(DbGrid *db,
   st_estimate_neigh_management(-1, nvois, ngh_old);
 
   return (error);
+}
 }

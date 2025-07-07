@@ -15,6 +15,8 @@
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{   
 class CSVformat;
 class Db;
 
@@ -47,3 +49,4 @@ GSTLEARN_EXPORT int csv_table_read(const String& filename,
                                    int* nrow_arg,
                                    VectorString& names,
                                    VectorDouble& tab);
+}

@@ -11,6 +11,8 @@
 #include "Model/Option_VarioFit.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 Option_VarioFit::Option_VarioFit(bool flag_noreduce,
                                  bool auth_aniso,
                                  bool auth_rotation,
@@ -90,4 +92,5 @@ String Option_VarioFit::toString(const AStringFormat* /*strfmt*/) const
     sstr << "- Resulting Multivariate Model should be Intrinsic" << std::endl;
 
   return sstr.str();
+}
 }

@@ -15,6 +15,9 @@
 #include "Basic/AException.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{ 
+
 MeshEStandard::MeshEStandard()
   : AMesh()
   , _apices()
@@ -532,3 +535,4 @@ bool MeshEStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) 
   return ret;
 }
 #endif
+}

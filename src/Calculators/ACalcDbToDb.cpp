@@ -14,6 +14,9 @@
 #include "Db/DbGrid.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{ 
+
 ACalcDbToDb::ACalcDbToDb(bool mustShareSameSpaceDimension)
   : ACalculator()
   , _mustShareSpaceDimension(mustShareSameSpaceDimension)
@@ -441,5 +444,6 @@ int ACalcDbToDb::_expandInformation(int mode, const ELoc& locatorType) const
     getDbin()->deleteColumnsByLocator(locatorType);
   }
   return 0;
+}
 }
 

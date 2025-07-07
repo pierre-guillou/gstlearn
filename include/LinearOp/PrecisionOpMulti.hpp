@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/AStringFormat.hpp"
 #include "LinearOp/ASimulable.hpp"
 #include "gstlearn_export.hpp"
 
@@ -23,9 +24,13 @@
 
 #define IND(i,j,nvar) j * nvar + i - (j * (j + 1))/2
 
-class Model;
-class ASimulable;
+namespace gstlrn
+{
 class CholeskyDense;
+class Model;
+class AStringable;
+class AStringFormat;
+class ASimulable;
 
 /**
  * Class to store objects for SPDE
@@ -103,3 +108,4 @@ private:
   mutable VectorVectorDouble _works;
   mutable VectorDouble _workTot;
 };
+}

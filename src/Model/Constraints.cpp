@@ -14,6 +14,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 Constraints::Constraints(double constantSillValue, const VectorDouble& constantSills)
     : AStringable(),
       _constantSillValue(constantSillValue),
@@ -254,4 +256,5 @@ int add_unit_sill_constraints(Constraints& constraints)
 {
   constraints.setConstantSillValue(1.);
   return (0);
+}
 }

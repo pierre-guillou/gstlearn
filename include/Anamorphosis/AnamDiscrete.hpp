@@ -15,7 +15,11 @@
 #include "Anamorphosis/AAnam.hpp"
 #include "Matrix/MatrixDense.hpp"
 
-class Selectivity;
+
+namespace gstlrn {
+  class Selectivity;
+
+  class AAnam;  // Forward declaration
 
 class GSTLEARN_EXPORT AnamDiscrete: public AAnam
 {
@@ -99,3 +103,4 @@ private:
   VectorDouble _zCut;
   MatrixDense _stats;
 };
+}

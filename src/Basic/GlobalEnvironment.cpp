@@ -12,6 +12,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 GlobalEnvironment* GlobalEnvironment::_env = nullptr;
 
 GlobalEnvironment::GlobalEnvironment()
@@ -63,4 +65,4 @@ bool GlobalEnvironment::matchDomainReference(double value) const
   if ((int) value == _domainReference) return true;
   return false;
 }
-
+}

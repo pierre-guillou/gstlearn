@@ -29,6 +29,9 @@
 #define CASE_COL    3
 #define CASE_ROW    4
 
+
+namespace gstlrn
+{
 class EJustify;
 
 static char FORMAT[100];
@@ -330,23 +333,6 @@ void messerrFlush(const String& string)
   message_extern(string.c_str());
 }
 
-/**
- * Print Error message
- * @param format Output format
- * @param ...    Additional arguments
- */
-void messerr(const char *format, ...)
-{
-  char str[1000];
-  va_list ap;
-
-  va_start(ap, format);
-  (void) vsnprintf(str, sizeof(str), format, ap);
-  va_end(ap);
-
-  message_extern(str);
-  message_extern("\n");
-}
 
 /**
  * Print a standard Error Message if an argument does not lie in Interval
@@ -531,6 +517,7 @@ void AStringable::display(int level) const
 }
 
 /**
+ * @overload
  * Print the contents of a VectorDouble in a Matrix Form
  * @param title        Title of the printout
  * @param mat          Contents of a AMatrix
@@ -551,6 +538,7 @@ String toMatrix(const String &title,
 
 /**
  * Print the contents of a VectorDouble in a Matrix Form
+ * @fn String gstlrn::toMatrix(const String& title, const VectorString& colnames, const VectorString& rownames, bool bycol, int nrows, int ncols, const VectorDouble& tab, bool flagOverride, bool flagSkipZero)
  * @param title        Title of the printout
  * @param colnames     Names of the columns (optional)
  * @param rownames     Names of the rows (optional)
@@ -577,6 +565,19 @@ String toMatrix(const String& title,
   return toMatrix(title, colnames, rownames, bycol, nrows, ncols, tab.data(),
                   flagOverride, flagSkipZero);
 }
+
+/** * Print the contents of a VectorDouble in a Matrix Form
+ * @overload
+ * @param title        Title of the printout
+ * @param colnames     Names of the columns (optional)
+ * @param rownames     Names of the rows (optional)
+ * @param bycol        true if values as sorted by column; false otherwise     
+ * @param nrows        Number of rows
+ * @param ncols        Number of columns
+ * @param tab          VectorDouble containing the values
+ * @param flagOverride true to override printout limitations
+ * @param flagSkipZero when true, skip the zero values (represented by a '.' as for sparse matrix)
+ */ 
   String toMatrix(const String& title,
                   const VectorString& colnames,
                   const VectorString& rownames,
@@ -658,6 +659,7 @@ String toMatrix(const String& title,
 }
 
 /**
+ * @overload
  * Print the contents of a VectorDouble in a Matrix Form
  * @param title        Title of the printout
  * @param colnames     Names of the columns (optional)
@@ -754,6 +756,7 @@ String toMatrix(const String& title,
 
 /**
  * Printout a vector in a formatted manner
+ * @fn String gstlrn::toVector(const String& title, const VectorDouble& tab, bool flagOverride)
  * @param title Title of the printout (or empty string)
  * @param tab   Vector (real values) to be printed
  * @param flagOverride true to override printout limitations
@@ -799,6 +802,14 @@ String toVector(const String& title, const VectorDouble& tab, bool flagOverride)
   return sstr.str();
 }
 
+/**
+ * Printout a vector in a formatted manner
+ * @fn String gstlrn::toVector(const String& title, constvect tab, bool flagOverride)
+ * @param title Title of the printout (or empty string)
+ * @param tab   Vector (real values) to be printed
+ * @param flagOverride true to override printout limitations
+ * @return The string (terminated with a newline)
+ */
 String toVector(const String& title, constvect tab, bool flagOverride)
 {
   std::stringstream sstr;
@@ -840,6 +851,8 @@ String toVector(const String& title, constvect tab, bool flagOverride)
 }
 /**
  * Printout a list of vectors in a formatted manner
+ * @overload
+ * @fn String gstlrn::toVector(const String& title, const VectorVectorDouble& tab, bool flagOverride)
  * @param title Title of the printout (or empty string)
  * @param tab   Vector of vectors (real values) to be printed
  * @param flagOverride true to override printout limitations
@@ -868,6 +881,8 @@ String toVector(const String& title, const VectorVectorDouble& tab, bool flagOve
 
 /**
  * Printout a list of vectors in a formatted manner
+ * @fn String gstlrn::toVector(const String& title, const VectorVectorInt& tab, bool flagOverride)
+ * @overload
  * @param title Title of the printout (or empty string)
  * @param tab   Vector of vectors (integer values) to be printed
  * @param flagOverride true to override printout limitations
@@ -893,6 +908,15 @@ String toVector(const String& title, const VectorVectorInt& tab, bool flagOverri
   return sstr.str();
 }
 
+/**
+ * Printout a vector in a formatted manner
+ * @fn String gstlrn::toVector(const String& title, const VectorString& tab, bool flagOverride)
+ * @overload
+ * @param title Title of the printout (or empty string)
+ * @param tab   Vector (string values) to be printed
+ * @param flagOverride true to override printout limitations
+ * @return The string (terminated with a newline)
+ */
 String toVector(const String& title, const VectorString& tab, bool flagOverride)
 {
   std::stringstream sstr;
@@ -935,6 +959,8 @@ String toVector(const String& title, const VectorString& tab, bool flagOverride)
 
 /**
  * Printout a vector in a formatted manner
+ * @fn String gstlrn::toVector(const String& title, const VectorInt& tab, bool flagOverride)
+ * @overload
  * @param title Title of the printout (or empty string)
  * @param tab   Vector (integer values) to be printed
  * @param flagOverride true to override printout limitations
@@ -1551,4 +1577,25 @@ void print_ivector(const char *title,
                    const VectorInt &itab)
 {
   print_ivector(title, flag_limit, ntab, itab.data());
+}
+
+
+
+/**
+ * Print Error message
+ * @param format Output format
+ * @param ...    Additional arguments
+ */
+void messerr(const char *format, ...)
+{
+  char str[1000];
+  va_list ap;
+
+  va_start(ap, format);
+  (void) vsnprintf(str, sizeof(str), format, ap);
+  va_end(ap);
+
+  message_extern(str);
+  message_extern("\n");
+}
 }

@@ -28,6 +28,8 @@ DISABLE_WARNING_PUSH
 
 DISABLE_WARNING_ARRAY_BOUNDS
 
+namespace gstlrn
+{
 typedef struct
 {
   int ntri;
@@ -3304,4 +3306,5 @@ int solve_P3(double a, double b, double c, double d, VectorDouble& x)
   for (k = 0; k < 3; k++)
     x[k] = ecart + 2. * sqrt(-p / 3.) * cos((acos(s1) + 2. * k * GV_PI) / 3.);
   return (3);
+}
 }

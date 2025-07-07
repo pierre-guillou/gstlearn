@@ -19,6 +19,8 @@
 #include "geoslib_old_f.h"
 #include <math.h>
 
+namespace gstlrn
+{
 CalcGlobal::CalcGlobal(int ivar0, bool verbose)
   : ACalcInterpolator()
   , _flagArithmetic(false)
@@ -351,4 +353,6 @@ Global_Result global_kriging(Db* dbin,
   if (global.run())
     gres = global.getGRes();
   return gres;
+}
+
 }

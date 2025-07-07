@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OptimCostBinary.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT OptimCostColored : public OptimCostBinary
 {
 public:
@@ -65,3 +67,4 @@ private:
   VectorVectorInt _splits;
   VectorDouble    _meanProps;
 };
+}

@@ -11,6 +11,8 @@
 
 #include "Basic/ASerializable.hpp"
 #include "Basic/SerializeNeutralFile.hpp"
+namespace gstlrn
+{
 
 bool SerializeNeutralFile::fileOpenWrite(const ASerializable& parent,
                                          const String& filename,
@@ -110,4 +112,5 @@ bool SerializeNeutralFile::onlyBlanks(char* string)
     if (string[i] != ' ') return false;
   }
   return true;
+}
 }

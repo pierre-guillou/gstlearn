@@ -17,6 +17,9 @@
 #include "Basic/VectorT.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn 
+{
+
 class ASerializable;
 
 namespace SerializeNeutralFile
@@ -300,4 +303,5 @@ bool SerializeNeutralFile::recordReadVecInPlace(std::istream& is,
     return false;
   }
   return true;
+}
 }

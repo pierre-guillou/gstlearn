@@ -12,6 +12,8 @@
 #include "Db/DbGrid.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{
 BiTargetCheckCell::BiTargetCheckCell(const DbGrid* dbgrid)
   : ABiTargetCheck()
   , _dbgrid(dbgrid)
@@ -66,4 +68,5 @@ bool BiTargetCheckCell::isValid(const Db* dbin, const Db* dbout)
   if (!dbout->isGrid()) return false;
   _dbgrid = dynamic_cast<const DbGrid*>(dbout);
   return true;
+}
 }

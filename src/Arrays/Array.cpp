@@ -11,6 +11,8 @@
 #include "Arrays/Array.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 Array::Array(const VectorInt& ndims)
     : AArray(ndims),
       _values()
@@ -64,4 +66,5 @@ void Array::setValue(const VectorInt& indice, double value)
   if (! _isValidIndice(indice)) return;
   int iad = indiceToRank(indice);
   _values[iad] = value;
+}
 }

@@ -14,6 +14,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SimuFFTParam: public AStringable
 {
 public:
@@ -34,3 +36,4 @@ private:
   bool _flagAliasing;
   double _percent;
 };
+}
