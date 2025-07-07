@@ -144,7 +144,7 @@ typedef struct
 
 typedef struct
 {
-  double* res;
+  VectorDouble res;
 } CTable;
 
 typedef struct
