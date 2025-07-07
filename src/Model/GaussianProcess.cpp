@@ -53,9 +53,19 @@ String GaussianProcess::toString(const AStringFormat* strfmt) const
 {
   String sstr              = "Gaussian Process Model:\n";
   const auto* modelderived = dynamic_cast<const Model*>(_model.get());
+  if (modelderived == nullptr)
+  {
+    sstr.append("No model defined.\n");
+    return sstr;
+  }
   sstr.append("Model:\n");
   sstr.append(modelderived->toString(strfmt));
   sstr.append("Data:\n");
+  if (_data == nullptr)
+  {
+    sstr.append("No data defined.\n");
+    return sstr;
+  }
   sstr.append(_data->toString(strfmt));
   return sstr;
 }
