@@ -8,13 +8,13 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/VectorNumT.hpp"
-#include "Drifts/ADrift.hpp"
 #include "Drifts/DriftList.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Drifts/DriftFactory.hpp"
+#include "Basic/VectorNumT.hpp"
 #include "Db/Db.hpp"
+#include "Drifts/ADrift.hpp"
+#include "Drifts/DriftFactory.hpp"
 
 namespace gstlrn
 {
@@ -616,7 +616,7 @@ VectorDouble DriftList::evalMeanVecByRanks(const Db* db,
     messerr("The returned matrix has no valid sample and no valid variable");
     return 1;
   }
-  int nvar  = getNVar();
+  int nvar = getNVar();
 
   VectorDouble vec(neq, 0.);
 
@@ -657,8 +657,8 @@ int DriftList::evalDriftMatByTargetInPlace(MatrixDense& mat,
 
   // Create the sets of Vector of valid sample indices per variable
   // (not masked and defined)
-  viech2[0] = iech2;
-  const VectorVectorInt &index = db->getSampleRanks(ivars, viech2, true, false, false);
+  viech2[0]                    = iech2;
+  const VectorVectorInt& index = db->getSampleRanks(ivars, viech2, true, false, false);
 
   // Creating the matrix
   int neq = VH::count(index);

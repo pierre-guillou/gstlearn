@@ -8,74 +8,71 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_f.h"
-#include "geoslib_old_f.h"
-#include "geoslib_f_private.h"
-#include "geoslib_define.h"
-
-#include "Enum/ECalcMember.hpp"
-
-#include "Db/Db.hpp"
-#include "Db/DbGrid.hpp"
-#include "Model/Model.hpp"
-#include "Model/CovInternal.hpp"
-#include "Neigh/NeighMoving.hpp"
-#include "Neigh/NeighImage.hpp"
-#include "Neigh/NeighUnique.hpp"
-#include "Neigh/ANeigh.hpp"
 #include "Anamorphosis/AnamDiscreteIR.hpp"
 #include "Anamorphosis/AnamHermite.hpp"
-#include "Basic/String.hpp"
-#include "Basic/NamingConvention.hpp"
-#include "Basic/Utilities.hpp"
-#include "Basic/Law.hpp"
 #include "Basic/File.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/Memory.hpp"
+#include "Basic/NamingConvention.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/String.hpp"
+#include "Basic/Utilities.hpp"
+#include "Core/Keypair.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "Drifts/DriftList.hpp"
+#include "Enum/ECalcMember.hpp"
 #include "Estimation/KrigingSystem.hpp"
 #include "Matrix/MatrixFactory.hpp"
-#include "Basic/Memory.hpp"
-#include "Core/Keypair.hpp"
-
-#include <math.h>
-#include <string.h>
-#include <stdio.h>
+#include "Model/CovInternal.hpp"
+#include "Model/Model.hpp"
+#include "Neigh/ANeigh.hpp"
+#include "Neigh/NeighImage.hpp"
+#include "Neigh/NeighMoving.hpp"
+#include "Neigh/NeighUnique.hpp"
+#include "geoslib_define.h"
+#include "geoslib_f.h"
+#include "geoslib_f_private.h"
+#include "geoslib_old_f.h"
 #include <limits.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 /*! \cond */
-#define NBYPAS 5
-#define VAR0(iv,jv)       (var0_global[(jv) + nvar * (iv)])
-#define LHS_C(i,j)        (lhs [(i) + nred * (j)])
-#define RHS_C(i,iv)       (rhs [(i) + nred * (iv)])
-#define DISC1(i,idim)     (KOPTION->disc1[(idim) * KOPTION->ntot + (i)])
-#define DISC2(i,idim)     (KOPTION->disc2[(idim) * KOPTION->ntot + (i)])
-#define LHS_EXP(i,j)      (lhs_global[(i) * neq + (j)])
-#define RHS_EXP(i)        (rhs_global[(i)])
-#define COV_REF(iz)       (cov_ref[cov_radius + (iz)])
-#define SMEAN(i,isimu)    (smean[(isimu) * nfeq + (i)])
-#define IAD(ix,iy,iz,nn,ss) (((iz) + nn[2]) + ss[2] * (((iy) + nn[1]) + ss[1] * ((ix) + nn[0])))
-#define COV_RES(ix,iy,iz) cov_res[IAD(ix,iy,iz,cov_nn,cov_ss)]
-#define COV_TOT(ix,iy,iz) cov_tot[IAD(ix,iy,iz,cov_nn,cov_ss)]
-#define NUM_TOT(ix,iy,iz) num_tot[IAD(ix,iy,iz,cov_nn,cov_ss)]
-#define NEI_CUR(ix,iy,iz) nei_cur[IAD(ix,iy,iz,nei_nn,nei_ss)]
-#define NEI_REF(ix,iy,iz) nei_ref[IAD(ix,iy,iz,nei_nn,nei_ss)]
-#define CC(iz,jz)         (cc[(jz)*((jz) + 1) / 2 +(iz)])
-#define UTAB(i,j)         (utab[(i) + ndat * (j)])
-#define TUTIL(i,j)        (tutil[(i) + nutil * (j)])
-#define SPART(i,j)        (spart[(i) + npart * (j)])
-#define COVSS(is,js)      (covss  [(js) + ns * (is)])
-#define COVGEN(i1,i2)     (covgen [(i2) + n2 * (i1)])
-#define COVPP(ip,jp)      (covpp  [(jp) + np * (ip)])
-#define COVGP(ig,ip)      (covgp  [(ip) + np * (ig)])
-#define DISTGEN(i,is)     (distgen[(is) + ns * (i)])
-#define DISTPS(ip,is)     (distps [(is) + ns * (ip)])
-#define DISTGS(ig,is)     (distgs [(is) + ns * (ig)])
-#define PRODGEN(i,is)     (prodgen[(is) + ns * (i)])
-#define PRODPS(ip,is)     (prodps [(is) + ns * (ip)])
-#define PRODGS(ig,is)     (prodgs [(is) + ns * (ig)])
-#define DRFTAB(ip,il)     (drftab [(il) + nbfl * (ip)])
-#define YMAT(ip,il)       (ymat   [(il) + nbfl * (ip)])
+#define NBYPAS                  5
+#define VAR0(iv, jv)            (var0_global[(jv) + nvar * (iv)])
+#define LHS_C(i, j)             (lhs[(i) + nred * (j)])
+#define RHS_C(i, iv)            (rhs[(i) + nred * (iv)])
+#define DISC1(i, idim)          (KOPTION->disc1[(idim) * KOPTION->ntot + (i)])
+#define DISC2(i, idim)          (KOPTION->disc2[(idim) * KOPTION->ntot + (i)])
+#define LHS_EXP(i, j)           (lhs_global[(i) * neq + (j)])
+#define RHS_EXP(i)              (rhs_global[(i)])
+#define COV_REF(iz)             (cov_ref[cov_radius + (iz)])
+#define SMEAN(i, isimu)         (smean[(isimu) * nfeq + (i)])
+#define IAD(ix, iy, iz, nn, ss) (((iz) + nn[2]) + ss[2] * (((iy) + nn[1]) + ss[1] * ((ix) + nn[0])))
+#define COV_RES(ix, iy, iz)     cov_res[IAD(ix, iy, iz, cov_nn, cov_ss)]
+#define COV_TOT(ix, iy, iz)     cov_tot[IAD(ix, iy, iz, cov_nn, cov_ss)]
+#define NUM_TOT(ix, iy, iz)     num_tot[IAD(ix, iy, iz, cov_nn, cov_ss)]
+#define NEI_CUR(ix, iy, iz)     nei_cur[IAD(ix, iy, iz, nei_nn, nei_ss)]
+#define NEI_REF(ix, iy, iz)     nei_ref[IAD(ix, iy, iz, nei_nn, nei_ss)]
+#define CC(iz, jz)              (cc[(jz) * ((jz) + 1) / 2 + (iz)])
+#define UTAB(i, j)              (utab[(i) + ndat * (j)])
+#define TUTIL(i, j)             (tutil[(i) + nutil * (j)])
+#define SPART(i, j)             (spart[(i) + npart * (j)])
+#define COVSS(is, js)           (covss[(js) + ns * (is)])
+#define COVGEN(i1, i2)          (covgen[(i2) + n2 * (i1)])
+#define COVPP(ip, jp)           (covpp[(jp) + np * (ip)])
+#define COVGP(ig, ip)           (covgp[(ip) + np * (ig)])
+#define DISTGEN(i, is)          (distgen[(is) + ns * (i)])
+#define DISTPS(ip, is)          (distps[(is) + ns * (ip)])
+#define DISTGS(ig, is)          (distgs[(is) + ns * (ig)])
+#define PRODGEN(i, is)          (prodgen[(is) + ns * (i)])
+#define PRODPS(ip, is)          (prodps[(is) + ns * (ip)])
+#define PRODGS(ig, is)          (prodgs[(is) + ns * (ig)])
+#define DRFTAB(ip, il)          (drftab[(il) + nbfl * (ip)])
+#define YMAT(ip, il)            (ymat[(il) + nbfl * (ip)])
 /*! \endcond */
 
 namespace gstlrn
@@ -86,17 +83,17 @@ static VectorDouble d1_2_global;
 static double *covaux_global, *var0_global;
 static VectorDouble d1_global, d1_t_global;
 static double *lhs_global, *rhs_global, *wgt_global, *zam1_global;
-static int *flag_global;
+static int* flag_global;
 static int KRIGE_INIT = 0;
 static int MODEL_INIT = 0;
 static int IECH_OUT   = -1;
 static int FLAG_COLK, FLAG_SIMU, FLAG_EST, FLAG_STD, FLAG_VARZ, FLAG_PROF;
 static int IPTR_EST, IPTR_STD, IPTR_VARZ, IPTR_NBGH;
-static int *RANK_COLCOK;
+static int* RANK_COLCOK;
 static Db *DBIN, *DBOUT;
-static Koption *KOPTION;
+static Koption* KOPTION;
 static int INH_FLAG_VERBOSE = 0;
-static int INH_FLAG_LIMIT = 1;
+static int INH_FLAG_LIMIT   = 1;
 static char string[100];
 
 
@@ -108,7 +105,7 @@ typedef struct
   int ndtot;
   int rank1;
   int rank2;
-  Model *model;
+  Model* model;
   int nugget_opt;
   int nostd;
   ECalcMember member;
@@ -133,8 +130,8 @@ static double* st_core(int nli, int nco)
 
   /* Initialization */
 
-  tab = nullptr;
-  rsize = (double) nli * (double) nco;
+  tab   = nullptr;
+  rsize = (double)nli * (double)nco;
   if (rsize < 0 || rsize > INT_MAX)
   {
     messerr("Core allocation problem: Size (%d x %d) too big", nli, nco);
@@ -144,7 +141,7 @@ static double* st_core(int nli, int nco)
 
   /* Allocation */
 
-  tab = (double*) mem_alloc(sizeof(double) * size, 0);
+  tab = (double*)mem_alloc(sizeof(double) * size, 0);
   if (tab == nullptr)
   {
     messerr("Core allocation problem: Size (%d) too big", size);
@@ -172,14 +169,15 @@ static int* st_icore(int nli, int nco)
 
   /* Initialization */
 
-  tab = nullptr;
+  tab  = nullptr;
   size = nli * nco;
 
   /* Allocation */
 
-  tab = (int*) mem_alloc(sizeof(int) * size, 0);
-  if (tab != nullptr) for (i = 0; i < size; i++)
-    tab[i] = 0;
+  tab = (int*)mem_alloc(sizeof(int) * size, 0);
+  if (tab != nullptr)
+    for (i = 0; i < size; i++)
+      tab[i] = 0;
 
   return (tab);
 }
@@ -193,9 +191,9 @@ static int* st_icore(int nli, int nco)
  ** \param[in]  rel_arg Relative position array (used for deletion)
  **
  *****************************************************************************/
-static int* st_relative_position_array(int mode, int neq, int *rel_arg)
+static int* st_relative_position_array(int mode, int neq, int* rel_arg)
 {
-  int *rel = nullptr;
+  int* rel = nullptr;
   if (mode > 0)
   {
 
@@ -220,7 +218,7 @@ static int* st_relative_position_array(int mode, int neq, int *rel_arg)
     /* Deletion */
 
     rel = rel_arg;
-    rel = (int*) mem_free((char* ) rel);
+    rel = (int*)mem_free((char*)rel);
   }
   return (rel);
 }
@@ -233,16 +231,16 @@ static int* st_relative_position_array(int mode, int neq, int *rel_arg)
  ** \param[in]  dbout  output Db structure
  **
  *****************************************************************************/
-static void st_global_init(Db *dbin, Db *dbout)
+static void st_global_init(Db* dbin, Db* dbout)
 {
   FLAG_COLK = FLAG_PROF = FLAG_SIMU = 0;
   IPTR_EST = IPTR_STD = IPTR_VARZ = IPTR_NBGH = 0;
-  IECH_OUT = 0;
+  IECH_OUT                                    = 0;
   FLAG_EST = FLAG_STD = FLAG_VARZ = false;
 
   /* Set the global variables */
 
-  DBIN = dbin;
+  DBIN  = dbin;
   DBOUT = dbout;
 
   /* Change of support coefficient for DGM */
@@ -295,7 +293,7 @@ static double st_get_idim(int loc_rank, int idim)
 // ** \param[out] covtab_loc   Output covariance array
 // **
 // *****************************************************************************/
-//static void st_cov(Model *model,
+// static void st_cov(Model *model,
 //                   int flag_init,
 //                   int nugget_opt,
 //                   int nostd,
@@ -353,7 +351,7 @@ static double st_get_idim(int loc_rank, int idim)
 // ** \param[in]  it     Pointer to the Internal Disc_Structure
 // **
 // *****************************************************************************/
-//static void st_data_discretize_dd(int idim, int jdim, Disc_Structure *it)
+// static void st_data_discretize_dd(int idim, int jdim, Disc_Structure *it)
 //{
 //  double exts2, dsize, decal;
 //
@@ -459,7 +457,7 @@ void set_DBOUT(Db* dbout)
 // ** \param[in]  it     Pointer to the Internal Disc_Structure
 // **
 // *****************************************************************************/
-//static void st_data_discretize_dg(int idim, Disc_Structure *it)
+// static void st_data_discretize_dg(int idim, Disc_Structure *it)
 //{
 //  double exts2, dsize, decal;
 //
@@ -575,11 +573,11 @@ static double st_get_verr(int rank, int ivar)
 
   if (rank >= 0)
   {
-    value = DBIN->getLocVariable(ELoc::V,rank, ivar);
+    value = DBIN->getLocVariable(ELoc::V, rank, ivar);
   }
   else
   {
-    value = DBOUT->getLocVariable(ELoc::V,IECH_OUT, ivar);
+    value = DBOUT->getLocVariable(ELoc::V, IECH_OUT, ivar);
   }
   return (value);
 }
@@ -600,7 +598,7 @@ static double st_get_verr(int rank, int ivar)
  *****************************************************************************/
 static int st_check_environment(int flag_in,
                                 int flag_out,
-                                Model *model)
+                                Model* model)
 {
   int error, ndim, nvar, nfex;
 
@@ -692,8 +690,8 @@ static int st_check_environment(int flag_in,
   {
     VectorDouble db_mini;
     VectorDouble db_maxi;
-    db_mini.resize(ndim,TEST);
-    db_maxi.resize(ndim,TEST);
+    db_mini.resize(ndim, TEST);
+    db_maxi.resize(ndim, TEST);
 
     /* Input Db structure */
 
@@ -711,7 +709,7 @@ static int st_check_environment(int flag_in,
   /* Set the error return code */
 
   error = 0;
-  label_end:
+label_end:
   return (error);
 }
 
@@ -728,7 +726,7 @@ static int st_check_environment(int flag_in,
  ** \remarks  equal to the number of variables in the Model
  **
  *****************************************************************************/
-static int st_model_manage(int mode, Model *model)
+static int st_model_manage(int mode, Model* model)
 
 {
   int nvar;
@@ -757,8 +755,8 @@ static int st_model_manage(int mode, Model *model)
   else
   {
     if (!MODEL_INIT) return (1);
-    covaux_global = (double*) mem_free((char* ) covaux_global);
-    MODEL_INIT = 0;
+    covaux_global = (double*)mem_free((char*)covaux_global);
+    MODEL_INIT    = 0;
   }
   return (0);
 }
@@ -788,10 +786,10 @@ static int st_krige_manage_basic(int mode,
 
   /* Initializations */
 
-  ncmax = nmax * nvar;
+  ncmax  = nmax * nvar;
   neqmax = ncmax + nfeq;
   if (FLAG_COLK) neqmax += nvar;
-//  if (FLAG_COLK) nech += 1;
+  //  if (FLAG_COLK) nech += 1;
 
   /* Dispatch */
 
@@ -821,13 +819,13 @@ static int st_krige_manage_basic(int mode,
     /* Deallocation */
 
     if (!KRIGE_INIT) return (1);
-    flag_global = (int*) mem_free((char* ) flag_global);
-    lhs_global = (double*) mem_free((char* ) lhs_global);
-    rhs_global = (double*) mem_free((char* ) rhs_global);
-    zam1_global = (double*) mem_free((char* ) zam1_global);
-    wgt_global = (double*) mem_free((char* ) wgt_global);
-    var0_global = (double*) mem_free((char* ) var0_global);
-    KRIGE_INIT = 0;
+    flag_global = (int*)mem_free((char*)flag_global);
+    lhs_global  = (double*)mem_free((char*)lhs_global);
+    rhs_global  = (double*)mem_free((char*)rhs_global);
+    zam1_global = (double*)mem_free((char*)zam1_global);
+    wgt_global  = (double*)mem_free((char*)wgt_global);
+    var0_global = (double*)mem_free((char*)var0_global);
+    KRIGE_INIT  = 0;
   }
   return (0);
 }
@@ -841,7 +839,7 @@ static int st_krige_manage_basic(int mode,
  ** \param[in]  neigh ANeigh structure
  **
  *****************************************************************************/
-static int st_get_nmax(ANeigh *neigh)
+static int st_get_nmax(ANeigh* neigh)
 {
   return neigh->getNSampleMax(DBIN);
 }
@@ -866,8 +864,8 @@ static int st_get_nmax(ANeigh *neigh)
  *****************************************************************************/
 static int st_krige_manage(int mode,
                            int nvar,
-                           Model *model,
-                           ANeigh *neigh)
+                           Model* model,
+                           ANeigh* neigh)
 {
   int nech, nfeq, nmax;
 
@@ -993,15 +991,15 @@ static void st_block_discretize(int mode, int flag_rand, int iech)
     nval = ntot;
     for (idim = ndim - 1; idim >= 0; idim--)
     {
-      taille = (mode == 0) ? dbgrid->getDX(idim) : DBOUT->getLocVariable(ELoc::BLEX,iech, idim);
-      nd = KOPTION->ndisc[idim];
+      taille = (mode == 0) ? dbgrid->getDX(idim) : DBOUT->getLocVariable(ELoc::BLEX, iech, idim);
+      nd     = KOPTION->ndisc[idim];
       nval /= nd;
       j = jech / nval;
       jech -= j * nval;
-      DISC1(i,idim) = taille * ((j + 0.5) / nd - 0.5);
-      DISC2(i,idim) = DISC1(i, idim);
+      DISC1(i, idim) = taille * ((j + 0.5) / nd - 0.5);
+      DISC2(i, idim) = DISC1(i, idim);
       if (flag_rand)
-      DISC2(i,idim) += taille * law_uniform(-0.5, 0.5) / (double) nd;
+        DISC2(i, idim) += taille * law_uniform(-0.5, 0.5) / (double)nd;
     }
   }
   law_set_random_seed(memo);
@@ -1025,7 +1023,7 @@ static void st_block_discretize(int mode, int flag_rand, int iech)
  *****************************************************************************/
 int krige_koption_manage(int mode,
                          int flag_check,
-                         const EKrigOpt &calcul,
+                         const EKrigOpt& calcul,
                          int flag_rand,
                          const VectorInt& ndiscs)
 {
@@ -1034,7 +1032,7 @@ int krige_koption_manage(int mode,
   /* Initializations */
 
   error = 1;
-  ndim = DBOUT->getNDim();
+  ndim  = DBOUT->getNDim();
 
   /* Dispatch */
 
@@ -1043,19 +1041,19 @@ int krige_koption_manage(int mode,
 
     /* Allocation of the structure */
 
-    KOPTION = new Koption();
+    KOPTION         = new Koption();
     KOPTION->calcul = calcul;
 
     // Target discretization
-    KOPTION->ndim = ndim;
-    KOPTION->ntot = 0;
+    KOPTION->ndim  = ndim;
+    KOPTION->ntot  = 0;
     KOPTION->disc1 = nullptr;
     KOPTION->disc2 = nullptr;
     KOPTION->ndisc = nullptr;
 
     // Data discretization
     KOPTION->flag_data_disc = 0;
-    KOPTION->dsize = nullptr;
+    KOPTION->dsize          = nullptr;
 
     /* Data discretization case (optional) */
 
@@ -1074,7 +1072,7 @@ int krige_koption_manage(int mode,
 
         /* Preliminary checks */
 
-        if (flag_check && ! DBOUT->isGrid())
+        if (flag_check && !DBOUT->isGrid())
         {
           messerr("Discretization is not allowed if the Target is not a Grid");
           goto label_dealloc;
@@ -1099,12 +1097,13 @@ int krige_koption_manage(int mode,
 
     /* Deallocation procedure */
 
-    label_dealloc: if (KOPTION != nullptr)
+  label_dealloc:
+    if (KOPTION != nullptr)
     {
-      KOPTION->ndisc = (int*)    mem_free((char* ) KOPTION->ndisc);
-      KOPTION->disc1 = (double*) mem_free((char* ) KOPTION->disc1);
-      KOPTION->disc2 = (double*) mem_free((char* ) KOPTION->disc2);
-      KOPTION->dsize = (double*) mem_free((char* ) KOPTION->dsize);
+      KOPTION->ndisc = (int*)mem_free((char*)KOPTION->ndisc);
+      KOPTION->disc1 = (double*)mem_free((char*)KOPTION->disc1);
+      KOPTION->disc2 = (double*)mem_free((char*)KOPTION->disc2);
+      KOPTION->dsize = (double*)mem_free((char*)KOPTION->dsize);
       delete KOPTION;
     }
   }
@@ -1126,15 +1125,15 @@ int krige_koption_manage(int mode,
 void krige_lhs_print(int nech,
                      int neq,
                      int nred,
-                     const int *flag,
-                     const double *lhs)
+                     const int* flag,
+                     const double* lhs)
 {
   int *rel, i, j, ipass, npass, ideb, ifin;
 
   /* Initializations */
 
-  rel = nullptr;
-  rel = st_relative_position_array(1, neq, rel);
+  rel   = nullptr;
+  rel   = st_relative_position_array(1, neq, rel);
   npass = (nred - 1) / NBYPAS + 1;
 
   /* General Header */
@@ -1202,8 +1201,8 @@ void krige_rhs_print(int nvar,
                      int nech,
                      int neq,
                      int nred,
-                     const int *flag,
-                     double *rhs)
+                     const int* flag,
+                     double* rhs)
 {
   int *rel, i, ivar, idim;
 
@@ -1284,7 +1283,7 @@ void krige_rhs_print(int nvar,
  ** \param[in]  dual     Kriging Dual matrix
  **
  *****************************************************************************/
-void krige_dual_print(int nech, int neq, int nred, const int *flag, double *dual)
+void krige_dual_print(int nech, int neq, int nred, const int* flag, double* dual)
 {
   int *rel, i;
 
@@ -1344,18 +1343,18 @@ static void krige_wgt_print(int status,
                             const VectorInt& nbgh_ranks,
                             int nred,
                             int icase,
-                            const int *flag,
-                            const double *wgt)
+                            const int* flag,
+                            const double* wgt)
 {
   double *sum, value;
   int iwgt, ivar, jvar_m, ivar_m, iech, lec, cumflag, idim, ndim, ib, number,
-      flag_value, nech;
+    flag_value, nech;
 
   /* Initializations */
 
-  nech = (int) nbgh_ranks.size();
+  nech = (int)nbgh_ranks.size();
   ndim = DBIN->getNDim();
-  sum = (double*) st_core(nvar_m, 1);
+  sum  = (double*)st_core(nvar_m, 1);
   if (sum == nullptr) return;
 
   /* Header */
@@ -1373,15 +1372,16 @@ static void krige_wgt_print(int status,
   if (DBIN->hasLocVariable(ELoc::C)) tab_prints(NULL, "Code");
   if (DBIN->getNLoc(ELoc::V) > 0)
     tab_prints(NULL, "Err.");
-  if (KOPTION->flag_data_disc) for (idim = 0; idim < ndim; idim++)
-  {
-    (void) gslSPrintf(string, "Size%d", idim + 1);
-    tab_prints(NULL, string);
-  }
+  if (KOPTION->flag_data_disc)
+    for (idim = 0; idim < ndim; idim++)
+    {
+      (void)gslSPrintf(string, "Size%d", idim + 1);
+      tab_prints(NULL, string);
+    }
   tab_prints(NULL, "Data");
   for (ivar = 0; ivar < nvar; ivar++)
   {
-    (void) gslSPrintf(string, "Z%d*", ivar + 1);
+    (void)gslSPrintf(string, "Z%d*", ivar + 1);
     tab_prints(NULL, string);
   }
   message("\n");
@@ -1403,13 +1403,13 @@ static void krige_wgt_print(int status,
       for (idim = 0; idim < ndim; idim++)
         tab_printg(NULL, st_get_idim(nbgh_ranks[iech], idim));
       if (DBIN->hasLocVariable(ELoc::C))
-        tab_printg(NULL, DBIN->getLocVariable(ELoc::C,nbgh_ranks[iech],0));
+        tab_printg(NULL, DBIN->getLocVariable(ELoc::C, nbgh_ranks[iech], 0));
       if (DBIN->getNLoc(ELoc::V) > 0)
         tab_printg(NULL, st_get_verr(nbgh_ranks[iech], (FLAG_PROF) ? 0 : jvar_m));
       if (KOPTION->flag_data_disc)
       {
         for (idim = 0; idim < ndim; idim++)
-          tab_printg(NULL, DBIN->getLocVariable(ELoc::BLEX,nbgh_ranks[iech], idim));
+          tab_printg(NULL, DBIN->getLocVariable(ELoc::BLEX, nbgh_ranks[iech], idim));
       }
       if (icase < 0)
         tab_printg(NULL, st_get_ivar(nbgh_ranks[iech], jvar_m));
@@ -1418,7 +1418,7 @@ static void krige_wgt_print(int status,
 
       for (ivar = 0; ivar < nvar; ivar++)
       {
-        iwgt = nred * ivar + cumflag;
+        iwgt  = nred * ivar + cumflag;
         value = (wgt != nullptr && status == 0 && flag_value) ? wgt[iwgt] : TEST;
         if (!FFFF(value)) sum[ivar] += value;
         tab_printg(NULL, value);
@@ -1439,7 +1439,7 @@ static void krige_wgt_print(int status,
     message("\n");
   }
 
-  mem_free((char* ) sum);
+  mem_free((char*)sum);
   if (nfeq <= 0 || wgt == nullptr) return;
 
   /* Header */
@@ -1502,7 +1502,7 @@ static void st_result_kriging_print(int flag_xvalid, int nvar, int status)
     if (flag_xvalid != 0)
     {
       message("Variable Z%-2d\n", ivar + 1);
-      message( "Printout for Cross-validation should not be performed anymore\n");
+      message("Printout for Cross-validation should not be performed anymore\n");
     }
     else
     {
@@ -1587,7 +1587,7 @@ int _krigsim(Db* dbin,
   if (ksys.setKrigOptFlagSimu(true, nbsimu, icase)) return 1;
   if (ksys.updKrigOptEstim(iptr_est, -1, -1, true)) return 1;
   if (ksys.setKrigOptBayes(flag_bayes, dmean, dcov)) return 1;
-  if (! ksys.isReady()) return 1;
+  if (!ksys.isReady()) return 1;
 
   /* Loop on the targets to be processed */
 
@@ -1636,7 +1636,8 @@ int global_transitive(DbGrid* dbgrid,
 
   cvv = wtot = dsse = gint = dsum = 0.;
   st_global_init(dbgrid, dbgrid);
-  if (st_check_environment(0, 1, model)) return 1;;
+  if (st_check_environment(0, 1, model)) return 1;
+  ;
   int ndim = dbgrid->getNDim();
   VectorDouble d1(ndim, 0.);
 
@@ -1764,7 +1765,7 @@ int global_transitive(DbGrid* dbgrid,
   if (flag_value)
   {
     *abundance = dsum;
-    *cvtrans = ((*sse) <= 0.) ? TEST : dsum / (*sse);
+    *cvtrans   = ((*sse) <= 0.) ? TEST : dsum / (*sse);
   }
   else
   {
@@ -1819,7 +1820,7 @@ int global_transitive(DbGrid* dbgrid,
  ** \param[out] ifin    Index of the ending sample
  **
  *****************************************************************************/
-static int st_get_limits(DbGrid* db, double top, double bot, int *ideb, int *ifin)
+static int st_get_limits(DbGrid* db, double top, double bot, int* ideb, int* ifin)
 {
   int ndim, nz, iad;
   double z0, dz;
@@ -1827,9 +1828,9 @@ static int st_get_limits(DbGrid* db, double top, double bot, int *ideb, int *ifi
   /* Initializations */
 
   ndim = db->getNDim();
-  z0 = db->getX0(ndim - 1);
-  nz = db->getNX(ndim - 1);
-  dz = db->getDX(ndim - 1);
+  z0   = db->getX0(ndim - 1);
+  nz   = db->getNX(ndim - 1);
+  dz   = db->getDX(ndim - 1);
 
   /* Preliminary checks */
 
@@ -1842,15 +1843,15 @@ static int st_get_limits(DbGrid* db, double top, double bot, int *ideb, int *ifi
   if (FFFF(bot))
     iad = 0;
   else
-    iad = (int) ((bot - z0) / dz);
+    iad = (int)((bot - z0) / dz);
   if (bot > z0 + iad * dz) iad++;
-  *ideb = MAX(0, MIN(iad, nz-1));
+  *ideb = MAX(0, MIN(iad, nz - 1));
 
   if (FFFF(top))
     iad = nz - 1;
   else
-    iad = (int) ((top - z0) / dz);
-  *ifin = MAX(0, MIN(iad, nz-1));
+    iad = (int)((top - z0) / dz);
+  *ifin = MAX(0, MIN(iad, nz - 1));
   return (0);
 }
 
@@ -1873,19 +1874,19 @@ static int st_get_limits(DbGrid* db, double top, double bot, int *ideb, int *ifi
 static int st_get_neigh(int ideb,
                         int ifin,
                         int neigh_radius,
-                        int *status,
-                        int *nbefore,
-                        int *nafter)
+                        int* status,
+                        int* nbefore,
+                        int* nafter)
 {
   int iad;
 
   *status = 1;
   if (IECH_OUT < ideb || IECH_OUT > ifin) return (1);
 
-  iad = MAX(IECH_OUT - neigh_radius, ideb);
+  iad      = MAX(IECH_OUT - neigh_radius, ideb);
   *nbefore = IECH_OUT - iad;
 
-  iad = MIN(IECH_OUT + neigh_radius, ifin);
+  iad     = MIN(IECH_OUT + neigh_radius, ifin);
   *nafter = iad - IECH_OUT;
 
   *status = 0;
@@ -1902,7 +1903,7 @@ static int st_get_neigh(int ideb,
  ** \param[in]  flag_sym      1 for symmetrized covariance
  **
  *****************************************************************************/
-static double st_cov_exp(int dist, const double *cov, int cov_radius, int flag_sym)
+static double st_cov_exp(int dist, const double* cov, int cov_radius, int flag_sym)
 {
   double val1, val2, val;
 
@@ -1910,7 +1911,7 @@ static double st_cov_exp(int dist, const double *cov, int cov_radius, int flag_s
   {
     val1 = cov[cov_radius - dist];
     val2 = cov[cov_radius + dist];
-    val = (val1 + val2) / 2.;
+    val  = (val1 + val2) / 2.;
   }
   else
   {
@@ -1933,7 +1934,7 @@ static double st_cov_exp(int dist, const double *cov, int cov_radius, int flag_s
  ** \param[in]  neq           Number of kriging equations
  **
  *****************************************************************************/
-static void st_lhs_exp(double *covdd,
+static void st_lhs_exp(double* covdd,
                        int cov_radius,
                        int flag_sym,
                        int nfeq,
@@ -1948,10 +1949,10 @@ static void st_lhs_exp(double *covdd,
   for (i = -nbefore; i <= nafter; i++)
     for (j = -nbefore; j <= nafter; j++)
     {
-      LHS_EXP(i+nbefore,j+nbefore) = st_cov_exp(i - j, covdd, cov_radius,
-                                                flag_sym);
-      LHS_EXP(j+nbefore,i+nbefore) = st_cov_exp(j - i, covdd, cov_radius,
-                                                flag_sym);
+      LHS_EXP(i + nbefore, j + nbefore) = st_cov_exp(i - j, covdd, cov_radius,
+                                                     flag_sym);
+      LHS_EXP(j + nbefore, i + nbefore) = st_cov_exp(j - i, covdd, cov_radius,
+                                                     flag_sym);
     }
 
   /* Drift part */
@@ -1959,10 +1960,10 @@ static void st_lhs_exp(double *covdd,
   if (nfeq == 0) return;
   for (i = -nbefore; i <= nafter; i++)
   {
-    LHS_EXP(i+nbefore,neq-1) = 1.;
-    LHS_EXP(neq-1,i+nbefore) = 1.;
+    LHS_EXP(i + nbefore, neq - 1) = 1.;
+    LHS_EXP(neq - 1, i + nbefore) = 1.;
   }
-  LHS_EXP(neq-1,neq-1) = 0.;
+  LHS_EXP(neq - 1, neq - 1) = 0.;
 }
 
 /****************************************************************************/
@@ -1979,7 +1980,7 @@ static void st_lhs_exp(double *covdd,
  ** \param[in]  neq           Number of equations
  **
  *****************************************************************************/
-static void st_rhs_exp(double *covd0,
+static void st_rhs_exp(double* covd0,
                        int cov_radius,
                        int flag_sym,
                        int nfeq,
@@ -1992,12 +1993,12 @@ static void st_rhs_exp(double *covd0,
   /* Covariance part */
 
   for (i = -nbefore; i <= nafter; i++)
-    RHS_EXP(i+nbefore) = st_cov_exp(i, covd0, cov_radius, flag_sym);
+    RHS_EXP(i + nbefore) = st_cov_exp(i, covd0, cov_radius, flag_sym);
 
   /* Drift part */
 
   if (nfeq == 0) return;
-  RHS_EXP(neq-1) = 1.;
+  RHS_EXP(neq - 1) = 1.;
 }
 
 /****************************************************************************/
@@ -2011,7 +2012,7 @@ static void st_rhs_exp(double *covd0,
  ** \param[in]  nafter        Number of samples in neighborhood after target
  **
  *****************************************************************************/
-static double st_estim_exp(Db *db, const double *wgt, int nbefore, int nafter)
+static double st_estim_exp(Db* db, const double* wgt, int nbefore, int nafter)
 {
   int i;
   double result;
@@ -2043,9 +2044,9 @@ static double st_estim_exp(Db *db, const double *wgt, int nbefore, int nafter)
  ** \param[in]  nfeq          0 or 1 drift function(s)
  **
  *****************************************************************************/
-int anakexp_f(DbGrid *db,
-              double *covdd,
-              double *covd0,
+int anakexp_f(DbGrid* db,
+              double* covdd,
+              double* covd0,
               double top,
               double bot,
               int cov_radius,
@@ -2062,12 +2063,12 @@ int anakexp_f(DbGrid *db,
 
   error = 1;
   st_global_init(db, db);
-  FLAG_EST = true;
+  FLAG_EST   = true;
   lhs_global = rhs_global = wgt_global = nullptr;
-  ndim = db->getNDim();
-  nvarin = db->getNLoc(ELoc::Z);
+  ndim                                 = db->getNDim();
+  nvarin                               = db->getNLoc(ELoc::Z);
   nbefore_mem = nafter_mem = -1;
-  size = 0;
+  size                     = 0;
 
   /* Prepare the Koption structure */
 
@@ -2075,7 +2076,7 @@ int anakexp_f(DbGrid *db,
 
   /* Preliminary checks */
 
-  if (ndim != 1 || ! db->isGrid())
+  if (ndim != 1 || !db->isGrid())
   {
     messerr("This procedure is limited to 1-D grid");
     goto label_end;
@@ -2113,7 +2114,7 @@ int anakexp_f(DbGrid *db,
   ranks.resize(nech);
   for (i = 0; i < nech; i++)
   {
-    ranks[i] = i;
+    ranks[i]       = i;
     flag_global[i] = 1;
   }
 
@@ -2151,7 +2152,7 @@ int anakexp_f(DbGrid *db,
     if (nbefore_mem != nbefore || nafter_mem != nafter || OptDbg::force())
     {
       nbefore_mem = nbefore;
-      nafter_mem = nafter;
+      nafter_mem  = nafter;
 
       /* Establish the L.H.S. of the kriging system */
 
@@ -2189,8 +2190,9 @@ int anakexp_f(DbGrid *db,
 
   error = 0;
 
-  label_end: OptDbg::setCurrentIndex(0);
-  (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
+label_end:
+  OptDbg::setCurrentIndex(0);
+  (void)krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
   st_krige_manage_basic(-1, size, size, 1, nfeq);
   return (error);
 }
@@ -2212,24 +2214,24 @@ int anakexp_f(DbGrid *db,
  **                           variable
  **
  *****************************************************************************/
-static void st_calculate_covres(DbGrid *db,
-                                Model *model,
-                                const double *cov_ref,
+static void st_calculate_covres(DbGrid* db,
+                                Model* model,
+                                const double* cov_ref,
                                 int cov_radius,
                                 int flag_sym,
                                 const int cov_ss[3],
                                 const int cov_nn[3],
-                                double *cov_res)
+                                double* cov_res)
 {
   double covtab, covver;
 
   /* Initializations */
 
-  VectorDouble d1(3,0.);
-  double dx = db->getDX(0);
-  double dy = db->getDX(1);
+  VectorDouble d1(3, 0.);
+  double dx     = db->getDX(0);
+  double dy     = db->getDX(1);
   double covtot = COV_REF(0);
-  double c00 = model->evaluateOneGeneric(nullptr, d1);
+  double c00    = model->evaluateOneGeneric(nullptr, d1);
 
   /* Evaluate the array of experimental covariance of the residual variable */
 
@@ -2241,10 +2243,10 @@ static void st_calculate_covres(DbGrid *db,
           covver = COV_REF(iz);
         else
           covver = (COV_REF(iz) + COV_REF(-iz)) / 2.;
-        d1[0] = dx * ix;
-        d1[1] = dy * iy;
-        covtab = model->evaluateOneGeneric(nullptr, d1);
-        COV_RES(ix,iy,iz) = covver * (covtab + covtot - c00) / covtot;
+        d1[0]               = dx * ix;
+        d1[1]               = dy * iy;
+        covtab              = model->evaluateOneGeneric(nullptr, d1);
+        COV_RES(ix, iy, iz) = covver * (covtab + covtot - c00) / covtot;
       }
 }
 
@@ -2271,8 +2273,8 @@ static void st_calculate_covtot(DbGrid* db,
                                 int flag_sym,
                                 const int cov_ss[3],
                                 const int cov_nn[3],
-                                int *num_tot,
-                                double *cov_tot)
+                                int* num_tot,
+                                double* cov_tot)
 {
   int ix, iy, iz, ix1, iy1, iz1, jx1, jy1, jz1, jx2, jy2, jz2;
   int idx, idy, idz, jdx, jdy, iad, jad;
@@ -2281,7 +2283,7 @@ static void st_calculate_covtot(DbGrid* db,
   /* Initialization */
 
   int ndim = db->getNDim();
-  VectorInt indg(ndim,0);
+  VectorInt indg(ndim, 0);
   for (ix = -cov_nn[0]; ix <= cov_nn[0]; ix++)
     for (iy = -cov_nn[1]; iy <= cov_nn[1]; iy++)
       for (iz = -cov_nn[2]; iz <= cov_nn[2]; iz++)
@@ -2305,9 +2307,9 @@ static void st_calculate_covtot(DbGrid* db,
         indg[0] = jx1;
         indg[1] = jy1;
         indg[2] = jz1;
-        iad = db->indiceToRank(indg);
+        iad     = db->indiceToRank(indg);
         if (!db->isActive(iad)) continue;
-        val1 = db->getZVariable( iad, 0);
+        val1 = db->getZVariable(iad, 0);
         if (FFFF(val1)) continue;
 
         /* Loop on the second point within the covariance array */
@@ -2331,9 +2333,9 @@ static void st_calculate_covtot(DbGrid* db,
               indg[0] = jx2;
               indg[1] = jy2;
               indg[2] = jz2;
-              jad = db->indiceToRank(indg);
+              jad     = db->indiceToRank(indg);
               if (!db->isActive(jad)) continue;
-              val2 = db->getZVariable( jad, 0);
+              val2 = db->getZVariable(jad, 0);
               if (FFFF(val2)) continue;
 
               /* Update the Covariance */
@@ -2366,9 +2368,9 @@ static void st_calculate_covtot(DbGrid* db,
     for (iy = -cov_nn[1]; iy <= cov_nn[1]; iy++)
       for (iz = -cov_nn[2]; iz <= cov_nn[2]; iz++)
       {
-        val1 = COV_TOT(ix, iy, iz);
-        val2 = COV_TOT(-ix, iy, iz);
-        val  = (FFFF(val1) || FFFF(val2)) ? TEST : (val1 + val2) / 2.;
+        val1                = COV_TOT(ix, iy, iz);
+        val2                = COV_TOT(-ix, iy, iz);
+        val                 = (FFFF(val1) || FFFF(val2)) ? TEST : (val1 + val2) / 2.;
         COV_TOT(ix, iy, iz) = COV_TOT(-ix, iy, iz) = val;
       }
 
@@ -2376,9 +2378,9 @@ static void st_calculate_covtot(DbGrid* db,
     for (iy = -cov_nn[1]; iy < 0; iy++)
       for (iz = -cov_nn[2]; iz <= cov_nn[2]; iz++)
       {
-        val1 = COV_TOT(ix, -iy, iz);
-        val2 = COV_TOT(ix, iy, iz);
-        val  = (FFFF(val1) || FFFF(val2)) ? TEST : (val1 + val2) / 2.;
+        val1                = COV_TOT(ix, -iy, iz);
+        val2                = COV_TOT(ix, iy, iz);
+        val                 = (FFFF(val1) || FFFF(val2)) ? TEST : (val1 + val2) / 2.;
         COV_TOT(ix, iy, iz) = COV_TOT(ix, -iy, iz) = val;
       }
 
@@ -2387,9 +2389,9 @@ static void st_calculate_covtot(DbGrid* db,
       for (iy = -cov_nn[1]; iy <= cov_nn[1]; iy++)
         for (iz = -cov_nn[2]; iz < 0; iz++)
         {
-          val1 = COV_TOT(ix, iy, -iz);
-          val2 = COV_TOT(ix, iy, iz);
-          val  = (FFFF(val1) || FFFF(val2)) ? TEST : (val1 + val2) / 2.;
+          val1                 = COV_TOT(ix, iy, -iz);
+          val2                 = COV_TOT(ix, iy, iz);
+          val                  = (FFFF(val1) || FFFF(val2)) ? TEST : (val1 + val2) / 2.;
           COV_TOT(ix, iy, -iz) = COV_TOT(ix, iy, iz) = val;
         }
 }
@@ -2408,18 +2410,18 @@ static void st_calculate_covtot(DbGrid* db,
  ** \param[out] nei_cur       Array containing the neighborhood
  **
  *****************************************************************************/
-static VectorInt st_neigh_find(DbGrid *db,
+static VectorInt st_neigh_find(DbGrid* db,
                                int ix0,
                                int iy0,
                                int iz0,
                                const int nei_ss[3],
                                const int nei_nn[3],
-                               int *nei_cur)
+                               int* nei_cur)
 {
   int ix, iy, iz, jx, jy, jz, number, locrank;
   VectorInt nbgh_ranks;
   int ndim = db->getNDim();
-  VectorInt indg(ndim,0);
+  VectorInt indg(ndim, 0);
 
   /* Loop on the pixels of the neighborhood */
 
@@ -2428,8 +2430,8 @@ static VectorInt st_neigh_find(DbGrid *db,
     for (iy = -nei_nn[1]; iy <= nei_nn[1]; iy++)
       for (iz = -nei_nn[2]; iz <= nei_nn[2]; iz++)
       {
-        NEI_CUR(ix,iy,iz)= -1;
-        jx = ix0 + ix;
+        NEI_CUR(ix, iy, iz) = -1;
+        jx                  = ix0 + ix;
         if (jx < 0 || jx >= db->getNX(0)) continue;
         jy = iy0 + iy;
         if (jy < 0 || jy >= db->getNX(1)) continue;
@@ -2439,14 +2441,14 @@ static VectorInt st_neigh_find(DbGrid *db,
         indg[1] = jy;
         indg[2] = jz;
         locrank = db->indiceToRank(indg);
-        if (FFFF(db->getZVariable(locrank,0))) continue;
-        NEI_CUR(ix,iy,iz) = locrank;
+        if (FFFF(db->getZVariable(locrank, 0))) continue;
+        NEI_CUR(ix, iy, iz) = locrank;
         nbgh_ranks.push_back(locrank);
         flag_global[number] = 1;
         number++;
       }
 
-      /* Define the returned argument */
+  /* Define the returned argument */
 
   return nbgh_ranks;
 }
@@ -2465,8 +2467,8 @@ static VectorInt st_neigh_find(DbGrid *db,
  *****************************************************************************/
 static int st_neigh_diff(const int nei_ss[3],
                          const int nei_nn[3],
-                         int *nei_ref,
-                         const int *nei_cur)
+                         int* nei_ref,
+                         const int* nei_cur)
 {
   int ix, iy, iz, flag1, flag2, flag_diff;
 
@@ -2477,20 +2479,20 @@ static int st_neigh_diff(const int nei_ss[3],
     for (iy = -nei_nn[1]; iy <= nei_nn[1]; iy++)
       for (iz = -nei_nn[2]; iz <= nei_nn[2]; iz++)
       {
-        flag1 = NEI_REF(ix,iy,iz)< 0;
-        flag2 = NEI_CUR(ix,iy,iz) < 0;
+        flag1 = NEI_REF(ix, iy, iz) < 0;
+        flag2 = NEI_CUR(ix, iy, iz) < 0;
         if (flag1 != flag2) goto label_end;
       }
   flag_diff = 0;
 
-  label_end:
+label_end:
 
   /* Copy the current neighborhood into the reference neighborhood */
 
   for (ix = -nei_nn[0]; ix <= nei_nn[0]; ix++)
     for (iy = -nei_nn[1]; iy <= nei_nn[1]; iy++)
       for (iz = -nei_nn[2]; iz <= nei_nn[2]; iz++)
-        NEI_REF(ix,iy,iz)= NEI_CUR(ix,iy,iz);
+        NEI_REF(ix, iy, iz) = NEI_CUR(ix, iy, iz);
 
   return (flag_diff);
 }
@@ -2516,8 +2518,8 @@ static void st_lhs_exp_3D(int nech,
                           const int nei_nn[3],
                           const int cov_ss[3],
                           const int cov_nn[3],
-                          const int *nei_cur,
-                          const double *cov_tot,
+                          const int* nei_cur,
+                          const double* cov_tot,
                           double nugget)
 {
   int ix, iy, iz, jx, jy, jz, i, j, neq;
@@ -2529,7 +2531,7 @@ static void st_lhs_exp_3D(int nech,
 
   /* Covariance part of the L.H.S. */
 
-  i   = 0;
+  i = 0;
   for (ix = -nei_nn[0]; ix <= nei_nn[0]; ix++)
     for (iy = -nei_nn[1]; iy <= nei_nn[1]; iy++)
       for (iz = -nei_nn[2]; iz <= nei_nn[2]; iz++)
@@ -2597,15 +2599,15 @@ static void st_rhs_exp_3D(int nech,
     for (iy = -nei_nn[1]; iy <= nei_nn[1]; iy++)
       for (iz = -nei_nn[2]; iz <= nei_nn[2]; iz++)
       {
-        if (NEI_CUR(ix,iy,iz)< 0) continue;
-        RHS_EXP(i) = COV_RES(ix,iy,iz);
+        if (NEI_CUR(ix, iy, iz) < 0) continue;
+        RHS_EXP(i) = COV_RES(ix, iy, iz);
         i++;
       }
 
-      /* Drift part */
+  /* Drift part */
 
   if (nfeq == 0) return;
-  RHS_EXP(neq-1) = 1.;
+  RHS_EXP(neq - 1) = 1.;
 }
 
 /****************************************************************************/
@@ -2621,11 +2623,11 @@ static void st_rhs_exp_3D(int nech,
  ** \param[in]  weight        Array of Kriging weights
  **
  *****************************************************************************/
-static double st_estim_exp_3D(Db *db,
+static double st_estim_exp_3D(Db* db,
                               const int nei_ss[3],
                               const int nei_nn[3],
-                              int *nei_cur,
-                              const double *weight)
+                              int* nei_cur,
+                              const double* weight)
 {
   int i, ix, iy, iz;
   double result;
@@ -2633,13 +2635,13 @@ static double st_estim_exp_3D(Db *db,
   /* Initializations */
 
   result = 0.;
-  i = 0;
+  i      = 0;
   for (ix = -nei_nn[0]; ix <= nei_nn[0]; ix++)
     for (iy = -nei_nn[1]; iy <= nei_nn[1]; iy++)
       for (iz = -nei_nn[2]; iz <= nei_nn[2]; iz++)
       {
-        if (NEI_CUR(ix,iy,iz)< 0) continue;
-        result += weight[i] * db->getZVariable(NEI_CUR(ix,iy,iz),0);
+        if (NEI_CUR(ix, iy, iz) < 0) continue;
+        result += weight[i] * db->getZVariable(NEI_CUR(ix, iy, iz), 0);
         i++;
       }
 
@@ -2659,13 +2661,13 @@ static double st_estim_exp_3D(Db *db,
  ** \param[out] cov_tot  Array containing the covariance of the total variable
  **
  *****************************************************************************/
-static void st_vario_dump(FILE *file,
+static void st_vario_dump(FILE* file,
                           int ix0,
                           int iy0,
                           const int cov_ss[3],
                           const int cov_nn[3],
-                          const int *num_tot,
-                          const double *cov_tot)
+                          const int* num_tot,
+                          const double* cov_tot)
 {
   int ix, iy, iz, num;
   double cov;
@@ -2726,7 +2728,7 @@ int anakexp_3D(DbGrid* db,
   int cov_ss[3], cov_nn[3], nei_ss[3], nei_nn[3];
   int *num_tot, *nei_cur, *nei_ref;
   double *cov_tot, *cov_res, result;
-  FILE *fildmp;
+  FILE* fildmp;
   VectorInt nbgh_ranks;
 
   /* Initializations */
@@ -2749,7 +2751,7 @@ int anakexp_3D(DbGrid* db,
 
   /* Preliminary checks */
 
-  if (ndim != 3 || ! db->isGrid())
+  if (ndim != 3 || !db->isGrid())
   {
     messerr("This procedure is limited to 3-D grid");
     goto label_end;
@@ -2775,8 +2777,7 @@ int anakexp_3D(DbGrid* db,
 
   /* Open the Variogram debugging file */
 
-  if (dbg_ix >= -1 && dbg_ix < db->getNX(0) && dbg_iy >= -1
-      && dbg_iy < db->getNX(1))
+  if (dbg_ix >= -1 && dbg_ix < db->getNX(0) && dbg_iy >= -1 && dbg_iy < db->getNX(1))
   {
     fildmp = gslFopen("Vario.dat", "w");
     if (fildmp == nullptr) goto label_end;
@@ -2847,9 +2848,9 @@ int anakexp_3D(DbGrid* db,
       {
         mes_process("3-D Factorial Kriging Analysis", DBOUT->getNSample(),
                     ecr);
-        indg[0] = ix;
-        indg[1] = iy;
-        indg[2] = iz;
+        indg[0]  = ix;
+        indg[1]  = iy;
+        indg[2]  = iz;
         IECH_OUT = db->indiceToRank(indg);
         OptDbg::setCurrentIndex(IECH_OUT + 1);
 
@@ -2859,8 +2860,7 @@ int anakexp_3D(DbGrid* db,
 
         if (FFFF(db->getZVariable(IECH_OUT, 0)) || !db->isActive(IECH_OUT))
           continue;
-        if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH)
-            || OptDbg::query(EDbg::RESULTS))
+        if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
         {
           mestitle(1, "Target location");
           db_sample_print(db, IECH_OUT, 1, 0, 0, 0);
@@ -2869,7 +2869,7 @@ int anakexp_3D(DbGrid* db,
         /* Look for the neighborhood */
 
         nbgh_ranks = st_neigh_find(db, ix, iy, iz, nei_ss, nei_nn, nei_cur);
-        nech = (int) nbgh_ranks.size();
+        nech       = (int)nbgh_ranks.size();
         if (nech <= 0) continue;
         neq = (nfeq == 0) ? nech : nech + 1;
 
@@ -2922,14 +2922,15 @@ int anakexp_3D(DbGrid* db,
   error = 0;
   if (fildmp != nullptr) fclose(fildmp);
 
-  label_end: OptDbg::setCurrentIndex(0);
-  (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
+label_end:
+  OptDbg::setCurrentIndex(0);
+  (void)krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
   st_krige_manage_basic(-1, size_nei, size_nei, 1, nfeq);
-  mem_free((char* ) num_tot);
-  mem_free((char* ) nei_cur);
-  mem_free((char* ) nei_ref);
-  mem_free((char* ) cov_tot);
-  mem_free((char* ) cov_res);
+  mem_free((char*)num_tot);
+  mem_free((char*)nei_cur);
+  mem_free((char*)nei_ref);
+  mem_free((char*)cov_tot);
+  mem_free((char*)cov_res);
   return (error);
 }
 
@@ -2948,7 +2949,7 @@ int anakexp_3D(DbGrid* db,
  ** \param[out] smean     Array for simulated posterior mean for the drift means
  **
  *****************************************************************************/
-int bayes_simulate(Model *model,
+int bayes_simulate(Model* model,
                    int nbsimu,
                    const VectorDouble& rmean,
                    const VectorDouble& rcov,
@@ -2960,9 +2961,9 @@ int bayes_simulate(Model *model,
 
   /* Initializations */
 
-  nfeq = model->getNDriftEquation();
+  nfeq  = model->getNDriftEquation();
   nftri = nfeq * (nfeq + 1) / 2;
-  memo = law_get_random_seed();
+  memo  = law_get_random_seed();
 
   /* Core allocation */
 
@@ -2979,7 +2980,7 @@ int bayes_simulate(Model *model,
     messerr("The Drift coefficients have been set to their posterior mean");
     for (isimu = 0; isimu < nbsimu; isimu++)
       for (il = 0; il < nfeq; il++)
-        SMEAN(il,isimu) = rmean[il];
+        SMEAN(il, isimu) = rmean[il];
     goto label_suite;
   }
 
@@ -3001,12 +3002,13 @@ int bayes_simulate(Model *model,
     /* Add the mean */
 
     for (il = 0; il < nfeq; il++)
-      SMEAN(il,isimu) += rmean[il];
+      SMEAN(il, isimu) += rmean[il];
   }
 
   /* If DEBUG option is switched ON, the values are printed out */
 
-  label_suite: if (OptDbg::query(EDbg::BAYES))
+label_suite:
+  if (OptDbg::query(EDbg::BAYES))
   {
     mestitle(1, "Simulation of Drift Coefficients (for Bayesian Simulation)");
     message("Rank     Drift Coefficients\n");
@@ -3042,10 +3044,10 @@ int bayes_simulate(Model *model,
  ** \remark  - the constraints is stored in "sum" (only used in dbout)
  **
  *****************************************************************************/
-int krigsum(Db *dbin,
-            Db *dbout,
-            Model *model,
-            ANeigh *neigh,
+int krigsum(Db* dbin,
+            Db* dbout,
+            Model* model,
+            ANeigh* neigh,
             bool flag_positive,
             const NamingConvention& namconv)
 {
@@ -3059,7 +3061,7 @@ int krigsum(Db *dbin,
   {
     messerr("This procedure requires one Variable with Locator SUM in the Output Db");
     messerr("The number of such variable is currently equal to %d",
-            dbout->getNLoc(ELoc::SUM ));
+            dbout->getNLoc(ELoc::SUM));
     return 1;
   }
 
@@ -3079,7 +3081,7 @@ int krigsum(Db *dbin,
   KrigingSystem ksys(dbin, dbout, model, neigh);
   if (ksys.updKrigOptEstim(iptr_est, -1, -1)) return 1;
   if (ksys.setKrigOptFlagLTerm(true)) return 1;
-  if (! ksys.isReady()) return 1;
+  if (!ksys.isReady()) return 1;
 
   /* Loop on the variables */
 
@@ -3089,7 +3091,7 @@ int krigsum(Db *dbin,
     dbin->setLocatorByUID(iuids[ivar], ELoc::Z, 0);
     if (ksys.resetData()) return 1;
     if (ksys.updKrigOptEstim(iptr_est + ivar, -1, -1)) return 1;
-    (void) gslSPrintf(string, "Kriging of variable #%d at sample", ivar + 1);
+    (void)gslSPrintf(string, "Kriging of variable #%d at sample", ivar + 1);
 
     /* Loop on the targets to be processed */
 
@@ -3115,7 +3117,7 @@ int krigsum(Db *dbin,
 
     /* Implicit loop until the solution is acceptable */
 
-    while (! correct)
+    while (!correct)
     {
       double seistot = 0.;
       double seisloc = dbout->getFromLocator(ELoc::SUM, iech_out);
@@ -3135,9 +3137,8 @@ int krigsum(Db *dbin,
       for (int ivar = 0; ivar < nvar; ivar++)
       {
         double estim = 0.;
-        if (! active[ivar])
-          estim = (dbout->getArray(iech_out, iptr_est + ivar)
-              + lterm[ivar] * seisloc / seistot);
+        if (!active[ivar])
+          estim = (dbout->getArray(iech_out, iptr_est + ivar) + lterm[ivar] * seisloc / seistot);
         dbout->setArray(iech_out, iptr_est + ivar, estim);
       }
       correct = true;
@@ -3179,15 +3180,15 @@ int krigsum(Db *dbin,
  **
  *****************************************************************************/
 static VectorInt st_ranks_other(int nech,
-                                const VectorInt &ranks1,
-                                const VectorInt &ranks2)
+                                const VectorInt& ranks1,
+                                const VectorInt& ranks2)
 {
   VectorInt rother(nech, 0);
   for (int i = 0; i < nech; i++)
     rother[i] = i;
-  for (int i = 0, nsize1 = (int) ranks1.size(); i < nsize1; i++)
+  for (int i = 0, nsize1 = (int)ranks1.size(); i < nsize1; i++)
     rother[ranks1[i]] = -1;
-  for (int i = 0, nsize2 = (int) ranks2.size(); i < nsize2; i++)
+  for (int i = 0, nsize2 = (int)ranks2.size(); i < nsize2; i++)
     rother[ranks2[i]] = -1;
   return rother;
 }
@@ -3212,17 +3213,17 @@ static VectorInt st_ranks_other(int nech,
  ** \param[out] invsig_arg Returned array for Inverse Sigma
  **
  *****************************************************************************/
-static int st_sampling_krige_data(Db *db,
-                                  Model *model,
+static int st_sampling_krige_data(Db* db,
+                                  Model* model,
                                   double beta,
                                   VectorInt& ranks1,
                                   VectorInt& ranks2,
                                   VectorInt& rother,
-                                  int *ntot_arg,
-                                  int *nutil_arg,
+                                  int* ntot_arg,
+                                  int* nutil_arg,
                                   VectorInt& rutil,
-                                  double **tutil_arg,
-                                  double **invsig_arg)
+                                  double** tutil_arg,
+                                  double** invsig_arg)
 {
   int i, j, ecr, nmax;
   double *utab, *tutil, *invsig, sumval;
@@ -3232,20 +3233,20 @@ static int st_sampling_krige_data(Db *db,
 
   /* Initializations */
 
-  int error = 1;
-  int ndat = db->getNSample(true);
-  int nsize1 = (int) ranks1.size();
-  int nsize2 = (int) ranks2.size();
-  int ntot = nsize1 + nsize2;
-  int npart = ndat - nsize1;
-  int nutil = 0;
+  int error  = 1;
+  int ndat   = db->getNSample(true);
+  int nsize1 = (int)ranks1.size();
+  int nsize2 = (int)ranks2.size();
+  int ntot   = nsize1 + nsize2;
+  int npart  = ndat - nsize1;
+  int nutil  = 0;
   MatrixSymmetric mat_s;
 
   utab = tutil = invsig = nullptr;
 
   /* Core allocation */
 
-  utab = (double*) mem_alloc(sizeof(double) * ndat * ntot, 0);
+  utab = (double*)mem_alloc(sizeof(double) * ndat * ntot, 0);
   if (utab == nullptr) goto label_end;
   for (i = 0; i < ndat * ntot; i++)
     utab[i] = 0.;
@@ -3254,7 +3255,7 @@ static int st_sampling_krige_data(Db *db,
   /* Defining 'utab' for exact pivots */
 
   for (i = 0; i < nsize1; i++)
-    UTAB(i,i) = 1.;
+    UTAB(i, i) = 1.;
   ecr = 0;
   for (i = 0; i < nsize1; i++)
     ralls[ecr++] = ranks1[i];
@@ -3276,7 +3277,7 @@ static int st_sampling_krige_data(Db *db,
     mat_s = model->evalCovMatSym(db);
 
     CholeskyDense mat_s_Chol(&mat_s);
-    if (! mat_s_Chol.isReady()) goto label_end;
+    if (!mat_s_Chol.isReady()) goto label_end;
     VectorDouble tl = mat_s_Chol.getLowerTriangle();
 
     MatrixSymmetric* sq = MatrixSymmetric::createFromTriangle(0, nsize2, tl);
@@ -3290,18 +3291,16 @@ static int st_sampling_krige_data(Db *db,
     MatrixSymmetric tn1;
     mat_s_Chol.normMatInPlace(1, nsize2, MatrixSymmetric(), tn1);
 
-    MatrixSymmetric* tn2 = dynamic_cast<MatrixSymmetric*>
-      (MatrixFactory::prodMatMat(&v, &v, true, false));
+    MatrixSymmetric* tn2 = dynamic_cast<MatrixSymmetric*>(MatrixFactory::prodMatMat(&v, &v, true, false));
 
     tn1.linearCombination(1, &tn1, 1, tn2);
 
     if (tn1.computeEigen()) goto label_end;
-    VectorDouble eigval = tn1.getEigenValues();
+    VectorDouble eigval  = tn1.getEigenValues();
     MatrixSquare* eigvec = tn1.getEigenVectors()->clone();
 
     eigvec->prodByDiagInPlace(3, eigval);
-    MatrixDense* spart = dynamic_cast<MatrixDense*>
-      (MatrixFactory::createGlue(sq, &v, true, false));
+    MatrixDense* spart = dynamic_cast<MatrixDense*>(MatrixFactory::createGlue(sq, &v, true, false));
     spart->prodMatMatInPlace(spart, eigvec);
     delete eigvec;
 
@@ -3311,20 +3310,20 @@ static int st_sampling_krige_data(Db *db,
       {
         sumval = 0.;
         for (j = 0; j < nsize2; j++)
-          sumval = MAX(sumval, ABS(spart->getValue(i,j)));
+          sumval = MAX(sumval, ABS(spart->getValue(i, j)));
         vsort[i] = sumval;
         isort[i] = i;
       }
       ut_sort_double(1, npart, isort.data(), vsort.data());
-      nmax = MIN(npart, (int ) (beta * (double ) npart));
+      nmax = MIN(npart, (int)(beta * (double)npart));
       for (i = 0; i < nmax; i++)
         for (j = 0; j < nsize2; j++)
-          spart->setValue(isort[i],j, 0.);
+          spart->setValue(isort[i], j, 0.);
     }
 
     for (i = 0; i < npart; i++)
       for (j = 0; j < nsize2; j++)
-        UTAB(i+nsize1,j+nsize1) = -spart->getValue(i, j);
+        UTAB(i + nsize1, j + nsize1) = -spart->getValue(i, j);
 
     /* Core deallocation */
 
@@ -3340,47 +3339,47 @@ static int st_sampling_krige_data(Db *db,
   {
     sumval = 0.;
     for (j = 0; j < ntot; j++)
-      sumval += ABS(UTAB(i,j));
+      sumval += ABS(UTAB(i, j));
     if (sumval > 0.) nutil++;
   }
 
   /* Create the output arrays */
 
   rutil.resize(nutil, 0);
-  tutil = (double*) mem_alloc(sizeof(double) * ntot * nutil, 0);
+  tutil = (double*)mem_alloc(sizeof(double) * ntot * nutil, 0);
   if (tutil == nullptr) goto label_end;
-  invsig = (double*) mem_alloc(sizeof(double) * ntot * ntot, 0);
+  invsig = (double*)mem_alloc(sizeof(double) * ntot * ntot, 0);
   if (invsig == nullptr) goto label_end;
 
   for (i = ecr = 0; i < ndat; i++)
   {
     sumval = 0.;
     for (j = 0; j < ntot; j++)
-      sumval += ABS(UTAB(i,j));
+      sumval += ABS(UTAB(i, j));
     if (sumval <= 0.) continue;
     rutil[ecr] = ralls[i];
     for (j = 0; j < ntot; j++)
-      TUTIL(ecr,j) = UTAB(i, j);
+      TUTIL(ecr, j) = UTAB(i, j);
     ecr++;
   }
   mat_s = model->evalCovMatSym(db, rutil, -1);
   if (matrix_prod_norme(-1, nutil, ntot, tutil, mat_s.getValues().data(), invsig)) goto label_end;
   if (matrix_invert(invsig, ntot, 0)) goto label_end;
-  utab = (double*) mem_free((char* ) utab);
+  utab = (double*)mem_free((char*)utab);
 
   /* Returning arguments */
 
-  *ntot_arg = ntot;
-  *nutil_arg = nutil;
-  *tutil_arg = tutil;
+  *ntot_arg   = ntot;
+  *nutil_arg  = nutil;
+  *tutil_arg  = tutil;
   *invsig_arg = invsig;
 
   /* Error return code */
 
   error = 0;
 
-  label_end:
-  mem_free((char* ) utab);
+label_end:
+  mem_free((char*)utab);
   return (error);
 }
 
@@ -3402,15 +3401,15 @@ static int st_sampling_krige_data(Db *db,
  ** \param[out] data_var  Array of estimation variance at samples
  **
  *****************************************************************************/
-int st_krige_data(Db *db,
-                  Model *model,
+int st_krige_data(Db* db,
+                  Model* model,
                   double beta,
                   VectorInt& ranks1,
                   VectorInt& ranks2,
                   VectorInt& rother,
                   int flag_abs,
-                  double *data_est,
-                  double *data_var)
+                  double* data_est,
+                  double* data_var)
 {
   int ntot, nutil, i, iech, nech;
   double *tutil, *invsig, *s, *c00;
@@ -3424,7 +3423,7 @@ int st_krige_data(Db *db,
   /* Core allocation */
 
   nutil = ntot = 0;
-  nech = db->getNSample();
+  nech         = db->getNSample();
 
   /* Perform local sampling */
 
@@ -3456,8 +3455,8 @@ int st_krige_data(Db *db,
     if (!db->isActive(iech)) continue;
     if (rother[iech] < 0) continue;
     VectorInt vech = {iech};
-    c00 = model->evalCovMat(db, db, -1, -1, vech, vech).getValues().data();
-    s   = model->evalCovMat(db, db, -1, -1, rutil, vech).getValues().data();
+    c00            = model->evalCovMat(db, db, -1, -1, vech, vech).getValues().data();
+    s              = model->evalCovMat(db, db, -1, -1, rutil, vech).getValues().data();
 
     matrix_product_safe(1, nutil, ntot, s, tutil, aux3.data());
     matrix_product_safe(1, ntot, 1, aux2.data(), aux3.data(), &estim);
@@ -3476,14 +3475,14 @@ int st_krige_data(Db *db,
     matrix_product_safe(1, ntot, 1, aux3.data(), aux4.data(), &variance);
     data_var[iech] = c00[0] - variance;
 
-    s = (double*) mem_free((char* ) s);
-    c00 = (double*) mem_free((char* ) c00);
+    s   = (double*)mem_free((char*)s);
+    c00 = (double*)mem_free((char*)c00);
   }
 
-  mem_free((char* ) tutil);
-  mem_free((char* ) invsig);
-  mem_free((char* ) s);
-  mem_free((char* ) c00);
+  mem_free((char*)tutil);
+  mem_free((char*)invsig);
+  mem_free((char*)s);
+  mem_free((char*)c00);
   return 0;
 }
 
@@ -3501,11 +3500,11 @@ int st_krige_data(Db *db,
  ** \param[out] crit       Array of criterion
  **
  *****************************************************************************/
-int st_crit_global(Db *db,
-                   Model *model,
+int st_crit_global(Db* db,
+                   Model* model,
                    VectorInt& ranks1,
                    VectorInt& rother,
-                   double *crit)
+                   double* crit)
 {
   int ecr;
   double *c00, *invc, *cs, *cs1;
@@ -3513,7 +3512,7 @@ int st_crit_global(Db *db,
 
   /* Initializations */
 
-  int nsize1 = (int) ranks1.size();
+  int nsize1 = (int)ranks1.size();
   int ndat   = db->getNSample(true);
   int nutil  = ndat - nsize1;
   c00 = invc = cs = cs1 = nullptr;
@@ -3547,8 +3546,8 @@ int st_crit_global(Db *db,
     if (!db->isActive(iech)) continue;
     if (rother[iech] < 0) continue;
 
-    VectorInt vech = { iech };
-    c00 = model->evalCovMat(db, db, -1, -1, vech, vech).getValues().data();
+    VectorInt vech = {iech};
+    c00            = model->evalCovMat(db, db, -1, -1, vech, vech).getValues().data();
     if (c00 == nullptr) return 1;
 
     cs = model->evalCovMat(db, db, -1, -1, ranks1, vech).getValues().data();
@@ -3561,8 +3560,8 @@ int st_crit_global(Db *db,
     matrix_product_safe(1, nsize1, 1, cs, temp_loc, &sigma);
     olddiv[ecr] = olderr[ecr] / (c00[0] - sigma);
 
-    c00 = (double*) mem_free((char* ) c00);
-    cs = (double*) mem_free((char* ) cs);
+    c00 = (double*)mem_free((char*)c00);
+    cs  = (double*)mem_free((char*)cs);
     ecr++;
   }
 
@@ -3574,8 +3573,8 @@ int st_crit_global(Db *db,
     if (!db->isActive(iech)) continue;
     if (rother[iech] < 0) continue;
 
-    VectorInt vech = { iech };
-    cs = model->evalCovMat(db, db, -1, -1, vech, ranks1).getValues().data();
+    VectorInt vech = {iech};
+    cs             = model->evalCovMat(db, db, -1, -1, vech, ranks1).getValues().data();
     if (cs == nullptr) return 1;
 
     cs1 = model->evalCovMat(db, db, -1, -1, vech, rother).getValues().data();
@@ -3590,15 +3589,15 @@ int st_crit_global(Db *db,
       value += cs1[i] * cs1[i];
     crit[iech] = value / nutil;
 
-    cs  = (double*) mem_free((char* ) cs);
-    cs1 = (double*) mem_free((char* ) cs1);
+    cs  = (double*)mem_free((char*)cs);
+    cs1 = (double*)mem_free((char*)cs1);
     ecr++;
   }
 
-  mem_free((char* ) c00);
-  mem_free((char* ) invc);
-  mem_free((char* ) cs);
-  mem_free((char* ) cs1);
+  mem_free((char*)c00);
+  mem_free((char*)invc);
+  mem_free((char*)cs);
+  mem_free((char*)cs1);
   return 0;
 }
 
@@ -3640,9 +3639,9 @@ int sampling_f(Db* db,
 
   /* Initializations */
 
-  int nsize1 = (int) ranks1.size();
-  int nsize2 = (int) ranks2.size();
-  int nech = db->getNSample();
+  int nsize1 = (int)ranks1.size();
+  int nsize2 = (int)ranks2.size();
+  int nech   = db->getNSample();
 
   /* Preliminary checks */
 
@@ -3672,19 +3671,19 @@ int sampling_f(Db* db,
     {
       if (st_krige_data(db, model, beta, ranks1, ranks2, rother,
                         1, data_est.data(), data_var.data())) return 1;
-      best_rank = VectorHelper::whereMaximum(VectorHelper::initVDouble(data_est.data(), nech));
+      best_rank  = VectorHelper::whereMaximum(VectorHelper::initVDouble(data_est.data(), nech));
       best_ecart = data_est[best_rank];
     }
     else
     {
       if (st_crit_global(db, model, ranks1, rother, data_est.data())) return 1;
-      best_rank = VectorHelper::whereMinimum(VectorHelper::initVDouble(data_est.data(), nech));
+      best_rank  = VectorHelper::whereMinimum(VectorHelper::initVDouble(data_est.data(), nech));
       best_ecart = data_est[best_rank];
     }
     if (verbose)
       message("Exact Pivots (%3d/%3d): Rank = %3d - value = %lf\n", nsize1 + 1,
               nsize1_max, best_rank + 1, best_ecart);
-    ranks1[nsize1] = best_rank;
+    ranks1[nsize1]    = best_rank;
     rother[best_rank] = -1;
     nsize1++;
   }
@@ -3695,12 +3694,12 @@ int sampling_f(Db* db,
   {
     if (st_krige_data(db, model, beta, ranks1, ranks2, rother,
                       1, data_est.data(), data_var.data())) return 1;
-    best_rank = VectorHelper::whereMaximum(VectorHelper::initVDouble(data_est.data(), nech));
+    best_rank  = VectorHelper::whereMaximum(VectorHelper::initVDouble(data_est.data(), nech));
     best_ecart = data_est[best_rank];
     if (verbose)
       message("ACP   Pivots (%3d/%3d): Rank = %3d - value = %lf\n", nsize2 + 1,
               nsize2_max, best_rank + 1, best_ecart);
-    ranks2[nsize2] = best_rank;
+    ranks2[nsize2]    = best_rank;
     rother[best_rank] = -1;
     nsize2++;
   }
@@ -3740,9 +3739,9 @@ int sampling_f(Db* db,
  ** \param[in]  verbose    Verbose flag
  **
  *****************************************************************************/
-int krigsampling_f(Db *dbin,
-                   Db *dbout,
-                   Model *model,
+int krigsampling_f(Db* dbin,
+                   Db* dbout,
+                   Model* model,
                    double beta,
                    VectorInt& ranks1,
                    VectorInt& ranks2,
@@ -3756,8 +3755,8 @@ int krigsampling_f(Db *dbin,
 
   /* Preliminary checks */
 
-  int nsize1 = (int) ranks1.size();
-  int nsize2 = (int) ranks2.size();
+  int nsize1   = (int)ranks1.size();
+  int nsize2   = (int)ranks2.size();
   double sigma = 0.;
   tutil = invsig = s = c00 = nullptr;
   st_global_init(dbin, dbout);
@@ -3844,8 +3843,8 @@ int krigsampling_f(Db *dbin,
       db_sample_print(dbout, IECH_OUT, 1, 0, 0, 0);
     }
 
-    VectorInt vech = { IECH_OUT };
-    s = model->evalCovMat(dbin, dbout, -1, -1, rutil, vech).getValues().data();
+    VectorInt vech = {IECH_OUT};
+    s              = model->evalCovMat(dbin, dbout, -1, -1, rutil, vech).getValues().data();
     if (s == nullptr) return 1;
     if (FLAG_STD)
     {
@@ -3882,14 +3881,14 @@ int krigsampling_f(Db *dbin,
 
     /* Core deallocation */
 
-    s = (double*) mem_free((char* ) s);
-    c00 = (double*) mem_free((char* ) c00);
+    s   = (double*)mem_free((char*)s);
+    c00 = (double*)mem_free((char*)c00);
   }
 
-  mem_free((char* ) tutil);
-  mem_free((char* ) invsig);
-  mem_free((char* ) s);
-  mem_free((char* ) c00);
+  mem_free((char*)tutil);
+  mem_free((char*)invsig);
+  mem_free((char*)s);
+  mem_free((char*)c00);
   return 0;
 }
 
@@ -3904,13 +3903,13 @@ int krigsampling_f(Db *dbin,
  ** \param[in]  iptr      Rank of the weighting variable
  **
  *****************************************************************************/
-static void st_declustering_stats(int mode, int method, Db *db, int iptr)
+static void st_declustering_stats(int mode, int method, Db* db, int iptr)
 {
   double mean, var, zval, coeff, mini, maxi, sumwgt;
 
   mean = var = sumwgt = 0.;
-  mini = MAXIMUM_BIG;
-  maxi = MINIMUM_BIG;
+  mini                = MAXIMUM_BIG;
+  maxi                = MINIMUM_BIG;
   for (int iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
@@ -3919,8 +3918,8 @@ static void st_declustering_stats(int mode, int method, Db *db, int iptr)
     coeff = (mode == 0) ? 1. : db->getArray(iech, iptr);
     coeff = ABS(coeff);
     sumwgt += coeff;
-    mean   += coeff * zval;
-    var    += coeff * zval * zval;
+    mean += coeff * zval;
+    var += coeff * zval * zval;
     if (coeff < mini) mini = coeff;
     if (coeff > maxi) maxi = coeff;
   }
@@ -3961,7 +3960,7 @@ static void st_declustering_stats(int mode, int method, Db *db, int iptr)
  ** \param[in]  iptr      Rank of the Weight variable
  **
  *****************************************************************************/
-static void st_declustering_truncate_and_rescale(Db *db, int iptr)
+static void st_declustering_truncate_and_rescale(Db* db, int iptr)
 {
   double total, coeff;
 
@@ -4000,7 +3999,7 @@ static void st_declustering_truncate_and_rescale(Db *db, int iptr)
  ** \param[in]  radius    Array of neighborhood radius
  **
  *****************************************************************************/
-static int st_declustering_1(Db *db, int iptr, const VectorDouble& radius)
+static int st_declustering_1(Db* db, int iptr, const VectorDouble& radius)
 {
   int ndim = db->getNDim();
   VectorDouble vect(ndim);
@@ -4025,7 +4024,7 @@ static int st_declustering_1(Db *db, int iptr, const VectorDouble& radius)
       if (!db->isActive(jech)) continue;
       double value = db->getZVariable(iech, 0);
       if (FFFF(value)) continue;
-      (void) distance_intra(db, iech, jech, vect.data());
+      (void)distance_intra(db, iech, jech, vect.data());
 
       /* Normalize the distance */
 
@@ -4070,16 +4069,16 @@ static int st_declustering_1(Db *db, int iptr, const VectorDouble& radius)
  ** \param[in]  iptr       Rank of the declustering weight
  **
  *****************************************************************************/
-static int st_declustering_2(Db *db,
-                             Model *model,
+static int st_declustering_2(Db* db,
+                             Model* model,
                              ANeigh* neigh,
                              int iptr)
 {
   KrigOpt krigopt;
   krigopt.setOptionCalcul(EKrigOpt::DRIFT);
   KrigingSystem ksys(db, db, model, neigh, krigopt);
-  if (ksys.setKrigOptDataWeights(iptr,  true)) return 1;
-  if (! ksys.isReady()) return 1;
+  if (ksys.setKrigOptDataWeights(iptr, true)) return 1;
+  if (!ksys.isReady()) return 1;
   if (ksys.estimate(0)) return 1;
   ksys.conclusion();
 
@@ -4105,10 +4104,10 @@ static int st_declustering_2(Db *db,
  ** \param[in]  iptr       Rank of the declustering weight
  **
  *****************************************************************************/
-static int st_declustering_3(Db *db,
-                             Db *dbgrid,
-                             Model *model,
-                             ANeigh *neigh,
+static int st_declustering_3(Db* db,
+                             Db* dbgrid,
+                             Model* model,
+                             ANeigh* neigh,
                              const VectorInt& ndiscs,
                              int iptr)
 {
@@ -4135,8 +4134,8 @@ static int st_declustering_3(Db *db,
   KrigOpt krigopt;
   krigopt.setOptionCalcul(EKrigOpt::BLOCK, ndiscs);
   KrigingSystem ksys(db, dbgrid, model, neigh, krigopt);
-  if (ksys.setKrigOptDataWeights(iptr,  false)) return 1;
-  if (! ksys.isReady()) return 1;
+  if (ksys.setKrigOptDataWeights(iptr, false)) return 1;
+  if (!ksys.isReady()) return 1;
 
   /* Loop on the targets to be processed */
 
@@ -4172,17 +4171,17 @@ static int st_declustering_3(Db *db,
  ** \param[in]  verbose    Verbose option
  **
  *****************************************************************************/
-int declustering(Db *dbin,
-                 Model *model,
+int declustering(Db* dbin,
+                 Model* model,
                  int method,
-                 ANeigh *neigh,
-                 DbGrid *dbgrid,
+                 ANeigh* neigh,
+                 DbGrid* dbgrid,
                  const VectorDouble& radius,
                  const VectorInt& ndiscs,
                  int flag_sel,
                  bool verbose)
 {
-  if (! dbin->isNVarComparedTo(1)) return 1;
+  if (!dbin->isNVarComparedTo(1)) return 1;
 
   /* Add the kriging weight as a new variable */
 
@@ -4269,15 +4268,15 @@ int declustering(Db *dbin,
  ** \remarks The returned argument must be freed by the calling function
  **
  *****************************************************************************/
-static double* st_calcul_covmat(const char *title,
-                                Db *db1,
+static double* st_calcul_covmat(const char* title,
+                                Db* db1,
                                 int test_def1,
-                                Db *db2,
+                                Db* db2,
                                 int test_def2,
-                                Model *model)
+                                Model* model)
 {
   int n1, n2, i1, i2;
-  double *covgen;
+  double* covgen;
 
   /* Initializations */
 
@@ -4286,7 +4285,7 @@ static double* st_calcul_covmat(const char *title,
 
   /* Core allocation */
 
-  covgen = (double*) mem_alloc(sizeof(double) * n1 * n2, 0);
+  covgen = (double*)mem_alloc(sizeof(double) * n1 * n2, 0);
   if (covgen == nullptr) return (covgen);
 
   for (int ii1 = i1 = 0; ii1 < db1->getNSample(); ii1++)
@@ -4314,7 +4313,7 @@ static double* st_calcul_covmat(const char *title,
       for (int idim = 0; idim < db1->getNDim(); idim++)
         d1_global[idim] = db1->getDistance1D(ii1, ii2, idim);
 
-      COVGEN(i1,i2) = model->evaluateOneGeneric(nullptr, d1_global);
+      COVGEN(i1, i2) = model->evaluateOneGeneric(nullptr, d1_global);
       i2++;
     }
     i1++;
@@ -4342,23 +4341,22 @@ static double* st_calcul_covmat(const char *title,
  ** \remarks The returned argument must be freed by the calling function
  **
  *****************************************************************************/
-static double* st_calcul_drfmat(const char *title,
-                                Db *db1,
+static double* st_calcul_drfmat(const char* title,
+                                Db* db1,
                                 int test_def1,
-                                Model *model)
+                                Model* model)
 {
   int i1, n1, nbfl;
-  double *drftab;
+  double* drftab;
 
   /* Initializations */
 
-  n1 = (test_def1) ? db1->getNSampleActiveAndDefined(0) :
-                     db1->getNSample(true);
+  n1   = (test_def1) ? db1->getNSampleActiveAndDefined(0) : db1->getNSample(true);
   nbfl = model->getNDrift();
 
   /* Core allocation */
 
-  drftab = (double*) mem_alloc(sizeof(double) * n1 * nbfl, 0);
+  drftab = (double*)mem_alloc(sizeof(double) * n1 * nbfl, 0);
   if (drftab == nullptr) return (drftab);
 
   /* Loop on the samples */
@@ -4376,7 +4374,7 @@ static double* st_calcul_drfmat(const char *title,
     }
 
     VectorDouble drfloc = model->evalDriftBySample(db1, ii1, ECalcMember::LHS);
-    (void) memcpy(&drftab[i1 * nbfl], drfloc.data(), nbfl * sizeof(double));
+    (void)memcpy(&drftab[i1 * nbfl], drfloc.data(), nbfl * sizeof(double));
     i1++;
   }
 
@@ -4404,10 +4402,10 @@ static double* st_calcul_drfmat(const char *title,
  ** \remarks The returned argument must be freed by the calling function
  **
  *****************************************************************************/
-static double* st_calcul_distmat(const char *title,
-                                 Db *db1,
+static double* st_calcul_distmat(const char* title,
+                                 Db* db1,
                                  int test_def1,
-                                 Db *db2,
+                                 Db* db2,
                                  int test_def2,
                                  double power)
 {
@@ -4416,15 +4414,13 @@ static double* st_calcul_distmat(const char *title,
 
   /* Initializations */
 
-  n1 = (test_def1) ? db1->getNSampleActiveAndDefined(0) :
-                     db1->getNSample(true);
-  ns = (test_def2) ? db2->getNSampleActiveAndDefined(0) :
-                     db2->getNSample(true);
+  n1   = (test_def1) ? db1->getNSampleActiveAndDefined(0) : db1->getNSample(true);
+  ns   = (test_def2) ? db2->getNSampleActiveAndDefined(0) : db2->getNSample(true);
   ndim = db1->getNDim();
 
   /* Core allocation */
 
-  distgen = (double*) mem_alloc(sizeof(double) * n1 * ns, 0);
+  distgen = (double*)mem_alloc(sizeof(double) * n1 * ns, 0);
   if (distgen == nullptr) return (distgen);
 
   for (int ii1 = i1 = 0; ii1 < db1->getNSample(); ii1++)
@@ -4456,7 +4452,7 @@ static double* st_calcul_distmat(const char *title,
         dist += d1_global[idim] * d1_global[idim];
       }
 
-      DISTGEN(i1,is) = 1. / pow(dist, power / 2.);
+      DISTGEN(i1, is) = 1. / pow(dist, power / 2.);
       is++;
     }
     i1++;
@@ -4485,23 +4481,23 @@ static double* st_calcul_distmat(const char *title,
  ** \remarks The returned argument must be freed by the calling function
  **
  *****************************************************************************/
-static double* st_calcul_product(const char *title,
+static double* st_calcul_product(const char* title,
                                  int n1,
                                  int ns,
-                                 const double *covss,
-                                 const double *distgen)
+                                 const double* covss,
+                                 const double* distgen)
 {
-  double *prodgen;
+  double* prodgen;
 
-  prodgen = (double*) mem_alloc(sizeof(double) * n1 * ns, 0);
+  prodgen = (double*)mem_alloc(sizeof(double) * n1 * ns, 0);
   if (prodgen == nullptr) return (prodgen);
 
   for (int i1 = 0; i1 < n1; i1++)
     for (int is = 0; is < ns; is++)
     {
-      PRODGEN(i1,is) = 0.;
+      PRODGEN(i1, is) = 0.;
       for (int js = 0; js < ns; js++)
-        PRODGEN(i1,is) += COVSS(is,js) * DISTGEN(i1, js);
+        PRODGEN(i1, is) += COVSS(is, js) * DISTGEN(i1, js);
     }
 
   /* Optional printout */
@@ -4525,13 +4521,13 @@ static double* st_calcul_product(const char *title,
  ** \param[in]  prodps      Product of DistPS by CovSS
  **
  *****************************************************************************/
-static double* st_inhomogeneous_covpp(Db *dbdat,
-                                      Db *dbsrc,
-                                      Model *model_dat,
-                                      const double *distps,
-                                      const double *prodps)
+static double* st_inhomogeneous_covpp(Db* dbdat,
+                                      Db* dbsrc,
+                                      Model* model_dat,
+                                      const double* distps,
+                                      const double* prodps)
 {
-  double *covpp;
+  double* covpp;
   int np, ns, error;
 
   /* Initializations */
@@ -4553,15 +4549,16 @@ static double* st_inhomogeneous_covpp(Db *dbdat,
     for (int jp = ip; jp < np; jp++)
       for (int is = 0; is < ns; is++)
       {
-        COVPP(ip,jp) += DISTPS(ip,is) * PRODPS(jp, is);
-        if (jp > ip) COVPP(jp,ip) = COVPP(ip, jp);
+        COVPP(ip, jp) += DISTPS(ip, is) * PRODPS(jp, is);
+        if (jp > ip) COVPP(jp, ip) = COVPP(ip, jp);
       }
 
   /* Set the error return code */
 
   error = 0;
 
-  label_end: if (error) covpp = (double*) mem_free((char* ) covpp);
+label_end:
+  if (error) covpp = (double*)mem_free((char*)covpp);
   return (covpp);
 }
 
@@ -4583,16 +4580,16 @@ static double* st_inhomogeneous_covpp(Db *dbdat,
  ** \remarks: When used with flag_source=TRUE, 'dbsrc' and 'dbout' coincide
  **
  *****************************************************************************/
-static double* st_inhomogeneous_covgp(Db *dbdat,
-                                      Db *dbsrc,
-                                      Db *dbout,
+static double* st_inhomogeneous_covgp(Db* dbdat,
+                                      Db* dbsrc,
+                                      Db* dbout,
                                       int flag_source,
-                                      Model *model_dat,
-                                      const double *distps,
-                                      const double *prodps,
-                                      const double *prodgs)
+                                      Model* model_dat,
+                                      const double* distps,
+                                      const double* prodps,
+                                      const double* prodgs)
 {
-  double *covgp;
+  double* covgp;
   int np, ns, ng, error;
 
   /* Initializations */
@@ -4616,20 +4613,21 @@ static double* st_inhomogeneous_covgp(Db *dbdat,
     for (int ig = 0; ig < ng; ig++)
       for (int ip = 0; ip < np; ip++)
         for (int is = 0; is < ns; is++)
-          COVGP(ig,ip) += DISTPS(ip,is) * PRODGS(ig, is);
+          COVGP(ig, ip) += DISTPS(ip, is) * PRODGS(ig, is);
   }
   else
   {
     for (int ig = 0; ig < ng; ig++)
       for (int ip = 0; ip < np; ip++)
-        COVGP(ig,ip) = PRODPS(ip, ig);
+        COVGP(ig, ip) = PRODPS(ip, ig);
   }
 
   /* Set the error return code */
 
   error = 0;
 
-  label_end: if (error) covgp = (double*) mem_free((char* ) covgp);
+label_end:
+  if (error) covgp = (double*)mem_free((char*)covgp);
   return (covgp);
 }
 
@@ -4649,12 +4647,12 @@ static double* st_inhomogeneous_covgp(Db *dbdat,
  ** \remarks The returned argument must be freed by the calling function
  **
  *****************************************************************************/
-static VectorDouble st_inhomogeneous_covgg(Db *dbsrc,
-                                           Db *dbout,
+static VectorDouble st_inhomogeneous_covgg(Db* dbsrc,
+                                           Db* dbout,
                                            int flag_source,
-                                           Model *model_dat,
-                                           const double *distgs,
-                                           const double *prodgs)
+                                           Model* model_dat,
+                                           const double* distgs,
+                                           const double* prodgs)
 {
   int ns = dbsrc->getNSample(true);
   int ng = dbout->getNSample(true);
@@ -4672,7 +4670,7 @@ static VectorDouble st_inhomogeneous_covgg(Db *dbsrc,
     {
       covgg[ig] = c00;
       for (int is = 0; is < ns; is++)
-        covgg[ig] += DISTGS(ig,is) * PRODGS(ig, is);
+        covgg[ig] += DISTGS(ig, is) * PRODGS(ig, is);
     }
   }
   else
@@ -4703,10 +4701,10 @@ static VectorDouble st_inhomogeneous_covgg(Db *dbsrc,
  *****************************************************************************/
 static int st_drift_prepar(int np,
                            int nbfl,
-                           const double *covpp,
-                           const double *drftab,
-                           double **yloc,
-                           double **zloc)
+                           const double* covpp,
+                           const double* drftab,
+                           double** yloc,
+                           double** zloc)
 {
   double *ymat, *zmat, value;
   int error, ecr;
@@ -4718,7 +4716,7 @@ static int st_drift_prepar(int np,
 
   /* First returned array */
 
-  ymat = (double*) mem_alloc(sizeof(double) * nbfl * np, 0);
+  ymat = (double*)mem_alloc(sizeof(double) * nbfl * np, 0);
   if (ymat == nullptr) goto label_end;
 
   ecr = 0;
@@ -4727,13 +4725,13 @@ static int st_drift_prepar(int np,
     {
       value = 0.;
       for (int jp = 0; jp < np; jp++)
-        value += COVPP(ip,jp) * DRFTAB(jp, il);
+        value += COVPP(ip, jp) * DRFTAB(jp, il);
       ymat[ecr++] = value;
     }
 
   /* Second retrned array */
 
-  zmat = (double*) mem_alloc(sizeof(double) * nbfl * nbfl, 0);
+  zmat = (double*)mem_alloc(sizeof(double) * nbfl * nbfl, 0);
   if (zmat == nullptr) goto label_end;
 
   ecr = 0;
@@ -4742,7 +4740,7 @@ static int st_drift_prepar(int np,
     {
       value = 0.;
       for (int ip = 0; ip < np; ip++)
-        value += YMAT(ip,il) * DRFTAB(ip, jl);
+        value += YMAT(ip, il) * DRFTAB(ip, jl);
       zmat[ecr++] = value;
     }
 
@@ -4754,10 +4752,11 @@ static int st_drift_prepar(int np,
 
   error = 0;
 
-  label_end: if (error)
+label_end:
+  if (error)
   {
-    ymat = (double*) mem_free((char* ) ymat);
-    zmat = (double*) mem_free((char* ) zmat);
+    ymat = (double*)mem_free((char*)ymat);
+    zmat = (double*)mem_free((char*)zmat);
   }
   *yloc = ymat;
   *zloc = zmat;
@@ -4782,13 +4781,13 @@ static int st_drift_prepar(int np,
  *****************************************************************************/
 static void st_drift_update(int np,
                             int nbfl,
-                            const double *covgp,
-                            const double *driftg,
-                            const double *ymat,
-                            double *zmat,
-                            double *maux,
-                            double *lambda,
-                            double *mu)
+                            const double* covgp,
+                            const double* driftg,
+                            const double* ymat,
+                            double* zmat,
+                            double* maux,
+                            double* lambda,
+                            double* mu)
 {
   double value;
 
@@ -4798,7 +4797,7 @@ static void st_drift_update(int np,
   {
     value = 0.;
     for (int ip = 0; ip < np; ip++)
-      value = YMAT(ip,il) * covgp[ip] - driftg[il];
+      value = YMAT(ip, il) * covgp[ip] - driftg[il];
     maux[il] = value;
   }
   matrix_product_safe(nbfl, nbfl, 1, zmat, maux, mu);
@@ -4807,7 +4806,7 @@ static void st_drift_update(int np,
 
   for (int ip = 0; ip < np; ip++)
     for (int il = 0; il < nbfl; il++)
-      lambda[ip] -= YMAT(ip,il) * mu[il];
+      lambda[ip] -= YMAT(ip, il) * mu[il];
 }
 
 /****************************************************************************/
@@ -4825,13 +4824,13 @@ static void st_drift_update(int np,
  ** \param[in]  model_src   Model structure for the sources
  **
  *****************************************************************************/
-int inhomogeneous_kriging(Db *dbdat,
-                          Db *dbsrc,
-                          Db *dbout,
+int inhomogeneous_kriging(Db* dbdat,
+                          Db* dbsrc,
+                          Db* dbout,
                           double power,
                           int flag_source,
-                          Model *model_dat,
-                          Model *model_src)
+                          Model* model_dat,
+                          Model* model_src)
 {
   int error, np, ip, ns, ng, nvar, neq, nred, nfeq, nbfl;
   double *covss, *distps, *distgs, *covpp, *covgp, *prodps, *prodgs;
@@ -4847,14 +4846,14 @@ int inhomogeneous_kriging(Db *dbdat,
 
   /* Preliminary checks */
 
-  error = nvar = 1;
+  error = nvar        = 1;
   NeighUnique* neighU = NeighUnique::create(false);
   st_global_init(dbdat, dbout);
   FLAG_EST = true;
   FLAG_STD = true;
   distps = distgs = prodgs = prodps = nullptr;
   covss = covpp = covgp = nullptr;
-  driftp = nullptr;
+  driftp                = nullptr;
   ymat = zmat = nullptr;
   if (st_check_environment(1, 1, model_dat)) goto label_end;
 
@@ -4884,10 +4883,10 @@ int inhomogeneous_kriging(Db *dbdat,
     if (IPTR_STD < 0) goto label_end;
   }
   nred = neq = np = dbdat->getNSampleActiveAndDefined(0);
-  nfeq = 0;
-  ns = dbsrc->getNSample(true);
-  ng = dbout->getNSample(true);
-  nbfl = model_dat->getNDrift();
+  nfeq            = 0;
+  ns              = dbsrc->getNSample(true);
+  ng              = dbout->getNSample(true);
+  nbfl            = model_dat->getNDrift();
 
   /* Core allocation */
 
@@ -5045,9 +5044,9 @@ int inhomogeneous_kriging(Db *dbdat,
 
     /* Update the variance calculation */
 
-    VAR0(0,0) = covgg[IECH_OUT];
-    stdev = covgg[IECH_OUT] - stdev;
-    stdev = (stdev > 0) ? sqrt(stdev) : 0.;
+    VAR0(0, 0) = covgg[IECH_OUT];
+    stdev      = covgg[IECH_OUT] - stdev;
+    stdev      = (stdev > 0) ? sqrt(stdev) : 0.;
 
     /* Store the result */
 
@@ -5064,20 +5063,21 @@ int inhomogeneous_kriging(Db *dbdat,
 
   error = 0;
 
-  label_end: OptDbg::setCurrentIndex(0);
-  mem_free((char* ) covss);
-  mem_free((char* ) distps);
-  mem_free((char* ) distgs);
-  mem_free((char* ) prodps);
-  mem_free((char* ) prodgs);
-  mem_free((char* ) driftp);
-  mem_free((char* ) covpp);
-  mem_free((char* ) covgp);
-  mem_free((char* ) ymat);
-  mem_free((char* ) zmat);
-  (void) st_model_manage(-1, model_dat);
-  (void) st_krige_manage(-1, 1, model_dat, neighU);
-  (void) krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
+label_end:
+  OptDbg::setCurrentIndex(0);
+  mem_free((char*)covss);
+  mem_free((char*)distps);
+  mem_free((char*)distgs);
+  mem_free((char*)prodps);
+  mem_free((char*)prodgs);
+  mem_free((char*)driftp);
+  mem_free((char*)covpp);
+  mem_free((char*)covgp);
+  mem_free((char*)ymat);
+  mem_free((char*)zmat);
+  (void)st_model_manage(-1, model_dat);
+  (void)st_krige_manage(-1, 1, model_dat, neighU);
+  (void)krige_koption_manage(-1, 1, EKrigOpt::POINT, 1, VectorInt());
   delete neighU;
   return (error);
 }
@@ -5095,14 +5095,14 @@ int inhomogeneous_kriging(Db *dbdat,
 ** \remarks Limited to the monovariate case
 **
 *****************************************************************************/
-void _image_smoother(DbGrid *dbgrid,
-                     const NeighImage *neigh,
+void _image_smoother(DbGrid* dbgrid,
+                     const NeighImage* neigh,
                      int type,
                      double range,
                      int iptr0)
 {
-  int ndim   = dbgrid->getNDim();
-  double r2  = (type == 1) ? 1. : range * range;
+  int ndim  = dbgrid->getNDim();
+  double r2 = (type == 1) ? 1. : range * range;
 
   /* Core allocation */
 
@@ -5115,7 +5115,7 @@ void _image_smoother(DbGrid *dbgrid,
 
   VectorInt nx(ndim);
   int nech = 1;
-  for (int idim=0; idim<ndim; idim++)
+  for (int idim = 0; idim < ndim; idim++)
   {
     nx[idim] = 2 * neigh->getImageRadius(idim) + 1;
     nech *= nx[idim];
@@ -5129,39 +5129,39 @@ void _image_smoother(DbGrid *dbgrid,
 
   DbGrid* dbaux =
     DbGrid::create(nx, dbgrid->getDXs(), dbgrid->getX0s(), dbgrid->getAngles(),
-                   ELoadBy::COLUMN, tab, {"test"}, {String{ELoc::Z.getKey()}}, 1);
+                   ELoadBy::COLUMN, tab, {"test"}, {String {ELoc::Z.getKey()}}, 1);
 
   int nb_neigh = dbaux->getNSample(true);
-  dbaux->rankToIndice(nb_neigh/2, indn0);
+  dbaux->rankToIndice(nb_neigh / 2, indn0);
 
   /* Loop on the targets to be processed */
 
-  for (int iech_out=0; iech_out<dbgrid->getNSample(); iech_out++)
+  for (int iech_out = 0; iech_out < dbgrid->getNSample(); iech_out++)
   {
-    if (! dbgrid->isActive(iech_out)) continue;
+    if (!dbgrid->isActive(iech_out)) continue;
     dbgrid->rankToIndice(iech_out, indg0);
 
     /* Loop on the neighboring points */
 
     double estim = 0.;
     double total = 0.;
-    for (int iech=0; iech<nb_neigh; iech++)
+    for (int iech = 0; iech < nb_neigh; iech++)
     {
       if (FFFF(dbaux->getZVariable(iech, 0))) continue;
       dbaux->rankToIndice(iech, indnl);
       double d2 = 0.;
-      for (int i=0; i<ndim; i++)
+      for (int i = 0; i < ndim; i++)
       {
         int idelta   = (indnl[i] - indn0[i]);
         double delta = idelta * dbgrid->getDX(i);
-        d2      += delta * delta;
+        d2 += delta * delta;
         indgl[i] = indg0[i] + idelta;
         indgl[i] = dbgrid->getMirrorIndex(i, indgl[i]);
       }
 
-      int jech = dbgrid->indiceToRank(indgl);
+      int jech    = dbgrid->indiceToRank(indgl);
       double data = dbgrid->getZVariable(jech, 0);
-      if (! FFFF(data))
+      if (!FFFF(data))
       {
         double weight = (type == 1) ? 1. : exp(-d2 / r2);
         estim += data * weight;

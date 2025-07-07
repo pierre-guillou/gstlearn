@@ -46,7 +46,6 @@ verbose = False
 filetype = gl.ASerializable.getFileIdentity(filename, verbose)
 if filetype == "":
     exit()
-filetaux = gl.ASerializable.getFileIdentity(fileaux, verbose)
 
 if filetype == "Db":
     db = gl.Db.createFromNF(filename, verbose)
@@ -103,12 +102,13 @@ elif filetype == "DbGrid":
             gp.decoration(title=name)
             plt.show()
     else:
-        gp.correlation(dbgrid, nameX, nameY, asPoint=False, bins=100)
+        gp.correlation(dbgrid, nameX, nameY, asPoint=False, bins=100, cmin=1)
         plt.show()
         
 elif filetype == "Vario":
     vario = gl.Vario.createFromNF(filename,False)
     checkValidPointer(vario)
+    filetaux = gl.ASerializable.getFileIdentity(fileaux, verbose)
     
     if filetaux == "Model":
         model = gl.Model.createFromNF(fileaux,False)
@@ -122,6 +122,7 @@ elif filetype == "Vario":
 elif filetype == "Model":
     model = gl.Model.createFromNF(filename,False)
     checkValidPointer(model)
+    filetaux = gl.ASerializable.getFileIdentity(fileaux, verbose)
     
     if filetaux == "Vario":
         vario = gl.Vario.createFromNF(fileaux,False)
@@ -154,7 +155,7 @@ elif filetype == "Polygon":
 elif filetype == "MeshETurbo":
     mesh = gl.MeshETurbo.createFromNF(filename, False)
     checkValidPointer(mesh)
-    gp.mesh(mesh)
+    gp.mesh(mesh, flagEdge=True, flagApex=True)
     plt.show()
  
 else:

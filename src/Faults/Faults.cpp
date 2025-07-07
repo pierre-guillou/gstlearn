@@ -9,27 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Faults/Faults.hpp"
-
-#include "Geometry/GeometryHelper.hpp"
-#include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/SerializeHDF5.hpp"
+#include "Geometry/GeometryHelper.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 
 namespace gstlrn
 {
 Faults::Faults()
-  : AStringable(),
-    ASerializable(),
-    _faults()
+  : AStringable()
+  , ASerializable()
+  , _faults()
 {
 }
 
 Faults::Faults(const Faults& r)
-    : AStringable(r),
-      ASerializable(r),
-      _faults(r._faults)
+  : AStringable(r)
+  , ASerializable(r)
+  , _faults(r._faults)
 {
 }
 
@@ -58,7 +57,7 @@ String Faults::toString(const AStringFormat* strfmt) const
 
   for (int i = 0; i < nfaults; i++)
   {
-    sstr << "Fault #" << i+1 << std::endl;
+    sstr << "Fault #" << i + 1 << std::endl;
     sstr << _faults[i].toString(strfmt);
   }
   return sstr.str();
@@ -67,7 +66,7 @@ String Faults::toString(const AStringFormat* strfmt) const
 bool Faults::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && _recordWrite<int>(os, "Number of Faults", getNFaults());
+  ret      = ret && _recordWrite<int>(os, "Number of Faults", getNFaults());
   for (int i = 0; ret && i < getNFaults(); i++)
     ret = ret && _faults[i]._serializeAscii(os, verbose);
   return ret;
@@ -76,8 +75,8 @@ bool Faults::_serializeAscii(std::ostream& os, bool verbose) const
 bool Faults::_deserializeAscii(std::istream& is, bool verbose)
 {
   int nfaults = 0;
-  bool ret = true;
-  ret = ret && _recordRead<int>(is, "Number of Faults", nfaults);
+  bool ret    = true;
+  ret         = ret && _recordRead<int>(is, "Number of Faults", nfaults);
 
   for (int i = 0; ret && i < nfaults; i++)
   {
@@ -118,7 +117,7 @@ bool Faults::isSplitByFaultSP(const SpacePoint& P1, const SpacePoint& P2) const
   return isSplitByFault(xt1, yt1, xt2, yt2);
 }
 
-bool Faults::isSplitByFault(double xt1,double yt1, double xt2, double yt2) const
+bool Faults::isSplitByFault(double xt1, double yt1, double xt2, double yt2) const
 {
   double xint, yint;
 
@@ -168,7 +167,7 @@ bool Faults::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   if (!faultG) return false;
 
   /* Read the grid characteristics */
-  bool ret = true;
+  bool ret    = true;
   int nfaults = 0;
 
   ret = ret && SerializeHDF5::readValue(*faultG, "NFaults", nfaults);
@@ -178,7 +177,7 @@ bool Faults::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   for (int i = 0; ret && i < nfaults; i++)
   {
     String locName = "Line" + std::to_string(i);
-    auto lineG      = SerializeHDF5::getGroup(*faultsG, locName);
+    auto lineG     = SerializeHDF5::getGroup(*faultsG, locName);
     if (!lineG) return false;
 
     PolyLine2D fault;

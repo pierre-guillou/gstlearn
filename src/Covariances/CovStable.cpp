@@ -56,7 +56,6 @@ double CovStable::simulateTurningBand(double t0, TurningBandOperate& operTB) con
 {
   if (getParam() > 1)
     return operTB.cosineOne(t0);
-  else
-    return operTB.spectralOne(t0);
+  return operTB.spectralOne(t0);
 }
 }

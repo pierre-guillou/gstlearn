@@ -9,14 +9,14 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Estimation/KrigOpt.hpp"
-#include "Enum/EKrigOpt.hpp"
-#include "Matrix/MatrixDense.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Db/DbGrid.hpp"
-#include "Neigh/ANeigh.hpp"
-#include "Model/ModelGeneric.hpp"
+#include "Enum/EKrigOpt.hpp"
+#include "Matrix/MatrixDense.hpp"
 #include "Model/Model.hpp"
+#include "Model/ModelGeneric.hpp"
+#include "Neigh/ANeigh.hpp"
 
 namespace gstlrn
 {
@@ -59,19 +59,19 @@ KrigOpt& KrigOpt::operator=(const KrigOpt& m)
 {
   if (this != &m)
   {
-    _calcul       = m._calcul;
-    _mode         = m._mode;
-    _flagPerCell  = m._flagPerCell;
-    _nDiscDim     = m._nDiscDim;
-    _nDiscNumber  = m._nDiscNumber;
-    _ndiscs       = m._ndiscs;
-    _disc1        = m._disc1;
-    _disc2        = m._disc2;
-    _flagDGM      = m._flagDGM;
-    _flagColcok   = m._flagColcok;
-    _rankColcok   = m._rankColcok;
-    _matLC        = m._matLC;
-    _dbgrid       = m._dbgrid;
+    _calcul      = m._calcul;
+    _mode        = m._mode;
+    _flagPerCell = m._flagPerCell;
+    _nDiscDim    = m._nDiscDim;
+    _nDiscNumber = m._nDiscNumber;
+    _ndiscs      = m._ndiscs;
+    _disc1       = m._disc1;
+    _disc2       = m._disc2;
+    _flagDGM     = m._flagDGM;
+    _flagColcok  = m._flagColcok;
+    _rankColcok  = m._rankColcok;
+    _matLC       = m._matLC;
+    _dbgrid      = m._dbgrid;
   }
   return *this;
 }
@@ -128,7 +128,7 @@ int KrigOpt::setOptionCalcul(const EKrigOpt& calcul,
       messerr("i.e. a vector (dimension: Space Dimension) filled with positive numbers");
       return 1;
     }
-    _ndiscs = ndiscs;
+    _ndiscs      = ndiscs;
     _flagPerCell = flag_per_cell;
 
     // Prepare auxiliary storage
@@ -152,7 +152,7 @@ int KrigOpt::setOptionCalcul(const EKrigOpt& calcul,
 int KrigOpt::setColCok(const VectorInt& rank_colcok)
 {
   _rankColcok = rank_colcok;
-  _flagColcok = ! rank_colcok.empty();
+  _flagColcok = !rank_colcok.empty();
   return 0;
 }
 
@@ -219,7 +219,7 @@ bool KrigOpt::_isValidCalcul(const Db* dbout, const ANeigh* neigh) const
   if (_calcul == EKrigOpt::BLOCK)
   {
     const DbGrid* dbgrid = dynamic_cast<const DbGrid*>(dbout);
-    _dbgrid = dbgrid;
+    _dbgrid              = dbgrid;
     if (dbgrid == nullptr)
     {
       messerr("Block Estimation is only possible for Grid '_dbout'");
@@ -343,10 +343,10 @@ bool KrigOpt::_isValidDGM(const Db* dbout, const ModelGeneric* model) const
   return true;
 }
 
-  bool KrigOpt::isCorrect(const Db* dbout, const ANeigh* neigh, const ModelGeneric* model) const
+bool KrigOpt::isCorrect(const Db* dbout, const ANeigh* neigh, const ModelGeneric* model) const
 {
   // Check against Block calculation options
-  if (! _isValidCalcul(dbout, neigh)) return false;
+  if (!_isValidCalcul(dbout, neigh)) return false;
 
   // Check against Colocated CoKriging options
   if (!_isValidColcok(dbout, model)) return false;
@@ -354,9 +354,9 @@ bool KrigOpt::_isValidDGM(const Db* dbout, const ModelGeneric* model) const
   // Check against the matLC option
   if (!_isValidMatLC(model)) return false;
 
-   // Check the validity for Discrete Gaussian Model
+  // Check the validity for Discrete Gaussian Model
   if (!_isValidDGM(dbout, model)) return false;
- 
+
   return true;
 }
 

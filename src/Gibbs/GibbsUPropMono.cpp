@@ -9,12 +9,11 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Gibbs/GibbsUPropMono.hpp"
-#include "Model/Model.hpp"
-#include "Db/Db.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Db/Db.hpp"
 #include "Model/CovInternal.hpp"
-
+#include "Model/Model.hpp"
 #include <math.h>
 
 namespace gstlrn
@@ -26,27 +25,27 @@ GibbsUPropMono::GibbsUPropMono()
 {
 }
 
-GibbsUPropMono::GibbsUPropMono(Db* db, const std::vector<Model *>& models, double rho)
+GibbsUPropMono::GibbsUPropMono(Db* db, const std::vector<Model*>& models, double rho)
   : GibbsMultiMono(db, models, rho)
   , _rval(0.5)
   , _eps(EPSILON3)
 {
 }
 
-GibbsUPropMono::GibbsUPropMono(const GibbsUPropMono &r)
+GibbsUPropMono::GibbsUPropMono(const GibbsUPropMono& r)
   : GibbsMultiMono(r)
   , _rval(0.5)
   , _eps(r._eps)
 {
 }
 
-GibbsUPropMono& GibbsUPropMono::operator=(const GibbsUPropMono &r)
+GibbsUPropMono& GibbsUPropMono::operator=(const GibbsUPropMono& r)
 {
   if (this != &r)
   {
     AGibbs::operator=(r);
     _rval = r._rval;
-    _eps = r._eps;
+    _eps  = r._eps;
   }
   return *this;
 }
@@ -67,7 +66,7 @@ GibbsUPropMono::~GibbsUPropMono()
 *****************************************************************************/
 int GibbsUPropMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 {
-  if (verbose) mestitle(1,"Gibbs using Unique Neighborhood in Propagative case");
+  if (verbose) mestitle(1, "Gibbs using Unique Neighborhood in Propagative case");
 
   // Initialize the statistics (optional)
 
@@ -95,15 +94,15 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
 
   /* Initializations */
 
-  Db* db = getDb();
+  Db* db       = getDb();
   Model* model = getModels(0);
-  int nact  = _getSampleRankNumber();
-  int ndim  = model->getNDim();
-  int icase = getRank(ipgs,0);
+  int nact     = _getSampleRankNumber();
+  int ndim     = model->getNDim();
+  int icase    = getRank(ipgs, 0);
 
-  double eps  = getEps();
-  double r    = getRval();
-  double sqr  = sqrt(1. - r * r);
+  double eps = getEps();
+  double r   = getRval();
+  double sqr = sqrt(1. - r * r);
 
   /* Core allocation */
 
@@ -113,7 +112,7 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
   /* Print the title */
 
   if (OptDbg::query(EDbg::CONVERGE))
-    mestitle(1,"Iterative Conditional Expectation (Simu:%d)",isimu+1);
+    mestitle(1, "Iterative Conditional Expectation (Simu:%d)", isimu + 1);
 
   /* Loop on the samples */
 
@@ -136,14 +135,14 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
       sigval = model->evaluateOneGeneric(nullptr, d1);
     }
     if (sigval <= 0) continue;
-    sigval = sqrt(sigval);
+    sigval       = sqrt(sigval);
     double delta = (r - 1.) * y[icase][iact] + sigval * sqr * law_gaussian();
 
     /* Update the gaussian vector */
 
     for (int jact = 0; jact < nact; jact++)
     {
-      if (iter > 0 && ! img[nact * iact + jact]) continue;
+      if (iter > 0 && !img[nact * iact + jact]) continue;
       int jech = getSampleRank(jact);
 
       double sigloc;

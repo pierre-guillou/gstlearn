@@ -9,23 +9,22 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Estimation/AModelOptimFactory.hpp"
-
 #include "Covariances/CorAniso.hpp"
+#include "Covariances/CovAniso.hpp"
+#include "Covariances/CovLMCAnamorphosis.hpp"
+#include "Db/DbGrid.hpp"
 #include "Enum/EConsElem.hpp"
 #include "Enum/EConsType.hpp"
-#include "Estimation/Vecchia.hpp"
-#include "Estimation/Likelihood.hpp"
 #include "Estimation/AModelOptim.hpp"
-#include "Model/Constraints.hpp"
+#include "Estimation/Likelihood.hpp"
+#include "Estimation/Vecchia.hpp"
 #include "Model/ConsItem.hpp"
+#include "Model/Constraints.hpp"
 #include "Model/Model.hpp"
+#include "Model/ModelCovList.hpp"
 #include "Model/ModelOptimVMap.hpp"
 #include "Model/ModelOptimVario.hpp"
-#include "Model/ModelCovList.hpp"
-#include "Covariances/CovLMCAnamorphosis.hpp"
-#include "Covariances/CovAniso.hpp"
 #include "Variogram/Vario.hpp"
-#include "Db/DbGrid.hpp"
 #include "geoslib_define.h"
 
 namespace gstlrn

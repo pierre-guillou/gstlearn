@@ -13,7 +13,8 @@
 namespace gstlrn
 {
 CGParam::CGParam(int nitermax, double eps)
-  : _nIterMax(nitermax)
+  : AStringable()
+  , _nIterMax(nitermax)
   , _eps(eps)
   , _x0()
   , _precondStatus(0)
@@ -21,24 +22,26 @@ CGParam::CGParam(int nitermax, double eps)
 {
 }
 
-CGParam::CGParam(const CGParam &m)
-    : _nIterMax(m._nIterMax),
-      _eps(m._eps),
-      _x0(m._x0),
-      _precondStatus(m._precondStatus),
-      _precond(m._precond)
+CGParam::CGParam(const CGParam& m)
+  : AStringable(m)
+  , _nIterMax(m._nIterMax)
+  , _eps(m._eps)
+  , _x0(m._x0)
+  , _precondStatus(m._precondStatus)
+  , _precond(m._precond)
 {
 }
 
-CGParam& CGParam::operator=(const CGParam &m)
+CGParam& CGParam::operator=(const CGParam& m)
 {
   if (this != &m)
   {
-    _nIterMax = m._nIterMax;
-    _eps = m._eps;
-    _x0 = m._x0;
+    AStringable::operator=(m);
+    _nIterMax      = m._nIterMax;
+    _eps           = m._eps;
+    _x0            = m._x0;
     _precondStatus = m._precondStatus;
-    _precond = m._precond;
+    _precond       = m._precond;
   }
   return *this;
 }
@@ -53,7 +56,7 @@ CGParam::~CGParam()
 **
 ** \param[in]  precond  Pointer to a ALinearOp operator
 ** \param[in]  status   Status of this Pre-conditioner
-** \li                  0 : not defined and therefore not used 
+** \li                  0 : not defined and therefore not used
 ** \li                 -1 : Pre-conditioner is the Q_{-1}
 ** \li                  1 : Pre-conditioner is the Q
 **
@@ -61,9 +64,21 @@ CGParam::~CGParam()
 **
 *****************************************************************************/
 void CGParam::setPrecond(const ALinearOp* precond, int status)
-{ 
-  _precond = precond; 
+{
+  _precond       = precond;
   _precondStatus = status;
   if (precond == NULL) _precondStatus = 0;
+}
+
+String CGParam::toString(const AStringFormat* strfmt) const
+{
+  DECLARE_UNUSED(strfmt);
+  std::stringstream sstr;
+
+  sstr << "Maximum number of Conjugate Gradient iterations = " << _nIterMax << std::endl;
+  sstr << "Numerical tolerance = " << _eps << std::endl;
+  sstr << "Initial value = " << _x0 << std::endl;
+  sstr << "Using a Pre-conditioner = " << _precondStatus << std::endl;
+  return sstr.str();
 }
 }

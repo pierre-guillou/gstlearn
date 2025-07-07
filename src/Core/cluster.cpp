@@ -22,16 +22,15 @@ Website: https://gstlearn.org
 License: BSD 3-clause
 */
 
-#include "geoslib_old_f.h"
 #include "Basic/Law.hpp"
-
+#include "geoslib_old_f.h"
 #include <limits.h>
 
-#define DATA(iech,ivar)         (data[(iech)    * nvar + (ivar)])
-#define DATA1(iech,ivar)        (data1[(iech)   * nvar + (ivar)])
-#define DATA2(iech,ivar)        (data2[(iech)   * nvar + (ivar)])
-#define CDATA(icl,ivar)         (cdata[(icl)    * nvar + (ivar)])
-#define DISTMATRIX(i,j)         (distmatrix[(i) * nech + (j)])
+#define DATA(iech, ivar)  (data[(iech) * nvar + (ivar)])
+#define DATA1(iech, ivar) (data1[(iech) * nvar + (ivar)])
+#define DATA2(iech, ivar) (data2[(iech) * nvar + (ivar)])
+#define CDATA(icl, ivar)  (cdata[(icl) * nvar + (ivar)])
+#define DISTMATRIX(i, j)  (distmatrix[(i) * nech + (j)])
 
 namespace gstlrn
 {
@@ -57,13 +56,12 @@ static double st_distance(int nvar,
   result = weight = 0.;
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    term = DATA1(index1,ivar) - DATA2(index2, ivar);
+    term = DATA1(index1, ivar) - DATA2(index2, ivar);
     result += term * term;
     weight += 1.;
   }
   if (weight > 0) result /= weight;
   return (result);
-
 }
 
 /*****************************************************************************/
@@ -106,8 +104,8 @@ static void st_randomassign(int nclusters,
   /* Create a random permutation of the cluster assignments */
   for (i = 0; i < nech; i++)
   {
-    j = (int) (i + (nech - i) * law_uniform(0., 1.));
-    k = clusterid[j];
+    j            = (int)(i + (nech - i) * law_uniform(0., 1.));
+    k            = clusterid[j];
     clusterid[j] = clusterid[i];
     clusterid[i] = k;
   }
@@ -187,7 +185,7 @@ static void st_getclustermeans(const VectorDouble& data,
   {
     cmask[i] = 0;
     for (j = 0; j < nvar; j++)
-      CDATA(i,j) = 0.;
+      CDATA(i, j) = 0.;
   }
 
   for (k = 0; k < nech; k++)
@@ -195,12 +193,12 @@ static void st_getclustermeans(const VectorDouble& data,
     i = clusterid[k];
     cmask[i]++;
     for (j = 0; j < nvar; j++)
-      CDATA(i,j) += DATA(k, j);
+      CDATA(i, j) += DATA(k, j);
   }
 
   for (i = 0; i < nclusters; i++)
     for (j = 0; j < nvar; j++)
-      if (cmask[i] > 0) CDATA(i,j) /= cmask[i];
+      if (cmask[i] > 0) CDATA(i, j) /= cmask[i];
 }
 
 /*****************************************************************************/
@@ -241,9 +239,9 @@ static void st_getclustermedian(const VectorDouble& data,
         }
       }
       if (count > 0)
-        CDATA(i,j) = ut_median(cache, count);
+        CDATA(i, j) = ut_median(cache, count);
       else
-        CDATA(i,j) = 0.;
+        CDATA(i, j) = 0.;
     }
   }
 }
@@ -272,7 +270,7 @@ static void st_get_distmatrix(const VectorDouble& data,
 
   for (int i = 0; i < nech; i++)
     for (int j = 0; j < i; j++)
-      DISTMATRIX(i,j) = st_distance(nvar, data, data, i, j);
+      DISTMATRIX(i, j) = st_distance(nvar, data, data, i, j);
 }
 
 /*****************************************************************************/
@@ -313,7 +311,7 @@ static void st_getclustermedoids(int nech,
     }
     if (d < errors[j])
     {
-      errors[j] = d;
+      errors[j]    = d;
       centroids[j] = i;
     }
   }
@@ -359,8 +357,8 @@ VectorDouble kclusters(const VectorDouble& data,
   if (nclusters >= nech)
   {
     messerr(
-        "The number of clusters (%d) cannot be larger than the number of points (%d)",
-        nclusters, nech);
+      "The number of clusters (%d) cannot be larger than the number of points (%d)",
+      nclusters, nech);
     goto label_end;
   }
 
@@ -380,8 +378,8 @@ VectorDouble kclusters(const VectorDouble& data,
   for (int ipass = 0; ipass < npass; ipass++)
   {
     if (verbose) message("Pass #%d\n", ipass + 1);
-    total = MAXIMUM_BIG;
-    niter = 0;
+    total  = MAXIMUM_BIG;
+    niter  = 0;
     period = 10;
 
     /* First, randomly assign elements to clusters. */
@@ -397,7 +395,7 @@ VectorDouble kclusters(const VectorDouble& data,
     while (1)
     {
       previous = total;
-      total = 0.0;
+      total    = 0.0;
 
       /* Save the current cluster */
       if (niter % period == 0)
@@ -486,7 +484,7 @@ VectorDouble kclusters(const VectorDouble& data,
 
   /* Set the error return code */
 
-  label_end: 
+label_end:
   return (cdata);
 }
 
@@ -526,8 +524,8 @@ VectorInt kmedoids(const VectorDouble& data,
   if (nclusters >= nech)
   {
     messerr(
-        "The number of clusters (%d) cannot be larger than the number of points (%d)",
-        nclusters, nech);
+      "The number of clusters (%d) cannot be larger than the number of points (%d)",
+      nclusters, nech);
     goto label_end;
   }
 
@@ -547,8 +545,8 @@ VectorInt kmedoids(const VectorDouble& data,
   for (int ipass = 0; ipass < npass; ipass++)
   {
     if (verbose) message("Pass #%d\n", ipass + 1);
-    total = MAXIMUM_BIG;
-    niter = 0;
+    total  = MAXIMUM_BIG;
+    niter  = 0;
     period = 10;
 
     /* First, randomly assign elements to clusters. */
@@ -558,7 +556,7 @@ VectorInt kmedoids(const VectorDouble& data,
     while (1)
     {
       previous = total;
-      total = 0.0;
+      total    = 0.0;
 
       /* Save the current cluster */
       if (niter % period == 0)
@@ -584,14 +582,14 @@ VectorInt kmedoids(const VectorDouble& data,
           j = centroids[icluster];
           if (i == j)
           {
-            distance = 0.0;
+            distance      = 0.0;
             tclusterid[i] = icluster;
             break;
           }
           tdistance = (i > j) ? DISTMATRIX(i, j) : DISTMATRIX(j, i);
           if (tdistance < distance)
           {
-            distance = tdistance;
+            distance      = tdistance;
             tclusterid[i] = icluster;
           }
         }
@@ -637,7 +635,7 @@ VectorInt kmedoids(const VectorDouble& data,
 
   /* Set the error return code */
 
-  label_end:
+label_end:
   return (clusterid);
 }
 }

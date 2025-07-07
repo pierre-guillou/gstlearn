@@ -14,18 +14,18 @@
 namespace gstlrn
 {
 BiTargetCheckFaults::BiTargetCheckFaults(const Faults* faults)
-    : ABiTargetCheck(),
-      _faults(faults)
+  : ABiTargetCheck()
+  , _faults(faults)
 {
 }
 
-BiTargetCheckFaults::BiTargetCheckFaults(const BiTargetCheckFaults &r)
-    : ABiTargetCheck(r),
-      _faults(r._faults)
+BiTargetCheckFaults::BiTargetCheckFaults(const BiTargetCheckFaults& r)
+  : ABiTargetCheck(r)
+  , _faults(r._faults)
 {
 }
 
-BiTargetCheckFaults& BiTargetCheckFaults::operator=(const BiTargetCheckFaults &r)
+BiTargetCheckFaults& BiTargetCheckFaults::operator=(const BiTargetCheckFaults& r)
 {
   if (this != &r)
   {
@@ -54,8 +54,8 @@ String BiTargetCheckFaults::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-bool BiTargetCheckFaults::isOK(const SpaceTarget &T1,
-                               const SpaceTarget &T2) const
+bool BiTargetCheckFaults::isOK(const SpaceTarget& T1,
+                               const SpaceTarget& T2) const
 {
   if (_faults == nullptr) return true;
   return !_faults->isSplitByFaultSP(T1.getCoordAsSP(), T2.getCoordAsSP());

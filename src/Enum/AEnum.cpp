@@ -23,8 +23,8 @@ void AEnum::printEnum() const {
  * @param format Printing format
  * @param args   Variable list of arguments
  */
-template<typename ... Args>
-void AEnum::_printMsg(const char *format, Args... args)
+template<typename... Args>
+void AEnum::_printMsg(const char* format, Args... args)
 {
   message(format, args...);
 }

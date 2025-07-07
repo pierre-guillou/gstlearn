@@ -9,26 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Geometry/BiTargetCheckDate.hpp"
-#include "Space/SpaceTarget.hpp"
 #include "Basic/Utilities.hpp"
+#include "Space/SpaceTarget.hpp"
 
 namespace gstlrn
 {
 BiTargetCheckDate::BiTargetCheckDate(double deltamin, double deltamax)
-    : ABiTargetCheck(),
-      _deltaMin(deltamin),
-      _deltaMax(deltamax)
+  : ABiTargetCheck()
+  , _deltaMin(deltamin)
+  , _deltaMax(deltamax)
 {
 }
 
-BiTargetCheckDate::BiTargetCheckDate(const BiTargetCheckDate &r)
-    : ABiTargetCheck(r),
-      _deltaMin(r._deltaMin),
-      _deltaMax(r._deltaMax)
+BiTargetCheckDate::BiTargetCheckDate(const BiTargetCheckDate& r)
+  : ABiTargetCheck(r)
+  , _deltaMin(r._deltaMin)
+  , _deltaMax(r._deltaMax)
 {
 }
 
-BiTargetCheckDate& BiTargetCheckDate::operator=(const BiTargetCheckDate &r)
+BiTargetCheckDate& BiTargetCheckDate::operator=(const BiTargetCheckDate& r)
 {
   if (this != &r)
   {
@@ -57,7 +57,7 @@ String BiTargetCheckDate::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-bool BiTargetCheckDate::isOK(const SpaceTarget &T1, const SpaceTarget &T2) const
+bool BiTargetCheckDate::isOK(const SpaceTarget& T1, const SpaceTarget& T2) const
 {
   double date1 = T1.getDate();
   double date2 = T2.getDate();
@@ -65,7 +65,7 @@ bool BiTargetCheckDate::isOK(const SpaceTarget &T1, const SpaceTarget &T2) const
   if (FFFF(date1) || FFFF(date2)) return false;
 
   double delta = date2 - date1;
-  if (delta <  _deltaMin) return false;
+  if (delta < _deltaMin) return false;
   if (delta >= _deltaMax) return false;
   return true;
 }

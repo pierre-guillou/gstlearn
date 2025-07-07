@@ -8,22 +8,20 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_f_private.h"
-#include "Enum/EStatOption.hpp"
-
-#include "Calculators/ACalcInterpolator.hpp"
 #include "Estimation/CalcImage.hpp"
-#include "Estimation/KrigingSystem.hpp"
-#include "Neigh/NeighImage.hpp"
-#include "Neigh/NeighUnique.hpp"
+#include "Basic/Convolution.hpp"
+#include "Basic/NamingConvention.hpp"
+#include "Calculators/ACalcInterpolator.hpp"
 #include "Db/DbGrid.hpp"
 #include "Db/DbStringFormat.hpp"
-#include "Morpho/Morpho.hpp"
+#include "Enum/EStatOption.hpp"
+#include "Estimation/KrigingSystem.hpp"
 #include "Model/Model.hpp"
-#include "Basic/NamingConvention.hpp"
-#include "Basic/Convolution.hpp"
+#include "Morpho/Morpho.hpp"
+#include "Neigh/NeighImage.hpp"
+#include "Neigh/NeighUnique.hpp"
 #include "Stats/Classical.hpp"
-
+#include "geoslib_f_private.h"
 #include "geoslib_old_f.h"
 
 namespace gstlrn
@@ -55,11 +53,11 @@ CalcImage::~CalcImage()
 
 bool CalcImage::_check()
 {
-  if (! ACalcInterpolator::_check()) return false;
+  if (!ACalcInterpolator::_check()) return false;
 
   if (!hasDbin()) return false;
   int nvar = getDbin()->getNLoc(ELoc::Z);
-  if (! getDbin()->isGrid())
+  if (!getDbin()->isGrid())
   {
     messerr("This method requires the Db to be a Grid");
     return false;
@@ -133,7 +131,7 @@ bool CalcImage::_postprocess()
     _renameVariable(2, VectorString(), ELoc::Z, getDbin()->getNLoc(ELoc::Z), _iattOut, String(), 1);
 
   if (_flagMorpho)
-    _renameVariable(2, VectorString(), ELoc::Z, 1, _iattOut, String{_oper.getKey()}, _nvarMorpho);
+    _renameVariable(2, VectorString(), ELoc::Z, 1, _iattOut, String {_oper.getKey()}, _nvarMorpho);
 
   if (_flagSmooth)
     _renameVariable(2, VectorString(), ELoc::Z, 1, _iattOut, String(), 1);
@@ -148,9 +146,9 @@ void CalcImage::_rollback()
 
 /**
  * @brief Create the vector of centered grid indices for neighborhood
- * 
+ *
  * @param dblocal Neighborhood Grid template
- * @return Returned vector of sample indices 
+ * @return Returned vector of sample indices
  */
 VectorVectorInt CalcImage::_getActiveRanks(const DbGrid* dblocal)
 {
@@ -212,11 +210,11 @@ bool CalcImage::_filterImage(DbGrid* dbgrid, const ModelCovList* model)
   int retcode = 0;
   if (!_flagFFT)
   {
-    retcode = conv.ConvolveSparse(_iattOut, ranks, wgt, means, (int) _verbose);
+    retcode = conv.ConvolveSparse(_iattOut, ranks, wgt, means, (int)_verbose);
   }
   else
   {
-    DbGrid* marpat = _buildMarpat(neighI, ranks, wgt, (int) _verbose);
+    DbGrid* marpat = _buildMarpat(neighI, ranks, wgt, (int)_verbose);
     retcode        = conv.ConvolveFFT(_iattOut, nvar, marpat, means);
     delete marpat;
   }
@@ -255,7 +253,7 @@ DbGrid* CalcImage::_buildMarpat(const NeighImage* neigh,
   for (int ineigh = 0; ineigh < nbneigh; ineigh++)
   {
     local = ranks[ineigh];
-    VH::addInPlace(local,  center);
+    VH::addInPlace(local, center);
     int iadd = dbgrid->indiceToRank(local);
 
     // Load the weights as variables
@@ -376,11 +374,11 @@ int krimage(DbGrid* dbgrid,
  ** \param[in]  namconv    Naming Convention
  **
  *****************************************************************************/
-int dbSmoother(DbGrid *dbgrid,
-               ANeigh *neigh,
+int dbSmoother(DbGrid* dbgrid,
+               ANeigh* neigh,
                int type,
                double range,
-               const NamingConvention &namconv)
+               const NamingConvention& namconv)
 {
   CalcImage image;
 
@@ -411,15 +409,15 @@ int dbSmoother(DbGrid *dbgrid,
  * @param namconv Naming convention
  * @return
  */
-GSTLEARN_EXPORT int dbMorpho(DbGrid *dbgrid,
-                             const EMorpho &oper,
+GSTLEARN_EXPORT int dbMorpho(DbGrid* dbgrid,
+                             const EMorpho& oper,
                              double vmin,
                              double vmax,
                              int option,
-                             const VectorInt &radius,
+                             const VectorInt& radius,
                              bool flagDistErode,
                              bool verbose,
-                             const NamingConvention &namconv)
+                             const NamingConvention& namconv)
 {
   CalcImage image;
 

@@ -8,12 +8,12 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/Db.hpp"
 #include "Db/DbMeshStandard.hpp"
-#include "Db/DbStringFormat.hpp"
 #include "Basic/AStringable.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/SerializeHDF5.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbStringFormat.hpp"
 
 namespace gstlrn
 {
@@ -134,15 +134,15 @@ bool DbMeshStandard::_deserializeAscii(std::istream& is, bool verbose)
 
   // Reading the header
 
-  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
+  ret = ret && _recordRead<int>(is, "Space Dimension", ndim);
 
   // Reading the meshing information
 
-  ret      = ret && _mesh._deserializeAscii(is);
+  ret = ret && _mesh._deserializeAscii(is);
 
   // Reading the Db information
 
-  ret      = ret && Db::_deserializeAscii(is, verbose);
+  ret = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
@@ -153,15 +153,15 @@ bool DbMeshStandard::_serializeAscii(std::ostream& os, bool verbose) const
 
   /* Writing the header */
 
-  ret      = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+  ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh._serializeAscii(os);
+  ret = ret && _mesh._serializeAscii(os);
 
   /* Writing the tail of the file */
 
-  ret      = ret && Db::_serializeAscii(os, verbose);
+  ret = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -234,7 +234,7 @@ VectorDouble DbMeshStandard::getCoordinatesPerMesh(int imesh, int idim, bool fla
 
   return vec;
 }
-#ifdef HDF5 
+#ifdef HDF5
 bool DbMeshStandard::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 {
   auto dbg = SerializeHDF5::getGroup(grp, "DbMeshStandard");

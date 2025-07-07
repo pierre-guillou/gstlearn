@@ -8,35 +8,33 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-#include "geoslib_define.h"
-
-#include "Enum/EStatOption.hpp"
 #include "Db/Db.hpp"
-#include "Db/PtrGeos.hpp"
-#include "Db/DbStringFormat.hpp"
-#include "Db/DbGrid.hpp"
-#include "Polygon/Polygons.hpp"
+#include "Basic/AException.hpp"
 #include "Basic/AStringable.hpp"
-#include "Basic/String.hpp"
 #include "Basic/CSVformat.hpp"
-#include "Basic/Utilities.hpp"
+#include "Basic/GlobalEnvironment.hpp"
+#include "Basic/Law.hpp"
 #include "Basic/Limits.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "Basic/SerializeHDF5.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/AException.hpp"
-#include "Basic/GlobalEnvironment.hpp"
+#include "Basic/String.hpp"
+#include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Core/CSV.hpp"
+#include "Db/DbGrid.hpp"
+#include "Db/DbStringFormat.hpp"
+#include "Db/PtrGeos.hpp"
+#include "Enum/EStatOption.hpp"
 #include "Geometry/GeometryHelper.hpp"
-#include "Stats/Classical.hpp"
-#include "Matrix/Table.hpp"
 #include "Matrix/MatrixDense.hpp"
+#include "Matrix/Table.hpp"
+#include "Polygon/Polygons.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Space/SpaceTarget.hpp"
-#include "Core/CSV.hpp"
-
+#include "Stats/Classical.hpp"
+#include "geoslib_define.h"
+#include "geoslib_old_f.h"
 #include <math.h>
 #include <stdio.h>
 #include <vector>
@@ -1359,7 +1357,7 @@ int Db::addColumnsByConstant(int nadd,
 
 /**
  * Create a set of new variables in an already existing Db and initialize
- * their contents as a ranom value (from Normal distribution)
+ * their contents as a random value (from Normal distribution)
  * @param nadd     Number of variables to be added
  * @param radix    Generic radix given to the newly created variables
  * @param locatorType Generic locator assigned to new variables
@@ -2371,13 +2369,18 @@ bool Db::hasLargerDimension(const Db* dbaux) const
   return retOK;
 }
 
+/**
+ * @brief Initiaze the contents of one or several columns with the Db
+ * with either a constant value or a value drawn at random (persample)
+ *
+ * @param ncol
+ * @param icol0
+ * @param flagCst
+ * @param valinit
+ */
 void Db::_columnInit(int ncol, int icol0, bool flagCst, double valinit)
 {
   double value;
-  if (flagCst)
-    value = valinit;
-  else
-    value = law_gaussian();
   for (int jcol = 0; jcol < ncol; jcol++)
   {
     int icol = jcol + icol0;
@@ -2385,7 +2388,7 @@ void Db::_columnInit(int ncol, int icol0, bool flagCst, double valinit)
     if (!GlobalEnvironment::getEnv()->isDomainReference() || !hasLocator(ELoc::DOM))
     {
       for (int iech = 0; iech < _nech; iech++)
-        _array[_getAddress(iech, icol)] = value;
+        _array[_getAddress(iech, icol)] = (flagCst) ? valinit : law_gaussian();
     }
     else
     {
@@ -2429,7 +2432,6 @@ const double* Db::getColAdressByColIdx(int icol) const
 {
   return &_array[_getAddress(0, icol)];
 }
-
 
 VectorDouble Db::getValuesByNames(const VectorInt& iechs,
                                   const VectorString& names,
@@ -3686,7 +3688,7 @@ void Db::getSampleRanksInPlace(VectorVectorInt& sampleRanks,
   sampleRanks.resize(nvar);
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int jvar             = jvars[ivar];
+    int jvar = jvars[ivar];
     getSampleRanksPerVariable(sampleRanks[ivar], nbgh, jvar, useSel, useZ, useVerr, useExtD);
   }
 }
@@ -4355,8 +4357,8 @@ VectorVectorDouble Db::getColumnsAsVVD(const VectorString& names,
  * Returns the contents of the columns specified by their names
  */
 MatrixDense Db::getColumnsAsMatrix(const VectorString& names,
-                                         bool useSel,
-                                         bool flagCompress) const
+                                   bool useSel,
+                                   bool flagCompress) const
 {
   if (names.empty()) return MatrixDense();
   VectorInt iuids = _ids(names, false);
@@ -5346,7 +5348,7 @@ Db* Db::createFromGridRandomized(DbGrid* dbgrid,
   return db;
 }
 
-const Db* Db::coverSeveralDbs(const Db* db1, const Db* db2, bool *isBuilt)
+const Db* Db::coverSeveralDbs(const Db* db1, const Db* db2, bool* isBuilt)
 {
   *isBuilt = false;
   int ndef = 0;
@@ -5380,11 +5382,11 @@ const Db* Db::coverSeveralDbs(const Db* db1, const Db* db2, bool *isBuilt)
   VectorDouble ext(ndim);
   VectorDouble dx(ndim);
   VectorDouble x0(ndim);
-  VectorInt    nx(ndim, 2);
+  VectorInt nx(ndim, 2);
   for (int idim = 0; idim < ndim; idim++)
   {
-    ext[0] = MIN(ext1[idim][0], ext2[idim][0]);
-    ext[1] = MAX(ext1[idim][1], ext2[idim][1]);
+    ext[0]   = MIN(ext1[idim][0], ext2[idim][0]);
+    ext[1]   = MAX(ext1[idim][1], ext2[idim][1]);
     dx[idim] = ext[1] - ext[0];
     x0[idim] = ext[0];
   }

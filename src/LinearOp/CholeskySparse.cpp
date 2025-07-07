@@ -9,11 +9,13 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/CholeskySparse.hpp"
-#include "LinearOp/CholeskySparseInv.hpp"
+#include "Basic/OptCst.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Core/SparseInv.hpp"
+#include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixSparse.hpp"
-#include "Core/SparseInv.hpp"
-
+#include "Matrix/MatrixSymmetric.hpp"
 #include "csparse_f.h"
 #include <Eigen/src/Core/Matrix.h>
 #include <vector>
@@ -49,7 +51,7 @@ CholeskySparse::CholeskySparse(const CholeskySparse& m)
   {
     if (m._factor != nullptr)
     {
-      _factor = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>;
+      _factor = new Eigen::SimplicialLDLT<Sp>;
       _factor = m._factor;
     }
   }
@@ -70,7 +72,7 @@ CholeskySparse& CholeskySparse::operator=(const CholeskySparse& m)
     {
       if (m._factor != nullptr)
       {
-        _factor = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>;
+        _factor = new Eigen::SimplicialLDLT<Sp>;
         _factor = m._factor;
       }
     }
@@ -104,17 +106,18 @@ void CholeskySparse::_clean()
  **  Perform the calculation of the Standard Deviation of Estimation Error
  **
  ** \param[out] vcur     Output array
+ ** \param[out] proj Projection to the final output dimension
  ** \param[in]  flagStDev FALSE for a variance calculation, True for StDev.
  **
  *****************************************************************************/
-int CholeskySparse::stdev(VectorDouble& vcur, bool flagStDev) const
+int CholeskySparse::stdev(VectorDouble& vcur,
+                          const MatrixSparse* proj,
+                          bool flagStDev) const
 {
   if (_mat == nullptr) return 1;
-  int ntarget = getSize();
-  vcur.resize(ntarget, 0);
   if (_flagEigen)
   {
-    if (_stdevEigen(vcur)) return 1;
+    if (_stdevEigen(vcur, proj)) return 1;
   }
   else
   {
@@ -122,7 +125,7 @@ int CholeskySparse::stdev(VectorDouble& vcur, bool flagStDev) const
   }
 
   if (flagStDev)
-    for (int iech = 0; iech < ntarget; iech++)
+    for (int iech = 0, ntarget = (int)vcur.size(); iech < ntarget; iech++)
       vcur[iech] = sqrt(vcur[iech]);
   return 0;
 }
@@ -222,7 +225,7 @@ int CholeskySparse::_prepare() const
   {
     if (_factor != nullptr) return 0;
 
-    _factor = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>;
+    _factor = new Eigen::SimplicialLDLT<Sp>;
     _factor->compute(matCS->getEigenMatrix());
     if (_factor == nullptr)
     {
@@ -372,27 +375,58 @@ int CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
 
 /**
  * @brief Compute the inverse of the 'this' matrix
- * 
+ *
  * @param vcur Storing the diagonal of the inverse matrix
- * @return int 
+ * @param proj Projection matrix
+ * @return int
  *
  * @note: The method 'partial_inverse' used assumes a LTT decomposition
  * (which is not the decomposition of _factor [LDLT]). Hence a local
  * decomposition is performed again here.
+ * This should be optimally replaced by a more clever version of
+ * the original Takahashi algorithm (see sparseinv in old code)
  */
-int CholeskySparse::_stdevEigen(VectorDouble& vcur) const
+int CholeskySparse::_stdevEigen(VectorDouble& vcur,
+                                const MatrixSparse* proj) const
 {
   Eigen::Map<Eigen::VectorXd> vcurm(vcur.data(), vcur.size());
+  vcurm.setZero();
 
-  // Find the pointor on the initial matrix
-  const auto a = dynamic_cast<const MatrixSparse*>(_mat)->getEigenMatrix();
+  // Conversion de P en RowMajor (une seule fois)
+  const auto& Pcol = proj->getEigenMatrix(); // ℓ×k, col‑major
+  using SpRowMat   = Eigen::SparseMatrix<double, Eigen::RowMajor>;
+  SpRowMat P       = Pcol; // copie creuse -> row‑major ; coût négligeable si P très creuse
 
-  // Construct a SimplicialLLT matrix (instead of the LDLT stored in '_factor')
-  Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> llt;
-  llt.compute(a);
+  // Alias ----------------------------------------------------------------------
+  using SpRowMat = Eigen::SparseMatrix<double, Eigen::RowMajor>; // P (row‑major)
+  using SpVec    = Eigen::SparseVector<double>;
+  using DenseVec = Eigen::VectorXd;
 
-  Eigen::SparseMatrix Qinv = partial_inverse(llt, a);
-  vcurm = Qinv.diagonal();
+  /** ---------------------------------------------------------------------------
+   * @brief  Renvoie diag( P Q⁻¹ Pᵀ ).
+   *
+   * @param Q   k×k SPD  (col‑major)
+   * @param P   ℓ×k  (row‑major)  --- chaque ligne est p_i
+   * @return    VectorXd de taille ℓ :  S_ii = p_i Q⁻¹ p_iᵀ
+   * --------------------------------------------------------------------------*/
+  const int k = P.cols();
+  const int l = P.rows();
+  SpVec p_i(k);
+
+  for (int i = 0; i < l; ++i)
+  {
+    p_i.setZero();
+
+    // 1) Extraction de la ligne i de P (row‑major) ------------------------
+    for (SpRowMat::InnerIterator it(P, i); it; ++it)
+      p_i.coeffRef(it.col()) = it.value();
+
+    // 2) Résolution :  Q y = p_iᵀ   --------------------------------------
+    DenseVec y = _factor->solve(p_i);
+
+    // 3) Contribution diagonale : p_i · y  -------------------------------
+    vcurm(i) = p_i.dot(y);
+  }
   return 0;
 }
 }

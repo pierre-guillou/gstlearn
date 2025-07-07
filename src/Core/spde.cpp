@@ -11,9 +11,7 @@
 #include "geoslib_define.h"
 #include "geoslib_f_private.h"
 #include "geoslib_old_f.h"
-
 #include "Enum/ELoadBy.hpp"
-
 #include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSparse.hpp"
@@ -39,7 +37,6 @@
 #include "Geometry/GeometryHelper.hpp"
 #include "Basic/Memory.hpp"
 #include "Core/Keypair.hpp"
-
 #include <math.h>
 #include <string.h>
 

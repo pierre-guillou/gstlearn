@@ -8,21 +8,22 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/Db.hpp"
-#include "Db/DbGrid.hpp"
-#include "Neigh/NeighMoving.hpp"
-#include "Neigh/NeighUnique.hpp"
-#include "Variogram/VarioParam.hpp"
-#include "Variogram/Vario.hpp"
-#include "Matrix/Table.hpp"
-#include "Model/Model.hpp"
+#include "Basic/AStringFormat.hpp"
 #include "Basic/File.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/PolyLine2D.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Basic/AStringFormat.hpp"
-#include "Polygon/Polygons.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "LithoRule/Rule.hpp"
+#include "Matrix/Table.hpp"
+#include "Mesh/MeshETurbo.hpp"
+#include "Model/Model.hpp"
+#include "Neigh/NeighMoving.hpp"
+#include "Neigh/NeighUnique.hpp"
+#include "Polygon/Polygons.hpp"
+#include "Variogram/Vario.hpp"
+#include "Variogram/VarioParam.hpp"
 
 using namespace gstlrn;
 /****************************************************************************/
@@ -31,7 +32,7 @@ using namespace gstlrn;
 ** in Neutral or HDF5 format
 **
 *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
 
   if (mode == 0 || mode == 1)
   {
-    Db* db1      = db->clone();
+    Db* db1 = db->clone();
     db1->display();
 
     // Serialize
@@ -303,17 +304,17 @@ int main(int argc, char *argv[])
 
   if (mode == 0 || mode == 9)
   {
-    int nmaxi = 20;
-    double radius = 4.;
-    int nmini = 2;
-    int nsect = 5;
+    int nmaxi           = 20;
+    double radius       = 4.;
+    int nmini           = 2;
+    int nsect           = 5;
     int nsmax           = 3;
     VectorDouble coeffs = {2., 3.};
     VectorDouble angles = {25., 0.};
     bool useBallTree    = true;
 
     NeighMoving* neigh1 = NeighMoving::create(false, nmaxi, radius,
-                                              nmini, nsect, nsmax, 
+                                              nmini, nsect, nsmax,
                                               coeffs, angles, useBallTree);
     neigh1->display();
 
@@ -360,6 +361,33 @@ int main(int argc, char *argv[])
 
     delete neigh1;
     delete neigh2;
+  }
+
+  // ========================
+  // Checking Meshing (Turbo)
+  // ========================
+
+  if (mode == 0 || mode == 11)
+  {
+    MeshETurbo* mesh1 = MeshETurbo::create({10, 10});
+    mesh1->display();
+
+    // Serialize
+    if (flagNeutral)
+      (void)mesh1->dumpToNF("Mesh.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)mesh1->dumpToNF("Mesh.NF.h5", EFormatNF::H5);
+
+    // Deserialize
+    MeshETurbo* mesh2 = nullptr;
+    if (flagNeutral)
+      mesh2 = MeshETurbo::createFromNF("Mesh.NF.ascii", verbose);
+    else
+      mesh2 = MeshETurbo::createFromNF("Mesh.NF.h5", verbose);
+    mesh2->display();
+
+    delete mesh1;
+    delete mesh2;
   }
 
   // Cleaning procedure

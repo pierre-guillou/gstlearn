@@ -8,6 +8,13 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "API/SPDE.hpp"
+#include "Basic/ASerializable.hpp"
+#include "Basic/OptCst.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Db/DbGrid.hpp"
+#include "Db/DbStringFormat.hpp"
+#include "Mesh/MeshETurbo.hpp"
 #include "Model/Model.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "Basic/AStringable.hpp"

@@ -8,17 +8,15 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Covariances/CovCalcMode.hpp"
-#include "Enum/ECalcMember.hpp"
-#include "geoslib_old_f.h"
-
 #include "Estimation/CalcGlobal.hpp"
-#include "Db/DbGrid.hpp"
+#include "Covariances/CovCalcMode.hpp"
 #include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
+#include "Enum/ECalcMember.hpp"
 #include "Estimation/KrigingSystem.hpp"
-#include "Neigh/NeighUnique.hpp"
 #include "Model/Model.hpp"
-
+#include "Neigh/NeighUnique.hpp"
+#include "geoslib_old_f.h"
 #include <math.h>
 
 namespace gstlrn
@@ -39,11 +37,11 @@ CalcGlobal::~CalcGlobal()
 
 bool CalcGlobal::_check()
 {
-  if (! ACalcInterpolator::_check()) return false;
+  if (!ACalcInterpolator::_check()) return false;
 
-  if (! hasDbin()) return false;
-  if (! hasDbout()) return false;
-  if (! hasModel()) return false;
+  if (!hasDbin()) return false;
+  if (!hasDbout()) return false;
+  if (!hasModel()) return false;
 
   _modelLocal = dynamic_cast<Model*>(getModel());
   if (_modelLocal == nullptr)
@@ -54,7 +52,7 @@ bool CalcGlobal::_check()
 
   if (_flagArithmetic)
   {
-    if (! getDbout()->isGrid())
+    if (!getDbout()->isGrid())
     {
       messerr("'dbout'  must be a grid for Arithmetic Global estimation");
       return false;
@@ -112,10 +110,10 @@ bool CalcGlobal::_run()
 int CalcGlobal::_globalKriging()
 {
   VectorDouble rhsCum;
-  Db* dbin            = getDbin();
-  Db* dbout           = getDbout();
-  int nvar            = _modelLocal->getNVar();
-  int ng              = 0;
+  Db* dbin  = getDbin();
+  Db* dbout = getDbout();
+  int nvar  = _modelLocal->getNVar();
+  int ng    = 0;
   VectorDouble wgt;
 
   KrigOpt krigopt;
@@ -126,7 +124,7 @@ int CalcGlobal::_globalKriging()
   CovCalcMode mode            = CovCalcMode(ECalcMember::LHS);
   VectorVectorInt sampleRanks = dbin->getSampleRanks({_ivar0});
   VectorDouble Z              = dbin->getValuesByRanks(sampleRanks,
-                                                       _modelLocal->getMeans(), 
+                                                       _modelLocal->getMeans(),
                                                        !_modelLocal->hasDrift());
   if (_modelLocal->evalCovMatSymInPlaceFromIdx(Sigma, dbin, sampleRanks, &mode, false)) return 1;
   if (_modelLocal->evalDriftMatByRanksInPlace(X, dbin, sampleRanks, ECalcMember::LHS)) return 1;
@@ -171,15 +169,15 @@ int CalcGlobal::_globalKriging()
   double stdv  = algebra.getStdv()[0];
   // The previous term corresponds to the standard deviation calculated
   // with a punctual target. Therefore the corresponding variance
-  // must be corrected (C00 -> Cvv) to pass to a correct Territory variance 
+  // must be corrected (C00 -> Cvv) to pass to a correct Territory variance
   // of estimation
-  double c00   = Sigma00.getValue(0,0);
+  double c00 = Sigma00.getValue(0, 0);
 
   /* Preliminary checks */
 
-  int ntot = dbin->getNSample(false);
-  int np   = dbin->getNSample(true);
-  double cell = 1.;
+  int ntot       = dbin->getNSample(false);
+  int np         = dbin->getNSample(true);
+  double cell    = 1.;
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(dbout);
   if (dbgrid != nullptr) cell = dbgrid->getCellSize();
   double surface = ng * cell;
@@ -187,32 +185,32 @@ int CalcGlobal::_globalKriging()
   /* Average covariance over the territory */
 
   double cvv = _modelLocal->evalAverageDbToDb(dbout, dbout, _ivar0, _ivar0,
-                                        dbin->getExtensionDiagonal() / 1.e3, 0);
+                                              dbin->getExtensionDiagonal() / 1.e3, 0);
 
   /* Perform the estimation */
 
   double cvvgeo = stdv * stdv - c00 + cvv;
 
   double stdgeo = (cvvgeo > 0) ? sqrt(cvvgeo) : 0.;
-  double cvgeo = (isZero(estim) || FFFF(estim)) ? TEST : stdgeo / estim;
+  double cvgeo  = (isZero(estim) || FFFF(estim)) ? TEST : stdgeo / estim;
 
   /* Store the results in the output Global_Result struture */
 
-  _gRes.ntot = ntot;
-  _gRes.np = np;
-  _gRes.ng = ng;
+  _gRes.ntot    = ntot;
+  _gRes.np      = np;
+  _gRes.ng      = ng;
   _gRes.surface = surface;
-  _gRes.zest = estim;
-  _gRes.sse = stdgeo;
-  _gRes.cvgeo = cvgeo;
-  _gRes.cvv = cvv;
+  _gRes.zest    = estim;
+  _gRes.sse     = stdgeo;
+  _gRes.cvgeo   = cvgeo;
+  _gRes.cvv     = cvv;
   _gRes.weights = wgt;
 
   /* Printout */
 
   if (_verbose)
   {
-    mestitle(1,"Global estimation kriging");
+    mestitle(1, "Global estimation kriging");
     message("Total number of data             = %d\n", ntot);
     message("Number of active data            = %d\n", np);
     message("Number of variables              = %d\n", nvar);
@@ -240,9 +238,9 @@ int CalcGlobal::_globalKriging()
 int CalcGlobal::_globalArithmetic()
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  int ntot = getDbin()->getNSample(false);
-  int np = getDbin()->getNSample(true);
-  int ng = dbgrid->getNSample(true);
+  int ntot       = getDbin()->getNSample(false);
+  int np         = getDbin()->getNSample(true);
+  int ng         = dbgrid->getNSample(true);
   double surface = ng * dbgrid->getCellSize();
 
   /* Average covariance over the data */
@@ -258,7 +256,7 @@ int CalcGlobal::_globalArithmetic()
   /* Average covariance over the territory */
 
   double cvv = _modelLocal->evalAverageDbToDb(dbgrid, dbgrid, _ivar0, _ivar0,
-                                        dbgrid->getExtensionDiagonal() / 1.e3, 0);
+                                              dbgrid->getExtensionDiagonal() / 1.e3, 0);
 
   /* Calculating basic statistics */
 
@@ -272,27 +270,27 @@ int CalcGlobal::_globalArithmetic()
 
   /* Filling the resulting structure */
 
-  double sse = cvv - 2. * cxv + cxx;
-  sse = (sse > 0) ? sqrt(sse) : 0.;
-  double cvsam = (! isZero(ave)) ? sqrt(var) / ave : TEST;
+  double sse   = cvv - 2. * cxv + cxx;
+  sse          = (sse > 0) ? sqrt(sse) : 0.;
+  double cvsam = (!isZero(ave)) ? sqrt(var) / ave : TEST;
   double cviid = cvsam / sqrt(np);
-  double cvgeo = (! isZero(ave)) ? sse / ave : TEST;
+  double cvgeo = (!isZero(ave)) ? sse / ave : TEST;
 
   /* Filling the output structure */
 
-  _gRes.ntot = ntot;
-  _gRes.np = np;
-  _gRes.ng = ng;
+  _gRes.ntot    = ntot;
+  _gRes.np      = np;
+  _gRes.ng      = ng;
   _gRes.surface = surface;
-  _gRes.zest = ave;
-  _gRes.sse  = sse;
-  _gRes.cvgeo = cvgeo;
-  _gRes.cvv = cvv;
-  _gRes.weights.resize(np, 1./np);
+  _gRes.zest    = ave;
+  _gRes.sse     = sse;
+  _gRes.cvgeo   = cvgeo;
+  _gRes.cvv     = cvv;
+  _gRes.weights.resize(np, 1. / np);
 
   if (_verbose)
   {
-    mestitle(1,"Global estimation by arithmetic average");
+    mestitle(1, "Global estimation by arithmetic average");
     message("Total number of data             = %d\n", ntot);
     message("Number of active data            = %d\n", np);
     message("Sample variance                  = %lf\n", var);
@@ -321,9 +319,9 @@ int CalcGlobal::_globalArithmetic()
   return 0;
 }
 
-Global_Result global_arithmetic(Db *dbin,
-                                DbGrid *dbgrid,
-                                ModelGeneric *model,
+Global_Result global_arithmetic(Db* dbin,
+                                DbGrid* dbgrid,
+                                ModelGeneric* model,
                                 int ivar0,
                                 bool verbose)
 {
@@ -339,11 +337,11 @@ Global_Result global_arithmetic(Db *dbin,
   return gres;
 }
 
-Global_Result global_kriging(Db *dbin,
-                            Db *dbout,
-                            ModelGeneric *model,
-                            int ivar0,
-                            bool verbose)
+Global_Result global_kriging(Db* dbin,
+                             Db* dbout,
+                             ModelGeneric* model,
+                             int ivar0,
+                             bool verbose)
 {
   Global_Result gres;
   CalcGlobal global(ivar0, verbose);

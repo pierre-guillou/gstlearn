@@ -8,16 +8,14 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
 #include "Gibbs/GibbsUMultiMono.hpp"
-#include "Model/Model.hpp"
-#include "Db/Db.hpp"
 #include "Basic/OptDbg.hpp"
-
+#include "Db/Db.hpp"
+#include "Model/Model.hpp"
+#include "geoslib_old_f.h"
 #include <math.h>
 
-#define COVMAT(ivar,i,j)              (_covmat[ivar][(i) * nact + (j)])
+#define COVMAT(ivar, i, j) (_covmat[ivar][(i) * nact + (j)])
 
 namespace gstlrn
 {
@@ -27,19 +25,19 @@ GibbsUMultiMono::GibbsUMultiMono()
 {
 }
 
-GibbsUMultiMono::GibbsUMultiMono(Db* db, const std::vector<Model *>& models, double rho)
+GibbsUMultiMono::GibbsUMultiMono(Db* db, const std::vector<Model*>& models, double rho)
   : GibbsMultiMono(db, models, rho)
   , _covmat()
 {
 }
 
-GibbsUMultiMono::GibbsUMultiMono(const GibbsUMultiMono &r)
+GibbsUMultiMono::GibbsUMultiMono(const GibbsUMultiMono& r)
   : GibbsMultiMono(r)
   , _covmat(r._covmat)
 {
 }
 
-GibbsUMultiMono& GibbsUMultiMono::operator=(const GibbsUMultiMono &r)
+GibbsUMultiMono& GibbsUMultiMono::operator=(const GibbsUMultiMono& r)
 {
   if (this != &r)
   {
@@ -69,7 +67,7 @@ int GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 
   // Initialization
 
-  if (verbose) mestitle(1,"Gibbs using Unique Neighborhood in MultiMono case");
+  if (verbose) mestitle(1, "Gibbs using Unique Neighborhood in MultiMono case");
   int nact = _getSampleRankNumber();
   int nvar = getNVar();
   _covmat.resize(nvar);
@@ -83,12 +81,12 @@ int GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 
     // Establish Covariance Matrix (always based on the first variable in MultiMono case)
 
-    if (verbose) message("Establish Covariance matrix (Var=%d)\n",ivar+1);
+    if (verbose) message("Establish Covariance matrix (Var=%d)\n", ivar + 1);
     _covmat[ivar] = model->evalCovMat(db, db, 0, 0).getValues();
 
     // Invert Covariance Matrix
 
-    if (verbose) message("Invert Covariance matrix (Var=%d)\n",ivar+1);
+    if (verbose) message("Invert Covariance matrix (Var=%d)\n", ivar + 1);
     if (matrix_invert(_covmat[ivar].data(), nact, -1))
     {
       messerr("Error during the covariance matrix inversion");
@@ -143,14 +141,14 @@ void GibbsUMultiMono::update(VectorVectorDouble& y,
   /* Print the title */
 
   if (OptDbg::query(EDbg::CONVERGE))
-    mestitle(1,"Iterative Conditional Expectation (PGS=%d - Simu:%d - Iter=%d)",
-             ipgs+1,isimu+1,iter+1);
+    mestitle(1, "Iterative Conditional Expectation (PGS=%d - Simu:%d - Iter=%d)",
+             ipgs + 1, isimu + 1, iter + 1);
 
   /* Loop on the target */
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs,ivar);
+    int icase = getRank(ipgs, ivar);
     for (int iact = 0; iact < nact; iact++)
     {
       if (!_isConstraintTight(icase, iact, &valsim))

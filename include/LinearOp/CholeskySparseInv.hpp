@@ -166,6 +166,7 @@ typename SpChol::MatrixType partial_inverse(
 
   // Return the non-zero elements of Qinv corresponding to the non-zero
   // elements of Q
-  return MatchPattern(Qinv, pattern)();
+  return Qinv;
+  // return MatchPattern(Qinv, pattern)();
 }
 }

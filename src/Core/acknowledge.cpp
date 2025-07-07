@@ -8,9 +8,8 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/AStringable.hpp"
 #include "Core/Acknowledge.hpp"
-
+#include "Basic/AStringable.hpp"
 #include "version.h"
 
 namespace gstlrn
@@ -22,7 +21,7 @@ namespace gstlrn
  ****************************************************************************/
 void acknowledge_gstlearn(void)
 {
-  // Print the header 
+  // Print the header
 
   message("gstlearn Library (Version: %s - Date: %s - Commit: %s)",
           GSTLEARN_FULL_VERSION, GSTLEARN_DATE, GSTLEARN_COMMIT);

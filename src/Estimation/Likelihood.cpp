@@ -10,16 +10,15 @@
 /******************************************************************************/
 #include "Estimation/Likelihood.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
 #include "Db/RankHandler.hpp"
 #include "Estimation/ALikelihood.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Space/SpacePoint.hpp"
-#include "Tree/Ball.hpp"
-#include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Model/ModelGeneric.hpp"
+#include "Space/SpacePoint.hpp"
 #include "Stats/Classical.hpp"
+#include "Tree/Ball.hpp"
 #include "geoslib_define.h"
 
 namespace gstlrn
@@ -123,7 +122,6 @@ void Likelihood::evalGrad(vect res)
     _fillGradCovMat(rkh, gradcov[iparam]);
     _gradCovMat.prodMatVecInPlace(_Cm1Y, _temp);
     double dquad = -VH::innerProduct(_Cm1Y, _temp);
-
     res[iparam] = 0.0;
     if (_reml && _model->getNDriftEquation() > 0)
     {
@@ -132,10 +130,10 @@ void Likelihood::evalGrad(vect res)
       double dlogdetreml = MatrixDense::traceProd(invXtCm1X, temp);
       res[iparam] += 0.5 * dlogdetreml;
     }
-
     double dlogdet = MatrixDense::traceProd(invcov, _gradCovMat); // Warning: _gradCovMat is modified so the line
     // has to be after _gradCovMat.prodMatVecInPlace(_Cm1Y, _temp);
     res[iparam] += 0.5 * (dlogdet + dquad);
+
   }
 }
 

@@ -8,16 +8,14 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Basic/Memory.hpp"
+#include "Basic/Utilities.hpp"
+#include "Core/Keypair.hpp"
+#include "Db/Db.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
+#include "Model/Model.hpp"
 #include "geoslib_define.h"
 #include "geoslib_old_f.h"
-
-#include "Basic/Utilities.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
-#include "Db/Db.hpp"
-#include "Basic/Memory.hpp"
-#include "Core/Keypair.hpp"
-#include "Model/Model.hpp"
-
 #include <math.h>
 
 namespace gstlrn
@@ -34,8 +32,8 @@ typedef struct
   double vz[3];
 } Surf_Def;
 
-#define MAT(i,j)    (mat[3*(i) + (j)])
-#define EIGVEC(i,j) (eigvec[3*(i) + (j)])
+#define MAT(i, j)    (mat[3 * (i) + (j)])
+#define EIGVEC(i, j) (eigvec[3 * (i) + (j)])
 
 static int VERBOSE = 0;
 
@@ -49,7 +47,7 @@ static int VERBOSE = 0;
  ** \param[in]  surf_reference Surf_Def structure (used for deallocation)
  **
  *****************************************************************************/
-static Surf_Def* st_reference_manage(int mode, Surf_Def *surf_reference)
+static Surf_Def* st_reference_manage(int mode, Surf_Def* surf_reference)
 {
   /* Dispatch */
 
@@ -58,10 +56,10 @@ static Surf_Def* st_reference_manage(int mode, Surf_Def *surf_reference)
 
     /* Allocation */
 
-    surf_reference = (Surf_Def*) mem_alloc(sizeof(Surf_Def), 1);
-    surf_reference->xg = 0.;
-    surf_reference->yg = 0.;
-    surf_reference->zg = 0.;
+    surf_reference       = (Surf_Def*)mem_alloc(sizeof(Surf_Def), 1);
+    surf_reference->xg   = 0.;
+    surf_reference->yg   = 0.;
+    surf_reference->zg   = 0.;
     surf_reference->extx = 0.;
     surf_reference->exty = 0.;
     for (int i = 0; i < 3; i++)
@@ -76,7 +74,7 @@ static Surf_Def* st_reference_manage(int mode, Surf_Def *surf_reference)
 
     /* Deallocation */
 
-    surf_reference = (Surf_Def*) mem_free((char* ) surf_reference);
+    surf_reference = (Surf_Def*)mem_free((char*)surf_reference);
   }
   return (surf_reference);
 }
@@ -88,7 +86,7 @@ static Surf_Def* st_reference_manage(int mode, Surf_Def *surf_reference)
  ** \param[in,out]  vect    Vector to be normalized
  **
  *****************************************************************************/
-static void st_normalize_vector(double *vect)
+static void st_normalize_vector(double* vect)
 {
   double norme;
 
@@ -113,7 +111,7 @@ static void st_normalize_vector(double *vect)
  ** \param[out] surf_reference Surf_Def structure
  **
  *****************************************************************************/
-static int st_reference_define(Db *db, int *iptr_init, Surf_Def *surf_reference)
+static int st_reference_define(Db* db, int* iptr_init, Surf_Def* surf_reference)
 {
   double x, y, z;
   VectorDouble gg(3, 0.);
@@ -147,12 +145,12 @@ static int st_reference_define(Db *db, int *iptr_init, Surf_Def *surf_reference)
     x = db->getArray(iech, iptr_init[0]) - surf_reference->xg;
     y = db->getArray(iech, iptr_init[1]) - surf_reference->yg;
     z = db->getArray(iech, iptr_init[2]) - surf_reference->zg;
-    mat.updValue(0,0,EOperator::ADD,x * x);
-    mat.updValue(0,1,EOperator::ADD,x * y);
-    mat.updValue(0,2,EOperator::ADD,x * z);
-    mat.updValue(1,1,EOperator::ADD,y * y);
-    mat.updValue(1,2,EOperator::ADD,y * z);
-    mat.updValue(2,2,EOperator::ADD,z * z);
+    mat.updValue(0, 0, EOperator::ADD, x * x);
+    mat.updValue(0, 1, EOperator::ADD, x * y);
+    mat.updValue(0, 2, EOperator::ADD, x * z);
+    mat.updValue(1, 1, EOperator::ADD, y * y);
+    mat.updValue(1, 2, EOperator::ADD, y * z);
+    mat.updValue(2, 2, EOperator::ADD, z * z);
   }
 
   /* Eigen values decomposition */
@@ -162,7 +160,7 @@ static int st_reference_define(Db *db, int *iptr_init, Surf_Def *surf_reference)
     messerr("Error in the Plane determination");
     return (1);
   }
-  VectorDouble eigval = mat.getEigenValues();
+  VectorDouble eigval        = mat.getEigenValues();
   const MatrixSquare* eigvec = mat.getEigenVectors();
 
   /* Look for the smallest eigen value */
@@ -209,7 +207,7 @@ static int st_reference_define(Db *db, int *iptr_init, Surf_Def *surf_reference)
  ** \param[out]  nundefs   Number of undefined values
  **
  *****************************************************************************/
-static void st_mima_init(double mima[2][3], int *nundefs)
+static void st_mima_init(double mima[2][3], int* nundefs)
 {
   (*nundefs) = 0;
   for (int idim = 0; idim < 3; idim++)
@@ -232,7 +230,7 @@ static void st_mima_process(double mima[2][3],
                             double x,
                             double y,
                             double z,
-                            int *nundefs)
+                            int* nundefs)
 {
   if (FFFF(x)) (*nundefs)++;
   if (x < mima[0][0]) mima[0][0] = x;
@@ -252,7 +250,7 @@ static void st_mima_process(double mima[2][3],
  ** \param[in]  nundefs   Number of undefined values
  **
  *****************************************************************************/
-static void st_mima_print(const char *title, double mima[2][3], int nundefs)
+static void st_mima_print(const char* title, double mima[2][3], int nundefs)
 {
   message("Statistics for %s\n", title);
   if (nundefs > 0) message("- Number of Undefined values = %d\n", nundefs);
@@ -274,10 +272,10 @@ static void st_mima_print(const char *title, double mima[2][3], int nundefs)
  ** \param[in]  iptr_proj      Array of coordinate locators (projected)
  **
  *****************************************************************************/
-static void st_transform_init2proj(Surf_Def *surf_reference,
-                                   Db *db,
-                                   int *iptr_init,
-                                   int *iptr_proj)
+static void st_transform_init2proj(Surf_Def* surf_reference,
+                                   Db* db,
+                                   int* iptr_init,
+                                   int* iptr_proj)
 {
   double x, y, z, newx, newy, newz, mima_in[2][3], mima_out[2][3];
   int n, nundefs_in, nundefs_out;
@@ -308,12 +306,9 @@ static void st_transform_init2proj(Surf_Def *surf_reference,
 
     /* Calculate the new coordinates */
 
-    newx = (x * surf_reference->vx[0] + y * surf_reference->vx[1]
-            + z * surf_reference->vx[2]);
-    newy = (x * surf_reference->vy[0] + y * surf_reference->vy[1]
-            + z * surf_reference->vy[2]);
-    newz = (x * surf_reference->vz[0] + y * surf_reference->vz[1]
-            + z * surf_reference->vz[2]);
+    newx = (x * surf_reference->vx[0] + y * surf_reference->vx[1] + z * surf_reference->vx[2]);
+    newy = (x * surf_reference->vy[0] + y * surf_reference->vy[1] + z * surf_reference->vy[2]);
+    newz = (x * surf_reference->vz[0] + y * surf_reference->vz[1] + z * surf_reference->vz[2]);
 
     /* Update statistics */
 
@@ -349,7 +344,7 @@ static void st_transform_init2proj(Surf_Def *surf_reference,
  ** \param[in]  points         Array of 3-D coordinates
  **
  *****************************************************************************/
-static void st_transform_proj2init(Surf_Def *surf_reference,
+static void st_transform_proj2init(Surf_Def* surf_reference,
                                    int npoint,
                                    VectorDouble& points)
 {
@@ -375,12 +370,9 @@ static void st_transform_proj2init(Surf_Def *surf_reference,
 
     /* Calculate the new coordinates */
 
-    newx = (x * surf_reference->vx[0] + y * surf_reference->vy[0]
-            + z * surf_reference->vz[0]);
-    newy = (x * surf_reference->vx[1] + y * surf_reference->vy[1]
-            + z * surf_reference->vz[1]);
-    newz = (x * surf_reference->vx[2] + y * surf_reference->vy[2]
-            + z * surf_reference->vz[2]);
+    newx = (x * surf_reference->vx[0] + y * surf_reference->vy[0] + z * surf_reference->vz[0]);
+    newy = (x * surf_reference->vx[1] + y * surf_reference->vy[1] + z * surf_reference->vz[1]);
+    newz = (x * surf_reference->vx[2] + y * surf_reference->vy[2] + z * surf_reference->vz[2]);
 
     newx += surf_reference->xg;
     newy += surf_reference->yg;
@@ -392,7 +384,7 @@ static void st_transform_proj2init(Surf_Def *surf_reference,
 
     /* Store the new coordinates */
 
-    points[3 * ip] = newx;
+    points[3 * ip]     = newx;
     points[3 * ip + 1] = newy;
     points[3 * ip + 2] = newz;
     n++;
@@ -420,14 +412,14 @@ static void st_transform_proj2init(Surf_Def *surf_reference,
  ** \remarks If the code is undefined, this function has no action
  **
  *****************************************************************************/
-static int st_selection_per_code(Db *db, int icode, int iptr_sel)
+static int st_selection_per_code(Db* db, int icode, int iptr_sel)
 {
   int number;
 
   number = 0;
   for (int iech = 0; iech < db->getNSample(); iech++)
   {
-    if (IFFFF(icode) || (int) db->getLocVariable(ELoc::C,iech,0) == icode)
+    if (IFFFF(icode) || (int)db->getLocVariable(ELoc::C, iech, 0) == icode)
     {
 
       db->setArray(iech, iptr_sel, 1.);
@@ -460,8 +452,8 @@ static int st_concatenate_arrays(int ndim,
                                  int npoints,
                                  VectorInt& triloc,
                                  VectorDouble& poiloc,
-                                 int *ntri_arg,
-                                 int *npoint_arg,
+                                 int* ntri_arg,
+                                 int* npoint_arg,
                                  VectorInt& triangles,
                                  VectorDouble& points)
 {
@@ -502,7 +494,7 @@ static int st_concatenate_arrays(int ndim,
 
   /* Set the returned arguments */
 
-  *ntri_arg = ntloc;
+  *ntri_arg   = ntloc;
   *npoint_arg = nploc;
 
   return (0);
@@ -520,9 +512,9 @@ static int st_concatenate_arrays(int ndim,
  ** \param[out] points       Array containing the 2-D vertices
  **
  *****************************************************************************/
-static int st_rectangle_surface(Surf_Def *surf_reference,
-                                int *ntri_arg,
-                                int *npoint_arg,
+static int st_rectangle_surface(Surf_Def* surf_reference,
+                                int* ntri_arg,
+                                int* npoint_arg,
                                 VectorInt& triangles,
                                 VectorDouble& points)
 {
@@ -531,9 +523,9 @@ static int st_rectangle_surface(Surf_Def *surf_reference,
 
   /* Initializations */
 
-  int ndim = 3;
+  int ndim   = 3;
   int ncoord = 5;
-  int ntri = 4;
+  int ntri   = 4;
   *ntri_arg = *npoint_arg = 0;
 
   /* Core allocation */
@@ -543,7 +535,7 @@ static int st_rectangle_surface(Surf_Def *surf_reference,
 
   /* Load the points */
 
-  ecr = 0;
+  ecr           = 0;
   points[ecr++] = 0.;
   points[ecr++] = 0.;
   points[ecr++] = 0.;
@@ -566,7 +558,7 @@ static int st_rectangle_surface(Surf_Def *surf_reference,
 
   /* Load the triangles */
 
-  ecr = 0;
+  ecr              = 0;
   triangles[ecr++] = 1;
   triangles[ecr++] = 2;
   triangles[ecr++] = 3;
@@ -585,7 +577,7 @@ static int st_rectangle_surface(Surf_Def *surf_reference,
 
   /* Set the error code */
 
-  *ntri_arg = ntri;
+  *ntri_arg   = ntri;
   *npoint_arg = ncoord;
   return 0;
 }
@@ -612,20 +604,20 @@ static int st_rectangle_surface(Surf_Def *surf_reference,
  ** \remarks must be freed by the calling function
  **
  *****************************************************************************/
-int db_trisurf(Db *db,
-               Model *model,
-               const String &triswitch,
+int db_trisurf(Db* db,
+               Model* model,
+               const String& triswitch,
                int icode0,
                int verbose,
-               int *ncode_arg,
-               int *ntri_arg,
-               int *npoint_arg,
-               double *codesel,
+               int* ncode_arg,
+               int* ntri_arg,
+               int* npoint_arg,
+               double* codesel,
                VectorInt& ntcode,
                VectorInt& triangles,
                VectorDouble& points)
 {
-  Surf_Def *surf_reference;
+  Surf_Def* surf_reference;
   int iptr_sel, iptr_init[3], iptr_proj[3], error;
   int ndim, ntriloc, ntricum, npoicum, npoiloc, icode, ncodes, ncode_eff, number;
   int flag_rectangle_surface;
@@ -636,23 +628,23 @@ int db_trisurf(Db *db,
 
   /* Initializations */
 
-  error = 1;
+  error   = 1;
   ntricum = npoicum = *ncode_arg = *ntri_arg = *npoint_arg = 0;
-  VERBOSE = verbose;
-  ndim = db->getNDim();
-  iptr_sel = -1;
-  surf_reference = (Surf_Def*) NULL;
+  VERBOSE                                                  = verbose;
+  ndim                                                     = db->getNDim();
+  iptr_sel                                                 = -1;
+  surf_reference                                           = (Surf_Def*)NULL;
   for (int idim = 0; idim < ndim; idim++)
     iptr_init[idim] = iptr_proj[idim] = -1;
-  flag_rectangle_surface = (int) get_keypone("Flag_Rectangle_Surface", 0);
+  flag_rectangle_surface = (int)get_keypone("Flag_Rectangle_Surface", 0);
 
   /* Process the code */
 
   ncode_eff = 1;
-  ncodes = 1;
+  ncodes    = 1;
   if (db->hasLocVariable(ELoc::C))
   {
-    codetab = db->getCodeList();
+    codetab   = db->getCodeList();
     ncode_eff = static_cast<int>(codetab.size());
     if (!IFFFF(icode0))
     {
@@ -682,7 +674,7 @@ int db_trisurf(Db *db,
   /* Allocate the reference projection */
 
   surf_reference = st_reference_manage(1, NULL);
-  if (surf_reference == (Surf_Def*) NULL) goto label_end;
+  if (surf_reference == (Surf_Def*)NULL) goto label_end;
 
   /* Core allocation */
 
@@ -714,7 +706,7 @@ int db_trisurf(Db *db,
     ntriloc = npoiloc = 0;
     if (db->hasLocVariable(ELoc::C))
     {
-      icode = (!IFFFF(icode0)) ? (int) codetab[icode0] : (int) codetab[jcode];
+      icode = (!IFFFF(icode0)) ? (int)codetab[icode0] : (int)codetab[jcode];
       message("\nProcessing Fault for code %d\n", icode);
     }
     else
@@ -733,7 +725,7 @@ int db_trisurf(Db *db,
 
     st_transform_init2proj(surf_reference, db, iptr_init, iptr_proj);
 
-    if (! flag_rectangle_surface)
+    if (!flag_rectangle_surface)
     {
 
       /* Perform the estimation of the elevation (in the projected space) */
@@ -764,19 +756,19 @@ int db_trisurf(Db *db,
     message("- Count of samples   = %d\n", number);
     message("- Count of triangles = %d\n", ntriloc);
 
-    label_suite:
+  label_suite:
     ntcode[jcode] = ntriloc;
   }
 
   /* Set the error return code */
 
   (*ncode_arg) = ncodes;
-  *ntri_arg = ntricum;
-  *npoint_arg = npoicum;
-  *codesel = (db->hasLocVariable(ELoc::C) && !IFFFF(icode0)) ? codetab[icode0] : TEST;
-  error = 0;
+  *ntri_arg    = ntricum;
+  *npoint_arg  = npoicum;
+  *codesel     = (db->hasLocVariable(ELoc::C) && !IFFFF(icode0)) ? codetab[icode0] : TEST;
+  error        = 0;
 
-  label_end:
+label_end:
 
   /* Free memory */
 

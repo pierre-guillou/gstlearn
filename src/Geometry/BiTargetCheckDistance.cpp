@@ -9,32 +9,30 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Geometry/BiTargetCheckDistance.hpp"
-
-#include "geoslib_old_f.h"
-
 #include "Basic/VectorHelper.hpp"
 #include "Geometry/GeometryHelper.hpp"
 #include "Space/SpaceTarget.hpp"
+#include "geoslib_old_f.h"
 
 namespace gstlrn
 {
 BiTargetCheckDistance::BiTargetCheckDistance(double radius,
                                              const VectorDouble& coeffs,
                                              const VectorDouble& angles)
-  : ABiTargetCheck(),
-    _ndim(0),
-    _flagAniso(false),
-    _flagRotation(false),
-    _radius(radius),
-    _anisoCoeffs(),
-    _anisoRotMat(),
-    _dist(TEST),
-    _movingIncr(),
-    _movingAux()
+  : ABiTargetCheck()
+  , _ndim(0)
+  , _flagAniso(false)
+  , _flagRotation(false)
+  , _radius(radius)
+  , _anisoCoeffs()
+  , _anisoRotMat()
+  , _dist(TEST)
+  , _movingIncr()
+  , _movingAux()
 {
-  if (! coeffs.empty())
+  if (!coeffs.empty())
   {
-    _ndim = (int) coeffs.size();
+    _ndim = (int)coeffs.size();
 
     //    _flagAniso = (ut_vector_constant(coeffs)) ? 0 : 1;
     _flagAniso = true;
@@ -42,11 +40,11 @@ BiTargetCheckDistance::BiTargetCheckDistance(double radius,
     _anisoRotMat.resize(_ndim * _ndim);
     _anisoCoeffs = coeffs;
 
-    if (! angles.empty())
+    if (!angles.empty())
     {
       VectorDouble angles_local = angles;
       angles_local.resize(_ndim, 0.);
-      _flagRotation = (! VH::isConstant(angles_local, 0.));
+      _flagRotation = (!VH::isConstant(angles_local, 0.));
       GH::rotationMatrixInPlace(_ndim, angles_local, _anisoRotMat);
     }
     else
@@ -67,34 +65,34 @@ BiTargetCheckDistance::BiTargetCheckDistance(double radius,
   _movingAux.resize(_ndim);
 }
 
-BiTargetCheckDistance::BiTargetCheckDistance(const BiTargetCheckDistance &r)
-  : ABiTargetCheck(r),
-    _ndim(r._ndim),
-    _flagAniso(r._flagAniso),
-    _flagRotation(r._flagRotation),
-    _radius(r._radius),
-    _anisoCoeffs(r._anisoCoeffs),
-    _anisoRotMat(r._anisoRotMat),
-    _dist(r._dist),
-    _movingIncr(r._movingIncr),
-    _movingAux(r._movingAux)
+BiTargetCheckDistance::BiTargetCheckDistance(const BiTargetCheckDistance& r)
+  : ABiTargetCheck(r)
+  , _ndim(r._ndim)
+  , _flagAniso(r._flagAniso)
+  , _flagRotation(r._flagRotation)
+  , _radius(r._radius)
+  , _anisoCoeffs(r._anisoCoeffs)
+  , _anisoRotMat(r._anisoRotMat)
+  , _dist(r._dist)
+  , _movingIncr(r._movingIncr)
+  , _movingAux(r._movingAux)
 {
 }
 
-BiTargetCheckDistance& BiTargetCheckDistance::operator=(const BiTargetCheckDistance &r)
+BiTargetCheckDistance& BiTargetCheckDistance::operator=(const BiTargetCheckDistance& r)
 {
   if (this != &r)
   {
     ABiTargetCheck::operator=(r);
-    _ndim = r._ndim;
-    _flagAniso = r._flagAniso;
+    _ndim         = r._ndim;
+    _flagAniso    = r._flagAniso;
     _flagRotation = r._flagRotation;
-    _radius = r._radius;
-    _anisoCoeffs = r._anisoCoeffs;
-    _anisoRotMat = r._anisoRotMat;
-    _dist = r._dist;
-    _movingIncr = r._movingIncr;
-    _movingAux = r._movingAux;
+    _radius       = r._radius;
+    _anisoCoeffs  = r._anisoCoeffs;
+    _anisoRotMat  = r._anisoRotMat;
+    _dist         = r._dist;
+    _movingIncr   = r._movingIncr;
+    _movingAux    = r._movingAux;
   }
   return *this;
 }
@@ -127,12 +125,12 @@ String BiTargetCheckDistance::toString(const AStringFormat* /*strfmt*/) const
       for (int idim = 0; idim < _ndim; idim++)
         ranges[idim] = _radius * _anisoCoeffs[idim];
       sstr << toMatrix("Anisotropic Ranges :", VectorString(), VectorString(),
-                      true, 1, _ndim, ranges);
+                       true, 1, _ndim, ranges);
 
       if (_flagRotation)
       {
         sstr << toMatrix("Anisotropy Rotation :", VectorString(),
-                        VectorString(), true, _ndim, _ndim, _anisoRotMat);
+                         VectorString(), true, _ndim, _ndim, _anisoRotMat);
       }
     }
   }
@@ -175,8 +173,8 @@ void BiTargetCheckDistance::_calculateDistance() const
   _dist = sqrt(_dist);
 }
 
-bool BiTargetCheckDistance::isOK(const SpaceTarget &T1,
-                                const SpaceTarget &T2) const
+bool BiTargetCheckDistance::isOK(const SpaceTarget& T1,
+                                 const SpaceTarget& T2) const
 {
   int ndim = getNDim();
   for (int idim = 0; idim < ndim; idim++)

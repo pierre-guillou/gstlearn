@@ -9,17 +9,15 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Gibbs/GibbsMMulti.hpp"
-#include "Gibbs/AGibbs.hpp"
-#include "Model/Model.hpp"
-#include "Basic/Timer.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/Timer.hpp"
 #include "Db/Db.hpp"
+#include "Gibbs/AGibbs.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include "Matrix/NF_Triplet.hpp"
-
+#include "Model/Model.hpp"
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
-
 #include <math.h>
 
 static bool storeSparse = true;
@@ -66,18 +64,18 @@ GibbsMMulti::GibbsMMulti(const GibbsMMulti& r)
   _allocate();
 }
 
-GibbsMMulti& GibbsMMulti::operator=(const GibbsMMulti &r)
+GibbsMMulti& GibbsMMulti::operator=(const GibbsMMulti& r)
 {
   if (this != &r)
   {
     GibbsMulti::operator=(r);
-    _Cmat = r._Cmat;
-    _CmatChol = r._CmatChol;
-    _eps = r._eps;
+    _Cmat              = r._Cmat;
+    _CmatChol          = r._CmatChol;
+    _eps               = r._eps;
     _flagStoreInternal = r._flagStoreInternal;
-    _areas = r._areas;
-    _matWgt = r._matWgt;
-    _weights = r._weights;
+    _areas             = r._areas;
+    _matWgt            = r._matWgt;
+    _weights           = r._weights;
   }
   return *this;
 }
@@ -109,12 +107,12 @@ int GibbsMMulti::covmatAlloc(bool verbose, bool verboseTimer)
   // Initialization
 
   if (verboseTimer) verbose = true;
-  if (verbose) mestitle(1,"Gibbs using Moving Neighborhood");
-  Db* db = getDb();
-  Model* model = getModel();
-  int nvar   = _getNVar();
-  int nact   = _getSampleRankNumber();
-  int nvardb = db->getNLoc(ELoc::Z);
+  if (verbose) mestitle(1, "Gibbs using Moving Neighborhood");
+  Db* db                = getDb();
+  Model* model          = getModel();
+  int nvar              = _getNVar();
+  int nact              = _getSampleRankNumber();
+  int nvardb            = db->getNLoc(ELoc::Z);
   bool flag_var_defined = nvardb > 0;
 
   // Consistency check
@@ -122,14 +120,14 @@ int GibbsMMulti::covmatAlloc(bool verbose, bool verboseTimer)
   if (flag_var_defined && nvar != nvardb)
   {
     messerr("Inconsistency in Number of Variables between Model (%d) and Db (%d)",
-            nvar,nvardb);
+            nvar, nvardb);
     return 1;
   }
 
   // Establish the covariance matrix as sparse (hopefully)
 
   if (verbose)
-    message("Building Covariance Sparse Matrix (Dimension = %d)\n",nact);
+    message("Building Covariance Sparse Matrix (Dimension = %d)\n", nact);
   Timer timer;
   _Cmat = model->evalCovMatSparse(db, db, -1, -1, _getRanks(), _getRanks());
   if (_Cmat == nullptr) return 1;
@@ -174,7 +172,7 @@ double GibbsMMulti::_getVariance(int icol) const
 ** \param[in]  iter        Rank of the iteration
 **
 *****************************************************************************/
-void GibbsMMulti::update(VectorVectorDouble &y, int isimu, int ipgs, int iter)
+void GibbsMMulti::update(VectorVectorDouble& y, int isimu, int ipgs, int iter)
 {
   double valsim, yk, vk;
 
@@ -190,14 +188,14 @@ void GibbsMMulti::update(VectorVectorDouble &y, int isimu, int ipgs, int iter)
 
   for (int ivar0 = 0; ivar0 < nvar; ivar0++)
   {
-    int icase = getRank(ipgs,ivar0);
+    int icase = getRank(ipgs, ivar0);
     for (int iact0 = 0; iact0 < nact; iact0++)
     {
       // Load the vector of weights
       int icol = _getColumn(iact0, ivar0);
       _getWeights(icol);
 
-      if (! _isConstraintTight(icase, iact0, &valsim))
+      if (!_isConstraintTight(icase, iact0, &valsim))
       {
         // The term of y corresponding to the current (variable, sample)
         // is set to 0 in order to avoid testing it next.
@@ -238,11 +236,11 @@ int GibbsMMulti::_getColumn(int iact, int ivar) const
   return (iact + ivar * nact);
 }
 
-void GibbsMMulti::_splitCol(int icol, int *iact, int *ivar) const
+void GibbsMMulti::_splitCol(int icol, int* iact, int* ivar) const
 {
   int nact = _getSampleRankNumber();
-  *ivar = icol / nact;
-  *iact = icol - nact * (*ivar);
+  *ivar    = icol / nact;
+  *iact    = icol - nact * (*ivar);
 }
 
 /**
@@ -252,7 +250,7 @@ void GibbsMMulti::_splitCol(int icol, int *iact, int *ivar) const
  * @param tol     Tolerance below which weights are set to 0
  */
 void GibbsMMulti::_calculateWeights(int icol,
-                                    VectorDouble &b,
+                                    VectorDouble& b,
                                     double tol) const
 {
   b.fill(0.);
@@ -290,16 +288,16 @@ int GibbsMMulti::_storeAllWeights(bool verbose)
   long ntotal = nrow * nrow;
   if (verbose)
   {
-    if (! _flagStoreInternal)
+    if (!_flagStoreInternal)
       message("Weights are stored externally (HDF5 format)\n");
     else
       message("Weights are stored internally\n");
-    message("- Total core needs       = %ld\n",ntotal);
+    message("- Total core needs       = %ld\n", ntotal);
   }
 
   // Create the HDF5 file (optional)
 
-  if (! _flagStoreInternal)
+  if (!_flagStoreInternal)
   {
 #ifdef TODO
     std::vector<hsize_t> dims(2);
@@ -340,9 +338,9 @@ int GibbsMMulti::_storeAllWeights(bool verbose)
 
   if (verbose)
   {
-    message("- Number of zero weights = %d\n",  nzero);
-    double reduc = 100. * (double) (ntotal - nzero) / (double) ntotal;
-    message("- Percentage             = %6.2lf\n",reduc);
+    message("- Number of zero weights = %d\n", nzero);
+    double reduc = 100. * (double)(ntotal - nzero) / (double)ntotal;
+    message("- Percentage             = %6.2lf\n", reduc);
   }
   return 0;
 }
@@ -405,7 +403,7 @@ void GibbsMMulti::setFlagStoreInternal(bool flagStoreInternal)
 
 double GibbsMMulti::_getEstimate(int ipgs,
                                  int icol,
-                                 const VectorVectorDouble &y) const
+                                 const VectorVectorDouble& y) const
 {
   int jact, jvar, jcase;
   double yk = 0.;
@@ -414,7 +412,7 @@ double GibbsMMulti::_getEstimate(int ipgs,
   {
     if (_matWgt->isFlagEigen())
     {
-      for (Eigen::SparseMatrix<double>::InnerIterator it(_matWgt->getEigenMatrix(),icol); it; ++it)
+      for (Eigen::SparseMatrix<double>::InnerIterator it(_matWgt->getEigenMatrix(), icol); it; ++it)
       {
         _splitCol(it.row(), &jact, &jvar);
         jcase = getRank(ipgs, jvar);

@@ -10,23 +10,23 @@ Kriging.Data.2.stdev      6.519
 Co-Kriging using SPDE (Matrix)
 ------------------------------
                       Mean
-KM.Data.1.estim      1.760
-KM.Data.2.estim      0.287
-KM.Data.1.stdev     11.392
-KM.Data.2.stdev      8.711
-Difference with Kriging.Data.1.estim (Matrix) = 0.01211
-Difference with Kriging.Data.2.estim (Matrix) = 0.01099
-Difference with Kriging.Data.1.stdev (Matrix) = 0.06703
-Difference with Kriging.Data.2.stdev (Matrix) = 0.03201
+KM.Data.1.estim      1.742
+KM.Data.2.estim      0.201
+KM.Data.1.stdev      7.565
+KM.Data.2.stdev      6.312
+Difference with Kriging.Data.1.estim (Matrix) = 0.04657
+Difference with Kriging.Data.2.estim (Matrix) = 0.04046
+Difference with Kriging.Data.1.stdev (Matrix) = 0.01329
+Difference with Kriging.Data.2.stdev (Matrix) = 0.01394
 
 Co-Kriging using SPDE (Matrix-Free)
 -----------------------------------
                       Mean
-KF.Data.1.estim      1.483
-KF.Data.2.estim      0.097
-KF.Data.1.stdev      7.302
-KF.Data.2.stdev      6.116
-Difference with Kriging.Data.1.estim (matrix) = 0.01983
-Difference with Kriging.Data.2.estim (matrix) = 0.01025
-Difference with Kriging.Data.1.stdev (matrix) = 0.02758
-Difference with Kriging.Data.2.stdev (matrix) = 0.02395
+KF.Data.1.estim      1.497
+KF.Data.2.estim      0.061
+KF.Data.1.stdev      7.504
+KF.Data.2.stdev      6.285
+Difference with Kriging.Data.1.estim  = 0.04644
+Difference with Kriging.Data.2.estim  = 0.04052
+Difference with Kriging.Data.1.stdev  = 0.02645
+Difference with Kriging.Data.2.stdev  = 0.01891

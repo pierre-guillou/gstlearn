@@ -9,9 +9,9 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/SPDEOpMatrix.hpp"
+#include "LinearOp/MatrixSymmetricSim.hpp"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
-#include "LinearOp/MatrixSymmetricSim.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
 namespace gstlrn
@@ -25,7 +25,7 @@ SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
            (invNoise == nullptr) ? nullptr : new MatrixSymmetricSim(invNoise),
            nullptr,
            nullptr,
-           projOut, 
+           projOut,
            projOut,
            true)
   , _QpAinvNoiseAt(MatrixSparse(0, 0))
@@ -41,7 +41,7 @@ SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
 
 SPDEOpMatrix::~SPDEOpMatrix()
 {
-  delete _chol; 
+  delete _chol;
 }
 
 int SPDEOpMatrix::_solve(const constvect inv, vect outv) const
@@ -62,7 +62,7 @@ int SPDEOpMatrix::_solve(const constvect inv, vect outv) const
 *****************************************************************************/
 int SPDEOpMatrix::_addToDest(const constvect inv, vect outv) const
 {
- return _QpAinvNoiseAt.addToDest(inv,outv);
+  return _QpAinvNoiseAt.addToDest(inv, outv);
 }
 
 double SPDEOpMatrix::computeLogDetOp(int nbsimu) const
@@ -75,7 +75,7 @@ double SPDEOpMatrix::computeLogDetOp(int nbsimu) const
 }
 
 /**
- * @brief Computing Standard deviation of the estimation error 
+ * @brief Computing Standard deviation of the estimation error
  * using partial_invert of a Sparse Cholesky matrix
  *
  * @param dat Vector of Data
@@ -91,16 +91,13 @@ VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) con
 
   if (_chol == nullptr)
     _chol = new CholeskySparse(&_QpAinvNoiseAt);
-  
-  VectorDouble vcur(_QKriging->getSize(), 0.0);
-  _chol->stdev(vcur, true); // true for standard deviation
 
-  // Project the result on the output mesh (optional)
-  if (_projOutSimu == nullptr)
-    return vcur;
+  const ProjMultiMatrix* proj = dynamic_cast<const ProjMultiMatrix*>(_projOutKriging);
+  const MatrixSparse* projmat = proj->getProj();
 
-  VectorDouble result(_projOutSimu->getNPoint());
-  _projOutSimu->mesh2point(vcur, result);
+  VectorDouble result(projmat->getNRows());
+  _chol->stdev(result, projmat, true); // true for standard deviation
+
   return result;
 }
 }

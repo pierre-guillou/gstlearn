@@ -13,26 +13,26 @@
 #include "Enum/ECov.hpp"
 
 #include "API/SPDE.hpp"
-#include "LinearOp/MatrixSymmetricSim.hpp"
-#include "LinearOp/PrecisionOpMulti.hpp"
-#include "LinearOp/SPDEOp.hpp"
-#include "LinearOp/SPDEOpMatrix.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
-#include "Matrix/NF_Triplet.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Mesh/MeshETurbo.hpp"
 #include "Basic/Law.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Basic/NamingConvention.hpp"
-#include "Model/Model.hpp"
-#include "LinearOp/ShiftOpMatrix.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Covariances/CovAniso.hpp"
+#include "Db/Db.hpp"
+#include "LinearOp/MatrixSymmetricSim.hpp"
 #include "LinearOp/PrecisionOp.hpp"
+#include "LinearOp/PrecisionOpMulti.hpp"
 #include "LinearOp/PrecisionOpMultiConditional.hpp"
 #include "LinearOp/PrecisionOpMultiConditionalCs.hpp"
+#include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include "LinearOp/ProjMatrix.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
-#include "LinearOp/PrecisionOpMultiMatrix.hpp"
-#include "Db/Db.hpp"
+#include "LinearOp/SPDEOp.hpp"
+#include "LinearOp/SPDEOpMatrix.hpp"
+#include "LinearOp/ShiftOpMatrix.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
+#include "Matrix/NF_Triplet.hpp"
+#include "Mesh/MeshETurbo.hpp"
+#include "Model/Model.hpp"
 #include "geoslib_define.h"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include <math.h>
@@ -141,13 +141,13 @@ static void _uncenterResultByDriftInPlace(const Db* dbout,
 
 /**
  * @brief Simulate nugget component and add it to one multivariate simulation
- * 
+ *
  * @param model The Model
  * @param result The array containing ONE multivariate simulation
  * @param nechred Number of valid samples per variable
  *
  * @note The nugget component is added to each variable with its correct variance
- * @note but not accounting for the dependency across different variables.  
+ * @note but not accounting for the dependency across different variables.
  */
 static void _addNuggetToResult(const Model* model, VectorDouble& result, int nechred)
 {
@@ -193,33 +193,33 @@ SPDE::SPDE(Model* model,
            const SPDEParam& params,
            bool verbose,
            bool showStats)
-    : _data(data),
-      _calcul(calcul),
-      _precisionsKrig(nullptr),
-      _precisionsSimu(nullptr),
-      _pilePrecisions(),
-      _pileProjMatrix(),
-      _meshingSimu(),
-      _meshingKrig(),
-      _driftCoeffs(),
-      _model(model),
-      _workingKrig(),
-      _workingSimu(),
-      _workingData(),
-      _workingDataInit(),
-      _projOnDbOut(),
-      _adressesICov(),
-      _nugget(0.),
-      _driftTab(),
-      _requireCoeffs(false),
-      _isCoeffsComputed(false),
-      _deleteMesh(false),
-      _useCholesky(true),
-      _params(params)
+  : _data(data)
+  , _calcul(calcul)
+  , _precisionsKrig(nullptr)
+  , _precisionsSimu(nullptr)
+  , _pilePrecisions()
+  , _pileProjMatrix()
+  , _meshingSimu()
+  , _meshingKrig()
+  , _driftCoeffs()
+  , _model(model)
+  , _workingKrig()
+  , _workingSimu()
+  , _workingData()
+  , _workingDataInit()
+  , _projOnDbOut()
+  , _adressesICov()
+  , _nugget(0.)
+  , _driftTab()
+  , _requireCoeffs(false)
+  , _isCoeffsComputed(false)
+  , _deleteMesh(false)
+  , _useCholesky(true)
+  , _params(params)
 {
   _setUseCholesky(useCholesky, verbose);
 
-  (void) _init(domain, meshUser, verbose, showStats);
+  (void)_init(domain, meshUser, verbose, showStats);
 }
 
 SPDE::~SPDE()
@@ -234,33 +234,33 @@ void SPDE::_purge()
   delete _precisionsSimu;
   _precisionsSimu = nullptr;
 
-  for (int i = 0, n = (int) _pilePrecisions.size(); i < n; i++)
+  for (int i = 0, n = (int)_pilePrecisions.size(); i < n; i++)
     delete _pilePrecisions[i];
   _pilePrecisions.clear();
 
-  for (int i = 0, n = (int) _pileProjMatrix.size(); i < n; i++)
+  for (int i = 0, n = (int)_pileProjMatrix.size(); i < n; i++)
     delete _pileProjMatrix[i];
   _pileProjMatrix.clear();
 
-  for (int i = 0, n = (int) _projOnDbOut.size(); i < n; i++)
+  for (int i = 0, n = (int)_projOnDbOut.size(); i < n; i++)
     delete _projOnDbOut[i];
   _projOnDbOut.clear();
 
   if (_deleteMesh)
   {
-    for (int i = 0, n = (int) _meshingSimu.size(); i < n; i++)
+    for (int i = 0, n = (int)_meshingSimu.size(); i < n; i++)
       delete _meshingSimu[i];
-    for (int i = 0, n = (int) _meshingKrig.size(); i < n; i++)
+    for (int i = 0, n = (int)_meshingKrig.size(); i < n; i++)
       delete _meshingKrig[i];
   }
   _meshingSimu.clear();
   _meshingKrig.clear();
 }
 
-SPDE* SPDE::create(Model *model,
-                   const Db *domain,
-                   const Db *data,
-                   const ESPDECalcMode &calcul,
+SPDE* SPDE::create(Model* model,
+                   const Db* domain,
+                   const Db* data,
+                   const ESPDECalcMode& calcul,
                    const AMesh* meshUser,
                    int useCholesky,
                    const SPDEParam& params,
@@ -292,17 +292,17 @@ void SPDE::_setUseCholesky(int useCholesky, bool verbose)
   {
     mestitle(1, "SPDE parameters");
     message("- Space dimension = %d\n", _model->getNDim());
-    if (! _meshingKrig.empty())
+    if (!_meshingKrig.empty())
     {
-      for (int imesh = 0; imesh < (int) _meshingKrig.size(); imesh++)
+      for (int imesh = 0; imesh < (int)_meshingKrig.size(); imesh++)
         message("- Number of meshes (Kriging #%d) = %d\n",
-                imesh+1, _meshingKrig[imesh]->getNMeshes());
+                imesh + 1, _meshingKrig[imesh]->getNMeshes());
     }
-    if (! _meshingSimu.empty())
+    if (!_meshingSimu.empty())
     {
-      for (int imesh = 0; imesh < (int) _meshingSimu.size(); imesh++)
+      for (int imesh = 0; imesh < (int)_meshingSimu.size(); imesh++)
         message("- Number of meshes (Kriging #%d) = %d\n",
-                imesh+1, _meshingSimu[imesh]->getNMeshes());
+                imesh + 1, _meshingSimu[imesh]->getNMeshes());
     }
 
     if (_useCholesky)
@@ -316,7 +316,7 @@ void SPDE::_setUseCholesky(int useCholesky, bool verbose)
   }
 }
 
-int SPDE::_init(const Db *domain, const AMesh *meshUser, bool verbose, bool showStats)
+int SPDE::_init(const Db* domain, const AMesh* meshUser, bool verbose, bool showStats)
 {
   if (_isKrigingRequested() && _data == nullptr)
   {
@@ -352,7 +352,7 @@ int SPDE::_init(const Db *domain, const AMesh *meshUser, bool verbose, bool show
   for (int icov = 0, ncov = _model->getNCov(); icov < ncov; icov++)
   {
     CovAniso* cova = _model->getCovAniso(icov);
-    double sill = cova->getSill(0,0);
+    double sill    = cova->getSill(0, 0);
 
     if (cova->getType() == ECov::NUGGET)
     {
@@ -366,10 +366,10 @@ int SPDE::_init(const Db *domain, const AMesh *meshUser, bool verbose, bool show
       {
         if (meshUser == nullptr)
         {
-          mesh = MeshETurbo::createFromCova(*cova, domain, _params.getRefineS(),
-                                            _params.getBorder(), _params.isPolarized(),
-                                            useSel, _params.getNxMax(),
-                                            verbose);
+          mesh        = MeshETurbo::createFromCova(*cova, domain, _params.getRefineS(),
+                                                   _params.getBorder(), _params.isPolarized(),
+                                                   useSel, _params.getNxMax(),
+                                                   verbose);
           _deleteMesh = true;
         }
         _meshingSimu.push_back(mesh);
@@ -428,9 +428,9 @@ int SPDE::_init(const Db *domain, const AMesh *meshUser, bool verbose, bool show
     {
       // If a variance of measurement error is defined
       // we must intersect it with the definition of the Z-value
-      VectorDouble valData = _data->getColumnByLocator(ELoc::Z,0,useSel);
-      VectorDouble varData = _data->getColumnByLocator(ELoc::V,0,useSel);
-      double eps_loc = _params.getEpsNugget() * totalSill;
+      VectorDouble valData = _data->getColumnByLocator(ELoc::Z, 0, useSel);
+      VectorDouble varData = _data->getColumnByLocator(ELoc::V, 0, useSel);
+      double eps_loc       = _params.getEpsNugget() * totalSill;
       for (int iech = 0; iech < _data->getNSample(true); iech++)
       {
         if (FFFF(valData[iech])) continue;
@@ -515,36 +515,36 @@ void SPDE::_centerByDrift(const VectorDouble& dataVect, bool useSel) const
       _workingDataInit.resize(dataVect.size());
     }
 
-    for(int iech = 0, nech = (int) _workingDataInit.size(); iech<nech;iech++)
+    for (int iech = 0, nech = (int)_workingDataInit.size(); iech < nech; iech++)
     {
       _workingDataInit[iech] = dataVect[iech];
     }
   }
   else
   {
-    _workingDataInit = _model->evalDriftVarCoefs(_data,_driftCoeffs,useSel);
+    _workingDataInit = _model->evalDriftVarCoefs(_data, _driftCoeffs, useSel);
 
-    for(int iech = 0, nech = (int) _workingDataInit.size(); iech<nech; iech++)
+    for (int iech = 0, nech = (int)_workingDataInit.size(); iech < nech; iech++)
     {
       _workingDataInit[iech] = dataVect[iech] - _workingDataInit[iech];
     }
   }
 }
 
-void SPDE::_addDrift(Db* db, VectorDouble &result, bool useSel)
+void SPDE::_addDrift(Db* db, VectorDouble& result, bool useSel)
 {
-  if (! _requireCoeffs) return;
+  if (!_requireCoeffs) return;
   VectorDouble temp_out = _model->evalDriftVarCoefs(db, _driftCoeffs, useSel);
   VH::addInPlace(result, temp_out);
 }
 
-int SPDE::compute(Db *dbout,
+int SPDE::compute(Db* dbout,
                   int nbsimu,
-                  const NamingConvention &namconv)
+                  const NamingConvention& namconv)
 {
   VectorDouble dataVect;
   bool useSel = true;
-  int ivar = 0;
+  int ivar    = 0;
 
   // Preliminary checks
   if (_isKrigingRequested())
@@ -577,10 +577,10 @@ int SPDE::compute(Db *dbout,
   // Preliminary tasks
   if (_data != nullptr)
   {
-    dataVect = _data->getColumnByLocator(ELoc::Z,ivar,useSel);
+    dataVect = _data->getColumnByLocator(ELoc::Z, ivar, useSel);
     // Suppress any TEST value and center by the drift
     dataVect = VH::suppressTest(dataVect);
-    _centerByDrift(dataVect,useSel);
+    _centerByDrift(dataVect, useSel);
   }
 
   // Create the output vectors in the output Db
@@ -608,7 +608,7 @@ int SPDE::compute(Db *dbout,
     _workingData = _workingDataInit;
     _computeKriging();
 
-    for (int icov = 0, ncov = (int) _meshingKrig.size(); icov < ncov; icov++)
+    for (int icov = 0, ncov = (int)_meshingKrig.size(); icov < ncov; icov++)
       _projecLocal(dbout, _meshingKrig[icov], _workingKrig[icov], result);
     _addDrift(dbout, result);
     dbout->setColumnByUID(result, iptr, useSel);
@@ -622,7 +622,7 @@ int SPDE::compute(Db *dbout,
     result.fill(0.);
     _workingData = _workingDataInit;
     _computeKriging();
-    for (int icov = 0, ncov = (int) _meshingKrig.size(); icov < ncov; icov++)
+    for (int icov = 0, ncov = (int)_meshingKrig.size(); icov < ncov; icov++)
       _projecLocal(dbout, _meshingKrig[icov], _workingKrig[icov], result);
     _addDrift(dbout, result);
     dbout->setColumnByUID(result, iptr, useSel);
@@ -637,7 +637,7 @@ int SPDE::compute(Db *dbout,
     {
       result.fill(0.);
       _computeSimuCond();
-      for (int icov = 0, ncov = (int) _meshingSimu.size(); icov < ncov; icov++)
+      for (int icov = 0, ncov = (int)_meshingSimu.size(); icov < ncov; icov++)
       {
         _projecLocal(dbout, _meshingSimu[icov], _workingSimu[icov], result);
         _projecLocal(dbout, _meshingKrig[icov], _workingKrig[icov], result);
@@ -650,17 +650,17 @@ int SPDE::compute(Db *dbout,
     }
     VH::mean1AndMean2ToStdev(temp_mean, temp_mean2, result, nbsimu);
     dbout->setColumnByUID(result, iptr + 1, useSel);
-    namconv.setNamesAndLocators(_data, VectorString(), ELoc::Z, 1, dbout, iptr+1,
+    namconv.setNamesAndLocators(_data, VectorString(), ELoc::Z, 1, dbout, iptr + 1,
                                 "stdev", 1);
   }
 
   if (_calcul == ESPDECalcMode::SIMUNONCOND)
   {
-    for(int isimu = 0; isimu < nbsimu; isimu++)
+    for (int isimu = 0; isimu < nbsimu; isimu++)
     {
       result.fill(0.);
       _computeSimuNonCond();
-      for(int icov = 0, ncov = (int) _meshingSimu.size() ; icov < ncov; icov++)
+      for (int icov = 0, ncov = (int)_meshingSimu.size(); icov < ncov; icov++)
         _projecLocal(dbout, _meshingSimu[icov], _workingSimu[icov], result);
       _addNuggetOnResult(result);
       _addDrift(dbout, result);
@@ -672,15 +672,15 @@ int SPDE::compute(Db *dbout,
   if (_calcul == ESPDECalcMode::SIMUCOND)
   {
     _workingData = _workingDataInit;
-    for(int isimu = 0; isimu < nbsimu; isimu++)
+    for (int isimu = 0; isimu < nbsimu; isimu++)
     {
       result.fill(0.);
       _computeSimuCond();
-      for(int icov = 0, ncov = (int) _meshingSimu.size(); icov < ncov; icov++)
+      for (int icov = 0, ncov = (int)_meshingSimu.size(); icov < ncov; icov++)
       {
         _projecLocal(dbout, _meshingSimu[icov], _workingSimu[icov], result);
         _projecLocal(dbout, _meshingKrig[icov], _workingKrig[icov], result);
-       }
+      }
       _addNuggetOnResult(result);
       _addDrift(dbout, result);
       dbout->setColumnByUID(result, iptr + isimu, useSel);
@@ -699,33 +699,29 @@ void SPDE::_projecLocal(Db* dbout,
   std::vector<double> temp_out(dbout->getNSample(true));
   vect tempoutm(temp_out);
   constvect workingm(working);
-  ProjMatrix proj(dbout,meshing);
-  proj.mesh2point(working,tempoutm);
+  ProjMatrix proj(dbout, meshing);
+  proj.mesh2point(working, tempoutm);
   for (int i = 0; i < (int)result.size(); i++)
   {
-    result[i]+= temp_out[i];
+    result[i] += temp_out[i];
   }
 }
 
-void SPDE::_addNuggetOnResult(VectorDouble &result) const
+void SPDE::_addNuggetOnResult(VectorDouble& result) const
 {
   if (_nugget <= 0) return;
-  for (int iech = 0, nech = (int) result.size(); iech < nech; iech++)
+  for (int iech = 0, nech = (int)result.size(); iech < nech; iech++)
     result[iech] += law_gaussian(0., sqrt(_nugget));
 }
 
 bool SPDE::_isSimulationRequested() const
 {
-  return _calcul == ESPDECalcMode::KRIGVAR
-      || _calcul == ESPDECalcMode::SIMUCOND
-      || _calcul == ESPDECalcMode::SIMUNONCOND;
+  return _calcul == ESPDECalcMode::KRIGVAR || _calcul == ESPDECalcMode::SIMUCOND || _calcul == ESPDECalcMode::SIMUNONCOND;
 }
 
 bool SPDE::_isKrigingRequested() const
 {
-  return _calcul == ESPDECalcMode::SIMUCOND
-      || _calcul == ESPDECalcMode::KRIGING
-      || _calcul == ESPDECalcMode::KRIGVAR;
+  return _calcul == ESPDECalcMode::SIMUCOND || _calcul == ESPDECalcMode::KRIGING || _calcul == ESPDECalcMode::KRIGVAR;
 }
 
 double SPDE::computeTotalLogDet(int nMC) const
@@ -752,10 +748,10 @@ double SPDE::computeQuad() const
     return TEST;
   }
 
-  int ivar = 0;
-  bool useSel = true;
-  VectorDouble dataVect = _data->getColumnByLocator(ELoc::Z,ivar,useSel);
-  _centerByDrift(dataVect,useSel);
+  int ivar              = 0;
+  bool useSel           = true;
+  VectorDouble dataVect = _data->getColumnByLocator(ELoc::Z, ivar, useSel);
+  _centerByDrift(dataVect, useSel);
   return _precisionsKrig->computeQuadratic(_workingData);
 }
 
@@ -796,7 +792,7 @@ double SPDE::computeLogLikelihood(int nbsimu, bool verbose) const
 {
   VectorDouble dataVect;
   bool useSel = true;
-  int ivar = 0;
+  int ivar    = 0;
 
   // Preliminary checks
   if (_isKrigingRequested())
@@ -819,10 +815,10 @@ double SPDE::computeLogLikelihood(int nbsimu, bool verbose) const
   // Preliminary tasks
   if (_data != nullptr)
   {
-    dataVect = _data->getColumnByLocator(ELoc::Z,ivar,useSel);
+    dataVect = _data->getColumnByLocator(ELoc::Z, ivar, useSel);
     // Suppress any TEST value and center by the drift
     dataVect = VH::suppressTest(dataVect);
-    _centerByDrift(dataVect,useSel);
+    _centerByDrift(dataVect, useSel);
   }
 
   // Dispatch
@@ -840,11 +836,11 @@ double SPDE::computeLogLikelihood(int nbsimu, bool verbose) const
 void SPDE::_computeDriftCoeffs() const
 {
   if (!_isCoeffsComputed)
-   {
+  {
     if (_requireCoeffs)
     {
       _precisionsKrig->makeReady();
-      _driftCoeffs = _precisionsKrig->computeCoeffs(_data->getColumnByLocator(ELoc::Z,0,true),
+      _driftCoeffs = _precisionsKrig->computeCoeffs(_data->getColumnByLocator(ELoc::Z, 0, true),
                                                     _driftTab);
     }
     _model->setBetaHat(_driftCoeffs);
@@ -854,7 +850,7 @@ void SPDE::_computeDriftCoeffs() const
 
 void SPDE::setDriftCoeffs(const VectorDouble& coeffs)
 {
-  _driftCoeffs  = coeffs;
+  _driftCoeffs      = coeffs;
   _isCoeffsComputed = true;
 }
 
@@ -881,25 +877,25 @@ double logLikelihoodSPDEOld(Db* dbin,
 }
 
 static int _loadPositions(int iech,
-                          const VectorVectorInt &index1,
-                          const VectorInt &cumul,
+                          const VectorVectorInt& index1,
+                          const VectorInt& cumul,
                           VectorInt& positions,
                           VectorInt& identity,
-                          int *rank_arg)
+                          int* rank_arg)
 {
-  int nvar = (int) cumul.size();
+  int nvar = (int)cumul.size();
   int ndef = 0;
   int rank = 0;
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    rank = 2 * rank;
+    rank     = 2 * rank;
     int ipos = VH::whereElement(index1[ivar], iech);
     if (ipos < 0)
       positions[ivar] = -1;
     else
     {
       positions[ivar] = ipos + cumul[ivar];
-      identity[ndef] = ivar;
+      identity[ndef]  = ivar;
       ndef++;
       rank += 1;
     }
@@ -910,7 +906,7 @@ static int _loadPositions(int iech,
 
 static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef)
 {
-  int nverr = (int) verrDef.size();
+  int nverr = (int)verrDef.size();
   if (nverr > 0)
   {
     for (int iverr = 0; iverr < nverr; iverr++)
@@ -920,17 +916,17 @@ static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef
 
 static void _checkMinNugget(MatrixSymmetric& sills, const VectorDouble& minNug)
 {
-  int nvar = (int) minNug.size();
+  int nvar = (int)minNug.size();
 
   // Check that the diagonal of the Sill matrix is large enough
   for (int ivar = 0; ivar < nvar; ivar++)
-    sills.setValue(ivar,ivar, MAX(sills.getValue(ivar,ivar), minNug[ivar]));
+    sills.setValue(ivar, ivar, MAX(sills.getValue(ivar, ivar), minNug[ivar]));
 }
 
-static MatrixSymmetric _buildSillPartialMatrix(const MatrixSymmetric &sillsRef,
-                                                     int nvar,
-                                                     int ndef,
-                                                     const VectorInt &identity)
+static MatrixSymmetric _buildSillPartialMatrix(const MatrixSymmetric& sillsRef,
+                                               int nvar,
+                                               int ndef,
+                                               const VectorInt& identity)
 {
   MatrixSymmetric sills;
   if (ndef == nvar)
@@ -947,9 +943,9 @@ static MatrixSymmetric _buildSillPartialMatrix(const MatrixSymmetric &sillsRef,
 
 /**
  * @brief Create the set of Projections needed within SPDE
- * 
+ *
  * @param db Target Data Base
- * @param model Target Model structure 
+ * @param model Target Model structure
  * @param meshes Set of Mesh (one per structure, nugget excluded)
  * @param projIn Set of Projection matrices (Input)
  * @param checkOnZVariable see details in 'createFromDbAndMeshes'
@@ -1031,8 +1027,8 @@ static int _defineMeshes(const Db* dbin,
                          const SPDEParam& params,
                          bool flagKrige = true)
 {
-  int ncov    = model->getNCov(true);
-  int nmesh   = (int)meshes.size();
+  int ncov  = model->getNCov(true);
+  int nmesh = (int)meshes.size();
   if (nmesh == 0)
   {
     meshes = defineMeshesFromDbs(dbin, dbout, model, params, flagKrige);
@@ -1051,7 +1047,7 @@ static int _defineMeshes(const Db* dbin,
     return 1;
   }
 
-  // If the dimensions 'nmesh' and 'ncov' match: do nothing 
+  // If the dimensions 'nmesh' and 'ncov' match: do nothing
   return 0;
 }
 
@@ -1104,8 +1100,8 @@ int krigingSPDE(Db* dbin,
                 const NamingConvention& namconv)
 {
   bool flagCholesky = _defineCholesky(useCholesky, model);
-  bool flagSimu = flag_std && ! flagCholesky;
-  if (dbin  == nullptr) return 1;
+  bool flagSimu     = flag_std && !flagCholesky;
+  if (dbin == nullptr) return 1;
   if (dbout == nullptr) return 1;
   if (model == nullptr) return 1;
 
@@ -1130,7 +1126,7 @@ int krigingSPDE(Db* dbin,
                             (projInS == nullptr) ? AInK : projInS);
     if (AInS == nullptr) return 1;
   }
-  const ProjMultiMatrix* AoutK  = _defineProjMulti(dbout, model, meshLocalK, nullptr, false);
+  const ProjMultiMatrix* AoutK = _defineProjMulti(dbout, model, meshLocalK, nullptr, false);
   bool flagAoutSConstruct      = (flagSimu) && (meshLocalK != meshLocalS);
   const ProjMultiMatrix* AoutS = flagAoutSConstruct ? _defineProjMulti(dbout, model, meshLocalS, nullptr) : AoutK;
 
@@ -1146,12 +1142,12 @@ int krigingSPDE(Db* dbin,
   PrecisionOpMultiMatrix* Qom = nullptr;
   if (flagCholesky)
   {
-    Qom = new PrecisionOpMultiMatrix(model, meshLocalK);
+    Qom    = new PrecisionOpMultiMatrix(model, meshLocalK);
     spdeop = new SPDEOpMatrix(Qom, AInK, invnoise, AoutK);
   }
   else
   {
-    Qop    = new PrecisionOpMulti(model, meshLocalK, params.getUseStencil());
+    Qop = new PrecisionOpMulti(model, meshLocalK, params.getUseStencil());
     if (!meshLocalS.empty())
       QopS = new PrecisionOpMulti(model, meshLocalS, params.getUseStencil());
     spdeop = new SPDEOp(Qop, AInK, invnoisep, QopS, AInS, AoutK, AoutS);
@@ -1181,7 +1177,7 @@ int krigingSPDE(Db* dbin,
   {
     int seedLocal = params.getSeedMC();
     int nMC       = params.getNMC();
-    result   = spdeop->stdev(Z, nMC, seedLocal);
+    result        = spdeop->stdev(Z, nMC, seedLocal);
     int iuid      = dbout->addColumns(result, "stdev", ELoc::UNKNOWN, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                                 "stdev");
@@ -1196,6 +1192,16 @@ int krigingSPDE(Db* dbin,
   delete AoutK;
   if (flagAoutSConstruct)
     delete AoutS;
+  if (meshesS.empty() && !meshLocalS.empty() && meshLocalK != meshLocalS)
+  {
+    for (int i = 0, n = meshLocalS.size(); i < n; i++)
+      delete meshLocalS[i];
+  }
+  if (meshesK.empty() && !meshLocalK.empty())
+  {
+    for (int i = 0, n = meshLocalK.size(); i < n; i++)
+      delete meshLocalK[i];
+  }
   if (projInS == nullptr && AInS != AInK)
   {
     delete AInS;
@@ -1255,7 +1261,7 @@ int simulateSPDE(Db* dbin,
                  const NamingConvention& namconv)
 {
   bool flagCholesky = _defineCholesky(useCholesky, model);
-  bool flagCond = (dbin != nullptr);
+  bool flagCond     = (dbin != nullptr);
   if (dbout == nullptr) return 1;
   if (model == nullptr) return 1;
 
@@ -1286,9 +1292,9 @@ int simulateSPDE(Db* dbin,
       invnoisep = new MatrixSymmetricSim(invnoise);
   }
   const ProjMultiMatrix* AoutK = _defineProjMulti(dbout, model, meshLocalK, nullptr);
-  bool flagAoutSConstruct = (! flagCholesky) && (meshLocalK != meshLocalS);
+  bool flagAoutSConstruct      = (!flagCholesky) && (meshLocalK != meshLocalS);
   const ProjMultiMatrix* AoutS = flagAoutSConstruct ? _defineProjMulti(dbout, model, meshLocalS, nullptr) : AoutK;
-  
+
   SPDEOp* spdeop              = nullptr;
   PrecisionOpMulti* Qop       = nullptr;
   PrecisionOpMulti* QopS      = nullptr;
@@ -1353,6 +1359,16 @@ int simulateSPDE(Db* dbin,
   delete AoutK;
   if (flagAoutSConstruct)
     delete AoutS;
+  if (meshesS.empty() && !meshLocalS.empty() && meshLocalK != meshLocalS)
+  {
+    for (int i = 0, n = meshLocalS.size(); i < n; i++)
+      delete meshLocalS[i];
+  }
+  if (meshesK.empty() && !meshLocalK.empty())
+  {
+    for (int i = 0, n = meshLocalK.size(); i < n; i++)
+      delete meshLocalK[i];
+  }
   if (projInS == nullptr && AInS != AInK)
   {
     delete AInS;
@@ -1443,9 +1459,9 @@ double logLikelihoodSPDE(Db* dbin,
   if (verbose)
   {
     message("Likelihood calculation:\n");
-    message("Nb. active samples = %d\n",  size);
-    message("Nb. Monte-Carlo    = %d\n",  nMC);
-    message("Cholesky           = %d\n",  flagCholesky);
+    message("Nb. active samples = %d\n", size);
+    message("Nb. Monte-Carlo    = %d\n", nMC);
+    message("Cholesky           = %d\n", flagCholesky);
     message("Log-Determinant    = %lf\n", logdet);
     message("Quadratic term     = %lf\n", quad);
     message("Log-likelihood     = %lf\n", loglike);
@@ -1651,7 +1667,7 @@ VectorMeshes defineMeshesFromDbs(const Db* dbin,
 
   int refine  = (flagKrige) ? params.getRefineK() : params.getRefineS();
   int ncovtot = model->getNCov(false);
-  int ncov = model->getNCov(true);
+  int ncov    = model->getNCov(true);
   VectorMeshes meshes(ncov);
 
   // Create as many meshes as they are structures (nugget excluded)

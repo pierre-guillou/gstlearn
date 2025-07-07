@@ -8,17 +8,15 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_io.h"
-
-#include "Basic/Utilities.hpp"
-#include "Basic/File.hpp"
-#include "Basic/String.hpp"
-#include "Basic/OptDbg.hpp"
 #include "Core/io.hpp"
-
-#include <string.h>
-#include <stdarg.h>
+#include "Basic/File.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Basic/String.hpp"
+#include "Basic/Utilities.hpp"
+#include "geoslib_io.h"
 #include <math.h>
+#include <stdarg.h>
+#include <string.h>
 
 /*! \cond */
 #define OLD 0
@@ -34,21 +32,21 @@ static char DEL_BLK = ' ';
 const char* DEL_SEP = " ";
 
 // TODO : No more char* and printf ! Use std::string and iostream
-static void st_print(const char *string);
+static void st_print(const char* string);
 static void st_read(const char* prompt, char* buffer);
 static void st_exit(void);
-static void (*WRITE_FUNC)(const char*) = (void (*)(const char*)) st_print;
-static void (*WARN_FUNC)(const char*) = (void (*)(const char*)) st_print;
+static void (*WRITE_FUNC)(const char*)       = (void (*)(const char*))st_print;
+static void (*WARN_FUNC)(const char*)        = (void (*)(const char*))st_print;
 static void (*READ_FUNC)(const char*, char*) = st_read;
-static void (*EXIT_FUNC)(void) = st_exit;
+static void (*EXIT_FUNC)(void)               = st_exit;
 
 static char LINE[LONG_SIZE], LINE_MEM[LONG_SIZE], *LCUR, *LINEB;
-static char *cur = NULL;
+static char* cur = NULL;
 
 // https://stackoverflow.com/a/26359433/3952924
 #ifdef _MSC_VER
-#define strncasecmp _strnicmp
-#define strcasecmp _stricmp
+#  define strncasecmp _strnicmp
+#  define strcasecmp  _stricmp
 #endif
 
 
@@ -70,7 +68,7 @@ static void st_exit(void)
  **  \param[in]  string Message to be printed
  **
  *****************************************************************************/
-static void st_print(const char *string)
+static void st_print(const char* string)
 {
   //(void) printf("%s",string); // Default printf statement
   std::cout << string << std::flush;
@@ -84,13 +82,13 @@ static void st_print(const char *string)
  ** \param[in]  buffer Array where the Input string is stored
  **
  *****************************************************************************/
-static void st_read(const char *prompt, char *buffer)
+static void st_read(const char* prompt, char* buffer)
 {
   message("%s :", prompt);
 
   while (fgets(LINE, LONG_SIZE, stdin) == NULL);
 
-  (void) gslStrcpy(buffer, LINE);
+  (void)gslStrcpy(buffer, LINE);
   buffer[strlen(buffer) - 1] = '\0';
 }
 
@@ -150,13 +148,13 @@ void redefine_exit(void (*exit_func)(void))
  ** \param[in]  flag_lead 1 to strip only the leading blanks
  **
  *****************************************************************************/
-void string_strip_blanks(char *string, int flag_lead)
+void string_strip_blanks(char* string, int flag_lead)
 
 {
   int i, ecr, length, flag_test;
 
   flag_test = 0;
-  length = static_cast<int>(strlen(string));
+  length    = static_cast<int>(strlen(string));
   for (i = ecr = 0; i < length; i++)
   {
     if (string[i] == ' ' && !flag_test) continue;
@@ -177,7 +175,7 @@ void string_strip_blanks(char *string, int flag_lead)
  ** \remarks character
  **
  *****************************************************************************/
-void string_strip_quotes(char *string)
+void string_strip_quotes(char* string)
 
 {
   int ecr, length;
@@ -211,7 +209,7 @@ void string_strip_quotes(char *string)
  ** \remark  In output, the buffer he input buffer
  **
  *****************************************************************************/
-char * strsep(char **stringp, const char* delim)
+char* strsep(char** stringp, const char* delim)
 {
   char* start = *stringp;
   char* p;
@@ -239,7 +237,7 @@ char * strsep(char **stringp, const char* delim)
  ** \param[in]  string   String to be displayed
  **
  ****************************************************************************/
-void message_extern(const char *string)
+void message_extern(const char* string)
 
 {
   WRITE_FUNC(string);
@@ -272,7 +270,7 @@ void mem_error(int nbyte)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Open an ASCII file
  **
  ** \return  FILE returned pointer
@@ -283,9 +281,9 @@ void mem_error(int nbyte)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-FILE* _file_open(const char *filename, int mode)
+FILE* _file_open(const char* filename, int mode)
 {
-  FILE *file;
+  FILE* file;
 
   /* Dispatch */
 
@@ -317,7 +315,7 @@ void _file_delimitors(char del_com, const char* del_sep, char del_blk)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Print the current line read from an ASCII file
  **
  *****************************************************************************/
@@ -327,7 +325,7 @@ void print_current_line(void)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Check if a string is composed of blanks only
  **
  ** \return  1 if it is only blanks
@@ -335,7 +333,7 @@ void print_current_line(void)
  ** \param[in]  string     String to be checked
  **
  *****************************************************************************/
-static int st_only_blanks(char *string)
+static int st_only_blanks(char* string)
 {
   int number;
 
@@ -348,7 +346,7 @@ static int st_only_blanks(char *string)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Read the next token from the file
  **
  ** \return  -1 if the end-of-file has been found
@@ -362,15 +360,15 @@ static int st_only_blanks(char *string)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _file_read(FILE *file, const char *format, va_list ap)
+int _file_read(FILE* file, const char* format, va_list ap)
 {
   int flag_com;
   unsigned int ideb, i;
-  const char *fmt;
-  int *ret_i;
-  float *ret_f;
-  double *ret_d;
-  char *ret_s;
+  const char* fmt;
+  int* ret_i;
+  float* ret_f;
+  double* ret_d;
+  char* ret_s;
 
   /* Loop on the elements to read (from the format) */
 
@@ -385,7 +383,8 @@ int _file_read(FILE *file, const char *format, va_list ap)
       continue;
     }
 
-    label_start: fmt = &format[ideb];
+  label_start:
+    fmt = &format[ideb];
     if (LCUR == NULL)
     {
 
@@ -393,7 +392,7 @@ int _file_read(FILE *file, const char *format, va_list ap)
 
       if (fgets(LINE, LONG_SIZE, file) == NULL) return (-1);
       LINE[strlen(LINE) - 1] = '\0';
-      (void) gslStrcpy(LINE_MEM, LINE);
+      (void)gslStrcpy(LINE_MEM, LINE);
       if (OptDbg::query(EDbg::INTERFACE)) message("Lecture ASCII = %s\n", LINE);
 
       /* Eliminate the comments */
@@ -404,7 +403,7 @@ int _file_read(FILE *file, const char *format, va_list ap)
         if (LINE[i] == DEL_COM)
         {
           flag_com = 1 - flag_com;
-          LINE[i] = '\0';
+          LINE[i]  = '\0';
         }
         else
         {
@@ -417,7 +416,7 @@ int _file_read(FILE *file, const char *format, va_list ap)
     /* Decode the line looking for the next token */
 
     LCUR = gslStrtok(cur, DEL_SEP);
-    cur = NULL;
+    cur  = NULL;
     if (LCUR == NULL) goto label_start;
     if (OptDbg::query(EDbg::INTERFACE)) message("String to be decoded = '%s'\n", LCUR);
 
@@ -438,7 +437,7 @@ int _file_read(FILE *file, const char *format, va_list ap)
       ret_i = va_arg(ap, int*);
       if (gslSScanf(LCUR, "%d", ret_i) <= 0) return (1);
       ideb += 2;
-      if (*ret_i == (int) ASCII_TEST) *ret_i = ITEST;
+      if (*ret_i == (int)ASCII_TEST) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
     }
     else if (!strcmp(fmt, "%f"))
@@ -446,7 +445,7 @@ int _file_read(FILE *file, const char *format, va_list ap)
       ret_f = va_arg(ap, float*);
       if (gslSScanf(LCUR, "%f", ret_f) <= 0) return (1);
       ideb += 2;
-      if (*ret_f == ASCII_TEST) *ret_f = (float) TEST;
+      if (*ret_f == ASCII_TEST) *ret_f = (float)TEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Float = %s\n", *ret_f);
     }
     else if (!strcmp(fmt, "%lf"))
@@ -476,7 +475,7 @@ int _file_read(FILE *file, const char *format, va_list ap)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Get the number of tokens in the line
  **
  ** \return   Number of tokens
@@ -486,7 +485,7 @@ int _file_read(FILE *file, const char *format, va_list ap)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _file_get_ncol(FILE *file)
+int _file_get_ncol(FILE* file)
 
 {
   int ncol, flag_com, i;
@@ -504,12 +503,12 @@ int _file_get_ncol(FILE *file)
   /* Eliminate the comments */
 
   flag_com = 0;
-  for (i = 0; i < (int) strlen(LINE); i++)
+  for (i = 0; i < (int)strlen(LINE); i++)
   {
     if (LINE[i] == DEL_COM)
     {
       flag_com = 1 - flag_com;
-      LINE[i] = '\0';
+      LINE[i]  = '\0';
     }
     else
     {
@@ -531,7 +530,7 @@ int _file_get_ncol(FILE *file)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Erase the current decoding string
  **
  ** This method is not documented on purpose. It should remain private
@@ -558,15 +557,15 @@ void _erase_current_string(void)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _buffer_read(char **buffer, const char *format, va_list ap)
+int _buffer_read(char** buffer, const char* format, va_list ap)
 {
   int flag_com;
   unsigned int ideb, i;
-  const char *fmt;
-  int *ret_i;
-  float *ret_f;
-  double *ret_d;
-  char *ret_s;
+  const char* fmt;
+  int* ret_i;
+  float* ret_f;
+  double* ret_d;
+  char* ret_s;
 
   /* Loop on the elements to read (from the format) */
 
@@ -583,7 +582,8 @@ int _buffer_read(char **buffer, const char *format, va_list ap)
 
     /* Loop on the buffer to be decode */
 
-    label_start: fmt = &format[ideb];
+  label_start:
+    fmt = &format[ideb];
     if (LCUR == NULL)
     {
 
@@ -591,7 +591,7 @@ int _buffer_read(char **buffer, const char *format, va_list ap)
 
       LINEB = strsep(buffer, "\n");
       if (LINEB == NULL) return (-1);
-      (void) gslStrcpy(LINE_MEM, LINEB);
+      (void)gslStrcpy(LINE_MEM, LINEB);
       if (OptDbg::query(EDbg::INTERFACE)) message("Lecture ASCII = %s\n", LINEB);
 
       /* Eliminate the comments */
@@ -615,7 +615,7 @@ int _buffer_read(char **buffer, const char *format, va_list ap)
     /* Decode the line looking for the next token */
 
     LCUR = gslStrtok(cur, DEL_SEP);
-    cur = NULL;
+    cur  = NULL;
     if (LCUR == NULL) goto label_start;
     if (OptDbg::query(EDbg::INTERFACE))
       message("String to be decoded = '%s'\n", LCUR);
@@ -634,7 +634,7 @@ int _buffer_read(char **buffer, const char *format, va_list ap)
       ret_i = va_arg(ap, int*);
       if (gslSScanf(LCUR, "%d", ret_i) <= 0) return (1);
       ideb += 2;
-      if (*ret_i == (int) ASCII_TEST) *ret_i = ITEST;
+      if (*ret_i == (int)ASCII_TEST) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
     }
     else if (!strcmp(fmt, "%f"))
@@ -642,7 +642,7 @@ int _buffer_read(char **buffer, const char *format, va_list ap)
       ret_f = va_arg(ap, float*);
       if (gslSScanf(LCUR, "%f", ret_f) <= 0) return (1);
       ideb += 2;
-      if (*ret_f == ASCII_TEST) *ret_f = (float) TEST;
+      if (*ret_f == ASCII_TEST) *ret_f = (float)TEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Float = %s\n", *ret_f);
     }
     else if (!strcmp(fmt, "%lf"))
@@ -672,7 +672,7 @@ int _buffer_read(char **buffer, const char *format, va_list ap)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Write the next token from the file
  **
  ** \param[in]  file       FILE structure
@@ -682,11 +682,11 @@ int _buffer_read(char **buffer, const char *format, va_list ap)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-void _file_write(FILE *file, const char *format, va_list ap)
+void _file_write(FILE* file, const char* format, va_list ap)
 {
   int ret_i, no_blank;
   double ret_d;
-  char *ret_s;
+  char* ret_s;
 
   /* Initializations */
 
@@ -757,7 +757,7 @@ void _file_write(FILE *file, const char *format, va_list ap)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Write the next token into the buffer
  **
  ** \param[in]  buffer     Writing buffer
@@ -767,11 +767,11 @@ void _file_write(FILE *file, const char *format, va_list ap)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-void _buffer_write(char *buffer, const char *format, va_list ap)
+void _buffer_write(char* buffer, const char* format, va_list ap)
 {
   int ret_i, no_blank;
   double ret_d;
-  char *ret_s;
+  char* ret_s;
 
   /* Initializations */
 
@@ -782,54 +782,54 @@ void _buffer_write(char *buffer, const char *format, va_list ap)
   if (!strcmp(format, "%s"))
   {
     ret_s = va_arg(ap, char*);
-    (void) gslSPrintf(buffer, "%s", ret_s);
+    (void)gslSPrintf(buffer, "%s", ret_s);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded String = %s\n", ret_s);
   }
   else if (!strcmp(format, "%d"))
   {
     ret_i = va_arg(ap, int);
     if (ret_i == TEST)
-      (void) gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void) gslSPrintf(buffer, "%d", ret_i);
+      (void)gslSPrintf(buffer, "%d", ret_i);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Integer = %i\n", ret_i);
   }
   else if (!strcmp(format, "%f"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void) gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void) gslSPrintf(buffer, "%f", ret_d);
+      (void)gslSPrintf(buffer, "%f", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Float = %s\n", ret_d);
   }
   else if (!strcmp(format, "%lf"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void) gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void) gslSPrintf(buffer, "%lf", ret_d);
+      (void)gslSPrintf(buffer, "%lf", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Double = %lf\n", ret_d);
   }
   else if (!strcmp(format, "%lg"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void) gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void) gslSPrintf(buffer, "%lg", ret_d);
+      (void)gslSPrintf(buffer, "%lg", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Double = %lg\n", ret_d);
   }
   else if (!strcmp(format, "\n"))
   {
-    (void) gslSPrintf(buffer, "\n");
+    (void)gslSPrintf(buffer, "\n");
     no_blank = 1;
   }
   else if (!strcmp(format, "#"))
   {
     ret_s = va_arg(ap, char*);
-    (void) gslSPrintf(buffer, "# %s\n", ret_s);
+    (void)gslSPrintf(buffer, "# %s\n", ret_s);
     no_blank = 1;
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Comment = %s\n", ret_s);
   }
@@ -838,12 +838,11 @@ void _buffer_write(char *buffer, const char *format, va_list ap)
     messerr("Wrong format %s", format);
     return;
   }
-  if (!no_blank) (void) gslStrcat(buffer, " ");
+  if (!no_blank) (void)gslStrcat(buffer, " ");
 }
 
-
 /****************************************************************************/
-/*! 
+/*!
  **  Read astring
  **
  ** \param[in]  question  Question to be asked
@@ -855,19 +854,19 @@ void _buffer_write(char *buffer, const char *format, va_list ap)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-void _lire_string(const char *question,
+void _lire_string(const char* question,
                   int flag_def,
-                  const char *valdef,
-                  char *answer)
+                  const char* valdef,
+                  char* answer)
 {
 
-  loop:
+loop:
 
   /* Compose the question */
 
-  (void) gslSPrintf(LINE, "%s ", question);
-  if (flag_def) (void) gslSPrintf(&LINE[strlen(LINE)], "(Def=%s) ", valdef);
-  (void) gslStrcat(LINE, ": ");
+  (void)gslSPrintf(LINE, "%s ", question);
+  if (flag_def) (void)gslSPrintf(&LINE[strlen(LINE)], "(Def=%s) ", valdef);
+  (void)gslStrcat(LINE, ": ");
 
   /* Read the answer */
 
@@ -879,7 +878,7 @@ void _lire_string(const char *question,
   {
     if (flag_def)
     {
-      (void) gslStrcpy(answer, valdef);
+      (void)gslStrcpy(answer, valdef);
     }
     else
     {
@@ -889,12 +888,12 @@ void _lire_string(const char *question,
   }
   else
   {
-    (void) gslStrcpy(answer, BUFFER);
+    (void)gslStrcpy(answer, BUFFER);
   }
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Read an integer value
  **
  ** \return  Integer value
@@ -908,7 +907,7 @@ void _lire_string(const char *question,
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _lire_int(const char *question,
+int _lire_int(const char* question,
               int flag_def,
               int valdef,
               int valmin,
@@ -916,26 +915,26 @@ int _lire_int(const char *question,
 {
   int rep;
 
-  loop:
+loop:
 
   /* Compose the question */
 
-  (void) gslSPrintf(LINE, "%s ", question);
+  (void)gslSPrintf(LINE, "%s ", question);
   if (!IFFFF(valmin) && !IFFFF(valmax) && valmin > valmax)
     valmin = valmax = ITEST;
   if (!IFFFF(valmin) && !IFFFF(valdef) && valdef < valmin) valdef = valmin;
   if (!IFFFF(valmax) && !IFFFF(valdef) && valdef > valmax) valdef = valmax;
   if (flag_def && !IFFFF(valdef))
-    (void) gslSPrintf(&LINE[strlen(LINE)], "(Def=%d) ", valdef);
+    (void)gslSPrintf(&LINE[strlen(LINE)], "(Def=%d) ", valdef);
   if (IFFFF(valmin))
-    (void) gslStrcat(LINE, "[NA,");
+    (void)gslStrcat(LINE, "[NA,");
   else
-    (void) gslSPrintf(&LINE[strlen(LINE)], "[%d,", valmin);
+    (void)gslSPrintf(&LINE[strlen(LINE)], "[%d,", valmin);
   if (IFFFF(valmax))
-    (void) gslStrcat(LINE, "NA] ");
+    (void)gslStrcat(LINE, "NA] ");
   else
-    (void) gslSPrintf(&LINE[strlen(LINE)], "%d] ", valmax);
-  (void) gslStrcat(LINE, ": ");
+    (void)gslSPrintf(&LINE[strlen(LINE)], "%d] ", valmax);
+  (void)gslStrcat(LINE, ": ");
 
   /* Read the answer */
 
@@ -991,7 +990,7 @@ int _lire_int(const char *question,
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-double _lire_double(const char *question,
+double _lire_double(const char* question,
                     int flag_def,
                     double valdef,
                     double valmin,
@@ -999,25 +998,25 @@ double _lire_double(const char *question,
 {
   double rep;
 
-  loop:
+loop:
 
   /* Compose the question */
 
-  (void) gslSPrintf(LINE, "%s ", question);
+  (void)gslSPrintf(LINE, "%s ", question);
   if (!FFFF(valmin) && !FFFF(valmax) && valmin > valmax) valmin = valmax = TEST;
   if (!FFFF(valmin) && !FFFF(valdef) && valdef < valmin) valdef = valmin;
   if (!FFFF(valmax) && !FFFF(valdef) && valdef > valmax) valdef = valmax;
   if (flag_def && !FFFF(valdef))
-    (void) gslSPrintf(&LINE[strlen(LINE)], "(Def=%lf) ", valdef);
+    (void)gslSPrintf(&LINE[strlen(LINE)], "(Def=%lf) ", valdef);
   if (FFFF(valmin))
-    (void) gslStrcat(LINE, "[NA,");
+    (void)gslStrcat(LINE, "[NA,");
   else
-    (void) gslSPrintf(&LINE[strlen(LINE)], "[%lf,", valmin);
+    (void)gslSPrintf(&LINE[strlen(LINE)], "[%lf,", valmin);
   if (FFFF(valmax))
-    (void) gslStrcat(LINE, "NA] ");
+    (void)gslStrcat(LINE, "NA] ");
   else
-    (void) gslSPrintf(&LINE[strlen(LINE)], "%lf] ", valmax);
-  (void) gslStrcat(LINE, ": ");
+    (void)gslSPrintf(&LINE[strlen(LINE)], "%lf] ", valmax);
+  (void)gslStrcat(LINE, ": ");
 
   /* Read the answer */
 
@@ -1071,21 +1070,21 @@ double _lire_double(const char *question,
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _lire_logical(const char *question, int flag_def, int valdef)
+int _lire_logical(const char* question, int flag_def, int valdef)
 {
-  loop:
+loop:
 
   /* Compose the question */
 
-  (void) gslSPrintf(LINE, "%s ", question);
+  (void)gslSPrintf(LINE, "%s ", question);
   if (flag_def && !IFFFF(valdef))
   {
     if (valdef == 0)
-      (void) gslStrcat(LINE, "(Def=n)");
+      (void)gslStrcat(LINE, "(Def=n)");
     else
-      (void) gslStrcat(LINE, "(Def=y)");
+      (void)gslStrcat(LINE, "(Def=y)");
   }
-  (void) gslStrcat(LINE, " [y,n] : ");
+  (void)gslStrcat(LINE, " [y,n] : ");
 
   /* Read the answer */
 
@@ -1115,7 +1114,7 @@ int _lire_logical(const char *question, int flag_def, int valdef)
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Read the next record
  **
  ** This method is not documented on purpose. It should remain private
@@ -1123,14 +1122,14 @@ int _lire_logical(const char *question, int flag_def, int valdef)
  *****************************************************************************/
 void record_close(void)
 {
-  cur = NULL;
-  LCUR = NULL;
-  LINE[0] = '\0';
+  cur         = NULL;
+  LCUR        = NULL;
+  LINE[0]     = '\0';
   LINE_MEM[0] = '\0';
 }
 
 /****************************************************************************/
-/*! 
+/*!
  **  Read the next record
  **
  ** \return Error return code
@@ -1142,7 +1141,7 @@ void record_close(void)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _record_read(FILE *file, const char *format, ...)
+int _record_read(FILE* file, const char* format, ...)
 {
   va_list ap;
   int error;

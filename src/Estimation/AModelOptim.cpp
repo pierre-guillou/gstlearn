@@ -8,9 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-
 #include "Estimation/AModelOptim.hpp"
-
 #include "Basic/OptCustom.hpp"
 #include "Basic/Optim.hpp"
 #include "Basic/VectorHelper.hpp"

@@ -9,14 +9,13 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Estimation/ALikelihood.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Basic/Iterators.hpp"
 #include "Db/Db.hpp"
+#include "LinearOp/CholeskyDense.hpp"
+#include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Model/ModelGeneric.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Matrix/MatrixFactory.hpp"
-#include "LinearOp/CholeskyDense.hpp"
-#include "Space/SpacePoint.hpp"
 
 namespace gstlrn
 {

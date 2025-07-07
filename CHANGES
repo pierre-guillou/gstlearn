@@ -10,6 +10,7 @@ Release 1.8.0
 - ACov does not inherit from ASpaceObject anymore (and it becomes AStringable)
 - Add constants MINIMUM_BIG (-1.e30) and MAXIMUM_BIG (1.e30)
 - Class Pile has been suppressed as not used anymore.
+- Classes CGParams et SPDEParams are made Stringable.
 
 Release 1.7.4
 =============

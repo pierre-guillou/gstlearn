@@ -13,10 +13,10 @@
 
 namespace gstlrn{
 ALinearOp::ALinearOp()
-: _usefactor(false)
-, _idfactor(0.)
-, _factor(1.)
-, _temp()
+  : _usefactor(false)
+  , _idfactor(0.)
+  , _factor(1.)
+  , _temp()
 {
 }
 
@@ -43,7 +43,7 @@ ALinearOp::ALinearOp()
 VectorDouble ALinearOp::evalDirect(const VectorDouble& in) const
 {
   VectorDouble res;
-  evalDirect(in,res);
+  evalDirect(in, res);
   return res;
 }
 
@@ -57,12 +57,12 @@ int ALinearOp::addToDest(const ::Eigen::VectorXd& inv,
 
 int ALinearOp::addToDest(const constvect inv, vect outv) const
 {
-  
+
   if (!_usefactor)
     return _addToDest(inv, outv);
-  
+
   _temp.resize(outv.size());
-  vect ctemp(_temp.data(),_temp.size());
+  vect ctemp(_temp.data(), _temp.size());
   std::fill(ctemp.begin(), ctemp.end(), 0.);
   int err = _addToDest(inv, ctemp);
   for (int i = 0; i < (int)outv.size(); i++)
@@ -77,24 +77,24 @@ int ALinearOp::evalDirect(constvect inv, vect outv) const
 }
 
 int ALinearOp::evalDirect(const VectorDouble& inv, VectorDouble& outv) const
-{ 
+{
   outv.resize(inv.size());
   constvect in(inv);
   vect out(outv);
-  return evalDirect(in,out);
+  return evalDirect(in, out);
 }
 
-void ALinearOp::multiplyByValueAndAddDiagonal(double v1,double v2)
+void ALinearOp::multiplyByValueAndAddDiagonal(double v1, double v2)
 {
   _usefactor = true;
-  _idfactor = v2;
-  _factor = v1;
+  _idfactor  = v2;
+  _factor    = v1;
 }
 
 void ALinearOp::resetModif()
 {
   _usefactor = false;
-  _idfactor = 0.;
-  _factor = 1.;
+  _idfactor  = 0.;
+  _factor    = 1.;
 }
 }

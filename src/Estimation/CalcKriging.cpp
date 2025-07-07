@@ -8,19 +8,18 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/DbGrid.hpp"
-#include "Db/Db.hpp"
 #include "Estimation/CalcKriging.hpp"
+#include "Basic/OptCustom.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "Enum/EKrigOpt.hpp"
 #include "Estimation/CalcKrigingSimpleCase.hpp"
 #include "Estimation/KrigOpt.hpp"
 #include "Estimation/KrigingSystem.hpp"
-#include "Basic/OptDbg.hpp"
-#include "Basic/OptCustom.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/NeighBench.hpp"
 #include "Neigh/NeighUnique.hpp"
-
 #include <math.h>
 
 namespace gstlrn
@@ -59,12 +58,12 @@ CalcKriging::~CalcKriging()
 
 bool CalcKriging::_check()
 {
-  if (! ACalcInterpolator::_check()) return false;
+  if (!ACalcInterpolator::_check()) return false;
 
-  if (! hasDbin()) return false;
-  if (! hasDbout()) return false;
-  if (! hasModel()) return false;
-  if (! hasNeigh()) return false;
+  if (!hasDbin()) return false;
+  if (!hasDbout()) return false;
+  if (!hasModel()) return false;
+  if (!hasNeigh()) return false;
   if (getNeigh()->getType() == ENeigh::IMAGE)
   {
     messerr("This tool cannot function with an IMAGE neighborhood");
@@ -174,7 +173,7 @@ bool CalcKriging::_postprocess()
   }
   else
   {
-    if (! getKrigopt().hasMatLC())
+    if (!getKrigopt().hasMatLC())
     {
       _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrVarZ, "varz", 1);
       _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrStd, "stdev", 1);
@@ -310,11 +309,11 @@ int kriging(Db* dbin,
             const NamingConvention& namconv)
 {
   NeighBench* neighBench = dynamic_cast<NeighBench*>(neigh);
-  if (krigopt.getCalcul() == EKrigOpt::POINT && 
+  if (krigopt.getCalcul() == EKrigOpt::POINT &&
       !krigopt.hasColcok() &&
-      !krigopt.hasMatLC() && 
+      !krigopt.hasMatLC() &&
       neighBench == nullptr &&
-      model->getNVar() == 1 && 
+      model->getNVar() == 1 &&
       OptCustom::query("NotOptimSimpleCase", 0) == 0)
   {
     OptCustom::define("Optim", 1);

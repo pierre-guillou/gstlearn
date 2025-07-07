@@ -12,6 +12,7 @@
 
 #include "gstlearn_export.hpp"
 
+#include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
 
@@ -19,13 +20,16 @@ namespace gstlrn
 {
 class ALinearOp;
 
-class GSTLEARN_EXPORT CGParam {
-
+class GSTLEARN_EXPORT CGParam: public AStringable
+{
 public:
   CGParam(int nitermax = 1000, double eps = EPSILON8);
-  CGParam(const CGParam &m);
-  CGParam& operator=(const CGParam &m);
+  CGParam(const CGParam& m);
+  CGParam& operator=(const CGParam& m);
   virtual ~CGParam();
+
+  /// AStringable Interface
+  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void setEps(double eps) { _eps = eps; }
   void setNIterMax(int nIterMax) { _nIterMax = nIterMax; }
@@ -35,16 +39,16 @@ public:
 
   double getEps() const { return _eps; }
   int getNIterMax() const { return _nIterMax; }
+  int getPrecondStatus() const { return _precondStatus; }
+  double getX0(int i) const { return _x0[i]; }
   const ALinearOp* getPrecond() const { return _precond; }
   const VectorDouble& getX0() const { return _x0; }
-  double getX0(int i) const { return _x0[i]; }
-  int getPrecondStatus() const { return _precondStatus; }
 
 private:
-  int              _nIterMax;
-  double           _eps;
-  VectorDouble     _x0;
-  int              _precondStatus;
+  int _nIterMax;
+  double _eps;
+  VectorDouble _x0;
+  int _precondStatus;
   const ALinearOp* _precond; // External Pointer
 };
 }

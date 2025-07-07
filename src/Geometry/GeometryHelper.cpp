@@ -9,16 +9,14 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Geometry/GeometryHelper.hpp"
-
-#include "Basic/VectorNumT.hpp"
-#include "Enum/ERotation.hpp"
+#include "Basic/Law.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Basic/Law.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Enum/ERotation.hpp"
+#include "Matrix/MatrixSquare.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpaceSN.hpp"
-#include "Matrix/MatrixSquare.hpp"
-
 #include <math.h>
 
 namespace gstlrn
@@ -219,7 +217,7 @@ void GeometryHelper::rotationMatrixInPlace(int ndim,
 
 void GeometryHelper::rotationMatrixDerivativesInPlace(int ndim,
                                                       const VectorDouble& angles,
-                                                      std::vector<MatrixSquare>& dR) 
+                                                      std::vector<MatrixSquare>& dR)
 {
 
   if (ndim == 2)
@@ -248,11 +246,10 @@ void GeometryHelper::rotation2DMatrixDerivativesInPlace(double angle, MatrixSqua
 
   GH::rotationGetSinCos(angle, &ca, &sa);
 
-
   /* Define the 2-D rotation matrix */
 
   dR.setValue(0, 0, -sa);
-  dR.setValue(1, 0,  ca);
+  dR.setValue(1, 0, ca);
   dR.setValue(0, 1, -ca);
   dR.setValue(1, 1, -sa);
 }
@@ -268,23 +265,22 @@ void GeometryHelper::rotation3DMatrixDerivativesInPlace(const VectorDouble& angl
   GH::rotationGetSinCos(angles[1], &ca[1], &sa[1]);
   GH::rotationGetSinCos(angles[2], &ca[2], &sa[2]);
 
-
   /* Define the 3-D rotation matrix */
 
-  dR[0].setValue(0, 0, - sa[0] * ca[1]);
+  dR[0].setValue(0, 0, -sa[0] * ca[1]);
   dR[0].setValue(0, 1, -(ca[0] * ca[2]) - (sa[0] * sa[1] * sa[2]));
-  dR[0].setValue(0, 2,  (ca[0] * sa[2]) - (sa[0] * sa[1] * ca[2]));
-  dR[0].setValue(1, 0,   ca[0] * ca[1]);
+  dR[0].setValue(0, 2, (ca[0] * sa[2]) - (sa[0] * sa[1] * ca[2]));
+  dR[0].setValue(1, 0, ca[0] * ca[1]);
   dR[0].setValue(1, 1, -(sa[0] * ca[2]) + (ca[0] * sa[1] * sa[2]));
-  dR[0].setValue(1, 2,  (sa[0] * sa[2]) + (ca[0] * sa[1] * ca[2]));
+  dR[0].setValue(1, 2, (sa[0] * sa[2]) + (ca[0] * sa[1] * ca[2]));
   dR[0].setValue(2, 0, 0.);
   dR[0].setValue(2, 1, 0.);
   dR[0].setValue(2, 2, 0.);
 
-  dR[1].setValue(0, 0, - ca[0] * sa[1]);
+  dR[1].setValue(0, 0, -ca[0] * sa[1]);
   dR[1].setValue(0, 1, ca[0] * ca[1] * sa[2]);
-  dR[1].setValue(0, 2, ca[0] *  ca[1] * ca[2]);
-  dR[1].setValue(1, 0, - sa[0] * sa[1]);
+  dR[1].setValue(0, 2, ca[0] * ca[1] * ca[2]);
+  dR[1].setValue(1, 0, -sa[0] * sa[1]);
   dR[1].setValue(1, 1, sa[0] * ca[1] * sa[2]);
   dR[1].setValue(1, 2, sa[0] * ca[1] * ca[2]);
   dR[1].setValue(2, 0, -ca[1]);
@@ -292,16 +288,14 @@ void GeometryHelper::rotation3DMatrixDerivativesInPlace(const VectorDouble& angl
   dR[1].setValue(2, 2, -sa[1] * ca[2]);
 
   dR[2].setValue(0, 0, 0.);
-  dR[2].setValue(0, 1,  (sa[0] * sa[2]) + (ca[0] * sa[1] * ca[2]));
-  dR[2].setValue(0, 2,  (sa[0] * ca[2]) - (ca[0] * sa[1] * sa[2]));
+  dR[2].setValue(0, 1, (sa[0] * sa[2]) + (ca[0] * sa[1] * ca[2]));
+  dR[2].setValue(0, 2, (sa[0] * ca[2]) - (ca[0] * sa[1] * sa[2]));
   dR[2].setValue(1, 0, 0.);
   dR[2].setValue(1, 1, -(ca[0] * sa[2]) + (sa[0] * sa[1] * ca[2]));
   dR[2].setValue(1, 2, -(ca[0] * ca[2]) - (sa[0] * sa[1] * sa[2]));
   dR[2].setValue(2, 0, 0.);
-  dR[2].setValue(2, 1,  ca[1] * ca[2]);
+  dR[2].setValue(2, 1, ca[1] * ca[2]);
   dR[2].setValue(2, 2, -ca[1] * sa[2]);
- 
-
 }
 
 /*****************************************************************************/

@@ -10,16 +10,16 @@
 /******************************************************************************/
 #include "Estimation/Vecchia.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Estimation/ALikelihood.hpp"
-#include "LinearOp/CholeskySparse.hpp"
-#include "Tree/Ball.hpp"
 #include "Db/Db.hpp"
+#include "Estimation/ALikelihood.hpp"
 #include "LinearOp/CholeskyDense.hpp"
+#include "LinearOp/CholeskySparse.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Matrix/MatrixT.hpp"
 #include "Model/ModelGeneric.hpp"
 #include "Stats/Classical.hpp"
+#include "Tree/Ball.hpp"
 #include "geoslib_define.h"
 
 namespace gstlrn
@@ -380,6 +380,7 @@ Vecchia* Vecchia::createForOptim(ModelGeneric* model,
                                  int nb_neigh,
                                  bool reml)
 {
+
   auto* vec            = new Vecchia(model, nb_neigh, db, nullptr, reml);
   MatrixSymmetric vars = dbVarianceMatrix(db);
   double hmax          = db->getExtensionDiagonal();
