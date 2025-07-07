@@ -148,20 +148,22 @@ jobs:
       with:
         name: windows-python-package-${{matrix.arch.ar}}-${{matrix.python.py}}
 
-    - name: Setup Python Version
-      uses: actions/setup-python@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
       with:
-        python-version: ${{matrix.python.py}}
+        python-version: ${{ matrix.python.py }}
 
     - name: Install Python package
-      run: pip install "$(ls *.whl)[conv]"
+      run: |
+        uv venv
+        uv pip install "$(ls *.whl)[conv]"
 
     - name: Test installed Python package
       run: |
-        python -c "import gstlearn as gl; gl.acknowledge_gstlearn()"
-        python tests/py/test_Arguments.py
-        python tests/py/test_Assessors.py
-        python tests/py/test_Matrix.py
+        uv run python -c 'import gstlearn as gl; gl.acknowledge_gstlearn()'
+        uv run python tests/py/test_Arguments.py
+        uv run python tests/py/test_Assessors.py
+        uv run python tests/py/test_Matrix.py
 
   publish:
     needs: test
