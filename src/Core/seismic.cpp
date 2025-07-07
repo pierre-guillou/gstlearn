@@ -1766,25 +1766,25 @@ static void st_seismic_contrast(int nz, double* tab)
  ** \param[in]  db            Db structure
  ** \param[in]  flag_operate  1 to perform the convolution; 0 otherwise
  ** \param[in]  flag_contrast 1 to perform contrast; 0 otherwise
- ** \param[in]  type          Type of the wavelet (ENUM_WAVELETS)
- ** \param[in]  ntw           half-length of the wavelet excluding center (samples)
- ** \param[in]  option        option used to perform the convolution
- ** \li                       -1 : erode the edge (on ntw pixels)
- ** \li                        0 : truncate the wavelet on the edge
- ** \li                       +1 : extend the trace with padding before convolution
- ** \li                       +2 : extend the trace with the last informed values
- ** \param[in]  tindex        time index to locate the spike (Spike)
- ** \param[in]  fpeak         peak frequency of the Ricker wavelet
- ** \param[in]  period        wavelet period (s) (Ricker)
- ** \param[in]  amplitude     wavelet amplitude (Ricker)
- ** \param[in]  distort       wavelet distortion factor (Ricker)
- ** \param[in]  val_before    Replacement value for undefined element
- **                           before first defined sample
- ** \param[in]  val_middle    Replacement value for undefined element
- **                           between defined samples
- ** \param[in]  val_after     Replacement value for undefined element
- **                           after last defined sample
- ** \param[in]  wavelet       Wavelet defined as input (Dimension: 2*ntw+1)
+ ** \param[in]  type        Type of the wavelet (ENUM_WAVELETS)
+ ** \param[in]  ntw         half-length of the wavelet excluding center (samples)
+ ** \param[in]  option      option used to perform the convolution
+ ** \li                     -1 : erode the edge (on ntw pixels)
+ ** \li                      0 : truncate the wavelet on the edge
+ ** \li                     +1 : extend the trace with padding before convolution
+ ** \li                     +2 : extend the trace with the last informed values
+ ** \param[in]  tindex      time index to locate the spike (Spike)
+ ** \param[in]  fpeak       peak frequency of the Ricker wavelet
+ ** \param[in]  period      wavelet period (s) (Ricker)
+ ** \param[in]  amplitude   wavelet amplitude (Ricker)
+ ** \param[in]  distort     wavelet distortion factor (Ricker)
+ ** \param[in]  val_before  Replacement value for undefined element
+ **                         before first defined sample
+ ** \param[in]  val_middle  Replacement value for undefined element
+ **                         between defined samples
+ ** \param[in]  val_after   Replacement value for undefined element
+ **                         after last defined sample
+ ** \param[in]  wavelet     Wavelet defined as input (Dimension: 2*ntw+1)
  **
  *****************************************************************************/
 int seismic_convolve(DbGrid* db,

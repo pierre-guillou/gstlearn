@@ -1786,8 +1786,8 @@ label_end:
  ** \param[in]  nmini       Minimum number of nodes before drawing
  **
  ** \param[out] nech_ret    Number of selected samples
- ** \param[out] coor_ret    Array of coordinates
- ** \param[out] data_ret    Array of variables
+ ** \param[out] coor        Array of coordinates
+ ** \param[out] data        Array of variables
  **
  ** \remarks The returned arrays 'coor' and 'data' must be freed by
  ** \remarks the calling function
