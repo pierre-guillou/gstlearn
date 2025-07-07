@@ -10,6 +10,7 @@
 /******************************************************************************/
 #include "Estimation/ALikelihood.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/Iterators.hpp"
 #include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixFactory.hpp"
@@ -17,9 +18,11 @@
 #include "Model/ModelGeneric.hpp"
 
 ALikelihood::ALikelihood(ModelGeneric* model,
-                         const Db* db)
+                         const Db* db,
+                         bool reml)
   : AModelOptim(model)
   , _db(db)
+  , _reml(reml)
 {
 }
 
@@ -30,7 +33,10 @@ ALikelihood::ALikelihood(const ALikelihood& r)
   , _X(r._X)
   , _beta(r._beta)
   , _Cm1X(r._Cm1X)
-  , _Cm1Y(r._Cm1Y) {};
+  , _Cm1Y(r._Cm1Y) 
+  , _XtCm1X(r._XtCm1X) 
+  , _reml(r._reml)
+  {};
 
 ALikelihood& ALikelihood::operator=(const ALikelihood& r)
 {
@@ -43,6 +49,8 @@ ALikelihood& ALikelihood::operator=(const ALikelihood& r)
     _beta = r._beta;
     _Cm1X = r._Cm1X;
     _Cm1Y = r._Cm1Y;
+    _XtCm1X = r._XtCm1X;
+    _reml = r._reml;
   }
   return *this;
 }
@@ -100,16 +108,16 @@ double ALikelihood::computeLogLikelihood(bool verbose)
     _computeCm1X();
 
     // Calculate XtCm1X = Xt * Cm1 * X
-    MatrixSymmetric* XtCm1X =
-      MatrixFactory::prodMatMat<MatrixSymmetric>(&_X, &_Cm1X, true, false);
+    _XtCm1X.resize(_X.getNCols(), _X.getNCols());
+    _XtCm1X.prodMatMatInPlaceOptim(&_X, &_Cm1X, true, false);
+   
 
     // Construct ZtCm1X = Zt * Cm1 * X and perform its Cholesky decomposition
     VectorDouble ZtCm1X = _Cm1X.prodVecMat(_Y);
-    CholeskyDense XtCm1XChol(XtCm1X);
+    CholeskyDense XtCm1XChol(&_XtCm1X);
     if (!XtCm1XChol.isReady())
     {
       messerr("Cholesky decomposition of XtCm1X matrix failed");
-      delete XtCm1X;
       return TEST;
     }
 
@@ -117,11 +125,10 @@ double ALikelihood::computeLogLikelihood(bool verbose)
     if (XtCm1XChol.solve(ZtCm1X, _beta))
     {
       messerr("Error when calculating Likelihood");
-      delete XtCm1X;
       return TEST;
     }
     // model->setBetaHat(beta);
-    delete XtCm1X;
+
 
     if (verbose)
     {
@@ -145,6 +152,11 @@ double ALikelihood::computeLogLikelihood(bool verbose)
   // Derive the log-likelihood
   int size       = (int)_Y.size();
   double loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
+  if (_reml && _model->getNDriftEquation() > 0)
+  {
+    CholeskyDense XtCm1XChol(&_XtCm1X);
+     loglike -= 0.5 * XtCm1XChol.computeLogDeterminant();
+  }
 
   // Optional printout
   if (verbose)

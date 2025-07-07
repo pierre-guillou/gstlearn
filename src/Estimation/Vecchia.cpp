@@ -25,8 +25,9 @@
 Vecchia::Vecchia(ModelGeneric* model,
                  int nb_neigh,
                  const Db* db1,
-                 const Db* db2)
-  : ALikelihood(model, db1)
+                 const Db* db2,
+                 bool reml)
+  : ALikelihood(model, db1, reml)
   , _nbNeigh(nb_neigh)
   , _db1(db1)
   , _db2(db2)
@@ -374,9 +375,11 @@ double logLikelihoodVecchia(const Db* db,
 
 Vecchia* Vecchia::createForOptim(ModelGeneric* model,
                                  const Db* db,
-                                 int nb_neigh)
+                                 int nb_neigh,
+                                 bool reml)
 {
-  auto* vec            = new Vecchia(model, nb_neigh, db, nullptr);
+
+  auto* vec            = new Vecchia(model, nb_neigh, db, nullptr, reml);
   MatrixSymmetric vars = dbVarianceMatrix(db);
   double hmax          = db->getExtensionDiagonal();
   vec->setEnvironment(vars, hmax);

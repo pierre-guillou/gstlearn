@@ -366,7 +366,6 @@ static int _modifyModelForMop(const ModelOptimParam& mop,
       coraniso->setOptimNoAniso(true);
     }
   }
-
   return 0;
 }
 
@@ -376,7 +375,8 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
                                         const DbGrid* dbmap,
                                         Constraints* constraints,
                                         const ModelOptimParam& mop,
-                                        int nb_neighVecchia)
+                                        int nb_neighVecchia,
+                                        bool reml)
 {
   ModelOptimParam mopLocal = mop;
 
@@ -384,8 +384,8 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
   if (db != nullptr)
   {
     if ((int)model->getNDim() != db->getNDim()) return nullptr;
-    if (nb_neighVecchia != ITEST) return Vecchia::createForOptim(model, db, nb_neighVecchia);
-    return Likelihood::createForOptim(model, db);
+    if (nb_neighVecchia != ITEST) return Vecchia::createForOptim(model, db, nb_neighVecchia, reml);
+    return Likelihood::createForOptim(model, db, reml);
   }
 
   // Fitting from a Variogram Map

@@ -10,10 +10,10 @@
 /******************************************************************************/
 #pragma once
 #include "Covariances/ACovFunc.hpp"
-
+#ifndef SWIG
 #include <boost/math/differentiation/autodiff.hpp>
+#endif
 
-using namespace boost::math::differentiation;
 
 
 // Classe intermédiaire générique utilisant Boost.Autodiff
@@ -36,7 +36,7 @@ public:
 
     double _evaluateCovDerivative(double h) const override {
         // Création variable autodiff pour 1re dérivée
-        autodiff_fvar<double, 1> x =  make_fvar<double, 1>(h);
+        boost::math::differentiation::autodiff_fvar<double, 1> x =  boost::math::differentiation::make_fvar<double, 1>(h);
 
         // Appel version générique (autodiff)
         auto y = evalGeneric(x);

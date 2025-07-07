@@ -11,7 +11,7 @@
 
 #include "Covariances/CovBase.hpp"
 #include "Basic/ListParams.hpp"
-#include "Basic/LowerTriangularRange.hpp"
+#include "Basic/Iterators.hpp"
 #include "Basic/ParamInfo.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
@@ -38,7 +38,7 @@ CovBase::CovBase(ACov* cor,
                  const MatrixSymmetric& sill)
   : ACov(cor == nullptr ? CovContext() : cor->getContext())
   , _cholSillsInfo(MatrixT<ParamInfo>(sill.getNRows(), sill.getNCols(), createParamInfoForCholSill()))
-  , _cholSills(MatrixDense(sill.getNRows(), sill.getNCols()))
+  , _cholSills(MatrixSymmetric(sill.getNRows()))
   , _sillCur(sill)
   , _cor(std::dynamic_pointer_cast<ACov>(cor==nullptr? nullptr :cor->cloneShared()))
   , _itRange(sill.getNRows())
@@ -544,6 +544,27 @@ void CovBase::_multiplyCorDerivativesBySills(int oldSize, std::vector<covmaptype
     };
   }
 }
+
+static double softplus(double x)
+{
+  // Softplus function to ensure positive values
+  return std::log1p(std::exp(x));
+  // stable version of softplus:  log(1 + exp(x))
+
+}
+
+static double softplusinv(double x)
+{
+  // Inverse of the softplus function
+  if (x <= 0) return -std::numeric_limits<double>::infinity();
+  return x + std::log1p(- std::exp(-x));
+  // stable version of softplus inverse: log(exp(x) - 1)
+}
+static double softplusDerivative(double x)
+{
+  // Derivative of the softplus function
+  return 1. / (1.0 + exp(-x));
+}
 void CovBase::appendParams(ListParams& listParams,
                            std::vector<covmaptype>* gradFuncs)
 {
@@ -565,6 +586,11 @@ void CovBase::appendParams(ListParams& listParams,
         for (int i = jvard; i < this->getNVar(); i++)
         {
           double val = this->_cholSillsInfo.getValue(i, jvard).getValue();
+          if (i == (int)jvard)
+          {
+            double grad_softplus = softplusDerivative(val);
+            val = grad_softplus * softplus(val); // Apply softplus to ensure positive values
+          }
           if (i == (int)ivard)
           {
             val *= 2; // Derivative of the diagonal element is 2
@@ -572,7 +598,6 @@ void CovBase::appendParams(ListParams& listParams,
           dSillDChol.setValue(i, ivard, val);
           dSillDChol.setValue(ivard, i, val);
         }
-
         double cor = this->_eval(p1, p2, ivar, jvar, mode);
         return dSillDChol.getValue(ivar, jvar) * cor;
       });
@@ -585,6 +610,8 @@ void CovBase::initParams(const MatrixSymmetric& vars, double href)
   for (const auto& [ivar, jvar]: _itRange)
   {
     double value = chol.getLowerTriangle(ivar, jvar);
+    if (ivar == jvar)
+       value = softplusinv(abs(value)); 
     _cholSillsInfo(ivar, jvar).setValue(value);
   }
 
@@ -599,7 +626,11 @@ void CovBase::updateCov()
   {
     if (_cholSillsInfo(ivar, jvar).isFixed()) continue;
     nvaroptim++;
-    _cholSills.setValue(ivar, jvar, _cholSillsInfo(ivar, jvar).getValue());
+    double val =  _cholSillsInfo(ivar, jvar).getValue();
+    if (ivar == jvar)
+       val = softplus(val); // Apply softplus to ensure positive values
+    
+    _cholSills.setValue(ivar, jvar, val);
   }
 
   if (nvaroptim > 0)

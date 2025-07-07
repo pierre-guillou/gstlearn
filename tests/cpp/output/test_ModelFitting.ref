@@ -81,6 +81,7 @@ Known Mean(s)     0.000
 
 Sill Fitting from Variogram Map (new version)
 =============================================
+Warning, optimization return code is -1
 
 Model characteristics
 =====================
@@ -93,14 +94,14 @@ Number of drift equation(s)  = 0
 Covariance Part
 ---------------
 Nugget Effect
-- Sill         =      1.970
+- Sill         =      1.967
 Spherical
-- Sill         =      2.756
+- Sill         =      2.760
 - Ranges       =      0.222     0.258
-- Angles       =      7.592     0.000
+- Angles       =      0.001     0.000
 - Rotation Matrix
                [,  0]    [,  1]
-     [  0,]     0.991    -0.132
-     [  1,]     0.132     0.991
+     [  0,]     1.000     0.000
+     [  1,]     0.000     1.000
 Total Sill     =      4.727
 Known Mean(s)     0.000

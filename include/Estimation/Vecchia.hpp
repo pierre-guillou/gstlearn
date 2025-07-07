@@ -31,7 +31,8 @@ public:
   Vecchia(ModelGeneric* model,
           int nb_neigh,
           const Db* db1,
-          const Db* db2 = nullptr);
+          const Db* db2 = nullptr,
+          bool reml = false);
   Vecchia(const Vecchia& r);           
   Vecchia& operator=(const Vecchia& r);
   virtual ~Vecchia();
@@ -39,7 +40,8 @@ public:
 public:
   static Vecchia* createForOptim(ModelGeneric* model,
                                  const Db* db1,
-                                 int nb_neigh = 30);
+                                 int nb_neigh = 30,
+                                 bool reml = false);
 
   int computeLower(const MatrixT<int>& Ranks, bool verbose = false);
   const MatrixSparse& getLFull() const { return _LFull; }

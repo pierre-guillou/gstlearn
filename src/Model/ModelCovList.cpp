@@ -43,15 +43,10 @@ ModelCovList::~ModelCovList()
 
 }
 
-void ModelCovList::addCov(const CovBase* cov)
+void ModelCovList::addCov(const CovBase& cov)
 {
-  if (cov == nullptr)
-  {
-    messerr("Error: Covariance is nullptr");
-    return;
-  }
 
-  if (!cov->getContext().isEqual(_ctxt))
+  if (!cov.getContext().isEqual(_ctxt))
   {
     messerr("Error: Covariance should share the same Context as 'Model'");
     messerr("Operation is cancelled");

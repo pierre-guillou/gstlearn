@@ -400,7 +400,7 @@ void Model::addCovFromParamOldStyle(const ECov& type,
 
   if (! angles.empty())
     cov.setAnisoAngles(angles);
-  addCov(&cov);
+  addCov(cov);
 }
 
 void Model::addCovFromParam(const ECov& type,
@@ -497,7 +497,7 @@ void Model::addCovFromParam(const ECov& type,
   _ctxt.setNVar(cov.getNVar());
   _copyCovContext();
   if (!angles.empty()) cov.setAnisoAngles(angles);
-  addCovAniso(&cov);
+  addCovAniso(cov);
 }
 
 double Model::evalCovFromIncr(const VectorDouble &incr,
@@ -649,7 +649,7 @@ int Model::fitFromCovIndices(Vario *vario,
   for (int is = 0; is < (int) types.size(); is++)
   {
     CovAniso cov = CovAniso(types[is], _ctxt);
-    addCov(&cov);
+    addCov(cov);
   }
 
   return model_auto_fit(vario, this, verbose, mauto, constraints, optvar);
@@ -691,7 +691,7 @@ int Model::fit(Vario* vario,
   for (int is = 0; is < (int) types.size(); is++)
   {
     CovAniso cov = CovAniso(types[is], _ctxt);
-    addCov(&cov);
+    addCov(cov);
   }
   return model_auto_fit(vario, this, verbose, mauto, constraints, optvar);
 }
@@ -726,7 +726,7 @@ int Model::fitFromVMap(DbGrid* dbmap,
   for (int is = 0; is < (int) types.size(); is++)
   {
     CovAniso cov = CovAniso(types[is], _ctxt);
-    addCov(&cov);
+    addCov(cov);
   }
   return vmap_auto_fit(dbmap, this, verbose, mauto, constraints, optvar);
 }
@@ -812,7 +812,7 @@ bool Model::_deserializeAscii(std::istream& is, bool /*verbose*/)
     }
     else
       cova.setRangeIsotropic(range);
-    covs.addCov(&cova);
+    covs.addCov(cova);
   }
   setCovAnisoList(&covs);
 
@@ -962,7 +962,7 @@ void Model::_create()
   setCovAnisoList(&tmp);
 }
 
-void Model::addCovAniso(const CovAniso* cov)
+void Model::addCovAniso(const CovAniso& cov)
 {
   ModelCovList::addCov(cov);
 }
@@ -1436,7 +1436,7 @@ bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
     }
     else
       cova.setRangeIsotropic(range);
-    covs.addCov(&cova);
+    covs.addCov(cova);
   }
   setCovAnisoList(&covs);
 

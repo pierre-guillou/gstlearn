@@ -62,3 +62,23 @@ public:
 private:
     size_t n_;
 };
+
+template <typename T>
+auto enumerate(T& container) {
+    struct iterator {
+        size_t i;
+        typename T::iterator it;
+
+        bool operator!=(const iterator& other) const { return it != other.it; }
+        void operator++() { ++i; ++it; }
+        auto operator*() const { return std::pair(i, *it); }
+    };
+
+    struct iterable_wrapper {
+        T& container;
+        auto begin() { return iterator{0, container.begin()}; }
+        auto end() { return iterator{0, container.end()}; }
+    };
+
+    return iterable_wrapper{container};
+}

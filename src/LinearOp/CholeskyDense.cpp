@@ -68,6 +68,14 @@ bool CholeskyDense::empty() const
   return _empty;
 }
 
+MatrixDense CholeskyDense::inverse() const
+{
+  if (!isReady()) return MatrixDense();
+  auto Id = Eigen::MatrixXd::Identity(_size, _size);
+  MatrixDense res(_size, _size);
+  res.getEigenMat() = _factor.solve(Id);
+  return res;
+}
 void CholeskyDense::solveMatInPlace(const MatrixDense& mat, MatrixDense& res) const
 {
   if (!isReady()) return;

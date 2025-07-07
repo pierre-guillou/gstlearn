@@ -127,7 +127,7 @@ public:
 
   static MatrixDense* create(const MatrixDense* mat);
   static MatrixDense* create(int nrow, int ncol);
-
+  static double traceProd(const MatrixDense& a, MatrixDense& b); // Warning: b is modified to reduce memory allocation
   static MatrixDense* createFromVVD(const VectorVectorDouble& X);
   static MatrixDense* createFromVD(const VectorDouble& X,
                                    int nrow,
@@ -176,6 +176,7 @@ public:
   // Adding a Row or a Column (at the bottom or right of Rectangular Matrix)
   void addRow(int nrow_added = 1);
   void addColumn(int ncolumn_added = 1);
+
 
 #ifndef SWIG
   static void sum(const MatrixDense* mat1,
@@ -237,8 +238,8 @@ protected:
   bool _flagEigenDecompose;
   VectorDouble _eigenValues;   // Used only when ! flag_eigen()
   MatrixSquare* _eigenVectors; // Used only when ! flag_eigen()
-  int _maxSize;
-
-protected:
   VectorDouble _eigenMatrix; // Eigen storage for Dense matrix in Eigen Library
+
+private:
+  int _maxSize;
 };

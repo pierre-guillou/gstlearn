@@ -44,12 +44,12 @@ class CovCalcMode;
  * - the field extension: this information is needed to get a *stationary* version to any covariance
  * - the experimental mean vector and the variance-covariance matrix (used to calibrate the Model)
  */
-class GSTLEARN_EXPORT ModelGeneric : public ICloneable
+class GSTLEARN_EXPORT ModelGeneric: public ICloneable
 {
 public:
   ModelGeneric(const CovContext& ctxt = CovContext());
-  ModelGeneric(const ModelGeneric &r);
-  ModelGeneric& operator= (const ModelGeneric &r);
+  ModelGeneric(const ModelGeneric& r);
+  ModelGeneric& operator=(const ModelGeneric& r);
   virtual ~ModelGeneric();
 
   //getters for member pointers
@@ -63,12 +63,12 @@ public:
 
   ACov*       _getCovModify() { return _cova.get(); }
   CovContext* _getContextModify() { return &_ctxt; }
-  DriftList*  _getDriftListModify() { return _driftList; }
+  DriftList* _getDriftListModify() { return _driftList; }
   std::vector<covmaptype>& getGradients()
   {
     return _gradFuncs;
   }
-  
+
 public:
   // Forwarding the methods from _cova
   FORWARD_METHOD(getCov, evalCovMat)
@@ -97,9 +97,9 @@ public:
   FORWARD_METHOD(getCov, evalCxvM)
   FORWARD_METHOD(getCov, evalPointToDb)
   FORWARD_METHOD(getCov, evalPointToDbAsSP)
-  FORWARD_METHOD(getCov, evalAverageDbToDb,TEST)
-  FORWARD_METHOD(getCov, evalAverageIncrToIncr,TEST)
-  FORWARD_METHOD(getCov, evalAveragePointToDb,TEST)
+  FORWARD_METHOD(getCov, evalAverageDbToDb, TEST)
+  FORWARD_METHOD(getCov, evalAverageIncrToIncr, TEST)
+  FORWARD_METHOD(getCov, evalAveragePointToDb, TEST)
   FORWARD_METHOD(getCov, samplingDensityVariance, TEST)
   FORWARD_METHOD(getCov, specificVolume, TEST)
   FORWARD_METHOD(getCov, coefficientOfVariation, TEST)
@@ -123,10 +123,10 @@ public:
   FORWARD_METHOD_NON_CONST(getCov, makeStationary)
 
   FORWARD_METHOD_NON_CONST(_getCovModify, setContext)
-  FORWARD_METHOD_NON_CONST(_getCovModify, evalCovGrad,VectorDouble())
+  FORWARD_METHOD_NON_CONST(_getCovModify, evalCovGrad, VectorDouble())
 
   // Forwarding the methods from _driftList
-  
+
   FORWARD_METHOD(getDriftList, getDrift)
   FORWARD_METHOD(getDriftList, computeDrift, TEST)
   FORWARD_METHOD(getDriftList, evalDriftValue, TEST)
@@ -140,7 +140,7 @@ public:
   FORWARD_METHOD(getDriftList, getNDriftEquation)
   FORWARD_METHOD(getDriftList, getNExtDrift)
   FORWARD_METHOD(getDriftList, isFlagLinked)
-  FORWARD_METHOD(getDriftList, getDriftMaxIRFOrder,-1)
+  FORWARD_METHOD(getDriftList, getDriftMaxIRFOrder, -1)
   FORWARD_METHOD(getDriftList, getRankFex)
   FORWARD_METHOD(getDriftList, isDriftSampleDefined)
   FORWARD_METHOD(getDriftList, isDriftFiltered)
@@ -155,7 +155,7 @@ public:
 
   FORWARD_METHOD(getDriftList, getMean, TEST)
   FORWARD_METHOD(getDriftList, getMeans)
-  FORWARD_METHOD(getDriftList, evalDriftVarCoef,TEST)
+  FORWARD_METHOD(getDriftList, evalDriftVarCoef, TEST)
   FORWARD_METHOD(getDriftList, evalDriftVarCoefs)
 
   FORWARD_METHOD_NON_CONST(_getDriftListModify, setFlagLinked)
@@ -166,7 +166,7 @@ public:
   FORWARD_METHOD_NON_CONST(_getDriftListModify, copyCovContext)
   FORWARD_METHOD_NON_CONST(_getDriftListModify, setMeans)
   FORWARD_METHOD_NON_CONST(_getDriftListModify, setMean)
-  
+
   // Forwarding the methods from _ctxt
   FORWARD_METHOD(getContext, getNVar, -1)
   FORWARD_METHOD(getContext, getNDim, -1)
@@ -178,7 +178,7 @@ public:
   FORWARD_METHOD_NON_CONST(_getContextModify, setField)
   FORWARD_METHOD_NON_CONST(_getContextModify, setCovar0s)
   FORWARD_METHOD_NON_CONST(_getContextModify, setCovar0)
-  
+
   void setField(double field);
   bool isValid() const;
 
@@ -203,7 +203,8 @@ public:
               const ModelOptimParam& mop = ModelOptimParam(),
               int nb_neighVecchia        = 30,
               bool verbose               = false,
-              bool trace                 = false);
+              bool trace                 = false,
+              bool reml                  = false);
 
 private:
   virtual bool _isValid() const;

@@ -20,19 +20,6 @@
 #include <filesystem>
 #include <fstream>
 
-#if defined(_WIN32) || defined(_WIN64)
-#include <windows.h> // for CreateDirectory
-#else
-#include <unistd.h> // for readlink
-#endif
-
-#ifdef __APPLE__
-#include <mach-o/dyld.h> // for _NSGetExecutablePath
-#endif
-
-#include <sys/stat.h>
-#include <sys/types.h>
-
 String ASerializable::_myPrefixName = String();
 
 ASerializable::ASerializable()                                    = default;
@@ -196,8 +183,8 @@ String ASerializable::buildFileName(int status, const String& filename, bool ens
   fileLocal.clear();
 
   // container name: first search for the GSTLEARN_OUTPUT_DIR
-  // environment variable, then if empty create a `gstlearn_dir'
-  // folder in the current directory
+  // environment variable. If not defined, use the current directory
+  // instead.
   const auto output_dir = gslGetEnv("GSTLEARN_OUTPUT_DIR");
 
   if (!output_dir.empty())
@@ -206,7 +193,7 @@ String ASerializable::buildFileName(int status, const String& filename, bool ens
   }
   else
   {
-    fileLocal = std::filesystem::current_path() / "gstlearn_dir";
+    fileLocal = std::filesystem::current_path();
   }
 
   if (ensureDirExist)

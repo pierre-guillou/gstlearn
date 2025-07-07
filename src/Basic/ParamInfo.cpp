@@ -58,7 +58,7 @@ ParamInfo::~ParamInfo()
 void ParamInfo::increaseMin(double value)
 {
   _userBounds[0] = std::max(value, _userBounds[0]);
-  _value         = std::max(value, _value);
+  _value         = std::max(_userBounds[0], _value);
   _currentValue  = _value;
 }
 
@@ -66,7 +66,7 @@ void ParamInfo::increaseMin(double value)
 void ParamInfo::decreaseMax(double value)
 {
   _userBounds[1] = std::min(value, _userBounds[1]);
-  _value         = std::min(value, _value);
+  _value         = std::min(_userBounds[1], _value);
   _currentValue  = _value;
 }
 
@@ -107,6 +107,21 @@ void ParamInfo::setMinValue(double value)
     messerr("Setting the minimum user value to the minimum authorized value");
     _userBounds[0] = _absoluteBounds[0];
   }
+}
+
+void ParamInfo::setValue(double value)
+{
+  if (value < _userBounds[0] || value > _userBounds[1])
+  {
+    messerr("Value is out of user bounds");
+    messerr("Setting the value to the closest bound");
+    _value = std::clamp(value, _userBounds[0], _userBounds[1]);
+  }
+  else
+  {
+    _value = value;
+  }
+  _currentValue = _value;
 }
 
 void ParamInfo::setMaxValue(double value)
