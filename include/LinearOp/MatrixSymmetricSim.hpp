@@ -16,8 +16,9 @@
 #include "LinearOp/ACholesky.hpp"
 #include "Matrix/AMatrix.hpp"
 
+namespace gstlrn
+{
 class AMatrix;
-class Cholesky;
 
 /**
  * Square Symmetric matrices
@@ -46,3 +47,4 @@ private:
   bool _inverse;
   ACholesky* _factor;
 };
+}

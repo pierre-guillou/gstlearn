@@ -15,6 +15,8 @@
 #include "Basic/PolyLine2D.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT PolyElem: public PolyLine2D
 {
 public:
@@ -70,3 +72,4 @@ private:
 
   friend class Polygons;
 };
+}

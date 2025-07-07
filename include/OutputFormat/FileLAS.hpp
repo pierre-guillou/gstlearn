@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{ 
 class Db;
 
 class GSTLEARN_EXPORT FileLAS: public AOF
@@ -43,3 +45,4 @@ private:
   double _ywell;
   double _cwell;
 };
+}

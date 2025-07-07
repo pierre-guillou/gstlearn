@@ -16,6 +16,8 @@
 
 /* Be careful ! This is not a real covariance */
 
+namespace gstlrn
+{
 class CovContext;
 class TurningBandOperate;
 
@@ -38,4 +40,4 @@ public:
 protected:
   double _evaluateCov(double h) const override;
 };
-
+}

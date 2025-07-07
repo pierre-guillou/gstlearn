@@ -17,6 +17,8 @@
 #include "Db/DbGrid.hpp"
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT CalcGridToGrid: public ACalcDbToDb
 {
 public:
@@ -83,3 +85,4 @@ GSTLEARN_EXPORT int dbg2gInterpolate(DbGrid *dbin,
                                      const VectorString &bots = VectorString(),
                                      const NamingConvention &namconv = NamingConvention(
                                          "Interpolation", false));
+}

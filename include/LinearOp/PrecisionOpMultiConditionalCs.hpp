@@ -13,9 +13,11 @@
 #include "LinearOp/PrecisionOpMultiConditional.hpp"
 #include <vector>
 
-class PrecisionOp;
+namespace gstlrn
+{
 class IProj;
 class CholeskySparse;
+class PrecisionOp;
 
 /**
  * Class to store objects for SPDE
@@ -48,3 +50,4 @@ private:
   MatrixSparse* _QpAtA;
   mutable CholeskySparse* _chol;
 };
+}

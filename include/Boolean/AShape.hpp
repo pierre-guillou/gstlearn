@@ -19,6 +19,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Boolean/ShapeParameter.hpp"
 
+namespace gstlrn
+{
 class BooleanObject;
 
 /**
@@ -74,3 +76,4 @@ private:
   VectorString _paramNames;
   std::vector<ShapeParameter> _params; // TODO map (regrouping the two last lines)
 };
+}

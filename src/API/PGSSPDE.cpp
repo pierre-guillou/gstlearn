@@ -18,6 +18,8 @@
 #include "Basic/String.hpp"
 #include "LithoRule/RuleProp.hpp"
 
+namespace gstlrn
+{
 PGSSPDE::PGSSPDE(const std::vector<Model*>& models,
                  const Db* field,
                  const RuleProp* ruleprop,
@@ -66,4 +68,5 @@ PGSSPDE::~PGSSPDE()
   {
     delete e;
   }
+}
 }

@@ -16,6 +16,8 @@
 #include <iostream>
 #include <math.h>
 
+namespace gstlrn
+{ 
 
 SpaceTarget::SpaceTarget(const ASpaceSharedPtr& space,
                          bool checkExtend,
@@ -110,4 +112,5 @@ String SpaceTarget::toString(const AStringFormat* /*strfmt*/) const
       sstr << "- Date      = (undefined)" << std::endl;
   }
   return sstr.str();
+}
 }

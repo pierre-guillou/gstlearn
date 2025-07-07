@@ -14,6 +14,8 @@
 
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BiTargetCheckDate: public ABiTargetCheck
 {
 public:
@@ -36,3 +38,4 @@ private:
   double _deltaMin;
   double _deltaMax;
 };
+}

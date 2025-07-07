@@ -16,11 +16,13 @@
 #include "Matrix/MatrixDense.hpp"
 #include "Basic/ASerializable.hpp"
 
+namespace gstlrn
+{
+
 /**
  * Stores an array of values as a Table, i.e. a MatrixDense
  * where rows and columns can be optionally decorated
  */
-
 class GSTLEARN_EXPORT Table : public MatrixDense, public ASerializable {
 
 public:
@@ -83,3 +85,4 @@ private:
   bool _skipTitle;
   bool _skipDescription;
 };
+}

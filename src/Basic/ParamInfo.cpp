@@ -3,7 +3,8 @@
 #include "geoslib_define.h"
 
 #include <sstream>
-
+namespace gstlrn
+{ 
 ParamInfo::ParamInfo(const String& name,
                      double value,
                      const std::array<double, 2>& absoluteBounds,
@@ -136,4 +137,5 @@ void ParamInfo::setMaxValue(double value)
     messerr("Setting the maximum user value to the maximum authorized value");
     _userBounds[1] = value;
   }
+}
 }

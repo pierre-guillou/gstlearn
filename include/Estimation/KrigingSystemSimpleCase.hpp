@@ -23,6 +23,10 @@
 #include "LinearOp/CholeskyDense.hpp"
 #include "Enum/EKrigOpt.hpp"
 
+
+namespace gstlrn
+{ 
+
 class Db;
 class DbGrid;
 class Model;
@@ -151,3 +155,4 @@ private:
   bool _flagVerr;
   bool _flagNoStat;
 };
+}

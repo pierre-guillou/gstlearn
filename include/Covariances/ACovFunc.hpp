@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/AStringFormat.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
@@ -20,12 +21,15 @@
 #include "Arrays/Array.hpp"
 #include "Matrix/MatrixDense.hpp"
 
+
+namespace gstlrn
+{
+
 class TurningBandOperate;
 
 /* Covariance basic function for normalized sill and distance:
  * Positive definite function
  * */
-
 class GSTLEARN_EXPORT ACovFunc : public AStringable
 {
 public:
@@ -147,4 +151,4 @@ private:
   CovContext  _ctxt;    /*! Context (space, number of variables, ...) */
   double      _param;   /*! Third parameter (TEST if not used) */
 };
-
+}

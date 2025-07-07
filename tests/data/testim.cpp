@@ -27,6 +27,8 @@
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "Estimation/CalcKriging.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************
 **
 ** FUNCTION: st_modify

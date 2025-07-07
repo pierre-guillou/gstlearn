@@ -15,6 +15,9 @@
 
 #include "Enum/EDbg.hpp"
 
+namespace gstlrn
+{
+
 /**
  * Operate the list of active Debug options
  * These options correspond to various keywords chosen from a close list (see EDbg.hpp).
@@ -66,3 +69,4 @@ private:
   static int _currentIndex;
   static int _reference;
 };
+}

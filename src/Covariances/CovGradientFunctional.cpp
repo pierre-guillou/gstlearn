@@ -17,6 +17,8 @@
 
 #define TR(i,j) (Tr[3 * (i) + (j)])
 
+namespace gstlrn
+{
 CovGradientFunctional::CovGradientFunctional(const ECov& type,
                                              const CovContext& ctxt)
     : ACovGradient(type, ctxt)
@@ -202,4 +204,4 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
     }
   }
 }
-
+}

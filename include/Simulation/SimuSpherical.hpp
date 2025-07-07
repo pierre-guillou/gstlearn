@@ -19,6 +19,9 @@
 
 class MeshSpherical;
 
+namespace gstlrn
+{
+
 class GSTLEARN_EXPORT SimuSpherical: public ACalcSimulation
 {
 public:
@@ -58,3 +61,4 @@ GSTLEARN_EXPORT int simsph(DbGrid *db,
                            int seed,
                            bool verbose,
                            const NamingConvention& namconv = NamingConvention("SimSphe"));
+}

@@ -22,6 +22,8 @@
 #include "Stats/Classical.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 Likelihood::Likelihood(ModelGeneric* model,
                        const Db* db,
                        bool reml)
@@ -167,4 +169,5 @@ void Likelihood::_fillGradCovMat(RankHandler& rkh, covmaptype& gradcov)
       jcur++;
     }
   }
+}
 }

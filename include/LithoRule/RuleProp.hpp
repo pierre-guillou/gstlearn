@@ -17,6 +17,8 @@
 
 #include <vector>
 
+namespace gstlrn
+{
 class Db;
 class VarioParam;
 
@@ -89,3 +91,4 @@ private:
   std::vector<const Rule*> _rules;
   bool _ruleInternal; // TRUE if a fictitious rule has been established internally
 };
+}

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Arrays/AArray.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BImage : public AArray
 {
 public:
@@ -51,3 +53,4 @@ private:
 private:
   VectorUChar _values;
 };
+}

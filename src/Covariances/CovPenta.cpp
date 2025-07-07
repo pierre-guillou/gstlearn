@@ -12,6 +12,8 @@
 
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovPenta::CovPenta(const CovContext& ctxt)
 : ACovFunc(ECov::PENTA, ctxt)
 {
@@ -49,3 +51,4 @@ double CovPenta::_evaluateCov(double h) const
   return (cov);
 }
 
+}

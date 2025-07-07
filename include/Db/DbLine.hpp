@@ -16,6 +16,8 @@
 #include "Basic/NamingConvention.hpp"
 #include "Basic/ICloneable.hpp"
 
+namespace gstlrn
+{
 /**
  * \brief
  * Class containing the Data Information organized as a set of Lines
@@ -130,3 +132,4 @@ private:
   // - second dimension: Number of addresses (within Db) per Line
   VectorVectorInt _lineAdds;
 };
+}

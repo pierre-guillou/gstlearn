@@ -15,6 +15,8 @@
 #include "Simulation/TurningBandOperate.hpp"
 #include "Basic/Law.hpp"
 
+namespace gstlrn
+{
 CovStable::CovStable(const CovContext& ctxt)
 : ACovFunc(ECov::STABLE, ctxt)
 {
@@ -58,4 +60,5 @@ double CovStable::simulateTurningBand(double t0, TurningBandOperate &operTB) con
     return operTB.cosineOne(t0);
   else
     return operTB.spectralOne(t0);
+}
 }

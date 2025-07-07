@@ -23,6 +23,8 @@
 #include "Db/Db.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
 ** Main Program for bench marking the variogram calculation

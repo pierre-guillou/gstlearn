@@ -18,6 +18,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 CovLMCTapering::CovLMCTapering(const ETape& tapetype,
                                double taperange,
                                const CovContext& ctxt)
@@ -222,4 +224,5 @@ double CovLMCTapering::_eval(const SpacePoint& p1,
 std::string_view CovLMCTapering::getName() const
 {
   return _tapeType.getDescr();
+}
 }

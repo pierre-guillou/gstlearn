@@ -24,6 +24,8 @@
 #include "Neigh/NeighImage.hpp"
 #include "Estimation/CalcImage.hpp"
 
+using namespace gstlrn;
+
 int main(int argc, char* argv[])
 {
   std::stringstream sfn;

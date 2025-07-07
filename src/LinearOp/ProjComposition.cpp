@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "LinearOp/ProjComposition.hpp"
 
+namespace gstlrn
+{
 ProjComposition::ProjComposition(std::vector<const IProj*> projs) : IProj()
 {
   // Nothing to do except checking compatibility. Incompatible sizes are a
@@ -85,4 +87,5 @@ int ProjComposition::_addMesh2point(const constvect in, vect out) const {
   }
 
   return _projs[idx]->addMesh2point(_works[idx-1], out);
+}
 }

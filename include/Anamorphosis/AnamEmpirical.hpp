@@ -37,6 +37,8 @@
  * to the square of the value).
  */
 
+ namespace gstlrn
+{
 class GSTLEARN_EXPORT AnamEmpirical: public AnamContinuous
 {
 public:
@@ -125,3 +127,4 @@ private:
   VectorDouble _ZDisc;
   VectorDouble _YDisc;
 };
+}

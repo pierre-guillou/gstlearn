@@ -17,6 +17,8 @@
 #include "Fractures/FracFault.hpp"
 #include "Fractures/FracFamily.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT FracEnviron: public AStringable, public ASerializable
 {
 public:
@@ -77,3 +79,4 @@ private:
   std::vector<FracFamily> _families; //!< Family definition
   std::vector<FracFault>  _faults;   //!< Fault definition
 };
+}

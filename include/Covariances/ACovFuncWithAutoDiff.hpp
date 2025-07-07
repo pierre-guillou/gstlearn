@@ -18,9 +18,9 @@
 
 // Classe intermédiaire générique utilisant Boost.Autodiff
 template <typename Derived>
-class ACovFuncWithAutoDiff : public ACovFunc {
+class ACovFuncWithAutoDiff : public gstlrn::ACovFunc {
 public:
-    ACovFuncWithAutoDiff(const ECov& type, const CovContext& ctxt)
+    ACovFuncWithAutoDiff(const gstlrn::ECov& type, const gstlrn::CovContext& ctxt)
         : ACovFunc(type, ctxt) {}
     ACovFuncWithAutoDiff(const ACovFuncWithAutoDiff &r)
         : ACovFunc(r) {}

@@ -21,7 +21,8 @@
 
 #include <math.h>
 
-
+namespace gstlrn
+{
 CovLMCConvolution::CovLMCConvolution(const EConvType& conv_type,
                                      const EConvDir&  conv_dir,
                                      double conv_range,
@@ -337,4 +338,5 @@ double CovLMCConvolution::_eval(const SpacePoint& p1,
     cov = cov0 -cov;
   }
   return cov;
+}
 }

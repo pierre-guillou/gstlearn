@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Simulation/TurningBandOperate.hpp"
 
+namespace gstlrn
+{
  TurningBandOperate:: TurningBandOperate()
     : _nt0(0),
       _flagScaled(false),
@@ -221,4 +223,5 @@ void TurningBandOperate::pushV1(double value)
 void TurningBandOperate::pushV2(double value)
 {
   _v2.push_back(value);
+}
 }

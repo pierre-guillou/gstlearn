@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 
+namespace gstlrn {
 class APolynomial;
 class AMesh;
 
@@ -159,3 +160,4 @@ protected:
   mutable std::vector<std::vector<double>> _workPoly;
 #endif
 };
+}

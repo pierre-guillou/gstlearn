@@ -19,9 +19,11 @@
 #include <functional>
 
 
-class AFunction;
 class ALinearOpMulti;
 class AShiftOp;
+
+namespace gstlrn {  
+class AFunction;
 class cs; /// TODO : Dependency to csparse to be removed
 
 class GSTLEARN_EXPORT Chebychev: public APolynomial
@@ -81,3 +83,4 @@ private:
   double _b;
   bool _verbose;
 };
+}

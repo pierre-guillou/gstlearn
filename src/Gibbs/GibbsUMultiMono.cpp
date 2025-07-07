@@ -19,6 +19,8 @@
 
 #define COVMAT(ivar,i,j)              (_covmat[ivar][(i) * nact + (j)])
 
+namespace gstlrn
+{
 GibbsUMultiMono::GibbsUMultiMono()
   : GibbsMultiMono()
   , _covmat()
@@ -171,4 +173,5 @@ void GibbsUMultiMono::update(VectorVectorDouble& y,
   // Update statistics (optional)
 
   _updateStats(y, ipgs, iter);
+}
 }

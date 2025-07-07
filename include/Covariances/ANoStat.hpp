@@ -16,8 +16,10 @@
 #include "Basic/AStringable.hpp"
 
 
-class ACov;
+
+namespace gstlrn {
 class AMesh;
+class ACov;
 
 class GSTLEARN_EXPORT ANoStat : public AStringable
 {
@@ -57,3 +59,4 @@ protected:
   mutable VectorDouble _tabvertices; // Dimension: nvertex
 
 };
+}

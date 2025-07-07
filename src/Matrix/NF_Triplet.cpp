@@ -11,6 +11,8 @@
 #include "Matrix/NF_Triplet.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
 
+namespace gstlrn
+{
 NF_Triplet::NF_Triplet()
     : _nrowmax(0),
       _ncolmax(0),
@@ -171,4 +173,5 @@ void NF_Triplet::appendInPlace(const NF_Triplet& T2)
     if (irow > _nrowmax) _nrowmax = irow;
     if (icol > _ncolmax) _ncolmax = icol;
   }
+}
 }

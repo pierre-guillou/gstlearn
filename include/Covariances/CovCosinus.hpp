@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+  // Forward declaration
 class CovContext;
 
 class GSTLEARN_EXPORT CovCosinus : public ACovFunc
@@ -33,3 +36,4 @@ protected:
   double _evaluateCov(double h) const override;
 };
 
+}

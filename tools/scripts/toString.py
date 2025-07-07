@@ -109,7 +109,7 @@ def generate_swig_extend_code(class_name):
     :return: Code SWIG %extend.
     """
     return f"""
-%extend {class_name} {{
+%extend gstlrn::{class_name} {{
   std::string __repr__() {{
     return $self->toString();
   }}
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     include_path = os.path.join("..", "..", "include")
     Astringable_classes = sorted(find_classes_inheriting_from_AStringable(include_path))
     with open(output_txt_file, "w", encoding='utf-8') as file:
-        excluded = ["Node", "CovGradientFunctional", "GibbsUPropMono",
+        excluded = ["AStringable","PrecisionOpMulti", "PrecisionOpMultiMatrix","MatrixSparse","Node", "CovGradientFunctional", "GibbsUPropMono",
                     "Tapering", "GibbsUPropMultiMono", 
                     "CovGradientNumerical", "ElemNostat",
                     "GibbsMultiMono", "RuleShift", "GibbsUMultiMono",

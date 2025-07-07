@@ -14,6 +14,8 @@
 #include "LinearOp/IProj.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
+namespace gstlrn
+{
 class AMesh;
 class Db;
 
@@ -66,3 +68,4 @@ public:
 //                         int flag_exact = 0,
 //                         bool verbose = false);
 };
+}

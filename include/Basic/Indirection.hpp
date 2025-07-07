@@ -18,7 +18,8 @@
 
 #include <map>
 
-
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Indirection: public AStringable
 {
 public:
@@ -60,3 +61,4 @@ private:
   VectorInt _vecAToR;
   std::map<int, int> _mapAToR;
 };
+}

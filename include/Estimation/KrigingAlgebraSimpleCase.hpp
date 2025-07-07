@@ -19,6 +19,8 @@
 #include "Matrix/AMatrix.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 /**
  * @brief Perform the Algebra for Kriging and CoKriging
  *
@@ -233,3 +235,4 @@ private:
 
   VectorDouble _dummy;
 };
+}

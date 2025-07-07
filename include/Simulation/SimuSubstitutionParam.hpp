@@ -15,6 +15,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn  
+{
 class GSTLEARN_EXPORT SimuSubstitutionParam: public AStringable
 {
 public:
@@ -82,3 +84,4 @@ private:
   VectorDouble _vector;
   VectorDouble _trans;
 };
+}

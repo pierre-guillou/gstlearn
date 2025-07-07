@@ -20,6 +20,8 @@
 #include "Basic/CSVformat.hpp"
 #include "Polygon/Polygons.hpp"
 
+namespace gstlrn
+{
 Polygons::Polygons()
   : _polyelems(),
     _emptyVec(),
@@ -1079,3 +1081,4 @@ bool Polygons::_serializeH5(H5::Group& grp, bool verbose) const
   return ret;
 }
 #endif
+}

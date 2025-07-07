@@ -12,6 +12,8 @@
 
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovWendland1::CovWendland1(const CovContext& ctxt)
 : ACovFunc(ECov::WENDLAND1, ctxt)
 {
@@ -43,3 +45,4 @@ double CovWendland1::_evaluateCov(double h) const
   return (cov);
 }
 
+}

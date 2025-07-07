@@ -385,6 +385,7 @@
   //DISABLE_WARNING_DECLARATION_MASKED
   //DISABLE_WARNING_EXPR_COND_ASSIGNMENT
   //DISABLE_WARNING_UNREFERENCED_FORMAL_PARAMETER
+   using namespace gstlrn;
 %}
 
 ////////////////////////////
@@ -405,25 +406,27 @@
 %template(DoNotUseVVectorDoubleStd) std::vector< std::vector< double > >;
 %template(DoNotUseVVectorFloatStd)  std::vector< std::vector< float > >; 
 
-%template(VectorECov)              std::vector< ECov >;
-%template(VectorEStatOption)       std::vector< EStatOption >;
-%template(VectorESelectivity)      std::vector< ESelectivity >;
-%template(VectorDirParam)          std::vector< DirParam >;
-%template(VectorPolyElem)          std::vector< PolyElem >;
-%template(VectorInterval)          std::vector< Interval >; 
-%template(VectorEPostStat)         std::vector< EPostStat >;
-%template(VectorSpacePoint)        std::vector< SpacePoint >;
-%template(VectorABiTargetCheck)    std::vector< ABiTargetCheck* >;
-%template(VectorProjMatrix)        std::vector< ProjMatrix* >;
-%template(VectorConstProjMatrix)   std::vector< const ProjMatrix*>;
-%template(VectorConstIProj)  std::vector< const IProj*>;
-%template(VVectorConstProjMatrix)  std::vector< std::vector< const ProjMatrix*> >;
-%template(VVectorConstIProj) std::vector< std::vector< const IProj*> >;
-%template(VectorMeshes)            std::vector< const AMesh*>;
-%template(VectorMatrixSquare)      std::vector<MatrixSquare >;
+%template(VectorECov)              std::vector< gstlrn::ECov >;
+%template(VectorEStatOption)       std::vector< gstlrn::EStatOption >;
+%template(VectorESelectivity)      std::vector< gstlrn::ESelectivity >;
+%template(VectorDirParam)          std::vector< gstlrn::DirParam >;
+%template(VectorPolyElem)          std::vector< gstlrn::PolyElem >;
+%template(VectorInterval)          std::vector< gstlrn::Interval >; 
+%template(VectorEPostStat)         std::vector< gstlrn::EPostStat >;
+%template(VectorSpacePoint)        std::vector< gstlrn::SpacePoint >;
+%template(VectorABiTargetCheck)    std::vector< gstlrn::ABiTargetCheck* >;
+%template(VectorProjMatrix)        std::vector< gstlrn::ProjMatrix* >;
+%template(VectorConstProjMatrix)   std::vector< const gstlrn::ProjMatrix*>;
+%template(VectorConstIProj)  std::vector< const gstlrn::IProj*>;
+%template(VVectorConstProjMatrix)  std::vector< std::vector< const gstlrn::ProjMatrix*> >;
+%template(VVectorConstIProj) std::vector< std::vector< const gstlrn::IProj*> >;
+%template(VectorMeshes)            std::vector< const gstlrn::AMesh*>;
+%template(VectorMatrixSquare)      std::vector<gstlrn::MatrixSquare >;
 
 ////////////////////////////////////////////////
 // Conversion Target language => C++
+
+namespace gstlrn {
 
 // Note : Before including this file :
 //        - vectorToCpp, vectorVectorToCpp, matrixDenseToCpp, matrixSparseToCpp and convertToCpp 
@@ -1041,7 +1044,9 @@
 //    SWIG_exception_fail(SWIG_ArgError(errcode), "in method $symname, wrong return value: $type");
 //}
 
-%extend Grid {
+} // namespace gstlrn
+
+%extend gstlrn::Grid {
   double indiceToCoordinate(int idim0, const VectorInt& indice,
                             const VectorDouble& percent = {},
                             bool flag_rotate            = true) const
@@ -1068,7 +1073,7 @@
   }
 };
 
-%extend Rule {
+%extend gstlrn::Rule {
   // Don't return std::array to wrapping languages
   VectorDouble getThresh(int facies) const
   {
@@ -1092,5 +1097,5 @@
   #include <memory>
 %}
 %include <std_shared_ptr.i>
-%template(ASpaceSharedPtr)    std::shared_ptr<const ASpace>;
-%template(ASpaceSharedPtrVector)   std::vector< ASpaceSharedPtr>;
+%template(ASpaceSharedPtr)    std::shared_ptr<const gstlrn::ASpace>;
+%template(ASpaceSharedPtrVector)   std::vector< gstlrn::ASpaceSharedPtr>;

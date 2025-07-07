@@ -41,6 +41,8 @@ Website: https://gstlearn.org
 #include <stddef.h>
 #include "csparse_d.h"
 
+namespace gstlrn
+{
 cs     *cs_add (const cs *A, const cs *B, double alpha, double beta) ;
 int     cs_cholsol (const cs *A, double *b, int order) ;
 int     cs_dupl (cs *A) ;
@@ -127,5 +129,5 @@ int     cs_getnrow(const cs* mat);
 #define CS_MARKED(Ap,j) (Ap [j] < 0)
 #define CS_MARK(Ap,j) { Ap [j] = CS_FLIP (Ap [j]) ; }
 #define CS_OVERFLOW(n,size) (n > INT_MAX / (int) size)
-
+}
 #endif

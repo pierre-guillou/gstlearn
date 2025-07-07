@@ -33,6 +33,8 @@
 #include <array>
 #include <vector>
 
+namespace gstlrn
+{
 class Rotation;
 class MatrixSquare;
 class MatrixDense;
@@ -342,4 +344,4 @@ private:
   // They are in a protected section as they may be modified by class hierarchy
 };
 
-
+}

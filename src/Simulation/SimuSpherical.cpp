@@ -26,6 +26,8 @@
 #define IPTR(ix,iy)        ((iy) * nx + (ix))
 #define DISCRET(idisc)     (GV_PI * (0.5 + (idisc)) / ((double) ndisc))
 
+namespace gstlrn
+{
 SimuSpherical::SimuSpherical(int nbsimu, int seed)
     : ACalcSimulation(nbsimu, seed)
 {
@@ -507,4 +509,5 @@ int SimuSpherical::_check_degree_order(const VectorDouble& freqs,
 bool SimuSpherical::_run()
 {
   return true;
+}
 }

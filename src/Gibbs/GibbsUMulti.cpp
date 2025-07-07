@@ -19,6 +19,8 @@
 
 #define COVMAT(i,j)              (_covmat[(i) * neq + (j)])
 
+namespace gstlrn
+{
 GibbsUMulti::GibbsUMulti()
   : GibbsMulti()
   , _covmat()
@@ -179,4 +181,5 @@ void GibbsUMulti::update(VectorVectorDouble& y,
   // Update statistics (optional)
 
   _updateStats(y, ipgs, iter);
+}
 }

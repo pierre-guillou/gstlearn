@@ -15,6 +15,8 @@
 #include "Db/DbGrid.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -67,3 +69,4 @@ private:
   mutable VectorInt _indg;
   mutable VectorDouble _xyz;
 };
+}

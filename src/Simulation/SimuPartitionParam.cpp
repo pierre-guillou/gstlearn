@@ -13,6 +13,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 SimuPartitionParam::SimuPartitionParam(int nbtuba,
                                        double intensity,
                                        const VectorDouble& dilate)
@@ -65,3 +67,4 @@ double SimuPartitionParam::getDilate(int idim) const
   return _dilate[idim];
 }
 
+}

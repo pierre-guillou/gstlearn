@@ -18,7 +18,8 @@ set(DOXYGEN_WARN_NO_PARAMDOC YES)
 set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
 set(DOXYGEN_EXCLUDE ${CMAKE_SOURCE_DIR}/include/geoslib_old_f.h
                     ${CMAKE_SOURCE_DIR}/include/geoslib_f_private.h
-                    ${CMAKE_SOURCE_DIR}/include/geoslib_d_private.h)
+                    ${CMAKE_SOURCE_DIR}/include/geoslib_d_private.h
+                    ${CMAKE_SOURCE_DIR}/include/LinearOp/LinearOpCGSolver.hpp)
 set(DOXYGEN_EXCLUDE_SYMBOLS "FORWARD_METHOD_NON_CONST"
                             "FORWARD_METHOD_CONST")
 
@@ -31,13 +32,26 @@ set(DOXYGEN_LAYOUT_FILE ${CMAKE_SOURCE_DIR}/cmake/DoxygenLayout.xml)
 set(DOXYGEN_GENERATE_XML YES)
 set(DOXYGEN_GENERATE_TREEVIEW YES)
 set(DOXYGEN_MAX_INITIALIZER_LINES 1000) # For very long macros
-set(DOXYGEN_MACRO_EXPANSION YES)
-set(DOXYGEN_EXPAND_ONLY_PREDEF NO)
 
 set(DOXYGEN_ENABLE_PROCESSING YES)
 set(DOXYGEN_MACRO_EXPANSION YES)
 set(DOXYGEN_EXPAND_ONLY_PREDEF YES)
-set(DOXYGEN_PREDEFINED "protected=private")
+
+set(DOXYGEN_PREDEFINED "GSTLEARN_EXPORT=" 
+                       "VectorDouble" "VectorNumT<double>"
+                       "VectorInt" "VectorNumT<int>"
+                       "VectorFloat" "VectorNumT<float>"
+                       "VectorUChar" "VectorNumT<UChar>"
+                       "VectorVectorInt" "VectorT<VectorInt>"
+                       "VectorVectorDouble" "VectorT<VectorDouble>"
+                       "VectorVectorFloat" "VectorT<VectorFloat>"
+                       "protected=private")
+
+# Ajoutez ces lignes pour mieux gérer les surcharges
+set(DOXYGEN_HIDE_SCOPE_NAMES NO)
+set(DOXYGEN_QUALIFY_CLASSES YES)
+set(DOXYGEN_TYPEDEF_HIDES_STRUCT NO)
+
 set(DOXYGEN_EXTRACT_PRIVATE NO)
 
 set(DOXYGEN_QUIET YES)

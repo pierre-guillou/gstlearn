@@ -16,6 +16,8 @@
 #include "Basic/Law.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovPoisson::CovPoisson(const CovContext& ctxt)
 : ACovFunc(ECov::POISSON, ctxt)
 {
@@ -60,4 +62,5 @@ VectorDouble CovPoisson::_evaluateSpectrumOnSphere(int n, double scale) const
   VH::normalize(sp, 1);
 
   return sp;
+}
 }

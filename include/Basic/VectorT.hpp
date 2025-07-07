@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <cmath>
 
+namespace gstlrn
+{
 class AStringFormat;
 
 /***************************************************************************
@@ -289,3 +291,4 @@ std::ostream& operator<<(std::ostream& os, const VectorT<T>& vec)
 typedef VectorT<UChar>  VectorBool; // Use UChar because std::vector of bool has a specific implementation
 typedef VectorT<String> VectorString;
 
+}

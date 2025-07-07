@@ -15,6 +15,8 @@
 
 #include <stdio.h>
 
+namespace gstlrn
+{
 AOF::AOF(const String& filename, const Db* db)
   : _filename(filename)
   , _db(db)
@@ -158,4 +160,5 @@ bool AOF::isAuthorized() const
   if (! isValidForNDim()) return false;
   if (! isValidForRotation()) return false;
   return true;
+}
 }

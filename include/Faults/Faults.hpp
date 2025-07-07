@@ -16,6 +16,9 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
 
+
+namespace gstlrn
+{
 class SpacePoint;
 
 class GSTLEARN_EXPORT Faults: public AStringable, public ASerializable
@@ -52,3 +55,4 @@ protected:
 private:
   std::vector<PolyLine2D> _faults;
 };
+}

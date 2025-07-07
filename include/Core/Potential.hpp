@@ -15,6 +15,8 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 class ANeigh;
@@ -68,3 +70,4 @@ GSTLEARN_EXPORT int potential_xvalid(Db* dbiso,
                                      double nugget_tgt   = 0.,
                                      bool flag_dist_conv = false,
                                      bool verbose        = false);
+}

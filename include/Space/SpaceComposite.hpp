@@ -18,6 +18,8 @@
 #include <memory>
 #include <vector>
 
+namespace gstlrn
+{
 class SpacePoint;
 class Tensor;
 
@@ -112,3 +114,4 @@ private:
   /// Space composits list
   std::vector<std::shared_ptr<ASpace> > _comps;
 };
+}

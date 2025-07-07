@@ -55,6 +55,8 @@
 
 #define R(i,j)              (R[(i) * n + (j)])
 
+namespace gstlrn
+{
 typedef struct
 {
   char key[5];
@@ -2141,4 +2143,4 @@ int db_proportion_estimate(Db *dbin,
 
   return 0;
 }
-
+}

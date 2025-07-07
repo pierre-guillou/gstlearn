@@ -18,6 +18,8 @@
 #include <Eigen/src/Core/Matrix.h>
 #endif
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ALinearOp
 {
 public:
@@ -37,7 +39,7 @@ public:
 public:
   int evalDirect(constvect inv, vect outv) const;
   int addToDest(const constvect inv, vect outv) const;
-  int addToDest(const Eigen::VectorXd& inv, Eigen::VectorXd& outv) const;
+  int addToDest(const ::Eigen::VectorXd& inv, ::Eigen::VectorXd& outv) const;
 
 protected:
   virtual int _addToDest(constvect inv, vect outv) const = 0;
@@ -49,3 +51,4 @@ private:
   mutable double _factor;
   mutable VectorDouble _temp;
 };
+}

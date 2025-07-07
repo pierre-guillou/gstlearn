@@ -15,6 +15,8 @@
 #include "Covariances/CovBase.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 
+namespace gstlrn
+{
 CovProportional::CovProportional(ACov* cor,
                 const MatrixSymmetric &sill)
 : CovBase(cor,sill)
@@ -71,4 +73,5 @@ double CovProportional::_eval(const SpacePoint& p1,
   const CovCalcMode* mode) const
 {
 return _sillCur.getValue(ivar,jvar) * getCor()->evalCov(p1, p2,0, 0, mode);
+}
 }

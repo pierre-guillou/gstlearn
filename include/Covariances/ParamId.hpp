@@ -17,6 +17,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ICloneable.hpp"
 
+namespace gstlrn
+{ 
 /**
  * This class is used:
  * - to define the constraints for the Model Automatic Fitting (authAssign true)
@@ -76,3 +78,4 @@ struct ParamIdEqual {
                lhs.getIV2() == lhs.getIV2();
     }
 };
+}

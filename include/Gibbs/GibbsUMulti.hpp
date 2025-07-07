@@ -14,6 +14,8 @@
 
 #include "Gibbs/GibbsMulti.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -37,3 +39,4 @@ private:
 private:
   VectorDouble _covmat;
 };
+}

@@ -14,6 +14,8 @@
 #include "Covariances/TabNoStat.hpp"
 #include "Enum/EConsElem.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT TabNoStatSills : public TabNoStat
 {
   public:
@@ -34,3 +36,4 @@ private:
   bool _isValid(const EConsElem &econs) const override;
 
 };
+}

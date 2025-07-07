@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Basic/CSVformat.hpp"
 
+namespace gstlrn
+{ 
 CSVformat::CSVformat(bool flagHeader,
                      int nSkip,
                      char charSep,
@@ -78,3 +80,4 @@ String CSVformat::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
+}

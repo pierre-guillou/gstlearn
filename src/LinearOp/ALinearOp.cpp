@@ -11,6 +11,7 @@
 #include "LinearOp/ALinearOp.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn{
 ALinearOp::ALinearOp()
 : _usefactor(false)
 , _idfactor(0.)
@@ -46,8 +47,8 @@ VectorDouble ALinearOp::evalDirect(const VectorDouble& in) const
   return res;
 }
 
-int ALinearOp::addToDest(const Eigen::VectorXd& inv,
-                         Eigen::VectorXd& outv) const
+int ALinearOp::addToDest(const ::Eigen::VectorXd& inv,
+                         ::Eigen::VectorXd& outv) const
 {
   constvect ins(inv.data(), inv.size());
   vect outs(outv.data(), outv.size());
@@ -95,4 +96,5 @@ void ALinearOp::resetModif()
   _usefactor = false;
   _idfactor = 0.;
   _factor = 1.;
+}
 }

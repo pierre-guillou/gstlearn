@@ -16,6 +16,8 @@
 #include "Space/SpacePoint.hpp"
 #include "Estimation/AModelOptim.hpp"
 
+namespace gstlrn
+{
 class ModelGeneric;
 class Vario;
 
@@ -71,3 +73,4 @@ protected:
   const Vario* _vario;
   std::vector<OneLag> _lags;
 };
+}

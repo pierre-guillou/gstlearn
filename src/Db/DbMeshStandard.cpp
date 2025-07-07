@@ -15,6 +15,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 DbMeshStandard::DbMeshStandard(int ndim,
                                int napexpermesh,
                                const VectorDouble& apices,
@@ -269,3 +271,4 @@ bool DbMeshStandard::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   return ret;
 }
 #endif
+}

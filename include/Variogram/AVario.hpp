@@ -17,6 +17,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ICloneable.hpp"
 
+namespace gstlrn
+{
 class Db;
 class ECalcVario;
 
@@ -110,3 +112,4 @@ protected:
 private:
   ECalcVario _calcul;
 };
+}

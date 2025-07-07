@@ -26,6 +26,7 @@
 #include "Core/Potential.hpp"
 #include "Covariances/CovAniso.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

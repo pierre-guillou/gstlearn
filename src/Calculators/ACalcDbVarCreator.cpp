@@ -14,6 +14,8 @@
 #include "Model/Model.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{
 ACalcDbVarCreator::ACalcDbVarCreator()
     : ACalculator(),
       _db(nullptr),
@@ -117,4 +119,5 @@ bool ACalcDbVarCreator::hasDb(bool verbose) const
     return false;
   }
   return true;
+}
 }

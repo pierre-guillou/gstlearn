@@ -17,7 +17,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
-class GridOld;
+namespace gstlrn
+{
 class MatrixSquare;
 
 class GSTLEARN_EXPORT Grid: public AStringable, public ASerializable
@@ -200,3 +201,4 @@ private:
 
   friend class DbGrid;
 };
+}

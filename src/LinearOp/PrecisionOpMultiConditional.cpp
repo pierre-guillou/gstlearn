@@ -20,6 +20,7 @@
 #include <vector>
 #include <algorithm>
 
+namespace gstlrn{
 PrecisionOpMultiConditional::PrecisionOpMultiConditional()
   :_multiPrecisionOp(std::vector<PrecisionOp*>())
   ,_multiProjData(std::vector<IProj*>())
@@ -400,4 +401,5 @@ VectorDouble PrecisionOpMultiConditional::computeCoeffs(const VectorDouble& Y,
   XtInvSigmaX.solve(XtInvSigmaZ, result);
 
   return result;
+}
 }

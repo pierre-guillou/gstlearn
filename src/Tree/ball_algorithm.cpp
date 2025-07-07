@@ -30,6 +30,8 @@ License: BSD 3-clause
 #include "Basic/AStringable.hpp"
 #include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 static double (*st_distance_function)(const double*, const double*, int) = euclidean_distance;
 
 double **copy_double_arrAsVVD(const VectorVectorDouble& arr)
@@ -464,4 +466,5 @@ double euclidean_distance(const double* x1, const double* x2, int n_features)
   p1.setCoords(x1, n_features);
   p2.setCoords(x2, n_features);
   return p1.getDistance(p2);
+}
 }

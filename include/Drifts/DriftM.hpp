@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Drifts/ADrift.hpp"
 
+namespace gstlrn
+{
+
 /**
  * Monomial drift term.
  * Examples:
@@ -44,3 +47,4 @@ public:
 private:
   VectorInt _monomialPower;
 };
+}

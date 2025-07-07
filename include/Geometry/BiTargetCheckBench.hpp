@@ -14,6 +14,8 @@
 
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BiTargetCheckBench: public ABiTargetCheck
 {
 public:
@@ -40,3 +42,4 @@ private:
   int       _idimBench;
   double    _width;
 };
+}

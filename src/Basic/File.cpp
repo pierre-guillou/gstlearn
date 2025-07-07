@@ -24,7 +24,8 @@
 #include <io.h>
 #include <fcntl.h>
 #endif
-
+namespace gstlrn
+{
 StdoutRedirect::StdoutRedirect(const String &file,
                                int argc,
                                char *argv[],
@@ -197,5 +198,5 @@ std::istream& gslSafeGetline(std::istream& is, String& t)
     }
   }
 }
-
+}
 

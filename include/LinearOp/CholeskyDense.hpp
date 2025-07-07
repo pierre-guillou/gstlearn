@@ -21,6 +21,8 @@
 #  include <Eigen/src/Core/Matrix.h>
 #endif
 
+namespace gstlrn
+{ 
 class MatrixSymmetric;
 class MatrixDense;
 
@@ -69,3 +71,4 @@ private:
   mutable VectorDouble _xl;                    // Lower triangular matrix
   mutable Eigen::LLT<Eigen::MatrixXd> _factor; // Cholesky decomposition (Eigen format)
 };
+}

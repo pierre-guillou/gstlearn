@@ -11,6 +11,8 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/ASerializable.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
 ** Main Program for testing the utilities

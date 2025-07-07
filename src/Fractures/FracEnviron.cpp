@@ -13,6 +13,8 @@
 #include "Basic/ASerializable.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 FracEnviron::FracEnviron(double xmax,
                          double ymax,
                          double deltax,
@@ -277,3 +279,4 @@ bool FracEnviron::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
   return ret;
 }
 #endif
+}

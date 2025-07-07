@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT GridBmp: public AOF
@@ -83,3 +85,4 @@ private:
   VectorInt _greens;
   VectorInt _blues;
 };
+}

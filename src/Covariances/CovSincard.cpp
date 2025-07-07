@@ -15,6 +15,8 @@
 
 #include "math.h"
 
+namespace gstlrn
+{
 CovSincard::CovSincard(const CovContext& ctxt)
 : ACovFunc(ECov::SINCARD, ctxt)
 {
@@ -59,4 +61,5 @@ String CovSincard::getFormula() const
 double CovSincard::simulateTurningBand(double t0, TurningBandOperate &operTB) const
 {
   return operTB.cosineOne(t0);
+}
 }

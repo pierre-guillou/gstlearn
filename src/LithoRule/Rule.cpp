@@ -35,6 +35,8 @@
 #define NODE_RANK(inode)     (nodes[6 * (inode) + 4])
 #define FACIES(inode)        (nodes[6 * (inode) + 5])
 
+namespace gstlrn
+{
 static const VectorString symbol = {"F","S","T"};
 static int GAUSS_MODE = 1;
 
@@ -1133,3 +1135,4 @@ bool Rule::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

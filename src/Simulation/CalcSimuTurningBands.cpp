@@ -29,6 +29,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{ 
 CalcSimuTurningBands::CalcSimuTurningBands(int nbsimu,
                                            int nbtuba,
                                            bool flag_check,
@@ -2430,4 +2432,6 @@ int simbayes(Db *dbin,
   // Run the calculator
   int error = (situba.run()) ? 0 : 1;
   return error;
+}
+
 }

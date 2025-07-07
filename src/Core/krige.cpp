@@ -78,6 +78,8 @@
 #define YMAT(ip,il)       (ymat   [(il) + nbfl * (ip)])
 /*! \endcond */
 
+namespace gstlrn
+{
 // TODO : remove all these static stuffs !
 static VectorDouble d1_1_global;
 static VectorDouble d1_2_global;
@@ -97,7 +99,9 @@ static int INH_FLAG_VERBOSE = 0;
 static int INH_FLAG_LIMIT = 1;
 static char string[100];
 
+
 static CovInternal COVINT;
+
 
 typedef struct
 {
@@ -5167,4 +5171,5 @@ void _image_smoother(DbGrid *dbgrid,
     estim = (total <= 0.) ? TEST : estim / total;
     dbgrid->setArray(iech_out, iptr0, estim);
   }
+}
 }

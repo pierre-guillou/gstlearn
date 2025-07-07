@@ -21,13 +21,17 @@ def extract_macro_calls(header_file, macro_name):
                 macro_calls += [(classname, func_name.strip(), body.strip(), arg)]
     return macro_calls
     
+import os
+import re
+
 def find_function_return_type_in_file(method_name, header_path):
     """
-    Retourne le type de retour nettoyé (sans pointeur, référence, const, etc.) 
-    pour une méthode dans un fichier header donné.
+    Returns the cleaned return type (without pointer, reference, const, etc.)
+    of a method declared in the given header file.
+    Ignores method calls inside other functions.
     """
     if not os.path.isfile(header_path):
-        print(f"Error: Fichier non trouvé : {header_path}")
+        print(f"Error: File not found: {header_path}")
         return None
 
     with open(header_path, 'r', encoding='utf-8') as f:
@@ -38,33 +42,41 @@ def find_function_return_type_in_file(method_name, header_path):
 
     for line in lines:
         stripped = line.strip()
-        if not collecting and re.search(rf'\b{re.escape(method_name)}\s*\(', stripped):
-            collecting = True
+
+        # Start collecting only if the line looks like a method declaration
+        if not collecting:
+            if re.match(rf'^(virtual\s+)?[\w:<>\s*&]+[\s*&]+{re.escape(method_name)}\s*\(', stripped):
+                collecting = True
+
         if collecting:
             buffer += " " + stripped
             if "{" in stripped or ";" in stripped:
                 break
 
     if not buffer:
-        print(f"Error: Méthode {method_name} introuvable dans {header_path}")
+        print(f"Error: Method '{method_name}' not found in {header_path}")
         return None
 
-    # Nettoyage
+    # Remove comments
     buffer = re.sub(r'//.*', '', buffer)
     buffer = re.sub(r'/\*.*?\*/', '', buffer)
 
-    # Extraction du type
-    match = re.match(r'(?:virtual\s+)?([\w\s:<>,*&]+?)\s+\**' + re.escape(method_name) + r'\s*\(', buffer.strip())
+    # Try extracting the return type
+    match = re.match(
+        rf'^(?:virtual\s+)?([\w:<>\s,&*]+?)\s+\**{re.escape(method_name)}\s*\(',
+        buffer.strip()
+    )
+
     if match:
-        return_type = match.group(1).strip()
-        # Nettoyage : suppression de const, &, *, etc.
+        return_type = match.group(1)
+        # Clean return type (remove const, &, *, extra spaces)
         return_type = return_type.replace('const', '')
         return_type = return_type.replace('&', '')
         return_type = return_type.replace('*', '')
         return_type = return_type.strip()
         return return_type
 
-    print(f"Warning: Signature non reconnue pour {method_name} dans {header_path}")
+    print(f"Warning: Could not parse return type for '{method_name}' in {header_path}")
     return None
 
 def find_include_folder_in_file(classname, file_path):

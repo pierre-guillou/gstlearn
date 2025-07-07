@@ -12,8 +12,12 @@
 
 /* Different ENUM lists */
 
+namespace gstlrn
+{
 #ifndef SWIG
-// Internal enums (currently not exported via SWIG)
+
+ 
+// Internal nums (currently not exported via SWIG)
 typedef enum
 {
   TYPE_DB = 0,        //!< Data Base
@@ -264,4 +268,4 @@ typedef enum
   CALCUL_SIMUNONCOND = 2 //!< Non conditional simulations
 } ENUM_CALCUL_MODE;  // Now see ESPDECalcMode.hpp
 */
-
+}

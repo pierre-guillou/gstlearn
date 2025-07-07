@@ -15,6 +15,8 @@
 #include "Basic/VectorT.hpp"
 #include "Enum/ECov.hpp"
 
+namespace gstlrn
+{
 bool _isSelected(ACovFunc *cov,
                  int ndim,
                  int minorder,
@@ -66,4 +68,6 @@ VectorString CovHelper::getAllCovariances(int  ndim,
     it.toNext();
   }
   return vs;
+}
+
 }

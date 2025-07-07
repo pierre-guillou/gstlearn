@@ -13,6 +13,8 @@
 #include "math.h"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovCosExp::CovCosExp(const CovContext& ctxt)
 : ACovFunc(ECov::COSEXP, ctxt)
 {
@@ -50,4 +52,5 @@ double CovCosExp::_evaluateCov(double h) const
   double h2 = h / getParam();
   cov *= cos(2. * GV_PI * h2);
   return (cov);
+}
 }

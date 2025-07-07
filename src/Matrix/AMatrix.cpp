@@ -19,6 +19,9 @@
 
 #include <iostream>
 
+namespace gstlrn
+{ 
+
 static int  globalMultiThread = 0;
 
 AMatrix::AMatrix(int nrow, int ncol)
@@ -1492,4 +1495,4 @@ bool isMultiThread()
 {
   return globalMultiThread > 0;
 }
-
+}

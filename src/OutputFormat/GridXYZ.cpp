@@ -13,6 +13,8 @@
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 
+namespace gstlrn
+{
 GridXYZ::GridXYZ(const char* filename, const Db* db)
   : AOF(filename, db)
 {
@@ -67,4 +69,5 @@ int GridXYZ::writeInFile()
 
   _fileClose();
   return 0;
+}
 }

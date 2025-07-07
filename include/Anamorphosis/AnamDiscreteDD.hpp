@@ -20,6 +20,8 @@
 #include "Stats/PCA.hpp"
 #include "Stats/Selectivity.hpp"
 
+namespace gstlrn {
+  
 class GSTLEARN_EXPORT AnamDiscreteDD: public AnamDiscrete
 {
 public:
@@ -113,3 +115,4 @@ private:
 
   friend class Selectivity;
 };
+}

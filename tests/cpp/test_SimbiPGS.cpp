@@ -30,6 +30,7 @@
 #include "LithoRule/RuleShadow.hpp"
 #include "LithoRule/RuleProp.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program

@@ -19,6 +19,8 @@
 #include "API/SPDE.hpp"
 #include "Model/Model.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program
@@ -53,22 +55,22 @@ int main(int argc, char *argv[])
   VectorDouble z = VH::simulateGaussian(ndata);
   int useCholesky = 0;
   law_set_random_seed(132341);
-  (void)simulateSPDE(nullptr, dat, model, 1, useCholesky,
+  (void)gstlrn::simulateSPDE(nullptr, dat, model, 1, useCholesky,
                      VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(),
                      NamingConvention("variable", false, false));
   dat->display();
 
   // Estimation and simulations
-  (void)krigingSPDE(dat, grid, model, true, false, useCholesky, 
+  (void)gstlrn::krigingSPDE(dat, grid, model, true, false, useCholesky, 
                     VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(), 
                     NamingConvention("K-spirale"));
   law_set_random_seed(132341);
 
-  (void)simulateSPDE(nullptr, grid, model, nbsimu, useCholesky, 
+  (void)gstlrn::simulateSPDE(nullptr, grid, model, nbsimu, useCholesky, 
                      VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(), 
                      NamingConvention("NCS-spirale"));
   law_set_random_seed(132341);
-  (void)simulateSPDE(dat, grid, model, nbsimu, useCholesky,
+  (void)gstlrn::simulateSPDE(dat, grid, model, nbsimu, useCholesky,
                      VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(), 
                      NamingConvention("CDS-spirale"));
 

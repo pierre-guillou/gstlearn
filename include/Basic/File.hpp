@@ -24,6 +24,9 @@
 #endif
 */
 
+namespace gstlrn
+{
+
 // Standard output stream redirection
 
 /**
@@ -89,3 +92,4 @@ GSTLEARN_EXPORT String gslGetEnv(const String& name);
  */
 GSTLEARN_EXPORT std::istream& gslSafeGetline(std::istream& is, String& t);
 
+}

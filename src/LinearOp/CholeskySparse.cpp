@@ -18,6 +18,8 @@
 #include <Eigen/src/Core/Matrix.h>
 #include <vector>
 
+namespace gstlrn
+{
 CholeskySparse::CholeskySparse(const MatrixSparse* mat)
   : ACholesky(mat)
   , _flagEigen(false)
@@ -392,4 +394,5 @@ int CholeskySparse::_stdevEigen(VectorDouble& vcur) const
   Eigen::SparseMatrix Qinv = partial_inverse(llt, a);
   vcurm = Qinv.diagonal();
   return 0;
+}
 }

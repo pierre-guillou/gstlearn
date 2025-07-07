@@ -17,6 +17,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace gstlrn
+{
 ASpace::ASpace(unsigned int ndim)
   : AStringable()
   , _nDim(ndim)
@@ -273,3 +275,4 @@ VectorDouble ASpace::projCoord(const VectorDouble& coord, int ispace) const
 }
 
 /////////////////////////////////////////////////////////
+}

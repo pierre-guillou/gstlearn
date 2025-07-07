@@ -23,6 +23,8 @@
 #include "Variogram/DirParam.hpp"
 #include "Variogram/Vario.hpp"
 
+namespace gstlrn
+{
 class AAnam;
 class AnamDiscreteDD;
 class AnamDiscreteIR;
@@ -862,3 +864,4 @@ GSTLEARN_EXPORT VectorInt kmedoids(const VectorDouble& data,
                                    int nclusters,
                                    int npass,
                                    int verbose);
+}

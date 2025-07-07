@@ -20,6 +20,8 @@
 #include <filesystem>
 #include <fstream>
 
+namespace gstlrn
+{
 String ASerializable::_myPrefixName = String();
 
 ASerializable::ASerializable()                                    = default;
@@ -289,4 +291,5 @@ void ASerializable::unsetPrefixName(void)
 const String& ASerializable::getPrefixName()
 {
   return _myPrefixName;
+}
 }

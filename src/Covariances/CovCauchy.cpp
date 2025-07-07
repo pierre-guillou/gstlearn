@@ -13,6 +13,8 @@
 
 #include "math.h"
 
+namespace gstlrn
+{
 CovCauchy::CovCauchy(const CovContext& ctxt)
 : ACovFunc(ECov::CAUCHY, ctxt)
 {
@@ -51,4 +53,5 @@ double CovCauchy::_evaluateCov(double h) const
 String CovCauchy::getFormula() const
 {
   return "C(h)=\\frac{1}{\\left( 1+ \\frac{h^2}{a_t^2} \\right)^\\alpha";
+}
 }

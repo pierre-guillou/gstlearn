@@ -17,6 +17,9 @@
 #include "Db/DbGrid.hpp"
 #include "Basic/NamingConvention.hpp"
 
+
+namespace gstlrn
+{ 
 class ELoc;
 
 class GSTLEARN_EXPORT ACalcDbToDb: public ACalculator
@@ -90,3 +93,4 @@ private:
   int _ndim;
   int _nvar;
 };
+}

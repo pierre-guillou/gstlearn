@@ -26,6 +26,9 @@
 
 #include <math.h>
 
+namespace gstlrn
+{ 
+
 CalcAnamTransform::CalcAnamTransform(AAnam* anam)
     : ACalcDbVarCreator(),
       _iattVar(-1),
@@ -1291,4 +1294,5 @@ int anamPointToBlock(AAnam* anam, int verbose, double cvv, double coeff, double 
   anam->updatePointToBlock(r_coef);
 
   return 0;
+}
 }

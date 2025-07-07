@@ -12,6 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT GlobalEnvironment
 {
 private:
@@ -31,3 +33,4 @@ public:
 private:
   int _domainReference;
 };
+}

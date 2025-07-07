@@ -15,6 +15,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Matrix/MatrixSquare.hpp"
 
+
+namespace gstlrn {
 class AMatrix;
 class EOperator;
 
@@ -116,3 +118,4 @@ public:
 private:
   int _getTriangleSize() const;
 };
+}

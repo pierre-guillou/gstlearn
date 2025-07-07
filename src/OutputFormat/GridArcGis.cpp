@@ -14,6 +14,8 @@
 #include "Db/DbGrid.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 GridArcGis::GridArcGis(const char* filename, const Db* db)
   : AOF(filename, db)
 {
@@ -84,3 +86,4 @@ int GridArcGis::writeInFile()
   return 0;
 }
 
+}

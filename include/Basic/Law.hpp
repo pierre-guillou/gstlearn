@@ -15,6 +15,8 @@
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT void   law_set_old_style(bool style);
 GSTLEARN_EXPORT int    law_get_random_seed(void);
 GSTLEARN_EXPORT void   law_set_random_seed(int seed);
@@ -65,3 +67,4 @@ GSTLEARN_EXPORT VectorDouble law_exp_sample(const double* tabin,
                                             int seed,
                                             double percent);
 GSTLEARN_EXPORT int sampleInteger(int minit, int maxi);
+}

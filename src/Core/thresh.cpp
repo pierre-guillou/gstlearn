@@ -30,6 +30,8 @@
 #define PROPWRK(ifac1,ifac2) (propdef->propwrk[INDLOC(ifac1,ifac2)])
 /*! \endcond */
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Free a Rule structure
@@ -1295,4 +1297,5 @@ Model* model_rule_combine(const Model *model1,
 
   new_model = model_combine(model1, model2, rho);
   return (new_model);
+}
 }

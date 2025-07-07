@@ -18,6 +18,8 @@
 #include "Enum/ENeigh.hpp"
 #include "Neigh/ANeigh.hpp"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 
@@ -83,3 +85,4 @@ private:
   int _skip;                  /* Skipping factor */
   VectorInt _imageRadius;     /* Vector of image neighborhood radius */
 };
+}

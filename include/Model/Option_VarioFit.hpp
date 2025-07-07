@@ -15,6 +15,8 @@
 // WARNING: Make this include list as small as possible!
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 /**
  * This class defines the options and parameters used during the Variogram Fitting.
  * All the parameters described hereafter are either available in the construction,
@@ -35,6 +37,7 @@
  * - keep_instr: When True, at least ONE basic structure must be kept in the Model
  * - flag_instrinsic: When True, fit a Model which includes at least one Intrinsic basic Structure
  */
+
 
 class GSTLEARN_EXPORT Option_VarioFit: public AStringable
 {
@@ -84,3 +87,4 @@ private:
   bool _keep_intstr;       /* Keep at least one intrinsic structure */
   bool _flag_intrinsic;    /* Ask for an intrinsic model */
 };
+}

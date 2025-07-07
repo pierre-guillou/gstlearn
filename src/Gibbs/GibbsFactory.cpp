@@ -17,6 +17,8 @@
 #include "Basic/AStringable.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 GibbsFactory::GibbsFactory()
 {
 }
@@ -101,4 +103,5 @@ AGibbs* GibbsFactory::createGibbs(Db* db,
 
   GibbsUMultiMono* gibbs = new GibbsUMultiMono(db, models, rho);
   return (static_cast<AGibbs*>(gibbs));
+}
 }

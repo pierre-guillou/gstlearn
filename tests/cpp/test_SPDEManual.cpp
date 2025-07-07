@@ -29,6 +29,7 @@
 #define __USE_MATH_DEFINES
 #include <cmath>
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

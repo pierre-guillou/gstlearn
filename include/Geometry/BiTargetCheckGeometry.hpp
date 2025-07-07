@@ -14,6 +14,8 @@
 
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BiTargetCheckGeometry: public ABiTargetCheck
 {
 public:
@@ -56,3 +58,4 @@ private:
   mutable double _psmin;
   mutable double _dist;
 };
+}

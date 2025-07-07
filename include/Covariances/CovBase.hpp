@@ -28,6 +28,8 @@
 class AFunctional;
 class CovInternal;
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT CovBase: public ACov
 {
 public:
@@ -160,3 +162,4 @@ private:
   std::shared_ptr<ACov> _cor;
   LowerTriangularRange _itRange;
 };
+}

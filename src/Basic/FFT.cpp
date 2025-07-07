@@ -14,6 +14,8 @@
 #include "Core/fftn.hpp"
 #include <math.h>
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Calculate the FFT in a space of dimension N
@@ -224,4 +226,4 @@ void fftshift(const VectorInt& dims, VectorDouble& data)
     data[new_index] = temp[index];
   }
 }
-
+}

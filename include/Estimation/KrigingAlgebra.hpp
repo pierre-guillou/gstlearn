@@ -15,6 +15,8 @@
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/AMatrix.hpp"
 
+namespace gstlrn
+{
 /**
  * @brief Perform the Algebra for Kriging and CoKriging
  *
@@ -240,3 +242,4 @@ private:
   bool _flagBayes;
   bool _flagDual;
 };
+}

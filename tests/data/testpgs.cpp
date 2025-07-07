@@ -30,6 +30,7 @@
 /* Program principal */
 /*********************/
 
+using namespace gstlrn;
 int main(int argc, char *argv[])
 {
   char       filename[BUFFER_LENGTH];

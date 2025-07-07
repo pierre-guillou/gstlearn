@@ -14,6 +14,8 @@
 #include "Db/Db.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 AVario::AVario()
   : AStringable()
   , _calcul(ECalcVario::UNDEFINED)
@@ -427,4 +429,4 @@ void AVario::setCalcul(const ECalcVario& calcul)
     }
   }
 }
-
+}

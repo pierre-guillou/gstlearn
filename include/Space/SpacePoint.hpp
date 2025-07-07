@@ -17,6 +17,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Space/ASpaceObject.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SpacePoint : public ASpaceObject
 {
 public:
@@ -81,3 +83,4 @@ protected:
   mutable int _iech;   // Absolute rank of the sample within the Db
   mutable bool _isProjected; // True if the coordinates are projected
 };
+}

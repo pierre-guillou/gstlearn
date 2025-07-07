@@ -15,7 +15,10 @@
 #include "Basic/VectorNumT.hpp"
 #include "LinearOp/IOptimCost.hpp"
 
-class PrecisionOp;
+
+namespace gstlrn
+{
+class PrecisionOp; 
 class ProjMatrix;
 
 class GSTLEARN_EXPORT OptimCostBinary: public IOptimCost
@@ -78,3 +81,4 @@ private:
   mutable VectorDouble _lambdav; /* Dimension: Nvertex */
   mutable VectorDouble _works;   /* Dimension: Nseis   */
 };
+}

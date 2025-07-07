@@ -90,6 +90,8 @@
 //  Creation:   September 2, 2004
 //
 // ***************************************************************************/
+namespace gstlrn
+{   
 void write_point_mesh(const char* filename,
                       int ub,
                       int npts,
@@ -320,3 +322,4 @@ void write_curvilinear_mesh(const char* filename,
                             int* centering,
                             const char* const* varnames,
                             float** vars);
+}

@@ -11,6 +11,8 @@
 #include "Basic/Timer.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 Timer::Timer()
 {
   reset();
@@ -104,4 +106,5 @@ void Timer::displayMilliseconds(const String& title, double msec, int expected_t
     messageNoDiff("%s: %d ms. (Ref = %d ms.)\n", title.c_str(), (int)msec, expected_time);
   else
     messageNoDiff("%s: %d ms.\n", title.c_str(), (int)msec);
+}
 }

@@ -15,6 +15,8 @@
 #include "Db/Db.hpp"
 #include "Space/ASpace.hpp"
 
+namespace gstlrn
+{
 NeighUnique::NeighUnique(bool flag_xvalid,  const ASpaceSharedPtr& space)
     : ANeigh(space)
 {
@@ -184,3 +186,4 @@ bool NeighUnique::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
   return ret;
 }
 #endif
+}

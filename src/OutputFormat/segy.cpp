@@ -20,6 +20,8 @@
 #include <string.h>
 #include <math.h>
 
+namespace gstlrn
+{
 struct RefPt
 {
   int iline;
@@ -2051,3 +2053,4 @@ int db_segy(const char *filesegy,
   return 0;
 }
 
+}

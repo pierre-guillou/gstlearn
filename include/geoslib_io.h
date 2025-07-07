@@ -11,6 +11,8 @@
 
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT void record_close(void);
 #ifndef SWIG
 GSTLEARN_EXPORT void redefine_message(void (*write_func)(const char*));
@@ -31,3 +33,4 @@ GSTLEARN_EXPORT char * strsep(char **stringp, const char* delim);
 #endif
 GSTLEARN_EXPORT void print_current_line(void);
 
+}

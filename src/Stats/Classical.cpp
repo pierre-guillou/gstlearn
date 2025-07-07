@@ -30,6 +30,8 @@
 #include <Matrix/Table.hpp>
 #include <string.h>
 
+namespace gstlrn
+{ 
 /****************************************************************************/
 /*!
  **  Check the operator name
@@ -2348,4 +2350,6 @@ std::map<int, std::map<int, int>> contingencyTable2(const VectorInt& values,
   for (int i = 0, size = (int) values.size(); i < size; i++)
     table[values[i]][bins[i]]++;
   return table;
+}
+
 }

@@ -19,6 +19,7 @@
 #define _TL(i, j)     _tl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
 #define _XL(i, j)     _xl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
 
+namespace gstlrn{
 CholeskyDense::CholeskyDense(const MatrixSymmetric* mat)
   : ACholesky(mat)
   , _tl()
@@ -385,4 +386,5 @@ void CholeskyDense::normMatInPlace(int mode,
       }
       b.setValue(i, j, val);
     }
+}
 }

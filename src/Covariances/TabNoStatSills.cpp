@@ -4,7 +4,8 @@
 #include "Enum/EConsElem.hpp"
 #include "geoslib_define.h"
 
-
+namespace gstlrn
+{ 
 TabNoStatSills::TabNoStatSills()
 {
 }
@@ -60,4 +61,5 @@ int TabNoStatSills::getNSills() const
 
 TabNoStatSills::~TabNoStatSills()
 {
+}
 }

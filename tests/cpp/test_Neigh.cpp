@@ -14,6 +14,7 @@
 #include "Neigh/NeighUnique.hpp"
 #include "Neigh/NeighMoving.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

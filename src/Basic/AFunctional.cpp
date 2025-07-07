@@ -12,6 +12,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 AFunctional::AFunctional(int ndim)
     : _ndim(ndim)
 {
@@ -57,4 +59,5 @@ VectorDouble AFunctional::getFunctionValues(const Db *db, bool useSel) const
     vec.push_back(value);
   }
   return vec;
+}
 }

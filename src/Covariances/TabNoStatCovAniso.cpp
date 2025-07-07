@@ -3,6 +3,8 @@
 #include "Covariances/TabNoStat.hpp"
 #include "Enum/EConsElem.hpp"
 
+namespace gstlrn
+{
 TabNoStatCovAniso::TabNoStatCovAniso()
 : _nAngles(0)
 , _nRanges(0)
@@ -174,3 +176,4 @@ TabNoStatCovAniso::~TabNoStatCovAniso()
 
 }
 
+}

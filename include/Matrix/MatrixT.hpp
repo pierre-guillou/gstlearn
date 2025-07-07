@@ -3,6 +3,9 @@
 #include <cstddef>
 #include <vector>
 
+namespace gstlrn
+{
+  
 template<typename T>
 class MatrixT
 {
@@ -74,3 +77,4 @@ private:
   size_t _ncol;
   std::vector<T> _data; // Stockage contigu en 1D
 };
+}

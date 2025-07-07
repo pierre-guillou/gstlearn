@@ -28,6 +28,8 @@
 #include "Db/DbGrid.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{ 
 static void _modifyMopForAnam(ModelGeneric* model,
                               ModelOptimParam& mop)
 {
@@ -409,4 +411,5 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
     return ModelOptimVario::createForOptim(model, vario, constraints, mopLocal);
   }
   return nullptr;
+}
 }

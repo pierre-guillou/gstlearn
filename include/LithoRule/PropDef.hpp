@@ -14,6 +14,8 @@
 
 #include "Enum/EProcessOper.hpp"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 class Rule;
@@ -81,3 +83,4 @@ GSTLEARN_EXPORT PropDef* proportion_manage(int mode,
                                            PropDef* proploc);
 GSTLEARN_EXPORT void propdef_reset(PropDef* propdef);
 GSTLEARN_EXPORT void proportion_print(PropDef* propdef);
+}

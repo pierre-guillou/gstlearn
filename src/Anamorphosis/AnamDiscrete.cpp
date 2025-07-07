@@ -18,6 +18,8 @@
 
 #define ANAM_KD_NELEM 6
 
+namespace gstlrn
+{
 AnamDiscrete::AnamDiscrete()
     : AAnam(),
       _nCut(0),
@@ -352,3 +354,4 @@ bool AnamDiscrete::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) c
   return ret;
 }
 #endif
+}

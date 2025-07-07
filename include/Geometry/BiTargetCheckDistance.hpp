@@ -14,6 +14,8 @@
 
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BiTargetCheckDistance: public ABiTargetCheck
 {
 public:
@@ -72,3 +74,4 @@ private:
   mutable VectorDouble _movingIncr;
   mutable VectorDouble _movingAux;
 };
+}

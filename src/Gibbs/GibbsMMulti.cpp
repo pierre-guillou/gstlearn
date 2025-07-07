@@ -24,6 +24,9 @@
 
 static bool storeSparse = true;
 
+namespace gstlrn
+{ 
+
 GibbsMMulti::GibbsMMulti()
   : GibbsMulti()
   , _Cmat(nullptr)
@@ -434,4 +437,5 @@ double GibbsMMulti::_getEstimate(int ipgs,
     }
   }
   return yk;
+}
 }

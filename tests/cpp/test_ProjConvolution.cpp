@@ -17,6 +17,8 @@
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "LinearOp/ProjConvolution.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

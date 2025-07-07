@@ -16,6 +16,8 @@
 #include "Arrays/BImage.hpp"
 #include "Db/DbGrid.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Spill_Res
 {
 public:
@@ -224,3 +226,4 @@ GSTLEARN_EXPORT int db_morpho_calc(DbGrid* dbgrid,
                                    bool verbose);
 GSTLEARN_EXPORT void db_morpho_angle2D(DbGrid* dbgrid, const VectorInt& radius, int iptr0);
 GSTLEARN_EXPORT void db_morpho_gradients(DbGrid* dbgrid, int iptr0);
+}

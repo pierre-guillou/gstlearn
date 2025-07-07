@@ -14,12 +14,15 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 /**
  * Class for management of Directions used in Turning Band algorithm
  * Remark: The 3-D definition is compulsory (even in 2-D)
  */
+
 class GSTLEARN_EXPORT TurningBandOperate
 {
 public:
@@ -85,3 +88,4 @@ private:
   VectorDouble _v1;
   VectorDouble _v2;
 };
+}

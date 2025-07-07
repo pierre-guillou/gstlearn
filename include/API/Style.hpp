@@ -14,6 +14,8 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 /**
  * \brief
  * The Style class contains all the recommended styles considerations.
@@ -198,3 +200,4 @@ private:
   VectorInt _argVectorInt;       //!< Private attribute of type `VectorInt`
   VectorDouble _argVectorDouble; //!< Private attribute of type `VectorDouble`
 };
+}

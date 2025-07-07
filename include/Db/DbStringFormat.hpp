@@ -29,6 +29,9 @@
 //  FLAG_LOCATOR = 32,  //!< Print the locators
 //} DISPLAY_PARAMS;
 //
+
+namespace gstlrn
+{
  static unsigned char FLAG_RESUME = 1;  //!< Print the Db summary
  static unsigned char FLAG_VARS = 2;   //!< Print the Field names
  static unsigned char FLAG_EXTEND = 4; //!< Print the Db extension
@@ -142,3 +145,4 @@ private:
   bool _useSel;
   int _mode;
 };
+}

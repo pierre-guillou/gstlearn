@@ -18,6 +18,8 @@
 #include <math.h>
 #include <random>
 
+namespace gstlrn
+{
 static int Random_factor     = 105;
 static int Random_congruent  = 20000159;
 static int Random_value      = 43241421;
@@ -1213,4 +1215,5 @@ int sampleInteger(int mini, int maxi)
   double rand = law_uniform(rmini, rmaxi);
   int retval = (rand > 0) ? (int) trunc(rand + 0.5) : (int) -trunc(-rand + 0.5);
   return retval;
+}
 }

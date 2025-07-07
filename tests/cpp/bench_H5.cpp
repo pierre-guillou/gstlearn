@@ -2,6 +2,7 @@
 #include <Basic/Timer.hpp>
 #include <Db/DbGrid.hpp>
 
+using namespace gstlrn;
 int test_NF(const DbGrid& db)
 {
   Timer tm;

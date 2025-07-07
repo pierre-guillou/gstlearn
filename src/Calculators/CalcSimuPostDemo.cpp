@@ -11,6 +11,8 @@
 #include "Calculators/CalcSimuPostDemo.hpp"
 #include "Basic/VectorHelper.hpp"
 
+namespace gstlrn
+{
 CalcSimuPostDemo::CalcSimuPostDemo()
     : CalcSimuPost()
 {
@@ -88,4 +90,5 @@ int simuPostDemo(Db *dbin,
 
   int error = (calcul.run()) ? 0 : 1;
   return error;
+}
 }

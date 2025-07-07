@@ -12,6 +12,8 @@
 
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovWendland2::CovWendland2(const CovContext& ctxt)
 : ACovFunc(ECov::WENDLAND2, ctxt)
 {
@@ -77,4 +79,5 @@ double CovWendland2::_evaluateCovDerivative(int degree, double h) const
       break;
   }
   return (res);
+}
 }

@@ -18,6 +18,8 @@
 #include "Mesh/AMesh.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
+namespace gstlrn
+{
 class Koption
 {
 public:
@@ -186,3 +188,4 @@ struct Local_Relem
 
 typedef struct Local_Relem Relem;
 typedef struct Local_Split Split;
+}

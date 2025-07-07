@@ -18,6 +18,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class ASpace;
 class SpacePoint;
 
@@ -112,3 +114,4 @@ GSTLEARN_EXPORT const ASpace* getDefaultSpace();
 GSTLEARN_EXPORT ASpaceSharedPtr getDefaultSpaceSh();
 
 GSTLEARN_EXPORT bool isDefaultSpaceSphere();
+}

@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <cmath>
 
+namespace gstlrn
+{
 /***************************************************************************
  **
  ** Vector of T values (numerical type).
@@ -235,3 +237,4 @@ typedef VectorNumT<UChar>     VectorUChar; // Use typedef because swig doesn't l
 typedef VectorT<VectorInt>    VectorVectorInt;
 typedef VectorT<VectorDouble> VectorVectorDouble;
 typedef VectorT<VectorFloat>  VectorVectorFloat;
+}

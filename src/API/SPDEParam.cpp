@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "API/SPDEParam.hpp"
 
+namespace gstlrn
+{
 SPDEParam::SPDEParam(int refineK,
                      int refineS,
                      int border,
@@ -81,4 +83,5 @@ SPDEParam* SPDEParam::create(int refineK,
 {
   return new SPDEParam(refineK, refineS, border, flag_polarized, nxmax,
                        epsNugget, useStencil, nMC, seedMC, cgparams);
+}
 }

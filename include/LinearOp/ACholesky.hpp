@@ -15,7 +15,12 @@
 #include "LinearOp/ASimulable.hpp"
 #include "Matrix/AMatrix.hpp"
 
+
+namespace gstlrn
+{ 
+class AMatrix;
 class MatrixDense;
+
 
 class GSTLEARN_EXPORT ACholesky: public ASimulable
 {
@@ -61,3 +66,4 @@ protected:
   mutable bool _ready;
   mutable bool _empty;
 };
+}

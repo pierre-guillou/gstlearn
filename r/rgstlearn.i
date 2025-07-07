@@ -32,6 +32,7 @@
 #include <iostream>
 %}
 
+namespace gstlrn {
 %fragment("ToCpp", "header")
 {
   template <typename Type> int convertToCpp(SEXP obj, Type& value);
@@ -322,15 +323,15 @@
 %typemap(rtypecheck, noblock=1) const float&, float                           { length($arg) == 1 &&  is.numeric(unlist($arg)) }
 %typemap(rtypecheck, noblock=1) const UChar&, UChar                           { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
 %typemap(rtypecheck, noblock=1) const bool&, bool                             { length($arg) == 1 &&  is.logical(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const VectorInt&, VectorInt                   { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
-%typemap(rtypecheck, noblock=1) const VectorDouble&, VectorDouble             { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorString&, VectorString             { length($arg) == 0 || (length($arg) > 0 &&  is.character(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorFloat&, VectorFloat               { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorUChar&, VectorUChar               { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
-%typemap(rtypecheck, noblock=1) const VectorBool&, VectorBool                 { length($arg) == 0 || (length($arg) > 0 &&  is.logical(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorVectorInt&, VectorVectorInt       { length($arg) == 0 || (length($arg) > 0 && 
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorInt&, gstlrn::VectorInt                   { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorDouble&, gstlrn::VectorDouble             { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorString&, gstlrn::VectorString             { length($arg) == 0 || (length($arg) > 0 &&  is.character(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorFloat&, gstlrn::VectorFloat               { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorUChar&, gstlrn::VectorUChar               { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorBool&, gstlrn::VectorBool                 { length($arg) == 0 || (length($arg) > 0 &&  is.logical(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorVectorInt&, gstlrn::VectorVectorInt       { length($arg) == 0 || (length($arg) > 0 && 
                                                                                (length($arg[[1]]) == 0 || (length($arg[[1]]) > 0 && (is.integer(unlist($arg[[1]])) || is.numeric(unlist($arg[[1]])))))) }
-%typemap(rtypecheck, noblock=1) const VectorVectorDouble&, VectorVectorDouble { length($arg) == 0 || (length($arg) > 0 && 
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorVectorDouble&, gstlrn::VectorVectorDouble { length($arg) == 0 || (length($arg) > 0 && 
                                                                                (length($arg[[1]]) == 0 || (length($arg[[1]]) > 0 && is.numeric(unlist($arg[[1]]))))) }
 
 %fragment("FromCpp", "header")
@@ -472,7 +473,7 @@
 
   int matrixDenseFromCppCreate(SEXP* obj, const MatrixDense& mat)
   {
-    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_MatrixDense, 0 |  0 );
+    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_gstlrn__MatrixDense, 0 |  0 );
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
@@ -526,7 +527,7 @@
 
   int matrixSparseFromCppCreate(SEXP* obj, const MatrixSparse& mat)
   {
-    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_MatrixSparse, 0 |  0 );
+    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_gstlrn__MatrixSparse, 0 |  0 );
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
@@ -562,7 +563,7 @@
   if (typeof($input) == "character") $input = NamingConvention($input);
   if (inherits($input, "ExternalReference")) $input = slot($input,"ref");
 %}
-
+}
 //////////////////////////////////////////////////////////////
 //         C++ library SWIG includes and typemaps           //
 //////////////////////////////////////////////////////////////
@@ -673,24 +674,24 @@
 ## Add automatic display for all AStringable objects and vectors
 ## ------------------------------------------------------------- ##
 
-setMethod(f = "show", signature = "_p_AStringable",                     definition = function(object){ AStringable_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__AStringable",                     definition = function(object){ AStringable_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_double_t",               definition = function(object){ VectorTDouble_display(object) })
-setMethod(f = "show", signature = "_p_VectorNumTT_double_t",            definition = function(object){ VectorTDouble_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_double_t",               definition = function(object){ VectorTDouble_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorNumTT_double_t",            definition = function(object){ VectorTDouble_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_int_t",                  definition = function(object){ VectorTInt_display(object) })
-setMethod(f = "show", signature = "_p_VectorNumTT_int_t",               definition = function(object){ VectorTInt_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_int_t",                  definition = function(object){ VectorTInt_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorNumTT_int_t",               definition = function(object){ VectorTInt_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_float_t",                definition = function(object){ VectorTFloat_display(object) })
-setMethod(f = "show", signature = "_p_VectorNumTT_float_t",             definition = function(object){ VectorTFloat_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_float_t",                definition = function(object){ VectorTFloat_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorNumTT_float_t",             definition = function(object){ VectorTFloat_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_String_t",               definition = function(object){ VectorString_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_String_t",               definition = function(object){ VectorString_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_int_t_t",    definition = function(object){ VectorVectorInt_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_VectorNumTT_int_t_t",    definition = function(object){ VectorVectorInt_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_double_t_t", definition = function(object){ VectorVectorDouble_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_VectorNumTT_double_t_t", definition = function(object){ VectorVectorDouble_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_float_t_t",  definition = function(object){ VectorVectorFloat_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_VectorNumTT_float_t_t",  definition = function(object){ VectorVectorFloat_display(object) })
 
 ##
 ## Add function for fixing inheritance issue (known caveat):
@@ -730,7 +731,7 @@ setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_float_t_t",  definiti
 
 "addMethodsFromNames" <- function(derived,listmethods) {
   setMethod(
-    "$", paste0("_p_", derived),
+    "$", paste0("_p_gstlrn__", derived),
     function(x, name) {
       idx = match(name, names(listmethods))
       if (is.na(idx)) {
@@ -789,30 +790,30 @@ function(x, i, value)
   x
 }
 
-setMethod('[',    '_p_VectorTT_int_t',                  getVitem)
-setMethod('[<-',  '_p_VectorTT_int_t',                  setVitem)
-setMethod('[',    '_p_VectorTT_double_t',               getVitem)
-setMethod('[<-',  '_p_VectorTT_double_t',               setVitem)
-setMethod('[',    '_p_VectorTT_String_t',               getVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
-setMethod('[<-',  '_p_VectorTT_String_t',               setVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
-setMethod('[',    '_p_VectorTT_float_t',                getVitem)
-setMethod('[<-',  '_p_VectorTT_float_t',                setVitem)
-setMethod('[',    '_p_VectorTT_UChar_t',                getVitem)
-setMethod('[<-',  '_p_VectorTT_UChar_t',                setVitem)
-setMethod('[',    '_p_VectorNumTT_int_t',               getVitem)
-setMethod('[<-',  '_p_VectorNumTT_int_t',               setVitem)
-setMethod('[',    '_p_VectorNumTT_double_t',            getVitem)
-setMethod('[<-',  '_p_VectorNumTT_double_t',            setVitem)
-setMethod('[',    '_p_VectorNumTT_float_t',             getVitem)
-setMethod('[<-',  '_p_VectorNumTT_float_t',             setVitem)
-setMethod('[',    '_p_VectorNumTT_UChar_t',             getVitem)
-setMethod('[<-',  '_p_VectorNumTT_UChar_t',             setVitem)
-setMethod('[[',   '_p_VectorTT_VectorNumTT_int_t_t',    getVitem)
-setMethod('[[<-', '_p_VectorTT_VectorNumTT_int_t_t',    setVitem)
-setMethod('[[',   '_p_VectorTT_VectorNumTT_double_t_t', getVitem)
-setMethod('[[<-', '_p_VectorTT_VectorNumTT_double_t_t', setVitem)
-setMethod('[[',   '_p_VectorTT_VectorNumTT_float_t_t',  getVitem)
-setMethod('[[<-', '_p_VectorTT_VectorNumTT_float_t_t',  setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_int_t',                  getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_int_t',                  setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_double_t',               getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_double_t',               setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_String_t',               getVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
+setMethod('[<-',  '_p_gstlrn__VectorTT_String_t',               setVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
+setMethod('[',    '_p_gstlrn__VectorTT_float_t',                getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_float_t',                setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_UChar_t',                getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_UChar_t',                setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_int_t',               getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_int_t',               setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_double_t',            getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_double_t',            setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_float_t',             getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_float_t',             setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_UChar_t',             getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_UChar_t',             setVitem)
+setMethod('[[',   '_p_gstlrn__VectorTT_VectorNumTT_int_t_t',    getVitem)
+setMethod('[[<-', '_p_gstlrn__VectorTT_VectorNumTT_int_t_t',    setVitem)
+setMethod('[[',   '_p_gstlrn__VectorTT_VectorNumTT_double_t_t', getVitem)
+setMethod('[[<-', '_p_gstlrn__VectorTT_VectorNumTT_double_t_t', setVitem)
+setMethod('[[',   '_p_gstlrn__VectorTT_VectorNumTT_float_t_t',  getVitem)
+setMethod('[[<-', '_p_gstlrn__VectorTT_VectorNumTT_float_t_t',  setVitem)
 
 ##
 ## Add toTL for Vector* R classes
@@ -980,10 +981,10 @@ function (x,i,j,...,drop=TRUE)
   db
 }
 
-setMethod('[',    '_p_Db',               getDbitem)
-setMethod('[<-',  '_p_Db',               setDbitem)
-setMethod('[',    '_p_DbGrid',           getDbitem)
-setMethod('[<-',  '_p_DbGrid',           setDbitem)
+setMethod('[',    '_p_gstlrn__Db',               getDbitem)
+setMethod('[<-',  '_p_gstlrn__Db',               setDbitem)
+setMethod('[',    '_p_gstlrn__DbGrid',           getDbitem)
+setMethod('[<-',  '_p_gstlrn__DbGrid',           setDbitem)
 
 ##
 ## Add toTL to Db R class
@@ -1066,8 +1067,8 @@ function (x,i,j,...,drop=TRUE)
   table
 }
 
-setMethod('[',    '_p_Table',               getTableitem)
-setMethod('[<-',  '_p_Table',               setTableitem)
+setMethod('[',    '_p_gstlrn__Table',               getTableitem)
+setMethod('[<-',  '_p_gstlrn__Table',               setTableitem)
 
 ##
 ## Add toTL to Table R class
@@ -1264,20 +1265,20 @@ setMethod('[<-',  '_p_Table',               setTableitem)
   vario
 }
 
-setMethod('[',    '_p_Vario',               getVarioitem)
-setMethod('[<-',  '_p_Vario',               setVarioitem)
+setMethod('[',    '_p_gstlrn__Vario',               getVarioitem)
+setMethod('[<-',  '_p_gstlrn__Vario',               setVarioitem)
 
 #"MatrixDense_create" <- function(mat)
 #{
 #  if (inherits(mat, "ExternalReference")) mat = slot(mat,"ref"); 
 #  ;ans = .Call('R_swig_MatrixDense_create', mat, PACKAGE='gstlearn');
 #  ans <- if (is.null(ans)) ans
-#  else new("_p_Plane", ref=ans);
+#  else new("_p_gstlrn__Plane", ref=ans);
 #  
 #  ans
 #}
-#attr(`MatrixDense_create`, 'returnType') = '_p_MatrixDense'
-#attr(`MatrixDense_create`, "inputTypes") = c('_p_MatrixDense')
+#attr(`MatrixDense_create`, 'returnType') = '_p_gstlrn__MatrixDense'
+#attr(`MatrixDense_create`, "inputTypes") = c('_p_gstlrn__MatrixDense')
 #class(`MatrixDense_create`) = c("SWIGFunction", class('MatrixDense_create'))
 
 #"MatrixSparse_create" <- function(mat)
@@ -1289,8 +1290,8 @@ setMethod('[<-',  '_p_Vario',               setVarioitem)
 #  
 #  ans
 #}
-#attr(`MatrixSparse_create`, 'returnType') = '_p_MatrixSparse'
-#attr(`MatrixSparse_create`, "inputTypes") = c('_p_MatrixSparse')
+#attr(`MatrixSparse_create`, 'returnType') = '_p_gstlrn__MatrixSparse'
+#attr(`MatrixSparse_create`, "inputTypes") = c('_p_gstlrn__MatrixSparse')
 #class(`MatrixSparse_create`) = c("SWIGFunction", class('MatrixSparse_create'))
 
 
@@ -1348,14 +1349,14 @@ setMethod('[<-',  '_p_Vario',               setVarioitem)
 }
 
 # Special function overloaded for plot.R
-setMethod("plot", signature(x="_p_AMesh"),    function(x,y=missing,...) plot.mesh(x,...))
-setMethod("plot", signature(x="_p_DbGrid"),   function(x,y=missing,...) plot.raster(x,...))
-setMethod("plot", signature(x="_p_Db"),       function(x,y=missing,...) plot.symbol(x,...))
-setMethod("plot", signature(x="_p_Polygons"), function(x,y=missing,...) plot.polygon(x,...))
-setMethod("plot", signature(x="_p_Vario"),    function(x,y=missing,...) plot.vario(x,...))
-setMethod("plot", signature(x="_p_Model"),    function(x,y=missing,...) plot.model(x,...))
-setMethod("plot", signature(x="_p_Rule"),     function(x,y=missing,...) plot.rule(x,...))
-setMethod("plot", signature(x="_p_AAnam"),    function(x,y=missing,...) plot.anam(x,...))
+setMethod("plot", signature(x="_p_gstlrn__AMesh"),    function(x,y=missing,...) plot.mesh(x,...))
+setMethod("plot", signature(x="_p_gstlrn__DbGrid"),   function(x,y=missing,...) plot.raster(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Db"),       function(x,y=missing,...) plot.symbol(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Polygons"), function(x,y=missing,...) plot.polygon(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Vario"),    function(x,y=missing,...) plot.vario(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Model"),    function(x,y=missing,...) plot.model(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Rule"),     function(x,y=missing,...) plot.rule(x,...))
+setMethod("plot", signature(x="_p_gstlrn__AAnam"),    function(x,y=missing,...) plot.anam(x,...))
 
 #Add methods of ModelCovList (base) to Model (derived) (in case inheritance didn t work)
 
@@ -1368,6 +1369,4 @@ addMethods("CovAnisoList", c("ACov","CovList"))
 
 addMethods("Db", c("ASerializable"))
 addMethods("DbGrid", c("ASerializable"))
-
-
 %}

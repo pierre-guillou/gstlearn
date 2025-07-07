@@ -15,6 +15,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 DbMeshTurbo::DbMeshTurbo(const VectorInt& nx,
                          const VectorDouble& dx,
                          const VectorDouble& x0,
@@ -211,3 +213,4 @@ bool DbMeshTurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
   return ret;
 }
 #endif
+}

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Gibbs/AGibbs.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -42,3 +44,4 @@ public:
 private:
   Model* _model;
 };
+}

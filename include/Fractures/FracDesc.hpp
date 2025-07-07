@@ -14,6 +14,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT FracDesc: public AStringable
 {
 public:
@@ -45,3 +47,4 @@ private:
   VectorDouble _x;
   VectorDouble _y;
 };
+}

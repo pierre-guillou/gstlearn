@@ -27,6 +27,9 @@
 #include <cstddef>
 #include <memory>
 
+namespace gstlrn 
+{
+
 ParamInfo CovBase::createParamInfoForCholSill()
 {
   return ParamInfo(String("Cholesky sill"),
@@ -635,4 +638,5 @@ void CovBase::updateCov()
 
   if (nvaroptim > 0)
     _sillCur.prodMatMatInPlace(&_cholSills, &_cholSills, false, true);
+}
 }

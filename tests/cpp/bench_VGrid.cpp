@@ -17,6 +17,7 @@
 #include "Basic/Timer.hpp"
 #include "Db/DbGrid.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for bench marking the variogram calculation on the Grid

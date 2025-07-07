@@ -14,6 +14,8 @@
 #include "Model/ConsItem.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 ConsItem::ConsItem(const CovParamId& paramid,
                    const EConsType& type,
                    double value)
@@ -134,4 +136,5 @@ ConsItem ConsItem::define(const EConsElem& elem,
 {
   CovParamId parid(0, icov, elem, iv1, iv2);
   return ConsItem(parid, type, value);
+}
 }

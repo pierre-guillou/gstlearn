@@ -19,6 +19,8 @@
 #include "Basic/AStringable.hpp"
 #include "Simulation/ACalcSimulation.hpp"
 
+namespace gstlrn
+{
 class Skin;
 class MatrixDense;
 
@@ -40,6 +42,8 @@ class MatrixDense;
  * \remark  Volume_max represents the volumic part of the invaded area:
  * \remark  it is always <= number of cells invaded.
  */
+
+
 class GSTLEARN_EXPORT CalcSimuEden: public ACalcSimulation, public AStringable, public ISkinFunctions
 {
 public:
@@ -155,3 +159,4 @@ GSTLEARN_EXPORT int fluid_propagation(DbGrid *dbgrid,
                                       int seed = 321321,
                                       bool verbose = false,
                                       const NamingConvention& namconv = NamingConvention("Eden"));
+}

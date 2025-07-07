@@ -22,6 +22,8 @@
 #include "Matrix/MatrixSparse.hpp"
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{ 
 class Db;
 class ModelGeneric;
 
@@ -97,3 +99,4 @@ GSTLEARN_EXPORT double logLikelihoodVecchia(const Db* db,
                                             ModelGeneric* model,
                                             int nb_neigh = 5,
                                             bool verbose = false);
+}

@@ -12,6 +12,9 @@
 
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
+class MatrixSparse;
 class Model;
 class Vario;
 class ANeigh;
@@ -28,7 +31,6 @@ class DbGrid;
 class NeighImage;
 class EMorpho;
 class MatrixSymmetric;
-class MatrixSparse;
 
 /****************************************/
 /* Prototyping the functions in krige.c */
@@ -94,3 +96,4 @@ int _db_threshold(Db *db,
                   Model *model = nullptr,
                   const NamingConvention& namconv = NamingConvention("Thresh"));
 
+}

@@ -21,6 +21,9 @@
 #include "Db/DbGrid.hpp"
 #include <math.h>
 
+namespace gstlrn
+{ 
+
 NeighMoving::NeighMoving(bool flag_xvalid,
                          int nmaxi,
                          double radius,
@@ -840,3 +843,4 @@ bool NeighMoving::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
   return ret;
 }
 #endif
+}

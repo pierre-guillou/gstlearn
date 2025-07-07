@@ -15,6 +15,8 @@
 #include "LinearOp/IProj.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT TestInheritance : public AStringable
 {
 public:
@@ -31,3 +33,4 @@ public:
 private:
  IProj* _iproj;
 };
+}

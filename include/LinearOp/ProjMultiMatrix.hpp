@@ -13,6 +13,8 @@
 #include "Matrix/MatrixSparse.hpp"
 #include "LinearOp/ProjMulti.hpp"
 
+namespace gstlrn
+{
 class ProjMatrix;
 class AMesh;
 class Db;
@@ -46,3 +48,4 @@ private:
 private:
   bool _toClean;
 };
+}

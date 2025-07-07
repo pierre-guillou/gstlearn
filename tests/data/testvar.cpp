@@ -22,6 +22,8 @@
 #include "Db/DbGrid.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 
+using namespace gstlrn;
+
 /*********************/
 /* Program principal */
 /*********************/

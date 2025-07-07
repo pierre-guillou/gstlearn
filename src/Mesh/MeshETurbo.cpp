@@ -23,6 +23,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 MeshETurbo::MeshETurbo(int mode)
     : AMesh(),
       _grid(),
@@ -1133,3 +1135,4 @@ bool MeshETurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
+}

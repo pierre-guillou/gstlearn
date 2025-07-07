@@ -11,6 +11,8 @@
 #include "Space/ASpaceObject.hpp"
 #include "Covariances/ParamId.hpp"
 
+namespace gstlrn
+{
 ParamId::ParamId(const EConsElem& elem,
                  int iv1,
                  int iv2)
@@ -132,4 +134,5 @@ String ParamId::toString(const AStringFormat* /*strfmt*/) const
   sstr << std::endl;
 
   return sstr.str();
+}
 }

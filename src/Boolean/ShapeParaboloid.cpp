@@ -11,6 +11,8 @@
 #include "Boolean/ShapeParaboloid.hpp"
 #include "Simulation/BooleanObject.hpp"
 
+namespace gstlrn
+{
 ShapeParaboloid::ShapeParaboloid(double proportion,
                                  double xext,
                                  double yext,
@@ -79,4 +81,5 @@ bool ShapeParaboloid::belongObject(const VectorDouble& coor,
   if (dx * dx + dy * dy - dz > 1) return false;
   if (dx * dx + dy * dy + dz > 1) return false;
   return true;
+}
 }

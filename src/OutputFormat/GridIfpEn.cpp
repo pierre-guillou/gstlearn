@@ -18,6 +18,8 @@
 
 #include <string.h>
 
+namespace gstlrn
+{
 GridIfpEn::GridIfpEn(const char* filename, const Db* db)
   : AOF(filename, db)
 {
@@ -289,4 +291,5 @@ int GridIfpEn::_readLine(int mode,
     if (gslSScanf(&line[start], "%lf", valrel) != 1) return (1);
   }
   return (0);
+}
 }

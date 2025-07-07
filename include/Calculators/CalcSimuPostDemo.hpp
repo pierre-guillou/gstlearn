@@ -21,6 +21,8 @@
 #include "Basic/NamingConvention.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT CalcSimuPostDemo: public CalcSimuPost
 {
 public:
@@ -45,3 +47,4 @@ GSTLEARN_EXPORT int simuPostDemo(Db *dbin,
                                  const VectorInt& check_targets = VectorInt(),
                                  int check_level = 0,
                                  const NamingConvention &namconv = NamingConvention("Post"));
+}

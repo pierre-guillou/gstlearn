@@ -16,6 +16,8 @@
 #include "Basic/ASerializable.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 Table::Table(int nrow, int ncol, bool skip_title, bool skip_description)
   : MatrixDense(nrow, ncol),
     ASerializable(),
@@ -330,3 +332,4 @@ bool Table::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

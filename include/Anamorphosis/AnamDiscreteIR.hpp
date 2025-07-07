@@ -18,6 +18,7 @@
 #include "Anamorphosis/AnamDiscrete.hpp"
 #include "Stats/Selectivity.hpp"
 
+namespace gstlrn {
 class Db;
 
 class GSTLEARN_EXPORT AnamDiscreteIR: public AnamDiscrete
@@ -92,3 +93,4 @@ private:
 
   friend class Selectivity;
 };
+}

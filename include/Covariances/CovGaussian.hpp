@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 class CovContext;
 class TurningBandOperate;
 class MatrixDense;
@@ -43,3 +45,4 @@ protected:
   double _evaluateCovDerivative(int degree, double h) const override;
 };
 
+}

@@ -16,6 +16,9 @@
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 #include "Covariances/CovAnisoList.hpp"
+
+namespace gstlrn
+{
 class ASpace;
 class SpacePoint;
 class CovAniso;
@@ -82,3 +85,4 @@ private:
   ETape  _tapeType;
   double _tapeRange;
 };
+}

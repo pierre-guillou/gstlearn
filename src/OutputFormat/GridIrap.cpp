@@ -15,6 +15,8 @@
 
 #define N_SAMPLE(nx,nsample) ((int) ((nx-1) / nsample) + 1)
 
+namespace gstlrn
+{
 GridIrap::GridIrap(const char* filename, const Db* db)
   : AOF(filename, db)
   , _nsamplex(1)
@@ -92,4 +94,5 @@ int GridIrap::writeInFile()
 
   _fileClose();
   return 0;
+}
 }

@@ -25,6 +25,7 @@
 #include "Enum/ESpaceType.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

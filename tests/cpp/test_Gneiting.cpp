@@ -22,6 +22,8 @@
 #include "Space/SpaceRN.hpp"
 #include "Space/SpaceComposite.hpp"
 #include "Estimation/CalcKriging.hpp"
+
+using namespace gstlrn;
 /**
  * This file is meant to test Kriging with Gneiting Model
  */

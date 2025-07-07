@@ -16,6 +16,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "LinearOp/ASimulable.hpp"
 
+
 #ifndef SWIG
 #  include "LinearOp/ASimulableEigenCG.hpp"
 DECLARE_EIGEN_TRAITS(SPDEOp)
@@ -23,8 +24,12 @@ DECLARE_EIGEN_TRAITS(SPDEOp)
 
 #include "LinearOp/LinearOpCGSolver.hpp"
 
-class PrecisionOpMulti;
+namespace gstlrn {
+
 class ProjMulti;
+class ALinearOp;
+class PrecisionOpMulti;
+
 
 
 class GSTLEARN_EXPORT ASPDEOp : public virtual ALinearOp
@@ -124,7 +129,7 @@ private:
   mutable VectorDouble _rhs;
   mutable VectorDouble _workmesh;
 };
-
+}
 /****************************************************************************/
 
 class GSTLEARN_EXPORT SPDEOp : public ASPDEOp,
@@ -210,4 +215,3 @@ DECLARE_EIGEN_PRODUCT(ExampleSPDEOp)
 #endif
 
 #endif
-

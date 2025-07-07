@@ -15,6 +15,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT FracFault: public AStringable, public ASerializable
 {
 public:
@@ -69,3 +71,4 @@ private:
 
   friend class FracEnviron;
 };
+}

@@ -16,6 +16,8 @@
 
 #include "Covariances/CovAnisoList.hpp"
 
+namespace gstlrn
+{
 class ASpace;
 class SpacePoint;
 class CovGradientNumerical;
@@ -58,3 +60,4 @@ private:
                              VectorDouble& covGG,
                              bool flagGrad);
 };
+}

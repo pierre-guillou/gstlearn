@@ -23,6 +23,8 @@
 
 #define ZYCOR_NULL_CH "  0.1000000E+31"
 
+namespace gstlrn
+{
 GridZycor::GridZycor(const char* filename, const Db* db)
   : AOF(filename, db)
 {
@@ -226,4 +228,5 @@ DbGrid*  GridZycor::readGridFromFile()
   _fileClose();
 
   return dbgrid;
+}
 }

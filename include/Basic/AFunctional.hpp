@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{ 
 class Db;
 
 class GSTLEARN_EXPORT AFunctional
@@ -33,3 +35,4 @@ public:
 private:
   int _ndim;
 };
+}

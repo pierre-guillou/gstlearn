@@ -16,6 +16,8 @@
 
 #include "math.h"
 
+namespace gstlrn
+{
 CovGaussian::CovGaussian(const CovContext& ctxt)
 : ACovFunc(ECov::GAUSSIAN, ctxt)
 {
@@ -98,4 +100,5 @@ MatrixDense CovGaussian::simulateSpectralOmega(int nb) const
     for (int icol = 0; icol < ndim; icol++)
       mat.setValue(irow, icol, law_gaussian());
   return mat;
+}
 }

@@ -17,6 +17,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Limits : public AStringable
 {
 public:
@@ -107,3 +109,4 @@ private:
 private:
   std::vector<Interval> _bounds;
 };
+}

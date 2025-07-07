@@ -21,6 +21,8 @@
 
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 ShiftOpStencil::ShiftOpStencil(const MeshETurbo* mesh,
                                const CovAniso* cova,
                                bool verbose)
@@ -303,4 +305,5 @@ void ShiftOpStencil::_printStencil() const
   for (int i = 0; i < size; i++)
     if (_isInside[i]) ntreated++;
   message("Number of pixels inside the grid (no edge effect) = %d/%d\n", ntreated, size);
+}
 }

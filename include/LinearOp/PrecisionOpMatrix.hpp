@@ -13,10 +13,13 @@
 #include "LinearOp/CholeskySparse.hpp"
 #include "LinearOp/PrecisionOp.hpp"
 
+
+namespace gstlrn
+{
 class AMesh;
-class ShiftOpMatrix;
 class CovAniso;
 class Model;
+class ShiftOpMatrix;
 
 /** This class is just a specialization of PrecisionOp when the shift
 * Operator is built with sparse matrices and therefore algebra can be performed with Cholesky.
@@ -74,3 +77,5 @@ private:
   MatrixSparse* _Q;
   mutable CholeskySparse* _chol;
 };
+
+}

@@ -12,6 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT void set_keypair(
   const char* keyword, int origin, int nrow, int ncol, const double* values);
 GSTLEARN_EXPORT void app_keypair(
@@ -27,3 +29,4 @@ GSTLEARN_EXPORT int
 get_keypair_int(const char* keyword, int* nrow, int* ncol, int** values);
 GSTLEARN_EXPORT void del_keypair(const char* keyword, int flag_exact);
 GSTLEARN_EXPORT void print_keypair(int flag_short);
+}

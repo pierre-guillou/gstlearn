@@ -14,6 +14,8 @@
 #include "LinearOp/MatrixSymmetricSim.hpp"
 #include "Matrix/MatrixSparse.hpp"
 
+namespace gstlrn
+{
 SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
                            const ProjMultiMatrix* A,
                            const MatrixSparse* invNoise,
@@ -100,4 +102,5 @@ VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) con
   VectorDouble result(_projOutSimu->getNPoint());
   _projOutSimu->mesh2point(vcur, result);
   return result;
+}
 }

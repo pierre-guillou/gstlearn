@@ -17,6 +17,8 @@
 #include <sstream>
 #include <iomanip>
 
+namespace gstlrn
+{
 std::vector<EDbg> OptDbg::_dbg = std::vector<EDbg>();
 int OptDbg::_currentIndex = -1;
 int OptDbg::_reference = -1;
@@ -167,4 +169,5 @@ bool OptDbg::force(void)
   if (_reference < 0) return false;
   if (_currentIndex != _reference) return false;
   return true;
+}
 }

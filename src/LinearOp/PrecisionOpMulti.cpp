@@ -84,6 +84,7 @@
     if (COMPUTEOP) return 0;\
   }
 
+namespace gstlrn{
 PrecisionOpMulti::PrecisionOpMulti(Model* model,
                                    const VectorMeshes& meshes,
                                    bool stencil,
@@ -420,4 +421,4 @@ double PrecisionOpMulti::computeLogDetQ(int nMC) const
   }
   return result;
 }
-
+}

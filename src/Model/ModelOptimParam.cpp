@@ -11,6 +11,8 @@
 #include "Model/ModelOptimParam.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 ModelOptimParam::ModelOptimParam()
   : AStringable()
   , _auth_aniso(true)
@@ -115,4 +117,5 @@ String ModelOptimParam::toString(const AStringFormat* /*strfmt*/) const
   sstr << "- Stopping Criterion (scaled)  " << getTolred() << std::endl;
 
   return sstr.str();
+}
 }

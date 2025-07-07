@@ -18,6 +18,8 @@
 // TODO : add Namespace
 #define SPACES " \t\r\n"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT void skipBOM(std::ifstream &ins);
 
 GSTLEARN_EXPORT String toUpper(const std::string_view string);
@@ -149,3 +151,4 @@ GSTLEARN_EXPORT int gslFScanf(FILE *stream, const char *format, ...);
  }
  */
 
+}

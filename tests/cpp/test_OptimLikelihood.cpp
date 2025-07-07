@@ -17,6 +17,8 @@
 #include "Model/Model.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 
+using namespace gstlrn;
+
 /**
  * This file is meant to parametrized the ModelGeneric in terms of ParamInfo
  * and to fit the values of these parameters according to the Maximum LogLikelihood

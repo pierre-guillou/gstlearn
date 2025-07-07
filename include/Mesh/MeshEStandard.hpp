@@ -15,6 +15,8 @@
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/MatrixInt.hpp"
 
+namespace gstlrn
+{
 class MeshETurbo;
 
 /**
@@ -86,3 +88,4 @@ private:
 
   friend class DbMeshStandard;
 };
+}

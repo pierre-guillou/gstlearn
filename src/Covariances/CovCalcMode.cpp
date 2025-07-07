@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Covariances/CovCalcMode.hpp"
 
+namespace gstlrn {
+
 CovCalcMode::CovCalcMode(const ECalcMember& member,
                          bool asVario,
                          bool unitary,
@@ -52,4 +54,5 @@ CovCalcMode* CovCalcMode::create(const ECalcMember &member,
                                  int orderVario)
 {
   return new CovCalcMode(member, asVario, unitary, orderVario);
+}
 }

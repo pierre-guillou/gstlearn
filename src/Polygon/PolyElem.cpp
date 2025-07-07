@@ -14,6 +14,8 @@
 #include "Basic/PolyLine2D.hpp"
 #include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 PolyElem::PolyElem(const VectorDouble& x,
                  const VectorDouble& y,
                  double zmin,
@@ -321,3 +323,4 @@ bool PolyElem::_serializeH5(H5::Group& grp, bool verbose) const
   return ret;
 }
 #endif
+}

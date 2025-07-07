@@ -27,9 +27,14 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 DISABLE_WARNING_POP
 #endif
 
+
+
+namespace gstlrn {
+
 class cs;
 class EOperator;
-
+}
+namespace gstlrn{
 /**
  * Sparse Matrix
  * 
@@ -295,6 +300,7 @@ GSTLEARN_EXPORT void setUpdateNonZeroValue(int status = 2);
 GSTLEARN_EXPORT int getUpdateNonZeroValue();
 
 /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
+#ifndef SWIG
 GSTLEARN_EXPORT MatrixSparse* prodNormMatMat(const MatrixSparse* a,
                                              const MatrixSparse* m,
                                              bool transpose = false);
@@ -302,6 +308,7 @@ GSTLEARN_EXPORT MatrixSparse* prodNormMatMat(const MatrixSparse* a,
 GSTLEARN_EXPORT MatrixSparse* prodNormMat(const MatrixSparse* a,
                                           const VectorDouble& vec = VectorDouble(),
                                           bool transpose = false);
+#endif
 /*! Product 'Diag(vec)' %*% 'A' %*% 'Diag(vec)' */
 GSTLEARN_EXPORT MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
                                               const VectorDouble& vec,
@@ -318,3 +325,4 @@ GSTLEARN_EXPORT bool isGlobalFlagEigen();
 GSTLEARN_EXPORT Eigen::SparseMatrix<double> AtMA(const Eigen::SparseMatrix<double>& A,
                                                  const Eigen::SparseMatrix<double>& M);
 #endif
+}

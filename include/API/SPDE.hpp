@@ -21,13 +21,20 @@
 #include "LinearOp/PrecisionOpMultiConditional.hpp"
 #include <vector>
 
+
+
+
+
+namespace gstlrn
+{
+
 class ShiftOpMatrix;
-class Db;
-class DbGrid;
 class PrecisionOp;
 class PrecisionOpMatrix;
-class Model;
+class Db;
+class DbGrid;
 class MeshETurbo;
+class Model;
 
 /**
  * The SPDE class provides the SPDE implementation of a univariate model defined by
@@ -177,3 +184,4 @@ GSTLEARN_EXPORT VectorMeshes defineMeshesFromDbs(const Db* dbin,
                                                  const Model* model,
                                                  const SPDEParam& params = SPDEParam(),
                                                  bool flagKrige          = true);
+}

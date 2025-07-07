@@ -16,6 +16,8 @@
 #include "Basic/VectorHelper.hpp"
 #include "Model/ModelCovList.hpp"
 
+namespace gstlrn
+{ 
 AModelOptim::AModelOptim(ModelGeneric* model, bool verbose)
   : _model(model)
   , _verbose(verbose)
@@ -174,4 +176,5 @@ void AModelOptim::run()
 void AModelOptim::resetIter()
 {
   _iter = 0;
+}
 }

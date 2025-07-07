@@ -16,6 +16,8 @@
 #include "Drifts/DriftFactory.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 DriftList::DriftList(const CovContext& ctxt)
   : AStringable()
   , _flagLinked(false)
@@ -857,4 +859,5 @@ DriftList::evalDriftVarCoefs(const Db* db, const VectorDouble& coeffs, bool useS
   VectorDouble vec;
   vec = evalDriftCoefs(db, coeffs, useSel);
   return vec;
+}
 }

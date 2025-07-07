@@ -12,6 +12,9 @@
 
 #include "gstlearn_export.hpp"
 
+
+namespace gstlrn
+{
 class ALinearOp;
 
 class GSTLEARN_EXPORT LogStats {
@@ -57,3 +60,4 @@ private:
   mutable int        _choleskyNumber;
   mutable double     _choleskyTime;
 };
+}

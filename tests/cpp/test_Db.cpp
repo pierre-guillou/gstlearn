@@ -20,6 +20,7 @@
 #include "API/SPDE.hpp"
 #include "Model/Model.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

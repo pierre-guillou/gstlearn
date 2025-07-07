@@ -17,6 +17,8 @@
 #include "Simulation/SimuSubstitutionParam.hpp"
 #include "Simulation/CalcSimuSubstitution.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

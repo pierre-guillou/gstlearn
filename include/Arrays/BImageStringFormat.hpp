@@ -14,6 +14,8 @@
 #include "Basic/AStringFormat.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BImageStringFormat: public AStringFormat
 {
 public:
@@ -38,3 +40,4 @@ private:
   char _charZero;
   char _charOne;
 };
+}

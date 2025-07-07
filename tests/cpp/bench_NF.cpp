@@ -16,6 +16,8 @@
 #include "Basic/Timer.hpp"
 #include "Db/Db.hpp"
 
+using namespace gstlrn;
+
 /****************************************************************************/
 /*!
  ** Main Program

@@ -15,6 +15,8 @@
 
 #include <memory>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ProjComposition : public IProj
 {
 public:
@@ -37,3 +39,4 @@ private:
   std::vector<std::unique_ptr<const IProj>> _projs;
   mutable std::vector<std::vector<double>> _works;
 };
+}

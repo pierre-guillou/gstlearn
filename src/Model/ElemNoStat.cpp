@@ -11,6 +11,8 @@
 #include "Model/ElemNostat.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 ElemNostat::ElemNostat()
     : AStringable(),
       _locType(EConsElem::UNKNOWN),
@@ -124,4 +126,5 @@ String ElemNostat::toString(const AStringFormat* /*strfmt*/) const
   if (!IFFFF(getRankV2())) sstr << " - " << getRankV2() + 1;
 
   return sstr.str();
+}
 }

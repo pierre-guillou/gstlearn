@@ -28,6 +28,7 @@
 #include "Matrix/MatrixT.hpp"
 #include "Tree/Ball.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program

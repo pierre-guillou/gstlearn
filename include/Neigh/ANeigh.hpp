@@ -21,6 +21,8 @@
 #include "Tree/Ball.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 class Ball;
@@ -130,3 +132,4 @@ private:
   mutable VectorInt _nbghMemo;
   mutable Ball _ball;
 };
+}

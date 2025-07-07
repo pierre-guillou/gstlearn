@@ -24,6 +24,10 @@
 #include "LinearOp/CholeskyDense.hpp"
 #include "Enum/EKrigOpt.hpp"
 
+
+namespace gstlrn
+{ 
+
 class Db;
 class DbGrid;
 class Model;
@@ -237,3 +241,4 @@ private:
   mutable VectorInt _rankXvalidEqs;
   mutable VectorInt _rankXvalidVars;
 };
+}

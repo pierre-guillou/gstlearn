@@ -16,6 +16,8 @@
 #include "Matrix/MatrixDense.hpp"
 #include "geoslib_define.h"
 
+namespace gstlrn
+{
 ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
                  const ProjMulti* const projInKriging,
                  const ASimulable* const invNoise,
@@ -420,4 +422,5 @@ double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
   double result = TEST;
   if (! FFFF(a1) && ! FFFF(a2) && ! FFFF(a3)) result = a1 - a2 + a3;
   return result;
+}
 }

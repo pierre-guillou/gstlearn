@@ -18,6 +18,8 @@
 // Advances in Computational Mathematics, Vol. 4 (389-396), 1995
 // It corresponds to Wendland \psi_{4,2}
 
+namespace gstlrn
+{
 class CovContext;
 
 class GSTLEARN_EXPORT CovWendland2 : public ACovFunc
@@ -39,3 +41,4 @@ protected:
   double _evaluateCovDerivative(int degree, double h) const override;
 };
 
+}

@@ -16,6 +16,8 @@
 #include "Basic/Law.hpp"
 #include "Mesh/AMesh.hpp"
 
+namespace gstlrn
+{
 Ball::Ball(const double** data,
   int n_samples,
   int n_features,
@@ -395,4 +397,5 @@ double** Ball::_getInformationFromMesh(const AMesh* mesh,
   *n_samples  = nmesh;
   *n_features = ndim;
   return internal;
+}
 }

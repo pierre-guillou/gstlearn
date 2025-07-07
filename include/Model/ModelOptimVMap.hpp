@@ -16,6 +16,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Model/ModelOptimParam.hpp"
 
+namespace gstlrn
+{
 class Model;
 class DbGrid;
 class Constraints;
@@ -69,3 +71,4 @@ protected:
   int _nech;
   int _npadir;
 };
+}

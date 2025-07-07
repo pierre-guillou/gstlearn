@@ -16,6 +16,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 CovPower::CovPower(const CovContext& ctxt)
 : ACovFunc(ECov::POWER, ctxt)
 {
@@ -65,4 +67,5 @@ double CovPower::_evaluateCov(double h) const
 double CovPower::simulateTurningBand(double t0, TurningBandOperate &operTB) const
 {
   return operTB.cosineOne(t0);
+}
 }

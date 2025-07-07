@@ -32,6 +32,9 @@
 #include <math.h>
 #include <vector>
 
+namespace gstlrn
+{
+
 CovAnisoList::CovAnisoList(const CovContext& ctxt)
   : CovList(ctxt)
 {
@@ -452,11 +455,11 @@ bool CovAnisoList::isChangeSupportDefined() const
   return getAnam()->isChangeSupportDefined();
 }
 
-const AnamHermite* CovAnisoList::getAnamHermite() const
+const gstlrn::AnamHermite* CovAnisoList::getAnamHermite() const
 {
-  const AAnam* anam = getAnam();
+  const gstlrn::AAnam* anam = getAnam();
   if (anam == nullptr) return nullptr;
-  const AnamHermite* anamH = dynamic_cast<const AnamHermite*>(anam);
+  const gstlrn::AnamHermite* anamH = dynamic_cast<const gstlrn::AnamHermite*>(anam);
   return anamH;
 }
 
@@ -597,4 +600,5 @@ void CovAnisoList::appendParams(ListParams& listParams,
       }
     }
   }
+}
 }

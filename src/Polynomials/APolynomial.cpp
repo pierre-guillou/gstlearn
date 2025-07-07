@@ -18,6 +18,8 @@
 #include <iterator>
 #include <math.h>
 
+namespace gstlrn
+{
 APolynomial::APolynomial()
     : AStringable()
 {
@@ -82,4 +84,5 @@ void APolynomial::init(const VectorDouble& coeffs)
 void APolynomial::addEvalOp(ALinearOp* Op, const constvect inv, vect outv) const
 {
   _addEvalOp(Op, inv, outv);
+}
 }

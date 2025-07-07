@@ -14,6 +14,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 CovGCspline::CovGCspline(const CovContext& ctxt)
 : ACovFunc(ECov::SPLINE_GC, ctxt)
 {
@@ -60,4 +62,5 @@ double CovGCspline::_evaluateCov(double h) const
 double CovGCspline::simulateTurningBand(double t0, TurningBandOperate &operTB) const
 {
   return operTB.cosineOne(t0);
+}
 }

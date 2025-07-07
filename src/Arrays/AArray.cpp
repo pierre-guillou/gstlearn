@@ -11,6 +11,8 @@
 #include "Arrays/AArray.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{ 
 AArray::AArray(const VectorInt& ndims)
     : AStringable(),
       _ndims(ndims)
@@ -132,4 +134,5 @@ bool AArray::_isValidIndice(const VectorInt& indice) const
       return false;
   }
   return true;
+}
 }

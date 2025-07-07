@@ -20,6 +20,9 @@
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "geoslib_define.h"
 #include <memory>
+
+namespace gstlrn
+{
 GaussianProcess::GaussianProcess(ModelGeneric* model, Db* data)
   : AStringable()
   , _model(nullptr)
@@ -107,4 +110,5 @@ void GaussianProcess::simulate(Db* out, int nbsimus)
   {
     simtub(getData().get(), out, dynamic_cast<Model*>(getModel().get()), &neigh, nbsimus, seed);
   }
+}
 }

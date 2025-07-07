@@ -16,6 +16,8 @@
 #include "Basic/VectorNumT.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 class SpacePoint;
 class Tensor;
 
@@ -72,3 +74,4 @@ protected:
                             VectorDouble& ptemp,
                             int ispace = -1) const override;
 };
+}

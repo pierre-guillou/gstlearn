@@ -19,6 +19,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 GibbsMultiMono::GibbsMultiMono()
     : AGibbs(),
       _models(),
@@ -240,3 +242,4 @@ int GibbsMultiMono::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
   return nerror;
 }
 
+}

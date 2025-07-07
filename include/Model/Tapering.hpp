@@ -14,6 +14,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 typedef struct
 {
   std::string tapeName;
@@ -61,3 +63,4 @@ private:
   double _range;
   String _name;
 };
+}

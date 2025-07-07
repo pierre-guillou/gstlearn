@@ -14,7 +14,8 @@
 #include "Basic/SerializeHDF5.hpp"
 
 #include <math.h>
-
+namespace gstlrn
+{
 FracFault::FracFault(double coord, double orient)
   : AStringable(),
     ASerializable(),
@@ -177,3 +178,4 @@ bool FracFault::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) cons
   return ret;
 }
 #endif
+}

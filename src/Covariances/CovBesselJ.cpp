@@ -17,6 +17,9 @@
 
 #define MAXTAB 100
 
+namespace gstlrn
+{
+
 CovBesselJ::CovBesselJ(const CovContext& ctxt)
 : ACovFunc(ECov::BESSELJ, ctxt)
 {
@@ -69,4 +72,5 @@ String CovBesselJ::getFormula() const
 double CovBesselJ::simulateTurningBand(double t0, TurningBandOperate &operTB) const
 {
   return operTB.cosineOne(t0);
+}
 }

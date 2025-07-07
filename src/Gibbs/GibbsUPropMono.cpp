@@ -17,6 +17,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 GibbsUPropMono::GibbsUPropMono()
   : GibbsMultiMono()
   , _rval(0.5)
@@ -166,4 +168,5 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
   // Update statistics (optional)
 
   _updateStats(y, ipgs, iter);
+}
 }

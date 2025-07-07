@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Db/DbStringFormat.hpp"
 
+namespace gstlrn
+{
 DbStringFormat::DbStringFormat(unsigned char params,
                                const VectorString& names,
                                const VectorInt& cols,
@@ -153,3 +155,4 @@ void DbStringFormat::setFlags(bool flag_resume,
   if (flag_locator) _params = _params | FLAG_LOCATOR;
 }
 
+}

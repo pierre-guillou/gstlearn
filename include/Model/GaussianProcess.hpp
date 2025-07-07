@@ -16,6 +16,8 @@
 #include "Model/Model.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 class Db;
 class ModelGeneric;
 class Model;
@@ -52,3 +54,4 @@ private:
   std::shared_ptr<ModelGeneric> _model; // The model used for the Gaussian process
   std::shared_ptr<Db> _data;            // The database containing the data for the Gaussian process
 };
+}

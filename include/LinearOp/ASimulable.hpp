@@ -13,6 +13,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "LinearOp/ALinearOp.hpp"
 
+namespace gstlrn{
 class GSTLEARN_EXPORT ASimulable : public ALinearOp
 {
 public:
@@ -33,3 +34,4 @@ protected:
   virtual int _addSimulateToDest(const constvect whitenoise, vect outv) const = 0;
 #endif
 };
+}

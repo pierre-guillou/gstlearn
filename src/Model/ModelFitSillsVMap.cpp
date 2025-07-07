@@ -22,6 +22,8 @@
 #define _WT(ijvar, ipadir)     _wt[IJDIR(ijvar, ipadir)]
 #define _GG(ijvar, ipadir)     _gg[IJDIR(ijvar, ipadir)]
 
+namespace gstlrn
+{
 ModelFitSillsVMap::ModelFitSillsVMap(const DbGrid* dbmap,
                                      ModelCovList* model,
                                      const Constraints* constraints,
@@ -226,4 +228,5 @@ int ModelFitSillsVMap::_getDimensions()
     return (1);
   }
   return (0);
+}
 }

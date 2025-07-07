@@ -17,7 +17,6 @@
 #include "Basic/SerializeHDF5.hpp"
 #include "LithoRule/RuleShadow.hpp"
 #include "LithoRule/Rule.hpp"
-#include "LithoRule/Node.hpp"
 #include "LithoRule/PropDef.hpp"
 #include "Model/Model.hpp"
 #include "Db/Db.hpp"
@@ -26,6 +25,8 @@
 #include <sstream>
 #include <math.h>
 
+namespace gstlrn
+{
 RuleShadow::RuleShadow()
     : Rule(),
       _shDsup(0.),
@@ -743,3 +744,4 @@ bool RuleShadow::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
+}

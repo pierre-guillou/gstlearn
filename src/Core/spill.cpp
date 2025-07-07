@@ -18,6 +18,8 @@
 
 #include <string.h>
 
+namespace gstlrn
+{
 typedef struct
 {
   double *bitmap; /* pointer to pixels */
@@ -809,4 +811,5 @@ int spill_point(DbGrid* dbgrid,
   *h = hspill;
 
   return (error);
+}
 }

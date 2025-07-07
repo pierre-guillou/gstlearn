@@ -10,14 +10,18 @@
 /******************************************************************************/
 #pragma once
 
+#include "Anamorphosis/AAnam.hpp"
 #include "Covariances/CovAnisoList.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Space/ASpace.hpp"
 #include "gstlearn_export.hpp"
 
 #include "Enum/EAnam.hpp"
-#include "Anamorphosis/AAnam.hpp"
 
+
+
+namespace gstlrn {
+class AAnam;  // Forward declaration
 class ASpace;
 class SpacePoint;
 class CovAniso;
@@ -52,7 +56,7 @@ public:
   const AAnam* getAnam() const override { return _anam; }
   void setActiveFactor(int iclass) override;
   int getActiveFactor() const override { return _activeFactor; }
-  int getAnamNClass() const override { return _anam->getNClass(); }
+  int getAnamNClass() const override;
 
   int init(const VectorInt& strcnt = VectorInt());
   EAnam getAnamType() const;
@@ -102,3 +106,4 @@ private:
   VectorInt _anamStrCount;    /* List of covariances in the Model (for RI only) */
   const AAnam* _anam;
 };
+}

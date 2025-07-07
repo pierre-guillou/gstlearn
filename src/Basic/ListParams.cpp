@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <sstream>
 
+namespace gstlrn
+{
 ListParams::ListParams()
   : AStringable()
 {
@@ -155,4 +157,5 @@ void ListParams::setValues(const std::vector<double>& values)
   {
     _params[i].get().setValue(values[_dispatch[i]]);
   }
+}
 }

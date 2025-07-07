@@ -35,6 +35,10 @@ DISABLE_WARNING_POP
 /**
  * This variable switches ON/OFF the ability to use Eigen library for Algebra
  */
+
+namespace gstlrn
+{
+
 static bool globalFlagEigen = true;
 
 MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax, int opt_eigen)
@@ -1777,3 +1781,4 @@ void MatrixSparse::prodMatVecInPlace(constvect x, vect res, bool transpose) cons
       _eigenMatrix.insert(maxRows - 1, maxCols - 1) = 0.0; // Élément fictif
     }
   }
+}

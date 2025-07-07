@@ -27,6 +27,8 @@ License: BSD 3-clause
 
 #include "Tree/ball_algorithm.h"
 
+namespace gstlrn
+{
 void dual_swap(double* darr, int* iarr, int i1, int i2)
 {
   double dtmp = darr[i1];
@@ -194,4 +196,5 @@ void nheap_sort(t_nheap* h)
 {
   for (int row = 0; row < h->n_pts; row++)
     simultaneous_sort(h->distances[row], h->indices[row], h->n_nbrs);
+}
 }

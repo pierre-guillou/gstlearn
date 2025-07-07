@@ -11,8 +11,7 @@
 #include "geoslib_old_f.h"
 
 #include "Core/SparseInv.hpp"
-#include "LinearOp/CholeskyEigenCG.hpp"
-#include "LinearOp/Identity.hpp"
+#include "../doc/dev/sandbox/CholeskyEigenCG.hpp"
 #include "Basic/AException.hpp"
 #include "Basic/Timer.hpp"
 #include "Basic/OptDbg.hpp"
@@ -20,6 +19,7 @@
 #include "Matrix/LinkMatrixSparse.hpp"
 
 #include "csparse_f.h"
+
 
 CholeskyEigenCG::CholeskyEigenCG(const MatrixSparse* mat)
     : ALinearOp(),

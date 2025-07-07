@@ -14,6 +14,8 @@
 
 #include "Calculators/ACalcInterpolator.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT ACalcSimulation: public ACalcInterpolator
 {
 public:
@@ -35,3 +37,5 @@ private:
   int _nbsimu;
   int _seed;
 };
+
+}

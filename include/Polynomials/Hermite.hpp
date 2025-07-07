@@ -15,6 +15,8 @@
 #include "Basic/VectorNumT.hpp"
 #include "Matrix/MatrixSquare.hpp"
 
+namespace gstlrn
+{
 GSTLEARN_EXPORT VectorDouble hermitePolynomials(double y,
                                                 double r,
                                                 int nbpoly);
@@ -74,3 +76,4 @@ GSTLEARN_EXPORT VectorDouble hermiteCondStd(VectorDouble krigest,
 GSTLEARN_EXPORT double hermiteCondStdElement(double krigest,
                                              double krigstd,
                                              const VectorDouble &phi);
+}

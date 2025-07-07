@@ -19,6 +19,8 @@
 #include "Matrix/MatrixInt.hpp"
 #include <vector>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT GeometryHelper
 {
 public:
@@ -191,3 +193,4 @@ private:
 class GH: public GeometryHelper
 {
 };
+}

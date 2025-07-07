@@ -19,6 +19,8 @@
 #include "Space/ASpaceObject.hpp"
 #include "Space/ASpace.hpp"
 
+namespace gstlrn
+{
 VarioParam::VarioParam(double scale,
                        const VectorDouble& dates,
                        const Faults* faults)
@@ -524,4 +526,4 @@ Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam)
 
   return newdb;
 }
-
+}

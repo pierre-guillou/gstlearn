@@ -22,6 +22,9 @@
 
 #include <optional>
 
+namespace gstlrn
+{
+ 
 namespace SerializeHDF5
 {
   /**
@@ -387,3 +390,4 @@ bool SerializeHDF5::writeValue(H5::H5Object& grp, const String& name, const T& v
 }
 
 #endif // HDF5
+}

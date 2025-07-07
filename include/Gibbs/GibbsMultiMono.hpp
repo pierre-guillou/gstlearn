@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Gibbs/AGibbs.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -45,3 +47,4 @@ private:
   std::vector<Model *> _models;
   double _rho;
 };
+}

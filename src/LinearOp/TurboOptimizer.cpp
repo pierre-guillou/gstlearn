@@ -22,6 +22,8 @@
 #define H(i,j)   (hh[GETADR(TO_ndim,i,j)])
 #define W(i,j)   (ww[GETADR(TO_ndim,i,j)])
 
+namespace gstlrn
+{
 TurboOptimizer::TurboOptimizer(int nx,
                                int ny,
                                double dx,
@@ -1015,4 +1017,5 @@ void TurboOptimizer::printQ(int nper_batch,
   int ncols = col_end - col_begin + 1;
   _printMatrix("Matrix Q", nrows, ncols, temp, nper_batch, row_begin, col_begin);
 
+}
 }

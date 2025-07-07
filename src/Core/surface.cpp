@@ -20,6 +20,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 typedef struct
 {
   double xg;
@@ -787,4 +789,5 @@ int db_trisurf(Db *db,
     db->deleteColumnByUID(iptr_proj[ndim - idim - 1]);
 
   return (error);
+}
 }

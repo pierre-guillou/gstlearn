@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "LinearOp/CGParam.hpp"
 
+namespace gstlrn
+{
 CGParam::CGParam(int nitermax, double eps)
   : _nIterMax(nitermax)
   , _eps(eps)
@@ -63,4 +65,5 @@ void CGParam::setPrecond(const ALinearOp* precond, int status)
   _precond = precond; 
   _precondStatus = status;
   if (precond == NULL) _precondStatus = 0;
+}
 }

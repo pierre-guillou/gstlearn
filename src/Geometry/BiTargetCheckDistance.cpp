@@ -16,6 +16,8 @@
 #include "Geometry/GeometryHelper.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{
 BiTargetCheckDistance::BiTargetCheckDistance(double radius,
                                              const VectorDouble& coeffs,
                                              const VectorDouble& angles)
@@ -183,4 +185,5 @@ bool BiTargetCheckDistance::isOK(const SpaceTarget &T1,
   _calculateDistance();
 
   return _dist <= _radius;
+}
 }

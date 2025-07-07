@@ -15,6 +15,8 @@
 #include "Geometry/GeometryHelper.hpp"
 #include <memory>
 
+namespace gstlrn
+{
 SpaceSN::SpaceSN(unsigned int ndim, double radius)
   : ASpace(ndim)
   , _radius(radius)
@@ -147,4 +149,5 @@ void SpaceSN::_getIncrementInPlace(const SpacePoint& p1,
   unsigned int ndim   = getNDim();
   for (unsigned int i = offset; i < ndim + offset; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
+}
 }

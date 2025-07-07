@@ -20,6 +20,8 @@
 
 #include <math.h>
 
+namespace gstlrn
+{
 AGibbs::AGibbs()
     : AStringable(),
       _npgs(1),
@@ -584,4 +586,5 @@ String AGibbs::toString(const AStringFormat* /*strfmt*/) const
 
   return sstr.str();
 
+}
 }

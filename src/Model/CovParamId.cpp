@@ -12,6 +12,8 @@
 
 #include "Space/ASpaceObject.hpp"
 
+namespace gstlrn
+{
 CovParamId::CovParamId(int igrf,
                        int icov,
                        const EConsElem& elem,
@@ -150,4 +152,5 @@ String CovParamId::toString(const AStringFormat* /*strfmt*/) const
   sstr << std::endl;
 
   return sstr.str();
+}
 }

@@ -16,6 +16,9 @@
 
 #include <complex>
 
+namespace gstlrn
+{
+
 class CovAniso;
 class GSTLEARN_EXPORT CovDiffusionAdvection
 {
@@ -68,3 +71,4 @@ private:
   bool               _markovRdefined;
   bool               _markovLdefined;
 };
+}

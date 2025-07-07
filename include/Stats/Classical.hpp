@@ -18,12 +18,15 @@
 #include "Basic/VectorNumT.hpp"
 #include "Basic/NamingConvention.hpp"
 
-class Db;
-class DbGrid;
+
 class Polygons;
 class Table;
 class VarioParam;
 
+namespace gstlrn
+{
+class Db;
+class DbGrid;
 GSTLEARN_EXPORT VectorString statOptionToName(const std::vector<EStatOption>& opers);
 GSTLEARN_EXPORT std::vector<EStatOption> KeysToStatOptions(const VectorString& opers);
 
@@ -170,3 +173,4 @@ GSTLEARN_EXPORT int dbStatisticsInGridTool(Db* db,
                                            int iptr0);
 
 #endif // SWIG
+}

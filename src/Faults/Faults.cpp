@@ -17,6 +17,8 @@
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 Faults::Faults()
   : AStringable(),
     ASerializable(),
@@ -206,3 +208,4 @@ bool Faults::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

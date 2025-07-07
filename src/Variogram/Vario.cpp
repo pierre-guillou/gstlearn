@@ -43,6 +43,9 @@ static int VARWGT[4][5] = {{1, -1, 0, 0, 0}, {1, -2, 1, 0, 0}, {1, -3, 3, -1, 0}
 #define IJDIR(ijvar, ipadir) ((ijvar)*npadir + (ipadir))
 #define WT(ijvar, ipadir)    wt[IJDIR(ijvar, ipadir)]
 
+namespace gstlrn
+{
+
 /**
  * Build a Vario object by calculating the experimental variogram
  * @param varioparam VarioParam structure
@@ -5259,3 +5262,4 @@ bool Vario::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+}

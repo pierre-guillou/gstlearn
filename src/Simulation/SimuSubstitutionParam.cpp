@@ -15,6 +15,8 @@
 
 #define TRANS(i,j)     (_trans[(j) + _nfacies * (i)])
 
+namespace gstlrn
+{
 SimuSubstitutionParam::SimuSubstitutionParam(int nfacies,
                                              double intensity,
                                              bool flag_direct,
@@ -310,4 +312,5 @@ int SimuSubstitutionParam::getColang(int idim) const
   if (idim < (int) _colang.size())
     return _colang[idim];
   return 0.;
+}
 }

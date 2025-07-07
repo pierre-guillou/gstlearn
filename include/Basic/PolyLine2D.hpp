@@ -17,6 +17,8 @@
 #include "Basic/VectorHelper.hpp"
 #include "Basic/NamingConvention.hpp"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 
@@ -118,3 +120,4 @@ GSTLEARN_EXPORT int dbFromPolylines(Db* db,
                                     bool flagMask = true,
                                     const NamingConvention &namconv = NamingConvention(
                                         "Lines"));
+}
