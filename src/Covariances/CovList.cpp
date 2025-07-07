@@ -11,6 +11,7 @@
 #include "Covariances/CovList.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Iterators.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
 #include "Covariances/CovBase.hpp"
