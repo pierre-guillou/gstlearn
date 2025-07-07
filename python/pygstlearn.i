@@ -812,17 +812,18 @@ namespace gstlrn
 %typemap(freearg) std::map<std::string, std::vector<double, std::allocator<double> > > * {
   delete $1;
 }
-// This for automatically converting R string to NamingConvention
+
+// This for automatically converting Python strings to NamingConvention
 
 %typemap(in) NamingConvention, NamingConvention &, const NamingConvention, const NamingConvention &
+    (NamingConvention tmp)
 {
   String value;
-  NamingConvention* localNC=nullptr;
+  NamingConvention *localNC = &tmp;
   int myres = SWIG_AsVal_std_string($input, &value);
   if (SWIG_IsOK(myres))
   {
-    // TODO: Memory leak
-    localNC = new NamingConvention(value);
+    tmp = NamingConvention(value);
   }
   else
   {
