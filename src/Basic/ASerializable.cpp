@@ -183,8 +183,8 @@ String ASerializable::buildFileName(int status, const String& filename, bool ens
   fileLocal.clear();
 
   // container name: first search for the GSTLEARN_OUTPUT_DIR
-  // environment variable, then if empty create a `gstlearn_dir'
-  // folder in the current directory
+  // environment variable. If not defined, use the current directory
+  // instead.
   const auto output_dir = gslGetEnv("GSTLEARN_OUTPUT_DIR");
 
   if (!output_dir.empty())
