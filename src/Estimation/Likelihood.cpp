@@ -12,6 +12,7 @@
 #include "Basic/VectorHelper.hpp"
 #include "Db/RankHandler.hpp"
 #include "Estimation/ALikelihood.hpp"
+#include "Matrix/MatrixDense.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Tree/Ball.hpp"
 #include "Db/Db.hpp"
@@ -22,8 +23,9 @@
 #include "geoslib_define.h"
 
 Likelihood::Likelihood(ModelGeneric* model,
-                       const Db* db)
-  : ALikelihood(model, db)
+                       const Db* db,
+                       bool reml)
+  : ALikelihood(model, db, reml)
 {
   setAuthorizedAnalyticalGradients(true);
 }
@@ -57,9 +59,10 @@ double logLikelihood(const Db* db,
 }
 
 Likelihood* Likelihood::createForOptim(ModelGeneric* model,
-                                       const Db* db)
+                                       const Db* db,
+                                       bool reml)
 {
-  auto* vec            = new Likelihood(model, db);
+  auto* vec            = new Likelihood(model, db, reml);
   MatrixSymmetric vars = dbVarianceMatrix(db);
   double hmax          = db->getExtensionDiagonal();
   vec->setEnvironment(vars, hmax);
@@ -101,18 +104,36 @@ void Likelihood::evalGrad(vect res)
 
   _temp.resize(_Y.size());
   _gradCovMatTimesInvCov.resize(_Y.size(), _Y.size());
+  auto invcov = _covChol.inverse();
   RankHandler rkh(_db);
   rkh.defineSampleRanks();
   auto gradcov = _model->getGradients();
   _gradCovMat.resize(_Y.size(), _Y.size());
+  CholeskyDense XtCm1XChol;
+  MatrixSymmetric invXtCm1X;
+  if (_reml && _model->getNDriftEquation() > 0)
+  {
+    XtCm1XChol.setMatrix(&_XtCm1X);
+    invXtCm1X = XtCm1XChol.inverse();
+  }
   for (size_t iparam = 0; iparam < gradcov.size(); iparam++)
   {
     _fillGradCovMat(rkh, gradcov[iparam]);
     _gradCovMat.prodMatVecInPlace(_Cm1Y, _temp);
     double dquad = -VH::innerProduct(_Cm1Y, _temp);
-    _covChol.solveMatInPlace(_gradCovMat, _gradCovMatTimesInvCov);
-    double dlogdet = _gradCovMatTimesInvCov.trace();
-    res[iparam] = 0.5 * (dlogdet + dquad);
+
+    res[iparam] = 0.0;
+    if (_reml && _model->getNDriftEquation() > 0)
+    {
+      MatrixSymmetric temp(_X.getNCols());
+      temp.prodNormMatMatInPlace(&_Cm1X, &_gradCovMat, true);
+      double dlogdetreml = MatrixDense::traceProd(invXtCm1X, temp);
+      res[iparam] += 0.5 * dlogdetreml;
+    }
+
+    double dlogdet = MatrixDense::traceProd(invcov, _gradCovMat); // Warning: _gradCovMat is modified so the line
+    // has to be after _gradCovMat.prodMatVecInPlace(_Cm1Y, _temp);
+    res[iparam] += 0.5 * (dlogdet + dquad);
   }
 }
 

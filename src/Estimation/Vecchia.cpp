@@ -25,9 +25,10 @@
 Vecchia::Vecchia(ModelGeneric* model,
                  int nb_neigh,
                  const Db* db1,
-                 const Db* db2)
-  : ALikelihood(model, db1)
-  ,_nbNeigh(nb_neigh)
+                 const Db* db2,
+                 bool reml)
+  : ALikelihood(model, db1, reml)
+  , _nbNeigh(nb_neigh)
   , _db1(db1)
   , _db2(db2)
   , _DFull()
@@ -118,10 +119,10 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
 
   // Resizing
   _DFull.resize(ntot);
-  //if (_LFull.empty())
-    _LFull = MatrixSparse(ntot, ntot, nb_neigh + 1);
-  //if (_Dmat.empty())
-    _Dmat = MatrixSparse(ntot, ntot);
+  // if (_LFull.empty())
+  _LFull = MatrixSparse(ntot, ntot, nb_neigh + 1);
+  // if (_Dmat.empty())
+  _Dmat = MatrixSparse(ntot, ntot);
 
   // Creating empty Dbs
   if (_dbTemp == nullptr)
@@ -366,7 +367,7 @@ double logLikelihoodVecchia(const Db* db,
                             int nb_neigh,
                             bool verbose)
 {
-  Vecchia* vec = Vecchia::createForOptim(model, db, nb_neigh);
+  Vecchia* vec  = Vecchia::createForOptim(model, db, nb_neigh);
   double result = vec->computeCost(verbose);
   delete vec;
   return result;
@@ -374,9 +375,10 @@ double logLikelihoodVecchia(const Db* db,
 
 Vecchia* Vecchia::createForOptim(ModelGeneric* model,
                                  const Db* db,
-                                 int nb_neigh)
+                                 int nb_neigh,
+                                 bool reml)
 {
-  auto* vec = new Vecchia(model, nb_neigh, db, nullptr);
+  auto* vec            = new Vecchia(model, nb_neigh, db, nullptr, reml);
   MatrixSymmetric vars = dbVarianceMatrix(db);
   double hmax          = db->getExtensionDiagonal();
   vec->setEnvironment(vars, hmax);
@@ -395,7 +397,7 @@ void Vecchia::_computeCm1Y()
   productVecchia(_Y, _Cm1Y);
 }
 
-double Vecchia::_computeLogDet() const 
+double Vecchia::_computeLogDet() const
 {
   return -VH::cumulLog(getDFull());
 }

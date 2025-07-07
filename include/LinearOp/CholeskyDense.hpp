@@ -16,9 +16,9 @@
 #include "Basic/VectorNumT.hpp"
 
 #ifndef SWIG
-  #include <Eigen/Core>
-  #include <Eigen/Dense>
-  #include <Eigen/src/Core/Matrix.h>
+#  include <Eigen/Core>
+#  include <Eigen/Dense>
+#  include <Eigen/src/Core/Matrix.h>
 #endif
 
 class MatrixSymmetric;
@@ -28,8 +28,8 @@ class GSTLEARN_EXPORT CholeskyDense: public ACholesky
 {
 public:
   CholeskyDense(const MatrixSymmetric* mat = nullptr);
-  CholeskyDense(const CholeskyDense &m);
-  CholeskyDense& operator=(const CholeskyDense &m);
+  CholeskyDense(const CholeskyDense& m);
+  CholeskyDense& operator=(const CholeskyDense& m);
   virtual ~CholeskyDense();
 
   int setMatrix(const MatrixSymmetric* mat);
@@ -53,8 +53,10 @@ public:
                       int neq,
                       const MatrixSymmetric& a,
                       MatrixSymmetric& b);
+  MatrixDense inverse() const;
   void clear();
   bool empty() const;
+
 private:
   void _clear();
   int _prepare() const;
@@ -63,7 +65,7 @@ private:
   int _computeXL() const;
 
 private:
-  mutable VectorDouble _tl; // Lower triangular matrix
-  mutable VectorDouble _xl; // Lower triangular matrix
+  mutable VectorDouble _tl;                    // Lower triangular matrix
+  mutable VectorDouble _xl;                    // Lower triangular matrix
   mutable Eigen::LLT<Eigen::MatrixXd> _factor; // Cholesky decomposition (Eigen format)
 };

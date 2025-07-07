@@ -82,21 +82,21 @@ static Model* createModel(int nvar, int typecov, int typedrift, int typemean)
   if (typecov == 1)
   {
     CovAniso cova1(ECov::SPHERICAL, 40., 0., 45., ctxt);
-    covs.addCov(&cova1);
+    covs.addCov(cova1);
     CovAniso cova2(ECov::NUGGET, 0., 0., 12., ctxt);
-    covs.addCov(&cova2);
+    covs.addCov(cova2);
     model->setCovAnisoList(&covs);
   }
   else if (typecov == 2)
   {
     CovAniso covaL(ECov::LINEAR, 1., 0., 1., ctxt);
-    covs.addCov(&covaL);
+    covs.addCov(covaL);
     model->setCovAnisoList(&covs);
   }
   else if (typecov == 3)
   {
     CovAniso cova1(ECov::SPHERICAL, 40., 0., 1., ctxt);
-    covs.addCov(&cova1);
+    covs.addCov(cova1);
     model->setCovAnisoList(&covs);
   }
 

@@ -883,7 +883,6 @@ MatrixSymmetric dbVarianceMatrix(const Db* db)
     for (int jvar = 0; jvar <= ivar; jvar++)
     {
       double value = mat.getValue(ivar, jvar);
-      value /= numiso;
       value = value / numiso - mean[ivar] * mean[jvar];
       mat.setValue(ivar, jvar, value);
     }

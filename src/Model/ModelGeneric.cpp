@@ -373,11 +373,13 @@ void ModelGeneric::fitNew(const Db* db,
                           const ModelOptimParam& mop,
                           int nb_neighVecchia,
                           bool verbose,
-                          bool trace)
+                          bool trace,
+                          bool reml)
 {
   AModelOptim* amopt = AModelOptimFactory::create(this, db, vario, dbmap,
                                                   constraints, mop,
-                                                  nb_neighVecchia);
+                                                  nb_neighVecchia,
+                                                  reml);
   amopt->setVerbose(verbose, trace);
   amopt->resetIter();
   amopt->run();

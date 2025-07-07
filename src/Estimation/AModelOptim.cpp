@@ -27,19 +27,16 @@ AModelOptim::AModelOptim(ModelGeneric* model, bool verbose)
   bool useGradient = (bool)OptCustom::query("UseGradient", 1);
   _params          = _model->generateListParams();
 
-  int nvar                 = _model->getNVar();
-  MatrixSymmetric varsUnit = MatrixSymmetric(nvar);
-  for (int ivar = 0; ivar < nvar; ivar++) varsUnit.setValue(ivar, ivar, 1.);
-  _model->initParams(varsUnit, 1.);
+  // int nvar                 = _model->getNVar();
+  // MatrixSymmetric varsUnit = MatrixSymmetric(nvar);
+  // for (int ivar = 0; ivar < nvar; ivar++) varsUnit.setValue(ivar, ivar, 1.);
+  // _model->initParams(varsUnit, 1.);
   _x    = _params->getOptimizableValues();
-  _xmin = _params->getMinValues();
-  _xmax = _params->getMaxValues();
   if (useGradient)
     _opt = new Optim(LBFGS, (int)_x.size());
   else
     _opt = new Optim(NELDERMEAD, (int)_x.size());
-  _opt->setLowerBounds(_xmin);
-  _opt->setUpperBounds(_xmax);
+
   _opt->setXtolRel(EPSILON6);
   _opt->setObjective([this](const std::vector<double>& x)
                      { return this->eval(x); });
@@ -53,6 +50,8 @@ AModelOptim::AModelOptim(ModelGeneric* model, bool verbose)
 void AModelOptim::setEnvironment(const MatrixSymmetric& vars, double href)
 {
   _model->initParams(vars, href);
+  _opt->setLowerBounds(_params->getMinValues());
+  _opt->setUpperBounds(_params->getMaxValues());
   _x = _params->getOptimizableValues();
 }
 

@@ -63,7 +63,7 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// CovAnisoList Interface
-  void addCov(const CovBase* cov) override;
+  void addCov(const CovBase& cov) override;
   const AnamHermite* getAnamHermite() const;
 
   const EModelProperty& getCovMode() const;
@@ -73,7 +73,7 @@ public:
   virtual int getActiveFactor() const { return 0; }
   virtual int getAnamNClass() const { return 0; }
 
-  void addCovList(const CovAnisoList* covs);
+  void addCovList(const CovAnisoList& covs);
 
   int getNCov(bool skipNugget = false) const;
   bool hasRange() const;

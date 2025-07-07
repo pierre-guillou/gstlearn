@@ -56,7 +56,7 @@ static int _modifyMopForVMap(const DbGrid* dbmap,
                              Constraints* constraints,
                              ModelOptimParam& mop)
 {
-  // Clever setting of options 
+  // Clever setting of options
   mop.setAuthAniso(true);
   mop.setAuthRotation(true);
   mop.setLockNo3d(dbmap->getNDim() <= 2);
@@ -71,7 +71,7 @@ static int _modifyMopForVMap(const DbGrid* dbmap,
     if (modify_constraints_on_sill(*constraints)) return (1);
   }
 
-  // Return an error if Goulard is not used in multivariate case 
+  // Return an error if Goulard is not used in multivariate case
   if (model->getNVar() > 1 && !mop.getFlagGoulard())
   {
     messerr("In Multivariate case, Goulard option is mandatory");
@@ -214,9 +214,9 @@ static int _modifyModelForConstraints(Constraints* constraints,
     int iv1                  = consitem->getIV1();
     int iv2                  = consitem->getIV2();
 
-    CovBase* covbase = mcv->getCovBase(icov);
+    CovBase* covbase   = mcv->getCovBase(icov);
     CovAniso* covaniso = dynamic_cast<CovAniso*>(covbase);
-    ParamInfo* param = nullptr;
+    ParamInfo* param   = nullptr;
 
     if (igrf != 0)
     {
@@ -262,7 +262,7 @@ static int _modifyModelForConstraints(Constraints* constraints,
       }
       if (iv1 != 0 && iv2 != 0)
       {
-        messerr("Setting Sill(%d,%d) not possible as nvar = %d", iv1, iv2, nvar); 
+        messerr("Setting Sill(%d,%d) not possible as nvar = %d", iv1, iv2, nvar);
         return 1;
       }
       param = &covbase->getParamInfoCholSills(iv1, iv2);
@@ -359,7 +359,7 @@ static int _modifyModelForMop(const ModelOptimParam& mop,
         _fixAllAnglesFromIndex(coraniso, 0, false);
       }
     }
-    else 
+    else
     {
 
       // Anisotropy forbidden
@@ -367,7 +367,6 @@ static int _modifyModelForMop(const ModelOptimParam& mop,
       coraniso->setOptimNoAniso(true);
     }
   }
-
   return 0;
 }
 
@@ -377,7 +376,8 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
                                         const DbGrid* dbmap,
                                         Constraints* constraints,
                                         const ModelOptimParam& mop,
-                                        int nb_neighVecchia)
+                                        int nb_neighVecchia,
+                                        bool reml)
 {
   ModelOptimParam mopLocal = mop;
 
@@ -385,8 +385,8 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
   if (db != nullptr)
   {
     if ((int)model->getNDim() != db->getNDim()) return nullptr;
-    if (nb_neighVecchia != ITEST) return Vecchia::createForOptim(model, db, nb_neighVecchia);
-    return Likelihood::createForOptim(model, db);
+    if (nb_neighVecchia != ITEST) return Vecchia::createForOptim(model, db, nb_neighVecchia, reml);
+    return Likelihood::createForOptim(model, db, reml);
   }
 
   // Fitting from a Variogram Map

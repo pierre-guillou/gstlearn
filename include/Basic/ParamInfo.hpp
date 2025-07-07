@@ -45,11 +45,7 @@ public:
     void setMaxValue(double value);
     void decreaseMax(double value);
     void increaseMin(double value);
-    void setValue(double value)
-    {
-      _value = value;
-      _currentValue = value;
-    }
+    void setValue(double value);
     String getName() const {return _name;};
     double getUserMin() const {return _userBounds[0];};
     double getUserMax() const {return _userBounds[1];};

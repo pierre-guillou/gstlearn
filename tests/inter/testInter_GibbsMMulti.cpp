@@ -94,7 +94,7 @@ int main()
   CovAniso cova(ECov::SPHERICAL,ctxt);
   cova.setRanges(ranges);
   cova.setSill(sill);
-  covs.addCov(&cova);
+  covs.addCov(cova);
   model.setCovAnisoList(&covs);
   model.display();
 

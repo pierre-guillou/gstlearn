@@ -58,15 +58,15 @@ CovAnisoList::~CovAnisoList()
   delAllCov();
 }
 
-void CovAnisoList::addCovList(const CovAnisoList* covs)
+void CovAnisoList::addCovList(const CovAnisoList& covs)
 {
-  for (int icov = 0, ncov = covs->getNCov(); icov < ncov; icov++)
-    addCov(covs->getCovAniso(icov));
+  for (int icov = 0, ncov = covs.getNCov(); icov < ncov; icov++)
+    addCov(*covs.getCovAniso(icov));
 }
 
-void CovAnisoList::addCov(const CovBase* cov)
+void CovAnisoList::addCov(const CovBase& cov)
 {
-  if (dynamic_cast<const CovAniso*>(cov) == nullptr)
+  if (dynamic_cast<const CovAniso*>(&cov) == nullptr)
   {
     messerr("The argument should be of type 'CovAniso*'");
     return;

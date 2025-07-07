@@ -1,6 +1,7 @@
 # Why is cmake file GLOB evil?
 # https://stackoverflow.com/questions/32411963/why-is-cmake-file-glob-evil
 set(SRC
+  API/newAPIs.cpp
   Enum/AEnum.cpp
   Enum/Enums.cpp
   Fractures/FracEnviron.cpp
@@ -38,6 +39,7 @@ set(SRC
   LithoRule/RuleShift.cpp
   LithoRule/Node.cpp
   Model/ModelGeneric.cpp
+  Model/GaussianProcess.cpp
   Model/ModelCovList.cpp
   Model/ConsItem.cpp
   Model/CovParamId.cpp

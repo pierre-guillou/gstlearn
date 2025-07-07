@@ -150,7 +150,7 @@ Model* model_duplicate_for_gradient(const Model *model, double ball_radius)
       {
         my_throw("Argument 'ifact' invalid");
       }
-      covs->addCov(covnew);
+      covs->addCov(*covnew);
       delete covnew;
     }
   }

@@ -221,6 +221,7 @@
 %include Basic/ParamInfo.hpp
 %include Basic/ListParams.hpp
 %include Model/ModelGeneric.hpp
+%include Model/GaussianProcess.hpp
 %include Model/ModelCovList.hpp
 %include Model/Model.hpp
 %include Model/ModelOptimParam.hpp
@@ -403,6 +404,8 @@
 %include Core/Acknowledge.hpp
 %include Core/Potential.hpp
 %include Core/Seismic.hpp
+
+%include/API/newAPIs.hpp
 
 // For suppressing SWIG warning due to -keyword option (if used)
 #pragma SWIG nowarn=511
