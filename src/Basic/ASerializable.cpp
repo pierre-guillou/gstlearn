@@ -20,19 +20,6 @@
 #include <filesystem>
 #include <fstream>
 
-#if defined(_WIN32) || defined(_WIN64)
-#include <windows.h> // for CreateDirectory
-#else
-#include <unistd.h> // for readlink
-#endif
-
-#ifdef __APPLE__
-#include <mach-o/dyld.h> // for _NSGetExecutablePath
-#endif
-
-#include <sys/stat.h>
-#include <sys/types.h>
-
 String ASerializable::_myPrefixName = String();
 
 ASerializable::ASerializable()                                    = default;
