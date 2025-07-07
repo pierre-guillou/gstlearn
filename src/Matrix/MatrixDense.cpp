@@ -25,8 +25,8 @@ MatrixDense::MatrixDense(int nrow, int ncol)
   , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
-  , _maxSize(nrow * ncol)
   , _eigenMatrix()
+  , _maxSize(nrow * ncol)
 {
   _allocate();
 }
@@ -36,8 +36,9 @@ MatrixDense::MatrixDense(const MatrixDense& r)
   , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
-  , _maxSize(r._maxSize)
   , _eigenMatrix()
+  , _maxSize(r._maxSize)
+
 {
   _allocate();
   _recopy(r);
@@ -48,8 +49,8 @@ MatrixDense::MatrixDense(const AMatrix& r)
   , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
-  , _maxSize(r.getNRows() * r.getNCols())
   , _eigenMatrix()
+  , _maxSize(r.getNRows() * r.getNCols())
 {
   _allocate();
   copyElements(r);
@@ -119,14 +120,14 @@ void MatrixDense::setValue(int irow, int icol, double value, bool flagCheck)
   if (mustBeSymmetric() && irow != icol) getEigenMat()(icol, irow) = value;
 }
 
-double MatrixDense::traceProd(const MatrixDense &a, MatrixDense &b)
+double MatrixDense::traceProd(const MatrixDense& a, MatrixDense& b)
 {
   if (a.getNRows() != b.getNRows() || a.getNCols() != b.getNCols())
   {
     messerr("MatrixDense::traceProd: incompatible matrix sizes");
     return TEST;
   }
-  
+
   b.getEigenMat().array() *= a.getEigenMat().transpose().array();
   return b.getEigenMat().sum();
 }
