@@ -28,6 +28,7 @@
 #include "LithoRule/RuleProp.hpp"
 #include "LithoRule/RuleShadow.hpp"
 #include "LithoRule/RuleShift.hpp"
+#include "Mesh/MeshSpherical.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/NeighMoving.hpp"
 #include "Neigh/NeighUnique.hpp"
