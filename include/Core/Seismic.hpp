@@ -67,3 +67,4 @@ GSTLEARN_EXPORT int seismic_convolve(DbGrid* db,
                                      double val_middle,
                                      double val_after,
                                      VectorDouble& wavelet);
+}
