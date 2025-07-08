@@ -18,14 +18,13 @@
 #include "Enum/EStatOption.hpp"
 #include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
+#include "Matrix/Table.hpp"
 #include "Model/Model.hpp"
 #include "Polygon/Polygons.hpp"
 #include "Space/SpaceRN.hpp"
 #include "Space/SpaceTarget.hpp"
 #include "Variogram/Vario.hpp"
-#include "Variogram/VarioParam.hpp"
 #include "geoslib_define.h"
-#include <Matrix/Table.hpp>
 
 #include <cmath>
 #include <cstring>
