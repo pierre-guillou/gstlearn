@@ -31,3 +31,4 @@ if (BUILD_R)
 endif()
 
 add_dependencies(check ${CHECK_DEP})
+

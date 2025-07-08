@@ -215,7 +215,7 @@ foreach(FLAVOR ${FLAVORS})
       target_link_libraries(${FLAVOR} PUBLIC stdc++fs)
     endif()
   endif()
-
+  enable_coverage(${FLAVOR})
   # Build a cmake file to be imported by library users
   export(TARGETS ${FLAVOR}
          NAMESPACE ${PROJECT_NAME}::
