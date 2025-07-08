@@ -18,6 +18,7 @@
 #include "Basic/VectorHelper.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "Db/Db.hpp"
+#include "LinearOp/InvNuggetOp.hpp"
 #include "LinearOp/MatrixSymmetricSim.hpp"
 #include "LinearOp/PrecisionOp.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
@@ -30,12 +31,12 @@
 #include "LinearOp/SPDEOpMatrix.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
-#include "Matrix/NF_Triplet.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Model/Model.hpp"
 #include "geoslib_define.h"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include <math.h>
+#include <memory>
 #include <vector>
 
 namespace gstlrn
@@ -876,71 +877,6 @@ double logLikelihoodSPDEOld(Db* dbin,
   return spde.computeLogLikelihood(nbsimu, verbose);
 }
 
-static int _loadPositions(int iech,
-                          const VectorVectorInt& index1,
-                          const VectorInt& cumul,
-                          VectorInt& positions,
-                          VectorInt& identity,
-                          int* rank_arg)
-{
-  int nvar = (int)cumul.size();
-  int ndef = 0;
-  int rank = 0;
-  for (int ivar = 0; ivar < nvar; ivar++)
-  {
-    rank     = 2 * rank;
-    int ipos = VH::whereElement(index1[ivar], iech);
-    if (ipos < 0)
-      positions[ivar] = -1;
-    else
-    {
-      positions[ivar] = ipos + cumul[ivar];
-      identity[ndef]  = ivar;
-      ndef++;
-      rank += 1;
-    }
-  }
-  *rank_arg = rank;
-  return ndef;
-}
-
-static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef)
-{
-  int nverr = (int)verrDef.size();
-  if (nverr > 0)
-  {
-    for (int iverr = 0; iverr < nverr; iverr++)
-      sills.updValue(iverr, iverr, EOperator::ADD, verrDef[iverr]);
-  }
-}
-
-static void _checkMinNugget(MatrixSymmetric& sills, const VectorDouble& minNug)
-{
-  int nvar = (int)minNug.size();
-
-  // Check that the diagonal of the Sill matrix is large enough
-  for (int ivar = 0; ivar < nvar; ivar++)
-    sills.setValue(ivar, ivar, MAX(sills.getValue(ivar, ivar), minNug[ivar]));
-}
-
-static MatrixSymmetric _buildSillPartialMatrix(const MatrixSymmetric& sillsRef,
-                                               int nvar,
-                                               int ndef,
-                                               const VectorInt& identity)
-{
-  MatrixSymmetric sills;
-  if (ndef == nvar)
-    sills = sillsRef;
-  else
-  {
-    sills = MatrixSymmetric(ndef);
-    for (int idef = 0; idef < ndef; idef++)
-      for (int jdef = 0; jdef <= idef; jdef++)
-        sills.setValue(idef, jdef, sillsRef.getValue(identity[idef], identity[jdef]));
-  }
-  return sills;
-}
-
 /**
  * @brief Create the set of Projections needed within SPDE
  *
@@ -1131,10 +1067,10 @@ int krigingSPDE(Db* dbin,
   const ProjMultiMatrix* AoutS = flagAoutSConstruct ? _defineProjMulti(dbout, model, meshLocalS, nullptr) : AoutK;
 
   // Auxiliary information
-  MatrixSparse* invnoise        = buildInvNugget(dbin, model, params);
-  MatrixSymmetricSim* invnoisep = nullptr;
+  auto invnoise        = buildInvNugget(dbin, model, params);
+  std::shared_ptr<MatrixSymmetricSim> invnoisep = nullptr;
   if (!flagCholesky)
-    invnoisep = new MatrixSymmetricSim(invnoise);
+    invnoisep = std::make_shared<MatrixSymmetricSim>(invnoise);
 
   SPDEOp* spdeop              = nullptr;
   PrecisionOpMulti* Qop       = nullptr;
@@ -1187,8 +1123,6 @@ int krigingSPDE(Db* dbin,
   delete spdeop;
   delete Qom;
   delete Qop;
-  delete invnoise;
-  delete invnoisep;
   delete AoutK;
   if (flagAoutSConstruct)
     delete AoutS;
@@ -1275,8 +1209,8 @@ int simulateSPDE(Db* dbin,
   if (_defineMeshes(dbin, dbout, model, meshLocalS, params, false)) return 1;
 
   // Auxiliary parameters
-  MatrixSparse* invnoise        = nullptr;
-  MatrixSymmetricSim* invnoisep = nullptr;
+  std::shared_ptr<MatrixSparse> invnoise        = nullptr;
+  std::shared_ptr<const MatrixSymmetricSim> invnoisep = nullptr;
   if (flagCond)
   {
     AInK = _defineProjMulti(dbin, model, meshLocalK, projInK);
@@ -1289,7 +1223,7 @@ int simulateSPDE(Db* dbin,
     }
     invnoise = buildInvNugget(dbin, model, params);
     if (!flagCholesky)
-      invnoisep = new MatrixSymmetricSim(invnoise);
+      invnoisep = std::shared_ptr<const MatrixSymmetricSim>(new MatrixSymmetricSim(invnoise));
   }
   const ProjMultiMatrix* AoutK = _defineProjMulti(dbout, model, meshLocalK, nullptr);
   bool flagAoutSConstruct      = (!flagCholesky) && (meshLocalK != meshLocalS);
@@ -1354,8 +1288,6 @@ int simulateSPDE(Db* dbin,
   delete spdeop;
   delete Qom;
   delete Qop;
-  delete invnoise;
-  delete invnoisep;
   delete AoutK;
   if (flagAoutSConstruct)
     delete AoutS;
@@ -1421,10 +1353,10 @@ double logLikelihoodSPDE(Db* dbin,
   if (AIn == nullptr) return 1;
 
   // Auxiliary information
-  MatrixSparse* invnoise        = buildInvNugget(dbin, model, params);
-  MatrixSymmetricSim* invnoisep = nullptr;
+  std::shared_ptr<MatrixSparse> invnoise        = buildInvNugget(dbin, model, params);
+  std::shared_ptr<const MatrixSymmetricSim> invnoisep = nullptr;
   if (!flagCholesky)
-    invnoisep = new MatrixSymmetricSim(invnoise);
+    invnoisep = std::shared_ptr<const MatrixSymmetricSim>(new MatrixSymmetricSim(invnoise));
 
   SPDEOp* spdeop              = nullptr;
   PrecisionOpMulti* Qop       = nullptr;
@@ -1471,8 +1403,6 @@ double logLikelihoodSPDE(Db* dbin,
   delete spdeop;
   delete Qom;
   delete Qop;
-  delete invnoise;
-  delete invnoisep;
   if (flagProjCreated)
   {
     delete AIn;
@@ -1480,181 +1410,6 @@ double logLikelihoodSPDE(Db* dbin,
   }
   return loglike;
 }
-
-/**
- * Build the inverse of the Nugget Effect matrix
- * It is established for:
- * - the number of variables defined in 'dbin' (and in 'Model')
- * - the active samples of 'dbin'
- * - the samples where Z-variable (and possibly V-variable) is defined
- *
- * @param db Input Db structure
- * @param model Input Model structure
- * @param params A structure for ruling the parameters of SPDE
- */
-MatrixSparse* buildInvNugget(Db* db, Model* model, const SPDEParam& params)
-{
-  MatrixSparse* mat = nullptr;
-  if (db == nullptr) return mat;
-  int nech = db->getNSample();
-  if (model == nullptr) return mat;
-  int nvar = db->getNLoc(ELoc::Z);
-  if (nvar != model->getNVar())
-  {
-    messerr("'db' and 'model' should have the same number of variables");
-    return mat;
-  }
-  bool hasnugget = false;
-  CovAniso* cova = nullptr;
-
-  for (int icov = 0; icov < model->getNCov(); icov++)
-  {
-    if (model->getCovAniso(icov)->getType() == ECov::NUGGET)
-    {
-      cova      = model->getCovAniso(icov);
-      hasnugget = true;
-      break;
-    }
-  }
-  if (!hasnugget)
-  {
-    MatrixSymmetric sills(model->getNVar());
-    cova = CovAniso::createIsotropicMulti(*model->getContext(), ECov::NUGGET, 0, sills);
-  }
-  VectorInt ivars = VH::sequence(nvar);
-
-  // Get the minimum value for diagonal terms
-  double eps = params.getEpsNugget();
-  VectorDouble minNug(nvar);
-  for (int ivar = 0; ivar < nvar; ivar++)
-    minNug[ivar] = eps * model->getTotalSill(ivar, ivar);
-
-  // Play the non-stationarity (if needed)
-  bool flag_nostat_sill = cova->isNoStatForVariance();
-  if (flag_nostat_sill)
-    cova->informDbInForSills(db);
-
-  // Create sets of Vector of valid sample indices per variable (not masked and defined)
-  VectorVectorInt index1 = db->getSampleRanks(ivars);
-  // 'cumul' counts the number of valid positions for all variables before 'ivar'
-  VectorInt cumul = VH::cumulIncrement(index1);
-
-  // Check the various possibilities
-  // - flag_verr: True if Variance of Measurement Error variable is defined
-  // - flag_isotropic: True in Isotopic case
-  // - flag_uniqueVerr: True if the Variance of Measurement Error is constant per variable
-  // - flag_nostat: True is some non-stationarity is defined
-  int nverr          = db->getNLoc(ELoc::V);
-  bool flag_verr     = (nverr > 0);
-  bool flag_isotopic = true;
-  for (int ivar = 1; ivar < nvar && flag_isotopic; ivar++)
-    if (!VH::isEqual(index1[ivar], index1[0])) flag_isotopic = false;
-  bool flag_uniqueVerr = true;
-  VectorDouble verrDef(nverr, 0.);
-  if (flag_verr)
-  {
-    for (int iverr = 0; iverr < nverr && flag_uniqueVerr; iverr++)
-    {
-      VectorDouble verr = db->getColumnByLocator(ELoc::V, iverr);
-      if ((int)VH::unique(verr).size() > 1) flag_uniqueVerr = false;
-      verrDef[iverr] = verr[0];
-    }
-  }
-  bool flag_constant = (!flag_nostat_sill && (!flag_verr || flag_uniqueVerr));
-
-  // Elaborate the Sill matrix for the Nugget Effect component
-  MatrixSymmetric sillsRef = cova->getSill();
-  int count                = (int)pow(2, nvar);
-  std::vector<MatrixSymmetric> sillsInv(count);
-
-  // Pre-calculate the inverse of the sill matrix (if constant)
-
-  if (flag_constant)
-  {
-    // In case of (Unique) Variance of measurement error, patch sill matrix
-    if (flag_verr) _addVerrConstant(sillsRef, verrDef);
-
-    // Check that the diagonal of the Sill matrix is large enough
-    _checkMinNugget(sillsRef, minNug);
-  }
-
-  // Constitute the triplet
-  NF_Triplet NF_T;
-
-  // Loop on the samples
-  int rank;
-  int ndef = nvar;
-  VectorInt position(nvar);
-  VectorInt identity(nvar);
-  for (int iech = 0; iech < nech; iech++)
-  {
-    if (!db->isActive(iech)) continue;
-
-    // Count the number of variables for which current sample is valid
-    ndef = _loadPositions(iech, index1, cumul, position, identity, &rank);
-    if (ndef <= 0) continue;
-
-    // If all samples are defined, in the stationary case, use the inverted sill matrix
-    if (flag_constant)
-    {
-      if (sillsInv[rank].empty())
-      {
-        sillsInv[rank] = _buildSillPartialMatrix(sillsRef, nvar, ndef, identity);
-        if (sillsInv[rank].invert() != 0) return mat;
-      }
-      for (int idef = 0; idef < ndef; idef++)
-        for (int jdef = 0; jdef < ndef; jdef++)
-          NF_T.add(position[identity[idef]], position[identity[jdef]],
-                   sillsInv[rank].getValue(idef, jdef));
-    }
-    else
-    {
-      // Update due to non-stationarity (optional)
-      if (flag_nostat_sill)
-      {
-        cova->updateCovByPoints(1, iech, 1, iech);
-        sillsRef = cova->getSill();
-      }
-
-      // Establish a local matrix
-      MatrixSymmetric local(ndef);
-      for (int idef = 0; idef < ndef; idef++)
-        for (int jdef = 0; jdef <= idef; jdef++)
-        {
-          // Load the sill value of the Nugget Effect component
-          double value = sillsRef.getValue(identity[idef], identity[jdef]);
-
-          // Patch the diagonal term of the local matrix
-          if (idef == jdef)
-          {
-            // Add the Variance of measurement error (optional)
-            if (flag_verr && idef < nverr)
-              value += db->getFromLocator(ELoc::V, iech, identity[idef]);
-
-            // Check the minimum values over the diagonal
-            value = MAX(value, MAX(local.getValue(idef, idef), minNug[idef]));
-          }
-
-          local.setValue(idef, jdef, value);
-        }
-      if (local.invert() != 0) return mat;
-
-      for (int idef = 0; idef < ndef; idef++)
-        for (int jdef = 0; jdef < ndef; jdef++)
-          NF_T.add(position[identity[idef]], position[identity[jdef]],
-                   local.getValue(idef, jdef));
-    }
-  }
-
-  // Convert from triplet to sparse matrix
-  mat = MatrixSparse::createFromTriplet(NF_T);
-
-  // Free the non-stationary specific allocation
-  if (!hasnugget)
-    delete cova;
-  return mat;
-}
-
 VectorMeshes defineMeshesFromDbs(const Db* dbin,
                                  const Db* dbout,
                                  const Model* model,

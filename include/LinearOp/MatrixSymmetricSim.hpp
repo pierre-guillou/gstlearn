@@ -26,13 +26,13 @@ class AMatrix;
 class GSTLEARN_EXPORT MatrixSymmetricSim : public ASimulable
 {
 public:
-  MatrixSymmetricSim(const AMatrix* m, bool inverse = true);
+  MatrixSymmetricSim(const std::shared_ptr<const AMatrix>& m, bool inverse = true);
   MatrixSymmetricSim(const MatrixSymmetricSim &m) = delete;
   MatrixSymmetricSim& operator=(const MatrixSymmetricSim &m) = delete;
   virtual ~MatrixSymmetricSim();
 
   const AMatrix* getMatrix() const;
-  int  getSize() const override;
+  virtual int  getSize() const override;
   bool isEmpty() const { return _factor == nullptr; }
   double computeLogDet(int nMC = 1) const override;
   

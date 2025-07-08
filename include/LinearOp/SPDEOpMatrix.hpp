@@ -26,7 +26,7 @@ class GSTLEARN_EXPORT SPDEOpMatrix : public SPDEOp
 public:
   SPDEOpMatrix(const PrecisionOpMultiMatrix* pop = nullptr,
                const ProjMultiMatrix* A          = nullptr,
-               const MatrixSparse* invNoise      = nullptr,
+               const std::shared_ptr<const MatrixSparse>& invNoise      = nullptr,
                const ProjMultiMatrix* projOut    = nullptr);
   virtual ~SPDEOpMatrix();
 

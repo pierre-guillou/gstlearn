@@ -151,6 +151,7 @@
 %include Matrix/MatrixDense.hpp
 %include Matrix/MatrixSparse.hpp
 %include Matrix/MatrixSquare.hpp
+%include LinearOp/InvNuggetOp.hpp
 %include Matrix/NF_Triplet.hpp
 %include Matrix/MatrixSymmetric.hpp
 %include Matrix/MatrixFactory.hpp

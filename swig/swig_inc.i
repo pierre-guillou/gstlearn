@@ -143,6 +143,7 @@
   #include "LinearOp/LinearOpCGSolver.hpp"
   #include "LinearOp/ALinearOpMulti.hpp"
   #include "LinearOp/AShiftOp.hpp"
+  #include "LinearOp/InvNuggetOp.hpp"
   #include "LinearOp/ShiftOpStencil.hpp"
   #include "LinearOp/ShiftOpMatrix.hpp"
   #include "LinearOp/PrecisionOp.hpp"
@@ -1097,5 +1098,12 @@ namespace gstlrn {
   #include <memory>
 %}
 %include <std_shared_ptr.i>
+%shared_ptr(gstlrn::InvNuggetOp);
 %template(ASpaceSharedPtr)    std::shared_ptr<const gstlrn::ASpace>;
 %template(ASpaceSharedPtrVector)   std::vector< gstlrn::ASpaceSharedPtr>;
+%template(InvNugget) std::shared_ptr<const gstlrn::InvNuggetOp>;
+
+
+%warnfilter(473) gstlrn::ICloneable;
+%warnfilter(520) gstlrn::InvNuggetOp;
+%warnfilter(473) gstlrn::ACov;

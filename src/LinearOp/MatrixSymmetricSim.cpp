@@ -20,7 +20,7 @@
 
 namespace gstlrn
 {
-MatrixSymmetricSim::MatrixSymmetricSim(const AMatrix* m,
+MatrixSymmetricSim::MatrixSymmetricSim(const std::shared_ptr<const AMatrix>& m,
                                        bool inverse)
   : ASimulable()
   , _inverse(inverse)
@@ -35,12 +35,12 @@ MatrixSymmetricSim::MatrixSymmetricSim(const AMatrix* m,
 
   if (m->isSparse())
   {
-    const MatrixSparse* matCS = dynamic_cast<const MatrixSparse*>(m);
+    const MatrixSparse* matCS = dynamic_cast<const MatrixSparse*>(m.get());
     if (matCS != nullptr) _factor = new CholeskySparse(matCS);
   }
   else
   {
-    const MatrixSymmetric* matSym = dynamic_cast<const MatrixSymmetric*>(m);
+    const MatrixSymmetric* matSym = dynamic_cast<const MatrixSymmetric*>(m.get());
     if (matSym != nullptr) _factor = new CholeskyDense(matSym);
   }
   if (_factor == nullptr)
