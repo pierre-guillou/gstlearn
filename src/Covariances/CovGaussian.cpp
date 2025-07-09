@@ -13,7 +13,8 @@
 #include "Covariances/CovContext.hpp"
 #include "Matrix/MatrixDense.hpp"
 #include "Simulation/TurningBandOperate.hpp"
-#include "math.h"
+
+#include <cmath>
 
 namespace gstlrn
 {
@@ -100,4 +101,4 @@ MatrixDense CovGaussian::simulateSpectralOmega(int nb) const
       mat.setValue(irow, icol, law_gaussian());
   return mat;
 }
-}
+} // namespace gstlrn
