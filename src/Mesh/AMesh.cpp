@@ -786,7 +786,7 @@ void AMesh::resetProjFromDb(ProjMatrix* m,
 
   /* Instantiate a Ball Tree for quick search */
   // Note: this Ball tree is defined in 3D despite the space dimension of mesh
-  Ball ball(this, nullptr, 10, false, 1);
+  Ball ball(this, 10, false);
   if (verbose) ball.display(1);
 
   /* Instantiate a Sparse matrix structrue (Triplets) */

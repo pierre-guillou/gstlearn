@@ -1082,6 +1082,13 @@ namespace gstlrn {
   }
 };
 
+%extend gstlrn::KNN {
+  VectorInt getIndices(int rank = 0) const {
+    const auto view = $self->getIndices(rank);
+    return {view.begin(), view.end()};
+  }
+}
+
 // Prevent memory leaks from 'create*' and 'clone' methods
 
 // The following file should contain all 'createFrom*' methods
