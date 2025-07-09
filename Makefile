@@ -128,7 +128,7 @@ ifeq ($(ASAN), 1)
   BUILD_ASAN = OFF
 endif
 
-ifeq ($(COVERAGE), 0)
+ifeq ($(COVERAGE), 1)
   BUILD_COVERAGE = ON
  else
   BUILD_COVERAGE = OFF
