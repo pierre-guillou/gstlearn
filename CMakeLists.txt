@@ -15,14 +15,6 @@ set (PROJECT_VERSION_SUFFIX a2)  # Alpha (new feature not yet stable)
 # Build the full version
 set (PROJECT_FULL_VERSION "${PROJECT_VERSION}${PROJECT_VERSION_SUFFIX}")
 
-
-function(enable_coverage target)
-  if(BUILD_COVERAGE)
-    message(STATUS "Enabling coverage for target: ${target}")
-    target_compile_options(${target} PRIVATE -O0 -g --coverage)
-    target_link_options(${target} PRIVATE --coverage)
-  endif()
-endfunction()
 ####################################################
 ## CONFIGURATION
 
@@ -149,4 +141,5 @@ endif()
 add_subdirectory(doc/demo)
 add_subdirectory(doc/courses)
 
+# Force generation of compilation database (for clangd LSP server)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

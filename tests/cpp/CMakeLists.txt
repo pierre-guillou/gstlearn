@@ -65,8 +65,6 @@ foreach(TEST_SOURCE_FILE ${TEST_SOURCES})
     add_executable(${TEST_NAME} ${TEST_SOURCE_FILE})
     # Link each test to shared library
     target_link_libraries(${TEST_NAME} PRIVATE ${PROJECT_NAME}::shared)
-    # Add coverage
-    enable_coverage(${TEST_NAME})
     # Pass CMAKE_SOURCE_DIR to executables (for the `getTestData' function)
     target_compile_definitions(${TEST_NAME} PRIVATE -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
     # Trigger the prepare target each time a test is compiled

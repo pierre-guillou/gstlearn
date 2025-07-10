@@ -57,6 +57,25 @@ if(BUILD_ASAN)
   add_link_options(-fsanitize=address)
 endif()
 
+# Code coverage (GCC/Clang)
+option(BUILD_COVERAGE "Build with code coverage enabled" OFF)
+mark_as_advanced(BUILD_COVERAGE)
+
+if(BUILD_COVERAGE AND MSVC)
+  message(WARNING "Cannot use BUILD_COVERAGE option with Microsoft Visual Studio compilers")
+  set(BUILD_COVERAGE OFF)
+endif()
+
+if(BUILD_COVERAGE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+  message(WARNING "Switch to Debug mode to get the best of BUILD_COVERAGE")
+  set(BUILD_COVERAGE OFF)
+endif()
+
+if(BUILD_COVERAGE)
+  add_compile_options(--coverage)
+  add_link_options(--coverage)
+endif()
+
 # For valgrind usage (use Debug)
 #add_compile_options(-O0)
 
@@ -215,7 +234,7 @@ foreach(FLAVOR ${FLAVORS})
       target_link_libraries(${FLAVOR} PUBLIC stdc++fs)
     endif()
   endif()
-  enable_coverage(${FLAVOR})
+
   # Build a cmake file to be imported by library users
   export(TARGETS ${FLAVOR}
          NAMESPACE ${PROJECT_NAME}::
