@@ -9,13 +9,9 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/CholeskySparse.hpp"
-#include "Basic/OptCst.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Core/SparseInv.hpp"
-#include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixSparse.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
 #include "csparse_f.h"
 #include <Eigen/src/Core/Matrix.h>
 #include <vector>
@@ -374,11 +370,10 @@ int CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
 }
 
 /**
- * @brief Compute the inverse of the 'this' matrix
+ * @brief Returns the diagonal of the inverse of 'this' matrix
  *
- * @param vcur Storing the diagonal of the inverse matrix
- * @param proj Projection matrix
- * @return int
+ * @param vcur Output vector
+ * @param proj Projection sparse matrix
  *
  * @note: The method 'partial_inverse' used assumes a LTT decomposition
  * (which is not the decomposition of _factor [LDLT]). Hence a local
@@ -429,4 +424,4 @@ int CholeskySparse::_stdevEigen(VectorDouble& vcur,
   }
   return 0;
 }
-}
+} // namespace gstlrn
