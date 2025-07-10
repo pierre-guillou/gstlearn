@@ -397,13 +397,6 @@ int CholeskySparse::_stdevEigen(VectorDouble& vcur,
   using SpVec    = Eigen::SparseVector<double>;
   using DenseVec = Eigen::VectorXd;
 
-  /** ---------------------------------------------------------------------------
-   * @brief  Renvoie diag( P Q⁻¹ Pᵀ ).
-   *
-   * @param Q   k×k SPD  (col‑major)
-   * @param P   ℓ×k  (row‑major)  --- chaque ligne est p_i
-   * @return    VectorXd de taille ℓ :  S_ii = p_i Q⁻¹ p_iᵀ
-   * --------------------------------------------------------------------------*/
   const int k = P.cols();
   const int l = P.rows();
   SpVec p_i(k);
