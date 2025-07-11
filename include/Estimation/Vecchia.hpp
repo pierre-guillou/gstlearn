@@ -10,20 +10,19 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/NamingConvention.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Estimation/ALikelihood.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
+#include "Matrix/MatrixT.hpp"
 #include "Mesh/AMesh.hpp"
 #include "gstlearn_export.hpp"
 
-#include "Matrix/MatrixT.hpp"
-#include "Matrix/MatrixSparse.hpp"
-#include "Basic/NamingConvention.hpp"
-
 namespace gstlrn
-{ 
+{
 class Db;
 class ModelGeneric;
 
@@ -34,8 +33,8 @@ public:
           int nb_neigh,
           const Db* db1,
           const Db* db2 = nullptr,
-          bool reml = false);
-  Vecchia(const Vecchia& r);           
+          bool reml     = false);
+  Vecchia(const Vecchia& r);
   Vecchia& operator=(const Vecchia& r);
   virtual ~Vecchia();
 
@@ -43,7 +42,7 @@ public:
   static Vecchia* createForOptim(ModelGeneric* model,
                                  const Db* db1,
                                  int nb_neigh = 30,
-                                 bool reml = false);
+                                 bool reml    = false);
 
   int computeLower(const MatrixT<int>& Ranks, bool verbose = false);
   const MatrixSparse& getLFull() const { return _LFull; }
@@ -99,4 +98,4 @@ GSTLEARN_EXPORT double logLikelihoodVecchia(const Db* db,
                                             ModelGeneric* model,
                                             int nb_neigh = 5,
                                             bool verbose = false);
-}
+} // namespace gstlrn
