@@ -10,15 +10,15 @@
 /******************************************************************************/
 #include "Basic/ASerializable.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/File.hpp"
 #include "Basic/SerializeHDF5.hpp"
 #include "Basic/SerializeNeutralFile.hpp"
-#include "Basic/File.hpp"
 #include "Basic/String.hpp"
 #include "Enum/EFormatNF.hpp"
 
-#include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 namespace gstlrn
 {
@@ -52,7 +52,7 @@ void ASerializable::setDefaultFormatNF(const EFormatNF& format)
  * ASerializable::DefaultFormatNF()
  */
 bool ASerializable::dumpToNF(const String& NFFilename,
-                             const EFormatNF& format, 
+                             const EFormatNF& format,
                              bool verbose) const
 {
   bool ret = true;
@@ -74,7 +74,7 @@ bool ASerializable::dumpToNF(const String& NFFilename,
     if (SerializeNeutralFile::fileOpenWrite(*this, NFFilename, os, true))
     {
       ret = _serializeAscii(os, verbose);
-      if (! ret)
+      if (!ret)
         messerr("Problem writing in the Neutral File.");
       os.close();
     }
@@ -102,7 +102,11 @@ bool ASerializable::_fileOpenAndDeserialize(const String& filename,
   // Check that the file exists
   String filepath = ASerializable::buildFileName(1, filename, true);
   std::ifstream file(filepath);
-  if (!file.good()) return false;
+  if (!file.good())
+  {
+    if (verbose) messerr("The file %s does not exist", filepath.c_str());
+    return false;
+  }
 
   // Try to open it according to HDF5 format
 #ifdef HDF5
@@ -153,10 +157,10 @@ bool ASerializable::_tableWrite(std::ostream& os,
   return SerializeNeutralFile::tableWrite(os, string, ntab, tab);
 }
 
-bool ASerializable::_tableRead(std::istream &is,
-                               const String &string,
+bool ASerializable::_tableRead(std::istream& is,
+                               const String& string,
                                int ntab,
-                               double *tab)
+                               double* tab)
 {
   return SerializeNeutralFile::tableRead(is, string, ntab, tab);
 }
@@ -292,4 +296,4 @@ const String& ASerializable::getPrefixName()
 {
   return _myPrefixName;
 }
-}
+} // namespace gstlrn

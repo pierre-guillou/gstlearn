@@ -16,7 +16,7 @@
 #include "gstlearn_export.hpp"
 
 namespace gstlrn
-{   
+{
 class CSVformat;
 class Db;
 
@@ -30,7 +30,7 @@ GSTLEARN_EXPORT void csv_print_double(double value);
 
 GSTLEARN_EXPORT Db* db_read_csv(const char* file_name,
                                 const CSVformat& csvfmt,
-                                int verbose            = 0,
+                                bool verbose           = false,
                                 int ncol_max           = -1,
                                 int nrow_max           = -1,
                                 bool flagAddSampleRank = false);
@@ -42,11 +42,11 @@ GSTLEARN_EXPORT int db_write_csv(Db* db,
                                  bool flagInteger = false);
 GSTLEARN_EXPORT int csv_table_read(const String& filename,
                                    const CSVformat& csvfmt,
-                                   int verbose,
+                                   bool verbose,
                                    int ncol_max,
                                    int nrow_max,
                                    int* ncol_arg,
                                    int* nrow_arg,
                                    VectorString& names,
                                    VectorDouble& tab);
-}
+} // namespace gstlrn
