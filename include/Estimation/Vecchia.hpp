@@ -65,6 +65,8 @@ private:
   void _computeCm1X() override;
   void _computeCm1Y() override;
   double _computeLogDet() const override;
+  void _computeC0(const MatrixT<int>& Ranks, int ind);
+  void _computeC(const MatrixT<int>& Ranks, int ind);
 
 private:
   // Following members are copies of pointers (not to be deleted)

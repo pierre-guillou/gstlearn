@@ -99,6 +99,56 @@ namespace gstlrn
   {
     _Ranks = findNN(_db, nullptr, _nbNeigh + 1, false, verbose);
   }
+
+  void Vecchia::_computeC0(const MatrixT<int>& Ranks, int ind)
+  {
+    double value;
+    int ndim = _model->getNDim();
+    int Ndb1 = _db1->getNSample();
+    int iabs = Ranks(ind, 0);
+
+    for (int idim = 0; idim < ndim; idim++)
+    {
+      if (iabs < Ndb1)
+        value = _db1->getCoordinate(iabs, idim);
+      else
+        value = _db2->getCoordinate(iabs - Ndb1, idim);
+      _dbOnePoint->setCoordinate(0, idim, value);
+    }
+  }
+
+  void Vecchia::_computeC(const MatrixT<int>& Ranks, int ind)
+  {
+    double value;
+    int ndim     = _model->getNDim();
+    int Ndb1     = _db1->getNSample();
+    int nb_neigh = (int)Ranks.getNCols() - 1;
+
+    int icur = 0;
+    for (int jp = nb_neigh; jp >= 1; jp--)
+    {
+      int ip = Ranks(ind, jp);
+
+      if (IFFFF(ip))
+      {
+        _dbTemp->setLocVariable(ELoc::SEL, icur, 0, 0.);
+      }
+      else
+      {
+        _dbTemp->setLocVariable(ELoc::SEL, icur, 0, 1.);
+        for (int idim = 0; idim < ndim; idim++)
+        {
+          if (ip < Ndb1)
+            value = _db1->getCoordinate(ip, idim);
+          else
+            value = _db2->getCoordinate(ip - Ndb1, idim);
+          _dbTemp->setCoordinate(icur, idim, value);
+        }
+      }
+      icur++;
+    }
+  }
+
   /**
    * @brief Construct the Vecchia approximation starting from 'Ranks'
    *
@@ -120,9 +170,7 @@ namespace gstlrn
     int ndim     = _model->getNDim();
     int ntot     = (int)Ranks.getNRows();
     int nb_neigh = (int)Ranks.getNCols() - 1;
-    int Ndb1     = _db1->getNSample();
     double varK  = _model->eval0();
-    double value;
 
     // Resizing
     _DFull.resize(ntot);
@@ -138,40 +186,11 @@ namespace gstlrn
       _dbOnePoint = Db::createEmpty(1, ndim, 0);
 
     // Loop on the samples
+    int icur;
     for (int ind = 0; ind < ntot; ind++)
     {
-      int icur = 0;
-      int iabs = Ranks(ind, 0);
-      for (int idim = 0; idim < ndim; idim++)
-      {
-        if (iabs < Ndb1)
-          value = _db1->getCoordinate(iabs, idim);
-        else
-          value = _db2->getCoordinate(iabs - Ndb1, idim);
-        _dbOnePoint->setCoordinate(0, idim, value);
-      }
-
-      for (int jp = nb_neigh; jp >= 1; jp--)
-      {
-        int ip = Ranks(ind, jp);
-        if (IFFFF(ip))
-        {
-          _dbTemp->setLocVariable(ELoc::SEL, icur, 0, 0.);
-        }
-        else
-        {
-          _dbTemp->setLocVariable(ELoc::SEL, icur, 0, 1.);
-          for (int idim = 0; idim < ndim; idim++)
-          {
-            if (ip < Ndb1)
-              value = _db1->getCoordinate(ip, idim);
-            else
-              value = _db2->getCoordinate(ip - Ndb1, idim);
-            _dbTemp->setCoordinate(icur, idim, value);
-          }
-        }
-        icur++;
-      }
+      _computeC0(Ranks, ind);
+      _computeC(Ranks, ind);
 
       if (_dbTemp->getNSample(true) <= 0)
       {
@@ -182,9 +201,10 @@ namespace gstlrn
       {
         _matCov.resize(nb_neigh, nb_neigh);
         _vectCov.resize(nb_neigh, 1);
-        _model->evalCovMatSymInPlace(*_matCov, _dbTemp);
-        _chol->setMatrix(*_matCov);
+        _model->evalCovMatSymInPlace(_matCov, _dbTemp);
+        _chol->setMatrix(&_matCov);
         _model->evalCovMatInPlace(_vectCov, _dbTemp, _dbOnePoint);
+
         constvect vect = _vectCov.getViewOnColumn(0);
         _work.resize(vect.size());
         _chol->solve(vect, _work);
@@ -201,6 +221,7 @@ namespace gstlrn
         _DFull[ind] = 1. / (varK - VH::innerProduct(_work, vect));
       }
     }
+
     _Dmat.setDiagonal(_DFull);
     _LFull.transposeInPlace();
 

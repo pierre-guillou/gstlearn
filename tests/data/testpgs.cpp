@@ -78,7 +78,6 @@ int main(int argc, char* argv[])
   String outname =
     concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
   ASerializable::setPrefixName(outname);
-  setInternalDebug(true);
 
   /* Getting the Study name */
 
