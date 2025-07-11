@@ -34,8 +34,8 @@
 #include "Mesh/MeshETurbo.hpp"
 #include "Model/Model.hpp"
 #include "geoslib_define.h"
-#include "LinearOp/PrecisionOpMultiMatrix.hpp"
-#include <math.h>
+
+#include <cmath>
 #include <memory>
 #include <vector>
 
@@ -1439,4 +1439,4 @@ VectorMeshes defineMeshesFromDbs(const Db* dbin,
 
   return meshes;
 }
-}
+} // namespace gstlrn

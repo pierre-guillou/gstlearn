@@ -36,11 +36,11 @@
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Space/SpaceSN.hpp"
-
 #include "geoslib_define.h"
+
 #include <algorithm>
+#include <cmath>
 #include <functional>
-#include <math.h>
 #include <vector>
 
 static int NWGT[4]      = {2, 3, 4, 5};
@@ -1671,4 +1671,4 @@ void CorAniso::updateCov()
     }
   }
 }
-}
+} // namespace gstlrn
