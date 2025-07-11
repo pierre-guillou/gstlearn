@@ -104,7 +104,7 @@ bool ASerializable::_fileOpenAndDeserialize(const String& filename,
   std::ifstream file(filepath);
   if (!file.good())
   {
-    messerr("The file %s does not exist", filepath.c_str());
+    if (verbose) messerr("The file %s does not exist", filepath.c_str());
     return false;
   }
 

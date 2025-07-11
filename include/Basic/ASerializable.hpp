@@ -74,7 +74,7 @@ protected:
   bool _fileOpenRead(const String& filename,
                      std::ifstream& is,
                      bool verbose = false) const;
-  bool _fileOpenAndDeserialize(const String& filename, bool verbose);
+  bool _fileOpenAndDeserialize(const String& filename, bool verbose = true);
 
   static bool _commentWrite(std::ostream& os,
                             const String& comment);
