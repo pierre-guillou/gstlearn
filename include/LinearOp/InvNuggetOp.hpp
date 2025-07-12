@@ -39,7 +39,10 @@ namespace gstlrn
     InvNuggetOp& operator=(const InvNuggetOp& m) = delete;
     virtual ~InvNuggetOp();
     int getSize() const override;
-    std::shared_ptr<MatrixSparse> getInvNugget() const { return _invNugget; }
+    const std::shared_ptr<MatrixSparse>& getInvNuggetMatrix() const { return _invNuggetMatrix; }
+    const MatrixSparse* cloneInvNuggetMatrix() const;
+
+    double computeLogDet(int nMC = 1) const override;
   protected:
    int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
    int _addToDest(constvect inv, vect outv) const override;
@@ -48,10 +51,13 @@ namespace gstlrn
    void _buildInvNugget(Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam());
   
   private :
-    std::shared_ptr<MatrixSparse> _invNugget; // The inverse nugget matrix
+    std::shared_ptr<MatrixSparse> _invNuggetMatrix; // The inverse nugget matrix
     std::vector<MatrixSymmetric> _sillsInv;
   };
 
-GSTLEARN_EXPORT std::shared_ptr<MatrixSparse> buildInvNugget(Db* dbin, Model* model, const SPDEParam& params = SPDEParam());
+#ifndef SWIG
+  // Function to build the inverse nugget matrix
+  GSTLEARN_EXPORT std::shared_ptr<MatrixSparse> buildInvNugget(Db* dbin, Model* model, const SPDEParam& params = SPDEParam());
+#endif
 } // namespace gstlrn
 

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "gstlearn_export.hpp"
-
+#include "Matrix/MatrixSymmetric.hpp"
 #include "LinearOp/ACholesky.hpp"
 #include "Basic/VectorNumT.hpp"
 
@@ -23,18 +23,17 @@
 
 namespace gstlrn
 { 
-class MatrixSymmetric;
 class MatrixDense;
 
 class GSTLEARN_EXPORT CholeskyDense: public ACholesky
 {
 public:
-  CholeskyDense(const MatrixSymmetric* mat = nullptr);
+  CholeskyDense(const MatrixSymmetric& mat = MatrixSymmetric());
   CholeskyDense(const CholeskyDense& m);
   CholeskyDense& operator=(const CholeskyDense& m);
   virtual ~CholeskyDense();
 
-  int setMatrix(const MatrixSymmetric* mat);
+  int setMatrix(const MatrixSymmetric& mat);
   double computeLogDeterminant() const override;
 
   VectorDouble getLowerTriangle() const;
@@ -61,7 +60,7 @@ public:
 
 private:
   void _clear();
-  int _prepare() const;
+  int _prepare(const MatrixSymmetric& mat) const;
   int _getTriangleSize() const;
   int _computeTL() const;
   int _computeXL() const;

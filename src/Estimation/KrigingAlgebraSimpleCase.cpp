@@ -82,7 +82,7 @@ KrigingAlgebraSimpleCase::KrigingAlgebraSimpleCase(bool flagDual,
   _Sigma00 = std::make_shared<MatrixSymmetric>();
   if (_flagCholesky)
   {
-    _cholSigma = std::make_shared<CholeskyDense>(_Sigma.get());
+    _cholSigma = std::make_shared<CholeskyDense>(*_Sigma);
     _invSigmaX = std::make_shared<MatrixDense>();
   }
   else
@@ -184,7 +184,7 @@ void KrigingAlgebraSimpleCase::_copyContentForMovingNeigh(const KrigingAlgebraSi
     if (r._cholSigma == nullptr)
       _cholSigma = std::make_shared<CholeskyDense>();
     else
-      _cholSigma = std::shared_ptr<CholeskyDense>(new CholeskyDense(r._Sigma.get()));
+      _cholSigma = std::shared_ptr<CholeskyDense>(new CholeskyDense(*r._Sigma));
 
     if (r._invSigmaX == nullptr)
       _invSigmaX = std::make_shared<MatrixDense>();
@@ -726,7 +726,7 @@ int KrigingAlgebraSimpleCase::_needInvSigma()
   if (_notFindSigma()) return 1;
   if (_flagCholesky)
   {
-    _cholSigma = std::make_shared<CholeskyDense>(_Sigma.get());
+    _cholSigma = std::make_shared<CholeskyDense>(*_Sigma);
   }
   else
   {

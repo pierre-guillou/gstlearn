@@ -23,19 +23,19 @@ namespace gstlrn
 
   InvNuggetOp::InvNuggetOp(Db* dbin, Model* model, const SPDEParam& params)
     : ASimulable()
-    , _invNugget(nullptr)
+    , _invNuggetMatrix(nullptr)
   {
     _buildInvNugget(dbin, model, params);
   }
 
   int InvNuggetOp::getSize() const
   {
-    return _invNugget ? _invNugget->getNRows() : 0;
+    return _invNuggetMatrix ? _invNuggetMatrix->getNRows() : 0;
   }
 
   InvNuggetOp::~InvNuggetOp()
   {
-
+    
   }
 
   int InvNuggetOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
@@ -47,7 +47,7 @@ namespace gstlrn
 
   int InvNuggetOp::_addToDest(const constvect inv, vect outv) const
   {
-    return _invNugget->addToDest(inv, outv);
+    return _invNuggetMatrix->addToDest(inv, outv);
   }
 
   static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef)
@@ -128,7 +128,7 @@ namespace gstlrn
    */
   void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
   {
-    _invNugget = nullptr;
+    _invNuggetMatrix = nullptr;
     if (db == nullptr) return;
     int nech = db->getNSample();
     if (model == nullptr) return;
@@ -281,16 +281,27 @@ namespace gstlrn
     }
 
     // Convert from triplet to sparse matrix
-    _invNugget = std::shared_ptr<MatrixSparse>(MatrixSparse::createFromTriplet(NF_T));
+    _invNuggetMatrix = std::shared_ptr<MatrixSparse>(MatrixSparse::createFromTriplet(NF_T));
 
     // Free the non-stationary specific allocation
     if (!hasnugget)
       delete cova;
   }
 
-  std::shared_ptr<MatrixSparse> buildInvNugget(Db* dbin, Model* model, const SPDEParam& params)
+std::shared_ptr<MatrixSparse> buildInvNugget(Db* dbin, Model* model, const SPDEParam& params)
   {
     InvNuggetOp invnugg(dbin, model, params);
-    return invnugg.getInvNugget();
+    return invnugg.getInvNuggetMatrix();
   }
+
+double InvNuggetOp::computeLogDet(int nMC) const
+{
+  DECLARE_UNUSED(nMC)
+  return TEST;
+}
+
+const MatrixSparse* InvNuggetOp::cloneInvNuggetMatrix() const 
+{
+ return _invNuggetMatrix->clone(); 
+}
 } // namespace gstlrn

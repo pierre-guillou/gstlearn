@@ -115,8 +115,9 @@ double ALikelihood::computeLogLikelihood(bool verbose)
    
 
     // Construct ZtCm1X = Zt * Cm1 * X and perform its Cholesky decomposition
+    // workaround to create a shared_ptr which is not deleted at the end of the scope
     VectorDouble ZtCm1X = _Cm1X.prodVecMat(_Y);
-    CholeskyDense XtCm1XChol(&_XtCm1X);
+    CholeskyDense XtCm1XChol(_XtCm1X);
     if (!XtCm1XChol.isReady())
     {
       messerr("Cholesky decomposition of XtCm1X matrix failed");
@@ -156,7 +157,7 @@ double ALikelihood::computeLogLikelihood(bool verbose)
   double loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
   if (_reml && _model->getNDriftEquation() > 0)
   {
-    CholeskyDense XtCm1XChol(&_XtCm1X);
+    CholeskyDense XtCm1XChol(_XtCm1X);
      loglike -= 0.5 * XtCm1XChol.computeLogDeterminant();
   }
 

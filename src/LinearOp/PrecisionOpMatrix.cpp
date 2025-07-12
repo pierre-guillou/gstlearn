@@ -48,7 +48,6 @@ const MatrixSparse* PrecisionOpMatrix::getS() const
 
 PrecisionOpMatrix::~PrecisionOpMatrix()
 {
-  delete _Q;
   delete _chol;
 }
 
@@ -161,7 +160,7 @@ int PrecisionOpMatrix::_addToDest(const constvect inv, vect outv) const
 int PrecisionOpMatrix::_addSimulateToDest(const constvect whitenoise,
                                       vect outv) const
 {
-  if (_chol == nullptr) _chol = new CholeskySparse(_Q);
+  if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
   _chol->addSimulateToDest(whitenoise, outv);
   return 0;
 }
@@ -169,14 +168,14 @@ int PrecisionOpMatrix::_addSimulateToDest(const constvect whitenoise,
 void PrecisionOpMatrix::evalInverse(const constvect vecin,
                                 std::vector<double>& vecout)
 {
-  if (_chol == nullptr) _chol = new CholeskySparse(_Q);
+  if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
   _chol->solve(vecin, vecout);
 }
 
 double PrecisionOpMatrix::getLogDeterminant(int nMC)
 {
   DECLARE_UNUSED(nMC);
-  if (_chol == nullptr) _chol = new CholeskySparse(_Q);
+  if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
   return _chol->computeLogDeterminant();
 }
 
@@ -251,7 +250,6 @@ void PrecisionOpMatrix::evalDerivOptim(vect outv,
 
 void PrecisionOpMatrix::_buildQ()
 {
-  delete _Q;
   if (!isCovaDefined()) return;
 
   // Calculate the Vector of coefficients (blin)
@@ -259,7 +257,7 @@ void PrecisionOpMatrix::_buildQ()
 
   // Calculate the Precision matrix Q
 
-  _Q = _build_Q();
+  _Q = std::shared_ptr<MatrixSparse>(_build_Q());
 }
 
 /****************************************************************************/

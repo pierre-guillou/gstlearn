@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "Matrix/MatrixSymmetric.hpp"
 #include "gstlearn_export.hpp"
 
 #include "LinearOp/ASimulable.hpp"
@@ -26,12 +27,11 @@ class AMatrix;
 class GSTLEARN_EXPORT MatrixSymmetricSim : public ASimulable
 {
 public:
-  MatrixSymmetricSim(const std::shared_ptr<const AMatrix>& m, bool inverse = true);
+  MatrixSymmetricSim(const AMatrix& m, bool inverse = true);
   MatrixSymmetricSim(const MatrixSymmetricSim &m) = delete;
   MatrixSymmetricSim& operator=(const MatrixSymmetricSim &m) = delete;
   virtual ~MatrixSymmetricSim();
 
-  const AMatrix* getMatrix() const;
   virtual int  getSize() const override;
   bool isEmpty() const { return _factor == nullptr; }
   double computeLogDet(int nMC = 1) const override;
@@ -46,5 +46,7 @@ protected:
 private:
   bool _inverse;
   ACholesky* _factor;
+  const AMatrix& _mat;
+  MatrixSymmetric _matSymConverted; // Used if the input matrix is not a MatrixSymmetric, just to avoid premature destruction
 };
 }

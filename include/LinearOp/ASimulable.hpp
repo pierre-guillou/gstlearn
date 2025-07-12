@@ -17,7 +17,7 @@ namespace gstlrn{
 class GSTLEARN_EXPORT ASimulable : public ALinearOp
 {
 public:
-  ASimulable() {}
+  ASimulable();
   virtual ~ASimulable() {}
 
   int evalSimulate(const VectorDouble& whitenoise, VectorDouble& outv) const;

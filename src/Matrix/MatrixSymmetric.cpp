@@ -9,6 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Matrix/MatrixSymmetric.hpp"
+#include "Basic/AStringable.hpp"
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/MatrixSquare.hpp"
 #include "Basic/VectorHelper.hpp"
@@ -34,13 +35,24 @@ MatrixSymmetric::MatrixSymmetric(const MatrixSymmetric& m)
 MatrixSymmetric::MatrixSymmetric(const AMatrix& m)
   : MatrixSquare(m)
 {
-  if (!m.isSymmetric())
+  if (!m.isSquare())
   {
-    messerr("The input matrix should be Symmetric");
+    messerr("The input matrix should be Square");
     _clear();
     return;
   }
+
   copyElements(m);
+
+  if (!m.isSymmetric())
+  {
+    messerr("The input matrix should be Symmetric");
+    messerr("It has been symetrized by computing (this + this^T)/2");
+    this->transposeInPlace();
+    this->addMatInPlace(m);
+    this->prodScalar(0.5);
+  }
+  
 }
 
 MatrixSymmetric& MatrixSymmetric::operator= (const MatrixSymmetric &m)

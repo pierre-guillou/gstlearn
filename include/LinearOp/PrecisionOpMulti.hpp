@@ -12,6 +12,8 @@
 
 #include "Basic/AStringFormat.hpp"
 #include "LinearOp/ASimulable.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "gstlearn_export.hpp"
 
 #include "Basic/VectorT.hpp"
@@ -89,6 +91,8 @@ private:
 protected:
   std::vector<PrecisionOp*> _pops;
   VectorBool _isNoStatForVariance;
+  std::vector<MatrixSymmetric> _sills;
+  std::vector<std::vector<MatrixSymmetric>>_localSills; // Local Sills for non-stationary covariances
   std::vector<VectorVectorDouble> _invCholSillsNoStat;
   std::vector<VectorVectorDouble> _cholSillsNoStat;
   std::vector<CholeskyDense> _invCholSillsStat; // Stationary Sills

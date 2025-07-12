@@ -24,21 +24,20 @@ SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
                            const ProjMultiMatrix* projOut)
   : SPDEOp(pop,
            A,
-           std::dynamic_pointer_cast<const ASimulable>(invNoise),
+           invNoise == nullptr ? nullptr:std::shared_ptr<ASimulable>(new MatrixSymmetricSim(*invNoise)),
            nullptr,
            nullptr,
            projOut,
-           projOut,
-           true)
-  , _QpAinvNoiseAt(MatrixSparse(0, 0))
+           projOut)
+  , _QpAinvNoiseAt(std::make_shared<MatrixSparse>(0,0))
   , _chol(nullptr)
 {
-  _QpAinvNoiseAt.resize(pop->getSize(), pop->getSize());
+  _QpAinvNoiseAt->resize(pop->getSize(), pop->getSize());
   if (A != nullptr)
   {
-    _QpAinvNoiseAt.prodNormMatMatInPlace(A->getProj(), invNoise.get(), true);
+    _QpAinvNoiseAt->prodNormMatMatInPlace(A->getProj(), invNoise.get(), true);
   }
-  _QpAinvNoiseAt.addMatInPlace(*pop->getQ());
+  _QpAinvNoiseAt->addMatInPlace(*pop->getQ());
 }
 
 SPDEOpMatrix::~SPDEOpMatrix()
@@ -49,7 +48,7 @@ SPDEOpMatrix::~SPDEOpMatrix()
 int SPDEOpMatrix::_solve(const constvect inv, vect outv) const
 {
   if (_chol == nullptr)
-    _chol = new CholeskySparse(&_QpAinvNoiseAt);
+    _chol = new CholeskySparse(*_QpAinvNoiseAt);
   return _chol->solve(inv, outv);
 }
 
@@ -64,7 +63,7 @@ int SPDEOpMatrix::_solve(const constvect inv, vect outv) const
 *****************************************************************************/
 int SPDEOpMatrix::_addToDest(const constvect inv, vect outv) const
 {
-  return _QpAinvNoiseAt.addToDest(inv, outv);
+  return _QpAinvNoiseAt->addToDest(inv, outv);
 }
 
 double SPDEOpMatrix::computeLogDetOp(int nbsimu) const
@@ -72,7 +71,7 @@ double SPDEOpMatrix::computeLogDetOp(int nbsimu) const
   DECLARE_UNUSED(nbsimu);
 
   if (_chol == nullptr)
-    _chol = new CholeskySparse(&_QpAinvNoiseAt);
+    _chol = new CholeskySparse(*_QpAinvNoiseAt);//TODO avoid to do it twice
   return _chol->computeLogDeterminant();
 }
 
@@ -92,7 +91,7 @@ VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) con
   DECLARE_UNUSED(seed);
 
   if (_chol == nullptr)
-    _chol = new CholeskySparse(&_QpAinvNoiseAt);
+    _chol = new CholeskySparse(*_QpAinvNoiseAt);//TODO avoid to do it twice
 
   const ProjMultiMatrix* proj = dynamic_cast<const ProjMultiMatrix*>(_projOutKriging);
   const MatrixSparse* projmat = proj->getProj();
@@ -102,4 +101,4 @@ VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) con
 
   return result;
 }
-}
+} // namespace gstlrn

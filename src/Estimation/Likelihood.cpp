@@ -27,12 +27,14 @@ Likelihood::Likelihood(ModelGeneric* model,
                        const Db* db,
                        bool reml)
   : ALikelihood(model, db, reml)
+  , _cov(std::make_shared<MatrixSymmetric>(0))
 {
   setAuthorizedAnalyticalGradients(true);
 }
 
 Likelihood::Likelihood(const Likelihood& r)
   : ALikelihood(r)
+  , _cov(r._cov)
 {
 }
 
@@ -41,6 +43,7 @@ Likelihood& Likelihood::operator=(const Likelihood& r)
   if (this != &r)
   {
     ALikelihood::operator=(r);
+    _cov = r._cov;
   }
   return *this;
 }
@@ -96,8 +99,8 @@ double Likelihood::_computeLogDet() const
 void Likelihood::_updateModel(bool verbose)
 {
   DECLARE_UNUSED(verbose);
-  _model->evalCovMatSymInPlace(_cov, _db);
-  _covChol.setMatrix(&_cov);
+  _model->evalCovMatSymInPlace(*_cov, _db);
+  _covChol.setMatrix(*_cov);
 }
 
 void Likelihood::evalGrad(vect res)
@@ -114,7 +117,7 @@ void Likelihood::evalGrad(vect res)
   MatrixSymmetric invXtCm1X;
   if (_reml && _model->getNDriftEquation() > 0)
   {
-    XtCm1XChol.setMatrix(&_XtCm1X);
+    XtCm1XChol.setMatrix(_XtCm1X);
     invXtCm1X = XtCm1XChol.inverse();
   }
   for (size_t iparam = 0; iparam < gradcov.size(); iparam++)

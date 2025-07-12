@@ -15,6 +15,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/WarningMacro.hpp"
+#include "LinearOp/ALinearOp.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixFactory.hpp"
 #include "Matrix/NF_Triplet.hpp"
@@ -42,7 +43,7 @@ namespace gstlrn
 static bool globalFlagEigen = true;
 
 MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax, int opt_eigen)
-  : AMatrix(nrow, ncol)
+  : AMatrix(nrow, ncol), ALinearOp()
   , _csMatrix(nullptr)
   , _eigenMatrix()
   , _flagEigen(false)

@@ -25,6 +25,7 @@
 #include "Enum/ECalcMember.hpp"
 #include "Estimation/KrigingSystem.hpp"
 #include "Matrix/MatrixFactory.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Model/CovInternal.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/ANeigh.hpp"
@@ -3274,7 +3275,7 @@ static int st_sampling_krige_data(Db* db,
 
     mat_s = model->evalCovMatSym(db);
 
-    CholeskyDense mat_s_Chol(&mat_s);
+    CholeskyDense mat_s_Chol(mat_s);
     if (!mat_s_Chol.isReady()) goto label_end;
     VectorDouble tl = mat_s_Chol.getLowerTriangle();
 

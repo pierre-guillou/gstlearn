@@ -17,31 +17,42 @@
 #include "Matrix/MatrixSparse.hpp"
 #include "LinearOp/ACholesky.hpp"
 #include <Eigen/src/Core/Matrix.h>
+#include <memory>
+#include <typeinfo>
 
 namespace gstlrn
 {
-MatrixSymmetricSim::MatrixSymmetricSim(const std::shared_ptr<const AMatrix>& m,
+MatrixSymmetricSim::MatrixSymmetricSim(const AMatrix& m,
                                        bool inverse)
   : ASimulable()
   , _inverse(inverse)
   , _factor(nullptr)
+  , _mat(m)
 
 {
-  if (!m->isSquare())
+  if (!m.isSquare())
   {
     messerr("The matrix must be square!");
     return;
   }
 
-  if (m->isSparse())
+  if (m.isSparse())
   {
-    const MatrixSparse* matCS = dynamic_cast<const MatrixSparse*>(m.get());
-    if (matCS != nullptr) _factor = new CholeskySparse(matCS);
+    const auto& matCS = dynamic_cast<const MatrixSparse&>(m);
+    _factor = new CholeskySparse(matCS);
   }
   else
   {
-    const MatrixSymmetric* matSym = dynamic_cast<const MatrixSymmetric*>(m.get());
-    if (matSym != nullptr) _factor = new CholeskyDense(matSym);
+    const auto* matSym = dynamic_cast<const MatrixSymmetric*>(&m);
+    if (matSym == nullptr)
+    {
+       _matSymConverted = MatrixSymmetric(m);
+       _factor = new CholeskyDense(_matSymConverted);
+    }
+    else 
+    {
+      _factor = new CholeskyDense(*matSym);
+    }
   }
   if (_factor == nullptr)
   {
@@ -61,7 +72,7 @@ MatrixSymmetricSim::~MatrixSymmetricSim()
 
 int MatrixSymmetricSim::_addToDest(const constvect inv, vect outv) const
 {
-  if (_inverse) return _factor->getMatrix()->addProdMatVecInPlace(inv, outv);
+  if (_inverse) return _mat.addProdMatVecInPlace(inv, outv);
   return _factor->addSolveX(inv, outv);
 }
 
@@ -70,12 +81,6 @@ int MatrixSymmetricSim::_addSimulateToDest(const constvect whitenoise,
 {
   if (_inverse) return _factor->addInvLtX(whitenoise, outv);
   return _factor->addLX(whitenoise, outv);
-}
-
-const AMatrix* MatrixSymmetricSim::getMatrix() const
-{
-  if (_factor == nullptr) return nullptr;
-  return _factor->getMatrix();
 }
 
 int MatrixSymmetricSim::getSize() const

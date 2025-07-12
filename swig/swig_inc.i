@@ -140,10 +140,10 @@
   #include "LinearOp/LogStats.hpp"
   #include "LinearOp/ALinearOp.hpp"
   #include "LinearOp/ASimulable.hpp"
+  #include "LinearOp/InvNuggetOp.hpp"
   #include "LinearOp/LinearOpCGSolver.hpp"
   #include "LinearOp/ALinearOpMulti.hpp"
   #include "LinearOp/AShiftOp.hpp"
-  #include "LinearOp/InvNuggetOp.hpp"
   #include "LinearOp/ShiftOpStencil.hpp"
   #include "LinearOp/ShiftOpMatrix.hpp"
   #include "LinearOp/PrecisionOp.hpp"
@@ -1097,13 +1097,21 @@ namespace gstlrn {
 %{
   #include <memory>
 %}
+
+//quick and dirty way to handle shared_ptrs for one python test
+// This is not a good practice, but it works for now
+// better solution would be to use a shared_ptr 
+%typemap(in) const std::shared_ptr<const gstlrn::ASimulable> & {
+  gstlrn::MatrixSymmetricSim* ptr = nullptr;
+  int res = SWIG_ConvertPtr($input, (void**)&ptr, SWIGTYPE_p_gstlrn__MatrixSymmetricSim, 0);
+
+  if (SWIG_IsOK(res) && ptr != nullptr) {
+    *$1 = std::shared_ptr<const gstlrn::ASimulable>(ptr);  
+  } else {
+    SWIG_exception_fail(SWIG_TypeError, "Expected MatrixSymmetricSim");
+  }
+}
+
 %include <std_shared_ptr.i>
-%shared_ptr(gstlrn::InvNuggetOp);
 %template(ASpaceSharedPtr)    std::shared_ptr<const gstlrn::ASpace>;
 %template(ASpaceSharedPtrVector)   std::vector< gstlrn::ASpaceSharedPtr>;
-%template(InvNugget) std::shared_ptr<const gstlrn::InvNuggetOp>;
-
-
-%warnfilter(473) gstlrn::ICloneable;
-%warnfilter(520) gstlrn::InvNuggetOp;
-%warnfilter(473) gstlrn::ACov;

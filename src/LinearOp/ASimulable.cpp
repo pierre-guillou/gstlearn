@@ -16,6 +16,11 @@
 
 namespace gstlrn
 {
+
+ASimulable::ASimulable()
+  : ALinearOp()
+{
+}
 VectorDouble ASimulable::evalSimulate(const VectorDouble& whitenoise) const
 {
   VectorDouble res;

@@ -83,7 +83,6 @@ GibbsMMulti& GibbsMMulti::operator=(const GibbsMMulti& r)
 
 GibbsMMulti::~GibbsMMulti()
 {
-  delete _Cmat;
   delete _CmatChol;
   delete _matWgt;
 }
@@ -130,7 +129,7 @@ int GibbsMMulti::covmatAlloc(bool verbose, bool verboseTimer)
   if (verbose)
     message("Building Covariance Sparse Matrix (Dimension = %d)\n", nact);
   Timer timer;
-  _Cmat = model->evalCovMatSparse(db, db, -1, -1, _getRanks(), _getRanks());
+  _Cmat = std::shared_ptr<MatrixSparse>(model->evalCovMatSparse(db, db, -1, -1, _getRanks(), _getRanks()));
   if (_Cmat == nullptr) return 1;
   if (verboseTimer)
     timer.displayIntervalMilliseconds("Building Covariance");
@@ -138,7 +137,8 @@ int GibbsMMulti::covmatAlloc(bool verbose, bool verboseTimer)
   // Cholesky decomposition
 
   if (verbose) message("Cholesky Decomposition of Covariance Matrix\n");
-  _CmatChol = new CholeskySparse(_Cmat);
+
+  _CmatChol = new CholeskySparse(*_Cmat);
   if (!_CmatChol->isReady()) return 1;
   if (verboseTimer)
     timer.displayIntervalMilliseconds("Cholesky Decomposition");

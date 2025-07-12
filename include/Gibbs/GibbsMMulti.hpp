@@ -58,7 +58,7 @@ private:
   void _updateStatWeights(int* nzero);
 
 private:
-  MatrixSparse*   _Cmat;
+  std::shared_ptr<MatrixSparse>   _Cmat;
   CholeskySparse* _CmatChol;
   double          _eps;
   bool            _flagStoreInternal;

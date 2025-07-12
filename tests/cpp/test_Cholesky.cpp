@@ -19,7 +19,7 @@
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Matrix/NF_Triplet.hpp"
 
-using  namespace gstlrn;
+using namespace gstlrn;
 MatrixSparse* _createSparseMatrix(int n, double proba)
 {
   // We create a square matrix
@@ -82,8 +82,9 @@ int main(int argc, char* argv[])
   VectorDouble vecref(size);
 
   // Creating the Cholesky objects
-  CholeskySparse cholSparse(Q);
-  CholeskyDense cholDense(M);
+  CholeskySparse cholSparse(*Q);
+
+  CholeskyDense cholDense(*M);
 
   // Checking the Cholesky decomposition
   M->prodMatVecInPlace(vecin, vecref);
@@ -154,9 +155,9 @@ int main(int argc, char* argv[])
   (void)MP.invert();
   VectorDouble vecout1b = MP.getDiagonal();
 
-  MatrixSparse* M2 = MatrixSparse::createFromTriplet(
+  MatrixSparse* M2 =MatrixSparse::createFromTriplet(
     M->getMatrixToTriplet(), M->getNRows(), M->getNCols(), -1, 1);
-  CholeskySparse Qchol(M2);
+  CholeskySparse Qchol(*M2);
   MatrixSparse* proj = MatrixSparse::Identity(M->getNRows());
   Qchol.stdev(vecout2, proj, false);
   delete proj;
@@ -185,7 +186,6 @@ int main(int argc, char* argv[])
   // Free the pointers
   delete Q;
   delete M;
-  delete M2;
 
   return (0);
 }

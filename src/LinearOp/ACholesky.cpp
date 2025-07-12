@@ -9,20 +9,19 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/ACholesky.hpp"
+#include "Matrix/AMatrix.hpp"
 #include "Matrix/MatrixDense.hpp"
 
 namespace gstlrn{
-ACholesky::ACholesky(const AMatrix* mat)
-  : _mat(mat)
-  , _size(0)
+ACholesky::ACholesky(const AMatrix& mat)
+  : _size(0)
   , _ready(false)
 {
-  if (mat != nullptr) _size = mat->getNRows();
+  _size = mat.getNRows();
 }
 
 ACholesky::ACholesky(const ACholesky& m)
-  : _mat(m._mat)
-  , _size(m._size)
+  : _size(m._size)
   , _ready(m._ready)
 {
 }
@@ -31,7 +30,6 @@ ACholesky& ACholesky::operator=(const ACholesky& m)
 {
   if (this != &m)
   {
-    _mat   = m._mat;
     _size  = m._size;
     _ready = m._ready;
   }

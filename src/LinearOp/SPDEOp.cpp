@@ -24,8 +24,7 @@ namespace gstlrn
                    const PrecisionOpMulti* const popSimu,
                    const ProjMulti* const projInSimu,
                    const ProjMulti* const projOutKriging,
-                   const ProjMulti* const projOutSimu,
-                   bool todelete)
+                   const ProjMulti* const projOutSimu)
     : _QKriging(popKriging)
     , _projInKriging(projInKriging)
     , _invNoise(invNoise)

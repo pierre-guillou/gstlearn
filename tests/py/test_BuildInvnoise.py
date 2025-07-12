@@ -7,7 +7,8 @@ np.random.seed(1312)
 # %%
 # Nouvelle fonction renvoyant directement l'inverse de la matrice
 def computeNew(dat, model, debug=False):
-    mat = gl.buildInvNugget(dat, model)
+    invnug = gl.InvNuggetOp(dat,model)
+    mat = invnug.cloneInvNuggetMatrix()
     
     if debug:
         mat.display()

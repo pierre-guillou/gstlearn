@@ -76,7 +76,7 @@ private:
   int _nt;
   int _nd;
   MatrixT<int> _Ranks; // Matrix of ranks for the Vecchia approximation
-  MatrixSymmetric _matCov;
+  std::shared_ptr<MatrixSymmetric> _matCov;
   MatrixDense _vectCov;
   VectorDouble _work; // Work vector for calculations
   mutable VectorDouble _LdY;

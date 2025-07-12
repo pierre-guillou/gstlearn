@@ -26,6 +26,7 @@
 #include "Geometry/GeometryHelper.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixSquare.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Model/Constraints.hpp"
 #include "Model/Model.hpp"
 #include "Model/Option_AutoFit.hpp"
@@ -4215,14 +4216,14 @@ static void st_vario_varchol_manage(const Vario* vario,
         mat.setValue(ivar, jvar, vario->getVar(ivar, jvar));
   }
 
-  CholeskyDense matChol(&mat);
+  CholeskyDense matChol(mat);
   if (!matChol.isReady())
   {
     /* The matrix is filled arbitrarily */
     for (int ivar = 0; ivar < nvar; ivar++)
       for (int jvar = 0; jvar < nvar; jvar++)
         mat.setValue(ivar, jvar, (ivar == jvar));
-    matChol.setMatrix(&mat);
+    matChol.setMatrix(mat);
     if (!matChol.isReady())
       messageAbort("Error in st_vario_varchol_manage(): This should never happen");
   }

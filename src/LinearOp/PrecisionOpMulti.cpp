@@ -10,87 +10,91 @@
 /******************************************************************************/
 
 #include "LinearOp/PrecisionOpMulti.hpp"
-#include "LinearOp/CholeskyDense.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/Interval.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/CovAniso.hpp"
+#include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Mesh/MeshETurbo.hpp"
 
 #include <vector>
 
-#define EVALOP(IN,OUT,TAB,getmat,OP,IY,COMPUTEOP,XORY,START,END,IVAR,JVAR) \
-  {\
-    int nvar = _getNVar();\
-    int ncov = _getNCov();\
-    int iad_x = 0;\
-    int iad_struct = 0;\
-    vect y;\
-    for (int icov = 0; icov < ncov; icov++)\
-    {\
-      int napices = size(icov);\
-      if ( (nvar == 1) && (ncov == 1) )\
-      {\
-        y = vect(OUT);\
-      }\
-      else\
-      {\
-        if (COMPUTEOP)\
-        {\
-          _works[icov].resize(napices);\
-          y = vect(_works[icov]);\
-        }\
-      }\
-      for (int jvar = 0; jvar < nvar; jvar++)\
-      {\
-        int iad_y = IY;\
-        constvect x(IN.data() + iad_x, napices);\
-        if (nvar == 1)\
-          y = vect(OUT.data() + iad_y, napices);\
-        if (COMPUTEOP) \
-        {\
-          if ( (nvar > 1) || (ncov > 1) )\
-            std::fill(y.begin(),y.end(),0.);\
-          _pops[icov]->OP(x, y);\
-        }\
-        if ( (nvar == 1) && (ncov == 1) ) break;\
-        if (nvar == 1)\
-        {\
-          iad_x += napices;\
-          continue;\
-        }\
-        for (int ivar = START; ivar < END; ivar++)\
-        {\
-          if (_isNoStatForVariance[icov])\
-          {\
-            constvect i1(TAB##NoStat[icov][IND(IVAR,JVAR,nvar)]);\
-            constvect i2(XORY);\
-            vect i3(OUT);\
-            VectorHelper::addMultiplyVectVectInPlace(i1,i2,i3,iad_y); \
-          }\
-          else\
-          {\
-            constvect i1(XORY);\
-            vect i2(OUT);\
-            VectorHelper::addMultiplyConstantInPlace(TAB##Stat[icov].getmat(IVAR,JVAR),i1,i2,iad_y);\
-          }\
-          iad_y += napices;\
-        }\
-        iad_x += napices;  \
-      }\
-      iad_struct += napices * nvar;\
-    }\
-    if (COMPUTEOP) return 0;\
+#define EVALOP(IN, OUT, TAB, getmat, OP, IY, COMPUTEOP, XORY, START, END, IVAR, JVAR)                    \
+  {                                                                                                      \
+    int nvar       = _getNVar();                                                                         \
+    int ncov       = _getNCov();                                                                         \
+    int iad_x      = 0;                                                                                  \
+    int iad_struct = 0;                                                                                  \
+    vect y;                                                                                              \
+    for (int icov = 0; icov < ncov; icov++)                                                              \
+    {                                                                                                    \
+      int napices = size(icov);                                                                          \
+      if ((nvar == 1) && (ncov == 1))                                                                    \
+      {                                                                                                  \
+        y = vect(OUT);                                                                                   \
+      }                                                                                                  \
+      else                                                                                               \
+      {                                                                                                  \
+        if (COMPUTEOP)                                                                                   \
+        {                                                                                                \
+          _works[icov].resize(napices);                                                                  \
+          y = vect(_works[icov]);                                                                        \
+        }                                                                                                \
+      }                                                                                                  \
+      for (int jvar = 0; jvar < nvar; jvar++)                                                            \
+      {                                                                                                  \
+        int iad_y = IY;                                                                                  \
+        constvect x(IN.data() + iad_x, napices);                                                         \
+        if (nvar == 1)                                                                                   \
+          y = vect(OUT.data() + iad_y, napices);                                                         \
+        if (COMPUTEOP)                                                                                   \
+        {                                                                                                \
+          if ((nvar > 1) || (ncov > 1))                                                                  \
+            std::fill(y.begin(), y.end(), 0.);                                                           \
+          _pops[icov]->OP(x, y);                                                                         \
+        }                                                                                                \
+        if ((nvar == 1) && (ncov == 1)) break;                                                           \
+        if (nvar == 1)                                                                                   \
+        {                                                                                                \
+          iad_x += napices;                                                                              \
+          continue;                                                                                      \
+        }                                                                                                \
+        for (int ivar = START; ivar < END; ivar++)                                                       \
+        {                                                                                                \
+          if (_isNoStatForVariance[icov])                                                                \
+          {                                                                                              \
+            constvect i1(TAB##NoStat[icov][IND(IVAR, JVAR, nvar)]);                                      \
+            constvect i2(XORY);                                                                          \
+            vect i3(OUT);                                                                                \
+            VectorHelper::addMultiplyVectVectInPlace(i1, i2, i3, iad_y);                                 \
+          }                                                                                              \
+          else                                                                                           \
+          {                                                                                              \
+            constvect i1(XORY);                                                                          \
+            vect i2(OUT);                                                                                \
+            VectorHelper::addMultiplyConstantInPlace(TAB##Stat[icov].getmat(IVAR, JVAR), i1, i2, iad_y); \
+          }                                                                                              \
+          iad_y += napices;                                                                              \
+        }                                                                                                \
+        iad_x += napices;                                                                                \
+      }                                                                                                  \
+      iad_struct += napices * nvar;                                                                      \
+    }                                                                                                    \
+    if (COMPUTEOP) return 0;                                                                             \
   }
 
-namespace gstlrn{
+namespace gstlrn
+{
 PrecisionOpMulti::PrecisionOpMulti(Model* model,
                                    const VectorMeshes& meshes,
                                    bool stencil,
                                    bool buildOp)
   : _pops()
   , _isNoStatForVariance(false)
+  , _sills()
+  , _localSills()
   , _invCholSillsNoStat()
   , _cholSillsNoStat()
   , _invCholSillsStat()
@@ -104,28 +108,28 @@ PrecisionOpMulti::PrecisionOpMulti(Model* model,
   , _allStat(true)
   , _ready(false)
 {
-  if (! _isValidModel(model)) return;
+  if (!_isValidModel(model)) return;
 
-  if (! _isValidMeshes(meshes)) return;
+  if (!_isValidMeshes(meshes)) return;
 
-  if (! _matchModelAndMeshes()) return;
+  if (!_matchModelAndMeshes()) return;
 
   _isValid = true;
   _computeSize();
-  int ncov = (int)meshes.size(); 
-  _isNoStatForVariance.resize(ncov,false);
-  
+  int ncov = (int)meshes.size();
+  _isNoStatForVariance.resize(ncov, false);
+
   _works.resize(ncov);
 
   for (int icov = 0; icov < ncov; icov++)
-  {    
-    bool nostaticov =  _model->getCovAniso(icov)->isNoStatForVariance();
+  {
+    bool nostaticov            = _model->getCovAniso(icov)->isNoStatForVariance();
     _isNoStatForVariance[icov] = nostaticov;
-    _allStat = _allStat && !nostaticov;
+    _allStat                   = _allStat && !nostaticov;
   }
   _buildMatrices();
 
-  if(buildOp)
+  if (buildOp)
   {
     bool localStencil = stencil && isTurbo(meshes) && !model->isNoStat();
     buildQop(localStencil);
@@ -148,12 +152,11 @@ bool PrecisionOpMulti::_checkReady() const
   return _ready;
 }
 
-
 void PrecisionOpMulti::_buildQop(bool stencil)
 {
   for (int i = 0, number = _getNCov(); i < number; i++)
   {
-     CovAniso* cova = _model->getCovAniso(_covList[i]);
+    CovAniso* cova = _model->getCovAniso(_covList[i]);
     _pops.push_back(PrecisionOp::create(_meshes[i], cova, stencil));
   }
 }
@@ -213,11 +216,11 @@ bool PrecisionOpMulti::_isValidMeshes(const std::vector<const AMesh*>& meshes)
 
 void PrecisionOpMulti::_popsClear()
 {
-  for (int i = 0, n = (int) _pops.size(); i < n; i++)
+  for (int i = 0, n = (int)_pops.size(); i < n; i++)
     delete _pops[i];
 }
 
-bool PrecisionOpMulti::_matchModelAndMeshes() const 
+bool PrecisionOpMulti::_matchModelAndMeshes() const
 {
   if (_getNCov() != _getNMesh())
   {
@@ -237,13 +240,13 @@ int PrecisionOpMulti::_getNVar() const
 int PrecisionOpMulti::_getNCov() const
 {
   if (_covList.empty()) return 0;
-  return (int) _covList.size();
+  return (int)_covList.size();
 }
 
 int PrecisionOpMulti::_getNMesh() const
 {
   if (_meshes.empty()) return 0;
-  return (int) _meshes.size();
+  return (int)_meshes.size();
 }
 
 int PrecisionOpMulti::getSize() const
@@ -254,7 +257,7 @@ void PrecisionOpMulti::_computeSize()
 {
   int nvar = _getNVar();
   int ncov = _getNCov();
-  _size = 0;
+  _size    = 0;
   for (int i = 0; i < ncov; i++)
   {
     _size += nvar * _meshes[i]->getNApices();
@@ -263,43 +266,46 @@ void PrecisionOpMulti::_computeSize()
 
 int PrecisionOpMulti::_buildGlobalMatricesStationary(int icov)
 {
-  _invCholSillsStat[icov].setMatrix(&_model->getSills(icov)); // TODO: a nettoyer
+  _sills[icov] = _model->getSills(icov);
+  _invCholSillsStat[icov].setMatrix(_sills[icov]); // TODO: a nettoyer
   if (!_invCholSillsStat[icov].isReady()) return 1;
-  _cholSillsStat[icov].setMatrix(&_model->getSills(icov));
+  _cholSillsStat[icov].setMatrix(_sills[icov]);
   if (!_cholSillsStat[icov].isReady()) return 1;
   return 0;
 }
 
 int PrecisionOpMulti::_buildLocalMatricesNoStat(int icov)
 {
+
   CovAniso* cova = _model->getCovAniso(icov);
-  int nvar = _getNVar();
+  int nvar       = _getNVar();
   cova->informMeshByApexForSills(_meshes[icov]);
-  int nvertex =  (int)_meshes[icov]->getNApices();
-  int nterms = nvar * (nvar + 1)/2;
+  int nvertex = _meshes[icov]->getNApices();
+  int nterms  = nvar * (nvar + 1) / 2;
   _invCholSillsNoStat[icov].resize(nterms);
   _cholSillsNoStat[icov].resize(nterms);
 
   for (int i = 0; i < nterms; i++)
   {
+    _localSills[icov].resize(nvertex);
     _invCholSillsNoStat[icov][i].resize(nvertex);
     _cholSillsNoStat[icov][i].resize(nvertex);
   }
   for (int imesh = 0; imesh < nvertex; imesh++)
   {
-    cova->updateCovByMesh(imesh,false);
-    MatrixSymmetric sills = cova->getSill();
-    CholeskyDense sillsChol(&sills);
-    if (! sillsChol.isReady()) return 1;
+    cova->updateCovByMesh(imesh, false);
+    _localSills[icov][imesh] = cova->getSill();
+    CholeskyDense sillsChol(_localSills[icov][imesh]);
+    if (!sillsChol.isReady()) return 1;
 
     int s = 0;
     for (int icol = 0; icol < nvar; icol++)
     {
       for (int irow = icol; irow < nvar; irow++)
       {
-        _cholSillsNoStat[icov][s][imesh] = sillsChol.getLowerTriangle(irow,icol);
+        _cholSillsNoStat[icov][s][imesh]    = sillsChol.getLowerTriangle(irow, icol);
         _invCholSillsNoStat[icov][s][imesh] = sillsChol.getUpperTriangleInverse(irow, icol);
-         s++;
+        s++;
       }
     }
   }
@@ -315,28 +321,30 @@ int PrecisionOpMulti::_buildMatrices()
 
   // Do nothing if the array has already been calculated (correct dimension)
   if (ncov == (int)_cholSillsStat.size()) return 0;
-  _invCholSillsStat.resize(ncov);
-  _cholSillsStat.resize(ncov);
+
+  _localSills.resize(ncov);
   _cholSillsNoStat.resize(ncov);
   _invCholSillsNoStat.resize(ncov);
- 
+  _invCholSillsStat.resize(ncov);
+  _cholSillsStat.resize(ncov);
+  _sills.resize(ncov);
+
   for (int icov = 0; icov < ncov; icov++)
   {
-   if (_isNoStatForVariance[icov])
-   {  
-    if (_buildLocalMatricesNoStat(icov)) return 1;
-   }
-   else
-   {
-    if (_buildGlobalMatricesStationary(icov)) return 1;
-   }
+    if (_isNoStatForVariance[icov])
+    {
+      if (_buildLocalMatricesNoStat(icov)) return 1;
+    }
+    else
+    {
+      if (_buildGlobalMatricesStationary(icov)) return 1;
+    }
   }
   return 0;
 }
 
-
-int PrecisionOpMulti::size(int imesh) const 
-{ 
+int PrecisionOpMulti::size(int imesh) const
+{
   if (imesh < 0 || imesh >= _getNMesh()) return 0;
   return _meshes[imesh]->getNApices();
 }
@@ -347,10 +355,10 @@ String PrecisionOpMulti::toString(const AStringFormat* strfmt) const
 
   std::stringstream sstr;
 
-  sstr << "Number of Variables   = " << _getNVar()  << std::endl;
-  sstr << "Number of Covariances = " << _getNCov()  << std::endl;
+  sstr << "Number of Variables   = " << _getNVar() << std::endl;
+  sstr << "Number of Covariances = " << _getNCov() << std::endl;
   sstr << "Number of Meshes      = " << _getNMesh() << std::endl;
-  sstr << "Vector dimension      = " <<  getSize()  << std::endl;
+  sstr << "Vector dimension      = " << getSize() << std::endl;
 
   sstr << "Indices of Matérn Covariance = " << VH::toStringAsVI(_covList);
 
@@ -360,7 +368,8 @@ String PrecisionOpMulti::toString(const AStringFormat* strfmt) const
   sstr << std::endl;
 
   if (_isValid)
-   sstr << std::endl << "Class is Valid for operations!" << std::endl;
+    sstr << std::endl
+         << "Class is Valid for operations!" << std::endl;
   return sstr.str();
 }
 
@@ -383,7 +392,6 @@ int PrecisionOpMulti::_addToDest(const constvect vecin, vect vecout) const
            iad_struct, true, y, 0, 1, 0, 0)
   }
 }
-
 
 /**
  * Simulate based on an input random gaussian vector (Matrix free version)
@@ -421,4 +429,4 @@ double PrecisionOpMulti::computeLogDetQ(int nMC) const
   }
   return result;
 }
-}
+} // namespace gstlrn

@@ -1067,10 +1067,11 @@ int krigingSPDE(Db* dbin,
   const ProjMultiMatrix* AoutS = flagAoutSConstruct ? _defineProjMulti(dbout, model, meshLocalS, nullptr) : AoutK;
 
   // Auxiliary information
-  auto invnoise        = buildInvNugget(dbin, model, params);
+  auto invnoiseobj = InvNuggetOp(dbin,model,params);
+  const auto& invnoise = invnoiseobj.getInvNuggetMatrix();
   std::shared_ptr<MatrixSymmetricSim> invnoisep = nullptr;
   if (!flagCholesky)
-    invnoisep = std::make_shared<MatrixSymmetricSim>(invnoise);
+    invnoisep = std::make_shared<MatrixSymmetricSim>(*invnoise);
 
   SPDEOp* spdeop              = nullptr;
   PrecisionOpMulti* Qop       = nullptr;
@@ -1209,8 +1210,10 @@ int simulateSPDE(Db* dbin,
   if (_defineMeshes(dbin, dbout, model, meshLocalS, params, false)) return 1;
 
   // Auxiliary parameters
-  std::shared_ptr<MatrixSparse> invnoise        = nullptr;
-  std::shared_ptr<const MatrixSymmetricSim> invnoisep = nullptr;
+  auto invnoiseobj = InvNuggetOp(dbin,model,params);
+  const auto& invnoise = invnoiseobj.getInvNuggetMatrix();
+  std::shared_ptr<MatrixSymmetricSim> invnoisep = nullptr;
+
   if (flagCond)
   {
     AInK = _defineProjMulti(dbin, model, meshLocalK, projInK);
@@ -1221,9 +1224,8 @@ int simulateSPDE(Db* dbin,
                               (projInS == nullptr) ? AInK : projInS);
       if (AInS == nullptr) return 1;
     }
-    invnoise = buildInvNugget(dbin, model, params);
     if (!flagCholesky)
-      invnoisep = std::shared_ptr<const MatrixSymmetricSim>(new MatrixSymmetricSim(invnoise));
+      invnoisep = std::make_shared<MatrixSymmetricSim>(*invnoise);
   }
   const ProjMultiMatrix* AoutK = _defineProjMulti(dbout, model, meshLocalK, nullptr);
   bool flagAoutSConstruct      = (!flagCholesky) && (meshLocalK != meshLocalS);
@@ -1356,7 +1358,7 @@ double logLikelihoodSPDE(Db* dbin,
   std::shared_ptr<MatrixSparse> invnoise        = buildInvNugget(dbin, model, params);
   std::shared_ptr<const MatrixSymmetricSim> invnoisep = nullptr;
   if (!flagCholesky)
-    invnoisep = std::shared_ptr<const MatrixSymmetricSim>(new MatrixSymmetricSim(invnoise));
+    invnoisep = std::shared_ptr<const MatrixSymmetricSim>(new MatrixSymmetricSim(*invnoise));
 
   SPDEOp* spdeop              = nullptr;
   PrecisionOpMulti* Qop       = nullptr;

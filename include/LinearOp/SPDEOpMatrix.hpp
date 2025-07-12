@@ -41,7 +41,7 @@ VectorDouble stdev(const VectorDouble& dat, int nMC, int seed) const override;
 #endif
 
 private:
-  mutable MatrixSparse _QpAinvNoiseAt; // mutable is required to perform the Cholesky decomposition
+  mutable std::shared_ptr<MatrixSparse> _QpAinvNoiseAt; // mutable is required to perform the Cholesky decomposition
   mutable CholeskySparse* _chol;       // when needed, e.g in a const method.
 };
 }
