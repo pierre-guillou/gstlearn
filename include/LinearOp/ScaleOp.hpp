@@ -19,6 +19,7 @@ DECLARE_EIGEN_TRAITS(ScaleOp)
 #include "LinearOp/ALinearOp.hpp"
 #endif
 
+using namespace gstlrn;
 class GSTLEARN_EXPORT ScaleOp:
 #ifndef SWIG
   public gstlrn::ALinearOpEigenCG<ScaleOp>
