@@ -725,7 +725,7 @@ bool SPDE::_isKrigingRequested() const
   return _calcul == ESPDECalcMode::SIMUCOND || _calcul == ESPDECalcMode::KRIGING || _calcul == ESPDECalcMode::KRIGVAR;
 }
 
-double SPDE::computeTotalLogDet(int nMC) const
+double SPDE::computeTotalLogDet(int nMC, bool verbose) const
 {
   if (_precisionsKrig == nullptr)
   {
@@ -733,7 +733,7 @@ double SPDE::computeTotalLogDet(int nMC) const
     return TEST;
   }
 
-  return _precisionsKrig->computeTotalLogDet(nMC);
+  return _precisionsKrig->computeTotalLogDet(nMC, verbose);
 }
 
 double SPDE::computeQuad() const
@@ -769,7 +769,7 @@ double SPDE::_computeLogLikelihood(int nbsimu, bool verbose) const
     _computeDriftCoeffs();
   }
   int size       = (int)_workingData.size();
-  double logdet  = computeTotalLogDet(nbsimu);
+  double logdet  = computeTotalLogDet(nbsimu, verbose);
   double quad    = computeQuad();
   double loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
 

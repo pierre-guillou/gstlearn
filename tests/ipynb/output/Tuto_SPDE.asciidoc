@@ -1,8 +1,4 @@
 #NO_DIFF#XXX
-----<IPython.core.display.Javascript object>----
-
-
-#NO_DIFF#XXX
 ----
 Model characteristics
 =====================
@@ -216,6 +212,9 @@ Quadratic term  = 1118.4871
 
 #NO_DIFF#XXX
 ----
+LogDet of Q + ADA': 12296.938911
+LogDet of the precision operator: 11255.715075
+LogDet of noise operator: -2302.585093
 Likelihood calculation:
 - Length of Information Vector = 1000
 - Number of Simulations = 100
@@ -242,13 +241,12 @@ Log-likelihood     = -847.501461
 
 #NO_DIFF#XXX
 ----
-Not implemented yet in Matrix-free version
 Likelihood calculation:
 Nb. active samples = 1000
 Nb. Monte-Carlo    = 100
 Cholesky           = 0
-Log-Determinant    = 1233999999999999958672482500608.000000
+Log-Determinant    = -28482.843404
 Quadratic term     = -9157.277613
-Log-likelihood     = 1233999999999999958672482500608.000000
--> likelihood by New API with cholesky=0 nan
+Log-likelihood     = 17901.121975
+-> likelihood by New API with cholesky=0 17901.122
 ----

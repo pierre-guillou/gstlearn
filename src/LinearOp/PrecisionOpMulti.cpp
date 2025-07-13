@@ -425,7 +425,7 @@ double PrecisionOpMulti::computeLogDet(int nMC) const
   double result = 0.;
   for (const auto& e: _pops)
   {
-    result += e->getLogDeterminant(nMC);
+    result += e->computeLogDet(nMC);
   }
   return result;
 }

@@ -264,42 +264,6 @@ int PrecisionOp::_prepareChebychev(const EPowerPT& power) const
   return 0;
 }
 
-/**
- * Compute the Logarithm of the Determinant
- * @param nMC Number of Monte-Carlo simulations
- * @return The computed value or TEST if problem
- */
-double PrecisionOp::getLogDeterminant(int nMC)
-{
-  VectorDouble gauss;
-  VectorDouble result;
-  gauss.resize(getSize());
-  result.resize(getSize());
-
-  double val1 = 0.;
-  for (int isimu = 0; isimu < nMC; isimu++)
-  {
-    VH::simulateGaussianInPlace(gauss);
-    vect results(result);
-    if (_evalPoly(EPowerPT::LOG, gauss, results) != 0) return TEST;
-
-    for (int i = 0; i < getSize(); i++)
-    {
-      val1 += gauss[i] * result[i];
-    }
-  }
-  val1 /= nMC;
-
-  double val2 = 0.;
-  for (const auto& e: _shiftOp->getLambdas())
-  {
-    val2 += log(e);
-  }
-  val1 += 2. * val2;
-
-  return val1;
-}
-
 int PrecisionOp::reset(const AShiftOp* shiftop,
                        const CovAniso* cova,
                        bool verbose)
@@ -577,9 +541,39 @@ VectorDouble PrecisionOp::extractDiag() const
   return vec;
 }
 
+/**
+ * Compute the Logarithm of the Determinant
+ * @param nMC Number of Monte-Carlo simulations
+ * @return The computed value or TEST if problem
+ */
 double PrecisionOp::computeLogDet(int nMC) const
 {
-  DECLARE_UNUSED(nMC);
-  return TEST;
+  VectorDouble gauss;
+  VectorDouble result;
+  gauss.resize(getSize());
+  result.resize(getSize());
+
+  double val1 = 0.;
+  for (int isimu = 0; isimu < nMC; isimu++)
+  {
+    VH::simulateGaussianInPlace(gauss);
+    vect results(result);
+    if (_evalPoly(EPowerPT::LOG, gauss, results) != 0) return TEST;
+
+    for (int i = 0; i < getSize(); i++)
+    {
+      val1 += gauss[i] * result[i];
+    }
+  }
+  val1 /= nMC;
+
+  double val2 = 0.;
+  for (const auto& e: _shiftOp->getLambdas())
+  {
+    val2 += log(e);
+  }
+  val1 += 2. * val2;
+
+  return val1;
 }
 } // namespace gstlrn

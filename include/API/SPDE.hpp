@@ -73,7 +73,7 @@ public:
               int nbsimu                      = 1,
               const NamingConvention& namconv = NamingConvention("spde"));
 
-  double computeTotalLogDet(int nMC = 1) const;
+  double computeTotalLogDet(int nMC = 1, bool verbose = false) const;
   double computeQuad() const;
   double computeLogLikelihood(int nbsimu = 1, bool verbose = false) const;
   VectorDouble getCoeffs();

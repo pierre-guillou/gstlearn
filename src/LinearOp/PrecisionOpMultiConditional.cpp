@@ -9,6 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/PrecisionOpMultiConditional.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
@@ -173,7 +174,7 @@ double PrecisionOpMultiConditional::computeLogDetQ(int nMC) const
   double result = 0.;
   for (const auto& e: _multiPrecisionOp)
   {
-    result += e->getLogDeterminant(nMC);
+    result += e->computeLogDet(nMC);
   }
   return result;
 }
@@ -190,7 +191,7 @@ double PrecisionOpMultiConditional::computeLogDetNoise() const
 
 // We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + Sum(log sigma_i^2)
 
-double PrecisionOpMultiConditional::computeTotalLogDet(int nMC, int seed) const
+double PrecisionOpMultiConditional::computeTotalLogDet(int nMC, bool verbose, int seed) const
 {
   int memo = law_get_random_seed();
 
@@ -198,6 +199,12 @@ double PrecisionOpMultiConditional::computeTotalLogDet(int nMC, int seed) const
   double a1 = computeLogDetOp(nMC);
   double a2 = computeLogDetQ(nMC);
   double a3 = computeLogDetNoise();
+  if (verbose)
+  {
+    message("LogDet of Q + ADA': %f\n", a1);
+    message("LogDet of the precision operator: %f\n", a2);
+    message("LogDet of noise operator: %f\n", a3);
+  }
   law_set_random_seed(memo);
 
   double result = TEST;
