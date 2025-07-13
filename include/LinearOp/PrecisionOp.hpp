@@ -109,7 +109,7 @@ public:
   void setPolynomialFromPoly(APolynomial* polynomial);
   bool isCovaDefined() const { return _cova != nullptr; }
   VectorDouble getCoeffs();
-
+  virtual double computeLogDet(int nMC = 1) const override;
   virtual VectorDouble extractDiag() const;
 
 protected:

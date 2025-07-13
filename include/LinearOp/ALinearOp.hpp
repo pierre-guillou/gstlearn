@@ -31,8 +31,8 @@ public:
 
   int evalDirect(const VectorDouble& inv, VectorDouble& outv) const;
   VectorDouble evalDirect(const VectorDouble& in) const;
-  virtual void multiplyByValueAndAddDiagonal(double v1 = 1., double v2 = 0.);
-  virtual void resetModif();
+  virtual void multiplyByValueAndAddDiagonal(double v1 = 1., double v2 = 0.) const;
+  virtual void resetModif() const;
   void setUseFactor(bool usefactor) { _usefactor = usefactor; }
 #ifndef SWIG
 

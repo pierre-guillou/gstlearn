@@ -39,7 +39,7 @@ public:
 #ifndef SWIG
   void evalOp(MatrixSparse* S, const constvect x, vect y) const override;
 protected:
-  void _addEvalOp(ALinearOp* Op, const constvect inv, vect outv) const override;
+  void _addEvalOp(const ALinearOp* Op, const constvect inv, vect outv) const override;
 
   /* void evalOp(const ALinearOpMulti *Op,
               const std::vector<Eigen::VectorXd> &inv,

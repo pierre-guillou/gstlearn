@@ -29,9 +29,12 @@ public:
   virtual int getNApex() const = 0;
   virtual int getNPoint() const = 0;
 
+
 #ifndef SWIG
   int addMesh2point(const constvect inv, vect outv) const;
   int addPoint2mesh(const constvect inv, vect outv) const;
+  void mesh2point2mesh(const constvect inv, vect outv) const;
+  void point2mesh2point(const constvect inv, vect outv) const;
 
 protected:
   virtual int _addPoint2mesh(const constvect inv, vect outv) const
@@ -47,5 +50,10 @@ protected:
     return 1;
   }
   #endif
+
+private:
+  mutable VectorDouble _workpoint;
+  mutable VectorDouble _workmesh;
+
 };
 }

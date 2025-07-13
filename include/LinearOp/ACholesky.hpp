@@ -57,6 +57,7 @@ protected:
 private:
   int _addToDest(const constvect vecin, vect vecout) const override;
   int _addSimulateToDest(const constvect whitenoise, vect vecout) const override;
+  double computeLogDet(int nMC = 1) const override; //just for ASimulable interface
 
 protected:
   int _size;

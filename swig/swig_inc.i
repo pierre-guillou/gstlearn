@@ -1102,13 +1102,13 @@ namespace gstlrn {
 // This is not a good practice, but it works for now
 // better solution would be to use a shared_ptr 
 %typemap(in) const std::shared_ptr<const gstlrn::ASimulable> & {
-  gstlrn::MatrixSymmetricSim* ptr = nullptr;
-  int res = SWIG_ConvertPtr($input, (void**)&ptr, SWIGTYPE_p_gstlrn__MatrixSymmetricSim, 0);
+  gstlrn::ASimulable* ptr = nullptr;
+  int res = SWIG_ConvertPtr($input, (void**)&ptr, SWIGTYPE_p_gstlrn__ASimulable, 0);
 
   if (SWIG_IsOK(res) && ptr != nullptr) {
-    *$1 = std::shared_ptr<const gstlrn::ASimulable>(ptr);  
+    *$1 = std::shared_ptr<const gstlrn::ASimulable>(ptr);
   } else {
-    SWIG_exception_fail(SWIG_TypeError, "Expected MatrixSymmetricSim");
+    SWIG_exception_fail(SWIG_TypeError, "Expected ASimulable-derived object");
   }
 }
 

@@ -41,7 +41,6 @@ namespace gstlrn
     int getSize() const override;
     const std::shared_ptr<MatrixSparse>& getInvNuggetMatrix() const { return _invNuggetMatrix; }
     const MatrixSparse* cloneInvNuggetMatrix() const;
-
     double computeLogDet(int nMC = 1) const override;
   protected:
    int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
@@ -51,8 +50,9 @@ namespace gstlrn
    void _buildInvNugget(Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam());
   
   private :
+    std::vector<MatrixSymmetric> _invNuggetSubMatrices; // The inverse nugget submatrices for each location
     std::shared_ptr<MatrixSparse> _invNuggetMatrix; // The inverse nugget matrix
-    std::vector<MatrixSymmetric> _sillsInv;
+    double _logDeterminant; // The log determinant of the inverse nugget matrix
   };
 
 #ifndef SWIG

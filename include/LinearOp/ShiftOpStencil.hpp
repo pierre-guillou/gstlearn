@@ -49,8 +49,8 @@ class GSTLEARN_EXPORT ShiftOpStencil: public AShiftOp
     IMPLEMENT_CLONING(ShiftOpStencil)
 
     void normalizeLambdaBySills(const AMesh* mesh) override;
-    void multiplyByValueAndAddDiagonal(double v1 = 1., double v2 = 0.) override;
-    void resetModif() override;
+    void multiplyByValueAndAddDiagonal(double v1 = 1., double v2 = 0.) const override;
+    void resetModif() const override;
     double getMaxEigenValue() const override;
     double getLambda(int iapex) const override;
 
@@ -71,7 +71,7 @@ private:
   VectorBool _isInside; 
   double _lambdaVal;
   bool _useLambdaSingleVal;
-  bool _useModifiedShift;
+  mutable bool _useModifiedShift;
   const MeshETurbo* _mesh; // not to be deleted
 };
 }

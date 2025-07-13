@@ -320,7 +320,7 @@ void Chebychev::evalOp(MatrixSparse* S, const constvect x, vect y) const
   delete T1;
 }
 
-void Chebychev::_addEvalOp(ALinearOp* Op, const constvect inv, vect outv) const
+void Chebychev::_addEvalOp(const ALinearOp* Op, const constvect inv, vect outv) const
 {
   VectorDouble tm1, tm2, px, tx;
   int nvertex;

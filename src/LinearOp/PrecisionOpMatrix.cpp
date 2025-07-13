@@ -172,7 +172,7 @@ void PrecisionOpMatrix::evalInverse(const constvect vecin,
   _chol->solve(vecin, vecout);
 }
 
-double PrecisionOpMatrix::getLogDeterminant(int nMC)
+double PrecisionOpMatrix::computeLogDet(int nMC) const 
 {
   DECLARE_UNUSED(nMC);
   if (_chol == nullptr) _chol = new CholeskySparse(*_Q);

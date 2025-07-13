@@ -144,4 +144,10 @@ VectorDouble ACholesky::solveX(const VectorDouble& vecin) const
   addSolveX(spin, spout);
   return vecout;
 }
+
+double ACholesky::computeLogDet(int nMC) const
+{
+  DECLARE_UNUSED(nMC);
+  return computeLogDeterminant();
+}
 }

@@ -9,11 +9,11 @@ np.random.seed(1312)
 def computeNew(dat, model, debug=False):
     invnug = gl.InvNuggetOp(dat,model)
     mat = invnug.cloneInvNuggetMatrix()
-    
+    logdet = invnug.computeLogDet()    
     if debug:
         mat.display()
         
-    return mat
+    return mat, logdet
 
 # %%
 #Fonction pour calculer l'inverse de la matrice de covariance correspondant au bruit. 
@@ -25,8 +25,8 @@ def computeRef(dat,model,debug=False):
     
     if debug:
         mat.display()
-
-    return mat
+    _ ,logdet = np.linalg.slogdet(mat.toTL()) 
+    return mat, logdet
 
 # %%
 #Renvoie un vecteur de bool indiquant pour chaque variable d'un échantillon donné
@@ -260,9 +260,11 @@ def testInvNoise(dat,model, debug=False):
     if dat == None:
         return
     
-    ref = computeRef(dat,model, debug=debug).toTL()
+    ref, logdetref = computeRef(dat,model, debug=debug)
+    ref = ref.toTL()  # Convert to dense matrix for comparison
     
-    refnew = computeNew(dat, model, debug=debug).toTL()
+    refnew,logdetnew = computeNew(dat, model, debug=debug)
+    refnew = refnew.toTL()
     
     result = computeInvNoise(dat,model,True, debug=debug).toTL()
     
@@ -272,11 +274,15 @@ def testInvNoise(dat,model, debug=False):
         print(f"Pb between ref and new")
         
     error = np.sum(np.abs(refnew.toarray()-ref))
-    
+    errorlogdet = np.abs(logdetnew - logdetref)
     if error < 1e-13:
-        print(f"Error = ",1e-13)
+        print(f"Diff < ",1e-13)
     else: 
-        print(error)
+        print(f"Error",np.round(error,5))
+    if errorlogdet < 1e-13:
+        print(f"Diff logdet < ",1e-13)
+    else:
+        print(f"Error logdet",np.round(errorlogdet,5))
 
 # %%
 ndat= 10

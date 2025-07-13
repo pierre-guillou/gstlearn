@@ -137,7 +137,7 @@ int ShiftOpStencil::_addToDest(const constvect inv, vect outv) const
   return 0;
 }
 
-void ShiftOpStencil::resetModif()
+void ShiftOpStencil::resetModif() const
 {
   _useModifiedShift = false;
 }
@@ -176,7 +176,7 @@ double ShiftOpStencil::getLambda(int iapex) const
   return AShiftOp::getLambda(iapex);
 }
 
-void ShiftOpStencil::multiplyByValueAndAddDiagonal(double v1, double v2) 
+void ShiftOpStencil::multiplyByValueAndAddDiagonal(double v1, double v2) const
 {
   _weightsSimu = VectorDouble(_weights.size());
   for (int i = 0; i < (int)_weights.size(); i++)

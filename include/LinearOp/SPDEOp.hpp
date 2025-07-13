@@ -15,6 +15,7 @@
 
 #include "Basic/VectorNumT.hpp"
 #include "LinearOp/ASimulable.hpp"
+#include "Polynomials/Chebychev.hpp"
 
 #ifndef SWIG
 #  include "LinearOp/ASimulableEigenCG.hpp"
@@ -29,6 +30,7 @@ namespace gstlrn
 class ProjMulti;
 class ALinearOp;
 class PrecisionOpMulti;
+class Chebychev;
 
 class GSTLEARN_EXPORT ASPDEOp: public virtual ALinearOp
 {
@@ -40,7 +42,7 @@ public:
           const ProjMulti* const projInSimu                 = nullptr,
           const ProjMulti* const projOutKriging             = nullptr,
           const ProjMulti* const projOutSimu                = nullptr);
-    virtual ~ASPDEOp();
+  virtual ~ASPDEOp();
 
   virtual VectorDouble stdev(const VectorDouble& dat, int nMC = 1, int seed = 134343) const;
 
@@ -80,7 +82,7 @@ public:
   double computeQuadratic(const std::vector<double>& x) const;
   double computeTotalLogDet(int nMC = 5, int seed = 13132) const;
   double computeLogDetQ(int nMC = 5) const;
-  double computeLogDetNoise() const;
+  double computeLogDetInvNoise() const;
   static int centerDataByDriftMat(VectorDouble& Z,
                                   const MatrixDense& driftMat,
                                   const VectorDouble& driftCoeffs);
@@ -91,6 +93,8 @@ protected:
   int _addToDest(const constvect inv, vect outv) const override;
 
 private:
+  std::pair<double, double> _computeRangeEigenVal() const;
+  void _preparePoly(Chebychev& logPoly) const;
   int _kriging(const constvect inv, vect out) const;
   void _simNonCond(vect outv) const;
   void _simCond(const constvect data, vect outvK, vect outvS) const;
@@ -106,7 +110,7 @@ private:
   void _prepare(bool w1 = true, bool w2 = true) const;
 
 protected:
-  const PrecisionOpMulti* const _QKriging;
+  mutable const PrecisionOpMulti* _QKriging;
   const ProjMulti* const _projInKriging;
   const std::shared_ptr<const ASimulable> _invNoise;
   const PrecisionOpMulti* const _QSimu;

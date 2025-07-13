@@ -8,20 +8,21 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "LinearOp/PrecisionOp.hpp"
+#include "Basic/AException.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
-#include "Basic/AException.hpp"
-#include "LinearOp/PrecisionOp.hpp"
+#include "Covariances/CovAniso.hpp"
+#include "LinearOp/AShiftOp.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
 #include "LinearOp/ShiftOpStencil.hpp"
-#include "LinearOp/AShiftOp.hpp"
+#include "Mesh/AMesh.hpp"
 #include "Mesh/MeshEStandard.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Polynomials/APolynomial.hpp"
-#include "Polynomials/ClassicalPolynomial.hpp"
 #include "Polynomials/Chebychev.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Mesh/AMesh.hpp"
+#include "Polynomials/ClassicalPolynomial.hpp"
+#include "geoslib_define.h"
 #include <algorithm>
 #include <memory>
 
@@ -127,7 +128,7 @@ PrecisionOp& PrecisionOp::operator=(const PrecisionOp& pmat)
 {
   if (this != &pmat)
   {
-    _cova = pmat._cova->clone();
+    _cova           = pmat._cova->clone();
     _verbose        = pmat._verbose;
     _training       = pmat._training;
     _destroyShiftOp = pmat._destroyShiftOp;
@@ -575,4 +576,10 @@ VectorDouble PrecisionOp::extractDiag() const
   }
   return vec;
 }
+
+double PrecisionOp::computeLogDet(int nMC) const
+{
+  DECLARE_UNUSED(nMC);
+  return TEST;
 }
+} // namespace gstlrn

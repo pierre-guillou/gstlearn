@@ -62,7 +62,8 @@ public:
   /// AStringable Interface
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  double computeLogDetQ(int nMC = 1) const;
+  double computeLogDet(int nMC = 1) const override;
+  std::pair<double, double> rangeEigenValQ() const;
 
 protected:
   int size(int imesh) const;
@@ -86,7 +87,6 @@ private:
   void _popsClear();
   void _computeSize();
 
-  std::pair<double, double> rangeEigenValQ() const;
 
 protected:
   std::vector<PrecisionOp*> _pops;

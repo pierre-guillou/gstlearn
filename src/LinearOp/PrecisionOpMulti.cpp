@@ -420,7 +420,7 @@ std::pair<double, double> PrecisionOpMulti::rangeEigenValQ() const
   return result;
 }
 
-double PrecisionOpMulti::computeLogDetQ(int nMC) const
+double PrecisionOpMulti::computeLogDet(int nMC) const
 {
   double result = 0.;
   for (const auto& e: _pops)
