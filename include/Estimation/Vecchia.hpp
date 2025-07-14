@@ -65,8 +65,9 @@ private:
   void _computeCm1X() override;
   void _computeCm1Y() override;
   double _computeLogDet() const override;
-  void _computeC0(const MatrixT<int>& Ranks, int ind);
-  void _computeC(const MatrixT<int>& Ranks, int ind);
+  void _defineDbOnePoint(const MatrixT<int>& Ranks, int ind, Db* dbOnePoint);
+  void _defineDbTemp(const MatrixT<int>& Ranks, int ind, Db* dbTemp);
+  static int _getValidRanks(const MatrixT<int>& Ranks, int ind, VectorInt& nbgh);
 
 private:
   // Following members are copies of pointers (not to be deleted)
@@ -83,8 +84,6 @@ private:
   mutable VectorDouble _LdY;
   mutable VectorDouble _DFull;
   mutable MatrixSparse _LFull;
-  mutable Db* _dbTemp;          // Temporary Db for calculations
-  mutable Db* _dbOnePoint;      // Temporary Db for one point calculations
   mutable CholeskyDense* _chol; // Cholesky decomposition of the covariance matrix
   // Local calculation results (to be deleted later)
   mutable MatrixSparse _Dmat;

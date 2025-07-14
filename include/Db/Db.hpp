@@ -16,17 +16,15 @@
 #include "Enum/ELoadBy.hpp"
 #include "Enum/EStatOption.hpp"
 
-#include "Db/PtrGeos.hpp"
-#include "Matrix/Table.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Basic/NamingConvention.hpp"
-#include "Basic/CSVformat.hpp"
-#include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/AStringable.hpp"
+#include "Basic/CSVformat.hpp"
 #include "Basic/ICloneable.hpp"
 #include "Basic/Limits.hpp"
-
-
+#include "Basic/NamingConvention.hpp"
+#include "Db/PtrGeos.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/Table.hpp"
 
 namespace gstlrn
 {
@@ -35,7 +33,7 @@ class DbGrid;
 class Interval;
 class SpacePoint;
 class SpaceTarget;
-  
+
 /**
  * \brief
  * Class containing the Data Information.
@@ -310,7 +308,6 @@ public:
                            const ELoc& locatorType = ELoc::fromKey("UNKNOWN"),
                            int locatorIndex        = 0,
                            bool cleanSameLocator   = false);
-
   void addColumnsByVVD(const VectorVectorDouble& tab,
                        const String& radix,
                        const ELoc& locatorType,
@@ -608,7 +605,13 @@ public:
   static VectorInt getMultipleSelectedVariables(const VectorVectorInt& index,
                                                 const VectorInt& ivars = VectorInt(),
                                                 const VectorInt& nbgh  = VectorInt());
-
+  int getListOfSampleIndicesPerVariableInPlace(VectorInt& ranks,
+                                               int ivar    = 0,
+                                               bool useSel = true) const;
+  int getListOfSampleIndicesInPlace(int nvar,
+                                    VectorInt& cumul,
+                                    VectorVectorInt& ranks,
+                                    bool useSel = true) const;
   double getWeight(int iech) const;
   VectorDouble getWeights(bool useSel = false) const;
 
@@ -713,15 +716,15 @@ public:
                           bool useSel                 = false,
                           bool flagCompress           = true,
                           const VectorDouble& origins = VectorDouble()) const;
-  VectorVectorDouble getColumnsAsVVD(const VectorString &names = VectorString(),
-                                     bool useSel = false,
-                                     bool flagCompress = true) const;
-  MatrixDense getColumnsAsMatrix(const VectorString &names,
-                                       bool useSel = false,
-                                       bool flagCompress = true) const;
-  VectorDouble getColumnsByColIdx(const VectorInt& icols = VectorInt(),
-                                  bool useSel            = false,
-                                  bool flagCompress      = true,
+  VectorVectorDouble getColumnsAsVVD(const VectorString& names = VectorString(),
+                                     bool useSel               = false,
+                                     bool flagCompress         = true) const;
+  MatrixDense getColumnsAsMatrix(const VectorString& names,
+                                 bool useSel       = false,
+                                 bool flagCompress = true) const;
+  VectorDouble getColumnsByColIdx(const VectorInt& icols      = VectorInt(),
+                                  bool useSel                 = false,
+                                  bool flagCompress           = true,
                                   const VectorDouble& origins = VectorDouble()) const;
   VectorDouble getColumnsByColIdxInterval(int icol_beg,
                                           int icol_end,
@@ -853,7 +856,7 @@ public:
   VectorInt shrinkToValidRows(const VectorInt& rows) const;
   VectorInt shrinkToValidCols(const VectorInt& cols) const;
 
-  static const Db* coverSeveralDbs(const Db* db1, const Db* db2, bool *isBuilt);
+  static const Db* coverSeveralDbs(const Db* db1, const Db* db2, bool* isBuilt);
 
   /** @addtogroup DB_7 Calculating several statistics in Db
    * \ingroup DB
@@ -1006,4 +1009,8 @@ private:
   /// factor allocations
   mutable VectorInt _uids;
 };
-}
+
+GSTLEARN_EXPORT bool haveSameNDim(const Db* db1, const Db* db2, int* ndim);
+GSTLEARN_EXPORT bool haveCompatibleNVar(const Db* db1, const Db* db2, int* nvar);
+
+} // namespace gstlrn
