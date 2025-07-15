@@ -19,7 +19,6 @@ DECLARE_EIGEN_TRAITS(ScaleOp)
 #include "LinearOp/ALinearOp.hpp"
 #endif
 
-using namespace gstlrn;
 class GSTLEARN_EXPORT ScaleOp:
 #ifndef SWIG
   public gstlrn::ALinearOpEigenCG<ScaleOp>
@@ -36,7 +35,7 @@ public:
 
 #ifndef SWIG
 protected:
-  int _addToDest(const constvect inv, vect outv) const override;
+  int _addToDest(const gstlrn::constvect inv, gstlrn::vect outv) const override;
 #endif
 
 private:
