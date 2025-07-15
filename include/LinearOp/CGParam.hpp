@@ -23,7 +23,7 @@ class ALinearOp;
 class GSTLEARN_EXPORT CGParam: public AStringable
 {
 public:
-  CGParam(int nitermax = 1000, double eps = EPSILON8);
+  CGParam(int nitermax = 1000, double eps = EPSILON10);
   CGParam(const CGParam& m);
   CGParam& operator=(const CGParam& m);
   virtual ~CGParam();

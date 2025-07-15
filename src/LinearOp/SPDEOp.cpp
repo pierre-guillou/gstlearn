@@ -330,17 +330,13 @@ void ASPDEOp::evalInvCov(const constvect inv, vect result) const
   _workmesh.resize(getSize());
   _workdat2.resize(_getNDat());
   _workdat3.resize(_getNDat());
-  vect rhss(_rhs);
-  vect wms(_workmesh);
-  vect w2s(_workdat2);
-  vect w3s(_workdat3);
 
   _invNoise->evalDirect(inv, result);
-  _projInKriging->point2mesh(result, rhss);
-  _solve(rhss, wms);
-  _projInKriging->mesh2point(wms, w2s);
-  _invNoise->evalDirect(w2s, w3s);
-  VectorHelper::subtractInPlace(w3s, result, result);
+  _projInKriging->point2mesh(result, _rhs);
+  _solve(_rhs, _workmesh);
+  _projInKriging->mesh2point(_workmesh, _workdat2);
+  _invNoise->evalDirect(_workdat2, _workdat3);
+  VectorHelper::subtractInPlace(_workdat3, result, result);
 }
 
 VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,

@@ -1547,6 +1547,12 @@ void VectorHelper::subtractInPlace(VectorInt& dest, const VectorInt& src)
   }
 }
 
+/**
+ * Performs: outv = in2 - in1
+ * @param in1 Input vector
+ * @param in2 Input vector
+ * @param outv Output vector
+ */
 void VectorHelper::subtractInPlace(const constvect in1,
                                    const constvect in2,
                                    vect outv)

@@ -11,10 +11,26 @@
 
 #include "LinearOp/IProj.hpp"
 
+#include "Basic/VectorNumT.hpp"
 #include "geoslib_define.h"
 
 namespace gstlrn
 {
+
+VectorDouble IProj::mesh2point(const VectorDouble& inv) const
+{
+  VectorDouble outv(getNPoint());
+  mesh2point(inv.getVector(), outv.getVector());
+  return outv;
+}
+
+VectorDouble IProj::point2mesh(const VectorDouble& inv) const
+{
+  VectorDouble outv(getNApex());
+  point2mesh(inv.getVector(), outv.getVector());
+  return outv;
+}
+
 int IProj::mesh2point(const VectorDouble& inv,
                       VectorDouble& outv) const
 {

@@ -19,6 +19,8 @@ class GSTLEARN_EXPORT IProj
 public:
   IProj() { }
   virtual ~IProj() { }
+  VectorDouble point2mesh(const VectorDouble& inv) const;
+  VectorDouble mesh2point(const VectorDouble& inv) const;
   int point2mesh(const VectorDouble& inv, VectorDouble& outv) const;
   int mesh2point(const VectorDouble& inv, VectorDouble& outv) const;
 #ifndef SWIG
