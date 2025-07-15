@@ -140,3 +140,6 @@ endif()
 
 add_subdirectory(doc/demo)
 add_subdirectory(doc/courses)
+
+# Force generation of compilation database (for clangd LSP server)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
