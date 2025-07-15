@@ -59,8 +59,8 @@ typedef unsigned char UChar;
   inline void toTL() const                                          \
   {                                                                 \
     messerr("Not implemented yet (missing dependencies?)"); \
-  };                                                                \
-  // namespace gstlrn
+  };
+
 // No need to this stuff through SWIG (using target language NAs)
 // => Not really : Using customized SWIG 4.2.0b, TEST is often a default argument value!
 // #ifndef SWIG
