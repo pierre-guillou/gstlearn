@@ -58,7 +58,7 @@ typedef unsigned char UChar;
 #define DECLARE_TOTL                                                \
   inline void toTL() const                                          \
   {                                                                 \
-    gstlrn::messerr("Not implemented yet (missing dependencies?)"); \
+    messerr("Not implemented yet (missing dependencies?)"); \
   };                                                                \
   // namespace gstlrn
 // No need to this stuff through SWIG (using target language NAs)
