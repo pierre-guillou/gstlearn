@@ -24,25 +24,25 @@
 
 
 #define DECLARE_EIGEN_TRAITS(TLinOP) \
-class TLinOP; \
+namespace gstlrn { class TLinOP; } \
 using Eigen::SparseMatrix; \
  \
 namespace Eigen { \
 namespace internal { \
   template<> \
-  struct traits<TLinOP> :  public ::Eigen::internal::traits<::Eigen::SparseMatrix<double> > \
+  struct traits<gstlrn::TLinOP> :  public ::Eigen::internal::traits<::Eigen::SparseMatrix<double> > \
   {}; \
 } \
 }
 
 #define DECLARE_EIGEN_PRODUCT(TLinOP) \
 template<typename Rhs> \
-struct Eigen::internal::generic_product_impl<TLinOP, Rhs, Eigen::SparseShape, Eigen::DenseShape, Eigen::GemvProduct> \
-: Eigen::internal::generic_product_impl_base<TLinOP, Rhs, Eigen::internal::generic_product_impl<TLinOP,Rhs> > \
+struct Eigen::internal::generic_product_impl<gstlrn::TLinOP, Rhs, Eigen::SparseShape, Eigen::DenseShape, Eigen::GemvProduct> \
+: Eigen::internal::generic_product_impl_base<gstlrn::TLinOP, Rhs, Eigen::internal::generic_product_impl<gstlrn::TLinOP,Rhs> > \
 { \
-  typedef typename Product<TLinOP,Rhs>::Scalar Scalar; \
+  typedef typename Product<gstlrn::TLinOP,Rhs>::Scalar Scalar; \
   template<typename Dest> \
-  static void scaleAndAddTo(Dest& dst, const TLinOP& lhs, const Rhs& rhs, const Scalar& alpha) \
+  static void scaleAndAddTo(Dest& dst, const gstlrn::TLinOP& lhs, const Rhs& rhs, const Scalar& alpha) \
   { \
     assert(alpha==Scalar(1) && "scaling is not implemented"); \
     EIGEN_ONLY_USED_FOR_DEBUG(alpha); \

@@ -37,10 +37,12 @@ class ICloneable;
 /**
  * \brief Shift Operator for performing the basic tasks of SPDE
  */
-using namespace gstlrn;
 #ifndef SWIG
 DECLARE_EIGEN_TRAITS(AShiftOp)
 #endif
+
+namespace gstlrn {
+
 class GSTLEARN_EXPORT AShiftOp: public ICloneable,
 #ifndef SWIG
   public ALinearOpEigenCG<AShiftOp>
@@ -89,6 +91,8 @@ protected:
     // argument list
     std::shared_ptr<CovAniso> _cova;
 };
+
+} // namespace gstlrn
 
 #ifndef SWIG
   DECLARE_EIGEN_PRODUCT(AShiftOp)

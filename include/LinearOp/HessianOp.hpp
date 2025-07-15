@@ -18,10 +18,6 @@
   #include <Eigen/src/Core/Matrix.h>
 #endif
 
-namespace gstlrn
-{
-class PrecisionOp;
-}
 #ifndef SWIG
 #  include "LinearOp/ALinearOpEigenCG.hpp"
 DECLARE_EIGEN_TRAITS(HessianOp)
@@ -29,7 +25,9 @@ DECLARE_EIGEN_TRAITS(HessianOp)
 #  include "LinearOp/ALinearOp.hpp"
 #endif
 
-using namespace gstlrn;
+namespace gstlrn
+{
+class PrecisionOp;
 
 class GSTLEARN_EXPORT HessianOp:
 #ifndef SWIG
@@ -80,6 +78,8 @@ private:
   mutable std::vector<double>  _works;
 #endif
 };
+
+} // namespace gstlrn
 
 #ifndef SWIG
 DECLARE_EIGEN_PRODUCT(HessianOp)
