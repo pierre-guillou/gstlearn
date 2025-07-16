@@ -41,14 +41,14 @@ namespace gstlrn
 
 static bool globalFlagEigen = true;
 
-MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax, int opt_eigen)
+MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax)
   : AMatrix(nrow, ncol)
   , _csMatrix(nullptr)
   , _eigenMatrix()
   , _flagEigen(false)
   , _nColMax(ncolmax)
 {
-  _flagEigen = _defineFlagEigen(opt_eigen);
+  _flagEigen = true;
   _allocate();
 }
 
@@ -634,8 +634,7 @@ MatrixSparse* MatrixSparse::create(int nrow, int ncol)
 MatrixSparse* MatrixSparse::createFromTriplet(const NF_Triplet& NF_T,
                                               int nrow,
                                               int ncol,
-                                              int nrowmax,
-                                              int opt_eigen)
+                                              int nrowmax)
 {
   // If 'nrow' a  nd 'ncol' are not defined, derive them from NF_T
   if (nrow <= 0 || ncol <= 0)
@@ -643,16 +642,16 @@ MatrixSparse* MatrixSparse::createFromTriplet(const NF_Triplet& NF_T,
     nrow = NF_T.getNRows() + 1;
     ncol = NF_T.getNCols() + 1;
   }
-  MatrixSparse* mat = new MatrixSparse(nrow, ncol, nrowmax, opt_eigen);
+  MatrixSparse* mat = new MatrixSparse(nrow, ncol, nrowmax);
 
   mat->resetFromTriplet(NF_T);
 
   return mat;
 }
 
-MatrixSparse* MatrixSparse::Identity(int nrow, double value, int opt_eigen)
+MatrixSparse* MatrixSparse::Identity(int nrow, double value)
 {
-  MatrixSparse* mat = new MatrixSparse(nrow, nrow, opt_eigen);
+  MatrixSparse* mat = new MatrixSparse(nrow, nrow);
   for (int i = 0; i < nrow; i++)
   {
     if (mat->isFlagEigen())
@@ -668,7 +667,7 @@ MatrixSparse* MatrixSparse::addMatMat(const MatrixSparse* x,
                                       double cx,
                                       double cy)
 {
-  MatrixSparse* mat = new MatrixSparse(x->getNRows(), x->getNCols(), -1, x->isFlagEigen());
+  MatrixSparse* mat = new MatrixSparse(x->getNRows(), x->getNCols(), -1);
   if (x->isFlagEigen() && y->isFlagEigen())
   {
     mat->_eigenMatrix = cx * x->_eigenMatrix + cy * y->_eigenMatrix;
@@ -681,10 +680,10 @@ MatrixSparse* MatrixSparse::addMatMat(const MatrixSparse* x,
   return mat;
 }
 
-MatrixSparse* MatrixSparse::diagVec(const VectorDouble& vec, int opt_eigen)
+MatrixSparse* MatrixSparse::diagVec(const VectorDouble& vec)
 {
   int size          = (int)vec.size();
-  MatrixSparse* mat = new MatrixSparse(size, size, opt_eigen);
+  MatrixSparse* mat = new MatrixSparse(size, size);
 
   if (mat->isFlagEigen())
   {
@@ -698,9 +697,9 @@ MatrixSparse* MatrixSparse::diagVec(const VectorDouble& vec, int opt_eigen)
   return mat;
 }
 
-MatrixSparse* MatrixSparse::diagConstant(int number, double value, int opt_eigen)
+MatrixSparse* MatrixSparse::diagConstant(int number, double value)
 {
-  MatrixSparse* mat = new MatrixSparse(number, number, opt_eigen);
+  MatrixSparse* mat = new MatrixSparse(number, number);
 
   if (mat->isFlagEigen())
   {
@@ -719,10 +718,9 @@ MatrixSparse* MatrixSparse::diagConstant(int number, double value, int opt_eigen
  * Construct a sparse matrix with the diagonal of 'A', where each element is transformed
  * @param A    Input sparse matrix
  * @param oper_choice: Operation on the diagonal term (see Utilities::operate_XXX)
- * @param opt_eigen Option for choosing Eigen Library or not
  * @return
  */
-MatrixSparse* MatrixSparse::diagMat(MatrixSparse* A, int oper_choice, int opt_eigen)
+MatrixSparse* MatrixSparse::diagMat(MatrixSparse* A, int oper_choice)
 {
   if (!A->isSquare())
   {
@@ -732,7 +730,7 @@ MatrixSparse* MatrixSparse::diagMat(MatrixSparse* A, int oper_choice, int opt_ei
 
   VectorDouble diag = A->getDiagonal();
   VectorHelper::transformVD(diag, oper_choice);
-  return MatrixSparse::diagVec(diag, opt_eigen);
+  return MatrixSparse::diagVec(diag);
 }
 
 bool MatrixSparse::_isElementPresent(int irow, int icol) const
@@ -1104,7 +1102,7 @@ MatrixSparse* prodNormMatMat(const MatrixSparse* a,
 MatrixSparse* prodNormMat(const MatrixSparse* a, const VectorDouble& vec, bool transpose)
 {
   int nsym          = (transpose) ? a->getNCols() : a->getNRows();
-  MatrixSparse* mat = new MatrixSparse(nsym, nsym, a->isFlagEigen() ? 1 : 0);
+  MatrixSparse* mat = new MatrixSparse(nsym, nsym);
   mat->prodNormMatVecInPlace(a, vec, transpose);
   return mat;
 }
@@ -1115,7 +1113,7 @@ MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
 {
   int nrow          = a->getNRows();
   int ncol          = a->getNCols();
-  MatrixSparse* mat = new MatrixSparse(nrow, ncol, -1, a->isFlagEigen() ? 1 : 0);
+  MatrixSparse* mat = new MatrixSparse(nrow, ncol, -1);
 
   if (a->isFlagEigen())
   {
@@ -1433,12 +1431,12 @@ int MatrixSparse::_getIndexToRank(int irow, int icol) const
   return ITEST;
 }
 
-MatrixSparse* createFromAnyMatrix(const AMatrix* matin, int opt_eigen)
+MatrixSparse* createFromAnyMatrix(const AMatrix* matin)
 {
   return MatrixSparse::createFromTriplet(matin->getMatrixToTriplet(),
                                          matin->getNRows(),
                                          matin->getNCols(),
-                                         -1, opt_eigen);
+                                         -1);
 }
 
 void setUpdateNonZeroValue(int status)
@@ -1550,7 +1548,7 @@ MatrixSparse* MatrixSparse::glue(const MatrixSparse* A1,
   int nrow = (flagShiftRow) ? A1->getNRows() + A2->getNRows() : MAX(A1->getNRows(), A2->getNRows());
   int ncol = (flagShiftCol) ? A1->getNCols() + A2->getNCols() : MAX(A1->getNCols(), A2->getNCols());
 
-  return MatrixSparse::createFromTriplet(T1, nrow, ncol, -1, A1->isFlagEigen() ? 1 : 0);
+  return MatrixSparse::createFromTriplet(T1, nrow, ncol, -1);
 }
 
 /* Extract a sparse sub-matrix */
@@ -1635,21 +1633,7 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
     NF_Tout.add(ir, ic, NF_Tin.getValue(i));
   }
 
-  return MatrixSparse::createFromTriplet(NF_Tout, 0, 0, -1, isFlagEigen() ? 1 : 0);
-}
-
-/**
- * Define the use of Eigen Library according to the value of input argulent 'opt_eigen'
- * @param opt_eigen Choice: 0: Do not use Eigen library; 1; Use Eigen library; -1: use global environment
- * @return Option for using the Eigen library
- */
-bool MatrixSparse::_defineFlagEigen(int opt_eigen)
-{
-  // Dispatch
-
-  if (opt_eigen == 1) return true;
-  if (opt_eigen == 0) return false;
-  return globalFlagEigen;
+  return MatrixSparse::createFromTriplet(NF_Tout, 0, 0, -1);
 }
 
 /**

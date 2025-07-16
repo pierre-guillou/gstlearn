@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
   VectorDouble vecout1b = MP.getDiagonal();
 
   MatrixSparse* M2 = MatrixSparse::createFromTriplet(
-    M->getMatrixToTriplet(), M->getNRows(), M->getNCols(), -1, 1);
+    M->getMatrixToTriplet(), M->getNRows(), M->getNCols(), -1);
   CholeskySparse Qchol(M2);
   MatrixSparse* proj = MatrixSparse::Identity(M->getNRows());
   Qchol.stdev(vecout2, proj, false);
