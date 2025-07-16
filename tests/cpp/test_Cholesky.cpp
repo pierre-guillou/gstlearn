@@ -57,6 +57,11 @@ MatrixSymmetric* _createDenseMatrix(int n, const MatrixSparse* Q)
   return M;
 }
 
+void printError(const String& name)
+{
+  message(">>> Function '%s' is INVALID =======================\n", name.c_str());
+}
+
 /****************************************************************************/
 /*!
 ** Main Program for testing the Linear Algebra using Cholesky decomposition
@@ -100,7 +105,7 @@ int main(int argc, char* argv[])
     VH::dump("LLt (by Matrix)", vecref);
     VH::dump("LLt (by CholeskySparse)", vecout1);
     VH::dump("LLt (by CholeskyDense)", vecout2);
-    message(">>> Function 'LLt' is INVALID =======================\n");
+    printError("LLt");
   }
 
   // Checking method 'solve'
@@ -115,7 +120,7 @@ int main(int argc, char* argv[])
     VH::dump("Solve (by Matrix)", vecref);
     VH::dump("Solve (by CholeskySparse)", vecout1);
     VH::dump("Solve (by CholeskyDense)", vecout2);
-    message(">>> Function 'solve' is INVALID =======================\n");
+    printError("solve");
   }
 
   // Checking method 'LX' followed by 'InvLX'
@@ -131,7 +136,7 @@ int main(int argc, char* argv[])
     VH::dump("Function 'InvLX(LX)' (by Matrix)", vecin);
     VH::dump("Function 'InvLX(LX)' (by CholeskySparse)", vecout1);
     VH::dump("Function 'InvLX(LX)' (by CholeskyDense)", vecout2);
-    message(">>> Function 'InvLX(LX)' is INVALID ========================\n");
+    printError("InvLX(LX)");
   }
 
   // Checking method 'InvLtX' followed by 'LtX'
@@ -147,7 +152,7 @@ int main(int argc, char* argv[])
     VH::dump("Function 'LtX(InvLtX)' (by Matrix)", vecin);
     VH::dump("Function 'LtX(InvLtX)' (by CholeskySparse)", vecout1);
     VH::dump("Function 'LtX(InvLtX)' (by CholeskyDense)", vecout2);
-    message(">>> Function 'LtX(InvLtX)' is INVALID ========================\n");
+    printError("LtX(InvLtX)");
   }
 
   // Checking the Stdev vector
@@ -155,8 +160,8 @@ int main(int argc, char* argv[])
   (void)MP.invert();
   VectorDouble vecout1b = MP.getDiagonal();
 
-  MatrixSparse* M2 =MatrixSparse::createFromTriplet(
-    M->getMatrixToTriplet(), M->getNRows(), M->getNCols(), -1, 1);
+  MatrixSparse* M2 = MatrixSparse::createFromTriplet(
+    M->getMatrixToTriplet(), M->getNRows(), M->getNCols(), -1);
   CholeskySparse Qchol(*M2);
   MatrixSparse* proj = MatrixSparse::Identity(M->getNRows());
   Qchol.stdev(vecout2, proj, false);
@@ -168,7 +173,7 @@ int main(int argc, char* argv[])
   {
     VH::dump("Standard Deviation (by Matrix)", vecout1b);
     VH::dump("Standard Deviation (by Cholesky)", vecout2);
-    message(">>> Function 'stdev' is INVALID =============================\n");
+    printError("stdev");
   }
 
   // Checking the calculation of Log(Det)
@@ -180,7 +185,7 @@ int main(int argc, char* argv[])
   {
     message("Log(Det) (by Matrix) = %lf\n", res1);
     message("Log(Det) (by Cholesky) = %lf\n", res2);
-    message(">>> Log(Det) is INVALID =============================\n");
+    printError("Log(Det)");
   }
 
   // Free the pointers
