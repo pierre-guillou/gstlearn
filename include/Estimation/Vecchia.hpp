@@ -65,9 +65,21 @@ private:
   void _computeCm1X() override;
   void _computeCm1Y() override;
   double _computeLogDet() const override;
-  void _defineDbOnePoint(const MatrixT<int>& Ranks, int ind, Db* dbOnePoint);
-  void _defineDbTemp(const MatrixT<int>& Ranks, int ind, Db* dbTemp);
-  static int _getValidRanks(const MatrixT<int>& Ranks, int ind, VectorInt& nbgh);
+  int _buildNeighborhood(const MatrixT<int>& Ranks,
+                         int isample,
+                         int nvar,
+                         int nb_neigh,
+                         std::vector<std::array<int, 4>>& neighDescr) const;
+  void _buildLHS(int nitems,
+                 const std::vector<std::array<int, 4>>& neighDescr,
+                 MatrixSymmetric& _matCov);
+  void _buildRHS(int icase2,
+                 int iabs2,
+                 int ivar2,
+                 int nitems,
+                 const std::vector<std::array<int, 4>>& neighDescr,
+                 MatrixDense& _vectCov);
+  int _getAddress(int ip, int ivar) const;
 
 private:
   // Following members are copies of pointers (not to be deleted)
@@ -87,6 +99,13 @@ private:
   mutable CholeskyDense* _chol; // Cholesky decomposition of the covariance matrix
   // Local calculation results (to be deleted later)
   mutable MatrixSparse _Dmat;
+  mutable int _Ndb1; // Number of samples in Db1 (used for shift calculations)
+  mutable int _Ntot1;
+  mutable int _Ntot2;
+  mutable VectorInt _cumulRanks1;
+  mutable VectorInt _cumulRanks2;
+  mutable VectorVectorInt _varRanks1;
+  mutable VectorVectorInt _varRanks2;
 };
 
 GSTLEARN_EXPORT int krigingVecchia(Db* dbin,

@@ -35,7 +35,9 @@ ALikelihood::ALikelihood(const ALikelihood& r)
   , _Cm1X(r._Cm1X)
   , _Cm1Y(r._Cm1Y)
   , _XtCm1X(r._XtCm1X)
-  , _reml(r._reml) {};
+  , _reml(r._reml)
+{
+}
 
 ALikelihood& ALikelihood::operator=(const ALikelihood& r)
 {
@@ -48,14 +50,7 @@ ALikelihood& ALikelihood::operator=(const ALikelihood& r)
     _beta   = r._beta;
     _Cm1X   = r._Cm1X;
     _Cm1Y   = r._Cm1Y;
-    _db     = r._db;
-    _Y      = r._Y;
-    _X      = r._X;
-    _beta   = r._beta;
-    _Cm1X   = r._Cm1X;
-    _Cm1Y   = r._Cm1Y;
     _XtCm1X = r._XtCm1X;
-    _reml   = r._reml;
     _reml   = r._reml;
   }
   return *this;

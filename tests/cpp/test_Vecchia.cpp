@@ -30,6 +30,39 @@
 #include "geoslib_f.h"
 
 using namespace gstlrn;
+
+static Db* _createDb(int nvar = 1, int ndat = 5, bool verbose = false)
+{
+  int ndim = 2;
+  Db* db   = Db::createFillRandom(ndat, ndim, nvar);
+  // db->setZVariable(3, 0, TEST);
+  DbStringFormat dbfmt1(FLAG_ARRAY);
+  if (verbose) db->display(&dbfmt1);
+  return db;
+}
+
+static Model* _createModel(int nvar = 1, double range = 0.5, bool verbose = false)
+{
+  MatrixSymmetric* sills = MatrixSymmetric::createRandomDefinitePositive(nvar);
+  Model* model           = Model::createFromParam(ECov::EXPONENTIAL, range, TEST, 1., VectorDouble(), *sills);
+  delete sills;
+  if (verbose) model->display();
+  return model;
+}
+
+static DbGrid* _createGrid(int nx = 2)
+{
+  DbGrid* grid = DbGrid::create({nx, nx}, {1. / nx, 1. / nx});
+  return grid;
+}
+
+static void _dumpLimit(int mode)
+{
+  int limit = (mode > 0) ? -1 : 7;
+  OptCst::define(ECst::NTCOL, limit);
+  OptCst::define(ECst::NTROW, limit);
+}
+
 /****************************************************************************/
 /*!
  ** Main Program
@@ -42,56 +75,63 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   // Global parameters
+  int mode       = 4;
   int nb_vecchia = 3;
-  int mode       = 0;
-  bool verbose   = false;
-  OptCst::define(ECst::NTCOL, -1);
-  OptCst::define(ECst::NTROW, -1);
-
-  int ndat = 5;
-  Db* db   = Db::createFillRandom(ndat, 2, 1);
-  // db->setZVariable(3, 0, TEST);
-  DbStringFormat dbfmt1(FLAG_ARRAY);
-  db->display(&dbfmt1);
-
-  double range = 0.5;
-  Model* model = Model::createFromParam(ECov::EXPONENTIAL, range);
-
-  int nx       = 2;
-  DbGrid* grid = DbGrid::create({nx, nx}, {1. / nx, 1. / nx});
+  DbStringFormat dbfmt(FLAG_STATS, {"Vecchia*"});
 
   if (mode == 0 || mode == 1)
   {
-    verbose = true;
     mestitle(0, "Checking Vecchia Class");
+    _dumpLimit(1);
+    Db* db             = _createDb(1, 5, true);
+    Model* model       = _createModel(1);
     Vecchia V          = Vecchia(model, nb_vecchia, db);
-    MatrixT<int> Ranks = findNN(db, nullptr, nb_vecchia + 1, false, verbose);
-    (void)V.computeLower(Ranks, verbose);
+    MatrixT<int> Ranks = findNN(db, nullptr, nb_vecchia + 1, false, true);
+    (void)V.computeLower(Ranks, true);
+    delete db;
+    delete model;
+    _dumpLimit(-1);
   }
 
   if (mode == 0 || mode == 2)
   {
-    verbose = true;
     mestitle(0, "Kriging with Vecchia approximation");
-    krigingVecchia(db, grid, model, nb_vecchia, verbose);
-
-    // Get some statistics for check printout
-    DbStringFormat dbfmt(FLAG_STATS, {"Vecchia*"});
-    grid->display(&dbfmt);
+    _dumpLimit(1);
+    Db* db       = _createDb(1, 5, false);
+    Model* model = _createModel(1);
+    DbGrid* grid = _createGrid();
+    krigingVecchia(db, grid, model, nb_vecchia, true);
+    delete db;
+    delete model;
+    delete grid;
+    _dumpLimit(-1);
   }
 
   if (mode == 0 || mode == 3)
   {
-    delete db;
-    db = Db::createFillRandom(20000, 2, 1);
-
-    const double result = logLikelihoodVecchia(db, model, 20, false);
+    mestitle(0, "Log-Likelihood");
+    Db* db              = _createDb(1, 20000, false);
+    Model* model        = _createModel(1);
+    const double result = logLikelihoodVecchia(db, model, 10, false);
     message("Log-likelihood = %f\n", result);
+    delete db;
+    delete model;
   }
-  // ====================== Free pointers ==================================
-  delete db;
-  delete grid;
-  delete model;
+
+  if (mode == 0 || mode == 4)
+  {
+    nb_vecchia = 2;
+    mestitle(0, "Kriging with Vecchia approximation (nvar=2)");
+    _dumpLimit(1);
+    Db* db       = _createDb(2, 4, false);
+    Model* model = _createModel(2);
+    DbGrid* grid = _createGrid();
+    krigingVecchia(db, grid, model, nb_vecchia, true);
+    delete db;
+    delete model;
+    delete grid;
+    _dumpLimit(-1);
+  }
 
   return (0);
 }
