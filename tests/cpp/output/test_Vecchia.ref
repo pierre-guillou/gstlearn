@@ -109,6 +109,45 @@ Diagonal of Vecchia Matrix
      [  0,]     0.446     0.447     0.447     0.448     0.518     2.434     0.469
      [  7,]     0.477     0.863
 
+Data Base Grid Characteristics
+==============================
+
+Data Base Statistics
+--------------------
+4 - Name Vecchia.estim - Locator z1
+ Nb of data          =          4
+ Nb of active values =          4
+ Minimum value       =     -0.473
+ Maximum value       =      0.166
+ Mean value          =     -0.110
+ Standard Deviation  =      0.235
+ Variance            =      0.055
+
 Log-Likelihood
 ==============
 Log-likelihood = 233950.460292
+
+Kriging with Vecchia approximation (nvar=2)
+===========================================
+
+Data Base Grid Characteristics
+==============================
+
+Data Base Statistics
+--------------------
+4 - Name Vecchia.estim.1 - Locator z1
+ Nb of data          =      10000
+ Nb of active values =      10000
+ Minimum value       =     -1.794
+ Maximum value       =      1.556
+ Mean value          =      0.162
+ Standard Deviation  =      0.327
+ Variance            =      0.107
+5 - Name Vecchia.estim.2 - Locator z2
+ Nb of data          =      10000
+ Nb of active values =      10000
+ Minimum value       =     -2.250
+ Maximum value       =      1.448
+ Mean value          =     -0.299
+ Standard Deviation  =      0.422
+ Variance            =      0.178

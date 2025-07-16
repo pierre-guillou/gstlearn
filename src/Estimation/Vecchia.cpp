@@ -34,9 +34,9 @@ Vecchia::Vecchia(ModelGeneric* model,
   , _nbNeigh(nb_neigh)
   , _db1(db1)
   , _db2(db2)
+  , _Y()
   , _DFull()
   , _LFull()
-  , _Dmat()
   , _Ndb1(0)
   , _Ntot1(0)
   , _Ntot2(0)
@@ -46,8 +46,6 @@ Vecchia::Vecchia(ModelGeneric* model,
   , _varRanks2()
 {
   setAuthorizedAnalyticalGradients(false);
-  _nt   = (db1 == nullptr) ? 0 : db1->getNSample();
-  _nd   = (db2 == nullptr) ? 0 : db2->getNSample();
   _chol = new CholeskyDense();
 }
 
@@ -56,9 +54,9 @@ Vecchia::Vecchia(const Vecchia& r)
   , _nbNeigh(r._nbNeigh)
   , _db1(r._db1)
   , _db2(r._db2)
+  , _Y(r._Y)
   , _DFull(r._DFull)
   , _LFull(r._LFull)
-  , _Dmat(r._Dmat)
   , _Ndb1(r._Ndb1)
   , _Ntot1(r._Ntot1)
   , _Ntot2(r._Ntot2)
@@ -77,9 +75,9 @@ Vecchia& Vecchia::operator=(const Vecchia& r)
     _nbNeigh     = r._nbNeigh;
     _db1         = r._db1;
     _db2         = r._db2;
+    _Y           = r._Y;
     _DFull       = r._DFull;
     _LFull       = r._LFull;
-    _Dmat        = r._Dmat;
     _Ndb1        = r._Ndb1;
     _Ntot1       = r._Ntot1;
     _Ntot2       = r._Ntot2;
@@ -104,7 +102,28 @@ void Vecchia::_init(bool verbose)
   _Ranks = findNN(_db, nullptr, _nbNeigh + 1, false, verbose);
 }
 
-int Vecchia::_getAddress(int ip, int ivar) const
+int Vecchia::_getAddressAbsolute(int ip) const
+{
+  if (ip < _Ndb1)
+    return ip;
+  return ip - _Ndb1;
+}
+
+int Vecchia::_getSampleCase(int ip) const
+{
+  return (ip < _Ndb1) ? 1 : 2;
+}
+
+int Vecchia::_getCase() const
+{
+  int icase = 0;
+  if (_db1 != nullptr) icase = 1;
+  if (_db2 != nullptr) icase = 2;
+  if (_db1 != nullptr && _db2 != nullptr) icase = 2;
+  return icase;
+}
+
+int Vecchia::_getAddressInMatrix(int ip, int ivar) const
 {
   if (ip < _Ndb1)
     return _cumulRanks1[ivar] + _varRanks1[ivar][ip];
@@ -113,13 +132,10 @@ int Vecchia::_getAddress(int ip, int ivar) const
 
 int Vecchia::_buildNeighborhood(const MatrixT<int>& Ranks,
                                 int isample,
-                                int nvar,
+                                int ivar,
                                 int nb_neigh,
                                 std::vector<std::array<int, 4>>& neighDescr) const
 {
-  int icase;
-  int iabs;
-
   // Loop on the ranks of the neighboring samples
   int nitems = 0;
   for (int jp = 0; jp < nb_neigh; jp++)
@@ -129,24 +145,28 @@ int Vecchia::_buildNeighborhood(const MatrixT<int>& Ranks,
     // Discard the missing neighborhood index
     if (IFFFF(ip)) continue;
 
-    if (ip < _Ndb1)
-    {
-      icase = 1;
-      iabs  = ip;
-    }
-    else
-    {
-      icase = 2;
-      iabs  = ip - _Ndb1;
-    }
-
     // Loop on the variables
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (int jvar = 0; jvar <= ivar; jvar++)
     {
-      neighDescr[nitems][0] = icase;                 // 1 for Db1; 2 for Db2
-      neighDescr[nitems][1] = ivar;                  // Rank of the variable
-      neighDescr[nitems][2] = _getAddress(ip, ivar); // Position in the matrix
-      neighDescr[nitems][3] = iabs;                  // Rank of the sample
+      neighDescr[nitems][0] = _getSampleCase(ip);            // 1 for Db1; 2 for Db2
+      neighDescr[nitems][1] = jvar;                          // Rank of the variable
+      neighDescr[nitems][2] = _getAddressInMatrix(ip, jvar); // Position in the matrix
+      neighDescr[nitems][3] = _getAddressAbsolute(ip);       // Rank of the sample
+      nitems++;
+    }
+  }
+
+  // For high variable rank, ensure that the same sample for previous variables is selected
+
+  if (ivar > 0)
+  {
+    int ip0 = Ranks(isample, 0);
+    for (int jvar = 0; jvar < ivar; jvar++)
+    {
+      neighDescr[nitems][0] = _getSampleCase(ip0);            // 1 for Db1; 2 for Db2
+      neighDescr[nitems][1] = jvar;                           // Rank of the variable
+      neighDescr[nitems][2] = _getAddressInMatrix(ip0, jvar); // Position in the matrix
+      neighDescr[nitems][3] = _getAddressAbsolute(ip0);       // Rank of the sample
       nitems++;
     }
   }
@@ -217,6 +237,33 @@ void Vecchia::_buildRHS(int icase2,
 }
 
 /**
+ * @brief Store in the member _Y the list of data information
+ * This information corresponds to the list of data defined values over the active samples
+ * for all the variables
+ */
+void Vecchia::_loadDataFlattened()
+{
+  int icase = _getCase();
+  int ecr   = 0;
+  if (icase == 1)
+  {
+    _Y.resize(_Ntot1);
+    int nvar = _cumulRanks1.size();
+    for (int ivar = 0; ivar < nvar; ivar++)
+      for (int iech = 0, nech = _varRanks1[ivar].size(); iech < nech; iech++)
+        _Y[ecr++] = _db1->getLocVariable(ELoc::Z, _varRanks1[ivar][iech], ivar);
+  }
+  else
+  {
+    _Y.resize(_Ntot2);
+    int nvar = _cumulRanks2.size();
+    for (int ivar = 0; ivar < nvar; ivar++)
+      for (int iech = 0, nech = _varRanks2[ivar].size(); iech < nech; iech++)
+        _Y[ecr++] = _db2->getLocVariable(ELoc::Z, _varRanks2[ivar][iech], ivar);
+  }
+}
+
+/**
  * @brief Construct the Vecchia approximation starting from 'Ranks'
  *
  * @param Ranks MatrixT<int> which the ranks of the sample indices for each target
@@ -271,53 +318,44 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
   int ntot = _Ntot1 + _Ntot2;
   _DFull.resize(ntot);
   _LFull = MatrixSparse(ntot, ntot, nb_neigh + 1);
-  _Dmat  = MatrixSparse(ntot, ntot);
+
+  // Define the vector of flattened multivariate data information
+  _loadDataFlattened();
 
   // Loop on the samples
-  int nintern = nb_neigh * nvar;
-  std::vector<std::array<int, 4>> neighDescr(nintern);
+  int nmax = nb_neigh * nvar + nvar; // Multivariate neighborhood + Collocation
+  std::vector<std::array<int, 4>> neighDescr(nmax);
   for (int ivar = 0; ivar < nvar; ivar++)
   {
     for (int isample = 0; isample < nsample; isample++)
     {
       int target = Ranks(isample, 0);
-
-      // Get the 'row' index
-      int icase1;
-      int iabs1;
-      if (target < _Ndb1)
-      {
-        icase1 = 1;
-        iabs1  = target;
-      }
-      else
-      {
-        icase1 = 2;
-        iabs1  = target - _Ndb1;
-      }
-      int row = _getAddress(target, ivar);
+      int icase1 = _getSampleCase(target);
+      int iabs1  = _getAddressAbsolute(target);
+      int irel1  = _getAddressInMatrix(target, ivar);
 
       // Build the list of neighboring information
-      int nitems = _buildNeighborhood(Ranks, isample, nvar, nb_neigh, neighDescr);
+      int nitems = _buildNeighborhood(Ranks, isample, ivar, nb_neigh, neighDescr);
 
       // Optional printout
       if (debug)
       {
-        message("Neighborhood: Case=%d Sample=%d Variable=%d Row=%d\n",
-                icase1, iabs1, ivar, row);
+        message("Row=%d Case=%d Variable=%d Sample=%d\n",
+                irel1, icase1, ivar, iabs1);
         for (int item = 0; item < nitems; item++)
-          message(" Item=%d/%d - Case=%d Sample=%d Variable=%d Column=%d\n", item + 1, nitems,
-                  neighDescr[item][0], neighDescr[item][3], neighDescr[item][1], neighDescr[item][2]);
+          message("- Column=%d Case=%d Variable=%d Sample=%d\n",
+                  neighDescr[item][2], neighDescr[item][0],
+                  neighDescr[item][1], neighDescr[item][3]);
       }
 
       // Fill the full matrix
-      _LFull.setValue(row, row, 1.);
+      _LFull.setValue(irel1, irel1, 1.);
       double varK = _model->eval0(ivar, ivar);
       if (nitems <= 0)
       {
         // Case with no previous information available
 
-        _DFull[row] = 1. / varK;
+        _DFull[irel1] = 1. / varK;
       }
       else
       {
@@ -328,8 +366,7 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
         _buildRHS(icase1, iabs1, ivar, nitems, neighDescr, _vectCov);
 
         // Solve the local system
-        _chol->setMatrix(*_matCov);
-
+        _chol->setMatrix(&_matCov);
         constvect vect = _vectCov.getViewOnColumn(0);
         _work.resize(vect.size());
         _chol->solve(vect, _work);
@@ -337,16 +374,15 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
         // Patch the global matrix
         for (int i = 0; i < nitems; i++)
         {
-          int irel = neighDescr[i][2];
-          _LFull.setValue(irel, row, -_work[i]);
+          int irel2 = neighDescr[i][2];
+          _LFull.setValue(irel2, irel1, -_work[i]);
         }
-        _DFull[isample] = 1. / (varK - VH::innerProduct(_work, vect));
+        _DFull[irel1] = 1. / (varK - VH::innerProduct(_work, vect));
       }
     }
   }
 
   // Final calculations
-  _Dmat.setDiagonal(_DFull);
   _LFull.transposeInPlace();
 
   // Optional printout
@@ -407,7 +443,9 @@ MatrixSparse* Vecchia::calculateW(const VectorDouble& D_dd) const
   VectorInt indD = VectorInt(nt + nd, -1);
   for (int id = 0; id < nd; id++) indD[id + nt] = id;
   MatrixSparse* Ltt = getLFull().extractSubmatrixByRanks(indT, indT);
+  Ltt->forceDimension(nt, nt);
   MatrixSparse* Ldt = getLFull().extractSubmatrixByRanks(indD, indT);
+  Ldt->forceDimension(nd, nt);
 
   /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
   MatrixSparse* mat1 = prodNormMat(Ltt, D_tt, true);
@@ -443,12 +481,13 @@ int krigingVecchia(Db* dbin,
   VectorDouble DFull = V.getDFull();
   int nd             = V.getND();
   int nt             = V.getNT();
+  int nvar           = model->getNVar();
   VectorDouble D_dd(nd);
   VH::extractInPlace(DFull, D_dd, nt);
 
   // Calculate LdY
-  VectorDouble Y   = dbin->getColumnByLocator(ELoc::Z, 0);
-  VectorDouble LdY = V.calculateLdY(Y);
+  const VectorDouble& Y = V.getY();
+  VectorDouble LdY      = V.calculateLdY(Y);
   VH::multiplyInPlace(LdY, D_dd);
 
   // Calculate FtLdY
@@ -471,7 +510,7 @@ int krigingVecchia(Db* dbin,
 
   // Saving the results
   int iptr = dbout->addColumns(result, String(), ELoc::UNKNOWN, 0, true);
-  namconv.setNamesAndLocators(dbout, iptr, "estim", 1);
+  namconv.setNamesAndLocators(dbout, iptr, "estim", nvar);
 
   return 0;
 }

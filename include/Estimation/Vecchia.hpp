@@ -47,11 +47,12 @@ public:
   int computeLower(const MatrixT<int>& Ranks, bool verbose = false);
   const MatrixSparse& getLFull() const { return _LFull; }
   const VectorDouble& getDFull() const { return _DFull; }
-  const MatrixSparse& getDMat() const { return _Dmat; }
+  const VectorDouble& getY() const { return _Y; }
 
   double getLFull(int i, int j) const { return _LFull.getValue(i, j); }
-  int getND() const { return _nd; }
-  int getNT() const { return _nt; }
+  int getND() const { return _Ntot2; }
+  int getNT() const { return _Ntot1; }
+  int getNonZeros() const { return _LFull.getNonZeros(); }
 
   void productMatVecchia(const MatrixDense& X, MatrixDense& resmat) const;
   void productVecchia(constvect Y, vect res) const;
@@ -67,7 +68,7 @@ private:
   double _computeLogDet() const override;
   int _buildNeighborhood(const MatrixT<int>& Ranks,
                          int isample,
-                         int nvar,
+                         int ivar,
                          int nb_neigh,
                          std::vector<std::array<int, 4>>& neighDescr) const;
   void _buildLHS(int nitems,
@@ -79,7 +80,11 @@ private:
                  int nitems,
                  const std::vector<std::array<int, 4>>& neighDescr,
                  MatrixDense& _vectCov);
-  int _getAddress(int ip, int ivar) const;
+  void _loadDataFlattened();
+  int _getAddressInMatrix(int ip, int ivar) const;
+  int _getAddressAbsolute(int ip) const;
+  int _getSampleCase(int ip) const;
+  int _getCase() const;
 
 private:
   // Following members are copies of pointers (not to be deleted)
@@ -87,18 +92,16 @@ private:
   const Db* _db1;
   const Db* _db2;
 
-  int _nt;
-  int _nd;
   MatrixT<int> _Ranks; // Matrix of ranks for the Vecchia approximation
   std::shared_ptr<MatrixSymmetric> _matCov;
   MatrixDense _vectCov;
   VectorDouble _work; // Work vector for calculations
+  mutable VectorDouble _Y;
   mutable VectorDouble _LdY;
   mutable VectorDouble _DFull;
   mutable MatrixSparse _LFull;
   mutable CholeskyDense* _chol; // Cholesky decomposition of the covariance matrix
   // Local calculation results (to be deleted later)
-  mutable MatrixSparse _Dmat;
   mutable int _Ndb1; // Number of samples in Db1 (used for shift calculations)
   mutable int _Ntot1;
   mutable int _Ntot2;

@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   // Global parameters
-  int mode       = 4;
+  int mode       = 0;
   int nb_vecchia = 3;
   DbStringFormat dbfmt(FLAG_STATS, {"Vecchia*"});
 
@@ -101,6 +101,7 @@ int main(int argc, char* argv[])
     Model* model = _createModel(1);
     DbGrid* grid = _createGrid();
     krigingVecchia(db, grid, model, nb_vecchia, true);
+    grid->display(&dbfmt);
     delete db;
     delete model;
     delete grid;
@@ -122,15 +123,14 @@ int main(int argc, char* argv[])
   {
     nb_vecchia = 2;
     mestitle(0, "Kriging with Vecchia approximation (nvar=2)");
-    _dumpLimit(1);
-    Db* db       = _createDb(2, 4, false);
+    Db* db       = _createDb(2, 10, false);
     Model* model = _createModel(2);
-    DbGrid* grid = _createGrid();
-    krigingVecchia(db, grid, model, nb_vecchia, true);
+    DbGrid* grid = _createGrid(100);
+    krigingVecchia(db, grid, model, nb_vecchia, false);
+    grid->display(&dbfmt);
     delete db;
     delete model;
     delete grid;
-    _dumpLimit(-1);
   }
 
   return (0);
