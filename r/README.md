@@ -9,9 +9,9 @@ All *gstlearn* outputs can be ploted using *plot* generic function which relies 
 
 ## References
 
-The *gstlearn* R package is a R wrapper of the [gstlearn C++ Library](https://gstlearn.org). It's the successor of the [RGeostats R package](http://cg.ensmp.fr/rgeostats).
+The *gstlearn* R package is a R wrapper of the [gstlearn C++ Library](https://gstlearn.org). It's the successor of the [RGeostats R package](https://rgeostats.free.fr).
 
-This package contains a modified copy of [findR.cmake](https://github.com/root-project/root) script (see LICENSE.root in *root* folder).q
+This package contains a modified copy of [findR.cmake](https://github.com/root-project/root) script (see LICENSE.root in *root* folder of the [github repo of gstlearn](https://github.com/gstlearn/gstlearn)).
 
 The *gstlearn* R package is a derivative work based on the *swigex0* project: [https://github.com/fabien-ors/swigex0](https://github.com/fabien-ors/swigex0)
 
