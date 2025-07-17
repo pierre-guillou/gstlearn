@@ -433,7 +433,7 @@ double ASPDEOp::computeLogDetInvNoise() const
   return _invNoise->computeLogDet();
 }
 
-// We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + Sum(log sigma_i^2)
+// We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + log|Noise|
 double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
 {
   int memo = law_get_random_seed();
@@ -450,7 +450,7 @@ double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
     message("LogDet of InvNoise: %lf\n", a3);
   }
   double result = TEST;
-  if (!FFFF(a1) && !FFFF(a2) && !FFFF(a3)) result = a1 - a2 + a3;
+  if (!FFFF(a1) && !FFFF(a2) && !FFFF(a3)) result = a1 - a2 - a3; // -a3 since a3 is log|invNoise|
   return result;
 }
 } // namespace gstlrn
