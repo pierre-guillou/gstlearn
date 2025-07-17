@@ -245,7 +245,7 @@ Log-likelihood  = -847.501461
 ----
 LogDet of Q + ADA': 12296.938911
 LogDet of Q: 11255.715075
-LogDet of InvNoise: -2302.585093
+LogDet of InvNoise: 2302.585093
 Likelihood calculation:
 Nb. active samples = 1000
 Nb. Monte-Carlo    = 100
@@ -260,9 +260,9 @@ Log-likelihood     = -847.501461
 #NO_DIFF#XXX
 ----
 LogDet of Q + ADA': 11569.018180
-
 LogDet of Q: 11585.782711
-LogDet of InvNoise: -2302.585093
+LogDet of InvNoise: 2302.585093
+
 Likelihood calculation:
 Nb. active samples = 1000
 Nb. Monte-Carlo    = 100
@@ -278,7 +278,8 @@ Log-likelihood     = -318.674342
 ----
 LogDet of Q + ADA': 12455.819068
 LogDet of Q: 11170.021460
-LogDet of InvNoise: -2302.585093
+LogDet of InvNoise: 2302.585093
+
 Likelihood calculation:
 Nb. active samples = 1000
 Nb. Monte-Carlo    = 100
