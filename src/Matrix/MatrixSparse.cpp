@@ -43,7 +43,8 @@ namespace gstlrn
 static bool globalFlagEigen = true;
 
 MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax, int opt_eigen)
-  : ALinearOp(), AMatrix(nrow, ncol)
+  : ALinearOp()
+  , AMatrix(nrow, ncol)
   , _csMatrix(nullptr)
   , _eigenMatrix()
   , _flagEigen(false)
@@ -1349,13 +1350,15 @@ String MatrixSparse::toString(const AStringFormat* strfmt) const
 
 void MatrixSparse::_allocate(int nrow, int ncol, int ncolmax)
 {
-   _eigenMatrix = Eigen::SparseMatrix<double>(nrow, ncol);
+  _eigenMatrix = Eigen::SparseMatrix<double>(nrow, ncol);
+  _setNCols(ncol);
+  _setNRows(nrow);
 
-    if (ncolmax > 0)
-    {
-      _eigenMatrix.reserve(Eigen::VectorXi::Constant(nrow, ncolmax));
-    }
-    _nColMax = ncolmax;
+  if (ncolmax > 0)
+  {
+    _eigenMatrix.reserve(Eigen::VectorXi::Constant(nrow, ncolmax));
+  }
+  _nColMax = ncolmax;
 }
 
 /**
@@ -1798,13 +1801,13 @@ int MatrixSparse::forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLow
   return 0;
 }
 
-  void MatrixSparse::forceDimension(int maxRows, int maxCols)
+void MatrixSparse::forceDimension(int maxRows, int maxCols)
+{
+  // Redimensionner les matrices si nécessaire
+  if (_eigenMatrix.rows() < maxRows || _eigenMatrix.cols() < maxCols)
   {
-    // Redimensionner les matrices si nécessaire
-    if (_eigenMatrix.rows() < maxRows || _eigenMatrix.cols() < maxCols)
-    {
-      _eigenMatrix.conservativeResize(maxRows, maxCols);
-      _eigenMatrix.insert(maxRows - 1, maxCols - 1) = 0.0; // Élément fictif
-    }
+    _eigenMatrix.conservativeResize(maxRows, maxCols);
+    _eigenMatrix.insert(maxRows - 1, maxCols - 1) = 0.0; // Élément fictif
   }
 }
+} // namespace gstlrn
