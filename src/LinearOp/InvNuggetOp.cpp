@@ -14,8 +14,6 @@
 #include "Covariances/CovAniso.hpp"
 #include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
-#include "Matrix/MatrixSparse.hpp"
-#include "Matrix/NF_Triplet.hpp"
 #include "Model/Model.hpp"
 #include "geoslib_define.h"
 #include <algorithm>
@@ -26,8 +24,8 @@ namespace gstlrn
 {
 
 InvNuggetOp::InvNuggetOp(Db* dbin, Model* model, const SPDEParam& params, bool flagEigVals)
-  : ASimulable()
-  , _invNuggetMatrix(nullptr)
+  : ASimulable(),
+    MatrixSparse()
   , _logDeterminant(TEST)
   , _rangeEigenVal(INF, 0.)
   , _flagEigVals(flagEigVals)
@@ -37,7 +35,7 @@ InvNuggetOp::InvNuggetOp(Db* dbin, Model* model, const SPDEParam& params, bool f
 
 int InvNuggetOp::getSize() const
 {
-  return _invNuggetMatrix ? _invNuggetMatrix->getNRows() : 0;
+  return getNRows();
 }
 
 InvNuggetOp::~InvNuggetOp()
@@ -46,15 +44,9 @@ InvNuggetOp::~InvNuggetOp()
 
 int InvNuggetOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
 {
-  DECLARE_UNUSED(whitenoise, outv)
-  messerr("Not implemented: InvNuggetOp::_addSimulateToDest");
-  return 1;
+  return _cholNuggetMatrix->addToDest(whitenoise, outv);
 }
 
-int InvNuggetOp::_addToDest(const constvect inv, vect outv) const
-{
-  return _invNuggetMatrix->addToDest(inv, outv);
-}
 
 static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef)
 {
@@ -153,7 +145,7 @@ double InvNuggetOp::_updateQuantities(MatrixSymmetric& sillsinv)
  */
 void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
 {
-  _invNuggetMatrix = nullptr;
+  CholeskyDense chol;
   if (db == nullptr) return;
   int nech = db->getNSample();
   if (model == nullptr) return;
@@ -202,7 +194,8 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
 
   size_t sizetot = VH::count(index1);
   // Convert from triplet to sparse matrix
-  _invNuggetMatrix = std::make_shared<MatrixSparse>(sizetot, sizetot, nvar);
+   _allocate(sizetot, sizetot, nvar);
+  _cholNuggetMatrix = std::make_shared<MatrixSparse>(sizetot, sizetot, nvar);
 
   // Check the various possibilities
   // - flag_verr: True if Variance of Measurement Error variable is defined
@@ -235,9 +228,12 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
   // Pre-calculate the inverse of the sill matrix (if constant)
 
   std::vector<double> cacheLogDet;
+  std::vector<CholeskyDense> cholcache;
+
   if (flag_constant)
   {
     cacheLogDet.resize(count, 0.);
+    cholcache.resize(count);
     // In case of (Unique) Variance of measurement error, patch sill matrix
     if (flag_verr) _addVerrConstant(sillsRef, verrDef);
 
@@ -264,6 +260,8 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
       if (sillsInv[rank].empty())
       {
         sillsInv[rank] = _buildSillPartialMatrix(sillsRef, nvar, ndef, identity);
+        cholcache[rank].setMatrix(sillsInv[rank]);
+
         if (sillsInv[rank].invert() != 0) return;
         if (_flagEigVals)
         {
@@ -277,10 +275,7 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
       {
         _logDeterminant += cacheLogDet[rank];
       }
-      for (int idef = 0; idef < ndef; idef++)
-        for (int jdef = 0; jdef < ndef; jdef++)
-          _invNuggetMatrix->setValue(position[identity[idef]], position[identity[jdef]],
-                                     sillsInv[rank].getValue(idef, jdef));
+      _updateMatrix(sillsInv[rank], cholcache[rank], ndef, position, identity);
     }
     else
     {
@@ -312,6 +307,7 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
 
           local.setValue(idef, jdef, value);
         }
+      CholeskyDense chollocal(local);
       if (local.invert() != 0) return;
       if (_flagEigVals)
       {
@@ -319,22 +315,35 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
           _logDeterminant = 0.;
         _logDeterminant += _updateQuantities(local);
       }
-      for (int idef = 0; idef < ndef; idef++)
-        for (int jdef = 0; jdef < ndef; jdef++)
-          _invNuggetMatrix->setValue(position[identity[idef]], position[identity[jdef]],
-                                     local.getValue(idef, jdef));
+
+      _updateMatrix(local, chollocal, ndef, position, identity);
     }
   }
-
   // Free the non-stationary specific allocation
   if (!hasnugget)
     delete cova;
+}
+void InvNuggetOp::_updateMatrix(MatrixSymmetric& invsill, CholeskyDense& cholsill, int ndef, const VectorInt& position, const VectorInt& identity)
+{
+  {
+    for (int idef = 0; idef < ndef; idef++)
+      for (int jdef = 0; jdef < ndef; jdef++)
+      {
+        int pidef = position[identity[idef]];
+        int pjdef = position[identity[jdef]];
+        setValue(pidef, pjdef, invsill.getValue(idef, jdef));
+        if (idef >= jdef)
+        {
+          _cholNuggetMatrix->setValue(pidef, pjdef, cholsill.getLowerTriangle(idef, jdef));
+        }
+      }
+  }
 }
 
 std::shared_ptr<MatrixSparse> buildInvNugget(Db* dbin, Model* model, const SPDEParam& params)
 {
   InvNuggetOp invnugg(dbin, model, params);
-  return invnugg.getInvNuggetMatrix();
+  return std::make_shared<MatrixSparse>(*invnugg.getInvNuggetMatrix());
 }
 
 double InvNuggetOp::computeLogDet(int nMC) const
@@ -343,7 +352,7 @@ double InvNuggetOp::computeLogDet(int nMC) const
 
   if (FFFF(_logDeterminant))
   {
-    CholeskyDense cholesky(*_invNuggetMatrix);
+    CholeskyDense cholesky(*this);
     return cholesky.computeLogDeterminant();
   }
   return _logDeterminant;
@@ -351,6 +360,11 @@ double InvNuggetOp::computeLogDet(int nMC) const
 
 const MatrixSparse* InvNuggetOp::cloneInvNuggetMatrix() const
 {
-  return _invNuggetMatrix->clone();
+  return this->clone();
+}
+
+const MatrixSparse* InvNuggetOp::cloneCholNuggetMatrix() const
+{
+  return _cholNuggetMatrix->clone();
 }
 } // namespace gstlrn

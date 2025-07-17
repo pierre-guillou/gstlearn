@@ -11,6 +11,7 @@
 #include "LinearOp/SPDEOp.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
 #include "LinearOp/ProjMulti.hpp"
 #include "Matrix/MatrixDense.hpp"
@@ -21,7 +22,7 @@ namespace gstlrn
 {
 ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
                  const ProjMulti* const projInKriging,
-                 const std::shared_ptr<const ASimulable>& invNoise,
+                 const ASimulable* invNoise,
                  const PrecisionOpMulti* const popSimu,
                  const ProjMulti* const projInSimu,
                  const ProjMulti* const projOutKriging,

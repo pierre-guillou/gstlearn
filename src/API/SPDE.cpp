@@ -19,7 +19,6 @@
 #include "Covariances/CovAniso.hpp"
 #include "Db/Db.hpp"
 #include "LinearOp/InvNuggetOp.hpp"
-#include "LinearOp/MatrixSymmetricSim.hpp"
 #include "LinearOp/PrecisionOp.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
 #include "LinearOp/PrecisionOpMultiConditional.hpp"
@@ -1067,27 +1066,24 @@ int krigingSPDE(Db* dbin,
   const ProjMultiMatrix* AoutS = flagAoutSConstruct ? _defineProjMulti(dbout, model, meshLocalS, nullptr) : AoutK;
 
   // Auxiliary information
-  auto invnoiseobj = InvNuggetOp(dbin,model,params);
-  const auto& invnoise = invnoiseobj.getInvNuggetMatrix();
-  std::shared_ptr<MatrixSymmetricSim> invnoisep = nullptr;
-  if (!flagCholesky)
-    invnoisep = std::make_shared<MatrixSymmetricSim>(*invnoise);
 
-  SPDEOp* spdeop              = nullptr;
-  PrecisionOpMulti* Qop       = nullptr;
-  PrecisionOpMulti* QopS      = nullptr;
-  PrecisionOpMultiMatrix* Qom = nullptr;
+  SPDEOp* spdeop                           = nullptr;
+  PrecisionOpMulti* Qop                    = nullptr;
+  PrecisionOpMulti* QopS                   = nullptr;
+  PrecisionOpMultiMatrix* Qom              = nullptr;
+  std::shared_ptr<InvNuggetOp> invnoiseobj = std::make_shared<InvNuggetOp>(dbin, model, params,!flagCholesky);
   if (flagCholesky)
   {
-    Qom    = new PrecisionOpMultiMatrix(model, meshLocalK);
-    spdeop = new SPDEOpMatrix(Qom, AInK, invnoise, AoutK);
+    Qom           = new PrecisionOpMultiMatrix(model, meshLocalK);
+    spdeop        = new SPDEOpMatrix(Qom, AInK, invnoiseobj.get(), AoutK);
   }
   else
   {
     Qop = new PrecisionOpMulti(model, meshLocalK, params.getUseStencil());
     if (!meshLocalS.empty())
       QopS = new PrecisionOpMulti(model, meshLocalS, params.getUseStencil());
-    spdeop = new SPDEOp(Qop, AInK, invnoisep, QopS, AInS, AoutK, AoutS);
+
+    spdeop = new SPDEOp(Qop, AInK, invnoiseobj.get(), QopS, AInS, AoutK, AoutS);
     spdeop->setMaxIterations(params.getCGparams().getNIterMax());
     spdeop->setTolerance(params.getCGparams().getEps());
   }
@@ -1210,9 +1206,6 @@ int simulateSPDE(Db* dbin,
   if (_defineMeshes(dbin, dbout, model, meshLocalS, params, false)) return 1;
 
   // Auxiliary parameters
-  auto invnoiseobj = InvNuggetOp(dbin,model,params);
-  const auto& invnoise = invnoiseobj.getInvNuggetMatrix();
-  std::shared_ptr<MatrixSymmetricSim> invnoisep = nullptr;
 
   if (flagCond)
   {
@@ -1224,12 +1217,12 @@ int simulateSPDE(Db* dbin,
                               (projInS == nullptr) ? AInK : projInS);
       if (AInS == nullptr) return 1;
     }
-    if (!flagCholesky)
-      invnoisep = std::make_shared<MatrixSymmetricSim>(*invnoise);
   }
   const ProjMultiMatrix* AoutK = _defineProjMulti(dbout, model, meshLocalK, nullptr);
   bool flagAoutSConstruct      = (!flagCholesky) && (meshLocalK != meshLocalS);
   const ProjMultiMatrix* AoutS = flagAoutSConstruct ? _defineProjMulti(dbout, model, meshLocalS, nullptr) : AoutK;
+
+  auto invnoise = std::make_shared<InvNuggetOp>(dbin, model, params, !flagCholesky);
 
   SPDEOp* spdeop              = nullptr;
   PrecisionOpMulti* Qop       = nullptr;
@@ -1238,14 +1231,15 @@ int simulateSPDE(Db* dbin,
   if (flagCholesky)
   {
     Qom    = new PrecisionOpMultiMatrix(model, meshLocalK);
-    spdeop = new SPDEOpMatrix(Qom, AInK, invnoise, AoutK);
+    spdeop = new SPDEOpMatrix(Qom, AInK, invnoise.get(), AoutK);
   }
   else
   {
+
     Qop = new PrecisionOpMulti(model, meshLocalK, params.getUseStencil());
     if (!meshLocalS.empty())
       QopS = new PrecisionOpMulti(model, meshLocalS, params.getUseStencil());
-    spdeop = new SPDEOp(Qop, AInK, invnoisep, QopS, AInS, AoutK, AoutS);
+    spdeop = new SPDEOp(Qop, AInK, invnoise.get(), QopS, AInS, AoutK, AoutS);
     spdeop->setMaxIterations(params.getCGparams().getNIterMax());
     spdeop->setTolerance(params.getCGparams().getEps());
   }
@@ -1355,23 +1349,22 @@ double logLikelihoodSPDE(Db* dbin,
   if (AIn == nullptr) return 1;
 
   // Auxiliary information
-  std::shared_ptr<MatrixSparse> invnoise        = buildInvNugget(dbin, model, params);
-  std::shared_ptr<const MatrixSymmetricSim> invnoisep = nullptr;
-  if (!flagCholesky)
-    invnoisep = std::shared_ptr<const MatrixSymmetricSim>(new MatrixSymmetricSim(*invnoise));
 
   SPDEOp* spdeop              = nullptr;
   PrecisionOpMulti* Qop       = nullptr;
   PrecisionOpMultiMatrix* Qom = nullptr;
+  auto invnoiseobj            = std::make_shared<const InvNuggetOp>(dbin, model, params, !flagCholesky);
+
   if (flagCholesky)
   {
-    Qom    = new PrecisionOpMultiMatrix(model, meshLocal);
-    spdeop = new SPDEOpMatrix(Qom, AIn, invnoise);
+    auto invnoise = buildInvNugget(dbin, model, params);
+    Qom           = new PrecisionOpMultiMatrix(model, meshLocal);
+    spdeop        = new SPDEOpMatrix(Qom, AIn, invnoiseobj.get());
   }
   else
   {
     Qop    = new PrecisionOpMulti(model, meshLocal, params.getUseStencil());
-    spdeop = new SPDEOp(Qop, AIn, invnoisep);
+    spdeop = new SPDEOp(Qop, AIn, invnoiseobj.get());
     spdeop->setMaxIterations(params.getCGparams().getNIterMax());
     spdeop->setTolerance(params.getCGparams().getEps());
   }

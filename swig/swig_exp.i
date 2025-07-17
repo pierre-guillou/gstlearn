@@ -148,9 +148,9 @@
 %include LinearOp/ALinearOp.hpp
 %include LinearOp/ASimulable.hpp
 %include Matrix/AMatrix.hpp
-%include LinearOp/InvNuggetOp.hpp
 %include Matrix/MatrixDense.hpp
 %include Matrix/MatrixSparse.hpp
+%include LinearOp/InvNuggetOp.hpp
 %include Matrix/MatrixSquare.hpp
 %include Matrix/NF_Triplet.hpp
 %include Matrix/MatrixSymmetric.hpp

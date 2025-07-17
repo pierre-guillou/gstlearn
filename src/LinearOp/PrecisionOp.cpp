@@ -266,7 +266,7 @@ int PrecisionOp::_prepareChebychev(const EPowerPT& power) const
     { return pow(_polynomials[EPowerPT::ONE]->eval(val), -0.5); };
   }
 
-  chebMatern->fit(f, 0, b, EPSILON6);
+  chebMatern->fit(f, 0, b, EPSILON5);
   _polynomials[power] = std::move(chebMatern);
   return 0;
 }

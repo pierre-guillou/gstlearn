@@ -99,9 +99,7 @@ AM        = gl.ProjMulti(vectproj)
 AMout     = gl.ProjMulti(vectprojOut)
 Qop       = gl.PrecisionOpMulti(model,meshes,True)
 invnoise  = gl.InvNuggetOp(dat,modelNugg)
-invnoisep = gl.MatrixSymmetricSim(invnoise.cloneInvNuggetMatrix())
-invnoisep.thisown = False
-spdeop    = gl.SPDEOp(Qop, AM, invnoisep)
+spdeop    = gl.SPDEOp(Qop, AM, invnoise)
 ntarget   = grid.getNSample(True)
 local     = gl.VectorDouble(ntarget)
 for i in range(nbsimu):

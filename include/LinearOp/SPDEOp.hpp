@@ -35,13 +35,13 @@ class Chebychev;
 class GSTLEARN_EXPORT ASPDEOp: public virtual ALinearOp
 {
 public:
-  ASPDEOp(const PrecisionOpMulti* const popKriging          = nullptr,
-          const ProjMulti* const projInKriging              = nullptr,
-          const std::shared_ptr<const ASimulable>& invNoise = nullptr,
-          const PrecisionOpMulti* const popSimu             = nullptr,
-          const ProjMulti* const projInSimu                 = nullptr,
-          const ProjMulti* const projOutKriging             = nullptr,
-          const ProjMulti* const projOutSimu                = nullptr);
+  ASPDEOp(const PrecisionOpMulti* const popKriging = nullptr,
+          const ProjMulti* const projInKriging     = nullptr,
+          const ASimulable* invNoise               = nullptr,
+          const PrecisionOpMulti* const popSimu    = nullptr,
+          const ProjMulti* const projInSimu        = nullptr,
+          const ProjMulti* const projOutKriging    = nullptr,
+          const ProjMulti* const projOutSimu       = nullptr);
   virtual ~ASPDEOp();
 
   virtual VectorDouble stdev(const VectorDouble& dat, int nMC = 1, int seed = 134343) const;
@@ -65,7 +65,7 @@ public:
 
   const PrecisionOpMulti* getQKriging() const { return _QKriging; }
   const ProjMulti* getProjKriging() const { return _projInKriging; }
-  const ASimulable* getInvNoise() const { return _invNoise.get(); }
+  const ASimulable* getInvNoise() const { return _invNoise; }
   const PrecisionOpMulti* getQSimu() const { return _QSimu; }
   const ProjMulti* getProjInSimu() const { return _projInSimu; }
 
@@ -113,7 +113,7 @@ private:
 protected:
   mutable const PrecisionOpMulti* _QKriging;
   const ProjMulti* const _projInKriging;
-  const std::shared_ptr<const ASimulable> _invNoise;
+  const ASimulable* _invNoise;
   const PrecisionOpMulti* const _QSimu;
   const ProjMulti* const _projInSimu;
   const ProjMulti* const _projOutKriging;
@@ -143,13 +143,13 @@ class GSTLEARN_EXPORT SPDEOp: public ASPDEOp,
 #endif
 {
 public:
-  SPDEOp(const PrecisionOpMulti* const popKriging          = nullptr,
-         const ProjMulti* const projInKriging              = nullptr,
-         const std::shared_ptr<const ASimulable>& invNoise = nullptr,
-         const PrecisionOpMulti* const popSimu             = nullptr,
-         const ProjMulti* const projInSimu                 = nullptr,
-         const ProjMulti* const projOutKriging             = nullptr,
-         const ProjMulti* const projOutSimu                = nullptr)
+  SPDEOp(const PrecisionOpMulti* const popKriging = nullptr,
+         const ProjMulti* const projInKriging     = nullptr,
+         const ASimulable* invNoise               = nullptr,
+         const PrecisionOpMulti* const popSimu    = nullptr,
+         const ProjMulti* const projInSimu        = nullptr,
+         const ProjMulti* const projOutKriging    = nullptr,
+         const ProjMulti* const projOutSimu       = nullptr)
     : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu, projOutKriging, projOutSimu)
   {
     _solver = new LinearOpCGSolver<SPDEOp>(this);

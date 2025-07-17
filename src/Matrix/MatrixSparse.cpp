@@ -43,7 +43,7 @@ namespace gstlrn
 static bool globalFlagEigen = true;
 
 MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax, int opt_eigen)
-  : AMatrix(nrow, ncol), ALinearOp()
+  : ALinearOp(), AMatrix(nrow, ncol)
   , _csMatrix(nullptr)
   , _eigenMatrix()
   , _flagEigen(false)
@@ -1345,6 +1345,17 @@ String MatrixSparse::toString(const AStringFormat* strfmt) const
     sstr << toMatrix(String(), *this);
   }
   return sstr.str();
+}
+
+void MatrixSparse::_allocate(int nrow, int ncol, int ncolmax)
+{
+   _eigenMatrix = Eigen::SparseMatrix<double>(nrow, ncol);
+
+    if (ncolmax > 0)
+    {
+      _eigenMatrix.reserve(Eigen::VectorXi::Constant(nrow, ncolmax));
+    }
+    _nColMax = ncolmax;
 }
 
 /**

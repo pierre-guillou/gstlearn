@@ -14,7 +14,7 @@
 #include "LinearOp/ALinearOp.hpp"
 
 namespace gstlrn{
-class GSTLEARN_EXPORT ASimulable : public ALinearOp
+class GSTLEARN_EXPORT ASimulable : public virtual ALinearOp
 {
 public:
   ASimulable();

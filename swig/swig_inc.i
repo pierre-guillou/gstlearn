@@ -140,7 +140,6 @@
   #include "LinearOp/LogStats.hpp"
   #include "LinearOp/ALinearOp.hpp"
   #include "LinearOp/ASimulable.hpp"
-  #include "LinearOp/InvNuggetOp.hpp"
   #include "LinearOp/LinearOpCGSolver.hpp"
   #include "LinearOp/ALinearOpMulti.hpp"
   #include "LinearOp/AShiftOp.hpp"
@@ -272,6 +271,8 @@
   #include "Matrix/MatrixFactory.hpp"
   #include "Matrix/MatrixInt.hpp"
   #include "Matrix/Table.hpp"
+  #include "LinearOp/InvNuggetOp.hpp"
+
   
   #include "API/SPDE.hpp"
   #include "API/PGSSPDE.hpp"

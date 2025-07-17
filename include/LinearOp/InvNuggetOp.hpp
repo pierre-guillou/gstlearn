@@ -12,15 +12,17 @@
 
 #include "API/SPDEParam.hpp"
 #include "LinearOp/ASimulable.hpp"
+#include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
+#include "Matrix/MatrixSparse.hpp"
 #include "gstlearn_export.hpp"
 
 #include <memory>
 namespace gstlrn
 {
+class CholeskyDense;
 class Db;
 class Model;
-class MatrixSparse;
 class MatrixSymmetric;
 /**
  * invNuggetOp
@@ -31,7 +33,7 @@ class MatrixSymmetric;
  * the logdeterminant.
  * It inherits from ASimulable, allowing it to be used in simulations.
  */
-class GSTLEARN_EXPORT InvNuggetOp: public ASimulable
+class GSTLEARN_EXPORT InvNuggetOp: public virtual ASimulable, public virtual MatrixSparse
 {
 public:
   InvNuggetOp(Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam(), bool = false);
@@ -39,8 +41,9 @@ public:
   InvNuggetOp& operator=(const InvNuggetOp& m) = delete;
   virtual ~InvNuggetOp();
   int getSize() const override;
-  const std::shared_ptr<MatrixSparse>& getInvNuggetMatrix() const { return _invNuggetMatrix; }
+  const MatrixSparse* getInvNuggetMatrix() const { return dynamic_cast<const MatrixSparse*>(this); }
   const MatrixSparse* cloneInvNuggetMatrix() const;
+  const MatrixSparse* cloneCholNuggetMatrix() const;
   double computeLogDet(int nMC = 1) const override;
   double getMinEigenValue() const { return _rangeEigenVal.first; }
   double getMaxEigenValue() const { return _rangeEigenVal.second; }
@@ -48,18 +51,21 @@ public:
 
 protected:
   int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
-  int _addToDest(constvect inv, vect outv) const override;
 
 private:
+  void _updateMatrix(MatrixSymmetric& invsill,
+                     CholeskyDense& cholsill,
+                     int ndef,
+                     const VectorInt& position,
+                     const VectorInt& identity);
   double _updateQuantities(MatrixSymmetric& sillsinv);
   void _buildInvNugget(Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam());
 
 private:
-  std::vector<MatrixSymmetric> _invNuggetSubMatrices; // The inverse nugget submatrices for each location
-  std::shared_ptr<MatrixSparse> _invNuggetMatrix;     // The inverse nugget matrix
-  double _logDeterminant;                             // The log determinant of the inverse nugget matrix
-  std::pair<double, double> _rangeEigenVal;           // The range of eigenvalues for the inverse nugget matrix
-  bool _flagEigVals;                                  // Flag to indicate if eigenvalues should be computed
+  std::shared_ptr<MatrixSparse> _cholNuggetMatrix; // The Cholesky decomposition of the nugget matrix
+  double _logDeterminant;                          // The log determinant of the inverse nugget matrix
+  std::pair<double, double> _rangeEigenVal;        // The range of eigenvalues for the inverse nugget matrix
+  bool _flagEigVals;                               // Flag to indicate if eigenvalues should be computed
 };
 
 #ifndef SWIG

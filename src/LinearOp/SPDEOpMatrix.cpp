@@ -10,7 +10,7 @@
 /******************************************************************************/
 #include "LinearOp/SPDEOpMatrix.hpp"
 #include "LinearOp/ASimulable.hpp"
-#include "LinearOp/MatrixSymmetricSim.hpp"
+#include "LinearOp/InvNuggetOp.hpp"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
 #include "Matrix/MatrixSparse.hpp"
@@ -20,11 +20,11 @@ namespace gstlrn
 {
 SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
                            const ProjMultiMatrix* A,
-                           const std::shared_ptr<const MatrixSparse>& invNoise,
+                           const InvNuggetOp* invNoise,
                            const ProjMultiMatrix* projOut)
   : SPDEOp(pop,
            A,
-           invNoise == nullptr ? nullptr:std::shared_ptr<ASimulable>(new MatrixSymmetricSim(*invNoise)),
+           invNoise,
            nullptr,
            nullptr,
            projOut,
@@ -35,7 +35,7 @@ SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
   _QpAinvNoiseAt->resize(pop->getSize(), pop->getSize());
   if (A != nullptr)
   {
-    _QpAinvNoiseAt->prodNormMatMatInPlace(A->getProj(), invNoise.get(), true);
+    _QpAinvNoiseAt->prodNormMatMatInPlace(A->getProj(), invNoise, true);
   }
   _QpAinvNoiseAt->addMatInPlace(*pop->getQ());
 }

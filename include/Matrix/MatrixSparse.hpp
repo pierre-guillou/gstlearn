@@ -42,7 +42,7 @@ namespace gstlrn{
  * Storage relies either on Eigen3 Library (see opt_eigen flag) or cs code.
  * Default storage option can be set globally by using setGlobalFlagEigen
  */
-class GSTLEARN_EXPORT MatrixSparse: public AMatrix, public ALinearOp
+class GSTLEARN_EXPORT MatrixSparse: public AMatrix, public virtual ALinearOp
 {
 
 public:
@@ -240,7 +240,7 @@ public:
 #ifndef SWIG
 
 protected:
-  virtual int _addToDest(const constvect inv, vect outv) const override;
+  int _addToDest(const constvect inv, vect outv) const override;
 #endif
 
 #ifndef SWIG
@@ -257,6 +257,8 @@ protected:
     DECLARE_UNUSED(irow, icol);
     return true;
   }
+  void _allocate(int nrow, int ncol, int ncolmax);
+
   virtual void _allocate() override;
   virtual void _deallocate() override;
 
