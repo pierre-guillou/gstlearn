@@ -50,7 +50,7 @@ public:
 #ifndef SWIG
   virtual void evalInverse(const constvect vecin, std::vector<double>& vecout);
 #endif
-
+  std::vector<double> evalInverse(const VectorDouble& vecin);
   virtual std::pair<double, double> getRangeEigenVal(int ndiscr = 100);
 
   static PrecisionOp* createFromShiftOp(AShiftOp* shiftop    = nullptr,

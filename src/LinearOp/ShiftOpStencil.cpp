@@ -160,7 +160,7 @@ void ShiftOpStencil::normalizeLambdaBySills(const AMesh* mesh)
   }
 }
 
-double ShiftOpStencil::getMaxEigenValue() const
+double ShiftOpStencil::_getMaxEigenValue() const
 {
   double s = 0.;
   for (const auto &e : _weights)
@@ -174,6 +174,12 @@ double ShiftOpStencil::getLambda(int iapex) const
 {
   if (_useLambdaSingleVal) return _lambdaVal;
   return AShiftOp::getLambda(iapex);
+}
+
+double ShiftOpStencil::logDetLambda() const
+{
+  if (_useLambdaSingleVal) return 2. * log(_lambdaVal) * _napices;
+  return AShiftOp::logDetLambda();
 }
 
 void ShiftOpStencil::multiplyByValueAndAddDiagonal(double v1, double v2) const

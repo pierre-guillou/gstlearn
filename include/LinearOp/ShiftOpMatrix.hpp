@@ -77,7 +77,6 @@ public:
   void prodTildeC(const VectorDouble& x, VectorDouble& y, const EPowerPT& power) const;
 
   void prodLambdaOnSqrtTildeC(const VectorDouble& inv, VectorDouble& outv, double puis = 2) const;
-  double getMaxEigenValue() const override;
   MatrixSparse* getS() const { return _S; }
   MatrixSparse* getTildeCGrad(int iapex, int igparam) const;
   MatrixSparse* getSGrad(int iapex, int igparam) const;
@@ -91,6 +90,7 @@ public:
   // void multiplyByValueAndAddDiagonal(double v1 = 1.,double v2 = 0.) override;
 
 private:
+  double _getMaxEigenValue() const override;
   int _buildS(const AMesh* amesh, double tol = EPSILON10);
   int _buildSGrad(const AMesh* amesh, double tol = EPSILON10);
   void _buildLambda(const AMesh* amesh);

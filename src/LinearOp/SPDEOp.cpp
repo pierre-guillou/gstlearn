@@ -34,6 +34,7 @@ ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
   , _projOutKriging(projOutKriging)
   , _projOutSimu(projOutSimu == nullptr ? projOutKriging : projOutSimu)
   , _solver(nullptr)
+  , _verbose(false)
   , _ndat(0)
 {
   if (_projInKriging == nullptr) return;
@@ -379,7 +380,7 @@ VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
 std::pair<double, double> ASPDEOp::_computeRangeEigenVal() const
 {
   std::pair<double, double> result = _QKriging->rangeEigenValQ();
-  //result.second += getMaxEigenValProj();
+  // result.second += getMaxEigenValProj();
   return result;
 }
 
@@ -391,7 +392,8 @@ void ASPDEOp::_preparePoly(Chebychev& logPoly) const
   logPoly.setA(a);
   logPoly.setB(b);
   logPoly.setNcMax(1500);
-  logPoly.fit([](double val){return log(val);}, a, b, 2 * EPSILON4 / (a + b));
+  logPoly.fit([](double val)
+              { return log(val); }, a, b, 2 * EPSILON4 / (a + b));
 }
 
 double ASPDEOp::computeLogDetOp(int nbsimu) const
@@ -413,8 +415,8 @@ double ASPDEOp::computeLogDetOp(int nbsimu) const
 
 double ASPDEOp::computeQuadratic(const std::vector<double>& x) const
 {
-  _workdat1.resize(_getNDat());
-  vect w1s(_workdat1);
+  _workdat4.resize(_getNDat());
+  vect w1s(_workdat4);
   constvect xm(x);
   evalInvCov(xm, w1s);
   return VH::innerProduct(w1s, xm);
@@ -440,7 +442,12 @@ double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
   double a2 = computeLogDetQ(nMC);
   double a3 = computeLogDetInvNoise();
   law_set_random_seed(memo);
-
+  if (_verbose)
+  {
+    message("LogDet of Q + ADA': %lf\n", a1);
+    message("LogDet of Q: %lf\n", a2);
+    message("LogDet of InvNoise: %lf\n", a3);
+  }
   double result = TEST;
   if (!FFFF(a1) && !FFFF(a2) && !FFFF(a3)) result = a1 - a2 + a3;
   return result;

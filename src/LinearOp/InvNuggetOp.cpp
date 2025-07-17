@@ -18,14 +18,19 @@
 #include "Matrix/NF_Triplet.hpp"
 #include "Model/Model.hpp"
 #include "geoslib_define.h"
+#include <algorithm>
+#include <cmath>
+#include <numeric>
 
 namespace gstlrn
 {
 
-InvNuggetOp::InvNuggetOp(Db* dbin, Model* model, const SPDEParam& params)
+InvNuggetOp::InvNuggetOp(Db* dbin, Model* model, const SPDEParam& params, bool flagEigVals)
   : ASimulable()
   , _invNuggetMatrix(nullptr)
   , _logDeterminant(TEST)
+  , _rangeEigenVal(INF, 0.)
+  , _flagEigVals(flagEigVals)
 {
   _buildInvNugget(dbin, model, params);
 }
@@ -117,6 +122,25 @@ static int _loadPositions(int iech,
 }
 
 /**
+ * Compute the log det and update the range of eigenvalues
+ *
+ * @param sillsinv The inverse of the Nugget Effect matrix
+ * @return The log determinant of the inverse Nugget Effect matrix
+ */
+
+double InvNuggetOp::_updateQuantities(MatrixSymmetric& sillsinv)
+{
+  sillsinv.computeEigen();
+  auto eigenvals        = sillsinv.getEigenValues();
+  auto rangevals        = std::minmax_element(eigenvals.begin(), eigenvals.end());
+  _rangeEigenVal.first  = MIN(_rangeEigenVal.first, *rangevals.first);
+  _rangeEigenVal.second = MAX(_rangeEigenVal.second, *rangevals.second);
+  std::transform(eigenvals.begin(), eigenvals.end(), eigenvals.begin(), [](double x)
+                 { return std::log(x); });
+  return std::accumulate(eigenvals.begin(), eigenvals.end(), 0.);
+}
+
+/**
  * Build the inverse of the Nugget Effect matrix
  * It is established for:
  * - the number of variables defined in 'dbin' (and in 'Model')
@@ -151,7 +175,7 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
       break;
     }
   }
-  // If no Nugget Effect is defined, create a nugget to 
+  // If no Nugget Effect is defined, create a nugget to
   // integrate potential measurement error or minimum nugget
   if (!hasnugget)
   {
@@ -175,6 +199,10 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
   VectorVectorInt index1 = db->getSampleRanks(ivars);
   // 'cumul' counts the number of valid positions for all variables before 'ivar'
   VectorInt cumul = VH::cumulIncrement(index1);
+
+  size_t sizetot = VH::count(index1);
+  // Convert from triplet to sparse matrix
+  _invNuggetMatrix = std::make_shared<MatrixSparse>(sizetot, sizetot, nvar);
 
   // Check the various possibilities
   // - flag_verr: True if Variance of Measurement Error variable is defined
@@ -202,21 +230,20 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
   // Elaborate the Sill matrix for the Nugget Effect component
   MatrixSymmetric sillsRef = cova->getSill();
   int count                = (int)pow(2, nvar);
-  std::vector<MatrixSymmetric>  sillsInv(count);
+  std::vector<MatrixSymmetric> sillsInv(count);
 
   // Pre-calculate the inverse of the sill matrix (if constant)
 
+  std::vector<double> cacheLogDet;
   if (flag_constant)
   {
+    cacheLogDet.resize(count, 0.);
     // In case of (Unique) Variance of measurement error, patch sill matrix
     if (flag_verr) _addVerrConstant(sillsRef, verrDef);
 
     // Check that the diagonal of the Sill matrix is large enough
     _checkMinNugget(sillsRef, minNug);
   }
-
-  // Constitute the triplet
-  NF_Triplet NF_T;
 
   // Loop on the samples
   int rank;
@@ -238,11 +265,22 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
       {
         sillsInv[rank] = _buildSillPartialMatrix(sillsRef, nvar, ndef, identity);
         if (sillsInv[rank].invert() != 0) return;
+        if (_flagEigVals)
+        {
+          if (FFFF(_logDeterminant))
+            _logDeterminant = 0.;
+
+          cacheLogDet[rank] = _updateQuantities(sillsInv[rank]);
+        }
+      }
+      if (_flagEigVals)
+      {
+        _logDeterminant += cacheLogDet[rank];
       }
       for (int idef = 0; idef < ndef; idef++)
         for (int jdef = 0; jdef < ndef; jdef++)
-          NF_T.add(position[identity[idef]], position[identity[jdef]],
-                   sillsInv[rank].getValue(idef, jdef));
+          _invNuggetMatrix->setValue(position[identity[idef]], position[identity[jdef]],
+                                     sillsInv[rank].getValue(idef, jdef));
     }
     else
     {
@@ -275,16 +313,18 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
           local.setValue(idef, jdef, value);
         }
       if (local.invert() != 0) return;
-
+      if (_flagEigVals)
+      {
+        if (FFFF(_logDeterminant))
+          _logDeterminant = 0.;
+        _logDeterminant += _updateQuantities(local);
+      }
       for (int idef = 0; idef < ndef; idef++)
         for (int jdef = 0; jdef < ndef; jdef++)
-          NF_T.add(position[identity[idef]], position[identity[jdef]],
-                   local.getValue(idef, jdef));
+          _invNuggetMatrix->setValue(position[identity[idef]], position[identity[jdef]],
+                                     local.getValue(idef, jdef));
     }
   }
-
-  // Convert from triplet to sparse matrix
-  _invNuggetMatrix = std::shared_ptr<MatrixSparse>(MatrixSparse::createFromTriplet(NF_T));
 
   // Free the non-stationary specific allocation
   if (!hasnugget)
@@ -300,11 +340,13 @@ std::shared_ptr<MatrixSparse> buildInvNugget(Db* dbin, Model* model, const SPDEP
 double InvNuggetOp::computeLogDet(int nMC) const
 {
   DECLARE_UNUSED(nMC)
-  // TODO: we can probably optimize this by using Cholesky decomposition
-  // of each "individual" submatrix (i.e for each location)
-  // avoiding Cholesky of the full matrix
-  CholeskyDense cholesky(*_invNuggetMatrix);
-  return cholesky.computeLogDeterminant();
+
+  if (FFFF(_logDeterminant))
+  {
+    CholeskyDense cholesky(*_invNuggetMatrix);
+    return cholesky.computeLogDeterminant();
+  }
+  return _logDeterminant;
 }
 
 const MatrixSparse* InvNuggetOp::cloneInvNuggetMatrix() const

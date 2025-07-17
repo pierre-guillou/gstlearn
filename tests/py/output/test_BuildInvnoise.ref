@@ -4,18 +4,24 @@ Hetero without measurement error
 General Case
 Diff <  1e-13
 Diff logdet <  1e-13
+Diff min eigenvalue <  1e-13
+Diff max eigenvalue <  1e-13
 -----------------------------------------------------------------------
 Hetero with measurement errors (not the same for all the observations)
 -----------------------------------------------------------------------
 General Case
 Diff <  1e-13
 Diff logdet <  1e-13
+Diff min eigenvalue <  1e-13
+Diff max eigenvalue <  1e-13
 ----------------------------------------------------------------
 Hetero with the same measurement error for all the observations
 ----------------------------------------------------------------
 General Case
 Diff <  1e-13
 Diff logdet <  1e-13
+Diff min eigenvalue <  1e-13
+Diff max eigenvalue <  1e-13
 ------------------------------
 Iso without measurement error
 ------------------------------
@@ -24,12 +30,16 @@ Isotopic and Stationary and Measurement error identical:
 ---------------------------------------------------------
 Diff <  1e-13
 Diff logdet <  1e-13
+Diff min eigenvalue <  1e-13
+Diff max eigenvalue <  1e-13
 ----------------------------------------------------------------------
 Iso,  with measurement errors (not the same for all the observations)
 ----------------------------------------------------------------------
 General Case
 Diff <  1e-13
 Diff logdet <  1e-13
+Diff min eigenvalue <  1e-13
+Diff max eigenvalue <  1e-13
 -------------------------------------------------------------
 Iso,with the same measurement error for all the observations
 -------------------------------------------------------------
@@ -38,9 +48,13 @@ Isotopic and Stationary and Measurement error identical:
 ---------------------------------------------------------
 Diff <  1e-13
 Diff logdet <  1e-13
+Diff min eigenvalue <  1e-13
+Diff max eigenvalue <  1e-13
 ---------------------------------------------------------------------
 Iso,with the same measurement error for all the observations, nostat
 ---------------------------------------------------------------------
 General Case
 Diff <  1e-13
 Diff logdet <  1e-13
+Diff min eigenvalue <  1e-13
+Diff max eigenvalue <  1e-13

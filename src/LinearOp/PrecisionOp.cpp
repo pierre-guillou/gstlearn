@@ -168,6 +168,13 @@ PrecisionOp::~PrecisionOp()
   }
 }
 
+std::vector<double> PrecisionOp::evalInverse(const VectorDouble& vecin)
+{
+  std::vector<double> vecout(vecin.size());
+  constvect vecinconst(vecin);
+  evalInverse(vecinconst, vecout);
+  return vecout;
+}
 PrecisionOp* PrecisionOp::createFromShiftOp(AShiftOp* shiftop,
                                             const CovAniso* cova,
                                             bool verbose)
@@ -259,7 +266,7 @@ int PrecisionOp::_prepareChebychev(const EPowerPT& power) const
     { return pow(_polynomials[EPowerPT::ONE]->eval(val), -0.5); };
   }
 
-  chebMatern->fit(f, 0, b);
+  chebMatern->fit(f, 0, b, EPSILON6);
   _polynomials[power] = std::move(chebMatern);
   return 0;
 }
@@ -545,6 +552,7 @@ VectorDouble PrecisionOp::extractDiag() const
  * Compute the Logarithm of the Determinant
  * @param nMC Number of Monte-Carlo simulations
  * @return The computed value or TEST if problem
+ * 
  */
 double PrecisionOp::computeLogDet(int nMC) const
 {
@@ -552,28 +560,18 @@ double PrecisionOp::computeLogDet(int nMC) const
   VectorDouble result;
   gauss.resize(getSize());
   result.resize(getSize());
-
   double val1 = 0.;
   for (int isimu = 0; isimu < nMC; isimu++)
   {
     VH::simulateGaussianInPlace(gauss);
     vect results(result);
     if (_evalPoly(EPowerPT::LOG, gauss, results) != 0) return TEST;
-
-    for (int i = 0; i < getSize(); i++)
-    {
-      val1 += gauss[i] * result[i];
-    }
+    val1 += VH::innerProduct(gauss, result);   
   }
+
   val1 /= nMC;
 
-  double val2 = 0.;
-  for (const auto& e: _shiftOp->getLambdas())
-  {
-    val2 += log(e);
-  }
-  val1 += 2. * val2;
-
+  val1 += _shiftOp->logDetLambda();
   return val1;
 }
 } // namespace gstlrn

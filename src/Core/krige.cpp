@@ -3821,7 +3821,7 @@ int krigsampling_f(Db* dbin,
   if (FLAG_STD)
     aux4.resize(ntot, 0);
 
-  /* Get the vector of active data and substract the mean */
+  /* Get the vector of active data and subtract the mean */
 
   VectorDouble data = dbin->getColumnByLocator(ELoc::Z);
   for (i = 0; i < nutil; i++)

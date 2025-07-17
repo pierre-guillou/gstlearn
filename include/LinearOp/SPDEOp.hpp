@@ -88,6 +88,7 @@ public:
                                   const VectorDouble& driftCoeffs);
   static int centerDataByMeanVec(VectorDouble& Z,
                                  const VectorDouble& meanVec);
+  void setVerbose(bool v) { _verbose = v; }
 
 protected:
   int _addToDest(const constvect inv, vect outv) const override;
@@ -118,6 +119,7 @@ protected:
   const ProjMulti* const _projOutKriging;
   const ProjMulti* const _projOutSimu;
   ALinearOpCGSolver* _solver;
+  bool _verbose;
 
 private:
   int _ndat;

@@ -7,13 +7,16 @@ np.random.seed(1312)
 # %%
 # Nouvelle fonction renvoyant directement l'inverse de la matrice
 def computeNew(dat, model, debug=False):
-    invnug = gl.InvNuggetOp(dat,model)
+    param = gl.SPDEParam()
+    invnug = gl.InvNuggetOp(dat,model, param, True)
     mat = invnug.cloneInvNuggetMatrix()
-    logdet = invnug.computeLogDet()    
+    logdet = invnug.computeLogDet()
+    minval = invnug.getMinEigenValue()
+    maxval = invnug.getMaxEigenValue()    
     if debug:
         mat.display()
         
-    return mat, logdet
+    return mat, logdet, minval, maxval
 
 # %%
 #Fonction pour calculer l'inverse de la matrice de covariance correspondant au bruit. 
@@ -25,8 +28,9 @@ def computeRef(dat,model,debug=False):
     
     if debug:
         mat.display()
-    _ ,logdet = np.linalg.slogdet(mat.toTL()) 
-    return mat, logdet
+    _ ,logdet = np.linalg.slogdet(mat.toTL())
+    eigvals = np.linalg.eigvals(mat.toTL()) 
+    return mat, logdet, np.min(eigvals), np.max(eigvals)
 
 # %%
 #Renvoie un vecteur de bool indiquant pour chaque variable d'un échantillon donné
@@ -260,10 +264,10 @@ def testInvNoise(dat,model, debug=False):
     if dat == None:
         return
     
-    ref, logdetref = computeRef(dat,model, debug=debug)
+    ref, logdetref, minvalref, maxvalref = computeRef(dat,model, debug=debug)
     ref = ref.toTL()  # Convert to dense matrix for comparison
     
-    refnew,logdetnew = computeNew(dat, model, debug=debug)
+    refnew,logdetnew, minval, maxval = computeNew(dat, model, debug=debug)
     refnew = refnew.toTL()
     
     result = computeInvNoise(dat,model,True, debug=debug).toTL()
@@ -275,14 +279,28 @@ def testInvNoise(dat,model, debug=False):
         
     error = np.sum(np.abs(refnew.toarray()-ref))
     errorlogdet = np.abs(logdetnew - logdetref)
+    errormin = np.abs(minval - minvalref)
+    errormax = np.abs(maxval - maxvalref)
+    
     if error < 1e-13:
         print(f"Diff < ",1e-13)
     else: 
         print(f"Error",np.round(error,5))
+    
     if errorlogdet < 1e-13:
         print(f"Diff logdet < ",1e-13)
     else:
         print(f"Error logdet",np.round(errorlogdet,5))
+    
+    if errormin < 1e-13:
+        print(f"Diff min eigenvalue < ",1e-13)
+    else:
+        print(f"Error min eigenvalue",np.round(errormin,5))
+    
+    if errormax < 1e-13:
+        print(f"Diff max eigenvalue < ",1e-13)
+    else:
+        print(f"Error max eigenvalue",np.round(errormax,5))
 
 # %%
 ndat= 10

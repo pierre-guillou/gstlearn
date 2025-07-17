@@ -201,6 +201,7 @@ double PrecisionOpMultiConditional::computeTotalLogDet(int nMC, bool verbose, in
   double a3 = computeLogDetNoise();
   if (verbose)
   {
+    message("Message from PrecisionOpMultiConditional::computeTotalLogDet\n");
     message("LogDet of Q + ADA': %f\n", a1);
     message("LogDet of the precision operator: %f\n", a2);
     message("LogDet of noise operator: %f\n", a3);

@@ -56,12 +56,12 @@ public:
                           VectorDouble& y,
                           const EPowerPT& power) const;
   virtual ~AShiftOp();
-  virtual double getMaxEigenValue() const = 0;
+  virtual double getMaxEigenValue() const;
 
   virtual void normalizeLambdaBySills(const AMesh*) = 0;
   const VectorDouble& getLambdas() const { return _Lambda; }
   virtual double getLambda(int iapex) const { return _Lambda[iapex]; }
-
+  virtual double logDetLambda() const;
   static std::shared_ptr<CovAniso> cloneAndCast(const CovAniso* cova);
   static std::shared_ptr<CovAniso> cloneAndCast(const std::shared_ptr<CovAniso> &cova);
   int getSize() const override { return _napices; }
@@ -76,6 +76,8 @@ public:
     int _addToDest(const constvect inv, vect outv) const override = 0;
 #endif
 
+private:
+    virtual double _getMaxEigenValue() const = 0;
 protected:
     std::shared_ptr<CovAniso>& _getCovAniso();
     void _setCovAniso(const CovAniso* cova);

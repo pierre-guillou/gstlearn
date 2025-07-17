@@ -1112,6 +1112,18 @@ namespace gstlrn {
   }
 }
 
+%typemap(in) const std::shared_ptr<const gstlrn::MatrixSparse> & {
+  gstlrn::MatrixSparse* ptr = nullptr;
+  int res = SWIG_ConvertPtr($input, (void**)&ptr, SWIGTYPE_p_gstlrn__MatrixSparse, 0);
+
+  if (SWIG_IsOK(res) && ptr != nullptr) {
+    *$1 = std::shared_ptr<const gstlrn::MatrixSparse>(ptr);
+  } else {
+    SWIG_exception_fail(SWIG_TypeError, "Expected MatrixSparse object");
+  }
+}
+
 %include <std_shared_ptr.i>
 %template(ASpaceSharedPtr)    std::shared_ptr<const gstlrn::ASpace>;
 %template(ASpaceSharedPtrVector)   std::vector< gstlrn::ASpaceSharedPtr>;
+%template(MatrixSparseSh) std::shared_ptr<const gstlrn::MatrixSparse >;

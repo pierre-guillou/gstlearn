@@ -1376,6 +1376,8 @@ double logLikelihoodSPDE(Db* dbin,
     spdeop->setTolerance(params.getCGparams().getEps());
   }
 
+  spdeop->setVerbose(verbose);
+
   // Calculating the drift coefficient (optional) and Centering the Data
   VectorDouble driftCoeffs = _centerDataByDriftInPlace(spdeop, dbin, model, Z);
 
