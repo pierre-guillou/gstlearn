@@ -309,7 +309,7 @@ static void st_file_close(FILE* file)
 static FILE* st_file_open(const char* filename,
                           const char* filetype,
                           int mode,
-                          int verbose)
+                          bool verbose)
 {
   FILE* file;
   char idtype[LONG_SIZE];
@@ -365,7 +365,7 @@ static FILE* st_file_open(const char* filename,
  ** \param[in] verbose    Verbose option if the file cannot be opened
  **
  *****************************************************************************/
-void ascii_environ_read(char* file_name, int verbose)
+void ascii_environ_read(char* file_name, bool verbose)
 
 {
   FILE* file;
@@ -407,7 +407,7 @@ label_end:
  **
  *****************************************************************************/
 void ascii_simu_read(char* file_name,
-                     int verbose,
+                     bool verbose,
                      int* nbsimu,
                      int* nbtuba,
                      int* seed)
@@ -452,7 +452,7 @@ void ascii_simu_read(char* file_name,
  **
  *****************************************************************************/
 int ascii_option_defined(const char* file_name,
-                         int verbose,
+                         bool verbose,
                          const char* option_name,
                          int type,
                          void* answer)
@@ -523,7 +523,7 @@ label_end:
  *****************************************************************************/
 Db* db_read_csv(const char* file_name,
                 const CSVformat& csvfmt,
-                int verbose,
+                bool verbose,
                 int ncol_max,
                 int nrow_max,
                 bool flagAddSampleRank)
@@ -561,4 +561,4 @@ Db* db_read_csv(const char* file_name,
 label_end:
   return (db);
 }
-}
+} // namespace gstlrn
