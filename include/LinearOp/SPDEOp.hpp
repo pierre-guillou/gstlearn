@@ -132,7 +132,7 @@ private:
   mutable VectorDouble _rhs;
   mutable VectorDouble _workmesh;
 };
-}
+
 
 /****************************************************************************/
 
