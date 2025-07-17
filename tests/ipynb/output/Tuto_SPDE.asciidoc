@@ -114,7 +114,7 @@ Data Base Summary
 -----------------
 File is organized as a regular grid
 Space dimension              = 2
-Number of Columns            = 5
+Number of Columns            = 6
 Total number of samples      = 2500
 
 Grid characteristics:
@@ -133,7 +133,15 @@ Data Base Statistics
  Mean value          =     -0.121
  Standard Deviation  =      1.007
  Variance            =      1.014
-5 - Name spde.spde.estim - Locator z1
+5 - Name spde.spde.estim - Locator NA
+ Nb of data          =       2500
+ Nb of active values =       2500
+ Minimum value       =     -2.554
+ Maximum value       =      2.025
+ Mean value          =     -0.137
+ Standard Deviation  =      0.885
+ Variance            =      0.783
+6 - Name spde.spde.estim.1 - Locator z1
  Nb of data          =       2500
  Nb of active values =       2500
  Minimum value       =     -2.554
@@ -148,7 +156,8 @@ Column = 0 - Name = rank - Locator = NA
 Column = 1 - Name = x1 - Locator = x1
 Column = 2 - Name = x2 - Locator = x2
 Column = 3 - Name = spde - Locator = NA
-Column = 4 - Name = spde.spde.estim - Locator = z1
+Column = 4 - Name = spde.spde.estim - Locator = NA
+Column = 5 - Name = spde.spde.estim.1 - Locator = z1
 ----
 
 
@@ -182,6 +191,7 @@ Value for MU = -0.063
 ----
 Quadratic (manual)  = 1118.4871
 Quadratic (api-old) = 1118.4871
+Quadratic free (api-old) = 1118.487
 -> Relative difference quadratic = 0.0%
 ----
 
@@ -216,6 +226,7 @@ Quadratic term  = 1118.4871
 
 #NO_DIFF#XXX
 ----
+Message from PrecisionOpMultiConditional::computeTotalLogDet
 LogDet of Q + ADA': 12296.938911
 LogDet of the precision operator: 11255.715075
 LogDet of noise operator: -2302.585093
@@ -232,6 +243,9 @@ Log-likelihood  = -847.501461
 
 #NO_DIFF#XXX
 ----
+LogDet of Q + ADA': 12296.938911
+LogDet of Q: 11255.715075
+LogDet of InvNoise: -2302.585093
 Likelihood calculation:
 Nb. active samples = 1000
 Nb. Monte-Carlo    = 100
@@ -245,12 +259,32 @@ Log-likelihood     = -847.501461
 
 #NO_DIFF#XXX
 ----
+LogDet of Q + ADA': 11569.018180
+
+LogDet of Q: 11585.782711
+LogDet of InvNoise: -2302.585093
 Likelihood calculation:
 Nb. active samples = 1000
 Nb. Monte-Carlo    = 100
 Cholesky           = 0
-Log-Determinant    = -28482.843404
-Quadratic term     = -9157.277613
-Log-likelihood     = 17901.121975
--> likelihood by New API with cholesky=0 17901.122
+Log-Determinant    = -2319.349624
+Quadratic term     = 1118.821242
+Log-likelihood     = -318.674342
+-> likelihood by New API with cholesky=0 (stencil True) -318.6743
+----
+
+
+#NO_DIFF#XXX
+----
+LogDet of Q + ADA': 12455.819068
+LogDet of Q: 11170.021460
+LogDet of InvNoise: -2302.585093
+Likelihood calculation:
+Nb. active samples = 1000
+Nb. Monte-Carlo    = 100
+Cholesky           = 0
+Log-Determinant    = -1016.787485
+Quadratic term     = 1118.782812
+Log-likelihood     = -969.936197
+-> likelihood by New API with cholesky=0 (stencil False) -969.9362
 ----
