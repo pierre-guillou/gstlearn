@@ -173,6 +173,7 @@ int CalcGlobal::_globalKriging()
   // must be corrected (C00 -> Cvv) to pass to a correct Territory variance
   // of estimation
   double c00 = Sigma00.getValue(0, 0);
+  wgt        = algebra.getLambda()->getColumn(_ivar0);
 
   /* Preliminary checks */
 
@@ -356,4 +357,4 @@ Global_Result global_kriging(Db* dbin,
   return gres;
 }
 
-}
+} // namespace gstlrn

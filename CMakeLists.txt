@@ -8,7 +8,7 @@ project(gstlearn
         HOMEPAGE_URL "https://gstlearn.org"
         LANGUAGES    C CXX) # Enable C language for third party libraries
 # Use one of the following lines if you want to deliver a pre-release
-set (PROJECT_VERSION_SUFFIX a2)  # Alpha (new feature not yet stable)
+set (PROJECT_VERSION_SUFFIX a3)  # Alpha (new feature not yet stable)
 #set (PROJECT_VERSION_SUFFIX b1)  # Beta (new feature finished to be tested)
 #set (PROJECT_VERSION_SUFFIX rc1) # Release Candidate (only small bugs to be fixed before the release)
 
@@ -140,3 +140,6 @@ endif()
 
 add_subdirectory(doc/demo)
 add_subdirectory(doc/courses)
+
+# Force generation of compilation database (for clangd LSP server)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

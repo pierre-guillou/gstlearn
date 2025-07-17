@@ -17,10 +17,11 @@
 
 
 // Classe intermédiaire générique utilisant Boost.Autodiff
+namespace gstlrn {
 template <typename Derived>
-class ACovFuncWithAutoDiff : public gstlrn::ACovFunc {
+class ACovFuncWithAutoDiff : public ACovFunc {
 public:
-    ACovFuncWithAutoDiff(const gstlrn::ECov& type, const gstlrn::CovContext& ctxt)
+    ACovFuncWithAutoDiff(const ECov& type, const CovContext& ctxt)
         : ACovFunc(type, ctxt) {}
     ACovFuncWithAutoDiff(const ACovFuncWithAutoDiff &r)
         : ACovFunc(r) {}
@@ -52,3 +53,4 @@ protected:
         return static_cast<const Derived*>(this)->evalImpl(h);
     }
 };
+}

@@ -519,7 +519,7 @@ int db_write_csv(Db* db,
  *****************************************************************************/
 int csv_table_read(const String& filename,
                    const CSVformat& csvfmt,
-                   int verbose,
+                   bool verbose,
                    int ncol_max,
                    int nrow_max,
                    int* ncol_arg,

@@ -132,7 +132,8 @@ private:
   mutable VectorDouble _rhs;
   mutable VectorDouble _workmesh;
 };
-} // namespace gstlrn
+}
+
 /****************************************************************************/
 
 class GSTLEARN_EXPORT SPDEOp: public ASPDEOp,
@@ -156,6 +157,8 @@ public:
   }
   virtual ~SPDEOp() = default;
 };
+
+} // namespace gstlrn
 
 #ifndef SWIG
 DECLARE_EIGEN_PRODUCT(SPDEOp)

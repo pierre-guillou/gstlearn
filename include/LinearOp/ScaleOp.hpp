@@ -19,11 +19,13 @@ DECLARE_EIGEN_TRAITS(ScaleOp)
 #include "LinearOp/ALinearOp.hpp"
 #endif
 
+namespace gstlrn {
+
 class GSTLEARN_EXPORT ScaleOp:
 #ifndef SWIG
-  public gstlrn::ALinearOpEigenCG<ScaleOp>
+  public ALinearOpEigenCG<ScaleOp>
 #else
-  public gstlrn::ALinearOp
+  public ALinearOp
 #endif
 {
 
@@ -35,13 +37,15 @@ public:
 
 #ifndef SWIG
 protected:
-  int _addToDest(const constvect inv, vect outv) const override;
+  int _addToDest(const gstlrn::constvect inv, gstlrn::vect outv) const override;
 #endif
 
 private:
   int _n;
   double _scale;
 };
+
+} // namespace gstlrn
 
 #ifndef SWIG
 DECLARE_EIGEN_PRODUCT(ScaleOp)

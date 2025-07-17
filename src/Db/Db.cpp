@@ -132,7 +132,7 @@ int Db::resetFromCSV(const String& filename,
 
   /* Reading the CSV file */
 
-  if (csv_table_read(filename, csvfmt, (int)verbose, ncol_max, nrow_max,
+  if (csv_table_read(filename, csvfmt, verbose, ncol_max, nrow_max,
                      &ncol, &nrow, names, tab) != 0)
   {
     messerr("Problem when reading CSV file");

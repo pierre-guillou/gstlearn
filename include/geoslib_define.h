@@ -21,6 +21,8 @@
 #else
 #  include <span>
 #endif
+namespace gstlrn
+{
 typedef std::string String;
 typedef unsigned char UChar;
 
@@ -53,12 +55,12 @@ typedef unsigned char UChar;
 // This function must be:
 // - declared in rgstlearn.i or pygstlearn.i
 // - be called as 'classname'_toTL
-#define DECLARE_TOTL                                        \
-  inline void toTL() const                                  \
-  {                                                         \
-    gstlrn::messerr("Not implemented yet (missing dependencies?)"); \
-  };\
-   // namespace gstlrn
+#define DECLARE_TOTL                                                \
+  inline void toTL() const                                          \
+  {                                                                 \
+    messerr("Not implemented yet (missing dependencies?)"); \
+  };
+
 // No need to this stuff through SWIG (using target language NAs)
 // => Not really : Using customized SWIG 4.2.0b, TEST is often a default argument value!
 // #ifndef SWIG
@@ -193,3 +195,4 @@ using vectint      = std::span<int>;
 #  define FORWARD_METHOD_NON_CONST(obj, name, ...)
 
 #endif
+} // namespace gstlrn

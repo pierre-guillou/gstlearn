@@ -12,14 +12,15 @@
 
 #include "gstlearn_export.hpp"
 
-namespace gstlrn {
+namespace gstlrn
+{
 GSTLEARN_EXPORT void ascii_study_define(const char* study);
-GSTLEARN_EXPORT void ascii_environ_read(char* file_name, int verbose);
+GSTLEARN_EXPORT void ascii_environ_read(char* file_name, bool verbose);
 GSTLEARN_EXPORT void ascii_filename(const char* type, int rank, int mode, char* filename);
-GSTLEARN_EXPORT void ascii_simu_read(char* file_name, int verbose, int* nbsimu, int* nbtuba, int* seed);
+GSTLEARN_EXPORT void ascii_simu_read(char* file_name, bool verbose, int* nbsimu, int* nbtuba, int* seed);
 GSTLEARN_EXPORT int ascii_option_defined(const char* file_name,
-                                         int verbose,
+                                         bool verbose,
                                          const char* option_name,
                                          int type,
                                          void* answer);
-}
+} // namespace gstlrn
