@@ -644,29 +644,6 @@ static void st_qchol_filter(const char* title, int auth)
 
 /****************************************************************************/
 /*!
- **  Print information on the Sparse matrix and its cholesky decomposition
- **
- ** \param[in]  title   Optional title
- ** \param[in]  QC      Pointer to the QChol structure
- **
- *****************************************************************************/
-static void st_qchol_print(const char* title, QChol* QC)
-{
-  int nrows, ncols, count;
-  double percent;
-
-  if (QC == nullptr) return;
-
-  if (title != NULL) message("%s\n", title);
-  cs_rowcol(QC->Q->getCS(), &nrows, &ncols, &count, &percent);
-  message("- Nrows(%d) x Ncols(%d) - Non-zeros(%d) [%6.2lf (percent)]", nrows,
-          ncols, count, percent);
-  if (QC->S != NULL || QC->N != NULL) message(" (Cholesky)");
-  message("\n");
-}
-
-/****************************************************************************/
-/*!
  **  Construct the sparse matrix Q from another sparse matrix
  **
  ** \return The Q structure or NULL
@@ -738,7 +715,6 @@ static QChol* st_extract_QC_from_Q(const char* title,
     message("Extracting a part of Q for '%s'\n", title);
     st_qchol_filter("- Row authorization code   ", row_auth);
     st_qchol_filter("- Column authorization code", col_auth);
-    st_qchol_print(NULL, QC);
   }
 
   /* Set the error return code */
@@ -834,18 +810,16 @@ QChol* qchol_manage(int mode, QChol* QC)
   switch (mode)
   {
     case 1: /* Allocation */
-      QC    = (QChol*)mem_alloc(sizeof(QChol), 1);
-      QC->Q = nullptr;
-      QC->S = nullptr;
-      QC->N = nullptr;
+      QC       = (QChol*)mem_alloc(sizeof(QChol), 1);
+      QC->Q    = nullptr;
+      QC->chol = nullptr;
       break;
 
     case -1: /* Total deallocation */
       if (QC == nullptr) return (QC);
       delete QC->Q;
-      QC->S = cs_sfree2(QC->S);
-      QC->N = cs_nfree2(QC->N);
-      QC    = (QChol*)mem_free((char*)QC);
+      delete QC->chol;
+      QC = (QChol*)mem_free((char*)QC);
       break;
   }
   return (QC);
@@ -1986,7 +1960,7 @@ static int st_kriging_cholesky(QChol* QC,
 
   /* Prepare Cholesky decomposition (if not already performed) */
 
-  if (QC->S == nullptr)
+  if (!is_chol_ready(QC))
   {
     if (qchol_cholesky(VERBOSE, QC)) return (1);
   }
@@ -2029,7 +2003,7 @@ static int st_filter(double* work, double* y)
 
   /* Prepare Cholesky decomposition (if not already performed) */
 
-  if (QC->S == nullptr)
+  if (!is_chol_ready(QC))
   {
     if (qchol_cholesky(VERBOSE, QC)) return (1);
   }
@@ -3645,7 +3619,7 @@ static int st_simulate_cholesky(QChol* QC, VectorDouble& work, VectorDouble& zsn
 
   /* Prepare Cholesky decomposition (if not already performed) */
 
-  if (QC->S == nullptr)
+  if (!is_chol_ready(QC))
   {
     if (qchol_cholesky(VERBOSE, QC)) return (1);
   }

@@ -540,7 +540,8 @@ int MatrixDense::_terminateEigen(const Eigen::VectorXd& eigenValues,
 
   _eigenVectors = MatrixSquare::createFromVD(vec, nrows, false, changeOrder);
 
-  if (optionPositive) _eigenVectors->makePositiveColumn();
+  if (optionPositive)
+    _eigenVectors->makePositiveColumn();
 
   return 0;
 }

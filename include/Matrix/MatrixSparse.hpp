@@ -281,6 +281,20 @@ private:
                        VectorInt& colors,
                        VectorInt& temp) const;
 
+                       public:
+#ifndef SWIG
+
+public:
+  Eigen::Ref<const Eigen::SparseMatrix<double>> getEigenMat() const
+  {
+    return Eigen::Ref<const Eigen::SparseMatrix <double>>(_eigenMatrix);
+  }
+  Eigen::Ref<Eigen::SparseMatrix<double>> getEigenMat()
+  {
+    return Eigen::Ref<Eigen::SparseMatrix<double>>(_eigenMatrix);
+  }
+#endif
+
 private:
 #ifndef SWIG
   cs* _csMatrix;                            // Classical storage for Sparse matrix

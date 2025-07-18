@@ -14,15 +14,15 @@
 #include "LinearOp/ASimulable.hpp"
 #include "gstlearn_export.hpp"
 
-#include "Basic/VectorT.hpp"
-#include "Model/Model.hpp"
-#include "LinearOp/PrecisionOp.hpp"
-#include "LinearOp/CholeskyDense.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Basic/VectorT.hpp"
+#include "LinearOp/CholeskyDense.hpp"
+#include "LinearOp/PrecisionOp.hpp"
+#include "Model/Model.hpp"
 #include <vector>
 
-#define IND(i,j,nvar) j * nvar + i - (j * (j + 1))/2
+#define IND(i, j, nvar) j* nvar + i - (j * (j + 1)) / 2
 
 namespace gstlrn
 {
@@ -35,7 +35,7 @@ class ASimulable;
 /**
  * Class to store objects for SPDE
  */
-class GSTLEARN_EXPORT PrecisionOpMulti : public AStringable, public ASimulable
+class GSTLEARN_EXPORT PrecisionOpMulti: public AStringable, public ASimulable
 {
 public:
   PrecisionOpMulti(Model* model               = nullptr,
@@ -70,7 +70,6 @@ protected:
   int _getNMesh() const;
 
 private:
-
   bool _checkReady() const;
   virtual void _buildQop(bool stencil = false);
   bool _isValidModel(Model* model);
@@ -92,9 +91,9 @@ protected:
   std::vector<VectorVectorDouble> _invCholSillsNoStat;
   std::vector<VectorVectorDouble> _cholSillsNoStat;
   std::vector<CholeskyDense> _invCholSillsStat; // Stationary Sills
-  std::vector<CholeskyDense> _cholSillsStat; // Cholesky of the Sills
-  Model* _model; // Not to be deleted. TODO : make it const
-  std::vector<const AMesh*> _meshes; // Not to be deleted
+  std::vector<CholeskyDense> _cholSillsStat;    // Cholesky of the Sills
+  Model* _model;                                // Not to be deleted. TODO : make it const
+  std::vector<const AMesh*> _meshes;            // Not to be deleted
   int _size;
 
 private:
@@ -108,4 +107,4 @@ private:
   mutable VectorVectorDouble _works;
   mutable VectorDouble _workTot;
 };
-}
+} // namespace gstlrn

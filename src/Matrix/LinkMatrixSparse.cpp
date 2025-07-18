@@ -55,46 +55,6 @@ cs* cs_spfree2(cs* A)
 {
   return cs_spfree(A);
 }
-css* cs_sfree2(css* S)
-{
-  return cs_sfree(S);
-}
-csn* cs_nfree2(csn* N)
-{
-  return cs_nfree(N);
-}
-void cs_force_dimension(cs* T, int nrow, int ncol)
-{
-  if (cs_get_nrow(T) > nrow)
-    messageAbort("Forcing CS dimension: NRows current(%d) is larger than forecast(%d)",
-                 cs_get_nrow(T), nrow);
-  if (cs_getncol(T) > ncol)
-    messageAbort("Forcing CS dimension: NCols current(%d) is larger than forecast(%d)",
-                 cs_getncol(T), ncol);
-  T->m = nrow;
-  T->n = ncol;
-}
-
-/* Transform VectorDouble to cs diagonal */
-cs* cs_diag(VectorDouble diag, double tol)
-{
-  int number = (int)diag.size();
-
-  cs* Striplet = cs_spalloc(0, 0, 1, 1, 1);
-  for (int i = 0; i < number; i++)
-  {
-    if (ABS(diag[i]) < tol) continue;
-    if (!cs_entry(Striplet, i, i, diag[i]))
-    {
-      return nullptr;
-    }
-  }
-
-  cs_force_dimension(Striplet, number, number);
-  cs* Q = cs_triplet(Striplet);
-  cs_spfree(Striplet);
-  return Q;
-}
 
 /****************************************************************************/
 /*!
@@ -137,8 +97,6 @@ static void st_selection_update(int ncur, double* sel, const int* indCo)
 int qchol_cholesky(int verbose, QChol* QC)
 
 {
-  int nmax = 8;
-
   /* Check that the Q matrix has already been defined */
 
   if (QC->Q == nullptr) return (1);
@@ -153,31 +111,20 @@ int qchol_cholesky(int verbose, QChol* QC)
     return (1);
   }
 
-  /* Perform the Cholesky decomposition */
-
   if (verbose) message("  Cholesky Decomposition... ");
 
-  if (QC->S == nullptr)
+  // Perform the Cholesky decomposition (new style)
+
+  if (QC->chol == nullptr)
   {
-    if (verbose) message("Ordering... ");
-    QC->S = cs_schol(QC->Q->getCS(), 0);
-    if (QC->S == nullptr)
+    QC->chol = new CholeskySparse(QC->Q);
+    if (QC->chol == nullptr)
     {
-      messerr("Error in cs_schol function");
+      messerr("Error in Cholesky decompostion (new version)");
       goto label_err;
     }
   }
 
-  if (QC->N == nullptr)
-  {
-    if (verbose) message("Factorization... ");
-    QC->N = cs_chol(QC->Q->getCS(), QC->S);
-    if (QC->N == nullptr)
-    {
-      messerr("Error in cs_chol function");
-      goto label_err;
-    }
-  }
   if (verbose) message("Finished\n");
 
   /* Optional printout */
@@ -191,11 +138,13 @@ int qchol_cholesky(int verbose, QChol* QC)
   return (0);
 
 label_err:
-  if (verbose)
-    cs_print_nice("Cholesky Decomposition of QC", QC->Q->getCS(), nmax, nmax);
-  QC->N = cs_nfree(QC->N);
-  QC->S = cs_sfree(QC->S);
+  delete QC->chol;
   return (1);
+}
+
+bool is_chol_ready(QChol* QC)
+{
+  return QC->chol != nullptr;
 }
 
 /****************************************************************************/
@@ -381,20 +330,6 @@ static cs_MG* st_monogrid_manage(int mode, cs_MG* mg)
 
 /****************************************************************************/
 /*!
- **  Print the path
- **
- *****************************************************************************/
-static void st_path_print(int nlevels, int npath, int* path)
-{
-  if (npath == 0) return;
-  message("MultiGrid Path =");
-  for (int i = 0; i < npath; i++)
-    message(" %d", path[i]);
-  message(" -> Number of levels = %d\n", nlevels);
-}
-
-/****************************************************************************/
-/*!
  **  Allocate the structure for the multigrid manipulation
  **
  ** \param[in]  mgs     cs_MGS structure
@@ -430,41 +365,6 @@ cs_MGS* cs_multigrid_manage(cs_MGS* mgs, int mode, int nlevels, int path_type)
     mgs     = (cs_MGS*)mem_free((char*)mgs);
   }
   return (mgs);
-}
-
-/****************************************************************************/
-/*!
- **  Print one cs_MG structure
- **
- *****************************************************************************/
-static void st_mg_print(cs_MGS* mgs, int rank)
-{
-  cs_MG* mg;
-
-  mg = mgs->mg[rank];
-  mestitle(2, "Contents of the MG structure for level %d", rank);
-  if (mg->nh > 0 && mg->nH > 0)
-    message("Transition between %d and %d vertices\n", mg->nh, mg->nH);
-  if (mg->IhH != NULL) cs_print_range("Range of IhH", mg->IhH->getCS());
-  if (mg->A != NULL) cs_print_range("Range of A", mg->A->Q->getCS());
-  if (mg->sumrow != NULL)
-    print_range("Range of sumrow", mg->nh, mg->sumrow, NULL);
-}
-
-/****************************************************************************/
-/*!
- **  Print the cs_MGS structure
- **
- ** \param[in] mgs     cs_MGS structure
- **
- *****************************************************************************/
-void cs_multigrid_print(cs_MGS* mgs)
-{
-  mestitle(1, "Multigrid Levels");
-  st_path_print(mgs->nlevels, mgs->npath, mgs->path);
-  print_range("Range of diag", mgs->ncur, mgs->diag, NULL);
-  for (int i = 0; i <= mgs->nlevels; i++)
-    st_mg_print(mgs, i);
 }
 
 /****************************************************************************/
@@ -694,10 +594,6 @@ int cs_multigrid_setup(cs_MGS* mgs,
     }
   }
 
-  // Optional printout
-
-  if (verbose) cs_multigrid_print(mgs);
-
   // Set the error return code
 
   if (flag_sel) *sel_arg = sel;
@@ -715,20 +611,22 @@ label_end:
  **  Inversion using Cholesky
  **
  ** \param[in]  qctt     Qchol structure
- ** \param[in,out]  xcr Current vector
- ** \param[in]  rhs     Current R.H.S. vector
+ ** \param[in,out]  xcr  Current vector
+ ** \param[in]  rhs      Current R.H.S. vector
  **
  ** \param[out] work     Working array
  **
  *****************************************************************************/
-void cs_chol_invert(QChol* qctt, double* xcr, double* rhs, double* work)
+void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work)
 {
+  DECLARE_UNUSED(work);
   if (DEBUG) message("Cholesky Inversion\n");
   int n = qctt->Q->getNCols();
-  cs_ipvec(n, qctt->S->Pinv, rhs, work);
-  cs_lsolve(qctt->N->L, work);
-  cs_ltsolve(qctt->N->L, work);
-  cs_pvec(n, qctt->S->Pinv, work, xcr);
+
+  VectorDouble rhsVD(n);
+  for (int i = 0; i < n; i++) rhsVD[i] = rhs[i];
+  VectorDouble xcrVD = qctt->chol->solveX(rhsVD);
+  for (int i = 0; i < n; i++) xcr[i] = xcrVD[i];
 }
 
 /****************************************************************************/
@@ -741,12 +639,16 @@ void cs_chol_invert(QChol* qctt, double* xcr, double* rhs, double* work)
  ** \param[out] work     Working array
  **
  *****************************************************************************/
-void cs_chol_simulate(QChol* qctt, double* simu, double* work)
+void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
 {
   if (DEBUG) message("Cholesky Simulation\n");
   int n = qctt->Q->getNCols();
-  cs_ltsolve(qctt->N->L, work);
-  cs_pvec(n, qctt->S->Pinv, work, simu);
+
+  VectorDouble simuVD(n);
+  VectorDouble workVD(n);
+  for (int i = 0; i < n; i++) workVD[i] = work[i];
+  (void)qctt->chol->addSimulateToDest(workVD, simuVD);
+  for (int i = 0; i < n; i++) simu[i] = simuVD[i];
 }
 
 /****************************************************************************/
@@ -1923,7 +1825,6 @@ int cs_coarsening(const cs* Q, int type, int** indCo_ret, cs** L_ret)
   if (st_coarse_typen(L, Lt, type, indUd, indFi, indCo)) goto label_end;
 
   /* Set the error return code */
-
   error = 0;
 
 label_end:

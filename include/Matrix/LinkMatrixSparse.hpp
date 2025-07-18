@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "LinearOp/CholeskySparse.hpp"
 #include "gstlearn_export.hpp"
 
 #include "Basic/VectorNumT.hpp"
@@ -20,17 +21,13 @@ namespace gstlrn
 {
 class MatrixSparse;
 class cs;
-class css;
-class csn;
-class csd;
 class NF_Triplet;
 
 class GSTLEARN_EXPORT QChol
 {
 public:
   MatrixSparse* Q;
-  css* S;
-  csn* N;
+  CholeskySparse* chol;
 };
 
 class GSTLEARN_EXPORT cs_MG
@@ -63,8 +60,6 @@ public:
 
 /// TODO : cs_*2 functions to be removed (encapsulation)
 GSTLEARN_EXPORT cs* cs_spfree2(cs* A);
-GSTLEARN_EXPORT css* cs_sfree2(css* S);
-GSTLEARN_EXPORT csn* cs_nfree2(csn* N);
 
 GSTLEARN_EXPORT void cs_vector_xM(const cs* A, int nout, const double* x, double* y);
 GSTLEARN_EXPORT void cs_mulvec_uptri(const cs* A, int nout, const double* x, double* y, int flag_diag);
@@ -77,21 +72,18 @@ GSTLEARN_EXPORT void cs_print_nice(const char* title, const cs* A, int maxrow = 
 GSTLEARN_EXPORT void cs_print_dim(const char* title, const cs* A);
 GSTLEARN_EXPORT void cs_print_file(const char* radix, int rank, const cs* A);
 
-GSTLEARN_EXPORT void cs_force_dimension(cs* T, int nrow, int ncol);
-GSTLEARN_EXPORT cs* cs_diag(VectorDouble diag, double tol = EPSILON10);
-
 GSTLEARN_EXPORT int cs_lsolve_lowtri(const cs* L, const double* x, double* y);
 GSTLEARN_EXPORT int cs_lsolve_uptri(const cs* L, const double* x, double* y);
 
 // Qchol operations
+GSTLEARN_EXPORT bool is_chol_ready(QChol* QC);
 GSTLEARN_EXPORT int qchol_cholesky(int verbose, QChol* QC);
-GSTLEARN_EXPORT void cs_chol_invert(QChol* qctt, double* xcr, double* rhs, double* work);
-GSTLEARN_EXPORT void cs_chol_simulate(QChol* qctt, double* simu, double* work);
+GSTLEARN_EXPORT void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work);
+GSTLEARN_EXPORT void cs_chol_simulate(QChol* qctt, double* simu, const double* work);
 
 // Multigrid operations
 GSTLEARN_EXPORT cs_MGS* cs_multigrid_manage(cs_MGS* mgs, int mode, int nlevels, int path_type);
 GSTLEARN_EXPORT void cs_multigrid_params(cs_MGS* mgs, int flag_cg, int type_coarse, int ngc, int nmg, int ngs, double tolcg, double tolnmg);
-GSTLEARN_EXPORT void cs_multigrid_print(cs_MGS* mgs);
 GSTLEARN_EXPORT int cs_multigrid_setup(cs_MGS* mgs, QChol* Qctt, int flag_sel, int verbose, double** sel);
 GSTLEARN_EXPORT int cs_multigrid_process(cs_MGS* mgs, QChol* qctt, int verbose, double* x, double* b, double* work);
 
