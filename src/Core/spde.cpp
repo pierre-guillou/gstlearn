@@ -122,7 +122,6 @@ typedef struct
   bool flag_modif;      /* Post-processing simulations */
   bool flag_onechol;    /* Perform Simu & Kriging with same Chol */
   bool flag_filnug;     /* Filtering the Nugget Effect */
-  bool flag_mgrid;      /* Use the Multigrid option */
   bool flag_several;    /* Perform Kriging in iterative mode */
   bool simu_chol;       /* Use Cholesky simulation */
   bool simu_cheb;       /* Use Chebychev simulation */
@@ -218,7 +217,6 @@ static void st_matelem_print(int icov)
   message("QCov are defined:  %s\n", NOK[Matelem.QCov != NULL]);
   message("Lambda is defined: %s\n", NOK[!Matelem.Lambda.empty()]);
   message("qsimu is defined:  %s\n", NOK[Matelem.qsimu != NULL]);
-  message("mgs is defined:    %s\n", NOK[Matelem.mgs != NULL]);
   message("s_cheb is defined: %s\n", NOK[Matelem.s_cheb != NULL]);
   message("s_mesh is defined: %s\n", NOK[Matelem.amesh != NULL]);
 }
@@ -352,51 +350,6 @@ static void st_environ_init(void)
     SS->BheteroD = nullptr;
     SS->BheteroT = nullptr;
   }
-}
-
-/****************************************************************************/
-/*!
- **  Manage the Multigrid solving operations
- **
- ** \return  Error return code
- **
- ** \param[in]  mode       1 for allocation; -1 for deallocation
- ** \param[in]  mgs        cs_MGS to be freed (only for mode=-1)
- **
- *****************************************************************************/
-static cs_MGS* st_mgs_manage(int mode, cs_MGS* mgs)
-{
-  int nlevels, path_type, flag_cg, ngc, nmg, ngs, type_coarse;
-  double tolcg, tolnmg;
-
-  /* Dispatch */
-
-  if (mode > 0)
-  {
-
-    /* Initialize the cs_MGS structure */
-
-    nlevels   = (int)get_keypone("Multigrid_Number_Levels", 0);
-    path_type = (int)get_keypone("Multigrid_Path_Type", 1);
-    mgs       = cs_multigrid_manage(NULL, 1, nlevels, path_type);
-    if (mgs == (cs_MGS*)NULL) return (mgs);
-    flag_cg     = (int)get_keypone("Flag_CG", 1);
-    type_coarse = (int)get_keypone("Multigrid_Coarse", 0);
-    ngc         = (int)get_keypone("Multigrid_ngc", 100);
-    ngs         = (int)get_keypone("Multigrid_ngs", 2);
-    nmg         = (int)get_keypone("Multigrid_nmg", 4);
-    tolcg       = get_keypone("Multigrid_tolcg", 1.e-7);
-    tolnmg      = get_keypone("Multigrid_tolnmg", 1.e-7);
-    cs_multigrid_params(mgs, flag_cg, type_coarse, ngc, nmg, ngs, tolcg, tolnmg);
-  }
-  else
-  {
-
-    /* Free the cs_MGS structure */
-
-    mgs = cs_multigrid_manage(mgs, -1, 0, 0);
-  }
-  return (mgs);
 }
 
 /****************************************************************************/
@@ -3762,34 +3715,6 @@ static int st_simulate_chebychev(VectorDouble& zsnc)
 
 /****************************************************************************/
 /*!
- **  Perform the Calculation of the Kriging estimate (Multigrid case)
- **
- ** \return  Error return code
- **
- ** \param[in]  QC          Pointer to QChol structure (target-target)(finalized)
- ** \param[in]  rhs         R.H.S. array (Dimension: ntarget)
- **
- ** \param[out] work        Working array (Dimension: ntarget)
- ** \param[out] z           Output array  (Dimension: ntarget)
- **
- *****************************************************************************/
-static int st_kriging_multigrid(QChol* QC, double* rhs, VectorDouble& work, double* z)
-{
-  int ntarget           = qchol_getNCols(QC);
-  SPDE_Matelem& Matelem = spde_get_current_matelem(-1);
-
-  if (cs_multigrid_process(Matelem.mgs, QC, VERBOSE, z, rhs, work.data())) return (1);
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Kriging (Multigrid)\n");
-    print_range("- Result", ntarget, z, NULL);
-  }
-  return (0);
-}
-
-/****************************************************************************/
-/*!
  **  Solve the linear system (either using Cholesky or Multigrid)
  **
  ** \return  Error return code
@@ -3803,14 +3728,7 @@ static int st_kriging_multigrid(QChol* QC, double* rhs, VectorDouble& work, doub
  *****************************************************************************/
 static int st_solve(QChol* QC, double* rhs, VectorDouble& work, double* z)
 {
-  if (S_DECIDE.flag_mgrid)
-  {
-    if (st_kriging_multigrid(QC, rhs, work, z)) return (1);
-  }
-  else
-  {
-    if (st_kriging_cholesky(QC, rhs, work, z)) return (1);
-  }
+  if (st_kriging_cholesky(QC, rhs, work, z)) return (1);
   return (0);
 }
 
@@ -4347,15 +4265,10 @@ static int st_kriging_several(double* data,
   maxiter = (int)get_keypone("Multi_Structures_Maxiter", 200);
   tolmult = get_keypone("Multi_Structures_Tolerance", 1.e-8);
   rhsloc = rhscur = xcur = nullptr;
-  if (S_DECIDE.flag_mgrid)
-  {
-    messerr("The multi-structure Kriging is not programmed in multigrid");
-    return (1);
-  }
-  ncova = st_get_ncova();
-  nvar  = S_ENV.nvar;
-  ncur  = st_get_nvertex_max();
-  ss    = 0.;
+  ncova                  = st_get_ncova();
+  nvar                   = S_ENV.nvar;
+  ncur                   = st_get_nvertex_max();
+  ss                     = 0.;
 
   /* Core allocation */
 
@@ -4666,10 +4579,8 @@ static void st_matelem_manage(int mode)
         Matelem.Isill         = nullptr;
         Matelem.Csill         = nullptr;
         Matelem.qsimu         = nullptr;
-        Matelem.mgs           = (cs_MGS*)NULL;
-        if (S_DECIDE.flag_mgrid) Matelem.mgs = st_mgs_manage(1, NULL);
-        Matelem.s_cheb = nullptr;
-        Matelem.amesh  = nullptr;
+        Matelem.s_cheb        = nullptr;
+        Matelem.amesh         = nullptr;
       }
       break;
 
@@ -4688,7 +4599,6 @@ static void st_matelem_manage(int mode)
         Matelem.Isill  = (double*)mem_free((char*)Matelem.Isill);
         Matelem.Csill  = (double*)mem_free((char*)Matelem.Csill);
         Matelem.qsimu  = st_qsimu_manage(-1, Matelem.qsimu);
-        Matelem.mgs    = st_mgs_manage(-1, Matelem.mgs);
         Matelem.s_cheb = spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, Matelem.s_cheb);
         delete Matelem.amesh;
         Matelem.amesh = nullptr;
@@ -5644,7 +5554,7 @@ int spde_check(const Db* dbin,
                bool flag_modif)
 {
   Model* models[2];
-  int nlevels, ncova;
+  int ncova;
 
   st_environ_init();
 
@@ -5653,7 +5563,6 @@ int spde_check(const Db* dbin,
   models[1] = model2;
 
   FLAG_KEYPAIR       = (int)get_keypone("SPDE_FLAG_KEYPAIR", 0);
-  nlevels            = (int)get_keypone("Multigrid_Number_Levels", 0);
   DEBUG              = (int)get_keypone("SPDE_DEBUG", DEBUG);
   S_DECIDE.simu_chol = (int)get_keypone("Flag_Simu_Chol", 0);
   S_DECIDE.simu_cheb = !S_DECIDE.simu_chol;
@@ -5665,7 +5574,6 @@ int spde_check(const Db* dbin,
   S_DECIDE.flag_est        = flag_est;
   S_DECIDE.flag_std        = flag_std;
   S_DECIDE.flag_gibbs      = flag_gibbs;
-  S_DECIDE.flag_mgrid      = nlevels > 0;
   S_DECIDE.flag_several    = 0;
 
   S_DECIDE.flag_case = 0;
@@ -5681,7 +5589,7 @@ int spde_check(const Db* dbin,
   S_DECIDE.flag_Q       = (int)get_keypone("Flag_Q", S_DECIDE.flag_Q);
   S_DECIDE.flag_Qchol   = (S_DECIDE.flag_case == CASE_SIMULATE && S_DECIDE.flag_Q && S_DECIDE.simu_chol);
   S_DECIDE.flag_modif   = (S_DECIDE.flag_case == CASE_SIMULATE && flag_modif);
-  S_DECIDE.flag_onechol = (!S_DECIDE.flag_mgrid && S_DECIDE.simu_chol);
+  S_DECIDE.flag_onechol = (S_DECIDE.simu_chol);
   S_DECIDE.flag_onechol = (int)get_keypone("Flag_OneChol",
                                            S_DECIDE.flag_onechol);
   if (!S_DECIDE.flag_dbin) S_DECIDE.flag_onechol = 0;

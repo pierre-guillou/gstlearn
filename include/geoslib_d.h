@@ -113,7 +113,6 @@ public:
 };
 
 #ifndef SWIG
-class cs_MGS;
 typedef struct
 {
   VectorDouble Lambda;
@@ -124,7 +123,6 @@ typedef struct
   double* Isill;
   double* Csill;
   QSimu* qsimu;
-  cs_MGS* mgs;
   Cheb_Elem* s_cheb;
   AMesh* amesh;
 } SPDE_Matelem;
