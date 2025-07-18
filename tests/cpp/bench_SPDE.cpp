@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
   int ndat            = 50;
   int nxref           = 101;
   double matern_param = 1.0;
-  message("Use of Eigen Library = %d\n", isGlobalFlagEigen()); // Left in to avoid diffs in non-reg tests
 
   OptCst::define(ECst::NTDEC, 2);
   OptCst::define(ECst::NTROW, -1);
