@@ -14,22 +14,22 @@
  */
 #include "API/SPDEParam.hpp"
 #include "Basic/Law.hpp"
-#include "Enum/ESpaceType.hpp"
 #include "Enum/ECov.hpp"
+#include "Enum/ESpaceType.hpp"
 
-#include "Space/ASpaceObject.hpp"
+#include "API/SPDE.hpp"
+#include "Basic/File.hpp"
+#include "Basic/OptCst.hpp"
+#include "Basic/Timer.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Db/DbStringFormat.hpp"
-#include "Model/Model.hpp"
-#include "Basic/File.hpp"
-#include "Basic/Timer.hpp"
-#include "Basic/OptCst.hpp"
-#include "Mesh/MeshETurbo.hpp"
-#include "Neigh/NeighBench.hpp"
-#include "Stats/Classical.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
-#include "API/SPDE.hpp"
+#include "Mesh/MeshETurbo.hpp"
+#include "Model/Model.hpp"
+#include "Neigh/NeighBench.hpp"
+#include "Space/ASpaceObject.hpp"
+#include "Stats/Classical.hpp"
 
 using namespace gstlrn;
 /****************************************************************************/
@@ -37,7 +37,7 @@ using namespace gstlrn;
  ** Main Program
  **
  *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   Timer timer;
 
@@ -49,13 +49,12 @@ int main(int argc, char *argv[])
 
   // Global parameters
   defineDefaultSpace(ESpaceType::RN, 2);
-  int seed  = 123;
-  int nsim  = 10;
-  int ndat  = 50;
-  int nxref = 101;
+  int seed            = 123;
+  int nsim            = 10;
+  int ndat            = 50;
+  int nxref           = 101;
   double matern_param = 1.0;
-  setGlobalFlagEigen(true);
-  message("Use of Eigen Library = %d\n",isGlobalFlagEigen());
+  message("Use of Eigen Library = %d\n", isGlobalFlagEigen()); // Left in to avoid diffs in non-reg tests
 
   OptCst::define(ECst::NTDEC, 2);
   OptCst::define(ECst::NTROW, -1);
@@ -90,7 +89,7 @@ int main(int argc, char *argv[])
   Db* dat = Db::createFillRandom(ndat);
 
   // Generate the output grid
-  DbGrid* grid = DbGrid::create({nxref, nxref}, {1./(nxref-1), 1./(nxref-1)});
+  DbGrid* grid = DbGrid::create({nxref, nxref}, {1. / (nxref - 1), 1. / (nxref - 1)});
 
   // Printout of general environment
   if (showStats)
@@ -108,12 +107,12 @@ int main(int argc, char *argv[])
     if (ncov_ref >= 0 && ncov_ref != ncov) continue;
 
     // Generate the Model
-    Model *model;
+    Model* model;
     model = Model::createFromParam(ECov::MATERN, TEST, 1, matern_param,
-                                   { 0.1, 0.3 }, MatrixSymmetric(), { 30., 0. });
+                                   {0.1, 0.3}, MatrixSymmetric(), {30., 0.});
     if (ncov >= 1)
       model->addCovFromParam(ECov::MATERN, TEST, 1, matern_param,
-                             { 0.3, 0.2 }, MatrixSymmetric(), { -10., 0.});
+                             {0.3, 0.2}, MatrixSymmetric(), {-10., 0.});
     String sncov = (ncov == 0) ? "1" : "2";
 
     // Printout of general environment
@@ -137,11 +136,11 @@ int main(int argc, char *argv[])
       if (ifois_ref >= 0 && ifois != ifois_ref) continue;
 
       int useCholesky = ifois;
-      String option = (ifois == 0) ? ".NoChol" : ".Chol";
+      String option   = (ifois == 0) ? ".NoChol" : ".Chol";
       if (showStats)
         message("- Cholesky Option        = %d\n", useCholesky);
 
-       // Kriging
+      // Kriging
       if (mode < 0 || mode == 1)
       {
         timer.reset();
@@ -153,8 +152,8 @@ int main(int argc, char *argv[])
         SPDEParam params;
         params.setNMC(10);
         (void)gstlrn::krigingSPDE(dat, grid, model, true, true, useCholesky,
-                          VectorMeshes(), nullptr, VectorMeshes(), nullptr, params,
-                          NamingConvention(namconv));
+                                  VectorMeshes(), nullptr, VectorMeshes(), nullptr, params,
+                                  NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 400);
       }
 
@@ -168,9 +167,9 @@ int main(int argc, char *argv[])
         namconv.append(sncov);
         law_set_random_seed(seed);
         (void)gstlrn::simulateSPDE(nullptr, grid, model, nsim, useCholesky,
-                           VectorMeshes(), nullptr, VectorMeshes(), nullptr,
-                           SPDEParam(),
-                           NamingConvention(namconv));
+                                   VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                                   SPDEParam(),
+                                   NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 1350);
       }
 
@@ -184,9 +183,9 @@ int main(int argc, char *argv[])
         namconv.append(sncov);
         law_set_random_seed(seed);
         (void)gstlrn::simulateSPDE(dat, grid, model, nsim, useCholesky,
-                           VectorMeshes(), nullptr, VectorMeshes(), nullptr, 
-                           SPDEParam(),
-                           NamingConvention(namconv));
+                                   VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                                   SPDEParam(),
+                                   NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 3130);
       }
     }
@@ -195,16 +194,16 @@ int main(int argc, char *argv[])
 
   // Produce some statistics for comparison
   if (flagStatistics)
-    dbStatisticsPrint(grid, { "Kriging*", "Simu*" },
-                      EStatOption::fromKeys( { "MINI", "MAXI", "MEAN", "STDV" }));
+    dbStatisticsPrint(grid, {"Kriging*", "Simu*"},
+                      EStatOption::fromKeys({"MINI", "MAXI", "MEAN", "STDV"}));
   if (flagExhaustiveTest)
   {
-    DbStringFormat *dbfmt = DbStringFormat::createFromFlags(false, false, false, false, true);
+    DbStringFormat* dbfmt = DbStringFormat::createFromFlags(false, false, false, false, true);
     grid->display(dbfmt);
   }
-  (void) grid->dumpToNF("Grid.NF");
+  (void)grid->dumpToNF("Grid.NF");
 
-  delete dat ;
+  delete dat;
   delete grid;
 
   return (0);

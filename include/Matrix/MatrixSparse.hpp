@@ -312,8 +312,7 @@ GSTLEARN_EXPORT MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
                                               int oper_choice = 1);
 
 /// Manage global flag for EIGEN
-GSTLEARN_EXPORT void setGlobalFlagEigen(bool flagEigen);
-GSTLEARN_EXPORT bool isGlobalFlagEigen();
+GSTLEARN_EXPORT bool isGlobalFlagEigen() { return true; };
 
 // Not exported method
 

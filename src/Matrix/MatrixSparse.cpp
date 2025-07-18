@@ -39,8 +39,6 @@ DISABLE_WARNING_POP
 namespace gstlrn
 {
 
-static bool globalFlagEigen = true;
-
 MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax)
   : AMatrix(nrow, ncol)
   , _csMatrix(nullptr)
@@ -1647,21 +1645,6 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
   }
 
   return MatrixSparse::createFromTriplet(NF_Tout, 0, 0, -1);
-}
-
-/**
- * Modify the parameter for using EIGEN library or not.
- * Warning: this must be performed very early in the script in order to forbid mixing two different styles.
- * @param flagEigen True if EIGEN library must be used; False otherwise (cs is used)
- */
-void setGlobalFlagEigen(bool flagEigen)
-{
-  globalFlagEigen = flagEigen;
-}
-
-bool isGlobalFlagEigen()
-{
-  return globalFlagEigen;
 }
 
 void MatrixSparse::gibbs(int iech,

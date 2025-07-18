@@ -48,7 +48,6 @@ int main(int argc, char* argv[])
   model             = (Model*)NULL;
   flag_norm_sill    = 0;
   flag_goulard_used = 1;
-  setGlobalFlagEigen(true);
 
   /* Standard output redirection to file */
 
@@ -133,8 +132,8 @@ int main(int argc, char* argv[])
   options.setFlagGoulardUsed(flag_goulard_used);
   //  OptDbg::define(EDbg::CONVERGE);
   //  verbose = true;
-  // Discard use of Eigen library in order to prevent diffs across platforms
-  //  setGlobalFlagEigen(false);
+  // Warning: initially (before using NLOPT), we discarded the use of Eigen library
+  // in order to prevent diffs across platforms. This is now impossible.
   if (model_auto_fit(vario, model, verbose, mauto, constraints, options))
     messageAbort("model_auto_fit");
   model->display();
