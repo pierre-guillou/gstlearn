@@ -10,11 +10,10 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
-// #include "geoslib_define.h"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Basic/WarningMacro.hpp"
+#include "gstlearn_export.hpp"
 
 #ifndef SWIG
 DISABLE_WARNING_PUSH
@@ -29,8 +28,6 @@ typedef Eigen::Triplet<double> T;
 
 namespace gstlrn
 {
-class cs;
-
 /**
  * Stores the contents of a sparse matrix in Triplet form
  * The format is adapter to Eigen
@@ -61,10 +58,8 @@ public:
   void appendInPlace(const NF_Triplet& T2);
 
 #ifndef SWIG
-  cs* buildCsFromTriplet() const;
   ::Eigen::SparseMatrix<double> buildEigenFromTriplet() const;
 
-  static NF_Triplet createFromCs(const cs* mat, int shiftRow = 0, int shiftCol = 0);
   static NF_Triplet createFromEigen(const Eigen::SparseMatrix<double>& mat, int shiftRow = 0, int shiftCol = 0);
 #endif
 

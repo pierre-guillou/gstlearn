@@ -30,8 +30,6 @@ DISABLE_WARNING_UNUSED_BUT_SET_VARIABLE
 #include <omp.h>
 DISABLE_WARNING_POP
 
-#include <csparse_f.h>
-
 /**
  * This variable switches ON/OFF the ability to use Eigen library for Algebra
  */
