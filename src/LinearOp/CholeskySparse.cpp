@@ -19,7 +19,7 @@ CholeskySparse::CholeskySparse(const MatrixSparse& mat)
   : ACholesky(mat)
   , _factor(nullptr)
 {
-  (void)_prepare();
+  (void)_prepare(mat);
 }
 
 CholeskySparse::CholeskySparse(const CholeskySparse& m)
@@ -71,7 +71,6 @@ int CholeskySparse::stdev(VectorDouble& vcur,
                           const MatrixSparse* proj,
                           bool flagStDev) const
 {
-  if (_mat == nullptr) return 1;
   if (_stdev(vcur, proj)) return 1;
 
   if (flagStDev)
@@ -98,13 +97,10 @@ int CholeskySparse::setMatrix(const MatrixSparse& mat)
 
 int CholeskySparse::_prepare(const MatrixSparse& mat) const
 {
-  if (_mat == nullptr) return 1;
-  const MatrixSparse* matCS = dynamic_cast<const MatrixSparse*>(_mat);
-
   if (_factor != nullptr) return 0;
 
   _factor = new Eigen::SimplicialLDLT<Sp>;
-  _factor->compute(matCS->getEigenMatrix());
+  _factor->compute(mat.getEigenMatrix());
   if (_factor == nullptr)
   {
     messerr("Error when computing Cholesky Decomposition");

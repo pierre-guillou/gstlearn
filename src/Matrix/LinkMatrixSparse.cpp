@@ -45,8 +45,7 @@ namespace gstlrn
  ** \remarks If the decomposition is already performed, nothing is done
  **
  *****************************************************************************/
-int qchol_cholesky(int verbose, QChol* QC) int qchol_cholesky(int verbose, QChol* QC)
-
+int qchol_cholesky(int verbose, QChol* QC)
 {
   /* Check that the Q matrix has already been defined */
 
@@ -71,9 +70,7 @@ int qchol_cholesky(int verbose, QChol* QC) int qchol_cholesky(int verbose, QChol
 
     if (QC->chol == nullptr)
     {
-      QC->chol = new CholeskySparse(QC->Q);
-      if (QC->chol == nullptr)
-        QC->chol = new CholeskySparse(QC->Q);
+      QC->chol = new CholeskySparse(*QC->Q);
       if (QC->chol == nullptr)
       {
         messerr("Error in Cholesky decompostion (new version)");
@@ -96,14 +93,7 @@ int qchol_cholesky(int verbose, QChol* QC) int qchol_cholesky(int verbose, QChol
 
 label_err:
   delete QC->chol;
-label_err:
-  delete QC->chol;
   return (1);
-}
-
-bool is_chol_ready(QChol* QC)
-{
-  return QC->chol != nullptr;
 }
 
 bool is_chol_ready(QChol* QC)
@@ -138,13 +128,11 @@ int qchol_getNRows(QChol* QC)
  ** \param[in]  qctt     Qchol structure
  ** \param[in,out]  xcr  Current vector
  ** \param[in]  rhs      Current R.H.S. vector
- ** \param[in,out]  xcr  Current vector
- ** \param[in]  rhs      Current R.H.S. vector
  **
  ** \param[out] work     Working array
  **
  *****************************************************************************/
-void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work) void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work)
+void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work)
 {
   DECLARE_UNUSED(work);
   DECLARE_UNUSED(work);
@@ -167,7 +155,7 @@ void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* w
  ** \param[out] work     Working array
  **
  *****************************************************************************/
-void cs_chol_simulate(QChol* qctt, double* simu, const double* work) void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
+void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
 {
   if (DEBUG) message("Cholesky Simulation\n");
   int n = qchol_getNCols(qctt);

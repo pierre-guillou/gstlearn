@@ -90,6 +90,8 @@ protected:
   int _addToDest(const constvect inv, vect outv) const override;
 
 private:
+  std::pair<double, double> _computeRangeEigenVal() const;
+  void _preparePoly(Chebychev& logPoly) const;
   int _kriging(const constvect inv, vect out) const;
   void _simNonCond(vect outv) const;
   void _simCond(const constvect data, vect outvK, vect outvS) const;
@@ -116,7 +118,6 @@ protected:
   bool _verbose;
 
 private:
-  bool _noiseToDelete;
   int _ndat;
   mutable VectorDouble _workdat1;
   mutable VectorDouble _workdat2;
@@ -144,9 +145,8 @@ public:
          const PrecisionOpMulti* const popSimu    = nullptr,
          const ProjMulti* const projInSimu        = nullptr,
          const ProjMulti* const projOutKriging    = nullptr,
-         const ProjMulti* const projOutSimu       = nullptr,
-         bool noiseToDelete                       = false)
-    : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu, projOutKriging, projOutSimu, noiseToDelete)
+         const ProjMulti* const projOutSimu       = nullptr)
+    : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu, projOutKriging, projOutSimu)
   {
     _solver = new LinearOpCGSolver<SPDEOp>(this);
   }
@@ -198,9 +198,8 @@ public:
                 const ProjMulti*        const projInKriging = nullptr,
                 const ASimulable*       const invNoise = nullptr,
                 const PrecisionOpMulti* const popSimu = nullptr,
-                const ProjMulti*        const projInSimu = nullptr,
-                bool  noiseToDelete = false
-  ) : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu, noiseToDelete)
+                const ProjMulti*        const projInSimu = nullptr)
+  ) : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu)
   {
     _solver = new LinearOpCGSolver<ExampleSPDEOp>(this);
   }

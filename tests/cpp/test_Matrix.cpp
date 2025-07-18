@@ -459,7 +459,6 @@ int main(int argc, char* argv[])
 
   // For sparse matrix
   message("Reference Sparse matrix\n");
-  setUpdateNonZeroValue(0); // Allow flexible update of sparse matrix
   MSP->display();
 
   message("Setting terms of Column (%d) to a vector (sequence from 1 to %d)\n", icol0, nrow);

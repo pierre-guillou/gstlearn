@@ -58,7 +58,7 @@ public:
 
 private:
   void _clean();
-  int _prepare() const;
+  int _prepare(const MatrixSparse& mat) const;
   int _stdev(VectorDouble& vcur, const MatrixSparse* proj) const;
 
 private:
