@@ -16,20 +16,19 @@
 
 #include "API/SPDE.hpp"
 
-#include "Mesh/MeshETurbo.hpp"
-#include "Matrix/MatrixSparse.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/OptDbg.hpp"
-#include "Basic/OptCst.hpp"
 #include "Basic/File.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/OptCst.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Covariances/CovContext.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Db/DbStringFormat.hpp"
-#include "Space/ASpaceObject.hpp"
-#include "Covariances/CovContext.hpp"
-#include "Model/Model.hpp"
 #include "LinearOp/PrecisionOpMatrix.hpp"
-#include "Basic/Memory.hpp"
+#include "Matrix/MatrixSparse.hpp"
+#include "Mesh/MeshETurbo.hpp"
+#include "Model/Model.hpp"
+#include "Space/ASpaceObject.hpp"
 
 using namespace gstlrn;
 
