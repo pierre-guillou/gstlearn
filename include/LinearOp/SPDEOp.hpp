@@ -16,15 +16,9 @@
 #include "LinearOp/LinearOpCGSolver.hpp"
 #include "Matrix/MatrixDense.hpp"
 
-#include "Basic/VectorNumT.hpp"
-#include "LinearOp/ASimulable.hpp"
-#include "Polynomials/Chebychev.hpp"
-
 #ifndef SWIG
 DECLARE_EIGEN_TRAITS(SPDEOp)
 #endif
-
-#include "LinearOp/LinearOpCGSolver.hpp"
 
 namespace gstlrn
 {
@@ -96,8 +90,6 @@ protected:
   int _addToDest(const constvect inv, vect outv) const override;
 
 private:
-  std::pair<double, double> _computeRangeEigenVal() const;
-  void _preparePoly(Chebychev& logPoly) const;
   int _kriging(const constvect inv, vect out) const;
   void _simNonCond(vect outv) const;
   void _simCond(const constvect data, vect outvK, vect outvS) const;
@@ -113,9 +105,9 @@ private:
   void _prepare(bool w1 = true, bool w2 = true) const;
 
 protected:
-  mutable const PrecisionOpMulti* _QKriging;
+  const PrecisionOpMulti* const _QKriging;
   const ProjMulti* const _projInKriging;
-  const ASimulable* _invNoise;
+  const ASimulable* const _invNoise;
   const PrecisionOpMulti* const _QSimu;
   const ProjMulti* const _projInSimu;
   const ProjMulti* const _projOutKriging;
@@ -124,6 +116,7 @@ protected:
   bool _verbose;
 
 private:
+  bool _noiseToDelete;
   int _ndat;
   mutable VectorDouble _workdat1;
   mutable VectorDouble _workdat2;
@@ -151,8 +144,9 @@ public:
          const PrecisionOpMulti* const popSimu    = nullptr,
          const ProjMulti* const projInSimu        = nullptr,
          const ProjMulti* const projOutKriging    = nullptr,
-         const ProjMulti* const projOutSimu       = nullptr)
-    : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu, projOutKriging, projOutSimu)
+         const ProjMulti* const projOutSimu       = nullptr,
+         bool noiseToDelete                       = false)
+    : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu, projOutKriging, projOutSimu, noiseToDelete)
   {
     _solver = new LinearOpCGSolver<SPDEOp>(this);
   }

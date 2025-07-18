@@ -29,9 +29,14 @@ DISABLE_WARNING_POP
 
 namespace gstlrn
 {
+namespace gstlrn
+{
 
 class cs;
 class EOperator;
+} // namespace gstlrn
+namespace gstlrn
+{
 } // namespace gstlrn
 namespace gstlrn
 {
@@ -39,6 +44,7 @@ namespace gstlrn
  * Sparse Matrix
  *
  * Handle a sparse matrix that can be symmetrical, square or not.
+ * Storage relies on Eigen3 Library.
  * Storage relies on Eigen3 Library.
  */
 class GSTLEARN_EXPORT MatrixSparse: public AMatrix, public virtual ALinearOp
@@ -148,159 +154,168 @@ public:
                                          int ncol    = 0,
                                          int nrowmax = -1);
   static MatrixSparse* Identity(int nrow, double value = 1.);
-  static MatrixSparse* addMatMat(const MatrixSparse* x,
-                                 const MatrixSparse* y,
-                                 double cx = 1.,
-                                 double cy = 1.);
-  static MatrixSparse* diagVec(const VectorDouble& vec);
-  static MatrixSparse* diagConstant(int number, double value = 1.);
-  static MatrixSparse* diagMat(MatrixSparse* A, int oper_choice);
-  static MatrixSparse* glue(const MatrixSparse* A1,
-                            const MatrixSparse* A2,
-                            bool flagShiftRow,
-                            bool flagShiftCol);
-  static void glueInPlace(MatrixSparse* A1,
-                          const MatrixSparse* A2,
-                          bool flagShiftRow,
-                          bool flagShiftCol);
-  /// The next functions use specific definition of matrix (to avoid dynamic_cast)
-  /// rather than manipulating AMatrix. They are no more generic of AMatrix
-  /*! Add a matrix (multiplied by a constant) */
-  virtual void addMatInPlace(const MatrixSparse& y, double cx = 1., double cy = 1.);
-  /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' stored in 'this'*/
-  virtual void prodNormMatMatInPlace(const MatrixSparse* a,
-                                     const MatrixSparse* m,
-                                     bool transpose = false);
-  /*! Product 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' stored in 'this'*/
-  virtual void prodNormMatVecInPlace(const MatrixSparse* a,
-                                     const VectorDouble& vec = VectorDouble(),
-                                     bool transpose          = false);
+                                         int nrow    = 0,
+                                         int ncol    = 0,
+                                         int nrowmax = -1);
+                                         static MatrixSparse* Identity(int nrow, double value = 1.);
+                                         static MatrixSparse* addMatMat(const MatrixSparse* x,
+                                                                        const MatrixSparse* y,
+                                                                        double cx = 1.,
+                                                                        double cy = 1.);
+                                         static MatrixSparse* diagVec(const VectorDouble& vec);
+                                         static MatrixSparse* diagConstant(int number, double value = 1.);
+                                         static MatrixSparse* diagMat(MatrixSparse* A, int oper_choice);
+                                         static MatrixSparse* diagVec(const VectorDouble& vec);
+                                         static MatrixSparse* diagConstant(int number, double value = 1.);
+                                         static MatrixSparse* diagMat(MatrixSparse* A, int oper_choice);
+                                         static MatrixSparse* glue(const MatrixSparse* A1,
+                                                                   const MatrixSparse* A2,
+                                                                   bool flagShiftRow,
+                                                                   bool flagShiftCol);
+                                         static void glueInPlace(MatrixSparse* A1,
+                                                                 const MatrixSparse* A2,
+                                                                 bool flagShiftRow,
+                                                                 bool flagShiftCol);
+                                         /// The next functions use specific definition of matrix (to avoid dynamic_cast)
+                                         /// rather than manipulating AMatrix. They are no more generic of AMatrix
+                                         /*! Add a matrix (multiplied by a constant) */
+                                         virtual void addMatInPlace(const MatrixSparse& y, double cx = 1., double cy = 1.);
+                                         /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' stored in 'this'*/
+                                         virtual void prodNormMatMatInPlace(const MatrixSparse* a,
+                                                                            const MatrixSparse* m,
+                                                                            bool transpose = false);
+                                         /*! Product 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' stored in 'this'*/
+                                         virtual void prodNormMatVecInPlace(const MatrixSparse* a,
+                                                                            const VectorDouble& vec = VectorDouble(),
+                                                                            bool transpose          = false);
 
 #ifndef SWIG
-  /*! Returns a pointer to the Sparse storage */
-  const cs* getCS() const;
-  void setCS(cs* cs);
-  /*! Temporary function to get the CS contents of Sparse Matrix */
-  cs* getCSUnprotected() const;
+                                         /*! Returns a pointer to the Sparse storage */
+                                         const cs* getCS() const;
+                                         void setCS(cs* cs);
+                                         /*! Temporary function to get the CS contents of Sparse Matrix */
+                                         cs* getCSUnprotected() const;
 #endif
 
-  // virtual void reset(int nrows, int ncols) override; // Use base class method
-  virtual void resetFromValue(int nrows, int ncols, double value) override;
-  virtual void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
-  virtual void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true) override;
-  virtual void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
+                                         // virtual void reset(int nrows, int ncols) override; // Use base class method
+                                         virtual void resetFromValue(int nrows, int ncols, double value) override;
+                                         virtual void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
+                                         virtual void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true) override;
+                                         virtual void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
 
-  void resetFromTriplet(const NF_Triplet& NF_T);
+                                         void resetFromTriplet(const NF_Triplet& NF_T);
 
-  /*! Dump a specific range of samples from the internal storage */
-  static void dumpElements(const String& title, int ifrom, int ito);
+                                         /*! Dump a specific range of samples from the internal storage */
+                                         static void dumpElements(const String& title, int ifrom, int ito);
 
-  /*! Set all the values of the Matrix with random values */
-  void fillRandom(int seed = 432432, double zeroPercent = 0);
+                                         /*! Set all the values of the Matrix with random values */
+                                         void fillRandom(int seed = 432432, double zeroPercent = 0);
 
 #ifndef SWIG
-  int addVecInPlace(const constvect x, vect y) const;
+                                         int addVecInPlace(const constvect x, vect y) const;
 #endif
-  void addValue(int row, int col, double value);
+                                         void addValue(int row, int col, double value);
 
-  double L1Norm() const;
-  void getStats(int* nrows, int* ncols, int* count, double* percent) const;
-  int scaleByDiag();
-  int addVecInPlaceVD(const VectorDouble& x, VectorDouble& y) const;
-  void setConstant(double value);
-  VectorDouble extractDiag(int oper_choice = 1) const;
-  void prodNormDiagVecInPlace(const VectorDouble& vec, int oper = 1);
+                                         double L1Norm() const;
+                                         void getStats(int* nrows, int* ncols, int* count, double* percent) const;
+                                         int scaleByDiag();
+                                         int addVecInPlaceVD(const VectorDouble& x, VectorDouble& y) const;
+                                         void setConstant(double value);
+                                         VectorDouble extractDiag(int oper_choice = 1) const;
+                                         void prodNormDiagVecInPlace(const VectorDouble& vec, int oper = 1);
 #ifndef SWIG
-  const Eigen::SparseMatrix<double>& getEigenMatrix() const { return _eigenMatrix; }
-  void setEigenMatrix(const Eigen::SparseMatrix<double>& eigenMatrix) { _eigenMatrix = eigenMatrix; }
+                                         const Eigen::SparseMatrix<double>& getEigenMatrix() const { return _eigenMatrix; }
+                                         void setEigenMatrix(const Eigen::SparseMatrix<double>& eigenMatrix) { _eigenMatrix = eigenMatrix; }
 #endif
 
-  MatrixSparse* extractSubmatrixByRanks(const VectorInt& rank_rows,
-                                        const VectorInt& rank_cols) const;
-  MatrixSparse* extractSubmatrixByColor(const VectorInt& colors,
-                                        int ref_color,
-                                        bool row_ok,
-                                        bool col_ok);
-  VectorInt colorCoding() const;
-  int getNonZeros() const { return _getMatrixPhysicalSize(); }
-  void gibbs(int iech, const VectorDouble& zcur, double* yk, double* sk);
+                                         MatrixSparse* extractSubmatrixByRanks(const VectorInt& rank_rows,
+                                                                               const VectorInt& rank_cols) const;
+                                         MatrixSparse* extractSubmatrixByColor(const VectorInt& colors,
+                                                                               int ref_color,
+                                                                               bool row_ok,
+                                                                               bool col_ok);
+                                         VectorInt colorCoding() const;
+                                         int getNonZeros() const { return _getMatrixPhysicalSize(); }
+                                         void gibbs(int iech, const VectorDouble& zcur, double* yk, double* sk);
 
-  int forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLower = true) const;
-  void forceDimension(int maxRows, int maxCols);
-
-#ifndef SWIG
-
-protected:
-  int _addToDest(const constvect inv, vect outv) const override;
-#endif
+                                         int forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLower = true) const;
+                                         void forceDimension(int maxRows, int maxCols);
 
 #ifndef SWIG
 
-public:
-  void setDiagonal(const Eigen::Map<const Eigen::VectorXd>& tab);
-  void setDiagonal(const constvect tab);
+                                       protected:
+                                         int _addToDest(const constvect inv, vect outv) const override;
 #endif
 
-protected:
-  /// Interface for AMatrix
-  bool _isPhysicallyPresent(int irow, int icol) const override
-  {
-    DECLARE_UNUSED(irow, icol);
-    return true;
-  }
-  void _allocate(int nrow, int ncol, int ncolmax);
-
-  virtual void _allocate() override;
-  virtual void _deallocate() override;
-
-  virtual double& _getValueRef(int irow, int icol) override;
-  virtual int _getMatrixPhysicalSize() const override;
-  virtual void _setValueByRank(int rank, double value) override;
-  virtual void _setValues(const double* values, bool byCol) override;
-  virtual double _getValueByRank(int rank) const override;
-  virtual int _getIndexToRank(int irow, int icol) const override;
-  virtual void _transposeInPlace() override;
-
-  virtual void _prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _addProdMatVecInPlaceToDestPtr(const double* x, double* y, bool transpose = false) const override;
-
-  virtual int _invert() override;
-  virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
-
-  void _clear() override;
-  bool _isElementPresent(int irow, int icol) const;
-
-private:
-  static void _forbiddenForSparse(const String& func);
-  int _eigen_findColor(int imesh,
-                       int ncolor,
-                       VectorInt& colors,
-                       VectorInt& temp) const;
-
-public:
 #ifndef SWIG
 
-public:
-  Eigen::Ref<const Eigen::SparseMatrix<double>> getEigenMat() const
-  {
-    return Eigen::Ref<const Eigen::SparseMatrix<double>>(_eigenMatrix);
-  }
-  Eigen::Ref<Eigen::SparseMatrix<double>> getEigenMat()
-  {
-    return Eigen::Ref<Eigen::SparseMatrix<double>>(_eigenMatrix);
-  }
+                                       public:
+                                         void setDiagonal(const Eigen::Map<const Eigen::VectorXd>& tab);
+                                         void setDiagonal(const constvect tab);
 #endif
 
-private:
+                                       protected:
+                                         /// Interface for AMatrix
+                                         bool _isPhysicallyPresent(int irow, int icol) const override
+                                         {
+                                           DECLARE_UNUSED(irow, icol);
+                                           return true;
+                                         }
+                                         void _allocate(int nrow, int ncol, int ncolmax);
+
+                                         virtual void _allocate() override;
+                                         virtual void _deallocate() override;
+
+                                         virtual double& _getValueRef(int irow, int icol) override;
+                                         virtual int _getMatrixPhysicalSize() const override;
+                                         virtual void _setValueByRank(int rank, double value) override;
+                                         virtual void _setValues(const double* values, bool byCol) override;
+                                         virtual double _getValueByRank(int rank) const override;
+                                         virtual int _getIndexToRank(int irow, int icol) const override;
+                                         virtual void _transposeInPlace() override;
+
+                                         virtual void _prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
+                                         virtual void _prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
+                                         virtual void _addProdMatVecInPlaceToDestPtr(const double* x, double* y, bool transpose = false) const override;
+
+                                         virtual int _invert() override;
+                                         virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
+
+                                         void _clear() override;
+                                         bool _isElementPresent(int irow, int icol) const;
+
+                                       private:
+                                         static void _forbiddenForSparse(const String& func);
+                                         int _eigen_findColor(int imesh,
+                                                              int ncolor,
+                                                              VectorInt& colors,
+                                                              VectorInt& temp) const;
+
+                                       public:
 #ifndef SWIG
-  cs* _csMatrix;                            // Classical storage for Sparse matrix
-  Eigen::SparseMatrix<double> _eigenMatrix; // Storage (always stored Eigen::ColMajor)
+
+                                       public:
+                                         Eigen::Ref<const Eigen::SparseMatrix<double>> getEigenMat() const
+                                         {
+                                           return Eigen::Ref<const Eigen::SparseMatrix<double>>(_eigenMatrix);
+                                         }
+                                         Eigen::Ref<Eigen::SparseMatrix<double>> getEigenMat()
+                                         {
+                                           return Eigen::Ref<Eigen::SparseMatrix<double>>(_eigenMatrix);
+                                         }
 #endif
-  int _nColMax;
+
+                                       private:
+#ifndef SWIG
+                                         cs* _csMatrix;                            // Classical storage for Sparse matrix
+                                         Eigen::SparseMatrix<double> _eigenMatrix; // Storage (always stored Eigen::ColMajor)
+                                         Eigen::SparseMatrix<double> _eigenMatrix; // Storage (always stored Eigen::ColMajor)
+#endif
+                                         int _nColMax;
 };
 
 /*! Transform any matrix into a Sparse format */
+GSTLEARN_EXPORT MatrixSparse* createFromAnyMatrix(const AMatrix* mat);
 GSTLEARN_EXPORT MatrixSparse* createFromAnyMatrix(const AMatrix* mat);
 GSTLEARN_EXPORT void setUpdateNonZeroValue(int status = 2);
 GSTLEARN_EXPORT int getUpdateNonZeroValue();
@@ -324,4 +339,5 @@ GSTLEARN_EXPORT MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
 GSTLEARN_EXPORT Eigen::SparseMatrix<double> AtMA(const Eigen::SparseMatrix<double>& A,
                                                  const Eigen::SparseMatrix<double>& M);
 #endif
+} // namespace gstlrn
 } // namespace gstlrn

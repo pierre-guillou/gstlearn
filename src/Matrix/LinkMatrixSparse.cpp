@@ -23,6 +23,11 @@
 #define RHS(ilevel, i) (rhs[(ilevel) * ncur + (i)])
 #define MAT(i, j)      (mat[(i) * n + (j)])
 #define DEBUG          0
+#define MAX_NEIGH      100
+#define XCR(ilevel, i) (xcr[(ilevel) * ncur + (i)])
+#define RHS(ilevel, i) (rhs[(ilevel) * ncur + (i)])
+#define MAT(i, j)      (mat[(i) * n + (j)])
+#define DEBUG          0
 
 namespace gstlrn
 {
@@ -40,7 +45,7 @@ namespace gstlrn
  ** \remarks If the decomposition is already performed, nothing is done
  **
  *****************************************************************************/
-int qchol_cholesky(int verbose, QChol* QC)
+int qchol_cholesky(int verbose, QChol* QC) int qchol_cholesky(int verbose, QChol* QC)
 
 {
   /* Check that the Q matrix has already been defined */
@@ -62,14 +67,20 @@ int qchol_cholesky(int verbose, QChol* QC)
   // Perform the Cholesky decomposition (new style)
 
   if (QC->chol == nullptr)
-  {
-    QC->chol = new CholeskySparse(QC->Q);
+    // Perform the Cholesky decomposition (new style)
+
     if (QC->chol == nullptr)
     {
-      messerr("Error in Cholesky decompostion (new version)");
-      goto label_err;
+      QC->chol = new CholeskySparse(QC->Q);
+      if (QC->chol == nullptr)
+        QC->chol = new CholeskySparse(QC->Q);
+      if (QC->chol == nullptr)
+      {
+        messerr("Error in Cholesky decompostion (new version)");
+        messerr("Error in Cholesky decompostion (new version)");
+        goto label_err;
+      }
     }
-  }
 
   if (verbose) message("Finished\n");
 
@@ -85,7 +96,14 @@ int qchol_cholesky(int verbose, QChol* QC)
 
 label_err:
   delete QC->chol;
+label_err:
+  delete QC->chol;
   return (1);
+}
+
+bool is_chol_ready(QChol* QC)
+{
+  return QC->chol != nullptr;
 }
 
 bool is_chol_ready(QChol* QC)
@@ -120,12 +138,15 @@ int qchol_getNRows(QChol* QC)
  ** \param[in]  qctt     Qchol structure
  ** \param[in,out]  xcr  Current vector
  ** \param[in]  rhs      Current R.H.S. vector
+ ** \param[in,out]  xcr  Current vector
+ ** \param[in]  rhs      Current R.H.S. vector
  **
  ** \param[out] work     Working array
  **
  *****************************************************************************/
-void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work)
+void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work) void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work)
 {
+  DECLARE_UNUSED(work);
   DECLARE_UNUSED(work);
   if (DEBUG) message("Cholesky Inversion\n");
   int n = qchol_getNCols(qctt);
@@ -146,7 +167,7 @@ void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* w
  ** \param[out] work     Working array
  **
  *****************************************************************************/
-void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
+void cs_chol_simulate(QChol* qctt, double* simu, const double* work) void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
 {
   if (DEBUG) message("Cholesky Simulation\n");
   int n = qchol_getNCols(qctt);
