@@ -33,8 +33,6 @@ DISABLE_WARNING_POP
 
 namespace gstlrn
 {
-class css; /// TODO : Dependency to csparse to be removed
-class csn;
 class MatrixSparse;
 using Sp = Eigen::SparseMatrix<double>;
 
@@ -61,17 +59,9 @@ public:
 private:
   void _clean();
   int _prepare() const;
-  int _stdevOld(VectorDouble& vcur) const;
-  int _stdevEigen(VectorDouble& vcur, const MatrixSparse* proj) const;
+  int _stdev(VectorDouble& vcur, const MatrixSparse* proj) const;
 
 private:
-  bool _flagEigen;
-
-  // Old-style storage
-  mutable css* _S; // Cholesky decomposition (for Old-style Csparse storage)
-  mutable csn* _N; // Cholesky decomposition (for Old-style Csparse storage)
-
-  // Eigen storage
   mutable Eigen::SimplicialLDLT<Sp>* _factor;
 };
 } // namespace gstlrn

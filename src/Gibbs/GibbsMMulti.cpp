@@ -411,14 +411,11 @@ double GibbsMMulti::_getEstimate(int ipgs,
 
   if (storeSparse)
   {
-    if (_matWgt->isFlagEigen())
+    for (Eigen::SparseMatrix<double>::InnerIterator it(_matWgt->getEigenMatrix(), icol); it; ++it)
     {
-      for (Eigen::SparseMatrix<double>::InnerIterator it(_matWgt->getEigenMatrix(), icol); it; ++it)
-      {
-        _splitCol(it.row(), &jact, &jvar);
-        jcase = getRank(ipgs, jvar);
-        yk -= y[jcase][jact] * it.value();
-      }
+      _splitCol(it.row(), &jact, &jvar);
+      jcase = getRank(ipgs, jvar);
+      yk -= y[jcase][jact] * it.value();
     }
   }
   else
