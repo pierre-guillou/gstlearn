@@ -39,8 +39,6 @@ DISABLE_WARNING_POP
 namespace gstlrn
 {
 
-static bool globalFlagEigen = true;
-
 MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax)
   : AMatrix(nrow, ncol)
   , _csMatrix(nullptr)
@@ -1636,21 +1634,6 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
   return MatrixSparse::createFromTriplet(NF_Tout, 0, 0, -1);
 }
 
-/**
- * Modify the parameter for using EIGEN library or not.
- * Warning: this must be performed very early in the script in order to forbid mixing two different styles.
- * @param flagEigen True if EIGEN library must be used; False otherwise (cs is used)
- */
-void setGlobalFlagEigen(bool flagEigen)
-{
-  globalFlagEigen = flagEigen;
-}
-
-bool isGlobalFlagEigen()
-{
-  return globalFlagEigen;
-}
-
 void MatrixSparse::gibbs(int iech,
                          const VectorDouble& zcur,
                          double* yk,
@@ -1770,13 +1753,13 @@ int MatrixSparse::forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLow
   return 0;
 }
 
-  void MatrixSparse::forceDimension(int maxRows, int maxCols)
+void MatrixSparse::forceDimension(int maxRows, int maxCols)
+{
+  // Redimensionner les matrices si nécessaire
+  if (_eigenMatrix.rows() < maxRows || _eigenMatrix.cols() < maxCols)
   {
-    // Redimensionner les matrices si nécessaire
-    if (_eigenMatrix.rows() < maxRows || _eigenMatrix.cols() < maxCols)
-    {
-      _eigenMatrix.conservativeResize(maxRows, maxCols);
-      _eigenMatrix.insert(maxRows - 1, maxCols - 1) = 0.0; // Élément fictif
-    }
+    _eigenMatrix.conservativeResize(maxRows, maxCols);
+    _eigenMatrix.insert(maxRows - 1, maxCols - 1) = 0.0; // Élément fictif
   }
 }
+} // namespace gstlrn

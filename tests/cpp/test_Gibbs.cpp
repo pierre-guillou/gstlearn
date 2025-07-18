@@ -273,8 +273,6 @@ int main(int argc, char* argv[])
   OptCst::define(ECst::NTCAR, 10.);
   OptCst::define(ECst::NTDEC, 6.);
 
-  setGlobalFlagEigen(true);
-
   // 2-D grid output file
 
   VectorInt nx    = {100, 100};

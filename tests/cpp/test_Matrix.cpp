@@ -65,7 +65,6 @@ int main(int argc, char *argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
   setMultiThread(8);
 
-  setGlobalFlagEigen(true); // Check the Eigen version or not. Essential for first part.
   OptCst::define(ECst::NTCOL, -1);
   OptCst::define(ECst::NTROW, -1);
 
