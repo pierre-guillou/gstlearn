@@ -8,20 +8,20 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Matrix/AMatrix.hpp"
-#include "Matrix/MatrixInt.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Matrix/MatrixSquare.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
-#include "Matrix/MatrixSparse.hpp"
-#include "Matrix/MatrixFactory.hpp"
-#include "Matrix/NF_Triplet.hpp"
+#include "Basic/File.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/OptCst.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "LinearOp/CholeskySparse.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/File.hpp"
-#include "Basic/OptCst.hpp"
+#include "Matrix/AMatrix.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixFactory.hpp"
+#include "Matrix/MatrixInt.hpp"
+#include "Matrix/MatrixSparse.hpp"
+#include "Matrix/MatrixSquare.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
+#include "Matrix/NF_Triplet.hpp"
 
 using namespace gstlrn;
 void st_invgen()
@@ -35,7 +35,7 @@ void st_invgen()
   aaa.setValue(1, 1, 4.);
   aaa.display();
 
-  (void) aaa.computeGeneralizedInverse(bbb);
+  (void)aaa.computeGeneralizedInverse(bbb);
 
   message("Generalized Inverse\n");
   bbb.display();
@@ -58,7 +58,7 @@ void reset_to_initial_contents(AMatrix* M,
 ** Main program for testing the new classes of matrix algebra
 **
 *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
@@ -73,40 +73,40 @@ int main(int argc, char *argv[])
   st_invgen();
 
   message("Cloning Matrix of integers\n");
-  MatrixInt mati(2,3);
+  MatrixInt mati(2, 3);
   mati.setValues({1, 2, 3, 4, 5, 6});
   mati.display();
   MatrixInt* mati2(mati.clone());
   mati2->display();
 
   // Checking assessor for MatrixInt
-  int imemo = mati(1,2);
+  int imemo = mati(1, 2);
   message("Initial value of mati(1,2) = %d\n", imemo);
-  mati(1,2) = -23;
+  mati(1, 2) = -23;
   mati.display();
-  mati(1,2) = imemo; // set back to initial value
+  mati(1, 2) = imemo; // set back to initial value
 
   message("Cloning Matrix of doubles\n");
-  MatrixDense matd(2,3);
+  MatrixDense matd(2, 3);
   matd.setValues({1.0, 2.0, 3.0, 4.0, 5.0, 6.0});
   matd.display();
   AMatrix* pmat = &matd;
   MatrixDense* matd2(dynamic_cast<MatrixDense*>(pmat->clone())); // dynamic_cast cannot be avoided here
   matd2->display();
 
-  VectorDouble V1,V2,V3,Vref;
+  VectorDouble V1, V2, V3, Vref;
   law_set_random_seed(32432);
-  int nrow = 7; // For these tests, the matrix MUST be square (ncol = nrow)
-  int ncol = 7;
+  int nrow     = 7; // For these tests, the matrix MUST be square (ncol = nrow)
+  int ncol     = 7;
   double proba = 0.4; // Probability to set values to 0 (making matrix sparse)
 
   // We create a square symmetrical matrix (not necessarily sparse)
-  
+
   MatrixDense MR(nrow, ncol);
   for (int icol = 0; icol < ncol; icol++)
     for (int irow = 0; irow < nrow; irow++)
     {
-      double value = law_gaussian();
+      double value  = law_gaussian();
       double tirage = law_uniform(0., 1.);
       if (tirage < proba) value = 0.;
       MR.setValue(irow, icol, value);
@@ -116,15 +116,15 @@ int main(int argc, char *argv[])
 
   // Checking using the operator to modify and correct the initial matrix MR()
 
-  double memo = MR(1,2);
+  double memo = MR(1, 2);
   message("Initial value of M(1,2) = %lf\n", memo);
 
   double new_value = 111.111;
-  MR(1,2) = new_value;
+  MR(1, 2)         = new_value;
   message("Modifying it to new value = %lf\n", new_value);
   MR.display();
 
-  MR(1,2) = memo; // Set back to initial value
+  MR(1, 2) = memo; // Set back to initial value
   message("Resetting to initial value\n");
   MR.display();
 
@@ -132,20 +132,20 @@ int main(int argc, char *argv[])
 
   AMatrix* MRt = MR.transpose();
   MRt->display();
-//  AMatrix* M = prodMatMatInPlace(MRt, &MR);
+  //  AMatrix* M = prodMatMatInPlace(MRt, &MR);
   AMatrix* M = MatrixFactory::prodMatMat(MRt, &MR);
-  message("Matrix M (should be symmetric). Checking = %d\n", (int) M->isSymmetric());
+  message("Matrix M (should be symmetric). Checking = %d\n", (int)M->isSymmetric());
   M->display();
 
   // Creating two vectors for future use
 
-  V1.resize(ncol,0.);
-  V2.resize(ncol,0.);
+  V1.resize(ncol, 0.);
+  V2.resize(ncol, 0.);
 
   // Create the different matrix formats (by conversion or extraction)
- 
+
   // To a rectangular matrix
-  MatrixDense MRR(nrow,ncol);
+  MatrixDense MRR(nrow, ncol);
   MRR.setValues(M->getValues());
   message("Matrix MRR\n");
   MRR.display();
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
    */
   double addendum = 1.432;
 
-  mestitle(0,"Adding a constant value to the diagonal of a matrix");
+  mestitle(0, "Adding a constant value to the diagonal of a matrix");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Reference MRR (before addition)\n");
   MRR.display();
@@ -179,18 +179,18 @@ int main(int argc, char *argv[])
   MRR.display();
 
   MSG.addScalarDiag(addendum);
-  message("Are results for MRR and MSG similar: %d\n",(int) MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", (int)MRR.isSame(MSG));
   MSS.addScalarDiag(addendum);
-  message("Are results for MRR and MSS similar: %d\n",(int) MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", (int)MRR.isSame(MSS));
   MSP->addScalarDiag(addendum);
-  message("Are results for MRR and MSP similar: %d\n",(int) MRR.isSame(*MSP));
+  message("Are results for MRR and MSP similar: %d\n", (int)MRR.isSame(*MSP));
 
   /**
    * Multiplying the matrix by a constant
    */
   double multiply = 3.2;
 
-  mestitle(0,"Multiplying a Matrix by a constant");
+  mestitle(0, "Multiplying a Matrix by a constant");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Reference MRR (before multiplication)\n");
   MRR.display();
@@ -199,18 +199,18 @@ int main(int argc, char *argv[])
   MRR.display();
 
   MSG.prodScalar(multiply);
-  message("Are results for MRR and MSG similar: %d\n",(int) MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", (int)MRR.isSame(MSG));
   MSS.prodScalar(multiply);
-  message("Are results for MRR and MSS similar: %d\n",(int) MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", (int)MRR.isSame(MSS));
   MSP->prodScalar(multiply);
-  message("Are results for MRR and MSP similar: %d\n",(int) MRR.isSame(*MSP));
+  message("Are results for MRR and MSP similar: %d\n", (int)MRR.isSame(*MSP));
 
   /**
    * Adding a constant to a matrix
    * Note: This does not make sense for sparse or diagonal matrices
    */
 
-  mestitle(0,"Adding a constant value to the whole matrix");
+  mestitle(0, "Adding a constant value to the whole matrix");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Reference MRR (before addition)\n");
   MRR.display();
@@ -219,17 +219,17 @@ int main(int argc, char *argv[])
   MRR.display();
 
   MSG.addScalar(addendum);
-  message("Are results for MRR and MSG similar: %d\n",(int) MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", (int)MRR.isSame(MSG));
   MSS.addScalar(addendum);
-  message("Are results for MRR and MSS similar: %d\n",(int) MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", (int)MRR.isSame(MSS));
 
   /**
-    * Linear combination
-    */
-  double cx =  1.3;
+   * Linear combination
+   */
+  double cx = 1.3;
   double cy = -0.5;
 
-  mestitle(0,"Linear combination of matrices");
+  mestitle(0, "Linear combination of matrices");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Reference MRR (before linear combination)\n");
   MRR.display();
@@ -238,17 +238,17 @@ int main(int argc, char *argv[])
   MRR.display();
 
   MSG.addMatInPlace(MSG, cx, cy);
-  message("Are results for MRR and MSG similar: %d\n",(int) MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", (int)MRR.isSame(MSG));
   MSS.addMatInPlace(MSS, cx, cy);
-  message("Are results for MRR and MSS similar: %d\n",(int) MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", (int)MRR.isSame(MSS));
   MSP->addMatInPlace(*MSP, cx, cy);
-  message("Are results for MRR and MSP similar: %d\n",(int) MRR.isSame(*MSP));
+  message("Are results for MRR and MSP similar: %d\n", (int)MRR.isSame(*MSP));
 
   /**
    * Extraction of a Vector
    * All the tests are not performed on all the matrix types
    */
-  mestitle(0,"Extracting Vectors from Matrix");
+  mestitle(0, "Extracting Vectors from Matrix");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
 
   message("MRR and MSP matrices are used as Reference\n");
@@ -257,72 +257,72 @@ int main(int argc, char *argv[])
   VH::dump("Reference Vector", Vref);
 
   V1 = MSP->getDiagonal();
-  print_vector("Main Diagonal",0,(int) Vref.size(),Vref.data());
-  message("Are results for MRR and MSP similar: %d\n",(int) VH::isEqual(Vref,V1));
+  print_vector("Main Diagonal", 0, (int)Vref.size(), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", (int)VH::isEqual(Vref, V1));
   Vref = MRR.getDiagonal(1);
-  V1 = MSP->getDiagonal(1);
-  print_vector("Second Diagonal Below",0,(int) Vref.size(),Vref.data());
-  message("Are results for MRR and MSP similar: %d\n",(int) VH::isEqual(Vref,V1));
+  V1   = MSP->getDiagonal(1);
+  print_vector("Second Diagonal Below", 0, (int)Vref.size(), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", (int)VH::isEqual(Vref, V1));
   Vref = MRR.getDiagonal(-2);
-  V1 = MSP->getDiagonal(-2);
-  print_vector("Third Diagonal Above",0,(int) Vref.size(),Vref.data());
-  message("Are results for MRR and MSP similar: %d\n",(int) VH::isEqual(Vref,V1));
+  V1   = MSP->getDiagonal(-2);
+  print_vector("Third Diagonal Above", 0, (int)Vref.size(), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", (int)VH::isEqual(Vref, V1));
   Vref = MRR.getRow(2);
-  V1 = MSP->getRow(2);
-  print_vector("Third Row",0,(int) Vref.size(),Vref.data());
-  message("Are results for MRR and MSP similar: %d\n",(int) VH::isEqual(Vref,V1));
+  V1   = MSP->getRow(2);
+  print_vector("Third Row", 0, (int)Vref.size(), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", (int)VH::isEqual(Vref, V1));
   Vref = MRR.getColumn(3);
-  V1 = MSP->getColumn(3);
-  print_vector("Fourth Column",0,(int) Vref.size(),Vref.data());
-  message("Are results for MRR and MSP similar: %d\n",(int) VH::isEqual(Vref,V1));
+  V1   = MSP->getColumn(3);
+  print_vector("Fourth Column", 0, (int)Vref.size(), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", (int)VH::isEqual(Vref, V1));
 
   /**
    * Product of the matrix by a vector
    */
-  Vref.resize(nrow,0.);
+  Vref.resize(nrow, 0.);
 
-  mestitle(0,"Product of the matrix by a vector");
+  mestitle(0, "Product of the matrix by a vector");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Reference Matrix\n");
   MRR.display();
-  VH::dump("Reference Input Vector",V1);
+  VH::dump("Reference Input Vector", V1);
   MRR.prodMatVecInPlace(V1, Vref);
-  VH::dump("Reference Output Vector",Vref);
+  VH::dump("Reference Output Vector", Vref);
 
   MSG.prodMatVecInPlace(V1, V2);
-  message("Are results for MRR and MSG similar: %d\n",(int) VH::isEqual(Vref,V2));
+  message("Are results for MRR and MSG similar: %d\n", (int)VH::isEqual(Vref, V2));
   MSS.prodMatVecInPlace(V1, V2);
-  message("Are results for MRR and MSS similar: %d\n",(int) VH::isEqual(Vref,V2));
+  message("Are results for MRR and MSS similar: %d\n", (int)VH::isEqual(Vref, V2));
   MSP->prodMatVecInPlace(V1, V2);
-  message("Are results for MRR and MSP similar: %d\n",(int) VH::isEqual(Vref,V2));
+  message("Are results for MRR and MSP similar: %d\n", (int)VH::isEqual(Vref, V2));
 
   /**
    * Linear solver
    */
 
-  V3.resize(nrow,0.);
+  V3.resize(nrow, 0.);
 
-  mestitle(0,"Matrix Linear Solver");
+  mestitle(0, "Matrix Linear Solver");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Solve X from A*X=B. Compute A*X and compare with B\n");
 
   message("Reference Matrix\n");
   MSS.display();
-  VH::dump("Reference Input Vector",V1);
+  VH::dump("Reference Input Vector", V1);
   MSS.solve(V1, V2);
-  VH::dump("Reference Output Vector",V2);
+  VH::dump("Reference Output Vector", V2);
 
   MSS.prodMatVecInPlace(V2, V3);
-  message("Are results correct for MSS: %d\n",(int) VH::isEqual(V1,V3));
+  message("Are results correct for MSS: %d\n", (int)VH::isEqual(V1, V3));
   MSP->solve(V1, V2);
   MSP->prodMatVecInPlace(V2, V3);
-  message("Are results correct for MSP: %d\n",(int) VH::isEqual(V1,V3));
+  message("Are results correct for MSP: %d\n", (int)VH::isEqual(V1, V3));
 
   /**
    * Inversion
    */
 
-  mestitle(0,"Matrix Inversion");
+  mestitle(0, "Matrix Inversion");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Calculate B=A^{-1}. Compute A*B and compare to Identity\n");
 
@@ -335,24 +335,24 @@ int main(int argc, char *argv[])
   MSG.display();
 
   Res = MatrixFactory::prodMatMat(&MSG, &MSGref);
-  message("Are results correct for MSG: %d\n",(int) Res->isIdentity());
+  message("Are results correct for MSG: %d\n", (int)Res->isIdentity());
   delete Res;
 
   MSS.invert();
   Res = MatrixFactory::prodMatMat(&MSS, &MSGref);
-  message("Are results correct for MSS: %d\n",(int) Res->isIdentity());
+  message("Are results correct for MSS: %d\n", (int)Res->isIdentity());
   delete Res;
 
   MSP->invert();
   Res = MatrixFactory::prodMatMat(MSP, &MSGref);
-  message("Are results correct for MSP: %d\n",(int) Res->isIdentity());
+  message("Are results correct for MSP: %d\n", (int)Res->isIdentity());
   delete Res;
 
   /*
    * Auxiliary functions (virtual in AMatrix)
    */
 
-  mestitle(0,"Setting various Elements to known values");
+  mestitle(0, "Setting various Elements to known values");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   nrow = MSG.getNRows();
   ncol = MSG.getNCols();
@@ -363,13 +363,13 @@ int main(int argc, char *argv[])
 
   int icol0 = 1;
   message("Setting Column (%d) to a vector (sequence from 1 to %d)\n", icol0, nrow);
-  VectorDouble myCol = VH::sequence(1., (double) nrow);
+  VectorDouble myCol = VH::sequence(1., (double)nrow);
   MSG.setColumn(icol0, myCol);
   MSG.display();
 
   int irow0 = 2;
   message("Setting Row (%d) to a vector (sequence from 1 to %d)\n", irow0, ncol);
-  VectorDouble myRow = VH::sequence(1., (double) ncol);
+  VectorDouble myRow = VH::sequence(1., (double)ncol);
   MSG.setRow(irow0, myRow);
   MSG.display();
 
@@ -400,22 +400,22 @@ int main(int argc, char *argv[])
   MSG.display();
 
   message("Multiplying current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol = VH::sequence(1., (double)nrow);
   MSG.multiplyColumn(myCol);
   MSG.display();
 
   message("Dividing current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol = VH::sequence(1., (double)nrow);
   MSG.divideColumn(myCol);
   MSG.display();
 
   message("Multiplying current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow = VH::sequence(1., (double)ncol);
   MSG.multiplyRow(myRow);
   MSG.display();
 
   message("Dividing current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow = VH::sequence(1., (double)ncol);
   MSG.divideRow(myRow);
   MSG.display();
 
@@ -423,22 +423,22 @@ int main(int argc, char *argv[])
   VectorDouble myColRes;
 
   message("Multiplying sequence vector by matrix\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol    = VH::sequence(1., (double)nrow);
   myRowRes = MSG.prodVecMat(myCol, false);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix (transposed) by sequence vector\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol    = VH::sequence(1., (double)nrow);
   myRowRes = MSG.prodMatVec(myCol, true);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix by sequence vector\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow    = VH::sequence(1., (double)ncol);
   myColRes = MSG.prodMatVec(myRow, false);
   VH::dump("Resulting Vector", myColRes);
 
   message("Multiplying sequence vector by matrix (transposed)\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow    = VH::sequence(1., (double)ncol);
   myColRes = MSG.prodVecMat(myRow, true);
   VH::dump("Resulting Vector", myColRes);
 
@@ -448,7 +448,7 @@ int main(int argc, char *argv[])
   MSG.display();
 
   message("Clearing matrix and Setting Diagonal to a vector (sequence from 1 to %d)\n", ncol);
-  VectorDouble myDiag = VH::sequence(1., (double) ncol);
+  VectorDouble myDiag = VH::sequence(1., (double)ncol);
   MSG.setDiagonal(myDiag);
   MSG.display();
 
@@ -463,12 +463,12 @@ int main(int argc, char *argv[])
   MSP->display();
 
   message("Setting terms of Column (%d) to a vector (sequence from 1 to %d)\n", icol0, nrow);
-  myCol = VH::sequence(1., (double) nrow);
+  myCol = VH::sequence(1., (double)nrow);
   MSP->setColumn(icol0, myCol);
   MSP->display();
 
   message("Setting terms of Row (%d) to a vector (sequence from 1 to %d)\n", irow0, ncol);
-  myRow = VH::sequence(1., (double) ncol);
+  myRow = VH::sequence(1., (double)ncol);
   MSP->setRow(irow0, myRow);
   MSP->display();
 
@@ -494,42 +494,42 @@ int main(int argc, char *argv[])
   MSP->display();
 
   message("Multiplying current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol = VH::sequence(1., (double)nrow);
   MSP->multiplyColumn(myCol);
   MSP->display();
 
   message("Dividing current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol = VH::sequence(1., (double)nrow);
   MSP->divideColumn(myCol);
   MSP->display();
 
   message("Multiplying current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow = VH::sequence(1., (double)ncol);
   MSP->multiplyRow(myRow);
   MSP->display();
 
   message("Dividing current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow = VH::sequence(1., (double)ncol);
   MSP->divideRow(myRow);
   MSP->display();
 
   message("Multiplying sequence vector by matrix\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol    = VH::sequence(1., (double)nrow);
   myRowRes = MSP->prodVecMat(myCol, false);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix (transposed) by sequence vector\n");
-  myCol = VH::sequence(1., (double) nrow);
+  myCol    = VH::sequence(1., (double)nrow);
   myRowRes = MSP->prodMatVec(myCol, true);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix by sequence vector\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow    = VH::sequence(1., (double)ncol);
   myColRes = MSP->prodMatVec(myRow, false);
   VH::dump("Resulting Vector", myColRes);
 
   message("Multiplying sequence vector by matrix (transposed)\n");
-  myRow = VH::sequence(1., (double) ncol);
+  myRow    = VH::sequence(1., (double)ncol);
   myColRes = MSP->prodVecMat(myRow, true);
   VH::dump("Resulting Vector", myColRes);
 
@@ -539,7 +539,7 @@ int main(int argc, char *argv[])
   MSP->display();
 
   message("Clearing matrix and Setting Diagonal to a vector (sequence from 1 to %d)\n", ncol);
-  myDiag = VH::sequence(1., (double) ncol);
+  myDiag = VH::sequence(1., (double)ncol);
   MSP->setDiagonal(myDiag);
   MSP->display();
 
@@ -551,21 +551,21 @@ int main(int argc, char *argv[])
    * Testing LU
    */
 
-  int neq = 3;
+  int neq  = 3;
   int neq2 = neq * neq;
   MatrixSquare mat(neq);
   VectorDouble tab(neq2);
 
   MatrixSquare a(neq);
-  a(0,0) = -1;
-  a(0,1) =  0;
-  a(0,2) =  3;
-  a(1,0) = -2;
-  a(1,1) = -2;
-  a(1,2) =  7;
-  a(2,0) = -5;
-  a(2,1) =  0;
-  a(2,2) = 20;
+  a(0, 0) = -1;
+  a(0, 1) = 0;
+  a(0, 2) = 3;
+  a(1, 0) = -2;
+  a(1, 1) = -2;
+  a(1, 2) = 7;
+  a(2, 0) = -5;
+  a(2, 1) = 0;
+  a(2, 2) = 20;
   a.display();
   MatrixSquare ai(a);
 
@@ -587,36 +587,36 @@ int main(int argc, char *argv[])
 
   VectorDouble xtest(neq);
   VectorDouble x(neq);
-  VectorDouble b = { 2., 7., 0.};
-  VH::dump("B",b);
+  VectorDouble b = {2., 7., 0.};
+  VH::dump("B", b);
 
   message("Inverse (using LU or invreal depending on the dimension)\n");
-  (void) a.invert();
+  (void)a.invert();
   a.display();
 
   // ************
   // Eigen values
   // ************
 
-  mestitle(0,"Eigen values calculation for Dense matrices");
+  mestitle(0, "Eigen values calculation for Dense matrices");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
 
   // Get a Dense matrix
-  VectorDouble temp = MSS.getValues();
-  int ntemp = MSS.getNRows();
+  VectorDouble temp     = MSS.getValues();
+  int ntemp             = MSS.getNRows();
   MatrixSymmetric* MEig = MatrixSymmetric::createFromVD(temp);
   MEig->display();
   MatrixSymmetric* MNoEig = MatrixSymmetric::createFromVD(temp);
   MNoEig->display();
 
   // Extract the Eigen values and vectors (both matrix types)
-  (void) MEig->computeEigen();
+  (void)MEig->computeEigen();
   VectorDouble eigVal = MEig->getEigenValues();
   VH::dump("Eigen Values (Eigen Library)", eigVal);
   const MatrixSquare* eigVec = MEig->getEigenVectors();
   eigVec->display();
 
-  (void) MNoEig->computeEigen();
+  (void)MNoEig->computeEigen();
   VectorDouble eigNoVal = MNoEig->getEigenValues();
   VH::dump("Eigen Values (no Eigen Library)", eigNoVal);
   const MatrixSquare* eigNoVec = MNoEig->getEigenVectors();
@@ -630,25 +630,25 @@ int main(int argc, char *argv[])
   CholeskyDense MEigChol(*MEig);
 
   // Compare Cholesky Decomposition calculated using Eigen Library or not (sparse matrix only)
-  mestitle(0,"Cholesky Decomposition for Sparse matrices");
+  mestitle(0, "Cholesky Decomposition for Sparse matrices");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
 
   // Get a Sparse matrix
-  NF_Triplet triplet = MSP->getMatrixToTriplet();
-  MatrixSparse* MSEig = MatrixSparse::createFromTriplet(triplet, MSP->getNRows(), MSP->getNCols(),1);
+  NF_Triplet triplet  = MSP->getMatrixToTriplet();
+  MatrixSparse* MSEig = MatrixSparse::createFromTriplet(triplet, MSP->getNRows(), MSP->getNCols(), 1);
   MSEig->display();
-  MatrixSparse* MSNoEig = MatrixSparse::createFromTriplet(triplet, MSP->getNRows(), MSP->getNCols(),0);
+  MatrixSparse* MSNoEig = MatrixSparse::createFromTriplet(triplet, MSP->getNRows(), MSP->getNCols(), 0);
   MSNoEig->display();
 
   VectorDouble B = VH::simulateGaussian(ntemp);
-  VH::dump("Input vector",B);
+  VH::dump("Input vector", B);
 
   VectorDouble XEig(ntemp);
   VectorDouble XNoEig(ntemp);
 
   CholeskySparse MSEigChol(*MSEig);
   MSEigChol.solve(B, XEig);
-  VH::dump("Cholesky Solve (Eigen Library)",XEig);
+  VH::dump("Cholesky Solve (Eigen Library)", XEig);
   VectorDouble resEig = MSEig->prodVecMat(XEig);
   VH::dump("Verification (Eigen Library)", resEig);
   MSEigChol.addSimulateToDest(B, XEig);
@@ -657,13 +657,13 @@ int main(int argc, char *argv[])
 
   CholeskySparse MSNoEigChol(*MSNoEig);
   MSNoEigChol.solve(B, XNoEig);
-  VH::dump("Cholesky Solve (No Eigen Library)",XNoEig);
+  VH::dump("Cholesky Solve (No Eigen Library)", XNoEig);
   VectorDouble resNoEig = MSNoEig->prodVecMat(XNoEig);
-  VH::dump("Verification (no Eigen Library)",resNoEig);
+  VH::dump("Verification (no Eigen Library)", resNoEig);
   MSNoEigChol.addSimulateToDest(B, XNoEig);
 
   // Log Determinant
-  mestitle(0,"Cholesky Log Determinant");
+  mestitle(0, "Cholesky Log Determinant");
   message("Log Determinant Sparse (No Eigen Library)   = %lf\n",
           MSNoEigChol.computeLogDeterminant());
   message("Log Determinant Dense  (traditional method) = %lf\n",
@@ -672,19 +672,19 @@ int main(int argc, char *argv[])
           MEigChol.computeLogDeterminant());
 
   // Compute Cholesky factorization (for dense matrix (Eigen library)
-  mestitle(0,"Cholesky Decomposition for Dense matrices");
+  mestitle(0, "Cholesky Decomposition for Dense matrices");
   message("Input Square Symmetric Matrix (Dense format)\n");
   MEig->display();
 
   // Solving a Linear system after Cholesky decomposition
-  mestitle(0,"Solving a Linear system after Cholesky decomposition");
+  mestitle(0, "Solving a Linear system after Cholesky decomposition");
   VH::dump("Input Vector B =", B);
   MEigChol.solve(B, XEig);
   VH::dump("Result Vector X =", XEig);
-  message("Is M * X = B: %d\n",(int) VH::isEqual(B,MEig->prodMatVec(XEig)));
+  message("Is M * X = B: %d\n", (int)VH::isEqual(B, MEig->prodMatVec(XEig)));
 
   // Solving a linear system after Cholesky decomposition (matrix RHS)
-  mestitle(0,"Solving a Linear system after Cholesky decomposition (matrix RHS)");
+  mestitle(0, "Solving a Linear system after Cholesky decomposition (matrix RHS)");
   int nrows = MEig->getNRows();
   int ncols = 5;
   MatrixDense Bmat(nrows, ncols);
@@ -693,12 +693,12 @@ int main(int argc, char *argv[])
     Bmat.setColumn(icol, B);
   message("Input Matrix B =\n");
   Bmat.display();
-  (void) MEigChol.solveMatrix(Bmat, Bres);
+  (void)MEigChol.solveMatrix(Bmat, Bres);
   message("Result Matrix X =\n");
   Bres.display();
 
   MatrixDense* Bcheck = MatrixFactory::prodMatMat<MatrixDense>(MEig, &Bres);
-  message("Is M * X = B: %d\n", (int) Bmat.isSame(*Bcheck));
+  message("Is M * X = B: %d\n", (int)Bmat.isSame(*Bcheck));
   delete Bcheck;
 
   // Product by Diagonal built from a vector
@@ -721,23 +721,21 @@ int main(int argc, char *argv[])
 
   // Gluing two sparse matrices
 
-  MatrixSparse* MSGlueEig = dynamic_cast<MatrixSparse*>
-    (MatrixFactory::createGlue(MSEig, MSEig, true, true));
+  MatrixSparse* MSGlueEig = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(MSEig, MSEig, true, true));
   MSGlueEig->display();
-  MatrixSparse* MSGlueNoEig = dynamic_cast<MatrixSparse*>
-    (MatrixFactory::createGlue(MSNoEig, MSNoEig, true, true));
+  MatrixSparse* MSGlueNoEig = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(MSNoEig, MSNoEig, true, true));
   MSGlueNoEig->display();
 
   // Compare Generalized Eigen values calculated using Eigen Library or not (dense matrix only)
 
-  mestitle(0,"Generalized Eigen values calculation for Dense matrices");
+  mestitle(0, "Generalized Eigen values calculation for Dense matrices");
 
   // We use the Square symmetric matrices created in previous paragraph
   // We must construct another square symmetric matrix (B)
   VectorDouble vbh = VH::simulateGaussian(nrow * ncol);
 
-  MatrixDense* MREig = MatrixDense::createFromVD(vbh, nrow, ncol, false);
-  AMatrix* MREigt = MREig->transpose();
+  MatrixDense* MREig    = MatrixDense::createFromVD(vbh, nrow, ncol, false);
+  AMatrix* MREigt       = MREig->transpose();
   MatrixSymmetric* BEig = MatrixFactory::prodMatMat<MatrixSymmetric>(MREig, MREigt);
   delete MREig;
   delete MREigt;
@@ -747,21 +745,21 @@ int main(int argc, char *argv[])
   BEig->display();
 
   // Extract the Generalized Eigen values and vectors (both matrix types)
-  (void) MEig->computeGeneralizedEigen(*BEig);
-  VectorDouble genEigVal = MEig->getEigenValues();
+  (void)MEig->computeGeneralizedEigen(*BEig);
+  VectorDouble genEigVal        = MEig->getEigenValues();
   const MatrixSquare* genEigVec = MEig->getEigenVectors();
   VH::dump("Generalized Eigen Values (Eigen Library)", genEigVal);
   genEigVec->display();
   delete BEig;
 
-  MatrixDense* MRNoEig = MatrixDense::createFromVD(vbh, nrow, ncol, false);
-  AMatrix* MRNoEigt = MRNoEig->transpose();
+  MatrixDense* MRNoEig    = MatrixDense::createFromVD(vbh, nrow, ncol, false);
+  AMatrix* MRNoEigt       = MRNoEig->transpose();
   MatrixSymmetric* BNoEig = MatrixFactory::prodMatMat<MatrixSymmetric>(MRNoEig, MRNoEigt);
   delete MRNoEig;
   delete MRNoEigt;
 
-  (void) MNoEig->computeGeneralizedEigen(*BNoEig);
-  VectorDouble genEigNoVal = MNoEig->getEigenValues();
+  (void)MNoEig->computeGeneralizedEigen(*BNoEig);
+  VectorDouble genEigNoVal        = MNoEig->getEigenValues();
   const MatrixSquare* genEigNoVec = MNoEig->getEigenVectors();
   VH::dump("Generalized Eigen Values (no Eigen Library)", genEigNoVal);
   genEigNoVec->display();
@@ -770,5 +768,5 @@ int main(int argc, char *argv[])
   // Free the pointers
 
   delete M;
-  return(0);
+  return (0);
 }

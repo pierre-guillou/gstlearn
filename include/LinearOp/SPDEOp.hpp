@@ -10,7 +10,10 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/VectorNumT.hpp"
 #include "LinearOp/ALinearOpEigenCG.hpp"
+#include "LinearOp/ASimulable.hpp"
+#include "LinearOp/LinearOpCGSolver.hpp"
 #include "Matrix/MatrixDense.hpp"
 
 #include "Basic/VectorNumT.hpp"
@@ -18,7 +21,6 @@
 #include "Polynomials/Chebychev.hpp"
 
 #ifndef SWIG
-#  include "LinearOp/ASimulableEigenCG.hpp"
 DECLARE_EIGEN_TRAITS(SPDEOp)
 #endif
 
@@ -132,7 +134,6 @@ private:
   mutable VectorDouble _rhs;
   mutable VectorDouble _workmesh;
 };
-
 
 /****************************************************************************/
 

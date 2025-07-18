@@ -222,6 +222,7 @@ public:
   constvect getViewOnColumn(int icol) const;
   vect getViewOnColumnModify(int icol);
 #endif
+
 #ifndef SWIG
 
 public:
