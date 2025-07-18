@@ -286,7 +286,7 @@ private:
 private:
 #ifndef SWIG
   cs* _csMatrix;                            // Classical storage for Sparse matrix
-  Eigen::SparseMatrix<double> _eigenMatrix; // Eigen storage in Eigen Library (always stored Eigen::ColMajor)
+  Eigen::SparseMatrix<double> _eigenMatrix; // Storage (always stored Eigen::ColMajor)
 #endif
   int _nColMax;
 };

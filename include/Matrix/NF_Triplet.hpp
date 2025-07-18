@@ -11,17 +11,17 @@
 #pragma once
 
 #include "gstlearn_export.hpp"
-//#include "geoslib_define.h"
+// #include "geoslib_define.h"
 #include "Basic/AStringable.hpp"
-#include "Basic/WarningMacro.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Basic/WarningMacro.hpp"
 
 #ifndef SWIG
 DISABLE_WARNING_PUSH
 DISABLE_WARNING_COND_EXPR_CONSTANT
 DISABLE_WARNING_UNUSED_BUT_SET_VARIABLE
 DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
-#include <Eigen/Sparse>
+#  include <Eigen/Sparse>
 DISABLE_WARNING_POP
 
 typedef Eigen::Triplet<double> T;
@@ -33,23 +33,23 @@ class cs;
 
 /**
  * Stores the contents of a sparse matrix in Triplet form
- * The format is adapter to Eigen or to csparse
+ * The format is adapter to Eigen
  */
-class GSTLEARN_EXPORT NF_Triplet                                                                     
+class GSTLEARN_EXPORT NF_Triplet
 {
 public:
   NF_Triplet();
-  NF_Triplet(const NF_Triplet &r);
-  NF_Triplet& operator= (const NF_Triplet &);
+  NF_Triplet(const NF_Triplet& r);
+  NF_Triplet& operator=(const NF_Triplet&);
   virtual ~NF_Triplet();
 
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;
 
   void add(int irow, int icol, double value);
-  int getNElements() const { return (int) _eigenT.size(); }
-  int getNRows()  const { return _nrowmax; }
-  int getNCols()  const { return _ncolmax; }
+  int getNElements() const { return (int)_eigenT.size(); }
+  int getNRows() const { return _nrowmax; }
+  int getNCols() const { return _ncolmax; }
   void force(int nrow, int ncol);
 
   int getRow(int i) const;
@@ -64,15 +64,15 @@ public:
   cs* buildCsFromTriplet() const;
   ::Eigen::SparseMatrix<double> buildEigenFromTriplet() const;
 
-  static NF_Triplet createFromCs(const cs* mat, int shiftRow=0, int shiftCol=0);
-  static NF_Triplet createFromEigen(const Eigen::SparseMatrix<double>& mat, int shiftRow=0, int shiftCol=0);
+  static NF_Triplet createFromCs(const cs* mat, int shiftRow = 0, int shiftCol = 0);
+  static NF_Triplet createFromEigen(const Eigen::SparseMatrix<double>& mat, int shiftRow = 0, int shiftCol = 0);
 #endif
 
 private:
-  int  _nrowmax;
-  int  _ncolmax;
+  int _nrowmax;
+  int _ncolmax;
 #ifndef SWIG
   std::vector<T> _eigenT; // Triplet in Eigen format
 #endif
 };
-}
+} // namespace gstlrn

@@ -1371,11 +1371,4 @@ void ShiftOpMatrix::_determineFlagNoStatByHH()
   _flagNoStatByHH = _cova->isNoStatForTensor();
 }
 
-// void ShiftOpMatrix::multiplyByValueAndAddDiagonal(double v1,double v2)
-// {
-//   MatrixSparse* T1 = MatrixSparse::diagConstant(getSize(), 1.);
-//   if (T1 == nullptr) my_throw("Problem in cs_eye");
-//   _S->addMatInPlace(*T1, v1, v2);
-//   delete T1;
-// }
 } // namespace gstlrn
