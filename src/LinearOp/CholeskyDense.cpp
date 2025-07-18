@@ -20,13 +20,13 @@
 #define _XL(i, j)     _xl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
 
 namespace gstlrn{
-CholeskyDense::CholeskyDense(const MatrixSymmetric* mat)
+CholeskyDense::CholeskyDense(const MatrixSymmetric& mat)
   : ACholesky(mat)
   , _tl()
   , _xl()
   , _factor()
 {
-  (void)_prepare();
+  (void)_prepare(mat);
 }
 
 CholeskyDense::CholeskyDense(const CholeskyDense& m)
@@ -171,20 +171,18 @@ double CholeskyDense::getUpperTriangleInverse(int i, int j) const
   return (i >= j) ? _XL(i, j) : 0.;
 }
 
-int CholeskyDense::_prepare() const
+int CholeskyDense::_prepare(const MatrixSymmetric& mat) const
 {
-  if (_mat == nullptr) return 1;
-  const auto a = dynamic_cast<const MatrixDense*>(_mat)->getEigenMat();
+  const auto& a = mat.getEigenMat();
   _factor      = a.llt();
   _setReady();
   return 0;
 }
 
-int CholeskyDense::setMatrix(const MatrixSymmetric* mat)
+int CholeskyDense::setMatrix(const MatrixSymmetric& mat)
 {
-  _mat  = mat;
-  _size = mat->getNRows();
-  return _prepare();
+  _size = mat.getNRows();
+  return _prepare(mat);
 }
 
 int CholeskyDense::_computeTL() const

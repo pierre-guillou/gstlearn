@@ -12,6 +12,8 @@
 
 #include "Basic/AStringFormat.hpp"
 #include "LinearOp/ASimulable.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "gstlearn_export.hpp"
 
 #include "Basic/VectorT.hpp"
@@ -60,7 +62,8 @@ public:
   /// AStringable Interface
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  double computeLogDetQ(int nMC = 1) const;
+  double computeLogDet(int nMC = 1) const override;
+  std::pair<double, double> rangeEigenValQ() const;
 
 protected:
   int size(int imesh) const;
@@ -84,11 +87,12 @@ private:
   void _popsClear();
   void _computeSize();
 
-  std::pair<double, double> rangeEigenValQ() const;
 
 protected:
   std::vector<PrecisionOp*> _pops;
   VectorBool _isNoStatForVariance;
+  std::vector<MatrixSymmetric> _sills;
+  std::vector<std::vector<MatrixSymmetric>>_localSills; // Local Sills for non-stationary covariances
   std::vector<VectorVectorDouble> _invCholSillsNoStat;
   std::vector<VectorVectorDouble> _cholSillsNoStat;
   std::vector<CholeskyDense> _invCholSillsStat; // Stationary Sills

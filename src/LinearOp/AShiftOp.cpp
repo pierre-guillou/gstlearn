@@ -77,6 +77,19 @@ void AShiftOp::prodLambda(const VectorDouble& x,
   prodLambda(xv, yv, power);
 }
 
+double AShiftOp::logDetLambda() const
+  {
+    double res = 0.;
+    for (const auto& e : _Lambda)
+      res += log(e);
+    return 2. * res;
+  }
+
+double AShiftOp::getMaxEigenValue() const
+{
+  double val = _getMaxEigenValue();
+  return val;
+}
 void AShiftOp::addProdLambda(const constvect x,
                              vect y,
                              const EPowerPT& power) const

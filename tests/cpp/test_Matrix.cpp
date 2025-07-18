@@ -605,7 +605,7 @@ int main(int argc, char *argv[])
   // Get a Dense matrix
   VectorDouble temp = MSS.getValues();
   int ntemp = MSS.getNRows();
-  MatrixSymmetric* MEig   = MatrixSymmetric::createFromVD(temp);
+  MatrixSymmetric* MEig = MatrixSymmetric::createFromVD(temp);
   MEig->display();
   MatrixSymmetric* MNoEig = MatrixSymmetric::createFromVD(temp);
   MNoEig->display();
@@ -628,7 +628,7 @@ int main(int argc, char *argv[])
   // *********************
 
   // Compute Cholesky factorization (only for comparison)
-  CholeskyDense MEigChol(MEig);
+  CholeskyDense MEigChol(*MEig);
 
   // Compare Cholesky Decomposition calculated using Eigen Library or not (sparse matrix only)
   mestitle(0,"Cholesky Decomposition for Sparse matrices");
@@ -647,7 +647,7 @@ int main(int argc, char *argv[])
   VectorDouble XEig(ntemp);
   VectorDouble XNoEig(ntemp);
 
-  CholeskySparse MSEigChol(MSEig);
+  CholeskySparse MSEigChol(*MSEig);
   MSEigChol.solve(B, XEig);
   VH::dump("Cholesky Solve (Eigen Library)",XEig);
   VectorDouble resEig = MSEig->prodVecMat(XEig);
@@ -656,7 +656,7 @@ int main(int argc, char *argv[])
   // Simulation using Cholesky cannot be compared due to different choices in embedded permutations
   //  VH::dump("Cholesky Simulate (Eigen Library)", XEig);
 
-  CholeskySparse MSNoEigChol(MSNoEig);
+  CholeskySparse MSNoEigChol(*MSNoEig);
   MSNoEigChol.solve(B, XNoEig);
   VH::dump("Cholesky Solve (No Eigen Library)",XNoEig);
   VectorDouble resNoEig = MSNoEig->prodVecMat(XNoEig);

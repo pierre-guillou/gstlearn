@@ -68,7 +68,7 @@ public:
   
 #ifndef SWIG
 
-  void _addEvalOp(ALinearOp* Op, const constvect inv, vect outv) const override;
+  void _addEvalOp(const ALinearOp* Op, const constvect inv, vect outv) const override;
 
 #endif
 

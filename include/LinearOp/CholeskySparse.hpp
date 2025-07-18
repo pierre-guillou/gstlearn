@@ -43,12 +43,12 @@ using Sp = Eigen::SparseMatrix<double>;
 class GSTLEARN_EXPORT CholeskySparse: public ACholesky
 {
 public:
-  CholeskySparse(const MatrixSparse* mat = nullptr);
+  CholeskySparse(const MatrixSparse& mat);
   CholeskySparse(const CholeskySparse& m);
   CholeskySparse& operator=(const CholeskySparse& m);
   virtual ~CholeskySparse();
 
-  int setMatrix(const MatrixSparse* mat);
+  int setMatrix(const MatrixSparse& mat);
   int stdev(VectorDouble& vcur,
             const MatrixSparse* proj,
             bool flagStDev = false) const;
@@ -62,7 +62,7 @@ public:
 
 private:
   void _clean();
-  int _prepare() const;
+  int _prepare(const MatrixSparse& mat) const;
   int _stdevOld(VectorDouble& vcur) const;
   int _stdevEigen(VectorDouble& vcur, const MatrixSparse* proj) const;
 

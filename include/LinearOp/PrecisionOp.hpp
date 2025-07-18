@@ -50,7 +50,7 @@ public:
 #ifndef SWIG
   virtual void evalInverse(const constvect vecin, std::vector<double>& vecout);
 #endif
-
+  std::vector<double> evalInverse(const VectorDouble& vecin);
   virtual std::pair<double, double> getRangeEigenVal(int ndiscr = 100);
 
   static PrecisionOp* createFromShiftOp(AShiftOp* shiftop    = nullptr,
@@ -65,7 +65,6 @@ public:
             const CovAniso* cova = nullptr,
             bool verbose         = false);
 
-  virtual double getLogDeterminant(int nMC = 1);
 #ifndef SWIG
   virtual void gradYQX(const constvect /*X*/,
                        const constvect /*Y*/,
@@ -109,7 +108,7 @@ public:
   void setPolynomialFromPoly(APolynomial* polynomial);
   bool isCovaDefined() const { return _cova != nullptr; }
   VectorDouble getCoeffs();
-
+  virtual double computeLogDet(int nMC = 1) const override;
   virtual VectorDouble extractDiag() const;
 
 protected:

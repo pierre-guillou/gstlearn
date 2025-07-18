@@ -18,17 +18,15 @@
 
 namespace gstlrn
 {
-CholeskySparse::CholeskySparse(const MatrixSparse* mat)
+CholeskySparse::CholeskySparse(const MatrixSparse& mat)
   : ACholesky(mat)
   , _flagEigen(false)
   , _S(nullptr)
   , _N(nullptr)
   , _factor(nullptr)
 {
-  const MatrixSparse* matCS = dynamic_cast<const MatrixSparse*>(mat);
-  _flagEigen                = matCS->isFlagEigen();
-
-  (void)_prepare();
+  _flagEigen                = mat.isFlagEigen();
+  (void)_prepare(mat);
 }
 
 CholeskySparse::CholeskySparse(const CholeskySparse& m)
@@ -110,7 +108,6 @@ int CholeskySparse::stdev(VectorDouble& vcur,
                           const MatrixSparse* proj,
                           bool flagStDev) const
 {
-  if (_mat == nullptr) return 1;
   if (_flagEigen)
   {
     if (_stdevEigen(vcur, proj)) return 1;
@@ -205,24 +202,20 @@ double CholeskySparse::computeLogDeterminant() const
   return 2. * det;
 }
 
-int CholeskySparse::setMatrix(const MatrixSparse* mat)
+int CholeskySparse::setMatrix(const MatrixSparse& mat)
 {
-  _mat  = mat;
-  _size = mat->getNRows();
-  return _prepare();
+  _size = mat.getNRows();
+  return _prepare(mat);
 }
 
-int CholeskySparse::_prepare() const
+int CholeskySparse::_prepare(const MatrixSparse& mat) const
 {
-  if (_mat == nullptr) return 1;
-  const MatrixSparse* matCS = dynamic_cast<const MatrixSparse*>(_mat);
-
   if (_flagEigen)
   {
     if (_factor != nullptr) return 0;
 
     _factor = new Eigen::SimplicialLDLT<Sp>;
-    _factor->compute(matCS->getEigenMatrix());
+    _factor->compute(mat.getEigenMatrix());
     if (_factor == nullptr)
     {
       messerr("Error when computing Cholesky Decomposition");
@@ -232,14 +225,14 @@ int CholeskySparse::_prepare() const
   else
   {
     if (_S != nullptr && _N != nullptr) return 0;
-    _S = cs_schol(matCS->getCS(), 0);
+    _S = cs_schol(mat.getCS(), 0);
     if (_S == nullptr)
     {
       messerr("Error in cs_schol function");
       return 1;
     }
 
-    _N = cs_chol(matCS->getCS(), _S);
+    _N = cs_chol(mat.getCS(), _S);
     if (_N == nullptr)
     {
       messerr("Error in cs_chol function");

@@ -23,7 +23,7 @@
 #include "geoslib_define.h"
 
 namespace gstlrn
-{ 
+{
 Vecchia::Vecchia(ModelGeneric* model,
                  int nb_neigh,
                  const Db* db1,
@@ -33,6 +33,7 @@ Vecchia::Vecchia(ModelGeneric* model,
   , _nbNeigh(nb_neigh)
   , _db1(db1)
   , _db2(db2)
+  , _matCov(std::make_shared<MatrixSymmetric>(0))
   , _DFull()
   , _LFull()
   , _dbTemp(nullptr)
@@ -50,6 +51,7 @@ Vecchia::Vecchia(const Vecchia& r)
   , _nbNeigh(r._nbNeigh)
   , _db1(r._db1)
   , _db2(r._db2)
+  , _matCov(r._matCov)
   , _DFull(r._DFull)
   , _LFull(r._LFull)
   , _dbTemp(nullptr)
@@ -71,6 +73,7 @@ Vecchia& Vecchia::operator=(const Vecchia& r)
     _DFull   = r._DFull;
     _LFull   = r._LFull;
     _Dmat    = r._Dmat;
+    _matCov  = r._matCov;
 
     delete _dbTemp;
     delete _dbOnePoint;
@@ -176,10 +179,10 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
     else
     {
 
-      _matCov.resize(nb_neigh, nb_neigh);
+      _matCov->resize(nb_neigh, nb_neigh);
       _vectCov.resize(nb_neigh, 1);
-      _model->evalCovMatSymInPlace(_matCov, _dbTemp);
-      _chol->setMatrix(&_matCov);
+      _model->evalCovMatSymInPlace(*_matCov, _dbTemp);
+      _chol->setMatrix(*_matCov);
       _model->evalCovMatInPlace(_vectCov, _dbTemp, _dbOnePoint);
       constvect vect = _vectCov.getViewOnColumn(0);
       _work.resize(vect.size());
@@ -309,11 +312,10 @@ int krigingVecchia(Db* dbin,
   MatrixSparse* W = V.calculateW(D_dd);
 
   // Compute the Cholesky decomposition of 'W'
-  CholeskySparse cholW(W);
+  CholeskySparse cholW(*W);
   if (!cholW.isReady())
   {
     messerr("Cholesky decomposition of Covariance matrix failed");
-    delete W;
     return 1;
   }
 
@@ -325,7 +327,6 @@ int krigingVecchia(Db* dbin,
   int iptr = dbout->addColumns(result, String(), ELoc::UNKNOWN, 0, true);
   namconv.setNamesAndLocators(dbout, iptr, "estim", 1);
 
-  delete W;
   return 0;
 }
 
@@ -409,4 +410,4 @@ void Vecchia::_updateModel(bool verbose)
 {
   computeLower(_Ranks, verbose);
 }
-}
+} // namespace gstlrn

@@ -62,9 +62,9 @@ public:
   }
 
   //virtual void evalOp(const ALinearOpMulti* Op,const std::vector<Eigen::VectorXd>& inv, std::vector<Eigen::VectorXd>& outv) const;
-    void addEvalOp(ALinearOp* Op, const constvect inv, vect outv) const;
+    void addEvalOp(const ALinearOp* Op, const constvect inv, vect outv) const;
   protected:
-    virtual void _addEvalOp(ALinearOp* Op, const constvect inv, vect outv) const = 0;
+    virtual void _addEvalOp(const ALinearOp* Op, const constvect inv, vect outv) const = 0;
 
 #endif
   public:

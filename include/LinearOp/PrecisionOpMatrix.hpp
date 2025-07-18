@@ -43,7 +43,7 @@ public:
   int _addToDest(const constvect inv, vect outv) const override;
 #endif
 
-  double getLogDeterminant(int nMC = 1) override;
+  double computeLogDet(int nMC = 1) const override;
   VectorDouble extractDiag() const override;
 
   //void evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,int iapex,int igparam) override;
@@ -66,7 +66,7 @@ public:
                     vect result,
                     const EPowerPT& power) override;
 #endif
-  const MatrixSparse* getQ() const { return _Q; }
+  const MatrixSparse* getQ() const { return _Q.get(); }
   const MatrixSparse* getS() const;
 
 private:
@@ -74,7 +74,7 @@ private:
   MatrixSparse* _build_Q();
 
 private:
-  MatrixSparse* _Q;
+  std::shared_ptr<MatrixSparse> _Q;
   mutable CholeskySparse* _chol;
 };
 

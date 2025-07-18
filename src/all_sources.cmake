@@ -177,6 +177,7 @@ set(SRC
   Db/RankHandler.cpp
   LinearOp/LogStats.cpp
   LinearOp/CGParam.cpp
+  LinearOp/InvNuggetOp.cpp
   LinearOp/PrecisionOp.cpp
   LinearOp/TurboOptimizer.cpp
   LinearOp/ProjMatrix.cpp

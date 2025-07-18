@@ -8,20 +8,21 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "LinearOp/PrecisionOp.hpp"
+#include "Basic/AException.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
-#include "Basic/AException.hpp"
-#include "LinearOp/PrecisionOp.hpp"
+#include "Covariances/CovAniso.hpp"
+#include "LinearOp/AShiftOp.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
 #include "LinearOp/ShiftOpStencil.hpp"
-#include "LinearOp/AShiftOp.hpp"
+#include "Mesh/AMesh.hpp"
 #include "Mesh/MeshEStandard.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Polynomials/APolynomial.hpp"
-#include "Polynomials/ClassicalPolynomial.hpp"
 #include "Polynomials/Chebychev.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Mesh/AMesh.hpp"
+#include "Polynomials/ClassicalPolynomial.hpp"
+#include "geoslib_define.h"
 #include <algorithm>
 #include <memory>
 
@@ -127,7 +128,7 @@ PrecisionOp& PrecisionOp::operator=(const PrecisionOp& pmat)
 {
   if (this != &pmat)
   {
-    _cova = pmat._cova->clone();
+    _cova           = pmat._cova->clone();
     _verbose        = pmat._verbose;
     _training       = pmat._training;
     _destroyShiftOp = pmat._destroyShiftOp;
@@ -167,6 +168,13 @@ PrecisionOp::~PrecisionOp()
   }
 }
 
+std::vector<double> PrecisionOp::evalInverse(const VectorDouble& vecin)
+{
+  std::vector<double> vecout(vecin.size());
+  constvect vecinconst(vecin);
+  evalInverse(vecinconst, vecout);
+  return vecout;
+}
 PrecisionOp* PrecisionOp::createFromShiftOp(AShiftOp* shiftop,
                                             const CovAniso* cova,
                                             bool verbose)
@@ -258,45 +266,9 @@ int PrecisionOp::_prepareChebychev(const EPowerPT& power) const
     { return pow(_polynomials[EPowerPT::ONE]->eval(val), -0.5); };
   }
 
-  chebMatern->fit(f, 0, b);
+  chebMatern->fit(f, 0, b, EPSILON5);
   _polynomials[power] = std::move(chebMatern);
   return 0;
-}
-
-/**
- * Compute the Logarithm of the Determinant
- * @param nMC Number of Monte-Carlo simulations
- * @return The computed value or TEST if problem
- */
-double PrecisionOp::getLogDeterminant(int nMC)
-{
-  VectorDouble gauss;
-  VectorDouble result;
-  gauss.resize(getSize());
-  result.resize(getSize());
-
-  double val1 = 0.;
-  for (int isimu = 0; isimu < nMC; isimu++)
-  {
-    VH::simulateGaussianInPlace(gauss);
-    vect results(result);
-    if (_evalPoly(EPowerPT::LOG, gauss, results) != 0) return TEST;
-
-    for (int i = 0; i < getSize(); i++)
-    {
-      val1 += gauss[i] * result[i];
-    }
-  }
-  val1 /= nMC;
-
-  double val2 = 0.;
-  for (const auto& e: _shiftOp->getLambdas())
-  {
-    val2 += log(e);
-  }
-  val1 += 2. * val2;
-
-  return val1;
 }
 
 int PrecisionOp::reset(const AShiftOp* shiftop,
@@ -575,4 +547,31 @@ VectorDouble PrecisionOp::extractDiag() const
   }
   return vec;
 }
+
+/**
+ * Compute the Logarithm of the Determinant
+ * @param nMC Number of Monte-Carlo simulations
+ * @return The computed value or TEST if problem
+ * 
+ */
+double PrecisionOp::computeLogDet(int nMC) const
+{
+  VectorDouble gauss;
+  VectorDouble result;
+  gauss.resize(getSize());
+  result.resize(getSize());
+  double val1 = 0.;
+  for (int isimu = 0; isimu < nMC; isimu++)
+  {
+    VH::simulateGaussianInPlace(gauss);
+    vect results(result);
+    if (_evalPoly(EPowerPT::LOG, gauss, results) != 0) return TEST;
+    val1 += VH::innerProduct(gauss, result);   
+  }
+
+  val1 /= nMC;
+
+  val1 += _shiftOp->logDetLambda();
+  return val1;
 }
+} // namespace gstlrn

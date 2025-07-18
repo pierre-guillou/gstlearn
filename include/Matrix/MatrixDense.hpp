@@ -154,7 +154,7 @@ public:
                                      const VectorDouble& vec = VectorDouble(),
                                      bool transpose          = false);
 
-  VectorDouble getEigenValues() const { return _eigenValues; }
+  const VectorDouble& getEigenValues() const { return _eigenValues; }
   const MatrixSquare* getEigenVectors() const { return _eigenVectors; }
   int invert2(MatrixDense& res) const;
 

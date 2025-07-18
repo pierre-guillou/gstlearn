@@ -35,7 +35,6 @@ void PrecisionOpMultiConditionalCs::_clear()
 {
   delete _chol;
   _chol = nullptr;
-  delete _QpAtA;
   _QpAtA = nullptr;
 }
 
@@ -56,7 +55,7 @@ double PrecisionOpMultiConditionalCs::computeLogDetOp(int nbsimu) const
   DECLARE_UNUSED(nbsimu);
 
   if (_chol == nullptr)
-    _chol = new CholeskySparse(_QpAtA);
+    _chol = new CholeskySparse(*_QpAtA);
   return _chol->computeLogDeterminant();
 }
 
@@ -141,7 +140,7 @@ int PrecisionOpMultiConditionalCs::_buildQpAtA()
   // Create the conditional multiple precision matrix 'Q'
   VectorDouble invsigma = VectorHelper::inverse(getAllVarianceData());
   MatrixSparse* AtAsVar = prodNormMat(Amult, invsigma, true);
-  _QpAtA                = MatrixSparse::addMatMat(Qmult, AtAsVar, 1., 1.);
+  _QpAtA                = std::shared_ptr<MatrixSparse>(MatrixSparse::addMatMat(Qmult, AtAsVar, 1., 1.));
 
   // Free core allocated
   delete Amult;
@@ -155,7 +154,7 @@ void PrecisionOpMultiConditionalCs::evalInverse(const std::vector<std::vector<do
                                                 std::vector<std::vector<double>>& vecout) const
 {
   if (_chol == nullptr)
-    _chol = new CholeskySparse(_QpAtA);
+    _chol = new CholeskySparse(*_QpAtA);
   std::vector<double> locVecin = VH::flatten(vecin);
   std::vector<double> locVecout(locVecin.size());
   _chol->solve(locVecin, locVecout);

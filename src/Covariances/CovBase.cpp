@@ -608,7 +608,7 @@ void CovBase::appendParams(ListParams& listParams,
 
 void CovBase::initParams(const MatrixSymmetric& vars, double href)
 {
-  CholeskyDense chol(&vars);
+  CholeskyDense chol(vars);
   for (const auto& [ivar, jvar]: _itRange)
   {
     double value = chol.getLowerTriangle(ivar, jvar);

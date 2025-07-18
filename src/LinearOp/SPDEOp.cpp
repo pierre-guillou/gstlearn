@@ -9,23 +9,24 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/SPDEOp.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/Law.hpp"
-#include "LinearOp/ProjMulti.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
+#include "LinearOp/ProjMulti.hpp"
 #include "Matrix/MatrixDense.hpp"
+#include "Polynomials/Chebychev.hpp"
 #include "geoslib_define.h"
 
 namespace gstlrn
 {
 ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
                  const ProjMulti* const projInKriging,
-                 const ASimulable* const invNoise,
+                 const ASimulable* invNoise,
                  const PrecisionOpMulti* const popSimu,
                  const ProjMulti* const projInSimu,
                  const ProjMulti* const projOutKriging,
-                 const ProjMulti* const projOutSimu,
-                 bool todelete)
+                 const ProjMulti* const projOutSimu)
   : _QKriging(popKriging)
   , _projInKriging(projInKriging)
   , _invNoise(invNoise)
@@ -34,7 +35,7 @@ ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
   , _projOutKriging(projOutKriging)
   , _projOutSimu(projOutSimu == nullptr ? projOutKriging : projOutSimu)
   , _solver(nullptr)
-  , _noiseToDelete(todelete)
+  , _verbose(false)
   , _ndat(0)
 {
   if (_projInKriging == nullptr) return;
@@ -46,7 +47,6 @@ ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
 
 ASPDEOp::~ASPDEOp()
 {
-  if (_noiseToDelete) delete _invNoise;
   delete _solver;
 }
 
@@ -74,7 +74,7 @@ void ASPDEOp::_prepare(bool w1, bool w2) const
 // int ASPDEOp::_addToDest(const constvect inv, vect outv) const
 // {
 //   _prepare();
-  
+
 //   vect w1s(_workdat1);
 //   vect w2s(_workdat2);
 //   _projKriging->mesh2point(inv, w1s);
@@ -114,13 +114,13 @@ void ASPDEOp::_simCond(const constvect data, vect outvK, vect outvS) const
 
   // Non conditional simulation on Simulation mesh
   VH::simulateGaussianInPlace(_workNoiseMesh);
-  _QSimu->evalSimulate(_workNoiseMesh, outvS); 
-  
+  _QSimu->evalSimulate(_workNoiseMesh, outvS);
+
   // Simulation at data locations (projection + noise)
-  _projInSimu->mesh2point(outvS, _workdat3); //Projection on data locations
+  _projInSimu->mesh2point(outvS, _workdat3); // Projection on data locations
   VH::simulateGaussianInPlace(_workNoiseData);
-  _invNoise->addSimulateToDest(_workNoiseData, _workdat3); //Add noise
-  
+  _invNoise->addSimulateToDest(_workNoiseData, _workdat3); // Add noise
+
   // compute residual _workdat4 = data - outv
   VH::subtractInPlace(_workdat3, data, _workdat4);
 
@@ -162,13 +162,13 @@ int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
 {
   int nrows = driftMat.getNRows();
   int ncols = driftMat.getNCols();
-  if (nrows != (int) Z.size())
+  if (nrows != (int)Z.size())
   {
     messerr("Error in number of Rows of drift matrix (%d) and size of data vector (%d)",
             nrows, Z.size());
     return 1;
   }
-  if (ncols != (int) driftCoeffs.size())
+  if (ncols != (int)driftCoeffs.size())
   {
     messerr("Error in number of Columns of drift matrix (%d) and size of drift coefficients (%d)",
             ncols, driftCoeffs.size());
@@ -211,7 +211,7 @@ VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
   vect outMeshKv(outMeshK);
   VectorDouble outMeshS(_QSimu->getSize());
   vect outMeshSv(outMeshS);
-  
+
   // Perform the conditional simulation
   _simCond(datv, outMeshKv, outMeshSv);
 
@@ -230,11 +230,11 @@ VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
 /**
  * @brief Computing Standard deviation of the estimation error using MonteCarlo
  * on conditional simulations
- * 
+ *
  * @param dat Vector of Data
  * @param nMC  Number of Monte-Carlo simulations
  * @param seed Random seed for the Monte-Carlo simulations
- * @return VectorDouble 
+ * @return VectorDouble
  */
 VectorDouble ASPDEOp::stdev(const VectorDouble& dat, int nMC, int seed) const
 {
@@ -327,22 +327,18 @@ int ASPDEOp::_buildRhs(const constvect inv) const
 void ASPDEOp::evalInvCov(const constvect inv, vect result) const
 {
   // InvNoise - InvNoise * Proj' * (Q + Proj * InvNoise * Proj')^-1 * Proj * InvNoise
-  
+
   _rhs.resize(getSize());
   _workmesh.resize(getSize());
   _workdat2.resize(_getNDat());
   _workdat3.resize(_getNDat());
-  vect rhss(_rhs);
-  vect wms(_workmesh);
-  vect w2s(_workdat2);
-  vect w3s(_workdat3);
 
-  _invNoise->evalDirect(inv,result);
-  _projInKriging->point2mesh(result,rhss);
-  _solve(rhss,wms);
-  _projInKriging->mesh2point(wms,w2s);
-  _invNoise->evalDirect(w2s, w3s);
-  VectorHelper::subtractInPlace(w3s, result, result);
+  _invNoise->evalDirect(inv, result);
+  _projInKriging->point2mesh(result, _rhs);
+  _solve(_rhs, _workmesh);
+  _projInKriging->mesh2point(_workmesh, _workdat2);
+  _invNoise->evalDirect(_workdat2, _workdat3);
+  VectorHelper::subtractInPlace(_workdat3, result, result);
 }
 
 VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
@@ -356,43 +352,72 @@ VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
 
   _workdat1.resize(_getNDat());
   vect w1s(_workdat1);
-  for(int i = 0; i< xsize; i++)
+  for (int i = 0; i < xsize; i++)
   {
     auto xm = driftMat.getColumnPtr(i);
     evalInvCov(xm, w1s);
 
-    constvect ym(Z.data(),Z.size());
-    constvect wd1(_workdat1.data(),_workdat1.size());
-    XtInvSigmaZ[i] = VH::innerProduct(ym,wd1);
+    constvect ym(Z.data(), Z.size());
+    constvect wd1(_workdat1.data(), _workdat1.size());
+    XtInvSigmaZ[i] = VH::innerProduct(ym, wd1);
 
-    for(int j = i; j < xsize;j++)
+    for (int j = i; j < xsize; j++)
     {
       constvect xmj = driftMat.getViewOnColumn(j);
       double prod   = VH::innerProduct(xmj, w1s);
-      XtInvSigmaX.setValue(i,j,prod);
+      XtInvSigmaX.setValue(i, j, prod);
     }
   }
 
-  XtInvSigmaX.solve(XtInvSigmaZ,result);
+  XtInvSigmaX.solve(XtInvSigmaZ, result);
 
   // Optional printout
   if (verbose)
     VH::dump("Drift coefficients", result);
-  
+
   return result;
+}
+
+std::pair<double, double> ASPDEOp::_computeRangeEigenVal() const
+{
+  std::pair<double, double> result = _QKriging->rangeEigenValQ();
+  // result.second += getMaxEigenValProj();
+  return result;
+}
+
+void ASPDEOp::_preparePoly(Chebychev& logPoly) const
+{
+  std::pair<double, double> ranges = _computeRangeEigenVal();
+  double a                         = ranges.first;
+  double b                         = ranges.second;
+  logPoly.setA(a);
+  logPoly.setB(b);
+  logPoly.setNcMax(1500);
+  logPoly.fit([](double val)
+              { return log(val); }, a, b, 2 * EPSILON4 / (a + b));
 }
 
 double ASPDEOp::computeLogDetOp(int nbsimu) const
 {
-  DECLARE_UNUSED(nbsimu);
-  messerr("Not implemented yet in Matrix-free version");
-  return TEST;
+  Chebychev logPoly;
+  _preparePoly(logPoly);
+  _workNoiseMesh.resize(getSize());
+  _workmesh.resize(getSize());
+  double val = 0.;
+  for (int i = 0; i < nbsimu; i++)
+  {
+    VH::simulateGaussianInPlace(_workNoiseMesh);
+    std::fill(_workmesh.begin(), _workmesh.end(), 0.);
+    logPoly.addEvalOp(this, _workNoiseMesh, _workmesh);
+    val += VH::innerProduct(_workNoiseMesh, _workmesh);
+  }
+  return val / nbsimu;
 }
 
 double ASPDEOp::computeQuadratic(const std::vector<double>& x) const
 {
-  _workdat1.resize(_getNDat());
-  vect w1s(_workdat1);
+  _workdat4.resize(_getNDat());
+  vect w1s(_workdat4);
   constvect xm(x);
   evalInvCov(xm, w1s);
   return VH::innerProduct(w1s, xm);
@@ -400,15 +425,15 @@ double ASPDEOp::computeQuadratic(const std::vector<double>& x) const
 
 double ASPDEOp::computeLogDetQ(int nMC) const
 {
-  return _QKriging->computeLogDetQ(nMC);
+  return _QKriging->computeLogDet(nMC);
 }
 
-double ASPDEOp::computeLogDetNoise() const
+double ASPDEOp::computeLogDetInvNoise() const
 {
   return _invNoise->computeLogDet();
 }
 
-// We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + Sum(log sigma_i^2)
+// We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + log|Noise|
 double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
 {
   int memo = law_get_random_seed();
@@ -416,11 +441,16 @@ double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
   law_set_random_seed(seed);
   double a1 = computeLogDetOp(nMC);
   double a2 = computeLogDetQ(nMC);
-  double a3 = computeLogDetNoise();
+  double a3 = computeLogDetInvNoise();
   law_set_random_seed(memo);
-
+  if (_verbose)
+  {
+    message("LogDet of Q + ADA': %lf\n", a1);
+    message("LogDet of Q: %lf\n", a2);
+    message("LogDet of InvNoise: %lf\n", a3);
+  }
   double result = TEST;
-  if (! FFFF(a1) && ! FFFF(a2) && ! FFFF(a3)) result = a1 - a2 + a3;
+  if (!FFFF(a1) && !FFFF(a2) && !FFFF(a3)) result = a1 - a2 - a3; // -a3 since a3 is log|invNoise|
   return result;
 }
-}
+} // namespace gstlrn

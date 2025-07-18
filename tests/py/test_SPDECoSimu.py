@@ -98,10 +98,8 @@ modelNugg = gl.Model.createFromParam(gl.ECov.NUGGET, sills = sillsNugg)
 AM        = gl.ProjMulti(vectproj)
 AMout     = gl.ProjMulti(vectprojOut)
 Qop       = gl.PrecisionOpMulti(model,meshes,True)
-invnoise  = gl.buildInvNugget(dat,modelNugg)
-invnoisep = gl.MatrixSymmetricSim(invnoise)
-
-spdeop    = gl.SPDEOp(Qop, AM, invnoisep)
+invnoise  = gl.InvNuggetOp(dat,modelNugg)
+spdeop    = gl.SPDEOp(Qop, AM, invnoise)
 ntarget   = grid.getNSample(True)
 local     = gl.VectorDouble(ntarget)
 for i in range(nbsimu):

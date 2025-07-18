@@ -25,14 +25,12 @@ class MatrixDense;
 class GSTLEARN_EXPORT ACholesky: public ASimulable
 {
 public:
-  ACholesky(const AMatrix* mat);
+  ACholesky(const AMatrix& mat);
   ACholesky(const ACholesky& m);
   ACholesky& operator=(const ACholesky& m);
   virtual ~ACholesky() {}
 
   int getSize() const override { return _size; }
-  const AMatrix* getMatrix() const { return _mat; }
-
   int solve(const constvect vecin, vect vecout) const;
   int InvLtX(const constvect whitenoise, vect vecout) const;
   int LtX(const constvect whitenoise, vect vecout) const;
@@ -59,9 +57,9 @@ protected:
 private:
   int _addToDest(const constvect vecin, vect vecout) const override;
   int _addSimulateToDest(const constvect whitenoise, vect vecout) const override;
+  double computeLogDet(int nMC = 1) const override; //just for ASimulable interface
 
 protected:
-  const AMatrix* _mat; // Pointer to original matrix (not to be deleted) TODO Suppress this pointer (useless)
   int _size;
   mutable bool _ready;
   mutable bool _empty;

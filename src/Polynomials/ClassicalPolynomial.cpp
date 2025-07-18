@@ -85,7 +85,7 @@ void ClassicalPolynomial::evalOpCumul(MatrixSparse* Op,
   }
 }
 
-void ClassicalPolynomial::_addEvalOp(ALinearOp* Op,
+void ClassicalPolynomial::_addEvalOp(const ALinearOp* Op,
                                     const constvect inv,
                                     vect outv) const
 {

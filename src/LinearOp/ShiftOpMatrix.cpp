@@ -1307,7 +1307,7 @@ int ShiftOpMatrix::getSGradAddress(int iapex, int igparam) const
   return napices * igparam + iapex;
 }
 
-double ShiftOpMatrix::getMaxEigenValue() const
+double ShiftOpMatrix::_getMaxEigenValue() const
 {
   return getS()->L1Norm();
 }

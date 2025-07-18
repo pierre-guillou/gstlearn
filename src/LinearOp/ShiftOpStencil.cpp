@@ -137,7 +137,7 @@ int ShiftOpStencil::_addToDest(const constvect inv, vect outv) const
   return 0;
 }
 
-void ShiftOpStencil::resetModif()
+void ShiftOpStencil::resetModif() const
 {
   _useModifiedShift = false;
 }
@@ -160,7 +160,7 @@ void ShiftOpStencil::normalizeLambdaBySills(const AMesh* mesh)
   }
 }
 
-double ShiftOpStencil::getMaxEigenValue() const
+double ShiftOpStencil::_getMaxEigenValue() const
 {
   double s = 0.;
   for (const auto &e : _weights)
@@ -176,7 +176,13 @@ double ShiftOpStencil::getLambda(int iapex) const
   return AShiftOp::getLambda(iapex);
 }
 
-void ShiftOpStencil::multiplyByValueAndAddDiagonal(double v1, double v2) 
+double ShiftOpStencil::logDetLambda() const
+{
+  if (_useLambdaSingleVal) return 2. * log(_lambdaVal) * _napices;
+  return AShiftOp::logDetLambda();
+}
+
+void ShiftOpStencil::multiplyByValueAndAddDiagonal(double v1, double v2) const
 {
   _weightsSimu = VectorDouble(_weights.size());
   for (int i = 0; i < (int)_weights.size(); i++)

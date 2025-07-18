@@ -25,6 +25,7 @@
 #include "Enum/ECalcMember.hpp"
 #include "Estimation/KrigingSystem.hpp"
 #include "Matrix/MatrixFactory.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Model/CovInternal.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/ANeigh.hpp"
@@ -3274,7 +3275,7 @@ static int st_sampling_krige_data(Db* db,
 
     mat_s = model->evalCovMatSym(db);
 
-    CholeskyDense mat_s_Chol(&mat_s);
+    CholeskyDense mat_s_Chol(mat_s);
     if (!mat_s_Chol.isReady()) goto label_end;
     VectorDouble tl = mat_s_Chol.getLowerTriangle();
 
@@ -3820,7 +3821,7 @@ int krigsampling_f(Db* dbin,
   if (FLAG_STD)
     aux4.resize(ntot, 0);
 
-  /* Get the vector of active data and substract the mean */
+  /* Get the vector of active data and subtract the mean */
 
   VectorDouble data = dbin->getColumnByLocator(ELoc::Z);
   for (i = 0; i < nutil; i++)

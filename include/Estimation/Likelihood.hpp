@@ -40,7 +40,7 @@ private:
   double _computeLogDet() const override;
 
 private:
-  MatrixSymmetric _cov;
+  std::shared_ptr<MatrixSymmetric> _cov;
   CholeskyDense _covChol;
   MatrixSymmetric _gradCovMat;
   VectorDouble _temp;

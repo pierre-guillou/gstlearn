@@ -13,6 +13,7 @@
 #include "Basic/Utilities.hpp"
 #include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Stats/Selectivity.hpp"
 #include "geoslib_old_f.h"
 
@@ -491,7 +492,8 @@ VectorDouble AnamDiscreteDD::factors_mod()
       c_s.setValue(iclass, jclass, value);
     }
 
-  if (c_sChol.setMatrix(&c_s)) return VectorDouble();
+  auto c_sptr = std::make_shared<const MatrixSymmetric>(c_s);
+  if (c_sChol.setMatrix(c_s)) return VectorDouble();
   VectorDouble tri1 = c_sChol.getLowerTriangle();
   c_sChol.matProductInPlace(2, ptab, q_s);
 

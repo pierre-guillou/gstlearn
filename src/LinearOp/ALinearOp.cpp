@@ -84,14 +84,14 @@ int ALinearOp::evalDirect(const VectorDouble& inv, VectorDouble& outv) const
   return evalDirect(in, out);
 }
 
-void ALinearOp::multiplyByValueAndAddDiagonal(double v1, double v2)
+void ALinearOp::multiplyByValueAndAddDiagonal(double v1, double v2) const
 {
   _usefactor = true;
   _idfactor  = v2;
   _factor    = v1;
 }
 
-void ALinearOp::resetModif()
+void ALinearOp::resetModif() const
 {
   _usefactor = false;
   _idfactor  = 0.;

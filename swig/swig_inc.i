@@ -271,6 +271,8 @@
   #include "Matrix/MatrixFactory.hpp"
   #include "Matrix/MatrixInt.hpp"
   #include "Matrix/Table.hpp"
+  #include "LinearOp/InvNuggetOp.hpp"
+
   
   #include "API/SPDE.hpp"
   #include "API/PGSSPDE.hpp"
@@ -1096,6 +1098,33 @@ namespace gstlrn {
 %{
   #include <memory>
 %}
+
+//quick and dirty way to handle shared_ptrs for one python test
+// This is not a good practice, but it works for now
+// better solution would be to use a shared_ptr 
+%typemap(in) const std::shared_ptr<const gstlrn::ASimulable> & {
+  gstlrn::ASimulable* ptr = nullptr;
+  int res = SWIG_ConvertPtr($input, (void**)&ptr, SWIGTYPE_p_gstlrn__ASimulable, 0);
+
+  if (SWIG_IsOK(res) && ptr != nullptr) {
+    *$1 = std::shared_ptr<const gstlrn::ASimulable>(ptr);
+  } else {
+    SWIG_exception_fail(SWIG_TypeError, "Expected ASimulable-derived object");
+  }
+}
+
+%typemap(in) const std::shared_ptr<const gstlrn::MatrixSparse> & {
+  gstlrn::MatrixSparse* ptr = nullptr;
+  int res = SWIG_ConvertPtr($input, (void**)&ptr, SWIGTYPE_p_gstlrn__MatrixSparse, 0);
+
+  if (SWIG_IsOK(res) && ptr != nullptr) {
+    *$1 = std::shared_ptr<const gstlrn::MatrixSparse>(ptr);
+  } else {
+    SWIG_exception_fail(SWIG_TypeError, "Expected MatrixSparse object");
+  }
+}
+
 %include <std_shared_ptr.i>
 %template(ASpaceSharedPtr)    std::shared_ptr<const gstlrn::ASpace>;
 %template(ASpaceSharedPtrVector)   std::vector< gstlrn::ASpaceSharedPtr>;
+%template(MatrixSparseSh) std::shared_ptr<const gstlrn::MatrixSparse >;
