@@ -24,7 +24,6 @@ namespace gstlrn
 {
 MatrixDense::MatrixDense(int nrow, int ncol)
   : AMatrix(nrow, ncol)
-  , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
   , _eigenMatrix()
@@ -35,7 +34,6 @@ MatrixDense::MatrixDense(int nrow, int ncol)
 
 MatrixDense::MatrixDense(const MatrixDense& r)
   : AMatrix(r)
-  , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
   , _eigenMatrix()
@@ -48,7 +46,6 @@ MatrixDense::MatrixDense(const MatrixDense& r)
 
 MatrixDense::MatrixDense(const AMatrix& r)
   : AMatrix(r)
-  , _flagEigenDecompose(false)
   , _eigenValues()
   , _eigenVectors(nullptr)
   , _eigenMatrix()
@@ -545,8 +542,6 @@ int MatrixDense::_terminateEigen(const Eigen::VectorXd& eigenValues,
 
   if (optionPositive) _eigenVectors->makePositiveColumn();
 
-  _flagEigenDecompose = true;
-
   return 0;
 }
 
@@ -582,9 +577,8 @@ bool MatrixDense::_needToReset(int nrows, int ncols)
 
 void MatrixDense::_recopy(const MatrixDense& r)
 {
-  _eigenMatrix        = r._eigenMatrix;
-  _flagEigenDecompose = r._flagEigenDecompose;
-  _eigenValues        = r._eigenValues;
+  _eigenMatrix = r._eigenMatrix;
+  _eigenValues = r._eigenValues;
   delete _eigenVectors;
   _eigenVectors = nullptr;
   if (r._eigenVectors != nullptr)

@@ -111,6 +111,7 @@ int CholeskySparse::_prepare() const
     messerr("Error when computing Cholesky Decomposition");
     return 1;
   }
+  _setReady();
   return 0;
 }
 

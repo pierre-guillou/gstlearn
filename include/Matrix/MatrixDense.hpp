@@ -27,8 +27,6 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 DISABLE_WARNING_POP
 #endif
 
-
-
 namespace gstlrn
 {
 class MatrixSquare;
@@ -181,7 +179,6 @@ public:
   void addRow(int nrow_added = 1);
   void addColumn(int ncolumn_added = 1);
 
-
 #ifndef SWIG
   static void sum(const MatrixDense* mat1,
                   const MatrixDense* mat2,
@@ -239,12 +236,11 @@ public:
 #endif
 
 protected:
-  bool _flagEigenDecompose;
-  VectorDouble _eigenValues;   // Used only when ! flag_eigen()
-  MatrixSquare* _eigenVectors; // Used only when ! flag_eigen()
-  VectorDouble _eigenMatrix; // Eigen storage for Dense matrix in Eigen Library
+  VectorDouble _eigenValues;
+  MatrixSquare* _eigenVectors;
+  VectorDouble _eigenMatrix;
 
 private:
   int _maxSize;
 };
-}
+} // namespace gstlrn
