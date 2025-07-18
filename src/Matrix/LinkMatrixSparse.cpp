@@ -35,22 +35,6 @@
 
 namespace gstlrn
 {
-static int flagUpdateNonzero = 1;
-
-/**
- * Define the status when modifying the value of a nonzero element of the sparse matrix
- * @param status 0 (no test); 1 (warning issued); 2 (throw issued)
- */
-void cs_set_status_update_nonzero_value(int status)
-{
-  flagUpdateNonzero = status;
-}
-
-int cs_get_status_update_nonzero_value()
-{
-  return flagUpdateNonzero;
-}
-
 cs* cs_spfree2(cs* A)
 {
   return cs_spfree(A);
@@ -103,10 +87,10 @@ int qchol_cholesky(int verbose, QChol* QC)
 
   /* Cholesky decomposition is only valid for square matric */
 
-  if (QC->Q->getNRows() != QC->Q->getNCols())
+  if (qchol_getNRows(QC) != qchol_getNCols(QC))
   {
     messerr("You wish to perform a Cholesky Decomposition of a Matrix");
-    messerr("which is not square: %d x %d", QC->Q->getNRows(), QC->Q->getNCols());
+    messerr("which is not square: %d x %d", qchol_getNRows(QC), qchol_getNCols(QC));
     messerr("This must be an error");
     return (1);
   }
@@ -132,8 +116,8 @@ int qchol_cholesky(int verbose, QChol* QC)
   if (OptDbg::query(EDbg::KRIGING) || OptDbg::force())
   {
     message("Q Sparse Matrix\n");
-    cs_print(QC->Q->getCS(), 1);
-    cs_print_range("Q", QC->Q->getCS());
+    print_matrix("", 1, *QC->Q);
+    QC->Q->dumpRange("Q");
   }
   return (0);
 
@@ -145,6 +129,26 @@ label_err:
 bool is_chol_ready(QChol* QC)
 {
   return QC->chol != nullptr;
+}
+
+QChol* qchol_free(QChol* QC)
+{
+  if (QC == nullptr) return QC;
+  delete QC->chol;
+  delete QC;
+  return QC;
+}
+int qchol_getNCols(QChol* QC)
+{
+  if (QC == nullptr) return 0;
+  if (QC->Q == nullptr) return 0;
+  return QC->Q->getNCols();
+}
+int qchol_getNRows(QChol* QC)
+{
+  if (QC == nullptr) return 0;
+  if (QC->Q == nullptr) return 0;
+  return QC->Q->getNRows();
 }
 
 /****************************************************************************/
@@ -512,7 +516,7 @@ int cs_multigrid_setup(cs_MGS* mgs,
 
   // Define the size of the system
 
-  mgs->ncur = qctt->Q->getNCols();
+  mgs->ncur = qchol_getNCols(qctt);
 
   // Initialize the Selection vector
 
@@ -531,7 +535,6 @@ int cs_multigrid_setup(cs_MGS* mgs,
     mgs->diag = csd_extract_diag(qctt->Q->getCS(), -3);
     if (mgs->diag == nullptr) return (1);
     cs* local = cs_normalize_by_diag_and_release(qctt->Q->getCSUnprotected(), 1);
-    qctt->Q->freeCS();
     qctt->Q->setCS(local);
     local = cs_spfree(local);
   }
@@ -548,7 +551,7 @@ int cs_multigrid_setup(cs_MGS* mgs,
     if (ilevel == 0)
     {
       mg->A->Q = qctt->Q;
-      mg->nh   = mg->A->Q->getNCols();
+      mg->nh   = qchol_getNCols(mg->A);
     }
     else
     {
@@ -565,7 +568,7 @@ int cs_multigrid_setup(cs_MGS* mgs,
       if (cs_coarsening(mg->A->Q->getCS(), mgs->type_coarse, &indCo, &L)) goto label_end;
       if (flag_print) cs_print_file("L", ilevel, L);
       if (flag_print)
-        for (int ik = 0; ik < mg->A->Q->getNCols(); ik++)
+        for (int ik = 0, nk = qchol_getNCols(mg->A); ik < nk; ik++)
           message("indco[%d] = %d\n", ik, indCo[ik]);
 
       // Interpolation
@@ -621,7 +624,7 @@ void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* w
 {
   DECLARE_UNUSED(work);
   if (DEBUG) message("Cholesky Inversion\n");
-  int n = qctt->Q->getNCols();
+  int n = qchol_getNCols(qctt);
 
   VectorDouble rhsVD(n);
   for (int i = 0; i < n; i++) rhsVD[i] = rhs[i];
@@ -642,7 +645,7 @@ void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* w
 void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
 {
   if (DEBUG) message("Cholesky Simulation\n");
-  int n = qctt->Q->getNCols();
+  int n = qchol_getNCols(qctt);
 
   VectorDouble simuVD(n);
   VectorDouble workVD(n);
@@ -820,7 +823,7 @@ static int st_multigrid_kriging_prec(cs_MGS* mgs,
     // Calculate the score
 
     score = 0.;
-    cs_vector_xM(mgs->mg[0]->A->Q->getCS(), mgs->mg[0]->A->Q->getNCols(), &XCR(0, 0), work);
+    cs_vector_xM(mgs->mg[0]->A->Q->getCS(), qchol_getNCols(mgs->mg[0]->A), &XCR(0, 0), work);
     for (int icur = 0; icur < ncur; icur++)
     {
       delta = (b[icur] - work[icur]);
@@ -993,7 +996,7 @@ int cs_multigrid_process(cs_MGS* mgs,
   }
   else
   {
-    if (mgs->ncur != qctt->Q->getNCols())
+    if (mgs->ncur != qchol_getNCols(qctt))
       messageAbort("Check that multigrid has been setup up correctly");
   }
 
@@ -1052,76 +1055,6 @@ NF_Triplet csToTriplet(const cs* A, int shiftRow, int shiftCol, double tol)
       NF_T.add(Ai[p] + shiftRow, j + shiftCol, value);
     }
   return NF_T;
-}
-
-int cs_get_nrow(const cs* A)
-{
-  if (A == nullptr) return 0;
-  int nrow = cs_getnrow(A);
-  return (nrow);
-}
-
-int cs_get_ncol(const cs* A)
-{
-  if (A == nullptr) return 0;
-  int ncol = cs_getncol(A);
-  return (ncol);
-}
-
-void cs_print_dim(const char* title, const cs* A)
-{
-  if (A == nullptr) return;
-  message("%s: Nrow=%d Ncol=%d NNZ=%d\n", title, cs_getnrow(A), cs_getncol(A), A->nzmax);
-}
-
-void cs_print_range(const char* title, const cs* C)
-{
-  if (C == nullptr) return;
-
-  /* Convert the contents of the sparse matrix into triplets (eigen formet) */
-
-  NF_Triplet NF_T = csToTriplet(C);
-
-  /* Calculate the extreme values */
-
-  StatResults stats = ut_statistics(NF_T.getNElements(), NF_T.getValues().data());
-
-  /* Printout */
-
-  if (title != NULL)
-    message("%s\n", title);
-  else
-    message("Sparse matrix\n");
-  message(" Descr: m=%d n=%d nnz=%d\n", cs_getnrow(C), cs_getncol(C), C->nzmax);
-  if (NF_T.getNElements() > 0)
-    message(" Range: [%lf ; %lf] (%d/%d)\n", stats.mini, stats.maxi, stats.nvalid, NF_T.getNElements());
-  else
-    message(" All terms are set to zero\n");
-}
-
-/* Construct the sparse diagonal matrix */
-cs* cs_eye(int number, double value)
-{
-  cs *Atriplet, *A;
-
-  /* Initializations */
-
-  A = nullptr;
-
-  /* Fill the new sparse triplet */
-
-  Atriplet = cs_spalloc(0, 0, 1, 1, 1);
-  if (Atriplet == nullptr) goto label_end;
-  for (int i = 0; i < number; i++)
-  {
-    if (!cs_entry(Atriplet, i, i, value)) goto label_end;
-  }
-
-  A = cs_triplet(Atriplet);
-
-label_end:
-  cs_spfree(Atriplet);
-  return (A);
 }
 
 // Build a sparse matrix containing the diagonal of a sparse matrix
@@ -1184,116 +1117,6 @@ double* csd_extract_diag(const cs* C, int oper_choice)
 
 label_end:
   return (diag);
-}
-
-/* Return the number of rows and columns */
-/* as well as the percentage of filled terms */
-void cs_rowcol(const cs* A, int* nrows, int* ncols, int* count, double* percent)
-{
-  cs* AT;
-  int* Ap;
-  double* Ax;
-
-  (*nrows) = (*ncols) = (*count) = 0;
-  (*percent)                     = 0.;
-  if (!A) return;
-
-  Ap = A->p;
-  Ax = A->x;
-  if (A->nz >= 0) return;
-
-  for (int j = 0; j < cs_getncol(A); j++)
-    for (int p = Ap[j]; p < Ap[j + 1]; p++)
-    {
-      if (ABS(Ax[p]) > 0) (*count)++;
-    }
-
-  *ncols = cs_getncol(A);
-  AT     = cs_transpose(A, 1);
-  *nrows = cs_getncol(AT);
-  cs_spfree(AT);
-
-  if ((*nrows) > 0 && (*ncols) > 0)
-    (*percent) = ((100. * (double)(*count)) / ((double)(*nrows) * (double)(*ncols)));
-}
-
-/* Print a nice sparse matrix */
-/* The format is copied from Matrix package */
-void cs_print_nice(const char* title, const cs* A, int maxrow, int maxcol)
-{
-  int p, j, m, n, *Ap, *Ai, npass, jdeb, jfin, found, num_line;
-  double* Ax;
-  int nbypass = 7;
-
-  if (!A)
-  {
-    message("(null)\n");
-    return;
-  }
-  m  = cs_getnrow(A);
-  n  = cs_getncol(A);
-  Ap = A->p;
-  Ai = A->i;
-  Ax = A->x;
-  if (A->nz >= 0) return;
-  if (maxcol >= 0) n = maxcol;
-  if (maxrow >= 0) m = maxrow;
-
-  npass = (int)ceil((double)n / (double)nbypass);
-
-  /* Print the title (optional) */
-
-  if (title != NULL)
-    message("%s", title);
-  else
-    message("Print Sparse Matrix");
-  if (maxrow >= 0) message(" nrows<=%d", maxrow);
-  if (maxcol >= 0) message(" ncols<=%d", maxcol);
-  message("\n");
-
-  /* Loop on the passes */
-
-  for (int ipass = 0; ipass < npass; ipass++)
-  {
-    jdeb = ipass * nbypass;
-    jfin = MIN(jdeb + nbypass, n);
-
-    /* Title of the columns */
-
-    message("      ");
-    for (j = jdeb; j < jfin; j++)
-      message("    [,%3d]", j + 1);
-    message("\n");
-
-    /* Loop on the lines */
-
-    for (int i = 0; i < m; i++)
-    {
-      message("[%3d,] ", i + 1);
-
-      /* Loop on the columns */
-
-      for (j = jdeb; j < jfin; j++)
-      {
-
-        /* Search for the correct line number */
-
-        found = -1;
-        for (p = Ap[j]; p < Ap[j + 1] && found < 0; p++)
-        {
-          num_line = Ai[p];
-          if (num_line == i) found = p;
-        }
-
-        if (found < 0)
-          message(" .        ");
-        else
-          message("%9.4lf ", Ax[found]);
-      }
-      message("\n");
-    }
-    message("\n");
-  }
 }
 
 cs* cs_duplicate(const cs* b1)
@@ -2159,6 +1982,12 @@ void cs_print_file(const char* radix, int rank, const cs* A)
   }
 
   (void)fclose(file);
+}
+
+void cs_print_dim(const char* title, const cs* A)
+{
+  if (A == nullptr) return;
+  message("%s: Nrow=%d Ncol=%d NNZ=%d\n", title, cs_getnrow(A), cs_getncol(A), A->nzmax);
 }
 
 } // namespace gstlrn

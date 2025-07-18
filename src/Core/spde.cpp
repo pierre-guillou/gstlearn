@@ -1660,7 +1660,7 @@ static void st_gibbs(int igrf,
   double sk;
   double yk           = 0.;
   int niter           = MAX(1, ngibbs_int);
-  MatrixSparse mat    = MatrixSparse(QC->Q->getCS());
+  MatrixSparse mat    = MatrixSparse(*QC->Q);
   VectorDouble zcurVD = VH::initVDouble(zcur, nout);
 
   /* Loop on the Gibbs samples */
@@ -1954,7 +1954,7 @@ static int st_kriging_cholesky(QChol* QC,
 
   /* Initializations */
 
-  ntarget = QC->Q->getNCols();
+  ntarget = qchol_getNCols(QC);
   for (int icur = 0; icur < ntarget; icur++)
     work[icur] = 0.;
 
@@ -1997,7 +1997,7 @@ static int st_filter(double* work, double* y)
   /* Initializations */
 
   QC      = spde_get_current_matelem(-1).QC;
-  ntarget = QC->Q->getNCols();
+  ntarget = qchol_getNCols(QC);
   for (int icur = 0; icur < ntarget; icur++)
     work[icur] = 0.;
 
@@ -3613,7 +3613,7 @@ static int st_simulate_cholesky(QChol* QC, VectorDouble& work, VectorDouble& zsn
 
   /* Initializations */
 
-  nvertex = QC->Q->getNCols();
+  nvertex = qchol_getNCols(QC);
   for (int ip = 0; ip < nvertex; ip++)
     work[ip] = law_gaussian();
 
@@ -3775,7 +3775,7 @@ static int st_simulate_chebychev(VectorDouble& zsnc)
  *****************************************************************************/
 static int st_kriging_multigrid(QChol* QC, double* rhs, VectorDouble& work, double* z)
 {
-  int ntarget           = QC->Q->getNCols();
+  int ntarget           = qchol_getNCols(QC);
   SPDE_Matelem& Matelem = spde_get_current_matelem(-1);
 
   if (cs_multigrid_process(Matelem.mgs, QC, VERBOSE, z, rhs, work.data())) return (1);
@@ -3835,7 +3835,7 @@ static int st_kriging_one(double* data, double* rhs, VectorDouble& work, double*
   /* Initializations */
 
   qsimu   = spde_get_current_matelem(-1).qsimu;
-  ntarget = qsimu->QCtt->Q->getNCols();
+  ntarget = qchol_getNCols(qsimu->QCtt);
 
   /* Initialize the resulting array */
 

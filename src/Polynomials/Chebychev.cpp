@@ -279,7 +279,7 @@ void Chebychev::evalOp(MatrixSparse* S, const constvect x, vect y) const
   /* Create the T1 sparse matrix */
 
   T1 = MatrixSparse::diagConstant(nvertex, 1.);
-  if (T1 == nullptr) my_throw("Problem in cs_eye");
+  if (T1 == nullptr) my_throw("Problem in MatrixSparse::diagCOnstant");
   T1->addMatInPlace(*S, v2, v1);
 
   /* Initialize the simulation */

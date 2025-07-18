@@ -46,16 +46,6 @@ MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax)
   _allocate();
 }
 
-#ifndef SWIG
-MatrixSparse::MatrixSparse(const cs* A)
-  : AMatrix(cs_get_nrow(A), cs_get_ncol(A))
-  , _csMatrix(nullptr)
-  , _eigenMatrix()
-{
-  _csMatrix = cs_duplicate(A);
-}
-#endif
-
 MatrixSparse::MatrixSparse(const MatrixSparse& m)
   : AMatrix(m)
   // , ALinearOp(m)
@@ -822,10 +812,6 @@ void MatrixSparse::setCS(cs* cs)
 {
   _csMatrix = cs_duplicate(cs);
 }
-void MatrixSparse::freeCS()
-{
-  _csMatrix = cs_spfree2(_csMatrix);
-}
 /*! Temporary function to get the CS contents of Sparse Matrix */
 cs* MatrixSparse::getCSUnprotected() const
 {
@@ -981,16 +967,6 @@ MatrixSparse* createFromAnyMatrix(const AMatrix* matin)
                                          matin->getNRows(),
                                          matin->getNCols(),
                                          -1);
-}
-
-void setUpdateNonZeroValue(int status)
-{
-  cs_set_status_update_nonzero_value(status);
-}
-
-int getUpdateNonZeroValue()
-{
-  return cs_get_status_update_nonzero_value();
 }
 
 int MatrixSparse::_eigen_findColor(int imesh,

@@ -43,12 +43,8 @@ namespace gstlrn
  */
 class GSTLEARN_EXPORT MatrixSparse: public AMatrix, public virtual ALinearOp
 {
-
 public:
   MatrixSparse(int nrow = 0, int ncol = 0, int ncolmax = -1);
-#ifndef SWIG
-  MatrixSparse(const cs* A);
-#endif
   MatrixSparse(const MatrixSparse& m);
   MatrixSparse& operator=(const MatrixSparse& m);
   virtual ~MatrixSparse();
@@ -184,7 +180,6 @@ public:
   /*! Returns a pointer to the Sparse storage */
   const cs* getCS() const;
   void setCS(cs* cs);
-  void freeCS();
   /*! Temporary function to get the CS contents of Sparse Matrix */
   cs* getCSUnprotected() const;
 #endif
@@ -283,13 +278,13 @@ private:
                        VectorInt& colors,
                        VectorInt& temp) const;
 
-                       public:
+public:
 #ifndef SWIG
 
 public:
   Eigen::Ref<const Eigen::SparseMatrix<double>> getEigenMat() const
   {
-    return Eigen::Ref<const Eigen::SparseMatrix <double>>(_eigenMatrix);
+    return Eigen::Ref<const Eigen::SparseMatrix<double>>(_eigenMatrix);
   }
   Eigen::Ref<Eigen::SparseMatrix<double>> getEigenMat()
   {
