@@ -309,9 +309,6 @@ GSTLEARN_EXPORT MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
                                               const VectorDouble& vec,
                                               int oper_choice = 1);
 
-/// Manage global flag for EIGEN
-GSTLEARN_EXPORT bool isGlobalFlagEigen() { return true; };
-
 // Not exported method
 
 #ifndef SWIG

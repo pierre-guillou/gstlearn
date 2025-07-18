@@ -1,4 +1,3 @@
-Use of Eigen Library = 1
 #NO_DIFF# Establishing S: 44 ms. (Ref = 150 ms.)
 #NO_DIFF# Kriging.NoChol1: 1613 ms. (Ref = 400 ms.)
 #NO_DIFF# Simu.NC.NoChol1: 709 ms. (Ref = 1350 ms.)
