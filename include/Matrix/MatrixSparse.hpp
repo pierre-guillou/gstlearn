@@ -61,7 +61,6 @@ public:
 
   int getSize() const override { return getNRows(); } // It assumes that the matrix is symmetric. Maybe a class MatrixSparseSymmetric would be interesting
                                                       // to inherit from ALinearOp
-  bool isFlagEigen() const { return true; }
   /// Interface for AMatrix
   /*! Returns if the current matrix is Sparse */
   bool isSparse() const override { return true; }
@@ -289,7 +288,6 @@ private:
   cs* _csMatrix;                            // Classical storage for Sparse matrix
   Eigen::SparseMatrix<double> _eigenMatrix; // Eigen storage in Eigen Library (always stored Eigen::ColMajor)
 #endif
-  bool _flagEigen;
   int _nColMax;
 };
 
