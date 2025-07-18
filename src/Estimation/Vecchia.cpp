@@ -311,7 +311,6 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
   _Ntot2 = 0;
   if (_db2 != nullptr)
     _Ntot2 = _db2->getListOfSampleIndicesInPlace(nvar, _cumulRanks2, _varRanks2, true);
-
   _Ndb1 = (_db1 != nullptr) ? _db1->getNSample() : 0;
 
   // Resizing
