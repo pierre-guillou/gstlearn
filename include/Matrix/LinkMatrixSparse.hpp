@@ -27,9 +27,6 @@ public:
   CholeskySparse* chol;
 };
 
-GSTLEARN_EXPORT void cs_print_dim(const char* title, const cs* A);
-GSTLEARN_EXPORT cs* cs_duplicate(const cs* b1);
-
 // Qchol operations
 GSTLEARN_EXPORT bool is_chol_ready(QChol* QC);
 GSTLEARN_EXPORT QChol* qchol_free(QChol* QC);

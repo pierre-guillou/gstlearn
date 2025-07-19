@@ -167,17 +167,5 @@ void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
   for (int i = 0; i < n; i++) simu[i] = simuVD[i];
 }
 
-cs* cs_duplicate(const cs* b1)
-{
-  cs* bres;
-  bres = cs_add(b1, b1, 1., 0.);
-  return (bres);
-}
-
-void cs_print_dim(const char* title, const cs* A)
-{
-  if (A == nullptr) return;
-  message("%s: Nrow=%d Ncol=%d NNZ=%d\n", title, cs_getnrow(A), cs_getncol(A), A->nzmax);
-}
 
 } // namespace gstlrn

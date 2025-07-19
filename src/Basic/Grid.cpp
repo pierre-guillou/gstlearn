@@ -112,7 +112,7 @@ Grid::Grid(int ndim,
 
 Grid::Grid(const Grid& r)
   : AStringable(r)
-  , ASerializable()
+  , ASerializable(r)
 {
   _recopy(r);
 }

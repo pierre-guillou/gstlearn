@@ -3854,7 +3854,6 @@ static int st_kriging_several_rhs(double* data,
             // Q1_td_ij * Z_j
             B0 = st_extract_Q1_hetero(ivar, jvar, 2, 1, &nrows, &ncols);
             if (B0 == nullptr) goto label_end;
-            cs_print_dim("Apres extraction de Qtd", B0->getCS());
             B0->prodVecMatInPlacePtr(&DATA(jvar, 0), temp, false);
             for (int i = 0; i < nrows; i++)
               work[i] += temp[i];

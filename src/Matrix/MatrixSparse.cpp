@@ -39,7 +39,6 @@ namespace gstlrn
 
 MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax)
   : AMatrix(nrow, ncol)
-  , _csMatrix(nullptr)
   , _eigenMatrix()
   , _nColMax(ncolmax)
 {
@@ -49,7 +48,6 @@ MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax)
 MatrixSparse::MatrixSparse(const MatrixSparse& m)
   : AMatrix(m)
   // , ALinearOp(m)
-  , _csMatrix(nullptr)
   , _eigenMatrix(m._eigenMatrix)
 {
 }
@@ -800,23 +798,6 @@ void MatrixSparse::prodNormMatVecInPlace(const MatrixSparse* a, const VectorDoub
     }
   }
 }
-
-#ifndef SWIG
-/*! Returns a pointer to the Sparse storage */
-const cs* MatrixSparse::getCS() const
-{
-  return _csMatrix;
-}
-void MatrixSparse::setCS(cs* cs)
-{
-  _csMatrix = cs_duplicate(cs);
-}
-/*! Temporary function to get the CS contents of Sparse Matrix */
-cs* MatrixSparse::getCSUnprotected() const
-{
-  return _csMatrix;
-}
-#endif
 
 void MatrixSparse::prodNormMatMatInPlace(const MatrixSparse* a,
                                          const MatrixSparse* m,

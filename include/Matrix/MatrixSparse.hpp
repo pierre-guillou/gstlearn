@@ -178,14 +178,6 @@ public:
                                      const VectorDouble& vec = VectorDouble(),
                                      bool transpose          = false);
 
-#ifndef SWIG
-  /*! Returns a pointer to the Sparse storage */
-  const cs* getCS() const;
-  void setCS(cs* cs);
-  /*! Temporary function to get the CS contents of Sparse Matrix */
-  cs* getCSUnprotected() const;
-#endif
-
   // virtual void reset(int nrows, int ncols) override; // Use base class method
   virtual void resetFromValue(int nrows, int ncols, double value) override;
   virtual void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
@@ -212,11 +204,6 @@ public:
   void setConstant(double value);
   VectorDouble extractDiag(int oper_choice = 1) const;
   void prodNormDiagVecInPlace(const VectorDouble& vec, int oper = 1);
-#ifndef SWIG
-  const Eigen::SparseMatrix<double>& getEigenMatrix() const { return _eigenMatrix; }
-  void setEigenMatrix(const Eigen::SparseMatrix<double>& eigenMatrix) { _eigenMatrix = eigenMatrix; }
-#endif
-
   MatrixSparse* extractSubmatrixByRanks(const VectorInt& rank_rows,
                                         const VectorInt& rank_cols) const;
   MatrixSparse* extractSubmatrixByColor(const VectorInt& colors,
@@ -280,7 +267,6 @@ private:
                        VectorInt& colors,
                        VectorInt& temp) const;
 
-public:
 #ifndef SWIG
 
 public:
@@ -292,11 +278,12 @@ public:
   {
     return Eigen::Ref<Eigen::SparseMatrix<double>>(_eigenMatrix);
   }
+  const Eigen::SparseMatrix<double>& getEigenMatrix() const { return _eigenMatrix; }
+  void setEigenMatrix(const Eigen::SparseMatrix<double>& eigenMatrix) { _eigenMatrix = eigenMatrix; }
 #endif
 
 private:
 #ifndef SWIG
-  cs* _csMatrix;                            // Classical storage for Sparse matrix
   Eigen::SparseMatrix<double> _eigenMatrix; // Storage (always stored Eigen::ColMajor)
 #endif
   int _nColMax;
