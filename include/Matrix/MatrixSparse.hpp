@@ -252,7 +252,7 @@ protected:
 
   virtual void _prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
   virtual void _prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _addProdMatVecInPlaceToDestPtr(const double* x, double* y, bool transpose = false) const override;
+  virtual void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
 
   virtual int _invert() override;
   virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
@@ -270,16 +270,15 @@ private:
 #ifndef SWIG
 
 public:
-  Eigen::Ref<const Eigen::SparseMatrix<double>> getEigenMat() const
+  const Eigen::SparseMatrix<double>& eigenMat() const
   {
-    return Eigen::Ref<const Eigen::SparseMatrix<double>>(_eigenMatrix);
+    return _eigenMatrix;
   }
-  Eigen::Ref<Eigen::SparseMatrix<double>> getEigenMat()
+
+  Eigen::SparseMatrix<double>& eigenMat()
   {
-    return Eigen::Ref<Eigen::SparseMatrix<double>>(_eigenMatrix);
+    return _eigenMatrix;
   }
-  const Eigen::SparseMatrix<double>& getEigenMatrix() const { return _eigenMatrix; }
-  void setEigenMatrix(const Eigen::SparseMatrix<double>& eigenMatrix) { _eigenMatrix = eigenMatrix; }
 #endif
 
 private:

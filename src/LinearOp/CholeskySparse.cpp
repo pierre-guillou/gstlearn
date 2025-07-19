@@ -100,7 +100,7 @@ int CholeskySparse::_prepare(const MatrixSparse& mat) const
   if (_factor != nullptr) return 0;
 
   _factor = new Eigen::SimplicialLDLT<Sp>;
-  _factor->compute(mat.getEigenMatrix());
+  _factor->compute(mat.eigenMat());
   if (_factor == nullptr)
   {
     messerr("Error when computing Cholesky Decomposition");
@@ -204,7 +204,7 @@ int CholeskySparse::_stdev(VectorDouble& vcur,
   vcurm.setZero();
 
   // Conversion de P en RowMajor (une seule fois)
-  const auto& Pcol = proj->getEigenMatrix(); // ℓ×k, col‑major
+  const auto& Pcol = proj->eigenMat(); // ℓ×k, col‑major
   using SpRowMat   = Eigen::SparseMatrix<double, Eigen::RowMajor>;
   SpRowMat P       = Pcol; // copie creuse -> row‑major ; coût négligeable si P très creuse
 

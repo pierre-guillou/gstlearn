@@ -607,7 +607,7 @@ void MatrixSparse::prodScalar(double v)
       it.valueRef() *= v;
 }
 
-void MatrixSparse::_addProdMatVecInPlaceToDestPtr(const double* x, double* y, bool transpose) const
+void MatrixSparse::_addProdMatVecInPlacePtr(const double* x, double* y, bool transpose) const
 {
   if (transpose)
   {
@@ -739,8 +739,8 @@ MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
   VH::transformVD(vecp, oper_choice);
 
   Eigen::Map<const Eigen::VectorXd> vecm(vecp.data(), vecp.size());
-  auto diag = vecm.asDiagonal();
-  mat->setEigenMatrix(diag * a->getEigenMatrix() * diag);
+  auto diag       = vecm.asDiagonal();
+  mat->eigenMat() = (diag * a->eigenMat() * diag);
   return mat;
 }
 

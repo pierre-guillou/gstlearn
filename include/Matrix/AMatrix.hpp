@@ -246,18 +246,18 @@ protected:
   virtual double _getValueByRank(int rank) const        = 0;
   virtual int _getIndexToRank(int irow, int icol) const = 0;
 
-  virtual void _transposeInPlace()                                          = 0;
+  virtual void _transposeInPlace()                                    = 0;
   virtual void _prodMatVecInPlacePtr(const double* x,
                                      double* y,
-                                     bool transpose = false) const          = 0;
-  virtual void _addProdMatVecInPlaceToDestPtr(const double* x,
-                                              double* y,
-                                              bool transpose = false) const = 0;
+                                     bool transpose = false) const    = 0;
+  virtual void _addProdMatVecInPlacePtr(const double* x,
+                                        double* y,
+                                        bool transpose = false) const = 0;
   virtual void _prodVecMatInPlacePtr(const double* x,
                                      double* y,
-                                     bool transpose = false) const          = 0;
-  virtual int _invert()                                                     = 0;
-  virtual int _solve(const VectorDouble& b, VectorDouble& x) const          = 0;
+                                     bool transpose = false) const    = 0;
+  virtual int _invert()                                               = 0;
+  virtual int _solve(const VectorDouble& b, VectorDouble& x) const    = 0;
   virtual void _clear();
   virtual bool _isNumbersValid(int nrows, int ncols) const;
 

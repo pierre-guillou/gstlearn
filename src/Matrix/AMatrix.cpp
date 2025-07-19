@@ -444,7 +444,7 @@ void AMatrix::prodScalar(double v)
 void AMatrix::prodMatVecInPlace(const VectorDouble& x, VectorDouble& y, bool transpose) const
 {
   y.fill(0., y.size());
-  _addProdMatVecInPlaceToDestPtr(x.data(), y.data(), transpose);
+  _addProdMatVecInPlacePtr(x.data(), y.data(), transpose);
 }
 
 int AMatrix::addProdMatVecInPlace(const constvect x,
@@ -471,7 +471,7 @@ int AMatrix::addProdMatVecInPlace(const constvect x,
       return 1;
     }
   }
-  _addProdMatVecInPlaceToDestPtr(x.data(), y.data(), transpose);
+  _addProdMatVecInPlacePtr(x.data(), y.data(), transpose);
   return 0;
 }
 

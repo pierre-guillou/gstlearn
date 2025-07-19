@@ -95,7 +95,7 @@ void CholeskyEigenCG::_compute()
     messerr("The argument '_matCS' must be defined");
     return;
   }
-  _cholSolver.compute(_matCS->getEigenMatrix());
+  _cholSolver.compute(_matCS->eigenMat());
 }
 
 int CholeskyEigenCG::solve(const VectorDouble& b, VectorDouble& x) const
