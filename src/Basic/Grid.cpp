@@ -578,7 +578,7 @@ void Grid::rankToIndice(int rank, vectint indices, bool minusOne) const
 
 void Grid::initThread() const
 {
-  if (_nDim > (int)_iwork0.size())
+  if (_nDim != (int)_iwork0.size())
   {
     _iwork0.resize(_nDim);
     _work1.resize(_nDim);
