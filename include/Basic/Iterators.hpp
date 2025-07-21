@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 #include <cstddef>
+#include <iterator>
 #include <utility> // std::pair
 #include <tuple>   // structured bindings
 
@@ -48,6 +49,10 @@ public:
 
         bool operator!=(const Iterator& other) const {
             return !(*this == other);
+        }
+
+        size_t size() const {
+          return n_;
         }
 
     private:
