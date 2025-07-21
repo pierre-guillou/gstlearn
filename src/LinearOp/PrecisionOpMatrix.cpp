@@ -13,13 +13,12 @@
 #include "Matrix/MatrixSparse.hpp"
 #include "geoslib_define.h"
 
+#include "Basic/AException.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "LinearOp/PrecisionOpMatrix.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
-#include "Polynomials/APolynomial.hpp"
-#include "Polynomials/ClassicalPolynomial.hpp"
 #include "Mesh/AMesh.hpp"
-#include "Basic/AException.hpp"
+#include "Polynomials/APolynomial.hpp"
 
 namespace gstlrn
 {
@@ -68,7 +67,7 @@ void PrecisionOpMatrix::gradYQX(const constvect X,
   double temp, val;
   int iadress;
   const AShiftOp* sopt = getShiftOp();
-  const auto *soptmat = dynamic_cast<const ShiftOpMatrix*>(sopt);
+  const auto* soptmat  = dynamic_cast<const ShiftOpMatrix*>(sopt);
   if (soptmat == nullptr)
   {
     messerr("Method only available for ShiftOpMatrix\n");
@@ -102,9 +101,9 @@ void PrecisionOpMatrix::gradYQX(const constvect X,
 }
 
 void PrecisionOpMatrix::gradYQXOptim(const constvect X,
-                                 const constvect Y,
-                                 vect result,
-                                 const EPowerPT& power)
+                                     const constvect Y,
+                                     vect result,
+                                     const EPowerPT& power)
 {
   if (_work2.size() == 0) _work2.resize(getSize());
   if (_work3.size() == 0) _work3.resize(getSize());
@@ -122,7 +121,7 @@ void PrecisionOpMatrix::gradYQXOptim(const constvect X,
   int iadress;
 
   const AShiftOp* sopt = getShiftOp();
-  const auto *soptmat = dynamic_cast<const ShiftOpMatrix*>(sopt);
+  const auto* soptmat  = dynamic_cast<const ShiftOpMatrix*>(sopt);
   if (soptmat == nullptr)
   {
     messerr("Method only available for ShiftOpMatrix\n");
@@ -158,7 +157,7 @@ int PrecisionOpMatrix::_addToDest(const constvect inv, vect outv) const
 }
 
 int PrecisionOpMatrix::_addSimulateToDest(const constvect whitenoise,
-                                      vect outv) const
+                                          vect outv) const
 {
   if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
   _chol->addSimulateToDest(whitenoise, outv);
@@ -166,7 +165,7 @@ int PrecisionOpMatrix::_addSimulateToDest(const constvect whitenoise,
 }
 
 void PrecisionOpMatrix::evalInverse(const constvect vecin,
-                                std::vector<double>& vecout)
+                                    std::vector<double>& vecout)
 {
   if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
   _chol->solve(vecin, vecout);
@@ -180,17 +179,21 @@ double PrecisionOpMatrix::computeLogDet(int nMC) const
 }
 
 void PrecisionOpMatrix::evalDeriv(
-  const constvect inv, vect outv, int iapex, int igparam, const EPowerPT& power)
+  const constvect inv,
+  vect outv,
+  int iapex,
+  int igparam,
+  const EPowerPT& power)
 {
-  DECLARE_UNUSED(iapex,igparam)
-  if (_work.size()==0) _work.resize(getSize());
+  DECLARE_UNUSED(iapex, igparam)
+  if (_work.size() == 0) _work.resize(getSize());
 
   if (power == EPowerPT::MINUSONE)
-  my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSONE'");
+    my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSONE'");
   if (power == EPowerPT::MINUSHALF)
-  my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSHALF'");
+    my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSHALF'");
   if (power == EPowerPT::LOG)
-  my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::LOG'");
+    my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::LOG'");
 
   // Pre-processing
   vect ws(_work);
@@ -207,22 +210,22 @@ void PrecisionOpMatrix::evalDeriv(
 }
 
 void PrecisionOpMatrix::evalDerivOptim(vect outv,
-                                   int iapex,
-                                   int igparam,
-                                   const EPowerPT& power)
+                                       int iapex,
+                                       int igparam,
+                                       const EPowerPT& power)
 {
-  DECLARE_UNUSED(iapex,igparam)
-  if (_work.size()  == 0) _work3.resize(getSize());
+  DECLARE_UNUSED(iapex, igparam)
+  if (_work.size() == 0) _work3.resize(getSize());
   if (_work5.size() == 0) _work5.resize(getSize());
 
   vect ws(_work);
   vect w5s(_work5);
   if (power == EPowerPT::MINUSONE)
-  my_throw("'evalDeriv' is not yet implemented for 'POPT_MINUSONE'");
+    my_throw("'evalDeriv' is not yet implemented for 'POPT_MINUSONE'");
   if (power == EPowerPT::MINUSHALF)
-  my_throw("'evalDeriv' is not yet implemented for 'POPT_MINUSHALF'");
+    my_throw("'evalDeriv' is not yet implemented for 'POPT_MINUSHALF'");
   if (power == EPowerPT::LOG)
-  my_throw("'evalDeriv' is not yet implemented for 'POPT_LOG'");
+    my_throw("'evalDeriv' is not yet implemented for 'POPT_LOG'");
 
   // ((ClassicalPolynomial*) getPoly(power))->evalDerivOpOptim(getShiftOp(), ws,
   //                                                           w5s, outv,
@@ -233,27 +236,26 @@ void PrecisionOpMatrix::evalDerivOptim(vect outv,
   getShiftOp()->prodLambda(outv, outv, EPowerPT::ONE);
 }
 
-
-//void PrecisionOpMatrix::evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,int iapex,int igparam)
+// void PrecisionOpMatrix::evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,int iapex,int igparam)
 //{
 //
-//  if(getPower() == EPowerPT::ONE)
-//     my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::ONE'");
-//  if(getPower() == EPowerPT::MINUSONE)
-//     my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSONE'");
-//  if(getPower() == EPowerPT::MINUSHALF)
-//     my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSHALF'");
-//  if(getPower() == EPowerPT::LOG)
-//     my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::LOG'");
+//   if(getPower() == EPowerPT::ONE)
+//      my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::ONE'");
+//   if(getPower() == EPowerPT::MINUSONE)
+//      my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSONE'");
+//   if(getPower() == EPowerPT::MINUSHALF)
+//      my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::MINUSHALF'");
+//   if(getPower() == EPowerPT::LOG)
+//      my_throw("'evalDeriv' is not yet implemented for 'EPowerPT::LOG'");
 //
-//}
+// }
 
 void PrecisionOpMatrix::_buildQ()
 {
   if (!isCovaDefined()) return;
 
   // Calculate the Vector of coefficients (blin)
-  //VectorDouble blin = getPoly(EPowerPT::ONE)->getCoeffs();
+  // VectorDouble blin = getPoly(EPowerPT::ONE)->getCoeffs();
 
   // Calculate the Precision matrix Q
 
@@ -268,11 +270,11 @@ void PrecisionOpMatrix::_buildQ()
 MatrixSparse* PrecisionOpMatrix::_build_Q()
 {
   // Preliminary checks
-  auto *S = ((ShiftOpMatrix*)getShiftOp())->getS();
-  auto Lambda = getShiftOp()->getLambdas();
+  auto* S           = ((ShiftOpMatrix*)getShiftOp())->getS();
+  auto Lambda       = getShiftOp()->getLambdas();
   VectorDouble blin = getPoly(EPowerPT::ONE)->getCoeffs();
-  int nblin = static_cast<int>(blin.size());
-  int nvertex = S->getNCols();
+  int nblin         = static_cast<int>(blin.size());
+  int nvertex       = S->getNCols();
   if (nvertex <= 0)
   {
     messerr("You must define a valid Meshing beforehand");
@@ -311,4 +313,4 @@ VectorDouble PrecisionOpMatrix::extractDiag() const
 {
   return _Q->extractDiag();
 }
-}
+} // namespace gstlrn

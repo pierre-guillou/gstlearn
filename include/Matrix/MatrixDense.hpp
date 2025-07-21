@@ -27,8 +27,6 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 DISABLE_WARNING_POP
 #endif
 
-
-
 namespace gstlrn
 {
 class MatrixSquare;
@@ -181,7 +179,6 @@ public:
   void addRow(int nrow_added = 1);
   void addColumn(int ncolumn_added = 1);
 
-
 #ifndef SWIG
   static void sum(const MatrixDense* mat1,
                   const MatrixDense* mat2,
@@ -204,7 +201,7 @@ protected:
   virtual void _transposeInPlace() override;
   virtual void _prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
   virtual void _prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _addProdMatVecInPlaceToDestPtr(const double* x, double* y, bool transpose = false) const override;
+  virtual void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
   virtual int _invert() override;
   virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
 
@@ -225,26 +222,26 @@ public:
   constvect getViewOnColumn(int icol) const;
   vect getViewOnColumnModify(int icol);
 #endif
+
 #ifndef SWIG
 
 public:
-  Eigen::Map<const Eigen::MatrixXd> getEigenMat() const
+  Eigen::Map<const Eigen::MatrixXd> eigenMat() const
   {
     return Eigen::Map<const Eigen::MatrixXd>(_eigenMatrix.data(), getNRows(), getNCols());
   }
-  Eigen::Map<Eigen::MatrixXd> getEigenMat()
+  Eigen::Map<Eigen::MatrixXd> eigenMat()
   {
     return Eigen::Map<Eigen::MatrixXd>(_eigenMatrix.data(), getNRows(), getNCols());
   }
 #endif
 
 protected:
-  bool _flagEigenDecompose;
-  VectorDouble _eigenValues;   // Used only when ! flag_eigen()
-  MatrixSquare* _eigenVectors; // Used only when ! flag_eigen()
-  VectorDouble _eigenMatrix; // Eigen storage for Dense matrix in Eigen Library
+  VectorDouble _eigenValues;
+  MatrixSquare* _eigenVectors;
+  VectorDouble _eigenMatrix;
 
 private:
   int _maxSize;
 };
-}
+} // namespace gstlrn

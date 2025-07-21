@@ -19,7 +19,8 @@
 #define _TL(i, j)     _tl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
 #define _XL(i, j)     _xl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
 
-namespace gstlrn{
+namespace gstlrn
+{
 CholeskyDense::CholeskyDense(const MatrixSymmetric& mat)
   : ACholesky(mat)
   , _tl()
@@ -74,13 +75,13 @@ MatrixDense CholeskyDense::inverse() const
   if (!isReady()) return MatrixDense();
   auto Id = Eigen::MatrixXd::Identity(_size, _size);
   MatrixDense res(_size, _size);
-  res.getEigenMat() = _factor.solve(Id);
+  res.eigenMat() = _factor.solve(Id);
   return res;
 }
 void CholeskyDense::solveMatInPlace(const MatrixDense& mat, MatrixDense& res) const
 {
   if (!isReady()) return;
-  res.getEigenMat() = _factor.solve(mat.getEigenMat());
+  res.eigenMat() = _factor.solve(mat.eigenMat());
 }
 int CholeskyDense::addInvLtX(const constvect vecin, vect vecout) const
 {
@@ -173,8 +174,8 @@ double CholeskyDense::getUpperTriangleInverse(int i, int j) const
 
 int CholeskyDense::_prepare(const MatrixSymmetric& mat) const
 {
-  const auto& a = mat.getEigenMat();
-  _factor      = a.llt();
+  const auto& a = mat.eigenMat();
+  _factor       = a.llt();
   _setReady();
   return 0;
 }
@@ -385,4 +386,4 @@ void CholeskyDense::normMatInPlace(int mode,
       b.setValue(i, j, val);
     }
 }
-}
+} // namespace gstlrn

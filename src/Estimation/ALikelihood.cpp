@@ -10,10 +10,8 @@
 /******************************************************************************/
 #include "Estimation/ALikelihood.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Basic/Iterators.hpp"
 #include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
-#include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "Model/ModelGeneric.hpp"
 
@@ -35,24 +33,30 @@ ALikelihood::ALikelihood(const ALikelihood& r)
   , _X(r._X)
   , _beta(r._beta)
   , _Cm1X(r._Cm1X)
-  , _Cm1Y(r._Cm1Y) 
-  , _XtCm1X(r._XtCm1X) 
-  , _reml(r._reml)
-  {};
+  , _Cm1Y(r._Cm1Y)
+  , _XtCm1X(r._XtCm1X)
+  , _reml(r._reml) {};
 
 ALikelihood& ALikelihood::operator=(const ALikelihood& r)
 {
   if (this != &r)
   {
     AModelOptim::operator=(r);
-    _db   = r._db;
-    _Y    = r._Y;
-    _X    = r._X;
-    _beta = r._beta;
-    _Cm1X = r._Cm1X;
-    _Cm1Y = r._Cm1Y;
+    _db     = r._db;
+    _Y      = r._Y;
+    _X      = r._X;
+    _beta   = r._beta;
+    _Cm1X   = r._Cm1X;
+    _Cm1Y   = r._Cm1Y;
+    _db     = r._db;
+    _Y      = r._Y;
+    _X      = r._X;
+    _beta   = r._beta;
+    _Cm1X   = r._Cm1X;
+    _Cm1Y   = r._Cm1Y;
     _XtCm1X = r._XtCm1X;
-    _reml = r._reml;
+    _reml   = r._reml;
+    _reml   = r._reml;
   }
   return *this;
 }
@@ -112,7 +116,6 @@ double ALikelihood::computeLogLikelihood(bool verbose)
     // Calculate XtCm1X = Xt * Cm1 * X
     _XtCm1X.resize(_X.getNCols(), _X.getNCols());
     _XtCm1X.prodMatMatInPlaceOptim(&_X, &_Cm1X, true, false);
-   
 
     // Construct ZtCm1X = Zt * Cm1 * X and perform its Cholesky decomposition
     // workaround to create a shared_ptr which is not deleted at the end of the scope
@@ -131,7 +134,6 @@ double ALikelihood::computeLogLikelihood(bool verbose)
       return TEST;
     }
     // model->setBetaHat(beta);
-
 
     if (verbose)
     {
@@ -158,7 +160,7 @@ double ALikelihood::computeLogLikelihood(bool verbose)
   if (_reml && _model->getNDriftEquation() > 0)
   {
     CholeskyDense XtCm1XChol(_XtCm1X);
-     loglike -= 0.5 * XtCm1XChol.computeLogDeterminant();
+    loglike -= 0.5 * XtCm1XChol.computeLogDeterminant();
   }
 
   // Optional printout
@@ -175,4 +177,4 @@ double ALikelihood::computeCost(bool verbose)
 {
   return -computeLogLikelihood(verbose);
 }
-}
+} // namespace gstlrn

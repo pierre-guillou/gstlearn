@@ -15,22 +15,23 @@
 #include "Basic/VectorNumT.hpp"
 #include "Matrix/MatrixSquare.hpp"
 
-
-namespace gstlrn {
+namespace gstlrn
+{
 class AMatrix;
 class EOperator;
 
 /**
  * Square Symmetric matrices
  */
-class GSTLEARN_EXPORT MatrixSymmetric : public MatrixSquare {
+class GSTLEARN_EXPORT MatrixSymmetric: public MatrixSquare
+{
 
 public:
   MatrixSymmetric(int nrow = 0);
-  MatrixSymmetric(const MatrixSymmetric &m);
-  MatrixSymmetric(const AMatrix &m);
-  MatrixSymmetric& operator= (const MatrixSymmetric &m);
-	virtual ~MatrixSymmetric();
+  MatrixSymmetric(const MatrixSymmetric& m);
+  MatrixSymmetric(const AMatrix& m);
+  MatrixSymmetric& operator=(const MatrixSymmetric& m);
+  virtual ~MatrixSymmetric();
 
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;
@@ -50,13 +51,13 @@ public:
 
   void normMatrix(const AMatrix& y, const MatrixSquare& x = MatrixSquare(), bool transpose = false);
 
-  static MatrixSymmetric* createFromVVD(const VectorVectorDouble &X);
-  static MatrixSymmetric* createFromVD(const VectorDouble &X);
+  static MatrixSymmetric* createFromVVD(const VectorVectorDouble& X);
+  static MatrixSymmetric* createFromVD(const VectorDouble& X);
   static MatrixSymmetric* createFromTLTU(int neq,
-                                               const VectorDouble &tl);
+                                         const VectorDouble& tl);
   static MatrixSymmetric* createFromTriangle(int mode,
-                                                   int neq,
-                                                   const VectorDouble &tl);
+                                             int neq,
+                                             const VectorDouble& tl);
   static MatrixSymmetric* createRandomDefinitePositive(int neq, int seed = 13242);
   static bool sample(MatrixSymmetric& res,
                      const MatrixSymmetric& A,
@@ -65,9 +66,9 @@ public:
 
   int computeEigen(bool optionPositive = true);
   int computeGeneralizedEigen(const MatrixSymmetric& b, bool optionPositive = true);
-  int computeGeneralizedInverse(MatrixSymmetric &tabout,
+  int computeGeneralizedInverse(MatrixSymmetric& tabout,
                                 double maxicond = 1.e20,
-                                double eps = EPSILON20);
+                                double eps      = EPSILON20);
   bool isDefinitePositive();
   int minimizeWithConstraintsInPlace(const VectorDouble& gmat,
                                      const MatrixDense& aemat,
@@ -118,4 +119,4 @@ public:
 private:
   int _getTriangleSize() const;
 };
-}
+} // namespace gstlrn

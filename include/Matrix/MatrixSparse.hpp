@@ -27,29 +27,26 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 DISABLE_WARNING_POP
 #endif
 
-
-
-namespace gstlrn {
+namespace gstlrn
+{
 
 class cs;
 class EOperator;
-}
-namespace gstlrn{
+} // namespace gstlrn
+
+namespace gstlrn
+{
 /**
  * Sparse Matrix
  *
  * Handle a sparse matrix that can be symmetrical, square or not.
- * Storage relies either on Eigen3 Library (see opt_eigen flag) or cs code.
- * Default storage option can be set globally by using setGlobalFlagEigen
+ * Storage relies on Eigen3 Library.
+ * Storage relies on Eigen3 Library.
  */
 class GSTLEARN_EXPORT MatrixSparse: public AMatrix, public virtual ALinearOp
 {
-
 public:
-  MatrixSparse(int nrow = 0, int ncol = 0, int ncolmax = -1, int opt_eigen = -1);
-#ifndef SWIG
-  MatrixSparse(const cs* A);
-#endif
+  MatrixSparse(int nrow = 0, int ncol = 0, int ncolmax = -1);
   MatrixSparse(const MatrixSparse& m);
   MatrixSparse& operator=(const MatrixSparse& m);
   virtual ~MatrixSparse();
@@ -62,7 +59,6 @@ public:
 
   int getSize() const override { return getNRows(); } // It assumes that the matrix is symmetric. Maybe a class MatrixSparseSymmetric would be interesting
                                                       // to inherit from ALinearOp
-  bool isFlagEigen() const { return _flagEigen; }
   /// Interface for AMatrix
   /*! Returns if the current matrix is Sparse */
   bool isSparse() const override { return true; }
@@ -150,19 +146,17 @@ public:
   static MatrixSparse* create(const MatrixSparse* mat);
   static MatrixSparse* create(int nrow, int ncol);
   static MatrixSparse* createFromTriplet(const NF_Triplet& NF_T,
-                                         int nrow      = 0,
-                                         int ncol      = 0,
-                                         int nrowmax   = -1,
-                                         int opt_eigen = -1);
-  static MatrixSparse* Identity(int nrow, double value = 1., int opt_eigen = -1);
+                                         int nrow    = 0,
+                                         int ncol    = 0,
+                                         int nrowmax = -1);
+  static MatrixSparse* Identity(int nrow, double value = 1.);
   static MatrixSparse* addMatMat(const MatrixSparse* x,
                                  const MatrixSparse* y,
                                  double cx = 1.,
                                  double cy = 1.);
-  static MatrixSparse* diagVec(const VectorDouble& vec,
-                               int opt_eigen = -1);
-  static MatrixSparse* diagConstant(int number, double value = 1., int opt_eigen = -1);
-  static MatrixSparse* diagMat(MatrixSparse* A, int oper_choice, int opt_eigen = -1);
+  static MatrixSparse* diagVec(const VectorDouble& vec);
+  static MatrixSparse* diagConstant(int number, double value = 1.);
+  static MatrixSparse* diagMat(MatrixSparse* A, int oper_choice);
   static MatrixSparse* glue(const MatrixSparse* A1,
                             const MatrixSparse* A2,
                             bool flagShiftRow,
@@ -183,15 +177,6 @@ public:
   virtual void prodNormMatVecInPlace(const MatrixSparse* a,
                                      const VectorDouble& vec = VectorDouble(),
                                      bool transpose          = false);
-
-#ifndef SWIG
-  /*! Returns a pointer to the Sparse storage */
-  const cs* getCS() const;
-  void setCS(cs* cs);
-  void freeCS();
-  /*! Temporary function to get the CS contents of Sparse Matrix */
-  cs* getCSUnprotected() const;
-#endif
 
   // virtual void reset(int nrows, int ncols) override; // Use base class method
   virtual void resetFromValue(int nrows, int ncols, double value) override;
@@ -219,11 +204,6 @@ public:
   void setConstant(double value);
   VectorDouble extractDiag(int oper_choice = 1) const;
   void prodNormDiagVecInPlace(const VectorDouble& vec, int oper = 1);
-#ifndef SWIG
-  const Eigen::SparseMatrix<double>& getEigenMatrix() const { return _eigenMatrix; }
-  void setEigenMatrix(const Eigen::SparseMatrix<double>& eigenMatrix) { _eigenMatrix = eigenMatrix; }
-#endif
-
   MatrixSparse* extractSubmatrixByRanks(const VectorInt& rank_rows,
                                         const VectorInt& rank_cols) const;
   MatrixSparse* extractSubmatrixByColor(const VectorInt& colors,
@@ -272,7 +252,7 @@ protected:
 
   virtual void _prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
   virtual void _prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _addProdMatVecInPlaceToDestPtr(const double* x, double* y, bool transpose = false) const override;
+  virtual void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
 
   virtual int _invert() override;
   virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
@@ -281,26 +261,35 @@ protected:
   bool _isElementPresent(int irow, int icol) const;
 
 private:
-  static bool _defineFlagEigen(int opt_eigen);
   static void _forbiddenForSparse(const String& func);
   int _eigen_findColor(int imesh,
                        int ncolor,
                        VectorInt& colors,
                        VectorInt& temp) const;
 
+#ifndef SWIG
+
+public:
+  const Eigen::SparseMatrix<double>& eigenMat() const
+  {
+    return _eigenMatrix;
+  }
+
+  Eigen::SparseMatrix<double>& eigenMat()
+  {
+    return _eigenMatrix;
+  }
+#endif
+
 private:
 #ifndef SWIG
-  cs* _csMatrix;                            // Classical storage for Sparse matrix
-  Eigen::SparseMatrix<double> _eigenMatrix; // Eigen storage in Eigen Library (always stored Eigen::ColMajor)
+  Eigen::SparseMatrix<double> _eigenMatrix; // Storage (always stored Eigen::ColMajor)
 #endif
-  bool _flagEigen;
   int _nColMax;
 };
 
 /*! Transform any matrix into a Sparse format */
-GSTLEARN_EXPORT MatrixSparse* createFromAnyMatrix(const AMatrix* mat, int opt_eigen = -1);
-GSTLEARN_EXPORT void setUpdateNonZeroValue(int status = 2);
-GSTLEARN_EXPORT int getUpdateNonZeroValue();
+GSTLEARN_EXPORT MatrixSparse* createFromAnyMatrix(const AMatrix* mat);
 
 /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
 GSTLEARN_EXPORT MatrixSparse* prodNormMatMat(const MatrixSparse* a,
@@ -315,14 +304,10 @@ GSTLEARN_EXPORT MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
                                               const VectorDouble& vec,
                                               int oper_choice = 1);
 
-/// Manage global flag for EIGEN
-GSTLEARN_EXPORT void setGlobalFlagEigen(bool flagEigen);
-GSTLEARN_EXPORT bool isGlobalFlagEigen();
-
 // Not exported method
 
 #ifndef SWIG
 GSTLEARN_EXPORT Eigen::SparseMatrix<double> AtMA(const Eigen::SparseMatrix<double>& A,
                                                  const Eigen::SparseMatrix<double>& M);
 #endif
-}
+} // namespace gstlrn

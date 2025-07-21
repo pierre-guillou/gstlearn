@@ -41,7 +41,7 @@ public:
   VectorDouble invLtX(const VectorDouble& vecin) const;
   VectorDouble LtX(const VectorDouble& vecin) const;
   VectorDouble LX(const VectorDouble& vecin) const;
-  VectorDouble invLX(const VectorDouble& vecin) const;
+  VectorDouble invLX(const VectorDouble& vecin) const; 
   VectorDouble solveX(const VectorDouble& vecin) const;
   
   virtual double computeLogDeterminant() const                    = 0;

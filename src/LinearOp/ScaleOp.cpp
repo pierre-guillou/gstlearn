@@ -9,11 +9,11 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/ScaleOp.hpp"
-#include "LinearOp/ALinearOp.hpp"
 
 using namespace gstlrn;
-ScaleOp::ScaleOp(int n, double scale) :
-  _n(n), _scale(scale)
+ScaleOp::ScaleOp(int n, double scale)
+  : _n(n)
+  , _scale(scale)
 {
 }
 

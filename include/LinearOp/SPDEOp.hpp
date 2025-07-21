@@ -10,19 +10,15 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/VectorNumT.hpp"
 #include "LinearOp/ALinearOpEigenCG.hpp"
+#include "LinearOp/ASimulable.hpp"
+#include "LinearOp/LinearOpCGSolver.hpp"
 #include "Matrix/MatrixDense.hpp"
 
-#include "Basic/VectorNumT.hpp"
-#include "LinearOp/ASimulable.hpp"
-#include "Polynomials/Chebychev.hpp"
-
 #ifndef SWIG
-#  include "LinearOp/ASimulableEigenCG.hpp"
 DECLARE_EIGEN_TRAITS(SPDEOp)
 #endif
-
-#include "LinearOp/LinearOpCGSolver.hpp"
 
 namespace gstlrn
 {
@@ -111,9 +107,9 @@ private:
   void _prepare(bool w1 = true, bool w2 = true) const;
 
 protected:
-  mutable const PrecisionOpMulti* _QKriging;
+  const PrecisionOpMulti* const _QKriging;
   const ProjMulti* const _projInKriging;
-  const ASimulable* _invNoise;
+  const ASimulable* const _invNoise;
   const PrecisionOpMulti* const _QSimu;
   const ProjMulti* const _projInSimu;
   const ProjMulti* const _projOutKriging;
@@ -132,7 +128,6 @@ private:
   mutable VectorDouble _rhs;
   mutable VectorDouble _workmesh;
 };
-
 
 /****************************************************************************/
 
@@ -203,9 +198,8 @@ public:
                 const ProjMulti*        const projInKriging = nullptr,
                 const ASimulable*       const invNoise = nullptr,
                 const PrecisionOpMulti* const popSimu = nullptr,
-                const ProjMulti*        const projInSimu = nullptr,
-                bool  noiseToDelete = false
-  ) : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu, noiseToDelete)
+                const ProjMulti*        const projInSimu = nullptr)
+  ) : ASPDEOp(popKriging, projInKriging, invNoise, popSimu, projInSimu)
   {
     _solver = new LinearOpCGSolver<ExampleSPDEOp>(this);
   }
