@@ -35,9 +35,7 @@ ALikelihood::ALikelihood(const ALikelihood& r)
   , _Cm1X(r._Cm1X)
   , _Cm1Y(r._Cm1Y)
   , _XtCm1X(r._XtCm1X)
-  , _reml(r._reml)
-{
-}
+  , _reml(r._reml) {};
 
 ALikelihood& ALikelihood::operator=(const ALikelihood& r)
 {

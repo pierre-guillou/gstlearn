@@ -35,7 +35,7 @@ Vecchia::Vecchia(ModelGeneric* model,
   , _db1(db1)
   , _db2(db2)
   , _Ranks()
-  , _matCov(std::make_shared<MatrixSymmetric>(0))
+  , _matCov()
   , _vectCov()
   , _work()
   , _Y()
@@ -65,7 +65,6 @@ Vecchia::Vecchia(const Vecchia& r)
   , _Y(r._Y)
   , _DFull(r._DFull)
   , _LFull(r._LFull)
-  , _chol(nullptr) // Will be initialized in the constructor
   , _Ndb1(r._Ndb1)
   , _Ntot1(r._Ntot1)
   , _Ntot2(r._Ntot2)
@@ -84,10 +83,6 @@ Vecchia& Vecchia::operator=(const Vecchia& r)
     _nbNeigh     = r._nbNeigh;
     _db1         = r._db1;
     _db2         = r._db2;
-    _Ranks       = r._Ranks;
-    _matCov      = r._matCov;
-    _vectCov     = r._vectCov;
-    _work        = r._work;
     _Y           = r._Y;
     _DFull       = r._DFull;
     _LFull       = r._LFull;
@@ -372,13 +367,13 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
       else
       {
         // Constitute the local Kriging matrix
+        _matCov.resize(nitems, nitems);
         _vectCov.resize(nitems, 1);
-        _matCov->resize(nitems, nitems);
-        _buildLHS(nitems, neighDescr, *_matCov);
+        _buildLHS(nitems, neighDescr, _matCov);
         _buildRHS(icase1, iabs1, ivar, nitems, neighDescr, _vectCov);
 
         // Solve the local system
-        _chol->setMatrix(*_matCov);
+        _chol->setMatrix(_matCov);
         constvect vect = _vectCov.getViewOnColumn(0);
         _work.resize(vect.size());
         _chol->solve(vect, _work);

@@ -22,6 +22,7 @@
 #include "gstlearn_export.hpp"
 
 namespace gstlrn
+
 {
 class Db;
 class ModelGeneric;
@@ -93,7 +94,7 @@ private:
   const Db* _db2;
 
   MatrixT<int> _Ranks; // Matrix of ranks for the Vecchia approximation
-  std::shared_ptr<MatrixSymmetric> _matCov;
+  MatrixSymmetric _matCov;
   MatrixDense _vectCov;
   VectorDouble _work; // Work vector for calculations
   mutable VectorDouble _Y;
