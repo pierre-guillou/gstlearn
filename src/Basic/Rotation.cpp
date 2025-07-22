@@ -9,18 +9,17 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Geometry/Rotation.hpp"
-#include "Geometry/GeometryHelper.hpp"
-#include "Matrix/AMatrix.hpp"
-#include "Matrix/MatrixSquare.hpp"
 #include "Basic/AException.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Geometry/GeometryHelper.hpp"
+#include "Matrix/MatrixSquare.hpp"
 
 namespace gstlrn
-{ 
+{
 Rotation::Rotation(unsigned int ndim)
-  : AStringable(),
-    _nDim(ndim)
+  : AStringable()
+  , _nDim(ndim)
   , _flagRot(false)
   , _angles()
   , _rotMat()
@@ -35,7 +34,7 @@ Rotation::Rotation(const Rotation& r)
   _recopy(r);
 }
 
-Rotation& Rotation::operator= (const Rotation& r)
+Rotation& Rotation::operator=(const Rotation& r)
 {
   if (this != &r)
   {
@@ -51,23 +50,23 @@ Rotation::~Rotation()
 
 void Rotation::resetFromSpaceDimension(unsigned int ndim)
 {
-  _nDim = ndim;
+  _nDim    = ndim;
   _flagRot = false;
   _angles.resize(_nDim, 0.);
-  _rotMat.reset(_nDim , _nDim);
+  _rotMat.reset(_nDim, _nDim);
   _rotMat.setIdentity();
-  _rotInv.reset(_nDim , _nDim);
+  _rotInv.reset(_nDim, _nDim);
   _rotInv.setIdentity();
 }
 
 int Rotation::setMatrixDirect(const MatrixSquare& rotmat)
 {
-  if (! rotmat.empty())
+  if (!rotmat.empty())
   {
-    if (! _rotMat.isSameSize(rotmat))
-      my_throw ("The argument 'rotmat' does not have same dimension as 'this'");
+    if (!_rotMat.isSameSize(rotmat))
+      my_throw("The argument 'rotmat' does not have same dimension as 'this'");
     VectorDouble local = rotmat.getValues();
-    if (! Rotation::isMatrixRotation(rotmat, true)) return 1;
+    if (!Rotation::isMatrixRotation(rotmat, true)) return 1;
     _rotMat = rotmat;
     GH::rotationGetAnglesInPlace(local, _angles);
     _directToInverse();
@@ -78,13 +77,13 @@ int Rotation::setMatrixDirect(const MatrixSquare& rotmat)
 
 int Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
 {
-  if (! rotmat.empty())
+  if (!rotmat.empty())
   {
-    if ((int) rotmat.size() != _rotMat.size())
-      my_throw ("The argument 'rotmat' does not have same dimension as 'this'");
+    if ((int)rotmat.size() != _rotMat.size())
+      my_throw("The argument 'rotmat' does not have same dimension as 'this'");
     MatrixSquare local(_nDim);
     local.setValues(rotmat);
-    if (! Rotation::isMatrixRotation(local, true)) return 1;
+    if (!Rotation::isMatrixRotation(local, true)) return 1;
     _rotMat = local;
     GH::rotationGetAnglesInPlace(_nDim, rotmat.data(), _angles.data());
     _directToInverse();
@@ -95,13 +94,13 @@ int Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
 
 int Rotation::setAngles(const VectorDouble& angles)
 {
-  if (! angles.empty())
+  if (!angles.empty())
   {
     if (angles.size() > _nDim)
       my_throw("Wrong dimension number for 'angles' argument");
 
     _angles = angles;
-    _angles.resize(_nDim,0.);
+    _angles.resize(_nDim, 0.);
     if (_nDim == 2) _angles[1] = 0.;
 
     _local.resize(_nDim * _nDim);
@@ -115,18 +114,17 @@ int Rotation::setAngles(const VectorDouble& angles)
 
 int Rotation::getDerivativesInPlace(std::vector<MatrixSquare>& res) const
 {
- 
+
   GH::rotationMatrixDerivativesInPlace(_nDim, _angles, res);
-  for (auto& dR : res)
+  for (auto& dR: res)
   {
-    dR.prodScalar(GV_PI / 180); 
+    dR.prodScalar(GV_PI / 180);
   }
   return 0;
 }
 
-std::vector<MatrixSquare> Rotation::getDerivatives()
+std::vector<MatrixSquare> Rotation::getDerivatives() const
 {
-      
   std::vector<MatrixSquare> res;
   if (_nDim == 2)
   {
@@ -145,8 +143,8 @@ std::vector<MatrixSquare> Rotation::getDerivatives()
 
 void Rotation::setIdentity()
 {
-  for (int idim = 0; idim < (int) _nDim; idim++)
-    VH::fill(_angles,0.);
+  for (int idim = 0; idim < (int)_nDim; idim++)
+    VH::fill(_angles, 0.);
   _rotMat.setIdentity();
   _rotInv.setIdentity();
   _checkRotForIdentity();
@@ -156,7 +154,7 @@ String Rotation::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
   if (!_flagRot) return sstr.str();
-  sstr << toVector("Rotation Angles        = ",_angles);
+  sstr << toVector("Rotation Angles        = ", _angles);
 
   AStringFormat sf;
   if (strfmt != nullptr) sf = *strfmt;
@@ -175,7 +173,7 @@ void Rotation::rotateDirect(const VectorDouble& inv, VectorDouble& outv) const
   if (!_flagRot)
     outv = inv;
   else
-   _rotMat.prodMatVecInPlace(inv, outv, false);
+    _rotMat.prodMatVecInPlace(inv, outv, false);
 }
 
 void Rotation::rotateInverse(const VectorDouble& inv, VectorDouble& outv) const
@@ -186,13 +184,13 @@ void Rotation::rotateInverse(const VectorDouble& inv, VectorDouble& outv) const
     _rotInv.prodMatVecInPlace(inv, outv, false);
 }
 
-void Rotation::_recopy(const Rotation &r)
+void Rotation::_recopy(const Rotation& r)
 {
-  _nDim = r._nDim;
+  _nDim    = r._nDim;
   _flagRot = r._flagRot;
-  _angles = r._angles;
-  _rotMat = r._rotMat;
-  _rotInv = r._rotInv;
+  _angles  = r._angles;
+  _rotMat  = r._rotMat;
+  _rotInv  = r._rotInv;
 }
 
 void Rotation::_directToInverse()
@@ -209,7 +207,7 @@ void Rotation::_inverseToDirect()
 
 void Rotation::_checkRotForIdentity()
 {
-  _flagRot = (! _rotMat.isIdentity());
+  _flagRot = (!_rotMat.isIdentity());
 }
 
 bool Rotation::isSame(const Rotation& rot) const
@@ -252,7 +250,7 @@ bool Rotation::isMatrixRotation(const MatrixSquare& rotmat, bool verbose)
     {
       double prod = 0.;
       for (int k = 0; k < neq; k++)
-        prod += rotmat.getValue(i,k) * rotmat.getValue(j,k);
+        prod += rotmat.getValue(i, k) * rotmat.getValue(j, k);
       double comp = (i == j) ? 1 : 0.;
       if (ABS(prod - comp) > EPSILON6)
       {
@@ -271,4 +269,4 @@ bool Rotation::isMatrixRotation(const MatrixSquare& rotmat, bool verbose)
   }
   return true;
 }
-}
+} // namespace gstlrn

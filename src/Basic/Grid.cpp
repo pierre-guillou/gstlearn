@@ -489,7 +489,8 @@ void Grid::indicesToCoordinateInPlace(const constvectint indice,
 {
   if ((int)coor.size() < _nDim)
   {
-    messerr("Argument coor should have the correct size. Output argument 'coor' not modified.");
+    messerr("Argument coor (%d) should have the size at least equal to %d.",
+            (int)coor.size(), _nDim);
     return;
   }
 

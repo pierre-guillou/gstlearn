@@ -12,8 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
-#include "geoslib_define.h"
 #include "Basic/AStringable.hpp"
+#include "geoslib_define.h"
 
 #include "Matrix/MatrixSquare.hpp"
 
@@ -36,7 +36,7 @@ public:
   const VectorDouble& getAngles() const { return _angles; }
   double getAngle(int idim) const { return _angles[idim]; }
   int getDerivativesInPlace(std::vector<MatrixSquare>& res) const;
-  std::vector<MatrixSquare> getDerivatives();
+  std::vector<MatrixSquare> getDerivatives() const;
   void resetFromSpaceDimension(unsigned int ndim);
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
   int setMatrixDirect(const MatrixSquare& rotmat);
@@ -68,4 +68,4 @@ private:
   MatrixSquare _rotInv;
   mutable VectorDouble _local;
 };
-}
+} // namespace gstlrn

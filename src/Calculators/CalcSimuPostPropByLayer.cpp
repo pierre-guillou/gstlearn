@@ -191,17 +191,17 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
  * For a detailed list of arguments, see \link CalcSimuPost.cpp simuPost \endlink
  */
 
-int simuPostPropByLayer(Db *dbin,
-                        DbGrid *dbout,
-                        const VectorString &names,
+int simuPostPropByLayer(Db* dbin,
+                        DbGrid* dbout,
+                        const VectorString& names,
                         bool flag_match,
-						bool flag_topToBase,
-                        const EPostUpscale &upscale,
-                        const std::vector<EPostStat> &stats,
+                        bool flag_topToBase,
+                        const EPostUpscale& upscale,
+                        const std::vector<EPostStat>& stats,
                         bool verbose,
                         const VectorInt& check_targets,
                         int check_level,
-                        const NamingConvention &namconv)
+                        const NamingConvention& namconv)
 {
   CalcSimuPostPropByLayer calcul;
   calcul.setDbin(dbin);
