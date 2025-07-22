@@ -115,9 +115,9 @@ void MatrixDense::_setValueByRank(int irank, double value)
 void MatrixDense::setValue(int irow, int icol, double value)
 {
   if (getFlagMatrixCheck() && !_isIndexValid(irow, icol)) return;
-  auto mat        = eigenMat();
-  mat(irow, icol) = value;
-  if (mustBeSymmetric() && irow != icol) mat(icol, irow) = value;
+  eigenMat().coeffRef(irow, icol) = value;
+  if (mustBeSymmetric() && irow != icol)
+    eigenMat().coeffRef(icol, irow) = value;
 }
 
 double MatrixDense::traceProd(const MatrixDense& a, MatrixDense& b)

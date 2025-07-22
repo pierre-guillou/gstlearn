@@ -68,7 +68,7 @@ public:
   /*! Set the value for in a matrix cell */
   void setValue(int irow, int icol, double value) override;
   /*! Get the value from a matrix cell */
-  virtual double getValue(int irow, int icol) const override;
+  double getValue(int irow, int icol) const override;
   /*! Update the contents of a matrix cell */
   void updValue(int irow,
                 int icol,
@@ -76,41 +76,41 @@ public:
                 double value) override;
 
   /*! Set the contents of a Column */
-  virtual void setColumn(int icol,
-                         const VectorDouble& tab) override;
+  void setColumn(int icol,
+                 const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant value */
-  virtual void setColumnToConstant(int icol,
-                                   double value) override;
+  void setColumnToConstant(int icol,
+                           double value) override;
   /*! Set the contents of a Row */
-  virtual void setRow(int irow,
-                      const VectorDouble& tab) override;
+  void setRow(int irow,
+              const VectorDouble& tab) override;
   /*! Set the contents of a Row to a constant value*/
-  virtual void setRowToConstant(int irow,
-                                double value) override;
+  void setRowToConstant(int irow,
+                        double value) override;
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab) override;
+  void setDiagonal(const VectorDouble& tab) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
-  virtual void setDiagonalToConstant(double value = 1.) override;
+  void setDiagonalToConstant(double value = 1.) override;
   /*! Add a value to each matrix component */
-  virtual void addScalar(double v) override;
+  void addScalar(double v) override;
   /*! Add value to matrix diagonal */
-  virtual void addScalarDiag(double v) override;
+  void addScalarDiag(double v) override;
   /*! Multiply each matrix component by a value */
-  virtual void prodScalar(double v) override;
+  void prodScalar(double v) override;
   /*! Set all the values of the Matrix at once */
-  virtual void fill(double value) override;
+  void fill(double value) override;
   /*! Multiply a Matrix row-wise */
-  virtual void multiplyRow(const VectorDouble& vec) override;
+  void multiplyRow(const VectorDouble& vec) override;
   /*! Multiply a Matrix column-wise */
-  virtual void multiplyColumn(const VectorDouble& vec) override;
+  void multiplyColumn(const VectorDouble& vec) override;
   /*! Divide a Matrix row-wise */
-  virtual void divideRow(const VectorDouble& vec) override;
+  void divideRow(const VectorDouble& vec) override;
   /*! Divide a Matrix column-wise */
-  virtual void divideColumn(const VectorDouble& vec) override;
+  void divideColumn(const VectorDouble& vec) override;
   /*! Extract a Row */
-  virtual VectorDouble getRow(int irow) const override;
+  VectorDouble getRow(int irow) const override;
   /*! Extract a Column */
-  virtual VectorDouble getColumn(int icol) const override;
+  VectorDouble getColumn(int icol) const override;
   constvect getColumnPtr(int icol) const;
 
   static MatrixDense* create(const MatrixDense* mat);
@@ -182,19 +182,19 @@ public:
 #endif
 
 protected:
-  virtual void _allocate() override;
-  virtual void _deallocate() override;
+  void _allocate() override;
+  void _deallocate() override;
 
-  virtual int _getMatrixPhysicalSize() const override;
-  virtual double& _getValueRef(int irow, int icol) override;
-  virtual double _getValueByRank(int rank) const override;
-  virtual void _setValueByRank(int rank, double value) override;
-  virtual int _getIndexToRank(int irow, int icol) const override;
-  virtual void _transposeInPlace() override;
-  virtual void _addProdVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual int _invert() override;
-  virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
+  int _getMatrixPhysicalSize() const override;
+  double& _getValueRef(int irow, int icol) override;
+  double _getValueByRank(int rank) const override;
+  void _setValueByRank(int rank, double value) override;
+  int _getIndexToRank(int irow, int icol) const override;
+  void _transposeInPlace() override;
+  void _addProdVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
+  void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
+  int _invert() override;
+  int _solve(const VectorDouble& b, VectorDouble& x) const override;
 
   int _computeEigen(bool optionPositive = true);
   int _computeGeneralizedEigen(const MatrixSymmetric& b, bool optionPositive = true);

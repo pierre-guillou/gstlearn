@@ -88,45 +88,45 @@ public:
   void prodMatVecInPlaceC(constvect x, vect res, bool transpose = false) const;
 #endif
   /*! Set the contents of a Column */
-  virtual void setColumn(int icol,
-                         const VectorDouble& tab) override;
+  void setColumn(int icol,
+                 const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant */
-  virtual void setColumnToConstant(int icol,
-                                   double value) override;
+  void setColumnToConstant(int icol,
+                           double value) override;
   /*! Set the contents of a Row */
-  virtual void setRow(int irow,
-                      const VectorDouble& tab) override;
+  void setRow(int irow,
+              const VectorDouble& tab) override;
   /*! Set the contents of a Row to a constant*/
-  virtual void setRowToConstant(int irow,
-                                double value) override;
+  void setRowToConstant(int irow,
+                        double value) override;
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab) override;
+  void setDiagonal(const VectorDouble& tab) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
-  virtual void setDiagonalToConstant(double value = 1.) override;
+  void setDiagonalToConstant(double value = 1.) override;
   /*! Transpose the matrix and return it as a copy*/
-  virtual MatrixSparse* transpose() const override;
+  MatrixSparse* transpose() const override;
   /*! Add a value to each matrix component */
-  virtual void addScalar(double v) override;
+  void addScalar(double v) override;
   /*! Add value to matrix diagonal */
-  virtual void addScalarDiag(double v) override;
+  void addScalarDiag(double v) override;
   /*! Multiply each matrix component by a value */
-  virtual void prodScalar(double v) override;
+  void prodScalar(double v) override;
   /*! Set all the values of the matrix at once */
-  virtual void fill(double value) override;
+  void fill(double value) override;
   /*! Multiply the matrix row-wise */
-  virtual void multiplyRow(const VectorDouble& vec) override;
+  void multiplyRow(const VectorDouble& vec) override;
   /*! Multiply the matrix column-wise */
-  virtual void multiplyColumn(const VectorDouble& vec) override;
+  void multiplyColumn(const VectorDouble& vec) override;
   /*! Divide the matrix row-wise */
-  virtual void divideRow(const VectorDouble& vec) override;
+  void divideRow(const VectorDouble& vec) override;
   /*! Divide the matrix column-wise */
-  virtual void divideColumn(const VectorDouble& vec) override;
+  void divideColumn(const VectorDouble& vec) override;
 
   /*! Extract the contents of the matrix */
-  virtual NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const override;
+  NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const override;
 
   //// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   // Static functions
   static MatrixSparse* create(const MatrixSparse* mat);
@@ -174,10 +174,10 @@ public:
                           bool transpose = false) override;
 
   // virtual void reset(int nrows, int ncols) override; // Use base class method
-  virtual void resetFromValue(int nrows, int ncols, double value) override;
-  virtual void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
-  virtual void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true) override;
-  virtual void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
+  void resetFromValue(int nrows, int ncols, double value) override;
+  void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
+  void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true) override;
+  void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
 
   void resetFromTriplet(const NF_Triplet& NF_T);
 
@@ -234,22 +234,22 @@ protected:
   }
   void _allocate(int nrow, int ncol, int ncolmax);
 
-  virtual void _allocate() override;
-  virtual void _deallocate() override;
+  void _allocate() override;
+  void _deallocate() override;
 
-  virtual double& _getValueRef(int irow, int icol) override;
-  virtual int _getMatrixPhysicalSize() const override;
-  virtual void _setValueByRank(int rank, double value) override;
-  virtual void _setValues(const double* values, bool byCol) override;
-  virtual double _getValueByRank(int rank) const override;
-  virtual int _getIndexToRank(int irow, int icol) const override;
-  virtual void _transposeInPlace() override;
+  double& _getValueRef(int irow, int icol) override;
+  int _getMatrixPhysicalSize() const override;
+  void _setValueByRank(int rank, double value) override;
+  void _setValues(const double* values, bool byCol) override;
+  double _getValueByRank(int rank) const override;
+  int _getIndexToRank(int irow, int icol) const override;
+  void _transposeInPlace() override;
 
-  virtual void _addProdVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
+  void _addProdVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
+  void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
 
-  virtual int _invert() override;
-  virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
+  int _invert() override;
+  int _solve(const VectorDouble& b, VectorDouble& x) const override;
 
   void _clear() override;
   bool _isElementPresent(int irow, int icol) const;
