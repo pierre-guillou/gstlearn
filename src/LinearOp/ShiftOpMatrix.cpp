@@ -925,7 +925,7 @@ MatrixSparse* ShiftOpMatrix::_prepareSparse(const AMesh* amesh)
   Sl = MatrixSparse::createFromTriplet(NF_T);
 
   // Operate the product Sl * t(Sl) to get the final matrix Sret
-  Sret = prodNormMat(Sl, VectorDouble(), false);
+  Sret = prodNormMat(Sl, false);
   delete Sl;
 
   // Blank out the contents of the sparse matrix

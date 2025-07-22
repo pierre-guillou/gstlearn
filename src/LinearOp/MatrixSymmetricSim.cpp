@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-
 #include "LinearOp/MatrixSymmetricSim.hpp"
 #include "Basic/AStringable.hpp"
 #include "LinearOp/ACholesky.hpp"
@@ -70,7 +69,11 @@ MatrixSymmetricSim::~MatrixSymmetricSim()
 
 int MatrixSymmetricSim::_addToDest(const constvect inv, vect outv) const
 {
-  if (_inverse) return _mat.addProdMatVecInPlace(inv, outv);
+  if (_inverse)
+  {
+    _mat.addProdMatVecInPlaceC(inv, outv);
+    return 0;
+  }
   return _factor->addSolveX(inv, outv);
 }
 

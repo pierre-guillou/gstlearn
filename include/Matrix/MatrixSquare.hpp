@@ -10,21 +10,22 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "Matrix/MatrixDense.hpp"
+#include "gstlearn_export.hpp"
 
 /**
  * Square Matrix
  */
 namespace gstlrn
 {
-class GSTLEARN_EXPORT MatrixSquare : public MatrixDense {
+class GSTLEARN_EXPORT MatrixSquare: public MatrixDense
+{
 
 public:
   MatrixSquare(int nrow = 0);
-  MatrixSquare(const MatrixSquare &r);
-  MatrixSquare(const AMatrix &m);
-  MatrixSquare& operator= (const MatrixSquare &r);
+  MatrixSquare(const MatrixSquare& r);
+  MatrixSquare(const AMatrix& m);
+  MatrixSquare& operator=(const MatrixSquare& r);
   virtual ~MatrixSquare();
 
   /// Has a specific implementation in the Target language
@@ -36,7 +37,11 @@ public:
   /// Interface for AMatrix
   virtual double determinant(void) const;
   /*! Check if the matrix is (non empty) square */
-  bool isSquare(bool printWhyNot = false) const override { DECLARE_UNUSED(printWhyNot); return true; }
+  bool isSquare(bool printWhyNot = false) const override
+  {
+    DECLARE_UNUSED(printWhyNot);
+    return true;
+  }
   /*! Say if the matrix must be symmetric */
   bool mustBeSymmetric() const override { return false; }
 
@@ -46,9 +51,9 @@ public:
 
   static MatrixSquare* createFromVVD(const VectorVectorDouble& X);
   static MatrixSquare* createFromVD(const VectorDouble& X,
-                                     int nrow,
-                                     bool byCol             = false,
-                                     bool invertColumnOrder = false);
+                                    int nrow,
+                                    bool byCol             = false,
+                                    bool invertColumnOrder = false);
   double trace() const;
 
   /*! Perform inner product */
@@ -83,10 +88,13 @@ private:
 
 /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
 GSTLEARN_EXPORT MatrixSquare* prodNormMatMat(const MatrixDense* a,
-                                              const MatrixDense* m,
-                                              bool transpose = false);
+                                             const MatrixDense* m,
+                                             bool transpose = false);
 /*! Product 't(A)' %*% 'A' or 'A' %*% 't(A)' */
 GSTLEARN_EXPORT MatrixSquare* prodNormMat(const MatrixDense& a,
-                                           const VectorDouble& vec = VectorDouble(),
-                                           bool transpose          = false);
-}
+                                          bool transpose = false);
+/*! Product 't(A)' %*% 'vec' %*% 'A' or 'A' %*% 'vec' %*% 't(A)' */
+GSTLEARN_EXPORT MatrixSquare* prodNormMatVec(const MatrixDense& a,
+                                             const VectorDouble& vec,
+                                             bool transpose = false);
+} // namespace gstlrn

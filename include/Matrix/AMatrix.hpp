@@ -72,15 +72,15 @@ public:
   virtual bool mustBeSymmetric() const { return false; }
 
   /*! Set the contents of a Column */
-  virtual void setColumn(int icol, const VectorDouble& tab, bool flagCheck = true);
+  virtual void setColumn(int icol, const VectorDouble& tab);
   /*! Set the contents of a Column to a constant value*/
-  virtual void setColumnToConstant(int icol, double value, bool flagCheck = true);
+  virtual void setColumnToConstant(int icol, double value);
   /*! Set the contents of a Row */
-  virtual void setRow(int irow, const VectorDouble& tab, bool flagCheck = true);
+  virtual void setRow(int irow, const VectorDouble& tab);
   /*! Set the contents of a Row to a constant value*/
-  virtual void setRowToConstant(int irow, double value, bool flagCheck = true);
+  virtual void setRowToConstant(int irow, double value);
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab, bool flagCheck = true);
+  virtual void setDiagonal(const VectorDouble& tab);
   /*! Set the contents of the (main) Diagonal to a constant value */
   virtual void setDiagonalToConstant(double value = 1.);
   /*! Transpose the matrix in place*/
@@ -103,51 +103,35 @@ public:
   virtual void divideRow(const VectorDouble& vec);
   /*! Divide a Matrix column-wise */
   virtual void divideColumn(const VectorDouble& vec);
-  /*! Perform 'vec' * 'this' */
-  virtual VectorDouble prodVecMat(const VectorDouble& x, bool transpose = false) const;
-  /*! Perform 'this' * 'vec' */
-  virtual VectorDouble prodMatVec(const VectorDouble& x, bool transpose = false) const;
+
   /*! Extract a Row */
   virtual VectorDouble getRow(int irow) const;
   /*! Extract a Column */
   virtual VectorDouble getColumn(int icol) const;
-  /*! Multiply matrix 'x' by matrix 'y' and store the result in 'this' */
-  virtual void prodMatMatInPlace(const AMatrix* x,
-                                 const AMatrix* y,
-                                 bool transposeX = false,
-                                 bool transposeY = false);
+
   /*! Extract the contents of the matrix */
   virtual NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const;
   /*! Add a matrix (multiplied by a constant) */
   void addMatInPlace(const AMatrix& y, double cx = 1., double cy = 1.);
   /*! Multiply 'this' by matrix 'y' and store in 'this'*/
   void prodMatInPlace(const AMatrix* matY, bool transposeY = false);
-  /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' stored in 'this'*/
-  void prodNormMatMatInPlace(const AMatrix* a,
-                             const AMatrix* m,
-                             bool transpose = false);
-  /*! Product 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' stored in 'this'*/
-  void prodNormMatVecInPlace(const AMatrix& a,
-                             const VectorDouble& vec = VectorDouble(),
-                             bool transpose          = false);
 
   /*! Modify the dimension of the matrix (if needed) */
   void resize(int nrows, int ncols);
   /*! Gets the value at row 'irow' and column 'icol' */
-  virtual double getValue(int irow, int icol, bool flagCheck = true) const = 0;
+  virtual double getValue(int irow, int icol) const = 0;
   /*! Sets the value at row 'irow' and column 'icol' */
-  virtual void setValue(int irow, int icol, double value, bool flagCheck = true) = 0;
+  virtual void setValue(int irow, int icol, double value) = 0;
   /*! Update the value at row 'irow' and column 'icol' */
   virtual void updValue(int irow,
                         int icol,
                         const EOperator& oper,
-                        double value,
-                        bool flagCheck = true) = 0;
+                        double value) = 0;
   /*! Add a value to a matrix term */
   void addValue(int irow, int icol, double value);
   /*! Check if a matrix is the same as me (norm L1) */
   bool isSame(const AMatrix& m, double eps = EPSILON4, bool printWhyNot = false);
-  /*! Check that both matrix have the same number of rows and columns */
+  /*! Check that 'm' has the same dimensions as 'this' */
   bool isSameSize(const AMatrix& m) const;
   /*! Returns if the current matrix is Empty */
   bool empty() const { return (_nRows == 0 || _nCols == 0); }
@@ -179,17 +163,43 @@ public:
   bool isNonNegative(bool verbose = false) const;
 
   /*! Perform 'y' = 'this' * 'x' */
+  VectorDouble prodMatVec(const VectorDouble& x, bool transpose = false) const;
   void prodMatVecInPlace(const VectorDouble& x, VectorDouble& y, bool transpose = false) const;
-#ifndef SWIG
-  int prodMatVecInPlace(const constvect x, vect y, bool transpose = false) const;
-#endif
   void prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const;
+#ifndef SWIG
+  void prodMatVecInPlaceC(const constvect x, vect y, bool transpose = false) const;
+  void addProdMatVecInPlaceC(const constvect x, vect y, bool transpose = false) const;
+#endif
+
   /*! Perform 'y' = 'x' * 'this' */
+  VectorDouble prodVecMat(const VectorDouble& x, bool transpose = false) const;
   void prodVecMatInPlace(const VectorDouble& x, VectorDouble& y, bool transpose = false) const;
   void prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const;
+#ifndef SWIG
+  void prodVecMatInPlaceC(const constvect x, vect y, bool transpose = false) const;
+  void addProdVecMatInPlaceC(const constvect x, vect y, bool transpose = false) const;
+#endif
 
   /*! Perform x %*% mat %*% y */
-  double quadraticMatrix(const VectorDouble& x, const VectorDouble& y);
+  double prodVecMatVec(const VectorDouble& x, const VectorDouble& y) const;
+
+  /*! Perform 'this' = 'x' * 'y' */
+  virtual void prodMatMatInPlace(const AMatrix* x,
+                                 const AMatrix* y,
+                                 bool transposeX = false,
+                                 bool transposeY = false);
+  /*! Perform 'this' = 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
+  virtual void prodNormMatMatInPlace(const AMatrix* a,
+                                     const AMatrix* m,
+                                     bool transpose = false);
+  /*! Perform 'this' = 't(A)' %*% 'vec' %*% 'A' or 'A' %*% 'vec' %*% 't(A)' */
+  virtual void prodNormMatVecInPlace(const AMatrix* a,
+                                     const VectorDouble& vec,
+                                     bool transpose = false);
+  /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
+  virtual void prodNormMatInPlace(const AMatrix* a,
+                                  bool transpose = false);
+
   /*! Matrix inversion in place */
   int invert();
   /*! Solving the Matrix Linear system */
@@ -210,7 +220,6 @@ public:
                   const VectorInt& validRows,
                   const VectorInt& validCols);
   void copyElements(const AMatrix& m, double factor = 1.);
-  void setFlagCheckAddress(bool flagCheckAddress) { _flagCheckAddress = flagCheckAddress; }
 
   void makePositiveColumn();
   void linearCombination(double val1,
@@ -222,7 +231,6 @@ public:
   void dumpRange(const char* title);
 
 #ifndef SWIG
-  virtual int addProdMatVecInPlace(const constvect x, vect y, bool transpose = false) const;
 
   /*! Get value operator override */
   double operator()(int row, int col) const { return getValue(row, col); }
@@ -247,15 +255,12 @@ protected:
   virtual int _getIndexToRank(int irow, int icol) const = 0;
 
   virtual void _transposeInPlace()                                    = 0;
-  virtual void _prodMatVecInPlacePtr(const double* x,
-                                     double* y,
-                                     bool transpose = false) const    = 0;
   virtual void _addProdMatVecInPlacePtr(const double* x,
                                         double* y,
                                         bool transpose = false) const = 0;
-  virtual void _prodVecMatInPlacePtr(const double* x,
-                                     double* y,
-                                     bool transpose = false) const    = 0;
+  virtual void _addProdVecMatInPlacePtr(const double* x,
+                                        double* y,
+                                        bool transpose = false) const = 0;
   virtual int _invert()                                               = 0;
   virtual int _solve(const VectorDouble& b, VectorDouble& x) const    = 0;
   virtual void _clear();
@@ -274,23 +279,26 @@ protected:
   bool _isRankValid(int rank) const;
   void _fillFromVVD(const VectorVectorDouble& X);
 
-  bool _getFlagCheckAddress() const { return _flagCheckAddress; }
-
-  bool _checkLink(int nrow1,
-                  int ncol1,
-                  bool transpose1,
-                  int nrow2       = 0,
-                  int ncol2       = 0,
-                  bool transpose2 = false,
-                  int nrow3       = 0,
-                  int ncol3       = 0,
-                  bool transpose3 = false) const;
+  static bool _isMatrixCompatible(const String& name,
+                                  const AMatrix* mat1 = nullptr,
+                                  int vsize1          = 0,
+                                  bool transpose1     = false,
+                                  const AMatrix* mat2 = nullptr,
+                                  int vsize2          = 0,
+                                  bool transpose2     = false,
+                                  const AMatrix* mat3 = nullptr,
+                                  int vsize3          = 0,
+                                  bool transpose3     = false);
+  static bool _identifyRowAndCol(const AMatrix* mat,
+                                 int vsize,
+                                 bool transpose,
+                                 int* nrow,
+                                 int* ncol);
 
 private:
   mutable VectorDouble _diagonal;
   int _nRows;
   int _nCols;
-  bool _flagCheckAddress;
   double _nullTerm; // Used for returning a null constant address
 #endif
 };
@@ -299,4 +307,6 @@ private:
 GSTLEARN_EXPORT void setMultiThread(int nthreads);
 GSTLEARN_EXPORT int getMultiThread();
 GSTLEARN_EXPORT bool isMultiThread();
+GSTLEARN_EXPORT bool getFlagMatrixCheck();
+GSTLEARN_EXPORT void setFlagMatrixCheck(bool flag);
 } // namespace gstlrn

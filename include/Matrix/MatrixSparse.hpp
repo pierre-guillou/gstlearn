@@ -66,15 +66,14 @@ public:
   bool isDense() const override { return false; }
 
   /*! Set the value for a matrix cell */
-  void setValue(int irow, int icol, double value, bool flagCheck = true) override;
+  void setValue(int irow, int icol, double value) override;
   /*! Get the value from a matrix cell */
-  double getValue(int row, int col, bool flagCheck = true) const override;
+  double getValue(int row, int col) const override;
   /*! Modifies the contents of a matrix cell */
   void updValue(int irow,
                 int icol,
                 const EOperator& oper,
-                double value,
-                bool flagCheck = true) override;
+                double value) override;
 
   MatrixSparse* getRowAsMatrixSparse(int irow, double coeff = 1.) const;
   MatrixSparse* getColumnAsMatrixSparse(int icol, double coeff = 1.) const;
@@ -86,26 +85,22 @@ public:
                                   vect out,
                                   bool transpose = false) const;
 
-  void prodMatVecInPlace(constvect x, vect res, bool transpose = false) const;
+  void prodMatVecInPlaceC(constvect x, vect res, bool transpose = false) const;
 #endif
   /*! Set the contents of a Column */
   virtual void setColumn(int icol,
-                         const VectorDouble& tab,
-                         bool flagCheck = true) override;
+                         const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant */
   virtual void setColumnToConstant(int icol,
-                                   double value,
-                                   bool flagCheck = true) override;
+                                   double value) override;
   /*! Set the contents of a Row */
   virtual void setRow(int irow,
-                      const VectorDouble& tab,
-                      bool flagCheck = true) override;
+                      const VectorDouble& tab) override;
   /*! Set the contents of a Row to a constant*/
   virtual void setRowToConstant(int irow,
-                                double value,
-                                bool flagCheck = true) override;
+                                double value) override;
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab, bool flagCheck = true) override;
+  virtual void setDiagonal(const VectorDouble& tab) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
   virtual void setDiagonalToConstant(double value = 1.) override;
   /*! Transpose the matrix and return it as a copy*/
@@ -126,15 +121,6 @@ public:
   virtual void divideRow(const VectorDouble& vec) override;
   /*! Divide the matrix column-wise */
   virtual void divideColumn(const VectorDouble& vec) override;
-  /*! Perform y = x %*% 'this' */
-  virtual VectorDouble prodVecMat(const VectorDouble& x, bool transpose = false) const override;
-  /*! Perform y = 'this' %*% x */
-  virtual VectorDouble prodMatVec(const VectorDouble& x, bool transpose = false) const override;
-  /*! Multiply matrix 'x' by matrix 'y' and store the result in 'this' */
-  virtual void prodMatMatInPlace(const AMatrix* x,
-                                 const AMatrix* y,
-                                 bool transposeX = false,
-                                 bool transposeY = false) override;
 
   /*! Extract the contents of the matrix */
   virtual NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const override;
@@ -169,14 +155,23 @@ public:
   /// rather than manipulating AMatrix. They are no more generic of AMatrix
   /*! Add a matrix (multiplied by a constant) */
   virtual void addMatInPlace(const MatrixSparse& y, double cx = 1., double cy = 1.);
-  /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' stored in 'this'*/
-  virtual void prodNormMatMatInPlace(const MatrixSparse* a,
-                                     const MatrixSparse* m,
-                                     bool transpose = false);
-  /*! Product 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' stored in 'this'*/
-  virtual void prodNormMatVecInPlace(const MatrixSparse* a,
-                                     const VectorDouble& vec = VectorDouble(),
-                                     bool transpose          = false);
+
+  /*! Multiply matrix 'x' by matrix 'y' and store the result in 'this' */
+  void prodMatMatInPlace(const AMatrix* x,
+                         const AMatrix* y,
+                         bool transposeX = false,
+                         bool transposeY = false) override;
+  /*! Perform 'this' = 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
+  void prodNormMatMatInPlace(const AMatrix* a,
+                             const AMatrix* m,
+                             bool transpose = false) override;
+  /*! Perform 'this' = 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' */
+  void prodNormMatVecInPlace(const AMatrix* a,
+                             const VectorDouble& vec,
+                             bool transpose = false) override;
+  /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
+  void prodNormMatInPlace(const AMatrix* a,
+                          bool transpose = false) override;
 
   // virtual void reset(int nrows, int ncols) override; // Use base class method
   virtual void resetFromValue(int nrows, int ncols, double value) override;
@@ -250,8 +245,7 @@ protected:
   virtual int _getIndexToRank(int irow, int icol) const override;
   virtual void _transposeInPlace() override;
 
-  virtual void _prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
+  virtual void _addProdVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
   virtual void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
 
   virtual int _invert() override;
@@ -295,10 +289,13 @@ GSTLEARN_EXPORT MatrixSparse* createFromAnyMatrix(const AMatrix* mat);
 GSTLEARN_EXPORT MatrixSparse* prodNormMatMat(const MatrixSparse* a,
                                              const MatrixSparse* m,
                                              bool transpose = false);
-/*! Product 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' stored in 'this'*/
+/*! Product 't(A)' %*% 'vec' %*% 'A' or 'A' %*% 'vec' %*% 't(A)' stored in 'this'*/
+GSTLEARN_EXPORT MatrixSparse* prodNormMatVec(const MatrixSparse* a,
+                                             const VectorDouble& vec,
+                                             bool transpose = false);
+/*! Product 't(A)' %*% 'A' or 'A' %*% 't(A)' stored in 'this'*/
 GSTLEARN_EXPORT MatrixSparse* prodNormMat(const MatrixSparse* a,
-                                          const VectorDouble& vec = VectorDouble(),
-                                          bool transpose          = false);
+                                          bool transpose = false);
 /*! Product 'Diag(vec)' %*% 'A' %*% 'Diag(vec)' */
 GSTLEARN_EXPORT MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
                                               const VectorDouble& vec,

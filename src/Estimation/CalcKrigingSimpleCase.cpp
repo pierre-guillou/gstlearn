@@ -187,4 +187,4 @@ bool CalcKrigingSimpleCase::_run()
 
   return true;
 }
-}
+} // namespace gstlrn

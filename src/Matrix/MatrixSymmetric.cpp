@@ -826,11 +826,7 @@ int MatrixSymmetric::computeGeneralizedInverse(MatrixSymmetric& tabout,
                                                double maxicond,
                                                double eps)
 {
-  if (!isSameSize(tabout))
-  {
-    messerr("The argument 'tabout' must have same dimensions as input matrix");
-    return 1;
-  }
+  if (!isSameSize(tabout)) return 1;
 
   // Calculate the Eigen vectors
   if (computeEigen() != 0) return 1;

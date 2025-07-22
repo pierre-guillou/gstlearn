@@ -18,7 +18,7 @@
 #include "Neigh/NeighMoving.hpp"
 #include "geoslib_old_f.h"
 
-namespace gstlrn 
+namespace gstlrn
 {
 
 CalcSimpleInterpolation::CalcSimpleInterpolation()
@@ -820,7 +820,7 @@ double CalcSimpleInterpolation::_stdevCalc(Db* dbin,
 
   // Covariance between Data and Data
   MatrixDense Mxx = getModel()->evalCovMat(dbin, dbin, 0, 0, nbgh, nbgh);
-  double cxx      = Mxx.quadraticMatrix(weights, weights);
+  double cxx      = Mxx.prodVecMatVec(weights, weights);
 
   double result = sqrt(c00 - 2. * c0x + cxx);
   if (OptDbg::query(EDbg::RESULTS)) message("St Dev = %f\n", result);
@@ -848,4 +848,4 @@ void CalcSimpleInterpolation::_saveResults(Db* dbin,
   if (_flagStd) dbout->setArray(iech, _iattStd, stdev);
 }
 
-}
+} // namespace gstlrn

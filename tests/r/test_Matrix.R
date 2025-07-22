@@ -195,7 +195,6 @@ err = mestitle(0,"Product of the matrix by a vector")
 err = reset_to_initial_contents(M, MRR, MSG, MSS, MSP)
 
 # initialisation
-print(paste0("nrow = ", nrow))
 Vref = VectorDouble(nrow)
 V2   = VectorDouble(nrow)
 

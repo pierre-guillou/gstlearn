@@ -10,8 +10,8 @@
 /******************************************************************************/
 #include "LinearOp/ProjMatrix.hpp"
 #include "Db/Db.hpp"
-#include "Mesh/AMesh.hpp"
 #include "Matrix/LinkMatrixSparse.hpp"
+#include "Mesh/AMesh.hpp"
 
 namespace gstlrn
 {
@@ -40,16 +40,16 @@ ProjMatrix::ProjMatrix(const MatrixSparse* m)
 {
 }
 
-ProjMatrix& ProjMatrix::operator= (const ProjMatrix &m)
+ProjMatrix& ProjMatrix::operator=(const ProjMatrix& m)
 {
   if (this != &m)
   {
-    MatrixSparse::operator =(m);
+    MatrixSparse::operator=(m);
   }
   return *this;
 }
 
-ProjMatrix::~ProjMatrix() 
+ProjMatrix::~ProjMatrix()
 {
 }
 
@@ -76,22 +76,22 @@ void ProjMatrix::resetFromMeshAndDb(const Db* db, const AMesh* a_mesh, int rankZ
   }
 }
 
-//int ProjMatrix::resetFromDbByNeigh(const Db *db,
-//                                   AMesh *amesh,
-//                                   double radius,
-//                                   int flag_exact,
-//                                   bool verbose)
+// int ProjMatrix::resetFromDbByNeigh(const Db *db,
+//                                    AMesh *amesh,
+//                                    double radius,
+//                                    int flag_exact,
+//                                    bool verbose)
 //{
-//  int nactive;
-//  int *ranks;
-//  if (_AprojCS != nullptr) delete _AprojCS;
-//  _AprojCS = db_mesh_neigh(db, amesh, radius, flag_exact, verbose, &nactive, &ranks);
-//  if (_AprojCS == nullptr) return 1;
-//  if (ranks != nullptr) ranks = (int *) mem_free((char *) ranks);
-//  _nPoint  = nactive;
-//  _nApices = amesh->getNMeshes();
-//  return 0;
-//}
+//   int nactive;
+//   int *ranks;
+//   if (_AprojCS != nullptr) delete _AprojCS;
+//   _AprojCS = db_mesh_neigh(db, amesh, radius, flag_exact, verbose, &nactive, &ranks);
+//   if (_AprojCS == nullptr) return 1;
+//   if (ranks != nullptr) ranks = (int *) mem_free((char *) ranks);
+//   _nPoint  = nactive;
+//   _nApices = amesh->getNMeshes();
+//   return 0;
+// }
 
 /* int ProjMatrix::point2mesh(const VectorDouble& inv, VectorDouble& outv) const
 {
@@ -108,22 +108,22 @@ void ProjMatrix::resetFromMeshAndDb(const Db* db, const AMesh* a_mesh, int rankZ
     return 1;
   }
 
-  prodMatVecInPlace(inv, outv, true);
+  prodMatVecInPlaceC(inv, outv, true);
   return 0;
 }
  */
 int ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
 {
-  if ((int) inv.size() != getNApex())
+  if ((int)inv.size() != getNApex())
   {
     messerr("mesh2point: Error in the dimension of argument 'inv'(%d). It should be (%d)",
-            inv.size(),getNApex());
+            inv.size(), getNApex());
     return 1;
   }
-  if ((int) outv.size() != getNPoint())
+  if ((int)outv.size() != getNPoint())
   {
     messerr("mesh2point: Error in the dimension of argument 'outv'(%d). It should be (%d)",
-            outv.size(),getNPoint());
+            outv.size(), getNPoint());
     return 1;
   }
 
@@ -133,16 +133,16 @@ int ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
 
 int ProjMatrix::_addPoint2mesh(const constvect inv, vect outv) const
 {
-  if ((int) inv.size() != getNPoint())
+  if ((int)inv.size() != getNPoint())
   {
     messerr("point2mesh: Error in the dimension of argument 'inv'(%d). It should be (%d)",
-            inv.size(),getNPoint());
+            inv.size(), getNPoint());
     return 1;
   }
-  if ((int) outv.size() != getNApex())
+  if ((int)outv.size() != getNApex())
   {
     messerr("point2mesh: Error in the dimension of argument 'outv'(%d). It should be (%d)",
-            outv.size(),getNApex());
+            outv.size(), getNApex());
     return 1;
   }
 
@@ -185,9 +185,9 @@ void ProjMatrix::dumpVerticesUsed(int npmax) const
     for (int ic = 0, nc = getNApex(); ic < nc; ic++)
     {
       if (getValue(ip, ic) > 0)
-        message(" %3d [%5.2lf]", ic, getValue(ip,ic));
+        message(" %3d [%5.2lf]", ic, getValue(ip, ic));
     }
     message("\n");
   }
 }
-}
+} // namespace gstlrn

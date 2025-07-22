@@ -3803,6 +3803,7 @@ static int st_kriging_several_rhs(double* data,
   ndata = SS->ndata;
   temp  = nullptr;
   B0    = nullptr;
+  VectorDouble rhslocal(size);
 
   /* Core allocation */
 
@@ -3824,7 +3825,10 @@ static int st_kriging_several_rhs(double* data,
       for (int ivar = 0; ivar < nvar; ivar++)
       {
         for (int i = 0; i < size; i++)
-          work[i] = 0.;
+        {
+          work[i]     = 0.;
+          rhslocal[i] = RHS(icov, ivar, i);
+        }
         for (int jvar = 0; jvar < nvar; jvar++)
         {
           // E_ij * Z_j
@@ -3835,7 +3839,7 @@ static int st_kriging_several_rhs(double* data,
             work[i] += temp[i];
           delete B0;
         }
-        Matelem.Aproj->prodMatVecInPlacePtr(work.data(), &RHS(icov, ivar, 0), true);
+        Matelem.Aproj->prodMatVecInPlacePtr(work.data(), rhslocal.data(), true);
       }
     }
     else
@@ -3846,7 +3850,10 @@ static int st_kriging_several_rhs(double* data,
       for (int ivar = 0; ivar < nvar; ivar++)
       {
         for (int i = 0; i < size; i++)
-          work[i] = 0.;
+        {
+          work[i]     = 0.;
+          rhslocal[i] = RHS(icov, ivar, i);
+        }
         if (icov == 0)
         {
           for (int jvar = 0; jvar < nvar; jvar++)
@@ -3875,8 +3882,7 @@ static int st_kriging_several_rhs(double* data,
               work[i] += temp[i];
             delete B0;
           }
-          // A^t(icov) * sum{ Q1_dd_ij * Z_j }
-          Matelem.Aproj->prodMatVecInPlacePtr(work.data(), &RHS(icov, ivar, 0), true);
+          Matelem.Aproj->prodMatVecInPlacePtr(work.data(), rhslocal.data(), true);
         }
       }
     }
@@ -5834,7 +5840,7 @@ static void st_product_Q(const VectorDouble& blin,
   {
     for (int i = 0; i < n; i++)
       y[i] += blin[ilin] * x1[i];
-    S->prodMatVecInPlace(x1, x2);
+    S->prodMatVecInPlaceC(x1, x2);
     for (int i = 0; i < n; i++)
       x1[i] = x2[i];
   }
@@ -8578,7 +8584,7 @@ int m2d_gibbs_spde(Db* dbin,
 
           for (int i = 0; i < nvertex; i++)
             zkrig[i] = vwork[i] = 0.;
-          Matelem.Aproj->prodMatVecInPlace(ydat_loc, rhs, true);
+          Matelem.Aproj->prodMatVecInPlaceC(ydat_loc, rhs, true);
           st_kriging_cholesky(Qc, rhs.data(), vwork, zkrig.data());
           for (int i = 0; i < nvertex; i++)
             yvert_loc[i] += zkrig[i];

@@ -108,7 +108,7 @@ double ALikelihood::computeLogLikelihood(bool verbose)
 
     // Calculate XtCm1X = Xt * Cm1 * X
     _XtCm1X.resize(_X.getNCols(), _X.getNCols());
-    _XtCm1X.prodMatMatInPlaceOptim(&_X, &_Cm1X, true, false);
+    _XtCm1X.prodMatMatInPlace(&_X, &_Cm1X, true, false);
 
     // Construct ZtCm1X = Zt * Cm1 * X and perform its Cholesky decomposition
     // workaround to create a shared_ptr which is not deleted at the end of the scope
