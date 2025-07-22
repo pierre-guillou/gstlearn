@@ -8,27 +8,61 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/AStringable.hpp"
-#include "geoslib_f.h"
-#include "Db/Db.hpp"
-#include "Db/DbStringFormat.hpp"
-#include "Model/Model.hpp"
-#include "Basic/File.hpp"
-#include "Basic/OptCst.hpp"
-#include "Neigh/NeighUnique.hpp"
-#include "Neigh/NeighMoving.hpp"
-#include "Neigh/NeighImage.hpp"
 #include "Anamorphosis/AnamHermite.hpp"
 #include "Anamorphosis/CalcAnamTransform.hpp"
-#include "Simulation/CalcSimuTurningBands.hpp"
-#include "Estimation/CalcKriging.hpp"
-#include "Estimation/CalcImage.hpp"
+#include "Basic/AStringable.hpp"
+#include "Basic/File.hpp"
+#include "Basic/OptCst.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbStringFormat.hpp"
 #include "Estimation/CalcGlobal.hpp"
+#include "Estimation/CalcImage.hpp"
+#include "Estimation/CalcKriging.hpp"
 #include "Estimation/Vecchia.hpp"
 #include "Matrix/MatrixT.hpp"
+#include "Model/Model.hpp"
+#include "Neigh/NeighImage.hpp"
+#include "Neigh/NeighMoving.hpp"
+#include "Neigh/NeighUnique.hpp"
+#include "Simulation/CalcSimuTurningBands.hpp"
 #include "Tree/Ball.hpp"
 
+#include "geoslib_f.h"
+
 using namespace gstlrn;
+
+static Db* _createDb(int nvar = 1, int ndat = 5, bool verbose = false)
+{
+  int ndim = 2;
+  Db* db   = Db::createFillRandom(ndat, ndim, nvar);
+  // db->setZVariable(3, 0, TEST);
+  DbStringFormat dbfmt1(FLAG_ARRAY);
+  if (verbose) db->display(&dbfmt1);
+  return db;
+}
+
+static Model* _createModel(int nvar = 1, double range = 0.5, bool verbose = false)
+{
+  MatrixSymmetric* sills = MatrixSymmetric::createRandomDefinitePositive(nvar);
+  Model* model           = Model::createFromParam(ECov::EXPONENTIAL, range, TEST, 1., VectorDouble(), *sills);
+  delete sills;
+  if (verbose) model->display();
+  return model;
+}
+
+static DbGrid* _createGrid(int nx = 2)
+{
+  DbGrid* grid = DbGrid::create({nx, nx}, {1. / nx, 1. / nx});
+  return grid;
+}
+
+static void _dumpLimit(int mode)
+{
+  int limit = (mode > 0) ? -1 : 7;
+  OptCst::define(ECst::NTCOL, limit);
+  OptCst::define(ECst::NTROW, limit);
+}
+
 /****************************************************************************/
 /*!
  ** Main Program
@@ -41,52 +75,63 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   // Global parameters
-  int nb_neigh = 3;
-  int mode     = 0;
-  bool verbose = false;
-  OptCst::define(ECst::NTCOL, -1);
-  OptCst::define(ECst::NTROW, -1);
-
-  int ndat = 4;
-  Db* db = Db::createFillRandom(ndat, 2, 1);
-
-  double range = 0.5;
-  Model* model = Model::createFromParam(ECov::EXPONENTIAL, range);
-
-  int nx = 2;
-  DbGrid* grid = DbGrid::create({nx, nx}, {1. / nx, 1. / nx});
+  int mode       = 0;
+  int nb_vecchia = 3;
+  DbStringFormat dbfmt(FLAG_STATS, {"Vecchia*"});
 
   if (mode == 0 || mode == 1)
   {
     mestitle(0, "Checking Vecchia Class");
-    verbose = true;
-    Vecchia V          = Vecchia(model, nb_neigh, db);
-    MatrixT<int> Ranks = findNN(db, nullptr, nb_neigh+1, false, verbose);
-    (void)V.computeLower(Ranks, verbose);
+    _dumpLimit(1);
+    Db* db             = _createDb(1, 5, true);
+    Model* model       = _createModel(1);
+    Vecchia V          = Vecchia(model, nb_vecchia, db);
+    MatrixT<int> Ranks = findNN(db, nullptr, nb_vecchia + 1, false, true);
+    (void)V.computeLower(Ranks, true);
+    delete db;
+    delete model;
+    _dumpLimit(-1);
   }
 
   if (mode == 0 || mode == 2)
   {
     mestitle(0, "Kriging with Vecchia approximation");
-    krigingVecchia(db, grid, model, nb_neigh);
-
-    // Get some statistics for check printout
-    DbStringFormat dbfmt(FLAG_STATS, {"Vecchia*"});
+    _dumpLimit(1);
+    Db* db       = _createDb(1, 5, false);
+    Model* model = _createModel(1);
+    DbGrid* grid = _createGrid();
+    krigingVecchia(db, grid, model, nb_vecchia, true);
     grid->display(&dbfmt);
+    delete db;
+    delete model;
+    delete grid;
+    _dumpLimit(-1);
   }
 
   if (mode == 0 || mode == 3)
   {
-    delete db;
-    db = Db::createFillRandom(20000, 2, 1);
-
-    const double result = logLikelihoodVecchia(db, model, 20, false);
+    mestitle(0, "Log-Likelihood");
+    Db* db              = _createDb(1, 20000, false);
+    Model* model        = _createModel(1);
+    const double result = logLikelihoodVecchia(db, model, 10, false);
     message("Log-likelihood = %f\n", result);
+    delete db;
+    delete model;
   }
-  // ====================== Free pointers ==================================
-  delete db;
-  delete grid;
-  delete model;
+
+  if (mode == 0 || mode == 4)
+  {
+    nb_vecchia = 2;
+    mestitle(0, "Kriging with Vecchia approximation (nvar=2)");
+    Db* db       = _createDb(2, 10, false);
+    Model* model = _createModel(2);
+    DbGrid* grid = _createGrid(100);
+    krigingVecchia(db, grid, model, nb_vecchia, false);
+    grid->display(&dbfmt);
+    delete db;
+    delete model;
+    delete grid;
+  }
 
   return (0);
 }

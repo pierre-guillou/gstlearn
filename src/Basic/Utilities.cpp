@@ -10,33 +10,32 @@
 /******************************************************************************/
 #include "Enum/EDbg.hpp"
 
-#include "Basic/Utilities.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/Memory.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "geoslib_define.h"
 
 #include <cmath>
 #include <map>
 
-#define LSTACK    1000
-#define MINI        10
+#define LSTACK 1000
+#define MINI   10
 
-namespace gstlrn 
+namespace gstlrn
 {
 
 static EDbg _debugOptions = EDbg::DB;
-static bool _internalDebug = false;
 
 bool isInteger(double value, double eps)
 {
   int iclose = getClosestInteger(value);
-  return (ABS((double) iclose - value) <= eps);
+  return (ABS((double)iclose - value) <= eps);
 }
 
 int getClosestInteger(double value)
 {
-  int iclose = (int) round(value);
+  int iclose = (int)round(value);
   return iclose;
 }
 
@@ -44,7 +43,7 @@ bool isMultiple(int nbig, int nsmall)
 {
   double ratio;
 
-  ratio = (double) nbig / (double) nsmall;
+  ratio = (double)nbig / (double)nsmall;
   return (isInteger(ratio));
 }
 
@@ -136,7 +135,7 @@ bool IFFFF(int value)
   return (value == ITEST);
 }
 
-#endif //SWIG
+#endif // SWIG
 
 /*****************************************************************************/
 /*!
@@ -177,7 +176,7 @@ double ut_rad2deg(double angle)
  ** \remark  If ind = NULL, ind is ignored
  **
  *****************************************************************************/
-void ut_sort_double(int safe, int nech, int *ind, double *value)
+void ut_sort_double(int safe, int nech, int* ind, double* value)
 {
   static int LISTE_L[LSTACK];
   static int LISTE_R[LSTACK];
@@ -189,7 +188,7 @@ void ut_sort_double(int safe, int nech, int *ind, double *value)
   inddev = 0;
   if (safe)
   {
-    tab = (double*) mem_alloc(sizeof(double) * nech, 1);
+    tab = (double*)mem_alloc(sizeof(double) * nech, 1);
     for (i = 0; i < nech; i++)
       tab[i] = value[i];
   }
@@ -202,7 +201,7 @@ void ut_sort_double(int safe, int nech, int *ind, double *value)
   {
     if (ind)
     {
-      pstack = 0;
+      pstack          = 0;
       LISTE_L[pstack] = 0;
       LISTE_R[pstack] = nech - 1;
 
@@ -214,7 +213,7 @@ void ut_sort_double(int safe, int nech, int *ind, double *value)
         {
           i = l;
           j = r + 1;
-          p = (int) ((double) (l + r) / 2.);
+          p = (int)((double)(l + r) / 2.);
 
           if (tab[p] < tab[l])
           {
@@ -301,7 +300,7 @@ void ut_sort_double(int safe, int nech, int *ind, double *value)
     }
     else
     {
-      pstack = 0;
+      pstack          = 0;
       LISTE_L[pstack] = 0;
       LISTE_R[pstack] = nech - 1;
 
@@ -313,7 +312,7 @@ void ut_sort_double(int safe, int nech, int *ind, double *value)
         {
           i = l;
           j = r + 1;
-          p = (int) ((double) (l + r) / 2.);
+          p = (int)((double)(l + r) / 2.);
 
           if (tab[p] < tab[l])
           {
@@ -406,7 +405,7 @@ void ut_sort_double(int safe, int nech, int *ind, double *value)
     }
   }
 
-  if (safe) mem_free((char* ) tab);
+  if (safe) mem_free((char*)tab);
 }
 
 /****************************************************************************/
@@ -419,7 +418,7 @@ void ut_sort_double(int safe, int nech, int *ind, double *value)
  ** \param[in]  wgt     Array containing the Weights or NULL
  **
  ****************************************************************************/
-StatResults ut_statistics(int nech, const double *tab, const double *sel, const double *wgt)
+StatResults ut_statistics(int nech, const double* tab, const double* sel, const double* wgt)
 {
   StatResults stats;
 
@@ -427,10 +426,10 @@ StatResults ut_statistics(int nech, const double *tab, const double *sel, const 
 
   double tmin = MAXIMUM_BIG;
   double tmax = MINIMUM_BIG;
-  double num = 0.;
-  double mm = 0.;
-  double vv = 0.;
-  int nval = 0;
+  double num  = 0.;
+  double mm   = 0.;
+  double vv   = 0.;
+  int nval    = 0;
 
   for (int i = 0; i < nech; i++)
   {
@@ -441,8 +440,8 @@ StatResults ut_statistics(int nech, const double *tab, const double *sel, const 
     if (tab[i] > tmax) tmax = tab[i];
     nval++;
     num += weight;
-    mm  += weight * tab[i];
-    vv  += weight * tab[i] * tab[i];
+    mm += weight * tab[i];
+    vv += weight * tab[i] * tab[i];
   }
 
   /* Returning arguments */
@@ -451,16 +450,16 @@ StatResults ut_statistics(int nech, const double *tab, const double *sel, const 
   stats.nvalid = nval;
   if (tmax < tmin || nval <= 0)
   {
-    stats.mini = TEST;
-    stats.maxi = TEST;
+    stats.mini  = TEST;
+    stats.maxi  = TEST;
     stats.delta = TEST;
-    stats.mean = TEST;
-    stats.stdv = TEST;
+    stats.mean  = TEST;
+    stats.stdv  = TEST;
   }
   else
   {
-    stats.mini = tmin;
-    stats.maxi = tmax;
+    stats.mini  = tmin;
+    stats.maxi  = tmax;
     stats.delta = tmax - tmin;
     mm /= num;
     vv = vv / num - mm * mm;
@@ -481,7 +480,7 @@ StatResults ut_statistics(int nech, const double *tab, const double *sel, const 
  ** \param[in]  sel     Array containing the Selection or NULL
  **
  ****************************************************************************/
-void ut_stats_mima_print(const char *title, int nech, double *tab, double *sel)
+void ut_stats_mima_print(const char* title, int nech, double* tab, double* sel)
 {
   StatResults stats = ut_statistics(nech, tab, sel);
 
@@ -508,11 +507,11 @@ void ut_stats_mima_print(const char *title, int nech, double *tab, double *sel)
  **
  ****************************************************************************/
 void ut_facies_statistics(int nech,
-                          double *tab,
-                          double *sel,
-                          int *nval,
-                          int *mini,
-                          int *maxi)
+                          double* tab,
+                          double* sel,
+                          int* nval,
+                          int* mini,
+                          int* maxi)
 {
   int i, number, facies, facmin, facmax;
 
@@ -526,7 +525,7 @@ void ut_facies_statistics(int nech,
   {
     if (sel != nullptr && isZero(sel[i])) continue;
     if (FFFF(tab[i])) continue;
-    facies = (int) tab[i];
+    facies = (int)tab[i];
     if (facies < 0) continue;
     if (facies < facmin) facmin = facies;
     if (facies > facmax) facmax = facies;
@@ -566,15 +565,15 @@ void ut_facies_statistics(int nech,
  **
  *****************************************************************************/
 void ut_classify(int nech,
-                 const double *tab,
-                 double *sel,
+                 const double* tab,
+                 double* sel,
                  int nclass,
                  double start,
                  double pas,
-                 int *nmask,
-                 int *ntest,
-                 int *nout,
-                 int *classe)
+                 int* nmask,
+                 int* ntest,
+                 int* nout,
+                 int* classe)
 {
   int i, icl, rank;
 
@@ -601,7 +600,7 @@ void ut_classify(int nech,
       (*ntest)++;
       continue;
     }
-    rank = (int) ((value - start) / pas);
+    rank = (int)((value - start) / pas);
     if (rank < 0 || rank >= nclass)
     {
       (*nout)++;
@@ -626,8 +625,8 @@ double ut_median(VectorDouble& tab, int ntab)
   int i, j, k, nr, nl, even, lo, hi, loop, mid;
   double result, xlo, xhi, temp, xmin, xmax;
 
-  nr = ntab / 2;
-  nl = nr - 1;
+  nr   = ntab / 2;
+  nl   = nr - 1;
   even = 0;
   /* hi & lo are position limits encompassing the median. */
   lo = 0;
@@ -644,19 +643,20 @@ double ut_median(VectorDouble& tab, int ntab)
   /* Find median of 1st, middle & last values. */
   do
   {
-    mid = (lo + hi) / 2;
+    mid    = (lo + hi) / 2;
     result = tab[mid];
-    xlo = tab[lo];
-    xhi = tab[hi];
+    xlo    = tab[lo];
+    xhi    = tab[hi];
     if (xhi < xlo)
     {
       temp = xlo;
-      xlo = xhi;
-      xhi = temp;
+      xlo  = xhi;
+      xhi  = temp;
     }
     if (result > xhi)
       result = xhi;
-    else if (result < xlo) result = xlo;
+    else if (result < xlo)
+      result = xlo;
     /* The basic quicksort algorithm to move all values <= the sort key (XMED)
      * to the left-hand end, and all higher values to the other end.
      */
@@ -671,15 +671,14 @@ double ut_median(VectorDouble& tab, int ntab)
       loop = 0;
       if (i < j)
       {
-        temp = tab[i];
+        temp   = tab[i];
         tab[i] = tab[j];
         tab[j] = temp;
         i++;
         j--;
         if (i <= j) loop = 1;
       }
-    }
-    while (loop); /* Decide which half the median is in. */
+    } while (loop); /* Decide which half the median is in. */
 
     if (even)
     {
@@ -711,13 +710,12 @@ double ut_median(VectorDouble& tab, int ntab)
       if (i > nr) hi = j;
       if (i == j && i == nr) return result;
     }
-  }
-  while (lo < hi - 1);
+  } while (lo < hi - 1);
 
   if (even) return (0.5 * (tab[nl] + tab[nr]));
   if (tab[lo] > tab[hi])
   {
-    temp = tab[lo];
+    temp    = tab[lo];
     tab[lo] = tab[hi];
     tab[hi] = temp;
   }
@@ -795,13 +793,13 @@ MatrixSquare ut_pascal(int ndim)
  ** \param[in,out] comb   Current array of combinations
  **
  *****************************************************************************/
-static void st_combinations(int *v,
+static void st_combinations(int* v,
                             int start,
                             int n,
                             int k,
                             int maxk,
-                            int *ncomb,
-                            int **comb)
+                            int* ncomb,
+                            int** comb)
 {
   int i, nloc, ndeb, *cloc;
 
@@ -814,12 +812,12 @@ static void st_combinations(int *v,
   if (k > maxk)
   {
     /* insert code here to use combinations as you please */
-    cloc = (int*) mem_realloc((char* ) cloc, sizeof(int) * maxk * (nloc + 1), 1);
+    cloc = (int*)mem_realloc((char*)cloc, sizeof(int) * maxk * (nloc + 1), 1);
     ndeb = nloc * maxk;
     for (i = 0; i < maxk; i++)
       cloc[ndeb + i] = v[i + 1];
     *ncomb = nloc + 1;
-    *comb = cloc;
+    *comb  = cloc;
     return;
   }
 
@@ -850,18 +848,18 @@ static void st_combinations(int *v,
  ** \remarks The calling function must free the returned array.
  **
  *****************************************************************************/
-int* ut_combinations(int n, int maxk, int *ncomb)
+int* ut_combinations(int n, int maxk, int* ncomb)
 {
   int *v, *comb;
 
-  v = (int*) mem_alloc(sizeof(int) * n, 1);
+  v = (int*)mem_alloc(sizeof(int) * n, 1);
   for (int i = 0; i < n; i++)
     v[i] = i;
 
   (*ncomb) = 0;
-  comb = nullptr;
+  comb     = nullptr;
   st_combinations(v, 1, n, 1, maxk, ncomb, &comb);
-  mem_free((char* ) v);
+  mem_free((char*)v);
   return (comb);
 }
 
@@ -916,7 +914,7 @@ void ut_shuffle_array(int nrow, int ncol, VectorDouble& tab)
  */
 VectorInt getListActiveToAbsolute(const VectorDouble& sel)
 {
-  int nech = (int) sel.size();
+  int nech = (int)sel.size();
   VectorInt ranks;
   for (int iabs = 0; iabs < nech; iabs++)
   {
@@ -935,7 +933,7 @@ VectorInt getListActiveToAbsolute(const VectorDouble& sel)
 std::map<int, int> getMapAbsoluteToRelative(const VectorDouble& sel, bool verbose)
 {
   std::map<int, int> map;
-  int nabs = (int) sel.size();
+  int nabs   = (int)sel.size();
   int ifirst = ITEST;
   int ilast  = ITEST;
   int irel   = 0;
@@ -954,8 +952,8 @@ std::map<int, int> getMapAbsoluteToRelative(const VectorDouble& sel, bool verbos
     message("Map Absolute to Relative\n");
     message("- Number of absolute positions = %d\n", nabs);
     message("- Number of active positions   = %d\n", irel);
-    message("- Absolute address of the first active sample = %d\n",ifirst);
-    message("- Absolute address of the last active sample  = %d\n",ilast);
+    message("- Absolute address of the first active sample = %d\n", ifirst);
+    message("- Absolute address of the last active sample  = %d\n", ilast);
   }
   return map;
 }
@@ -994,7 +992,7 @@ int getRankMapRelativeToAbsolute(const std::map<int, int>& map, int irel)
  *            -3: returns the inverse of the square root
  * @return Pointer to the specified function
  */
-operate_function operate_Identify( int oper )
+operate_function operate_Identify(int oper)
 {
   double (*oper_choice)(double) = nullptr;
 
@@ -1130,7 +1128,7 @@ double truncateDecimals(double value, int ndec)
 {
   double precision = pow(10., ndec);
   if (value > 0)
-    value =  floor( value * precision) / precision;
+    value = floor(value * precision) / precision;
   else
     value = -floor(-value * precision) / precision;
   return value;
@@ -1147,19 +1145,10 @@ double truncateDigits(double value, int ndigits)
   if (ndigits <= 0) return TEST;
   int iSigned = value > 0 ? 1 : -1;
   value *= iSigned;
-  int order = (int) log10(value);
-  int ndec = (value > 1) ? ndigits - order - 1 : ndigits - order;
-  value = truncateDecimals(value, ndec) * iSigned;
+  int order = (int)log10(value);
+  int ndec  = (value > 1) ? ndigits - order - 1 : ndigits - order;
+  value     = truncateDecimals(value, ndec) * iSigned;
   return value;
-}
-
-void setInternalDebug(bool status)
-{
-  _internalDebug = status;
-}
-bool isInternalDebug()
-{
-  return _internalDebug;
 }
 
 /****************************************************************************/
@@ -1245,10 +1234,10 @@ bool isEqualExtended(double v1,
   //
   if (diff >= eps)
   {
-    if (! string.empty()) message("%s : ", string.c_str());
+    if (!string.empty()) message("%s : ", string.c_str());
     message("Experimental value = %lf is larger than tolerance (%lf)\n", diff, eps);
     return false;
   }
   return true;
 }
-}
+} // namespace gstlrn

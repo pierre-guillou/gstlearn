@@ -164,9 +164,6 @@ GSTLEARN_EXPORT double roundZero(double value, double eps = EPSILON6);
 GSTLEARN_EXPORT double truncateDecimals(double value, int ndec = 0);
 GSTLEARN_EXPORT double truncateDigits(double value, int ndigits);
 
-GSTLEARN_EXPORT void setInternalDebug(bool status);
-GSTLEARN_EXPORT bool isInternalDebug();
-
 GSTLEARN_EXPORT void print_range(const char* title, int ntab, const double* tab, const double* sel);
 
 GSTLEARN_EXPORT void convertIndptrToIndices(int ncumul, const int* cumul, int* tab);

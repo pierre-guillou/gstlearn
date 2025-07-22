@@ -9,27 +9,27 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Tree/Ball.hpp"
-#include "Tree/ball_algorithm.h"
-#include "Db/Db.hpp"
-#include "Space/SpacePoint.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
 #include "Mesh/AMesh.hpp"
+#include "Space/SpacePoint.hpp"
+#include "Tree/ball_algorithm.h"
 
 namespace gstlrn
 {
 Ball::Ball(const double** data,
-  int n_samples,
-  int n_features,
-  double (*dist_function)(const double* x1,
-                          const double* x2,
-                          int n_features),
-  int leaf_size,
-  int default_distance_function)
-: _tree(nullptr)
+           int n_samples,
+           int n_features,
+           double (*dist_function)(const double* x1,
+                                   const double* x2,
+                                   int n_features),
+           int leaf_size,
+           int default_distance_function)
+  : _tree(nullptr)
 {
-_tree = btree_init(data, n_samples, n_features, false, dist_function, leaf_size,
-            default_distance_function);
+  _tree = btree_init(data, n_samples, n_features, false, dist_function, leaf_size,
+                     default_distance_function);
 }
 
 Ball::Ball(const Db* dbin,
@@ -56,7 +56,7 @@ Ball::Ball(const Db* dbin,
 
 /**
  * @brief Construct a new Ball object based on the barycenters of the meshes
- * 
+ *
  * @param mesh  AMesh description
  * @param dist_function template distance function
  * @param leaf_size Number of elements in the leafs of the Ball tree
@@ -74,12 +74,12 @@ Ball::Ball(const AMesh* mesh,
   _master = true;
   int n_samples;
   int n_features;
-  double **internal = _getInformationFromMesh(mesh, &n_samples, &n_features);
+  double** internal = _getInformationFromMesh(mesh, &n_samples, &n_features);
   if (internal == nullptr) return;
 
   _master = true;
-  _tree = btree_init((const double**)internal, n_samples, n_features, has_constraints,
-                     dist_function, leaf_size, default_distance_function);
+  _tree   = btree_init((const double**)internal, n_samples, n_features, has_constraints,
+                       dist_function, leaf_size, default_distance_function);
   free_2d_double(internal, n_samples);
 }
 
@@ -93,7 +93,7 @@ Ball& Ball::operator=(const Ball& p)
 {
   if (this != &p)
   {
-    _tree = p._tree;
+    _tree   = p._tree;
     _master = false;
   }
   return *this;
@@ -124,10 +124,10 @@ Ball::~Ball()
     free_tree(_tree);
 }
 
-KNN Ball::query(const double **test, int n_samples, int n_features, int n_neighbors)
+KNN Ball::query(const double** test, int n_samples, int n_features, int n_neighbors)
 {
   KNN knn;
-  (void) knn.btree_query(_tree, test, n_samples, n_features, n_neighbors);
+  (void)knn.btree_query(_tree, test, n_samples, n_features, n_neighbors);
   return knn;
 }
 
@@ -135,35 +135,35 @@ KNN Ball::queryAsVVD(const VectorVectorDouble& test, int n_neighbors)
 {
   KNN knn;
   if (test.empty()) return knn;
-  int n_samples = (int) test[0].size();
-  int n_features = (int) test.size();
+  int n_samples     = (int)test[0].size();
+  int n_features    = (int)test.size();
   double** internal = copy_double_arrAsVVD(test);
-  (void) knn.btree_query(_tree, (const double**) internal, n_samples, n_features, n_neighbors);
+  (void)knn.btree_query(_tree, (const double**)internal, n_samples, n_features, n_neighbors);
   //  free_2d_double(internal, n_features);
   free_2d_double(internal, n_samples);
   return knn;
 }
 
-KNN Ball::queryOne(const double *test, int n_features, int n_neighbors)
+KNN Ball::queryOne(const double* test, int n_features, int n_neighbors)
 {
   KNN knn;
-  (void) knn.btree_query(_tree, (const double**) &test, 1, n_features, n_neighbors);
+  (void)knn.btree_query(_tree, (const double**)&test, 1, n_features, n_neighbors);
   return knn;
 }
 
 KNN Ball::queryOneAsVD(const VectorDouble& test, int n_neighbors)
 {
   KNN knn;
-  int n_features = (int) test.size();
+  int n_features         = (int)test.size();
   const double* internal = test.data();
-  (void) knn.btree_query(_tree, (const double**) &internal, 1, n_features, n_neighbors);
+  (void)knn.btree_query(_tree, (const double**)&internal, 1, n_features, n_neighbors);
   return knn;
 }
 
 KNN Ball::queryOneAsVDFromSP(const SpacePoint& Pt, int n_neighbors)
 {
   KNN knn;
-  int n_features = Pt.getNDim();
+  int n_features         = Pt.getNDim();
   const double* internal = Pt.getCoords().data();
   (void)knn.btree_query(_tree, (const double**)&internal, 1, n_features,
                         n_neighbors);
@@ -179,9 +179,9 @@ VectorInt Ball::getIndices(const SpacePoint& Pt, int n_neighbors)
 int Ball::queryClosest(const VectorDouble& test)
 {
   KNN knn;
-  int n_features = (int) test.size();
+  int n_features         = (int)test.size();
   const double* internal = test.data();
-  if (knn.btree_query(_tree, (const double**) &internal, 1, n_features, 1)) return ITEST;
+  if (knn.btree_query(_tree, (const double**)&internal, 1, n_features, 1)) return ITEST;
   return knn.getIndex(0, 0);
 }
 
@@ -200,7 +200,7 @@ int Ball::queryOneInPlace(const VectorDouble& test,
 
 /**
  * @brief Ask for information regarding the Ball Tree organization
- * 
+ *
  * @param level Level of details
  *              -1 Just the general volumetry information
  *               0 List of the different nodes
@@ -224,7 +224,7 @@ bool Ball::_isConstraintDefined() const
 int Ball::setConstraint(int rank, bool status)
 {
   if (_tree == nullptr) return 1;
-  if (! _isConstraintDefined()) return 1;
+  if (!_isConstraintDefined()) return 1;
   if (rank < 0 || rank >= _tree->n_samples) return 1;
   _tree->accept[rank] = status;
   return 0;
@@ -277,7 +277,7 @@ MatrixT<int> findNN(const Db* dbin,
   VectorDouble distances(nb_neigh);
 
   if (verbose)
-    mestitle(1, "List of Neighborhoors for NN search");
+    mestitle(1, "List of Neighbors for NN search");
 
   ranks = (flagShuffle) ? law_random_path(n1) : VH::sequence(n1);
   for (int jech = 0; jech < n1; jech++)
@@ -377,8 +377,8 @@ double** Ball::_getInformationFromMesh(const AMesh* mesh,
                                        int* n_features)
 {
   VectorDouble oneColumn;
-  int ndim    = mesh->getNDim();
-  int nmesh   = mesh->getNMeshes();
+  int ndim  = mesh->getNDim();
+  int nmesh = mesh->getNMeshes();
   VectorDouble center(ndim);
 
   // Core allocation
@@ -398,4 +398,4 @@ double** Ball::_getInformationFromMesh(const AMesh* mesh,
   *n_features = ndim;
   return internal;
 }
-}
+} // namespace gstlrn

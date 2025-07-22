@@ -11,14 +11,12 @@
 
 #include "LinearOp/MatrixSymmetricSim.hpp"
 #include "Basic/AStringable.hpp"
+#include "LinearOp/ACholesky.hpp"
 #include "LinearOp/CholeskyDense.hpp"
 #include "LinearOp/CholeskySparse.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
 #include "Matrix/MatrixSparse.hpp"
-#include "LinearOp/ACholesky.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include <Eigen/src/Core/Matrix.h>
-#include <memory>
-#include <typeinfo>
 
 namespace gstlrn
 {
@@ -39,17 +37,17 @@ MatrixSymmetricSim::MatrixSymmetricSim(const AMatrix& m,
   if (m.isSparse())
   {
     const auto& matCS = dynamic_cast<const MatrixSparse&>(m);
-    _factor = new CholeskySparse(matCS);
+    _factor           = new CholeskySparse(matCS);
   }
   else
   {
     const auto* matSym = dynamic_cast<const MatrixSymmetric*>(&m);
     if (matSym == nullptr)
     {
-       _matSymConverted = MatrixSymmetric(m);
-       _factor = new CholeskyDense(_matSymConverted);
+      _matSymConverted = MatrixSymmetric(m);
+      _factor          = new CholeskyDense(_matSymConverted);
     }
-    else 
+    else
     {
       _factor = new CholeskyDense(*matSym);
     }
@@ -77,7 +75,7 @@ int MatrixSymmetricSim::_addToDest(const constvect inv, vect outv) const
 }
 
 int MatrixSymmetricSim::_addSimulateToDest(const constvect whitenoise,
-                                                 vect outv) const
+                                           vect outv) const
 {
   if (_inverse) return _factor->addInvLtX(whitenoise, outv);
   return _factor->addLX(whitenoise, outv);
@@ -96,4 +94,4 @@ double MatrixSymmetricSim::computeLogDet(int nMC) const
   int sign = _inverse ? -1 : 1;
   return sign * _factor->computeLogDeterminant();
 }
-}
+} // namespace gstlrn

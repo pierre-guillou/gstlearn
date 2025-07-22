@@ -2352,6 +2352,92 @@ bool Db::hasSameDimension(const Db* dbaux) const
 }
 
 /**
+ * @brief Given two Dbs, check that they have same Space Dimension
+ * The first or the second Db must be undefined
+ * When both are undefined, FALSE if returned
+ *
+ * @param db1
+ * @param db2
+ * @param ndim Common space dimension
+ * @return true
+ * @return false
+ */
+bool haveSameNDim(const Db* db1, const Db* db2, int* ndim)
+{
+  if (db1 == nullptr)
+  {
+    // Db1 is undefined
+    if (db2 == nullptr)
+    {
+      // Db2 is undefined
+      return false;
+    }
+
+    // Db2 is defined
+    *ndim = db2->getNDim();
+    return true;
+  }
+  // Db1 is defined
+  if (db2 == nullptr)
+  {
+    // Db2 is undefined
+    *ndim = db1->getNDim();
+    return true;
+  }
+
+  // Db1 and Db2 are defined
+  if (db1->getNDim() != db2->getNDim())
+  {
+    messerr("Db1 (%d) and Dbé (%d) should share the same Space Dimension",
+            db1->getNDim(), db2->getNDim());
+    return false;
+  }
+
+  *ndim = db1->getNDim();
+  return true;
+}
+
+/**
+ * @brief Given two Dbs, check that they have same Variable Number (locator Z)
+ * The first or the second Db must be undefined
+ * When both are undefined, FALSE if returned
+ * When both are defined, return the Maximum value
+ *
+ * @param db1
+ * @param db2
+ * @param nvar Common number of variables
+ * @return true
+ * @return false
+ */
+bool haveCompatibleNVar(const Db* db1, const Db* db2, int* nvar)
+{
+  if (db1 == nullptr)
+  {
+    // Db1 is undefined
+    if (db2 == nullptr)
+    {
+      // Db2 is undefined
+      return false;
+    }
+
+    // Db2 is defined
+    *nvar = db2->getNLoc(ELoc::Z);
+    return true;
+  }
+  // Db1 is defined
+  if (db2 == nullptr)
+  {
+    // Db2 is undefined
+    *nvar = db1->getNLoc(ELoc::Z);
+    return true;
+  }
+
+  // Db1 and Db2 are defined
+  *nvar = MAX(db1->getNLoc(ELoc::Z), db2->getNLoc(ELoc::Z));
+  return true;
+}
+
+/**
  * Check if the Space Dimension of 'dbaux' is larger (or equal) than the one of 'this'
  * @param dbaux    Second Db
  * @return
@@ -3612,6 +3698,83 @@ VectorInt Db::getMultipleSelectedVariables(const VectorVectorInt& index,
     }
   }
   return vec;
+}
+
+/**
+ * @brief Returns the vector of indices for samples with variable 'ivar' defined
+ * For the target variable 'ivar' and for sample 'iech',
+ * - ranks[iech] = IFFFF if variable 'ivar' is not defined for sample 'iech'
+ * - ranks[iech] = 'ipos' if the variable 'ivar' is defined for sample 'iech',
+ * where 'ipos' is rank within the list of samples where 'ivar' is defined
+ *
+ * @param ranks Vector of the (defined) sample indices
+ * @param ivar Index of the variable of interest
+ * @param useSel  Discard the masked samples (if True)
+ * @return Count of samples defined
+ *
+ * @remark When the file has NO Z-locator variable defined, we consider
+ * that all active samples are available
+ */
+int Db::getListOfSampleIndicesPerVariableInPlace(VectorInt& ranks,
+                                                 int ivar,
+                                                 bool useSel) const
+{
+  int nech = getNSample();
+  int nvar = getNLoc(ELoc::Z);
+  ranks.resize(nech);
+
+  int ecr   = 0;
+  int count = 0;
+  for (int iech = 0; iech < nech; iech++)
+  {
+    if (useSel && !isActive(iech)) continue;
+    double value = getLocVariable(ELoc::Z, iech, ivar);
+    // The following strange line tells that the rank of a target sample ('iech') is set to ITEST if:
+    // - either the value of the target variable ('ivar') for the target sample is undefined
+    // - or the file does not have any variable (LOC::Z) defined
+    if (FFFF(value) && nvar > 0)
+      ranks[ecr] = ITEST;
+    else
+      ranks[ecr] = count++;
+    ecr++;
+  }
+  ranks.resize(ecr);
+  return count;
+}
+
+/**
+ * @brief Updates (and resizes) the two arguments:
+ * - cumul cumulated number of samples where each variable is defined
+ * - ranks Each vector gives the ranks of defined samples (or ITEST) if not defined
+ * These two arguments have 'nvar' as first dimension
+ *
+ * @param nvar Number of variables
+ * @param cumul Vector of cumulated number of defined samples per variable
+ * @param ranks Vector of vectors of ranks of defined samples
+ * @param useSel Discard the masked samples (if True)
+ *
+ * @return The total number of samples where ALL variables are defined
+ *
+ * @remark Argument 'nvar' is provided as it may serve for a file which does not
+ * contain any variable (Loc::Z) defined.
+ */
+int Db::getListOfSampleIndicesInPlace(int nvar,
+                                      VectorInt& cumul,
+                                      VectorVectorInt& ranks,
+                                      bool useSel) const
+{
+  cumul.resize(nvar);
+  ranks.resize(nvar);
+
+  // Loop on the variables
+  int total = 0;
+  for (int ivar = 0; ivar < nvar; ivar++)
+  {
+    int number  = getListOfSampleIndicesPerVariableInPlace(ranks[ivar], ivar, useSel);
+    cumul[ivar] = total;
+    total += number;
+  }
+  return total;
 }
 
 /**
