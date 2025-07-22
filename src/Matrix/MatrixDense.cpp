@@ -310,8 +310,8 @@ void MatrixDense::prodMatMatInPlace(const AMatrix* x,
                            x, 0, transposeX,
                            y, 0, transposeY)) return;
 
-  const MatrixDense* xm = dynamic_cast<const MatrixDense*>(x);
-  const MatrixDense* ym = dynamic_cast<const MatrixDense*>(y);
+  const auto* xm = dynamic_cast<const MatrixDense*>(x);
+  const auto* ym = dynamic_cast<const MatrixDense*>(y);
   if (xm == nullptr || ym == nullptr)
   {
     AMatrix::prodMatMatInPlace(x, y, transposeX, transposeY);
@@ -475,17 +475,6 @@ void MatrixDense::divideColumn(const VectorDouble& vec)
   VectorDouble temp = VH::inverse(vec);
   Eigen::Map<const Eigen::VectorXd> vecm(temp.data(), getNRows());
   eigenMat() = eigenMat() * vecm.asDiagonal();
-}
-
-void MatrixDense::prodMatVecInPlace(const VectorDouble& x, VectorDouble& y, bool transpose) const
-{
-  Eigen::Map<const Eigen::VectorXd> xm(x.data(), x.size());
-  y.resize(transpose ? getNCols() : getNRows());
-  Eigen::Map<Eigen::VectorXd> ym(y.data(), y.size());
-  if (transpose)
-    ym = eigenMat().transpose() * xm;
-  else
-    ym = eigenMat() * xm;
 }
 
 /*! Extract a Row */

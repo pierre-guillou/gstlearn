@@ -88,8 +88,7 @@ public:
   void prodMatVecInPlaceC(constvect x, vect res, bool transpose = false) const;
 #endif
   /*! Set the contents of a Column */
-  void setColumn(int icol,
-                 const VectorDouble& tab) override;
+  void setColumn(int icol, const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant */
   void setColumnToConstant(int icol,
                            double value) override;

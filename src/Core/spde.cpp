@@ -3839,7 +3839,7 @@ static int st_kriging_several_rhs(double* data,
             work[i] += temp[i];
           delete B0;
         }
-        Matelem.Aproj->prodMatVecInPlacePtr(work.data(), rhslocal.data(), true);
+        Matelem.Aproj->prodMatVecInPlace(work, rhslocal, true);
       }
     }
     else
@@ -3882,7 +3882,7 @@ static int st_kriging_several_rhs(double* data,
               work[i] += temp[i];
             delete B0;
           }
-          Matelem.Aproj->prodMatVecInPlacePtr(work.data(), rhslocal.data(), true);
+          Matelem.Aproj->prodMatVecInPlace(work, rhslocal, true);
         }
       }
     }

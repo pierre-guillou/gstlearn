@@ -76,8 +76,7 @@ public:
                 double value) override;
 
   /*! Set the contents of a Column */
-  void setColumn(int icol,
-                 const VectorDouble& tab) override;
+  void setColumn(int icol, const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant value */
   void setColumnToConstant(int icol,
                            double value) override;
@@ -139,7 +138,7 @@ public:
   void prodNormMatMatInPlace(const AMatrix* a,
                              const AMatrix* m,
                              bool transpose = false) override;
-  /*! Perform 'this' = 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' */
+  /*! Perform 'this' = 't(A)' %*% 'vec' %*% 'A' or 'A' %*% 'vec' %*% 't(A)' */
   void prodNormMatVecInPlace(const AMatrix* a,
                              const VectorDouble& vec,
                              bool transpose = false) override;
@@ -173,7 +172,6 @@ public:
   // Adding a Row or a Column (at the bottom or right of Rectangular Matrix)
   void addRow(int nrow_added = 1);
   void addColumn(int ncolumn_added = 1);
-  void prodMatVecInPlace(const VectorDouble& x, VectorDouble& y, bool transpose = false) const;
 
 #ifndef SWIG
   static void sum(const MatrixDense* mat1,

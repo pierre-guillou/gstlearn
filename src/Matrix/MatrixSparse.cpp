@@ -445,7 +445,6 @@ MatrixSparse* MatrixSparse::diagMat(MatrixSparse* A, int oper_choice)
   VectorDouble diag = A->getDiagonal();
   VectorHelper::transformVD(diag, oper_choice);
   return MatrixSparse::diagVec(diag);
-  return MatrixSparse::diagVec(diag);
 }
 
 bool MatrixSparse::_isElementPresent(int irow, int icol) const

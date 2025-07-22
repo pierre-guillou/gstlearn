@@ -230,7 +230,7 @@ static int st_gibbs(int niter,
     for (int icol = 0; icol < ncolor; icol++)
     {
       st_vector_compress(nvertex, colref[icol], z, colors, ind, zred);
-      Qcols[icol]->prodVecMatInPlacePtr(zred.data(), krig.data(), false);
+      Qcols[icol]->prodVecMatInPlace(zred, krig, false);
 
       for (int ic = 0, nc = (int)ind.size(); ic < nc; ic++)
       {

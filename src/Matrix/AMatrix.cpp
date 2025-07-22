@@ -486,13 +486,6 @@ void AMatrix::prodMatVecInPlaceC(const constvect x, vect y, bool transpose) cons
   _addProdMatVecInPlacePtr(x.data(), y.data(), transpose);
 }
 
-void AMatrix::prodMatVecInPlacePtr(const double* x, double* y, bool transpose) const
-{
-  int size = (transpose) ? _nCols : _nRows;
-  for (int i = 0; i < size; i++) y[i] = 0.0;
-  _addProdMatVecInPlacePtr(x, y, transpose);
-}
-
 void AMatrix::addProdMatVecInPlaceC(const constvect x,
                                     vect y,
                                     bool transpose) const

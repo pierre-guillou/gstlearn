@@ -302,7 +302,7 @@ void Chebychev::evalOp(MatrixSparse* S, const constvect x, vect y) const
 
   for (int ib = 2; ib < (int)_coeffs.size(); ib++)
   {
-    T1->prodVecMatInPlacePtr(tm1.data(), tx.data(), false);
+    T1->prodVecMatInPlace(tm1, tx, false);
     for (int i = 0; i < nvertex; i++)
     {
       tx[i] = 2. * tx[i] - tm2[i];

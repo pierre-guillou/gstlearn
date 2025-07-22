@@ -62,12 +62,11 @@ public:
   /*! Check if the matrix is (non empty) square */
   virtual bool isSquare(bool printWhyNot = false) const;
   /*! Indicate if the given indices are valid for the current matrix size */
-  virtual bool isValid(int irow, int icol, bool printWhyNot = false) const;
+  bool isValid(int irow, int icol, bool printWhyNot = false) const;
   /*! Check if the matrix is square and Identity */
-  virtual bool isIdentity(bool printWhyNot = false) const;
+  bool isIdentity(bool printWhyNot = false) const;
   /*! Check if the input matrix is (non empty and square) symmetric */
-  virtual bool
-  isSymmetric(double eps = EPSILON10, bool printWhyNot = false) const;
+  virtual bool isSymmetric(double eps = EPSILON10, bool printWhyNot = false) const;
   /*! Say if the matrix must be symmetric */
   virtual bool mustBeSymmetric() const { return false; }
 
@@ -165,7 +164,6 @@ public:
   /*! Perform 'y' = 'this' * 'x' */
   VectorDouble prodMatVec(const VectorDouble& x, bool transpose = false) const;
   void prodMatVecInPlace(const VectorDouble& x, VectorDouble& y, bool transpose = false) const;
-  void prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const;
 #ifndef SWIG
   void prodMatVecInPlaceC(const constvect x, vect y, bool transpose = false) const;
   void addProdMatVecInPlaceC(const constvect x, vect y, bool transpose = false) const;
@@ -180,7 +178,7 @@ public:
   void addProdVecMatInPlaceC(const constvect x, vect y, bool transpose = false) const;
 #endif
 
-  /*! Perform x %*% mat %*% y */
+  /*! Perform x %*% 'this' %*% y */
   double prodVecMatVec(const VectorDouble& x, const VectorDouble& y) const;
 
   /*! Perform 'this' = 'x' * 'y' */
