@@ -34,8 +34,8 @@ ProjMatrix::ProjMatrix(const ProjMatrix& m)
 {
 }
 
-ProjMatrix::ProjMatrix(const MatrixSparse* m)
-  : MatrixSparse(*m)
+ProjMatrix::ProjMatrix(const MatrixSparse& m)
+  : MatrixSparse(m)
 {
 }
 

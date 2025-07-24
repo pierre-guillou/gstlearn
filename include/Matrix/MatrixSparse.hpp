@@ -78,12 +78,6 @@ public:
                 int icol,
                 const EOperator& oper,
                 double value) override;
-
-  void resetFromValue(int nrows, int ncols, double value) override;
-  void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
-  void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true) override;
-  void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
-
   /*! Set the contents of a Column */
   void setColumn(int icol, const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant */
@@ -96,8 +90,6 @@ public:
   void setDiagonal(const VectorDouble& tab) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
   void setDiagonalToConstant(double value = 1.) override;
-  /*! Transpose the matrix and return it as a copy*/
-  MatrixSparse* transpose() const override;
   /*! Add a value to each matrix component */
   void addScalar(double v) override;
   /*! Add value to matrix diagonal */
@@ -114,6 +106,14 @@ public:
   void divideRow(const VectorDouble& vec) override;
   /*! Divide the matrix column-wise */
   void divideColumn(const VectorDouble& vec) override;
+
+  void resetFromValue(int nrows, int ncols, double value) override;
+  void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
+  void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true) override;
+  void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
+
+  /*! Transpose the matrix and return it as a copy*/
+  MatrixSparse* transpose() const override;
 
   /*! Multiply matrix 'x' by matrix 'y' and store the result in 'this' */
   void prodMatMatInPlace(const AMatrix* x,
@@ -226,24 +226,19 @@ protected:
   void _transposeInPlace() override;
   int _invert() override;
   int _solve(const VectorDouble& b, VectorDouble& x) const override;
+  int _getMatrixPhysicalSize() const override;
+  double _getValueByRank(int rank) const override;
+  double& _getValueRef(int irow, int icol) override;
 #ifndef SWIG
   void _addProdVecMatInPlacePtr(constvect x, vect y, bool transpose = false) const override;
   void _addProdMatVecInPlacePtr(constvect x, vect y, bool transpose = false) const override;
 #endif
 
-  bool _isPhysicallyPresent(int irow, int icol) const override
-  {
-    DECLARE_UNUSED(irow, icol);
-    return true;
-  }
-  int _getMatrixPhysicalSize() const override;
-  double _getValueByRank(int rank) const override;
+  bool _isPhysicallyPresent(int /*irow*/, int /*icol*/) const override { return true; }
   void _setValues(const double* values, bool byCol) override;
   void _clear() override;
-
   bool _isElementPresent(int irow, int icol) const;
   void _allocate(int nrow, int ncol, int ncolmax);
-  double& _getValueRef(int irow, int icol) override;
 
 private:
   static void _forbiddenForSparse(const String& func);

@@ -137,8 +137,8 @@ void MatrixSparse::_transposeInPlace()
 
 MatrixSparse* MatrixSparse::transpose() const
 {
-  auto* mat = dynamic_cast<MatrixSparse*>(clone());
-  mat->eigenMat()   = eigenMat().transpose();
+  auto* mat       = dynamic_cast<MatrixSparse*>(clone());
+  mat->eigenMat() = eigenMat().transpose();
   return mat;
 }
 
@@ -204,8 +204,6 @@ void MatrixSparse::setRowToConstant(int irow, double value)
 
 void MatrixSparse::setDiagonal(const VectorDouble& tab)
 {
-  if (!isSquare())
-    my_throw("This function is only valid for Square matrices");
   if (getFlagMatrixCheck())
   {
     if (!_isRowSizeConsistent(tab)) return;
@@ -287,6 +285,11 @@ void MatrixSparse::fill(double value)
 /*! Multiply a Matrix row-wise */
 void MatrixSparse::multiplyRow(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNRows() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of rows. Nothing is done");
+    return;
+  }
   for (int k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() *= vec[it.row()];
@@ -295,6 +298,11 @@ void MatrixSparse::multiplyRow(const VectorDouble& vec)
 /*! Multiply a Matrix column-wise */
 void MatrixSparse::multiplyColumn(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNCols() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of columns. Nothing is done");
+    return;
+  }
   for (int k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() *= vec[it.col()];
@@ -303,6 +311,11 @@ void MatrixSparse::multiplyColumn(const VectorDouble& vec)
 /*! Divide a Matrix row-wise */
 void MatrixSparse::divideRow(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNRows() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of rows. Nothing is done");
+    return;
+  }
   for (int k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() /= vec[it.row()];
@@ -311,6 +324,11 @@ void MatrixSparse::divideRow(const VectorDouble& vec)
 /*! Divide a Matrix column-wise */
 void MatrixSparse::divideColumn(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNCols() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of columns. Nothing is done");
+    return;
+  }
   for (int k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() /= vec[it.col()];
@@ -1165,7 +1183,7 @@ void MatrixSparse::setDiagonal(const Eigen::Map<const Eigen::VectorXd>& tab)
 /*! Extract a Row */
 MatrixSparse* MatrixSparse::getRowAsMatrixSparse(int irow, double coeff) const
 {
-  int ncols         = getNCols();
+  int ncols = getNCols();
   auto* res = new MatrixSparse(1, ncols);
 
   // The input sparse matrix being symmetrical, we benefit from its
@@ -1180,7 +1198,7 @@ MatrixSparse* MatrixSparse::getRowAsMatrixSparse(int irow, double coeff) const
 /*! Extract a Column */
 MatrixSparse* MatrixSparse::getColumnAsMatrixSparse(int icol, double coeff) const
 {
-  int nrows         = getNRows();
+  int nrows = getNRows();
   auto* res = new MatrixSparse(nrows, 1);
 
   for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), icol); it; ++it)

@@ -63,6 +63,34 @@ public:
                         int icol,
                         const EOperator& oper,
                         double value) = 0;
+  /*! Set the contents of a Column */
+  virtual void setColumn(int icol, const VectorDouble& tab) = 0;
+  /*! Set the contents of a Column to a constant value*/
+  virtual void setColumnToConstant(int icol, double value) = 0;
+  /*! Set the contents of a Row */
+  virtual void setRow(int irow, const VectorDouble& tab) = 0;
+  /*! Set the contents of a Row to a constant value*/
+  virtual void setRowToConstant(int irow, double value) = 0;
+  /*! Set the contents of the (main) Diagonal */
+  virtual void setDiagonal(const VectorDouble& tab) = 0;
+  /*! Set the contents of the (main) Diagonal to a constant value */
+  virtual void setDiagonalToConstant(double value = 1.) = 0;
+  /*! Add a value to each matrix component */
+  virtual void addScalar(double v) = 0;
+  /*! Add value to matrix diagonal */
+  virtual void addScalarDiag(double v) = 0;
+  /*! Multiply each matrix component by a value */
+  virtual void prodScalar(double v) = 0;
+  /*! Set all the values of the Matrix at once */
+  virtual void fill(double value) = 0;
+  /*! Multiply a Matrix row-wise */
+  virtual void multiplyRow(const VectorDouble& vec) = 0;
+  /*! Multiply a Matrix column-wise */
+  virtual void multiplyColumn(const VectorDouble& vec) = 0;
+  /*! Divide a Matrix row-wise */
+  virtual void divideRow(const VectorDouble& vec) = 0;
+  /*! Divide a Matrix column-wise */
+  virtual void divideColumn(const VectorDouble& vec) = 0;
 
   /*! Check if the matrix is (non empty) square */
   virtual bool isSquare(bool printWhyNot = false) const;
@@ -77,38 +105,11 @@ public:
   virtual void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true);
   virtual void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true);
 
-  /*! Set the contents of a Column */
-  virtual void setColumn(int icol, const VectorDouble& tab);
-  /*! Set the contents of a Column to a constant value*/
-  virtual void setColumnToConstant(int icol, double value);
-  /*! Set the contents of a Row */
-  virtual void setRow(int irow, const VectorDouble& tab);
-  /*! Set the contents of a Row to a constant value*/
-  virtual void setRowToConstant(int irow, double value);
-  /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab);
-  /*! Set the contents of the (main) Diagonal to a constant value */
-  virtual void setDiagonalToConstant(double value = 1.);
   /*! Transpose the matrix in place*/
   virtual void transposeInPlace();
   /*! Transpose the matrix and return it as a copy*/
   virtual AMatrix* transpose() const;
-  /*! Add a value to each matrix component */
-  virtual void addScalar(double v);
-  /*! Add value to matrix diagonal */
-  virtual void addScalarDiag(double v);
-  /*! Multiply each matrix component by a value */
-  virtual void prodScalar(double v);
-  /*! Set all the values of the Matrix at once */
-  virtual void fill(double value);
-  /*! Multiply a Matrix row-wise */
-  virtual void multiplyRow(const VectorDouble& vec);
-  /*! Multiply a Matrix column-wise */
-  virtual void multiplyColumn(const VectorDouble& vec);
-  /*! Divide a Matrix row-wise */
-  virtual void divideRow(const VectorDouble& vec);
-  /*! Divide a Matrix column-wise */
-  virtual void divideColumn(const VectorDouble& vec);
+
   /*! Extract a Row */
   virtual VectorDouble getRow(int irow) const;
   /*! Extract a Column */
@@ -246,6 +247,9 @@ protected:
   virtual void _transposeInPlace()                                 = 0;
   virtual int _invert()                                            = 0;
   virtual int _solve(const VectorDouble& b, VectorDouble& x) const = 0;
+  virtual int _getMatrixPhysicalSize() const                       = 0;
+  virtual double _getValueByRank(int rank) const                   = 0;
+  virtual double& _getValueRef(int irow, int icol)                 = 0;
 #ifndef SWIG
   virtual void _addProdMatVecInPlacePtr(constvect x,
                                         vect y,
@@ -257,9 +261,6 @@ protected:
 
   virtual bool _needToReset(int nrows, int ncols);
   virtual bool _isPhysicallyPresent(int /*irow*/, int /*icol*/) const { return true; }
-  virtual int _getMatrixPhysicalSize() const;
-  virtual double& _getValueRef(int irow, int icol);
-  virtual double _getValueByRank(int rank) const = 0;
   virtual void _setValues(const double* values, bool byCol);
 
   virtual void _clear();

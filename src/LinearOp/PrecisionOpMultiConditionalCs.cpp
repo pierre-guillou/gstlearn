@@ -111,15 +111,15 @@ ProjMatrix* PrecisionOpMultiConditionalCs::_buildAmult() const
   else
   {
     MatrixSparse* mstemp      = nullptr;
-    const MatrixSparse* msref = dynamic_cast<const MatrixSparse*>(getProjMatrix(0));
+    const auto* msref = dynamic_cast<const MatrixSparse*>(getProjMatrix(0));
     for (int is = 1; is < number; is++)
     {
-      const MatrixSparse* msaux = dynamic_cast<const MatrixSparse*>(getProjMatrix(is));
+      const auto* msaux = dynamic_cast<const MatrixSparse*>(getProjMatrix(is));
       delete mstemp;
       mstemp = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(msref, msaux, false, true));
       msref  = mstemp;
     }
-    Pmult = new ProjMatrix(mstemp);
+    Pmult = new ProjMatrix(*mstemp);
     delete mstemp;
   }
   return Pmult;

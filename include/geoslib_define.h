@@ -12,7 +12,7 @@
 #include "Basic/WarningMacro.hpp"
 // Important remark: the following line MUST NOT BE REMOVED (even if not used
 // directly here) used as a MACRO
-#include "Basic/RepeatMacro.hpp"
+#include "Basic/RepeatMacro.hpp" 
 
 // WARNING: Make this include list as small as possible!
 #include <string>
@@ -55,9 +55,9 @@ typedef unsigned char UChar;
 // This function must be:
 // - declared in rgstlearn.i or pygstlearn.i
 // - be called as 'classname'_toTL
-#define DECLARE_TOTL                                                \
-  inline void toTL() const                                          \
-  {                                                                 \
+#define DECLARE_TOTL                                        \
+  inline void toTL() const                                  \
+  {                                                         \
     messerr("Not implemented yet (missing dependencies?)"); \
   };
 

@@ -72,9 +72,6 @@ public:
                 int icol,
                 const EOperator& oper,
                 double value) override;
-
-  /*! Say if the matrix must be symmetric */
-  bool mustBeSymmetric() const override { return false; }
   /*! Set the contents of a Column */
   void setColumn(int icol, const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant value */
@@ -103,6 +100,10 @@ public:
   void divideRow(const VectorDouble& vec) override;
   /*! Divide a Matrix column-wise */
   void divideColumn(const VectorDouble& vec) override;
+
+  /*! Say if the matrix must be symmetric */
+  bool mustBeSymmetric() const override { return false; }
+
   /*! Extract a Row */
   VectorDouble getRow(int irow) const override;
   /*! Extract a Column */
@@ -174,14 +175,13 @@ protected:
   void _transposeInPlace() override;
   int _invert() override;
   int _solve(const VectorDouble& b, VectorDouble& x) const override;
+  int _getMatrixPhysicalSize() const override;
+  double _getValueByRank(int rank) const override;
+  double& _getValueRef(int irow, int icol) override;
 #ifndef SWIG
   void _addProdVecMatInPlacePtr(constvect x, vect y, bool transpose = false) const override;
   void _addProdMatVecInPlacePtr(constvect x, vect y, bool transpose = false) const override;
 #endif
-
-  int _getMatrixPhysicalSize() const override;
-  double& _getValueRef(int irow, int icol) override;
-  double _getValueByRank(int rank) const override;
 
   int _computeEigen(bool optionPositive = true);
   int _computeGeneralizedEigen(const MatrixSymmetric& b, bool optionPositive = true);

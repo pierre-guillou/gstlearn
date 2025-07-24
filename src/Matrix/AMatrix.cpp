@@ -312,21 +312,6 @@ AMatrix* AMatrix::transpose() const
 }
 
 /**
- * Fill 'this' with the constant 'value'
- * @param value Constant value used for filling 'this'
- */
-void AMatrix::fill(double value)
-{
-  for (int rank = 0, n = _getMatrixPhysicalSize(); rank < n; rank++)
-    _setValueByRank(rank, value);
-}
-
-int AMatrix::_getMatrixPhysicalSize() const
-{
-  return (getNRows() * getNCols());
-}
-
-/**
  * Filling the matrix with an array of values
  * Note that this array is ALWAYS dimensioned to the total number
  * of elements in the matrix.
@@ -398,54 +383,6 @@ void AMatrix::setIdentity(double value)
       setValue(irow, icol, value * (irow == icol));
 }
 
-/**
- *
- * @param v Add a scalar value to all (valid) terms of the current matrix
- */
-void AMatrix::addScalar(double v)
-{
-  if (isZero(v)) return;
-  for (int rank = 0; rank < _getMatrixPhysicalSize(); rank++)
-    _setValueByRank(rank, _getValueByRank(rank) + v);
-}
-
-/**
- *
- * @param v Add constant value to the diagonal of the current Matrix
- */
-void AMatrix::addScalarDiag(double v)
-{
-  if (isZero(v)) return;
-  for (int irow = 0; irow < _nRows; irow++)
-  {
-    for (int icol = 0; icol < _nCols; icol++)
-    {
-      if (irow == icol)
-      {
-        int rank = _getIndexToRank(irow, icol);
-        _setValueByRank(rank, _getValueByRank(rank) + v);
-      }
-    }
-  }
-}
-
-/**
- *
- * @param v Multiply all the terms of the matrix by the scalar 'v'
- */
-void AMatrix::prodScalar(double v)
-{
-  if (isOne(v)) return;
-  for (int rank = 0; rank < _getMatrixPhysicalSize(); rank++)
-    _setValueByRank(rank, _getValueByRank(rank) * v);
-}
-
-/**
- * Returns 'y' = 'this' %*% 'x'
- * @param x Input vector
- * @param transpose True if the matrix 'this' must be transposed
- * @return The resulting vector 'y'
- */
 VectorDouble AMatrix::prodMatVec(const VectorDouble& x, bool transpose) const
 {
   if (_flagMatrixCheck &&
@@ -717,65 +654,6 @@ void AMatrix::prodNormMatInPlace(const AMatrix* a, bool transpose)
         value += a_ik * a_kj;
       }
       setValue(i, j, value);
-    }
-}
-
-void AMatrix::multiplyRow(const VectorDouble& vec)
-{
-  if (_flagMatrixCheck && _nRows != (int)vec.size())
-  {
-    messerr("The size of 'vec' must match the number of rows. Nothing is done");
-    return;
-  }
-  for (int irow = 0; irow < _nRows; irow++)
-    for (int icol = 0; icol < _nCols; icol++)
-    {
-      if (!_isPhysicallyPresent(irow, icol)) continue;
-      setValue(irow, icol, getValue(irow, icol) * vec[irow]);
-    }
-}
-
-void AMatrix::divideRow(const VectorDouble& vec)
-{
-  if (_flagMatrixCheck && _nRows != (int)vec.size())
-  {
-    messerr("The size of 'vec' must match the number of rows. Nothing is done");
-    return;
-  }
-  for (int irow = 0; irow < _nRows; irow++)
-    for (int icol = 0; icol < _nCols; icol++)
-    {
-      if (!_isPhysicallyPresent(irow, icol)) continue;
-      setValue(irow, icol, getValue(irow, icol) / vec[irow]);
-    }
-}
-
-void AMatrix::multiplyColumn(const VectorDouble& vec)
-{
-  if (_flagMatrixCheck && _nCols != (int)vec.size())
-  {
-    messerr("The size of 'vec' must match the number of columns. Nothing is done");
-    return;
-  }
-  for (int irow = 0; irow < _nRows; irow++)
-    for (int icol = 0; icol < _nCols; icol++)
-    {
-      if (!_isPhysicallyPresent(irow, icol)) continue;
-      setValue(irow, icol, getValue(irow, icol) * vec[icol]);
-    }
-}
-void AMatrix::divideColumn(const VectorDouble& vec)
-{
-  if (_flagMatrixCheck && _nCols != (int)vec.size())
-  {
-    messerr("The size of 'vec' must match the number of columns. Nothing is done");
-    return;
-  }
-  for (int irow = 0; irow < _nRows; irow++)
-    for (int icol = 0; icol < _nCols; icol++)
-    {
-      if (!_isPhysicallyPresent(irow, icol)) continue;
-      setValue(irow, icol, getValue(irow, icol) / vec[icol]);
     }
 }
 
@@ -1155,47 +1033,6 @@ const VectorDouble& AMatrix::getDiagonal(int shift) const
   return _diagonal;
 }
 
-/**
- * Reset the contents of a matrix by setting all terms to 0 and
- * update diagonal terms from the input argument 'tab'
- * @param tab Input vector to be copied to the diagonal of the output matrix
- */
-void AMatrix::setDiagonal(const VectorDouble& tab)
-{
-  int nrows = getNRows();
-  if (!isSquare())
-  {
-    messerr("This function is only valid for Square matrices. Nothing is done");
-    return;
-  }
-  if (getFlagMatrixCheck())
-  {
-    if (!_isRowSizeConsistent(tab)) return;
-  }
-
-  for (int irow = 0; irow < nrows; irow++)
-  {
-    if (irow >= getNCols()) continue;
-    setValue(irow, irow, tab[irow]);
-  }
-}
-
-void AMatrix::setDiagonalToConstant(double value)
-{
-  if (!isSquare())
-  {
-    messerr("This function is only valid for Square matrices. Nothing is done");
-    return;
-  }
-
-  for (int irow = 0; irow < getNRows(); irow++)
-  {
-    int icol = irow;
-    if (icol < 0 || icol >= getNCols()) continue;
-    setValue(irow, icol, value);
-  }
-}
-
 /*! Extract a Row */
 VectorDouble AMatrix::getRow(int irow) const
 {
@@ -1205,28 +1042,6 @@ VectorDouble AMatrix::getRow(int irow) const
   for (int icol = 0; icol < getNCols(); icol++)
     vect.push_back(getValue(irow, icol));
   return vect;
-}
-
-/*! Set the contents of a Row */
-void AMatrix::setRow(int irow, const VectorDouble& tab)
-{
-  if (irow < 0 || irow >= getNRows())
-    my_throw("Incorrect argument 'irow'");
-  if ((int)tab.size() != getNCols())
-    my_throw("Incorrect dimension of 'tab'");
-
-  for (int icol = 0; icol < getNCols(); icol++)
-    setValue(irow, icol, tab[icol]);
-}
-
-/*! Set the contents of a Row to a constant value*/
-void AMatrix::setRowToConstant(int irow, double value)
-{
-  if (irow < 0 || irow >= getNRows())
-    my_throw("Incorrect argument 'irow'");
-
-  for (int icol = 0; icol < getNCols(); icol++)
-    setValue(irow, icol, value);
 }
 
 /*! Extract a Column */
@@ -1250,27 +1065,6 @@ VectorDouble AMatrix::getColumnByRowRange(int icol, int rowFrom, int rowTo) cons
   for (int irow = rowFrom; irow < rowTo; irow++)
     vect.push_back(getValue(irow, icol));
   return vect;
-}
-
-/*! Set the contents of a Column */
-void AMatrix::setColumn(int icol, const VectorDouble& tab)
-{
-  if (icol < 0 || icol >= getNCols())
-    my_throw("Incorrect argument 'icol'");
-  if ((int)tab.size() != getNRows())
-    my_throw("Incorrect dimension of 'tab'");
-
-  for (int irow = 0; irow < getNRows(); irow++)
-    setValue(irow, icol, tab[irow]);
-}
-
-/*! Set the contents of a Column to a constant value*/
-void AMatrix::setColumnToConstant(int icol, double value)
-{
-  if (icol < 0 || icol >= getNCols())
-    my_throw("Incorrect argument 'icol'");
-  for (int irow = 0; irow < getNRows(); irow++)
-    setValue(irow, icol, value);
 }
 
 /*! Checks if a Column is valid (contains a non TEST value) */
@@ -1387,13 +1181,6 @@ double AMatrix::getNormInf() const
       if (value > norminf) norminf = value;
     }
   return norminf;
-}
-
-double& AMatrix::_getValueRef(int irow, int icol)
-{
-  DECLARE_UNUSED(irow);
-  DECLARE_UNUSED(icol);
-  return _nullTerm;
 }
 
 void AMatrix::copyReduce(const AMatrix* x,
