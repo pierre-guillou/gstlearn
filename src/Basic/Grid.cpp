@@ -32,6 +32,10 @@ typedef struct
   VectorInt tab;
 } DimLoop;
 
+// The following vectors should remain private to this class
+// They serve in optimizing local calculations.
+// They should not be made available for other classes as their dimensions
+// are only defined for local contingency (they do not match the Space Dimension)
 thread_local VectorInt _iwork0;
 thread_local VectorDouble _work1;
 thread_local VectorDouble _work2;
@@ -361,11 +365,23 @@ double Grid::getCoordinate(int rank, int idim0, bool flag_rotate) const
  * @param dxsPerCell   Vector of variable grid meshes (optional)
  * @return
  */
-const VectorDouble& Grid::getCoordinatesByIndice(const VectorInt& indice,
-                                                 bool flag_rotate,
-                                                 const VectorInt& shift,
-                                                 const VectorDouble& dxsPerCell) const
+VectorDouble Grid::getCoordinatesByIndice(const VectorInt& indice,
+                                          bool flag_rotate,
+                                          const VectorInt& shift,
+                                          const VectorDouble& dxsPerCell) const
 {
+  VectorDouble coor(_nDim);
+  getCoordinatesByIndiceInPlace(coor, indice, flag_rotate, shift, dxsPerCell);
+  return coor;
+}
+
+void Grid::getCoordinatesByIndiceInPlace(VectorDouble& coor,
+                                         const VectorInt& indice,
+                                         bool flag_rotate,
+                                         const VectorInt& shift,
+                                         const VectorDouble& dxsPerCell) const
+{
+  if ((int)coor.size() != _nDim) return;
   /* Calculate the coordinates in the grid system */
 
   for (int idim = 0; idim < _nDim; idim++)
@@ -383,11 +399,12 @@ const VectorDouble& Grid::getCoordinatesByIndice(const VectorInt& indice,
   if (flag_rotate)
   {
     _rotation.rotateDirect(_work1, _work2);
-    for (int idim = 0; idim < _nDim; idim++) _work2[idim] += _x0[idim];
-    return _work2;
+    for (int idim = 0; idim < _nDim; idim++) coor[idim] = _work2[idim] + _x0[idim];
   }
-  for (int idim = 0; idim < _nDim; idim++) _work1[idim] += _x0[idim];
-  return _work1;
+  else
+  {
+    for (int idim = 0; idim < _nDim; idim++) coor[idim] = _work1[idim] + _x0[idim];
+  }
 }
 
 /**
@@ -395,13 +412,21 @@ const VectorDouble& Grid::getCoordinatesByIndice(const VectorInt& indice,
  * @param icorner Vector specifying the corner (0: minimum; 1: maximum). (Dimension: ndim)
  * @return The coordinates of a corner
  */
-const VectorDouble& Grid::getCoordinatesByCorner(const VectorInt& icorner) const
+VectorDouble Grid::getCoordinatesByCorner(const VectorInt& icorner) const
 {
+  VectorDouble coor(_nDim);
+  getCoordinatesByCornerInPlace(coor, icorner);
+  return coor;
+}
+
+void Grid::getCoordinatesByCornerInPlace(VectorDouble& coor, const VectorInt& icorner) const
+{
+  if ((int)coor.size() != _nDim) return;
   initThread();
   VH::fill(_iwork0, 0);
   for (int idim = 0; idim < _nDim; idim++)
     if (icorner[idim] > 0) _iwork0[idim] = _nx[idim] - 1;
-  return getCoordinatesByIndice(_iwork0);
+  getCoordinatesByIndiceInPlace(coor, _iwork0);
 }
 
 /**
@@ -412,23 +437,34 @@ const VectorDouble& Grid::getCoordinatesByCorner(const VectorInt& icorner) const
  * @param dxsPerCell Vector of variable mesh extensions at target cell
  * @return The coordinates of a cell corner (possibly shifted)
  */
-const VectorDouble& Grid::getCellCoordinatesByCorner(int node,
-                                                     const VectorInt& shift,
-                                                     const VectorDouble& dxsPerCell) const
+VectorDouble Grid::getCellCoordinatesByCorner(int node,
+                                              const VectorInt& shift,
+                                              const VectorDouble& dxsPerCell) const
 {
-
+  VectorDouble coor(_nDim);
+  getCellCoordinatesByCornerInPlace(coor, node, shift, dxsPerCell);
+  return coor;
+}
+void Grid::getCellCoordinatesByCornerInPlace(VectorDouble& coor,
+                                             int node,
+                                             const VectorInt& shift,
+                                             const VectorDouble& dxsPerCell) const
+{
+  if ((int)coor.size() != _nDim) return;
   rankToIndice(node, _iwork0);
-  return getCoordinatesByIndice(_iwork0, true, shift, dxsPerCell);
+  getCoordinatesByIndiceInPlace(coor, _iwork0, true, shift, dxsPerCell);
 }
 
 /**
  * Return the Vector of coordinates for a given grid node
+ * @param coor Output Vector of coordinates (dimension: _nDim)
  * @param rank Rank of the target grid node
  * @param flag_rotate TRUE: perform the rotation; FALSE: skip rotation
- * @return Vector of coordinates
  */
-const VectorDouble& Grid::getCoordinatesByRank(int rank, bool flag_rotate) const
+void Grid::getCoordinatesByRankInPlace(VectorDouble& coor, int rank, bool flag_rotate) const
 {
+  if ((int)coor.size() != _nDim) return;
+
   /* Convert a sample number into grid indices */
   rankToIndice(rank, _iwork0);
 
@@ -442,15 +478,21 @@ const VectorDouble& Grid::getCoordinatesByRank(int rank, bool flag_rotate) const
   if (flag_rotate)
   {
     _rotation.rotateDirect(_work1, _work2);
-    for (int idim = 0; idim < _nDim; idim++) _work2[idim] += _x0[idim];
-    return _work2;
+    for (int idim = 0; idim < _nDim; idim++)
+      coor[idim] = _work2[idim] + _x0[idim];
   }
+  else
+  {
+    for (int idim = 0; idim < _nDim; idim++)
+      coor[idim] = _work1[idim] + _x0[idim];
+  }
+}
 
-  /* Shift for the origin */
-
-  for (int idim = 0; idim < _nDim; idim++)
-    _work1[idim] += _x0[idim];
-  return _work1;
+VectorDouble Grid::getCoordinatesByRank(int rank, bool flag_rotate) const
+{
+  VectorDouble coor(_nDim);
+  getCoordinatesByRankInPlace(coor, rank, flag_rotate);
+  return coor;
 }
 
 double Grid::indiceToCoordinate(int idim0,
@@ -478,8 +520,9 @@ double Grid::indiceToCoordinate(int idim0,
 VectorDouble Grid::indicesToCoordinate(const VectorInt& indice,
                                        const VectorDouble& percent) const
 {
-  indicesToCoordinateInPlace(indice, _work1, percent);
-  return _work1;
+  VectorDouble coor(_nDim);
+  indicesToCoordinateInPlace(indice, coor, percent);
+  return coor;
 }
 
 void Grid::indicesToCoordinateInPlace(const constvectint indice,
@@ -579,7 +622,7 @@ void Grid::rankToIndice(int rank, vectint indices, bool minusOne) const
 
 void Grid::initThread() const
 {
-  if (_nDim != (int)_iwork0.size())
+  if (_nDim > (int)_iwork0.size())
   {
     _iwork0.resize(_nDim);
     _work1.resize(_nDim);
@@ -587,12 +630,25 @@ void Grid::initThread() const
   }
 }
 
-VectorInt& Grid::coordinateToIndices(const VectorDouble& coor,
-                                     bool centered,
-                                     double eps) const
+VectorInt Grid::coordinateToIndices(const VectorDouble& coor,
+                                    bool centered,
+                                    double eps) const
 {
   if (coordinateToIndicesInPlace(coor, _iwork0, centered, eps)) return _dummy;
-  return _iwork0;
+  VectorInt retvec = _iwork0;
+  retvec.resize(_nDim);
+  return retvec;
+}
+
+void Grid::coordinateToIndicesInPlace(VectorInt& indices,
+                                      const VectorDouble& coor,
+                                      bool centered,
+                                      double eps) const
+{
+  if ((int)indices.size() != _nDim) return;
+  if (coordinateToIndicesInPlace(coor, _iwork0, centered, eps)) return;
+  for (int i = 0; i < _nDim; i++)
+    indices[i] = _iwork0[i];
 }
 
 /**
@@ -654,7 +710,16 @@ VectorInt Grid::getCenterIndices(bool flagSup) const
 {
   for (int idim = 0; idim < _nDim; idim++)
     _iwork0[idim] = (flagSup) ? ceil(_nx[idim] / 2.) : floor(_nx[idim] / 2.);
-  return _iwork0;
+  VectorInt retvec = _iwork0;
+  retvec.resize(_nDim);
+  return retvec;
+}
+
+void Grid::getCenterIndicesInPlace(VectorInt& indices, bool flagSup) const
+{
+  if ((int)indices.size() != _nDim) return;
+  for (int idim = 0; idim < _nDim; idim++)
+    indices[idim] = (flagSup) ? ceil(_nx[idim] / 2.) : floor(_nx[idim] / 2.);
 }
 
 bool Grid::_isSpaceDimensionValid(int idim) const

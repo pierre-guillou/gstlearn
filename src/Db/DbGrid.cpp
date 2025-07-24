@@ -1533,6 +1533,7 @@ DbGrid* DbGrid::createGrid2D(const ELoadBy& order,
  * @param selRatio Percentage of samples that must be masked off (between 0 and 1)
  * @param heteroRatio Vector of proportions of NA to be generated per variable
  * @param means Vector of means per variable (optional)
+ * @param x0 Vector of coordinates of the origin of the grid (optional)
  * @param seed Value for the Random Generator seed
  * @return A pointer to the newly created DbGrid
  *
@@ -1551,6 +1552,7 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
                                  double selRatio,
                                  const VectorDouble& heteroRatio,
                                  const VectorDouble& means,
+                                 const VectorDouble& x0,
                                  int seed)
 {
   // Set the seed
@@ -1560,7 +1562,7 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
   int ndim = (int)nx.size();
   VectorDouble dx(ndim);
   for (int idim = 0; idim < ndim; idim++) dx[idim] = 1. / nx[idim];
-  DbGrid* dbgrid = DbGrid::create(nx, dx);
+  DbGrid* dbgrid = DbGrid::create(nx, dx, x0);
   int ndat       = VH::product(nx);
 
   // Generate the Vectors of Variance of measurement error (optional)
@@ -2507,4 +2509,4 @@ VectorDouble DbGrid::getDistanceToOrigin(const VectorInt& origin,
   }
   return distvec;
 }
-}
+} // namespace gstlrn

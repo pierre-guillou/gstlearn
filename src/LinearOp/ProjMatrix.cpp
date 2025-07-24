@@ -30,7 +30,8 @@ ProjMatrix::ProjMatrix(const Db* db,
 }
 
 ProjMatrix::ProjMatrix(const ProjMatrix& m)
-  : MatrixSparse(m)
+  : IProj(m)
+  , MatrixSparse(m)
 {
 }
 

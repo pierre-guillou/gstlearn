@@ -22,9 +22,8 @@ int main(int argc, char* argv[])
   DECLARE_UNUSED(argc);
   DECLARE_UNUSED(argv);
 
-  auto* g2 = DbGrid::createFillRandom({10, 10}, 1);
-  auto* g3 = DbGrid::createFillRandom({10, 10, 10}, 0);
-  g2->display();
+  auto* g3 = DbGrid::createFillRandom({10, 10, 10}, 0, 0, 0, 0., 0., VectorDouble(), VectorDouble(), {1., 2., 3.});
+  auto* g2 = DbGrid::createFillRandom({10, 10}, 1, 0, 0, 0., 0., VectorDouble(), VectorDouble(), {1., 2.});
 
   VectorInt cells = {1, 2, 3};
   simuPostPropByLayer(g2, g3, {"z"}, false, false,
