@@ -1,12 +1,16 @@
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "Interfaces/AParam.hpp"
+#include "Interfaces/interface_d.hpp"
+#include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Space/SpaceShape.hpp"
-#include "Interfaces/interface_d.hpp"
+#include "gstlearn_export.hpp"
 
 #include <vector>
+
+namespace gstlrn
+{
 
 /**********************************************************************
  ** Class defining the Condition to accept a Pair of Point (refering "code" notion)
@@ -20,26 +24,26 @@
  **
  ** Default: Everything is set to 0
  ************************************************************************/
-//:WARNING: ParamVarioCond must be attached to a variable
+//: WARNING: ParamVarioCond must be attached to a variable
 class GSTLEARN_EXPORT ParamVarioCond: public AParam
 {
 public:
   ParamVarioCond()
-      : operCond(0),
-        tol(0),
-        role(ERoles::NOROLE),
-        iRole(0)
+    : operCond(0)
+    , tol(0)
+    , role(ERoles::NOROLE)
+    , iRole(0)
   {
   }
   virtual ~ParamVarioCond()
   {
   }
 
-  ParamVarioCond(const ParamVarioCond &pvc)
-      : operCond(pvc.operCond),
-        tol(pvc.tol),
-        role(pvc.role),
-        iRole(pvc.iRole)
+  ParamVarioCond(const ParamVarioCond& pvc)
+    : operCond(pvc.operCond)
+    , tol(pvc.tol)
+    , role(pvc.role)
+    , iRole(pvc.iRole)
   {
   }
 
@@ -48,9 +52,9 @@ public:
     if (this != &pvc)
     {
       operCond = pvc.operCond;
-      tol = pvc.tol;
-      role = pvc.role;
-      iRole = pvc.iRole;
+      tol      = pvc.tol;
+      role     = pvc.role;
+      iRole    = pvc.iRole;
     }
     return (*this);
   }
@@ -118,32 +122,32 @@ public:
 class ParamVarioDir: public ASpaceObject
 {
 public:
-  ParamVarioDir(const ASpace* space = nullptr)
-      : ASpaceObject(space),
-        flagGrid(false),
-        gridIncr(),
-        normDir(space),
-        flagRegular(true),
-        lag(1),
-        dlag(0.5),
-        nlag(10),
-        irregularLags(),
-        pencil()
+  ParamVarioDir(const ASpaceObject* space = nullptr)
+    : ASpaceObject(*space)
+    , flagGrid(false)
+    , gridIncr()
+    , normDir()
+    , flagRegular(true)
+    , lag(1)
+    , dlag(0.5)
+    , nlag(10)
+    , irregularLags()
+    , pencil()
   {
   }
 
-  ParamVarioDir(const ParamVarioDir &pvd)
-      : ASpaceObject(pvd),
-        flagGrid(pvd.flagGrid),
-        gridIncr(pvd.gridIncr),
-        normDir(pvd.normDir),
-        flagRegular(pvd.flagRegular),
-        lag(pvd.lag),
-        dlag(pvd.dlag),
-        nlag(pvd.nlag),
-        irregularLags(pvd.irregularLags),
-        pencil(pvd.pencil),
-        paramVarioConds(pvd.paramVarioConds)
+  ParamVarioDir(const ParamVarioDir& pvd)
+    : ASpaceObject(pvd)
+    , flagGrid(pvd.flagGrid)
+    , gridIncr(pvd.gridIncr)
+    , normDir(pvd.normDir)
+    , flagRegular(pvd.flagRegular)
+    , lag(pvd.lag)
+    , dlag(pvd.dlag)
+    , nlag(pvd.nlag)
+    , irregularLags(pvd.irregularLags)
+    , pencil(pvd.pencil)
+    , paramVarioConds(pvd.paramVarioConds)
   {
   }
 
@@ -152,14 +156,14 @@ public:
     if (this != &ref)
     {
       ASpaceObject::operator=(ref);
-      flagGrid = ref.flagGrid;
-      gridIncr = ref.gridIncr;
-      normDir = ref.normDir;
-      flagRegular = ref.flagRegular;
-      lag = ref.lag;
-      dlag = ref.dlag;
-      nlag = ref.nlag;
-      irregularLags = ref.irregularLags;
+      flagGrid        = ref.flagGrid;
+      gridIncr        = ref.gridIncr;
+      normDir         = ref.normDir;
+      flagRegular     = ref.flagRegular;
+      lag             = ref.lag;
+      dlag            = ref.dlag;
+      nlag            = ref.nlag;
+      irregularLags   = ref.irregularLags;
       paramVarioConds = ref.paramVarioConds;
     }
     return (*this);
@@ -171,7 +175,7 @@ public:
 
   virtual bool isConsistent(const ASpace* space) const override
   {
-    return ( normDir.isConsistent(space));
+    return (normDir.isConsistent(space));
   }
 
   /********************************************************************
@@ -179,7 +183,7 @@ public:
    *********************************************************************/
   int getFirstOperCond(ERoles role) const
   {
-    for (const auto& pvc : paramVarioConds)
+    for (const auto& pvc: paramVarioConds)
     {
       if (pvc.role == role)
       {
@@ -194,7 +198,7 @@ public:
    *********************************************************************/
   int getFirstTol(ERoles role) const
   {
-    for (const auto& pvc : paramVarioConds)
+    for (const auto& pvc: paramVarioConds)
     {
       if (pvc.role == role)
       {
@@ -210,7 +214,7 @@ public:
   int getNbCond(ERoles role) const
   {
     int res = 0;
-    for (const auto& pvc : paramVarioConds)
+    for (const auto& pvc: paramVarioConds)
     {
       if (pvc.role == role)
       {
@@ -232,9 +236,10 @@ public:
     stream << " lag : " << pvd.lag << std::endl;
     stream << " dlag: " << pvd.dlag << std::endl;
     stream << " nlag : " << pvd.nlag << std::endl;
-    for (const auto& pcond : pvd.paramVarioConds)
+    for (const auto& pcond: pvd.paramVarioConds)
     {
-      stream << " ParamVarioCond " << std::endl << pcond << std::endl;
+      stream << " ParamVarioCond " << std::endl
+             << pcond << std::endl;
     }
     return (stream);
   }
@@ -249,7 +254,7 @@ public:
   int nlag;
   VectorDouble irregularLags;
   Pencil pencil;
-  //std::vector<ASpaceShape> spaceShapes; //Warning: intersection of Shape not used yet
+  // std::vector<ASpaceShape> spaceShapes; //Warning: intersection of Shape not used yet
   std::vector<ParamVarioCond> paramVarioConds;
 };
 
@@ -268,18 +273,18 @@ public:
 class ParamVario: public ASpaceObject
 {
 public:
-  ParamVario(const ASpace* space = nullptr)
-      : ASpaceObject(space),
-        dirs(),
-        rules(ECalcRules::CALCUL_BY_LAG),
-        useWeight(false)
+  ParamVario(const ASpaceObject* space = nullptr)
+    : ASpaceObject(*space)
+    , dirs()
+    , rules(ECalcRules::CALCUL_BY_LAG)
+    , useWeight(false)
   {
   }
-  ParamVario(const ParamVario &p_vario)
-      : ASpaceObject(p_vario),
-        dirs(p_vario.dirs),
-        rules(p_vario.rules),
-        useWeight(p_vario.useWeight)
+  ParamVario(const ParamVario& p_vario)
+    : ASpaceObject(p_vario)
+    , dirs(p_vario.dirs)
+    , rules(p_vario.rules)
+    , useWeight(p_vario.useWeight)
   {
   }
   ParamVario& operator=(const ParamVario& ref)
@@ -287,8 +292,8 @@ public:
     if (this != &ref)
     {
       ASpaceObject::operator=(ref);
-      dirs = ref.dirs;
-      rules = ref.rules;
+      dirs      = ref.dirs;
+      rules     = ref.rules;
       useWeight = ref.useWeight;
     }
     return (*this);
@@ -299,7 +304,7 @@ public:
 
   virtual bool isConsistent(const ASpace* space) const override
   {
-    for (const auto& dir : dirs)
+    for (const auto& dir: dirs)
     {
       if (!dir.isConsistent(space)) return (false);
     }
@@ -312,10 +317,11 @@ public:
 #ifndef SWIG
   friend std::ostream& operator<<(std::ostream& stream, const ParamVario pv)
   {
-    stream << std::endl << "Number of Dir : " << pv.dirs.size() << std::endl
+    stream << std::endl
+           << "Number of Dir : " << pv.dirs.size() << std::endl
            << std::endl;
     int idir = 1;
-    for (const auto& dir : pv.dirs)
+    for (const auto& dir: pv.dirs)
     {
       stream << "Dir n°" << idir << std::endl;
       stream << "------------------------------------------" << std::endl;
@@ -338,6 +344,7 @@ public:
 
   std::vector<ParamVarioDir> dirs;
   ECalcRules rules;
-  bool useWeight; //:WARNING: unused
+  bool useWeight; //: WARNING: unused
 };
 
+} // namespace gstlrn

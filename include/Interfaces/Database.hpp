@@ -10,15 +10,16 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
-#include "Space/ASpaceObject.hpp"
-#include "Interfaces/interface_d.hpp"
 #include "Interfaces/ParamGrid.hpp"
+#include "Interfaces/interface_d.hpp"
+#include "Space/ASpaceObject.hpp"
 #include "geoslib_enum.h"
+#include "gstlearn_export.hpp"
 
-#include <string>
 #include <vector>
-#include <string>
+
+namespace gstlrn
+{
 
 class Db;
 class DbGrid;
@@ -28,15 +29,15 @@ class ParamCSV;
 
 /*****************************************************************************
  * A Database is a representation of an excel sheet
- * 
+ *
  ****************************************************************************/
-class GSTLEARN_EXPORT Database : public ASpaceObject
+class GSTLEARN_EXPORT Database: public ASpaceObject
 {
 public:
-  Database(const ASpace* space = nullptr);
-  Database(const ParamCSV& pcsv,   const ASpace* space = nullptr);
-  Database(const ParamGrid& pgrid, const ASpace* space = nullptr);// TODO : Database from ParamGrid only valid in 2D from now
-  Database(const Database &db);
+  Database(const ASpaceObject* space = nullptr);
+  Database(const ParamCSV& pcsv, const ASpaceObject* space = nullptr);
+  Database(const ParamGrid& pgrid, const ASpaceObject* space = nullptr); // TODO : Database from ParamGrid only valid in 2D from now
+  Database(const Database& db);
   virtual ~Database();
   Database& operator=(const Database& ref);
 
@@ -44,27 +45,27 @@ public:
 
   virtual String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  unsigned int         getNSamples() const;
-  unsigned int         getNVars() const;
-  VectorString         getNames() const;
-  unsigned int         getNVarRole(ERoles role) const;
-  ERoles                getRole(int ivar) const;
-  int                  getIVar(const String& name) const;
-  std::pair<ERoles,int> getRoleAndIRole(const String& name) const;
-  String               getNameByLocator(ERoles role, int i_role) const;
-  VectorDouble         getValuesByName(const String& name);
-  AVariable*           getVariable(int ivar);
+  unsigned int getNSamples() const;
+  unsigned int getNVars() const;
+  VectorString getNames() const;
+  unsigned int getNVarRole(ERoles role) const;
+  ERoles getRole(int ivar) const;
+  int getIVar(const String& name) const;
+  std::pair<ERoles, int> getRoleAndIRole(const String& name) const;
+  String getNameByLocator(ERoles role, int i_role) const;
+  VectorDouble getValuesByName(const String& name);
+  AVariable* getVariable(int ivar);
 
   const ParamGrid& getParamGrid() const { return _pgrid; }
 
   ES setName(int iatt, const String& name);
   ES setRole(const VectorString& names, ERoles role);
-  
-  ES addVar(const String& name,const VectorDouble& val);
+
+  ES addVar(const String& name, const VectorDouble& val);
   ES delVar(const String& name);
   ES eraseRole(ERoles role);
   ES select(const String& name, const VectorBool& sel);
-  
+
   void printRoles();
   virtual void display_old() const;
   Db* toGeoslib() const;
@@ -78,22 +79,23 @@ public:
   bool serialize(const String& str) const;
   bool deserialize(const String& str);
 #endif
-  
-  ES addVar( AVariable* var); //:WARNING:: can't use this function in python
+
+  ES addVar(AVariable* var); //: WARNING:: can't use this function in python
 
 private:
-  ES    addVar(AVariable* var, ERoles role);
-  int   getNbCoord();
-  bool  nameExist(const String& name) const;
-  ES    indexOOR(int i) const;
+  ES addVar(AVariable* var, ERoles role);
+  int getNbCoord();
+  bool nameExist(const String& name) const;
+  ES indexOOR(int i) const;
 
-  void  changeKey(std::multimap<ERoles,String>::iterator it, ERoles new_role);
-  std::multimap<ERoles,String>::const_iterator getItRole(const String& name) const;
+  void changeKey(std::multimap<ERoles, String>::iterator it, ERoles new_role);
+  std::multimap<ERoles, String>::const_iterator getItRole(const String& name) const;
 
 private:
-  ParamGrid                    _pgrid;
-  bool                         _isGrid;
-  std::vector<AVariable*>      _vars;
-  std::multimap<ERoles,String> _roles; //order have an importance
-
+  ParamGrid _pgrid;
+  bool _isGrid;
+  std::vector<AVariable*> _vars;
+  std::multimap<ERoles, String> _roles; // order have an importance
 };
+
+} // namespace gstlrn

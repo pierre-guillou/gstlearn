@@ -1,5 +1,7 @@
 #include "Interfaces/VariableDouble.hpp"
 
+using namespace gstlrn;
+
 VariableDouble::VariableDouble()
 : AVariableTemplate()
 {

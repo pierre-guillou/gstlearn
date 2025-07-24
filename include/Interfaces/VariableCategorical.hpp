@@ -10,34 +10,30 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "Interfaces/AVariableTemplate.hpp"
 #include "Interfaces/Dictionary.hpp"
+#include "gstlearn_export.hpp"
 
-#include <string>
+namespace gstlrn
+{
 
 /// TODO : to be terminated
 class GSTLEARN_EXPORT VariableCategorical: public AVariableTemplate<Category>
 {
 public:
   VariableCategorical(const String& name, const Dictionary& dico);
-  VariableCategorical(const VariableCategorical &ref);
-  virtual ~VariableCategorical();
 
   /// Cloneable interface
   IMPLEMENT_CLONING(VariableCategorical)
 
-  virtual void resize(int n, const Category& val) override;
+  void resize(const size_t n, const Category& val) override;
   VectorDouble getValues() const override;
-  virtual void setValue(int i, const Category& cat) override;
-  void setValue(int i, int value);
-  void setValue(int i, const String& label);
-
-#ifdef _USE_NETCDF
-  netCDF::NcVar serialize(netCDF::NcFile& file, std::vector<netCDF::NcDim>& dims) const override;
-  void deserialize(const netCDF::NcFile& file,const netCDF::NcVar& var) override;
-#endif
+  void setValue(const size_t i, const Category& cat) override;
+  void setValue(const size_t i, const int value);
+  void setValue(const size_t i, const String& label);
 
 private:
   Dictionary _dico;
 };
+
+} // namespace gstlrn

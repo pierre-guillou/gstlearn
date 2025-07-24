@@ -1,33 +1,29 @@
-#include "geoslib_f.h"
-#include "geoslib_old_f.h"
-#include "Interfaces/interface_d.hpp"
 #include "Interfaces/Database.hpp"
-#include "Interfaces/AVariable.hpp"
-#include "Interfaces/VariableDouble.hpp"
-#include "Interfaces/VariableBool.hpp"
-#include "Interfaces/VariableInt.hpp"
-#include "Interfaces/VariableString.hpp"
-#include "Interfaces/Param.hpp"
-#include "Interfaces/ParamCSV.hpp"
-#include "Space/ASpace.hpp"
-#include "Db/ELoc.hpp"
-#include "Db/ELoadBy.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbStringFormat.hpp"
-
-#include <cstddef>
-#include <algorithm>
+#include "Enum/ELoadBy.hpp"
+#include "Enum/ELoc.hpp"
+#include "Interfaces/AVariable.hpp"
+#include "Interfaces/VariableBool.hpp"
+#include "Interfaces/VariableDouble.hpp"
+#include "Interfaces/interface_d.hpp"
+#include "Space/ASpace.hpp"
+#include "Space/ASpaceObject.hpp"
+#include "geoslib_f.h"
+#include "geoslib_old_f.h"
 
 ENUM_DEFINE(ENUM_ROLES)
 
 ENUM_DEFINE(ENUM_CALC_RULES)
 
-Database::Database(const ASpace* space)
-    : ASpaceObject(space),
-      _pgrid(),
-      _isGrid(false),
-      _vars(),
-      _roles()
+using namespace gstlrn;
+
+Database::Database(const ASpaceObject* space)
+  : ASpaceObject(*space)
+  , _pgrid()
+  , _isGrid(false)
+  , _vars()
+  , _roles()
 {
 }
 
@@ -42,24 +38,24 @@ Database::Database(const ASpace* space)
  *            roles are set to ERoles::NOROLE for each variable
  */
 
-Database::Database(const ParamCSV &pcsv, const ASpace* space)
-    : ASpaceObject(space),
-      _pgrid(),
-      _isGrid(false),
-      _vars(),
-      _roles()
+Database::Database(const ParamCSV& pcsv, const ASpaceObject* space)
+  : ASpaceObject(*space)
+  , _pgrid()
+  , _isGrid(false)
+  , _vars()
+  , _roles()
 {
   Db* db = nullptr;
   int ncol_arg;
   int nrow_arg;
   VectorString names;
   VectorDouble tab;
-  int skipnline = pcsv.getSkipNLines();
+  int skipnline   = pcsv.getSkipNLines();
   String filename = pcsv.getFilePath();
   CSVformat csvfmt(pcsv.getUseHeader(), skipnline, pcsv.getSeparatorChar(),
                    pcsv.getDecimalChar(), "MISS");
 
-  //read content from csv
+  // read content from csv
   if (csv_table_read(filename, csvfmt, 1, -1, -1, &ncol_arg, &nrow_arg, names, tab) != 0)
   {
     // Error, create empty database
@@ -67,7 +63,7 @@ Database::Database(const ParamCSV &pcsv, const ASpace* space)
     return;
   }
 
-//  db = db_create_point(nrow_arg, ncol_arg, ELoadBy::SAMPLE, 0, tab);
+  //  db = db_create_point(nrow_arg, ncol_arg, ELoadBy::SAMPLE, 0, tab);
 
   // fill attribute _vars
   int i = 0;
@@ -92,12 +88,12 @@ Database::Database(const ParamCSV &pcsv, const ASpace* space)
  *  @param[in] pgrid Grid parameters
  *  @param[in] space Contextual space pointer
  */
-Database::Database(const ParamGrid &pgrid, const ASpace* space)
-    : ASpaceObject(space),
-      _pgrid(pgrid),
-      _isGrid(true),
-      _vars(),
-      _roles()
+Database::Database(const ParamGrid& pgrid, const ASpaceObject* space)
+  : ASpaceObject(*space)
+  , _pgrid(pgrid)
+  , _isGrid(true)
+  , _vars()
+  , _roles()
 {
 }
 
@@ -106,13 +102,13 @@ Database::Database(const ParamGrid &pgrid, const ASpace* space)
  * Use Design Pattern Clonage to create Variable with good type
  */
 Database::Database(const Database& src)
-    : ASpaceObject(src),
-      _pgrid(src._pgrid),
-      _isGrid(src._isGrid),
-      _vars(),
-      _roles(src._roles)
+  : ASpaceObject(src)
+  , _pgrid(src._pgrid)
+  , _isGrid(src._isGrid)
+  , _vars()
+  , _roles(src._roles)
 {
-  for (const auto& v : src._vars)
+  for (const auto& v: src._vars)
   {
     _vars.push_back(dynamic_cast<AVariable*>(v->clone()));
   }
@@ -137,14 +133,14 @@ Database& Database::operator=(const Database& ref)
 {
   if (this != &ref)
   {
-    _pgrid = ref._pgrid;
+    _pgrid  = ref._pgrid;
     _isGrid = ref._isGrid;
-    _roles = ref._roles;
-    for (auto old_v : _vars)
+    _roles  = ref._roles;
+    for (auto old_v: _vars)
     {
       delete (old_v);
     }
-    for (const auto& new_v : ref._vars)
+    for (const auto& new_v: ref._vars)
     {
       _vars.push_back(dynamic_cast<AVariable*>(new_v->clone()));
     }
@@ -194,7 +190,7 @@ VectorString Database::getNames() const
   String name;
   VectorString names;
   int ncol = getNVars();
-  int i = 0;
+  int i    = 0;
 
   while (i < ncol)
   {
@@ -232,7 +228,7 @@ AVariable* Database::getVariable(int ivar)
  */
 ERoles Database::getRole(int ivar) const
 {
-  for (auto r : _roles)
+  for (auto r: _roles)
   {
     if (r.second.compare(_vars[ivar]->getName()) == 0) return (r.first);
   }
@@ -248,7 +244,7 @@ ERoles Database::getRole(int ivar) const
 int Database::getIVar(const String& name) const
 {
   int i = 0;
-  for (const auto& v : _vars)
+  for (const auto& v: _vars)
   {
     if (v->getName().compare(name) == 0) return (i);
     i++;
@@ -266,15 +262,16 @@ std::pair<ERoles, int> Database::getRoleAndIRole(const String& name) const
 {
   std::pair<ERoles, int> res;
 
-  int ivar = getIVar(name);
+  int ivar    = getIVar(name);
   ERoles role = getRole(ivar);
 
   std::pair<std::multimap<ERoles, String>::const_iterator,
-      std::multimap<ERoles, String>::const_iterator> ret;
-  ret = _roles.equal_range(role);
+            std::multimap<ERoles, String>::const_iterator>
+    ret;
+  ret   = _roles.equal_range(role);
   int i = 0;
   for (std::multimap<ERoles, String>::const_iterator it = ret.first;
-      it != ret.second; ++it)
+       it != ret.second; ++it)
   {
     if (it->second.compare(name) == 0) res = std::make_pair(role, i);
     i++;
@@ -291,7 +288,7 @@ std::pair<ERoles, int> Database::getRoleAndIRole(const String& name) const
 String Database::getNameByLocator(ERoles role, int i_role) const
 {
   std::multimap<ERoles, String>::const_iterator res;
-  res = _roles.find(role);
+  res   = _roles.find(role);
   int i = 0;
   while (i < i_role)
   {
@@ -340,7 +337,7 @@ ES Database::addVar(AVariable* var)
       return (ES_SIZE_VAR);
     }
   }
-  //std::cout << "Adding variable of type:" << typeid(*var).name() << std::endl;
+  // std::cout << "Adding variable of type:" << typeid(*var).name() << std::endl;
   _vars.push_back(var);
   _roles.insert(std::pair<ERoles, String>(ERoles::NOROLE, var->getName()));
   return (ES_NOERROR);
@@ -367,10 +364,10 @@ ES Database::addVar(AVariable* var, ERoles role)
  *  @param[in] iatt : indice of the attribute
  *  @param[in] name : name to give to the column
  */
-//:TODO:WARNING: We have to change name in multimap too
+//: TODO:WARNING: We have to change name in multimap too
 ES Database::setName(int iatt, const String& name)
 {
-  //check unicity of name
+  // check unicity of name
   if (nameExist(name))
   {
     return (ES_NAME);
@@ -419,7 +416,7 @@ ES Database::setRole(const VectorString& names, ERoles role)
     return (ES_PERMISSION_GRID_COORD);
   }
   // only set Role to Variable found
-  for (auto name : names)
+  for (auto name: names)
   {
     iatt = nameIdentify(name);
     if (iatt != -1)
@@ -462,10 +459,11 @@ ES Database::eraseRole(ERoles role)
     return (ES_PERMISSION_GRID_COORD);
   }
   std::pair<std::multimap<ERoles, String>::iterator,
-      std::multimap<ERoles, String>::iterator> ret;
+            std::multimap<ERoles, String>::iterator>
+    ret;
   ret = _roles.equal_range(role);
   for (std::multimap<ERoles, String>::iterator it = ret.first; it != ret.second;
-      ++it)
+       ++it)
   {
     String name = it->second;
     _roles.erase(it);
@@ -484,7 +482,7 @@ ES Database::eraseRole(ERoles role)
 ES Database::select(const String& name, const VectorBool& /*sel*/)
 {
   VariableBool* var_bool = new VariableBool(name);
-  VectorString names = { name };
+  VectorString names     = {name};
   addVar(var_bool);
   setRole(names, ERoles::SEL);
   return (ES_NOERROR);
@@ -499,7 +497,7 @@ ES Database::select(const String& name, const VectorBool& /*sel*/)
 std::multimap<ERoles, String>::const_iterator Database::getItRole(const String& name) const
 {
   for (std::multimap<ERoles, String>::const_iterator it = _roles.begin();
-      it != _roles.end(); ++it)
+       it != _roles.end(); ++it)
   {
     if (it->second.compare(name) == 0) return (it);
   }
@@ -515,7 +513,6 @@ void Database::display_old() const
   DbStringFormat dbfmt;
   dbfmt.setFlags(true, true, true, true, true);
   toGeoslib()->display(&dbfmt);
-
 }
 
 /**
@@ -525,7 +522,7 @@ void Database::display_old() const
 void Database::reset()
 {
   _pgrid.reset();
-  _isGrid = false;
+  _isGrid        = false;
   unsigned int i = 0;
   while (i < _vars.size())
   {
@@ -555,7 +552,7 @@ bool Database::nameExist(const String& test_name) const
 {
   VectorString names = getNames();
 
-  for (const auto& name : names)
+  for (const auto& name: names)
   {
     if (!test_name.compare(name))
     {
@@ -572,7 +569,7 @@ bool Database::nameExist(const String& test_name) const
  */
 ES Database::indexOOR(int ivar) const
 {
-  if (ivar < (int) _vars.size() && ivar >= 0)
+  if (ivar < (int)_vars.size() && ivar >= 0)
   {
     return (ES_NOERROR);
   }
@@ -589,11 +586,11 @@ ES Database::indexOOR(int ivar) const
  *
  *  @param[in] name  name of the variable to search
  */
-int Database::nameIdentify(const String &name) const
+int Database::nameIdentify(const String& name) const
 {
   int i = 0;
 
-  while (i < (int) _vars.size())
+  while (i < (int)_vars.size())
   {
     if (!name.compare(_vars[i]->getName()))
     {
@@ -612,7 +609,7 @@ int Database::getGridSize() const
   if (_isGrid)
   {
     int res = 1;
-    for (const auto& n : _pgrid.getNx())
+    for (const auto& n: _pgrid.getNx())
     {
       res = res * n;
     }
@@ -625,7 +622,7 @@ int Database::getGridSize() const
  * Create and return a  Db*(geoslib struct) from a Database object
  *
  */
-//:Tricky
+//: Tricky
 Db* Database::toGeoslib() const
 {
   Db* res;
@@ -636,35 +633,34 @@ Db* Database::toGeoslib() const
   VectorVectorDouble vec_role(ERoles::getSize());
 
   // Concatenate all column in one vector
-  for (const auto& var : _vars)
+  for (const auto& var: _vars)
   {
     vec = var->getValues();
     v.insert(v.end(), vec.begin(), vec.end());
   }
-  //create Db
+  // create Db
   if (!_isGrid)
   {
     int nrow = _vars[0]->getValues().size();
-    res = Db::createFromSamples(nrow, ELoadBy::COLUMN, v, VectorString(),
-                                   VectorString(), 1);
-
+    res      = Db::createFromSamples(nrow, ELoadBy::COLUMN, v, VectorString(),
+                                     VectorString(), 1);
   }
   else
   {
     res = DbGrid::create(_pgrid.getNx(), _pgrid.getDx(), _pgrid.getX0(),
                          VectorDouble(), ELoadBy::COLUMN, VectorDouble(),
                          VectorString(), VectorString(), 1);
-    //:TODO:Add VariableAuto with generator on the fly
+    //: TODO:Add VariableAuto with generator on the fly
   }
   // add name
   int ivar = 0;
-  while (ivar < (int) _vars.size())
+  while (ivar < (int)_vars.size())
   {
     if (_isGrid)
     {
       int new_att;
       new_att = res->addColumnsByConstant(1, 0);
-      res->setColumnByUID(_vars[ivar]->getValues(),new_att);
+      res->setColumnByUID(_vars[ivar]->getValues(), new_att);
     }
     db_name_set(res, iatt, _vars[ivar]->getName().c_str());
     iatt++;
@@ -678,7 +674,7 @@ Db* Database::toGeoslib() const
    */
 
   iatt = 0;
-  for (auto r : _roles)
+  for (auto r: _roles)
   {
     if (r.first != ERoles::NOROLE) vec_role[r.first.getValue()].push_back(getIVar(r.second));
   }
@@ -690,9 +686,9 @@ Db* Database::toGeoslib() const
     if (!vec_role[irole].empty())
     {
       jrole = 0;
-      while (jrole < (int) vec_role[irole].size())
+      while (jrole < (int)vec_role[irole].size())
       {
-        res->setLocatorByUID(vec_role[irole][jrole], ELoc::fromValue(irole), jrole+1);
+        res->setLocatorByUID(vec_role[irole][jrole], ELoc::fromValue(irole), jrole + 1);
         jrole++;
       }
     }
@@ -701,7 +697,7 @@ Db* Database::toGeoslib() const
   return (res);
 }
 
-//:TODO : case grid
+//: TODO : case grid
 void Database::fromGeoslib(DbGrid* db)
 {
   int i = 0;
@@ -716,15 +712,15 @@ void Database::fromGeoslib(DbGrid* db)
   {
     VectorDouble val;
     for (int iech = 0; iech < db->getSampleNumber(); iech++)
-      val[iech] = db->getArray(iech,i);
+      val[iech] = db->getArray(iech, i);
     VariableDouble* new_var = new VariableDouble(db->getNameByColIdx(i));
     new_var->setValues(val);
     addVar(new_var);
     i++;
   }
   VectorString lst_names = getNames();
-  int j = 0;
-  //fill v_name with name of variable for each possible ERoles.
+  int j                  = 0;
+  // fill v_name with name of variable for each possible ERoles.
   auto it = ELoc::getIterator();
   while (it.hasNext())
   {
@@ -734,7 +730,7 @@ void Database::fromGeoslib(DbGrid* db)
       int k = 0;
       while (k < db->getFromLocatorNumber(*it))
       {
-        String name = lst_names[db->getUIDByLocator(*it,k)];
+        String name = lst_names[db->getUIDByLocator(*it, k)];
         names_role.push_back(name);
         k++;
       }
@@ -750,7 +746,7 @@ void Database::fromGeoslib(DbGrid* db)
 void Database::printRoles()
 {
   reset();
-  for (const auto& role : _roles)
+  for (const auto& role: _roles)
   {
     std::cout << role.first.getKey() << "    " << role.second << std::endl;
   }
@@ -773,7 +769,7 @@ void Database::changeKey(std::multimap<ERoles, String>::iterator it,
  */
 VectorDouble Database::getValuesByName(const String& name)
 {
-  for (const auto& v : _vars)
+  for (const auto& v: _vars)
   {
     if (!v->getName().compare(name)) return (v->getValues());
   }
@@ -783,12 +779,12 @@ VectorDouble Database::getValuesByName(const String& name)
 
 #ifdef _USE_NETCDF
 
-#include <netcdf>
+#  include <netcdf>
 
 using namespace netCDF;
 using namespace netCDF::exceptions;
 
-static bool sortbysec(const std::pair<int,int> &a, const std::pair<int,int> &b)
+static bool sortbysec(const std::pair<int, int>& a, const std::pair<int, int>& b)
 {
   return (a.second < b.second);
 }
@@ -813,7 +809,7 @@ bool Database::serialize(const String& file_name) const
     {
       // Get size of each dimension
       VectorInt nx = _pgrid.getNx();
-      int ndim = nx.size();
+      int ndim     = nx.size();
       VectorInt dim_size(ndim);
       for (int i = 0; i < ndim; i++)
       {
@@ -823,44 +819,44 @@ bool Database::serialize(const String& file_name) const
       for (int i = 0; i < ndim; i++)
       {
         String name = "dim_grid" + std::to_string(i);
-        NcDim dim = sfc.addDim(name,dim_size[i]);
-        //Define the dimensions
+        NcDim dim   = sfc.addDim(name, dim_size[i]);
+        // Define the dimensions
         dims.push_back(dim);
 
-        //Define Coordinate netCDF variables
+        // Define Coordinate netCDF variables
         variable.push_back(sfc.addVar(name, ncDouble, dims[i]));
         /// TODO : Add Serialize / Deserialize to ParamGrid class
-        variable[i].putAtt("nx",ncInt,_pgrid.getNx()[i]);
-        variable[i].putAtt("dx",ncDouble,_pgrid.getDx()[i]);
-        variable[i].putAtt("x0",ncDouble,_pgrid.getX0()[i]);
-        variable[i].putAtt("rot",ncDouble,_pgrid.getRotation()[i]);
-        //write the coordinate variable Data
+        variable[i].putAtt("nx", ncInt, _pgrid.getNx()[i]);
+        variable[i].putAtt("dx", ncDouble, _pgrid.getDx()[i]);
+        variable[i].putAtt("x0", ncDouble, _pgrid.getX0()[i]);
+        variable[i].putAtt("rot", ncDouble, _pgrid.getRotation()[i]);
+        // write the coordinate variable Data
         /// TODO : Really needed ?
         variable[i].putVar(_pgrid.getValues(i).data());
       }
     }
     else
     {
-      NcDim mydim= sfc.addDim("nSamples",getNSamples());
+      NcDim mydim = sfc.addDim("nSamples", getNSamples());
       dims.push_back(mydim);
     }
 
-    //add each variable to the netcdf file  and create an attribute role with corresponding role
+    // add each variable to the netcdf file  and create an attribute role with corresponding role
     for (int i = 0; i < (int)getNVars(); i++)
     {
-      NcVar var = _vars[i]->serialize(sfc, dims);
-      std::pair<ERoles,int> pair = getRoleAndIRole(_vars[i]->getName());
-      var.putAtt("role",ncInt ,(int)pair.first.getValue());
-      var.putAtt("irole",ncInt, pair.second);
+      NcVar var                   = _vars[i]->serialize(sfc, dims);
+      std::pair<ERoles, int> pair = getRoleAndIRole(_vars[i]->getName());
+      var.putAtt("role", ncInt, (int)pair.first.getValue());
+      var.putAtt("irole", ncInt, pair.second);
     }
-    return(true);
+    return (true);
   }
-  catch(NcException& e)
+  catch (NcException& e)
   {
     e.what();
     return (false);
   }
-  return(true);
+  return (true);
 }
 
 /**
@@ -871,7 +867,7 @@ bool Database::serialize(const String& file_name) const
  * \remark  actually working For Database and grid (pgrid as argument of DB)
  *
  */
-//:TODO: When Deserialize , variable will be sort alphabetically by name in Database
+//: TODO: When Deserialize , variable will be sort alphabetically by name in Database
 // That's due to the way Netcdf store attribute by attribute
 bool Database::deserialize(const String& filename)
 {
@@ -884,19 +880,19 @@ bool Database::deserialize(const String& filename)
     VectorDouble vec_dx;
     VectorDouble vec_x0;
     VectorDouble vec_rot;
-    std::vector<std::vector<std::pair<int,int>>> info_roles(ERoles::getSize()); // used after the treatment of all variable
+    std::vector<std::vector<std::pair<int, int>>> info_roles(ERoles::getSize()); // used after the treatment of all variable
     // vector of size ROLEMAX. each element concern a role
     // for each role, there is a vector containing the index of the variable and the index of role rank.
     auto vars = datafile.getVars();
-    int ivar = 0;
-    for(auto pvar : vars)
+    int ivar  = 0;
+    for (auto pvar: vars)
     {
       String vname = pvar.first;
-      NcVar var = pvar.second;
+      NcVar var    = pvar.second;
 
       if (vname.find("dim_grid") != std::string::npos)
       {
-        //recup data from netcdf variablesi
+        // recup data from netcdf variablesi
         _isGrid = true;
         NcVarAtt att;
 
@@ -922,7 +918,7 @@ bool Database::deserialize(const String& filename)
       }
       else
       {
-        //get type attribute
+        // get type attribute
         NcVarAtt att_type;
         String type;
         att_type = var.getAtt("type");
@@ -932,52 +928,51 @@ bool Database::deserialize(const String& filename)
         int role;
         att_role = var.getAtt("role");
         att_role.getValues(&role);
-        //get irole attribute and fill info_role
+        // get irole attribute and fill info_role
         NcVarAtt att_irole;
         int irole;
         att_irole = var.getAtt("irole");
         att_irole.getValues(&irole);
-        std::cout <<role<< std::endl;
+        std::cout << role << std::endl;
         if (role != ERoles::NOROLE.getValue())
-        info_roles[role].push_back(std::make_pair(ivar,irole));
+          info_roles[role].push_back(std::make_pair(ivar, irole));
 
         AVariable* v = AVariable::createVariable(type, vname);
-        v->deserialize(datafile,var);
+        v->deserialize(datafile, var);
         addVar(v, ERoles::fromValue(role));
         ivar++;
       }
     }
     // set Role in good order in Database, process role after role
     int role = 0;
-    for (auto info_role : info_roles)
+    for (auto info_role: info_roles)
     {
-      if(info_role.size() > 1)
+      if (info_role.size() > 1)
       {
         // sort variable with current role, sort is done by second element of the pair: irole.
-        std::sort(info_role.begin(),info_role.end(),sortbysec);
+        std::sort(info_role.begin(), info_role.end(), sortbysec);
 
         // Create list of name for setRole method
         VectorString list_name;
         for (const auto& p: info_role)
-        list_name.push_back(_vars[p.first]->getName());
-        //setRole
+          list_name.push_back(_vars[p.first]->getName());
+        // setRole
         setRole(list_name, ERoles::fromValue(role));
       }
     }
     // Create ParamGrid
     if (_isGrid)
     {
-      VectorDouble rotation
-      { 0};
-      ParamGrid pgrid(vec_nx, vec_x0, vec_dx, vec_rot ,ELoadBy::COLUMN);
-      _pgrid=pgrid;
+      VectorDouble rotation {0};
+      ParamGrid pgrid(vec_nx, vec_x0, vec_dx, vec_rot, ELoadBy::COLUMN);
+      _pgrid = pgrid;
     }
   }
-  catch(NcException& e)
+  catch (NcException& e)
   {
     e.what();
   }
-  return(true);
+  return (true);
 }
 
 #endif

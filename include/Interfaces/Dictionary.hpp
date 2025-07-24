@@ -1,32 +1,36 @@
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "Interfaces/Category.hpp"
-#include "Interfaces/interface_d.hpp"
+#include "gstlearn_export.hpp"
 
 #include <vector>
-#include <string>
+
+namespace gstlrn
+{
 
 class GSTLEARN_EXPORT Dictionary
 {
-  public:
-    Dictionary();
-    Dictionary(const String&name);
-    virtual ~Dictionary();
-    
-    const String& getName() const;
-    const Category& getUndefCategory() const;
-    
-    const Category& getCategory(int value) const;
-    const Category& getCategory(const String& label) const;
-    void  addCategory(int value, const String& label);
-    bool  hasCategory(int value) const;
-    bool  hasCategory(const String& label) const;
-    bool  hasCategory(const Category& cat) const;
+public:
+  Dictionary() = default;
+  Dictionary(const String& name)
+    : _name {name}
+  {
+  }
 
-  private:
-    String _name;
-    Category _undefCategory;
-    std::vector<Category> _categories;
+  const String& getName() const { return _name; }
+  const Category& getUndefCategory() const { return _undefCategory; }
+
+  const Category& getCategory(const int value) const;
+  const Category& getCategory(const String& label) const;
+  void addCategory(const int value, const String& label);
+  bool hasCategory(const int value) const;
+  bool hasCategory(const String& label) const;
+  bool hasCategory(const Category& cat) const;
+
+private:
+  String _name;
+  Category _undefCategory;
+  std::vector<Category> _categories;
 };
 
+} // namespace gstlrn

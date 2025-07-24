@@ -10,35 +10,35 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "Interfaces/AVariableTemplate.hpp"
-#include "Interfaces/interface_d.hpp"
+#include "gstlearn_export.hpp"
 
-#include <string>
-#include <vector>
-#include <iostream>
-
-class GSTLEARN_EXPORT VariableDouble : public AVariableTemplate<double>
+namespace gstlrn
 {
-  public:
-    VariableDouble();
-    VariableDouble(const String &name);
-    VariableDouble(const VectorDouble& values);
-    VariableDouble(const VariableDouble& ref);
-    virtual ~VariableDouble();
-    VariableDouble& operator=(const VariableDouble& ref);
 
-    /// Cloneable interface
-    IMPLEMENT_CLONING(VariableDouble)
+class GSTLEARN_EXPORT VariableDouble: public AVariableTemplate<double>
+{
+public:
+  VariableDouble();
+  VariableDouble(const String& name);
+  VariableDouble(const VectorDouble& values);
+  VariableDouble(const VariableDouble& ref);
+  virtual ~VariableDouble();
+  VariableDouble& operator=(const VariableDouble& ref);
 
-    VectorDouble            getValues() const override;
+  /// Cloneable interface
+  IMPLEMENT_CLONING(VariableDouble)
+
+  VectorDouble getValues() const override;
 
 #ifdef _USE_NETCDF
-    netCDF::NcVar serialize(netCDF::NcFile& file, std::vector<netCDF::NcDim>& dims) const override;
-    void deserialize(const netCDF::NcFile& file,const netCDF::NcVar& var) override;
+  netCDF::NcVar serialize(netCDF::NcFile& file, std::vector<netCDF::NcDim>& dims) const override;
+  void deserialize(const netCDF::NcFile& file, const netCDF::NcVar& var) override;
 #endif
 
-    //bool                  isUndefined(int i) const override;
+  // bool                  isUndefined(int i) const override;
 
-  private:
+private:
 };
+
+} // namespace gstlrn

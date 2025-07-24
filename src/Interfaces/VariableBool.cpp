@@ -1,22 +1,24 @@
 #include "Interfaces/VariableBool.hpp"
 
+using namespace gstlrn;
+
 VariableBool::VariableBool()
-    : AVariableTemplate()
+  : AVariableTemplate()
 {
 }
 
-VariableBool::VariableBool(const String &name)
-    : AVariableTemplate(name)
+VariableBool::VariableBool(const String& name)
+  : AVariableTemplate(name)
 {
 }
 
 VariableBool::VariableBool(const VectorBool& values)
-    : AVariableTemplate("", values)
+  : AVariableTemplate("", values)
 {
 }
 
 VariableBool::VariableBool(const VariableBool& ref)
-    : AVariableTemplate(ref)
+  : AVariableTemplate(ref)
 {
 }
 
@@ -24,7 +26,7 @@ VariableBool& VariableBool::operator=(const VariableBool& ref)
 {
   if (this != &ref)
   {
-    _name = ref._name;
+    _name   = ref._name;
     _values = ref._values;
   }
   return (*this);
@@ -81,8 +83,8 @@ void VariableBool::deserialize(const netCDF::NcFile& file, const netCDF::NcVar& 
   std::vector<netCDF::NcDim> dims;
   int size = 1;
 
-  dims= var.getDims();
-  for (const auto& dim:dims)
+  dims = var.getDims();
+  for (const auto& dim: dims)
     size *= dim.getSize();
 
   VectorDouble val(size);

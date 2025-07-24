@@ -1,50 +1,10 @@
 #include "Interfaces/AVariable.hpp"
-#include "Interfaces/VariableDouble.hpp"
 #include "Interfaces/VariableBool.hpp"
+#include "Interfaces/VariableDouble.hpp"
 #include "Interfaces/VariableInt.hpp"
 #include "Interfaces/VariableString.hpp"
 
-AVariable::AVariable()
-    : AStringable(),
-      _name(UNDEF_STRING)
-{
-}
-
-AVariable::AVariable(const String &name)
-    : AStringable(),
-      _name(name)
-{
-}
-
-AVariable::AVariable(const AVariable &ref)
-    : AStringable(ref),
-      _name(ref._name)
-{
-}
-
-AVariable::~AVariable()
-{
-}
-
-AVariable& AVariable::operator=(const AVariable &ref)
-{
-  if (this != &ref)
-  {
-    AStringable::operator=(ref);
-    _name = ref._name;
-  }
-  return (*this);
-}
-
-void AVariable::setName(const String&name)
-{
-  _name = name;
-}
-
-const String& AVariable::getName() const
-{
-  return _name;
-}
+using namespace gstlrn;
 
 /**
  * Create a variable with appropriate type
@@ -55,28 +15,24 @@ const String& AVariable::getName() const
  *
  * @remark: if type does not match any existing type, an exception is throw
  */
-AVariable* AVariable::createVariable(const String& type, const String& name)
+std::unique_ptr<AVariable> AVariable::createVariable(const String& type, const String& name)
 {
-  AVariable* new_var;
-  if (!type.compare("int"))
+  if (type == "int")
   {
-    new_var = new VariableInt(name);
+    return std::make_unique<VariableInt>(name);
   }
-  else if (!type.compare("bool"))
+  if (type == "bool")
   {
-    new_var = new VariableBool(name);
+    return std::make_unique<VariableBool>(name);
   }
-  else if (!type.compare("double"))
+  if (type == "double")
   {
-    new_var = new VariableDouble(name);
+    return std::make_unique<VariableDouble>(name);
   }
-  else if (!type.compare("string"))
+  if (type == "string")
   {
-    new_var = new VariableString(name);
+    return std::make_unique<VariableString>(name);
   }
-  else
-  {
-    throw("Wrong variable type");
-  }
-  return new_var;
+
+  throw("Wrong variable type");
 }

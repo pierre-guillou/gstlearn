@@ -10,44 +10,49 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
-#include "Interfaces/interface_d.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/ICloneable.hpp"
+#include "Interfaces/interface_d.hpp"
+#include "gstlearn_export.hpp"
 
-#include <string>
-#include <vector>
+#include <memory>
 
-#ifdef _USE_NETCDF
-#include <netcdf>
-#endif
+namespace gstlrn
+{
 
 class VariableDouble;
 class VariableBool;
 class VariableInt;
 class VariableString;
 
-class GSTLEARN_EXPORT AVariable : public AStringable, public ICloneable
+class GSTLEARN_EXPORT AVariable: public AStringable, public ICloneable
 {
 public:
-  AVariable();
-  AVariable(const String& name);
-  AVariable(const AVariable& ref);
-  virtual ~AVariable();
-  AVariable& operator=(const AVariable& ref);
+  AVariable() = default;
+  AVariable(const String& name)
+    : AStringable()
+    , _name(name)
+  {
+  }
+  ~AVariable() = default;
 
-  virtual unsigned int getNValues() const = 0;
-  virtual VectorDouble getValues() const = 0;
+  virtual size_t getNValues() const = 0;
+  virtual VectorDouble getValues() const  = 0;
 
-#ifdef _USE_NETCDF
-  virtual netCDF::NcVar serialize(netCDF::NcFile& file, std::vector<netCDF::NcDim>& dims) const = 0;
-  virtual void deserialize(const netCDF::NcFile& file, const netCDF::NcVar &var) = 0;
-#endif
+  static std::unique_ptr<AVariable> createVariable(const String& type, const String& name);
 
-  static AVariable* createVariable(const String& type, const String& name);
-  void setName(const String& name);
+  void setName(const String& name)
+  {
+    _name = name;
+  }
 
-  const String& getName() const;
+  const String& getName() const
+  {
+    return _name;
+  }
+
 protected:
-  String _name;
+  String _name {UNDEF_STRING};
 };
+
+} // namespace gstlrn

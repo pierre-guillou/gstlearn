@@ -10,73 +10,58 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
-#include "Interfaces/interface_d.hpp"
 #include "Interfaces/AVariable.hpp"
+#include "gstlearn_export.hpp"
 
 #include <iostream>
-#include <string>
 #include <vector>
-#include <sstream>
+
+namespace gstlrn
+{
 
 template<class T>
-class GSTLEARN_EXPORT AVariableTemplate : public AVariable
+class GSTLEARN_EXPORT AVariableTemplate: public AVariable
 {
-  public:
+public:
+  AVariableTemplate()
+    : AVariable()
+    , _values()
+  {
+  }
+  AVariableTemplate(const String& name)
+    : AVariable(name)
+    , _values()
+  {
+  }
+  AVariableTemplate(const String& name, const std::vector<T>& values)
+    : AVariable(name)
+    , _values(values)
+  {
+  }
 
-    AVariableTemplate() : AVariable(), _values() {}
-    AVariableTemplate(const String& name) : AVariable(name), _values() {}
-    AVariableTemplate(const String& name, std::vector<T> values) : AVariable(name), _values(values) {}
-    AVariableTemplate(const AVariableTemplate& ref) : AVariable(ref), _values(ref._values) {}
-    AVariableTemplate& operator=(const AVariableTemplate& ref)
+  size_t getNValues() const override { return _values.size(); }
+
+  virtual void resize(const size_t n, const T& val) { _values.resize(n, val); }
+
+  virtual void setValue(const size_t i, const T& val) { _values.at(i) = val; }
+
+  virtual void setValues(const std::vector<T>& values) { _values = values; }
+
+  T getValueAsType(const size_t i) const { return _values.at(i); }
+
+  virtual const std::vector<T>& getValuesAsType() const { return _values; }
+
+  virtual void display_old() const
+  {
+    std::cout << "Variable " << _name << " :\n";
+    for (size_t i = 0; i < _values.size(); i++)
     {
-      if (this != &ref)
-      {
-        _name = ref._name;
-        _values = ref._values;
-        
-      }
-      return(*this);
+      std::cout << "  var[" << i << "]=" << _values[i] << " (" << _values[i] << ")\n";
     }
+  }
 
-    virtual ~AVariableTemplate()
-    {
-    }
-
-    unsigned int getNValues() const override { return (unsigned int) _values.size(); }
-
-    //bool isUndefined(int i) const { return getUndef<T>() == getValueAsType(i); }
-    virtual void resize(int n, const T& val) { _values.resize(n, val); }
-
-    virtual void setValue(int i, const T& val) { _checkIdx(i); _values[i] = val; }
-    
-    virtual void setValues(const std::vector<T>& values) { _values = values; }
-
-    T getValueAsType(int i) const { _checkIdx(i); return _values[i]; }
-
-    virtual const std::vector<T>& getValuesAsType() const { return _values; }
-
-    virtual void display_old() const
-    {
-      VectorDouble vals = getValues();
-      std::cout << "Variable " << _name << " :" << std::endl;
-
-      for (int i=0, n=(int) _values.size(); i<n; i++)
-      {
-        std::stringstream sstr;
-        sstr << "  var[" << i << "]=" << _values[i] << " (" << vals[i] << ")";
-        std::cout << sstr.str() << std::endl;
-      }
-    }
-
-  private:
-    void _checkIdx(int i) const
-    {
-      if (i < 0 || i >= (int)_values.size())
-        throw("Index out of range");
-    }
-
-  protected:
-    std::vector<T> _values;
+protected:
+  std::vector<T> _values;
 };
 
+} // namespace gstlrn

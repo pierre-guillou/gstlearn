@@ -359,4 +359,14 @@ set(SRC
   Tree/KNN.cpp
   Tree/ball_algorithm.cpp
   Tree/neighbors_heap.cpp
+  Interfaces/AVariable.cpp
+  Interfaces/Category.cpp
+  Interfaces/Dictionary.cpp
+  Interfaces/ParamCSV.cpp
+  Interfaces/ParamGrid.cpp
+  Interfaces/VariableBool.cpp
+  Interfaces/VariableCategorical.cpp
+  Interfaces/VariableDouble.cpp
+  Interfaces/VariableInt.cpp
+  Interfaces/VariableString.cpp
 )

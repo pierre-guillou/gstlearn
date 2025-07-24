@@ -2,23 +2,25 @@
 
 #include <sstream>
 
+using namespace gstlrn;
+
 VariableString::VariableString()
-    : AVariableTemplate()
+  : AVariableTemplate()
 {
 }
 
-VariableString::VariableString(const String &name)
-    : AVariableTemplate(name)
+VariableString::VariableString(const String& name)
+  : AVariableTemplate(name)
 {
 }
 
 VariableString::VariableString(const VectorString& values)
-    : AVariableTemplate("", values)
+  : AVariableTemplate("", values)
 {
 }
 
 VariableString::VariableString(const VariableString& ref)
-    : AVariableTemplate(ref)
+  : AVariableTemplate(ref)
 {
 }
 
@@ -26,7 +28,7 @@ VariableString& VariableString::operator=(const VariableString& ref)
 {
   if (this != &ref)
   {
-    _name = ref._name;
+    _name   = ref._name;
     _values = ref._values;
   }
   return (*this);
@@ -43,7 +45,7 @@ VariableString::~VariableString()
 VectorDouble VariableString::getValues() const
 {
   VectorDouble vals;
-  for (const auto& val : _values)
+  for (const auto& val: _values)
   {
     double dval = UNDEF_DOUBLE;
     std::stringstream sstr(val);
@@ -69,12 +71,12 @@ VectorDouble VariableString::getValues() const
  * @remark     Values as to be convert to Vector<char*> before getting add to
  *             the NcVar
  */
-netCDF::NcVar VariableString::serialize(netCDF::NcFile &file, std::vector<netCDF::NcDim>& dims) const
+netCDF::NcVar VariableString::serialize(netCDF::NcFile& file, std::vector<netCDF::NcDim>& dims) const
 {
   // Convert VectorString to Vector<char*>
   std::vector<char*> cstring;
   VectorString v_string = getValuesAsType();
-  for (auto& str : v_string)
+  for (auto& str: v_string)
   {
     cstring.push_back(&str.front());
   }
@@ -101,7 +103,7 @@ void VariableString::deserialize(const netCDF::NcFile& file, const netCDF::NcVar
   int size = 1;
 
   dims = var.getDims();
-  for (const auto& dim:dims)
+  for (const auto& dim: dims)
     size *= dim.getSize();
 
   std::vector<char*> cstring(size);
@@ -111,4 +113,3 @@ void VariableString::deserialize(const netCDF::NcFile& file, const netCDF::NcVar
   setValues(value);
 }
 #endif
-

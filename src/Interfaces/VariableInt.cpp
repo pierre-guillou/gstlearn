@@ -1,22 +1,24 @@
 #include "Interfaces/VariableInt.hpp"
 
+using namespace gstlrn;
+
 VariableInt::VariableInt()
-    : AVariableTemplate()
+  : AVariableTemplate()
 {
 }
 
-VariableInt::VariableInt(const String &name)
-    : AVariableTemplate(name)
+VariableInt::VariableInt(const String& name)
+  : AVariableTemplate(name)
 {
 }
 
 VariableInt::VariableInt(const VectorInt& values)
-    : AVariableTemplate("", values)
+  : AVariableTemplate("", values)
 {
 }
 
 VariableInt::VariableInt(const VariableInt& ref)
-    : AVariableTemplate(ref)
+  : AVariableTemplate(ref)
 {
 }
 
@@ -24,7 +26,7 @@ VariableInt& VariableInt::operator=(const VariableInt& ref)
 {
   if (this != &ref)
   {
-    _name = ref._name;
+    _name   = ref._name;
     _values = ref._values;
   }
   return (*this);
@@ -68,13 +70,13 @@ netCDF::NcVar VariableInt::serialize(netCDF::NcFile& file, std::vector<netCDF::N
  * @param[in]  file   netCDF file we read from
  * @param[in]  dims   Vector of dimensions associate to Variable
  */
-void VariableInt::deserialize(const netCDF::NcFile& file,const netCDF::NcVar &var)
+void VariableInt::deserialize(const netCDF::NcFile& file, const netCDF::NcVar& var)
 {
   std::vector<netCDF::NcDim> dims;
   int size = 1;
 
-  dims= var.getDims();
-  for (const auto& dim:dims)
+  dims = var.getDims();
+  for (const auto& dim: dims)
     size *= dim.getSize();
 
   VectorInt val(size);
@@ -82,4 +84,3 @@ void VariableInt::deserialize(const netCDF::NcFile& file,const netCDF::NcVar &va
   setValues(val);
 }
 #endif
-

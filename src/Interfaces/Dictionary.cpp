@@ -1,81 +1,47 @@
 #include "Interfaces/Dictionary.hpp"
 
-Dictionary::Dictionary()
-{
-}
+using namespace gstlrn;
 
-Dictionary::Dictionary(const String& name): _name(name)
+const Category& Dictionary::getCategory(const int value) const
 {
-}
-
-Dictionary::~Dictionary()
-{
-}
-
-const String& Dictionary::getName() const
-{
-  return (_name);
-}
-
-const Category& Dictionary::getUndefCategory() const
-{
-  return (_undefCategory);
-}
-
-const Category& Dictionary::getCategory(int value) const
-{
-  for (unsigned int i = 0; i < _categories.size(); i++)
+  for (const auto& el: _categories)
   {
-    if (_categories[i].getValue()== value)
+    if (el.getValue() == value)
     {
-      return (_categories[i]);
+      return el;
     }
   }
-  return (_undefCategory);
+  return _undefCategory;
 }
 
 const Category& Dictionary::getCategory(const String& label) const
 {
-  for (unsigned int i = 0; i < _categories.size(); i++)
+  for (const auto& el: _categories)
   {
-    if (_categories[i].getLabel() == label)
+    if (el.getLabel() == label)
     {
-      return (_categories[i]);
+      return el;
     }
   }
-  return (_undefCategory);
+  return _undefCategory;
 }
 
 void Dictionary::addCategory(int value, const String& label)
 {
-  if ( !hasCategory(value) && !hasCategory(label))
+  if (!hasCategory(value) && !hasCategory(label))
   {
-    _categories.push_back(Category(value,label));
+    _categories.emplace_back(value, label);
   }
 }
 
-bool Dictionary::hasCategory(int value) const
+bool Dictionary::hasCategory(const int value) const
 {
-  for (const auto& cat: _categories)
-  {
-    if (cat.getValue() == value)
-    {
-      return (true);
-    }
-  }
-  return (false);
+  return getCategory(value) != _undefCategory;
 }
 
 bool Dictionary::hasCategory(const String& label) const
 {
-  for (const auto& cat: _categories)
-  {
-    if (cat.getLabel() == label)
-    {
-      return (true);
-    }
-  }
-  return (false);
+  return getCategory(label) != _undefCategory;
 }
 
 bool Dictionary::hasCategory(const Category& cat) const
