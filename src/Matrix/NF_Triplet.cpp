@@ -9,7 +9,6 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Matrix/NF_Triplet.hpp"
-#include "Matrix/LinkMatrixSparse.hpp"
 
 namespace gstlrn
 {

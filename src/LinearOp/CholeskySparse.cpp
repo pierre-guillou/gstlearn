@@ -9,7 +9,6 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/CholeskySparse.hpp"
-#include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include <Eigen/src/Core/Matrix.h>
 

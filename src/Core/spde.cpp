@@ -1870,17 +1870,20 @@ static int st_simu_subtract_data(int ncur,
  **
  ** \param[in]  QCtd        Pointer to QChol structure (target-data)
  ** \param[in]  data        Input array (Dimension: ndata)
- ** \param[in]  ntarget     Number of target values
  **
  ** \param[out] rhs         Output array  (Dimension: ntarget)
  **
  *****************************************************************************/
 static void st_kriging_one_rhs(QChol* QCtd,
                                double* data,
-                               int ntarget,
                                double* rhs)
 {
-  QCtd->Q->prodVecMatInPlacePtr(data, rhs, false);
+  int ndata   = qchol_getNCols(QCtd);
+  int ntarget = qchol_getNCols(QCtd);
+
+  constvect cdata(data, ndata);
+  vect crhs(rhs, ntarget);
+  QCtd->Q->prodVecMatInPlaceC(cdata, crhs, false);
   for (int i = 0; i < ntarget; i++)
     rhs[i] = -rhs[i];
 }
@@ -3761,7 +3764,7 @@ static int st_kriging_one(double* data, double* rhs, VectorDouble& work, double*
 
   /* Define the Right-hand side */
 
-  st_kriging_one_rhs(qsimu->QCtd, data, ntarget, rhs);
+  st_kriging_one_rhs(qsimu->QCtd, data, rhs);
 
   /* Solve the Kriging system */
 
@@ -3810,6 +3813,7 @@ static int st_kriging_several_rhs(double* data,
   temp = (double*)mem_alloc(sizeof(double) * size, 0);
   if (temp == nullptr) goto label_end;
 
+
   /* Constitute the RHS */
 
   for (int icov = 0; icov < ncova; icov++)
@@ -3834,7 +3838,9 @@ static int st_kriging_several_rhs(double* data,
           // E_ij * Z_j
           B0 = st_extract_Q1_nugget(ivar, jvar, &nrows, &ncols);
           if (B0 == nullptr) goto label_end;
-          B0->prodVecMatInPlacePtr(&DATA(jvar, 0), temp, false);
+          constvect cdata(&DATA(jvar, 0), ndata);
+          vect ctemp(temp, size);
+          B0->prodVecMatInPlaceC(cdata, ctemp, false);
           for (int i = 0; i < nrows; i++)
             work[i] += temp[i];
           delete B0;
@@ -3861,7 +3867,9 @@ static int st_kriging_several_rhs(double* data,
             // Q1_td_ij * Z_j
             B0 = st_extract_Q1_hetero(ivar, jvar, 2, 1, &nrows, &ncols);
             if (B0 == nullptr) goto label_end;
-            B0->prodVecMatInPlacePtr(&DATA(jvar, 0), temp, false);
+            constvect cdata(&DATA(jvar, 0), ndata);
+            vect ctemp(temp, size);
+            B0->prodVecMatInPlaceC(cdata, ctemp, false);
             for (int i = 0; i < nrows; i++)
               work[i] += temp[i];
             delete B0;
@@ -3877,7 +3885,9 @@ static int st_kriging_several_rhs(double* data,
             // Q1_dd_ij * Z_j
             B0 = st_extract_Q1_hetero(ivar, jvar, 1, 1, &nrows, &ncols);
             if (B0 == nullptr) goto label_end;
-            B0->prodVecMatInPlacePtr(&DATA(jvar, 0), temp, false);
+            constvect cdata(&DATA(jvar, 0), ndata);
+            vect ctemp(temp, size);
+            B0->prodVecMatInPlaceC(cdata, ctemp, false);
             for (int i = 0; i < nrows; i++)
               work[i] += temp[i];
             delete B0;
@@ -3936,7 +3946,7 @@ static int st_kriging_several_loop(int flag_crit,
                                    double* crit)
 {
   MatrixSparse *tAicov, *Ajcov, *Bf, *B2, *B0, *Qicov;
-  int ncova, nvar, ncur, nicur, error, nrows, ncols, signe;
+  int ncova, nvar, ncur, nicur, error, nrows, ncols, signe, size;
 
   /* Initializations */
 
@@ -3944,6 +3954,7 @@ static int st_kriging_several_loop(int flag_crit,
   ncova  = st_get_ncova();
   nvar   = S_ENV.nvar;
   ncur   = st_get_nvertex_max();
+  size   = st_get_dimension();
   tAicov = Bf = B2 = B0 = Qicov = nullptr;
 
   /* Loop on the first covariance */
@@ -3979,7 +3990,9 @@ static int st_kriging_several_loop(int flag_crit,
           if (st_is_model_nugget())
           {
             // Sill(icov)_ij * Q(icov) * X_j
-            Qicov->prodVecMatInPlacePtr(&XCUR(icov, jvar, 0), rhsloc, false);
+            constvect cxcur(&XCUR(icov, jvar, 0), ncur);
+            vect crhsloc(rhsloc, nicur);
+            Qicov->prodVecMatInPlaceC(cxcur, crhsloc, false);
             for (int icur = 0; icur < nicur; icur++)
               rhsloc[icur] *= st_get_isill(icov, ivar, jvar);
           }
@@ -3989,13 +4002,17 @@ static int st_kriging_several_loop(int flag_crit,
             {
               // Q1_tt_ij * X_j
               B0 = st_extract_Q1_hetero(ivar, jvar, 2, 2, &nrows, &ncols);
-              B0->prodVecMatInPlacePtr(&XCUR(icov, jvar, 0), rhsloc, false);
+              constvect cxcur(&XCUR(icov, jvar, 0), ncur);
+              vect crhsloc(rhsloc, nicur);
+              B0->prodVecMatInPlaceC(cxcur, crhsloc, false);
               delete B0;
             }
             else
             {
               // Sill(icov)_ij * Q(icov) * X_j
-              Qicov->prodVecMatInPlacePtr(&XCUR(icov, jvar, 0), rhsloc, false);
+              constvect cxcur(&XCUR(icov, jvar, 0), ncur);
+              vect crhsloc(rhsloc, nicur);
+              Qicov->prodVecMatInPlaceC(cxcur, crhsloc, false);
               for (int icur = 0; icur < nicur; icur++)
                 rhsloc[icur] *= st_get_isill(icov, ivar, jvar);
             }
@@ -4052,8 +4069,11 @@ static int st_kriging_several_loop(int flag_crit,
             if (st_is_model_nugget())
             {
               // A^t(icov) * E_ij * A(jcov) * X_j
-              Ajcov->prodVecMatInPlacePtr(&XCUR(jcov, jvar, 0), work.data(), false);
-              Bf->prodVecMatInPlacePtr(work.data(), rhsloc, false);
+              constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
+              vect cwork(work.data(), size);
+              Ajcov->prodVecMatInPlaceC(cxcur, cwork, false);
+              vect crhsloc(rhsloc, nicur);
+              Bf->prodVecMatInPlaceC(cwork, crhsloc, false);
               signe = 1;
             }
             else
@@ -4062,23 +4082,32 @@ static int st_kriging_several_loop(int flag_crit,
               {
                 // -A^t(icov) * Q1_dt_ij * X_j
                 B0 = st_extract_Q1_hetero(ivar, jvar, 1, 2, &nrows, &ncols);
-                B0->prodVecMatInPlacePtr(&XCUR(jcov, jvar, 0), work.data(), false);
-                tAicov->prodVecMatInPlacePtr(work.data(), rhsloc, false);
+                constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
+                vect cwork(work.data(), size);
+                B0->prodVecMatInPlaceC(cxcur, cwork, false);
+                vect crhsloc(rhsloc, nicur);
+                tAicov->prodVecMatInPlaceC(cwork, crhsloc, false);
                 delete B0;
                 signe = -1;
               }
               else if (icov == 0 && jcov > 0)
               {
                 // -Q1_td_ij * A(jcov) * X_j
-                Ajcov->prodVecMatInPlacePtr(&XCUR(jcov, jvar, 0), work.data(), false);
-                Bf->prodVecMatInPlacePtr(work.data(), rhsloc, false);
+                constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
+                vect cwork(work.data(), size);
+                Ajcov->prodVecMatInPlaceC(cxcur, cwork, false);
+                vect crhsloc(rhsloc, nicur);
+                Bf->prodVecMatInPlaceC(cwork, crhsloc, false);
                 signe = -1;
               }
               else if (icov > 0 && jcov > 0)
               {
                 // A^t(icov) * Q1_dd_ij * A(jcov) * X_j
-                Ajcov->prodVecMatInPlacePtr(&XCUR(jcov, jvar, 0), work.data(), false);
-                Bf->prodVecMatInPlacePtr(work.data(), rhsloc, false);
+                constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
+                vect cwork(work.data(), size);
+                Ajcov->prodVecMatInPlaceC(cxcur, cwork, false);
+                vect crhsloc(rhsloc, nicur);
+                Bf->prodVecMatInPlaceC(cwork, crhsloc, false);
                 signe = +1;
               }
             }
@@ -8619,7 +8648,11 @@ int m2d_gibbs_spde(Db* dbin,
       /* Project from vertices to grid nodes */
 
       for (int ilayer = 0; ilayer < nlayer; ilayer++)
-        Bproj->prodVecMatInPlacePtr(&YVERT(ilayer, 0), &GWORK(ilayer, 0), false);
+      {
+        constvect cyvert(&YVERT(ilayer, 0), nvertex);
+        vect cgwork(&GWORK(ilayer, 0), ngrid);
+        Bproj->prodVecMatInPlaceC(cyvert, cgwork, false);
+      }
 
       /* Convert from Gaussian to Depth */
 

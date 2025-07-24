@@ -168,34 +168,34 @@ void MatrixDense::_transposeInPlace()
   _setNRows(ncols);
 }
 
-void MatrixDense::_addProdMatVecInPlacePtr(const double* x, double* y, bool transpose) const
+void MatrixDense::_addProdMatVecInPlacePtr(constvect x, vect y, bool transpose) const
 {
   if (transpose)
   {
-    Eigen::Map<const Eigen::VectorXd> xm(x, getNRows());
-    Eigen::Map<Eigen::VectorXd> ym(y, getNCols());
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNRows());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNCols());
     ym.noalias() += eigenMat().transpose() * xm;
   }
   else
   {
-    Eigen::Map<const Eigen::VectorXd> xm(x, getNCols());
-    Eigen::Map<Eigen::VectorXd> ym(y, getNRows());
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNCols());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNRows());
     ym.noalias() += eigenMat() * xm;
   }
 }
 
-void MatrixDense::_addProdVecMatInPlacePtr(const double* x, double* y, bool transpose) const
+void MatrixDense::_addProdVecMatInPlacePtr(constvect x, vect y, bool transpose) const
 {
   if (transpose)
   {
-    Eigen::Map<const Eigen::VectorXd> xm(x, getNCols());
-    Eigen::Map<Eigen::VectorXd> ym(y, getNRows());
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNCols());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNRows());
     ym.noalias() += xm.transpose() * eigenMat().transpose();
   }
   else
   {
-    Eigen::Map<const Eigen::VectorXd> xm(x, getNRows());
-    Eigen::Map<Eigen::VectorXd> ym(y, getNCols());
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNRows());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNCols());
     ym.noalias() += xm.transpose() * eigenMat();
   }
 }
@@ -364,8 +364,8 @@ void MatrixDense::prodNormMatMatInPlace(const AMatrix* a,
                            m, 0, false,
                            a, 0, !transpose)) return;
 
-  const MatrixDense* am = dynamic_cast<const MatrixDense*>(a);
-  const MatrixDense* mm = dynamic_cast<const MatrixDense*>(m);
+  const auto* am = dynamic_cast<const MatrixDense*>(a);
+  const auto* mm = dynamic_cast<const MatrixDense*>(m);
   if (am == nullptr || mm == nullptr)
   {
     AMatrix::prodNormMatMatInPlace(a, m, transpose);
@@ -397,7 +397,7 @@ void MatrixDense::prodNormMatVecInPlace(const AMatrix* a, const VectorDouble& ve
                            a, 0, transpose,
                            a, 0, !transpose)) return;
 
-  const MatrixDense* am = dynamic_cast<const MatrixDense*>(a);
+  const auto* am = dynamic_cast<const MatrixDense*>(a);
   if (am == nullptr)
   {
     AMatrix::prodNormMatVecInPlace(a, vec, transpose);
@@ -424,7 +424,7 @@ void MatrixDense::prodNormMatInPlace(const AMatrix* a, bool transpose)
                            a, 0, transpose,
                            a, 0, !transpose)) return;
 
-  const MatrixDense* am = dynamic_cast<const MatrixDense*>(a);
+  const auto* am = dynamic_cast<const MatrixDense*>(a);
   if (am == nullptr)
   {
     AMatrix::prodNormMatInPlace(a, transpose);

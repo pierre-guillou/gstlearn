@@ -34,8 +34,8 @@ class EOperator;
  *  (icol * getNRows() + irow)
  *
  * Since gstlearn version v1.3:
- * - Dense Matrices storage and algebra rely on Eigen3 library only
- * - Sparse Matrices storage and algebra rely on Eigen3 or cs library (see MatrixSparse.hpp)
+ * - Dense Matrices storage and algebra rely on Eigen3 library
+ * - Sparse Matrices storage and algebra rely on Eigen3 library
  */
 class GSTLEARN_EXPORT AMatrix: public AStringable, public ICloneable
 {
@@ -45,30 +45,37 @@ public:
   AMatrix& operator=(const AMatrix& m);
   virtual ~AMatrix();
 
+  /// Interface to AStringable
+  String toString(const AStringFormat* strfmt = nullptr) const override;
+
+  /// Functions to be implemented in derived classes
+
+  /*! Returns if the current matrix is Sparse */
+  virtual bool isSparse() const = 0;
+  /*! Returns if the matrix belongs to the MatrixDense class */
+  virtual bool isDense() const = 0;
+  /*! Gets the value at row 'irow' and column 'icol' */
+  virtual double getValue(int irow, int icol) const = 0;
+  /*! Sets the value at row 'irow' and column 'icol' */
+  virtual void setValue(int irow, int icol, double value) = 0;
+  /*! Update the value at row 'irow' and column 'icol' */
+  virtual void updValue(int irow,
+                        int icol,
+                        const EOperator& oper,
+                        double value) = 0;
+
+  /*! Check if the matrix is (non empty) square */
+  virtual bool isSquare(bool printWhyNot = false) const;
+  /*! Check if the input matrix is (non empty and square) symmetric */
+  virtual bool isSymmetric(double eps = EPSILON10, bool printWhyNot = false) const;
+  /*! Say if the matrix must be symmetric */
+  virtual bool mustBeSymmetric() const { return false; }
+
   virtual void reset(int nrows, int ncols);
   virtual void resetFromValue(int nrows, int ncols, double value);
   virtual void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true);
   virtual void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true);
   virtual void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true);
-
-  /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
-  void clear();
-  /// Interface to AMatrix
-  /*! Returns if the matrix belongs to the MatrixDense class (avoids dynamic_cast) */
-  virtual bool isDense() const = 0;
-  /*! Returns if the current matrix is Sparse */
-  virtual bool isSparse() const = 0;
-  /*! Check if the matrix is (non empty) square */
-  virtual bool isSquare(bool printWhyNot = false) const;
-  /*! Indicate if the given indices are valid for the current matrix size */
-  bool isValid(int irow, int icol, bool printWhyNot = false) const;
-  /*! Check if the matrix is square and Identity */
-  bool isIdentity(bool printWhyNot = false) const;
-  /*! Check if the input matrix is (non empty and square) symmetric */
-  virtual bool isSymmetric(double eps = EPSILON10, bool printWhyNot = false) const;
-  /*! Say if the matrix must be symmetric */
-  virtual bool mustBeSymmetric() const { return false; }
 
   /*! Set the contents of a Column */
   virtual void setColumn(int icol, const VectorDouble& tab);
@@ -102,30 +109,44 @@ public:
   virtual void divideRow(const VectorDouble& vec);
   /*! Divide a Matrix column-wise */
   virtual void divideColumn(const VectorDouble& vec);
-
   /*! Extract a Row */
   virtual VectorDouble getRow(int irow) const;
   /*! Extract a Column */
   virtual VectorDouble getColumn(int icol) const;
 
+  /*! Perform 'this' = 'x' * 'y' */
+  virtual void prodMatMatInPlace(const AMatrix* x,
+                                 const AMatrix* y,
+                                 bool transposeX = false,
+                                 bool transposeY = false);
+  /*! Perform 'this' = 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
+  virtual void prodNormMatMatInPlace(const AMatrix* a,
+                                     const AMatrix* m,
+                                     bool transpose = false);
+  /*! Perform 'this' = 't(A)' %*% 'vec' %*% 'A' or 'A' %*% 'vec' %*% 't(A)' */
+  virtual void prodNormMatVecInPlace(const AMatrix* a,
+                                     const VectorDouble& vec,
+                                     bool transpose = false);
+  /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
+  virtual void prodNormMatInPlace(const AMatrix* a,
+                                  bool transpose = false);
+
   /*! Extract the contents of the matrix */
   virtual NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const;
+
+  void clear();
+  /*! Modify the dimension of the matrix (if needed) */
+  void resize(int nrows, int ncols);
+  /*! Indicate if the given indices are valid for the current matrix size */
+  bool isValid(int irow, int icol, bool printWhyNot = false) const;
+  /*! Check if the matrix is square and Identity */
+  bool isIdentity(bool printWhyNot = false) const;
+
   /*! Add a matrix (multiplied by a constant) */
   void addMatInPlace(const AMatrix& y, double cx = 1., double cy = 1.);
   /*! Multiply 'this' by matrix 'y' and store in 'this'*/
   void prodMatInPlace(const AMatrix* matY, bool transposeY = false);
 
-  /*! Modify the dimension of the matrix (if needed) */
-  void resize(int nrows, int ncols);
-  /*! Gets the value at row 'irow' and column 'icol' */
-  virtual double getValue(int irow, int icol) const = 0;
-  /*! Sets the value at row 'irow' and column 'icol' */
-  virtual void setValue(int irow, int icol, double value) = 0;
-  /*! Update the value at row 'irow' and column 'icol' */
-  virtual void updValue(int irow,
-                        int icol,
-                        const EOperator& oper,
-                        double value) = 0;
   /*! Add a value to a matrix term */
   void addValue(int irow, int icol, double value);
   /*! Check if a matrix is the same as me (norm L1) */
@@ -172,7 +193,6 @@ public:
   /*! Perform 'y' = 'x' * 'this' */
   VectorDouble prodVecMat(const VectorDouble& x, bool transpose = false) const;
   void prodVecMatInPlace(const VectorDouble& x, VectorDouble& y, bool transpose = false) const;
-  void prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const;
 #ifndef SWIG
   void prodVecMatInPlaceC(const constvect x, vect y, bool transpose = false) const;
   void addProdVecMatInPlaceC(const constvect x, vect y, bool transpose = false) const;
@@ -180,23 +200,6 @@ public:
 
   /*! Perform x %*% 'this' %*% y */
   double prodVecMatVec(const VectorDouble& x, const VectorDouble& y) const;
-
-  /*! Perform 'this' = 'x' * 'y' */
-  virtual void prodMatMatInPlace(const AMatrix* x,
-                                 const AMatrix* y,
-                                 bool transposeX = false,
-                                 bool transposeY = false);
-  /*! Perform 'this' = 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
-  virtual void prodNormMatMatInPlace(const AMatrix* a,
-                                     const AMatrix* m,
-                                     bool transpose = false);
-  /*! Perform 'this' = 't(A)' %*% 'vec' %*% 'A' or 'A' %*% 'vec' %*% 't(A)' */
-  virtual void prodNormMatVecInPlace(const AMatrix* a,
-                                     const VectorDouble& vec,
-                                     bool transpose = false);
-  /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
-  virtual void prodNormMatInPlace(const AMatrix* a,
-                                  bool transpose = false);
 
   /*! Matrix inversion in place */
   int invert();
@@ -229,38 +232,36 @@ public:
   void dumpRange(const char* title);
 
 #ifndef SWIG
-
-  /*! Get value operator override */
+  /*! Get value operator */
   double operator()(int row, int col) const { return getValue(row, col); }
-  /*! Set value operator override */
+  /*! Set value operator */
   double& operator()(int row, int col) { return _getValueRef(row, col); }
-
-  virtual bool needToReset(int nrows, int ncols);
+#endif
 
 protected:
-  virtual void _allocate()   = 0;
-  virtual void _deallocate() = 0;
-  virtual bool _needToReset(int nrows, int ncols);
+  virtual void _allocate()                                         = 0;
+  virtual void _deallocate()                                       = 0;
+  virtual int _getIndexToRank(int irow, int icol) const            = 0;
+  virtual void _setValueByRank(int rank, double value)             = 0;
+  virtual void _transposeInPlace()                                 = 0;
+  virtual int _invert()                                            = 0;
+  virtual int _solve(const VectorDouble& b, VectorDouble& x) const = 0;
+#ifndef SWIG
+  virtual void _addProdMatVecInPlacePtr(constvect x,
+                                        vect y,
+                                        bool transpose = false) const = 0;
+  virtual void _addProdVecMatInPlacePtr(constvect x,
+                                        vect y,
+                                        bool transpose = false) const = 0;
+#endif
 
-  /*! Say if (irow, icol) is stored physically or not */
+  virtual bool _needToReset(int nrows, int ncols);
   virtual bool _isPhysicallyPresent(int /*irow*/, int /*icol*/) const { return true; }
-  virtual double& _getValueRef(int irow, int icol);
   virtual int _getMatrixPhysicalSize() const;
+  virtual double& _getValueRef(int irow, int icol);
+  virtual double _getValueByRank(int rank) const = 0;
   virtual void _setValues(const double* values, bool byCol);
 
-  virtual void _setValueByRank(int rank, double value)  = 0;
-  virtual double _getValueByRank(int rank) const        = 0;
-  virtual int _getIndexToRank(int irow, int icol) const = 0;
-
-  virtual void _transposeInPlace()                                    = 0;
-  virtual void _addProdMatVecInPlacePtr(const double* x,
-                                        double* y,
-                                        bool transpose = false) const = 0;
-  virtual void _addProdVecMatInPlacePtr(const double* x,
-                                        double* y,
-                                        bool transpose = false) const = 0;
-  virtual int _invert()                                               = 0;
-  virtual int _solve(const VectorDouble& b, VectorDouble& x) const    = 0;
   virtual void _clear();
   virtual bool _isNumbersValid(int nrows, int ncols) const;
 
@@ -277,6 +278,7 @@ protected:
   bool _isRankValid(int rank) const;
   void _fillFromVVD(const VectorVectorDouble& X);
 
+  // Static functions
   static bool _isMatrixCompatible(const String& name,
                                   const AMatrix* mat1 = nullptr,
                                   int vsize1          = 0,
@@ -294,11 +296,13 @@ protected:
                                  int* ncol);
 
 private:
+  bool _matrixNeedToReset(int nrows, int ncols);
+
+private:
   mutable VectorDouble _diagonal;
   int _nRows;
   int _nCols;
   double _nullTerm; // Used for returning a null constant address
-#endif
 };
 
 /* Shortcut functions for C style aficionados */

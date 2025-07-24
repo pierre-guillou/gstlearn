@@ -10,7 +10,6 @@
 /******************************************************************************/
 #include "LinearOp/ProjMatrix.hpp"
 #include "Db/Db.hpp"
-#include "Matrix/LinkMatrixSparse.hpp"
 #include "Mesh/AMesh.hpp"
 
 namespace gstlrn

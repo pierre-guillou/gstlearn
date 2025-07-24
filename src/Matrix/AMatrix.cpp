@@ -454,7 +454,7 @@ VectorDouble AMatrix::prodMatVec(const VectorDouble& x, bool transpose) const
                            nullptr, x.size(), false)) return VectorDouble();
   int size = (transpose) ? _nCols : _nRows;
   VectorDouble y(size, 0.);
-  _addProdMatVecInPlacePtr(x.data(), y.data(), transpose);
+  _addProdMatVecInPlacePtr(x, y, transpose);
   return y;
 }
 
@@ -464,7 +464,9 @@ VectorDouble AMatrix::prodMatVec(const VectorDouble& x, bool transpose) const
  * @param y Output vector
  * @param transpose True if the matrix 'this' must be transposed
  */
-void AMatrix::prodMatVecInPlace(const VectorDouble& x, VectorDouble& y, bool transpose) const
+void AMatrix::prodMatVecInPlace(const VectorDouble& x,
+                                VectorDouble& y,
+                                bool transpose) const
 {
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodMatVecInPlace",
@@ -472,10 +474,12 @@ void AMatrix::prodMatVecInPlace(const VectorDouble& x, VectorDouble& y, bool tra
                            nullptr, x.size(), false)) return;
   int size = (transpose) ? _nCols : _nRows;
   y.fill(0., size);
-  _addProdMatVecInPlacePtr(x.data(), y.data(), transpose);
+  _addProdMatVecInPlacePtr(x, y, transpose);
 }
 
-void AMatrix::prodMatVecInPlaceC(const constvect x, vect y, bool transpose) const
+void AMatrix::prodMatVecInPlaceC(const constvect x,
+                                 vect y,
+                                 bool transpose) const
 {
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodMatVecInPlaceC",
@@ -483,7 +487,7 @@ void AMatrix::prodMatVecInPlaceC(const constvect x, vect y, bool transpose) cons
                            nullptr, x.size(), false)) return;
   int size = (transpose) ? _nCols : _nRows;
   std::fill(y.begin(), y.begin() + size, 0.0);
-  _addProdMatVecInPlacePtr(x.data(), y.data(), transpose);
+  _addProdMatVecInPlacePtr(x, y, transpose);
 }
 
 void AMatrix::addProdMatVecInPlaceC(const constvect x,
@@ -494,7 +498,7 @@ void AMatrix::addProdMatVecInPlaceC(const constvect x,
       !_isMatrixCompatible("AMatrix::addProdMatVecInPlaceC",
                            this, 0, transpose,
                            nullptr, x.size(), false)) return;
-  _addProdMatVecInPlacePtr(x.data(), y.data(), transpose);
+  _addProdMatVecInPlacePtr(x, y, transpose);
 }
 
 VectorDouble AMatrix::prodVecMat(const VectorDouble& x, bool transpose) const
@@ -505,7 +509,7 @@ VectorDouble AMatrix::prodVecMat(const VectorDouble& x, bool transpose) const
                            this, 0, transpose)) return VectorDouble();
   int size = (transpose) ? _nRows : _nCols;
   VectorDouble y(size, 0.);
-  _addProdVecMatInPlacePtr(x.data(), y.data(), transpose);
+  _addProdVecMatInPlacePtr(x, y, transpose);
   return y;
 }
 
@@ -517,13 +521,6 @@ void AMatrix::prodVecMatInPlace(const VectorDouble& x, VectorDouble& y, bool tra
                            this, 0, transpose)) return;
   int size = (transpose) ? _nRows : _nCols;
   y.fill(0., size);
-  _addProdVecMatInPlacePtr(x.data(), y.data(), transpose);
-}
-
-void AMatrix::prodVecMatInPlacePtr(const double* x, double* y, bool transpose) const
-{
-  int size = (transpose) ? _nRows : _nCols;
-  for (int i = 0; i < size; i++) y[i] = 0.0;
   _addProdVecMatInPlacePtr(x, y, transpose);
 }
 
@@ -535,7 +532,7 @@ void AMatrix::prodVecMatInPlaceC(const constvect x, vect y, bool transpose) cons
                            nullptr, x.size(), false)) return;
   int size = (transpose) ? _nCols : _nRows;
   std::fill(y.begin(), y.begin() + size, 0.0);
-  _addProdVecMatInPlacePtr(x.data(), y.data(), transpose);
+  _addProdVecMatInPlacePtr(x, y, transpose);
 }
 
 void AMatrix::addProdVecMatInPlaceC(const constvect x,
@@ -546,10 +543,10 @@ void AMatrix::addProdVecMatInPlaceC(const constvect x,
       !_isMatrixCompatible("AMatrix::addProdVecMatInPlaceC",
                            this, 0, transpose,
                            nullptr, x.size(), false)) return;
-  _addProdVecMatInPlacePtr(x.data(), y.data(), transpose);
+  _addProdVecMatInPlacePtr(x, y, transpose);
 }
 
-bool AMatrix::needToReset(int nrows, int ncols)
+bool AMatrix::_matrixNeedToReset(int nrows, int ncols)
 {
   return nrows != getNRows() || ncols != getNCols() || _needToReset(nrows, ncols);
 }
@@ -569,7 +566,7 @@ bool AMatrix::_needToReset(int nrows, int ncols)
 void AMatrix::resize(int nrows, int ncols)
 {
   // Check if nothing is to be done
-  if (!needToReset(nrows, ncols))
+  if (!_matrixNeedToReset(nrows, ncols))
     return;
 
   // Reset the sizes (clear values)
@@ -1087,7 +1084,6 @@ NF_Triplet AMatrix::getMatrixToTriplet(int shiftRow, int shiftCol) const
       if (isZero(value)) continue;
       NF_T.add(irow + shiftRow, icol + shiftCol, value);
     }
-
   return NF_T;
 }
 

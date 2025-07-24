@@ -10,12 +10,12 @@
 /******************************************************************************/
 #pragma once
 
-#include "geoslib_define.h"
 #include "Basic/VectorNumT.hpp"
+#include "geoslib_define.h"
 
 #ifndef SWIG
-#include <Eigen/Core>
-#include <Eigen/src/Core/Matrix.h>
+#  include <Eigen/Core>
+#  include <Eigen/src/Core/Matrix.h>
 #endif
 
 namespace gstlrn
@@ -24,8 +24,8 @@ class GSTLEARN_EXPORT ALinearOp
 {
 public:
   ALinearOp();
-  ALinearOp(const ALinearOp &m) = delete;
-  ALinearOp& operator= (const ALinearOp &m) = delete;
+  ALinearOp(const ALinearOp& m)            = delete;
+  ALinearOp& operator=(const ALinearOp& m) = delete;
   virtual ~ALinearOp() {}
   virtual int getSize() const = 0;
 
@@ -46,9 +46,9 @@ protected:
 #endif
 
 private:
-  mutable bool   _usefactor;
+  mutable bool _usefactor;
   mutable double _idfactor;
   mutable double _factor;
   mutable VectorDouble _temp;
 };
-}
+} // namespace gstlrn
