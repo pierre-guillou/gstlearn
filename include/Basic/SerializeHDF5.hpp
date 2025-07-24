@@ -389,5 +389,6 @@ bool SerializeHDF5::writeValue(H5::H5Object& grp, const String& name, const T& v
   return true;
 }
 
+} // namespace gstlrn
+
 #endif // HDF5
-}
