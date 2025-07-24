@@ -32,9 +32,10 @@ typedef struct
   VectorInt tab;
 } DimLoop;
 
-// The following vectors should remain private to this class
+// The following vectors should not be exposed outside of this
+// compilation unit (e.g. through methods of the Grid class).
 // They serve in optimizing local calculations.
-// They should not be made available for other classes as their dimensions
+// They should not be used outside the Grid class as their dimensions
 // are only defined for local contingency (they do not match the Space Dimension)
 thread_local VectorInt _iwork0;
 thread_local VectorDouble _work1;
