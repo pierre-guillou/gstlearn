@@ -236,7 +236,7 @@ double& MatrixSparse::_getValueRef(int irow, int icol)
   DECLARE_UNUSED(irow);
   DECLARE_UNUSED(icol);
   _forbiddenForSparse("_getValueRef");
-  return AMatrix::_getValueRef(irow, icol);
+  return _eigenMatrix.coeffRef(irow, icol);
 }
 
 void MatrixSparse::_setValueByRank(int rank, double value)
