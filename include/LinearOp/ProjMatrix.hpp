@@ -10,9 +10,9 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "LinearOp/IProj.hpp"
 #include "Matrix/MatrixSparse.hpp"
+#include "gstlearn_export.hpp"
 
 namespace gstlrn
 {
@@ -44,28 +44,29 @@ public:
   /// Interface for IProj
 
 #ifndef SWIG
-  protected:
-    int _addMesh2point(const constvect inv, vect outv) const override;
-    int _addPoint2mesh(const constvect inv, vect outv) const override;
-#endif
-  public:
 
+protected:
+  int _addMesh2point(const constvect inv, vect outv) const override;
+  int _addPoint2mesh(const constvect inv, vect outv) const override;
+#endif
+
+public:
   int getNApex() const override { return getNCols(); }
   int getNPoint() const override { return getNRows(); }
 
-  static ProjMatrix* create(const Db *db,
-                            const AMesh *a_mesh,
-                            int rankZ = -1,
+  static ProjMatrix* create(const Db* db,
+                            const AMesh* a_mesh,
+                            int rankZ    = -1,
                             bool verbose = false);
   void resetFromMeshAndDb(const Db* db,
                           const AMesh* a_mesh,
-                          int rankZ = -1,
+                          int rankZ    = -1,
                           bool verbose = false);
   void dumpVerticesUsed(int npmax = -1) const;
-//  int resetFromDbByNeigh(const Db *db,   // currently unused feature
-//                         AMesh *amesh,
-//                         double radius,
-//                         int flag_exact = 0,
-//                         bool verbose = false);
+  //  int resetFromDbByNeigh(const Db *db,   // currently unused feature
+  //                         AMesh *amesh,
+  //                         double radius,
+  //                         int flag_exact = 0,
+  //                         bool verbose = false);
 };
-}
+} // namespace gstlrn

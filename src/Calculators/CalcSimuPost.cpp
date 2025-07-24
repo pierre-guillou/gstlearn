@@ -13,30 +13,30 @@
 
 #include "Enum/EPostUpscale.hpp"
 
+#include "Basic/VectorHelper.hpp"
+#include "Calculators/CalcSimuPost.hpp"
 #include "Db/Db.hpp"
 #include "Matrix/Table.hpp"
-#include "Calculators/CalcSimuPost.hpp"
-#include "Basic/VectorHelper.hpp"
 
 namespace gstlrn
 {
 CalcSimuPost::CalcSimuPost()
-    : ACalcDbToDb(),
-      _verbose(false),
-      _flagMatch(false),
-      _flagUpscale(false),
-      _checkLevel(0),
-      _checkTargets(),
-      _upscale(EPostUpscale::UNKNOWN),
-      _stats(),
-      _names(),
-      _iechout(0),
-      _iter(-1),
-      _iattOut(0),
-      _niter(0),
-      _nvarOut(0),
-      _nfact(),
-      _iuids()
+  : ACalcDbToDb()
+  , _verbose(false)
+  , _flagMatch(false)
+  , _flagUpscale(false)
+  , _checkLevel(0)
+  , _checkTargets()
+  , _upscale(EPostUpscale::UNKNOWN)
+  , _stats()
+  , _names()
+  , _iechout(0)
+  , _iter(-1)
+  , _iattOut(0)
+  , _niter(0)
+  , _nvarOut(0)
+  , _nfact()
+  , _iuids()
 {
 }
 
@@ -47,17 +47,17 @@ CalcSimuPost::~CalcSimuPost()
 bool CalcSimuPost::_check()
 {
   if (!ACalcDbToDb::_check()) return false;
-  
+
   /************************************************************/
   /* Both Files are compulsory: the output one must be a Grid */
   /************************************************************/
 
-  if (! hasDbin())   return false;
+  if (!hasDbin()) return false;
 
   if (_flagUpscale)
   {
-    if (! hasDbout())  return false;
-    if (! isGridOut()) return false;
+    if (!hasDbout()) return false;
+    if (!isGridOut()) return false;
   }
   else
   {
@@ -129,7 +129,7 @@ bool CalcSimuPost::_mustBeChecked(int level) const
 {
   if (_checkTargets.empty()) return false;
   if (level > _checkLevel) return false;
-  return (VH::isInList(_checkTargets, _iechout+1));
+  return (VH::isInList(_checkTargets, _iechout + 1));
 }
 
 bool CalcSimuPost::_preprocess()
@@ -183,7 +183,7 @@ int CalcSimuPost::_defineVaroutNumber()
   // Loop on the statistic options
 
   int nvarin = _getNEff();
-  _nvarOut = 0;
+  _nvarOut   = 0;
   for (int ioption = 0, noption = _getNStats(); ioption < noption; ioption++)
   {
     if (_stats[ioption] != EPostStat::UNKNOWN)
@@ -212,9 +212,9 @@ void CalcSimuPost::_readIn(int iech, const VectorInt& indices, VectorDouble& tab
 
   if (_mustBeChecked(1))
   {
-    message("    Sample Rank #%d - Coordinates:",iech);
+    message("    Sample Rank #%d - Coordinates:", iech);
     for (int idim = 0, ndim = getDbin()->getNDim(); idim < ndim; idim++)
-      message(" %lf", getDbin()->getCoordinate(iech,  idim));
+      message(" %lf", getDbin()->getCoordinate(iech, idim));
     message("\n");
   }
   if (_mustBeChecked(2))
@@ -234,8 +234,8 @@ void CalcSimuPost::_writeOut(int iech, const VectorDouble& tabout) const
  */
 void CalcSimuPost::_upscaleFunction(const VectorVectorDouble& Y_p_k_s, VectorDouble& tabout) const
 {
-  int nsample = (int) Y_p_k_s.size();
-  int nvar = (int) Y_p_k_s[0].size();
+  int nsample = (int)Y_p_k_s.size();
+  int nvar    = (int)Y_p_k_s[0].size();
 
   // Initialization values
   double valinit;
@@ -248,7 +248,7 @@ void CalcSimuPost::_upscaleFunction(const VectorVectorDouble& Y_p_k_s, VectorDou
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int ndef = 0;
+    int ndef      = 0;
     double result = valinit;
     for (int ip = 0; ip < nsample; ip++)
     {
@@ -298,8 +298,8 @@ void CalcSimuPost::_upscaleFunction(const VectorVectorDouble& Y_p_k_s, VectorDou
  * @param Y_p VectorVectorDouble containing information for several iterations
  * @param tabout Vector for multivariate statistics
  */
-void CalcSimuPost::_statisticsFunction(const VectorVectorDouble &Y_p,
-                                       VectorDouble &tabout) const
+void CalcSimuPost::_statisticsFunction(const VectorVectorDouble& Y_p,
+                                       VectorDouble& tabout) const
 {
   int niter   = _getNiter();
   int nvarout = _getNEff();
@@ -341,20 +341,20 @@ void CalcSimuPost::_statisticsFunction(const VectorVectorDouble &Y_p,
     }
   }
 
-  if (_mustBeChecked(0) && ! Y_p.empty())
+  if (_mustBeChecked(0) && !Y_p.empty())
   {
-    Table stat_table = Table(_getNEff(),_getNStats());
+    Table stat_table = Table(_getNEff(), _getNStats());
     stat_table.setTitle("Statistics");
     stat_table.setSkipTitle(true);
     stat_table.setSkipDescription(true);
 
     for (int istat = 0; istat < nstat; istat++)
-      stat_table.setColumnName(istat, String{_stats[istat].getDescr()});
+      stat_table.setColumnName(istat, String {_stats[istat].getDescr()});
 
     for (int ivar = 0; ivar < _getNEff(); ivar++)
     {
       std::ostringstream name;
-      name << "Var " << ivar+1;
+      name << "Var " << ivar + 1;
       stat_table.setRowName(ivar, name.str());
     }
 
@@ -366,10 +366,10 @@ void CalcSimuPost::_statisticsFunction(const VectorVectorDouble &Y_p,
   }
 }
 
-void CalcSimuPost::_printIndices(const VectorVectorInt &indices) const
+void CalcSimuPost::_printIndices(const VectorVectorInt& indices) const
 {
   int nvar = _getNVar();
-  message("  Iteration (1-based) %3d/%3d -> Indices:", _iter+1, _niter);
+  message("  Iteration (1-based) %3d/%3d -> Indices:", _iter + 1, _niter);
   for (int ivar = 0; ivar < nvar; ivar++)
     message(" %d/%d", indices[_iter][ivar] + 1, _nfact[ivar]);
   message("\n");
@@ -377,7 +377,7 @@ void CalcSimuPost::_printIndices(const VectorVectorInt &indices) const
 
 VectorVectorInt CalcSimuPost::_getIndices() const
 {
-  int nvar = _getNVar();
+  int nvar  = _getNVar();
   int niter = _getNiter();
   VectorVectorInt indices(niter);
 
@@ -385,7 +385,7 @@ VectorVectorInt CalcSimuPost::_getIndices() const
 
   for (int jter = 0; jter < niter; jter++)
   {
-    indices[jter].resize(nvar,0);
+    indices[jter].resize(nvar, 0);
 
     // Dispatch according to the multiplicity mode
     if (_flagMatch)
@@ -400,10 +400,10 @@ VectorVectorInt CalcSimuPost::_getIndices() const
       int local = jter;
       for (int ivar = 0; ivar < nvar; ivar++)
       {
-        int jvar = nvar - ivar - 1;
-        int divid = local / _nfact[jvar];
+        int jvar            = nvar - ivar - 1;
+        int divid           = local / _nfact[jvar];
         indices[jter][jvar] = local - divid * _nfact[jvar];
-        local = divid;
+        local               = divid;
       }
     }
   }
@@ -442,16 +442,16 @@ int CalcSimuPost::_defineNames()
   // For each name, find the multiplicity nvar for each variable in the input Db
 
   _nfact.clear();
-  _nfact.resize(nvar,0);
+  _nfact.resize(nvar, 0);
   _iuids.clear();
-  _iuids.resize(nvar,0);
+  _iuids.resize(nvar, 0);
   for (int ivar = 0; ivar < nvar; ivar++)
   {
     // Expand each filename
     VectorString subnames = getDbin()->expandNameList(_names[ivar]);
 
     // Get the multiplicity factor
-    int nfois = (int) subnames.size();
+    int nfois = (int)subnames.size();
     if (nfois <= 0)
     {
       messerr("The variable (%s) does not seem to exist in the input Db", _names[ivar].c_str());
@@ -526,7 +526,7 @@ VectorInt CalcSimuPost::_samplesInCellDifferentSpaceDimension() const
  */
 int CalcSimuPost::_getSortingCase() const
 {
-  if (! _flagUpscale)
+  if (!_flagUpscale)
     return 0;
   if (getDbin()->getNDim() == getDbout()->getNDim())
     return 1;
@@ -536,7 +536,7 @@ int CalcSimuPost::_getSortingCase() const
 int CalcSimuPost::_process()
 {
   int nechout = getDbout()->getNSample();
-  int niter = _getNiter();
+  int niter   = _getNiter();
   VectorDouble sampleIn(_getNVar());
   VectorDouble sampleOut;
   if (_getTransfoNvar() > 0)
@@ -560,7 +560,7 @@ int CalcSimuPost::_process()
   // Loop on the samples of the Output File
   for (_iechout = 0; _iechout < nechout; _iechout++)
   {
-    if (! getDbout()->isActive(_iechout)) continue;
+    if (!getDbout()->isActive(_iechout)) continue;
     VectorVectorDouble Y_p;
 
     // Get the vector of samples contained in the target cell
@@ -578,20 +578,20 @@ int CalcSimuPost::_process()
     if (_mustBeChecked(0))
     {
       if (_flagUpscale)
-        message("\n== Cell #%d/%d (regrouping %d samples)\n", _iechout+1, nechout, (int) local.size());
+        message("\n== Cell #%d/%d (regrouping %d samples)\n", _iechout + 1, nechout, (int)local.size());
       else
-        message("\n== Cell #%d/%d\n", _iechout+1, nechout);
+        message("\n== Cell #%d/%d\n", _iechout + 1, nechout);
     }
 
     // Loop on the iterations
     for (_iter = 0; _iter < niter; _iter++)
     {
       if (_mustBeChecked(2))
-         _printIndices(indices);
+        _printIndices(indices);
 
       // Loop on the samples contained in the target cell
       VectorVectorDouble Z_n_k_s;
-      for (int is = 0, nlocal = (int) local.size(); is < nlocal; is++)
+      for (int is = 0, nlocal = (int)local.size(); is < nlocal; is++)
       {
         int iechin = local[is];
 
@@ -605,7 +605,7 @@ int CalcSimuPost::_process()
         {
           _transformFunction(sampleIn, sampleOut);
           if (_mustBeChecked(2))
-            VH::dump("    Transformed",sampleOut, false);
+            VH::dump("    Transformed", sampleOut, false);
           Z_n_k_s.push_back(sampleOut);
         }
       }
@@ -662,11 +662,11 @@ int CalcSimuPost::_process()
  * -# Upscale to the target cell according to upscaling rule '_upscale': up_Y_p^{k}(C)
  * -# Compute statistics according to stat rule '_stats'
  */
-int simuPost(Db *dbin,
-             DbGrid *dbout,
-             const VectorString &names,
+int simuPost(Db* dbin,
+             DbGrid* dbout,
+             const VectorString& names,
              bool flag_match,
-             const EPostUpscale &upscale,
+             const EPostUpscale& upscale,
              const std::vector<EPostStat>& stats,
              bool verbose,
              const VectorInt& check_targets,
@@ -693,4 +693,4 @@ int simuPost(Db *dbin,
   int error = (calcul.run()) ? 0 : 1;
   return error;
 }
-}
+} // namespace gstlrn

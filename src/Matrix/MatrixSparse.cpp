@@ -258,7 +258,6 @@ void MatrixSparse::setValue(int irow, int icol, double value, bool flagCheck)
 {
   if (flagCheck && !_isIndexValid(irow, icol)) return;
   _eigenMatrix.coeffRef(irow, icol) = value;
-  _eigenMatrix.coeffRef(irow, icol) = value;
 }
 
 void MatrixSparse::updValue(int irow,
@@ -274,7 +273,6 @@ void MatrixSparse::updValue(int irow,
 
 int MatrixSparse::_getMatrixPhysicalSize() const
 {
-  return _eigenMatrix.nonZeros();
   return _eigenMatrix.nonZeros();
 }
 
