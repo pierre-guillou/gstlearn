@@ -306,8 +306,9 @@ void MatrixDense::addMat(const AMatrix& y, double cx, double cy)
   }
   else
   {
-    if (getFlagMatrixCheck() && !isSameSize(y)) return;
-    eigenMat().noalias() = cx * eigenMat() + cy * ym->eigenMat();
+    eigenMat().noalias() = cx * eigenMat();
+    if (getFlagMatrixCheck() && cy != 0. && !isSameSize(y)) return;
+    eigenMat().noalias() += cy * ym->eigenMat();
   }
 }
 

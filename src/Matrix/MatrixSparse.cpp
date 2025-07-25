@@ -842,8 +842,9 @@ void MatrixSparse::addMat(const AMatrix& y, double cx, double cy)
   }
   else
   {
-    if (getFlagMatrixCheck() && !isSameSize(y)) return;
-    eigenMat() = cx * eigenMat() + cy * ym->eigenMat();
+    eigenMat() = cx * eigenMat();
+    if (getFlagMatrixCheck() && cy != 0. && !isSameSize(y)) return;
+    eigenMat() += cy * ym->eigenMat();
   }
 }
 

@@ -9,7 +9,6 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/SPDEOpMatrix.hpp"
-#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/InvNuggetOp.hpp"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"

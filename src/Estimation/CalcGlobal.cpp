@@ -153,7 +153,7 @@ int CalcGlobal::_globalKriging()
 
     // Cumulate the R.H.S.
     Sigma0Cum.addMat(Sigma0);
-    X0Cum.addMat(X0);
+    if (X0.size() > 0) X0Cum.addMat(X0);
     ng++;
   }
 
