@@ -127,7 +127,6 @@ set(SRC
   Covariances/CovHelper.cpp
   Polygon/Polygons.cpp
   Polygon/PolyElem.cpp
-  Core/surface.cpp
   Core/math.cpp
   Core/stats.cpp
   Core/io.cpp
