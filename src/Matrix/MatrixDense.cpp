@@ -465,18 +465,18 @@ void MatrixDense::linearCombination(double val1,
   const auto* mmat3 = dynamic_cast<const MatrixDense*>(mat3);
 
   if ((mat1 != nullptr && mmat1 == nullptr) ||
-      (mat2 != nullptr && mmat2 == nullptr) ||
-      (mat3 != nullptr && mmat3 == nullptr))
+      (mat2 != nullptr && mmat2 == nullptr) || (mat2 == this) ||
+      (mat3 != nullptr && mmat3 == nullptr) || (mat3 == this))
   {
     AMatrix::linearCombination(val1, mat1, val2, mat2, val3, mat3);
   }
   else
   {
-    if (mmat1 != nullptr && val1 != 0.)
+    if (mat1 != nullptr && val1 != 0.)
       eigenMat() = val1 * mmat1->eigenMat();
-    if (mmat2 != nullptr && val2 != 0.)
+    if (mat2 != nullptr && val2 != 0.)
       eigenMat() += val2 * mmat2->eigenMat();
-    if (mmat3 != nullptr && val3 != 0.)
+    if (mat3 != nullptr && val3 != 0.)
       eigenMat() += val3 * mmat3->eigenMat();
   }
 }

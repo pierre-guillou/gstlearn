@@ -114,7 +114,7 @@ static void st_print_all(const VectorInt& colors,
 ** \param[in]  z        Array of input values
 ** \param[in]  colors   Array of colors (same dimension as 'z')
 **
-** \param[out]  ind     Array which contains address in 'z' of items of 'zred'
+** \param[out]  ind     Array of complementary addresses
 ** \param[out]  zred    Array of output values retained
 **
 *****************************************************************************/
@@ -129,7 +129,7 @@ static void st_vector_compress(int nvertex,
   zred.clear();
   for (int i = 0; i < nvertex; i++)
   {
-    if (colors[i] != colref)
+    if (colors[i] == colref)
       zred.push_back(z[i]);
     else
       ind.push_back(i);
@@ -348,13 +348,13 @@ int main(int argc, char* argv[])
   // Main Algorithm //
   //----------------//
 
-  MatrixSparse** Qcols = new MatrixSparse*[ncolor];
+  std::vector<MatrixSparse*> Qcols(ncolor);
   for (int icol = 0; icol < ncolor; icol++)
     Qcols[icol] = Q->extractSubmatrixByColor(colors, colref[icol], true, false);
 
   // Perform the Gibbs sampler
   int niter = 10;
-  (void)st_gibbs(niter, ncolor, nvertex, colors, colref, Qcols, consmin, consmax,
+  (void)st_gibbs(niter, ncolor, nvertex, colors, colref, Qcols.data(), consmin, consmax,
                  sigma, z, krig);
 
   // Add the newly created field to the grid for printout
@@ -367,7 +367,6 @@ int main(int argc, char* argv[])
 
   for (int icol = 0; icol < ncolor; icol++)
     delete Qcols[icol];
-  delete[] Qcols;
   delete dbgrid;
   delete model1;
   delete model2;
