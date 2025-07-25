@@ -836,14 +836,15 @@ void MatrixSparse::linearCombination(double val1,
 void MatrixSparse::addMat(const AMatrix& y, double cx, double cy)
 {
   const auto* ym = dynamic_cast<const MatrixSparse*>(&y);
-  if (ym == nullptr)
+  if (ym == nullptr || ym == this)
   {
     AMatrix::addMat(y, cx, cy);
   }
   else
   {
-    if (getFlagMatrixCheck() && !isSameSize(y)) return;
-    eigenMat() = cx * eigenMat() + cy * ym->eigenMat();
+    eigenMat() = cx * eigenMat();
+    if (cy == 0. || (getFlagMatrixCheck() && !isSameSize(y))) return;
+    eigenMat() += cy * ym->eigenMat();
   }
 }
 

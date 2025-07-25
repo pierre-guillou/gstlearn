@@ -300,14 +300,15 @@ void MatrixDense::prodScalar(double v)
 void MatrixDense::addMat(const AMatrix& y, double cx, double cy)
 {
   const auto* ym = dynamic_cast<const MatrixDense*>(&y);
-  if (ym == nullptr)
+  if (ym == nullptr || ym == this)
   {
     AMatrix::addMat(y, cx, cy);
   }
   else
   {
-    if (getFlagMatrixCheck() && !isSameSize(y)) return;
-    eigenMat().noalias() = cx * eigenMat() + cy * ym->eigenMat();
+    eigenMat().noalias() = cx * eigenMat();
+    if (cy == 0. || (getFlagMatrixCheck() && !isSameSize(y))) return;
+    eigenMat().noalias() += cy * ym->eigenMat();
   }
 }
 
