@@ -139,7 +139,7 @@ public:
                                  double val3         = 1.,
                                  const AMatrix* mat3 = nullptr);
   /*! Add a matrix (multiplied by a constant) */
-  virtual void addMatInPlace(const AMatrix& y, double cx = 1., double cy = 1.);
+  virtual void addMat(const AMatrix& y, double cx = 1., double cy = 1.);
 
   /*! Extract the contents of the matrix */
   virtual NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const;
@@ -151,9 +151,6 @@ public:
   bool isValid(int irow, int icol, bool printWhyNot = false) const;
   /*! Check if the matrix is square and Identity */
   bool isIdentity(bool printWhyNot = false) const;
-
-  /*! Multiply 'this' by matrix 'y' and store in 'this'*/
-  void prodMatInPlace(const AMatrix* matY, bool transposeY = false);
 
   /*! Add a value to a matrix term */
   void addValue(int irow, int icol, double value);
@@ -208,6 +205,8 @@ public:
 
   /*! Perform x %*% 'this' %*% y */
   double prodVecMatVec(const VectorDouble& x, const VectorDouble& y) const;
+  /*! Perform 'this' = 'y' %*% 'this' or 'this' %*% 'y' */
+  void prodMat(const AMatrix* matY, bool transposeY = false);
 
   /*! Matrix inversion in place */
   int invert();

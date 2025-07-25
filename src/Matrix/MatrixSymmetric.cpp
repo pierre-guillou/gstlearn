@@ -48,7 +48,7 @@ MatrixSymmetric::MatrixSymmetric(const AMatrix& m)
     messerr("The input matrix should be Symmetric");
     messerr("It has been symetrized by computing (this + this^T)/2");
     this->transposeInPlace();
-    this->addMatInPlace(m);
+    this->addMat(m);
     this->prodScalar(0.5);
   }
 }

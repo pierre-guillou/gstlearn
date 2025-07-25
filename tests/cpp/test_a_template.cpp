@@ -21,9 +21,9 @@ int main(int argc, char* argv[])
   DECLARE_UNUSED(argc);
   DECLARE_UNUSED(argv);
 
-  VectorInt nx        = {10, 20};
-  VectorDouble angles = {45, 0};
-  auto* grid          = DbGrid::create(nx, VectorDouble(), VectorDouble(), angles);
-  grid->display();
+  const auto* g3 = DbGrid::create({2, 3, 4}, VectorDouble(), VectorDouble(), {10., 20., 30.});
+  g3->display();
+  const auto* g2 = DbGrid::create({2, 3}, VectorDouble(), VectorDouble(), {10., 20.});
+  g2->display();
   return (0);
 }

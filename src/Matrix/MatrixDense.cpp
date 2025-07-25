@@ -297,12 +297,12 @@ void MatrixDense::prodScalar(double v)
   eigenMat().array() *= v;
 }
 
-void MatrixDense::addMatInPlace(const AMatrix& y, double cx, double cy)
+void MatrixDense::addMat(const AMatrix& y, double cx, double cy)
 {
   const auto* ym = dynamic_cast<const MatrixDense*>(&y);
   if (ym == nullptr)
   {
-    AMatrix::addMatInPlace(y, cx, cy);
+    AMatrix::addMat(y, cx, cy);
   }
   else
   {

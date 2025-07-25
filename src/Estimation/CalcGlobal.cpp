@@ -152,8 +152,8 @@ int CalcGlobal::_globalKriging()
     if (_modelLocal->evalDriftMatByTargetInPlace(X0, dbout, iech, krigopt)) return 1;
 
     // Cumulate the R.H.S.
-    Sigma0Cum.addMatInPlace(Sigma0);
-    X0Cum.addMatInPlace(X0);
+    Sigma0Cum.addMat(Sigma0);
+    X0Cum.addMat(X0);
     ng++;
   }
 

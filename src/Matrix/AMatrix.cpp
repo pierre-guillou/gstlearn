@@ -516,7 +516,7 @@ void AMatrix::resize(int nrows, int ncols)
  * @param cx Multiplicative parameter for this
  * @param cy Multiplicative parameter for y
  */
-void AMatrix::addMatInPlace(const AMatrix& y, double cx, double cy)
+void AMatrix::addMat(const AMatrix& y, double cx, double cy)
 {
   if (!isSameSize(y)) return;
 
@@ -1267,7 +1267,7 @@ void AMatrix::makePositiveColumn()
   }
 }
 
-void AMatrix::prodMatInPlace(const AMatrix* matY, bool transposeY)
+void AMatrix::prodMat(const AMatrix* matY, bool transposeY)
 {
   prodMatMatInPlace(this, matY, false, transposeY);
 }

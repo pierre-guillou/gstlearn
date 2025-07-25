@@ -833,12 +833,12 @@ void MatrixSparse::linearCombination(double val1,
  * @param cy Coefficient applied to the Matrix  'y'
  * @param y Second Matrix in the Linear combination
  */
-void MatrixSparse::addMatInPlace(const AMatrix& y, double cx, double cy)
+void MatrixSparse::addMat(const AMatrix& y, double cx, double cy)
 {
   const auto* ym = dynamic_cast<const MatrixSparse*>(&y);
   if (ym == nullptr)
   {
-    AMatrix::addMatInPlace(y, cx, cy);
+    AMatrix::addMat(y, cx, cy);
   }
   else
   {

@@ -173,7 +173,13 @@ void Rotation::rotateDirect(const VectorDouble& inv, VectorDouble& outv) const
   if (!_flagRot)
     outv = inv;
   else
-    _rotMat.prodMatVecInPlace(inv, outv, false);
+  {
+    // Using the constvect interface allows resizing the input and output vectors
+    // on the fly (avoiding copies)
+    constvect cinv(inv.data(), _nDim);
+    vect coutv(outv.data(), _nDim);
+    _rotMat.prodMatVecInPlaceC(cinv, coutv, false);
+  }
 }
 
 void Rotation::rotateInverse(const VectorDouble& inv, VectorDouble& outv) const
@@ -181,7 +187,13 @@ void Rotation::rotateInverse(const VectorDouble& inv, VectorDouble& outv) const
   if (!_flagRot)
     outv = inv;
   else
-    _rotInv.prodMatVecInPlace(inv, outv, false);
+  {
+    // Using the constvect interface allows resizing the input and output vectors
+    // on the fly (avoiding copies)
+    constvect cinv(inv.data(), _nDim);
+    vect coutv(outv.data(), _nDim);
+    _rotInv.prodMatVecInPlaceC(cinv, coutv, false);
+  }
 }
 
 void Rotation::_recopy(const Rotation& r)

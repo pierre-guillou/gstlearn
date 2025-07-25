@@ -3194,9 +3194,9 @@ MatrixSparse* _spde_build_Q(MatrixSparse* S,
 
   for (int iterm = 1; iterm < nblin; iterm++)
   {
-    Q->addMatInPlace(*Bi, 1., blin[iterm]);
+    Q->addMat(*Bi, 1., blin[iterm]);
     if (iterm < nblin - 1)
-      Bi->prodMatInPlace(S);
+      Bi->prodMat(S);
   }
   delete Bi;
 
@@ -3639,7 +3639,7 @@ int spde_chebychev_operate(MatrixSparse* S,
 
   T1 = MatrixSparse::diagConstant(nvertex, 1.);
   if (T1 == nullptr) goto label_end;
-  T1->addMatInPlace(*S, v2, v1);
+  T1->addMat(*S, v2, v1);
 
   /* Initialize the simulation */
 
@@ -3812,7 +3812,6 @@ static int st_kriging_several_rhs(double* data,
 
   temp = (double*)mem_alloc(sizeof(double) * size, 0);
   if (temp == nullptr) goto label_end;
-
 
   /* Constitute the RHS */
 

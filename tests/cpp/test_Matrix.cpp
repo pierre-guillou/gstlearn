@@ -233,15 +233,15 @@ int main(int argc, char* argv[])
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
   message("Reference MRR (before linear combination)\n");
   MRR.display();
-  MRR.addMatInPlace(MRR, cx, cy);
+  MRR.addMat(MRR, cx, cy);
   message("Reference MRR (after linear combination)\n");
   MRR.display();
 
-  MSG.addMatInPlace(MSG, cx, cy);
+  MSG.addMat(MSG, cx, cy);
   message("Are results for MRR and MSG similar: %d\n", (int)MRR.isSame(MSG));
-  MSS.addMatInPlace(MSS, cx, cy);
+  MSS.addMat(MSS, cx, cy);
   message("Are results for MRR and MSS similar: %d\n", (int)MRR.isSame(MSS));
-  MSP->addMatInPlace(*MSP, cx, cy);
+  MSP->addMat(*MSP, cx, cy);
   message("Are results for MRR and MSP similar: %d\n", (int)MRR.isSame(*MSP));
 
   /**
@@ -389,14 +389,14 @@ int main(int argc, char* argv[])
   MSG.display();
 
   message("Adding the matrix to itself\n");
-  MSG.addMatInPlace(MSG);
+  MSG.addMat(MSG);
   MSG.display();
 
   cx = 1.2;
   cy = -2.3;
   message("Making the linear combination of the matrix (multiplied by %f) and itself (multiplied by %lf)\n", cx, cy);
   MatrixSquare MSG3(MSG);
-  MSG.addMatInPlace(MSG3, cx, cy);
+  MSG.addMat(MSG3, cx, cy);
   MSG.display();
 
   message("Multiplying current matrix column-wise by a vector (sequence)\n");
@@ -484,12 +484,12 @@ int main(int argc, char* argv[])
   MSP->display();
 
   message("Adding the matrix to itself\n");
-  MSP->addMatInPlace(*MSP);
+  MSP->addMat(*MSP);
   MSP->display();
 
   message("Making the linear combination of the matrix (multiplied by %f) and itself (multiplied by %lf)\n", cx, cy);
   MatrixSparse MSP3(*MSP);
-  MSP->addMatInPlace(MSP3, cx, cy);
+  MSP->addMat(MSP3, cx, cy);
   MSP->display();
 
   message("Multiplying current matrix column-wise by a vector (sequence)\n");
