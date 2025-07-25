@@ -124,6 +124,15 @@ public:
   /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
   void prodNormMatInPlace(const AMatrix* a,
                           bool transpose = false) override;
+  /*! Perform 'this' = 'val1' * 'mat1' + 'val2' * 'mat2' + 'val3' * 'mat3' */
+  void linearCombination(double val1,
+                         const AMatrix* mat1,
+                         double val2         = 1.,
+                         const AMatrix* mat2 = nullptr,
+                         double val3         = 1.,
+                         const AMatrix* mat3 = nullptr) override;
+  /*! Add a matrix (multiplied by a constant) */
+  void addMatInPlace(const AMatrix& y, double cx = 1., double cy = 1.) override;
 
   const VectorDouble& getEigenValues() const { return _eigenValues; }
   const MatrixSquare* getEigenVectors() const { return _eigenVectors; }
@@ -139,8 +148,6 @@ public:
   void addRow(int nrow_added = 1);
   void addColumn(int ncolumn_added = 1);
   constvect getColumnPtr(int icol) const;
-  /*! Add a matrix (multiplied by a constant) */
-  void addMatInPlace(const MatrixDense& y, double cx = 1., double cy = 1.);
 
   static MatrixDense* create(const MatrixDense* mat);
   static MatrixDense* create(int nrow, int ncol);
@@ -178,6 +185,7 @@ protected:
   int _getMatrixPhysicalSize() const override;
   double _getValueByRank(int rank) const override;
   double& _getValueRef(int irow, int icol) override;
+
 #ifndef SWIG
   void _addProdVecMatInPlacePtr(constvect x, vect y, bool transpose = false) const override;
   void _addProdMatVecInPlacePtr(constvect x, vect y, bool transpose = false) const override;

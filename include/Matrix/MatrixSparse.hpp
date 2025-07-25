@@ -131,6 +131,15 @@ public:
   /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
   void prodNormMatInPlace(const AMatrix* a,
                           bool transpose = false) override;
+  /*! Perform 'this' = 'val1' * 'mat1' + 'val2' * 'mat2' + 'val3' * 'mat3' */
+  void linearCombination(double val1,
+                         const AMatrix* mat1,
+                         double val2         = 1.,
+                         const AMatrix* mat2 = nullptr,
+                         double val3         = 1.,
+                         const AMatrix* mat3 = nullptr) override;
+  /*! Add a matrix (multiplied by a constant) */
+  void addMatInPlace(const AMatrix& y, double cx = 1., double cy = 1.) override;
 
   /*! Extract the contents of the matrix */
   NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const override;
@@ -141,9 +150,6 @@ public:
 #ifndef SWIG
   int addVecInPlaceEigen(const Eigen::Map<const Eigen::VectorXd>& xm,
                          Eigen::Map<Eigen::VectorXd>& ym) const;
-  void addProdMatVecInPlaceToDest(const constvect in,
-                                  vect out,
-                                  bool transpose = false) const;
 #endif
 
   // Static functions
@@ -171,9 +177,6 @@ public:
                           bool flagShiftCol);
   /*! Dump a specific range of samples from the internal storage */
   static void dumpElements(const String& title, int ifrom, int ito);
-
-  /*! Add a matrix (multiplied by a constant) */
-  virtual void addMatInPlace(const MatrixSparse& y, double cx = 1., double cy = 1.);
 
   void resetFromTriplet(const NF_Triplet& NF_T);
 
@@ -229,6 +232,7 @@ protected:
   int _getMatrixPhysicalSize() const override;
   double _getValueByRank(int rank) const override;
   double& _getValueRef(int irow, int icol) override;
+
 #ifndef SWIG
   void _addProdVecMatInPlacePtr(constvect x, vect y, bool transpose = false) const override;
   void _addProdMatVecInPlacePtr(constvect x, vect y, bool transpose = false) const override;

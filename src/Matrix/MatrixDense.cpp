@@ -297,10 +297,18 @@ void MatrixDense::prodScalar(double v)
   eigenMat().array() *= v;
 }
 
-void MatrixDense::addMatInPlace(const MatrixDense& y, double cx, double cy)
+void MatrixDense::addMatInPlace(const AMatrix& y, double cx, double cy)
 {
-  if (y.eigenMat().size() <= 0) return;
-  eigenMat().noalias() = cx * eigenMat() + cy * y.eigenMat();
+  const auto* ym = dynamic_cast<const MatrixDense*>(&y);
+  if (ym == nullptr)
+  {
+    AMatrix::addMatInPlace(y, cx, cy);
+  }
+  else
+  {
+    if (getFlagMatrixCheck() && !isSameSize(y)) return;
+    eigenMat().noalias() = cx * eigenMat() + cy * ym->eigenMat();
+  }
 }
 
 void MatrixDense::prodMatMatInPlace(const AMatrix* x,
@@ -442,6 +450,34 @@ void MatrixDense::prodNormMatInPlace(const AMatrix* a, bool transpose)
     {
       eigenMat() = am->eigenMat() * am->eigenMat().transpose();
     }
+  }
+}
+
+void MatrixDense::linearCombination(double val1,
+                                    const AMatrix* mat1,
+                                    double val2,
+                                    const AMatrix* mat2,
+                                    double val3,
+                                    const AMatrix* mat3)
+{
+  const auto* mmat1 = dynamic_cast<const MatrixDense*>(mat1);
+  const auto* mmat2 = dynamic_cast<const MatrixDense*>(mat2);
+  const auto* mmat3 = dynamic_cast<const MatrixDense*>(mat3);
+
+  if ((mat1 != nullptr && mmat1 == nullptr) ||
+      (mat2 != nullptr && mmat2 == nullptr) ||
+      (mat3 != nullptr && mmat3 == nullptr))
+  {
+    AMatrix::linearCombination(val1, mat1, val2, mat2, val3, mat3);
+  }
+  else
+  {
+    if (mmat1 != nullptr && val1 != 0.)
+      eigenMat() = val1 * mmat1->eigenMat();
+    if (mmat2 != nullptr && val2 != 0.)
+      eigenMat() += val2 * mmat2->eigenMat();
+    if (mmat3 != nullptr && val3 != 0.)
+      eigenMat() += val3 * mmat3->eigenMat();
   }
 }
 

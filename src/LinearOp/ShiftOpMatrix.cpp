@@ -380,7 +380,7 @@ void ShiftOpMatrix::prodLambdaOnSqrtTildeC(const VectorDouble& inv,
  *****************************************************************************/
 int ShiftOpMatrix::_addToDest(const constvect inv, vect outv) const
 {
-  _S->addProdMatVecInPlaceToDest(inv, outv);
+  _S->addProdMatVecInPlaceC(inv, outv);
   return 0;
 }
 

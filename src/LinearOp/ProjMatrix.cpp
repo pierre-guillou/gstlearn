@@ -126,7 +126,7 @@ int ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
     return 1;
   }
 
-  addProdMatVecInPlaceToDest(inv, outv, false);
+  addProdMatVecInPlaceC(inv, outv, false);
   return 0;
 }
 
@@ -145,7 +145,7 @@ int ProjMatrix::_addPoint2mesh(const constvect inv, vect outv) const
     return 1;
   }
 
-  addProdMatVecInPlaceToDest(inv, outv, true);
+  addProdMatVecInPlaceC(inv, outv, true);
   return 0;
 }
 

@@ -334,19 +334,6 @@ void MatrixSparse::divideColumn(const VectorDouble& vec)
       it.valueRef() /= vec[it.col()];
 }
 
-/*! Perform y += 'this' %*% x */
-void MatrixSparse::addProdMatVecInPlaceToDest(const constvect in,
-                                              vect out,
-                                              bool transpose) const
-{
-  Eigen::Map<const Eigen::VectorXd> inm(in.data(), in.size());
-  Eigen::Map<Eigen::VectorXd> outm(out.data(), out.size());
-  if (transpose)
-    outm += eigenMat().transpose() * inm;
-  else
-    outm += eigenMat() * inm;
-}
-
 /**
  * Filling the matrix with an array of values
  * Note that this array is ALWAYS dimensioned to the total number
@@ -811,6 +798,34 @@ void MatrixSparse::prodNormMatMatInPlace(const AMatrix* a,
   }
 }
 
+void MatrixSparse::linearCombination(double val1,
+                                     const AMatrix* mat1,
+                                     double val2,
+                                     const AMatrix* mat2,
+                                     double val3,
+                                     const AMatrix* mat3)
+{
+  const auto* mmat1 = dynamic_cast<const MatrixSparse*>(mat1);
+  const auto* mmat2 = dynamic_cast<const MatrixSparse*>(mat2);
+  const auto* mmat3 = dynamic_cast<const MatrixSparse*>(mat3);
+
+  if ((mat1 != nullptr && mmat1 == nullptr) ||
+      (mat2 != nullptr && mmat2 == nullptr) ||
+      (mat3 != nullptr && mmat3 == nullptr))
+  {
+    AMatrix::linearCombination(val1, mat1, val2, mat2, val3, mat3);
+  }
+  else
+  {
+    if (mmat1 != nullptr && val1 != 0.)
+      eigenMat() = val1 * mmat1->eigenMat();
+    if (mmat2 != nullptr && val2 != 0.)
+      eigenMat() += val2 * mmat2->eigenMat();
+    if (mmat3 != nullptr && val3 != 0.)
+      eigenMat() += val3 * mmat3->eigenMat();
+  }
+}
+
 /*!
  * Updates the current Matrix as a linear combination of matrices as follows:
  *  this <- cx * this + cy * y
@@ -818,12 +833,18 @@ void MatrixSparse::prodNormMatMatInPlace(const AMatrix* a,
  * @param cy Coefficient applied to the Matrix  'y'
  * @param y Second Matrix in the Linear combination
  */
-void MatrixSparse::addMatInPlace(const MatrixSparse& y, double cx, double cy)
+void MatrixSparse::addMatInPlace(const AMatrix& y, double cx, double cy)
 {
-  if (getFlagMatrixCheck() &&
-      !isSameSize(y)) return;
-
-  eigenMat() = cx * eigenMat() + cy * y.eigenMat();
+  const auto* ym = dynamic_cast<const MatrixSparse*>(&y);
+  if (ym == nullptr)
+  {
+    AMatrix::addMatInPlace(y, cx, cy);
+  }
+  else
+  {
+    if (getFlagMatrixCheck() && !isSameSize(y)) return;
+    eigenMat() = cx * eigenMat() + cy * ym->eigenMat();
+  }
 }
 
 int MatrixSparse::_invert()

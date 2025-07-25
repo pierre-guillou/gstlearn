@@ -131,6 +131,15 @@ public:
   /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
   virtual void prodNormMatInPlace(const AMatrix* a,
                                   bool transpose = false);
+  /*! Perform 'this' = 'val1' * 'mat1' + 'val2' * 'mat2' + 'val3' * 'mat3' */
+  virtual void linearCombination(double val1,
+                                 const AMatrix* mat1,
+                                 double val2         = 1.,
+                                 const AMatrix* mat2 = nullptr,
+                                 double val3         = 1.,
+                                 const AMatrix* mat3 = nullptr);
+  /*! Add a matrix (multiplied by a constant) */
+  virtual void addMatInPlace(const AMatrix& y, double cx = 1., double cy = 1.);
 
   /*! Extract the contents of the matrix */
   virtual NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const;
@@ -143,8 +152,6 @@ public:
   /*! Check if the matrix is square and Identity */
   bool isIdentity(bool printWhyNot = false) const;
 
-  /*! Add a matrix (multiplied by a constant) */
-  void addMatInPlace(const AMatrix& y, double cx = 1., double cy = 1.);
   /*! Multiply 'this' by matrix 'y' and store in 'this'*/
   void prodMatInPlace(const AMatrix* matY, bool transposeY = false);
 
@@ -224,12 +231,7 @@ public:
   void copyElements(const AMatrix& m, double factor = 1.);
 
   void makePositiveColumn();
-  void linearCombination(double val1,
-                         const AMatrix* mat1,
-                         double val2         = 1.,
-                         const AMatrix* mat2 = nullptr,
-                         double val3         = 1.,
-                         const AMatrix* mat3 = nullptr);
+
   void dumpRange(const char* title);
 
 #ifndef SWIG
@@ -250,6 +252,7 @@ protected:
   virtual int _getMatrixPhysicalSize() const                       = 0;
   virtual double _getValueByRank(int rank) const                   = 0;
   virtual double& _getValueRef(int irow, int icol)                 = 0;
+
 #ifndef SWIG
   virtual void _addProdMatVecInPlacePtr(constvect x,
                                         vect y,
