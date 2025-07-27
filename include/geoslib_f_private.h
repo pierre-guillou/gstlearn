@@ -46,11 +46,6 @@ int _krigsim(Db* dbin,
              int icase,
              int nbsimu,
              bool flag_dgm);
-void _image_smoother(DbGrid* dbgrid,
-                     const NeighImage* neigh,
-                     int type,
-                     double range,
-                     int iptr0);
 
 /*******************************************/
 /* Prototyping the functions in variopgs.c */

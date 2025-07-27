@@ -148,7 +148,6 @@ GSTLEARN_EXPORT void matrix_cholesky_product(int mode,
                                              const double* tl,
                                              const double* a,
                                              double* x);
-GSTLEARN_EXPORT void matrix_cholesky_invert(int neq, const double* tl, double* xl);
 GSTLEARN_EXPORT void matrix_combine(int nval,
                                     double coeffa,
                                     const double* a,
@@ -457,7 +456,6 @@ GSTLEARN_EXPORT int db_diffusion(DbGrid* dbgrid1,
 /* Prototyping the functions in krige.c */
 /****************************************/
 
-GSTLEARN_EXPORT int is_flag_data_disc_defined(void);
 GSTLEARN_EXPORT void set_DBIN(Db* dbin);
 GSTLEARN_EXPORT void set_DBOUT(Db* dbout);
 GSTLEARN_EXPORT int krige_koption_manage(int mode,
@@ -476,16 +474,6 @@ GSTLEARN_EXPORT void krige_rhs_print(int nvar,
                                      int nred,
                                      const int* flag,
                                      double* rhs);
-GSTLEARN_EXPORT void krige_dual_print(int nech,
-                                      int neq,
-                                      int nred,
-                                      const int* flag,
-                                      double* dual);
-GSTLEARN_EXPORT int bayes_simulate(Model* model,
-                                   int nbsimu,
-                                   const VectorDouble& rmean,
-                                   const VectorDouble& rcov,
-                                   VectorDouble& smean);
 GSTLEARN_EXPORT int krigsampling_f(Db* dbin,
                                    Db* dbout,
                                    Model* model,

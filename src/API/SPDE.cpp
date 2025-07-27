@@ -29,7 +29,6 @@
 #include "LinearOp/SPDEOp.hpp"
 #include "LinearOp/SPDEOpMatrix.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Model/Model.hpp"
 #include "geoslib_define.h"
@@ -255,20 +254,6 @@ void SPDE::_purge()
   }
   _meshingSimu.clear();
   _meshingKrig.clear();
-}
-
-SPDE* SPDE::create(Model* model,
-                   const Db* domain,
-                   const Db* data,
-                   const ESPDECalcMode& calcul,
-                   const AMesh* meshUser,
-                   int useCholesky,
-                   const SPDEParam& params,
-                   bool verbose,
-                   bool showStats)
-{
-  return new SPDE(model, domain, data, calcul, meshUser, useCholesky,
-                  params, verbose, showStats);
 }
 
 /**
@@ -755,84 +740,6 @@ double SPDE::computeQuad() const
   return _precisionsKrig->computeQuadratic(_workingData);
 }
 
-double SPDE::_computeLogLikelihood(int nbsimu, bool verbose) const
-{
-  if (_precisionsKrig == nullptr)
-  {
-    messerr("The member '_precisionsKrig' must have been calculated beforehand");
-    return TEST;
-  }
-
-  if (!_isCoeffsComputed)
-  {
-    _computeDriftCoeffs();
-  }
-  int size       = (int)_workingData.size();
-  double logdet  = computeTotalLogDet(nbsimu, verbose);
-  double quad    = computeQuad();
-  double loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
-
-  if (verbose)
-  {
-    message("Likelihood calculation:\n");
-    message("- Length of Information Vector = %d\n", size);
-    message("- Number of Simulations = %d\n", nbsimu);
-    message("- Cholesky = %d\n", _useCholesky);
-    message("Log-Determinant = %lf\n", logdet);
-    message("Quadratic term  = %lf\n", quad);
-    message("Log-likelihood  = %lf\n", loglike);
-  }
-  return loglike;
-}
-
-/**
- * Calculate the Log-Likelihood profiling the Drift parameters
- */
-double SPDE::computeLogLikelihood(int nbsimu, bool verbose) const
-{
-  VectorDouble dataVect;
-  bool useSel = true;
-  int ivar    = 0;
-
-  // Preliminary checks
-  if (_isKrigingRequested())
-  {
-    if (_data == nullptr)
-    {
-      messerr("For this calculation option, you must define some Data");
-      return 1;
-    }
-    if (_data->getNLoc(ELoc::Z) != 1)
-    {
-      messerr("The Input dbin must contain ONE variable (Z locator)");
-      return 1;
-    }
-  }
-
-  if (_isKrigingRequested())
-    _precisionsKrig->makeReady();
-
-  // Preliminary tasks
-  if (_data != nullptr)
-  {
-    dataVect = _data->getColumnByLocator(ELoc::Z, ivar, useSel);
-    // Suppress any TEST value and center by the drift
-    dataVect = VH::suppressTest(dataVect);
-    _centerByDrift(dataVect, useSel);
-  }
-
-  // Dispatch
-
-  _workingData = _workingDataInit;
-  _computeKriging();
-
-  // we assume that covariance parameters have changed when using this function:
-  // so driftCoeffs have to be recomputed
-  _isCoeffsComputed = false;
-
-  return _computeLogLikelihood(nbsimu, verbose);
-}
-
 void SPDE::_computeDriftCoeffs() const
 {
   if (!_isCoeffsComputed)
@@ -858,22 +765,6 @@ VectorDouble SPDE::getCoeffs()
 {
   _computeDriftCoeffs();
   return _driftCoeffs;
-}
-
-double logLikelihoodSPDEOld(Db* dbin,
-                            Model* model,
-                            Db* domain,
-                            const AMesh* mesh,
-                            int useCholesky,
-                            int nbsimu,
-                            const SPDEParam& params,
-                            bool verbose)
-{
-  Db* domain_local = domain;
-  if (domain_local == nullptr) domain_local = dbin;
-  SPDE spde(model, domain_local, dbin, ESPDECalcMode::KRIGING, mesh, useCholesky,
-            params, verbose, false);
-  return spde.computeLogLikelihood(nbsimu, verbose);
 }
 
 /**
@@ -1071,11 +962,11 @@ int krigingSPDE(Db* dbin,
   PrecisionOpMulti* Qop                    = nullptr;
   PrecisionOpMulti* QopS                   = nullptr;
   PrecisionOpMultiMatrix* Qom              = nullptr;
-  std::shared_ptr<InvNuggetOp> invnoiseobj = std::make_shared<InvNuggetOp>(dbin, model, params,!flagCholesky);
+  std::shared_ptr<InvNuggetOp> invnoiseobj = std::make_shared<InvNuggetOp>(dbin, model, params, !flagCholesky);
   if (flagCholesky)
   {
-    Qom           = new PrecisionOpMultiMatrix(model, meshLocalK);
-    spdeop        = new SPDEOpMatrix(Qom, AInK, invnoiseobj.get(), AoutK);
+    Qom    = new PrecisionOpMultiMatrix(model, meshLocalK);
+    spdeop = new SPDEOpMatrix(Qom, AInK, invnoiseobj.get(), AoutK);
   }
   else
   {

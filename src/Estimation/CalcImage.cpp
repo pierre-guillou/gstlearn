@@ -10,6 +10,7 @@
 /******************************************************************************/
 #include "Estimation/CalcImage.hpp"
 #include "Basic/Convolution.hpp"
+#include "Basic/Law.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "Calculators/ACalcInterpolator.hpp"
 #include "Db/DbGrid.hpp"
@@ -322,6 +323,97 @@ bool CalcImage::_run()
 
 /****************************************************************************/
 /*!
+**  Smooth a regular grid
+**
+** \param[in]  dbgrid    input and output Db grid structure
+** \param[in]  neigh     Neigh structure
+** \param[in]  type      1 for Uniform; 2 for Gaussian
+** \param[in]  range     Range (used for Gaussian only)
+** \param[in]  iptr0     Storage address
+**
+** \remarks Limited to the monovariate case
+**
+*****************************************************************************/
+void CalcImage::_image_smoother(DbGrid* dbgrid,
+                                const NeighImage* neigh,
+                                int type,
+                                double range,
+                                int iptr0)
+{
+  int ndim  = dbgrid->getNDim();
+  double r2 = (type == 1) ? 1. : range * range;
+
+  /* Core allocation */
+
+  VectorInt indg0(ndim);
+  VectorInt indgl(ndim);
+  VectorInt indn0(ndim);
+  VectorInt indnl(ndim);
+
+  /* Create the secondary grid for image processing */
+
+  VectorInt nx(ndim);
+  int nech = 1;
+  for (int idim = 0; idim < ndim; idim++)
+  {
+    nx[idim] = 2 * neigh->getImageRadius(idim) + 1;
+    nech *= nx[idim];
+  }
+
+  law_set_random_seed(12345);
+  double seuil = 1. / neigh->getSkip();
+  VectorDouble tab(nech);
+  for (int iech = 0; iech < nech; iech++)
+    tab[iech] = (law_uniform(0., 1.) < seuil) ? 0. : TEST;
+
+  DbGrid* dbaux =
+    DbGrid::create(nx, dbgrid->getDXs(), dbgrid->getX0s(), dbgrid->getAngles(),
+                   ELoadBy::COLUMN, tab, {"test"}, {String {ELoc::Z.getKey()}}, 1);
+
+  int nb_neigh = dbaux->getNSample(true);
+  dbaux->rankToIndice(nb_neigh / 2, indn0);
+
+  /* Loop on the targets to be processed */
+
+  for (int iech_out = 0; iech_out < dbgrid->getNSample(); iech_out++)
+  {
+    if (!dbgrid->isActive(iech_out)) continue;
+    dbgrid->rankToIndice(iech_out, indg0);
+
+    /* Loop on the neighboring points */
+
+    double estim = 0.;
+    double total = 0.;
+    for (int iech = 0; iech < nb_neigh; iech++)
+    {
+      if (FFFF(dbaux->getZVariable(iech, 0))) continue;
+      dbaux->rankToIndice(iech, indnl);
+      double d2 = 0.;
+      for (int i = 0; i < ndim; i++)
+      {
+        int idelta   = (indnl[i] - indn0[i]);
+        double delta = idelta * dbgrid->getDX(i);
+        d2 += delta * delta;
+        indgl[i] = indg0[i] + idelta;
+        indgl[i] = dbgrid->getMirrorIndex(i, indgl[i]);
+      }
+
+      int jech    = dbgrid->indiceToRank(indgl);
+      double data = dbgrid->getZVariable(jech, 0);
+      if (!FFFF(data))
+      {
+        double weight = (type == 1) ? 1. : exp(-d2 / r2);
+        estim += data * weight;
+        total += weight;
+      }
+    }
+    estim = (total <= 0.) ? TEST : estim / total;
+    dbgrid->setArray(iech_out, iptr0, estim);
+  }
+}
+
+/****************************************************************************/
+/*!
  **  Kriging (Factorial) a regular grid
  **
  ** \return  Error return code
@@ -443,4 +535,5 @@ GSTLEARN_EXPORT int dbMorpho(DbGrid* dbgrid,
   int error = (image.run()) ? 0 : 1;
   return error;
 }
-}
+
+} // namespace gstlrn

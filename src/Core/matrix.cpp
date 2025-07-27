@@ -10,6 +10,7 @@
 /******************************************************************************/
 #include "Basic/Memory.hpp"
 #include "Basic/Utilities.hpp"
+#include "geoslib_define.h"
 #include "geoslib_old_f.h"
 #include <cmath>
 
@@ -53,7 +54,7 @@ namespace gstlrn
 {
 static double _getTolInvert()
 {
-  return 1.e-25;
+  return EPSILON25;
 }
 static double _getEpsMatrix()
 {
@@ -733,31 +734,6 @@ void matrix_cholesky_product(int mode,
 
 /*****************************************************************************/
 /*!
- **  Invert the Cholesky matrix
- **
- ** \param[in]  neq  number of equations in the system
- ** \param[in]  tl   lower triangular matrix defined by column
- **
- ** \param[out] xl   lower triangular inverted matrix defined by column
- **
- *****************************************************************************/
-void matrix_cholesky_invert(int neq, const double* tl, double* xl)
-{
-  for (int i = 0; i < neq; i++)
-  {
-    for (int j = 0; j < i; j++)
-    {
-      double sum = 0.;
-      for (int l = j; l < i; l++)
-        sum += TL(i, l) * XL(l, j);
-      XL(i, j) = -sum / TL(i, i);
-    }
-    XL(i, i) = 1. / TL(i, i);
-  }
-}
-
-/*****************************************************************************/
-/*!
  **  Perform a linear combination of matrices or vectors
  **            [C] = 'coeffa' * [A] + 'coeffb' * [B]
  **
@@ -872,4 +848,5 @@ int matrix_eigen_tridiagonal(const double* vecdiag,
   mem_free((char*)e);
   return (0);
 }
+
 } // namespace gstlrn

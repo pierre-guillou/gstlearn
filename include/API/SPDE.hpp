@@ -14,20 +14,15 @@
 #include "LinearOp/ProjMultiMatrix.hpp"
 #include "geoslib_define.h"
 
-#include "Enum/ESPDECalcMode.hpp"
-#include "Basic/NamingConvention.hpp"
 #include "API/SPDEParam.hpp"
+#include "Basic/NamingConvention.hpp"
+#include "Enum/ESPDECalcMode.hpp"
 #include "LinearOp/PrecisionOpMatrix.hpp"
 #include "LinearOp/PrecisionOpMultiConditional.hpp"
 #include <vector>
 
-
-
-
-
 namespace gstlrn
 {
-
 class ShiftOpMatrix;
 class PrecisionOp;
 class PrecisionOpMatrix;
@@ -59,23 +54,12 @@ public:
   SPDE& operator=(const SPDE& r) = delete;
   virtual ~SPDE();
 
-  static SPDE* create(Model* model,
-                      const Db* domain,
-                      const Db* data              = nullptr,
-                      const ESPDECalcMode& calcul = ESPDECalcMode::fromKey("SIMUCOND"),
-                      const AMesh* mesh           = nullptr,
-                      int useCholesky             = -1,
-                      const SPDEParam& params     = SPDEParam(),
-                      bool verbose                = false,
-                      bool showStats              = false);
-
   int compute(Db* dbout,
               int nbsimu                      = 1,
               const NamingConvention& namconv = NamingConvention("spde"));
 
   double computeTotalLogDet(int nMC = 1, bool verbose = false) const;
   double computeQuad() const;
-  double computeLogLikelihood(int nbsimu = 1, bool verbose = false) const;
   VectorDouble getCoeffs();
 
   void setDriftCoeffs(const VectorDouble& coeffs);
@@ -104,32 +88,31 @@ private:
   void _addNuggetOnResult(VectorDouble& result) const;
   void _addDrift(Db* db, VectorDouble& result, bool useSel = true);
   void _setUseCholesky(int useCholesky = -1, bool verbose = false);
-  double _computeLogLikelihood(int nbsimu = 1, bool verbose = false) const;
 
 #ifndef SWIG
-    static void _projecLocal(Db* dbout,
-                             const AMesh* meshing,
-                             std::vector<double>& working,
-                             VectorDouble& result);
+  static void _projecLocal(Db* dbout,
+                           const AMesh* meshing,
+                           std::vector<double>& working,
+                           VectorDouble& result);
 #endif
 
 private:
-  const Db*                    _data; // External Pointer
-  ESPDECalcMode                _calcul;
+  const Db* _data; // External Pointer
+  ESPDECalcMode _calcul;
   PrecisionOpMultiConditional* _precisionsKrig;
   PrecisionOpMultiConditional* _precisionsSimu;
-  std::vector<PrecisionOp*>    _pilePrecisions; // Dimension: number of valid covariances
-  std::vector<ProjMatrix*>     _pileProjMatrix; // Dimension: number of valid covariances
-  std::vector<const AMesh*>    _meshingSimu;    // Dimension: number of valid covariances
-  std::vector<const AMesh*>    _meshingKrig;    // Dimension: number of valid covariances
-  mutable VectorDouble         _driftCoeffs;
-  Model*                       _model; // External pointer
-  mutable std::vector<std::vector<double>>   _workingKrig;     // Number of Mesh apices * Number of valid covariances
-  mutable std::vector<std::vector<double>>   _workingSimu;     // Number of Mesh apices * Number of valid covariances
-  mutable std::vector<double>                _workingData;     // Number of valid data
-  mutable std::vector<double>                _workingDataInit; // Number of valid data
-  std::vector<ProjMatrix*>     _projOnDbOut;
-  VectorInt                    _adressesICov;
+  std::vector<PrecisionOp*> _pilePrecisions; // Dimension: number of valid covariances
+  std::vector<ProjMatrix*> _pileProjMatrix;  // Dimension: number of valid covariances
+  std::vector<const AMesh*> _meshingSimu;    // Dimension: number of valid covariances
+  std::vector<const AMesh*> _meshingKrig;    // Dimension: number of valid covariances
+  mutable VectorDouble _driftCoeffs;
+  Model* _model;                                         // External pointer
+  mutable std::vector<std::vector<double>> _workingKrig; // Number of Mesh apices * Number of valid covariances
+  mutable std::vector<std::vector<double>> _workingSimu; // Number of Mesh apices * Number of valid covariances
+  mutable std::vector<double> _workingData;              // Number of valid data
+  mutable std::vector<double> _workingDataInit;          // Number of valid data
+  std::vector<ProjMatrix*> _projOnDbOut;
+  VectorInt _adressesICov;
   double _nugget;
   VectorVectorDouble _driftTab;
   bool _requireCoeffs;
@@ -143,13 +126,13 @@ private:
 GSTLEARN_EXPORT int krigingSPDE(Db* dbin,
                                 Db* dbout,
                                 Model* model,
-                                bool flag_est                  = true,
-                                bool flag_std                  = false,
-                                int useCholesky                = -1,
-                                const VectorMeshes& meshesK    = VectorMeshes(),
-                                const ProjMultiMatrix* projInK = nullptr,
-                                const VectorMeshes& meshesS    = VectorMeshes(),
-                                const ProjMultiMatrix* projInS = nullptr,
+                                bool flag_est                   = true,
+                                bool flag_std                   = false,
+                                int useCholesky                 = -1,
+                                const VectorMeshes& meshesK     = VectorMeshes(),
+                                const ProjMultiMatrix* projInK  = nullptr,
+                                const VectorMeshes& meshesS     = VectorMeshes(),
+                                const ProjMultiMatrix* projInS  = nullptr,
                                 const SPDEParam& params         = SPDEParam(),
                                 const NamingConvention& namconv = NamingConvention("KrigingSPDE"));
 GSTLEARN_EXPORT int simulateSPDE(Db* dbin,
@@ -163,14 +146,6 @@ GSTLEARN_EXPORT int simulateSPDE(Db* dbin,
                                  const ProjMultiMatrix* projInS  = nullptr,
                                  const SPDEParam& params         = SPDEParam(),
                                  const NamingConvention& namconv = NamingConvention("SimuSPDE"));
-GSTLEARN_EXPORT double logLikelihoodSPDEOld(Db* dbin,
-                                         Model* model,
-                                         Db* domain              = nullptr,
-                                         const AMesh* mesh       = nullptr,
-                                         int useCholesky         = -1,
-                                         int nbsimu              = 1,
-                                         const SPDEParam& params = SPDEParam(),
-                                         bool verbose            = false);
 GSTLEARN_EXPORT double logLikelihoodSPDE(Db* dbin,
                                          Model* model,
                                          int useCholesky               = -1,
@@ -183,4 +158,4 @@ GSTLEARN_EXPORT VectorMeshes defineMeshesFromDbs(const Db* dbin,
                                                  const Model* model,
                                                  const SPDEParam& params = SPDEParam(),
                                                  bool flagKrige          = true);
-}
+} // namespace gstlrn

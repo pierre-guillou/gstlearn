@@ -10,21 +10,22 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "geoslib_define.h"
+#include "gstlearn_export.hpp"
 
 #include "Enum/EMorpho.hpp"
 
 #include "Calculators/ACalcInterpolator.hpp"
 
-
-namespace gstlrn {
+namespace gstlrn
+{
 
 class DbGrid;
 class ANeigh;
 class NeighImage;
 class ModelCovList;
-class GSTLEARN_EXPORT CalcImage: public ACalcInterpolator {
+class GSTLEARN_EXPORT CalcImage: public ACalcInterpolator
+{
 public:
   CalcImage();
   CalcImage(const CalcImage& r)            = delete;
@@ -55,6 +56,11 @@ private:
   virtual void _rollback() override;
 
   bool _filterImage(DbGrid* dbgrid, const ModelCovList* model);
+  static void _image_smoother(DbGrid* dbgrid,
+                              const NeighImage* neigh,
+                              int type,
+                              double range,
+                              int iptr0);
   static DbGrid* _buildMarpat(const NeighImage* neigh,
                               const VectorVectorInt& ranks,
                               const MatrixDense& wgt,
@@ -83,7 +89,7 @@ private:
   double _smoothRange;
 };
 
-GSTLEARN_EXPORT int   krimage(DbGrid* dbgrid,
+GSTLEARN_EXPORT int krimage(DbGrid* dbgrid,
                             Model* model,
                             ANeigh* neigh,
                             bool flagFFT                    = false,
@@ -104,4 +110,4 @@ GSTLEARN_EXPORT int dbSmoother(DbGrid* dbgrid,
                                int type                        = 1,
                                double range                    = 1.,
                                const NamingConvention& namconv = NamingConvention("Smooth"));
-}
+} // namespace gstlrn
