@@ -727,8 +727,6 @@ GSTLEARN_EXPORT int multilayers_get_prior(Db* dbin,
 /***************************************/
 /* Prototyping the functions in spde.c */
 /***************************************/
-GSTLEARN_EXPORT QChol* qchol_manage(int mode, QChol* qchol);
-GSTLEARN_EXPORT double spde_compute_correc(int ndim, double param);
 GSTLEARN_EXPORT int m2d_gibbs_spde(Db* dbin,
                                    Db* dbout,
                                    Model* model,
@@ -750,35 +748,7 @@ GSTLEARN_EXPORT AMesh* spde_mesh_load(Db* dbin,
                                       Db* dbout,
                                       const VectorDouble& gext,
                                       SPDE_Option& s_option,
-                                      bool verbose = false);
-GSTLEARN_EXPORT int spde_eval(const VectorDouble& blin,
-                              MatrixSparse* S,
-                              const VectorDouble& Lambda,
-                              const VectorDouble& TildeC,
-                              double power,
-                              VectorDouble& x,
-                              VectorDouble& y);
-GSTLEARN_EXPORT void spde_external_mesh_undefine(int icov0);
-#ifndef SWIG
-GSTLEARN_EXPORT MatrixSparse* spde_external_A_define(int icov0, MatrixSparse* A);
-#endif
-GSTLEARN_EXPORT int kriging2D_spde(Db* dbin,
-                                   Model* model,
-                                   SPDE_Option& s_option,
-                                   int verbose,
-                                   int* nmesh_arg,
-                                   int* nvertex_arg,
-                                   VectorInt& meshes_arg,
-                                   VectorDouble& points_arg);
-#ifndef SWIG
-GSTLEARN_EXPORT MatrixSparse* db_mesh_neigh(const Db* db,
-                                            AMesh* amesh,
-                                            double radius,
-                                            int flag_exact,
-                                            bool verbose,
-                                            int* nactive,
-                                            int** ranks);
-#endif
+                                      bool verbose);
 
 /******************************************/
 /* Prototyping the functions in cluster.c */
