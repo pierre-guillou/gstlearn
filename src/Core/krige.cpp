@@ -46,8 +46,8 @@
 #define VAR0(iv, jv)            (var0_global[(jv) + nvar * (iv)])
 #define LHS_C(i, j)             (lhs[(i) + nred * (j)])
 #define RHS_C(i, iv)            (rhs[(i) + nred * (iv)])
-#define DISC1(i, idim)          (KOPTION->disc1[(idim) * KOPTION->ntot + (i)])
-#define DISC2(i, idim)          (KOPTION->disc2[(idim) * KOPTION->ntot + (i)])
+#define DISC1(i, idim)          (KOPTION.disc1[(idim) * KOPTION.ntot + (i)])
+#define DISC2(i, idim)          (KOPTION.disc2[(idim) * KOPTION.ntot + (i)])
 #define LHS_EXP(i, j)           (lhs_global[(i) * neq + (j)])
 #define RHS_EXP(i)              (rhs_global[(i)])
 #define COV_REF(iz)             (cov_ref[cov_radius + (iz)])
@@ -92,7 +92,7 @@ static Id FLAG_COLK, FLAG_SIMU, FLAG_EST, FLAG_STD, FLAG_VARZ, FLAG_PROF;
 static Id IPTR_EST, IPTR_STD, IPTR_VARZ, IPTR_NBGH;
 static Id* RANK_COLCOK;
 static Db *DBIN, *DBOUT;
-static Koption* KOPTION;
+static Koption KOPTION;
 static Id INH_FLAG_VERBOSE = 0;
 static Id INH_FLAG_LIMIT   = 1;
 static char string[100];
@@ -889,16 +889,11 @@ static Id st_block_discretize_alloc(Id ndim, const VectorInt& ndiscs)
   for (Id idim = 0; idim < ndim; idim++)
     ntot *= ndiscs[idim];
   if (ntot <= 0) return (1);
-  KOPTION->ntot = ntot;
+  KOPTION.ntot = ntot;
 
-  KOPTION->ndisc = st_icore(ndim, 1);
-  if (KOPTION->ndisc == nullptr) return (1);
-  KOPTION->disc1 = st_core(ndim, ntot);
-  if (KOPTION->disc1 == nullptr) return (1);
-  KOPTION->disc2 = st_core(ndim, ntot);
-  if (KOPTION->disc2 == nullptr) return (1);
-  for (Id idim = 0; idim < ndim; idim++)
-    KOPTION->ndisc[idim] = ndiscs[idim];
+  KOPTION.ndisc = ndiscs;
+  KOPTION.disc1.resize(ndim * ntot);
+  KOPTION.disc2.resize(ndim * ntot);
   return (0);
 }
 
@@ -914,10 +909,10 @@ static void st_data_discretize_alloc(Id ndim)
 {
   Id nrow, ncol;
 
-  KOPTION->flag_data_disc = 0;
+  KOPTION.flag_data_disc = 0;
   if (DBIN->getNLoc(ELoc::BLEX) > 0)
   {
-    if (!get_keypair("Data_Discretization", &nrow, &ncol, &KOPTION->dsize))
+    if (!get_keypair("Data_Discretization", &nrow, &ncol, KOPTION.dsize))
     {
       if (nrow * ncol != ndim)
       {
@@ -928,7 +923,7 @@ static void st_data_discretize_alloc(Id ndim)
       }
       else
       {
-        KOPTION->flag_data_disc = 1;
+        KOPTION.flag_data_disc = 1;
       }
     }
     else
@@ -972,8 +967,8 @@ static void st_block_discretize(Id mode, Id flag_rand, Id iech)
   /* Initializations */
 
   memo = law_get_random_seed();
-  ntot = KOPTION->ntot;
-  ndim = KOPTION->ndim;
+  ntot = KOPTION.ntot;
+  ndim = KOPTION.ndim;
   law_set_random_seed(1234546);
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(DBOUT);
 
@@ -986,7 +981,7 @@ static void st_block_discretize(Id mode, Id flag_rand, Id iech)
     for (idim = ndim - 1; idim >= 0; idim--)
     {
       taille = (mode == 0) ? dbgrid->getDX(idim) : DBOUT->getLocVariable(ELoc::BLEX, iech, idim);
-      nd     = KOPTION->ndisc[idim];
+      nd     = KOPTION.ndisc[idim];
       nval /= nd;
       j = jech / nval;
       jech -= j * nval;
@@ -1034,20 +1029,18 @@ Id krige_koption_manage(Id mode,
   {
 
     /* Allocation of the structure */
-
-    KOPTION         = new Koption();
-    KOPTION->calcul = calcul;
+    KOPTION.calcul = calcul;
 
     // Target discretization
-    KOPTION->ndim  = ndim;
-    KOPTION->ntot  = 0;
-    KOPTION->disc1 = nullptr;
-    KOPTION->disc2 = nullptr;
-    KOPTION->ndisc = nullptr;
+    KOPTION.ndim = ndim;
+    KOPTION.ntot = 0;
+    KOPTION.disc1.clear();
+    KOPTION.disc2.clear();
+    KOPTION.ndisc.clear();
 
     // Data discretization
-    KOPTION->flag_data_disc = 0;
-    KOPTION->dsize          = nullptr;
+    KOPTION.flag_data_disc = 0;
+    KOPTION.dsize.clear();
 
     /* Data discretization case (optional) */
 
@@ -1055,7 +1048,7 @@ Id krige_koption_manage(Id mode,
 
     /* Block discretization case */
 
-    switch (KOPTION->calcul.toEnum())
+    switch (KOPTION.calcul.toEnum())
     {
       case EKrigOpt::E_POINT:
       case EKrigOpt::E_DRIFT:
@@ -1069,15 +1062,15 @@ Id krige_koption_manage(Id mode,
         if (flag_check && !DBOUT->isGrid())
         {
           messerr("Discretization is not allowed if the Target is not a Grid");
-          goto label_dealloc;
+          return error;
         }
         if (ndiscs.empty())
         {
           messerr("For block estimation, Discretization must be provided");
-          goto label_dealloc;
+          return error;
         }
 
-        if (st_block_discretize_alloc(ndim, ndiscs)) goto label_dealloc;
+        if (st_block_discretize_alloc(ndim, ndiscs)) return error;
 
         st_block_discretize(0, flag_rand, 0);
 
@@ -1088,18 +1081,6 @@ Id krige_koption_manage(Id mode,
   else
   {
     error = 0;
-
-    /* Deallocation procedure */
-
-  label_dealloc:
-    if (KOPTION != nullptr)
-    {
-      KOPTION->ndisc = (Id*)mem_free((char*)KOPTION->ndisc);
-      KOPTION->disc1 = (double*)mem_free((char*)KOPTION->disc1);
-      KOPTION->disc2 = (double*)mem_free((char*)KOPTION->disc2);
-      KOPTION->dsize = (double*)mem_free((char*)KOPTION->dsize);
-      delete KOPTION;
-    }
   }
   return (error);
 }
@@ -1214,9 +1195,8 @@ void krige_rhs_print(Id nvar,
 
   /* Kriging option */
 
-  if (KOPTION != nullptr)
   {
-    switch (KOPTION->calcul.toEnum())
+    switch (KOPTION.calcul.toEnum())
     {
       case EKrigOpt::E_POINT:
         message("Punctual Estimation\n");
@@ -1224,10 +1204,10 @@ void krige_rhs_print(Id nvar,
 
       case EKrigOpt::E_BLOCK:
         message("Block Estimation : Discretization = ");
-        for (idim = 0; idim < KOPTION->ndim; idim++)
+        for (idim = 0; idim < KOPTION.ndim; idim++)
         {
           if (idim != 0) message(" x ");
-          message("%ld", KOPTION->ndisc[idim]);
+          message("%ld", KOPTION.ndisc[idim]);
         }
         message("\n");
         break;
@@ -1319,7 +1299,7 @@ static void st_krige_wgt_print(Id status,
   if (DBIN->hasLocVariable(ELoc::C)) tab_prints(NULL, "Code");
   if (DBIN->getNLoc(ELoc::V) > 0)
     tab_prints(NULL, "Err.");
-  if (KOPTION->flag_data_disc)
+  if (KOPTION.flag_data_disc)
     for (idim = 0; idim < ndim; idim++)
     {
       (void)gslSPrintf(string, "Size%d", idim + 1);
@@ -1353,7 +1333,7 @@ static void st_krige_wgt_print(Id status,
         tab_printg(NULL, DBIN->getLocVariable(ELoc::C, nbgh_ranks[iech], 0));
       if (DBIN->getNLoc(ELoc::V) > 0)
         tab_printg(NULL, st_get_verr(nbgh_ranks[iech], (FLAG_PROF) ? 0 : jvar_m));
-      if (KOPTION->flag_data_disc)
+      if (KOPTION.flag_data_disc)
       {
         for (idim = 0; idim < ndim; idim++)
           tab_printg(NULL, DBIN->getLocVariable(ELoc::BLEX, nbgh_ranks[iech], idim));
@@ -1376,7 +1356,7 @@ static void st_krige_wgt_print(Id status,
 
     number = 1 + ndim + 1;
     if (DBIN->getNLoc(ELoc::V) > 0) number++;
-    if (KOPTION->flag_data_disc) number += ndim + 1;
+    if (KOPTION.flag_data_disc) number += ndim + 1;
     tab_prints(NULL, "Sum of weights", number, EJustify::LEFT);
     for (ivar = 0; ivar < nvar; ivar++)
     {

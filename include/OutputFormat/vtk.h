@@ -39,7 +39,11 @@
 /* ************************************************************************* //
 //                              visit_writer.h                               //
 // ************************************************************************* */
- 
+
+#pragma once
+
+#include <Basic/VectorNumT.hpp>
+
 /*
 // This file contains function prototypes for writing out point meshes,
 // unstructured meshes, rectilinear meshes, regular meshes, and
@@ -102,7 +106,7 @@ void write_point_mesh(const char* filename,
                       Id nvars,
                       Id* vardim,
                       const char* const* varnames,
-                      float** vars);
+                      VectorVectorFloat& vars);
 
 /* ****************************************************************************
 //  Function: write_unstructured_mesh
@@ -191,7 +195,7 @@ void write_unstructured_mesh(const char* filename,
                              Id* vardim,
                              Id* centering,
                              const char* const* varnames,
-                             float** vars);
+                             VectorVectorFloat& vars);
 
 /* ****************************************************************************
 //  Function: write_regular_mesh
@@ -232,7 +236,7 @@ void write_regular_mesh(const char* filename,
                         Id* vardim,
                         Id* centering,
                         const char* const* varnames,
-                        float** vars);
+                        VectorVectorFloat& vars);
 
 /* ****************************************************************************
 //  Function: write_rectilinear_mesh
@@ -282,7 +286,7 @@ void write_rectilinear_mesh(const char* filename,
                             Id* vardim,
                             Id* centering,
                             const char* const* varnames,
-                            float** vars);
+                            VectorVectorFloat& vars);
 
 /* ****************************************************************************
 //  Function: write_curvilinear_mesh
@@ -324,5 +328,6 @@ void write_curvilinear_mesh(const char* filename,
                             Id* vardim,
                             Id* centering,
                             const char* const* varnames,
-                            float** vars);
-}
+                            VectorVectorFloat& vars);
+
+} // namespace gstlrn

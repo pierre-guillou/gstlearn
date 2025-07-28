@@ -26,11 +26,11 @@ public:
   EKrigOpt calcul;    /* Type of calculation (EKrigOpt) */
   Id ndim;           /* Space dimension */
   Id ntot;           /* Number of discretization points */
-  Id* ndisc;         /* Array of discretization counts */
-  double* disc1;      /* Discretization coordinates */
-  double* disc2;      /* Discretization randomized coordinates */
+  VectorInt ndisc;    /* Array of discretization counts */
+  VectorDouble disc1; /* Discretization coordinates */
+  VectorDouble disc2; /* Discretization randomized coordinates */
   Id flag_data_disc; /* Discretization flag */
-  double* dsize;
+  VectorDouble dsize;
 };
 
 class Model;
