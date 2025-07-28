@@ -4,6 +4,9 @@ This file contains the logs between consecutive releases
 
 Release 1.8.0
 =============
+- Modernizing and cleaning the SPDE APIs. Consequently:
+  db_kriging2D_SPDE function has disappeared
+  class PGSSPDE has been deleted
 - Correcting the output of weights for Global estimation by Kriging
 - Enclose the library in a namespace ("gstlrn")
 - Fix gstlearn_to_terra and terra_to_gstlearn (issue #566)

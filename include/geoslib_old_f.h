@@ -52,8 +52,6 @@ class Faults;
 class AMesh;
 class SpaceTarget;
 
-class QChol;
-
 /***************************************/
 /* Prototyping the functions in math.c */
 /***************************************/

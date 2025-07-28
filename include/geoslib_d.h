@@ -14,9 +14,9 @@
 #include "geoslib_define.h"
 
 #include "Enum/EKrigOpt.hpp"
-#include "Model/Option_VarioFit.hpp"
-#include "Mesh/AMesh.hpp"
 #include "Matrix/MatrixSparse.hpp"
+#include "Mesh/AMesh.hpp"
+#include "Model/Option_VarioFit.hpp"
 
 namespace gstlrn
 {
@@ -90,7 +90,7 @@ typedef struct
   std::vector<SubPlan> plans;
 } SubPlanes;
 
-class QChol;
+struct QChol;
 typedef struct
 {
   QChol* QCtt;
@@ -186,4 +186,4 @@ struct Local_Relem
 
 typedef struct Local_Relem Relem;
 typedef struct Local_Split Split;
-}
+} // namespace gstlrn

@@ -23,8 +23,8 @@
 #include "Db/Db.hpp"
 #include "Enum/ELoadBy.hpp"
 #include "Geometry/GeometryHelper.hpp"
+#include "LinearOp/CholeskySparse.hpp"
 #include "LinearOp/ProjMatrix.hpp"
-#include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSquare.hpp"
@@ -157,6 +157,12 @@ typedef struct
   VectorDouble srot;
 } SPDE_Calcul;
 
+struct QChol
+{
+  MatrixSparse* Q;
+  CholeskySparse* chol;
+};
+
 static void (*SIMU_FUNC_UPDATE)(Db*, int, int, int) = NULL;
 static void (*SIMU_FUNC_SCALE)(Db*, int, int)       = NULL;
 
@@ -174,6 +180,128 @@ static SPDE_Environ S_ENV;
 static SPDE_Decision S_DECIDE;
 static char string_encode[100];
 static SPDE_Calcul Calcul;
+
+static bool is_chol_ready(QChol* QC)
+{
+  return QC->chol != nullptr;
+}
+
+int qchol_getNRows(QChol* QC)
+{
+  if (QC == nullptr) return 0;
+  if (QC->Q == nullptr) return 0;
+  return QC->Q->getNRows();
+}
+
+int qchol_getNCols(QChol* QC)
+{
+  if (QC == nullptr) return 0;
+  if (QC->Q == nullptr) return 0;
+  return QC->Q->getNCols();
+}
+
+/****************************************************************************/
+/*!
+ **  Finalize the construction of the QChol structure.
+ **  Perform the Cholesky decomposition
+ **
+ ** \return  Error return code
+ **
+ ** \param[in]  verbose   Verbose flag
+ ** \param[in]  QC   QChol structure to be finalized
+ **
+ ** \remarks In case of problem the message is issued in this function
+ ** \remarks If the decomposition is already performed, nothing is done
+ **
+ *****************************************************************************/
+static int qchol_cholesky(int verbose, QChol* QC)
+{
+  /* Check that the Q matrix has already been defined */
+
+  if (QC->Q == nullptr) return (1);
+
+  /* Cholesky decomposition is only valid for square matric */
+
+  if (qchol_getNRows(QC) != qchol_getNCols(QC))
+  {
+    messerr("You wish to perform a Cholesky Decomposition of a Matrix");
+    messerr("which is not square: %d x %d", qchol_getNRows(QC), qchol_getNCols(QC));
+    messerr("This must be an error");
+    return (1);
+  }
+
+  if (verbose) message("  Cholesky Decomposition... ");
+
+  // Perform the Cholesky decomposition (new style)
+
+  if (QC->chol == nullptr)
+    // Perform the Cholesky decomposition (new style)
+
+    if (QC->chol == nullptr)
+    {
+      QC->chol = new CholeskySparse(*QC->Q);
+      if (QC->chol == nullptr)
+      {
+        messerr("Error in Cholesky decompostion (new version)");
+        messerr("Error in Cholesky decompostion (new version)");
+        goto label_err;
+      }
+    }
+
+  if (verbose) message("Finished\n");
+
+  return (0);
+
+label_err:
+  delete QC->chol;
+  return (1);
+}
+
+/****************************************************************************/
+/*!
+ **  Inversion using Cholesky
+ **
+ ** \param[in]  qctt     Qchol structure
+ ** \param[in,out]  xcr  Current vector
+ ** \param[in]  rhs      Current R.H.S. vector
+ **
+ ** \param[out] work     Working array
+ **
+ *****************************************************************************/
+static void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work)
+{
+  DECLARE_UNUSED(work);
+  DECLARE_UNUSED(work);
+  if (DEBUG) message("Cholesky Inversion\n");
+  int n = qchol_getNCols(qctt);
+
+  VectorDouble rhsVD(n);
+  for (int i = 0; i < n; i++) rhsVD[i] = rhs[i];
+  VectorDouble xcrVD = qctt->chol->solveX(rhsVD);
+  for (int i = 0; i < n; i++) xcr[i] = xcrVD[i];
+}
+
+/****************************************************************************/
+/*!
+ **  Simulate using Cholesky
+ **
+ ** \param[in]  qctt     Qchol structure
+ **
+ ** \param[out] simu     Simulated array
+ ** \param[out] work     Working array
+ **
+ *****************************************************************************/
+static void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
+{
+  if (DEBUG) message("Cholesky Simulation\n");
+  int n = qchol_getNCols(qctt);
+
+  VectorDouble simuVD(n);
+  VectorDouble workVD(n);
+  for (int i = 0; i < n; i++) workVD[i] = work[i];
+  (void)qctt->chol->addSimulateToDest(workVD, simuVD);
+  for (int i = 0; i < n; i++) simu[i] = simuVD[i];
+}
 
 /****************************************************************************/
 /*!

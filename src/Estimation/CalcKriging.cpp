@@ -309,7 +309,7 @@ int kriging(Db* dbin,
             const KrigOpt& krigopt,
             const NamingConvention& namconv)
 {
-  NeighBench* neighBench = dynamic_cast<NeighBench*>(neigh);
+  auto* neighBench = dynamic_cast<NeighBench*>(neigh);
   if (krigopt.getCalcul() == EKrigOpt::POINT &&
       !krigopt.hasColcok() &&
       !krigopt.hasMatLC() &&

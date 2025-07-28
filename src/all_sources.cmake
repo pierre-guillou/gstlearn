@@ -9,7 +9,6 @@ set(SRC
   Fractures/FracFault.cpp
   Fractures/FracDesc.cpp
   Fractures/FracList.cpp
-  Matrix/LinkMatrixSparse.cpp
   Matrix/AMatrix.cpp
   Matrix/MatrixSparse.cpp
   Matrix/MatrixInt.cpp
@@ -19,7 +18,6 @@ set(SRC
   Matrix/MatrixFactory.cpp
   Matrix/Table.cpp
   Matrix/NF_Triplet.cpp
-  API/PGSSPDE.cpp
   API/SPDE.cpp
   API/Style.cpp
   API/SPDEParam.cpp

@@ -1208,6 +1208,7 @@ int simulateSPDE(Db* dbin,
  * @param dbin Input Db (variable to be estimated). Only for conditional simulations
  * @param dbout Output Db where the estimation must be performed
  * @param model Model definition
+ * @param ruleprop RuleProp structure describing the Rule and the Proportions
  * @param nbsimu Number of simulations
  * @param useCholesky Define the choice regarding Cholesky (see _defineCholesky)
  * @param meshesK Meshes used for Kriging (optional)
@@ -1314,8 +1315,8 @@ int simPGSSPDE(Db* dbin,
 
   // Perform the Simulation and storage.
   // All is done in ONE step to avoid additional storage
-  int nvar    = model->getNVar();
-  int iuid    = dbout->addColumnsByConstant(nvar * nbsimu);
+  int nvar = model->getNVar();
+
   int nechred = dbout->getNSample(true);
   VectorDouble local(nechred);
   VectorDouble result;
@@ -1326,6 +1327,8 @@ int simPGSSPDE(Db* dbin,
   // Loop on the simulations
   for (int isimu = 0; isimu < nbsimu; isimu++)
   {
+    int iuid = dbout->addColumnsByConstant(nvar);
+
     result = (flagCond) ? spdeop->simCond(Z) : spdeop->simNonCond();
     _addNuggetToResult(model, result, nechred);
     _uncenterResultByDriftInPlace(dbout, model, result, driftCoeffs);
@@ -1334,16 +1337,14 @@ int simPGSSPDE(Db* dbin,
     for (int ivar = 0; ivar < nvar; ivar++)
     {
       VH::extractInPlace(result, local, ivar * nechred);
-      int juid = iuid + ivar * nbsimu + isimu;
-      dbout->setColumnByUID(local, juid, true);
-      dbout->setLocatorByUID(juid, ELoc::SIMU, ivar);
+      dbout->setColumnByUID(local, iuid + ivar, true);
+      dbout->setLocatorByUID(iuid + ivar, ELoc::SIMU, ivar);
     }
 
     // Convert the resulting simulation into categories
     ruleprop.gaussToCategory(dbout, namconv);
+    dbout->deleteColumnsByUID(VH::sequence(nvar, iuid));
   }
-  // namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
-  //                             "", nbsimu);
 
   // Cleaning phase
   delete spdeop;

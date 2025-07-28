@@ -11,12 +11,10 @@
 /* This file is meant to demonstrate the process of using PGS                 */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/Law.hpp"
 #include "geoslib_f.h"
 
 #include "Enum/ECov.hpp"
 
-#include "API/PGSSPDE.hpp"
 #include "API/SPDE.hpp"
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
@@ -36,11 +34,11 @@ static void _firstTest(const CovAniso* cov1,
                        Rule& rule)
 {
   // Creating the Model(s) of the Underlying GRF(s)
-  Model* model1 = new Model();
+  auto* model1 = new Model();
   model1->addCovAniso(*cov1);
   model1->display();
 
-  Model* model2 = new Model();
+  auto* model2 = new Model();
   model2->addCovAniso(*cov2);
   model2->display();
 
@@ -56,7 +54,7 @@ static void _secondTest(const CovAniso* cov1,
                         std::vector<Model*>& models,
                         Rule& rule)
 {
-  Model* model = new Model();
+  auto* model = new Model();
   model->addCovAniso(*cov1);
   model->addCovAniso(*cov2);
   model->display();
@@ -73,19 +71,15 @@ static void _thirdTest(const CovAniso* cov1,
                        Rule& rule)
 {
   // Creating the Model(s) of the Underlying GRF(s)
-  Model* model1 = new Model();
-  model1->addCovAniso(*cov1);
-  model1->display();
+  auto* model = new Model();
+  model->addCovAniso(*cov1);
+  model->addCovAniso(*cov2);
+  model->display();
 
-  Model* model2 = new Model();
-  model2->addCovAniso(*cov2);
-  model2->display();
-
-  models.push_back(model1);
-  models.push_back(model2);
+  models.push_back(model);
 
   // Creating the Rule
-  rule.resetFromNames({"S", "T", "F1", "F2"});
+  rule.resetFromNames({"S", "S", "F1", "F2", "F3"});
 }
 
 static void _clearModels(std::vector<Model*>& models)
@@ -136,6 +130,7 @@ int main(int argc, char* argv[])
   Db* dat        = Db::createFromBox(ndata, grid->getCoorMinimum(), grid->getCoorMaximum());
   VectorDouble z = VH::simulateGaussian(ndata);
   dat->addColumns(z, "variable", ELoc::Z);
+  dat->display();
 
   // Creating the covariances involved in the Model(s) of the Underlying GRF(s)
   double range1  = 0.20;
@@ -150,52 +145,61 @@ int main(int argc, char* argv[])
   RuleProp ruleprop;
   int mode = 3;
 
-  // MonoVariable PGS
-  if (mode == 0 || mode == 1)
-  {
-    _firstTest(cov1, cov2, models, rule);
-    ruleprop.resetFromRule(&rule, props);
+  // IMPORTANT NOTE: the two following tests have been temporarily discraded.
+  // They use the old class PGSSPDE which is now deprecated.
+  // They should be reactivated as soon as the new class SPDE:
+  // - allows processing a multivariate case (for PGS)
+  // - allows considering Conditional PGS simulations
 
-    PGSSPDE sNonCond(models, grid, &ruleprop);
-    law_set_random_seed(133672);
-    sNonCond.compute(grid, 0, NamingConvention("Facies-Mono-NC"));
+  // // MonoVariable PGS
+  // if (mode == 0 || mode == 1)
+  // {
+  //   _firstTest(cov1, cov2, models, rule);
+  //   ruleprop.resetFromRule(&rule, props);
+  //   ruleprop.display();
 
-    PGSSPDE sCond(models, grid, &ruleprop, dat);
-    law_set_random_seed(53782);
-    sCond.compute(grid, 0, NamingConvention("Facies-Mono-CD"));
+  //   PGSSPDE sNonCond(models, grid, &ruleprop);
+  //   law_set_random_seed(133672);
+  //   sNonCond.compute(grid, 0, NamingConvention("Facies-Mono-NC"));
 
-    _clearModels(models);
-  }
+  //   PGSSPDE sCond(models, grid, &ruleprop, dat);
+  //   law_set_random_seed(53782);
+  //   sCond.compute(grid, 0, NamingConvention("Facies-Mono-CD"));
 
-  // Bivariate PGS
-  if (mode == 0 || mode == 2)
-  {
-    _secondTest(cov1, cov2, models, rule);
-    ruleprop.resetFromRule(&rule, props);
+  //   _clearModels(models);
+  // }
 
-    PGSSPDE sNonCond(models, grid, &ruleprop);
-    law_set_random_seed(42434);
-    sNonCond.compute(grid, 0, NamingConvention("Facies-Multi-NC"));
+  // // Bivariate PGS
+  // if (mode == 0 || mode == 2)
+  // {
+  //   _secondTest(cov1, cov2, models, rule);
+  //   ruleprop.resetFromRule(&rule, props);
+  //   ruleprop.display();
 
-    PGSSPDE sCond(models, grid, &ruleprop, dat);
-    law_set_random_seed(43791);
-    sCond.compute(grid, 0, NamingConvention("Facies-Multi-CD"));
+  //   PGSSPDE sNonCond(models, grid, &ruleprop);
+  //   law_set_random_seed(42434);
+  //   sNonCond.compute(grid, 0, NamingConvention("Facies-Multi-NC"));
 
-    _clearModels(models);
-  }
+  //   PGSSPDE sCond(models, grid, &ruleprop, dat);
+  //   law_set_random_seed(43791);
+  //   sCond.compute(grid, 0, NamingConvention("Facies-Multi-CD"));
+
+  //   _clearModels(models);
+  // }
 
   // Monovariate in new interface
   if (mode == 0 || mode == 3)
   {
     _thirdTest(cov1, cov2, models, rule);
     ruleprop.resetFromRule(&rule, props);
+    ruleprop.display();
 
-    (void)simPGSSPDE(dat, grid, models[0], ruleprop, 1);
+    (void)simPGSSPDE(dat, grid, models[0], ruleprop);
 
     _clearModels(models);
   }
 
-  DbStringFormat dbfmt(FLAG_STATS, {"Facies"});
+  DbStringFormat dbfmt(FLAG_STATS);
   grid->display(&dbfmt);
   (void)grid->dumpToNF("pgs.NF");
 
