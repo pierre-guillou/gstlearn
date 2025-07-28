@@ -105,15 +105,15 @@ public:
   static Model* create(const CovContext& ctxt = CovContext());
   static Model* createFromEnvironment(int nvar, int ndim = 2);
   static Model* createNugget(int nvar, int ndim = 2, double sill = 1.);
-  static Model* createFromParam(const ECov& type = ECov::fromKey("NUGGET"),
-                  double range                       = 1.,
-                  double sill                        = 1.,
-                  double param                       = 1.,
-                  const VectorDouble& ranges         = VectorDouble(),
-                  const MatrixSymmetric& sills = MatrixSymmetric(),
-                  const VectorDouble& angles         = VectorDouble(),
-                  const ASpaceSharedPtr& space       = ASpaceSharedPtr(),
-                  bool flagRange                     = true);
+  static Model* createFromParam(const ECov& type             = ECov::fromKey("NUGGET"),
+                                double range                 = 1.,
+                                double sill                  = 1.,
+                                double param                 = 1.,
+                                const VectorDouble& ranges   = VectorDouble(),
+                                const MatrixSymmetric& sills = MatrixSymmetric(),
+                                const VectorDouble& angles   = VectorDouble(),
+                                const ASpaceSharedPtr& space = ASpaceSharedPtr(),
+                                bool flagRange               = true);
   static Model* createFromParamOldStyle(const ECov& type             = ECov::fromKey("NUGGET"),
                                         double range                 = 1.,
                                         double sill                  = 1.,

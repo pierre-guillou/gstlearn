@@ -30,6 +30,7 @@ class Db;
 class DbGrid;
 class MeshETurbo;
 class Model;
+class RuleProp;
 
 /**
  * The SPDE class provides the SPDE implementation of a univariate model defined by
@@ -146,6 +147,18 @@ GSTLEARN_EXPORT int simulateSPDE(Db* dbin,
                                  const ProjMultiMatrix* projInS  = nullptr,
                                  const SPDEParam& params         = SPDEParam(),
                                  const NamingConvention& namconv = NamingConvention("SimuSPDE"));
+GSTLEARN_EXPORT int simPGSSPDE(Db* dbin,
+                               Db* dbout,
+                               Model* model,
+                               const RuleProp& ruleprop,
+                               int nbsimu                      = 1,
+                               int useCholesky                 = -1,
+                               const VectorMeshes& meshesK     = VectorMeshes(),
+                               const ProjMultiMatrix* projInK  = nullptr,
+                               const VectorMeshes& meshesS     = VectorMeshes(),
+                               const ProjMultiMatrix* projInS  = nullptr,
+                               const SPDEParam& params         = SPDEParam(),
+                               const NamingConvention& namconv = NamingConvention("SimPGSSPDE"));
 GSTLEARN_EXPORT double logLikelihoodSPDE(Db* dbin,
                                          Model* model,
                                          int useCholesky               = -1,

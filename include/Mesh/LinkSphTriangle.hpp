@@ -30,4 +30,5 @@ GSTLEARN_EXPORT int meshes_2D_sph_from_auxiliary(const String& triswitch,
                                                  SphTriangle* t);
 GSTLEARN_EXPORT void meshes_2D_sph_print(SphTriangle* t, int brief);
 GSTLEARN_EXPORT int meshes_2D_sph_create(int verbose, SphTriangle* t);
+
 } // namespace gstlrn

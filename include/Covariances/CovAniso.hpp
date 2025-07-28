@@ -88,13 +88,13 @@ public:
 
   static CovAniso* createFromParam(const ECov& type,
                                    double range,
-                                   double sill,
-                                   double param,
-                                   const VectorDouble& ranges,
-                                   const MatrixSymmetric& sills,
-                                   const VectorDouble& angles,
-                                   const ASpaceSharedPtr& space,
-                                   bool flagRange);
+                                   double sill                  = 1.,
+                                   double param                 = 1,
+                                   const VectorDouble& ranges   = VectorDouble(),
+                                   const MatrixSymmetric& sills = MatrixSymmetric(),
+                                   const VectorDouble& angles   = VectorDouble(),
+                                   const ASpaceSharedPtr& space = nullptr,
+                                   bool flagRange               = true);
   static CovAniso* createIsotropic(const CovContext& ctxt,
                                    const ECov& type,
                                    double range,

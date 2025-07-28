@@ -402,7 +402,7 @@ CovAniso* CovAniso::createFromParam(const ECov& type,
   }
   if (ndim <= 0)
   {
-    messerr("You must define the SPace dimension");
+    messerr("You must define the Space dimension");
     return nullptr;
   }
 

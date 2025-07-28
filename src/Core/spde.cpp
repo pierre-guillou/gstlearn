@@ -2987,11 +2987,10 @@ static AMesh* st_create_meshes(Db* dbin,
   int ndim_loc = 0;
   if (dbin != nullptr) ndim_loc = MAX(ndim_loc, dbin->getNDim());
   if (dbout != nullptr) ndim_loc = MAX(ndim_loc, dbout->getNDim());
-  bool flag_sphere = isDefaultSpaceSphere();
 
   // Processing
 
-  if (flag_sphere)
+  if (isDefaultSpaceSphere())
   {
 
     /* Particular case of data on the sphere */
@@ -3003,8 +3002,9 @@ static AMesh* st_create_meshes(Db* dbin,
 
   /* Standard case */
 
-  /* Check that a single file must be meshed and that it corresponds */
-  /* to a grid */
+  // Check that:
+  // - a single file must be meshed
+  // - it corresponds to a grid
 
   Db* dbloc = NULL;
   if (!flag_force)
