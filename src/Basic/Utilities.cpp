@@ -181,19 +181,20 @@ void ut_sort_double(Id safe, Id nech, Id* ind, double* value)
   static Id LISTE_L[LSTACK];
   static Id LISTE_R[LSTACK];
   Id i, j, p, l, r, pstack, inddev, inddeu;
-  double *tab, tablev, tableu;
+  std::vector<double> tab;
+  double tablev, tableu;
 
   /* Initialization */
 
   inddev = 0;
   if (safe)
   {
-    tab = (double*)mem_alloc(sizeof(double) * nech, 1);
+    tab.resize(nech);
     for (i = 0; i < nech; i++)
       tab[i] = value[i];
   }
   else
-    tab = value;
+    tab = {value, value + nech};
 
   /* Segmentation */
 
@@ -404,8 +405,6 @@ void ut_sort_double(Id safe, Id nech, Id* ind, double* value)
       if (ind) ind[i] = inddev;
     }
   }
-
-  if (safe) mem_free((char*)tab);
 }
 
 /****************************************************************************/

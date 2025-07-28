@@ -10,6 +10,7 @@
 /******************************************************************************/
 #include "Basic/Memory.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/VectorNumT.hpp"
 #include "geoslib_define.h"
 #include "geoslib_old_f.h"
 #include <cmath>
@@ -84,15 +85,14 @@ Id matrix_eigen(const double* a_in, Id neq, double* value, double* vector)
 {
   double a11, a12, a13, a21, a22, a23, a33, a34;
   double bb, cc, co, hold, s, si, v1, v2, bigk, qj, pp, temp;
-  double *a, *work[4], *tmp;
-  Id *ind, i, j, k, ji, ki, kj, n1, n2, i1, i2, iter, error;
+  std::array<VectorDouble, 4> work;
+  VectorDouble a, tmp;
+  VectorInt ind;
+  Id i, j, k, ji, ki, kj, n1, n2, i1, i2, iter, error;
 
   /* Initializations */
 
   error = 1;
-  ind   = nullptr;
-  a = tmp = nullptr;
-  for (i = 0; i < 4; i++) work[i] = nullptr;
 
   a34 = 0.0;
   if (neq == 1)
@@ -102,13 +102,12 @@ Id matrix_eigen(const double* a_in, Id neq, double* value, double* vector)
     return (0);
   }
 
-  a = (double*)mem_alloc(sizeof(double) * neq * neq, 1);
+  a.resize(neq * neq);
   for (i = 0; i < neq * neq; i++) a[i] = a_in[i];
 
   for (i = 0; i < 4; i++)
   {
-    work[i] = (double*)mem_alloc(sizeof(double) * neq, 1);
-    for (j = 0; j < neq; j++) work[i][j] = 0.;
+    work[i].resize(neq);
   }
 
   work[0][0] = AS(0, 0);
@@ -308,10 +307,10 @@ Id matrix_eigen(const double* a_in, Id neq, double* value, double* vector)
 
   /* Sort the eigen values and the corresponding vectors */
 
-  ind = (Id*)mem_alloc(sizeof(Id) * neq, 1);
-  tmp = (double*)mem_alloc(sizeof(double) * neq * neq, 1);
+  ind.resize(neq);
+  tmp.resize(neq * neq);
   for (i = 0; i < neq; i++) ind[i] = i;
-  ut_sort_double(0, neq, ind, value);
+  ut_sort_double(0, neq, ind.data(), value);
   for (i = 0; i < neq; i++)
     for (j = 0; j < neq; j++) tmp[i + neq * j] = VECTOR(i, ind[j]);
   for (i = 0; i < neq * neq; i++) vector[i] = tmp[i];
@@ -337,10 +336,6 @@ Id matrix_eigen(const double* a_in, Id neq, double* value, double* vector)
   error = 0;
 
 label_end:
-  mem_free((char*)a);
-  mem_free((char*)ind);
-  mem_free((char*)tmp);
-  for (i = 0; i < 4; i++) mem_free((char*)work[i]);
 
   if (error) print_matrix("Eigen matrix", 0, 1, neq, neq, NULL, a_in);
 
@@ -795,13 +790,14 @@ Id matrix_eigen_tridiagonal(const double* vecdiag,
                              double* eigvec,
                              double* eigval)
 {
-  double *b, *e, h;
+  VectorDouble b, e;
+  double h;
   Id i, j;
 
   /* Initializations */
 
-  e = (double*)mem_alloc(sizeof(double) * neq, 1);
-  b = (double*)mem_alloc(sizeof(double) * neq * neq, 1);
+  e.resize(neq);
+  b.resize(neq * neq);
 
   for (i = 1; i < neq; i++)
   {
@@ -828,7 +824,7 @@ Id matrix_eigen_tridiagonal(const double* vecdiag,
 
   /* Compute the eigen eigval and eigen eigvec */
 
-  matrix_eigen(b, neq, eigval, eigvec);
+  matrix_eigen(b.data(), neq, eigval, eigvec);
 
   e[0] = 1.;
   for (i = 1; i < neq; i++)
@@ -844,8 +840,6 @@ Id matrix_eigen_tridiagonal(const double* vecdiag,
 
   /* Core deallocation */
 
-  mem_free((char*)b);
-  mem_free((char*)e);
   return (0);
 }
 

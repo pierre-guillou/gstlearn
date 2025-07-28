@@ -33,8 +33,8 @@ typedef struct
   VectorInt tab_jech;
   VectorInt tab_ipas;
   VectorInt tab_sort;
-  char* tab_aux_iech;
-  char* tab_aux_jech;
+  std::vector<char> tab_aux_iech;
+  std::vector<char> tab_aux_jech;
   VectorDouble tab_dist;
 } Vario_Order;
 

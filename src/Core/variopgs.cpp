@@ -11,7 +11,6 @@
 #include "Basic/AException.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/MathFunc.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/Utilities.hpp"
 #include "Core/CTables.hpp"
@@ -354,7 +353,7 @@ static void st_rules_print(const char* title,
 static void st_relem_subdivide(Relem* relem0, Id half, Id noper)
 {
   Split* split;
-  Id *divs, ndiv, number, ncur, previous_oper, verbose;
+  Id ndiv, number, ncur, previous_oper, verbose;
 
   verbose = 0;
   ncur    = static_cast<Id>(relem0->facies.size());
@@ -363,9 +362,9 @@ static void st_relem_subdivide(Relem* relem0, Id half, Id noper)
   previous_oper = 1;
   if (relem0->old_split != NULL) previous_oper = relem0->old_split->oper;
 
-  divs   = ut_split_into_two(ncur, half, verbose, &ndiv);
+  auto divs   = ut_split_into_two(ncur, half, verbose, &ndiv);
   number = ndiv * noper;
-  mem_free((char*)divs);
+  divs.clear();
 
   relem0->splits.resize(number);
 
@@ -386,7 +385,7 @@ static void st_relem_subdivide(Relem* relem0, Id half, Id noper)
         st_relem_subdivide(split->relems[i], 0, NGRF);
       }
     }
-    mem_free((char*)divs);
+    divs.clear();
   }
 
   relem0->splits.resize(number);
@@ -1780,17 +1779,15 @@ Vario_Order* vario_order_manage(Id mode,
       vorder_loc->tab_dist.resize(0);
       vorder_loc->size_aux     = size_aux;
       vorder_loc->flag_dist    = flag_dist;
-      vorder_loc->tab_aux_iech = nullptr;
-      vorder_loc->tab_aux_jech = nullptr;
+      vorder_loc->tab_aux_iech.clear();
+      vorder_loc->tab_aux_jech.clear();
       break;
 
     case 0:
       vorder_loc = vorder;
       if (vorder == nullptr) return (vorder_loc);
-      vorder_loc->tab_aux_iech = (char*)mem_free(
-        (char*)vorder_loc->tab_aux_iech);
-      vorder_loc->tab_aux_jech = (char*)mem_free(
-        (char*)vorder_loc->tab_aux_jech);
+      vorder_loc->tab_aux_iech.clear();
+      vorder_loc->tab_aux_jech.clear();
       break;
 
     case -1:
@@ -1798,10 +1795,8 @@ Vario_Order* vario_order_manage(Id mode,
       if (vorder == nullptr) return (vorder_loc);
       if (vorder_loc != nullptr)
       {
-        vorder_loc->tab_aux_iech = (char*)mem_free(
-          (char*)vorder_loc->tab_aux_iech);
-        vorder_loc->tab_aux_jech = (char*)mem_free(
-          (char*)vorder_loc->tab_aux_jech);
+        vorder_loc->tab_aux_iech.clear();
+        vorder_loc->tab_aux_jech.clear();
         delete vorder_loc;
         vorder_loc = nullptr;
       }
@@ -1851,12 +1846,8 @@ Id vario_order_add(Vario_Order* vorder,
     vorder->tab_sort.resize(vorder->nalloc);
     if (vorder->size_aux > 0)
     {
-      vorder->tab_aux_iech = (char*)mem_realloc(
-        (char*)vorder->tab_aux_iech, vorder->nalloc * vorder->size_aux, 0);
-      if (vorder->tab_aux_iech == nullptr) return (1);
-      vorder->tab_aux_jech = (char*)mem_realloc(
-        (char*)vorder->tab_aux_jech, vorder->nalloc * vorder->size_aux, 0);
-      if (vorder->tab_aux_jech == nullptr) return (1);
+      vorder->tab_aux_iech.resize(vorder->nalloc * vorder->size_aux);
+      vorder->tab_aux_jech.resize(vorder->nalloc * vorder->size_aux);
     }
     if (vorder->flag_dist)
       vorder->tab_dist.resize(vorder->nalloc);
@@ -1961,12 +1952,8 @@ Vario_Order* vario_order_final(Vario_Order* vorder, Id* npair)
 
     if (vorder->size_aux > 0)
     {
-      vorder->tab_aux_iech = (char*)mem_realloc(
-        (char*)vorder->tab_aux_iech, vorder->npair * vorder->size_aux, 0);
-      if (vorder->tab_aux_iech == nullptr) error = 1;
-      vorder->tab_aux_jech = (char*)mem_realloc(
-        (char*)vorder->tab_aux_jech, vorder->npair * vorder->size_aux, 0);
-      if (vorder->tab_aux_iech == nullptr) error = 1;
+      vorder->tab_aux_iech.resize(vorder->npair * vorder->size_aux);
+      vorder->tab_aux_jech.resize(vorder->npair * vorder->size_aux);
     }
   }
   vorder->nalloc = vorder->npair;

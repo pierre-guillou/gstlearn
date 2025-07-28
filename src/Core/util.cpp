@@ -902,23 +902,20 @@ void print_last_message(void)
  ** \remarks The elements of each row are set to 0 or 1 (subset rank)
  **
  *****************************************************************************/
-Id* ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
+VectorInt ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
 {
   Id p, nmax, ncomb, np, lec;
-  Id* mattab;
+  VectorInt mattab;
 
   /* Initializations */
 
   p      = (flag_half) ? static_cast<Id>(floor((double)ncolor / 2.)) : ncolor - 1;
   nmax   = static_cast<Id>(pow(2, ncolor));
-  mattab = nullptr;
   np     = 0;
 
   /* Core allocation */
 
-  mattab = (Id*)mem_alloc(sizeof(Id) * ncolor * nmax, 1);
-  for (Id i = 0; i < ncolor * nmax; i++)
-    mattab[i] = 0;
+  mattab.resize(ncolor * nmax);
 
   for (Id nsub = 1; nsub <= p; nsub++)
   {
@@ -934,7 +931,7 @@ Id* ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
 
   /* Resize */
 
-  mattab = (Id*)mem_realloc((char*)mattab, sizeof(Id) * ncolor * np, 1);
+  mattab.resize(ncolor * np);
   *nposs = np;
 
   /* Verbose option */
