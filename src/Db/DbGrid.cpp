@@ -309,7 +309,7 @@ DbGrid* DbGrid::create(const VectorInt& nx,
                        bool flagAddSampleRank,
                        bool flagAddCoordinates)
 {
-  DbGrid* dbgrid = new DbGrid;
+  auto* dbgrid = new DbGrid;
   if (dbgrid->reset(nx, dx, x0, angles, order, tab, names, locatorNames,
                     flagAddSampleRank, flagAddCoordinates))
   {

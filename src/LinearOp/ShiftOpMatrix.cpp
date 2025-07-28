@@ -380,7 +380,7 @@ void ShiftOpMatrix::prodLambdaOnSqrtTildeC(const VectorDouble& inv,
  *****************************************************************************/
 int ShiftOpMatrix::_addToDest(const constvect inv, vect outv) const
 {
-  _S->addProdMatVecInPlaceToDest(inv, outv);
+  _S->addProdMatVecInPlaceC(inv, outv);
   return 0;
 }
 
@@ -925,7 +925,7 @@ MatrixSparse* ShiftOpMatrix::_prepareSparse(const AMesh* amesh)
   Sl = MatrixSparse::createFromTriplet(NF_T);
 
   // Operate the product Sl * t(Sl) to get the final matrix Sret
-  Sret = prodNormMat(Sl, VectorDouble(), false);
+  Sret = prodNormMat(Sl, false);
   delete Sl;
 
   // Blank out the contents of the sparse matrix
@@ -1092,8 +1092,8 @@ int ShiftOpMatrix::_buildSGrad(const AMesh* amesh, double tol)
       A             = MatrixFactory::prodMatMat<MatrixSparse>(_S, tildeCGradMat);
       delete tildeCGradMat;
       At = A->transpose();
-      A->addMatInPlace(*At);
-      _SGrad[ind]->addMatInPlace(*A);
+      A->addMat(*At);
+      _SGrad[ind]->addMat(*A);
       delete At;
       delete A;
       ind++;

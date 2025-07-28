@@ -8,9 +8,9 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/Db.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
 #include "Basic/AStringable.hpp"
+#include "Db/Db.hpp"
 #include "LinearOp/IProj.hpp"
 #include "LinearOp/ProjMatrix.hpp"
 #include "LinearOp/ProjMulti.hpp"
@@ -37,18 +37,18 @@ static std::vector<std::vector<const IProj*>> castToBase(const std::vector<std::
 
 /**
  * @brief Construct the Projection Matrix starting from 'db' and 'meshes'
- * 
+ *
  * @param db  Target Db structure
  * @param meshes List of target meshes
  * @param ncov Number of covariances (nugget excluded)
  * @param nvar Number of variables (see notes)
  * @param checkOnZVariable Check if a sample should be considered or not
  * @param verbose Verbose flag
- * @return ProjMultiMatrix 
+ * @return ProjMultiMatrix
  * @note Argument 'nvar' is provided as it cannot be derived from 'db'
  * (when 'db' refers to the output file for example, where no Z-variable is available)
- * @note When Z-variable is defined, you can still bypass checking the validity of 
- * a sample (its Z-value is not NA) if 'checkOnZVariable' is False. 
+ * @note When Z-variable is defined, you can still bypass checking the validity of
+ * a sample (its Z-value is not NA) if 'checkOnZVariable' is False.
  */
 ProjMultiMatrix* ProjMultiMatrix::createFromDbAndMeshes(const Db* db,
                                                         const std::vector<const AMesh*>& meshes,
@@ -57,7 +57,7 @@ ProjMultiMatrix* ProjMultiMatrix::createFromDbAndMeshes(const Db* db,
                                                         bool checkOnZVariable,
                                                         bool verbose)
 {
-   if (db == nullptr)
+  if (db == nullptr)
   {
     messerr("db is null");
     return nullptr;
@@ -91,7 +91,7 @@ ProjMultiMatrix* ProjMultiMatrix::createFromDbAndMeshes(const Db* db,
 
   std::vector<std::vector<const ProjMatrix*>> stocker;
 
-  int nmesh = (int)meshes.size();
+  int nmesh      = (int)meshes.size();
   bool flagIsVar = checkOnZVariable && db->hasLocator(ELoc::Z);
   for (int ivar = 0; ivar < nvar; ivar++)
   {
@@ -111,18 +111,18 @@ ProjMultiMatrix* ProjMultiMatrix::createFromDbAndMeshes(const Db* db,
 
 void ProjMultiMatrix::_clear()
 {
-    if (!_toClean || _projs.empty()) return;
+  if (!_toClean || _projs.empty()) return;
 
-    for (auto &e: _projs)
+  for (auto& e: _projs)
+  {
+    for (auto& f: e)
     {
-        for (auto &f : e)
-        {
-            delete const_cast<IProj*>(f);
-            f = nullptr;
-        }
-        e.clear();
+      delete const_cast<IProj*>(f);
+      f = nullptr;
     }
-    _projs.clear();
+    e.clear();
+  }
+  _projs.clear();
 }
 ProjMultiMatrix::~ProjMultiMatrix()
 {
@@ -200,12 +200,12 @@ ProjMultiMatrix::ProjMultiMatrix(const std::vector<std::vector<const ProjMatrix*
 
 int ProjMultiMatrix::_addPoint2mesh(const constvect inv, vect outv) const
 {
-  _Proj.addProdMatVecInPlaceToDest(inv, outv, true);
+  _Proj.addProdMatVecInPlaceC(inv, outv, true);
   return 0;
 }
 int ProjMultiMatrix::_addMesh2point(const constvect inv, vect outv) const
 {
-  _Proj.addProdMatVecInPlaceToDest(inv, outv, false);
+  _Proj.addProdMatVecInPlaceC(inv, outv, false);
   return 0;
 }
-}
+} // namespace gstlrn

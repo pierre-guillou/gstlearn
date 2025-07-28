@@ -69,14 +69,14 @@ public:
   int &operator()(int irow, int icol)       { return _getValueRef(irow, icol); }
 
 private:
-  void   _allocate();
-  void   _deallocate();
-  bool   _isIndexValid(int irow, int icol) const;
-  bool   _isRankValid(int rank) const;
-  static bool   _isNumbersValid(int nrows, int ncols);
-  int    _getIndexToRank(int irow,int icol) const;
-  int&   _getValueRef(int irow, int icol);
-  static void   _transposeInPlace(int n1, int n2, const int *v1, int *w1);
+  void _allocate();
+  void _deallocate();
+  bool _isIndexValid(int irow, int icol) const;
+  bool _isRankValid(int rank) const;
+  int  _getIndexToRank(int irow, int icol) const;
+  int& _getValueRef(int irow, int icol);
+  static bool _isNumbersValid(int nrows, int ncols);
+  static void _transposeInPlace(int n1, int n2, const int* v1, int* w1);
 
 private:
   int _nRows;

@@ -7,6 +7,8 @@ Checks: >-
   -bugprone-macro-parentheses,
   -bugprone-reserved-identifier,
   modernize-deprecated-headers,
+  modernize-use-auto,
+  modernize-use-override,
   mpi-*,
   openmp-*,
   -openmp-use-default-none,

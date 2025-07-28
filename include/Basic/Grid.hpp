@@ -67,7 +67,7 @@ public:
   VectorDouble getExtends(bool flagCell = false) const;
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void copyParams(int mode, const Grid& gridaux);
   double getCoordinate(int rank, int idim, bool flag_rotate = true) const;

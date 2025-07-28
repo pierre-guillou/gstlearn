@@ -28,7 +28,7 @@ public:
              int rankZ    = -1,
              bool verbose = false);
   ProjMatrix(const ProjMatrix& m);
-  ProjMatrix(const MatrixSparse* m);
+  ProjMatrix(const MatrixSparse& m);
   ProjMatrix& operator=(const ProjMatrix& m);
   virtual ~ProjMatrix();
 
@@ -39,7 +39,7 @@ public:
   IMPLEMENT_CLONING(ProjMatrix)
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Interface for IProj
 

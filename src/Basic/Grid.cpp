@@ -980,7 +980,7 @@ void Grid::dilate(int mode,
 
   for (int idim = 0; idim < _nDim; idim++)
     _iwork0[idim] = -mode * nshift[idim];
-  indicesToCoordinate(_iwork0, _work1);
+  indicesToCoordinateInPlace(_iwork0, _work1);
 
   /* Calculate the center of the lower left cell */
 

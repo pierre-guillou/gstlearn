@@ -473,11 +473,19 @@ MatrixSquare* prodNormMatMat(const MatrixDense* a,
   return mat;
 }
 
-MatrixSquare* prodNormMat(const MatrixDense& a, const VectorDouble& vec, bool transpose)
+MatrixSquare* prodNormMat(const MatrixDense& a, bool transpose)
 {
   int nsym          = (transpose) ? a.getNCols() : a.getNRows();
   MatrixSquare* mat = new MatrixSquare(nsym);
-  mat->prodNormMatVecInPlace(a, vec, transpose);
+  mat->prodNormMatInPlace(&a, transpose);
+  return mat;
+}
+
+MatrixSquare* prodNormMatVec(const MatrixDense& a, const VectorDouble& vec, bool transpose)
+{
+  int nsym          = (transpose) ? a.getNCols() : a.getNRows();
+  MatrixSquare* mat = new MatrixSquare(nsym);
+  mat->prodNormMatVecInPlace(&a, vec, transpose);
   return mat;
 }
 } // namespace gstlrn

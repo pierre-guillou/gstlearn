@@ -280,7 +280,7 @@ void Chebychev::evalOp(MatrixSparse* S, const constvect x, vect y) const
 
   T1 = MatrixSparse::diagConstant(nvertex, 1.);
   if (T1 == nullptr) my_throw("Problem in MatrixSparse::diagCOnstant");
-  T1->addMatInPlace(*S, v2, v1);
+  T1->addMat(*S, v2, v1);
 
   /* Initialize the simulation */
 
@@ -302,7 +302,7 @@ void Chebychev::evalOp(MatrixSparse* S, const constvect x, vect y) const
 
   for (int ib = 2; ib < (int)_coeffs.size(); ib++)
   {
-    T1->prodVecMatInPlacePtr(tm1.data(), tx.data(), false);
+    T1->prodVecMatInPlace(tm1, tx, false);
     for (int i = 0; i < nvertex; i++)
     {
       tx[i] = 2. * tx[i] - tm2[i];

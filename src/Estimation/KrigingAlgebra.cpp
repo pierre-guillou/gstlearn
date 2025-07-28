@@ -1538,9 +1538,9 @@ void KrigingAlgebra::dumpLHS(int nbypas) const
         for (int j = ideb; j < ifin; j++)
         {
           if (j < _neq)
-            tab_printg(NULL, _Sigma->getValue(i, j, false));
+            tab_printg(NULL, _Sigma->getValue(i, j));
           else
-            tab_printg(NULL, _X->getValue(i, j - _neq, false));
+            tab_printg(NULL, _X->getValue(i, j - _neq));
         }
         message("\n");
       }
@@ -1549,7 +1549,7 @@ void KrigingAlgebra::dumpLHS(int nbypas) const
         for (int j = ideb; j < ifin; j++)
         {
           if (j < _neq)
-            tab_printg(NULL, _X->getValue(j, i - _neq, false));
+            tab_printg(NULL, _X->getValue(j, i - _neq));
           else
             tab_printg(NULL, 0.);
         }
@@ -1577,13 +1577,13 @@ void KrigingAlgebra::dumpRHS() const
     if (i < _neq)
     {
       for (int irhs = 0; irhs < _nrhs; irhs++)
-        tab_printg(NULL, _Sigma0->getValue(i, irhs, false));
+        tab_printg(NULL, _Sigma0->getValue(i, irhs));
     }
     else
     {
       if (_X0 != nullptr)
         for (int irhs = 0; irhs < _nrhs; irhs++)
-          tab_printg(NULL, _X0->getValue(irhs, i - _neq, false));
+          tab_printg(NULL, _X0->getValue(irhs, i - _neq));
     }
     message("\n");
   }
@@ -1635,7 +1635,7 @@ void KrigingAlgebra::dumpWGT()
       tab_printg(NULL, value);
       for (int irhs = 0; irhs < _nrhs; irhs++)
       {
-        value = lambda->getValue(lec, irhs, false);
+        value = lambda->getValue(lec, irhs);
         tab_printg(NULL, value);
         sum[irhs] += value;
       }
@@ -1698,7 +1698,7 @@ void KrigingAlgebra::dumpAux()
   {
     tab_printi(NULL, ibfl + 1);
     for (int irhs = 0; irhs < _nrhs; irhs++)
-      tab_printg(NULL, _MuUK.getValue(ibfl, irhs, false));
+      tab_printg(NULL, _MuUK.getValue(ibfl, irhs));
     tab_printg(NULL, _Beta[ibfl]);
     message("\n");
   }

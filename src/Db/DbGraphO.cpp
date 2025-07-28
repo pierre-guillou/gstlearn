@@ -423,7 +423,7 @@ VectorInt DbGraphO::getIndicesNextUp(int node) const
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
   v1[node] = 1.;
-  _downArcs.prodMatVecInPlace(v1, v2);
+  _downArcs.prodMatVecInPlaceC(v1, v2);
   return _getRanks(v2);
 }
 
@@ -643,4 +643,4 @@ bool DbGraphO::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
-}
+} // namespace gstlrn

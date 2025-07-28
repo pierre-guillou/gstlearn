@@ -58,74 +58,96 @@ public:
   IMPLEMENT_CLONING(MatrixDense)
 
   /// Interface for AMatrix
+
   /*! Returns if the current matrix is Dense */
   bool isDense() const override { return true; }
   /*! Returns if the current matrix is Sparse */
   bool isSparse() const override { return false; }
-  /*! Say if the matrix must be symmetric */
-  bool mustBeSymmetric() const override { return false; }
-
-  /*! Set the value for in a matrix cell */
-  void setValue(int irow, int icol, double value, bool flagCheck = false) override;
   /*! Get the value from a matrix cell */
-  virtual double getValue(int irow, int icol, bool flagCheck = false) const override;
+  double getValue(int irow, int icol) const override;
+  /*! Set the value for in a matrix cell */
+  void setValue(int irow, int icol, double value) override;
   /*! Update the contents of a matrix cell */
   void updValue(int irow,
                 int icol,
                 const EOperator& oper,
-                double value,
-                bool flagCheck = false) override;
-
+                double value) override;
   /*! Set the contents of a Column */
-  virtual void setColumn(int icol,
-                         const VectorDouble& tab,
-                         bool flagCheck = false) override;
+  void setColumn(int icol, const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant value */
-  virtual void setColumnToConstant(int icol,
-                                   double value,
-                                   bool flagCheck = false) override;
+  void setColumnToConstant(int icol, double value) override;
   /*! Set the contents of a Row */
-  virtual void setRow(int irow,
-                      const VectorDouble& tab,
-                      bool flagCheck = false) override;
+  void setRow(int irow, const VectorDouble& tab) override;
   /*! Set the contents of a Row to a constant value*/
-  virtual void setRowToConstant(int irow,
-                                double value,
-                                bool flagCheck = false) override;
+  void setRowToConstant(int irow, double value) override;
   /*! Set the contents of the (main) Diagonal */
-  virtual void setDiagonal(const VectorDouble& tab, bool flagCheck = false) override;
+  void setDiagonal(const VectorDouble& tab) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
-  virtual void setDiagonalToConstant(double value = 1.) override;
+  void setDiagonalToConstant(double value = 1.) override;
   /*! Add a value to each matrix component */
-  virtual void addScalar(double v) override;
+  void addScalar(double v) override;
   /*! Add value to matrix diagonal */
-  virtual void addScalarDiag(double v) override;
+  void addScalarDiag(double v) override;
   /*! Multiply each matrix component by a value */
-  virtual void prodScalar(double v) override;
+  void prodScalar(double v) override;
   /*! Set all the values of the Matrix at once */
-  virtual void fill(double value) override;
+  void fill(double value) override;
   /*! Multiply a Matrix row-wise */
-  virtual void multiplyRow(const VectorDouble& vec) override;
+  void multiplyRow(const VectorDouble& vec) override;
   /*! Multiply a Matrix column-wise */
-  virtual void multiplyColumn(const VectorDouble& vec) override;
+  void multiplyColumn(const VectorDouble& vec) override;
   /*! Divide a Matrix row-wise */
-  virtual void divideRow(const VectorDouble& vec) override;
+  void divideRow(const VectorDouble& vec) override;
   /*! Divide a Matrix column-wise */
-  virtual void divideColumn(const VectorDouble& vec) override;
-  /*! Perform 'vec' * 'this' */
-  virtual VectorDouble prodVecMat(const VectorDouble& x, bool transpose = false) const override;
-  /*! Perform 'this' * 'vec'*/
-  virtual VectorDouble prodMatVec(const VectorDouble& x, bool transpose = false) const override;
+  void divideColumn(const VectorDouble& vec) override;
+
+  /*! Say if the matrix must be symmetric */
+  bool mustBeSymmetric() const override { return false; }
+
   /*! Extract a Row */
-  virtual VectorDouble getRow(int irow) const override;
+  VectorDouble getRow(int irow) const override;
   /*! Extract a Column */
-  virtual VectorDouble getColumn(int icol) const override;
-  constvect getColumnPtr(int icol) const;
+  VectorDouble getColumn(int icol) const override;
   /*! Multiply matrix 'x' by matrix 'y' and store the result in 'this' */
-  virtual void prodMatMatInPlace(const AMatrix* x,
-                                 const AMatrix* y,
-                                 bool transposeX = false,
-                                 bool transposeY = false) override;
+  void prodMatMatInPlace(const AMatrix* x,
+                         const AMatrix* y,
+                         bool transposeX = false,
+                         bool transposeY = false) override;
+  /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' stored in 'this'*/
+  void prodNormMatMatInPlace(const AMatrix* a,
+                             const AMatrix* m,
+                             bool transpose = false) override;
+  /*! Perform 'this' = 't(A)' %*% 'vec' %*% 'A' or 'A' %*% 'vec' %*% 't(A)' */
+  void prodNormMatVecInPlace(const AMatrix* a,
+                             const VectorDouble& vec,
+                             bool transpose = false) override;
+  /*! Perform 'this' = 't(A)' %*% 'A' or 'A' %*% 't(A)' */
+  void prodNormMatInPlace(const AMatrix* a,
+                          bool transpose = false) override;
+  /*! Perform 'this' = 'val1' * 'mat1' + 'val2' * 'mat2' + 'val3' * 'mat3' */
+  void linearCombination(double val1,
+                         const AMatrix* mat1,
+                         double val2         = 1.,
+                         const AMatrix* mat2 = nullptr,
+                         double val3         = 1.,
+                         const AMatrix* mat3 = nullptr) override;
+  /*! Add a matrix (multiplied by a constant) */
+  void addMat(const AMatrix& y, double cx = 1., double cy = 1.) override;
+
+  const VectorDouble& getEigenValues() const { return _eigenValues; }
+  const MatrixSquare* getEigenVectors() const { return _eigenVectors; }
+  int invert2(MatrixDense& res) const;
+  void unsample(const AMatrix* A,
+                const VectorInt& rowFetch,
+                const VectorInt& colFetch,
+                bool flagInvertRow = false,
+                bool flagInvertCol = false);
+  MatrixDense compressMatLC(const MatrixDense& matLC, bool transpose = false);
+
+  // Adding a Row or a Column (at the bottom or right of Rectangular Matrix)
+  void addRow(int nrow_added = 1);
+  void addColumn(int ncolumn_added = 1);
+  constvect getColumnPtr(int icol) const;
 
   static MatrixDense* create(const MatrixDense* mat);
   static MatrixDense* create(int nrow, int ncol);
@@ -136,26 +158,6 @@ public:
                                    int ncol,
                                    bool byCol             = false,
                                    bool invertColumnOrder = false);
-
-  /// The next functions use specific definition of matrix (to avoid dynamic_cast)
-  /// rather than manipulating AMatrix. They are not generic of AMatrix anymore.
-  /// WARNING: output matrix should not match any of input matrices (speed up).
-
-  /*! Add a matrix (multiplied by a constant) */
-  void addMatInPlace(const MatrixDense& y, double cx = 1., double cy = 1.);
-  /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' stored in 'this'*/
-  virtual void prodNormMatMatInPlace(const MatrixDense* a,
-                                     const MatrixDense* m,
-                                     bool transpose = false);
-  /*! Product 't(A)' %*% ['vec'] %*% 'A' or 'A' %*% ['vec'] %*% 't(A)' stored in 'this'*/
-  virtual void prodNormMatVecInPlace(const MatrixDense& a,
-                                     const VectorDouble& vec = VectorDouble(),
-                                     bool transpose          = false);
-
-  const VectorDouble& getEigenValues() const { return _eigenValues; }
-  const MatrixSquare* getEigenVectors() const { return _eigenVectors; }
-  int invert2(MatrixDense& res) const;
-
   static MatrixDense* glue(const AMatrix* A1,
                            const AMatrix* A2,
                            bool flagShiftRow,
@@ -166,44 +168,28 @@ public:
                      const VectorInt& colKeep = VectorInt(),
                      bool flagInvertRow       = false,
                      bool flagInvertCol       = false);
-
-  void unsample(const AMatrix* A,
-                const VectorInt& rowFetch,
-                const VectorInt& colFetch,
-                bool flagInvertRow = false,
-                bool flagInvertCol = false);
-
-  MatrixDense compressMatLC(const MatrixDense& matLC, bool transpose = false);
-
-  // Adding a Row or a Column (at the bottom or right of Rectangular Matrix)
-  void addRow(int nrow_added = 1);
-  void addColumn(int ncolumn_added = 1);
-
 #ifndef SWIG
   static void sum(const MatrixDense* mat1,
                   const MatrixDense* mat2,
                   MatrixDense* mat3);
-#endif
-  void prodMatMatInPlaceOptim(const MatrixDense* x,
-                              const MatrixDense* y,
-                              bool transposeX = false,
-                              bool transposeY = false);
+#endif // !SWIG
 
 protected:
-  virtual void _allocate() override;
-  virtual void _deallocate() override;
+  void _allocate() override;
+  void _deallocate() override;
+  int _getIndexToRank(int irow, int icol) const override;
+  void _setValueByRank(int rank, double value) override;
+  void _transposeInPlace() override;
+  int _invert() override;
+  int _solve(const VectorDouble& b, VectorDouble& x) const override;
+  int _getMatrixPhysicalSize() const override;
+  double _getValueByRank(int rank) const override;
+  double& _getValueRef(int irow, int icol) override;
 
-  virtual int _getMatrixPhysicalSize() const override;
-  virtual double& _getValueRef(int irow, int icol) override;
-  virtual double _getValueByRank(int rank) const override;
-  virtual void _setValueByRank(int rank, double value) override;
-  virtual int _getIndexToRank(int irow, int icol) const override;
-  virtual void _transposeInPlace() override;
-  virtual void _prodMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _prodVecMatInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual void _addProdMatVecInPlacePtr(const double* x, double* y, bool transpose = false) const override;
-  virtual int _invert() override;
-  virtual int _solve(const VectorDouble& b, VectorDouble& x) const override;
+#ifndef SWIG
+  void _addProdVecMatInPlacePtr(constvect x, vect y, bool transpose = false) const override;
+  void _addProdMatVecInPlacePtr(constvect x, vect y, bool transpose = false) const override;
+#endif
 
   int _computeEigen(bool optionPositive = true);
   int _computeGeneralizedEigen(const MatrixSymmetric& b, bool optionPositive = true);

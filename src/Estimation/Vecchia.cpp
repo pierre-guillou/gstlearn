@@ -455,8 +455,8 @@ MatrixSparse* Vecchia::calculateW(const VectorDouble& D_dd) const
   Ldt->forceDimension(nd, nt);
 
   /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */
-  MatrixSparse* mat1 = prodNormMat(Ltt, D_tt, true);
-  MatrixSparse* mat2 = prodNormMat(Ldt, D_dd, true);
+  MatrixSparse* mat1 = prodNormMatVec(Ltt, D_tt, true);
+  MatrixSparse* mat2 = prodNormMatVec(Ldt, D_dd, true);
   mat1->forceDimension(nt, nt);
   mat2->forceDimension(nt, nt);
 
@@ -525,9 +525,9 @@ int krigingVecchia(Db* dbin,
 void Vecchia::productVecchia(constvect Y, vect res) const
 {
   _LdY.resize(_LFull.getNRows());
-  _LFull.prodMatVecInPlace(Y, _LdY, false);
+  _LFull.prodMatVecInPlaceC(Y, _LdY, false);
   VH::multiplyInPlace(_LdY, _DFull);
-  _LFull.prodMatVecInPlace(_LdY, res, true);
+  _LFull.prodMatVecInPlaceC(_LdY, res, true);
 }
 
 void Vecchia::productMatVecchia(const MatrixDense& X, MatrixDense& resmat) const

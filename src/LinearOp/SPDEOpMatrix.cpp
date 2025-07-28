@@ -9,7 +9,6 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/SPDEOpMatrix.hpp"
-#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/InvNuggetOp.hpp"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
@@ -29,7 +28,7 @@ SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
            nullptr,
            projOut,
            projOut)
-  , _QpAinvNoiseAt(std::make_shared<MatrixSparse>(0,0))
+  , _QpAinvNoiseAt(std::make_shared<MatrixSparse>(0, 0))
   , _chol(nullptr)
 {
   _QpAinvNoiseAt->resize(pop->getSize(), pop->getSize());
@@ -37,7 +36,7 @@ SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
   {
     _QpAinvNoiseAt->prodNormMatMatInPlace(A->getProj(), invNoise, true);
   }
-  _QpAinvNoiseAt->addMatInPlace(*pop->getQ());
+  _QpAinvNoiseAt->addMat(*pop->getQ());
 }
 
 SPDEOpMatrix::~SPDEOpMatrix()
@@ -71,7 +70,7 @@ double SPDEOpMatrix::computeLogDetOp(int nbsimu) const
   DECLARE_UNUSED(nbsimu);
 
   if (_chol == nullptr)
-    _chol = new CholeskySparse(*_QpAinvNoiseAt);//TODO avoid to do it twice
+    _chol = new CholeskySparse(*_QpAinvNoiseAt); // TODO avoid to do it twice
   return _chol->computeLogDeterminant();
 }
 
@@ -91,7 +90,7 @@ VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) con
   DECLARE_UNUSED(seed);
 
   if (_chol == nullptr)
-    _chol = new CholeskySparse(*_QpAinvNoiseAt);//TODO avoid to do it twice
+    _chol = new CholeskySparse(*_QpAinvNoiseAt); // TODO avoid to do it twice
 
   const ProjMultiMatrix* proj = dynamic_cast<const ProjMultiMatrix*>(_projOutKriging);
   const MatrixSparse* projmat = proj->getProj();

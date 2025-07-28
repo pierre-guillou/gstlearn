@@ -775,7 +775,7 @@ int KrigingAlgebraSimpleCase::_computeZstarWithDual()
   if (_needDual()) return 1;
   if (_notFindSigma0()) return 1;
   vect vZstar(_Zstar);
-  _Sigma0->prodMatVecInPlace(*_bDual, vZstar, true);
+  _Sigma0->prodMatVecInPlaceC(*_bDual, vZstar, true);
   if (_nbfl > 0)
   {
     if (_notFindX0()) return 1;
@@ -809,7 +809,7 @@ int KrigingAlgebraSimpleCase::_needZstar()
 {
   if (!_Zstar.empty()) return 0;
 
-  _Zstar.resize(_nrhs);
+  _Zstar.fill(0., _nrhs);
   if (_flagDual)
     return _computeZstarWithDual();
 
@@ -916,9 +916,9 @@ int KrigingAlgebraSimpleCase::_needXtInvSigmaZ()
   constvect vZ(*_Z);
   vect vres(*_XtInvSigmaZ);
   if (_flagCholesky)
-    _invSigmaX->prodMatVecInPlace(vZ, vres, true);
+    _invSigmaX->prodMatVecInPlaceC(vZ, vres, true);
   else
-    _XtInvSigma->prodMatVecInPlace(vZ, vres); // TODO in place
+    _XtInvSigma->prodMatVecInPlaceC(vZ, vres); // TODO in place
   return 0;
 }
 
@@ -978,7 +978,7 @@ int KrigingAlgebraSimpleCase::_needMuUK()
   _LambdaSKtX.resize(_nrhs, _nbfl);
   _Y0.resize(_nrhs, _nbfl);
 
-  _LambdaSKtX.prodMatMatInPlaceOptim(_LambdaSK.get(), _X.get(), true, false);
+  _LambdaSKtX.prodMatMatInPlace(_LambdaSK.get(), _X.get(), true, false);
   _Y0.linearCombination(1., _X0.get(), -1., &_LambdaSKtX);
 
   _MuUK.prodMatMatInPlace(_invSigmac.get(), &_Y0, false, true);
@@ -1024,7 +1024,7 @@ int KrigingAlgebraSimpleCase::_needLambdaSK()
     _cholSigma->solveMatInPlace(*_Sigma0, *_LambdaSK);
   }
   else
-    _LambdaSK->prodMatMatInPlaceOptim(_InvSigma.get(), _Sigma0.get());
+    _LambdaSK->prodMatMatInPlace(_InvSigma.get(), _Sigma0.get());
   return 0;
 }
 
@@ -1076,16 +1076,16 @@ int KrigingAlgebraSimpleCase::_needDual()
   if (_flagCholesky)
     _cholSigma->solve(vZ, vB);
   else
-    _InvSigma->prodMatVecInPlace(vZ, vB, true);
+    _InvSigma->prodMatVecInPlaceC(vZ, vB, true);
   if (_nbfl > 0)
   {
     if (_needBeta()) return 1;
     _invSigmaXBeta->resize(_neq);
     vect vISXD(*_invSigmaXBeta);
     if (_flagCholesky)
-      _invSigmaX->prodMatVecInPlace(*_Beta, vISXD);
+      _invSigmaX->prodMatVecInPlaceC(*_Beta, vISXD);
     else
-      _XtInvSigma->prodMatVecInPlace(*_Beta, vISXD, true);
+      _XtInvSigma->prodMatVecInPlaceC(*_Beta, vISXD, true);
     VH::linearCombinationInPlace(1., *_bDual, -1., *_invSigmaXBeta, *_bDual);
   }
   _dualHasChanged = false;
@@ -1214,9 +1214,9 @@ void KrigingAlgebraSimpleCase::dumpLHS(int nbypas) const
         for (int j = ideb; j < ifin; j++)
         {
           if (j < _neq)
-            tab_printg(NULL, _Sigma->getValue(i, j, false));
+            tab_printg(NULL, _Sigma->getValue(i, j));
           else
-            tab_printg(NULL, _X->getValue(i, j - _neq, false));
+            tab_printg(NULL, _X->getValue(i, j - _neq));
         }
         message("\n");
       }
@@ -1225,7 +1225,7 @@ void KrigingAlgebraSimpleCase::dumpLHS(int nbypas) const
         for (int j = ideb; j < ifin; j++)
         {
           if (j < _neq)
-            tab_printg(NULL, _X->getValue(j, i - _neq, false));
+            tab_printg(NULL, _X->getValue(j, i - _neq));
           else
             tab_printg(NULL, 0.);
         }
@@ -1253,13 +1253,13 @@ void KrigingAlgebraSimpleCase::dumpRHS() const
     if (i < _neq)
     {
       for (int irhs = 0; irhs < _nrhs; irhs++)
-        tab_printg(NULL, _Sigma0->getValue(i, irhs, false));
+        tab_printg(NULL, _Sigma0->getValue(i, irhs));
     }
     else
     {
       if (_X0 != nullptr)
         for (int irhs = 0; irhs < _nrhs; irhs++)
-          tab_printg(NULL, _X0->getValue(irhs, i - _neq, false));
+          tab_printg(NULL, _X0->getValue(irhs, i - _neq));
     }
     message("\n");
   }
@@ -1311,7 +1311,7 @@ void KrigingAlgebraSimpleCase::dumpWGT()
       tab_printg(NULL, value);
       for (int irhs = 0; irhs < _nrhs; irhs++)
       {
-        value = lambda->getValue(lec, irhs, false);
+        value = lambda->getValue(lec, irhs);
         tab_printg(NULL, value);
         sum[irhs] += value;
       }
@@ -1359,10 +1359,10 @@ void KrigingAlgebraSimpleCase::dumpAux()
   {
     tab_printi(NULL, ibfl + 1);
     for (int irhs = 0; irhs < _nrhs; irhs++)
-      tab_printg(NULL, _MuUK.getValue(ibfl, irhs, false));
+      tab_printg(NULL, _MuUK.getValue(ibfl, irhs));
     tab_printg(NULL, _Beta->at(ibfl));
     message("\n");
   }
 }
 
-}
+} // namespace gstlrn

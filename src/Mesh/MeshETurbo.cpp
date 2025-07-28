@@ -782,7 +782,7 @@ int MeshETurbo::_addWeights(int icas,
   if (lhs.invert()) return 1;
 
   // Calculate the weights
-  lhs.prodMatVecInPlace(_rhs, lambda);
+  lhs.prodMatVecInPlaceC(_rhs, lambda);
 
   // Check that all weights are positive
   for (int icorner = 0; icorner < ncorner; icorner++)

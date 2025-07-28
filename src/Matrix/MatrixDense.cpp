@@ -90,9 +90,9 @@ void MatrixDense::_deallocate()
   _eigenMatrix.clear();
 }
 
-double MatrixDense::getValue(int irow, int icol, bool flagCheck) const
+double MatrixDense::getValue(int irow, int icol) const
 {
-  if (flagCheck && !_isIndexValid(irow, icol)) return TEST;
+  if (getFlagMatrixCheck() && !_isIndexValid(irow, icol)) return TEST;
   return eigenMat()(irow, icol);
 }
 
@@ -112,12 +112,12 @@ void MatrixDense::_setValueByRank(int irank, double value)
   *(eigenMat().data() + irank) = value;
 }
 
-void MatrixDense::setValue(int irow, int icol, double value, bool flagCheck)
+void MatrixDense::setValue(int irow, int icol, double value)
 {
-  if (flagCheck && !_isIndexValid(irow, icol)) return;
-  auto mat        = eigenMat();
-  mat(irow, icol) = value;
-  if (mustBeSymmetric() && irow != icol) mat(icol, irow) = value;
+  if (getFlagMatrixCheck() && !_isIndexValid(irow, icol)) return;
+  eigenMat().coeffRef(irow, icol) = value;
+  if (mustBeSymmetric() && irow != icol)
+    eigenMat().coeffRef(icol, irow) = value;
 }
 
 double MatrixDense::traceProd(const MatrixDense& a, MatrixDense& b)
@@ -134,12 +134,12 @@ double MatrixDense::traceProd(const MatrixDense& a, MatrixDense& b)
 void MatrixDense::updValue(int irow,
                            int icol,
                            const EOperator& oper,
-                           double value,
-                           bool flagCheck)
+                           double value)
 {
-  if (flagCheck && !_isIndexValid(irow, icol)) return;
-  double result          = modifyOperator(oper, eigenMat()(irow, icol), value);
-  eigenMat()(irow, icol) = result;
+  if (getFlagMatrixCheck() && !_isIndexValid(irow, icol)) return;
+  double result                   = modifyOperator(oper, eigenMat()(irow, icol), value);
+  eigenMat().coeffRef(irow, icol) = result;
+  eigenMat()(irow, icol)          = result;
   if (mustBeSymmetric() && irow != icol)
     eigenMat()(icol, irow) = result;
 }
@@ -169,37 +169,36 @@ void MatrixDense::_transposeInPlace()
   _setNRows(ncols);
 }
 
-void MatrixDense::_addProdMatVecInPlacePtr(const double* x, double* y, bool transpose) const
+void MatrixDense::_addProdMatVecInPlacePtr(constvect x, vect y, bool transpose) const
 {
-  Eigen::Map<const Eigen::VectorXd> xm(x, getNCols());
-  Eigen::Map<Eigen::VectorXd> ym(y, getNRows());
   if (transpose)
+  {
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNRows());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNCols());
     ym.noalias() += eigenMat().transpose() * xm;
+  }
   else
+  {
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNCols());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNRows());
     ym.noalias() += eigenMat() * xm;
+  }
 }
 
-// TODO supress this method and implement it in the virtual class AMatrix
-void MatrixDense::_prodMatVecInPlacePtr(const double* x, double* y, bool transpose) const
+void MatrixDense::_addProdVecMatInPlacePtr(constvect x, vect y, bool transpose) const
 {
-  int nc = transpose ? getNRows() : getNCols();
-  int nr = transpose ? getNCols() : getNRows();
-  Eigen::Map<const Eigen::VectorXd> xm(x, nc);
-  Eigen::Map<Eigen::VectorXd> ym(y, nr);
   if (transpose)
-    ym.noalias() = eigenMat().transpose() * xm;
+  {
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNCols());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNRows());
+    ym.noalias() += xm.transpose() * eigenMat().transpose();
+  }
   else
-    ym.noalias() = eigenMat() * xm;
-}
-
-void MatrixDense::_prodVecMatInPlacePtr(const double* x, double* y, bool transpose) const
-{
-  Eigen::Map<const Eigen::VectorXd> xm(x, getNRows());
-  Eigen::Map<Eigen::VectorXd> ym(y, getNCols());
-  if (transpose)
-    ym.noalias() = xm.transpose() * eigenMat().transpose();
-  else
-    ym.noalias() = xm.transpose() * eigenMat();
+  {
+    Eigen::Map<const Eigen::VectorXd> xm(x.data(), getNRows());
+    Eigen::Map<Eigen::VectorXd> ym(y.data(), getNCols());
+    ym.noalias() += xm.transpose() * eigenMat();
+  }
 }
 
 int MatrixDense::_invert()
@@ -224,9 +223,9 @@ int MatrixDense::_solve(const VectorDouble& b, VectorDouble& x) const
   return 0;
 }
 
-void MatrixDense::setColumn(int icol, const VectorDouble& tab, bool flagCheck)
+void MatrixDense::setColumn(int icol, const VectorDouble& tab)
 {
-  if (flagCheck)
+  if (getFlagMatrixCheck())
   {
     if (!_isColumnValid(icol)) return;
     if (!_isColumnSizeConsistent(tab)) return;
@@ -235,18 +234,18 @@ void MatrixDense::setColumn(int icol, const VectorDouble& tab, bool flagCheck)
   eigenMat().col(icol) = tabm;
 }
 
-void MatrixDense::setColumnToConstant(int icol, double value, bool flagCheck)
+void MatrixDense::setColumnToConstant(int icol, double value)
 {
-  if (flagCheck)
+  if (getFlagMatrixCheck())
   {
     if (!_isColumnValid(icol)) return;
   }
   eigenMat().col(icol) = Eigen::VectorXd::Constant(getNRows(), value);
 }
 
-void MatrixDense::setRow(int irow, const VectorDouble& tab, bool flagCheck)
+void MatrixDense::setRow(int irow, const VectorDouble& tab)
 {
-  if (flagCheck)
+  if (getFlagMatrixCheck())
   {
     if (!_isRowValid(irow)) return;
     if (!_isRowSizeConsistent(tab)) return;
@@ -255,18 +254,18 @@ void MatrixDense::setRow(int irow, const VectorDouble& tab, bool flagCheck)
   eigenMat().row(irow) = tabm;
 }
 
-void MatrixDense::setRowToConstant(int irow, double value, bool flagCheck)
+void MatrixDense::setRowToConstant(int irow, double value)
 {
-  if (flagCheck)
+  if (getFlagMatrixCheck())
   {
     if (!_isRowValid(irow)) return;
   }
   eigenMat().row(irow) = Eigen::VectorXd::Constant(getNCols(), value);
 }
 
-void MatrixDense::setDiagonal(const VectorDouble& tab, bool flagCheck)
+void MatrixDense::setDiagonal(const VectorDouble& tab)
 {
-  if (flagCheck)
+  if (getFlagMatrixCheck())
   {
     if (!_isRowSizeConsistent(tab)) return;
   }
@@ -288,18 +287,29 @@ void MatrixDense::addScalar(double v)
 
 void MatrixDense::addScalarDiag(double v)
 {
+  if (isZero(v)) return;
   eigenMat().diagonal() += Eigen::VectorXd::Constant(getNRows(), v);
 }
 
 void MatrixDense::prodScalar(double v)
 {
+  if (isOne(v)) return;
   eigenMat().array() *= v;
 }
 
-void MatrixDense::addMatInPlace(const MatrixDense& y, double cx, double cy)
+void MatrixDense::addMat(const AMatrix& y, double cx, double cy)
 {
-  if (y.eigenMat().size() <= 0) return;
-  eigenMat().noalias() = cx * eigenMat() + cy * y.eigenMat();
+  const auto* ym = dynamic_cast<const MatrixDense*>(&y);
+  if (ym == nullptr || ym == this)
+  {
+    AMatrix::addMat(y, cx, cy);
+  }
+  else
+  {
+    eigenMat().noalias() = cx * eigenMat();
+    if (cy == 0. || (getFlagMatrixCheck() && !isSameSize(y))) return;
+    eigenMat().noalias() += cy * ym->eigenMat();
+  }
 }
 
 void MatrixDense::prodMatMatInPlace(const AMatrix* x,
@@ -307,9 +317,18 @@ void MatrixDense::prodMatMatInPlace(const AMatrix* x,
                                     bool transposeX,
                                     bool transposeY)
 {
-  const MatrixDense* xm = dynamic_cast<const MatrixDense*>(x);
-  const MatrixDense* ym = dynamic_cast<const MatrixDense*>(y);
-  if (xm != nullptr && ym != nullptr)
+  if (getFlagMatrixCheck() &&
+      !_isMatrixCompatible("MatrixDense::prodMatMatInPlace",
+                           x, 0, transposeX,
+                           y, 0, transposeY)) return;
+
+  const auto* xm = dynamic_cast<const MatrixDense*>(x);
+  const auto* ym = dynamic_cast<const MatrixDense*>(y);
+  if (xm == nullptr || ym == nullptr)
+  {
+    AMatrix::prodMatMatInPlace(x, y, transposeX, transposeY);
+  }
+  else
   {
     if (transposeX)
     {
@@ -334,40 +353,6 @@ void MatrixDense::prodMatMatInPlace(const AMatrix* x,
       }
     }
   }
-  else
-  {
-    AMatrix::prodMatMatInPlace(x, y, transposeX, transposeY);
-  }
-}
-
-void MatrixDense::prodMatMatInPlaceOptim(const MatrixDense* x,
-                                         const MatrixDense* y,
-                                         bool transposeX,
-                                         bool transposeY)
-{
-
-  if (transposeX)
-  {
-    if (transposeY)
-    {
-      eigenMat().noalias() = x->eigenMat().transpose() * y->eigenMat().transpose();
-    }
-    else
-    {
-      eigenMat().noalias() = x->eigenMat().transpose() * y->eigenMat();
-    }
-  }
-  else
-  {
-    if (transposeY)
-    {
-      eigenMat().noalias() = x->eigenMat() * y->eigenMat().transpose();
-    }
-    else
-    {
-      eigenMat().noalias() = x->eigenMat() * y->eigenMat();
-    }
-  }
 }
 
 /**
@@ -381,17 +366,32 @@ void MatrixDense::prodMatMatInPlaceOptim(const MatrixDense* x,
  *
  * @note: 'a' and 'm' may NOT coincide with 'this'
  */
-void MatrixDense::prodNormMatMatInPlace(const MatrixDense* a,
-                                        const MatrixDense* m,
+void MatrixDense::prodNormMatMatInPlace(const AMatrix* a,
+                                        const AMatrix* m,
                                         bool transpose)
 {
-  if (transpose)
+  if (getFlagMatrixCheck() &&
+      !_isMatrixCompatible("MatrixSparse::prodNormMatMatInPlace",
+                           a, 0, transpose,
+                           m, 0, false,
+                           a, 0, !transpose)) return;
+
+  const auto* am = dynamic_cast<const MatrixDense*>(a);
+  const auto* mm = dynamic_cast<const MatrixDense*>(m);
+  if (am == nullptr || mm == nullptr)
   {
-    eigenMat().noalias() = a->eigenMat().transpose() * m->eigenMat() * a->eigenMat();
+    AMatrix::prodNormMatMatInPlace(a, m, transpose);
   }
   else
   {
-    eigenMat().noalias() = a->eigenMat() * m->eigenMat() * a->eigenMat().transpose();
+    if (transpose)
+    {
+      eigenMat().noalias() = am->eigenMat().transpose() * mm->eigenMat() * am->eigenMat();
+    }
+    else
+    {
+      eigenMat().noalias() = am->eigenMat() * mm->eigenMat() * am->eigenMat().transpose();
+    }
   }
 }
 
@@ -402,27 +402,83 @@ void MatrixDense::prodNormMatMatInPlace(const MatrixDense* a,
  * @param vec Input vector
  * @param transpose When True, the input Matrix is transposed
  */
-void MatrixDense::prodNormMatVecInPlace(const MatrixDense& a, const VectorDouble& vec, bool transpose)
+void MatrixDense::prodNormMatVecInPlace(const AMatrix* a, const VectorDouble& vec, bool transpose)
 {
-  if (transpose)
+  if (getFlagMatrixCheck() &&
+      !_isMatrixCompatible("MatrixDense::prodNormMatVecInPlace",
+                           a, 0, transpose,
+                           a, 0, !transpose)) return;
+
+  const auto* am = dynamic_cast<const MatrixDense*>(a);
+  if (am == nullptr)
   {
-    if (vec.empty())
-      eigenMat().noalias() = a.eigenMat().transpose() * a.eigenMat();
-    else
-    {
-      Eigen::Map<const Eigen::VectorXd> vecm(vec.data(), vec.size());
-      eigenMat().noalias() = a.eigenMat().transpose() * vecm * a.eigenMat();
-    }
+    AMatrix::prodNormMatVecInPlace(a, vec, transpose);
   }
   else
   {
-    if (vec.empty())
-      eigenMat().noalias() = a.eigenMat() * a.eigenMat().transpose();
+    if (transpose)
+    {
+      Eigen::Map<const Eigen::VectorXd> vecm(vec.data(), vec.size());
+      eigenMat().noalias() = am->eigenMat().transpose() * vecm * am->eigenMat();
+    }
     else
     {
       Eigen::Map<const Eigen::VectorXd> vecm(vec.data(), vec.size());
-      eigenMat().noalias() = a.eigenMat() * vecm * a.eigenMat().transpose();
+      eigenMat().noalias() = am->eigenMat() * vecm * am->eigenMat().transpose();
     }
+  }
+}
+
+void MatrixDense::prodNormMatInPlace(const AMatrix* a, bool transpose)
+{
+  if (getFlagMatrixCheck() &&
+      !_isMatrixCompatible("MatrixDense::prodNormMatInPlace",
+                           a, 0, transpose,
+                           a, 0, !transpose)) return;
+
+  const auto* am = dynamic_cast<const MatrixDense*>(a);
+  if (am == nullptr)
+  {
+    AMatrix::prodNormMatInPlace(a, transpose);
+  }
+  else
+  {
+    if (transpose)
+    {
+      eigenMat() = am->eigenMat().transpose() * am->eigenMat();
+    }
+    else
+    {
+      eigenMat() = am->eigenMat() * am->eigenMat().transpose();
+    }
+  }
+}
+
+void MatrixDense::linearCombination(double val1,
+                                    const AMatrix* mat1,
+                                    double val2,
+                                    const AMatrix* mat2,
+                                    double val3,
+                                    const AMatrix* mat3)
+{
+  const auto* mmat1 = dynamic_cast<const MatrixDense*>(mat1);
+  const auto* mmat2 = dynamic_cast<const MatrixDense*>(mat2);
+  const auto* mmat3 = dynamic_cast<const MatrixDense*>(mat3);
+
+  if ((mat1 != nullptr && mmat1 == nullptr) ||
+      (mat2 != nullptr && mmat2 == nullptr) || (mat2 == this) ||
+      (mat3 != nullptr && mmat3 == nullptr) || (mat3 == this))
+  {
+    AMatrix::linearCombination(val1, mat1, val2, mat2, val3, mat3);
+  }
+  else
+  {
+    if (mat1 != nullptr && val1 != 0.)
+      eigenMat() = val1 * mmat1->eigenMat();
+    if (mat2 != nullptr && val2 != 0.)
+      eigenMat() += val2 * mmat2->eigenMat();
+    if (mat3 != nullptr && val3 != 0.)
+      eigenMat() += val3 * mmat3->eigenMat();
   }
 }
 
@@ -434,6 +490,11 @@ void MatrixDense::fill(double value)
 /*! Multiply a Matrix row-wise */
 void MatrixDense::multiplyRow(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNRows() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of rows. Nothing is done");
+    return;
+  }
   Eigen::Map<const Eigen::VectorXd> vecm(vec.data(), getNCols());
   eigenMat() = vecm.asDiagonal() * eigenMat();
 }
@@ -441,6 +502,11 @@ void MatrixDense::multiplyRow(const VectorDouble& vec)
 /*! Multiply a Matrix column-wise */
 void MatrixDense::multiplyColumn(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNCols() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of columns. Nothing is done");
+    return;
+  }
   Eigen::Map<const Eigen::VectorXd> vecm(vec.data(), getNRows());
   eigenMat() = eigenMat() * vecm.asDiagonal();
 }
@@ -448,6 +514,11 @@ void MatrixDense::multiplyColumn(const VectorDouble& vec)
 /*! Divide a Matrix row-wise */
 void MatrixDense::divideRow(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNRows() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of rows. Nothing is done");
+    return;
+  }
   VectorDouble temp = VH::inverse(vec);
   Eigen::Map<const Eigen::VectorXd> vecm(temp.data(), getNCols());
   eigenMat() = vecm.asDiagonal() * eigenMat();
@@ -456,35 +527,14 @@ void MatrixDense::divideRow(const VectorDouble& vec)
 /*! Divide a Matrix column-wise */
 void MatrixDense::divideColumn(const VectorDouble& vec)
 {
+  if (getFlagMatrixCheck() && getNCols() != (int)vec.size())
+  {
+    messerr("The size of 'vec' must match the number of columns. Nothing is done");
+    return;
+  }
   VectorDouble temp = VH::inverse(vec);
   Eigen::Map<const Eigen::VectorXd> vecm(temp.data(), getNRows());
   eigenMat() = eigenMat() * vecm.asDiagonal();
-}
-
-/*! Perform 'vec' * 'this' */
-VectorDouble MatrixDense::prodVecMat(const VectorDouble& x, bool transpose) const
-{
-  Eigen::Map<const Eigen::VectorXd> xm(x.data(), x.size());
-  VectorDouble y(transpose ? getNRows() : getNCols());
-  Eigen::Map<Eigen::VectorXd> ym(y.data(), y.size());
-  if (transpose)
-    ym = xm.transpose() * eigenMat().transpose();
-  else
-    ym = xm.transpose() * eigenMat();
-  return y;
-}
-
-/*! Perform 'this' * 'vec' */
-VectorDouble MatrixDense::prodMatVec(const VectorDouble& x, bool transpose) const
-{
-  Eigen::Map<const Eigen::VectorXd> xm(x.data(), x.size());
-  VectorDouble y(transpose ? getNCols() : getNRows());
-  Eigen::Map<Eigen::VectorXd> ym(y.data(), y.size());
-  if (transpose)
-    ym = eigenMat().transpose() * xm;
-  else
-    ym = eigenMat() * xm;
-  return y;
 }
 
 /*! Extract a Row */

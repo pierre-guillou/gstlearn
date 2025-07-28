@@ -111,15 +111,15 @@ ProjMatrix* PrecisionOpMultiConditionalCs::_buildAmult() const
   else
   {
     MatrixSparse* mstemp      = nullptr;
-    const MatrixSparse* msref = dynamic_cast<const MatrixSparse*>(getProjMatrix(0));
+    const auto* msref = dynamic_cast<const MatrixSparse*>(getProjMatrix(0));
     for (int is = 1; is < number; is++)
     {
-      const MatrixSparse* msaux = dynamic_cast<const MatrixSparse*>(getProjMatrix(is));
+      const auto* msaux = dynamic_cast<const MatrixSparse*>(getProjMatrix(is));
       delete mstemp;
       mstemp = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(msref, msaux, false, true));
       msref  = mstemp;
     }
-    Pmult = new ProjMatrix(mstemp);
+    Pmult = new ProjMatrix(*mstemp);
     delete mstemp;
   }
   return Pmult;
@@ -139,7 +139,7 @@ int PrecisionOpMultiConditionalCs::_buildQpAtA()
 
   // Create the conditional multiple precision matrix 'Q'
   VectorDouble invsigma = VectorHelper::inverse(getAllVarianceData());
-  MatrixSparse* AtAsVar = prodNormMat(Amult, invsigma, true);
+  MatrixSparse* AtAsVar = prodNormMatVec(Amult, invsigma, true);
   _QpAtA                = std::shared_ptr<MatrixSparse>(MatrixSparse::addMatMat(Qmult, AtAsVar, 1., 1.));
 
   // Free core allocated

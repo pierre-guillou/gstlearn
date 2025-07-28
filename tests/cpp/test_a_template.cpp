@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Calculators/CalcSimuPostPropByLayer.hpp"
 #include "Db/DbGrid.hpp"
 /**
  * This file is meant to parametrized the ModelGeneric in terms of ParamInfo
@@ -22,13 +21,9 @@ int main(int argc, char* argv[])
   DECLARE_UNUSED(argc);
   DECLARE_UNUSED(argv);
 
-  auto* g3 = DbGrid::createFillRandom({10, 10, 10}, 0, 0, 0, 0., 0., VectorDouble(), VectorDouble(), {1., 2., 3.});
-  auto* g2 = DbGrid::createFillRandom({10, 10}, 1, 0, 0, 0., 0., VectorDouble(), VectorDouble(), {1., 2.});
-
-  VectorInt cells = {1, 2, 3};
-  simuPostPropByLayer(g2, g3, {"z"}, false, false,
-                      EPostUpscale::MEAN, EPostStat::fromKeys({"MINI", "MAXI", "MED", "MEAN", "STD"}), true, cells, 0);
+  const auto* g3 = DbGrid::create({2, 3, 4}, VectorDouble(), VectorDouble(), {10., 20., 30.});
   g3->display();
-
+  const auto* g2 = DbGrid::create({2, 3}, VectorDouble(), VectorDouble(), {10., 20.});
+  g2->display();
   return (0);
 }

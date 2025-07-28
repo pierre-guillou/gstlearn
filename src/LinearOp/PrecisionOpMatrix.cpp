@@ -171,7 +171,7 @@ void PrecisionOpMatrix::evalInverse(const constvect vecin,
   _chol->solve(vecin, vecout);
 }
 
-double PrecisionOpMatrix::computeLogDet(int nMC) const 
+double PrecisionOpMatrix::computeLogDet(int nMC) const
 {
   DECLARE_UNUSED(nMC);
   if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
@@ -298,8 +298,8 @@ MatrixSparse* PrecisionOpMatrix::_build_Q()
 
   for (int iterm = 1; iterm < nblin; iterm++)
   {
-    Q->addMatInPlace(*Bi, 1., blin[iterm]);
-    if (iterm < nblin - 1) Bi->prodMatInPlace(S);
+    Q->addMat(*Bi, 1., blin[iterm]);
+    if (iterm < nblin - 1) Bi->prodMat(S);
   }
   delete Bi;
 
