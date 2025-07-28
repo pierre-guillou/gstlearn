@@ -22,7 +22,6 @@
 
 
 namespace gstlrn {
-class cs;
 class MatrixSparse;
 
 class GSTLEARN_EXPORT APolynomial: public AStringable, public ICloneable

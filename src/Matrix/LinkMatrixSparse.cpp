@@ -15,9 +15,6 @@
 
 #include "geoslib_old_f.h"
 
-// External library
-#include "csparse_f.h"
-
 #define MAX_NEIGH      100
 #define XCR(ilevel, i) (xcr[(ilevel) * ncur + (i)])
 #define RHS(ilevel, i) (rhs[(ilevel) * ncur + (i)])
