@@ -297,19 +297,9 @@ void MatrixDense::prodScalar(double v)
   eigenMat().array() *= v;
 }
 
-void MatrixDense::addMat(const AMatrix& y, double cx, double cy)
+void MatrixDense::addMat(const MatrixDense& y, const double cx, const double cy)
 {
-  const auto* ym = dynamic_cast<const MatrixDense*>(&y);
-  if (ym == nullptr || ym == this)
-  {
-    AMatrix::addMat(y, cx, cy);
-  }
-  else
-  {
-    eigenMat().noalias() = cx * eigenMat();
-    if (cy == 0. || (getFlagMatrixCheck() && !isSameSize(y))) return;
-    eigenMat().noalias() += cy * ym->eigenMat();
-  }
+  eigenMat().noalias() = cx * eigenMat() + cy * y.eigenMat();
 }
 
 void MatrixDense::prodMatMatInPlace(const AMatrix* x,

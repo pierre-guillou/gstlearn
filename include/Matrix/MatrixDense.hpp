@@ -132,7 +132,7 @@ public:
                          double val3         = 1.,
                          const AMatrix* mat3 = nullptr) override;
   /*! Add a matrix (multiplied by a constant) */
-  void addMat(const AMatrix& y, double cx = 1., double cy = 1.) override;
+  void addMat(const MatrixDense& y, const double cx = 1., const double cy = 1.);
 
   const VectorDouble& getEigenValues() const { return _eigenValues; }
   const MatrixSquare* getEigenVectors() const { return _eigenVectors; }

@@ -833,19 +833,9 @@ void MatrixSparse::linearCombination(double val1,
  * @param cy Coefficient applied to the Matrix  'y'
  * @param y Second Matrix in the Linear combination
  */
-void MatrixSparse::addMat(const AMatrix& y, double cx, double cy)
+void MatrixSparse::addMat(const MatrixSparse& y, const double cx, const double cy)
 {
-  const auto* ym = dynamic_cast<const MatrixSparse*>(&y);
-  if (ym == nullptr || ym == this)
-  {
-    AMatrix::addMat(y, cx, cy);
-  }
-  else
-  {
-    eigenMat() = cx * eigenMat();
-    if (cy == 0. || (getFlagMatrixCheck() && !isSameSize(y))) return;
-    eigenMat() += cy * ym->eigenMat();
-  }
+  eigenMat() = cx * eigenMat() + cy * y.eigenMat();
 }
 
 Id MatrixSparse::_invert()

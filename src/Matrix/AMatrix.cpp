@@ -14,6 +14,7 @@
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Matrix/MatrixFactory.hpp"
+#include "Matrix/MatrixSparse.hpp"
 #include "Matrix/NF_Triplet.hpp"
 #include "geoslib_define.h"
 
@@ -516,9 +517,27 @@ void AMatrix::resize(Id nrows, Id ncols)
  * @param cx Multiplicative parameter for this
  * @param cy Multiplicative parameter for y
  */
-void AMatrix::addMat(const AMatrix& y, double cx, double cy)
+void AMatrix::addMat(const AMatrix& y, const double cx, const double cy)
 {
   if (!isSameSize(y)) return;
+
+  auto* tmd       = dynamic_cast<MatrixDense*>(this);
+  const auto* omd = dynamic_cast<const MatrixDense*>(&y);
+
+  if (tmd != nullptr && omd != nullptr)
+  {
+    tmd->addMat(*omd, cx, cy);
+    return;
+  }
+
+  auto* tms       = dynamic_cast<MatrixSparse*>(this);
+  const auto* oms = dynamic_cast<const MatrixSparse*>(&y);
+
+  if (tms != nullptr && oms != nullptr)
+  {
+    tms->addMat(*oms, cx, cy);
+    return;
+  }
 
   for (Id irow = 0; irow < _nRows; irow++)
     for (Id icol = 0; icol < _nCols; icol++)

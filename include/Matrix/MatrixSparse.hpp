@@ -139,7 +139,7 @@ public:
                          double val3         = 1.,
                          const AMatrix* mat3 = nullptr) override;
   /*! Add a matrix (multiplied by a constant) */
-  void addMat(const AMatrix& y, double cx = 1., double cy = 1.) override;
+  void addMat(const MatrixSparse& y, const double cx = 1., const double cy = 1.);
 
   /*! Extract the contents of the matrix */
   NF_Triplet getMatrixToTriplet(Id shiftRow = 0, Id shiftCol = 0) const override;
