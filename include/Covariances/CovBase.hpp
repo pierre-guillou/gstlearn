@@ -12,19 +12,18 @@
 #include "Basic/AFunctional.hpp"
 #include "Basic/ICloneable.hpp"
 #include "Basic/Iterators.hpp"
+#include "Basic/ParamInfo.hpp"
 #include "Covariances/ACov.hpp"
+#include "Covariances/CovContext.hpp"
 #include "Covariances/TabNoStat.hpp"
 #include "Covariances/TabNoStatSills.hpp"
-#include "LinearOp/CholeskyDense.hpp"
 #include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
-#include "Covariances/CovContext.hpp"
+#include "Matrix/MatrixT.hpp"
 #include "Model/AModelFitSills.hpp"
 #include "Model/CovInternal.hpp"
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
-#include "Matrix/MatrixT.hpp"
-#include "Basic/ParamInfo.hpp"
 class AFunctional;
 class CovInternal;
 
@@ -41,8 +40,8 @@ public:
   IMPLEMENT_CLONING(CovBase)
   static ParamInfo createParamInfoForCholSill();
 
-  virtual bool isConsistent(const ASpace* space) const override;
-  virtual int getNVar() const override { return _ctxt.getNVar(); }
+  bool isConsistent(const ASpace* space) const override;
+  int getNVar() const override { return _ctxt.getNVar(); }
   bool isOptimizationInitialized(const Db* db = nullptr) const;
 
   void setCholSill(int ivar, int jvar, double val) const;
@@ -124,8 +123,8 @@ protected:
   bool _isVariableValid(int ivar) const;
 
   /// Update internal parameters consistency with the context
-  virtual void _updateFromContext() override;
-  virtual void _initFromContext() override;
+  void _updateFromContext() override;
+  void _initFromContext() override;
   void _copyCovContext(const CovContext& ctxt) override;
 
 private:
@@ -151,9 +150,10 @@ private:
                        int ivar                = 0,
                        int jvar                = 0,
                        const CovCalcMode* mode = nullptr) const override;
-void _multiplyCorDerivativesBySills(int oldSize, std::vector<covmaptype>* gradFuncs);
+  void _multiplyCorDerivativesBySills(int oldSize, std::vector<covmaptype>* gradFuncs);
 
-  protected: MatrixT<ParamInfo> _cholSillsInfo;
+protected:
+  MatrixT<ParamInfo> _cholSillsInfo;
   mutable MatrixSquare _cholSills;
   mutable MatrixSymmetric _sillCur;
   mutable MatrixSquare _workMat;
@@ -162,4 +162,4 @@ private:
   std::shared_ptr<ACov> _cor;
   LowerTriangularRange _itRange;
 };
-}
+} // namespace gstlrn

@@ -28,7 +28,7 @@ public:
   virtual ~ModelBoolean();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int getNbTokens() const { return (int) _shapes.size(); }
   void addToken(const AShape& token);

@@ -42,7 +42,7 @@ public:
                              bool verbose = false);
 
 private:
-  virtual bool _run() override;
+  bool _run() override;
 
   static VectorDouble _spectrum_chentsov(const SimuSphericalParam& sphepar);
   static VectorDouble _spectrum_exponential(Model *model, const SimuSphericalParam& sphepar);

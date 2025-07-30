@@ -25,7 +25,7 @@ public:
   CovNugget& operator= (const CovNugget &r);
   virtual ~CovNugget();
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Nugget Effect"; }
   int            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }

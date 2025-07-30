@@ -24,15 +24,14 @@ public:
   BiTargetCheckBench& operator=(const BiTargetCheckBench& r);
   virtual ~BiTargetCheckBench();
 
-  virtual bool isOK(const SpaceTarget &T1,
-                    const SpaceTarget &T2) const override;
-  virtual bool isValid(const Db* dbin, const Db* dbout) override;
+  bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
+  bool isValid(const Db* dbin, const Db* dbout) override;
 
   /// ICloneable Interface
   IMPLEMENT_CLONING(BiTargetCheckBench)
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static BiTargetCheckBench* create(int idim_bench, double width);
 

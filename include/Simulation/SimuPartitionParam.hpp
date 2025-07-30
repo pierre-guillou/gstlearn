@@ -28,7 +28,7 @@ public:
   virtual ~SimuPartitionParam();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   VectorDouble getDilate() const { return _dilate; }
   void setDilate(const VectorDouble& dilate) { _dilate = dilate; }

@@ -29,7 +29,7 @@ public:
   Indirection& operator=(const Indirection &m);
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void buildFromSel(const VectorDouble& sel);
   void buildFromRankRInA(const VectorInt& rels, int nabs);

@@ -11,12 +11,10 @@
 
 #include "LinearOp/PrecisionOpMulti.hpp"
 #include "Basic/AStringable.hpp"
-#include "Basic/Interval.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "LinearOp/CholeskyDense.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
 #include "Mesh/MeshETurbo.hpp"
 
 #include <vector>

@@ -25,7 +25,7 @@ public:
   virtual ~FracDesc();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int getNPoint() const { return (int) _x.size(); }
 

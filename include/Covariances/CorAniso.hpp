@@ -29,7 +29,6 @@
 #include "Covariances/CovContext.hpp"
 #include "Arrays/Array.hpp"
 #include "Space/SpacePoint.hpp"
-#include <algorithm>
 #include <array>
 #include <vector>
 
@@ -68,13 +67,13 @@ public:
   IMPLEMENT_CLONING(CorAniso)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// ASpaceObject Interface
-  virtual bool isConsistent(const ASpace* space) const override;
+  bool isConsistent(const ASpace* space) const override;
 
   /// ACov Interface
-  virtual int getNVar() const override { return 1; }
+  int getNVar() const override { return 1; }
 
   /// ACov Interface
 

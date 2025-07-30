@@ -34,7 +34,7 @@ public:
   virtual ~APolynomial();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void init(const VectorDouble& coeffs);
   virtual double eval(double x) const = 0;

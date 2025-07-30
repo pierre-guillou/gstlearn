@@ -20,7 +20,7 @@ public:
   ListParams& operator=(const ListParams& other) = delete;
   virtual ~ListParams()                          = default;
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void addParam(ParamInfo& param);
   void addParams(std::vector<ParamInfo>& params);

@@ -28,7 +28,7 @@ public:
   virtual ~ShapeParameter();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   ELaw getLaw() const { return _law; }
   const VectorDouble& getValarg() const { return _valarg; }

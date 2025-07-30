@@ -25,7 +25,7 @@ public:
   virtual ~SimuRefineParam();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   bool isFlagSK() const { return _flagSK; }
   void setFlagKs(bool flagKS) { _flagSK = flagKS; }

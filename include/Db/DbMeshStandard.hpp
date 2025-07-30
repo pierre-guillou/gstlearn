@@ -47,7 +47,7 @@ public:
   IMPLEMENT_CLONING(DbMeshStandard)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Db Interface
   bool isMesh() const override { return true; }
@@ -84,8 +84,8 @@ public:
   VectorDouble getCoordinatesPerMesh(int imesh, int idim, bool flagClose = false) const;
   
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

@@ -12,22 +12,21 @@
 
 #include "gstlearn_export.hpp"
 
+#include "Basic/NamingConvention.hpp"
 #include "Calculators/ACalculator.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
-#include "Basic/NamingConvention.hpp"
-
 
 namespace gstlrn
-{ 
+{
 class ELoc;
 
 class GSTLEARN_EXPORT ACalcDbToDb: public ACalculator
 {
 public:
   ACalcDbToDb(bool mustShareSameSpaceDimension = true);
-  ACalcDbToDb(const ACalcDbToDb &r) = delete;
-  ACalcDbToDb& operator=(const ACalcDbToDb &r) = delete;
+  ACalcDbToDb(const ACalcDbToDb& r)            = delete;
+  ACalcDbToDb& operator=(const ACalcDbToDb& r) = delete;
   virtual ~ACalcDbToDb();
 
   void setDbin(Db* dbin) { _dbin = dbin; }
@@ -49,8 +48,8 @@ public:
   bool isGridOut(bool verbose = true) const;
 
 protected:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
+  bool _check() override;
+  bool _preprocess() override;
   int _getNDim() const { return _ndim; }
   int _getNVar() const { return _nvar; }
   bool _setNdim(int ndim, bool flagForce = false);
@@ -60,8 +59,8 @@ protected:
                      int status,
                      const ELoc& locatorType,
                      int locatorIndex = 0,
-                     int number = 1,
-                     double valinit = 0.);
+                     int number       = 1,
+                     double valinit   = 0.);
   void _renameVariable(int whichDb,
                        const VectorString& names,
                        const ELoc& locatorType,
@@ -72,9 +71,9 @@ protected:
                        bool flagSetLocator = true,
                        int locatorShift    = 0);
   void _storeInVariableList(int whichDb, int status, const VectorInt& iuids);
-  int  _expandInformation(int mode, const ELoc& locatorType) const;
+  int _expandInformation(int mode, const ELoc& locatorType) const;
   void _cleanVariableDb(int status);
-  Db*  _whichDb(int whichDb);
+  Db* _whichDb(int whichDb);
   String _identifyVariable(int iuid) const;
 
 private:
@@ -93,4 +92,4 @@ private:
   int _ndim;
   int _nvar;
 };
-}
+} // namespace gstlrn

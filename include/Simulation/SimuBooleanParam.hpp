@@ -30,7 +30,7 @@ public:
   virtual ~SimuBooleanParam();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   double getBackground() const { return _background; }
   void setBackground(double background) { _background = background; }

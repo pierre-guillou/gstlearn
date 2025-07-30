@@ -37,9 +37,9 @@ public:
   /// Cloneable interface
   IMPLEMENT_CLONING(MatrixDense)
 
-  virtual void reset(int nrows, int ncols) override;
+  void reset(int nrows, int ncols) override;
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static Table* create(int nrow = 0, int ncol = 0);
   static Table* createFromNames(const VectorString &rownames,
@@ -67,8 +67,8 @@ public:
   void setSkipTitle(bool skipTitle) { _skipTitle = skipTitle; }
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

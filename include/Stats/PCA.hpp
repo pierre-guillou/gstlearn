@@ -33,7 +33,7 @@ public:
   virtual ~PCA();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void init(int nvar);
 

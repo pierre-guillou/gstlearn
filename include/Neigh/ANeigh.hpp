@@ -64,7 +64,7 @@ public:
   ANeigh& operator=(const ANeigh& r);
   virtual ~ANeigh();
   /// ASpaceObject Interface
-  virtual bool isConsistent(const ASpace* space) const override { DECLARE_UNUSED(space); return true; }
+  bool isConsistent(const ASpace* space) const override { DECLARE_UNUSED(space); return true; }
 
   /// Interface for ANeigh
   virtual int attach(const Db *dbin, const Db *dbout);
@@ -103,8 +103,8 @@ protected:
   Ball& getBall() { return _ball; }
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

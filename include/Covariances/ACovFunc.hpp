@@ -40,8 +40,7 @@ public:
 
   ///////////////////////////////////////////////////
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
-  ///////////////////////////////////////////////////
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   ///////////////////////////////////////////////////
   /// ACovFunc Interface

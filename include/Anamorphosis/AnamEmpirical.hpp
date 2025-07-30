@@ -10,8 +10,8 @@
 /******************************************************************************/
 #pragma once
 
-#include "gstlearn_export.hpp"
 #include "geoslib_define.h"
+#include "gstlearn_export.hpp"
 
 #include "Enum/EAnam.hpp"
 
@@ -37,24 +37,24 @@
  * to the square of the value).
  */
 
- namespace gstlrn
+namespace gstlrn
 {
 class GSTLEARN_EXPORT AnamEmpirical: public AnamContinuous
 {
 public:
-  AnamEmpirical(int ndisc = 100,
-                double sigma2e = TEST,
+  AnamEmpirical(int ndisc         = 100,
+                double sigma2e    = TEST,
                 bool flagDilution = false,
                 bool flagGaussian = true);
-  AnamEmpirical(const AnamEmpirical &m);
-  AnamEmpirical& operator= (const AnamEmpirical &m);
+  AnamEmpirical(const AnamEmpirical& m);
+  AnamEmpirical& operator=(const AnamEmpirical& m);
   virtual ~AnamEmpirical();
 
   /// ICloneable Interface
   IMPLEMENT_CLONING(AnamEmpirical)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// ASerializable Interface
   static AnamEmpirical* createFromNF(const String& NFFilename, bool verbose = true);
@@ -75,20 +75,20 @@ public:
   /// AAnam Interface
   const EAnam& getType() const override { return EAnam::fromKey("EMPIRICAL"); }
   int getNFactor() const override { return _nDisc; }
-  int fitFromArray(const VectorDouble &tab,
-                   const VectorDouble &wt = VectorDouble()) override;
+  int fitFromArray(const VectorDouble& tab,
+                   const VectorDouble& wt = VectorDouble()) override;
 
   /// AnamContinuous Interface
-  void    calculateMeanAndVariance() override;
-  double  rawToTransformValue(double zz) const override;
-  double  transformToRawValue(double yy) const override;
-  bool    isChangeSupportDefined() const override { return false; }
+  void calculateMeanAndVariance() override;
+  double rawToTransformValue(double zz) const override;
+  double transformToRawValue(double yy) const override;
+  bool isChangeSupportDefined() const override { return false; }
 
   static AnamEmpirical* create(int ndisc = 100, double sigma2e = TEST);
-  int    getNDisc() const { return _nDisc; }
+  int getNDisc() const { return _nDisc; }
   double getSigma2e() const { return _sigma2e; }
-  const  VectorDouble& getZDisc() const { return _ZDisc; }
-  const  VectorDouble& getYDisc() const { return _YDisc; }
+  const VectorDouble& getZDisc() const { return _ZDisc; }
+  const VectorDouble& getYDisc() const { return _YDisc; }
   bool isFlagDilution() const { return _flagDilution; }
   bool isFlagGaussian() const { return _flagGaussian; }
 
@@ -99,8 +99,8 @@ public:
   void setFlagGaussian(bool flagGaussian) { _flagGaussian = flagGaussian; }
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
@@ -115,16 +115,16 @@ private:
                             double* mini,
                             double* maxi,
                             double* var);
-  int _fitWithDilutionGaussian(const VectorDouble &tab);
-  int _fitWithDilutionLognormal(const VectorDouble &tab);
-  int _fitNormalScore(const VectorDouble &tab);
+  int _fitWithDilutionGaussian(const VectorDouble& tab);
+  int _fitWithDilutionLognormal(const VectorDouble& tab);
+  int _fitNormalScore(const VectorDouble& tab);
 
 private:
-  bool   _flagDilution;
-  bool   _flagGaussian;
-  int    _nDisc;
+  bool _flagDilution;
+  bool _flagGaussian;
+  int _nDisc;
   double _sigma2e;
   VectorDouble _ZDisc;
   VectorDouble _YDisc;
 };
-}
+} // namespace gstlrn

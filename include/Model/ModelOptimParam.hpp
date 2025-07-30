@@ -44,7 +44,7 @@ class GSTLEARN_EXPORT ModelOptimParam: public AStringable
   ModelOptimParam& operator= (const ModelOptimParam &m);
   virtual ~ModelOptimParam();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static ModelOptimParam* create(bool auth_aniso     = true,
                                  bool auth_rotation  = true,

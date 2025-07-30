@@ -42,7 +42,7 @@ public:
   IMPLEMENT_CLONING(Selectivity)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static Selectivity* create(int ncut);
   static Selectivity* createByCuts(const VectorDouble& zcut);

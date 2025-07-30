@@ -40,10 +40,9 @@ public:
     DECLARE_UNUSED(space)
     return true;
   }
+  
   /// ACov Interface
- 
-
-  virtual int getNVar() const override { return 1; }
+  int getNVar() const override { return 1; }
 
 protected:
   //void _optimizationSetTarget(SpacePoint& pt) const override;

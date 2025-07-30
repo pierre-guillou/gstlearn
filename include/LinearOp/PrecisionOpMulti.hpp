@@ -60,7 +60,7 @@ protected:
 
 public:
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   double computeLogDet(int nMC = 1) const override;
   std::pair<double, double> rangeEigenValQ() const;

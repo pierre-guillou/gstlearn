@@ -29,7 +29,7 @@ public:
   virtual ~Regression();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void setCoeffs(const VectorDouble& coeffs) { _coeffs = coeffs; }
   void setCount(int count) { _count = count; }

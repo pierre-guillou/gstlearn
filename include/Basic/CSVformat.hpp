@@ -30,7 +30,7 @@ public:
   virtual ~CSVformat();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   char  getCharDec()         const { return _charDec; }
   char  getCharSep()         const { return _charSep; }

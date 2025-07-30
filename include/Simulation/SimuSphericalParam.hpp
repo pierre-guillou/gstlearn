@@ -30,7 +30,7 @@ public:
   virtual ~SimuSphericalParam();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int getNbf() const { return _nbf; }
   void setNbf(int nbf) { _nbf = nbf; }

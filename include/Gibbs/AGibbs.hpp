@@ -37,7 +37,7 @@ public:
   virtual ~AGibbs();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Interface for AGibbs
   virtual int calculInitialize(VectorVectorDouble &y, int isimu, int ipgs) = 0;

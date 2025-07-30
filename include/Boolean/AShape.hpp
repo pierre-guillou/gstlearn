@@ -35,7 +35,7 @@ public:
   virtual ~AShape();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Interface for AShape
   virtual EShape getType() const = 0;

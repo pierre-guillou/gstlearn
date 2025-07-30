@@ -43,7 +43,7 @@ public:
   Tapering& operator= (const Tapering &m);
   virtual ~Tapering();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static int getNTape();
 

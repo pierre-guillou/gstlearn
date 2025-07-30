@@ -23,7 +23,7 @@ public:
   ProjMulti(const std::vector<std::vector<const IProj*>> &projs, bool silent = false);
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
   
   int getNApex() const override;
   int getNPoint() const override;
@@ -35,8 +35,8 @@ public:
 #ifndef SWIG
 
 protected:
-  virtual int _addPoint2mesh(const constvect inv, vect outv) const override;
-  virtual int _addMesh2point(const constvect inv, vect outv) const override;
+  int _addPoint2mesh(const constvect inv, vect outv) const override;
+  int _addMesh2point(const constvect inv, vect outv) const override;
 #endif
 
 private:

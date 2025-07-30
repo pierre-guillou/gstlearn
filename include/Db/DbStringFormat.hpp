@@ -51,7 +51,7 @@ public:
   virtual ~DbStringFormat();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static DbStringFormat* create(unsigned char params = FLAG_RESUME | FLAG_VARS,
                                 const VectorString& names = VectorString(),

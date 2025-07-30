@@ -31,7 +31,7 @@ public:
   virtual ~RuleProp();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int resetFromDb(const Db* dbprop,
                   const VectorDouble& propcst = VectorDouble());

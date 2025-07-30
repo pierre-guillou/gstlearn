@@ -13,8 +13,8 @@
 #include "API/SPDEParam.hpp"
 #include "LinearOp/ASimulable.hpp"
 #include "LinearOp/CholeskyDense.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
 #include "Matrix/MatrixSparse.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "gstlearn_export.hpp"
 
 #include <memory>
@@ -36,7 +36,7 @@ class MatrixSymmetric;
 class GSTLEARN_EXPORT InvNuggetOp: public virtual ASimulable, public virtual MatrixSparse
 {
 public:
-  InvNuggetOp(Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam(), bool = false);
+  InvNuggetOp(const Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam(), bool = false);
   InvNuggetOp(const InvNuggetOp& m)            = delete;
   InvNuggetOp& operator=(const InvNuggetOp& m) = delete;
   virtual ~InvNuggetOp();
@@ -59,7 +59,7 @@ private:
                      const VectorInt& position,
                      const VectorInt& identity);
   double _updateQuantities(MatrixSymmetric& sillsinv);
-  void _buildInvNugget(Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam());
+  void _buildInvNugget(const Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam());
 
 private:
   std::shared_ptr<MatrixSparse> _cholNuggetMatrix; // The Cholesky decomposition of the nugget matrix

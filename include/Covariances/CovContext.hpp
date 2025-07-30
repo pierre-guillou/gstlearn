@@ -33,10 +33,10 @@ public:
   virtual ~CovContext();
 
   /// AStringable interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Indicate if I am consistent with the provided space
-  virtual bool isConsistent(const ASpace* space) const override;
+  bool isConsistent(const ASpace* space) const override;
 
   static CovContext* create(int nvar, int ndim);
 

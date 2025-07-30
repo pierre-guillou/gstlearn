@@ -54,7 +54,7 @@ public:
   virtual ~ADrift();
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Interface for daughter classes
   virtual VectorInt getPowers() const { return VectorInt(); }

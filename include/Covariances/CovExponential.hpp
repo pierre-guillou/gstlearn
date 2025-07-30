@@ -47,7 +47,7 @@ public:
   }
   virtual ~CovExponential();
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   double getScadef() const override;
   String getCovName() const override { return "Exponential"; }
   int getMinOrder() const override { return -1; }

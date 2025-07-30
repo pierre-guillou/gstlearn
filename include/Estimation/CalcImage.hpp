@@ -49,11 +49,11 @@ public:
   void setSmoothType(int smoothType) { _smoothType = smoothType; }
 
 private:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
-  virtual bool _run() override;
-  virtual bool _postprocess() override;
-  virtual void _rollback() override;
+  bool _check() override;
+  bool _preprocess() override;
+  bool _run() override;
+  bool _postprocess() override;
+  void _rollback() override;
 
   bool _filterImage(DbGrid* dbgrid, const ModelCovList* model);
   static void _image_smoother(DbGrid* dbgrid,

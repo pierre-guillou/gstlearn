@@ -56,10 +56,10 @@ public:
   IMPLEMENT_CLONING(CovLMCTapering)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// ACov interface
-  virtual double eval0(int ivar = 0,
+  double eval0(int ivar = 0,
                        int jvar = 0,
                        const CovCalcMode* mode = nullptr) const override;
   

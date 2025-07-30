@@ -40,7 +40,7 @@ public:
   virtual ~FracList();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int getNFracs() const { return (int) _descs.size(); }
 

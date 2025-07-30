@@ -321,7 +321,7 @@ int main(int argc, char* argv[])
   law_set_random_seed(seed);
   int nsimu       = 2;
   int useCholesky = 1;
-  (void)gstlrn::simulateSPDE(nullptr, dbgrid, model2, nsimu, useCholesky);
+  (void)simulateSPDE(nullptr, dbgrid, model2, nsimu, useCholesky);
 
   int rank = dbgrid->getNColumn();
   for (int i = 0; i < nvertex; i++)

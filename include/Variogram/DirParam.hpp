@@ -117,10 +117,10 @@ public:
 
 public:
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// ASpaceObject Interface
-  virtual bool isConsistent(const ASpace* space) const override;
+  bool isConsistent(const ASpace* space) const override;
 
   double getBench() const { return _bench; }
   const  VectorDouble& getBreaks() const { return _breaks; }

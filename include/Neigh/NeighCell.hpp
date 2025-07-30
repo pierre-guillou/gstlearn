@@ -52,17 +52,17 @@ public:
 
   IMPLEMENT_CLONING(NeighCell)
   /// Interface for ANeigh
-  virtual int attach(const Db *dbin, const Db *dbout = nullptr) override;
-  virtual void getNeigh(int iech_out, VectorInt& ranks) override;
-  virtual bool hasChanged(int iech_out) const override;
-  virtual int getNSampleMax(const Db* db) const override {
+  int attach(const Db *dbin, const Db *dbout = nullptr) override;
+  void getNeigh(int iech_out, VectorInt& ranks) override;
+  bool hasChanged(int iech_out) const override;
+  int getNSampleMax(const Db* db) const override {
     DECLARE_UNUSED(db);
     return 0;
   }
-  virtual ENeigh getType() const override { return ENeigh::fromKey("CELL"); }
+  ENeigh getType() const override { return ENeigh::fromKey("CELL"); }
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighCell* create(bool flag_xvalid             = false,
                            int nmini                    = 1,
@@ -77,8 +77,8 @@ private:
   int _cell(int iech_out, VectorInt& ranks);
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

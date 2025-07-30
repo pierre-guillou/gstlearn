@@ -46,10 +46,9 @@ public:
     DECLARE_UNUSED(space)
     return true;
   }
-  /// ACov Interface
- 
 
-  virtual int getNVar() const override { return _nVar; }
+  /// ACov Interface
+  int getNVar() const override { return _nVar; }
   double getCorMax(int ivar, int jvar) const { return _corMax.getValue(ivar, jvar); }
   double computeScale(int ivar, int jvar) const; 
   double computeParam(int ivar, int jvar) const;   

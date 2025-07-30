@@ -14,12 +14,12 @@
 
 #include "geoslib_define.h"
 
+#include "Basic/Plane.hpp"
 #include "Simulation/ACalcSimulation.hpp"
 #include "Simulation/SimuSubstitutionParam.hpp"
-#include "Basic/Plane.hpp"
 
 namespace gstlrn
-{ 
+{
 
 class Db;
 class DbGrid;
@@ -28,19 +28,19 @@ class GSTLEARN_EXPORT CalcSimuSubstitution: public ACalcSimulation
 {
 public:
   CalcSimuSubstitution(int nbsimu = 0, int seed = 4324324, bool verbose = false);
-  CalcSimuSubstitution(const CalcSimuSubstitution &r) = delete;
-  CalcSimuSubstitution& operator=(const CalcSimuSubstitution &r) = delete;
+  CalcSimuSubstitution(const CalcSimuSubstitution& r)            = delete;
+  CalcSimuSubstitution& operator=(const CalcSimuSubstitution& r) = delete;
   virtual ~CalcSimuSubstitution();
 
   const SimuSubstitutionParam& getSubparam() const { return _subparam; }
-  void setSubparam(const SimuSubstitutionParam &subparam) { _subparam = subparam; }
+  void setSubparam(const SimuSubstitutionParam& subparam) { _subparam = subparam; }
 
 private:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
-  virtual bool _run() override;
-  virtual bool _postprocess() override;
-  virtual void _rollback() override;
+  bool _check() override;
+  bool _preprocess() override;
+  bool _run() override;
+  bool _postprocess() override;
+  void _rollback() override;
 
   bool _simulate();
   void _calculValue(int ip, double factor, const VectorDouble& vector);
@@ -50,14 +50,14 @@ private:
 
 private:
   bool _verbose;
-  int  _iattOut;
+  int _iattOut;
   SimuSubstitutionParam _subparam;
   std::vector<Plane> _planes;
 };
 
-GSTLEARN_EXPORT int substitution(DbGrid *dbgrid,
+GSTLEARN_EXPORT int substitution(DbGrid* dbgrid,
                                  SimuSubstitutionParam& subparam,
-                                 int seed = 43242,
-                                 int verbose = false,
+                                 int seed                        = 43242,
+                                 int verbose                     = false,
                                  const NamingConvention& namconv = NamingConvention("SimSub"));
-}
+} // namespace gstlrn

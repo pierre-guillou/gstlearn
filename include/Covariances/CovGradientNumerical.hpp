@@ -40,7 +40,7 @@ public:
                        const CovCalcMode* mode = nullptr) const override;
 
 
-  virtual double getBallRadius() const override { return _ballRadius; }
+  double getBallRadius() const override { return _ballRadius; }
 
   void evalZAndGradients(const SpacePoint& p1,
                          const SpacePoint& p2,

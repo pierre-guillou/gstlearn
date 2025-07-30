@@ -59,7 +59,7 @@ public:
   IMPLEMENT_CLONING(DriftList)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int getNVar() const { return _ctxt.getNVar(); }
   int getNDrift() const { return static_cast<int>(_drifts.size()); }
@@ -177,7 +177,7 @@ public:
     
   }
 
-  void initParams(const MatrixSymmetric& vars, double href = 1.)
+  static void initParams(const MatrixSymmetric& vars, double href = 1.)
   {
     DECLARE_UNUSED(vars, href);
   }

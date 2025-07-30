@@ -34,7 +34,7 @@ public:
   Rule& operator=(const Rule& m);
   virtual ~Rule();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int resetFromNames(const VectorString& nodnames,double rho = 0.);
   int resetFromCodes(const VectorInt& nodes,double rho = 0.);
@@ -115,8 +115,8 @@ public:
   void updateShift() const;
 
 protected:
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

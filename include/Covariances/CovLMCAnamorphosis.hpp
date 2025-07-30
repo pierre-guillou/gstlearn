@@ -44,7 +44,7 @@ public:
   IMPLEMENT_CLONING(CovLMCAnamorphosis)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// ACov Interface
   virtual double eval0(int ivar = 0,

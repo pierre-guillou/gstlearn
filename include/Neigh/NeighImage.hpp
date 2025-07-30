@@ -49,13 +49,13 @@ public:
 
   IMPLEMENT_CLONING(NeighImage)
   /// Interface for ANeigh
-  virtual void getNeigh(int iech_out, VectorInt& ranks) override;
-  virtual int getNSampleMax(const Db* db) const override;
-  virtual bool hasChanged(int iech_out) const override;
-  virtual ENeigh getType() const override { return ENeigh::fromKey("IMAGE"); }
+  void getNeigh(int iech_out, VectorInt& ranks) override;
+  int getNSampleMax(const Db* db) const override;
+  bool hasChanged(int iech_out) const override;
+  ENeigh getType() const override { return ENeigh::fromKey("IMAGE"); }
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighImage* create(const VectorInt& radius, int skip = 0, const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighImage* createFromNF(const String& NFFilename, bool verbose = true);
@@ -70,8 +70,8 @@ public:
   DbGrid* buildImageGrid(const DbGrid* dbgrid, int seed) const;
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

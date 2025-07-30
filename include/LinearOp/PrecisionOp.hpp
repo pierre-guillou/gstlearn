@@ -108,7 +108,7 @@ public:
   void setPolynomialFromPoly(APolynomial* polynomial);
   bool isCovaDefined() const { return _cova != nullptr; }
   VectorDouble getCoeffs();
-  virtual double computeLogDet(int nMC = 1) const override;
+  double computeLogDet(int nMC = 1) const override;
   virtual VectorDouble extractDiag() const;
 
 protected:
@@ -123,9 +123,8 @@ protected:
   int _addEvalPoly(const EPowerPT& power,
                    const constvect inv,
                    vect outv) const;
-  virtual int _addToDest(const constvect inv, vect outv) const override;
-  virtual int _addSimulateToDest(const constvect whitenoise,
-                                 vect outv) const override;
+  int _addToDest(const constvect inv, vect outv) const override;
+  int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
 
   void _addEvalPower(const constvect inv, vect outv, const EPowerPT& power) const;
 #endif

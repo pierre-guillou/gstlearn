@@ -45,7 +45,7 @@ public:
   DECLARE_TOTL;
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// AVario Interface
   double _getIVAR(const Db *db, int iech, int ivar) const override;

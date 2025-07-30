@@ -36,7 +36,7 @@ public:
   Node& operator=(const Node& m);
   virtual ~Node();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void getStatistics(int *node_tot,
                      int *nfac_tot,

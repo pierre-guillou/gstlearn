@@ -28,7 +28,7 @@ public:
   Plane& operator=(const Plane &m);
   virtual ~Plane();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   const VectorDouble& getCoor() const { return _coor; }
   void setCoor(const VectorDouble& coor) { _coor = coor; }
