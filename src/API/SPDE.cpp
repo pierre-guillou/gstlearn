@@ -170,8 +170,7 @@ int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose
     if (!flagKrige)
     {
       meshes = _meshesK; // For simulation, copy the one of Kriging
-      if (verbose && !_meshesK.empty())
-        message("Duplicate Meshings from Kriging phase\n");
+      if (verbose) message("Duplicate Meshings from Kriging phase\n");
     }
     if (meshes.empty())
     {
@@ -188,7 +187,7 @@ int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose
     for (int icov = 0; icov < ncov; icov++)
       meshes[icov] = meshesIn[0];
     createMesh = true;
-    if (verbose) message("Duplicating the Input Mesh for all %d covariances\n", ncov);
+    if (verbose) message("Duplicating the Input Mesh for each one of the %d covariance(s)\n", ncov);
   }
   else if (static_cast<int>(nmesh) != ncov)
   {

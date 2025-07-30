@@ -65,6 +65,7 @@ int law_get_random_seed(void)
  *****************************************************************************/
 void law_set_random_seed(int seed)
 {
+  message("seed = %d\n", seed);
   if (seed > 0)
   {
     Random_value = seed;
@@ -152,6 +153,7 @@ double law_gaussian(double mean, double sigma)
     std::normal_distribution<double> d {mean, sigma};
     value = d(Random_gen);
   }
+  message("tirage gaussien = %lf\n", value);
   return value;
 }
 

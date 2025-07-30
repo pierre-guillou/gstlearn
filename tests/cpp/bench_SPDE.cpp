@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   OptCst::define(ECst::NTROW, -1);
   bool flagExhaustiveTest = false;
   bool flagStatistics     = true;
-  bool verbose            = false;
+  bool verbose            = true;
 
   // Feature to be tested:
   // -1: all of them
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   //  1: Kriging
   //  2: non-conditional simulations
   //  3: conditional simulations
-  int mode = -1;
+  int mode = 2;
 
   int nfois = 2;
   // Feature to be tested:
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
         namconv.append("Kriging");
         namconv.append(option);
         namconv.append(sncov);
-        law_set_random_seed(13243);
+        law_set_random_seed(seed);
         SPDEParam params;
         params.setNMC(10);
         (void)krigingSPDE(dat, grid, model, true, true, useCholesky,
