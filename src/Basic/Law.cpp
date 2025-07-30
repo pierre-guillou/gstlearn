@@ -65,7 +65,6 @@ int law_get_random_seed(void)
  *****************************************************************************/
 void law_set_random_seed(int seed)
 {
-  message("seed = %d\n", seed);
   if (seed > 0)
   {
     Random_value = seed;
@@ -136,10 +135,11 @@ int law_int_uniform(int mini, int maxi)
  ** \param[in]  sigma Standard deviation of the Normal Distribution
  **
  *****************************************************************************/
-double law_gaussian(double mean, double sigma)
+double law_gaussian(double mean, double sigma, bool verbose)
 
 {
-  double value = 0.;
+  static int rank = 0;
+  double value    = 0.;
 
   if (Random_Old_Style)
   {
@@ -153,7 +153,8 @@ double law_gaussian(double mean, double sigma)
     std::normal_distribution<double> d {mean, sigma};
     value = d(Random_gen);
   }
-  message("tirage gaussien = %lf\n", value);
+  rank++;
+  if (verbose) message("dans law gaussian (%d) = %lf\n", rank, value);
   return value;
 }
 

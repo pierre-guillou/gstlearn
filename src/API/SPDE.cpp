@@ -592,6 +592,7 @@ int simulateSPDE(Db* dbin,
                  bool verbose,
                  const NamingConvention& namconv)
 {
+  message("pour voir = %lf\n", law_gaussian(0., 1., true));
   if (dbout == nullptr) return 1;
   if (model == nullptr) return 1;
   bool flagCond = (dbin != nullptr);
@@ -647,6 +648,7 @@ int simulateSPDE(Db* dbin,
                               "", nbsimu);
 
   delete spdeop;
+  message("pour voir2 = %lf\n", law_gaussian(0., 1., true));
   return 0;
 }
 
