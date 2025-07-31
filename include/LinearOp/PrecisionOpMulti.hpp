@@ -86,7 +86,6 @@ private:
   void _popsClear();
   void _computeSize();
 
-
 protected:
   std::vector<PrecisionOp*> _pops;
   VectorBool _isNoStatForVariance;

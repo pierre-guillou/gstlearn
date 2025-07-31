@@ -35,35 +35,35 @@ Data Base Statistics
 4 - Name SimuSPDE.1 - Locator NA
  Nb of data          =      10000
  Nb of active values =      10000
- Minimum value       =  -2.208432
- Maximum value       =   2.280843
- Mean value          =   0.056239
- Standard Deviation  =   0.786283
- Variance            =   0.618241
+ Minimum value       =  -2.441701
+ Maximum value       =   2.987868
+ Mean value          =   0.318635
+ Standard Deviation  =   1.008188
+ Variance            =   1.016443
 5 - Name SimuSPDE.2 - Locator z2
  Nb of data          =      10000
  Nb of active values =      10000
- Minimum value       =  -2.287530
- Maximum value       =   2.334130
- Mean value          =   0.211059
- Standard Deviation  =   0.639021
- Variance            =   0.408348
+ Minimum value       =  -2.940922
+ Maximum value       =   1.008336
+ Mean value          =  -0.920115
+ Standard Deviation  =   0.938248
+ Variance            =   0.880310
 6 - Name lower1 - Locator lower1
  Nb of data          =      10000
  Nb of active values =      10000
- Minimum value       =  -2.287530
- Maximum value       =   2.158297
- Mean value          =  -0.210434
- Standard Deviation  =   0.695913
- Variance            =   0.484295
+ Minimum value       =  -2.940922
+ Maximum value       =   0.829332
+ Mean value          =  -0.961276
+ Standard Deviation  =   0.904586
+ Variance            =   0.818276
 7 - Name upper1 - Locator upper1
  Nb of data          =      10000
  Nb of active values =      10000
- Minimum value       =  -0.708047
- Maximum value       =   2.334130
- Mean value          =   0.477732
- Standard Deviation  =   0.563464
- Variance            =   0.317492
+ Minimum value       =  -2.291498
+ Maximum value       =   2.987868
+ Mean value          =   0.359796
+ Standard Deviation  =   0.986464
+ Variance            =   0.973111
 8 - Name Color - Locator NA
  Nb of data          =      10000
  Nb of active values =      10000
@@ -75,8 +75,8 @@ Data Base Statistics
 9 - Name z1 - Locator z1
  Nb of data          =      10000
  Nb of active values =      10000
- Minimum value       =  -0.720975
- Maximum value       =   2.160286
- Mean value          =   0.123284
- Standard Deviation  =   0.399823
- Variance            =   0.159859
+ Minimum value       =  -2.293833
+ Maximum value       =   0.833636
+ Mean value          =  -0.187124
+ Standard Deviation  =   0.504630
+ Variance            =   0.254652

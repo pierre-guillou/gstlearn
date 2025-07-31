@@ -11,12 +11,12 @@
 #include "Basic/VectorNumT.hpp"
 #include "Enum/ESpaceType.hpp"
 
-#include "Space/ASpaceObject.hpp"
-#include "Db/Db.hpp"
 #include "Basic/File.hpp"
 #include "Basic/Timer.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
 #include "Neigh/NeighMoving.hpp"
+#include "Space/ASpaceObject.hpp"
 #include "Tree/Ball.hpp"
 
 using namespace gstlrn;
@@ -41,13 +41,13 @@ VectorDouble getSortedDistance(Db* data, const VectorInt& ranks, const SpaceTarg
  ** This is meant to compare the Moving Neighborhood to the KNN features
  **
  *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setPrefixName("NeighKNN-");
+  ASerializable::setPrefixName("bench_NeighKNN-");
 
   // Global parameters
   defineDefaultSpace(ESpaceType::RN, 2);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
   int nmaxi     = 20;
   int leaf_size = 20;
   int mode      = 0;
-  bool verbose = false;
+  bool verbose  = false;
 
   // Generate the input data base
   int ndim = 2;
@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
   Db* data = Db::createFillRandom(ndat, ndim, nvar);
 
   // Generate the output data base
-  Db* target  = Db::createFillRandom(ntarget, ndim, 0);
+  Db* target = Db::createFillRandom(ntarget, ndim, 0);
 
   // Moving Neighborhood
-  double radius = 0.5;
+  double radius       = 0.5;
   NeighMoving* neigh1 = NeighMoving::create(false, nmaxi, radius);
   neigh1->attach(data, target);
 
@@ -150,4 +150,4 @@ int main(int argc, char *argv[])
   delete target;
 
   return (0);
-  }
+}

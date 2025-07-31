@@ -48,7 +48,31 @@ Number :         50        50
 
 Data Base Statistics
 --------------------
-4 - Name spde - Locator z1
+1 - Name rank - Locator NA
+ Nb of data          =       2500
+ Nb of active values =       2500
+ Minimum value       =      1.000
+ Maximum value       =   2500.000
+ Mean value          =   1250.500
+ Standard Deviation  =    721.688
+ Variance            = 520833.250
+2 - Name x1 - Locator x1
+ Nb of data          =       2500
+ Nb of active values =       2500
+ Minimum value       =      0.000
+ Maximum value       =      0.980
+ Mean value          =      0.490
+ Standard Deviation  =      0.289
+ Variance            =      0.083
+3 - Name x2 - Locator x2
+ Nb of data          =       2500
+ Nb of active values =       2500
+ Minimum value       =      0.000
+ Maximum value       =      0.980
+ Mean value          =      0.490
+ Standard Deviation  =      0.289
+ Variance            =      0.083
+4 - Name SimuSPDE - Locator z1
  Nb of data          =       2500
  Nb of active values =       2500
  Minimum value       =     -3.342
@@ -62,7 +86,7 @@ Variables
 Column = 0 - Name = rank - Locator = NA
 Column = 1 - Name = x1 - Locator = x1
 Column = 2 - Name = x2 - Locator = x2
-Column = 3 - Name = spde - Locator = z1
+Column = 3 - Name = SimuSPDE - Locator = z1
 ----
 
 
@@ -87,20 +111,36 @@ Total number of samples      = 1000
 
 Data Base Statistics
 --------------------
-3 - Name spde - Locator z1
+1 - Name x - Locator x1
  Nb of data          =       1000
  Nb of active values =       1000
- Minimum value       =     -2.993
- Maximum value       =      2.428
- Mean value          =     -0.157
- Standard Deviation  =      1.014
- Variance            =      1.028
+ Minimum value       =      0.000
+ Maximum value       =      0.999
+ Mean value          =      0.499
+ Standard Deviation  =      0.285
+ Variance            =      0.081
+2 - Name y - Locator x2
+ Nb of data          =       1000
+ Nb of active values =       1000
+ Minimum value       =      0.000
+ Maximum value       =      1.000
+ Mean value          =      0.500
+ Standard Deviation  =      0.300
+ Variance            =      0.090
+3 - Name SimuSPDE - Locator z1
+ Nb of data          =       1000
+ Nb of active values =       1000
+ Minimum value       =     -2.990
+ Maximum value       =      2.941
+ Mean value          =      0.079
+ Standard Deviation  =      0.969
+ Variance            =      0.939
 
 Variables
 ---------
 Column = 0 - Name = x - Locator = x1
 Column = 1 - Name = y - Locator = x2
-Column = 2 - Name = spde - Locator = z1
+Column = 2 - Name = SimuSPDE - Locator = z1
 ----
 
 
@@ -125,7 +165,31 @@ Number :         50        50
 
 Data Base Statistics
 --------------------
-4 - Name spde - Locator NA
+1 - Name rank - Locator NA
+ Nb of data          =       2500
+ Nb of active values =       2500
+ Minimum value       =      1.000
+ Maximum value       =   2500.000
+ Mean value          =   1250.500
+ Standard Deviation  =    721.688
+ Variance            = 520833.250
+2 - Name x1 - Locator x1
+ Nb of data          =       2500
+ Nb of active values =       2500
+ Minimum value       =      0.000
+ Maximum value       =      0.980
+ Mean value          =      0.490
+ Standard Deviation  =      0.289
+ Variance            =      0.083
+3 - Name x2 - Locator x2
+ Nb of data          =       2500
+ Nb of active values =       2500
+ Minimum value       =      0.000
+ Maximum value       =      0.980
+ Mean value          =      0.490
+ Standard Deviation  =      0.289
+ Variance            =      0.083
+4 - Name SimuSPDE - Locator NA
  Nb of data          =       2500
  Nb of active values =       2500
  Minimum value       =     -3.342
@@ -133,31 +197,31 @@ Data Base Statistics
  Mean value          =     -0.121
  Standard Deviation  =      1.007
  Variance            =      1.014
-5 - Name spde.spde.estim - Locator NA
+5 - Name KrigingSPDE-Chol.SimuSPDE.estim - Locator NA
  Nb of data          =       2500
  Nb of active values =       2500
- Minimum value       =     -2.554
- Maximum value       =      2.025
- Mean value          =     -0.137
- Standard Deviation  =      0.885
- Variance            =      0.783
-6 - Name spde.spde.estim.1 - Locator z1
+ Minimum value       =     -2.569
+ Maximum value       =      2.379
+ Mean value          =      0.121
+ Standard Deviation  =      0.846
+ Variance            =      0.716
+6 - Name KrigingSPDE-Free.SimuSPDE.estim - Locator z1
  Nb of data          =       2500
  Nb of active values =       2500
- Minimum value       =     -2.554
- Maximum value       =      2.025
- Mean value          =     -0.137
- Standard Deviation  =      0.885
- Variance            =      0.783
+ Minimum value       =     -2.548
+ Maximum value       =      2.410
+ Mean value          =      0.121
+ Standard Deviation  =      0.846
+ Variance            =      0.715
 
 Variables
 ---------
 Column = 0 - Name = rank - Locator = NA
 Column = 1 - Name = x1 - Locator = x1
 Column = 2 - Name = x2 - Locator = x2
-Column = 3 - Name = spde - Locator = NA
-Column = 4 - Name = spde.spde.estim - Locator = NA
-Column = 5 - Name = spde.spde.estim.1 - Locator = z1
+Column = 3 - Name = SimuSPDE - Locator = NA
+Column = 4 - Name = KrigingSPDE-Chol.SimuSPDE.estim - Locator = NA
+Column = 5 - Name = KrigingSPDE-Free.SimuSPDE.estim - Locator = z1
 ----
 
 
@@ -169,123 +233,11 @@ Column = 5 - Name = spde.spde.estim.1 - Locator = z1
 
 #NO_DIFF#XXX
 ----
-Variance = 1.1733
-
-#NO_DIFF#XXX
+-> logLikelihood with cholesky=1 -840.8318
 ----
 
 
 #NO_DIFF#XXX
 ----
-#NO_DIFF#XXX
-----
-
-
-#NO_DIFF#XXX
-----
-Value for MU = -0.063
-----
-
-
-#NO_DIFF#XXX
-----
-Quadratic (manual)  = 1118.4871
-Quadratic (api-old) = 1118.4871
-Quadratic free (api-old) = 1118.487
--> Relative difference quadratic = 0.0%
-----
-
-
-#NO_DIFF#XXX
-----
-log_det_op (manual)  = 12296.9389
-log_det_op (api-old) = 12296.9389
--> Relative difference = 0.0%
-----
-
-
-#NO_DIFF#XXX
-----
-log_det_Q (manual)  = 11255.7151
-log_det_Q (api-old) = 11255.7151
--> Relative difference = 0.0%
-----
-
-
-#NO_DIFF#XXX
-----
-Likelihood calculation (manual):
-log_det_op      = 12296.9389
-log_det_Q       = 11255.7151
-log_det_Noise   = -2302.5851
-log_determinant = -1261.3613
-Quadratic term  = 1118.4871
--> Likelihood (manual) = -847.5015
-----
-
-
-#NO_DIFF#XXX
-----
-Message from PrecisionOpMultiConditional::computeTotalLogDet
-LogDet of Q + ADA': 12296.938911
-LogDet of the precision operator: 11255.715075
-LogDet of noise operator: -2302.585093
-Likelihood calculation:
-- Length of Information Vector = 1000
-- Number of Simulations = 100
-- Cholesky = 1
-Log-Determinant = -1261.361258
-Quadratic term  = 1118.487113
-Log-likelihood  = -847.501461
--> likelihood (api-old) = -847.5015
-----
-
-
-#NO_DIFF#XXX
-----
-LogDet of Q + ADA': 12296.938911
-LogDet of Q: 11255.715075
-LogDet of InvNoise: 2302.585093
-Likelihood calculation:
-Nb. active samples = 1000
-Nb. Monte-Carlo    = 100
-Cholesky           = 1
-Log-Determinant    = -1261.361258
-Quadratic term     = 1118.487113
-Log-likelihood     = -847.501461
--> likelihood (api-new) cholesky=1 -847.5015
-----
-
-
-#NO_DIFF#XXX
-----
-LogDet of Q + ADA': 11569.018180
-LogDet of Q: 11585.782711
-LogDet of InvNoise: 2302.585093
-
-Likelihood calculation:
-Nb. active samples = 1000
-Nb. Monte-Carlo    = 100
-Cholesky           = 0
-Log-Determinant    = -2319.349624
-Quadratic term     = 1118.821242
-Log-likelihood     = -318.674342
--> likelihood by New API with cholesky=0 (stencil True) -318.6743
-----
-
-
-#NO_DIFF#XXX
-----
-LogDet of Q + ADA': 12455.819068
-LogDet of Q: 11170.021460
-LogDet of InvNoise: 2302.585093
-
-Likelihood calculation:
-Nb. active samples = 1000
-Nb. Monte-Carlo    = 100
-Cholesky           = 0
-Log-Determinant    = -1016.787485
-Quadratic term     = 1118.782812
-Log-likelihood     = -969.936197
--> likelihood by New API with cholesky=0 (stencil False) -969.9362
+-> logLikelihood with cholesky=0 -311.8755
 ----

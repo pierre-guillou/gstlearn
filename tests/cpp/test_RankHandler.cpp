@@ -8,8 +8,8 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/Law.hpp"
 #include "Basic/File.hpp"
+#include "Basic/Law.hpp"
 #include "Basic/OptCst.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Db/Db.hpp"
@@ -25,26 +25,26 @@ using namespace gstlrn;
  ** This program is meant to check the facility offered by RankHandler class
  **
  *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setPrefixName("TestRkHdl-");
+  ASerializable::setPrefixName("test_RankHandler-");
   int seed = 10355;
   law_set_random_seed(seed);
   OptCst::define(ECst::NTROW, -1);
   OptCst::define(ECst::NTCOL, -1);
 
   // Creating the Db
-  int ndat = 20;
-  int ndim = 2;
-  int nvar = 3;
-  double selRatio = 0.2;
+  int ndat                 = 20;
+  int ndim                 = 2;
+  int nvar                 = 3;
+  double selRatio          = 0.2;
   VectorDouble heteroRatio = {0.3, 0.2, 0.1};
-  Db* db = Db::createFillRandom(ndat, ndim, nvar, 0, 0, 0., selRatio, heteroRatio);
-  DbStringFormat* dbfmt = DbStringFormat::create(FLAG_RESUME | FLAG_ARRAY);
+  Db* db                   = Db::createFillRandom(ndat, ndim, nvar, 0, 0, 0., selRatio, heteroRatio);
+  DbStringFormat* dbfmt    = DbStringFormat::create(FLAG_RESUME | FLAG_ARRAY);
   db->display(dbfmt);
 
   // Instanciate the RankHandler
@@ -76,4 +76,3 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-

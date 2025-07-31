@@ -29,15 +29,14 @@
 
 namespace gstlrn
 {
-  class EConsElem;
+class EConsElem;
 
-  class CovAniso;
-  class AMatrix;
-  class MatrixSquare;
-  class MatrixDense;
-  class MatrixSymmetric;
-  class MatrixSparse;
-
+class CovAniso;
+class AMatrix;
+class MatrixSquare;
+class MatrixDense;
+class MatrixSymmetric;
+class MatrixSparse;
 
 class GSTLEARN_EXPORT ShiftOpMatrix: public AShiftOp
 {
@@ -56,12 +55,11 @@ public:
 #endif
 
   static ShiftOpMatrix* create(const AMesh* amesh, const CovAniso* cova, const Db* dbout = nullptr, bool verbose = false);
-  static ShiftOpMatrix* createFromSparse(
-    const MatrixSparse* S,
-    const VectorDouble& TildeC,
-    const VectorDouble& Lambda,
-    const CovAniso* cova,
-    bool verbose = false);
+  static ShiftOpMatrix* createFromSparse(const MatrixSparse* S,
+                                         const VectorDouble& TildeC,
+                                         const VectorDouble& Lambda,
+                                         const CovAniso* cova,
+                                         bool verbose = false);
   int initFromMesh(const AMesh* amesh, const CovAniso* cova, const Db* dbout = nullptr, bool flagAdvection = false, bool verbose = false);
   int initGradFromMesh(const AMesh* amesh, const CovAniso* cova, bool verbose = false, double tol = EPSILON10);
   int initFromCS(const MatrixSparse* S, const VectorDouble& TildeC, const VectorDouble& Lambda, const CovAniso* cova, bool verbose = false);
@@ -161,4 +159,4 @@ private:
   int _ndim;
 };
 
-}
+} // namespace gstlrn

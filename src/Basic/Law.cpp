@@ -135,11 +135,10 @@ int law_int_uniform(int mini, int maxi)
  ** \param[in]  sigma Standard deviation of the Normal Distribution
  **
  *****************************************************************************/
-double law_gaussian(double mean, double sigma, bool verbose)
+double law_gaussian(double mean, double sigma)
 
 {
-  static int rank = 0;
-  double value    = 0.;
+  double value = 0.;
 
   if (Random_Old_Style)
   {
@@ -153,8 +152,6 @@ double law_gaussian(double mean, double sigma, bool verbose)
     std::normal_distribution<double> d {mean, sigma};
     value = d(Random_gen);
   }
-  rank++;
-  if (verbose) message("dans law gaussian (%d) = %lf\n", rank, value);
   return value;
 }
 
@@ -1208,4 +1205,5 @@ int sampleInteger(int mini, int maxi)
   int retval   = (rand > 0) ? (int)trunc(rand + 0.5) : (int)-trunc(-rand + 0.5);
   return retval;
 }
+
 } // namespace gstlrn

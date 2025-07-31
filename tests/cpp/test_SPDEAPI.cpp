@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_SPDEAPI-");
   int seed     = 10355;
   int nbsimu   = 3;
-  bool verbose = true;
+  bool verbose = false;
   law_set_random_seed(seed);
 
   // Creating the resulting Grid

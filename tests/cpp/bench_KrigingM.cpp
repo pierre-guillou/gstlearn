@@ -10,17 +10,17 @@
 /******************************************************************************/
 #include "Basic/OptCustom.hpp"
 #include "Basic/VectorNumT.hpp"
-#include "Enum/ESpaceType.hpp"
 #include "Enum/ECov.hpp"
+#include "Enum/ESpaceType.hpp"
 
-#include "Space/ASpaceObject.hpp"
-#include "Db/Db.hpp"
-#include "Db/DbStringFormat.hpp"
-#include "Model/Model.hpp"
 #include "Basic/File.hpp"
 #include "Basic/Timer.hpp"
-#include "Neigh/NeighMoving.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbStringFormat.hpp"
 #include "Estimation/CalcKriging.hpp"
+#include "Model/Model.hpp"
+#include "Neigh/NeighMoving.hpp"
+#include "Space/ASpaceObject.hpp"
 
 using namespace gstlrn;
 
@@ -29,13 +29,13 @@ using namespace gstlrn;
  ** Main Program
  **
  *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
-  OptCustom::define("ompthreads",5);
-  ASerializable::setPrefixName("BenchKrigingM-");
+  OptCustom::define("ompthreads", 5);
+  ASerializable::setPrefixName("bench_KrigingM-");
 
   // Global parameters
   int ndim = 2;
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
   for (int icas = 0; icas < (int)nechs.size(); icas++)
   {
     int nloop = (icas < 2) ? 2 : 1;
-    int nech = nechs[icas];
+    int nech  = nechs[icas];
     for (int iloop = 0; iloop < nloop; iloop++)
     {
       int ileaf = (iloop == 0) ? leaf_size : 0;
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   data = Db::createFillRandom(100000, 2, 1);
   grid->deleteColumn("Kriging.*");
   neighM = NeighMoving::create(false, nmaxi, radius, nmini, nsect, nsmax,
-                        VectorDouble(), VectorDouble(), true, leaf_size);
+                               VectorDouble(), VectorDouble(), true, leaf_size);
   kriging(data, grid, model, neighM, true, false);
   DbStringFormat* dbfmt = DbStringFormat::create(FLAG_STATS, {"Kriging*estim"});
   grid->display(dbfmt);

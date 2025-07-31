@@ -426,7 +426,7 @@ MeshETurbo* MeshETurbo::createFromCova(const CovAniso& cova,
                                        int nxmax,
                                        bool verbose)
 {
-  MeshETurbo* mesh = new MeshETurbo();
+  auto* mesh = new MeshETurbo();
   if (mesh->initFromCova(cova, field, ratio, nbExt, isPolarized, useSel,
                          nxmax, verbose))
     return nullptr;

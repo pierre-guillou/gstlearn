@@ -52,11 +52,11 @@ Data Base Statistics
 5 - Name SimuSPDE - Locator z1
  Nb of data          =      10201
  Nb of active values =      10201
- Minimum value       =     -4.613
- Maximum value       =      4.240
- Mean value          =      0.123
- Standard Deviation  =      1.000
- Variance            =      1.000
+ Minimum value       =     -4.133
+ Maximum value       =      4.684
+ Mean value          =     -0.198
+ Standard Deviation  =      1.081
+ Variance            =      1.168
 
 Variables
 ---------

@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
   int seed = 10355;
   law_set_random_seed(seed);
 
-  ASerializable::setPrefixName("test_nostat-");
+  ASerializable::setPrefixName("test_Nostat-");
 
   // Creating the 2-D Db
   auto nx            = {101, 101};

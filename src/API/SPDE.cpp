@@ -149,6 +149,16 @@ VectorMeshes SPDE::_defineMeshFromDbs(bool flagKrige)
   return meshes;
 }
 
+void SPDE::_printMeshesDetails(const VectorMeshes& meshes)
+{
+  int nmesh = (int)meshes.size();
+  for (int imesh = 0; imesh < nmesh; imesh++)
+  {
+    message("- Mesh #%d/%d: NMeshes = %d, NApices = %d\n",
+            imesh + 1, nmesh, meshes[imesh]->getNMeshes(), meshes[imesh]->getNApices());
+  }
+}
+
 /**
  * @brief Create the set of Meshes needed within SPDE
  *
@@ -167,36 +177,49 @@ int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose
   createMesh = false;
   if (nmesh == 0)
   {
-    if (!flagKrige)
+    if (!flagKrige && _meshesS.empty() && !_meshesK.empty())
     {
-      meshes = _meshesK; // For simulation, copy the one of Kriging
-      if (verbose) message("Duplicate Meshings from Kriging phase\n");
+      // Particular case of Simulations: if the corresponding mesh is not defined
+      // the meshing dedicated to Kriging is used instead.
+      meshes = _meshesK;
+      if (verbose) message("Copy Meshings from Kriging meshings\n");
     }
     if (meshes.empty())
     {
       meshes     = _defineMeshFromDbs(flagKrige);
       createMesh = true;
-      if (verbose) message("Creating Meshes covering the available Db(s)\n");
+      if (verbose)
+      {
+        message("Creating Meshes covering the available Db(s)\n");
+        _printMeshesDetails(meshes);
+      }
     }
   }
-  else if (nmesh == 1)
+  else if (nmesh == 1 && (int)nmesh != ncov)
   {
     meshes = meshesIn;
-    // Particular case of a single mesh: simply duplicate it
+    // Particular case of a single mesh: simply duplicate it (without creating new contents)
     meshes.resize(ncov);
     for (int icov = 0; icov < ncov; icov++)
       meshes[icov] = meshesIn[0];
-    createMesh = true;
-    if (verbose) message("Duplicating the Input Mesh for each one of the %d covariance(s)\n", ncov);
+    if (verbose)
+    {
+      message("Duplicating the Input Mesh for each one of the %d covariance(s)\n", ncov);
+      _printMeshesDetails(meshes);
+    }
   }
-  else if (static_cast<int>(nmesh) != ncov)
+  else if ((int)nmesh == ncov)
+  {
+    // If the dimensions 'nmesh' and 'ncov' match: copy pointer of the input VectorMeshes
+    meshes = meshesIn;
+  }
+  else
   {
     messerr("Argument 'meshes' contains %d items", nmesh);
     messerr("whereas the number of structures (nugget excluded) is %d", ncov);
     return 1;
   }
 
-  // If the dimensions 'nmesh' and 'ncov' match: do nothing here
   return 0;
 }
 
@@ -219,7 +242,6 @@ int SPDE::_defineProjection(bool flagIn,
     flagIn
       ? (flagKrige ? &_AinK : &_AinS)
       : (flagKrige ? &_AoutK : &_AoutS);
-
   auto& createProj = flagIn ? (flagKrige ? _createAinK : _createAinS) : (flagKrige ? _createAoutK : _createAoutS);
   const auto* db   = flagIn ? _dbin : _dbout;
 
@@ -304,8 +326,16 @@ SPDEOp* SPDE::defineShiftOperator(bool flagSimu, bool verbose)
 
   if (_flagCholesky)
   {
-    _Qom   = new PrecisionOpMultiMatrix(_model, _meshesK);
-    spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutK);
+    if (!_meshesK.empty())
+    {
+      _Qom   = new PrecisionOpMultiMatrix(_model, _meshesK);
+      spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutK);
+    }
+    else
+    {
+      _Qom   = new PrecisionOpMultiMatrix(_model, _meshesS);
+      spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutS);
+    }
   }
   else
   {
@@ -327,7 +357,10 @@ int SPDE::defineMeshes(bool flagSimu,
                        const VectorMeshes& meshesS,
                        bool verbose)
 {
-  if (_defineMesh(true, meshesK, verbose)) return 1;
+  if (_dbin != nullptr)
+  {
+    if (_defineMesh(true, meshesK, verbose)) return 1;
+  }
   if (flagSimu)
   {
     if (_defineMesh(false, meshesS, verbose)) return 1;
@@ -341,7 +374,7 @@ int SPDE::defineProjections(bool flagSimu,
                             const ProjMultiMatrix* projInS,
                             bool verbose)
 {
-  if (flagCond)
+  if (flagCond && _dbin != nullptr)
   {
     // Projection of Data for Kriging
     if (_defineProjection(true, true, projInK, verbose)) return 1;
@@ -352,7 +385,7 @@ int SPDE::defineProjections(bool flagSimu,
     }
   }
 
-  if (flagCond)
+  if (flagCond && _dbout != nullptr)
   {
     // Projection of Target for Kriging
     if (_defineProjection(false, true, nullptr, verbose)) return 1;
@@ -365,7 +398,7 @@ int SPDE::defineProjections(bool flagSimu,
   return 0;
 }
 
-int SPDE::centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z)
+int SPDE::centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z, bool verbose)
 {
   if (Z.empty()) return 1;
   _driftCoeffs.clear();
@@ -376,6 +409,7 @@ int SPDE::centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z)
     MatrixDense driftMat = _model->evalDriftMatByRanks(_dbin);
     _driftCoeffs         = spdeop->computeDriftCoeffs(Z, driftMat);
     ASPDEOp::centerDataByDriftMat(Z, driftMat, _driftCoeffs);
+    if (verbose) VH::dump("Drift coefficients = ", _driftCoeffs);
   }
   else
   {
@@ -448,6 +482,57 @@ void SPDE::addNuggetToResult(VectorDouble& result)
 }
 
 /**
+ * Derive the global trend in the SPDE framework
+ *
+ * @param dbin Input Db (must contain the variable to be estimated)
+ * @param dbout Output Db where the estimation must be performed
+ * @param model Model definition
+ * @param useCholesky Define the choice regarding Cholesky (see _defineCholesky)
+ * @param meshesK Meshes description (optional)
+ * @param projInK Matrix of projection (optional)
+ * @param params Set of SPDE parameters
+ * @param verbose Verbose flag
+ *
+ * @return Returned vector
+ */
+VectorDouble trendSPDE(Db* dbin,
+                       Db* dbout,
+                       Model* model,
+                       int useCholesky,
+                       const VectorMeshes& meshesK,
+                       const ProjMultiMatrix* projInK,
+                       const SPDEParam& params,
+                       bool verbose)
+{
+  // Preliminary checks
+  if (dbin == nullptr) return 1;
+  if (dbout == nullptr) return 1;
+  if (model == nullptr) return 1;
+
+  // Instantiate SPDE class
+  SPDE spde(model, useCholesky, params);
+  spde.setDbin(dbin);
+  spde.setDbout(dbout);
+  if (verbose) mestitle(1, "Trend in SPDE framework (Cholesky=%d)", (int)spde.getFlagCholesky());
+
+  // Define Meshes
+  if (spde.defineMeshes(false, meshesK, VectorMeshes(), verbose)) return 1;
+
+  // Define projections
+  if (spde.defineProjections(false, true, projInK, nullptr, verbose)) return 1;
+
+  // Define the Shift operator
+  auto* spdeop = spde.defineShiftOperator(false);
+
+  // Read information from the input Db and center it
+  VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
+  if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
+
+  delete spdeop;
+  return spde.getDriftCoefficients();
+}
+
+/**
  * Perform the estimation by KRIGING under the SPDE framework
  *
  * @param dbin Input Db (must contain the variable to be estimated)
@@ -516,11 +601,11 @@ int krigingSPDE(Db* dbin,
   if (spde.defineProjections(flagSimu, true, projInK, projInS, verbose)) return 1;
 
   // Define the Shift operator
-  SPDEOp* spdeop = spde.defineShiftOperator(flagSimu);
+  auto* spdeop = spde.defineShiftOperator(flagSimu);
 
   // Read information from the input Db and center it
   VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(spdeop, Z)) return 1;
+  if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
 
   // Performing the task and storing results in 'dbout'
   // This is performed in ONE step to avoid additional core allocation
@@ -592,7 +677,6 @@ int simulateSPDE(Db* dbin,
                  bool verbose,
                  const NamingConvention& namconv)
 {
-  message("pour voir = %lf\n", law_gaussian(0., 1., true));
   if (dbout == nullptr) return 1;
   if (model == nullptr) return 1;
   bool flagCond = (dbin != nullptr);
@@ -607,20 +691,19 @@ int simulateSPDE(Db* dbin,
   // Define Meshes
   if (spde.defineMeshes(true, meshesK, meshesS, verbose)) return 1;
 
-  // Define projections
+  // Define
   if (spde.defineProjections(true, flagCond, projInK, projInS, verbose)) return 1;
 
   // Define the Shift operator
-  SPDEOp* spdeop = spde.defineShiftOperator(true);
+  auto* spdeop = spde.defineShiftOperator(true);
 
   VectorDouble Z;
   VectorDouble driftCoeffs;
-
   if (flagCond)
   {
     // Read information from the input Db and center it
     Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-    if (spde.centerDataByDriftInPlace(spdeop, Z)) return 1;
+    if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
   }
 
   // Perform the Simulation and storage.
@@ -648,7 +731,6 @@ int simulateSPDE(Db* dbin,
                               "", nbsimu);
 
   delete spdeop;
-  message("pour voir2 = %lf\n", law_gaussian(0., 1., true));
   return 0;
 }
 
@@ -718,14 +800,14 @@ int simPGSSPDE(Db* dbin,
   if (spde.defineProjections(true, flagCond, projInK, projInS, verbose)) return 1;
 
   // Define the Shift operator
-  SPDEOp* spdeop = spde.defineShiftOperator(true);
+  auto* spdeop = spde.defineShiftOperator(true);
 
   VectorDouble Z;
   if (flagCond)
   {
     // Read information from the input Db and center it
     Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-    if (spde.centerDataByDriftInPlace(spdeop, Z)) return 1;
+    if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
   }
 
   // Perform the Simulation and storage.
@@ -806,11 +888,11 @@ double logLikelihoodSPDE(Db* dbin,
   if (spde.defineProjections(false, true, projIn, nullptr, verbose)) return 1;
 
   // Define the Shift operator
-  SPDEOp* spdeop = spde.defineShiftOperator(false, verbose);
+  auto* spdeop = spde.defineShiftOperator(false, verbose);
 
   // Read information from the input Db and center it
   VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(spdeop, Z)) return 1;
+  if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
 
   // Performing the task
   int size       = (int)Z.size();
@@ -833,7 +915,7 @@ double logLikelihoodSPDE(Db* dbin,
 
   // Cleaning phase
   delete spdeop;
-  return 0;
+  return loglike;
 }
 
 } // namespace gstlrn

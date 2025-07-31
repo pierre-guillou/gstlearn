@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setPrefixName("BenchSPDE-");
+  ASerializable::setPrefixName("bench_SPDE-");
 
   // Global parameters
   defineDefaultSpace(ESpaceType::RN, 2);
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   OptCst::define(ECst::NTROW, -1);
   bool flagExhaustiveTest = false;
   bool flagStatistics     = true;
-  bool verbose            = true;
+  bool verbose            = false;
 
   // Feature to be tested:
   // -1: all of them
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   //  1: Kriging
   //  2: non-conditional simulations
   //  3: conditional simulations
-  int mode = 2;
+  int mode = -1;
 
   int nfois = 2;
   // Feature to be tested:

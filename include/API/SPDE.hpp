@@ -59,21 +59,22 @@ public:
   const ProjMultiMatrix* getAinS() const { return _AinS; }
   const ProjMultiMatrix* getAoutK() const { return _AoutK; }
   const ProjMultiMatrix* getAoutS() const { return _AoutS; }
+  VectorDouble getDriftCoefficients() const { return _driftCoeffs; }
 
   int getSeed() const { return _params.getSeedMC(); }
   int getNMC() const { return _params.getNMC(); }
 
   int defineMeshes(bool flagSimu,
                    const VectorMeshes& meshesK,
-                   const VectorMeshes& meshesS,
-                   bool verbose = false);
+                   const VectorMeshes& meshesS = VectorMeshes(),
+                   bool verbose                = false);
   int defineProjections(bool flagSimu,
                         bool flagCond,
                         const ProjMultiMatrix* projInK,
-                        const ProjMultiMatrix* projInS,
-                        bool verbose);
+                        const ProjMultiMatrix* projInS = nullptr,
+                        bool verbose                   = false);
   SPDEOp* defineShiftOperator(bool flagSimu, bool verbose = false);
-  int centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z);
+  int centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z, bool verbose = false);
   void uncenterResultByDriftInPlace(VectorDouble& result);
   void addNuggetToResult(VectorDouble& result);
 
@@ -85,6 +86,7 @@ private:
                         bool flagKrige,
                         const ProjMultiMatrix* projIn,
                         bool verbose = false);
+  static void _printMeshesDetails(const VectorMeshes& meshes);
 
 private:
   const Db* _dbin;  // External Pointer
@@ -111,6 +113,14 @@ private:
   SPDEParam _params;
 };
 
+GSTLEARN_EXPORT VectorDouble trendSPDE(Db* dbin,
+                                       Db* dbout,
+                                       Model* model,
+                                       int useCholesky                = -1,
+                                       const VectorMeshes& meshesK    = VectorMeshes(),
+                                       const ProjMultiMatrix* projInK = nullptr,
+                                       const SPDEParam& params        = SPDEParam(),
+                                       bool verbose                   = false);
 GSTLEARN_EXPORT int krigingSPDE(Db* dbin,
                                 Db* dbout,
                                 Model* model,

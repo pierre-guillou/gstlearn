@@ -72,7 +72,7 @@ static int st_save(Db* dbgrid,
 
   /* Save the resulting 'dbgrid' in a neutral file */
 
-  (void)dbgrid->dumpToNF("Colored_Gibbs");
+  (void)dbgrid->dumpToNF("Grid");
   return (0);
 }
 
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
   /***********************/
   int ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
-  ASerializable::setPrefixName("Gibbs-");
+  ASerializable::setPrefixName("test_Gibbs-");
 
   // Setup constants
 
