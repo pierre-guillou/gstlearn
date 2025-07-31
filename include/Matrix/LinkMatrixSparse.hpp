@@ -18,7 +18,6 @@
 namespace gstlrn
 {
 class MatrixSparse;
-class cs;
 
 class GSTLEARN_EXPORT QChol
 {

@@ -191,8 +191,8 @@ foreach(FLAVOR ${FLAVORS})
   # Enable OpenMP
   target_link_libraries(${FLAVOR} PRIVATE OpenMP::OpenMP_CXX)
 
-  # Link to csparse and gmtsph
-  target_link_libraries(${FLAVOR} PRIVATE csparse gmtsph)
+  # Link to gmtsph
+  target_link_libraries(${FLAVOR} PRIVATE gmtsph)
     
   # Link to Eigen
   target_link_libraries(${FLAVOR} PUBLIC Eigen3::Eigen)

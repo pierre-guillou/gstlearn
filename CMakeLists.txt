@@ -91,7 +91,6 @@ cmake_path(APPEND GSTLEARN_CMAKE_FILE ${PROJECT_BINARY_DIR} "gstlearn.cmake")
 ####################################################
 ## EXTERNAL LIBS
 add_subdirectory(3rd-party/gmtsph)
-add_subdirectory(3rd-party/csparse)
 
 ####################################################
 ## BUILD & INSTALL

@@ -21,8 +21,6 @@
 
 namespace gstlrn
 {
-class cs;
-
 class DbGrid;
 class CovAniso;
 /**

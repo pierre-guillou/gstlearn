@@ -425,7 +425,6 @@ The *gstlearn* C++ library depends on the following third-party source code, sli
 
 | Name           | License        | URL                                                            | Copyright
 |----------------|----------------|----------------------------------------------------------------|-----------
-| csparse        | LGPL v2.1      | https://people.math.sc.edu/Burkardt/c_src/csparse/csparse.html | Copyright 2006, Timothy A. Davis
 | stripack (GMT) | LGPL v3        | https://www.generic-mapping-tools.org                          | Copyright(c) 2020, the GMT Team
 
 

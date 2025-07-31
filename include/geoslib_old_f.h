@@ -52,7 +52,6 @@ class Faults;
 class AMesh;
 class SpaceTarget;
 
-class cs;
 class QChol;
 
 /***************************************/
