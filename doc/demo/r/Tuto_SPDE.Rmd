@@ -1,12 +1,9 @@
 ---
-title: "A gentle introduction to SPDE in gstlearn"
+title: "Introduction to SPDE in gstlearn"
 author: "gstlearn Team"
-date: "2023-09-06"
-output:
-  pdf_document: default
-  html_document:
-    df_print: paged
-editor_options:
+date: "2023-07-10"
+output: pdf_document
+editor_options: 
   chunk_output_type: console
 ---
 
