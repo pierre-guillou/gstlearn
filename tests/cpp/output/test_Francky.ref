@@ -7,17 +7,17 @@ Data Base Statistics
 4 - Name Kriging.Data.estim - Locator NA
  Nb of data          =      10201
  Nb of active values =      10201
- Minimum value       =     -2.419
- Maximum value       =      2.415
- Mean value          =     -0.227
- Standard Deviation  =      0.653
- Variance            =      0.426
+ Minimum value       =     -2.877
+ Maximum value       =      1.974
+ Mean value          =     -0.224
+ Standard Deviation  =      0.713
+ Variance            =      0.509
 5 - Name KrigingSPDE.Data.estim - Locator z1
  Nb of data          =      10201
  Nb of active values =      10201
- Minimum value       =     -2.390
- Maximum value       =      2.354
- Mean value          =     -0.225
- Standard Deviation  =      0.679
- Variance            =      0.460
+ Minimum value       =     -2.944
+ Maximum value       =      1.948
+ Mean value          =     -0.232
+ Standard Deviation  =      0.751
+ Variance            =      0.565
 Test performed successfully

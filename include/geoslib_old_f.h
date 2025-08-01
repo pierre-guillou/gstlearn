@@ -9,19 +9,14 @@
 /******************************************************************************/
 #pragma once
 
-#include "Covariances/CovAniso.hpp"
-#include "geoslib_d.h"
-#include "gstlearn_export.hpp"
-
-#include "Enum/ECov.hpp"
-#include "Enum/ELoc.hpp"
-
 #include "Basic/NamingConvention.hpp"
-#include "Covariances/CovCalcMode.hpp"
+#include "Covariances/CovAniso.hpp"
 #include "Model/Constraints.hpp"
 #include "Model/Option_AutoFit.hpp"
 #include "Variogram/DirParam.hpp"
 #include "Variogram/Vario.hpp"
+#include "geoslib_d.h"
+#include "gstlearn_export.hpp"
 
 namespace gstlrn
 {
