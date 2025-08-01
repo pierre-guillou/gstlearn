@@ -91,6 +91,9 @@ sill = 1.
 nx = 200 * c(1,1)
 dx = 1/(nx-1)
 x0 = c(0,0)
+
+# Types of statistics
+opers = EStatOption_fromKeys(c("NUM", "MINI", "MAXI", "MEAN", "STDV"))
 ```
 
 ## Grid definition
@@ -276,6 +279,30 @@ p = plot.init() +
     plot.decoration(xlab = "Traditional", ylab = "SPDE", 
                   title = "Comparison for St. Dev.")
 plot.end(p)
+```
+
+Comparative statistics
+
+```{r}
+# statistics
+knitr::kable(dbStatisticsMono(db = grid, names = "*.estim", opers = opers)$toTL(),
+             digits = 3, caption = "Estimations")
+
+knitr::kable(dbStatisticsMono(db = grid, names = "*.stdev", opers = opers)$toTL(),
+             digits = 3, caption = "St. dev. of Estimation error")
+```
+
+Produce some auxiliary statistics for simulations
+
+```{r}
+knitr::kable(dbStatisticsMono(db = grid, names = "*NC.*", opers = opers)$toTL(),
+             digits = 3, caption = "Non conditional simulations")
+```
+
+
+```{r}
+knitr::kable(dbStatisticsMono(db = grid, names = "*CD.*", opers = opers)$toTL(),
+             digits = 3, caption = "Conditional simulations")
 ```
 
 # References
