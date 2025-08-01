@@ -197,7 +197,6 @@ int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose
   }
   else if (nmesh == 1 && (int)nmesh != ncov)
   {
-    meshes = meshesIn;
     // Particular case of a single mesh: simply duplicate it (without creating new contents)
     meshes.resize(ncov);
     for (int icov = 0; icov < ncov; icov++)
