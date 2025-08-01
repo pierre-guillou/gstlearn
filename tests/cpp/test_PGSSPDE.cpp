@@ -28,42 +28,42 @@
 
 using namespace gstlrn;
 
-static void _firstTest(const CovAniso* cov1,
-                       const CovAniso* cov2,
-                       std::vector<Model*>& models,
-                       Rule& rule)
-{
-  // Creating the Model(s) of the Underlying GRF(s)
-  auto* model1 = new Model();
-  model1->addCovAniso(*cov1);
-  model1->display();
+// static void _firstTest(const CovAniso* cov1,
+//                        const CovAniso* cov2,
+//                        std::vector<Model*>& models,
+//                        Rule& rule)
+// {
+//   // Creating the Model(s) of the Underlying GRF(s)
+//   auto* model1 = new Model();
+//   model1->addCovAniso(*cov1);
+//   model1->display();
 
-  auto* model2 = new Model();
-  model2->addCovAniso(*cov2);
-  model2->display();
+//   auto* model2 = new Model();
+//   model2->addCovAniso(*cov2);
+//   model2->display();
 
-  models.push_back(model1);
-  models.push_back(model2);
+//   models.push_back(model1);
+//   models.push_back(model2);
 
-  // Creating the Rule
-  rule.resetFromNames({"S", "T", "F1", "F2", "F3"});
-}
+//   // Creating the Rule
+//   rule.resetFromNames({"S", "T", "F1", "F2", "F3"});
+// }
 
-static void _secondTest(const CovAniso* cov1,
-                        const CovAniso* cov2,
-                        std::vector<Model*>& models,
-                        Rule& rule)
-{
-  auto* model = new Model();
-  model->addCovAniso(*cov1);
-  model->addCovAniso(*cov2);
-  model->display();
+// static void _secondTest(const CovAniso* cov1,
+//                         const CovAniso* cov2,
+//                         std::vector<Model*>& models,
+//                         Rule& rule)
+// {
+//   auto* model = new Model();
+//   model->addCovAniso(*cov1);
+//   model->addCovAniso(*cov2);
+//   model->display();
 
-  models.push_back(model);
+//   models.push_back(model);
 
-  // Creating the Rule
-  rule.resetFromNames({"S", "S", "F1", "F2", "F3"});
-}
+//   // Creating the Rule
+//   rule.resetFromNames({"S", "S", "F1", "F2", "F3"});
+// }
 
 static void _thirdTest(const CovAniso* cov1,
                        const CovAniso* cov2,
