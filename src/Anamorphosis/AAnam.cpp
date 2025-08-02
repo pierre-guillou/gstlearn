@@ -224,7 +224,7 @@ void AAnam::_printQTvars(const char* title, int type, int number)
 
 VectorDouble AAnam::rawToTransformVec(const VectorDouble& z) const
 {
-  VectorDouble y = VectorDouble(z.size(), TEST);
+  VectorDouble y(z.size(), TEST);
   for (int i = 0; i < (int)z.size(); i++)
     y[i] = rawToTransformValue(z[i]);
   return y;
@@ -232,7 +232,7 @@ VectorDouble AAnam::rawToTransformVec(const VectorDouble& z) const
 
 VectorDouble AAnam::transformToRawVec(const VectorDouble& y) const
 {
-  VectorDouble z = VectorDouble(y.size(), TEST);
+  VectorDouble z(y.size(), TEST);
   for (int i = 0; i < (int)z.size(); i++)
     z[i] = transformToRawValue(y[i]);
   return z;

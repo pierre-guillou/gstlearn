@@ -140,7 +140,7 @@ PolyElem* PolyElem::create()
 
 PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
 {
-  PolyElem* polyelem = new PolyElem();
+  auto* polyelem = new PolyElem();
   if (polyelem->_fileOpenAndDeserialize(NFFilename, verbose)) return polyelem;
   delete polyelem;
   return nullptr;

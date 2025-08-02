@@ -1118,7 +1118,7 @@ FracList* FracList::fractureImport(const VectorDouble& frac_segs,
 
   /* Initializations */
 
-  FracList* frac_list = new FracList();
+  auto* frac_list = new FracList();
 
   // Loop on Descriptions
 

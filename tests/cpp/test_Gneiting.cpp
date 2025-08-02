@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
                                                   false);
 
   double sep           = 1.;
-  CorGneiting covGneiting = CorGneiting(covS->getCorAniso(), covT->getCorAniso(), sep);
+  CorGneiting covGneiting(covS->getCorAniso(), covT->getCorAniso(), sep);
   message("Space dimension of Gneiting Covariance = %d\n", covGneiting.getNDim());
 
   // Testing the covariance calculation between two points
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
   DbGrid* grid = DbGrid::create(nx, dx);
 
   // Create the Model
-  ModelGeneric* model = new ModelGeneric();
+  auto* model = new ModelGeneric();
   model->setCov(&covGneiting);
   model->evalCov(p1, p2);
   message("Model dimension = %d\n", model->getNDim());

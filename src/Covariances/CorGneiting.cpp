@@ -45,7 +45,7 @@ CorGneiting::CorGneiting(const CorAniso* covS, const CorAniso* covTemp, double s
   _ctxt.setSpace(space);
 
   int nvar        = covS->getNVar();
-  CovContext ctxt = CovContext(nvar, space);
+  CovContext ctxt(nvar, space);
   setContext(ctxt);
 }
 

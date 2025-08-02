@@ -32,7 +32,6 @@
 #include "Drifts/ADrift.hpp"
 #include "Drifts/DriftFactory.hpp"
 #include "Drifts/DriftList.hpp"
-#include "LinearOp/CholeskyDense.hpp"
 #include "Model/CovInternal.hpp"
 #include "Model/Model.hpp"
 #include "Model/Option_AutoFit.hpp"
@@ -142,7 +141,7 @@ Model* Model::createFromEnvironment(int nvar, int ndim)
 
 Model* Model::createNugget(int nvar, int ndim, double sill)
 {
-  Model* model = new Model(nvar, ndim);
+  auto* model = new Model(nvar, ndim);
   model->addCovFromParam(ECov::NUGGET, 0., sill);
   return model;
 }
@@ -175,8 +174,8 @@ Model* Model::createFromParam(const ECov& type,
     }
   }
 
-  CovContext ctxt = CovContext(nvar, space);
-  Model* model    = new Model(ctxt);
+  CovContext ctxt(nvar, space);
+  auto* model     = new Model(ctxt);
   model->addCovFromParam(type, range, sill, param, ranges, sills, angles,
                          flagRange);
 
@@ -212,8 +211,8 @@ Model* Model::createFromParamOldStyle(const ECov& type,
     }
   }
 
-  CovContext ctxt = CovContext(nvar, spaceloc);
-  Model* model    = new Model(ctxt);
+  CovContext ctxt(nvar, spaceloc);
+  auto* model     = new Model(ctxt);
   model->addCovFromParamOldStyle(type, range, sill, param, ranges, sills,
                                  angles, flagRange);
 
@@ -222,7 +221,7 @@ Model* Model::createFromParamOldStyle(const ECov& type,
 
 Model* Model::createFromDb(const Db* db)
 {
-  Model* model = new Model();
+  auto* model = new Model();
   if (model->resetFromDb(db) != 0)
   {
     messerr("Problem when creating Model from Db");
@@ -234,7 +233,7 @@ Model* Model::createFromDb(const Db* db)
 
 Model* Model::createFromNF(const String& NFFilename, bool verbose)
 {
-  Model* model = new Model();
+  auto* model = new Model();
   if (model->_fileOpenAndDeserialize(NFFilename, verbose)) return model;
   delete model;
   return nullptr;
@@ -247,7 +246,7 @@ Model* Model::createFromVario(Vario* vario,
                               const Option_AutoFit& mauto,
                               bool verbose)
 {
-  Model* model = new Model();
+  auto* model = new Model();
   if (model->fit(vario, types, constraints, optvar, mauto, verbose) != 0)
   {
     messerr("Problem when creating Model from fitting an Experimental variogram");
@@ -524,7 +523,7 @@ void Model::switchToGradient()
   // If no covariance has been defined yet: do nothing
   if (_cova == nullptr)
   {
-    CovLMGradient* covg = new CovLMGradient(_ctxt);
+    auto* covg = new CovLMGradient(_ctxt);
     ModelCovList::setCovList(covg);
     delete covg;
   }
@@ -532,7 +531,7 @@ void Model::switchToGradient()
   {
     const CovAnisoList* covalist = castInCovAnisoListConst();
     if (covalist == nullptr) return;
-    CovLMGradient* covg = new CovLMGradient(*covalist);
+    auto* covg = new CovLMGradient(*covalist);
     ModelCovList::setCovList(covg);
     delete covg;
   }
@@ -575,7 +574,7 @@ int Model::setAnam(const gstlrn::AAnam* anam, const VectorInt& strcnt)
     }
 
     // Initiate a new CovLMCAnamorphosis class
-    CovLMCAnamorphosis* newcov = new CovLMCAnamorphosis(*cov, anam, strcnt);
+    auto* newcov = new CovLMCAnamorphosis(*cov, anam, strcnt);
 
     // Replace the current list by the newly create one (CovLMCAnamorphosis)
     ModelCovList::setCovList(newcov);
@@ -599,7 +598,7 @@ int Model::unsetAnam()
   }
 
   // Initiate a new CovAnisoList class
-  CovAnisoList* newcov = new CovAnisoList(*cov);
+  auto* newcov = new CovAnisoList(*cov);
 
   // Replace the current list by the newly create one (CovLMCAnamorphosis)
 
@@ -646,7 +645,7 @@ int Model::fitFromCovIndices(Vario* vario,
   _ctxt = CovContext(vario); /// TODO : What to do with that ?
   for (int is = 0; is < (int)types.size(); is++)
   {
-    CovAniso cov = CovAniso(types[is], _ctxt);
+    CovAniso cov(types[is], _ctxt);
     addCov(cov);
   }
 
@@ -688,7 +687,7 @@ int Model::fit(Vario* vario,
 
   for (int is = 0; is < (int)types.size(); is++)
   {
-    CovAniso cov = CovAniso(types[is], _ctxt);
+    CovAniso cov(types[is], _ctxt);
     addCov(cov);
   }
   return model_auto_fit(vario, this, verbose, mauto, constraints, optvar);
@@ -723,7 +722,7 @@ int Model::fitFromVMap(DbGrid* dbmap,
 
   for (int is = 0; is < (int)types.size(); is++)
   {
-    CovAniso cov = CovAniso(types[is], _ctxt);
+    CovAniso cov(types[is], _ctxt);
     addCov(cov);
   }
   return vmap_auto_fit(dbmap, this, verbose, mauto, constraints, optvar);
@@ -967,7 +966,7 @@ void Model::addCovAniso(const CovAniso& cov)
 
 Model* Model::duplicate() const
 {
-  Model* model = new Model(*getContext());
+  auto* model = new Model(*getContext());
 
   /* Add the list of Covariances */
 
@@ -990,7 +989,7 @@ Model* Model::createReduce(const VectorInt& validVars) const
     return nullptr;
   }
 
-  Model* model = new Model(*_ctxt.createReduce(validVars)); // TODO LEAK
+  auto* model = new Model(*_ctxt.createReduce(validVars)); // TODO LEAK
 
   /* Add the list of Drifts */
 

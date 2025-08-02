@@ -143,7 +143,7 @@ VarioParam* VarioParam::createOmniDirection(int nlag,
   DirParam* dir = DirParam::createOmniDirection(nlag, dlag, toldis,
                                                 opt_code, idate, bench, cylrad,
                                                 tolcode, breaks, space);
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
   varioparam->addDir(*dir);
   delete dir;
   return varioparam;
@@ -161,7 +161,7 @@ VarioParam* VarioParam::createMultiple(int ndir,
   std::vector<DirParam> dirs = DirParam::createMultiple(ndir, nlag, dlag,
                                                         toldis, angref, space);
   if (dirs.empty()) return nullptr;
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
   varioparam->addMultiDirs(dirs);
   return varioparam;
 }
@@ -187,7 +187,7 @@ VarioParam* VarioParam::createMultipleFromGrid(const DbGrid* dbgrid,
                                                const ASpaceSharedPtr& space,
                                                int ndimax)
 {
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
   int ndim               = dbgrid->getNDim();
   int ncalc = (ndimax <= 0) ? ndim : ndimax;
   VectorInt grincr(ndim, 0);
@@ -226,7 +226,7 @@ VarioParam* VarioParam::createFromSpaceDimension(int nlag,
   int ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
 
   for (int idim = 0; idim < ndim; idim++)
   {
@@ -253,7 +253,7 @@ VarioParam* VarioParam::createSeveral2D(const VectorDouble &angles,
   std::vector<DirParam> dirs = DirParam::createSeveral2D(angles, nlag, dlag,
                                                          toldis, tolang, space);
   if (dirs.empty()) return nullptr;
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
   varioparam->addMultiDirs(dirs);
   return varioparam;
 }
@@ -444,7 +444,7 @@ Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam)
   }
 
   // Creating a local Vario structure (to constitute the BiTargetCheck list
-  Vario vario = Vario(varioparam);
+  Vario vario(varioparam);
   vario.setDb(db);
   if (vario.prepare()) return nullptr;
 

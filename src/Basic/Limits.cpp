@@ -62,7 +62,7 @@ Limits::Limits(const VectorDouble& mini,
   {
     bool incmini_loc = (incmini.empty()) ? true : incmini[i];
     bool incmaxi_loc = (incmaxi.empty()) ? false : incmaxi[i];
-    Interval bd = Interval(mini[i],maxi[i],incmini_loc,incmaxi_loc);
+    Interval bd(mini[i],maxi[i],incmini_loc,incmaxi_loc);
     _bounds.push_back(bd);
   }
 }
@@ -81,7 +81,7 @@ Limits::Limits(const VectorDouble& bounds, bool addFromZero)
     _bounds.clear();
     for (int i = 0; i < nclass; i++)
     {
-      Interval bd = Interval(i + 0.5, i + 1.5);
+      Interval bd(i + 0.5, i + 1.5);
       _bounds.push_back(bd);
     }
   }
@@ -97,7 +97,7 @@ Limits::Limits(const VectorDouble& bounds, bool addFromZero)
 
     if (addFromZero && bounds[0] > 0)
     {
-      Interval bd = Interval(0., bounds[0]);
+      Interval bd(0., bounds[0]);
       _bounds.push_back(bd);
     }
 
@@ -122,7 +122,7 @@ Limits::Limits(int nclass)
   _bounds.clear();
   for (int i = 0; i < nclass; i++)
   {
-    Interval bd = Interval(i + 0.5, i + 1.5);
+    Interval bd(i + 0.5, i + 1.5);
     _bounds.push_back(bd);
   }
 }
@@ -147,19 +147,19 @@ Limits* Limits::create(const VectorDouble& mini,
                        const VectorBool& incmini,
                        const VectorBool& incmaxi)
 {
-  Limits* limits = new Limits(mini, maxi, incmini, incmaxi);
+  auto* limits = new Limits(mini, maxi, incmini, incmaxi);
   return limits;
 }
 
 Limits* Limits::create(const VectorDouble& bounds, bool addFromZero)
 {
-  Limits* limits = new Limits(bounds, addFromZero);
+  auto* limits = new Limits(bounds, addFromZero);
   return limits;
 }
 
 Limits* Limits::create(int nclass)
 {
-  Limits* limits = new Limits(nclass);
+  auto* limits = new Limits(nclass);
   return limits;
 }
 

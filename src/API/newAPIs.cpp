@@ -22,7 +22,7 @@ namespace gstlrn
 Db* createDbFromDataFrame(const DataFrame* dat,
                           const VectorString& coordinates)
 {
-  Db* db = new Db();
+  auto* db = new Db();
   for (const auto& [name, values]: *dat)
   {
 
@@ -38,7 +38,7 @@ GaussianProcess* createModelFromData(const Db* dat,
                                      bool addMeasurementError)
 {
 
-  GaussianProcess* gp = new GaussianProcess();
+  auto* gp = new GaussianProcess();
   CovContext ctxt(variables.size(), dat->getNDim());
   Model model(ctxt);
   if (structs.empty())

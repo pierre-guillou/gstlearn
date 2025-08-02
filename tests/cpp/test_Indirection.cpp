@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
   // Creating a Mesh based on the Masked Grid (in order to start Indirections)
 
-  MeshETurbo mesh = MeshETurbo(grid, false, false, 1);
+  MeshETurbo mesh(grid, false, false, 1);
   mesh.display();
   mesh.printMeshes(2);
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   // Performing the same task with the Indirection stored in Integer Arrays
   // This should be quicker but more space consuming
 
-  MeshETurbo mesh0 = MeshETurbo(grid, false, false, 0);
+  MeshETurbo mesh0(grid, false, false, 0);
   mesh0.display();
   mesh0.printMeshes(2);
 

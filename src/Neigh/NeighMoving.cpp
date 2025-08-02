@@ -265,7 +265,7 @@ NeighMoving* NeighMoving::create(bool flag_xvalid,
  */
 NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighMoving* neigh = new NeighMoving();
+  auto* neigh = new NeighMoving();
   if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
   delete neigh;
   return nullptr;

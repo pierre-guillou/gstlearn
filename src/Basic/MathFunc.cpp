@@ -8,20 +8,19 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_define.h"
 #include "geoslib_d.h"
+#include "geoslib_define.h"
 
-#include "Matrix/MatrixDense.hpp"
-#include "Basic/MathFunc.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/MathFunc.hpp"
 #include "Basic/WarningMacro.hpp"
 #include "Core/fftn.hpp"
-#include "Basic/Memory.hpp"
+#include "Matrix/MatrixDense.hpp"
 
-#include <cmath>
+#include <Geometry/GeometryHelper.hpp>
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
-#include <Geometry/GeometryHelper.hpp>
+#include <cmath>
 
 DISABLE_WARNING_PUSH
 
@@ -32,12 +31,12 @@ namespace gstlrn
 typedef struct
 {
   int ntri;
-  double *coor;
+  VectorDouble coor;
 } Reg_Coor;
 
 static double c_b11 = 1.;
-#define COORD(i,ip)  (coord[3 * (ip) + (i)])
-#define RCOORD(i,ip) (R_coor->coor[3 * (ip) + (i)])
+#define COORD(i, ip)  (coord[3 * (ip) + (i)])
+#define RCOORD(i, ip) (R_coor->coor[3 * (ip) + (i)])
 
 /**
  * Function to compute the Van der Corput sequence
@@ -51,8 +50,8 @@ static VectorDouble _corputVector(int n, int b)
 {
   VectorDouble retval(n, 0.);
 
-  int L = (int) ceil(log(n-1) / log(b));
-  VectorDouble un(L,0.);
+  int L = (int)ceil(log(n - 1) / log(b));
+  VectorDouble un(L, 0.);
   un[0] = 1.;
 
   MatrixDense d(n, L);
@@ -60,7 +59,7 @@ static VectorDouble _corputVector(int n, int b)
   if (L == 1)
   {
     for (int l = 0; l < n; l++)
-      retval[l] = (double) (l + 1.) / (double) b;
+      retval[l] = (double)(l + 1.) / (double)b;
   }
   else
   {
@@ -68,14 +67,14 @@ static VectorDouble _corputVector(int n, int b)
     for (int l = 1; l < n; l++)
     {
       for (int p = 0; p < L; p++)
-        d.setValue(l, p, d.getValue(l-1, p) + un[p]);
+        d.setValue(l, p, d.getValue(l - 1, p) + un[p]);
 
-      for (int p = 0; p < L-1; p++)
+      for (int p = 0; p < L - 1; p++)
       {
-        if (d.getValue(l,p) == b)
+        if (d.getValue(l, p) == b)
         {
-          d.setValue(l,p,0.);
-          d.setValue(l,p+1, d.getValue(l,p+1) + 1.);
+          d.setValue(l, p, 0.);
+          d.setValue(l, p + 1, d.getValue(l, p + 1) + 1.);
         }
       }
     }
@@ -84,7 +83,7 @@ static VectorDouble _corputVector(int n, int b)
     {
       double total = 0.;
       for (int p = 0; p < L; p++)
-        total += d.getValue(l,p) * pow(1./b, (double) p+1.);
+        total += d.getValue(l, p) * pow(1. / b, (double)p + 1.);
       retval[l] = total;
     }
   }
@@ -99,7 +98,7 @@ static VectorDouble _corputVector(int n, int b)
 **    Hart, J.F. et al, 'Computer Approximations', Wiley 1968
 **
 *****************************************************************************/
-static double st_mvnphi(const double *z)
+static double st_mvnphi(const double* z)
 
 {
   /* System generated locals */
@@ -112,36 +111,46 @@ static double st_mvnphi(const double *z)
 
   /* |Z| > 37 */
 
-  if (zabs > 37.) {
+  if (zabs > 37.)
+  {
     p = 0.;
-  } else {
+  }
+  else
+  {
 
     /* |Z| <= 37 */
 
     /* Computing 2nd power */
-    d__1 = zabs;
+    d__1   = zabs;
     expntl = exp(-(d__1 * d__1) / 2);
 
     /* |Z| < CUTOFF = 10/SQRT(2) */
 
-    if (zabs < 7.071067811865475) {
-      p = expntl * ((((((zabs * .03526249659989109 + .7003830644436881)
-                        * zabs + 6.37396220353165) * zabs + 33.912866078383) *
-                      zabs + 112.0792914978709) * zabs + 221.2135961699311) *
-                    zabs + 220.2068679123761) /
-        (((((((zabs * .08838834764831844 + 1.755667163182642) * zabs +
-              16.06417757920695) * zabs + 86.78073220294608) * zabs +
-            296.5642487796737) * zabs + 637.3336333788311) * zabs +
-          793.8265125199484) * zabs + 440.4137358247522);
+    if (zabs < 7.071067811865475)
+    {
+      p = expntl * ((((((zabs * .03526249659989109 + .7003830644436881) * zabs + 6.37396220353165) * zabs + 33.912866078383) * zabs + 112.0792914978709) * zabs + 221.2135961699311) * zabs + 220.2068679123761) /
+          (((((((zabs * .08838834764831844 + 1.755667163182642) * zabs +
+                16.06417757920695) *
+                 zabs +
+               86.78073220294608) *
+                zabs +
+              296.5642487796737) *
+               zabs +
+             637.3336333788311) *
+              zabs +
+            793.8265125199484) *
+             zabs +
+           440.4137358247522);
 
       /* |Z| >= CUTOFF. */
-
-    } else {
-      p = expntl / (zabs + 1 / (zabs + 2 / (zabs + 3 / (zabs + 4 / (
-                                                          zabs + .65))))) / 2.506628274631001;
+    }
+    else
+    {
+      p = expntl / (zabs + 1 / (zabs + 2 / (zabs + 3 / (zabs + 4 / (zabs + .65))))) / 2.506628274631001;
     }
   }
-  if (*z > 0.) {
+  if (*z > 0.)
+  {
     p = 1 - p;
   }
   ret_val = p;
@@ -157,11 +166,14 @@ static void st_mvnlms(double* a, double* b, const int* infin, double* lower, dou
 {
   *lower = 0.;
   *upper = 1.;
-  if (*infin >= 0) {
-    if (*infin != 0) {
+  if (*infin >= 0)
+  {
+    if (*infin != 0)
+    {
       *lower = st_mvnphi(a);
     }
-    if (*infin != 1) {
+    if (*infin != 1)
+    {
       *upper = st_mvnphi(b);
     }
   }
@@ -172,12 +184,12 @@ static void st_mvnlms(double* a, double* b, const int* infin, double* lower, dou
 ** st_dkswap
 **
 *****************************************************************************/
-static void st_dkswap(double *x,
-                      double *y)
+static void st_dkswap(double* x,
+                      double* y)
 {
   static double t;
 
-  t = *x;
+  t  = *x;
   *x = *y;
   *y = t;
 }
@@ -187,13 +199,13 @@ static void st_dkswap(double *x,
 ** Swaps rows and columns P and Q in situ, with P <= Q
 **
 *****************************************************************************/
-static void st_rcswp(const int *p,
-                     const int *q,
-                     double *a,
-                     double *b,
-                     int *infin,
-                     const int *n,
-                     double *c)
+static void st_rcswp(const int* p,
+                     const int* q,
+                     double* a,
+                     double* b,
+                     int* infin,
+                     const int* n,
+                     double* c)
 {
   /* System generated locals */
   int i__1;
@@ -210,25 +222,28 @@ static void st_rcswp(const int *p,
   /* Function Body */
   st_dkswap(&a[*p], &a[*q]);
   st_dkswap(&b[*p], &b[*q]);
-  j = infin[*p];
+  j         = infin[*p];
   infin[*p] = infin[*q];
   infin[*q] = j;
-  jj = *p * (*p - 1) / 2;
-  ii = *q * (*q - 1) / 2;
+  jj        = *p * (*p - 1) / 2;
+  ii        = *q * (*q - 1) / 2;
   st_dkswap(&c[jj + *p], &c[ii + *q]);
   i__1 = *p - 1;
-  for (j = 1; j <= i__1; ++j) {
+  for (j = 1; j <= i__1; ++j)
+  {
     st_dkswap(&c[jj + j], &c[ii + j]);
   }
   jj += *p;
   i__1 = *q - 1;
-  for (i = *p + 1; i <= i__1; ++i) {
+  for (i = *p + 1; i <= i__1; ++i)
+  {
     st_dkswap(&c[jj + *p], &c[ii + i]);
     jj += i;
   }
   ii += *q;
   i__1 = *n;
-  for (i = *q + 1; i <= i__1; ++i) {
+  for (i = *q + 1; i <= i__1; ++i)
+  {
     st_dkswap(&c[ii + *p], &c[ii + *q]);
     ii += i;
   }
@@ -239,17 +254,17 @@ static void st_rcswp(const int *p,
 ** Subroutine to sort integration limits and determine Cholesky factor
 **
 *****************************************************************************/
-static void st_covsrt(int *n,
-                      double *lower,
-                      double *upper,
-                      double *correl,
-                      int *infin,
-                      double *y,
-                      int *infis,
-                      double *a,
-                      double *b,
-                      double *cov,
-                      int *infi)
+static void st_covsrt(int* n,
+                      double* lower,
+                      double* upper,
+                      double* correl,
+                      int* infin,
+                      double* y,
+                      int* infis,
+                      double* a,
+                      double* b,
+                      double* cov,
+                      int* infi)
 {
   /* System generated locals */
   int i__1, i__2, i__3, i__4;
@@ -278,26 +293,33 @@ static void st_covsrt(int *n,
   amin = bmin = 0.;
 
   /* Function Body */
-  ij = 0;
-  ii = 0;
+  ij     = 0;
+  ii     = 0;
   *infis = 0;
-  i__1 = *n;
-  for (i = 1; i <= i__1; ++i) {
-    a[i] = 0.;
-    b[i] = 0.;
+  i__1   = *n;
+  for (i = 1; i <= i__1; ++i)
+  {
+    a[i]    = 0.;
+    b[i]    = 0.;
     infi[i] = infin[i];
-    if (infi[i] < 0) {
+    if (infi[i] < 0)
+    {
       ++(*infis);
-    } else {
-      if (infi[i] != 0) {
+    }
+    else
+    {
+      if (infi[i] != 0)
+      {
         a[i] = lower[i];
       }
-      if (infi[i] != 1) {
+      if (infi[i] != 1)
+      {
         b[i] = upper[i];
       }
     }
     i__2 = i - 1;
-    for (j = 1; j <= i__2; ++j) {
+    for (j = 1; j <= i__2; ++j)
+    {
       ++ij;
       ++ii;
       cov[ij] = correl[ii];
@@ -308,60 +330,70 @@ static void st_covsrt(int *n,
 
   /* First move any doubly infinite limits to innermost positions. */
 
-  if (*infis < *n) {
+  if (*infis < *n)
+  {
     i__1 = *n - *infis + 1;
-    for (i = *n; i >= i__1; --i) {
-      if (infi[i] >= 0) {
+    for (i = *n; i >= i__1; --i)
+    {
+      if (infi[i] >= 0)
+      {
         i__2 = i - 1;
-        for (j = 1; j <= i__2; ++j) {
-          if (infi[j] < 0) {
+        for (j = 1; j <= i__2; ++j)
+        {
+          if (infi[j] < 0)
+          {
             st_rcswp(&j, &i, &a[1], &b[1], &infi[1], n, &cov[1]);
             goto L10;
           }
         }
       }
-    L10:
-      ;
+    L10:;
     }
 
     /* Sort remaining limits and determine Cholesky factor. */
 
-    ii = 0;
+    ii   = 0;
     i__1 = *n - *infis;
-    for (i = 1; i <= i__1; ++i) {
+    for (i = 1; i <= i__1; ++i)
+    {
 
       /* Determine the integratio  n limits for variable with minimum */
       /* expected probability and interchange that variable with Ith. */
 
-      dmin_ = 0.;
-      emin = 1.;
-      jmin = i;
+      dmin_  = 0.;
+      emin   = 1.;
+      jmin   = i;
       cvdiag = 0.;
-      ij = ii;
-      i__2 = *n - *infis;
-      for (j = i; j <= i__2; ++j) {
-        if (cov[ij + j] > 1e-10) {
+      ij     = ii;
+      i__2   = *n - *infis;
+      for (j = i; j <= i__2; ++j)
+      {
+        if (cov[ij + j] > 1e-10)
+        {
           sumsq = sqrt(cov[ij + j]);
-          sum = 0.;
-          i__3 = i - 1;
-          for (k = 1; k <= i__3; ++k) {
+          sum   = 0.;
+          i__3  = i - 1;
+          for (k = 1; k <= i__3; ++k)
+          {
             sum += cov[ij + k] * y[k];
           }
           aj = (a[j] - sum) / sumsq;
           bj = (b[j] - sum) / sumsq;
           st_mvnlms(&aj, &bj, &infi[j], &d, &e);
-          if (emin + d >= e + dmin_) {
-            jmin = j;
-            amin = aj;
-            bmin = bj;
-            dmin_ = d;
-            emin = e;
+          if (emin + d >= e + dmin_)
+          {
+            jmin   = j;
+            amin   = aj;
+            bmin   = bj;
+            dmin_  = d;
+            emin   = e;
             cvdiag = sumsq;
           }
         }
         ij += j;
       }
-      if (jmin > i) {
+      if (jmin > i)
+      {
         st_rcswp(&i, &jmin, &a[1], &b[1], &infi[1], n, &cov[1]);
       }
       cov[ii + i] = cvdiag;
@@ -370,55 +402,70 @@ static void st_covsrt(int *n,
       /* Compute expected value for Ith integration variable and */
       /* scale Ith covariance matrix row and limits. */
 
-      if (cvdiag > 0.) {
-        il = ii + i;
+      if (cvdiag > 0.)
+      {
+        il   = ii + i;
         i__2 = *n - *infis;
-        for (l = i + 1; l <= i__2; ++l) {
+        for (l = i + 1; l <= i__2; ++l)
+        {
           cov[il + i] /= cvdiag;
-          ij = ii + i;
+          ij   = ii + i;
           i__3 = l;
-          for (j = i + 1; j <= i__3; ++j) {
+          for (j = i + 1; j <= i__3; ++j)
+          {
             cov[il + j] -= cov[il + i] * cov[ij + i];
             ij += j;
           }
           il += l;
         }
-        if (emin > dmin_ + 1e-10) {
+        if (emin > dmin_ + 1e-10)
+        {
           yl = 0.;
           yu = 0.;
-          if (infi[i] != 0) {
+          if (infi[i] != 0)
+          {
             /* Computing 2nd power */
             d__1 = amin;
-            yl = -exp(-(d__1 * d__1) / 2) / 2.506628274631001;
+            yl   = -exp(-(d__1 * d__1) / 2) / 2.506628274631001;
           }
-          if (infi[i] != 1) {
+          if (infi[i] != 1)
+          {
             /* Computing 2nd power */
             d__1 = bmin;
-            yu = -exp(-(d__1 * d__1) / 2) / 2.506628274631001;
+            yu   = -exp(-(d__1 * d__1) / 2) / 2.506628274631001;
           }
           y[i] = (yu - yl) / (emin - dmin_);
-        } else {
-          if (infi[i] == 0) {
+        }
+        else
+        {
+          if (infi[i] == 0)
+          {
             y[i] = bmin;
           }
-          if (infi[i] == 1) {
+          if (infi[i] == 1)
+          {
             y[i] = amin;
           }
-          if (infi[i] == 2) {
+          if (infi[i] == 2)
+          {
             y[i] = (amin + bmin) / 2;
           }
         }
         i__2 = i;
-        for (j = 1; j <= i__2; ++j) {
+        for (j = 1; j <= i__2; ++j)
+        {
           ++ii;
           cov[ii] /= cvdiag;
         }
         a[i] /= cvdiag;
         b[i] /= cvdiag;
-      } else {
-        il = ii + i;
+      }
+      else
+      {
+        il   = ii + i;
         i__2 = *n - *infis;
-        for (l = i + 1; l <= i__2; ++l) {
+        for (l = i + 1; l <= i__2; ++l)
+        {
           cov[il + i] = 0.;
           il += l;
         }
@@ -433,31 +480,37 @@ static void st_covsrt(int *n,
           {
             a[i] /= cov[ii + j];
             b[i] /= cov[ii + j];
-            if (cov[ii + j] < 0.) {
+            if (cov[ii + j] < 0.)
+            {
               st_dkswap(&a[i], &b[i]);
-              if (infi[i] != 2) {
+              if (infi[i] != 2)
+              {
                 infi[i] = 1 - infi[i];
               }
             }
             i__2 = j;
-            for (l = 1; l <= i__2; ++l) {
+            for (l = 1; l <= i__2; ++l)
+            {
               cov[ii + l] /= cov[ii + j];
             }
             i__2 = i - 1;
-            for (l = j + 1; l <= i__2; ++l) {
-              if (cov[(l - 1) * l / 2 + j + 1] > 0.) {
-                ij = ii;
+            for (l = j + 1; l <= i__2; ++l)
+            {
+              if (cov[(l - 1) * l / 2 + j + 1] > 0.)
+              {
+                ij   = ii;
                 i__3 = l;
-                for (k = i - 1; k >= i__3; --k) {
+                for (k = i - 1; k >= i__3; --k)
+                {
                   i__4 = k;
-                  for (m = 1; m <= i__4; ++m) {
-                    st_dkswap(&cov[ij - k + m], &cov[ij + m]
-                      );
+                  for (m = 1; m <= i__4; ++m)
+                  {
+                    st_dkswap(&cov[ij - k + m], &cov[ij + m]);
                   }
                   st_dkswap(&a[k], &a[k + 1]);
                   st_dkswap(&b[k], &b[k + 1]);
-                  m = infi[k];
-                  infi[k] = infi[k + 1];
+                  m           = infi[k];
+                  infi[k]     = infi[k + 1];
                   infi[k + 1] = m;
                   ij -= k;
                 }
@@ -485,64 +538,108 @@ static void st_covsrt(int *n,
 ** transcription.
 **
 *****************************************************************************/
-static double st_phinvs(const double *p)
+static double st_phinvs(const double* p)
 
 {
   double ret_val, d__1, d__2;
   static double q, r;
 
   q = (*p * 2 - 1) / 2;
-  if (ABS(q) <= .425) {
-    r = .180625 - q * q;
-    ret_val = q * (((((((r * 2509.0809287301226727 +
-                         33430.575583588128105) * r + 67265.770927008700853) * r +
-                       45921.953931549871457) * r + 13731.693765509461125) * r +
-                     1971.5909503065514427) * r + 133.14166789178437745) * r +
-                   3.387132872796366608) /
-      (((((((r * 5226.495278852854561 +
-             28729.085735721942674) * r + 39307.89580009271061) * r +
-           21213.794301586595867) * r + 5394.1960214247511077) * r +
-         687.1870074920579083) * r + 42.313330701600911252) * r + 1);
-
-  } else {
+  if (ABS(q) <= .425)
+  {
+    r       = .180625 - q * q;
+    ret_val = q * (((((((r * 2509.0809287301226727 + 33430.575583588128105) * r + 67265.770927008700853) * r + 45921.953931549871457) * r + 13731.693765509461125) * r + 1971.5909503065514427) * r + 133.14166789178437745) * r + 3.387132872796366608) /
+              (((((((r * 5226.495278852854561 +
+                     28729.085735721942674) *
+                      r +
+                    39307.89580009271061) *
+                     r +
+                   21213.794301586595867) *
+                    r +
+                  5394.1960214247511077) *
+                   r +
+                 687.1870074920579083) *
+                  r +
+                42.313330701600911252) *
+                 r +
+               1);
+  }
+  else
+  {
 
     /* Computing MIN */
 
     d__1 = *p, d__2 = 1 - *p;
-    r = MIN(d__1,d__2);
-    if (r > 0.) {
+    r = MIN(d__1, d__2);
+    if (r > 0.)
+    {
       r = sqrt(-log(r));
-      if (r <= 5.) {
+      if (r <= 5.)
+      {
         r += -1.6;
         ret_val = (((((((r * 7.7454501427834140764e-4 +
-                         .0227238449892691845833) * r + .24178072517745061177)
-                       * r + 1.27045825245236838258) * r +
-                      3.64784832476320460504) * r + 5.7694972214606914055) *
-                    r + 4.6303378461565452959) * r +
+                         .0227238449892691845833) *
+                          r +
+                        .24178072517745061177) *
+                         r +
+                       1.27045825245236838258) *
+                        r +
+                      3.64784832476320460504) *
+                       r +
+                     5.7694972214606914055) *
+                      r +
+                    4.6303378461565452959) *
+                     r +
                    1.42343711074968357734) /
-          (((((((r * 1.05075007164441684324e-9 + 5.475938084995344946e-4) *
-                r + .0151986665636164571966) * r +
-               .14810397642748007459) * r + .68976733498510000455) *
-             r + 1.6763848301838038494) * r +
-            2.05319162663775882187) * r + 1);
-      } else {
+                  (((((((r * 1.05075007164441684324e-9 + 5.475938084995344946e-4) *
+                          r +
+                        .0151986665636164571966) *
+                         r +
+                       .14810397642748007459) *
+                        r +
+                      .68976733498510000455) *
+                       r +
+                     1.6763848301838038494) *
+                      r +
+                    2.05319162663775882187) *
+                     r +
+                   1);
+      }
+      else
+      {
         r += -5.;
         ret_val = (((((((r * 2.01033439929228813265e-7 +
-                         2.71155556874348757815e-5) * r +
-                        .0012426609473880784386) * r + .026532189526576123093)
-                      * r + .29656057182850489123) * r +
-                     1.7848265399172913358) * r + 5.4637849111641143699) *
-                   r + 6.6579046435011037772) /
-          (((((((r * 2.04426310338993978564e-15 + 1.4215117583164458887e-7)
-                * r + 1.8463183175100546818e-5) * r +
-               7.868691311456132591e-4) * r +
-              .0148753612908506148525) * r + .13692988092273580531)
-            * r + .59983220655588793769) * r + 1);
+                         2.71155556874348757815e-5) *
+                          r +
+                        .0012426609473880784386) *
+                         r +
+                       .026532189526576123093) *
+                        r +
+                      .29656057182850489123) *
+                       r +
+                     1.7848265399172913358) *
+                      r +
+                    5.4637849111641143699) *
+                     r +
+                   6.6579046435011037772) /
+                  (((((((r * 2.04426310338993978564e-15 + 1.4215117583164458887e-7) * r + 1.8463183175100546818e-5) * r +
+                       7.868691311456132591e-4) *
+                        r +
+                      .0148753612908506148525) *
+                       r +
+                     .13692988092273580531) *
+                      r +
+                    .59983220655588793769) *
+                     r +
+                   1);
       }
-    } else {
+    }
+    else
+    {
       ret_val = 9.;
     }
-    if (q < 0.) {
+    if (q < 0.)
+    {
       ret_val = -ret_val;
     }
   }
@@ -571,51 +668,51 @@ static double st_phinvs(const double *p)
 ** \param[in] r  REAL, correlation coefficient
 **
 *****************************************************************************/
-static double st_bvu(const double *sh,
-                     const double *sk,
-                     const double *r)
+static double st_bvu(const double* sh,
+                     const double* sk,
+                     const double* r)
 {
   /* Initialized data */
 
-  static struct {
+  static struct
+  {
     double e_1[3];
     double fill_2[7];
     double e_3[6];
     double fill_4[4];
     double e_5[10];
   } equiv_99 = {
-    { .1713244923791705, .3607615730481384, .4679139345726904} ,
+    {.1713244923791705, .3607615730481384, .4679139345726904},
     {0},
     {.04717533638651177, .1069393259953183, .1600783285433464,
-     .2031674267230659, .2334925365383547, .2491470458134029 },
+     .2031674267230659, .2334925365383547, .2491470458134029},
     {0},
     {.01761400713915212, .04060142980038694, .06267204833410906,
-     .08327674157670475, .1019301198172404,  .1181945319615184,
-     .1316886384491766,  .1420961093183821,  .1491729864726037,
-     .1527533871307259 }
-  };
+     .08327674157670475, .1019301198172404, .1181945319615184,
+     .1316886384491766, .1420961093183821, .1491729864726037,
+     .1527533871307259}};
 
-#define w ((double *)&equiv_99)
+#define w ((double*)&equiv_99)
 
-  static struct {
+  static struct
+  {
     double e_1[3];
     double fill_2[7];
     double e_3[6];
     double fill_4[4];
     double e_5[10];
   } equiv_100 = {
-    { -.9324695142031522, -.6612093864662647, -.238619186083197 },
+    {-.9324695142031522, -.6612093864662647, -.238619186083197},
     {0},
-    {-.9815606342467191, -.904117256370475,  -.769902674194305,
-     -.5873179542866171, -.3678314989981802, -.1252334085114692 },
+    {-.9815606342467191, -.904117256370475, -.769902674194305,
+     -.5873179542866171, -.3678314989981802, -.1252334085114692},
     {0},
-    { -.9931285991850949, -.9639719272779138, -.9122344282513259,
-      -.8391169718222188, -.7463319064601508, -.636053680726515,
-      -.5108670019508271, -.3737060887154196, -.2277858511416451,
-      -.07652652113349733 }
-  };
+    {-.9931285991850949, -.9639719272779138, -.9122344282513259,
+     -.8391169718222188, -.7463319064601508, -.636053680726515,
+     -.5108670019508271, -.3737060887154196, -.2277858511416451,
+     -.07652652113349733}};
 
-#define x ((double *)&equiv_100)
+#define x ((double*)&equiv_100)
 
   /* System generated locals */
   int i__1;
@@ -631,25 +728,32 @@ static double st_bvu(const double *sh,
   static double bs, hk, hs, sn, rs, xs;
   static double bvn, asr;
 
-  if (ABS(*r) < .3) {
+  if (ABS(*r) < .3)
+  {
     ng = 1;
     lg = 3;
-  } else if (ABS(*r) < .75) {
+  }
+  else if (ABS(*r) < .75)
+  {
     ng = 2;
     lg = 6;
-  } else {
+  }
+  else
+  {
     ng = 3;
     lg = 10;
   }
-  h = *sh;
-  k = *sk;
-  hk = h * k;
+  h   = *sh;
+  k   = *sk;
+  hk  = h * k;
   bvn = 0.;
-  if (ABS(*r) < .925) {
-    hs = (h * h + k * k) / 2;
-    asr = asin(*r);
+  if (ABS(*r) < .925)
+  {
+    hs   = (h * h + k * k) / 2;
+    asr  = asin(*r);
     i__1 = lg;
-    for (i = 1; i <= i__1; ++i) {
+    for (i = 1; i <= i__1; ++i)
+    {
       sn = sin(asr * (x[i + ng * 10 - 11] + 1) / 2);
       bvn += w[i + ng * 10 - 11] * exp((sn * hk - hs) / (1 - sn * sn));
       sn = sin(asr * (-x[i + ng * 10 - 11] + 1) / 2);
@@ -657,58 +761,60 @@ static double st_bvu(const double *sh,
     }
     d__1 = -h;
     d__2 = -k;
-    bvn = bvn * asr / 12.566370614359172 + st_mvnphi(&d__1) * st_mvnphi(&d__2)
-      ;
-  } else {
-    if (*r < 0.) {
-      k = -k;
+    bvn  = bvn * asr / 12.566370614359172 + st_mvnphi(&d__1) * st_mvnphi(&d__2);
+  }
+  else
+  {
+    if (*r < 0.)
+    {
+      k  = -k;
       hk = -hk;
     }
-    if (ABS(*r) < 1.) {
+    if (ABS(*r) < 1.)
+    {
       as = (1 - *r) * (*r + 1);
-      a = sqrt(as);
+      a  = sqrt(as);
       /* Computing 2nd power */
       d__1 = h - k;
-      bs = d__1 * d__1;
-      c = (4 - hk) / 8;
-      d = (12 - hk) / 16;
-      bvn = a * exp(-(bs / as + hk) / 2) * (1 - c * (bs - as) * (1 - d * bs / 5) / 3 + c * d * as * as / 5);
-      if (hk > -160.) {
-        b = sqrt(bs);
+      bs   = d__1 * d__1;
+      c    = (4 - hk) / 8;
+      d    = (12 - hk) / 16;
+      bvn  = a * exp(-(bs / as + hk) / 2) * (1 - c * (bs - as) * (1 - d * bs / 5) / 3 + c * d * as * as / 5);
+      if (hk > -160.)
+      {
+        b    = sqrt(bs);
         d__1 = -b / a;
-        bvn -= exp(-hk / 2) * sqrt(6.283185307179586) * st_mvnphi(&d__1)
-          * b * (1 - c * bs * (1 - d * bs / 5) / 3);
+        bvn -= exp(-hk / 2) * sqrt(6.283185307179586) * st_mvnphi(&d__1) * b * (1 - c * bs * (1 - d * bs / 5) / 3);
       }
       a /= 2;
       i__1 = lg;
-      for (i = 1; i <= i__1; ++i) {
+      for (i = 1; i <= i__1; ++i)
+      {
         /* Computing 2nd power */
         d__1 = a * (x[i + ng * 10 - 11] + 1);
-        xs = d__1 * d__1;
-        rs = sqrt(1 - xs);
-        bvn += a * w[i + ng * 10 - 11] * (exp(-bs / (xs * 2) - hk / (
-                                                rs + 1)) / rs - exp(-(bs / xs + hk) / 2) * (c * xs * (
-                                                                                              d * xs + 1) + 1));
+        xs   = d__1 * d__1;
+        rs   = sqrt(1 - xs);
+        bvn += a * w[i + ng * 10 - 11] * (exp(-bs / (xs * 2) - hk / (rs + 1)) / rs - exp(-(bs / xs + hk) / 2) * (c * xs * (d * xs + 1) + 1));
         /* Computing 2nd power */
         d__1 = -x[i + ng * 10 - 11] + 1;
-        xs = as * (d__1 * d__1) / 4;
-        rs = sqrt(1 - xs);
-        bvn += a * w[i + ng * 10 - 11] * exp(-(bs / xs + hk) / 2) * (
-          exp(-hk * (1 - rs) / ((rs + 1) * 2)) / rs - (c * xs *
-                                                       (d * xs + 1) + 1));
+        xs   = as * (d__1 * d__1) / 4;
+        rs   = sqrt(1 - xs);
+        bvn += a * w[i + ng * 10 - 11] * exp(-(bs / xs + hk) / 2) * (exp(-hk * (1 - rs) / ((rs + 1) * 2)) / rs - (c * xs * (d * xs + 1) + 1));
       }
       bvn = -bvn / 6.283185307179586;
     }
-    if (*r > 0.) {
-      d__1 = -MAX(h,k);
+    if (*r > 0.)
+    {
+      d__1 = -MAX(h, k);
       bvn += st_mvnphi(&d__1);
     }
-    if (*r < 0.) {
+    if (*r < 0.)
+    {
       /* Computing MAX */
       d__3 = -h;
       d__4 = -k;
       d__1 = 0., d__2 = st_mvnphi(&d__3) - st_mvnphi(&d__4);
-      bvn = -bvn + MAX(d__1,d__2);
+      bvn = -bvn + MAX(d__1, d__2);
     }
   }
   ret_val = bvn;
@@ -729,12 +835,12 @@ static double st_bvu(const double *sh,
 ** \param[in] correl correlation coefficient
 **
 *****************************************************************************/
-static double st_bvnmvn(double *lower,
-                        double *upper,
-                        int *infin,
-                        double *correl)
+static double st_bvnmvn(double* lower,
+                        double* upper,
+                        int* infin,
+                        double* correl)
 {
-  double ret_val=0., d__1, d__2, d__3, d__4;
+  double ret_val = 0., d__1, d__2, d__3, d__4;
 
   /* Parameter adjustments */
   --infin;
@@ -742,42 +848,59 @@ static double st_bvnmvn(double *lower,
   --lower;
 
   /* Function Body */
-  if (infin[1] == 2 && infin[2] == 2) {
+  if (infin[1] == 2 && infin[2] == 2)
+  {
     ret_val = (st_bvu(&lower[1], &lower[2], correl) -
                st_bvu(&upper[1], &lower[2], correl) -
                st_bvu(&lower[1], &upper[2], correl) +
                st_bvu(&upper[1], &upper[2], correl));
-  } else if (infin[1] == 2 && infin[2] == 1) {
+  }
+  else if (infin[1] == 2 && infin[2] == 1)
+  {
     ret_val = (st_bvu(&lower[1], &lower[2], correl) -
                st_bvu(&upper[1], &lower[2], correl));
-  } else if (infin[1] == 1 && infin[2] == 2) {
+  }
+  else if (infin[1] == 1 && infin[2] == 2)
+  {
     ret_val = (st_bvu(&lower[1], &lower[2], correl) -
                st_bvu(&lower[1], &upper[2], correl));
-  } else if (infin[1] == 2 && infin[2] == 0) {
-    d__1 = -upper[1];
-    d__2 = -upper[2];
-    d__3 = -lower[1];
-    d__4 = -upper[2];
+  }
+  else if (infin[1] == 2 && infin[2] == 0)
+  {
+    d__1    = -upper[1];
+    d__2    = -upper[2];
+    d__3    = -lower[1];
+    d__4    = -upper[2];
     ret_val = st_bvu(&d__1, &d__2, correl) - st_bvu(&d__3, &d__4, correl);
-  } else if (infin[1] == 0 && infin[2] == 2) {
-    d__1 = -upper[1];
-    d__2 = -upper[2];
-    d__3 = -upper[1];
-    d__4 = -lower[2];
+  }
+  else if (infin[1] == 0 && infin[2] == 2)
+  {
+    d__1    = -upper[1];
+    d__2    = -upper[2];
+    d__3    = -upper[1];
+    d__4    = -lower[2];
     ret_val = st_bvu(&d__1, &d__2, correl) - st_bvu(&d__3, &d__4, correl);
-  } else if (infin[1] == 1 && infin[2] == 0) {
-    d__1 = -upper[2];
-    d__2 = -(*correl);
+  }
+  else if (infin[1] == 1 && infin[2] == 0)
+  {
+    d__1    = -upper[2];
+    d__2    = -(*correl);
     ret_val = st_bvu(&lower[1], &d__1, &d__2);
-  } else if (infin[1] == 0 && infin[2] == 1) {
-    d__1 = -upper[1];
-    d__2 = -(*correl);
+  }
+  else if (infin[1] == 0 && infin[2] == 1)
+  {
+    d__1    = -upper[1];
+    d__2    = -(*correl);
     ret_val = st_bvu(&d__1, &lower[2], &d__2);
-  } else if (infin[1] == 1 && infin[2] == 1) {
+  }
+  else if (infin[1] == 1 && infin[2] == 1)
+  {
     ret_val = st_bvu(&lower[1], &lower[2], correl);
-  } else if (infin[1] == 0 && infin[2] == 0) {
-    d__1 = -upper[1];
-    d__2 = -upper[2];
+  }
+  else if (infin[1] == 0 && infin[2] == 0)
+  {
+    d__1    = -upper[1];
+    d__2    = -upper[2];
     ret_val = st_bvu(&d__1, &d__2, correl);
   }
   return ret_val;
@@ -789,19 +912,18 @@ static double st_bvnmvn(double *lower,
 **
 *****************************************************************************/
 static double st_mvndfn_0(int n__,
-                          int *n,
-                          double *w,
-                          double *correl,
-                          double *lower,
-                          double *upper,
-                          int *infin,
-                          int *infis,
-                          double *d,
-                          double *e)
+                          int* n,
+                          double* w,
+                          double* correl,
+                          double* lower,
+                          double* upper,
+                          int* infin,
+                          int* infis,
+                          double* d,
+                          double* e)
 {
   int i__1, i__2;
   double ret_val, d__1, d__2;
-
 
   /* Local variables */
   static int infa, infb, infi[100];
@@ -811,69 +933,87 @@ static double st_mvndfn_0(int n__,
   static int ij, ik;
   static double cov[5050], sum;
 
-
   /* Parameter adjustments */
-  if (w) {
+  if (w)
+  {
     --w;
   }
-  if (correl) {
+  if (correl)
+  {
     --correl;
   }
-  if (lower) {
+  if (lower)
+  {
     --lower;
   }
-  if (upper) {
+  if (upper)
+  {
     --upper;
   }
-  if (infin) {
+  if (infin)
+  {
     --infin;
   }
 
   /* Function Body */
-  switch(n__) {
+  switch (n__)
+  {
     case 1: goto L_mvndnt;
   }
 
   ret_val = 1.;
-  infa = 0;
-  infb = 0;
-  ik = 1;
-  ij = 0;
-  i__1 = *n + 1;
-  for (i = 1; i <= i__1; ++i) {
-    sum = 0.;
+  infa    = 0;
+  infb    = 0;
+  ik      = 1;
+  ij      = 0;
+  i__1    = *n + 1;
+  for (i = 1; i <= i__1; ++i)
+  {
+    sum  = 0.;
     i__2 = i - 1;
-    for (j = 1; j <= i__2; ++j) {
+    for (j = 1; j <= i__2; ++j)
+    {
       ++ij;
-      if (j < ik) {
+      if (j < ik)
+      {
         sum += cov[ij - 1] * y[j - 1];
       }
     }
-    if (infi[i - 1] != 0) {
-      if (infa == 1) {
+    if (infi[i - 1] != 0)
+    {
+      if (infa == 1)
+      {
         /* Computing MAX */
         d__1 = ai, d__2 = a[i - 1] - sum;
-        ai = MAX(d__1,d__2);
-      } else {
-        ai = a[i - 1] - sum;
+        ai = MAX(d__1, d__2);
+      }
+      else
+      {
+        ai   = a[i - 1] - sum;
         infa = 1;
       }
     }
-    if (infi[i - 1] != 1) {
-      if (infb == 1) {
+    if (infi[i - 1] != 1)
+    {
+      if (infb == 1)
+      {
         /* Computing MIN */
         d__1 = bi, d__2 = b[i - 1] - sum;
-        bi = MIN(d__1,d__2);
-      } else {
-        bi = b[i - 1] - sum;
+        bi = MIN(d__1, d__2);
+      }
+      else
+      {
+        bi   = b[i - 1] - sum;
         infb = 1;
       }
     }
     ++ij;
-    if (i == *n + 1 || cov[ij + ik] > 0.) {
+    if (i == *n + 1 || cov[ij + ik] > 0.)
+    {
       i__2 = (infa << 1) + infb - 1;
       st_mvnlms(&ai, &bi, &i__2, &di, &ei);
-      if (di >= ei) {
+      if (di >= ei)
+      {
         ret_val = 0.;
         return ret_val;
       }
@@ -892,7 +1032,6 @@ static double st_mvndfn_0(int n__,
 
   /*     Entry point for intialization. */
 
-
 L_mvndnt:
   ret_val = 0.;
 
@@ -900,21 +1039,26 @@ L_mvndnt:
 
   st_covsrt(n, &lower[1], &upper[1], &correl[1], &infin[1], y, infis, a, b,
             cov, infi);
-  if (*n - *infis == 1) {
+  if (*n - *infis == 1)
+  {
     st_mvnlms(a, b, infi, d, e);
-  } else if (*n - *infis == 2) {
+  }
+  else if (*n - *infis == 2)
+  {
     /* Computing 2nd power */
     d__1 = cov[1];
-    *d = sqrt(d__1 * d__1 + 1);
-    if (infi[1] != 0) {
+    *d   = sqrt(d__1 * d__1 + 1);
+    if (infi[1] != 0)
+    {
       a[1] /= *d;
     }
-    if (infi[1] != 1) {
+    if (infi[1] != 1)
+    {
       b[1] /= *d;
     }
     d__1 = cov[1] / *d;
-    *e = st_bvnmvn(a, b, infi, &d__1);
-    *d = 0.;
+    *e   = st_bvnmvn(a, b, infi, &d__1);
+    *d   = 0.;
     ++(*infis);
   }
   return ret_val;
@@ -925,16 +1069,16 @@ L_mvndnt:
 ** st_mvndnt
 **
 *****************************************************************************/
-static double st_mvndnt(int *n,
-                        double *correl,
-                        double *lower,
-                        double *upper,
-                        int *infin,
-                        int *infis,
-                        double *d,
-                        double *e)
+static double st_mvndnt(int* n,
+                        double* correl,
+                        double* lower,
+                        double* upper,
+                        int* infin,
+                        int* infis,
+                        double* d,
+                        double* e)
 {
-  return st_mvndfn_0(1, n, (double *)0, correl, lower, upper, infin,
+  return st_mvndfn_0(1, n, (double*)0, correl, lower, upper, infin,
                      infis, d, e);
 }
 
@@ -950,19 +1094,18 @@ static double st_mvndnt(int *n,
 ** \param[out] quasi a new quasi-random S-vector
 **
 *****************************************************************************/
-static void st_dkrcht(const int *s,
-                      double *quasi)
+static void st_dkrcht(const int* s,
+                      double* quasi)
 {
   /* Initialized data */
 
-  static int olds = 0;
+  static int olds      = 0;
   static int prime[80] = {
-    2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,
-    59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,
-    149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,
-    233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,
-    331,337,347,349,353,359,367,373,379,383,389,397,401,409
-  };
+    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
+    59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
+    149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229,
+    233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317,
+    331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409};
 
   int i__1;
   double d__1;
@@ -976,37 +1119,44 @@ static void st_dkrcht(const int *s,
   --quasi;
 
   /* Function Body */
-  if (*s != olds || *s < 1) {
-    olds = *s;
-    n[0] = 0;
+  if (*s != olds || *s < 1)
+  {
+    olds  = *s;
+    n[0]  = 0;
     hisum = 0;
-    i__1 = *s;
-    for (i = 1; i <= i__1; ++i) {
-      rn = (double) prime[i - 1];
+    i__1  = *s;
+    for (i = 1; i <= i__1; ++i)
+    {
+      rn          = (double)prime[i - 1];
       psqt[i - 1] = sqrt(rn);
     }
   }
   i__1 = hisum;
-  for (i = 0; i <= i__1; ++i) {
+  for (i = 0; i <= i__1; ++i)
+  {
     ++n[i];
-    if (n[i] < 2) {
+    if (n[i] < 2)
+    {
       goto L10;
     }
     n[i] = 0;
   }
   ++hisum;
-  if (hisum > 48) {
+  if (hisum > 48)
+  {
     hisum = 0;
   }
   n[hisum] = 1;
 L10:
   rn = 0.;
-  for (i = hisum; i >= 0; --i) {
+  for (i = hisum; i >= 0; --i)
+  {
     rn = n[i] + rn * 2;
   }
   i__1 = *s;
-  for (i = 1; i <= i__1; ++i) {
-    d__1 = rn * psqt[i - 1];
+  for (i = 1; i <= i__1; ++i)
+  {
+    d__1     = rn * psqt[i - 1];
     quasi[i] = fmod(d__1, c_b11);
   }
 }
@@ -1016,13 +1166,13 @@ L10:
 ** st_dksmrc
 **
 *****************************************************************************/
-static void st_dksmrc(int *ndim,
-                      const int *klim,
-                      double *sumkro,
-                      const int *prime,
-                      double *vk,
-                      double (*functn)(int*,double *),
-                      double *x)
+static void st_dksmrc(int* ndim,
+                      const int* klim,
+                      double* sumkro,
+                      const int* prime,
+                      double* vk,
+                      double (*functn)(int*, double*),
+                      double* x)
 {
   /* System generated locals */
   int i__1, i__2;
@@ -1038,40 +1188,48 @@ static void st_dksmrc(int *ndim,
 
   /* Function Body */
   *sumkro = 0.;
-  nk = MIN(*ndim,*klim);
-  i__1 = nk - 1;
-  for (j = 1; j <= i__1; ++j) {
-    jp = (int) (j + law_uniform(0.,1.) * (nk + 1 - j));
-    xt = vk[j];
-    vk[j] = vk[jp];
+  nk      = MIN(*ndim, *klim);
+  i__1    = nk - 1;
+  for (j = 1; j <= i__1; ++j)
+  {
+    jp     = (int)(j + law_uniform(0., 1.) * (nk + 1 - j));
+    xt     = vk[j];
+    vk[j]  = vk[jp];
     vk[jp] = xt;
   }
   i__1 = *ndim;
-  for (j = 1; j <= i__1; ++j) {
-    x[*ndim + j] = law_uniform(0.,1.);
+  for (j = 1; j <= i__1; ++j)
+  {
+    x[*ndim + j] = law_uniform(0., 1.);
   }
   i__1 = *prime;
-  for (k = 1; k <= i__1; ++k) {
+  for (k = 1; k <= i__1; ++k)
+  {
     i__2 = nk;
-    for (j = 1; j <= i__2; ++j) {
+    for (j = 1; j <= i__2; ++j)
+    {
       d__1 = k * vk[j];
       x[j] = fmod(d__1, c_b11);
     }
-    if (*ndim > *klim) {
+    if (*ndim > *klim)
+    {
       i__2 = *ndim - *klim;
       st_dkrcht(&i__2, &x[*klim + 1]);
     }
     i__2 = *ndim;
-    for (j = 1; j <= i__2; ++j) {
+    for (j = 1; j <= i__2; ++j)
+    {
       xt = x[j] + x[*ndim + j];
-      if (xt > 1.) {
+      if (xt > 1.)
+      {
         xt += -1;
       }
       x[j] = (d__1 = xt * 2 - 1, ABS(d__1));
     }
     *sumkro += ((*functn)(ndim, &x[1]) - *sumkro) / ((k << 1) - 1);
     i__2 = *ndim;
-    for (j = 1; j <= i__2; ++j) {
+    for (j = 1; j <= i__2; ++j)
+    {
       x[j] = 1 - x[j];
     }
     *sumkro += ((*functn)(ndim, &x[1]) - *sumkro) / (k << 1);
@@ -1128,58 +1286,57 @@ static void st_dksmrc(int *ndim,
 **                     estimated absolute accuracy ABSERR.
 **
 *****************************************************************************/
-static void st_dkbvrc(int *ndim,
-                      int *minvls,
-                      const int *maxvls,
+static void st_dkbvrc(int* ndim,
+                      int* minvls,
+                      const int* maxvls,
                       double (*functn)(int*, double*),
-                      const double *abseps,
-                      const double *releps,
-                      double *abserr,
-                      double *finest,
-                      int *inform)
+                      const double* abseps,
+                      const double* releps,
+                      double* abserr,
+                      double* finest,
+                      int* inform)
 {
   /* Initialized data */
 
   static int p[25] = {
-    31,47,73,113,173,263,397,593,907,1361,2053,3079,
-    4621,6947,10427,15641,23473,35221,52837,79259,118891,178349,
-    267523,401287,601942 };
+    31, 47, 73, 113, 173, 263, 397, 593, 907, 1361, 2053, 3079,
+    4621, 6947, 10427, 15641, 23473, 35221, 52837, 79259, 118891, 178349,
+    267523, 401287, 601942};
   static int c[475] = {
-    12,13,27,35,64,111,163,
-    246,347,505,794,1189,1763,2872,4309,6610,9861,10327,19540,34566,
-    31929,40701,103650,165843,130365,9,11,28,27,66,42,154,189,402,220,
-    325,888,1018,3233,3758,6977,3647,7582,19926,9579,49367,69087,
-    125480,90647,236711,9,17,10,27,28,54,83,242,322,601,960,259,1500,
-    1534,4034,1686,4073,7124,11582,12654,10982,77576,59978,59925,
-    110235,13,10,11,36,28,118,43,102,418,644,528,1082,432,2941,1963,
-    3819,2535,8214,11113,26856,3527,64590,46875,189541,125699,12,15,
-    11,22,44,20,82,250,215,612,247,725,1332,2910,730,2314,3430,9600,
-    24585,37873,27066,39397,77172,67647,56483,12,15,20,29,44,31,92,
-    250,220,160,247,811,2203,393,642,5647,9865,10271,8726,38806,13226,
-    33179,83021,74795,93735,12,15,11,29,55,31,150,102,339,206,338,636,
-    126,1796,1502,3953,2830,10193,17218,29501,56010,10858,126904,
-    68365,234469,12,15,11,20,67,72,59,250,339,206,366,965,2240,919,
-    2246,3614,9328,10800,419,17271,18911,38935,14541,167485,60549,12,
-    15,28,45,10,17,76,280,339,206,847,497,1719,446,3834,5115,4320,
-    9086,4918,3663,40574,43129,56299,143918,1291,12,15,13,5,10,94,76,
-    118,337,422,753,497,1284,919,1511,423,5913,2365,4918,10763,20767,
-    35468,43636,74912,93937,12,22,13,5,10,14,47,196,218,134,753,1490,
-    878,919,1102,423,10365,4409,4918,18955,20767,35468,11655,167289,
-    245291,12,15,28,5,10,14,11,118,315,518,236,1490,1983,1117,1102,
-    5408,8272,13812,15701,1298,9686,2196,52680,75517,196061,3,15,13,
-    21,10,11,11,191,315,134,334,392,266,103,1522,7426,3706,5661,17710,
-    26560,47603,61518,88549,8148,258647,3,6,13,21,10,14,100,215,315,
-    134,334,1291,266,103,1522,423,6186,9344,4037,17132,47603,61518,
-    29804,172106,162489,3,6,13,21,38,14,131,121,315,518,461,508,266,
-    103,3427,423,7806,9344,4037,17132,11736,27945,101894,126159,
-    176631,12,6,14,21,38,14,116,121,167,652,711,508,266,103,3427,487,
-    7806,10362,15808,4753,11736,70975,113675,35867,204895,7,15,14,21,
-    10,94,116,49,167,382,652,1291,747,103,3928,6227,7806,9344,11401,
-    4753,41601,70975,48040,35867,73353,7,15,14,21,10,10,116,49,167,
-    206,381,1291,747,103,915,2660,8610,9344,19398,8713,12888,86478,
-    113675,35867,172319,12,9,14,21,10,10,116,49,167,158,381,508,127,
-    103,915,6227,2563,8585,25950,18624,32948,86478,34987,121694,28881
-  };
+    12, 13, 27, 35, 64, 111, 163,
+    246, 347, 505, 794, 1189, 1763, 2872, 4309, 6610, 9861, 10327, 19540, 34566,
+    31929, 40701, 103650, 165843, 130365, 9, 11, 28, 27, 66, 42, 154, 189, 402, 220,
+    325, 888, 1018, 3233, 3758, 6977, 3647, 7582, 19926, 9579, 49367, 69087,
+    125480, 90647, 236711, 9, 17, 10, 27, 28, 54, 83, 242, 322, 601, 960, 259, 1500,
+    1534, 4034, 1686, 4073, 7124, 11582, 12654, 10982, 77576, 59978, 59925,
+    110235, 13, 10, 11, 36, 28, 118, 43, 102, 418, 644, 528, 1082, 432, 2941, 1963,
+    3819, 2535, 8214, 11113, 26856, 3527, 64590, 46875, 189541, 125699, 12, 15,
+    11, 22, 44, 20, 82, 250, 215, 612, 247, 725, 1332, 2910, 730, 2314, 3430, 9600,
+    24585, 37873, 27066, 39397, 77172, 67647, 56483, 12, 15, 20, 29, 44, 31, 92,
+    250, 220, 160, 247, 811, 2203, 393, 642, 5647, 9865, 10271, 8726, 38806, 13226,
+    33179, 83021, 74795, 93735, 12, 15, 11, 29, 55, 31, 150, 102, 339, 206, 338, 636,
+    126, 1796, 1502, 3953, 2830, 10193, 17218, 29501, 56010, 10858, 126904,
+    68365, 234469, 12, 15, 11, 20, 67, 72, 59, 250, 339, 206, 366, 965, 2240, 919,
+    2246, 3614, 9328, 10800, 419, 17271, 18911, 38935, 14541, 167485, 60549, 12,
+    15, 28, 45, 10, 17, 76, 280, 339, 206, 847, 497, 1719, 446, 3834, 5115, 4320,
+    9086, 4918, 3663, 40574, 43129, 56299, 143918, 1291, 12, 15, 13, 5, 10, 94, 76,
+    118, 337, 422, 753, 497, 1284, 919, 1511, 423, 5913, 2365, 4918, 10763, 20767,
+    35468, 43636, 74912, 93937, 12, 22, 13, 5, 10, 14, 47, 196, 218, 134, 753, 1490,
+    878, 919, 1102, 423, 10365, 4409, 4918, 18955, 20767, 35468, 11655, 167289,
+    245291, 12, 15, 28, 5, 10, 14, 11, 118, 315, 518, 236, 1490, 1983, 1117, 1102,
+    5408, 8272, 13812, 15701, 1298, 9686, 2196, 52680, 75517, 196061, 3, 15, 13,
+    21, 10, 11, 11, 191, 315, 134, 334, 392, 266, 103, 1522, 7426, 3706, 5661, 17710,
+    26560, 47603, 61518, 88549, 8148, 258647, 3, 6, 13, 21, 10, 14, 100, 215, 315,
+    134, 334, 1291, 266, 103, 1522, 423, 6186, 9344, 4037, 17132, 47603, 61518,
+    29804, 172106, 162489, 3, 6, 13, 21, 38, 14, 131, 121, 315, 518, 461, 508, 266,
+    103, 3427, 423, 7806, 9344, 4037, 17132, 11736, 27945, 101894, 126159,
+    176631, 12, 6, 14, 21, 38, 14, 116, 121, 167, 652, 711, 508, 266, 103, 3427, 487,
+    7806, 10362, 15808, 4753, 11736, 70975, 113675, 35867, 204895, 7, 15, 14, 21,
+    10, 94, 116, 49, 167, 382, 652, 1291, 747, 103, 3928, 6227, 7806, 9344, 11401,
+    4753, 41601, 70975, 48040, 35867, 73353, 7, 15, 14, 21, 10, 10, 116, 49, 167,
+    206, 381, 1291, 747, 103, 915, 2660, 8610, 9344, 19398, 8713, 12888, 86478,
+    113675, 35867, 172319, 12, 9, 14, 21, 10, 10, 116, 49, 167, 158, 381, 508, 127,
+    103, 915, 6227, 2563, 8585, 25950, 18624, 32948, 86478, 34987, 121694, 28881};
 
   int i__1, i__2;
   double d__1, d__2;
@@ -1189,75 +1346,87 @@ static void st_dkbvrc(int *ndim,
   static double x[200];
   static int klimi;
   static double value;
-  static int np=0;
+  static int np = 0;
   static double vk[20], difint, finval;
   static double varprd;
-  static int sampls=0;
-  static double varest=0, varsqr;
+  static int sampls    = 0;
+  static double varest = 0, varsqr;
   static int intvls;
 
   *inform = 1;
-  intvls = 0;
-  klimi = 20;
-  if (*minvls >= 0) {
+  intvls  = 0;
+  klimi   = 20;
+  if (*minvls >= 0)
+  {
     *finest = 0.;
-    varest = 0.;
-    sampls = 8;
-    for (i = 1; i <= 25; ++i) {
+    varest  = 0.;
+    sampls  = 8;
+    for (i = 1; i <= 25; ++i)
+    {
       np = i;
-      if (*minvls < (sampls << 1) * p[i - 1]) {
+      if (*minvls < (sampls << 1) * p[i - 1])
+      {
         goto L10;
       }
     }
     /* Computing MAX */
     i__1 = 8, i__2 = *minvls / (p[np - 1] << 1);
-    sampls = MAX(i__1,i__2);
+    sampls = MAX(i__1, i__2);
   }
 L10:
   vk[0] = 1. / p[np - 1];
-  i__1 = MIN(*ndim,20);
-  for (i = 2; i <= i__1; ++i) {
+  i__1  = MIN(*ndim, 20);
+  for (i = 2; i <= i__1; ++i)
+  {
     /* Computing MIN */
-    i__2 = *ndim - 1;
-    d__1 = c[np + MIN(i__2,19) * 25 - 26] * vk[i - 2];
+    i__2      = *ndim - 1;
+    d__1      = c[np + MIN(i__2, 19) * 25 - 26] * vk[i - 2];
     vk[i - 1] = fmod(d__1, c_b11);
   }
   finval = 0.;
   varsqr = 0.;
-  i__1 = sampls;
-  for (i = 1; i <= i__1; ++i) {
+  i__1   = sampls;
+  for (i = 1; i <= i__1; ++i)
+  {
     st_dksmrc(ndim, &klimi, &value, &p[np - 1], vk, functn, x);
     difint = (value - finval) / i;
     finval += difint;
     /* Computing 2nd power */
-    d__1 = difint;
+    d__1   = difint;
     varsqr = (i - 2) * varsqr / i + d__1 * d__1;
   }
   intvls += (sampls << 1) * p[np - 1];
   varprd = varest * varsqr;
   *finest += (finval - *finest) / (varprd + 1);
-  if (varsqr > 0.) {
+  if (varsqr > 0.)
+  {
     varest = (varprd + 1) / varsqr;
   }
   *abserr = sqrt(varsqr / (varprd + 1)) * 3;
   /* Computing MAX */
   d__1 = *abseps, d__2 = ABS(*finest) * *releps;
-  if (*abserr > MAX(d__1,d__2)) {
-    if (np < 25) {
+  if (*abserr > MAX(d__1, d__2))
+  {
+    if (np < 25)
+    {
       ++np;
-    } else {
+    }
+    else
+    {
 
       /* Computing MIN */
 
-      i__1 = sampls * 3 / 2, i__2 = (*maxvls - intvls) / (p[np - 1] <<
-                                                          1);
-      sampls = MIN(i__1,i__2);
-      sampls = MAX(8,sampls);
+      i__1 = sampls * 3 / 2, i__2 = (*maxvls - intvls) / (p[np - 1] << 1);
+      sampls = MIN(i__1, i__2);
+      sampls = MAX(8, sampls);
     }
-    if (intvls + (sampls << 1) * p[np - 1] <= *maxvls) {
+    if (intvls + (sampls << 1) * p[np - 1] <= *maxvls)
+    {
       goto L10;
     }
-  } else {
+  }
+  else
+  {
     *inform = 0;
   }
   *minvls = intvls;
@@ -1268,11 +1437,10 @@ L10:
 ** st_mvndfn
 **
 *****************************************************************************/
-static double st_mvndfn(int *n,
-                        double *w)
+static double st_mvndfn(int* n,
+                        double* w)
 {
-  return st_mvndfn_0(0, n, w, (double *)0, (double *)0, (double *)
-                     0, (int *)0, (int *)0, (double *)0, (double *)0);
+  return st_mvndfn_0(0, n, w, (double*)0, (double*)0, (double*)0, (int*)0, (int*)0, (double*)0, (double*)0);
 }
 
 /****************************************************************************/
@@ -1310,16 +1478,16 @@ static double st_mvndfn(int *n,
 **
 *****************************************************************************/
 void mvndst(int n,
-                            double *lower,
-                            double *upper,
-                            int *infin,
-                            double *correl,
-                            int maxpts,
-                            double abseps,
-                            double releps,
-                            double *error,
-                            double *value,
-                            int *inform)
+            double* lower,
+            double* upper,
+            int* infin,
+            double* correl,
+            int maxpts,
+            double abseps,
+            double releps,
+            double* error,
+            double* value,
+            int* inform)
 {
   int seed_memo;
   int i__1;
@@ -1340,20 +1508,27 @@ void mvndst(int n,
   law_set_random_seed(4323151);
 
   /* Function Body */
-  if (n > 100 || n < 1) {
+  if (n > 100 || n < 1)
+  {
     *inform = 2;
-    *value = 0.;
-    *error = 1.;
-  } else {
-    *inform = (int) st_mvndnt(&n, &correl[1], &lower[1], &upper[1], &
-                              infin[1], &infis, &d, &e);
-    if (n - infis == 0) {
+    *value  = 0.;
+    *error  = 1.;
+  }
+  else
+  {
+    *inform = (int)st_mvndnt(&n, &correl[1], &lower[1], &upper[1], &infin[1], &infis, &d, &e);
+    if (n - infis == 0)
+    {
       *value = 1.;
       *error = 0.;
-    } else if (n - infis == 1) {
+    }
+    else if (n - infis == 1)
+    {
       *value = e - d;
       *error = (float)2e-16;
-    } else {
+    }
+    else
+    {
 
       /*        Call the lattice rule integration subroutine */
 
@@ -1382,31 +1557,31 @@ void mvndst(int n,
 ** \param[out]  inform      Returned code
 **
 *****************************************************************************/
-void mvndst4(double *lower,
-             double *upper,
-             const double *correl,
+void mvndst4(double* lower,
+             double* upper,
+             const double* correl,
              int maxpts,
              double abseps,
              double releps,
-             double *error,
-             double *value,
-             int *inform)
+             double* error,
+             double* value,
+             int* inform)
 {
-  int    infin[4];
+  int infin[4];
   double corloc[6];
 
   /* Initializations */
 
   int ecr = 0;
-  for (int i=0; i<4; i++)
+  for (int i = 0; i < 4; i++)
   {
-    infin[i] = mvndst_infin(lower[i],upper[i]);
-    for (int j=0; j<i; j++,ecr++)
-      corloc[ecr] = M_R(correl,4,i,j);
+    infin[i] = mvndst_infin(lower[i], upper[i]);
+    for (int j = 0; j < i; j++, ecr++)
+      corloc[ecr] = M_R(correl, 4, i, j);
   }
 
-  mvndst(4,lower,upper,infin,corloc,maxpts,abseps,releps,
-         error,value,inform);
+  mvndst(4, lower, upper, infin, corloc, maxpts, abseps, releps,
+         error, value, inform);
 }
 
 /****************************************************************************/
@@ -1426,34 +1601,34 @@ void mvndst4(double *lower,
 ** \param[out]  inform      Returned code
 **
 *****************************************************************************/
-void mvndst2n(const double *lower,
-              const double *upper,
-              const double *means,
-              double *correl,
+void mvndst2n(const double* lower,
+              const double* upper,
+              const double* means,
+              double* correl,
               int maxpts,
               double abseps,
               double releps,
-              double *error,
-              double *value,
-              int *inform)
+              double* error,
+              double* value,
+              int* inform)
 {
-  int    i,infin[2];
-  double scale,covar,low[2],upp[2];
+  int i, infin[2];
+  double scale, covar, low[2], upp[2];
 
   /* Initializations */
 
-  for (i=0; i<2; i++)
+  for (i = 0; i < 2; i++)
   {
     low[i] = lower[i];
     upp[i] = upper[i];
-    scale  = sqrt(M_R(correl,2,i,i));
+    scale  = sqrt(M_R(correl, 2, i, i));
     if (IS_GAUSS_DEF(low[i])) low[i] = (low[i] - means[i]) / scale;
     if (IS_GAUSS_DEF(upp[i])) upp[i] = (upp[i] - means[i]) / scale;
-    infin[i] = mvndst_infin(low[i],upp[i]);
+    infin[i] = mvndst_infin(low[i], upp[i]);
   }
-  covar = correl[1] / sqrt(M_R(correl,2,0,0) * M_R(correl,2,1,1));
+  covar = correl[1] / sqrt(M_R(correl, 2, 0, 0) * M_R(correl, 2, 1, 1));
 
-  mvndst(2,low,upp,infin,&covar,maxpts,abseps,releps,error,value,inform);
+  mvndst(2, low, upp, infin, &covar, maxpts, abseps, releps, error, value, inform);
 }
 
 /****************************************************************************/
@@ -1468,17 +1643,17 @@ void mvndst2n(const double *lower,
 *****************************************************************************/
 int mvndst_infin(double low, double sup)
 {
-  if (low == THRESH_INF && sup == THRESH_SUP) return(-1);
-  if (low == THRESH_INF) return(0);
-  if (sup == THRESH_SUP) return(1);
-  return(2);
+  if (low == THRESH_INF && sup == THRESH_SUP) return (-1);
+  if (low == THRESH_INF) return (0);
+  if (sup == THRESH_SUP) return (1);
+  return (2);
 }
 
 double besselj(double x, int n)
 {
-  VectorDouble tab(n+1);
+  VectorDouble tab(n + 1);
   if (x <= 0.) return 1.;
-  if (besselj_table(x, 0., n+1, tab.data()) < 0) return TEST;
+  if (besselj_table(x, 0., n + 1, tab.data()) < 0) return TEST;
   return tab[n];
 }
 
@@ -1516,20 +1691,20 @@ double besselj(double x, int n)
 ** \remark  J., NBS Jour. of Res. B. 77B, 1973, pp 125-132.
 **
 *****************************************************************************/
-int besselj_table(double x, double alpha, int nb, double *b)
+int besselj_table(double x, double alpha, int nb, double* b)
 {
-  static double enten = 1e38;
-  static double ensig = 1e17;
-  static double rtnsig = 1e-4;
-  static double enmten = 1.2e-37;
-  static double xlarge = 1e4;
+  static double enten    = 1e38;
+  static double ensig    = 1e17;
+  static double rtnsig   = 1e-4;
+  static double enmten   = 1.2e-37;
+  static double xlarge   = 1e4;
   static double fact[25] = {
-    1.,1.,2.,6.,24.,120.,720.,5040.,40320.,
-    362880.,3628800.,39916800.,479001600.,6227020800.,87178291200.,
-    1.307674368e12,2.0922789888e13,3.55687428096e14,6.402373705728e15,
-    1.21645100408832e17,2.43290200817664e18,5.109094217170944e19,
-    1.12400072777760768e21,2.585201673888497664e22,
-    6.2044840173323943936e23 };
+    1., 1., 2., 6., 24., 120., 720., 5040., 40320.,
+    362880., 3628800., 39916800., 479001600., 6227020800., 87178291200.,
+    1.307674368e12, 2.0922789888e13, 3.55687428096e14, 6.402373705728e15,
+    1.21645100408832e17, 2.43290200817664e18, 5.109094217170944e19,
+    1.12400072777760768e21, 2.585201673888497664e22,
+    6.2044840173323943936e23};
   static double twopi1 = 6.28125;
   static double twopi2 = .001935307179586476925286767;
 
@@ -1542,7 +1717,7 @@ int besselj_table(double x, double alpha, int nb, double *b)
   /* Start */
 
   --b;
-  magx = (int) (x);
+  magx = (int)(x);
   if (nb > 0 && x >= 0. && x <= xlarge && alpha >= 0. && alpha < 1.)
   {
 
@@ -1565,7 +1740,7 @@ int besselj_table(double x, double alpha, int nb, double *b)
       if (x > enmten) halfx = x / 2.;
       if (alpha != 0.)
         tempa = pow(halfx, alpha) /
-          (alpha * exp(loggamma(alpha)));
+                (alpha * exp(loggamma(alpha)));
       tempb = 0.;
       if (x > 0.) tempb = -halfx * halfx;
       b[1] = tempa + tempa * tempb / alpem;
@@ -1599,45 +1774,45 @@ int besselj_table(double x, double alpha, int nb, double *b)
 
       /* Asymptotic series for X .GT. 21.0. */
 
-      xc = sqrt(2. / GV_PI / x);
+      xc  = sqrt(2. / GV_PI / x);
       xin = 1. / (64. * x * x);
-      m = 11;
-      if (x >=  35.) m = 8;
+      m   = 11;
+      if (x >= 35.) m = 8;
       if (x >= 130.) m = 4;
-      xm = 4. * (double) m;
+      xm = 4. * (double)m;
 
       /* Argument reduction for SIN and COS routines. */
 
-      t = floor(x / (twopi1 + twopi2) + 0.5);
-      z = x - t * twopi1 - t * twopi2 - (alpha + 0.5) * GV_PI / 2.;
+      t    = floor(x / (twopi1 + twopi2) + 0.5);
+      z    = x - t * twopi1 - t * twopi2 - (alpha + 0.5) * GV_PI / 2.;
       vsin = sin(z);
       vcos = cos(z);
-      gnu = alpha + alpha;
+      gnu  = alpha + alpha;
       for (i = 1; i <= 2; ++i)
       {
-        s = (xm - 1. - gnu) * (xm - 1. + gnu) * xin / 2.;
-        t = (gnu - (xm - 3.)) * (gnu + (xm - 3.));
+        s    = (xm - 1. - gnu) * (xm - 1. + gnu) * xin / 2.;
+        t    = (gnu - (xm - 3.)) * (gnu + (xm - 3.));
         capp = s * t / fact[m * 2];
-        t1 = (gnu - (xm + 1.)) * (gnu + (xm + 1.));
+        t1   = (gnu - (xm + 1.)) * (gnu + (xm + 1.));
         capq = s * t1 / fact[(m << 1) + 1];
-        xk = xm;
-        k = m + m;
-        t1 = t;
+        xk   = xm;
+        k    = m + m;
+        t1   = t;
         for (j = 2; j <= m; ++j)
         {
           xk -= 4.;
-          s = (xk - 1. - gnu) * (xk - 1. + gnu);
-          t = (gnu - (xk - 3.)) * (gnu + (xk - 3.));
+          s    = (xk - 1. - gnu) * (xk - 1. + gnu);
+          t    = (gnu - (xk - 3.)) * (gnu + (xk - 3.));
           capp = (capp + 1. / fact[k - 2]) * s * t * xin;
           capq = (capq + 1. / fact[k - 1]) * s * t1 * xin;
           k += -2;
           t1 = t;
         }
         capp += 1.;
-        capq = (capq + 1.) * (gnu * gnu - 1.) / (8. *x);
+        capq = (capq + 1.) * (gnu * gnu - 1.) / (8. * x);
         b[i] = xc * (capp * vcos - capq * vsin);
-        if (nb == 1) return(ncalc);
-        t = vsin;
+        if (nb == 1) return (ncalc);
+        t    = vsin;
         vsin = -vcos;
         vcos = t;
         gnu += 2.;
@@ -1657,15 +1832,14 @@ int besselj_table(double x, double alpha, int nb, double *b)
 
       /* Use recurrence to generate results.  First initialize the */
       /* calculation of P*S. */
-
     }
     else
     {
-      nbmx = nb - magx;
-      n = magx + 1;
-      en = 2. * n + (alpha + alpha);
+      nbmx  = nb - magx;
+      n     = magx + 1;
+      en    = 2. * n + (alpha + alpha);
       plast = 1.;
-      p = en / x;
+      p     = en / x;
 
       /* Calculate general significance test. */
 
@@ -1675,17 +1849,17 @@ int besselj_table(double x, double alpha, int nb, double *b)
 
         /* Calculate P*S until N = NB-1.  Check for overflow. */
 
-        tover = enten / ensig;
+        tover  = enten / ensig;
         nstart = magx + 2;
-        nend = nb - 1;
-        en = 2. * nstart - 2. + (alpha + alpha);
+        nend   = nb - 1;
+        en     = 2. * nstart - 2. + (alpha + alpha);
         for (k = nstart; k <= nend; ++k)
         {
           n = k;
           en += 2.;
-          pold = plast;
+          pold  = plast;
           plast = p;
-          p = en * plast / x - pold;
+          p     = en * plast / x - pold;
           if (p > tover)
           {
 
@@ -1695,15 +1869,15 @@ int besselj_table(double x, double alpha, int nb, double *b)
             tover = enten;
             p /= tover;
             plast /= tover;
-            psave = p;
+            psave  = p;
             psavel = plast;
             nstart = n + 1;
           L100:
             ++n;
             en += 2.;
-            pold = plast;
+            pold  = plast;
             plast = p;
-            p = en * plast / x - pold;
+            p     = en * plast / x - pold;
             if (p <= 1.) goto L100;
             tempb = en / x;
 
@@ -1715,12 +1889,12 @@ int besselj_table(double x, double alpha, int nb, double *b)
             p = plast * tover;
             --n;
             en -= 2.;
-            nend = MIN(nb,n);
+            nend = MIN(nb, n);
             for (l = nstart; l <= nend; ++l)
             {
-              pold = psavel;
+              pold   = psavel;
               psavel = psave;
-              psave = en * psavel / x - pold;
+              psave  = en * psavel / x - pold;
               if (psave * psavel > test)
               {
                 ncalc = l - 1;
@@ -1731,12 +1905,12 @@ int besselj_table(double x, double alpha, int nb, double *b)
             goto L190;
           }
         }
-        n = nend;
+        n  = nend;
         en = 2. * n + (alpha + alpha);
 
         /* Calculate special significance test for NBMX .GT. 2. */
 
-        test = MAX(test,sqrt(plast * ensig) * sqrt(p + p));
+        test = MAX(test, sqrt(plast * ensig) * sqrt(p + p));
       }
 
       /* Calculate P*S until significance test passes. */
@@ -1744,9 +1918,9 @@ int besselj_table(double x, double alpha, int nb, double *b)
     L140:
       ++n;
       en += 2.;
-      pold = plast;
+      pold  = plast;
       plast = p;
-      p = en * plast / x - pold;
+      p     = en * plast / x - pold;
       if (p < test) goto L140;
 
       /* Initialize the backward recursion and the normalization sum. */
@@ -1754,12 +1928,12 @@ int besselj_table(double x, double alpha, int nb, double *b)
     L190:
       ++n;
       en += 2.;
-      tempb = 0.;
-      tempa = 1. / p;
-      m = (n << 1) - (n / 2 << 2);
-      sum = 0.;
-      em = floor(n / 2.);
-      alpem = em - 1. + alpha;
+      tempb  = 0.;
+      tempa  = 1. / p;
+      m      = (n << 1) - (n / 2 << 2);
+      sum    = 0.;
+      em     = floor(n / 2.);
+      alpem  = em - 1. + alpha;
       alp2em = em + em + alpha;
       if (m != 0) sum = tempa * alpem * alp2em / em;
       nend = n - nb;
@@ -1776,7 +1950,7 @@ int besselj_table(double x, double alpha, int nb, double *b)
           tempc = tempb;
           tempb = tempa;
           tempa = en * tempb / x - tempc;
-          m = 2 - m;
+          m     = 2 - m;
           if (m != 0)
           {
             em -= 1.;
@@ -1816,7 +1990,7 @@ int besselj_table(double x, double alpha, int nb, double *b)
           {
             em -= 1.;
             alp2em = em + em + alpha;
-            alpem = em - 1. + alpha;
+            alpem  = em - 1. + alpha;
             if (alpem == 0.) alpem = 1.;
             sum = (sum + b[n] * alp2em) * alpem / em;
           }
@@ -1834,12 +2008,12 @@ int besselj_table(double x, double alpha, int nb, double *b)
           --n;
           en -= 2.;
           b[n] = en * b[n + 1] / x - b[n + 2];
-          m = 2 - m;
+          m    = 2 - m;
           if (m != 0)
           {
             em -= 1.;
             alp2em = em + em + alpha;
-            alpem = em - 1. + alpha;
+            alpem  = em - 1. + alpha;
             if (alpem == 0.) alpem = 1.;
             sum = (sum + b[n] * alp2em) * alpem / em;
           }
@@ -1859,7 +2033,7 @@ int besselj_table(double x, double alpha, int nb, double *b)
 
     L250:
       if (alpha + 1. != 1.)
-        sum *= exp(loggamma(alpha)) * pow(x/2., -alpha);
+        sum *= exp(loggamma(alpha)) * pow(x / 2., -alpha);
       tempa = enmten;
       if (sum > 1.) tempa *= sum;
       for (n = 1; n <= nb; ++n)
@@ -1870,15 +2044,14 @@ int besselj_table(double x, double alpha, int nb, double *b)
     }
 
     /* Error return -- X, NB, or ALPHA is out of range. */
-
   }
   else
   {
-    b[1] = 0.;
-    ncalc = MIN(nb,0) - 1;
+    b[1]  = 0.;
+    ncalc = MIN(nb, 0) - 1;
   }
 
-  return(ncalc);
+  return (ncalc);
 }
 
 /*****************************************************************************/
@@ -1918,32 +2091,32 @@ int besselj_table(double x, double alpha, int nb, double *b)
 ** \remark  Research Council, Canada.
 **
 *****************************************************************************/
-int besselk(double x, double alpha, int nb, double *bk)
+int besselk(double x, double alpha, int nb, double* bk)
 {
   static const double p[] = {
-    .805629875690432845,20.4045500205365151,
-    157.705605106676174,536.671116469207504,900.382759291288778,
-    730.923886650660393,229.299301509425145,.822467033424113231 };
+    .805629875690432845, 20.4045500205365151,
+    157.705605106676174, 536.671116469207504, 900.382759291288778,
+    730.923886650660393, 229.299301509425145, .822467033424113231};
   static const double q[] = {
-    29.4601986247850434,277.577868510221208,
-    1206.70325591027438,2762.91444159791519,3443.74050506564618,
-    2210.63190113378647,572.267338359892221 };
+    29.4601986247850434, 277.577868510221208,
+    1206.70325591027438, 2762.91444159791519, 3443.74050506564618,
+    2210.63190113378647, 572.267338359892221};
   static const double r[] = {
-    -.48672575865218401848,13.079485869097804016,
-    -101.96490580880537526,347.65409106507813131,
-    3.495898124521934782e-4 };
+    -.48672575865218401848, 13.079485869097804016,
+    -101.96490580880537526, 347.65409106507813131,
+    3.495898124521934782e-4};
   static const double s[] = {
-    -25.579105509976461286,212.57260432226544008,
-    -610.69018684944109624,422.69668805777760407 };
+    -25.579105509976461286, 212.57260432226544008,
+    -610.69018684944109624, 422.69668805777760407};
   static const double t[] = {
     1.6125990452916363814e-10,
-    2.5051878502858255354e-8,2.7557319615147964774e-6,
-    1.9841269840928373686e-4,.0083333333333334751799,
-    .16666666666666666446 };
+    2.5051878502858255354e-8, 2.7557319615147964774e-6,
+    1.9841269840928373686e-4, .0083333333333334751799,
+    .16666666666666666446};
   static const double estm[] = {
-    52.0583,5.7607,2.7782,14.4303,185.3004,9.3715 };
+    52.0583, 5.7607, 2.7782, 14.4303, 185.3004, 9.3715};
   static const double estf[] = {
-    41.8341,7.1075,6.4306,42.511,1.35633,84.5096,20. };
+    41.8341, 7.1075, 6.4306, 42.511, 1.35633, 84.5096, 20.};
   static const double sqxmin = 1.49e-154;
   static const double xinf   = 1.79e308;
   static const double xmin   = 2.23e-308;
@@ -1955,14 +2128,14 @@ int besselk(double x, double alpha, int nb, double *bk)
 
   double x2by4, twox, c, blpha, dm, ex, bk1, bk2, enu;
   double ratio, wminf, d1, d2, d3, f0, f1, f2, p0, q0, t1, t2, twonu;
-  int i, j, k, m, iend{}, itemp{}, mplus1, ncalc;
+  int i, j, k, m, iend {}, itemp {}, mplus1, ncalc;
 
   /* Parameter adjustments */
 
   --bk;
-  ex = x;
-  enu = alpha;
-  ncalc = MIN(nb,0) - 2;
+  ex    = x;
+  enu   = alpha;
+  ncalc = MIN(nb, 0) - 2;
   if (nb > 0 && (enu >= 0. && enu < 1.) && (ex <= xmax) && ex > 0.)
   {
     k = 0;
@@ -1973,9 +2146,9 @@ int besselk(double x, double alpha, int nb, double *bk)
       enu -= 1.;
     }
     twonu = enu + enu;
-    iend = nb + k - 1;
-    c = enu * enu;
-    d3 = -c;
+    iend  = nb + k - 1;
+    c     = enu * enu;
+    d3    = -c;
     if (ex <= 1.)
     {
 
@@ -2029,7 +2202,7 @@ int besselk(double x, double alpha, int nb, double *bk)
         bk[1] = f0 + ex * f0;
         bk[1] -= ex * bk[1];
         ratio = p0 / f0;
-        c = ex * xinf;
+        c     = ex * xinf;
         if (k != 0)
         {
 
@@ -2037,20 +2210,20 @@ int besselk(double x, double alpha, int nb, double *bk)
           /*  ALPHA >= 1/2 */
 
           ncalc = -1;
-          if (bk[1] >= c / ratio) return(ncalc);
+          if (bk[1] >= c / ratio) return (ncalc);
           bk[1] = ratio * bk[1] / ex;
           twonu += 2.;
           ratio = twonu;
         }
         ncalc = 1;
-        if (nb == 1) return(ncalc);
+        if (nb == 1) return (ncalc);
 
         /*  Calculate  K(ALPHA+L,X)/K(ALPHA+L-1,X),  L  =  1,2,..., NB-1 */
 
         ncalc = -1;
         for (i = 2; i <= nb; ++i)
         {
-          if (ratio >= c) return(ncalc);
+          if (ratio >= c) return (ncalc);
           bk[i] = ratio / ex;
           twonu += 2.;
           ratio = twonu;
@@ -2063,20 +2236,20 @@ int besselk(double x, double alpha, int nb, double *bk)
 
         /*  1.0E-10 < X <= 1.0 */
 
-        c = 1.;
+        c     = 1.;
         x2by4 = ex * ex / 4.;
-        p0 = 0.5 * p0;
-        q0 = 0.5 * q0;
-        d1 = -1.;
+        p0    = 0.5 * p0;
+        q0    = 0.5 * q0;
+        d1    = -1.;
         d2 = bk1 = bk2 = 0.;
-        f1 = f0;
-        f2 = p0;
+        f1             = f0;
+        f2             = p0;
 
       L100:
         d1 += 2.;
         d2 += 1.;
         d3 = d1 + d3;
-        c = x2by4 * c / d2;
+        c  = x2by4 * c / d2;
         f0 = (d2 * f0 + p0 + q0) / d3;
         p0 /= d2 - enu;
         q0 /= d2 + enu;
@@ -2086,8 +2259,8 @@ int besselk(double x, double alpha, int nb, double *bk)
         bk2 += t2;
         if (ABS(t1 / (f1 + bk1)) > eps ||
             ABS(t2 / (f2 + bk2)) > eps) goto L100;
-        bk1 = f1 + bk1;
-        bk2 = 2. * (f2 + bk2) / ex;
+        bk1   = f1 + bk1;
+        bk2   = 2. * (f2 + bk2) / ex;
         wminf = estf[0] * ex + estf[1];
       }
     }
@@ -2097,16 +2270,16 @@ int besselk(double x, double alpha, int nb, double *bk)
       /*  X > 1./EPS */
 
       ncalc = nb;
-      bk1 = 1. / (d * sqrt(ex));
+      bk1   = 1. / (d * sqrt(ex));
       for (i = 1; i <= nb; ++i) bk[i] = bk1;
-      return(ncalc);
+      return (ncalc);
     }
     else
     {
 
       /*  X > 1.0 */
 
-      twox = ex + ex;
+      twox  = ex + ex;
       blpha = ratio = 0.;
       if (ex <= 4.)
       {
@@ -2114,7 +2287,7 @@ int besselk(double x, double alpha, int nb, double *bk)
         /*  Calculation of K(ALPHA+1,X)/K(ALPHA,X),  1.0 <= X <= 4.0 */
 
         d2 = floor(estm[0] / ex + estm[1]);
-        m = (int) d2;
+        m  = (int)d2;
         d1 = d2 + d2;
         d2 -= 0.5;
         d2 *= d2;
@@ -2129,8 +2302,8 @@ int besselk(double x, double alpha, int nb, double *bk)
         /*    recurrence and K(ALPHA,X) from the wronskian */
 
         d2 = floor(estm[2] * ex + estm[3]);
-        m = (int) d2;
-        c = ABS(enu);
+        m  = (int)d2;
+        c  = ABS(enu);
         d3 = c + c;
         d1 = d3 - 1.;
         f1 = xmin;
@@ -2138,11 +2311,11 @@ int besselk(double x, double alpha, int nb, double *bk)
         for (i = 3; i <= m; ++i)
         {
           d2 -= 1.;
-          f2 = (d3 + d2 + d2) * f0;
+          f2    = (d3 + d2 + d2) * f0;
           blpha = (1. + d1 / d2) * (f2 + blpha);
-          f2 = f2 / ex + f1;
-          f1 = f0;
-          f0 = f2;
+          f2    = f2 / ex + f1;
+          f1    = f0;
+          f0    = f2;
         }
         f1 = (d3 + 2.) * f0 / ex + f1;
         d1 = 0.;
@@ -2152,8 +2325,8 @@ int besselk(double x, double alpha, int nb, double *bk)
           d1 = c * d1 + p[i - 1];
           t1 = c * t1 + q[i - 1];
         }
-        p0 = exp(c * (a + c * (p[7] - c * d1 / t1) - log(ex))) / ex;
-        f2 = (c + 0.5 - ratio) * f1 / ex;
+        p0  = exp(c * (a + c * (p[7] - c * d1 / t1) - log(ex))) / ex;
+        f2  = (c + 0.5 - ratio) * f1 / ex;
         bk1 = p0 + (d3 * f0 - f2 + f0 + blpha) / (f2 + f1 + f0) * p0;
         bk1 *= exp(-ex);
         wminf = estf[2] * ex + estf[3];
@@ -2165,7 +2338,7 @@ int besselk(double x, double alpha, int nb, double *bk)
         /*  by backward recurrence, for  X > 4.0 */
 
         dm = floor(estm[4] / ex + estm[5]);
-        m = (int) dm;
+        m  = (int)dm;
         d2 = dm - 0.5;
         d2 *= d2;
         d1 = dm + dm;
@@ -2179,7 +2352,7 @@ int besselk(double x, double alpha, int nb, double *bk)
         }
         bk1 = 1. / ((d + d * blpha) * sqrt(ex));
         bk1 *= exp(-ex);
-        wminf = estf[4]*(ex - ABS(ex - estf[6])) + estf[5];
+        wminf = estf[4] * (ex - ABS(ex - estf[6])) + estf[5];
       }
 
       /*  Calculation of K(ALPHA+1,X) from K(ALPHA,X) and */
@@ -2193,16 +2366,16 @@ int besselk(double x, double alpha, int nb, double *bk)
 
     ncalc = nb;
     bk[1] = bk1;
-    if (iend == 0) return(ncalc);
+    if (iend == 0) return (ncalc);
     j = 2 - k;
     if (j > 0) bk[j] = bk2;
-    if (iend == 1) return(ncalc);
+    if (iend == 1) return (ncalc);
 
     /* Computing MIN */
-    m = MIN((int) (wminf - enu),iend);
+    m = MIN((int)(wminf - enu), iend);
     for (i = 2; i <= m; ++i)
     {
-      t1 = bk1;
+      t1  = bk1;
       bk1 = bk2;
       twonu += 2.;
       if (ex < 1.)
@@ -2214,7 +2387,7 @@ int besselk(double x, double alpha, int nb, double *bk)
         if (bk1 / ex >= xinf / twonu) goto L195;
       }
 
-      bk2 = twonu / ex * bk1 + t1;
+      bk2   = twonu / ex * bk1 + t1;
       itemp = i;
       ++j;
       if (j > 0) bk[j] = bk2;
@@ -2222,10 +2395,10 @@ int besselk(double x, double alpha, int nb, double *bk)
 
   L195:
     m = itemp;
-    if (m == iend) return(ncalc);
-    ratio = bk2 / bk1;
+    if (m == iend) return (ncalc);
+    ratio  = bk2 / bk1;
     mplus1 = m + 1;
-    ncalc = -1;
+    ncalc  = -1;
     for (i = mplus1; i <= iend; ++i)
     {
       twonu += 2.;
@@ -2235,26 +2408,26 @@ int besselk(double x, double alpha, int nb, double *bk)
         bk[j] = ratio;
       else
       {
-        if (bk2 >= xinf / ratio) return(ncalc);
+        if (bk2 >= xinf / ratio) return (ncalc);
         bk2 = ratio * bk2;
       }
     }
 
     /* Computing MAX */
-    ncalc = MAX(mplus1 - k,1);
+    ncalc = MAX(mplus1 - k, 1);
     if (ncalc == 1) bk[1] = bk2;
-    if (nb == 1) return(ncalc);
+    if (nb == 1) return (ncalc);
 
   L420:
     j = ncalc + 1;
     for (i = j; i <= nb; ++i)
     {
-      if (bk[ncalc] >= xinf / bk[i]) return(ncalc);
+      if (bk[ncalc] >= xinf / bk[i]) return (ncalc);
       bk[i] = bk[ncalc] * bk[i];
       ncalc = i;
     }
   }
-  return(ncalc);
+  return (ncalc);
 }
 
 /*****************************************************************************/
@@ -2271,42 +2444,41 @@ double loggamma(double parameter)
 {
   static double cval[2][8] =
     {
-      { 4.120843185847770,85.68982062831317,243.175243524421,
-        -261.7218583856145,-922.2613728801522,-517.6383498023218,
-        -77.41064071332953,-2.20884399721618 },
-      { 1.,45.64677187585908,377.8372484823942,951.323597679706,
-        846.0755362020782,262.3083470269460,24.43519662506312,
-        0.40977929210926}
-    };
-  double sval[2],x,xe,p,dalgam;
-  int m,k;
+      {4.120843185847770, 85.68982062831317, 243.175243524421,
+       -261.7218583856145, -922.2613728801522, -517.6383498023218,
+       -77.41064071332953, -2.20884399721618},
+      {1., 45.64677187585908, 377.8372484823942, 951.323597679706,
+       846.0755362020782, 262.3083470269460, 24.43519662506312,
+       0.40977929210926}};
+  double sval[2], x, xe, p, dalgam;
+  int m, k;
 
   x  = parameter;
   xe = floor(x);
-  if (x-xe>0.5) xe += 1.;
-  m = (int)(ceil(xe)-1);
+  if (x - xe > 0.5) xe += 1.;
+  m = (int)(ceil(xe) - 1);
 
   xe = x;
-  if (m == -1) xe = x+1.;
-  if (m >   0) xe = x-m;
+  if (m == -1) xe = x + 1.;
+  if (m > 0) xe = x - m;
 
   sval[0] = sval[1] = 0.;
-  for (k=0; k<8; k++)
+  for (k = 0; k < 8; k++)
   {
-    sval[0] = xe*sval[0] + cval[0][k];
-    sval[1] = xe*sval[1] + cval[1][k];
+    sval[0] = xe * sval[0] + cval[0][k];
+    sval[1] = xe * sval[1] + cval[1][k];
   }
 
-  dalgam = (xe-1.)*sval[0]/sval[1];
-  if (m <= -1) return(dalgam-log(x));
-  if (m ==  0) return(dalgam);
-  if (m ==  1) return(dalgam+log(xe));
+  dalgam = (xe - 1.) * sval[0] / sval[1];
+  if (m <= -1) return (dalgam - log(x));
+  if (m == 0) return (dalgam);
+  if (m == 1) return (dalgam + log(xe));
 
   if (m < 33)
   {
-    p=1;
-    for (k=0; k<m; k++) p *= (xe+k);
-    return(dalgam+log(p));
+    p = 1;
+    for (k = 0; k < m; k++) p *= (xe + k);
+    return (dalgam + log(p));
   }
   for (k = 0; k < m; k++) dalgam += log(xe + k);
   return (dalgam);
@@ -2360,7 +2532,7 @@ double ut_legendre(int n, double v, bool flagNorm)
 
 VectorDouble ut_legendreVec(int n, const VectorDouble& vecin, bool flagNorm)
 {
-  int size = (int) vecin.size();
+  int size = (int)vecin.size();
   VectorDouble vecout(size);
   for (int i = 0; i < size; i++)
     vecout[i] = ut_legendre(n, vecin[i], flagNorm);
@@ -2369,7 +2541,7 @@ VectorDouble ut_legendreVec(int n, const VectorDouble& vecin, bool flagNorm)
 
 MatrixDense ut_legendreMatNorm(int n, const VectorDouble& v)
 {
-  int nrow = (int) v.size();
+  int nrow = (int)v.size();
   int ncol = n + 1;
   MatrixDense res(nrow, ncol);
 
@@ -2379,7 +2551,7 @@ MatrixDense ut_legendreMatNorm(int n, const VectorDouble& v)
   double l;
   for (int ll = 0; ll <= n; ll++)
   {
-    l = (double) ll;
+    l = (double)ll;
     if (ll == 0)
     {
       val.fill(1.);
@@ -2387,12 +2559,12 @@ MatrixDense ut_legendreMatNorm(int n, const VectorDouble& v)
     else if (ll == 1)
     {
       for (int k = 0; k < nrow; k++)
-        val[k] = v[k] * sqrt(2.*l+1.);
+        val[k] = v[k] * sqrt(2. * l + 1.);
     }
     else
     {
-      double a = sqrt((2.*l+1.) * (2.*l-1.)) / l;
-      double b = (l-1.) / l * sqrt((2.*l+1.) / (2.*l-3.));
+      double a = sqrt((2. * l + 1.) * (2. * l - 1.)) / l;
+      double b = (l - 1.) / l * sqrt((2. * l + 1.) / (2. * l - 3.));
       for (int k = 0; k < nrow; k++)
         val[k] = a * v[k] * P1[k] - b * P0[k];
     }
@@ -2441,7 +2613,7 @@ MatrixDense ut_legendreMatNorm(int n, const VectorDouble& v)
  *****************************************************************************/
 MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm)
 {
-  int nrow = (int) v.size();
+  int nrow = (int)v.size();
   int ncol = l + 1;
   MatrixDense res(nrow, ncol);
 
@@ -2460,7 +2632,7 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
 
     for (int mm = 0; mm <= l; mm++)
     {
-      m = (double) mm;
+      m = (double)mm;
 
       // From m-1 to m
       if (mm == 0)
@@ -2476,7 +2648,7 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
       // From n-1 to n
       for (int nn = mm; nn <= l; nn++)
       {
-        n = (double) nn;
+        n = (double)nn;
         if (nn == mm)
         {
           Plm = Pmm;
@@ -2512,7 +2684,7 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
       // evaluation of P_l^m (m > 0)
       for (int mm = 1; mm <= l; mm++)
       {
-        m = (double) mm;
+        m = (double)mm;
         // computing P_{m}^{m} from P_{m-1}^{m-1}
         double a0 = (2. * m - 1.);
         for (int k = 0; k < nrow; k++)
@@ -2524,7 +2696,7 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
           Pn1m = Pmm;
           for (int nn = mm + 1; nn <= l; nn++)
           {
-            n = (double) nn;
+            n        = (double)nn;
             double a = (2. * n - 1.) / (n - m);
             double b = (n + m - 1.) / (n - m);
             for (int k = 0; k < nrow; k++)
@@ -2565,10 +2737,10 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
  *****************************************************************************/
 double ut_flegendre(int n, int k0, double theta, bool flagNorm)
 {
-  int m = ABS(k0);
-  double phi = 0.;
+  int m                       = ABS(k0);
+  double phi                  = 0.;
   std::complex<double> resbis = boost::math::spherical_harmonic<double, double>(
-      n, m, theta, phi);
+    n, m, theta, phi);
   double result = resbis.real();
 
   if (flagNorm)
@@ -2592,7 +2764,8 @@ double ut_flegendre(int n, int k0, double theta, bool flagNorm)
 double ut_sphericalHarmonic(int n, int k, double theta, double phi)
 {
   return boost::math::spherical_harmonic<double, double>(
-      n, k, theta, phi).real();
+           n, k, theta, phi)
+    .real();
 }
 
 VectorDouble ut_sphericalHarmonicVec(int n,
@@ -2600,7 +2773,7 @@ VectorDouble ut_sphericalHarmonicVec(int n,
                                      VectorDouble theta,
                                      VectorDouble phi)
 {
-  int size = (int) theta.size();
+  int size = (int)theta.size();
   VectorDouble res(size);
   for (int i = 0; i < size; i++)
     res[i] = ut_sphericalHarmonic(n, k, theta[i], phi[i]);
@@ -2623,27 +2796,27 @@ VectorDouble ut_sphericalHarmonicVec(int n,
  ** \param[out] niter          Number of iterations
  **
  *****************************************************************************/
-double golden_search(double (*func_evaluate)(double test, void *user_data),
-                     void *user_data,
+double golden_search(double (*func_evaluate)(double test, void* user_data),
+                     void* user_data,
                      double tolstop,
                      double a0,
                      double c0,
-                     double *test_loc,
-                     double *niter)
+                     double* test_loc,
+                     double* niter)
 {
   double phi, resphi, b, x, fb, fx, result, a, c;
   int flag_test;
 
   /* Initializations */
 
-  phi = (1. + sqrt(5.)) / 2.;
+  phi    = (1. + sqrt(5.)) / 2.;
   resphi = 2. - phi;
-  a = a0;
-  c = c0;
+  a      = a0;
+  c      = c0;
 
   /* Initial values for the golden search */
 
-  b = (a + c) / 2;
+  b  = (a + c) / 2;
   fb = func_evaluate(b, user_data);
 
   (*niter) = 1;
@@ -2654,21 +2827,21 @@ double golden_search(double (*func_evaluate)(double test, void *user_data),
       x = b + resphi * (c - b);
     else
       x = b - resphi * (b - a);
-    fx = func_evaluate(x, user_data);
+    fx       = func_evaluate(x, user_data);
     (*niter) = (*niter) + 1.;
 
     if (fx < fb)
     {
       if (flag_test)
       {
-        a = b;
-        b = x;
+        a  = b;
+        b  = x;
         fb = fx;
       }
       else
       {
-        c = b;
-        b = x;
+        c  = b;
+        b  = x;
         fb = fx;
       }
     }
@@ -2703,21 +2876,21 @@ double golden_search(double (*func_evaluate)(double test, void *user_data),
  **
  *****************************************************************************/
 int ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
-                       Cheb_Elem *cheb_elem,
+                       Cheb_Elem* cheb_elem,
                        double x,
-                       const VectorDouble &blin)
+                       const VectorDouble& blin)
 {
-  double *coeffs, y, y0, T1, Tx, Tm1, Tm2, power, a, b, tol;
+  double y, y0, T1, Tx, Tm1, Tm2, power, a, b, tol;
   int ncmax;
 
   // Initializations
 
-  power = cheb_elem->power;
-  a = cheb_elem->a;
-  b = cheb_elem->b;
-  tol = cheb_elem->tol;
-  ncmax = cheb_elem->ncmax;
-  coeffs = cheb_elem->coeffs;
+  power                = cheb_elem->power;
+  a                    = cheb_elem->a;
+  b                    = cheb_elem->b;
+  tol                  = cheb_elem->tol;
+  ncmax                = cheb_elem->ncmax;
+  VectorDouble& coeffs = cheb_elem->coeffs;
 
   /* Get the true value */
 
@@ -2726,7 +2899,7 @@ int ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
   /* Calculate the approximate value until tolerance is reached */
 
   T1 = 2 * (x - a) / (b - a) - 1.;
-  y = coeffs[0] + coeffs[1] * T1;
+  y  = coeffs[0] + coeffs[1] * T1;
   if (ABS(y * y - y0 * y0) / (y * y) < tol) return (2);
   Tm1 = T1;
   Tm2 = 1.;
@@ -2754,26 +2927,25 @@ int ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
  **
  *****************************************************************************/
 int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
-                        Cheb_Elem *cheb_elem,
+                        Cheb_Elem* cheb_elem,
                         const VectorDouble& blin)
 {
-  double *coeffs;
   double minsubdiv, theta, ct, val1, val2, coeff, power, a, b;
   int n, ncmax;
 
   /* Initializations */
 
-  power = cheb_elem->power;
-  ncmax = cheb_elem->ncmax;
-  a = cheb_elem->a;
-  b = cheb_elem->b;
-  coeffs = cheb_elem->coeffs;
+  power                = cheb_elem->power;
+  ncmax                = cheb_elem->ncmax;
+  a                    = cheb_elem->a;
+  b                    = cheb_elem->b;
+  VectorDouble& coeffs = cheb_elem->coeffs;
 
   minsubdiv = pow(2., 20.);
   if (minsubdiv >= (ncmax + 1.) / 2.)
     n = static_cast<int>(minsubdiv);
   else
-    n = static_cast<int>(ceil((double) (ncmax + 1) / 2));
+    n = static_cast<int>(ceil((double)(ncmax + 1) / 2));
 
   /* Core allocation */
 
@@ -2786,10 +2958,10 @@ int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
 
   for (int i = 0; i < n; i++)
   {
-    theta = 2. * GV_PI * ((double) i) / ((double) n);
-    ct = cos(theta / 2.);
-    val1 = func(((b + a) + (b - a) * ct) / 2., power, blin);
-    val2 = func(((b + a) - (b - a) * ct) / 2., power, blin);
+    theta = 2. * GV_PI * ((double)i) / ((double)n);
+    ct    = cos(theta / 2.);
+    val1  = func(((b + a) + (b - a) * ct) / 2., power, blin);
+    val2  = func(((b + a) - (b - a) * ct) / 2., power, blin);
     x1[i] = 0.5 * (val1 + val2);
     y1[i] = 0.;
     x2[i] = 0.5 * (val1 - val2) * cos(-theta / 2.);
@@ -2803,7 +2975,7 @@ int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
 
   /* Store the coefficients */
 
-  coeff = 2. / (double) n;
+  coeff = 2. / (double)n;
   for (int i = 0; i < ncmax; i++)
     coeffs[i] = 0.;
   for (int i = 0; i < n; i++)
@@ -2827,7 +2999,7 @@ int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
  ** \param[out]  a        Random direction vector
  **
  *****************************************************************************/
-static void st_init_rotation(double *ct, double *st, double *a)
+static void st_init_rotation(double* ct, double* st, double* a)
 {
   double rd, theta;
 
@@ -2841,8 +3013,8 @@ static void st_init_rotation(double *ct, double *st, double *a)
     a[k] /= rd;
 
   theta = 2. * GV_PI * law_uniform(0., 1.);
-  *ct = cos(theta);
-  *st = sin(theta);
+  *ct   = cos(theta);
+  *st   = sin(theta);
 }
 
 /****************************************************************************/
@@ -2861,26 +3033,26 @@ static void st_init_rotation(double *ct, double *st, double *a)
 void ut_vandercorput(int n,
                      int flag_sym,
                      int flag_rot,
-                     int *ntri_arg,
-                     VectorDouble &coord)
+                     int* ntri_arg,
+                     VectorDouble& coord)
 {
-  int i, j, ri, nb, ntri;
+  int j, ri;
   double base, u, v, ct, st, a[3];
 
   /* Core allocation */
 
-  ntri = 2 * n;
+  int ntri = 2 * n;
   coord.resize(3 * ntri);
 
   /* Processing */
 
-  nb = 0;
-  for (i = 0; i < n; i++)
+  int nb = 0;
+  for (int i = 0; i < n; i++)
   {
 
     // Binary decomposition
-    j = i;
-    u = 0;
+    j    = i;
+    u    = 0;
     base = 2.;
 
     while (j)
@@ -2892,8 +3064,8 @@ void ut_vandercorput(int n,
     }
 
     // Ternary decomposition
-    j = i;
-    v = 0;
+    j    = i;
+    v    = 0;
     base = 3;
 
     while (j)
@@ -2904,16 +3076,16 @@ void ut_vandercorput(int n,
       j = j / 3;
     }
 
-    COORD(0,nb) = cos(2. * GV_PI * u) * sqrt(1 - v * v);
-    COORD(1,nb) = sin(2. * GV_PI * u) * sqrt(1 - v * v);
-    COORD(2,nb) = v;
+    COORD(0, nb) = cos(2. * GV_PI * u) * sqrt(1 - v * v);
+    COORD(1, nb) = sin(2. * GV_PI * u) * sqrt(1 - v * v);
+    COORD(2, nb) = v;
     nb++;
 
     if (flag_sym)
     {
-      COORD(0,nb) = -cos(2. * GV_PI * u) * sqrt(1 - v * v);
-      COORD(1,nb) = -sin(2. * GV_PI * u) * sqrt(1 - v * v);
-      COORD(2,nb) = -v;
+      COORD(0, nb) = -cos(2. * GV_PI * u) * sqrt(1 - v * v);
+      COORD(1, nb) = -sin(2. * GV_PI * u) * sqrt(1 - v * v);
+      COORD(2, nb) = -v;
       nb++;
     }
   }
@@ -2923,7 +3095,7 @@ void ut_vandercorput(int n,
   if (flag_rot)
   {
     st_init_rotation(&ct, &st, a);
-    for (i = 0; i < ntri; i++)
+    for (int i = 0; i < ntri; i++)
       GH::rotationGetRandomDirection(ct, st, a, &coord[3 * i]);
   }
 
@@ -2939,21 +3111,17 @@ void ut_vandercorput(int n,
 static void st_addTriangle(const double v1[3],
                            const double v2[3],
                            const double v3[3],
-                           Reg_Coor *R_coor)
+                           Reg_Coor* R_coor)
 {
-  int n;
-
-  n = R_coor->ntri;
-
-  R_coor->coor = (double*) mem_realloc((char* ) R_coor->coor,
-                                       sizeof(double) * 3 * (n + 3), 1);
+  int n = R_coor->ntri;
+  R_coor->coor.resize(3 * (n + 3));
 
   for (int i = 0; i < 3; i++)
-    RCOORD(i,n) = v1[i];
+    RCOORD(i, n) = v1[i];
   for (int i = 0; i < 3; i++)
-    RCOORD(i,n+1) = v2[i];
+    RCOORD(i, n + 1) = v2[i];
   for (int i = 0; i < 3; i++)
-    RCOORD(i,n+2) = v3[i];
+    RCOORD(i, n + 2) = v3[i];
   R_coor->ntri += 3;
 }
 
@@ -2971,7 +3139,7 @@ void st_subdivide(double v1[3],
                   double v2[3],
                   double v3[3],
                   int depth,
-                  Reg_Coor *R_coor)
+                  Reg_Coor* R_coor)
 {
   if (depth == 0)
   {
@@ -2995,9 +3163,9 @@ void st_subdivide(double v1[3],
   st_normalize(v31);
 
   /* recursively subdivide new triangles */
-  st_subdivide( v1, v12, v31, depth - 1, R_coor);
-  st_subdivide( v2, v23, v12, depth - 1, R_coor);
-  st_subdivide( v3, v31, v23, depth - 1, R_coor);
+  st_subdivide(v1, v12, v31, depth - 1, R_coor);
+  st_subdivide(v2, v23, v12, depth - 1, R_coor);
+  st_subdivide(v3, v31, v23, depth - 1, R_coor);
   st_subdivide(v12, v23, v31, depth - 1, R_coor);
 }
 
@@ -3013,7 +3181,7 @@ static int st_already_present(Reg_Coor* R_coor,
   for (int itri = 0; itri < ntri; itri++)
   {
     for (int k = found = 0; k < 3; k++)
-      if (ABS(COORD(k,itri) - RCOORD(k,i0)) > eps) found = k + 1;
+      if (ABS(COORD(k, itri) - RCOORD(k, i0)) > eps) found = k + 1;
     if (found == 0) return (1);
   }
   return (0);
@@ -3036,40 +3204,36 @@ static int st_already_present(Reg_Coor* R_coor,
  ** \remarks is fixed here
  **
  *****************************************************************************/
-int ut_icosphere(int n, int flag_rot, int *ntri_arg, VectorDouble& coord)
+int ut_icosphere(int n, int flag_rot, int* ntri_arg, VectorDouble& coord)
 {
-  Reg_Coor R_coor;
 #define X 0.525731112119133696
 #define Z 0.850650808352039932
+  Reg_Coor R_coor;
 
   /* vertex data array */
-  static double vdata[12][3] = { {  -X, 0.0,   Z },
-                                 {   X, 0.0,   Z },
-                                 {  -X, 0.0,  -Z },
-                                 {   X, 0.0,  -Z },
-                                 { 0.0,   Z,   X },
-                                 { 0.0,   Z,  -X },
-                                 { 0.0,  -Z,   X },
-                                 { 0.0,  -Z,  -X },
-                                 {   Z,   X, 0.0 },
-                                 {  -Z,   X, 0.0 },
-                                 {   Z,  -X, 0.0 },
-                                 {  -Z,  -X, 0.0 } };
+  static double vdata[12][3] = {{-X, 0.0, Z},
+                                {X, 0.0, Z},
+                                {-X, 0.0, -Z},
+                                {X, 0.0, -Z},
+                                {0.0, Z, X},
+                                {0.0, Z, -X},
+                                {0.0, -Z, X},
+                                {0.0, -Z, -X},
+                                {Z, X, 0.0},
+                                {-Z, X, 0.0},
+                                {Z, -X, 0.0},
+                                {-Z, -X, 0.0}};
 
   /* triangle indices */
-  static int tindices[20][3] = { {  1,  4, 0 }, { 4,  9,  0 }, {  4,  5, 9 }, {  8, 5, 4 },
-                                 {  1,  8, 4 }, { 1, 10,  8 }, { 10,  3, 8 }, {  8, 3, 5 },
-                                 {  3,  2, 5 }, { 3,  7,  2 }, {  3, 10, 7 }, { 10, 6, 7 },
-                                 {  6, 11, 7 }, { 6,  0, 11 }, {  6,  1, 0 }, { 10, 1, 6 },
-                                 { 11,  0, 9 }, { 2, 11,  9 }, {  5,  2, 9 }, { 11, 2, 7 } };
+  static int tindices[20][3] = {{1, 4, 0}, {4, 9, 0}, {4, 5, 9}, {8, 5, 4}, {1, 8, 4}, {1, 10, 8}, {10, 3, 8}, {8, 3, 5}, {3, 2, 5}, {3, 7, 2}, {3, 10, 7}, {10, 6, 7}, {6, 11, 7}, {6, 0, 11}, {6, 1, 0}, {10, 1, 6}, {11, 0, 9}, {2, 11, 9}, {5, 2, 9}, {11, 2, 7}};
 
   if (n > 10)
   {
     messerr("The Regular Sphere discretization is limited to degree 10");
     return (1);
   }
-  R_coor.ntri = 0;
-  R_coor.coor = nullptr;
+  R_coor.ntri   = 0;
+  R_coor.coor.clear();
   int seed_memo = law_get_random_seed();
   law_set_random_seed(43241);
 
@@ -3091,7 +3255,7 @@ int ut_icosphere(int n, int flag_rot, int *ntri_arg, VectorDouble& coord)
   {
     if (st_already_present(&R_coor, i, ntri, coord)) continue;
     for (int k = 0; k < 3; k++)
-      COORD(k,ntri) = R_coor.coor[3 * i + k];
+      COORD(k, ntri) = R_coor.coor[3 * i + k];
     ntri++;
   }
 
@@ -3120,7 +3284,7 @@ int ut_icosphere(int n, int flag_rot, int *ntri_arg, VectorDouble& coord)
 
   /* Free the Reg_Coor structure */
 
-  R_coor.coor = (double*) mem_free((char* ) R_coor.coor);
+  R_coor.coor.clear();
 
   return (0);
 }
@@ -3134,13 +3298,13 @@ int ut_icosphere(int n, int flag_rot, int *ntri_arg, VectorDouble& coord)
  ** \param[out] factor  logarithm of factorials
  **
  *****************************************************************************/
-void ut_log_factorial(int nbpoly, double *factor)
+void ut_log_factorial(int nbpoly, double* factor)
 {
   int i;
 
   factor[0] = 0;
   for (i = 1; i < nbpoly; i++)
-    factor[i] = factor[i - 1] + log((double) (i + 1));
+    factor[i] = factor[i - 1] + log((double)(i + 1));
 }
 
 /*****************************************************************************/
@@ -3158,7 +3322,7 @@ double ut_factorial(int k)
 
   val = 1;
   for (int i = 1; i <= k; i++)
-    val *= (double) i;
+    val *= (double)i;
   return (val);
 }
 
@@ -3173,18 +3337,17 @@ DISABLE_WARNING_POP
  */
 MatrixDense* vanDerCorput(int n, int nd)
 {
-  VectorDouble primes = { 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,
-                          73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,
-                          151,157,163,167,173,179,181,191,193,197,199,211,223,227,229
-  };
+  VectorDouble primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+                         73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149,
+                         151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229};
 
-  if (nd > (int) primes.size())
+  if (nd > (int)primes.size())
   {
     messerr("Argument 'nd' should be smaller than 50.");
     return nullptr;
   }
 
-  MatrixDense* res = new MatrixDense(n, nd);
+  auto* res = new MatrixDense(n, nd);
   for (int k = 0; k < nd; k++)
   {
     VectorDouble local = _corputVector(n, primes[k]);
@@ -3193,9 +3356,9 @@ MatrixDense* vanDerCorput(int n, int nd)
   return res;
 }
 
-MatrixDense fillLegendreMatrix(const VectorDouble &r, int legendreOrder)
+MatrixDense fillLegendreMatrix(const VectorDouble& r, int legendreOrder)
 {
-  int nrow = (int) r.size();
+  int nrow = (int)r.size();
   int ncol = legendreOrder + 1;
   MatrixDense lp(nrow, ncol);
 
@@ -3212,8 +3375,8 @@ MatrixDense fillLegendreMatrix(const VectorDouble &r, int legendreOrder)
   for (int j = 1; j < legendreOrder; j++)
     for (int i = 0; i < nrow; i++)
     {
-      lp.setValue(i, j+1,
-                  ((2*j+1) * r[i] * lp.getValue(i,j) - (j) * lp.getValue(i,j-1))/(j+1));
+      lp.setValue(i, j + 1,
+                  ((2 * j + 1) * r[i] * lp.getValue(i, j) - (j)*lp.getValue(i, j - 1)) / (j + 1));
     }
   return lp;
 }
@@ -3306,4 +3469,4 @@ int solve_P3(double a, double b, double c, double d, VectorDouble& x)
     x[k] = ecart + 2. * sqrt(-p / 3.) * cos((acos(s1) + 2. * k * GV_PI) / 3.);
   return (3);
 }
-}
+} // namespace gstlrn

@@ -59,7 +59,7 @@ int Polygons::resetFromDb(const Db* db, double dilate, bool verbose)
 {
   if (db == nullptr) return 1;
 
-  Polygons* polygons = new Polygons();
+  auto* polygons = new Polygons();
   if (polygons->_buildHull(db, dilate, verbose))
   {
     delete polygons;
@@ -286,7 +286,7 @@ PolyElem Polygons::_extractFromTab(int ideb,
     x[i]  = tab[ncol * j + 0];
     y[i]  = tab[ncol * j + 1];
   }
-  PolyElem polyelem = PolyElem(x, y);
+  PolyElem polyelem(x, y);
   return polyelem;
 }
 
@@ -320,7 +320,7 @@ PolyElem Polygons::_extractFromWKT(const CSVformat& csv, String& polye)
       polye = polye.substr(found + 1);
   } while (found != std::string::npos);
 
-  PolyElem polyelem = PolyElem(x, y);
+  PolyElem polyelem(x, y);
   return polyelem;
 }
 
@@ -384,7 +384,7 @@ VectorDouble _emptyVec; // dummy
 PolyElem _emptyElem;    // dummy
 Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
 {
-  Polygons* polygons = new Polygons();
+  auto* polygons = new Polygons();
   if (polygons->_fileOpenAndDeserialize(NFFilename, verbose)) return polygons;
   delete polygons;
   return nullptr;
@@ -396,7 +396,7 @@ Polygons* Polygons::createFromCSV(const String& filename,
                                   int ncol_max,
                                   int nrow_max)
 {
-  Polygons* polygons = new Polygons();
+  auto* polygons = new Polygons();
   if (polygons->resetFromCSV(filename, csv, verbose, ncol_max, nrow_max))
   {
     if (verbose) messerr("Problem reading the CSV File.");
@@ -412,7 +412,7 @@ Polygons* Polygons::createFromWKT(const String& filename,
                                   int ncol_max,
                                   int nrow_max)
 {
-  Polygons* polygons = new Polygons();
+  auto* polygons = new Polygons();
   if (polygons->resetFromWKT(filename, csv, verbose, ncol_max, nrow_max))
   {
     if (verbose) messerr("Problem reading the CSV File (WKT).");
@@ -424,7 +424,7 @@ Polygons* Polygons::createFromWKT(const String& filename,
 
 Polygons* Polygons::createFromDb(const Db* db, double dilate, bool verbose)
 {
-  Polygons* polygons = new Polygons();
+  auto* polygons = new Polygons();
   if (polygons->resetFromDb(db, dilate, verbose))
   {
     messerr("Problem building Polygons from DB.");
@@ -881,7 +881,7 @@ int Polygons::_buildHull(const Db* db, double dilate, bool verbose)
 
   // Load the information within the polygon structure
 
-  PolyElem polyelem = PolyElem(xret, yret);
+  PolyElem polyelem(xret, yret);
   addPolyElem(polyelem);
 
   return 0;

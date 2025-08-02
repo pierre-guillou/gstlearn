@@ -406,7 +406,7 @@ void AMesh::getEmbeddedCoorPerApex(int iapex, VectorDouble& coords) const
 /*! Returns the Sparse Matrix for projecting the Mesh to a Db */
 ProjMatrix* AMesh::createProjMatrix(const Db* db, int rankZ, bool verbose) const
 {
-  ProjMatrix* m = new ProjMatrix();
+  auto* m = new ProjMatrix();
   resetProjFromDb(m, db, rankZ, verbose);
   return m;
 }

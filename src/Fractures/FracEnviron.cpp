@@ -78,7 +78,7 @@ FracEnviron::~FracEnviron()
  */
 FracEnviron* FracEnviron::createFromNF(const String& NFFilename, bool verbose)
 {
-  FracEnviron* envir = new FracEnviron();
+  auto* envir = new FracEnviron();
   if (envir->_fileOpenAndDeserialize(NFFilename, verbose)) return envir;
   delete envir;
   return nullptr;

@@ -32,10 +32,10 @@ MatrixSparse PrecisionOpMultiMatrix::_prepareMatrixStationary(int icov, const Ma
   MatrixSymmetric sills = _sills[icov];
   sills.invert();
     
-  MatrixSparse current = MatrixSparse(0,0);
+  MatrixSparse current(0,0);
   for (int jvar = 0; jvar < _getNVar(); jvar++)
   {
-    MatrixSparse currentCol = MatrixSparse(0,0);
+    MatrixSparse currentCol(0,0);
     for (int ivar = 0; ivar < _getNVar(); ivar++)
     {
       MatrixSparse copy = *Q;
@@ -55,12 +55,12 @@ MatrixSparse PrecisionOpMultiMatrix::_prepareMatrixNoStat(int icov, const Matrix
   const MatrixSparse empty(n,n);
   MatrixSparse diag(n,n);
 
-  MatrixSparse bigQ = MatrixSparse(0,0);
+  MatrixSparse bigQ(0,0);
   for (int jvar = 0; jvar < nvar; jvar++)
   {
     MatrixSparse::glueInPlace(&bigQ, Q, 1,1);
   }
-  MatrixSparse bigLambda = MatrixSparse(0,0);
+  MatrixSparse bigLambda(0,0);
   for (int ivar = 0; ivar < nvar; ivar++)
   {
     MatrixSparse currentRow(0,0);

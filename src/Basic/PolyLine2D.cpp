@@ -79,7 +79,7 @@ String PolyLine2D::toString(const AStringFormat* strfmt) const
 
   if (sf.getLevel() > 2)
   {
-    VectorDouble tab = VectorDouble(2 * npoints);
+    VectorDouble tab(2 * npoints);
     for (int i = 0; i < npoints; i++)
     {
       tab[i] = _x[i];
@@ -93,7 +93,7 @@ String PolyLine2D::toString(const AStringFormat* strfmt) const
 
 PolyLine2D* PolyLine2D::createFromNF(const String& NFFilename, bool verbose)
 {
-  PolyLine2D* line2D = new PolyLine2D();
+  auto* line2D = new PolyLine2D();
   if (line2D->_fileOpenAndDeserialize(NFFilename, verbose)) return line2D;
   delete line2D;
   return nullptr;

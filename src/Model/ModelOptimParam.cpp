@@ -83,7 +83,7 @@ ModelOptimParam* ModelOptimParam::create(bool auth_aniso,
                                          int maxiter,
                                          double tolred)
 {
-  ModelOptimParam* mop = new ModelOptimParam();
+  auto* mop = new ModelOptimParam();
   mop->_auth_aniso     = auth_aniso;
   mop->_auth_rotation  = auth_rotation;
   mop->_lock_samerot   = lock_samerot;

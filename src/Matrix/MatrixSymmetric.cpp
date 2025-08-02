@@ -83,7 +83,7 @@ MatrixSymmetric* MatrixSymmetric::createFromVVD(const VectorVectorDouble& X)
     messerr("The matrix does not seem to be square");
     return nullptr;
   }
-  MatrixSymmetric* mat = new MatrixSymmetric(nrow);
+  auto* mat = new MatrixSymmetric(nrow);
   mat->_fillFromVVD(X);
   return mat;
 }
@@ -103,7 +103,7 @@ MatrixSymmetric* MatrixSymmetric::createFromVD(const VectorDouble& X)
   }
   delete mattemp;
 
-  MatrixSymmetric* mat = new MatrixSymmetric(nrow);
+  auto* mat = new MatrixSymmetric(nrow);
 
   int lec = 0;
   for (int irow = 0; irow < nrow; irow++)
@@ -318,7 +318,7 @@ bool MatrixSymmetric::isDefinitePositive()
 MatrixSymmetric* MatrixSymmetric::createFromTLTU(int neq,
                                                  const VectorDouble& tl)
 {
-  MatrixSymmetric* mat = new MatrixSymmetric(neq);
+  auto* mat = new MatrixSymmetric(neq);
 
   for (int i = 0; i < neq; i++)
     for (int j = 0; j < neq; j++)
@@ -347,7 +347,7 @@ MatrixSymmetric* MatrixSymmetric::createFromTriangle(int mode,
                                                      int neq,
                                                      const VectorDouble& tl)
 {
-  MatrixSymmetric* mat = new MatrixSymmetric(neq);
+  auto* mat = new MatrixSymmetric(neq);
 
   mat->fill(0.);
 
@@ -895,7 +895,7 @@ MatrixSymmetric* MatrixSymmetric::createRandomDefinitePositive(int neq, int seed
 {
   MatrixSymmetric local(neq);
   local.fillRandom(seed);
-  MatrixSymmetric* mat = new MatrixSymmetric(neq);
+  auto* mat = new MatrixSymmetric(neq);
   mat->prodMatMatInPlace(&local, &local, true);
   return mat;
 }
@@ -904,7 +904,7 @@ MatrixSymmetric MatrixSymmetric::compress0MatLC(const MatrixDense& matLC)
 {
   int nvar            = getNCols();
   int nvarCL          = matLC.getNRows();
-  MatrixSymmetric mat = MatrixSymmetric(nvarCL);
+  MatrixSymmetric mat(nvarCL);
   for (int jvarCL = 0; jvarCL < nvarCL; jvarCL++)
     for (int ivarCL = 0; ivarCL <= jvarCL; ivarCL++)
     {

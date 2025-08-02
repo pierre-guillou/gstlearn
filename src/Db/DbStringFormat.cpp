@@ -126,7 +126,7 @@ DbStringFormat* DbStringFormat::createFromFlags(bool flag_resume,
                                                 const VectorInt& cols,
                                                 bool useSel)
 {
-  DbStringFormat* dbfmt = new DbStringFormat();
+  auto* dbfmt = new DbStringFormat();
   dbfmt->setFlags(flag_resume, flag_vars, flag_extend, flag_stats, flag_array,
                   flag_locator, names, cols, useSel);
   return dbfmt;

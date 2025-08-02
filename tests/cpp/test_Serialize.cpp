@@ -124,9 +124,9 @@ int main(int argc, char* argv[])
 
   if (mode == 0 || mode == 3)
   {
-    Polygons* poly1 = new Polygons();
+    auto* poly1 = new Polygons();
     poly1->resetFromDb(db);
-    Polygons* polyb = new Polygons();
+    auto* polyb = new Polygons();
     polyb->resetFromDb(dbg);
     poly1->addPolyElem(polyb->getPolyElem(0));
     poly1->display();
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
     VarioParam varioparam;
     DirParam dirparam(10, 0.02);
     varioparam.addDir(dirparam);
-    Vario vario1 = Vario(varioparam);
+    Vario vario1(varioparam);
     vario1.compute(db, ECalcVario::VARIOGRAM);
     vario1.display();
 

@@ -171,7 +171,7 @@ int modify_constraints_on_sill(Constraints& constraints)
     if (consitem->getIV1() == 0 && consitem->getIV2() == 0 &&
         consitem->getIcase() == EConsType::UPPER)
     {
-      ConsItem* consjtem = new ConsItem(*consitem);
+      auto* consjtem = new ConsItem(*consitem);
       consjtem->setValue(-consjtem->getValue());
       consjtem->setIcase(EConsType::LOWER);
       constraints.addItem(consjtem);

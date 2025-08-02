@@ -9,10 +9,10 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Neigh/NeighCell.hpp"
-#include "Db/Db.hpp"
-#include "Db/DbGrid.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/SerializeHDF5.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 
 namespace gstlrn
 {
@@ -23,7 +23,7 @@ NeighCell::NeighCell(bool flag_xvalid, int nmini, bool useBallTree, int leaf_siz
   , _T1(space)
   , _T2(space)
 {
-  setFlagXvalid (flag_xvalid);
+  setFlagXvalid(flag_xvalid);
 
   setBallSearch(useBallTree, leaf_size);
 
@@ -31,11 +31,11 @@ NeighCell::NeighCell(bool flag_xvalid, int nmini, bool useBallTree, int leaf_siz
 }
 
 NeighCell::NeighCell(const NeighCell& r)
-    : ANeigh(r),
-      _nMini(r._nMini),
-      _biPtCell(r._biPtCell),
-      _T1(r._T1),
-      _T2(r._T2)
+  : ANeigh(r)
+  , _nMini(r._nMini)
+  , _biPtCell(r._biPtCell)
+  , _T1(r._T1)
+  , _T2(r._T2)
 {
 }
 
@@ -44,11 +44,11 @@ NeighCell& NeighCell::operator=(const NeighCell& r)
   if (this != &r)
   {
     ANeigh::operator=(r);
-    _nMini = r._nMini;
+    _nMini    = r._nMini;
     _biPtCell = r._biPtCell;
-    _T1 = r._T1;
-    _T2 = r._T2;
-   }
+    _T1       = r._T1;
+    _T2       = r._T2;
+  }
   return *this;
 }
 
@@ -56,10 +56,10 @@ NeighCell::~NeighCell()
 {
 }
 
-int NeighCell::attach(const Db *dbin, const Db *dbout)
+int NeighCell::attach(const Db* dbin, const Db* dbout)
 {
   if (ANeigh::attach(dbin, dbout)) return 1;
-  if (! _biPtCell->isValid(dbin, dbout)) return 1;
+  if (!_biPtCell->isValid(dbin, dbout)) return 1;
 
   _dbgrid = dynamic_cast<const DbGrid*>(dbout);
   return 0;
@@ -70,7 +70,7 @@ String NeighCell::toString(const AStringFormat* strfmt) const
   DECLARE_UNUSED(strfmt);
   std::stringstream sstr;
 
-  sstr << toTitle(0,"Cell Neighborhood");
+  sstr << toTitle(0, "Cell Neighborhood");
 
   if (_biPtCell != nullptr)
     sstr << _biPtCell->toString();
@@ -81,8 +81,8 @@ String NeighCell::toString(const AStringFormat* strfmt) const
 bool NeighCell::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret = ret && ANeigh::_deserializeAscii(is, verbose);
-  ret = ret && _recordRead<int>(is, "Minimum Number of samples", _nMini);
+  ret      = ret && ANeigh::_deserializeAscii(is, verbose);
+  ret      = ret && _recordRead<int>(is, "Minimum Number of samples", _nMini);
 
   return ret;
 }
@@ -90,8 +90,8 @@ bool NeighCell::_deserializeAscii(std::istream& is, bool verbose)
 bool NeighCell::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serializeAscii(os, verbose);
-  ret = ret && _recordWrite<int>(os, "", getNMini());
+  ret      = ret && ANeigh::_serializeAscii(os, verbose);
+  ret      = ret && _recordWrite<int>(os, "", getNMini());
   return ret;
 }
 
@@ -112,7 +112,7 @@ NeighCell* NeighCell::create(bool flag_xvalid,
  */
 NeighCell* NeighCell::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighCell* neigh = new NeighCell();
+  auto* neigh = new NeighCell();
   if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
   delete neigh;
   return nullptr;
@@ -175,7 +175,7 @@ int NeighCell::_cell(int iech_out, VectorInt& ranks)
   {
     /* Discard the masked input sample */
 
-    if (! _dbin->isActive(iech)) continue;
+    if (!_dbin->isActive(iech)) continue;
 
     /* Discard samples where all variables are undefined */
 
@@ -192,7 +192,7 @@ int NeighCell::_cell(int iech_out, VectorInt& ranks)
 
     /* Discard sample located outside the bench */
 
-    if (! _biPtCell->isOK(_T1, _T2)) continue;
+    if (!_biPtCell->isOK(_T1, _T2)) continue;
 
     ranks[iech] = 0;
     nsel++;
@@ -232,4 +232,4 @@ bool NeighCell::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) cons
   return ret;
 }
 #endif
-}
+} // namespace gstlrn

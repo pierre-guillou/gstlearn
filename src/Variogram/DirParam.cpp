@@ -335,8 +335,8 @@ std::vector<DirParam> DirParam::createMultiple(int ndir,
   int ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
-  VectorDouble angles = VectorDouble(1);
-  VectorDouble codir  = VectorDouble(ndim, 0.);
+  VectorDouble angles(1);
+  VectorDouble codir(ndim, 0.);
   std::vector<DirParam> dirs;
   for (int idir = 0; idir < ndir; idir++)
   {
@@ -366,8 +366,8 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
     return dirs;
   }
 
-  VectorDouble anglesloc = VectorDouble(1);
-  VectorDouble codir     = VectorDouble(ndim);
+  VectorDouble anglesloc(1);
+  VectorDouble codir(ndim);
   int ndir               = (int)angles.size();
   if (FFFF(tolang)) tolang = 90. / ndir;
   for (int idir = 0; idir < ndir; idir++)
@@ -397,7 +397,7 @@ std::vector<DirParam> DirParam::createMultipleInSpace(int nlag, double dlag, con
   int ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
-  VectorDouble codir = VectorDouble(ndim);
+  VectorDouble codir(ndim);
   std::vector<DirParam> dirs;
   for (int idim = 0; idim < ndim; idim++)
   {

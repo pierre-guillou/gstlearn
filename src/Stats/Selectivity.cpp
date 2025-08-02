@@ -103,13 +103,13 @@ Selectivity::~Selectivity()
 
 Selectivity* Selectivity::create(int ncut)
 {
-  Selectivity* selectivity = new Selectivity(ncut);
+  auto* selectivity = new Selectivity(ncut);
   return selectivity;
 }
 
 Selectivity* Selectivity::createByCuts(const VectorDouble& zcut)
 {
-  Selectivity* selectivity = new Selectivity(zcut);
+  auto* selectivity = new Selectivity(zcut);
   return selectivity;
 }
 
@@ -120,7 +120,7 @@ Selectivity* Selectivity::createByCodes(const std::vector<ESelectivity>& codes,
                                         double proba,
                                         bool verbose)
 {
-  Selectivity* selectivity = new Selectivity(zcuts);
+  auto* selectivity = new Selectivity(zcuts);
   selectivity->defineRecoveries(codes, flag_est, flag_std, proba, verbose);
   return selectivity;
 }
@@ -143,7 +143,7 @@ Selectivity* Selectivity::createByKeys(const VectorString& keys,
     codes.push_back(code);
   }
 
-  Selectivity* selectivity = new Selectivity(zcuts, zmax, flag_tonnage_correct);
+  auto* selectivity = new Selectivity(zcuts, zmax, flag_tonnage_correct);
   selectivity->defineRecoveries(codes, flag_est, flag_std, proba, verbose);
   return selectivity;
 }
@@ -347,7 +347,7 @@ Selectivity* Selectivity::createInterpolation(const VectorDouble& zcuts,
   int nclass = selecin.getNCuts();
   int ncuts  = (int)zcuts.size();
 
-  Selectivity* selectivity = new Selectivity(ncuts);
+  auto* selectivity = new Selectivity(ncuts);
   for (int icut = 0; icut < ncuts; icut++)
   {
     double zval = zcuts[icut];

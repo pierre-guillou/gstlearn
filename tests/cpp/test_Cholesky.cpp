@@ -47,7 +47,7 @@ MatrixSparse* _createSparseMatrix(int n, double proba)
 MatrixSymmetric* _createDenseMatrix(int n, const MatrixSparse* Q)
 {
   // Create the corresponding Symmetric matrix
-  MatrixSymmetric* M = new MatrixSymmetric(n);
+  auto* M = new MatrixSymmetric(n);
   for (int icol = 0; icol < n; icol++)
     for (int irow = 0; irow < n; irow++)
     {

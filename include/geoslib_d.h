@@ -109,7 +109,7 @@ public:
   double v1;
   double v2;
   double tol;     /* Tolerance */
-  double* coeffs; /* Array of coefficients */
+  VectorDouble coeffs; /* Array of coefficients */
 };
 
 #ifndef SWIG

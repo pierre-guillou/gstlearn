@@ -67,7 +67,7 @@ ModelFitSillsVMap* ModelFitSillsVMap::createForOptim(const DbGrid* dbmap,
     messerr("The argument 'model' should be a 'ModelCovList'");
     return nullptr;
   }
-  ModelFitSillsVMap* optim = new ModelFitSillsVMap(dbmap, modelLocal, constraints, mop);
+  auto* optim = new ModelFitSillsVMap(dbmap, modelLocal, constraints, mop);
 
   return optim;
 }

@@ -985,7 +985,7 @@ CorAniso* CorAniso::createAnisotropic(const CovContext& ctxt,
     return nullptr;
   }
 
-  CorAniso* cov = new CorAniso(type, ctxt);
+  auto* cov = new CorAniso(type, ctxt);
   if (flagRange)
     cov->setRanges(ranges);
   else
@@ -1001,7 +1001,7 @@ CorAniso* CorAniso::createIsotropicMulti(const CovContext& ctxt,
                                          double param,
                                          bool flagRange)
 {
-  CorAniso* cov = new CorAniso(type, ctxt);
+  auto* cov = new CorAniso(type, ctxt);
 
   if (flagRange)
     cov->setRangeIsotropic(range);
@@ -1027,7 +1027,7 @@ CorAniso* CorAniso::createAnisotropicMulti(const CovContext& ctxt,
     return nullptr;
   }
 
-  CorAniso* cov = new CorAniso(type, ctxt);
+  auto* cov = new CorAniso(type, ctxt);
   if (flagRange)
     cov->setRanges(ranges);
   else

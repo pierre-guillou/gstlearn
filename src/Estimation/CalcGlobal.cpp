@@ -122,7 +122,7 @@ int CalcGlobal::_globalKriging()
   MatrixDense X;
 
   // Get the Covariance between data (Unique Neighborhood)
-  CovCalcMode mode            = CovCalcMode(ECalcMember::LHS);
+  CovCalcMode mode(ECalcMember::LHS);
   VectorVectorInt sampleRanks = dbin->getSampleRanks({_ivar0});
   VectorDouble Z              = dbin->getValuesByRanks(sampleRanks,
                                                        _modelLocal->getMeans(),

@@ -47,7 +47,7 @@ AnamDiscreteIR::~AnamDiscreteIR()
 
 AnamDiscreteIR* AnamDiscreteIR::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamDiscreteIR* anam = new AnamDiscreteIR();
+  auto* anam = new AnamDiscreteIR();
   if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
   delete anam;
   return nullptr;

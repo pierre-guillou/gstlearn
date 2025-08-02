@@ -62,7 +62,7 @@ AnamDiscreteDD::~AnamDiscreteDD()
 
 AnamDiscreteDD* AnamDiscreteDD::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamDiscreteDD* anam = new AnamDiscreteDD();
+  auto* anam = new AnamDiscreteDD();
   if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
   delete anam;
   return nullptr;

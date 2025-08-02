@@ -9,7 +9,6 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Calculators/CalcMigrate.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Calculators/ACalcDbToDb.hpp"
@@ -1060,50 +1059,46 @@ label_end:
  ** \remarks If the target variable values cross a cutoff, the coordinates of
  ** \remarks the intersection are calculated.
  ** \remarks The program returns the list of all these intersection coordinates
- **
- ** TODO FUTURE_REFACTOR
  *****************************************************************************/
-double* dbgridLineSampling(DbGrid* dbgrid,
-                           const double* x1,
-                           const double* x2,
-                           int ndisc,
-                           int ncut,
-                           const double* cuts,
-                           int* nval_ret)
+VectorDouble dbgridLineSampling(DbGrid* dbgrid,
+                                const double* x1,
+                                const double* x2,
+                                int ndisc,
+                                int ncut,
+                                const double* cuts,
+                                int* nval_ret)
 {
-  double *res, delta, vi1, vi2, cut, v1, v2;
-  int ndim, iatt, nval;
-  VectorDouble xi1;
-  VectorDouble xi2;
+  double delta, vi1, vi2, cut, v1, v2;
+  int ndim, iatt;
 
   /* Initializations */
 
-  *nval_ret = 0;
-  res       = nullptr;
-  ndim      = dbgrid->getNDim();
-  iatt      = dbgrid->getColIdxByLocator(ELoc::Z, 0);
+  ndim = dbgrid->getNDim();
+  iatt = dbgrid->getColIdxByLocator(ELoc::Z, 0);
 
   /* Preliminary checks */
 
   if (ndisc <= 1)
   {
     messerr("The number of discretization points must be larger than 1");
-    goto label_end;
+    return VectorDouble();
   }
   if (iatt < 0)
   {
     messerr("You need a target variable on the grid");
-    goto label_end;
+    return VectorDouble();
   }
 
   /* Core allocation */
 
-  xi1.resize(ndim, 0);
-  xi2.resize(ndim, 0);
+  VectorDouble xi1(ndim);
+  VectorDouble xi2(ndim);
+  VectorDouble res;
+  *nval_ret = 0;
 
   /* Loop on the discretized points */
 
-  nval = 0;
+  int nval = 0;
   for (int idisc = 0; idisc < ndisc; idisc++)
   {
 
@@ -1129,9 +1124,7 @@ double* dbgridLineSampling(DbGrid* dbgrid,
     {
       cut = cuts[icut];
       if (cut < v1 || cut > v2) continue;
-      res = (double*)mem_realloc((char*)res,
-                                 (ndim + 1) * (nval + 1) * sizeof(double), 0);
-      if (res == nullptr) goto label_end;
+      res.resize((ndim + 1) * (nval + 1));
 
       for (int idim = 0; idim < ndim; idim++)
       {
@@ -1143,8 +1136,6 @@ double* dbgridLineSampling(DbGrid* dbgrid,
     }
   }
   *nval_ret = nval;
-
-label_end:
   return (res);
 }
 

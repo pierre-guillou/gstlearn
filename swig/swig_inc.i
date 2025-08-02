@@ -636,7 +636,7 @@ namespace gstlrn {
 %typemap(in, fragment="ToCpp") const VectorDouble* (void *argp)
 {
   // Try to convert from any target language vector
-  VectorDouble* vec = new VectorDouble();
+  auto* vec = new VectorDouble();
   int errcode = vectorToCpp($input, *vec);
   if (errcode == SWIG_NullReferenceError)
   {
@@ -673,7 +673,7 @@ namespace gstlrn {
 %typemap(in, fragment="ToCpp") const VectorInt*    (void *argp, VectorInt vec)
 {
   // Try to convert from any target language vector
-  VectorInt* vec = new VectorInt();
+  auto* vec = new VectorInt();
   int errcode = vectorToCpp($input, *vec);
   if (errcode == SWIG_NullReferenceError)
   {
@@ -711,7 +711,7 @@ namespace gstlrn {
 %typemap(in, fragment="ToCpp") const VectorVectorInt*    (void *argp, VectorVectorInt vec)
 {
   // Try to convert from any target language vector
-  VectorVectorInt* vec = new VectorVectorInt();
+  auto* vec = new VectorVectorInt();
   int errcode = vectorVectorToCpp($input, *vec);
   if (errcode == SWIG_NullReferenceError)
   {

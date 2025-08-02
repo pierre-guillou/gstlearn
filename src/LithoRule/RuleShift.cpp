@@ -420,7 +420,7 @@ int RuleShift::evaluateBounds(PropDef* propdef,
 RuleShift* RuleShift::createFromNodes(const VectorInt& nodes,
                                       const VectorDouble& shift)
 {
-  RuleShift* ruleshift = new RuleShift();
+  auto* ruleshift = new RuleShift();
   if (ruleshift->resetFromNodes(nodes, shift))
   {
     messerr("Problem when creating RuleShift from Nodes");
@@ -432,7 +432,7 @@ RuleShift* RuleShift::createFromNodes(const VectorInt& nodes,
 RuleShift* RuleShift::createFromNames(const VectorString& nodnames,
                                       const VectorDouble& shift)
 {
-  RuleShift* ruleshift = new RuleShift();
+  auto* ruleshift = new RuleShift();
   if (ruleshift->resetFromNames(nodnames, shift))
   {
     messerr("Problem when creating RuleShift from Node Names");
@@ -444,7 +444,7 @@ RuleShift* RuleShift::createFromNames(const VectorString& nodnames,
 RuleShift* RuleShift::createFromFaciesCount(int nfacies,
                                             const VectorDouble& shift)
 {
-  RuleShift* ruleshift = new RuleShift();
+  auto* ruleshift = new RuleShift();
   if (ruleshift->resetFromFaciesCount(nfacies, shift))
   {
     messerr("Problem when creating RuleShift from Count of Facies");
@@ -457,7 +457,7 @@ RuleShift* RuleShift::createFromNumericalCoding(const VectorInt& n_type,
                                                 const VectorInt& n_facs,
                                                 const VectorDouble& shift)
 {
-  RuleShift* ruleshift = new RuleShift();
+  auto* ruleshift = new RuleShift();
   if (ruleshift->resetFromNumericalCoding(n_type, n_facs, shift))
   {
     messerr("Problem when creating RuleShift from Numerical Coding");

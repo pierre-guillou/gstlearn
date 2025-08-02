@@ -110,7 +110,7 @@ double FunctionalSpirale::getFunctionValue(const VectorDouble& coor) const
 MatrixSquare FunctionalSpirale::getFunctionMatrix(const VectorDouble& coor) const
 {
   int ndim          = 2;
-  MatrixSquare dirs = MatrixSquare(ndim);
+  MatrixSquare dirs(ndim);
 
   double angle = getFunctionValue(coor) * GV_PI / 180.;
   double u1    = cos(angle);

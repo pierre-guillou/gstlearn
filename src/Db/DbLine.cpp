@@ -572,7 +572,7 @@ namespace gstlrn
   Db* DbLine::createStatToHeader() const
   {
     // Create the resulting output Db
-    Db* db = new Db();
+    auto* db = new Db();
 
     // Glue the coordinates
     for (int idim = 0, ndim = getNDim(); idim < ndim; idim++)

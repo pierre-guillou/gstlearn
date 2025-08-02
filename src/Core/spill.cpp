@@ -356,8 +356,7 @@ static SPIMG* st_image_alloc(double value)
 
   /* Create the header */
 
-  image = (SPIMG*)mem_alloc(sizeof(SPIMG), 0);
-  if (image == (SPIMG*)NULL) goto label_end;
+  image = new SPIMG;
 
   /* Create the pixel array */
 
@@ -372,7 +371,11 @@ static SPIMG* st_image_alloc(double value)
   error = 0;
 
 label_end:
-  if (error) image = st_image_free(image);
+  if (error)
+  {
+    delete image;
+    image = nullptr;
+  }
   return (image);
 }
 
@@ -811,4 +814,4 @@ label_end:
 
   return (error);
 }
-}
+} // namespace gstlrn

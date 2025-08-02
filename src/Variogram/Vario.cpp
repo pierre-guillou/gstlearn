@@ -161,8 +161,8 @@ Vario* Vario::create(const VarioParam& varioparam)
 
 Vario* Vario::createFromNF(const String& NFFilename, bool verbose)
 {
-  VarioParam varioparam = VarioParam();
-  Vario* vario          = new Vario(varioparam);
+  VarioParam varioparam;
+  auto* vario          = new Vario(varioparam);
   if (vario->_fileOpenAndDeserialize(NFFilename, verbose)) return vario;
   delete vario;
   return nullptr;
@@ -207,7 +207,7 @@ Vario* Vario::createRegularizeFromModel(const Model& model,
 Vario* Vario::createTransformZToY(const Vario& varioZ,
                                   const AAnam* anam)
 {
-  Vario* varioY = new Vario(varioZ);
+  auto* varioY = new Vario(varioZ);
   if (varioY->transformZToY(anam))
   {
     messerr("Error when transforming Raw Variogram into Gaussian");
@@ -219,7 +219,7 @@ Vario* Vario::createTransformZToY(const Vario& varioZ,
 Vario* Vario::createTransformYToZ(const Vario& varioY,
                                   const AAnam* anam)
 {
-  Vario* varioZ = new Vario(varioY);
+  auto* varioZ = new Vario(varioY);
   if (varioZ->transformYToZ(anam))
   {
     messerr("Error when transforming Gaussian Variogram into Raw");
@@ -234,7 +234,7 @@ Vario* Vario::createReduce(const Vario& varioIn,
                            const VectorInt& dircols,
                            bool asSymmetric)
 {
-  Vario* varioOut = new Vario(varioIn);
+  auto* varioOut = new Vario(varioIn);
   varioOut->resetReduce(varcols, dircols, asSymmetric);
   return varioOut;
 }
@@ -392,7 +392,7 @@ int Vario::computeIndic(Db* db,
   }
 
   // Translate the 'Facies' into 'categories'   VectorDouble props =
-  Limits limits = Limits(nclass);
+  Limits limits(nclass);
   int iatt      = _db->getUIDByLocator(ELoc::Z, 0);
   if (limits.toIndicatorByAttribute(_db, iatt))
   {
@@ -2210,7 +2210,7 @@ VectorDouble Vario::_varsFromProportions(VectorDouble props)
   if (props.empty()) return VectorDouble();
 
   int nvar          = static_cast<int>(props.size());
-  VectorDouble vars = VectorDouble(nvar * nvar);
+  VectorDouble vars(nvar * nvar);
   int ecr           = 0;
   for (int ivar = 0; ivar < nvar; ivar++)
     for (int jvar = 0; jvar < nvar; jvar++)

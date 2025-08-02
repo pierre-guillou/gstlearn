@@ -69,7 +69,7 @@ ModelFitSillsVario* ModelFitSillsVario::createForOptim(const Vario* vario,
     messerr("The argument 'model' should be a 'ModelCovList'");
     return nullptr;
   }
-  ModelFitSillsVario* optim = new ModelFitSillsVario(vario, mcv, constraints, mop);
+  auto* optim = new ModelFitSillsVario(vario, mcv, constraints, mop);
 
   return optim;
 }

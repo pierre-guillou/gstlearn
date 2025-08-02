@@ -104,7 +104,7 @@ NeighImage* NeighImage::create(const VectorInt& radius, int skip, const ASpaceSh
  */
 NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighImage* neigh = new NeighImage();
+  auto* neigh = new NeighImage();
   if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
   delete neigh;
   return nullptr;

@@ -99,7 +99,7 @@ String AnamEmpirical::toString(const AStringFormat* /*strfmt*/) const
 
 AnamEmpirical* AnamEmpirical::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamEmpirical* anam = new AnamEmpirical();
+  auto* anam = new AnamEmpirical();
   if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
   return nullptr;
 }

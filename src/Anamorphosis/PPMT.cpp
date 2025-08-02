@@ -387,7 +387,7 @@ void PPMT::_fitInitHermite(AMatrix* Y)
   for (int icol = 0; icol < ncol; icol++)
   {
     VectorDouble Yvec = Y->getColumn(icol);
-    AnamHermite* anam = new AnamHermite(getNbpoly());
+    auto* anam = new AnamHermite(getNbpoly());
     anam->fitFromArray(Yvec);
     _initAnams.push_back(anam);
   }

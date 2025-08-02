@@ -70,7 +70,7 @@ T* MatrixFactory::prodMatMat(const AMatrix *x,
                              bool transposeX,
                              bool transposeY)
 {
-  T* res = new T(); /// TODO : if MatrixSparse => x or y 'eigen flag' is ignored
+  auto* res = new T();
 
   int nxrows = (! transposeX) ? x->getNRows() : x->getNCols();
   int nxcols = (! transposeX) ? x->getNCols() : x->getNRows();

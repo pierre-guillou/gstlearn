@@ -146,7 +146,7 @@ void SimuSpectral::_simulateOnSphere(int nd, bool verbose)
   // Simulate vector N
   int n       = 0;
   double p    = 0.;
-  VectorInt N = VectorInt(_ns, 0);
+  VectorInt N(_ns, 0);
   while (p < maxU && n < _ns)
   {
     p += spectrum[n++];
@@ -157,7 +157,7 @@ void SimuSpectral::_simulateOnSphere(int nd, bool verbose)
   }
 
   // Simulate vector K
-  VectorInt K = VectorInt(_ns, ITEST);
+  VectorInt K(_ns, ITEST);
   for (int is = 0; is < _ns; is++)
     K[is] = sampleInteger(-N[is], N[is]);
 
@@ -599,7 +599,7 @@ int simuSpectral(Db* dbin,
   }
 
   // Instantiate the SimuSpectral class
-  SimuSpectral simsph = SimuSpectral(model);
+  SimuSpectral simsph(model);
 
   // Set the seed for Random number generator (for all simulations)
   law_set_random_seed(seed);

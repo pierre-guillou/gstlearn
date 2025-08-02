@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     _dumpLimit(1);
     Db* db             = _createDb(1, 5, true);
     Model* model       = _createModel(1);
-    Vecchia V          = Vecchia(model, nb_vecchia, db);
+    Vecchia V(model, nb_vecchia, db);
     MatrixT<int> Ranks = findNN(db, nullptr, nb_vecchia + 1, false, true);
     (void)V.computeLower(Ranks, true);
     delete db;

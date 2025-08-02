@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   db->display(dbfmt);
 
   // Instanciate the RankHandler
-  RankHandler* rkhd = new RankHandler(db, true, true, true, true);
+  auto* rkhd = new RankHandler(db, true, true, true, true);
 
   // Creating the vector of elligible samples
   // It is constructed so as to involve:

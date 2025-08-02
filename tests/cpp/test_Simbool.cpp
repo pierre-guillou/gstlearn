@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
   // ====================== Create Shape Dictionary ===================
   message("\n<----- Creating Shape Dictionary ----->\n");
-  ModelBoolean* tokens = new ModelBoolean(0.01, true);
+  auto* tokens = new ModelBoolean(0.01, true);
   ShapeEllipsoid token_ellipsoid(0.4, 10., 20., 2.);
   token_ellipsoid.setFactorX2Y(1.5);
   tokens->addToken(token_ellipsoid);

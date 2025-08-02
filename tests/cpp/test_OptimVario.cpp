@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   modelfit->display();
 
   // Fitting procedure
-  ModelOptimParam mop = ModelOptimParam();
+  ModelOptimParam mop;
   mop.setFlagGoulard(true);
   bool verbose = false;
   bool trace   = false;

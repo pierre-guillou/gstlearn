@@ -88,7 +88,7 @@ DbMeshTurbo* DbMeshTurbo::create(const VectorInt& nx,
                                  bool verbose)
 {
   // Creating the MeshETurbo internal storage
-  DbMeshTurbo* dbmesh = new DbMeshTurbo(nx, dx, x0, angles, order, tab, names,
+  auto* dbmesh = new DbMeshTurbo(nx, dx, x0, angles, order, tab, names,
                                         locatorNames, flag_polarized, verbose);
   if (dbmesh == nullptr)
   {

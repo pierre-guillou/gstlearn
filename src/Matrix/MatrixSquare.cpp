@@ -259,7 +259,7 @@ MatrixSquare* MatrixSquare::createFromVVD(const VectorVectorDouble& X)
     return nullptr;
   }
 
-  MatrixSquare* mat = new MatrixSquare(nrow);
+  auto* mat = new MatrixSquare(nrow);
   mat->_fillFromVVD(X);
   return mat;
 }
@@ -275,7 +275,7 @@ MatrixSquare* MatrixSquare::createFromVD(const VectorDouble& X,
     messerr("Inconsistency between arguments 'nrow'(%d) and 'ncol'(%d)", nrow, ncol);
     messerr("and the dimension of the input Vector (%d)", (int)X.size());
   }
-  MatrixSquare* mat = new MatrixSquare(nrow);
+  auto* mat = new MatrixSquare(nrow);
 
   int lec = 0;
   if (byCol)
@@ -467,24 +467,24 @@ MatrixSquare* prodNormMatMat(const MatrixDense* a,
                              const MatrixDense* m,
                              bool transpose)
 {
-  int nrow          = (transpose) ? a->getNCols() : a->getNRows();
-  MatrixSquare* mat = new MatrixSquare(nrow);
+  int nrow  = (transpose) ? a->getNCols() : a->getNRows();
+  auto* mat = new MatrixSquare(nrow);
   mat->prodNormMatMatInPlace(a, m, transpose);
   return mat;
 }
 
 MatrixSquare* prodNormMat(const MatrixDense& a, bool transpose)
 {
-  int nsym          = (transpose) ? a.getNCols() : a.getNRows();
-  MatrixSquare* mat = new MatrixSquare(nsym);
+  int nsym  = (transpose) ? a.getNCols() : a.getNRows();
+  auto* mat = new MatrixSquare(nsym);
   mat->prodNormMatInPlace(&a, transpose);
   return mat;
 }
 
 MatrixSquare* prodNormMatVec(const MatrixDense& a, const VectorDouble& vec, bool transpose)
 {
-  int nsym          = (transpose) ? a.getNCols() : a.getNRows();
-  MatrixSquare* mat = new MatrixSquare(nsym);
+  int nsym  = (transpose) ? a.getNCols() : a.getNRows();
+  auto* mat = new MatrixSquare(nsym);
   mat->prodNormMatVecInPlace(&a, vec, transpose);
   return mat;
 }

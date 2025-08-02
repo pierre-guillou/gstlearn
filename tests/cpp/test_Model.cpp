@@ -55,16 +55,16 @@ int main(int argc, char* argv[])
 
   ///////////////////////
   // Creating the Model
-  Model modellmc = Model(ctxt);
+  Model modellmc(ctxt);
   // Build the List of Covariances
-  CovAnisoList covlmc = CovAnisoList(ctxt);
+  CovAnisoList covlmc(ctxt);
   // Build the Elementary Covariances
-  CovAniso cov1       = CovAniso(ECov::CUBIC, ctxt);
+  CovAniso cov1(ECov::CUBIC, ctxt);
   VectorDouble ranges = {1.2, 2.1};
   cov1.setRanges(ranges);
   cov1.setSill(1.5);
   covlmc.addCov(cov1);
-  CovAniso cov2 = CovAniso(ECov::NUGGET, ctxt);
+  CovAniso cov2(ECov::NUGGET, ctxt);
   cov2.setSill(0.5);
   covlmc.addCov(cov2);
   // Assembling the Model
@@ -83,12 +83,12 @@ int main(int argc, char* argv[])
 
   /////////////////////////////
   // Creating the Tapered Model
-  CovLMCTapering covtape = CovLMCTapering(ETape::STORKEY, 4., ctxt);
+  CovLMCTapering covtape(ETape::STORKEY, 4., ctxt);
   // Build the Covariance list
   covtape.addCov(cov1);
   covtape.addCov(cov2);
   // Building the Model
-  Model modeltape = Model(ctxt);
+  Model modeltape(ctxt);
   modeltape.setCovAnisoList(&covtape);
   modeltape.display();
 
@@ -97,12 +97,12 @@ int main(int argc, char* argv[])
 
   /////////////////////////////
   // Creating the Convoluted Model
-  CovLMCConvolution covconv = CovLMCConvolution(EConvType::EXPONENTIAL, EConvDir::X, 1., 10, ctxt);
+  CovLMCConvolution covconv(EConvType::EXPONENTIAL, EConvDir::X, 1., 10, ctxt);
   // Build the Covariance list
   covconv.addCov(cov1);
   covconv.addCov(cov2);
   // Building the Model
-  Model modelconv = Model(ctxt);
+  Model modelconv(ctxt);
   modelconv.setCovAnisoList(&covconv);
   modelconv.display();
   // Sample the Tapered Model at regular steps
@@ -155,10 +155,10 @@ int main(int argc, char* argv[])
   VectorDouble rnd2 = VH::simulateGaussian(nsample);
   rnd2[1]           = TEST;
   workingDbc->addColumns(rnd2, "Z2");
-  VectorDouble verr1 = VectorDouble(nsample, 0.1);
+  VectorDouble verr1(nsample, 0.1);
   verr1[3]           = TEST;
   workingDbc->addColumns(verr1, "V1");
-  VectorDouble verr2 = VectorDouble(nsample, 0.25);
+  VectorDouble verr2(nsample, 0.25);
   workingDbc->addColumns(verr2, "V2");
   // Adding a Selection
   workingDbc->addColumns({1, 1, 1, 0, 1, 0}, "Sel");

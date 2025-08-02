@@ -48,9 +48,9 @@
 
 namespace gstlrn
 {
-int NDIM_LOCAL        = 0;
-VectorDouble X1_LOCAL = VectorDouble();
-VectorDouble X2_LOCAL = VectorDouble();
+int NDIM_LOCAL = 0;
+VectorDouble X1_LOCAL;
+VectorDouble X2_LOCAL;
 
 /****************************************************************************/
 /*!
@@ -346,7 +346,7 @@ void model_cova_characteristics(const ECov& type,
                                 double* parmax)
 {
   auto space      = SpaceRN::create(1); // Use 1-D in order to retrieve all covariances
-  CovContext ctxt = CovContext(1, 1);
+  CovContext ctxt(1, 1);
   ACovFunc* cov   = CovFactory::createCovFunc(type, ctxt);
   (void)gslStrcpy((char*)cov_name, cov->getCovName().c_str());
   *flag_range    = cov->hasRange();
@@ -429,7 +429,7 @@ Model* model_combine(const Model* model1, const Model* model2, double r)
   cova0[3] = 1.;
 
   // Creating the context
-  CovContext ctxt = CovContext(2, model1->getNDim(), cova0);
+  CovContext ctxt(2, model1->getNDim(), cova0);
 
   // Creating the new Model
   model = new Model(ctxt);

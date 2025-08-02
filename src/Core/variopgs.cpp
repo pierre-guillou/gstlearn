@@ -839,8 +839,8 @@ static int st_vario_pgs_variable(int mode,
  *****************************************************************************/
 static Rule* st_rule_encode(const int* string)
 {
-  VectorInt n_type = VectorInt(NRULE);
-  VectorInt n_facs = VectorInt(NRULE);
+  VectorInt n_type(NRULE);
+  VectorInt n_facs(NRULE);
 
   for (int i = 0; i < NRULE; i++)
   {

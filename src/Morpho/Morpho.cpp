@@ -1042,8 +1042,8 @@ int db_morpho_calc(DbGrid* dbgrid,
 
   bool alreadyLoaded  = false;
   bool alreadySaved   = false;
-  BImage image2       = BImage(nxy);
-  VectorDouble tabout = VectorDouble(ntotal, TEST);
+  BImage image2(nxy);
+  VectorDouble tabout(ntotal, TEST);
   if (oper == EMorpho::THRESH)
   {
     morpho_duplicate(image, image2);
