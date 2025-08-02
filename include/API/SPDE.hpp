@@ -13,7 +13,6 @@
 #include "API/SPDEParam.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "LinearOp/InvNuggetOp.hpp"
-#include "LinearOp/PrecisionOpMatrix.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
@@ -23,7 +22,6 @@ namespace gstlrn
 {
 class ShiftOpMatrix;
 class PrecisionOp;
-class PrecisionOpMatrix;
 class Db;
 class DbGrid;
 class MeshETurbo;
@@ -41,7 +39,10 @@ class SPDEOp;
 class GSTLEARN_EXPORT SPDE
 {
 public:
-  SPDE(Model* model,
+  SPDE(const Db* dbin,
+       Db* dbout,
+       Model* model,
+       bool flagSimu,
        int useCholesky         = -1,
        const SPDEParam& params = SPDEParam());
   SPDE(const SPDE& r)            = delete;
@@ -50,9 +51,7 @@ public:
 
 public:
   bool getFlagCholesky() const { return _flagCholesky; }
-  void setDbin(const Db* dbin) { _dbin = dbin; };
-  void setDbout(const Db* dbout) { _dbout = dbout; };
-
+  bool getFlagCond() const { return _flagCond; }
   const VectorMeshes& getMeshesK() const { return _meshesK; }
   const VectorMeshes& getMeshesS() const { return _meshesS; }
   const ProjMultiMatrix* getAinK() const { return _AinK; }
@@ -63,18 +62,16 @@ public:
 
   int getSeed() const { return _params.getSeedMC(); }
   int getNMC() const { return _params.getNMC(); }
+  const SPDEOp* getSPDEOp() const { return _spdeop; }
 
-  int defineMeshes(bool flagSimu,
-                   const VectorMeshes& meshesK,
+  int defineMeshes(const VectorMeshes& meshesK,
                    const VectorMeshes& meshesS = VectorMeshes(),
                    bool verbose                = false);
-  int defineProjections(bool flagSimu,
-                        bool flagCond,
-                        const ProjMultiMatrix* projInK,
+  int defineProjections(const ProjMultiMatrix* projInK = nullptr,
                         const ProjMultiMatrix* projInS = nullptr,
                         bool verbose                   = false);
-  SPDEOp* defineShiftOperator(bool flagSimu, bool verbose = false);
-  int centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z, bool verbose = false);
+  int defineShiftOperator(bool verbose = false);
+  int centerDataByDriftInPlace(VectorDouble& Z, bool verbose = false);
   void uncenterResultByDriftInPlace(VectorDouble& result);
   void addNuggetToResult(VectorDouble& result);
 
@@ -92,7 +89,10 @@ private:
   const Db* _dbin;  // External Pointer
   const Db* _dbout; // External pointer
   Model* _model;    // External pointer
+
   bool _flagCholesky;
+  bool _flagSimu;
+  bool _flagCond;
   VectorDouble _driftCoeffs;
   bool _createMeshesK;
   VectorMeshes _meshesK;
@@ -110,6 +110,7 @@ private:
   PrecisionOpMulti* _QopS;
   PrecisionOpMultiMatrix* _Qom;
   InvNuggetOp* _invnoiseobj;
+  SPDEOp* _spdeop;
   SPDEParam _params;
 };
 

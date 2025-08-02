@@ -9,15 +9,15 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Mesh/AMesh.hpp"
-#include "Matrix/NF_Triplet.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Matrix/MatrixSquare.hpp"
-#include "Matrix/MatrixInt.hpp"
-#include "LinearOp/ProjMatrix.hpp"
-#include "Db/Db.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/SerializeHDF5.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
+#include "LinearOp/ProjMatrix.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixInt.hpp"
+#include "Matrix/MatrixSquare.hpp"
+#include "Matrix/NF_Triplet.hpp"
 #include "Space/SpacePoint.hpp"
 #include "Tree/Ball.hpp"
 
@@ -26,22 +26,22 @@
 namespace gstlrn
 {
 AMesh::AMesh()
-    : AStringable(),
-      ASerializable(),
-      _nDim(0),
-      _extendMin(),
-      _extendMax()
+  : AStringable()
+  , ASerializable()
+  , _nDim(0)
+  , _extendMin()
+  , _extendMax()
 {
 }
 
-AMesh::AMesh(const AMesh &m)
-  : AStringable(m),
-    ASerializable(m)
+AMesh::AMesh(const AMesh& m)
+  : AStringable(m)
+  , ASerializable(m)
 {
   _recopy(m);
 }
 
-AMesh& AMesh::operator= (const AMesh &m)
+AMesh& AMesh::operator=(const AMesh& m)
 {
   if (this != &m)
   {
@@ -54,7 +54,6 @@ AMesh& AMesh::operator= (const AMesh &m)
 
 AMesh::~AMesh()
 {
-
 }
 
 int AMesh::_setExtend(const VectorDouble& extendmin,
@@ -62,7 +61,7 @@ int AMesh::_setExtend(const VectorDouble& extendmin,
 {
   _extendMin = extendmin;
   _extendMax = extendmax;
-  return(0);
+  return (0);
 }
 
 String AMesh::toString(const AStringFormat* strfmt) const
@@ -84,8 +83,7 @@ String AMesh::toString(const AStringFormat* strfmt) const
   {
     sstr << toTitle(1, "Bounding Box Extension");
     for (int idim = 0; idim < _nDim; idim++)
-      sstr << "Dim #" << idim+1 << " - Min:" << _extendMin[idim] << " - Max:" <<
-              _extendMax[idim] << std::endl;
+      sstr << "Dim #" << idim + 1 << " - Min:" << _extendMin[idim] << " - Max:" << _extendMax[idim] << std::endl;
   }
 
   AStringFormat sf;
@@ -113,7 +111,7 @@ void AMesh::getCoordinatesPerMeshInPlace(int imesh, int rank, VectorDouble& coor
 void AMesh::getApexCoordinatesInPlace(int i, VectorDouble& coords) const
 {
   for (int idim = 0; idim < getNDim(); idim++)
-      coords[idim] = getApexCoor(i, idim);
+    coords[idim] = getApexCoor(i, idim);
 }
 
 /****************************************************************************/
@@ -125,12 +123,12 @@ void AMesh::getApexCoordinatesInPlace(int i, VectorDouble& coords) const
 ** \param[in]  db        Db structure
 **
 *****************************************************************************/
-int AMesh::isCompatibleDb(const Db *db) const
+int AMesh::isCompatibleDb(const Db* db) const
 {
   if (getNDim() == db->getNDim()) return 0;
 
   messerr("Inconsistent Space dimension between Meshing (%d) and Db (%d)",
-          getNDim(),db->getNDim());
+          getNDim(), db->getNDim());
   return 1;
 }
 
@@ -144,21 +142,22 @@ VectorDouble AMesh::getMeshSizes() const
 
 void AMesh::printMesh(int imesh0) const
 {
-  mestitle(0,"Mesh Information");
-  message("- Number of Meshes = %d\n",getNMeshes());
-  message("- Number of Apices = %d\n",getNApices());
+  mestitle(0, "Mesh Information");
+  message("- Number of Meshes = %d\n", getNMeshes());
+  message("- Number of Apices = %d\n", getNApices());
+  if (imesh0 < 0) return;
 
   int ideb = (imesh0 >= 0) ? imesh0 : 0;
-  int ifin = (imesh0 >= 0) ? imesh0 + 1: getNMeshes();
-  for (int imesh=ideb; imesh<ifin; imesh++)
+  int ifin = (imesh0 >= 0) ? imesh0 + 1 : getNMeshes();
+  for (int imesh = ideb; imesh < ifin; imesh++)
   {
-    message("Mesh #%d\n",imesh+1);
-    for (int icorn=0; icorn<getNApexPerMesh(); icorn++)
+    message("Mesh #%d\n", imesh + 1);
+    for (int icorn = 0; icorn < getNApexPerMesh(); icorn++)
     {
-      message("Point #%d",getApex(imesh, icorn));
-      for (int idim=0; idim<getNDim(); idim++)
+      message("Point #%d", getApex(imesh, icorn));
+      for (int idim = 0; idim < getNDim(); idim++)
       {
-        message(" %lf",getCoor(imesh,icorn,idim));
+        message(" %lf", getCoor(imesh, icorn, idim));
       }
       message("\n");
     }
@@ -167,9 +166,9 @@ void AMesh::printMesh(int imesh0) const
 
 void AMesh::printMeshes(int level, int nline_max) const
 {
-  mestitle(0,"Mesh Information");
-  message("- Number of Meshes = %d\n",getNMeshes());
-  message("- Number of Apices = %d\n",getNApices());
+  mestitle(0, "Mesh Information");
+  message("- Number of Meshes = %d\n", getNMeshes());
+  message("- Number of Apices = %d\n", getNApices());
 
   if (level == 0) return;
 
@@ -180,16 +179,16 @@ void AMesh::printMeshes(int level, int nline_max) const
     _printMeshListByCoordinates(nline_max);
 }
 
-void AMesh::_recopy(const AMesh &m)
+void AMesh::_recopy(const AMesh& m)
 {
-  _nDim    = m._nDim;
+  _nDim      = m._nDim;
   _extendMin = m._extendMin;
   _extendMax = m._extendMax;
 }
 
 VectorDouble AMesh::getCoordinatesPerApex(int idim) const
 {
-  if (! _isSpaceDimensionValid(idim)) return VectorDouble();
+  if (!_isSpaceDimensionValid(idim)) return VectorDouble();
   int np = getNApices();
   VectorDouble coor(np);
   for (int ip = 0; ip < np; ip++)
@@ -228,7 +227,7 @@ VectorVectorDouble AMesh::getAllCoordinates() const
  */
 MatrixInt AMesh::getAllMeshes() const
 {
-  int nper = getNApexPerMesh();
+  int nper    = getNApexPerMesh();
   int nmeshes = getNMeshes();
   MatrixInt meshes(nmeshes, nper);
 
@@ -250,7 +249,7 @@ double AMesh::getCenterCoordinate(int imesh, int idim) const
   int ncorner = getNApexPerMesh();
   for (int icorner = 0; icorner < ncorner; icorner++)
     coor += getCoor(imesh, icorner, idim);
-  return (coor / (double) ncorner);
+  return (coor / (double)ncorner);
 }
 
 VectorVectorDouble AMesh::getAllCenterCoordinates() const
@@ -301,7 +300,7 @@ VectorInt AMesh::getMeshByApexPair(int apex1, int apex2) const
     found = 0;
     for (int ic = 0; ic < ncorner; ic++)
     {
-      apex0 = getApex(imesh,ic);
+      apex0 = getApex(imesh, ic);
       if (apex0 == apex1)
         found++;
       if (apex0 == apex2)
@@ -333,7 +332,7 @@ void AMesh::getElements(MatrixDense& apices, MatrixInt& meshes) const
 
   // Dimension the returned containers
 
-  apices.reset(napices,ndim);
+  apices.reset(napices, ndim);
   meshes.reset(nmeshes, ncorner);
 
   // Load the Apices
@@ -343,15 +342,15 @@ void AMesh::getElements(MatrixDense& apices, MatrixInt& meshes) const
   {
     getApexCoordinatesInPlace(i, local);
     for (int idim = 0; idim < ndim; idim++)
-      apices.setValue(i,idim,local[idim]);
+      apices.setValue(i, idim, local[idim]);
   }
 
   // Load the Meshes
 
   for (int imesh = 0; imesh < nmeshes; imesh++)
-    for (int icorner= 0; icorner < ncorner; icorner++)
+    for (int icorner = 0; icorner < ncorner; icorner++)
       meshes.setValue(imesh, icorner, getApex(imesh, icorner));
- }
+}
 
 bool AMesh::_isSpaceDimensionValid(int idim) const
 {
@@ -372,7 +371,7 @@ VectorDouble AMesh::getCoordinatesPerMesh(int imesh, int idim, bool flagClose) c
   int ncorner = getNApexPerMesh();
 
   if (flagClose)
-    vec.resize(ncorner+1);
+    vec.resize(ncorner + 1);
   else
     vec.resize(ncorner);
 
@@ -434,10 +433,10 @@ void AMesh::getEmbeddedCoordinatesPerMeshInPlace(int imesh, VectorVectorDouble& 
  */
 VectorVectorDouble AMesh::getEmbeddedCoordinatesPerMesh(int imesh) const
 {
-  int ndim = getEmbeddedNDim();
+  int ndim    = getEmbeddedNDim();
   int ncorner = getNApexPerMesh();
   VectorVectorDouble vec(ncorner);
-  for (auto &e: vec)
+  for (auto& e: vec)
     e = VectorDouble(ndim);
 
   getEmbeddedCoordinatesPerMeshInPlace(imesh, vec);
@@ -446,10 +445,10 @@ VectorVectorDouble AMesh::getEmbeddedCoordinatesPerMesh(int imesh) const
 
 VectorVectorDouble AMesh::getCoordinatesPerMesh(int imesh) const
 {
-  int ndim = getNDim();
+  int ndim    = getNDim();
   int ncorner = getNApexPerMesh();
   VectorVectorDouble vec(ncorner);
-  for (auto &e: vec)
+  for (auto& e: vec)
     e = VectorDouble(ndim);
 
   for (int ic = 0; ic < ncorner; ic++)
@@ -465,10 +464,10 @@ VectorVectorDouble AMesh::getCoordinatesPerMesh(int imesh) const
  */
 VectorVectorDouble AMesh::getEmbeddedCoordinatesPerApex() const
 {
-  int ndim = getEmbeddedNDim();
+  int ndim    = getEmbeddedNDim();
   int napices = getNApices();
   VectorVectorDouble vec(ndim);
-  for (auto &e: vec)
+  for (auto& e: vec)
     e = VectorDouble(napices);
 
   VectorDouble local(ndim);
@@ -493,14 +492,14 @@ VectorDouble AMesh::getDistances(int iapex0, const VectorInt& japices) const
 {
   VectorInt jlocal = japices;
   if (jlocal.empty()) jlocal = VH::sequence(getNApices());
-  int number = (int) jlocal.size();
-  VectorDouble vec(number,0.);
+  int number = (int)jlocal.size();
+  VectorDouble vec(number, 0.);
 
-  SpacePoint P1(getApexCoordinates(iapex0),-1);
+  SpacePoint P1(getApexCoordinates(iapex0), -1);
 
   for (int iapex = 0; iapex < number; iapex++)
   {
-    SpacePoint P2(getApexCoordinates(jlocal[iapex]),-1);
+    SpacePoint P2(getApexCoordinates(jlocal[iapex]), -1);
     vec[iapex] = P1.getDistance(P2);
   }
   return vec;
@@ -560,7 +559,7 @@ VectorVectorInt AMesh::getNeighborhoodPerApex() const
     VectorInt vec;
 
     // Loop on the meshes neighboring the target apex 'ip'
-    int nmesh = (int) Vmesh[ip].size();
+    int nmesh = (int)Vmesh[ip].size();
     for (int i = 0; i < nmesh; i++)
     {
       // Index of the neighboring mesh
@@ -580,8 +579,8 @@ VectorVectorInt AMesh::getNeighborhoodPerApex() const
     }
 
     // Sort the list and suppress the duplicates
-    std::sort( vec.begin(), vec.end() );
-    vec.erase( std::unique( vec.begin(), vec.end() ), vec.end() );
+    std::sort(vec.begin(), vec.end());
+    vec.erase(std::unique(vec.begin(), vec.end()), vec.end());
 
     // Store the list
     Vapex[ip] = vec;
@@ -591,8 +590,8 @@ VectorVectorInt AMesh::getNeighborhoodPerApex() const
 
 void AMesh::dumpNeighborhood(std::vector<VectorInt>& Vmesh, int nline_max)
 {
-  mestitle(1,"List of Meshing Neighborhood");
-  int nmax = (int) Vmesh.size();
+  mestitle(1, "List of Meshing Neighborhood");
+  int nmax = (int)Vmesh.size();
   if (nline_max > 0) nmax = MIN(nmax, nline_max);
   for (int irow = 0; irow < nmax; irow++)
   {
@@ -603,18 +602,18 @@ void AMesh::dumpNeighborhood(std::vector<VectorInt>& Vmesh, int nline_max)
 bool AMesh::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
-  ret = ret && _recordRead<int>(is, "Space Dimension", _nDim);
-  ret = ret && _recordReadVec<double>(is, "Minimum Extension", _extendMin, _nDim);
-  ret = ret && _recordReadVec<double>(is, "Maximum Extension", _extendMax, _nDim);
+  ret      = ret && _recordRead<int>(is, "Space Dimension", _nDim);
+  ret      = ret && _recordReadVec<double>(is, "Minimum Extension", _extendMin, _nDim);
+  ret      = ret && _recordReadVec<double>(is, "Maximum Extension", _extendMax, _nDim);
   return ret;
 }
 
 bool AMesh::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
-  ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
-  ret = ret && _recordWriteVec<double>(os, "Minimum Extension", _extendMin);
-  ret = ret && _recordWriteVec<double>(os, "Maximum Extension", _extendMax);
+  ret      = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+  ret      = ret && _recordWriteVec<double>(os, "Minimum Extension", _extendMin);
+  ret      = ret && _recordWriteVec<double>(os, "Maximum Extension", _extendMax);
   return ret;
 }
 
@@ -648,17 +647,17 @@ bool AMesh::_weightsInMesh(const VectorDouble& coor,
 
   // Loop on the vertices
   double total = 0.;
-  for (int icorn=0; icorn<ncorner; icorn++)
+  for (int icorn = 0; icorn < ncorner; icorn++)
   {
 
     // Build the determinant
     MatrixSquare mat(ndim);
     int kcorn = 0;
-    for (int jcorn=0; jcorn<ncorner; jcorn++)
+    for (int jcorn = 0; jcorn < ncorner; jcorn++)
     {
       if (icorn == jcorn) continue;
-      for (int idim=0; idim<ndim; idim++)
-        mat.setValue(idim,kcorn,corners[jcorn][idim] - coor[idim]);
+      for (int idim = 0; idim < ndim; idim++)
+        mat.setValue(idim, kcorn, corners[jcorn][idim] - coor[idim]);
       kcorn++;
     }
     double ratio = ABS(mat.determinant()) / meshsize / FACDIM[ndim];
@@ -689,10 +688,10 @@ double AMesh::_getMeshUnit(const VectorVectorDouble& corners) const
 
   // Calculate the mesh size
   MatrixSquare mat;
-  mat.reset(ndim,ndim);
-  for (int icorn=1; icorn<ncorner; icorn++)
-    for (int idim=0; idim<ndim; idim++)
-      mat.setValue(icorn-1, idim, corners[icorn][idim] - corners[0][idim]);
+  mat.reset(ndim, ndim);
+  for (int icorn = 1; icorn < ncorner; icorn++)
+    for (int idim = 0; idim < ndim; idim++)
+      mat.setValue(icorn - 1, idim, corners[icorn][idim] - corners[0][idim]);
   unit = ABS(mat.determinant()) / facdim[ndim];
 
   return unit;
@@ -705,14 +704,14 @@ void AMesh::_printMeshListByCoordinates(int nline_max) const
   int ncorner = getNApexPerMesh();
 
   int iline = 0;
-  for (int imesh=0; imesh<nmesh; imesh++)
+  for (int imesh = 0; imesh < nmesh; imesh++)
   {
-    message("Mesh #%5d/%5d\n",imesh+1,nmesh);
-    for (int icorn=0; icorn<ncorner; icorn++)
+    message("Mesh #%5d/%5d\n", imesh + 1, nmesh);
+    for (int icorn = 0; icorn < ncorner; icorn++)
     {
-      message(" Apex %4d: ",getApex(imesh,icorn));
-      for (int idim=0; idim<ndim; idim++)
-        message(" %lf",getCoor(imesh,icorn,idim));
+      message(" Apex %4d: ", getApex(imesh, icorn));
+      for (int idim = 0; idim < ndim; idim++)
+        message(" %lf", getCoor(imesh, icorn, idim));
       message("\n");
     }
 
@@ -727,11 +726,11 @@ void AMesh::_printMeshListByIndices(int nline_max) const
   int ncorner = getNApexPerMesh();
 
   int iline = 0;
-  for (int imesh=0; imesh<nmesh; imesh++)
+  for (int imesh = 0; imesh < nmesh; imesh++)
   {
-    message("Mesh #%d/%d: ",imesh+1,nmesh);
-    for (int icorn=0; icorn<ncorner; icorn++)
-      message(" %d",getApex(imesh,icorn));
+    message("Mesh #%d/%d: ", imesh + 1, nmesh);
+    for (int icorn = 0; icorn < ncorner; icorn++)
+      message(" %d", getApex(imesh, icorn));
     message("\n");
 
     iline++;
@@ -909,8 +908,8 @@ bool AMesh::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   /* Read the grid characteristics */
   bool ret = true;
   ret      = ret && SerializeHDF5::readValue(*ameshG, "NDim", _nDim);
-  ret = ret && SerializeHDF5::readVec(*ameshG, "ExtendMin", _extendMin);
-  ret = ret && SerializeHDF5::readVec(*ameshG, "ExtendMax", _extendMax);
+  ret      = ret && SerializeHDF5::readVec(*ameshG, "ExtendMin", _extendMin);
+  ret      = ret && SerializeHDF5::readVec(*ameshG, "ExtendMax", _extendMax);
 
   return ret;
 }
@@ -927,4 +926,4 @@ bool AMesh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
-}
+} // namespace gstlrn

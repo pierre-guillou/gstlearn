@@ -397,8 +397,7 @@ int PrecisionOpMulti::_addToDest(const constvect vecin, vect vecout) const
  * @param vecout Output array
  */
 
-int PrecisionOpMulti::_addSimulateToDest(const constvect vecin,
-                                         vect vecout) const
+int PrecisionOpMulti::_addSimulateToDest(const constvect vecin, vect vecout) const
 {
   if (!_checkReady()) return 1;
   EVALOP(vecin, vecout, _cholSills, getLowerTriangle, evalSimulate,

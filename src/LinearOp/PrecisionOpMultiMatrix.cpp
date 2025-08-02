@@ -141,8 +141,7 @@ void PrecisionOpMultiMatrix::_buildQop(bool stencil)
   }
 }
 
-int PrecisionOpMultiMatrix::_addToDest(const constvect vecin,
-                                       vect vecout) const
+int PrecisionOpMultiMatrix::_addToDest(const constvect vecin, vect vecout) const
 {
   return getQ()->addToDest(vecin, vecout);
 }

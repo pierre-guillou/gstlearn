@@ -34,9 +34,8 @@ class AStringable;
 class AStringFormat;
 class ASimulable;
 
-/**
- * Class to store objects for SPDE
- */
+// This class is dedicated to the multivariate Model.
+// It creates a vector of precision operators (matrix-free).
 class GSTLEARN_EXPORT PrecisionOpMulti: public AStringable, public ASimulable
 {
 public:
@@ -47,25 +46,22 @@ public:
   PrecisionOpMulti(const PrecisionOpMulti& m)            = delete;
   PrecisionOpMulti& operator=(const PrecisionOpMulti& m) = delete;
   virtual ~PrecisionOpMulti();
-  int getSize() const override;
 
-protected:
-  void buildQop(bool stencil = false);
-#ifndef SWIG
-
-protected:
-  int _addToDest(const constvect vecin, vect vecout) const override;
-  int _addSimulateToDest(const constvect vecin, vect vecout) const override;
-#endif
-
-public:
   /// AStringable Interface
   String toString(const AStringFormat* strfmt = nullptr) const override;
+
+  int getSize() const override;
 
   double computeLogDet(int nMC = 1) const override;
   std::pair<double, double> rangeEigenValQ() const;
 
 protected:
+#ifndef SWIG
+  int _addToDest(const constvect vecin, vect vecout) const override;
+  int _addSimulateToDest(const constvect vecin, vect vecout) const override;
+#endif
+
+  void buildQop(bool stencil = false);
   int size(int imesh) const;
   int _getNCov() const;
   int _getCovInd(int i) const { return _covList[i]; }
@@ -90,13 +86,14 @@ protected:
   std::vector<PrecisionOp*> _pops;
   VectorBool _isNoStatForVariance;
   std::vector<MatrixSymmetric> _sills;
-  std::vector<std::vector<MatrixSymmetric>>_localSills; // Local Sills for non-stationary covariances
+  std::vector<std::vector<MatrixSymmetric>> _localSills; // Local Sills for non-stationary covariances
   std::vector<VectorVectorDouble> _invCholSillsNoStat;
   std::vector<VectorVectorDouble> _cholSillsNoStat;
   std::vector<CholeskyDense> _invCholSillsStat; // Stationary Sills
   std::vector<CholeskyDense> _cholSillsStat;    // Cholesky of the Sills
-  Model* _model;                                // Not to be deleted. TODO : make it const
-  std::vector<const AMesh*> _meshes;            // Not to be deleted
+
+  Model* _model;                     // Not to be deleted. TODO : make it const
+  std::vector<const AMesh*> _meshes; // Not to be deleted
   int _size;
 
 private:
@@ -106,7 +103,6 @@ private:
   bool _allStat;
   bool _ready;
 
-private:
   mutable VectorVectorDouble _works;
   mutable VectorDouble _workTot;
 };
