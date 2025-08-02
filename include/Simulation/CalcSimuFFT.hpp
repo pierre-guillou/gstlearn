@@ -14,10 +14,10 @@
 
 #include "geoslib_define.h"
 
-#include "Simulation/ACalcSimulation.hpp"
-#include "Simulation/SimuFFTParam.hpp"
 #include "Basic/Plane.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Simulation/ACalcSimulation.hpp"
+#include "Simulation/SimuFFTParam.hpp"
 
 namespace gstlrn
 {
@@ -30,20 +30,20 @@ class GSTLEARN_EXPORT CalcSimuFFT: public ACalcSimulation
 {
 public:
   CalcSimuFFT(int nbsimu = 0, bool verbose = false, int seed = 4324324);
-  CalcSimuFFT(const CalcSimuFFT &r) = delete;
-  CalcSimuFFT& operator=(const CalcSimuFFT &r) = delete;
+  CalcSimuFFT(const CalcSimuFFT& r)            = delete;
+  CalcSimuFFT& operator=(const CalcSimuFFT& r) = delete;
   virtual ~CalcSimuFFT();
 
-  void setParam(const SimuFFTParam &param) { _param = param; }
+  void setParam(const SimuFFTParam& param) { _param = param; }
   void setVerbose(bool verbose) { _verbose = verbose; }
-  VectorDouble changeSupport(const VectorDouble &sigma);
+  VectorDouble changeSupport(const VectorDouble& sigma);
 
 private:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
-  virtual bool _run() override;
-  virtual bool _postprocess() override;
-  virtual void _rollback() override;
+  bool _check() override;
+  bool _preprocess() override;
+  bool _run() override;
+  bool _postprocess() override;
+  void _rollback() override;
 
   bool _simulate();
   void _alloc();
@@ -64,7 +64,7 @@ private:
   void _defineSym3();
   void _setZero(int ix, int iy, int iz);
   void _setConjugate(int ix, int iy, int iz, int jx, int jy, int jz);
-  void _final(DbGrid *db, int iad);
+  void _final(DbGrid* db, int iad);
   double _support(double sigma);
   double _support1(double sigma);
   double _support2(double sigma);
@@ -87,17 +87,17 @@ private:
   VectorDouble _v;
 };
 
-GSTLEARN_EXPORT int simfft(DbGrid *db,
-                           ModelGeneric *model,
+GSTLEARN_EXPORT int simfft(DbGrid* db,
+                           ModelGeneric* model,
                            SimuFFTParam& param,
-                           int nbsimu = 1,
-                           int seed = 432431,
-                           int verbose = false,
+                           int nbsimu                      = 1,
+                           int seed                        = 432431,
+                           int verbose                     = false,
                            const NamingConvention& namconv = NamingConvention("FFT"));
-GSTLEARN_EXPORT VectorDouble getChangeSupport(DbGrid *db,
-                                              ModelGeneric *model,
-                                              const SimuFFTParam &param,
-                                              const VectorDouble &sigma = VectorDouble(),
-                                              int seed = 14333,
-                                              bool verbose = false);
-}
+GSTLEARN_EXPORT VectorDouble getChangeSupport(DbGrid* db,
+                                              ModelGeneric* model,
+                                              const SimuFFTParam& param,
+                                              const VectorDouble& sigma = VectorDouble(),
+                                              int seed                  = 14333,
+                                              bool verbose              = false);
+} // namespace gstlrn

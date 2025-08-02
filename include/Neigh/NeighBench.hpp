@@ -52,14 +52,14 @@ public:
 
   IMPLEMENT_CLONING(NeighBench)
   /// Interface for ANeigh
-  virtual int attach(const Db *dbin, const Db *dbout = nullptr) override;
-  virtual void getNeigh(int iech_out, VectorInt& ranks) override;
-  virtual bool hasChanged(int iech_out) const override;
-  virtual int getNSampleMax(const Db* db) const override;
-  virtual ENeigh getType() const override { return ENeigh::fromKey("BENCH"); }
+  int attach(const Db *dbin, const Db *dbout = nullptr) override;
+  void getNeigh(int iech_out, VectorInt& ranks) override;
+  bool hasChanged(int iech_out) const override;
+  int getNSampleMax(const Db* db) const override;
+  ENeigh getType() const override { return ENeigh::fromKey("BENCH"); }
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighBench* create(bool flag_xvalid             = false,
                             double width                 = 0,
@@ -71,8 +71,8 @@ public:
   double getWidth() const { return _width; }
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

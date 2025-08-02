@@ -298,7 +298,6 @@
 %include Drifts/DriftFactory.hpp
 
 %include API/SPDE.hpp
-%include API/PGSSPDE.hpp
 %include API/TestInheritance.hpp
 %include API/Style.hpp
 %include API/SPDEParam.hpp

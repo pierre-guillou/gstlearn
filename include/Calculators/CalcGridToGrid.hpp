@@ -14,8 +14,8 @@
 
 #include "ACalcDbToDb.hpp"
 
-#include "Db/DbGrid.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "Db/DbGrid.hpp"
 
 namespace gstlrn
 {
@@ -23,23 +23,23 @@ class GSTLEARN_EXPORT CalcGridToGrid: public ACalcDbToDb
 {
 public:
   CalcGridToGrid();
-  CalcGridToGrid(const CalcGridToGrid &r) = delete;
-  CalcGridToGrid& operator=(const CalcGridToGrid &r) = delete;
+  CalcGridToGrid(const CalcGridToGrid& r)            = delete;
+  CalcGridToGrid& operator=(const CalcGridToGrid& r) = delete;
   virtual ~CalcGridToGrid();
 
-  void setFlagCopy(bool flagCopy)     { _flagCopy = flagCopy; }
+  void setFlagCopy(bool flagCopy) { _flagCopy = flagCopy; }
   void setFlagExpand(bool flagExpand) { _flagExpand = flagExpand; }
   void setFlagShrink(bool flagShrink) { _flagShrink = flagShrink; }
-  void setFlagInter(bool flagInter)   { _flagInter = flagInter;   }
+  void setFlagInter(bool flagInter) { _flagInter = flagInter; }
   void setNameBots(const VectorString& name_bots) { _nameBots = name_bots; }
   void setNameTops(const VectorString& name_tops) { _nameTops = name_tops; }
 
 protected:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
-  virtual bool _run() override;
-  virtual bool _postprocess() override;
-  virtual void _rollback() override;
+  bool _check() override;
+  bool _preprocess() override;
+  bool _run() override;
+  bool _postprocess() override;
+  void _rollback() override;
 
 private:
   bool _g2gCopy();
@@ -52,37 +52,38 @@ private:
   double _interpolate(int nvar,
                       double valTop,
                       double valBot,
-                      const VectorDouble &coorTop,
-                      const VectorDouble &coorBot,
-                      const VectorDouble &coorOut);
+                      const VectorDouble& coorTop,
+                      const VectorDouble& coorBot,
+                      const VectorDouble& coorOut);
 
 private:
-  int  _iattOut;
+  int _iattOut;
   bool _flagCopy;
   bool _flagExpand;
   bool _flagShrink;
-  int  _iattAux;
+  int _iattAux;
   bool _flagInter;
   VectorString _nameTops;
   VectorString _nameBots;
 };
 
-GSTLEARN_EXPORT int dbg2gCopy(DbGrid *dbin,
-                              DbGrid *dbout,
-                              const NamingConvention &namconv = NamingConvention(
-                                  "Copy"));
-GSTLEARN_EXPORT int dbg2gExpand(DbGrid *dbin,
-                                DbGrid *dbout,
-                                const NamingConvention &namconv = NamingConvention(
-                                    "Expand"));
-GSTLEARN_EXPORT int dbg2gShrink(DbGrid *dbin,
-                                DbGrid *dbout,
-                                const NamingConvention &namconv = NamingConvention(
-                                    "Shrink"));
-GSTLEARN_EXPORT int dbg2gInterpolate(DbGrid *dbin,
-                                     DbGrid *dbout,
-                                     const VectorString &tops = VectorString(),
-                                     const VectorString &bots = VectorString(),
-                                     const NamingConvention &namconv = NamingConvention(
-                                         "Interpolation", false));
-}
+GSTLEARN_EXPORT int dbg2gCopy(DbGrid* dbin,
+                              DbGrid* dbout,
+                              const NamingConvention& namconv = NamingConvention(
+                                "Copy"));
+GSTLEARN_EXPORT int dbg2gExpand(DbGrid* dbin,
+                                DbGrid* dbout,
+                                const NamingConvention& namconv = NamingConvention(
+                                  "Expand"));
+GSTLEARN_EXPORT int dbg2gShrink(DbGrid* dbin,
+                                DbGrid* dbout,
+                                const NamingConvention& namconv = NamingConvention(
+                                  "Shrink"));
+GSTLEARN_EXPORT int dbg2gInterpolate(DbGrid* dbin,
+                                     DbGrid* dbout,
+                                     const VectorString& tops        = VectorString(),
+                                     const VectorString& bots        = VectorString(),
+                                     const NamingConvention& namconv = NamingConvention(
+                                       "Interpolation",
+                                       false));
+} // namespace gstlrn

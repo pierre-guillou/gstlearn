@@ -38,7 +38,7 @@ class GSTLEARN_EXPORT Option_AutoFit : public AStringable
   Option_AutoFit& operator= (const Option_AutoFit &m);
   virtual ~Option_AutoFit();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   double getEpsdelta() const { return _epsdelta; }
   double getInitdelta() const { return _initdelta; }

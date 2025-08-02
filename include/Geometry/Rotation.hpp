@@ -38,7 +38,7 @@ public:
   int getDerivativesInPlace(std::vector<MatrixSquare>& res) const;
   std::vector<MatrixSquare> getDerivatives() const;
   void resetFromSpaceDimension(unsigned int ndim);
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
   int setMatrixDirect(const MatrixSquare& rotmat);
   int setMatrixDirectVec(const VectorDouble& rotmat);
   int setAngles(const VectorDouble& angles);

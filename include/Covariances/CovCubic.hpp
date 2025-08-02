@@ -29,11 +29,11 @@ public:
 
   unsigned int getMaxNDim()   const  override { return 3; }
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Cubic"; }
   int            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
-  virtual bool   hasCovDerivative() const override { return true; }
+  bool   hasCovDerivative() const override { return true; }
 
   bool isValidForTurningBand() const override { return true; }
   double simulateTurningBand(double t0, TurningBandOperate &operTB) const override;

@@ -30,7 +30,7 @@ public:
   CovGamma& operator= (const CovGamma &r);
   virtual ~CovGamma();
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Gamma"; }
   int            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }

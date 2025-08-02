@@ -30,7 +30,7 @@ public:
   virtual ~MeshSpherical();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Interface to AMesh
   int     getNApices() const override;
@@ -61,8 +61,8 @@ public:
   VectorVectorInt getMeshesAsVVI() const {return _meshes.getMatrix();}
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

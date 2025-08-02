@@ -14,10 +14,8 @@
 #include "LinearOp/CGParam.hpp"
 
 namespace gstlrn
-{ 
+{
 class ALinearOp;
-
-
 
 /**
  * @brief Definition of the parameters used within SPDE
@@ -52,7 +50,7 @@ public:
   virtual ~SPDEParam();
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static SPDEParam* create(int refineK             = 11,
                            int refineS             = 18,
@@ -99,4 +97,4 @@ private:
   int _seedMC; // Seed for the random number generator
   CGParam _CGparams;
 };
-}
+} // namespace gstlrn

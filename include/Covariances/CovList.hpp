@@ -52,16 +52,16 @@ public:
   virtual ~CovList();
 
   /// Interface for ACov
-  virtual int getNVar() const override;
-  virtual bool isIndexable() const override { return true; }
-  virtual double eval0(int ivar                = 0,
+  int getNVar() const override;
+  bool isIndexable() const override { return true; }
+  double eval0(int ivar                = 0,
                        int jvar                = 0,
                        const CovCalcMode* mode = nullptr) const override;
 
-  virtual void updateCovByPoints(int icas1, int iech1, int icas2, int iech2) const override;
+  void updateCovByPoints(int icas1, int iech1, int icas2, int iech2) const override;
 
   /// Interface for AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// CovList Interface
   virtual void addCov(const CovBase& cov);

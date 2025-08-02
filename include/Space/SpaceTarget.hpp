@@ -54,7 +54,7 @@ public:
   bool checkDate() const { return _checkDate; }
 
   /// Convert space point to string
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
 private:
   void _initialize();

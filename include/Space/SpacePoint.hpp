@@ -48,7 +48,7 @@ public:
   int getIech() const { return _iech; }
   bool isProjected() const { return _isProjected; }
   /// Return true if the point is consistent with the provided space
-  virtual bool isConsistent(const ASpace* space) const override;
+  bool isConsistent(const ASpace* space) const override;
 
   /// Move me by the given vector
   void move(const VectorDouble& vec);
@@ -74,7 +74,7 @@ public:
   void setCoordFromAngle(const VectorDouble& angles);
 
   /// Convert space point to string
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
 protected:
   /// Points coordinates (whatever the space context)

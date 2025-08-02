@@ -66,16 +66,16 @@ public:
   IMPLEMENT_CLONING(NeighMoving)
   
   /// Interface for ANeigh
-  virtual int attach(const Db *dbin, const Db *dbout = nullptr) override;
-  virtual void getNeigh(int iech_out, VectorInt& ranks) override;
-  virtual bool hasChanged(int iech_out) const override;
-  virtual VectorDouble summary(int iech_out) override;
-  virtual int getNSampleMax(const Db* db) const override;
-  virtual ENeigh getType() const override { return ENeigh::fromKey("MOVING"); }
-  virtual bool getFlagContinuous() const override { return (! FFFF(_distCont) && _distCont < 1.); }
+  int attach(const Db *dbin, const Db *dbout = nullptr) override;
+  void getNeigh(int iech_out, VectorInt& ranks) override;
+  bool hasChanged(int iech_out) const override;
+  VectorDouble summary(int iech_out) override;
+  int getNSampleMax(const Db* db) const override;
+  ENeigh getType() const override { return ENeigh::fromKey("MOVING"); }
+  bool getFlagContinuous() const override { return (! FFFF(_distCont) && _distCont < 1.); }
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighMoving* create(bool flag_xvalid = false,
                              int nmaxi = 1000,
@@ -119,8 +119,8 @@ public:
   VectorVectorDouble getZoomLimits(const VectorDouble& target, double percent=20) const;
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

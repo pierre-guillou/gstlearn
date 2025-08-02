@@ -33,7 +33,7 @@ public:
   Limits& operator=(const Limits &m);
   virtual ~Limits();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static Limits* create(const VectorDouble& mini,
                         const VectorDouble& maxi,

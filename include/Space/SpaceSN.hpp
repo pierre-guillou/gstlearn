@@ -44,7 +44,7 @@ public:
                           int idx = -1) const override;
 
   /// Return true if the given space is equal to me
-  virtual bool isEqual(const ASpace *space) const override;
+  bool isEqual(const ASpace *space) const override;
 
 protected:
 

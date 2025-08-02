@@ -23,9 +23,9 @@
 namespace gstlrn
 {
 
-InvNuggetOp::InvNuggetOp(Db* dbin, Model* model, const SPDEParam& params, bool flagEigVals)
-  : ASimulable(),
-    MatrixSparse()
+InvNuggetOp::InvNuggetOp(const Db* dbin, Model* model, const SPDEParam& params, bool flagEigVals)
+  : ASimulable()
+  , MatrixSparse()
   , _logDeterminant(TEST)
   , _rangeEigenVal(INF, 0.)
   , _flagEigVals(flagEigVals)
@@ -46,7 +46,6 @@ int InvNuggetOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
 {
   return _cholNuggetMatrix->addToDest(whitenoise, outv);
 }
-
 
 static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef)
 {
@@ -143,7 +142,7 @@ double InvNuggetOp::_updateQuantities(MatrixSymmetric& sillsinv)
  * @param model Input Model structure
  * @param params A structure for ruling the parameters of SPDE
  */
-void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
+void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& params)
 {
   CholeskyDense chol;
   if (db == nullptr) return;
@@ -194,7 +193,7 @@ void InvNuggetOp::_buildInvNugget(Db* db, Model* model, const SPDEParam& params)
 
   size_t sizetot = VH::count(index1);
   // Convert from triplet to sparse matrix
-   _allocate(sizetot, sizetot, nvar);
+  _allocate(sizetot, sizetot, nvar);
   _cholNuggetMatrix = std::make_shared<MatrixSparse>(sizetot, sizetot, nvar);
 
   // Check the various possibilities

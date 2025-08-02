@@ -23,17 +23,17 @@
  * - calcul: tu run the fitting in variogram or in covariance
  */
 
+#include "Basic/OptCustom.hpp"
 #include "Basic/VectorNumT.hpp"
-#include "Model/Model.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
-#include "Variogram/Vario.hpp"
-#include "Variogram/VMap.hpp"
-#include "Variogram/VarioParam.hpp"
-#include "Model/ModelOptimVario.hpp"
+#include "Model/Model.hpp"
 #include "Model/ModelOptimVMap.hpp"
+#include "Model/ModelOptimVario.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
-#include "Basic/OptCustom.hpp"
+#include "Variogram/VMap.hpp"
+#include "Variogram/Vario.hpp"
+#include "Variogram/VarioParam.hpp"
 #include "geoslib_define.h"
 #include "geoslib_old_f.h"
 
@@ -96,8 +96,8 @@ static void _thirdTest(DbGrid* dbgrid,
 {
   mestitle(0, "Sill Fitting from Variogram Map (new version)");
 
-  DbGrid* dbmap = db_vmap(dbgrid, calcul, {50,50});
-  (void) dbmap->dumpToNF("VMap.NF");
+  DbGrid* dbmap = db_vmap(dbgrid, calcul, {50, 50});
+  (void)dbmap->dumpToNF("VMap.NF");
 
   model->fitNew(nullptr, nullptr, dbmap, nullptr, mop, ITEST,
                 verbose, trace);
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
-  ASerializable::setPrefixName("ModelFit-");
+  ASerializable::setPrefixName("test_ModelFitting-");
 
   // Global parameters
   int nvar                = 1;

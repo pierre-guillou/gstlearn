@@ -74,7 +74,7 @@ public:
   virtual ~NamingConvention();
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NamingConvention* create(const String& prefix = "",
                                   bool flag_varname = true,

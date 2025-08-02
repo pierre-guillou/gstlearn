@@ -1205,4 +1205,5 @@ int sampleInteger(int mini, int maxi)
   int retval   = (rand > 0) ? (int)trunc(rand + 0.5) : (int)-trunc(-rand + 0.5);
   return retval;
 }
+
 } // namespace gstlrn

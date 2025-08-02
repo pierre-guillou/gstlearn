@@ -14,38 +14,36 @@
 
 #include "geoslib_define.h"
 
+#include "Anamorphosis/AAnam.hpp"
 #include "Calculators/ACalcInterpolator.hpp"
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
-#include "Anamorphosis/AAnam.hpp"
-
-
 
 namespace gstlrn
 {
 class KrigingSystem;
 class Db;
 class DbGrid;
- 
+
 class GSTLEARN_EXPORT Krigtest_Res
 {
 public:
-  int ndim; // Space dimension
-  int nvar; // Number of variables
-  int nech; // Number of Neighboring samples
-  int CSize; // Number of drift equations in the Drift part
-  int DSize; // Number of Equations of the Covariance part 
-  int nrhs; // Number of R.H.S. vectors
-  VectorInt nbgh;            // Ranks of the neighboring samples 
-  VectorVectorDouble xyz;    // Coordinates of the neighboring samples [ndim][nech]
-  VectorDouble data;         // Usable values at neighboring samples [neq]
-  MatrixSymmetric lhs; // L.H.S. Covariance part (neq * neq)
-  MatrixDense lhsF;    // L.H.S. Drift part 
-  MatrixDense rhs;     // R.H.S. Covariance part (neq * nrhs)
-  MatrixDense rhsF;    // R.H.S. Drift part  (nbfl * nrhs)
-  MatrixDense wgt;     // Vector of weights (neq * nrhs)
-  MatrixDense mu;      // Vector of Lagrange parameters (nbfl * nrhs)
-  MatrixSquare var;   // Matrix of Target-Target Variance (nvar * nvar)
+  int ndim;               // Space dimension
+  int nvar;               // Number of variables
+  int nech;               // Number of Neighboring samples
+  int CSize;              // Number of drift equations in the Drift part
+  int DSize;              // Number of Equations of the Covariance part
+  int nrhs;               // Number of R.H.S. vectors
+  VectorInt nbgh;         // Ranks of the neighboring samples
+  VectorVectorDouble xyz; // Coordinates of the neighboring samples [ndim][nech]
+  VectorDouble data;      // Usable values at neighboring samples [neq]
+  MatrixSymmetric lhs;    // L.H.S. Covariance part (neq * neq)
+  MatrixDense lhsF;       // L.H.S. Drift part
+  MatrixDense rhs;        // R.H.S. Covariance part (neq * nrhs)
+  MatrixDense rhsF;       // R.H.S. Drift part  (nbfl * nrhs)
+  MatrixDense wgt;        // Vector of weights (neq * nrhs)
+  MatrixDense mu;         // Vector of Lagrange parameters (nbfl * nrhs)
+  MatrixSquare var;       // Matrix of Target-Target Variance (nvar * nvar)
 
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;
@@ -56,8 +54,8 @@ class GSTLEARN_EXPORT CalcKriging: public ACalcInterpolator
 {
 public:
   CalcKriging(bool flag_est = true, bool flag_std = true, bool flag_varZ = false);
-  CalcKriging(const CalcKriging &r) = delete;
-  CalcKriging& operator=(const CalcKriging &r) = delete;
+  CalcKriging(const CalcKriging& r)            = delete;
+  CalcKriging& operator=(const CalcKriging& r) = delete;
   virtual ~CalcKriging();
 
   void setPriorCov(const MatrixSymmetric& priorCov) { _priorCov = priorCov; }
@@ -77,11 +75,11 @@ public:
   Krigtest_Res getKtest() const { return _ktest; }
 
 private:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
-  virtual bool _run() override;
-  virtual bool _postprocess() override;
-  virtual void _rollback() override;
+  bool _check() override;
+  bool _preprocess() override;
+  bool _run() override;
+  bool _postprocess() override;
+  void _rollback() override;
 
   void _storeResultsForExport(const KrigingSystem& ksys);
 
@@ -96,7 +94,7 @@ private:
   VectorDouble _priorMean;
   MatrixSymmetric _priorCov;
 
-  int  _iechSingleTarget;
+  int _iechSingleTarget;
   bool _verboseSingleTarget;
 
   bool _flagGam;
@@ -104,12 +102,12 @@ private:
 
   bool _flagXvalid;
   bool _flagKfold;
-  int  _flagXvalidEst;
-  int  _flagXvalidStd;
-  int  _flagXvalidVarZ;
+  int _flagXvalidEst;
+  int _flagXvalidStd;
+  int _flagXvalidVarZ;
 
   bool _flagNeighOnly;
-  int  _nbNeigh;
+  int _nbNeigh;
 
   int _iptrEst;
   int _iptrStd;
@@ -140,11 +138,11 @@ GSTLEARN_EXPORT int kribayes(Db* dbin,
                              Db* dbout,
                              ModelGeneric* model,
                              ANeigh* neigh,
-                             const VectorDouble& prior_mean         = VectorDouble(),
+                             const VectorDouble& prior_mean   = VectorDouble(),
                              const MatrixSymmetric& prior_cov = MatrixSymmetric(),
-                             bool flag_est                          = true,
-                             bool flag_std                          = true,
-                             const NamingConvention& namconv        = NamingConvention("Bayes"));
+                             bool flag_est                    = true,
+                             bool flag_std                    = true,
+                             const NamingConvention& namconv  = NamingConvention("Bayes"));
 GSTLEARN_EXPORT int kriggam(Db* dbin,
                             Db* dbout,
                             ModelGeneric* model,
@@ -172,4 +170,4 @@ GSTLEARN_EXPORT int test_neigh(Db* dbin,
                                ModelGeneric* model,
                                ANeigh* neigh,
                                const NamingConvention& namconv = NamingConvention("Neigh"));
-}
+} // namespace gstlrn

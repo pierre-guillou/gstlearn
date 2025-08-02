@@ -26,7 +26,7 @@ public:
   virtual ~FracFault();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   double getCoord() const { return _coord; }
   double getOrient() const { return _orient; }
@@ -53,8 +53,8 @@ public:
   void setThetar(const VectorDouble& thetar) { _thetar = thetar; }
 
 protected:
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

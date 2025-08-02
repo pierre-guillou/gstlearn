@@ -27,10 +27,10 @@ public:
   /// ICloneable Interface
   IMPLEMENT_CLONING(BiTargetCheckCode)
 
-  virtual bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
+  bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static BiTargetCheckCode* create(int optcode=1, double tolcode=EPSILON6);
 

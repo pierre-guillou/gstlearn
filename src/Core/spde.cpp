@@ -23,8 +23,8 @@
 #include "Db/Db.hpp"
 #include "Enum/ELoadBy.hpp"
 #include "Geometry/GeometryHelper.hpp"
+#include "LinearOp/CholeskySparse.hpp"
 #include "LinearOp/ProjMatrix.hpp"
-#include "Matrix/LinkMatrixSparse.hpp"
 #include "Matrix/MatrixFactory.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSquare.hpp"
@@ -157,26 +157,151 @@ typedef struct
   VectorDouble srot;
 } SPDE_Calcul;
 
-static void (*SIMU_FUNC_TRANSF)(Db*, int, int, int) = NULL;
+struct QChol
+{
+  MatrixSparse* Q;
+  CholeskySparse* chol;
+};
+
 static void (*SIMU_FUNC_UPDATE)(Db*, int, int, int) = NULL;
 static void (*SIMU_FUNC_SCALE)(Db*, int, int)       = NULL;
 
 /*! \endcond */
-static int DEBUG             = 0;
-static int VERBOSE           = 0;
-static int FLAG_KEYPAIR      = 0;
-static double FACDIM[]       = {0., 1., 2., 6.};
-static int SPDE_CURRENT_IGRF = 0;
-static int SPDE_CURRENT_ICOV = 0;
-static Db *MEM_DBIN, *MEM_DBOUT;
+static int DEBUG                     = 0;
+static int VERBOSE                   = 0;
+static int FLAG_KEYPAIR              = 0;
+static double FACDIM[]               = {0., 1., 2., 6.};
+static int SPDE_CURRENT_IGRF         = 0;
+static int SPDE_CURRENT_ICOV         = 0;
 static AMesh* S_EXTERNAL_MESH[3]     = {NULL, NULL, NULL};
 static MatrixSparse* S_EXTERNAL_Q[3] = {NULL, NULL, NULL};
 static MatrixSparse* S_EXTERNAL_A[3] = {NULL, NULL, NULL};
 static SPDE_Environ S_ENV;
 static SPDE_Decision S_DECIDE;
-static char NAME[100];
 static char string_encode[100];
 static SPDE_Calcul Calcul;
+
+static bool is_chol_ready(QChol* QC)
+{
+  return QC->chol != nullptr;
+}
+
+int qchol_getNRows(QChol* QC)
+{
+  if (QC == nullptr) return 0;
+  if (QC->Q == nullptr) return 0;
+  return QC->Q->getNRows();
+}
+
+int qchol_getNCols(QChol* QC)
+{
+  if (QC == nullptr) return 0;
+  if (QC->Q == nullptr) return 0;
+  return QC->Q->getNCols();
+}
+
+/****************************************************************************/
+/*!
+ **  Finalize the construction of the QChol structure.
+ **  Perform the Cholesky decomposition
+ **
+ ** \return  Error return code
+ **
+ ** \param[in]  verbose   Verbose flag
+ ** \param[in]  QC   QChol structure to be finalized
+ **
+ ** \remarks In case of problem the message is issued in this function
+ ** \remarks If the decomposition is already performed, nothing is done
+ **
+ *****************************************************************************/
+static int qchol_cholesky(int verbose, QChol* QC)
+{
+  /* Check that the Q matrix has already been defined */
+
+  if (QC->Q == nullptr) return (1);
+
+  /* Cholesky decomposition is only valid for square matric */
+
+  if (qchol_getNRows(QC) != qchol_getNCols(QC))
+  {
+    messerr("You wish to perform a Cholesky Decomposition of a Matrix");
+    messerr("which is not square: %d x %d", qchol_getNRows(QC), qchol_getNCols(QC));
+    messerr("This must be an error");
+    return (1);
+  }
+
+  if (verbose) message("  Cholesky Decomposition... ");
+
+  // Perform the Cholesky decomposition (new style)
+
+  if (QC->chol == nullptr)
+    // Perform the Cholesky decomposition (new style)
+
+    if (QC->chol == nullptr)
+    {
+      QC->chol = new CholeskySparse(*QC->Q);
+      if (QC->chol == nullptr)
+      {
+        messerr("Error in Cholesky decompostion (new version)");
+        messerr("Error in Cholesky decompostion (new version)");
+        goto label_err;
+      }
+    }
+
+  if (verbose) message("Finished\n");
+
+  return (0);
+
+label_err:
+  delete QC->chol;
+  return (1);
+}
+
+/****************************************************************************/
+/*!
+ **  Inversion using Cholesky
+ **
+ ** \param[in]  qctt     Qchol structure
+ ** \param[in,out]  xcr  Current vector
+ ** \param[in]  rhs      Current R.H.S. vector
+ **
+ ** \param[out] work     Working array
+ **
+ *****************************************************************************/
+static void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const double* work)
+{
+  DECLARE_UNUSED(work);
+  DECLARE_UNUSED(work);
+  if (DEBUG) message("Cholesky Inversion\n");
+  int n = qchol_getNCols(qctt);
+
+  VectorDouble rhsVD(n);
+  for (int i = 0; i < n; i++) rhsVD[i] = rhs[i];
+  VectorDouble xcrVD = qctt->chol->solveX(rhsVD);
+  for (int i = 0; i < n; i++) xcr[i] = xcrVD[i];
+}
+
+/****************************************************************************/
+/*!
+ **  Simulate using Cholesky
+ **
+ ** \param[in]  qctt     Qchol structure
+ **
+ ** \param[out] simu     Simulated array
+ ** \param[out] work     Working array
+ **
+ *****************************************************************************/
+static void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
+{
+  if (DEBUG) message("Cholesky Simulation\n");
+  int n = qchol_getNCols(qctt);
+
+  VectorDouble simuVD(n);
+  VectorDouble workVD(n);
+  for (int i = 0; i < n; i++) workVD[i] = work[i];
+  (void)qctt->chol->addSimulateToDest(workVD, simuVD);
+  for (int i = 0; i < n; i++) simu[i] = simuVD[i];
+}
 
 /****************************************************************************/
 /*!
@@ -223,23 +348,10 @@ static void st_matelem_print(int icov)
 
 /****************************************************************************/
 /*!
- **  Add a new option item for an additional covariance structure
- **
- ** \param[in]  s_option    Pointer to SPDE_Option to be freed (if mode<0)
- ** \param[in]  triswitch   String defining the meshing characteristics
- **
- *****************************************************************************/
-void spde_option_update(SPDE_Option& s_option, const String& triswitch)
-{
-  s_option.options.push_back({false, false, triswitch});
-}
-
-/****************************************************************************/
-/*!
  **  Manage the SPDE_Option structure
  **
  *****************************************************************************/
-SPDE_Option spde_option_alloc(void)
+static SPDE_Option st_spde_option_alloc(void)
 {
   SPDE_Option s_option;
   s_option.options = std::vector<SPDE_SS_Option>();
@@ -261,6 +373,7 @@ SPDE_Matelem& spde_get_current_matelem(int icov)
   return (MATGRF(SPDE_CURRENT_IGRF)->Matelems[icov]);
 }
 #endif
+
 /****************************************************************************/
 /*!
  **  Update a string to include the rank of the current GRF and Covariance
@@ -350,18 +463,6 @@ static void st_environ_init(void)
     SS->BheteroD = nullptr;
     SS->BheteroT = nullptr;
   }
-}
-
-/****************************************************************************/
-/*!
- **  Define the function to transform a simulation
- **
- ** \param[in]  st_simu_transf  Pointer to the transformation function
- **
- *****************************************************************************/
-void simu_define_func_transf(void (*st_simu_transf)(Db*, int, int, int))
-{
-  SIMU_FUNC_TRANSF = st_simu_transf;
 }
 
 /****************************************************************************/
@@ -633,6 +734,41 @@ static MatrixSparse* st_extract_Q_from_Q(MatrixSparse* Q_in, int row_auth, int c
 
 /****************************************************************************/
 /*!
+ **  Manage the Sparse matrix and its cholesky decomposition
+ **
+ ** \return  Pointer to the QChol structure
+ **
+ ** \param[in]  mode       Management mode
+ **                         1 : Allocation
+ **                        -1 : Total deallocation (NULL is returned)
+ ** \param[in]  QC         Pointer to the QChol structure (when mode < 0)
+ **
+ *****************************************************************************/
+static QChol* st_qchol_manage(int mode, QChol* QC)
+{
+
+  /* Dispatch */
+
+  switch (mode)
+  {
+    case 1: /* Allocation */
+      QC       = (QChol*)mem_alloc(sizeof(QChol), 1);
+      QC->Q    = nullptr;
+      QC->chol = nullptr;
+      break;
+
+    case -1: /* Total deallocation */
+      if (QC == nullptr) return (QC);
+      delete QC->Q;
+      delete QC->chol;
+      QC = (QChol*)mem_free((char*)QC);
+      break;
+  }
+  return (QC);
+}
+
+/****************************************************************************/
+/*!
  **  Construct the QChol sub-structure from another QChol structure
  **
  ** \return The QChol structure or NULL
@@ -654,7 +790,7 @@ static QChol* st_extract_QC_from_Q(const char* title,
   /* Initializations */
 
   error = 1;
-  QC    = qchol_manage(1, nullptr);
+  QC    = st_qchol_manage(1, nullptr);
 
   /* Extract the submatrix */
 
@@ -675,7 +811,7 @@ static QChol* st_extract_QC_from_Q(const char* title,
   error = 0;
 
 label_end:
-  if (error) QC = qchol_manage(-1, QC);
+  if (error) QC = st_qchol_manage(-1, QC);
   return (QC);
 }
 
@@ -728,8 +864,8 @@ static QSimu* st_qsimu_manage(int mode, QSimu* qsimu)
 
     case -1: /* Deallocation */
       if (qsimu == nullptr) return (qsimu);
-      qsimu->QCtt = qchol_manage(-1, qsimu->QCtt);
-      qsimu->QCtd = qchol_manage(-1, qsimu->QCtd);
+      qsimu->QCtt = st_qchol_manage(-1, qsimu->QCtt);
+      qsimu->QCtd = st_qchol_manage(-1, qsimu->QCtd);
       qsimu       = (QSimu*)mem_free((char*)qsimu);
       break;
   }
@@ -741,41 +877,6 @@ static QSimu* st_qsimu_manage(int mode, QSimu* qsimu)
 label_end:
   if (error) qsimu = st_qsimu_manage(-1, qsimu);
   return (qsimu);
-}
-
-/****************************************************************************/
-/*!
- **  Manage the Sparse matrix and its cholesky decomposition
- **
- ** \return  Pointer to the QChol structure
- **
- ** \param[in]  mode       Management mode
- **                         1 : Allocation
- **                        -1 : Total deallocation (NULL is returned)
- ** \param[in]  QC         Pointer to the QChol structure (when mode < 0)
- **
- *****************************************************************************/
-QChol* qchol_manage(int mode, QChol* QC)
-{
-
-  /* Dispatch */
-
-  switch (mode)
-  {
-    case 1: /* Allocation */
-      QC       = (QChol*)mem_alloc(sizeof(QChol), 1);
-      QC->Q    = nullptr;
-      QC->chol = nullptr;
-      break;
-
-    case -1: /* Total deallocation */
-      if (QC == nullptr) return (QC);
-      delete QC->Q;
-      delete QC->chol;
-      QC = (QChol*)mem_free((char*)QC);
-      break;
-  }
-  return (QC);
 }
 
 /****************************************************************************/
@@ -825,28 +926,6 @@ static double st_get_cova_param(void)
 
 /****************************************************************************/
 /*!
- **  Return the maximum number of covariances in the different Models
- **  for all GRFS (nugget included)
- **
- *****************************************************************************/
-static int st_get_ncova_max(void)
-{
-  int ncova, ncova_max, igrf_memo;
-
-  ncova_max = 0;
-  igrf_memo = SPDE_CURRENT_IGRF;
-  for (int igrf = 0; igrf < st_get_number_grf(); igrf++)
-  {
-    SPDE_CURRENT_IGRF = igrf;
-    ncova             = st_get_model()->getNCov();
-    if (ncova > ncova_max) ncova_max = ncova;
-  }
-  SPDE_CURRENT_IGRF = igrf_memo;
-  return (ncova_max);
-}
-
-/****************************************************************************/
-/*!
  **  Returns the number of structures in the Model (nugget excluded)
  **
  *****************************************************************************/
@@ -878,63 +957,6 @@ static int st_get_ncova(void)
 static int st_get_nvertex(int icov)
 {
   return (spde_get_current_matelem(icov).amesh->getNApices());
-}
-
-/****************************************************************************/
-/*!
- **  Return the maximum number of vertices for all meshes for all GRFs
- **
- *****************************************************************************/
-static int st_get_nvertex_max(void)
-{
-  int nvertex, nvertex_max, igrf_memo;
-
-  nvertex_max = 0;
-  igrf_memo   = SPDE_CURRENT_IGRF;
-  for (int igrf = 0; igrf < st_get_number_grf(); igrf++)
-  {
-    SPDE_CURRENT_IGRF = igrf;
-    for (int icov = 0; icov < st_get_ncova(); icov++)
-    {
-      nvertex = st_get_nvertex(icov);
-      if (nvertex > nvertex_max) nvertex_max = nvertex;
-    }
-  }
-  SPDE_CURRENT_IGRF = igrf_memo;
-  return (nvertex_max);
-}
-
-/****************************************************************************/
-/*!
- **  Return the dimension for array allocation
- **  This dimension is the aximum of the maximum number of vertices
- **  and the number of data
- **
- *****************************************************************************/
-static int st_get_dimension(void)
-{
-  SPDE_SS_Environ* SS;
-  int size;
-
-  size = st_get_nvertex_max();
-  for (int igrf = 0; igrf < SPDE_MAX_NGRF; igrf++)
-  {
-    SS = &S_ENV.SS_ENV[igrf];
-    if (size < SS->ndata) size = SS->ndata;
-  }
-  return (size);
-}
-
-/****************************************************************************/
-/*!
- **  Return the mean of the model
- **
- ** \param[in]  ivar    Rank of the target variable (for its mean)
- **
- *****************************************************************************/
-static double st_get_model_mean(int ivar)
-{
-  return (st_get_model()->getMean(ivar));
 }
 
 /****************************************************************************/
@@ -972,36 +994,6 @@ static double st_get_sill_total(int ivar, int jvar)
     total += cova->getSill(ivar, jvar);
   }
   return (total);
-}
-
-/****************************************************************************/
-/*!
- **  Use the keypair mechanism to output some arrays
- **
- ** \param[in]  name   Name of the output
- ** \param[in]  iter   Concatenated in name if >= 0; ignored otherwise
- ** \param[in]  tab    Tab to be output
- **
- *****************************************************************************/
-static void st_keypair_array(const char* name, int iter, double* tab)
-{
-  int nvar, ncova, ncur;
-
-  if (!FLAG_KEYPAIR) return;
-  nvar  = S_ENV.nvar;
-  ncova = st_get_ncova();
-  ncur  = st_get_nvertex_max();
-
-  for (int icov = 0; icov < ncova; icov++)
-    for (int ivar = 0; ivar < nvar; ivar++)
-    {
-      if (iter < 0)
-        (void)gslSPrintf(NAME, "%s.%d.%d", name, icov + 1, ivar + 1);
-      else
-        (void)gslSPrintf(NAME, "%s.%d.%d.%d", name, iter + 1, icov + 1,
-                         ivar + 1);
-      set_keypair(NAME, 1, ncur, 1, &TAB(icov, ivar, 0));
-    }
 }
 
 /****************************************************************************/
@@ -1051,6 +1043,18 @@ static void st_print_all(const char* title)
                Calcul.blin.data());
 }
 
+static double st_spde_compute_correc(int ndim, double param)
+{
+  double g0, ndims2, gammap, gammaa, value;
+
+  ndims2 = ((double)ndim) / 2.;
+  gammap = exp(loggamma(param));
+  gammaa = exp(loggamma(param + ndims2));
+  g0     = pow(4. * GV_PI, ndims2);
+  value  = gammap / (g0 * gammaa);
+  return value;
+}
+
 /****************************************************************************/
 /*!
  **  Compute the variance correction term
@@ -1062,20 +1066,8 @@ static void st_compute_correc(void)
 {
   int ndim      = S_ENV.ndim;
   double param  = st_get_cova_param();
-  double value  = spde_compute_correc(ndim, param);
+  double value  = st_spde_compute_correc(ndim, param);
   Calcul.correc = value;
-}
-
-double spde_compute_correc(int ndim, double param)
-{
-  double g0, ndims2, gammap, gammaa, value;
-
-  ndims2 = ((double)ndim) / 2.;
-  gammap = exp(loggamma(param));
-  gammaa = exp(loggamma(param + ndims2));
-  g0     = pow(4. * GV_PI, ndims2);
-  value  = gammap / (g0 * gammaa);
-  return value;
 }
 
 /****************************************************************************/
@@ -1240,84 +1232,6 @@ static void st_convert_exponential2matern(CovAniso* cova)
     message("- Exponential: Range=%lf Scale=%lf\n", range_exp, scale_exp);
     message("- Matern     : Range=%lf Scale=%lf\n", range_bes, scale_bes);
   }
-}
-
-/****************************************************************************/
-/*!
- **  Attach the model
- **
- ** \return Error returned code
- **
- ** \param[in]  model        Model structure
- **
- *****************************************************************************/
-int spde_attach_model(Model* model)
-
-{
-  CovAniso* cova;
-  int ndim, nvar;
-
-  /* Check space dimension */
-
-  if (model == nullptr) return (1);
-
-  ndim = model->getNDim();
-  nvar = model->getNVar();
-
-  if (ndim > 3)
-  {
-    messerr("The SPDE Methodology is implemented up to 3-D");
-    return (1);
-  }
-  S_ENV.ndim = ndim;
-  S_ENV.nvar = nvar;
-  st_set_model(model);
-
-  /* Checking the Model contents */
-
-  for (int icov = 0; icov < model->getNCov(); icov++)
-  {
-    cova = model->getCovAniso(icov);
-    if (cova->getType() == ECov::MATERN)
-    {
-      continue;
-    }
-    if (cova->getType() == ECov::EXPONENTIAL)
-    {
-      st_convert_exponential2matern(cova);
-      continue;
-    }
-    if (cova->getType() == ECov::NUGGET)
-    {
-      if (model->getCovAniso(icov)->getSill(0, 0) > 0)
-        st_set_filnug(model->getCovAnisoList()->isFiltered(icov));
-    }
-    else
-    {
-      messerr("SPDE Model can only support:");
-      messerr("- Matern basic structures");
-      messerr("- Exponential basic structures");
-      messerr("- A complementary Neugget Effect");
-      return (1);
-    }
-  }
-  if (st_get_ncova() <= 0)
-  {
-    messerr("The SPDE procedure requires at least one Bessel structure");
-    return (1);
-  }
-  /* Check incompatibility between non-stationary and multivariate */
-
-  if (S_ENV.nvar > 1)
-  {
-    /*  const ANoStat *nostat = st_get_model()->getNoStat();
-     if (nostat != nullptr && nostat->isDefinedByType(EConsElem::SILL))
-     {
-       messerr("Non-stationary Sill parameter incompatible with multivariate");
-       return (1);
-     } */
-  }
-  return (0);
 }
 
 /****************************************************************************/
@@ -1487,409 +1401,6 @@ static int st_identify_nostat_param(const EConsElem& type0,
 
 /****************************************************************************/
 /*!
- **  Return the initial value given to a data under constraints
- **
- ** \return Initial value
- **
- ** \param[in]  db      Db structure
- ** \param[in]  igrf    Rank of the GRF
- ** \param[in]  iech    Sample rank
- **
- ** \remarks The test that Interval exists has already been performed
- **
- *****************************************************************************/
-static double st_get_data_constraints(Db* db, int igrf, int iech)
-{
-  double vmin, vmax, pmin, pmax, simu, sk;
-
-  vmin = db->getLocVariable(ELoc::L, iech, igrf);
-  vmax = db->getLocVariable(ELoc::U, iech, igrf);
-  sk   = sqrt(st_get_sill_total(0, 0));
-  pmin = law_cdf_gaussian(vmin);
-  pmax = law_cdf_gaussian(vmax);
-  simu = sk * law_invcdf_gaussian((pmin + pmax) / 2.);
-  return (simu);
-}
-
-/****************************************************************************/
-/*!
- **  Return the simulated value under constraints
- **
- ** \return Simulated value
- **
- ** \param[in]  db               Db structure
- ** \param[in]  igrf             Rank of the GRF
- ** \param[in]  iech             Rank of the sample
- ** \param[in]  iter             Gibbs iteration rank (starting from 0)
- ** \param[in]  ngibbs_burn      Number of iterations (Burning step)
- ** \param[in]  yk               Kriged value
- ** \param[in]  sk               Standard deviation of the kriged error
- **
- ** \remarks In the gradual case, the constraints is calculated as a function
- ** \remarks of the iteration rank
- ** \remarks Otherwise the constant bounds are used
- **
- *****************************************************************************/
-static double st_simu_constraints(Db* db,
-                                  int igrf,
-                                  int iech,
-                                  int iter,
-                                  int ngibbs_burn,
-                                  double yk,
-                                  double sk)
-{
-  double vmin, vmax, ys, ratio, rndval, delta;
-
-  /* Perform the simulation: read the (final) bound values */
-
-  vmin  = db->getLocVariable(ELoc::L, iech, igrf);
-  vmax  = db->getLocVariable(ELoc::U, iech, igrf);
-  ratio = (iter < ngibbs_burn)
-          ? (double)(ngibbs_burn - iter - 1) / (double)(iter + 1)
-          : 0.;
-  if (FFFF(vmin))
-    delta = ABS(vmax);
-  else if (FFFF(vmax))
-    delta = ABS(vmin);
-  else
-    delta = ABS(vmax - vmin);
-
-  /* Lower bound */
-
-  if (!FFFF(vmin))
-  {
-    vmin = vmin - delta * ratio;
-    vmin = (vmin - yk) / sk;
-  }
-
-  /* Upper bound */
-
-  if (!FFFF(vmax))
-  {
-    vmax = vmax + delta * ratio;
-    vmax = (vmax - yk) / sk;
-  }
-
-  /* Draw the random gaussian value under constraints */
-
-  rndval = law_gaussian_between_bounds(vmin, vmax);
-
-  /* Simulate the value under constraints */
-
-  ys = yk + sk * rndval;
-
-  return (ys);
-}
-
-/****************************************************************************/
-/*!
- **  Perform one iteration of the Gibbs sampler
- **
- ** \param[in]  igrf        Rank of the GRF
- ** \param[in]  nout        Number of samples on which Gibbs should be run
- ** \param[in]  ngibbs_int  Number of internal Gibbs iterations
- ** \param[in]  iter0       Gibbs iteration rank (starting from 0)
- ** \param[in]  ngibbs_burn Number of iterations (Burning step)
- ** \param[in]  dbin        Input Db
- ** \param[in]  dbout       Output Db
- **
- ** \param[out] zcur        Vector of simulation (VT_FREE|VT_GIBBS|VT_HARD)
- **
- ** \remarks The argument 'iter0' refers to the iteration rank, including
- ** \remarks 'ngibbs_burn' and 'ngibbs_iter'
- **
- *****************************************************************************/
-static void st_gibbs(int igrf,
-                     int nout,
-                     int ngibbs_int,
-                     int iter0,
-                     int ngibbs_burn,
-                     Db* dbin,
-                     Db* dbout,
-                     double* zcur)
-{
-  DECLARE_UNUSED(dbin);
-  QChol* QC = spde_get_current_matelem(-1).QC;
-  double sk;
-  double yk           = 0.;
-  int niter           = MAX(1, ngibbs_int);
-  MatrixSparse mat    = MatrixSparse(*QC->Q);
-  VectorDouble zcurVD = VH::initVDouble(zcur, nout);
-
-  /* Loop on the Gibbs samples */
-
-  for (int iter = 0; iter < niter; iter++)
-    for (int iech = 0; iech < nout; iech++)
-    {
-      mat.gibbs(iech, zcurVD, &yk, &sk);
-      zcurVD[iech] = st_simu_constraints(dbout, igrf, iech - 1, iter0, ngibbs_burn, yk, sk);
-    }
-  zcur = zcurVD.data();
-}
-
-/****************************************************************************/
-/*!
- **  Copy an array into the Db
- **
- ** \param[in]  z            Array of values
- ** \param[in]  dbout        Output Db structure
- ** \param[in]  locatorType  Rank of the pointer
- ** \param[in]  iatt_simu    Pointer to the current simulation
- **
- *****************************************************************************/
-static void st_save_result(double* z,
-                           Db* dbout,
-                           const ELoc& locatorType,
-                           int iatt_simu)
-{
-  int iech, lec, ecr;
-  int nech = dbout->getNSample();
-
-  /* Loop on all the vertices */
-
-  lec = ecr = 0;
-  for (int ivar = 0; ivar < S_ENV.nvar; ivar++)
-  {
-    iech = 0;
-    for (int i = 0; i < nech; i++, lec++)
-    {
-      if (!dbout->isActive(i)) continue;
-      while (!dbout->isActive(iech))
-        iech++;
-      dbout->setFromLocator(locatorType, iech, iatt_simu + ivar, z[lec]);
-      iech++;
-      ecr++;
-    }
-  }
-  if (DEBUG)
-  {
-    message("(DEBUG) Save ");
-    st_print_status(VT_OUTPUT);
-    message("\n");
-    message("- Writing %d values (%d variable)\n", ecr, S_ENV.nvar);
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Merge an auxiliary array into an permanent array
- **
- ** \param[in]  ncur         Number of elements per variable
- ** \param[in]  z            Array of values to be merged
- **
- ** \param[out] zperm        Fill permanent array
- **
- *****************************************************************************/
-static void st_merge(int ncur, double* z, double* zperm)
-{
-  int ecr, lec;
-
-  /* Loop on all the vertices */
-
-  lec = ecr = 0;
-  for (int ivar = 0; ivar < S_ENV.nvar; ivar++)
-  {
-    for (int i = 0; i < ncur; i++, ecr++)
-    {
-      zperm[ecr] = z[lec];
-      lec++;
-    }
-  }
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Merge ");
-    message("\n");
-    print_range("- From  ", lec, z, NULL);
-    print_range("- To    ", ecr, zperm, NULL);
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Copy an auxiliary array into an permanent array
- **
- ** \param[in]  ncur         Number of elements per variable
- ** \param[in]  z            Array of values to be merged
- **
- ** \param[out] zperm        Permanent array
- **
- ** \remarks This operation takes place for all samples located within the Part
- **
- *****************************************************************************/
-static void st_copy(int ncur, double* z, double* zperm)
-{
-  int ecr, lec;
-
-  /* Loop on all the vertices */
-
-  lec = ecr = 0;
-  for (int ivar = 0; ivar < S_ENV.nvar; ivar++)
-  {
-    for (int i = 0; i < ncur; i++, ecr++)
-    {
-      zperm[ecr] = z[lec];
-      lec++;
-    }
-  }
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Copy ");
-    message("\n");
-    print_range("- From  ", lec, z, NULL);
-    print_range("- To    ", ecr, zperm, NULL);
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Restores the conditional simulation array at mesh vertices
- **
- ** \param[in] number     : Number of terms in arrays 'perm' and 'aux'
- ** \param[in] zsnc       : Array containing the non-conditional simulation
- **
- ** \param[in,out] zcur   : Array containing the simulation error in input
- **                         and the conditional simulation in output
- **
- *****************************************************************************/
-static void st_simu_add_vertices(int number, const double* zsnc, double* zcur)
-{
-  for (int i = 0; i < number; i++)
-    zcur[i] += zsnc[i];
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Add non-conditional simulation\n");
-    print_range("- Result", number, zcur, NULL);
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Load an auxiliary array into a permanent array: perm <- aux
- **
- ** \param[in] number     : Number of terms in arrays 'perm' and 'aux'
- ** \param[in] aux        : Auxiliary array
- ** \param[in,out] perm   : Input/Output array
- **
- *****************************************************************************/
-static void st_load_array(int number, const double* aux, double* perm)
-{
-  for (int i = 0; i < number; i++)
-    perm[i] = aux[i];
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Loading\n");
-    print_range("- Result", number, perm, NULL);
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Initialize an array with a constant mean value
- **
- ** \param[in] ncova      Number of structures
- ** \param[in] nvar       Number of variables
- ** \param[in] ncur       Number of terms in arrays 'perm' and 'aux'
- ** \param[in] flag_var   1 : to initialize a variable;
- **                       0 : to initialize variance
- **
- ** \param[out] zperm     Output array
- **
- *****************************************************************************/
-static void st_init_array(int ncova,
-                          int nvar,
-                          int ncur,
-                          int flag_var,
-                          double* zperm)
-{
-  double mean;
-  int ecr;
-
-  ecr = 0;
-  for (int icov = 0; icov < ncova; icov++)
-    for (int ivar = 0; ivar < nvar; ivar++)
-    {
-      mean = (flag_var) ? st_get_model_mean(ivar) / ncova : 0.;
-      for (int icur = 0; icur < ncur; icur++)
-      {
-        zperm[ecr] = mean;
-        ecr++;
-      }
-    }
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Initialize array\n");
-    print_range("- Init  ", ncova * nvar * ncur, zperm, NULL);
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Constitutes the array containing the simulation error
- **
- ** \return Error return code
- **
- ** \param[in]  ncur         Number of elements per variable
- ** \param[in]  zsnc         Permanent array
- ** \param[in]  data         Array of datas
- **
- ** \param[in]  zerr         Array of extracted values
- **
- *****************************************************************************/
-static int st_simu_subtract_data(int ncur,
-                                 const double* zsnc,
-                                 const double* data,
-                                 double* zerr)
-{
-  int ecr;
-
-  /* Loop on all the vertices */
-
-  for (int i = ecr = 0; i < ncur; i++)
-  {
-    zerr[ecr] = data[ecr] - zsnc[i];
-    ecr++;
-  }
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Subtracting non-conditional simulation\n");
-    print_range("- Simu.Error", ecr, zerr, NULL);
-  }
-
-  return (0);
-}
-
-/****************************************************************************/
-/*!
- **  Prepare the RHS for Kriging
- **
- ** \param[in]  QCtd        Pointer to QChol structure (target-data)
- ** \param[in]  data        Input array (Dimension: ndata)
- **
- ** \param[out] rhs         Output array  (Dimension: ntarget)
- **
- *****************************************************************************/
-static void st_kriging_one_rhs(QChol* QCtd,
-                               double* data,
-                               double* rhs)
-{
-  int ndata   = qchol_getNCols(QCtd);
-  int ntarget = qchol_getNCols(QCtd);
-
-  constvect cdata(data, ndata);
-  vect crhs(rhs, ntarget);
-  QCtd->Q->prodVecMatInPlaceC(cdata, crhs, false);
-  for (int i = 0; i < ntarget; i++)
-    rhs[i] = -rhs[i];
-}
-
-/****************************************************************************/
-/*!
  **  Perform the Calculation of the Kriging estimate
  **
  ** \return  Error return code
@@ -1937,49 +1448,6 @@ static int st_kriging_cholesky(QChol* QC,
 
 /****************************************************************************/
 /*!
- **  Perform the Filtering of Nugget Effect
- **
- ** \return  Error return code
- **
- ** \param[out] work        Working array (Dimension: nvertex)
- ** \param[in]  y           Output Array (Dimension: nvertex)
- **
- *****************************************************************************/
-static int st_filter(double* work, double* y)
-{
-  QChol* QC;
-  int ntarget;
-
-  /* Initializations */
-
-  QC      = spde_get_current_matelem(-1).QC;
-  ntarget = qchol_getNCols(QC);
-  for (int icur = 0; icur < ntarget; icur++)
-    work[icur] = 0.;
-
-  /* Prepare Cholesky decomposition (if not already performed) */
-
-  if (!is_chol_ready(QC))
-  {
-    if (qchol_cholesky(VERBOSE, QC)) return (1);
-  }
-
-  /* Process the Cholesky inversion */
-
-  cs_chol_invert(QC, y, y, work);
-
-  /* Optional debugging information */
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Filtering\n");
-    print_range("- Result", ntarget, y, NULL);
-  }
-  return (0);
-}
-
-/****************************************************************************/
-/*!
  **  Calculate the array of dimensions of the meshes
  **
  ** \return Pointer to the newly allocated array containing mesh dimensions
@@ -1989,7 +1457,7 @@ static int st_filter(double* work, double* y)
  ** \remark The array returned by this function must be deallocated
  **
  *****************************************************************************/
-double* _spde_get_mesh_dimension(AMesh* amesh)
+static double* st_spde_get_mesh_dimension(AMesh* amesh)
 
 {
   double* units;
@@ -2704,7 +2172,7 @@ static void st_tangent_calculate(double center[3],
  ** \param[in]  units     Array containing the mesh dimensions
  **
  *****************************************************************************/
-MatrixSparse* _spde_fill_S(AMesh* amesh, Model* model, const double* units)
+static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* units)
 {
   DECLARE_UNUSED(model)
   double vald, mat[16], mat1[16];
@@ -2864,7 +2332,7 @@ label_end:
  ** \param[in]  units     Array containing the element units
  **
  *****************************************************************************/
-VectorDouble _spde_fill_TildeC(AMesh* amesh, const double* units)
+static VectorDouble st_spde_fill_TildeC(AMesh* amesh, const double* units)
 {
   VectorDouble tildec, cumunit;
   int nvertex = amesh->getNApices();
@@ -2911,9 +2379,9 @@ VectorDouble _spde_fill_TildeC(AMesh* amesh, const double* units)
  ** \param[in]  TildeC    Vector TildeC
  **
  *****************************************************************************/
-VectorDouble _spde_fill_Lambda(Model* model,
-                               AMesh* amesh,
-                               const VectorDouble& TildeC)
+static VectorDouble st_spde_fill_Lambda(Model* model,
+                                        AMesh* amesh,
+                                        const VectorDouble& TildeC)
 {
   DECLARE_UNUSED(model);
   VectorDouble Lambda;
@@ -3069,7 +2537,7 @@ static int st_build_QCov(SPDE_Matelem& Matelem)
 
   QCov = (QChol**)mem_alloc(sizeof(QChol*) * nvar, 1);
   for (int ivar = 0; ivar < nvar; ivar++)
-    QCov[ivar] = qchol_manage(1, NULL);
+    QCov[ivar] = st_qchol_manage(1, NULL);
 
   /* Dispatch */
 
@@ -3145,7 +2613,7 @@ label_end:
     if (QCov != NULL)
     {
       for (int ivar = 0; ivar < nvar; ivar++)
-        QCov[ivar] = qchol_manage(-1, QCov[ivar]);
+        QCov[ivar] = st_qchol_manage(-1, QCov[ivar]);
     }
   }
   return (error);
@@ -3163,10 +2631,10 @@ label_end:
  ** \param[in] blin     Array of coefficients for Linear combinaison
  **
  *****************************************************************************/
-MatrixSparse* _spde_build_Q(MatrixSparse* S,
-                            const VectorDouble& Lambda,
-                            int nblin,
-                            double* blin)
+static MatrixSparse* st_spde_build_Q(MatrixSparse* S,
+                                     const VectorDouble& Lambda,
+                                     int nblin,
+                                     double* blin)
 {
   // Preliminary checks
 
@@ -3228,11 +2696,11 @@ static int st_build_Q(SPDE_Matelem& Matelem)
 
   /* Core allocation */
 
-  Matelem.QC = qchol_manage(1, NULL);
+  Matelem.QC = st_qchol_manage(1, NULL);
 
   int nblin     = static_cast<int>(Calcul.blin.size());
-  Matelem.QC->Q = _spde_build_Q(Matelem.S, Matelem.Lambda, nblin,
-                                Calcul.blin.data());
+  Matelem.QC->Q = st_spde_build_Q(Matelem.S, Matelem.Lambda, nblin,
+                                  Calcul.blin.data());
   if (Matelem.QC->Q == nullptr) goto label_end;
 
   /* Optional printout */
@@ -3244,7 +2712,7 @@ static int st_build_Q(SPDE_Matelem& Matelem)
   error = 0;
 
 label_end:
-  if (error) QC = qchol_manage(-1, QC);
+  if (error) QC = st_qchol_manage(-1, QC);
   return (error);
 }
 
@@ -3261,7 +2729,7 @@ label_end:
  ** \remarks It must be freed by the calling functions
  **
  *****************************************************************************/
-int spde_build_matrices(Model* model, int verbose)
+static int st_spde_build_matrices(Model* model, int verbose)
 {
   int error = 1;
   VectorDouble tildec;
@@ -3272,23 +2740,23 @@ int spde_build_matrices(Model* model, int verbose)
 
   /* Calculate the units of the meshes */
 
-  units = _spde_get_mesh_dimension(amesh);
+  units = st_spde_get_mesh_dimension(amesh);
   if (units == nullptr) goto label_end;
 
   /* Fill S sparse matrix */
 
-  Matelem.S = _spde_fill_S(amesh, model, units);
+  Matelem.S = st_spde_fill_S(amesh, model, units);
   if (Matelem.S == nullptr) goto label_end;
   if (VERBOSE) message("Filling S Sparse Matrix performed successfully\n");
 
   /* Fill the TildeC vector */
 
-  tildec = _spde_fill_TildeC(amesh, units);
+  tildec = st_spde_fill_TildeC(amesh, units);
   if (VERBOSE) message("Filling TildeC Sparse Matrix performed successfully\n");
 
   /* Construct the matrix for the sill correction array */
 
-  Matelem.Lambda = _spde_fill_Lambda(model, amesh, tildec);
+  Matelem.Lambda = st_spde_fill_Lambda(model, amesh, tildec);
   if (VERBOSE) message("Filling Lambda Sparse Matrix performed successfully\n");
 
   /* Build the sparse matrix B */
@@ -3309,123 +2777,6 @@ int spde_build_matrices(Model* model, int verbose)
 label_end:
   mem_free((char*)units);
   return (error);
-}
-
-/****************************************************************************/
-/*!
- **  Load the data information within the complete output array
- **
- ** \param[in]  amesh       AMesh structure
- ** \param[in]  dbin        Db input structure
- ** \param[in]  dbout       Db output structure
- ** \param[in]  ivar0       Rank of the variable or -1
- **
- ** \param[out] data        Vector of active data
- ** \param[out] zcur        Output array (Dimension: number of meshes)
- **
- ** \remarks When 'ivar0' is defined, this corresponds to the flag_mult_data
- ** \remarks flag where the target is the simulation
- ** \remarks Otherwise the Z-variables must all be loaded
- **
- *****************************************************************************/
-static void st_load_data(AMesh* amesh,
-                         Db* dbin,
-                         Db* dbout,
-                         SPDE_Option& /*s_option*/,
-                         int ivar0,
-                         double* data,
-                         double* zcur)
-{
-  double zloc;
-  int ecr, ecrd, nvar, ivar, nvertex, igrf;
-
-  /* Initializations */
-
-  nvertex   = amesh->getNApices();
-  igrf      = SPDE_CURRENT_IGRF;
-  nvar      = (ivar0 >= 0) ? 1 : S_ENV.nvar;
-  MEM_DBIN  = dbin;  // This horrible assignment is to allows
-  MEM_DBOUT = dbout; // passing information to Kriging sub-procedures
-
-  /* Loop on the variables */
-
-  ecrd = 0;
-  for (int jvar = 0; jvar < nvar; jvar++)
-  {
-    ecr  = jvar * nvertex;
-    ivar = (ivar0 >= 0) ? ivar0 : jvar;
-
-    /* From the Output Db if present */
-
-    if (dbout != nullptr)
-    {
-      for (int iech = 0; iech < dbout->getNSample(); iech++)
-      {
-        if (!dbout->isActive(iech)) continue;
-
-        /* This target is not collocated to any Datum */
-
-        if (S_DECIDE.flag_gibbs && dbout->getNInterval() > 0)
-          zloc = st_get_data_constraints(dbout, igrf, iech);
-        else
-          zloc = TEST;
-
-        if (S_DECIDE.flag_mesh_dbout)
-        {
-          if (!FFFF(zloc))
-          {
-            zcur[ecr] = zloc;
-            if (st_get_filnug()) zcur[ecr] /= st_get_nugget_sill(0, 0);
-          }
-          else
-          {
-            if (st_get_filnug()) zcur[ecr] = 0.;
-          }
-          ecr++;
-        }
-      }
-    }
-
-    /* From the Input Db (if present) */
-    /* Note that 'ecr' is only incremented for non-duplicate sample */
-
-    if (dbin != nullptr)
-    {
-      for (int iech = 0; iech < dbin->getNSample(); iech++)
-      {
-        if (!dbin->isActive(iech)) continue;
-        if (S_DECIDE.flag_several) data[ecrd++] = dbin->getZVariable(iech, ivar);
-
-        if (S_DECIDE.flag_gibbs && dbin->getNInterval() > 0)
-          zloc = st_get_data_constraints(dbin, igrf, iech);
-        else
-          zloc = dbin->getZVariable(iech, ivar);
-
-        if (!S_DECIDE.flag_several) data[ecrd++] = zloc;
-
-        if (S_DECIDE.flag_mesh_dbin)
-        {
-          if (!FFFF(zloc))
-          {
-            zcur[ecr] = zloc;
-            if (st_get_filnug()) zcur[ecr] /= st_get_nugget_sill(0, 0);
-          }
-          else
-          {
-            if (st_get_filnug()) zcur[ecr] = 0.;
-          }
-          ecr++;
-        }
-      }
-    }
-  }
-
-  if (DEBUG)
-  {
-    message("(DEBUG) Load Data\n");
-    for (ivar = 0; ivar < nvar; ivar++)
-      print_range("- Load  ", nvertex, &zcur[ivar * nvertex], NULL);
-  }
 }
 
 /****************************************************************************/
@@ -3531,27 +2882,6 @@ label_end:
 
 /****************************************************************************/
 /*!
- **  Simulate the nugget effect component
- **
- ** \param[in]  ncur       Number of target to be simulated
- ** \param[out] zsnc       Output array (Dimension: nvertex)
- **
- *****************************************************************************/
-static void st_simulate_nugget(int ncur, VectorDouble& zsnc)
-
-{
-  double sill;
-
-  sill = st_get_nugget_sill(0, 0);
-  if (FFFF(sill) || sill <= 0.) return;
-  sill = sqrt(sill);
-
-  for (int icur = 0; icur < ncur; icur++)
-    zsnc[icur] += sill * law_gaussian();
-}
-
-/****************************************************************************/
-/*!
  **  Perform the basic non-conditional Simulation
  **  using the Cholesky decomposition method
  **
@@ -3593,846 +2923,7 @@ static int st_simulate_cholesky(QChol* QC, VectorDouble& work, VectorDouble& zsn
 }
 
 #ifndef SWIG
-/****************************************************************************/
-/*!
- **  Perform the Chebychev polynomial procedure on an input vector
- **
- ** \return Error return code
- **
- ** \param[in]     S          Shift operator
- ** \param[in]     cheb_elem  Cheb_Elem structure
- ** \param[in]     lambda     Scaling vector
- ** \param[in]     x          Input array (Dimension: nvertex)
- **
- ** \param[out]    y          Output array (Dimension: nvertex)
- **
- *****************************************************************************/
-int spde_chebychev_operate(MatrixSparse* S,
-                           Cheb_Elem* cheb_elem,
-                           const VectorDouble& lambda,
-                           const VectorDouble& x,
-                           VectorDouble& y)
-{
-  double *coeffs, v1, v2, coeff_ib, power;
-  int error, ncoeffs, nvertex;
-  MatrixSparse* T1;
 
-  /* Initializations */
-
-  error   = 1;
-  T1      = nullptr;
-  nvertex = S->getNCols();
-  v1      = cheb_elem->v1;
-  v2      = cheb_elem->v2;
-  power   = cheb_elem->power;
-  ncoeffs = cheb_elem->ncoeffs;
-  coeffs  = cheb_elem->coeffs;
-
-  /* Core allocation */
-
-  VectorDouble tm2(nvertex);
-  VectorDouble px(nvertex);
-  VectorDouble tx(nvertex);
-  VectorDouble tm1(nvertex);
-
-  /* Create the T1 sparse matrix */
-
-  T1 = MatrixSparse::diagConstant(nvertex, 1.);
-  if (T1 == nullptr) goto label_end;
-  T1->addMat(*S, v2, v1);
-
-  /* Initialize the simulation */
-
-  for (int i = 0; i < nvertex; i++)
-  {
-    tm1[i] = 0.;
-    y[i]   = x[i];
-  }
-  if (T1->addVecInPlaceVD(y, tm1)) goto label_end;
-  for (int i = 0; i < nvertex; i++)
-  {
-    px[i]  = coeffs[0] * y[i] + coeffs[1] * tm1[i];
-    tm2[i] = y[i];
-  }
-
-  /* Loop on the Chebychev polynomials */
-
-  for (int ib = 2; ib < ncoeffs; ib++)
-  {
-    T1->prodVecMatInPlace(tm1, tx, false);
-    coeff_ib = coeffs[ib];
-    for (int i = 0; i < nvertex; i++)
-    {
-      tx[i] = 2. * tx[i] - tm2[i];
-      px[i] += coeff_ib * tx[i];
-      tm2[i] = tm1[i];
-      tm1[i] = tx[i];
-    }
-  }
-
-  /* Save the results */
-
-  for (int i = 0; i < nvertex; i++)
-    y[i] = px[i] * pow(lambda[i], 2. * power);
-
-  /* Set the error return code */
-
-  error = 0;
-
-label_end:
-  delete T1;
-  return (error);
-}
-#endif
-/****************************************************************************/
-/*!
- **  Perform the basic non-conditional Simulation
- **  using the Chebychev Polynomial procedure
- **
- ** \return Error return code
- **
- ** \param[out] zsnc       Output array (Dimension: nvertex)
- **
- *****************************************************************************/
-static int st_simulate_chebychev(VectorDouble& zsnc)
-{
-  Cheb_Elem* cheb_elem;
-  int nvertex;
-
-  /* Initializations */
-
-  SPDE_Matelem& Matelem = spde_get_current_matelem(-1);
-  cheb_elem             = Matelem.s_cheb;
-  nvertex               = Matelem.amesh->getNApices();
-  VectorDouble x(nvertex);
-
-  /* Initialize the simulation */
-
-  for (int i = 0; i < nvertex; i++)
-    x[i] = law_gaussian();
-
-  /* Operate the Chebychev polynomials */
-
-  return spde_chebychev_operate(Matelem.S, cheb_elem, Matelem.Lambda, x, zsnc);
-}
-
-/****************************************************************************/
-/*!
- **  Solve the linear system (either using Cholesky or Multigrid)
- **
- ** \return  Error return code
- **
- ** \param[in]  QC          Qchol structure
- ** \param[in]  rhs         R.H.S.
- **
- ** \param[out] work        Working array (Dimension: ntarget)
- ** \param[out] z           Output Array (Dimension: ntarget)
- **
- *****************************************************************************/
-static int st_solve(QChol* QC, double* rhs, VectorDouble& work, double* z)
-{
-  if (st_kriging_cholesky(QC, rhs, work, z)) return (1);
-  return (0);
-}
-
-/****************************************************************************/
-/*!
- **  Perform the Kriging operation (monovariate - monostructure)
- **
- ** \return  Error return code
- **
- ** \param[in]  data        Vector of data
- **
- ** \param[out] rhs         R.H.S.
- ** \param[out] work        Working array
- ** \param[out] z           Output Array
- **
- *****************************************************************************/
-static int st_kriging_one(double* data, double* rhs, VectorDouble& work, double* z)
-{
-  QSimu* qsimu;
-  int ntarget;
-
-  /* Initializations */
-
-  qsimu   = spde_get_current_matelem(-1).qsimu;
-  ntarget = qchol_getNCols(qsimu->QCtt);
-
-  /* Initialize the resulting array */
-
-  st_init_array(1, 1, ntarget, 1, z);
-
-  /* Define the Right-hand side */
-
-  st_kriging_one_rhs(qsimu->QCtd, data, rhs);
-
-  /* Solve the Kriging system */
-
-  if (st_solve(qsimu->QCtt, rhs, work, z)) return (1);
-
-  return (0);
-}
-
-/****************************************************************************/
-/*!
- **  Prepare the R.H.S. for the Kriging operation (several)
- **
- ** \return  Error return code
- **
- ** \param[in]  data        Vector of data
- **
- ** \param[out] rhs         R.H.S.
- ** \param[out] work        Working array
- ** \param[out] ss_arg      Global returned criterion
- **
- *****************************************************************************/
-static int st_kriging_several_rhs(double* data,
-                                  double* rhs,
-                                  VectorDouble& work,
-                                  double* ss_arg)
-{
-  SPDE_SS_Environ* SS;
-  MatrixSparse* B0;
-  double *temp, ss;
-  int ndata, ncova, nvar, ncur, error, nrows, ncols, size;
-
-  /* Initializations */
-
-  error = 1;
-  SS    = MATGRF(SPDE_CURRENT_IGRF);
-  ncova = st_get_ncova();
-  nvar  = S_ENV.nvar;
-  size  = st_get_dimension();
-  ndata = SS->ndata;
-  temp  = nullptr;
-  B0    = nullptr;
-  VectorDouble rhslocal(size);
-
-  /* Core allocation */
-
-  temp = (double*)mem_alloc(sizeof(double) * size, 0);
-  if (temp == nullptr) goto label_end;
-
-  /* Constitute the RHS */
-
-  for (int icov = 0; icov < ncova; icov++)
-  {
-    SPDE_Matelem& Matelem = spde_get_current_matelem(icov);
-    ncur                  = st_get_nvertex(icov);
-
-    if (st_is_model_nugget())
-    {
-
-      /* Case with nugget effect */
-
-      for (int ivar = 0; ivar < nvar; ivar++)
-      {
-        for (int i = 0; i < size; i++)
-        {
-          work[i]     = 0.;
-          rhslocal[i] = RHS(icov, ivar, i);
-        }
-        for (int jvar = 0; jvar < nvar; jvar++)
-        {
-          // E_ij * Z_j
-          B0 = st_extract_Q1_nugget(ivar, jvar, &nrows, &ncols);
-          if (B0 == nullptr) goto label_end;
-          constvect cdata(&DATA(jvar, 0), ndata);
-          vect ctemp(temp, size);
-          B0->prodVecMatInPlaceC(cdata, ctemp, false);
-          for (int i = 0; i < nrows; i++)
-            work[i] += temp[i];
-          delete B0;
-        }
-        Matelem.Aproj->prodMatVecInPlace(work, rhslocal, true);
-      }
-    }
-    else
-    {
-
-      /* Case without nugget effect */
-
-      for (int ivar = 0; ivar < nvar; ivar++)
-      {
-        for (int i = 0; i < size; i++)
-        {
-          work[i]     = 0.;
-          rhslocal[i] = RHS(icov, ivar, i);
-        }
-        if (icov == 0)
-        {
-          for (int jvar = 0; jvar < nvar; jvar++)
-          {
-            // Q1_td_ij * Z_j
-            B0 = st_extract_Q1_hetero(ivar, jvar, 2, 1, &nrows, &ncols);
-            if (B0 == nullptr) goto label_end;
-            constvect cdata(&DATA(jvar, 0), ndata);
-            vect ctemp(temp, size);
-            B0->prodVecMatInPlaceC(cdata, ctemp, false);
-            for (int i = 0; i < nrows; i++)
-              work[i] += temp[i];
-            delete B0;
-          }
-          // -sum_j { Q1_td_ij * Z_j }
-          for (int i = 0; i < ncur; i++)
-            RHS(icov, ivar, i) = -work[i];
-        }
-        else
-        {
-          for (int jvar = 0; jvar < nvar; jvar++)
-          {
-            // Q1_dd_ij * Z_j
-            B0 = st_extract_Q1_hetero(ivar, jvar, 1, 1, &nrows, &ncols);
-            if (B0 == nullptr) goto label_end;
-            constvect cdata(&DATA(jvar, 0), ndata);
-            vect ctemp(temp, size);
-            B0->prodVecMatInPlaceC(cdata, ctemp, false);
-            for (int i = 0; i < nrows; i++)
-              work[i] += temp[i];
-            delete B0;
-          }
-          Matelem.Aproj->prodMatVecInPlace(work, rhslocal, true);
-        }
-      }
-    }
-  }
-
-  /* Evaluate the reference score */
-
-  ss = 0.;
-  for (int icov = 0; icov < ncova; icov++)
-  {
-    ncur = st_get_nvertex(icov);
-    for (int ivar = 0; ivar < nvar; ivar++)
-      for (int icur = 0; icur < ncur; icur++)
-        ss += RHS(icov, ivar, icur) * RHS(icov, ivar, icur);
-  }
-
-  /* Set the error return code */
-
-  error   = 0;
-  *ss_arg = ss;
-
-label_end:
-  delete B0;
-  mem_free((char*)temp);
-  return (error);
-}
-
-/****************************************************************************/
-/*!
- **  Perform the Loop for the Kriging operation (several)
- **
- ** \return  Error return code
- **
- ** \param[in]  flag_crit   1 if used for criterion evaluation;
- **                         0 when used for calculation loop
- **
- ** \param[out] work        Working array
- ** \param[out] rhscur      Working array
- ** \param[out] rhsloc      Working array
- ** \param[in,out] xcur        Current solution vector
- ** \param[in,out] rhs         R.H.S.
- ** \param[in,out] crit        Criterion
- **
- *****************************************************************************/
-static int st_kriging_several_loop(int flag_crit,
-                                   VectorDouble& work,
-                                   double* rhscur,
-                                   double* rhsloc,
-                                   double* xcur,
-                                   const double* rhs,
-                                   double* crit)
-{
-  MatrixSparse *tAicov, *Ajcov, *Bf, *B2, *B0, *Qicov;
-  int ncova, nvar, ncur, nicur, error, nrows, ncols, signe, size;
-
-  /* Initializations */
-
-  error  = 1;
-  ncova  = st_get_ncova();
-  nvar   = S_ENV.nvar;
-  ncur   = st_get_nvertex_max();
-  size   = st_get_dimension();
-  tAicov = Bf = B2 = B0 = Qicov = nullptr;
-
-  /* Loop on the first covariance */
-
-  (*crit) = 0.;
-  for (int icov = 0; icov < ncova; icov++)
-  {
-    SPDE_Matelem& Maticov = spde_get_current_matelem(icov);
-    Qicov                 = Maticov.QC->Q;
-    nicur                 = st_get_nvertex(icov);
-    tAicov                = Maticov.Aproj->transpose();
-    if (tAicov == nullptr) goto label_end;
-
-    /* Loop on the first variable */
-
-    for (int ivar = 0; ivar < nvar; ivar++)
-    {
-      for (int icur = 0; icur < nicur; icur++)
-        rhscur[icur] = RHS(icov, ivar, icur);
-
-      /* Loop on the second variable */
-
-      for (int jvar = 0; jvar < nvar; jvar++)
-      {
-
-        // Suppress the Q terms
-
-        if (flag_crit || ivar != jvar)
-        {
-          for (int icur = 0; icur < nicur; icur++)
-            rhsloc[icur] = 0.;
-
-          if (st_is_model_nugget())
-          {
-            // Sill(icov)_ij * Q(icov) * X_j
-            constvect cxcur(&XCUR(icov, jvar, 0), ncur);
-            vect crhsloc(rhsloc, nicur);
-            Qicov->prodVecMatInPlaceC(cxcur, crhsloc, false);
-            for (int icur = 0; icur < nicur; icur++)
-              rhsloc[icur] *= st_get_isill(icov, ivar, jvar);
-          }
-          else
-          {
-            if (icov == 0)
-            {
-              // Q1_tt_ij * X_j
-              B0 = st_extract_Q1_hetero(ivar, jvar, 2, 2, &nrows, &ncols);
-              constvect cxcur(&XCUR(icov, jvar, 0), ncur);
-              vect crhsloc(rhsloc, nicur);
-              B0->prodVecMatInPlaceC(cxcur, crhsloc, false);
-              delete B0;
-            }
-            else
-            {
-              // Sill(icov)_ij * Q(icov) * X_j
-              constvect cxcur(&XCUR(icov, jvar, 0), ncur);
-              vect crhsloc(rhsloc, nicur);
-              Qicov->prodVecMatInPlaceC(cxcur, crhsloc, false);
-              for (int icur = 0; icur < nicur; icur++)
-                rhsloc[icur] *= st_get_isill(icov, ivar, jvar);
-            }
-          }
-          for (int icur = 0; icur < nicur; icur++)
-            rhscur[icur] -= rhsloc[icur];
-        }
-
-        // Pre-calculation of factorized term
-
-        if (st_is_model_nugget())
-        {
-          // A^t(icov) * E_ij
-          B0 = st_extract_Q1_nugget(ivar, jvar, &nrows, &ncols);
-          if (B0 == nullptr) goto label_end;
-          Bf = MatrixFactory::prodMatMat<MatrixSparse>(tAicov, B0);
-          if (Bf == nullptr) goto label_end;
-          delete B0;
-        }
-        else
-        {
-          if (icov == 0)
-          {
-            // Q1_td_ij
-            Bf = st_extract_Q1_hetero(ivar, jvar, 2, 1, &nrows, &ncols);
-            if (Bf == nullptr) goto label_end;
-          }
-          else
-          {
-            // A^t(icov) * Q1_dd_ij
-            B0 = st_extract_Q1_hetero(ivar, jvar, 1, 1, &nrows, &ncols);
-            if (B0 == nullptr) goto label_end;
-            Bf = MatrixFactory::prodMatMat<MatrixSparse>(tAicov, B0);
-            if (Bf == nullptr) goto label_end;
-            delete B0;
-          }
-        }
-
-        /* Loop on the other structures */
-
-        for (int jcov = 0; jcov < ncova; jcov++)
-        {
-          SPDE_Matelem& Matjcov = spde_get_current_matelem(jcov);
-          Ajcov                 = Matjcov.Aproj;
-
-          // Suppress the AQAt terms
-
-          if (flag_crit || (icov != jcov || ivar != jvar))
-          {
-            signe = 0;
-            for (int icur = 0; icur < nicur; icur++)
-              rhsloc[icur] = 0.;
-
-            if (st_is_model_nugget())
-            {
-              // A^t(icov) * E_ij * A(jcov) * X_j
-              constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
-              vect cwork(work.data(), size);
-              Ajcov->prodVecMatInPlaceC(cxcur, cwork, false);
-              vect crhsloc(rhsloc, nicur);
-              Bf->prodVecMatInPlaceC(cwork, crhsloc, false);
-              signe = 1;
-            }
-            else
-            {
-              if (icov > 0 && jcov == 0)
-              {
-                // -A^t(icov) * Q1_dt_ij * X_j
-                B0 = st_extract_Q1_hetero(ivar, jvar, 1, 2, &nrows, &ncols);
-                constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
-                vect cwork(work.data(), size);
-                B0->prodVecMatInPlaceC(cxcur, cwork, false);
-                vect crhsloc(rhsloc, nicur);
-                tAicov->prodVecMatInPlaceC(cwork, crhsloc, false);
-                delete B0;
-                signe = -1;
-              }
-              else if (icov == 0 && jcov > 0)
-              {
-                // -Q1_td_ij * A(jcov) * X_j
-                constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
-                vect cwork(work.data(), size);
-                Ajcov->prodVecMatInPlaceC(cxcur, cwork, false);
-                vect crhsloc(rhsloc, nicur);
-                Bf->prodVecMatInPlaceC(cwork, crhsloc, false);
-                signe = -1;
-              }
-              else if (icov > 0 && jcov > 0)
-              {
-                // A^t(icov) * Q1_dd_ij * A(jcov) * X_j
-                constvect cxcur(&XCUR(jcov, jvar, 0), ncur);
-                vect cwork(work.data(), size);
-                Ajcov->prodVecMatInPlaceC(cxcur, cwork, false);
-                vect crhsloc(rhsloc, nicur);
-                Bf->prodVecMatInPlaceC(cwork, crhsloc, false);
-                signe = +1;
-              }
-            }
-            for (int icur = 0; icur < nicur; icur++)
-              rhscur[icur] -= rhsloc[icur] * signe;
-          }
-        }
-        delete Bf;
-      }
-
-      if (flag_crit)
-      {
-        for (int icur = 0; icur < nicur; icur++)
-          (*crit) += rhscur[icur] * rhscur[icur];
-      }
-      else
-      {
-        if (st_solve(Maticov.QCov[ivar], rhscur, work, &XCUR(icov, ivar, 0)))
-          goto label_end;
-      }
-    }
-  }
-
-  /* Set the error return code */
-
-  error = 0;
-
-label_end:
-  delete tAicov;
-  delete B0;
-  delete B2;
-  delete Bf;
-  return (error);
-}
-
-/****************************************************************************/
-/*!
- **  Perform the final reconstitution for multivariate or multistructure
- **  Kriging
- **
- ** \return  Error return code
- **
- ** \param[in]  xcur        Solution vector (Dimension: ncur * ncova * nvar)
- **
- ** \param[out] z           Output Array
- **
- *****************************************************************************/
-static int st_kriging_several_results(const double* xcur, double* z)
-{
-  int *ranks, ncova, nvar, ncur, error, flag_data, ecr, lec;
-  double valdat, valsum;
-  AMesh* amesh;
-
-  /* Initializations */
-
-  error     = 1;
-  ncova     = st_get_ncova();
-  nvar      = S_ENV.nvar;
-  ncur      = st_get_nvertex_max();
-  ranks     = nullptr;
-  valdat    = TEST;
-  amesh     = spde_get_current_matelem(0).amesh;
-  flag_data = 0;
-
-  /* Sample designation */
-
-  ranks = st_get_vertex_ranks(amesh, MEM_DBIN, MEM_DBOUT);
-  if (ranks == nullptr) goto label_end;
-
-  /* Constitute the resulting vector */
-
-  if (st_is_model_nugget())
-  {
-
-    /* Case with Nugget Effect */
-
-    ecr = 0;
-    for (int ivar = 0; ivar < nvar; ivar++)
-    {
-      for (int icur = 0; icur < ncur; icur++, ecr++)
-      {
-
-        /* Check if the vertex corresponds to a target (or a Steiner point) */
-        /* If it coincides with datum, we must still check that the variable */
-        /* is defined (heterotopic case) */
-
-        if (ranks[icur] <= 0)
-        {
-          flag_data = 0;
-        }
-        else
-        {
-          valdat    = MEM_DBIN->getZVariable(ranks[icur] - 1, ivar);
-          flag_data = !FFFF(valdat);
-        }
-
-        /* Store the sum of kriged components */
-
-        if (flag_data)
-          valsum = valdat;
-        else
-        {
-          valsum = 0.;
-          for (int icov = 0; icov < ncova; icov++)
-            valsum += XCUR(icov, ivar, icur);
-        }
-        z[ecr] = valsum;
-      }
-    }
-  }
-  else
-  {
-
-    /* Case with No Nugget Effect */
-
-    ecr = 0;
-    for (int ivar = 0; ivar < nvar; ivar++)
-    {
-      lec = 0;
-      for (int icur = 0; icur < ncur; icur++, ecr++)
-      {
-
-        /* Check if the vertex corresponds to a target (or a Steiner point) */
-        /* If it coincides with datum, we must still check that the variable */
-        /* is defined (heterotopic case) */
-
-        if (ranks[icur] <= 0)
-        {
-          flag_data = 0;
-        }
-        else
-        {
-          valdat    = MEM_DBIN->getZVariable(ranks[icur] - 1, ivar);
-          flag_data = !FFFF(valdat);
-        }
-
-        if (flag_data)
-        {
-          valsum = valdat;
-        }
-        else
-        {
-          valsum = XCUR(0, ivar, lec++);
-          for (int icov = 1; icov < ncova; icov++)
-            valsum += XCUR(icov, ivar, icur);
-        }
-        z[ecr] = valsum;
-      }
-    }
-  }
-
-  if (FLAG_KEYPAIR) set_keypair("Res.final", 1, ecr / nvar, nvar, z);
-
-  /* Set the error return code */
-
-  error = 0;
-
-label_end:
-  mem_free((char*)ranks);
-  return (error);
-}
-
-/****************************************************************************/
-/*!
- **  Perform the Kriging operation (multivariate and/or multistructure)
- **
- ** \return  Error return code
- **
- ** \param[in]  data        Vector of data
- **
- ** \param[out] rhs         R.H.S.
- ** \param[out] work        Working array
- ** \param[out] z           Output Array
- **
- ** \remark This code is only provided for the Cholesky solver
- **
- *****************************************************************************/
-static int st_kriging_several(double* data,
-                              double* rhs,
-                              VectorDouble& work,
-                              double* z)
-{
-  double *rhsloc, *rhscur, *xcur, ss, crit, tolmult;
-  int ncur, ncova, error, maxiter, nvar;
-
-  /* Initializations */
-
-  error   = 1;
-  maxiter = (int)get_keypone("Multi_Structures_Maxiter", 200);
-  tolmult = get_keypone("Multi_Structures_Tolerance", 1.e-8);
-  rhsloc = rhscur = xcur = nullptr;
-  ncova                  = st_get_ncova();
-  nvar                   = S_ENV.nvar;
-  ncur                   = st_get_nvertex_max();
-  ss                     = 0.;
-
-  /* Core allocation */
-
-  xcur = (double*)mem_alloc(sizeof(double) * ncur * ncova * nvar, 0);
-  if (xcur == nullptr) goto label_end;
-  rhsloc = (double*)mem_alloc(sizeof(double) * ncur, 0);
-  if (rhsloc == nullptr) goto label_end;
-  rhscur = (double*)mem_alloc(sizeof(double) * ncur, 0);
-  if (rhscur == nullptr) goto label_end;
-
-  /* Define the Initial solution */
-
-  st_init_array(ncova, nvar, ncur, 0, xcur);
-
-  /* Define the Right-hand sides */
-
-  if (st_kriging_several_rhs(data, rhs, work, &ss)) goto label_end;
-  st_keypair_array("RHS_init", -1, rhs);
-
-  /* Loop on iterations */
-
-  for (int iter = 0; iter < maxiter; iter++)
-  {
-
-    /* Forward process */
-
-    if (st_kriging_several_loop(0, work, rhscur, rhsloc, xcur, rhs, &crit))
-      goto label_end;
-    if (iter < 2)
-    {
-      st_keypair_array("RHS", iter, rhs);
-      st_keypair_array("XCUR", iter, xcur);
-    }
-
-    /* Calculate the convergence criterion */
-
-    if (st_kriging_several_loop(1, work, rhscur, rhsloc, xcur, rhs, &crit))
-      goto label_end;
-
-    crit /= ss;
-    if (VERBOSE) message("Iteration %3d - Criterion = %lg\n", iter + 1, crit);
-    if (crit < tolmult) break;
-  }
-
-  /* Constitute the resulting vector */
-
-  st_keypair_array("XCUR_results", -1, xcur);
-  if (st_kriging_several_results(xcur, z)) goto label_end;
-
-  /* Set the error return code */
-
-  error = 0;
-
-label_end:
-  mem_free((char*)xcur);
-  mem_free((char*)rhsloc);
-  mem_free((char*)rhscur);
-  return (error);
-}
-
-/****************************************************************************/
-/*!
- **  Perform the Kriging operation
- **
- ** \return  Error return code
- **
- ** \param[in]  amesh       AMesh structure
- ** \param[in]  data        Vector of data
- **
- ** \param[out] zkrig       Output Array
- **
- *****************************************************************************/
-static int st_kriging(AMesh* amesh, double* data, double* zkrig)
-{
-  DECLARE_UNUSED(amesh);
-  double *zkdat, *rhs;
-  int error, ncur, size, ncova, nvar;
-  VectorDouble work;
-
-  /* Initializations */
-
-  if (VERBOSE || DEBUG)
-  {
-    if (S_DECIDE.flag_several)
-      message("Kriging step (multiple path algorithm)\n");
-    else
-      message("Kriging step (single path algorithm)\n");
-  }
-  error = 1;
-  zkdat = rhs = nullptr;
-  nvar        = S_ENV.nvar;
-  ncova       = st_get_ncova();
-  ncur        = st_get_nvertex_max();
-  size        = st_get_dimension();
-
-  /* Core allocation */
-
-  work.resize(size, 0);
-  zkdat = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-  if (zkdat == nullptr) goto label_end;
-  rhs = (double*)mem_alloc(sizeof(double) * ncur * ncova * nvar, 0);
-  if (rhs == nullptr) goto label_end;
-  for (int i = 0; i < ncur * ncova * nvar; i++)
-    rhs[i] = 0.;
-  for (int i = 0; i < ncur * nvar; i++)
-    zkdat[i] = 0.;
-
-  /* Define the Initial solution and Right-hand side */
-
-  if (S_DECIDE.flag_several)
-  {
-    if (st_kriging_several(data, rhs, work, zkdat)) goto label_end;
-    st_copy(ncur, zkdat, zkrig);
-  }
-  else
-  {
-    if (st_kriging_one(data, rhs, work, zkdat)) goto label_end;
-    st_merge(ncur, zkdat, zkrig);
-  }
-
-  /* Set the error return code */
-
-  error = 0;
-
-label_end:
-  mem_free((char*)rhs);
-  mem_free((char*)zkdat);
-  return (error);
-}
-
-#ifndef SWIG
 /****************************************************************************/
 /*!
  **  Manage Cheb_Elem structure
@@ -4450,12 +2941,12 @@ label_end:
  ** \remarks Argument 'cheb_old' is used if mode=-1
  **
  *****************************************************************************/
-Cheb_Elem* spde_cheb_manage(int mode,
-                            int verbose,
-                            double power,
-                            const VectorDouble& blin,
-                            MatrixSparse* S,
-                            Cheb_Elem* cheb_old)
+static Cheb_Elem* st_spde_cheb_manage(int mode,
+                                      int verbose,
+                                      double power,
+                                      const VectorDouble& blin,
+                                      MatrixSparse* S,
+                                      Cheb_Elem* cheb_old)
 {
   Cheb_Elem* cheb_elem;
   double a, b, v1, v2, tol;
@@ -4522,61 +3013,10 @@ Cheb_Elem* spde_cheb_manage(int mode,
   error = 0;
 
 label_end:
-  if (error) cheb_elem = spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, cheb_elem);
+  if (error) cheb_elem = st_spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, cheb_elem);
   return (cheb_elem);
 }
 #endif
-/****************************************************************************/
-/*!
- **  Duplicate a Cheb_Elem structure
- **
- ** \return  Pointer to the newly created Cheb_Eleme structure
- **
- ** \param[in]  cheb_in    Input Cheb_Eleme structure
- **
- *****************************************************************************/
-Cheb_Elem* _spde_cheb_duplicate(Cheb_Elem* cheb_in)
-{
-  Cheb_Elem* cheb_out;
-  int error;
-
-  // Initializations
-
-  error    = 1;
-  cheb_out = nullptr;
-  if (cheb_in == nullptr) return (cheb_out);
-
-  // Allocation
-
-  cheb_out = new Cheb_Elem();
-  if (cheb_out == nullptr) goto label_end;
-
-  cheb_out->ncoeffs = cheb_in->ncoeffs;
-  cheb_out->ncmax   = cheb_in->ncmax;
-  cheb_out->ndisc   = cheb_in->ndisc;
-  cheb_out->power   = cheb_in->power;
-  cheb_out->a       = cheb_in->a;
-  cheb_out->b       = cheb_in->b;
-  cheb_out->v1      = cheb_in->v1;
-  cheb_out->v2      = cheb_in->v2;
-  cheb_out->tol     = cheb_in->tol;
-  cheb_out->coeffs  = nullptr;
-
-  cheb_out->coeffs = (double*)mem_alloc(sizeof(double) * cheb_in->ncoeffs, 0);
-  if (cheb_out->coeffs == nullptr) goto label_end;
-  for (int i = 0; i < cheb_in->ncoeffs; i++)
-    cheb_out->coeffs[i] = cheb_in->coeffs[i];
-
-  // Set the error return code
-
-  error = 0;
-
-label_end:
-  if (error)
-    cheb_out = spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, cheb_out);
-  return (cheb_out);
-}
-
 /****************************************************************************/
 /*!
  **  Initialize one SP_Mat structure
@@ -4623,335 +3063,21 @@ static void st_matelem_manage(int mode)
         SPDE_Matelem& Matelem = spde_get_current_matelem(icov);
         delete Matelem.S;
         delete Matelem.Aproj;
-        Matelem.QC = qchol_manage(-1, Matelem.QC);
+        Matelem.QC = st_qchol_manage(-1, Matelem.QC);
         if (Matelem.QCov != NULL)
         {
           for (int ivar = 0; ivar < S_ENV.nvar; ivar++)
-            Matelem.QCov[ivar] = qchol_manage(-1, Matelem.QCov[ivar]);
+            Matelem.QCov[ivar] = st_qchol_manage(-1, Matelem.QCov[ivar]);
         }
         Matelem.Isill  = (double*)mem_free((char*)Matelem.Isill);
         Matelem.Csill  = (double*)mem_free((char*)Matelem.Csill);
         Matelem.qsimu  = st_qsimu_manage(-1, Matelem.qsimu);
-        Matelem.s_cheb = spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, Matelem.s_cheb);
+        Matelem.s_cheb = st_spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, Matelem.s_cheb);
         delete Matelem.amesh;
         Matelem.amesh = nullptr;
       }
       break;
   }
-}
-
-/****************************************************************************/
-/*!
- **  Perform the Simulations
- **
- ** \return  Error return code
- **
- ** \param[in]  QC          Pointer to the QChol structure (finalized)
- **
- ** \param[out] zsnc        Output simulation array (Dimension: nvertex * nvar)
- **
- *****************************************************************************/
-static int st_simulate(QChol* QC, double* zsnc)
-{
-  int ncur  = st_get_nvertex_max();
-  int nvar  = S_ENV.nvar;
-  int ncova = st_get_ncova();
-  int nvs2  = nvar * (nvar + 1) / 2;
-
-  /* Core allocation */
-
-  VectorDouble work(ncur);
-  VectorDouble zloc(ncur);
-  for (int i = 0; i < nvar * ncur; i++)
-    zsnc[i] = 0.;
-
-  /* Loop on the covariances */
-
-  for (int icov = 0; icov < ncova; icov++)
-  {
-    SPDE_CURRENT_ICOV     = icov;
-    SPDE_Matelem& Matelem = spde_get_current_matelem(icov);
-
-    /* Loop on the variables */
-
-    for (int jvar = 0; jvar < nvar; jvar++)
-    {
-      /* Simulate the continuous part */
-
-      if (S_DECIDE.simu_chol)
-      {
-        if (st_simulate_cholesky(QC, work, zloc)) return (1);
-      }
-      else
-      {
-        if (st_simulate_chebychev(zloc)) return (1);
-      }
-
-      /* Simulate the nugget effect */
-
-      st_simulate_nugget(ncur, zloc);
-
-      /* Update the array for non-conditional simulation */
-
-      for (int ivar = 0; ivar < nvar; ivar++)
-      {
-        int iad = st_get_rank(ivar, jvar);
-        for (int icur = 0; icur < ncur; icur++)
-          zsnc[icur + ivar * ncur] += zloc[icur] * Matelem.Csill[iad + nvs2 * icov];
-      }
-    }
-  }
-  return 0;
-}
-
-/****************************************************************************/
-/*!
- **  Perform the main Simulations steps after Q has been constructed
- **
- ** \return  Error return code
- **
- ** \param[in]  dbin         Input Db grid structure (optional)
- ** \param[in]  dbout        Output Db grid structure
- ** \param[in]  s_option     SPDE_Option structure
- ** \param[in]  nbsimu       Number of simulations
- ** \param[in]  ngibbs_nburn Number of iterations (Burning step)
- ** \param[in]  ngibbs_niter Number of iterations
- ** \param[in]  ngibbs_int   Number of iterations internal to Gibbs (SPDE)
- **
- ** \remarks  If the number of simulations 'nbsimu' is set to 0,
- ** \remarks  the simulation algorithm is turned into a kriging one
- **
- *****************************************************************************/
-int spde_process(Db* dbin,
-                 Db* dbout,
-                 SPDE_Option& s_option,
-                 int nbsimu,
-                 int ngibbs_nburn,
-                 int ngibbs_niter,
-                 int ngibbs_int)
-{
-  int ncur, ndata, nbsimuw, isimuw, error, iatt_simu, ivar0;
-  int flag_mult_data, ngrf, nv_krige;
-  int ngibbs_total, ngtime, nvar;
-  double *data, *zcur, *zkrig, *zout, *vcur, *zsnc, *zdat;
-  AMesh* amesh;
-
-  /* Initializations */
-
-  flag_mult_data = (int)get_keypone("Flag_Mult_Data", 0);
-  error          = 1;
-  data = zcur = zkrig = zout = vcur = zsnc = zdat = nullptr;
-  ndata                                           = 0;
-  ngrf                                            = st_get_number_grf();
-  nvar                                            = S_ENV.nvar;
-  ncur                                            = st_get_nvertex_max();
-
-  /* Title (optional) */
-
-  if (VERBOSE) st_title(0, 0, 1, "Processing");
-
-  /* Core allocation and global initializations */
-
-  zcur = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-  if (zcur == nullptr) goto label_end;
-
-  if (S_DECIDE.flag_case == CASE_SIMULATE)
-  {
-    zsnc = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-    if (zsnc == nullptr) goto label_end;
-    zout = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-    if (zout == nullptr) goto label_end;
-  }
-  if (S_DECIDE.flag_dbin)
-  {
-    ndata = dbin->getNSample(true);
-    zkrig = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-    if (zkrig == nullptr) goto label_end;
-    zdat = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-    if (zdat == nullptr) goto label_end;
-    data = (double*)mem_alloc(sizeof(double) * ndata * nvar, 0);
-    if (data == nullptr) goto label_end;
-    if (S_DECIDE.flag_std)
-    {
-      vcur = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-      if (vcur == nullptr) goto label_end;
-    }
-  }
-
-  /***********************/
-  /* Preliminary Kriging */
-  /***********************/
-
-  if (S_DECIDE.flag_onechol && !flag_mult_data && !S_DECIDE.flag_gibbs && ngrf == 1)
-  {
-    SPDE_CURRENT_IGRF = 0;
-    amesh             = spde_get_current_matelem(-1).amesh;
-    st_init_array(1, nvar, ncur, 1, zkrig);
-    st_load_data(amesh, dbin, dbout, s_option, -1, data, zkrig);
-    if (st_kriging(amesh, data, zkrig)) goto label_end;
-  }
-
-  if (S_DECIDE.flag_case == CASE_KRIGING)
-  {
-    // Calculation of the Kriging Variance (optional)
-    if (S_DECIDE.flag_std)
-    {
-      messerr("Calculation of stdev has been disconnected within spde.cpp");
-      S_DECIDE.flag_std = false;
-    }
-
-    // Saving operation
-    nv_krige = 0;
-    spde_get_current_matelem(-1);
-    if (S_DECIDE.flag_est)
-      st_save_result(zkrig, dbout, ELoc::Z, nv_krige++);
-    if (S_DECIDE.flag_std)
-      st_save_result(vcur, dbout, ELoc::Z, nv_krige++);
-  }
-  else if (S_DECIDE.flag_case == CASE_SIMULATE)
-  {
-    /***************/
-    /* Simulations */
-    /***************/
-
-    nbsimuw = (S_DECIDE.flag_modif) ? 1 : nbsimu;
-
-    /***************************/
-    /* Loop on the simulations */
-    /***************************/
-
-    for (int isimu = 0; isimu < nbsimu; isimu++)
-    {
-      if (VERBOSE || DEBUG) message("Simulation #%d/%d\n", isimu + 1, nbsimu);
-      isimuw = (S_DECIDE.flag_modif) ? 0 : isimu;
-      st_init_array(1, nvar, ncur, 1, zcur);
-      if (S_DECIDE.flag_std) st_init_array(1, nvar, ncur, 0, vcur);
-
-      /****************************************************/
-      /* Loop on the underlying Gaussian Random Functions */
-      /****************************************************/
-
-      for (int igrf = 0; igrf < ngrf; igrf++)
-      {
-        if ((VERBOSE || DEBUG) && st_get_number_grf() > 1)
-          message("GRF iteration #%d/%d\n", igrf + 1, ngrf);
-        SPDE_CURRENT_IGRF = igrf;
-        amesh             = spde_get_current_matelem(-1).amesh;
-
-        /* Conditional Simulation */
-        /* Load the data set corresponding to the new variable */
-
-        if (S_DECIDE.flag_dbin)
-        {
-          st_init_array(1, nvar, ncur, 1, zdat);
-          ivar0 = (flag_mult_data) ? isimu : -1;
-          st_load_data(amesh, dbin, dbout, s_option, ivar0, data, zdat);
-        }
-
-        /***********************************************************/
-        /* Loop on the gibbs iterations (performed at end of loop) */
-        /***********************************************************/
-
-        ngtime       = 1;
-        ngibbs_total = ngibbs_nburn + ngibbs_niter;
-        if (S_DECIDE.flag_gibbs) ngtime = MAX(1, ngibbs_total);
-
-        for (int igtime = 0; igtime < ngtime; igtime++)
-        {
-          if ((VERBOSE || DEBUG) && S_DECIDE.flag_gibbs)
-            message("Gibbs iteration #%d/%d\n", igtime + 1, ngtime);
-
-          /* Perform the non-conditional simulation */
-          st_init_array(1, nvar, ncur, 1, zsnc);
-          if (!S_DECIDE.flag_onechol)
-          {
-            // Simulate the continuous part
-            if (st_simulate(spde_get_current_matelem(-1).QC, zsnc))
-              goto label_end;
-
-            if (S_DECIDE.flag_dbin)
-            {
-              // Calculate the simulation error
-              st_simu_subtract_data(ncur, zsnc, data, zdat);
-
-              // Perform Conditional Kriging
-              if (st_kriging(amesh, zdat, zcur)) goto label_end;
-
-              // Add the non-conditional simulation
-              st_simu_add_vertices(ncur, zsnc, zcur);
-            }
-            else
-            {
-              st_load_array(ncur, zsnc, zcur);
-            }
-          }
-          else
-          {
-            // Perform simulation of the residuals
-            if (st_simulate(spde_get_current_matelem(-1).qsimu->QCtt, zout))
-              goto label_end;
-            st_merge(ncur, zout, zsnc);
-
-            if (S_DECIDE.flag_gibbs)
-            {
-              // Perform Kriging of the Gibbsed Gaussian
-              if (st_kriging(amesh, data, zcur)) goto label_end;
-
-              // Add the non-conditional simulation
-              st_simu_add_vertices(ncur, zsnc, zcur);
-            }
-            else
-            {
-              st_load_array(ncur, zkrig, zcur);
-              st_simu_add_vertices(ncur, zsnc, zcur);
-            }
-          }
-
-          /* Gibbs iteration */
-
-          if (S_DECIDE.flag_gibbs)
-          {
-            st_gibbs(igrf, ncur, ngibbs_int, igtime, ngibbs_nburn,
-                     dbin, dbout, zcur);
-          }
-        }
-
-        /* Saving operation */
-
-        iatt_simu = Db::getSimRank(isimuw, 0, igrf, nbsimuw, 1);
-        st_save_result(zcur, dbout, ELoc::SIMU, iatt_simu);
-      }
-
-      /* Perform the transformation */
-
-      if (SIMU_FUNC_TRANSF != NULL)
-        SIMU_FUNC_TRANSF(dbout, VERBOSE, isimuw, nbsimuw);
-
-      /* Transforming the result (flag_modif) */
-
-      if (S_DECIDE.flag_modif && SIMU_FUNC_UPDATE != NULL)
-        SIMU_FUNC_UPDATE(dbout, VERBOSE, isimuw, nbsimuw);
-    }
-
-    /* Scale the simulations */
-
-    if (S_DECIDE.flag_modif && SIMU_FUNC_SCALE != NULL)
-      SIMU_FUNC_SCALE(dbout, VERBOSE, nbsimu);
-  }
-
-  /* Set the error return code */
-
-  error = 0;
-
-label_end:
-  mem_free((char*)data);
-  mem_free((char*)zdat);
-  mem_free((char*)zkrig);
-  mem_free((char*)zout);
-  mem_free((char*)zsnc);
-  mem_free((char*)zcur);
-  mem_free((char*)vcur);
-  return (error);
 }
 
 /****************************************************************************/
@@ -4989,11 +3115,10 @@ static AMesh* st_create_meshes(Db* dbin,
   int ndim_loc = 0;
   if (dbin != nullptr) ndim_loc = MAX(ndim_loc, dbin->getNDim());
   if (dbout != nullptr) ndim_loc = MAX(ndim_loc, dbout->getNDim());
-  bool flag_sphere = isDefaultSpaceSphere();
 
   // Processing
 
-  if (flag_sphere)
+  if (isDefaultSpaceSphere())
   {
 
     /* Particular case of data on the sphere */
@@ -5005,8 +3130,9 @@ static AMesh* st_create_meshes(Db* dbin,
 
   /* Standard case */
 
-  /* Check that a single file must be meshed and that it corresponds */
-  /* to a grid */
+  // Check that:
+  // - a single file must be meshed
+  // - it corresponds to a grid
 
   Db* dbloc = NULL;
   if (!flag_force)
@@ -5062,7 +3188,7 @@ static int st_is_external_AQ_defined(int icov0)
  ** \param[in]  icov0    Rank of the current Covariance
  **
  *****************************************************************************/
-int spde_external_copy(SPDE_Matelem& matelem, int icov0)
+static int st_spde_external_copy(SPDE_Matelem& matelem, int icov0)
 {
   if (S_EXTERNAL_A[icov0] == nullptr)
   {
@@ -5075,7 +3201,7 @@ int spde_external_copy(SPDE_Matelem& matelem, int icov0)
     return (1);
   }
 
-  matelem.QC    = qchol_manage(1, NULL);
+  matelem.QC    = st_qchol_manage(1, NULL);
   matelem.QC->Q = S_EXTERNAL_Q[icov0]->clone();
   matelem.Aproj = S_EXTERNAL_A[icov0]->clone();
 
@@ -5112,97 +3238,6 @@ AMesh* spde_mesh_load(Db* dbin,
 
 /****************************************************************************/
 /*!
- **  Manage the contents of the External AMesh structure used for
- **  storing external meshing information
- **
- ** \param[in]  icov0     Rank of the current covariance (from 0 to 2)
- ** \param[in]  mesh      AMesh pointer
- **
- *****************************************************************************/
-void spde_external_mesh_define(int icov0, AMesh* mesh)
-{
-  S_EXTERNAL_MESH[icov0] = mesh;
-}
-
-void spde_external_mesh_undefine(int icov0)
-{
-  if (S_EXTERNAL_MESH[icov0] != nullptr) delete S_EXTERNAL_MESH[icov0];
-  S_EXTERNAL_MESH[icov0] = nullptr;
-}
-#ifndef SWIG
-MatrixSparse* spde_external_A_define(int icov0, MatrixSparse* A)
-{
-  S_EXTERNAL_A[icov0] = A->clone();
-  return S_EXTERNAL_A[icov0];
-}
-
-MatrixSparse* spde_external_A_undefine(int icov0)
-{
-  if (S_EXTERNAL_A[icov0] == nullptr) return nullptr;
-  delete S_EXTERNAL_A[icov0];
-  S_EXTERNAL_A[icov0] = nullptr;
-  return nullptr;
-}
-
-MatrixSparse* spde_external_Q_define(int icov0, MatrixSparse* Q)
-{
-  S_EXTERNAL_Q[icov0] = Q->clone();
-  return S_EXTERNAL_Q[icov0];
-}
-
-MatrixSparse* spde_external_Q_undefine(int icov0)
-{
-  if (S_EXTERNAL_Q[icov0] == nullptr) return nullptr;
-  delete S_EXTERNAL_Q[icov0];
-  S_EXTERNAL_Q[icov0] = nullptr;
-  return nullptr;
-}
-#endif
-/****************************************************************************/
-/*!
- **  Assign fields of the AMesh structure which would have been calculated
- **  elsewhere
- **
- ** \param[in]  ndim      Space dimension
- ** \param[in]  ncorner   Number of vertices per element
- ** \param[in]  nvertex   Number of points
- ** \param[in]  nmesh     Number of meshes
- ** \param[in]  arg_meshes    Array containing the meshes
- ** \param[in]  arg_points    Array containing the vertex coordinates
- ** \param[in]  verbose   Verbose flag
- **
- ** \param[in,out]  amesh   Pointer to AMesh to be assigned
- **
- *****************************************************************************/
-void spde_mesh_assign(AMesh* amesh,
-                      int ndim,
-                      int ncorner,
-                      int nvertex,
-                      int nmesh,
-                      const VectorInt& arg_meshes,
-                      const VectorDouble& arg_points,
-                      int verbose)
-{
-  static bool debug = false;
-
-  delete amesh;
-
-  MatrixDense apices;
-  apices.reset(nvertex, ndim);
-  apices.setValues(arg_points, true);
-
-  MatrixInt meshes;
-  meshes.reset(nmesh, ncorner);
-  meshes.setValues(arg_meshes, true);
-
-  MeshEStandard* ameshSt = MeshEStandard::createFromExternal(apices, meshes, verbose);
-  amesh                  = dynamic_cast<AMesh*>(ameshSt);
-
-  if (debug) amesh->display();
-}
-
-/****************************************************************************/
-/*!
  **  Preparation using SPDE (for all GRF and COV)
  **
  ** \return  Error return code
@@ -5213,10 +3248,10 @@ void spde_mesh_assign(AMesh* amesh,
  ** \param[in]  s_option    SPDE_Option structure
  **
  *****************************************************************************/
-int spde_prepar(Db* dbin,
-                Db* dbout,
-                const VectorDouble& gext,
-                SPDE_Option& s_option)
+static int st_spde_prepar(Db* dbin,
+                          Db* dbout,
+                          const VectorDouble& gext,
+                          SPDE_Option& s_option)
 {
   st_calcul_init(S_ENV.ndim);
 
@@ -5262,7 +3297,7 @@ int spde_prepar(Db* dbin,
 
       if (flag_AQ_defined)
       {
-        if (spde_external_copy(Matelem, icov)) return 1;
+        if (st_spde_external_copy(Matelem, icov)) return 1;
       }
 
       /* Prepare the array of sparse matrices (without nugget effect) */
@@ -5309,7 +3344,7 @@ int spde_prepar(Db* dbin,
 
       if (!flag_AQ_defined)
       {
-        if (spde_build_matrices(st_get_model(), VERBOSE)) return 1;
+        if (st_spde_build_matrices(st_get_model(), VERBOSE)) return 1;
       }
 
       /* Build additional matrices */
@@ -5332,7 +3367,7 @@ int spde_prepar(Db* dbin,
 
       if (S_DECIDE.simu_cheb)
       {
-        Matelem.s_cheb = spde_cheb_manage(1, VERBOSE, -0.5, Calcul.blin, Matelem.S, NULL);
+        Matelem.s_cheb = st_spde_cheb_manage(1, VERBOSE, -0.5, Calcul.blin, Matelem.S, NULL);
         if (Matelem.s_cheb == nullptr) return 1;
       }
 
@@ -5354,7 +3389,7 @@ int spde_prepar(Db* dbin,
  ** \return  Error return code
  **
  *****************************************************************************/
-int spde_posterior()
+static int st_spde_posterior()
 {
   /*  if (st_get_model()->isNoStat())
    {
@@ -5409,147 +3444,6 @@ static void st_environ_print(const Db* dbout, const VectorDouble& gext)
 
 /****************************************************************************/
 /*!
- **  True if a (dilated) point intersects a mesh
- **
- ** \returns 1 if the intersection is not empty; 0 otherwise
- **
- ** \param[in]  amesh     AMesh structure
- ** \param[in]  coor      Point coordinates (Dimension: ndim)
- ** \param[in]  caux      Working array (Dimension: ndim)
- ** \param[in]  ndim      Comon space dimension between coor and s_mesh
- ** \param[in]  imesh     Mesh Index
- ** \param[in]  radius    Dilation radius
- **
- ** \remarks This function must not be called if on a sphere
- **
- *****************************************************************************/
-static bool is_in_mesh_neigh(AMesh* amesh,
-                             double* coor,
-                             double* caux,
-                             int ndim,
-                             int imesh,
-                             double radius)
-{
-  double top, bot, alpha, delta, ref;
-  int ncorner;
-
-  /* Initializations */
-
-  ncorner = amesh->getNApexPerMesh();
-
-  /* Check that at least one mesh vertex belongs to the point neighborhood */
-
-  for (int icorn = 0; icorn < ncorner; icorn++)
-  {
-    for (int idim = 0; idim < ndim; idim++)
-      caux[idim] = amesh->getCoor(imesh, icorn, idim);
-    if (ut_distance(ndim, coor, caux) <= radius) return (1);
-  }
-
-  /* Project the point on each mesh edge */
-
-  for (int icorn = 0; icorn < ncorner - 1; icorn++)
-    for (int jcorn = icorn + 1; jcorn < ncorner; jcorn++)
-    {
-
-      // Get the coordinates of the projection
-
-      top = bot = 0.;
-      for (int idim = 0; idim < ndim; idim++)
-      {
-        delta = (amesh->getCoor(imesh, jcorn, idim) - amesh->getCoor(imesh, icorn, idim));
-        top += delta * (amesh->getCoor(imesh, icorn, idim) - coor[idim]);
-        bot += delta * delta;
-      }
-      alpha = top / bot;
-
-      // Check that the projection lie between two vertices
-
-      if (alpha < 0 || alpha > 1) continue;
-
-      // Exhibit the coordinates of the projection
-
-      for (int idim = 0; idim < ndim; idim++)
-      {
-        ref        = amesh->getCoor(imesh, icorn, idim);
-        caux[idim] = ref + alpha * (amesh->getCoor(imesh, jcorn, idim) - ref);
-      }
-
-      // Calculate the distance between the projection and the point
-
-      if (ut_distance(ndim, coor, caux) <= radius) return (1);
-    }
-
-  return (0);
-}
-
-/****************************************************************************/
-/*!
- **  Construct the array of coordinates of triangles in 3-D space
- **  by gluing the original 2-D coordinates (turned back in the original space)
- **  with the information provided by the third dimension array
- **
- ** \return  Array of 3-D coordinates
- **
- ** \param[in]  amesh     AMesh structure
- ** \param[in]  zcur      Array of results
- **
- *****************************************************************************/
-static VectorDouble st_get_coords_3D(AMesh* amesh, const double* zcur)
-{
-  int ndim = 3;
-
-  VectorDouble points;
-  int nvertex            = amesh->getNApices();
-  MeshEStandard* ameshSt = dynamic_cast<MeshEStandard*>(amesh);
-  if (ameshSt != nullptr) points = ameshSt->getPointList();
-
-  /* Core allocation */
-
-  VectorDouble p3d(ndim * nvertex, 0);
-
-  /* Load the array of 3-D coordinates */
-
-  int np = 0;
-  for (int i = 0; i < nvertex; i++)
-  {
-    double value = zcur[i];
-    if (FFFF(value)) continue;
-    p3d[3 * np + 0] = points[2 * i + 0];
-    p3d[3 * np + 1] = points[2 * i + 1];
-    p3d[3 * np + 2] = value;
-    np++;
-  }
-
-  /* Reallocation (if necessary) */
-
-  if (np != nvertex)
-  {
-    p3d.resize(ndim * np);
-  }
-
-  return p3d;
-}
-
-/****************************************************************************/
-/*!
- **  Free all memory used in SPDE
- **
- *****************************************************************************/
-void spde_free_all(void)
-
-{
-  for (int igrf = 0; igrf < SPDE_MAX_NGRF; igrf++)
-  {
-    SPDE_CURRENT_IGRF = igrf;
-    st_matelem_manage(-1);
-    st_clean_Bnugget();
-    st_clean_Bhetero();
-  }
-}
-
-/****************************************************************************/
-/*!
  **  Define the main options
  **
  ** \return Error return code
@@ -5572,19 +3466,19 @@ void spde_free_all(void)
  ** \remarks This function initiates the Matelem structures
  **
  *****************************************************************************/
-int spde_check(const Db* dbin,
-               const Db* dbout,
-               Model* model1,
-               Model* model2,
-               bool verbose,
-               const VectorDouble& gext,
-               bool mesh_dbin,
-               bool mesh_dbout,
-               bool flag_advanced,
-               bool flag_est,
-               bool flag_std,
-               bool flag_gibbs,
-               bool flag_modif)
+static int st_spde_check(const Db* dbin,
+                         const Db* dbout,
+                         Model* model1,
+                         Model* model2,
+                         bool verbose,
+                         const VectorDouble& gext,
+                         bool mesh_dbin,
+                         bool mesh_dbout,
+                         bool flag_advanced,
+                         bool flag_est,
+                         bool flag_std,
+                         bool flag_gibbs,
+                         bool flag_modif)
 {
   Model* models[2];
   int ncova;
@@ -5710,253 +3604,6 @@ int spde_check(const Db* dbin,
   return (0);
 }
 
-/****************************************************************************/
-/*!
- **  Perform Kriging using SPDE on the set of constructed 2-D triangles
- **
- ** \return  Error return code
- **
- ** \param[in]  dbin        Db input structure
- ** \param[in]  model       Model structure
- ** \param[in]  s_option    SPDE_Option structure
- ** \param[in]  verbose     Verbose option
- **
- ** \param[out] nmesh_arg    Number of triangles generated
- ** \param[out] nvertex_arg  Number of vertices
- ** \param[out] meshes_arg   Array of triangulate vertex indices
- ** \param[out] points_arg   Array containing the 2-D vertices
- **
- ** \remark It is the responsability of the calling function to free
- ** \remark the returned arrays 'points_arg' and 'meshes_arg'.
- **
- ** \remark This function assumes that there is only one Model defined
- ** \remark Hence the test on the number of models
- **
- *****************************************************************************/
-int kriging2D_spde(Db* dbin,
-                   Model* model,
-                   SPDE_Option& s_option,
-                   int verbose,
-                   int* nmesh_arg,
-                   int* nvertex_arg,
-                   VectorInt& meshes_arg,
-                   VectorDouble& points_arg)
-{
-  int error, ncur, ndata, nvar, ncova;
-  double *zcur, *work, *data;
-  AMesh* amesh;
-  MeshEStandard* ameshSt;
-
-  /* Initializations */
-
-  error = 1;
-  zcur = work = data = nullptr;
-  *nmesh_arg = *nvertex_arg = 0;
-
-  /* Preliminary checks */
-
-  if (spde_check(dbin, NULL, model, NULL, verbose, VectorDouble(),
-                 true, true, true, true, false, false, false)) goto label_end;
-  if (st_get_number_grf() != 1)
-  {
-    messerr("This function should be called in the case of a single Model");
-    messerr("In your case: %d\n", st_get_number_grf());
-    goto label_end;
-  }
-
-  /* Preliminary checks */
-
-  if (model->getNDim() != 2)
-  {
-    messerr("This application is restricted to the 2-D case (ndim=%d)",
-            model->getNDim());
-    goto label_end;
-  }
-
-  /* Prepare all material */
-
-  if (spde_prepar(NULL, dbin, VectorDouble(), s_option)) goto label_end;
-  SPDE_CURRENT_IGRF = 0;
-  {
-    SPDE_Matelem& Matelem = spde_get_current_matelem(-1);
-    amesh                 = Matelem.amesh;
-
-    /* Core allocation */
-
-    nvar  = S_ENV.nvar;
-    ncova = st_get_ncova_max();
-    ndata = dbin->getNSample(true);
-    ncur  = amesh->getNApices();
-    zcur  = (double*)mem_alloc(sizeof(double) * ncur * nvar, 0);
-    if (zcur == nullptr) goto label_end;
-    work = (double*)mem_alloc(sizeof(double) * ncur, 0);
-    if (work == nullptr) goto label_end;
-    data = (double*)mem_alloc(sizeof(double) * ndata * nvar, 0);
-    if (data == nullptr) goto label_end;
-
-    /* Load the data */
-
-    st_init_array(ncova, nvar, ncur, 1, zcur);
-    st_load_data(amesh, dbin, NULL, s_option, -1, data, zcur);
-
-    /* for estimation */
-
-    if (st_get_filnug())
-    {
-      if (st_filter(work, zcur)) goto label_end;
-    }
-    else
-    {
-      if (st_kriging(amesh, data, zcur)) goto label_end;
-    }
-  }
-
-  /* Create the returned array */
-
-  points_arg = st_get_coords_3D(amesh, zcur);
-  if (!points_arg.empty()) *nvertex_arg = (int)points_arg.size() / 3;
-
-  ameshSt = dynamic_cast<MeshEStandard*>(amesh);
-  if (ameshSt != nullptr) meshes_arg = ameshSt->getMeshList();
-  *nmesh_arg = amesh->getNMeshes();
-
-  /* Cleaning procedure */
-
-  spde_posterior();
-
-  /* Set the error code */
-
-  error = 0;
-
-label_end:
-  mem_free((char*)zcur);
-  mem_free((char*)work);
-  mem_free((char*)data);
-  return (error);
-}
-
-/****************************************************************************/
-/*!
- **  Perform the product of x by Q using the blin decomposition
- **
- ** \param[in]  blin      Array of coefficients for Linear combinaison
- ** \param[in]  S         Shift operator
- ** \param[in]  Lambda    Vector Lambda
- ** \param[in]  TildeC    Vector TildeC
- ** \param[in]  x         Input array
- **
- ** \param[out] y         Output array
- **
- *****************************************************************************/
-static void st_product_Q(const VectorDouble& blin,
-                         MatrixSparse* S,
-                         const VectorDouble& Lambda,
-                         const VectorDouble& TildeC,
-                         const VectorDouble& x,
-                         VectorDouble& y)
-{
-  int n = S->getNCols();
-  VectorDouble x1(n);
-  VectorDouble x2(n);
-
-  for (int i = 0; i < n; i++)
-    y[i] = 0.;
-  for (int i = 0; i < n; i++)
-    x1[i] = x[i] * sqrt(TildeC[i]);
-
-  for (int ilin = 0, nblin = (int)blin.size(); ilin < nblin; ilin++)
-  {
-    for (int i = 0; i < n; i++)
-      y[i] += blin[ilin] * x1[i];
-    S->prodMatVecInPlaceC(x1, x2);
-    for (int i = 0; i < n; i++)
-      x1[i] = x2[i];
-  }
-
-  for (int i = 0; i < n; i++)
-    y[i] *= pow(Lambda[i] / sqrt(TildeC[i]), 2.) * sqrt(TildeC[i]);
-}
-
-#ifndef SWIG
-/****************************************************************************/
-/*!
- **  Perform the product of a vector by the inverse of the power
- **  of a sparse matrix using the Chebychev Polynomial procedure
- **
- ** \return Error return code
- **
- ** \param[in]  blin      Array of coefficients for Linear combinaison
- ** \param[in]  S         Shift operator
- ** \param[in]  Lambda    Vector Lambda
- ** \param[in]  TildeC    Vector TildeC
- ** \param[in]  power     Parameter used in the Chebychev approximation
- ** \param[in]  x         Input array
- **
- ** \param[out] y         Output array
- **
- *****************************************************************************/
-int spde_eval(const VectorDouble& blin,
-              MatrixSparse* S,
-              const VectorDouble& Lambda,
-              const VectorDouble& TildeC,
-              double power,
-              VectorDouble& x,
-              VectorDouble& y)
-{
-  Cheb_Elem* cheb_elem;
-  int error, n;
-
-  /* Initializations */
-
-  error     = 1;
-  cheb_elem = nullptr;
-  n         = S->getNCols();
-  if (power != 1.0 && power != -1.0 && power != -0.5)
-  {
-    messerr("Invalid value for the 'power' argument (%lf)", power);
-    messerr("It should be either -1, -0.5 or 1");
-    goto label_end;
-  }
-
-  // Dispatch
-
-  if (power == 1.)
-  {
-    st_product_Q(blin, S, Lambda, TildeC, x, y);
-  }
-  else
-  {
-    /* Pre-processing for the case power=-1 */
-
-    if (power == -1)
-      for (int i = 0; i < n; i++)
-        x[i] /= sqrt(TildeC[i]);
-
-    /* Create the Cheb_Elem structure */
-
-    cheb_elem = spde_cheb_manage(1, VERBOSE, power, blin, S, NULL);
-    if (cheb_elem == nullptr) goto label_end;
-
-    /* Operate the Chebychev polynomials */
-
-    if (spde_chebychev_operate(S, cheb_elem, Lambda, x, y)) goto label_end;
-
-    /* Post-processing for the case power=-1 */
-
-    if (power == -1)
-      for (int i = 0; i < n; i++)
-        y[i] *= sqrt(TildeC[i]);
-  }
-
-  /* Set the error return code */
-
-  error = 0;
-
-label_end:
-  cheb_elem = spde_cheb_manage(-1, 0, 0, VectorDouble(), NULL, cheb_elem);
-  return (error);
-}
-#endif
 /****************************************************************************/
 /*!
  **  Check the pinchout variable
@@ -7450,7 +5097,7 @@ static QChol* st_derive_Qc(double s2, QChol* Qc, SPDE_Matelem& Matelem)
 
   // Clean the previous Qc (if it exists)
 
-  if (Qc != nullptr) Qc = qchol_manage(-1, Qc);
+  if (Qc != nullptr) Qc = st_qchol_manage(-1, Qc);
 
   // Calculate: Q + t(B) %*% B
 
@@ -7461,7 +5108,7 @@ static QChol* st_derive_Qc(double s2, QChol* Qc, SPDE_Matelem& Matelem)
   B2 = MatrixFactory::prodMatMat<MatrixSparse>(Bt, B);
   if (B2 == nullptr) goto label_end;
 
-  Qc = qchol_manage(1, NULL);
+  Qc = st_qchol_manage(1, NULL);
   if (Qc == nullptr) goto label_end;
   Qc->Q = MatrixSparse::addMatMat(Q, B2, s2, 1.);
   if (Qc->Q == nullptr) goto label_end;
@@ -7476,187 +5123,9 @@ label_end:
   message("Done\n");
   delete Bt;
   delete B2;
-  if (error) Qc = qchol_manage(-1, Qc);
+  if (error) Qc = st_qchol_manage(-1, Qc);
   return (Qc);
 }
-
-#ifndef SWIG
-/****************************************************************************/
-/*!
- **  Returns the projection matrix of a set of points (contained in a Db)
- **  onto a meshing
- **
- ** \return Pointer to the newly created sparse matrix (or NULL)
- **
- ** \param[in]  db         Db structure
- ** \param[in]  amesh      AMesh structure
- ** \param[in]  flag_exact Type of test for intersection (See remarks)
- ** \param[in]  radius     Neighborhood radius
- **
- ** \param[out] nactive_arg Number of active samples from the Db
- ** \param[out] ranks_arg   Ranks of the active samples
- **
- ** \remarks The calling function must free the argument 'ranks'
- **
- ** \remarks When flag_exact is TRUE, for each active sample of Db, a vertex
- ** \remarks of the mesh is active as soon as it lies within the vicinity
- ** \remarks of the sample.
- ** \remarks If flag_exact is FALSE, all vertices of a mesh are considered as
- ** \remarks active as soon as the mesh intersects the ball around a sample.
- **
- ** \remarks The vicinity is defined as any point located at a distance
- ** \remarks from the sample smaller than 'radius'. The distance is calculated
- ** \remarks as the Euclidean distance over the space whose dimension is
- ** \remarks if the smallest value between the Db et Mesh space dimensions.
- **
- *****************************************************************************/
-MatrixSparse* db_mesh_neigh(const Db* db,
-                            AMesh* amesh,
-                            double radius,
-                            int flag_exact,
-                            bool /*verbose*/,
-                            int* nactive_arg,
-                            int** ranks_arg)
-{
-  double total;
-  int error, ncorner, ip, ndimd, ndimv, ndim, jech, jech_max, ip_max, nech, nactive;
-  MatrixSparse* A = nullptr;
-  VectorDouble caux;
-  VectorDouble coor;
-
-  /* Initializations */
-
-  error            = 1;
-  int* pts         = nullptr;
-  int* ranks       = nullptr;
-  ncorner          = amesh->getNApexPerMesh();
-  nech             = db->getNSample();
-  bool flag_sphere = isDefaultSpaceSphere();
-  NF_Triplet Atriplet;
-  if (flag_sphere)
-  {
-    messerr("The function 'db_mesh_neigh' is not programmed on sphere");
-    goto label_end;
-  }
-
-  /* Core allocation */
-
-  ranks = (int*)mem_alloc(sizeof(int) * nech, 0);
-  if (ranks == nullptr) goto label_end;
-  for (int iech = 0; iech < nech; iech++)
-    ranks[iech] = -1;
-
-  /* Core allocation */
-
-  ndimd = db->getNDim();
-  ndimv = amesh->getNDim();
-  ndim  = MIN(ndimd, ndimv);
-  coor.resize(ndim);
-  caux.resize(ndimd);
-  pts = (int*)mem_alloc(sizeof(int) * amesh->getNApices(), 0);
-  if (pts == nullptr) goto label_end;
-
-  /* Loop on the samples */
-
-  ip_max = jech_max = jech = 0;
-  for (int iech = 0; iech < nech; iech++)
-  {
-    if (!db->isActive(iech)) continue;
-
-    /* Identification of the sample in the meshing */
-
-    for (int idim = 0; idim < ndim; idim++)
-      coor[idim] = db->getCoordinate(iech, idim);
-
-    /* Blank out the array of hitting points */
-
-    for (ip = 0; ip < amesh->getNApices(); ip++)
-      pts[ip] = 0;
-
-    /* Loop on the meshes */
-
-    for (int imesh = 0; imesh < amesh->getNMeshes(); imesh++)
-    {
-      if (flag_exact)
-      {
-        for (int icorn = 0; icorn < amesh->getNApexPerMesh(); icorn++)
-        {
-          ip = amesh->getApex(imesh, icorn);
-          amesh->getApexCoordinatesInPlace(ip, caux);
-          if (ut_distance(ndim, coor.data(), caux.data()) <= radius)
-          {
-            pts[ip] = 1;
-            break;
-          }
-        }
-      }
-      else
-      {
-        if (!is_in_mesh_neigh(amesh, coor.data(), caux.data(), ndim, imesh, radius))
-          continue;
-
-        /* The meshing element is in the neighborhood of the sample */
-
-        for (int icorn = 0; icorn < ncorner; icorn++)
-        {
-          ip      = amesh->getApex(imesh, icorn);
-          pts[ip] = 1;
-          if (ip > ip_max) ip_max = ip;
-        }
-      }
-    }
-
-    /* Count the number of vertices hit by the point neighborhood */
-
-    total = 0.;
-    for (ip = 0; ip < amesh->getNApices(); ip++)
-      total += pts[ip];
-    if (total <= 0.) continue;
-
-    /* Add the active vertices to the triplet */
-
-    for (ip = 0; ip < amesh->getNApices(); ip++)
-    {
-      if (pts[ip] <= 0) continue;
-      if (ip > ip_max) ip_max = ip;
-      Atriplet.add(jech, ip, 1. / total);
-    }
-    ranks[jech] = iech;
-    if (jech > jech_max) jech_max = jech;
-    jech++;
-  }
-
-  /* Add the extreme value to force dimension */
-
-  if (ip_max < amesh->getNApices() - 1)
-    Atriplet.force(jech_max, amesh->getNApices());
-
-  /* Core reallocation */
-
-  nactive = jech_max + 1;
-  ranks   = (int*)mem_realloc((char*)ranks, sizeof(int) * nactive, 0);
-  if (ranks == nullptr) goto label_end;
-
-  /* Convert the triplet into a sparse matrix */
-
-  A = MatrixSparse::createFromTriplet(Atriplet);
-
-  /* Set the error return code */
-
-  error        = 0;
-  *nactive_arg = nactive;
-  *ranks_arg   = ranks;
-
-label_end:
-  mem_free((char*)pts);
-  if (error)
-  {
-    delete A;
-    A = nullptr;
-  }
-  return (A);
-}
-#endif
 
 /****************************************************************************/
 /*!
@@ -8134,10 +5603,10 @@ static int st_check_gibbs_data(const char* title,
  **                         (only used when mode==-1)
  **
  *****************************************************************************/
-static M2D_Environ* m2denv_manage(int mode,
-                                  int flag_ed,
-                                  double ystdv,
-                                  M2D_Environ* m2denv_old)
+static M2D_Environ* st_m2denv_manage(int mode,
+                                     int flag_ed,
+                                     double ystdv,
+                                     M2D_Environ* m2denv_old)
 {
   M2D_Environ* m2denv;
 
@@ -8444,7 +5913,7 @@ int m2d_gibbs_spde(Db* dbin,
 
   vartot = model->getTotalSill(0, 0);
 
-  m2denv = m2denv_manage(1, flag_ed, sqrt(vartot), NULL);
+  m2denv = st_m2denv_manage(1, flag_ed, sqrt(vartot), NULL);
   if (m2denv == (M2D_Environ*)NULL) goto label_end;
 
   /* Preparing the variables in 'dbout' */
@@ -8487,8 +5956,8 @@ int m2d_gibbs_spde(Db* dbin,
   // Then the environment is set to the multivariate case
   if (verbose) message("\n==> Checking SPDE Environment\n");
   st_define_locators(m2denv, dbc, ndim, 1, nlayer);
-  if (spde_check(dbc, dbout, model, NULL, 0, VectorDouble(), false, true, true,
-                 false, false, false, false)) goto label_end;
+  if (st_spde_check(dbc, dbout, model, NULL, 0, VectorDouble(), false, true, true,
+                    false, false, false, false)) goto label_end;
   st_define_locators(m2denv, dbc, ndim, nlayer, nlayer);
 
   /* Define initial values at constraints and set in Db */
@@ -8537,8 +6006,8 @@ int m2d_gibbs_spde(Db* dbin,
   /* Prepare all material */
 
   if (verbose) message("\n==> Preparing SPDE\n");
-  s_option = spde_option_alloc();
-  if (spde_prepar(dbc, dbout, VectorDouble(), s_option)) goto label_end;
+  s_option = st_spde_option_alloc();
+  if (st_spde_prepar(dbc, dbout, VectorDouble(), s_option)) goto label_end;
   {
     SPDE_Matelem& Matelem = spde_get_current_matelem(0);
     nvertex               = st_get_nvertex(0);
@@ -8731,13 +6200,13 @@ int m2d_gibbs_spde(Db* dbin,
 
   /* Set the error code */
 
-  spde_posterior();
+  st_spde_posterior();
   error = 0;
 
 label_end:
   (void)st_m2d_drift_inc_manage(m2denv, -1, nlayer, icol_pinch, dbc, dbout);
-  m2denv_manage(-1, flag_ed, 0., m2denv);
-  qchol_manage(-1, Qc);
+  st_m2denv_manage(-1, flag_ed, 0., m2denv);
+  st_qchol_manage(-1, Qc);
   delete Bproj;
   mem_free((char*)gwork);
   if (iatt_f >= 0) dbin->deleteColumnsByUIDRange(iatt_f, nlayer);
@@ -8745,4 +6214,5 @@ label_end:
     dbout->deleteColumnsByUIDRange(iatt_out, nlayer);
   return (error);
 }
+
 } // namespace gstlrn

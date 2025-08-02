@@ -31,7 +31,7 @@ public:
   IMPLEMENT_CLONING(MatrixInt)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static MatrixInt* createFromVI(const VectorInt &X,
                                  int nrow,

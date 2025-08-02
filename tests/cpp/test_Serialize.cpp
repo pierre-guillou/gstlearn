@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setPrefixName("Neutral-");
+  ASerializable::setPrefixName("test_Serialize-");
 
   // Next flag indicates if the format is NF (true) or H5 (false)
   bool flagNeutral = false;
@@ -276,7 +276,7 @@ int main(int argc, char* argv[])
     int npolyline          = 100;
     VectorDouble xpolyline = VH::simulateGaussian(npolyline);
     VectorDouble ypolyline = VH::simulateGaussian(npolyline);
-    PolyLine2D* polyline1  = new PolyLine2D(xpolyline, ypolyline);
+    auto* polyline1  = new PolyLine2D(xpolyline, ypolyline);
     AStringFormat afmt(3);
     polyline1->display(&afmt);
 

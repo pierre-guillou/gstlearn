@@ -29,7 +29,7 @@ public:
   /// ICloneable Interface
   IMPLEMENT_CLONING(BiTargetCheckDistance)
 
-  virtual bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
+  bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
 
   static BiTargetCheckDistance*
   create(double radius              = TEST,
@@ -37,7 +37,7 @@ public:
          const VectorDouble& angles = VectorDouble());
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int getNDim() const { return _ndim; }
   const VectorDouble& getAnisoCoeffs() const { return _anisoCoeffs; }

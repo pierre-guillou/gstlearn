@@ -63,10 +63,5 @@ public:
                           int rankZ    = -1,
                           bool verbose = false);
   void dumpVerticesUsed(int npmax = -1) const;
-  //  int resetFromDbByNeigh(const Db *db,   // currently unused feature
-  //                         AMesh *amesh,
-  //                         double radius,
-  //                         int flag_exact = 0,
-  //                         bool verbose = false);
 };
 } // namespace gstlrn

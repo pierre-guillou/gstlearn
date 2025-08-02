@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setPrefixName("BenchSPDE-");
+  ASerializable::setPrefixName("bench_SPDE-");
 
   // Global parameters
   defineDefaultSpace(ESpaceType::RN, 2);
@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
   OptCst::define(ECst::NTROW, -1);
   bool flagExhaustiveTest = false;
   bool flagStatistics     = true;
+  bool verbose            = false;
 
   // Feature to be tested:
   // -1: all of them
@@ -147,12 +148,12 @@ int main(int argc, char* argv[])
         namconv.append("Kriging");
         namconv.append(option);
         namconv.append(sncov);
-        law_set_random_seed(13243);
+        law_set_random_seed(seed);
         SPDEParam params;
         params.setNMC(10);
-        (void)gstlrn::krigingSPDE(dat, grid, model, true, true, useCholesky,
-                                  VectorMeshes(), nullptr, VectorMeshes(), nullptr, params,
-                                  NamingConvention(namconv));
+        (void)krigingSPDE(dat, grid, model, true, true, useCholesky,
+                          VectorMeshes(), nullptr, VectorMeshes(), nullptr, params, verbose,
+                          NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 400);
       }
 
@@ -165,10 +166,10 @@ int main(int argc, char* argv[])
         namconv.append(option);
         namconv.append(sncov);
         law_set_random_seed(seed);
-        (void)gstlrn::simulateSPDE(nullptr, grid, model, nsim, useCholesky,
-                                   VectorMeshes(), nullptr, VectorMeshes(), nullptr,
-                                   SPDEParam(),
-                                   NamingConvention(namconv));
+        (void)simulateSPDE(nullptr, grid, model, nsim, useCholesky,
+                           VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                           SPDEParam(), verbose,
+                           NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 1350);
       }
 
@@ -181,10 +182,10 @@ int main(int argc, char* argv[])
         namconv.append(option);
         namconv.append(sncov);
         law_set_random_seed(seed);
-        (void)gstlrn::simulateSPDE(dat, grid, model, nsim, useCholesky,
-                                   VectorMeshes(), nullptr, VectorMeshes(), nullptr,
-                                   SPDEParam(),
-                                   NamingConvention(namconv));
+        (void)simulateSPDE(dat, grid, model, nsim, useCholesky,
+                           VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                           SPDEParam(), verbose,
+                           NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 3130);
       }
     }

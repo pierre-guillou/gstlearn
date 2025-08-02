@@ -42,7 +42,7 @@ public:
   virtual ~ASpaceObject();
 
   /// AStringable interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
 public:
   /// Accessor to the current object space context

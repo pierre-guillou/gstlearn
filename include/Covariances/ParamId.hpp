@@ -38,7 +38,7 @@ public:
   IMPLEMENT_CLONING(ParamId)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static ParamId* create(   const EConsElem &elem = EConsElem::fromKey("UNKNOWN"),
                             int iv1 = 0,

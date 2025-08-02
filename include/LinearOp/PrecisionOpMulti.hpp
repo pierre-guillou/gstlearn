@@ -60,7 +60,7 @@ protected:
 
 public:
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   double computeLogDet(int nMC = 1) const override;
   std::pair<double, double> rangeEigenValQ() const;
@@ -85,7 +85,6 @@ private:
   int _buildMatrices();
   void _popsClear();
   void _computeSize();
-
 
 protected:
   std::vector<PrecisionOp*> _pops;

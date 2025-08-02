@@ -30,7 +30,7 @@ public:
   virtual ~SimuSubstitutionParam();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   const VectorInt& getColang() const { return _colang; }
   void setColang(const VectorInt& colang) { _colang = colang; }

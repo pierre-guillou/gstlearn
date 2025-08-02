@@ -55,7 +55,7 @@ public:
   IMPLEMENT_CLONING(VarioParam)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Shortcuts
   static VarioParam* createOmniDirection(int nlag = 10,

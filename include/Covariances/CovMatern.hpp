@@ -28,7 +28,7 @@ public:
   CovMatern& operator= (const CovMatern &r);
   virtual ~CovMatern();
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Matern"; }
   int            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }

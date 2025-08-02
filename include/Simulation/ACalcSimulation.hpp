@@ -30,12 +30,12 @@ public:
   void setNbSimu(int nbsimu) { _nbsimu = nbsimu; }
 
 protected:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
+  bool _check() override;
+  bool _preprocess() override;
 
 private:
   int _nbsimu;
   int _seed;
 };
 
-}
+} // namespace gstlrn

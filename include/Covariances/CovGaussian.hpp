@@ -27,11 +27,11 @@ public:
   CovGaussian& operator= (const CovGaussian &r);
   virtual ~CovGaussian();
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Gaussian"; }
   int            getMinOrder() const override { return -1; }
   double         getScadef() const override;
-  virtual bool   hasCovDerivative() const override { return true; }
+  bool   hasCovDerivative() const override { return true; }
   bool           getCompatibleSpaceR() const override { return true; }
 
   bool isValidForTurningBand() const override { return true; }

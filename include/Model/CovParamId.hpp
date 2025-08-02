@@ -39,7 +39,7 @@ public:
   IMPLEMENT_CLONING(CovParamId)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static CovParamId* create(int igrf = 0,
                             int icov = 0,

@@ -50,7 +50,7 @@ public:
   virtual ~SimuBoolean();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   int simulate(Db *dbin,
                DbGrid *dbout,
@@ -64,7 +64,7 @@ public:
   VectorDouble extractObjects() const;
 
 private:
-  virtual bool _run() override;
+  bool _run() override;
 
   void _clearAllObjects();
   int _getNObjects(int mode = 0) const;

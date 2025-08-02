@@ -432,11 +432,6 @@ static double st_get_idim(int loc_rank, int idim)
 //  }
 //}
 
-int is_flag_data_disc_defined(void)
-{
-  return KOPTION->flag_data_disc;
-}
-
 void set_DBIN(Db* dbin)
 {
   DBIN = dbin;
@@ -1106,7 +1101,6 @@ int krige_koption_manage(int mode,
       delete KOPTION;
     }
   }
-
   return (error);
 }
 
@@ -1273,52 +1267,6 @@ void krige_rhs_print(int nvar,
 
 /****************************************************************************/
 /*!
- **  Print the Dual matrix
- **
- ** \param[in]  nech     Number of active points (optional)
- ** \param[in]  neq      Number of equations
- ** \param[in]  nred     Reduced number of equations
- ** \param[in]  flag     Flag array (optional)
- ** \param[in]  dual     Kriging Dual matrix
- **
- *****************************************************************************/
-void krige_dual_print(int nech, int neq, int nred, const int* flag, double* dual)
-{
-  int *rel, i;
-
-  /* Initializations */
-
-  rel = nullptr;
-  rel = st_relative_position_array(1, neq, NULL);
-
-  /* General Header */
-
-  mestitle(0, "Dual Vector (completed with zeroes and compressed)");
-  if (nech > 0) message("Number of active samples    = %d\n", nech);
-  message("Total number of equations   = %d\n", neq);
-  message("Reduced number of equations = %d\n", nred);
-
-  /* Header line */
-
-  tab_prints(NULL, "Rank");
-  if (flag != nullptr) tab_prints(NULL, "Flag");
-  message("\n");
-
-  /* Matrix lines */
-
-  for (i = 0; i < nred; i++)
-  {
-    tab_printi(NULL, i + 1);
-    if (flag != nullptr) tab_printi(NULL, rel[i]);
-    tab_printg(NULL, dual[i]);
-    message("\n");
-  }
-
-  st_relative_position_array(-1, neq, rel);
-}
-
-/****************************************************************************/
-/*!
  **  Print the kriging weights
  **
  ** \param[in]  status  Kriging error status
@@ -1335,15 +1283,15 @@ void krige_dual_print(int nech, int neq, int nred, const int* flag, double* dual
  ** \remark printed as it changes for every sample, per simulation
  **
  *****************************************************************************/
-static void krige_wgt_print(int status,
-                            int nvar,
-                            int nvar_m,
-                            int nfeq,
-                            const VectorInt& nbgh_ranks,
-                            int nred,
-                            int icase,
-                            const int* flag,
-                            const double* wgt)
+static void st_krige_wgt_print(int status,
+                               int nvar,
+                               int nvar_m,
+                               int nfeq,
+                               const VectorInt& nbgh_ranks,
+                               int nred,
+                               int icase,
+                               const int* flag,
+                               const double* wgt)
 {
   double *sum, value;
   int iwgt, ivar, jvar_m, ivar_m, iech, lec, cumflag, idim, ndim, ib, number,
@@ -2931,97 +2879,6 @@ label_end:
   mem_free((char*)cov_tot);
   mem_free((char*)cov_res);
   return (error);
-}
-
-/****************************************************************************/
-/*!
- **  Simulate the drift coefficients from the posterior distributions
- **
- ** \return  Error returned code
- **
- ** \param[in] model      Model structure
- ** \param[in] nbsimu     Number of simulation (0 for kriging)
- ** \param[in] rmean      Array giving the posterior means for the drift terms
- ** \param[in] rcov       Array containing the posterior covariance matrix
- **                       for the drift terms
- **
- ** \param[out] smean     Array for simulated posterior mean for the drift means
- **
- *****************************************************************************/
-int bayes_simulate(Model* model,
-                   int nbsimu,
-                   const VectorDouble& rmean,
-                   const VectorDouble& rcov,
-                   VectorDouble& smean)
-{
-  int nfeq, il, isimu, nftri, rank, memo;
-  VectorDouble trimat;
-  VectorDouble rndmat;
-
-  /* Initializations */
-
-  nfeq  = model->getNDriftEquation();
-  nftri = nfeq * (nfeq + 1) / 2;
-  memo  = law_get_random_seed();
-
-  /* Core allocation */
-
-  trimat.resize(nftri);
-  rndmat.resize(nfeq);
-
-  /* Cholesky decomposition */
-
-  rank = matrix_cholesky_decompose(rcov.data(), trimat.data(), nfeq);
-  if (rank > 0)
-  {
-    messerr("Error in the Cholesky Decomposition of the covariance matrix");
-    messerr("Rank of the Matrix = %d", rank);
-    messerr("The Drift coefficients have been set to their posterior mean");
-    for (isimu = 0; isimu < nbsimu; isimu++)
-      for (il = 0; il < nfeq; il++)
-        SMEAN(il, isimu) = rmean[il];
-    goto label_suite;
-  }
-
-  /* Loop on the simulations */
-
-  for (isimu = 0; isimu < nbsimu; isimu++)
-  {
-
-    /* Draw a vector of gaussian independent values */
-
-    for (il = 0; il < nfeq; il++)
-      rndmat[il] = law_gaussian();
-
-    /* Product of the Lower triangular matrix by the random vector */
-
-    matrix_cholesky_product(1, nfeq, 1, trimat.data(), rndmat.data(),
-                            &SMEAN(0, isimu));
-
-    /* Add the mean */
-
-    for (il = 0; il < nfeq; il++)
-      SMEAN(il, isimu) += rmean[il];
-  }
-
-  /* If DEBUG option is switched ON, the values are printed out */
-
-label_suite:
-  if (OptDbg::query(EDbg::BAYES))
-  {
-    mestitle(1, "Simulation of Drift Coefficients (for Bayesian Simulation)");
-    message("Rank     Drift Coefficients\n");
-    for (isimu = 0; isimu < nbsimu; isimu++)
-    {
-      message(" %3d ", isimu + 1);
-      for (il = 0; il < nfeq; il++)
-        message(" %lf", SMEAN(il, isimu));
-      message("\n");
-    }
-  }
-
-  law_set_random_seed(memo);
-  return 0;
 }
 
 /****************************************************************************/
@@ -5010,8 +4867,8 @@ int inhomogeneous_kriging(Db* dbdat,
 
     matrix_product_safe(np, np, 1, covpp, rhs, lambda.data());
     if (OptDbg::force())
-      krige_wgt_print(0, nvar, nvar, nfeq, nbgh_ranks, nred, -1, NULL,
-                      lambda.data());
+      st_krige_wgt_print(0, nvar, nvar, nfeq, nbgh_ranks, nred, -1, NULL,
+                         lambda.data());
 
     /* Update vector of weights in presence of drift */
 
@@ -5081,94 +4938,4 @@ label_end:
   return (error);
 }
 
-/****************************************************************************/
-/*!
-**  Smooth a regular grid
-**
-** \param[in]  dbgrid    input and output Db grid structure
-** \param[in]  neigh     Neigh structure
-** \param[in]  type      1 for Uniform; 2 for Gaussian
-** \param[in]  range     Range (used for Gaussian only)
-** \param[in]  iptr0     Storage address
-**
-** \remarks Limited to the monovariate case
-**
-*****************************************************************************/
-void _image_smoother(DbGrid* dbgrid,
-                     const NeighImage* neigh,
-                     int type,
-                     double range,
-                     int iptr0)
-{
-  int ndim  = dbgrid->getNDim();
-  double r2 = (type == 1) ? 1. : range * range;
-
-  /* Core allocation */
-
-  VectorInt indg0(ndim);
-  VectorInt indgl(ndim);
-  VectorInt indn0(ndim);
-  VectorInt indnl(ndim);
-
-  /* Create the secondary grid for image processing */
-
-  VectorInt nx(ndim);
-  int nech = 1;
-  for (int idim = 0; idim < ndim; idim++)
-  {
-    nx[idim] = 2 * neigh->getImageRadius(idim) + 1;
-    nech *= nx[idim];
-  }
-
-  law_set_random_seed(12345);
-  double seuil = 1. / neigh->getSkip();
-  VectorDouble tab(nech);
-  for (int iech = 0; iech < nech; iech++)
-    tab[iech] = (law_uniform(0., 1.) < seuil) ? 0. : TEST;
-
-  DbGrid* dbaux =
-    DbGrid::create(nx, dbgrid->getDXs(), dbgrid->getX0s(), dbgrid->getAngles(),
-                   ELoadBy::COLUMN, tab, {"test"}, {String {ELoc::Z.getKey()}}, 1);
-
-  int nb_neigh = dbaux->getNSample(true);
-  dbaux->rankToIndice(nb_neigh / 2, indn0);
-
-  /* Loop on the targets to be processed */
-
-  for (int iech_out = 0; iech_out < dbgrid->getNSample(); iech_out++)
-  {
-    if (!dbgrid->isActive(iech_out)) continue;
-    dbgrid->rankToIndice(iech_out, indg0);
-
-    /* Loop on the neighboring points */
-
-    double estim = 0.;
-    double total = 0.;
-    for (int iech = 0; iech < nb_neigh; iech++)
-    {
-      if (FFFF(dbaux->getZVariable(iech, 0))) continue;
-      dbaux->rankToIndice(iech, indnl);
-      double d2 = 0.;
-      for (int i = 0; i < ndim; i++)
-      {
-        int idelta   = (indnl[i] - indn0[i]);
-        double delta = idelta * dbgrid->getDX(i);
-        d2 += delta * delta;
-        indgl[i] = indg0[i] + idelta;
-        indgl[i] = dbgrid->getMirrorIndex(i, indgl[i]);
-      }
-
-      int jech    = dbgrid->indiceToRank(indgl);
-      double data = dbgrid->getZVariable(jech, 0);
-      if (!FFFF(data))
-      {
-        double weight = (type == 1) ? 1. : exp(-d2 / r2);
-        estim += data * weight;
-        total += weight;
-      }
-    }
-    estim = (total <= 0.) ? TEST : estim / total;
-    dbgrid->setArray(iech_out, iptr0, estim);
-  }
-}
 } // namespace gstlrn

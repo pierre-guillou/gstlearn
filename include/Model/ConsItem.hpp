@@ -41,7 +41,7 @@ public:
   IMPLEMENT_CLONING(ConsItem)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static ConsItem* create(const CovParamId &paramid,
                           const EConsType &type = EConsType::fromKey("DEFAULT"),

@@ -34,7 +34,7 @@ public:
   virtual ~BooleanObject();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void setMode(int mode) { _mode = mode; }
   void setOrientation(double orientation) { _orientation = orientation; }

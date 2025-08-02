@@ -31,7 +31,7 @@ public:
   Constraints& operator= (const Constraints &m);
   virtual ~Constraints();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void addItem(const ConsItem* item);
   void addItemFromParamId(const EConsElem &elem = EConsElem::fromKey("UNKNOWN"),

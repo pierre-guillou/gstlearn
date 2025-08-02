@@ -23,7 +23,7 @@ namespace gstlrn
 {
 
 static int _globalMultiThread = 0;
-static bool _flagMatrixCheck  = true;
+static bool _flagMatrixCheck  = false;
 
 AMatrix::AMatrix(int nrow, int ncol)
   : AStringable()

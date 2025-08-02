@@ -27,7 +27,7 @@ public:
   CovMarkov& operator= (const CovMarkov &r);
   virtual ~CovMarkov();
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Markov"; }
 
   bool   hasParam() const override { return true; }

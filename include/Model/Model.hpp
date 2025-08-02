@@ -86,7 +86,7 @@ public:
   IMPLEMENT_CLONING(Model)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
 public:
   const CovAnisoList* castInCovAnisoListConst(int icov = -1) const;
@@ -105,15 +105,15 @@ public:
   static Model* create(const CovContext& ctxt = CovContext());
   static Model* createFromEnvironment(int nvar, int ndim = 2);
   static Model* createNugget(int nvar, int ndim = 2, double sill = 1.);
-  static Model* createFromParam(const ECov& type = ECov::fromKey("NUGGET"),
-                  double range                       = 1.,
-                  double sill                        = 1.,
-                  double param                       = 1.,
-                  const VectorDouble& ranges         = VectorDouble(),
-                  const MatrixSymmetric& sills = MatrixSymmetric(),
-                  const VectorDouble& angles         = VectorDouble(),
-                  const ASpaceSharedPtr& space       = ASpaceSharedPtr(),
-                  bool flagRange                     = true);
+  static Model* createFromParam(const ECov& type             = ECov::fromKey("NUGGET"),
+                                double range                 = 1.,
+                                double sill                  = 1.,
+                                double param                 = 1.,
+                                const VectorDouble& ranges   = VectorDouble(),
+                                const MatrixSymmetric& sills = MatrixSymmetric(),
+                                const VectorDouble& angles   = VectorDouble(),
+                                const ASpaceSharedPtr& space = ASpaceSharedPtr(),
+                                bool flagRange               = true);
   static Model* createFromParamOldStyle(const ECov& type             = ECov::fromKey("NUGGET"),
                                         double range                 = 1.,
                                         double sill                  = 1.,
@@ -257,8 +257,8 @@ public:
 
 protected:
   /// Interface to ASerializable
-  virtual bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  virtual bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;

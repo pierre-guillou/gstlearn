@@ -264,7 +264,6 @@
   #include "Matrix/AMatrix.hpp"
   #include "Matrix/MatrixDense.hpp"
   #include "Matrix/MatrixSparse.hpp"
-  #include "Matrix/LinkMatrixSparse.hpp"
   #include "Matrix/MatrixSquare.hpp"
   #include "Matrix/NF_Triplet.hpp"
   #include "Matrix/MatrixSymmetric.hpp"
@@ -275,7 +274,6 @@
 
   
   #include "API/SPDE.hpp"
-  #include "API/PGSSPDE.hpp"
   #include "API/TestInheritance.hpp"
   #include "API/Style.hpp"
   #include "API/SPDEParam.hpp"

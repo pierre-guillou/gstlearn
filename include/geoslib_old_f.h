@@ -9,19 +9,14 @@
 /******************************************************************************/
 #pragma once
 
-#include "Covariances/CovAniso.hpp"
-#include "gstlearn_export.hpp"
-#include "geoslib_d.h"
-
-#include "Enum/ECov.hpp"
-#include "Enum/ELoc.hpp"
-
-#include "Covariances/CovCalcMode.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "Covariances/CovAniso.hpp"
 #include "Model/Constraints.hpp"
 #include "Model/Option_AutoFit.hpp"
 #include "Variogram/DirParam.hpp"
 #include "Variogram/Vario.hpp"
+#include "geoslib_d.h"
+#include "gstlearn_export.hpp"
 
 namespace gstlrn
 {
@@ -51,8 +46,6 @@ class EStatOption;
 class Faults;
 class AMesh;
 class SpaceTarget;
-
-class QChol;
 
 /***************************************/
 /* Prototyping the functions in math.c */
@@ -148,7 +141,6 @@ GSTLEARN_EXPORT void matrix_cholesky_product(int mode,
                                              const double* tl,
                                              const double* a,
                                              double* x);
-GSTLEARN_EXPORT void matrix_cholesky_invert(int neq, const double* tl, double* xl);
 GSTLEARN_EXPORT void matrix_combine(int nval,
                                     double coeffa,
                                     const double* a,
@@ -457,7 +449,6 @@ GSTLEARN_EXPORT int db_diffusion(DbGrid* dbgrid1,
 /* Prototyping the functions in krige.c */
 /****************************************/
 
-GSTLEARN_EXPORT int is_flag_data_disc_defined(void);
 GSTLEARN_EXPORT void set_DBIN(Db* dbin);
 GSTLEARN_EXPORT void set_DBOUT(Db* dbout);
 GSTLEARN_EXPORT int krige_koption_manage(int mode,
@@ -476,16 +467,6 @@ GSTLEARN_EXPORT void krige_rhs_print(int nvar,
                                      int nred,
                                      const int* flag,
                                      double* rhs);
-GSTLEARN_EXPORT void krige_dual_print(int nech,
-                                      int neq,
-                                      int nred,
-                                      const int* flag,
-                                      double* dual);
-GSTLEARN_EXPORT int bayes_simulate(Model* model,
-                                   int nbsimu,
-                                   const VectorDouble& rmean,
-                                   const VectorDouble& rcov,
-                                   VectorDouble& smean);
 GSTLEARN_EXPORT int krigsampling_f(Db* dbin,
                                    Db* dbout,
                                    Model* model,
@@ -544,10 +525,6 @@ GSTLEARN_EXPORT int inhomogeneous_kriging(Db* dbdat,
 /* Prototyping the functions in simtub.c */
 /*****************************************/
 
-GSTLEARN_EXPORT void simu_define_func_transf(void (*st_simu_transf)(Db*,
-                                                                    int,
-                                                                    int,
-                                                                    int));
 GSTLEARN_EXPORT void simu_define_func_update(void (*st_simu_update)(Db*,
                                                                     int,
                                                                     int,
@@ -731,22 +708,6 @@ GSTLEARN_EXPORT int multilayers_get_prior(Db* dbin,
 /***************************************/
 /* Prototyping the functions in spde.c */
 /***************************************/
-GSTLEARN_EXPORT QChol* qchol_manage(int mode, QChol* qchol);
-GSTLEARN_EXPORT double spde_compute_correc(int ndim, double param);
-GSTLEARN_EXPORT int spde_check(const Db* dbin,
-                               const Db* dbout,
-                               Model* model1,
-                               Model* model2,
-                               bool verbose,
-                               const VectorDouble& gext,
-                               bool mesh_dbin,
-                               bool mesh_dbout,
-                               bool flag_advanced,
-                               bool flag_est,
-                               bool flag_std,
-                               bool flag_gibbs,
-                               bool flag_modif);
-GSTLEARN_EXPORT int spde_attach_model(Model* model);
 GSTLEARN_EXPORT int m2d_gibbs_spde(Db* dbin,
                                    Db* dbout,
                                    Model* model,
@@ -760,21 +721,7 @@ GSTLEARN_EXPORT int m2d_gibbs_spde(Db* dbin,
                                    int flag_ce,
                                    int flag_cstd,
                                    int verbose);
-GSTLEARN_EXPORT SPDE_Option spde_option_alloc(void);
-GSTLEARN_EXPORT void spde_option_update(SPDE_Option& s_option,
-                                        const String& triswitch);
-GSTLEARN_EXPORT int spde_prepar(Db* dbin,
-                                Db* dbout,
-                                const VectorDouble& gext,
-                                SPDE_Option& s_option);
-GSTLEARN_EXPORT int spde_posterior();
-GSTLEARN_EXPORT int spde_process(Db* dbin,
-                                 Db* dbout,
-                                 SPDE_Option& s_option,
-                                 int nbsimu,
-                                 int ngibbs_nburn,
-                                 int ngibbs_niter,
-                                 int ngibbs_int);
+
 #ifndef SWIG
 GSTLEARN_EXPORT SPDE_Matelem& spde_get_current_matelem(int icov);
 #endif
@@ -782,67 +729,7 @@ GSTLEARN_EXPORT AMesh* spde_mesh_load(Db* dbin,
                                       Db* dbout,
                                       const VectorDouble& gext,
                                       SPDE_Option& s_option,
-                                      bool verbose = false);
-GSTLEARN_EXPORT void spde_mesh_assign(AMesh* amesh,
-                                      int ndim,
-                                      int ncorner,
-                                      int nvertex,
-                                      int nmesh,
-                                      const VectorInt& arg_meshes,
-                                      const VectorDouble& arg_points,
-                                      int verbose);
-GSTLEARN_EXPORT int spde_build_matrices(Model* model, int verbose);
-GSTLEARN_EXPORT int spde_eval(const VectorDouble& blin,
-                              MatrixSparse* S,
-                              const VectorDouble& Lambda,
-                              const VectorDouble& TildeC,
-                              double power,
-                              VectorDouble& x,
-                              VectorDouble& y);
-GSTLEARN_EXPORT void spde_external_mesh_define(int icov0, AMesh* mesh);
-GSTLEARN_EXPORT void spde_external_mesh_undefine(int icov0);
-#ifndef SWIG
-GSTLEARN_EXPORT int spde_external_copy(SPDE_Matelem& matelem, int icov0);
-GSTLEARN_EXPORT MatrixSparse* spde_external_A_define(int icov0, MatrixSparse* A);
-GSTLEARN_EXPORT MatrixSparse* spde_external_Q_define(int icov0, MatrixSparse* Q);
-GSTLEARN_EXPORT MatrixSparse* spde_external_A_undefine(int icov0);
-GSTLEARN_EXPORT MatrixSparse* spde_external_Q_undefine(int icov0);
-#endif
-GSTLEARN_EXPORT int kriging2D_spde(Db* dbin,
-                                   Model* model,
-                                   SPDE_Option& s_option,
-                                   int verbose,
-                                   int* nmesh_arg,
-                                   int* nvertex_arg,
-                                   VectorInt& meshes_arg,
-                                   VectorDouble& points_arg);
-#ifndef SWIG
-GSTLEARN_EXPORT MatrixSparse* db_mesh_neigh(const Db* db,
-                                            AMesh* amesh,
-                                            double radius,
-                                            int flag_exact,
-                                            bool verbose,
-                                            int* nactive,
-                                            int** ranks);
-#endif
-GSTLEARN_EXPORT void spde_free_all(void);
-
-/***************************************/
-/* Prototyping the functions in math.c */
-/***************************************/
-
-GSTLEARN_EXPORT int db_trisurf(Db* db,
-                               Model* model,
-                               const String& triswitch,
-                               int icode0,
-                               int verbose,
-                               int* ncode_arg,
-                               int* ntri_arg,
-                               int* npoint_arg,
-                               double* codesel,
-                               VectorInt& ntcode,
-                               VectorInt& triangles,
-                               VectorDouble& points);
+                                      bool verbose);
 
 /******************************************/
 /* Prototyping the functions in cluster.c */
@@ -860,4 +747,4 @@ GSTLEARN_EXPORT VectorInt kmedoids(const VectorDouble& data,
                                    int nclusters,
                                    int npass,
                                    int verbose);
-}
+} // namespace gstlrn

@@ -32,10 +32,10 @@ public:
   /// ICloneable Interface
   IMPLEMENT_CLONING(BiTargetCheckGeometry)
 
-  virtual bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
+  bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static BiTargetCheckGeometry* create(int ndim,
                                        const VectorDouble &codir = VectorDouble(),

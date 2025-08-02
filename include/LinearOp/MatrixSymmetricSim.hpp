@@ -32,7 +32,7 @@ public:
   MatrixSymmetricSim& operator=(const MatrixSymmetricSim &m) = delete;
   virtual ~MatrixSymmetricSim();
 
-  virtual int  getSize() const override;
+  int  getSize() const override;
   bool isEmpty() const { return _factor == nullptr; }
   double computeLogDet(int nMC = 1) const override;
   
@@ -40,8 +40,8 @@ public:
   DECLARE_TOTL;
 
 protected:
-  virtual int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
-  virtual int _addToDest(const constvect inv, vect outv) const override;
+  int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
+  int _addToDest(const constvect inv, vect outv) const override;
 
 private:
   bool _inverse;

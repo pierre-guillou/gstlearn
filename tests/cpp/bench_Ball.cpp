@@ -10,16 +10,16 @@
 /******************************************************************************/
 #include "Enum/ESpaceType.hpp"
 
-#include "LinearOp/ProjMatrix.hpp"
-#include "Mesh/MeshSphericalExt.hpp"
-#include "Space/ASpaceObject.hpp"
-#include "Space/SpaceSN.hpp"
-#include "Db/Db.hpp"
-#include "Model/Model.hpp"
 #include "Basic/File.hpp"
 #include "Basic/Timer.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Calculators/CalcMigrate.hpp"
+#include "Db/Db.hpp"
+#include "LinearOp/ProjMatrix.hpp"
+#include "Mesh/MeshSphericalExt.hpp"
+#include "Model/Model.hpp"
+#include "Space/ASpaceObject.hpp"
+#include "Space/SpaceSN.hpp"
 #include "Tree/Ball.hpp"
 
 using namespace gstlrn;
@@ -29,7 +29,7 @@ using namespace gstlrn;
  ** This is meant to exhibit the Ball tree mechanism (for future improvements)
  **
  *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   Timer timer;
   VectorDouble vec;
@@ -40,12 +40,12 @@ int main(int argc, char *argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setPrefixName("Tree-");
+  ASerializable::setPrefixName("bench_Ball-");
 
   // Global parameters
   bool verbose = false;
-  int ndim = 2;
-  int mode = 0;
+  int ndim     = 2;
+  int mode     = 0;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Constructing the Data Set
@@ -126,13 +126,13 @@ int main(int argc, char *argv[])
     mestitle(0, "Demonstrating the findNN algorithm");
     bool flagShuffle = true;
 
-    nech = 20;
-    Db* aux = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
-                                    VectorDouble(), VectorDouble(),
-                                    VectorDouble(), 24813);
+    nech             = 20;
+    Db* aux          = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
+                                            VectorDouble(), VectorDouble(),
+                                            VectorDouble(), 24813);
     MatrixT<int> mat = findNN(data, aux, nb_neigh, flagShuffle);
-    int nrows        = (int) mat.getNRows();
-    int ncols        = (int) mat.getNCols();
+    int nrows        = (int)mat.getNRows();
+    int ncols        = (int)mat.getNCols();
     for (int irow = 0; irow < nrows; irow++)
     {
       for (int icol = 0; icol < ncols; icol++)

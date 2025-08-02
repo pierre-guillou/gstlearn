@@ -55,17 +55,17 @@ public:
   IMPLEMENT_CLONING(CovAnisoList)
 
   /// Interface for ASpaceObject
-  virtual bool isConsistent(const ASpace* space) const override;
+  bool isConsistent(const ASpace* space) const override;
 
   /// Interface for ACov
-  virtual int getNVar() const override;
-  virtual bool isIndexable() const override { return true; }
-  virtual double eval0(int ivar                = 0,
+  int getNVar() const override;
+  bool isIndexable() const override { return true; }
+  double eval0(int ivar                = 0,
                        int jvar                = 0,
                        const CovCalcMode* mode = nullptr) const override;
 
   /// Interface for AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// CovAnisoList Interface
   void addCov(const CovBase& cov) override;

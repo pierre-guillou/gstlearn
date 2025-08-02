@@ -32,7 +32,7 @@ public:
   virtual ~SpatialIndices();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat *strfmt = nullptr) const override;
+  String toString(const AStringFormat *strfmt = nullptr) const override;
 
   int  computeCGI(const String &name);
   void spatial(const String &name);

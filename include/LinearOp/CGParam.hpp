@@ -29,7 +29,7 @@ public:
   virtual ~CGParam();
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void setEps(double eps) { _eps = eps; }
   void setNIterMax(int nIterMax) { _nIterMax = nIterMax; }

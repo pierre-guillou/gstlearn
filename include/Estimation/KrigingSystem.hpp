@@ -227,7 +227,7 @@ private:
   mutable VectorInt    _dboutUidToBeDeleted;
 
   /// Some Space Point allocated once for all
-  mutable ASpaceSharedPtr    _space;
+  mutable ASpaceSharedPtr _space;
   mutable SpacePoint _p0;
   mutable SpacePoint _p1;
   mutable SpacePoint _p2;
