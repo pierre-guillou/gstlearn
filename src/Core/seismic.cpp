@@ -8,21 +8,17 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_enum.h"
-#include "geoslib_old_f.h"
-
-#include "Enum/EJustify.hpp"
-
+#include "Core/Seismic.hpp"
 #include "Basic/Law.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/String.hpp"
 #include "Basic/Utilities.hpp"
-#include "Core/Seismic.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
+#include "Enum/EJustify.hpp"
 #include "Model/Model.hpp"
-
+#include "geoslib_enum.h"
+#include "geoslib_old_f.h"
 #include <cmath>
 
 /*! \cond */
@@ -2092,7 +2088,7 @@ static ST_Seismic_Neigh* st_estimate_neigh_management(int mode,
 
     /* Allocation */
 
-    ngh = (ST_Seismic_Neigh*)mem_alloc(sizeof(ST_Seismic_Neigh), 0);
+    ngh = new ST_Seismic_Neigh;
     if (ngh == nullptr) return (ngh);
     ngh->nvois   = nvois;
     ngh->nactive = 0;
@@ -2113,7 +2109,8 @@ static ST_Seismic_Neigh* st_estimate_neigh_management(int mode,
     ngh->iz_ngh.clear();
     ngh->v1_ngh.clear();
     ngh->v2_ngh.clear();
-    mem_free((char*)ngh);
+    delete ngh;
+    ngh = nullptr;
   }
   return (ngh);
 }
@@ -2256,7 +2253,7 @@ static int st_estimate_neigh_create(DbGrid* db,
                                     int nbench,
                                     int nv2max,
                                     int /*npres*/[2],
-                                    int* presence[2],
+                                    VectorVectorInt& presence,
                                     ST_Seismic_Neigh* ngh)
 {
   int i, idx, ix, iz, jz, count, flag_valid;
@@ -2959,7 +2956,7 @@ int seismic_estimate_XZ(DbGrid* db,
                         int flag_sort,
                         int flag_stat)
 {
-  int *presence[2], npres[2], iatt_est[2], iatt_std[2];
+  int npres[2], iatt_est[2], iatt_std[2];
   int i, ix0, jx0, iz0, nvois, size, error, nred, nfeq, iatt_z1, iatt_z2;
   int nb_total, nb_process, nb_calcul;
   ST_Seismic_Neigh *ngh_cur, *ngh_old;
@@ -2969,6 +2966,7 @@ int seismic_estimate_XZ(DbGrid* db,
   VectorDouble var0;
   VectorInt flag;
   VectorInt rank;
+  VectorVectorInt presence(2);
 
   /* Initializations */
 
@@ -2980,8 +2978,8 @@ int seismic_estimate_XZ(DbGrid* db,
   {
     iatt_est[i] = -1;
     iatt_std[i] = -1;
-    presence[i] = nullptr;
-    npres[i]    = 0;
+    presence[i].clear();
+    npres[i] = 0;
   }
   if (krige_koption_manage(1, 1, EKrigOpt::POINT, 1, VectorInt())) goto label_end;
 
@@ -3016,14 +3014,13 @@ int seismic_estimate_XZ(DbGrid* db,
 
   for (i = 0; i < 2; i++)
   {
-    presence[i] = (int*)mem_alloc(sizeof(int) * NX, 0);
-    if (presence[i] == nullptr) goto label_end;
+    presence[i].resize(NX);
   }
 
   /* Look for columns where each variable is defined */
 
   for (i = 0; i < 2; i++)
-    st_estimate_check_presence(db, i, &npres[i], presence[i]);
+    st_estimate_check_presence(db, i, &npres[i], presence[i].data());
 
   /* Maximum dimension of the neighborhood */
 
@@ -3065,7 +3062,7 @@ int seismic_estimate_XZ(DbGrid* db,
 
   /* Calculate the order of the columns to be treated */
 
-  if (st_estimate_sort(presence[0], rank.data())) goto label_end;
+  if (st_estimate_sort(presence[0].data(), rank.data())) goto label_end;
 
   /* Loop on the grid nodes */
 
@@ -3136,7 +3133,7 @@ label_end:
   }
   for (i = 0; i < 2; i++)
   {
-    presence[i] = (int*)mem_free((char*)presence[i]);
+    presence[i].clear();
     if (error && iatt_est[i] >= 0) db->deleteColumnByUID(iatt_est[i]);
     if (error && iatt_std[i] >= 0) db->deleteColumnByUID(iatt_std[i]);
   }
@@ -3214,7 +3211,7 @@ int seismic_simulate_XZ(DbGrid* db,
                         int flag_sort,
                         int flag_stat)
 {
-  int *presence[2], npres[2], iatt_sim[2];
+  int npres[2], iatt_sim[2];
   int i, isimu, ix0, iz0, nvois, size, error, nred, nfeq, jx0;
   int nb_total, nb_process, nb_calcul;
   ST_Seismic_Neigh *ngh_cur, *ngh_old;
@@ -3224,6 +3221,7 @@ int seismic_simulate_XZ(DbGrid* db,
   VectorDouble c00;
   VectorInt flag;
   VectorInt rank;
+  VectorVectorInt presence(2);
 
   /* Initializations */
 
@@ -3234,8 +3232,8 @@ int seismic_simulate_XZ(DbGrid* db,
   for (i = 0; i < 2; i++)
   {
     iatt_sim[i] = -1;
-    presence[i] = nullptr;
     npres[i]    = 0;
+    presence[i].clear();
   }
 
   /* Check that the grid is XZ */
@@ -3267,15 +3265,14 @@ int seismic_simulate_XZ(DbGrid* db,
 
   for (i = 0; i < 2; i++)
   {
-    presence[i] = (int*)mem_alloc(sizeof(int) * NX, 0);
-    if (presence[i] == nullptr) goto label_end;
+    presence[i].resize(NX);
   }
 
   /* Look for columns where each variable is defined */
 
   law_set_random_seed(seed);
   for (i = 0; i < 2; i++)
-    st_estimate_check_presence(db, i, &npres[i], presence[i]);
+    st_estimate_check_presence(db, i, &npres[i], presence[i].data());
 
   /* Maximum dimension of the neighborhood */
 
@@ -3314,7 +3311,7 @@ int seismic_simulate_XZ(DbGrid* db,
 
   /* Calculate the order of the columns to be treated */
 
-  if (st_estimate_sort(presence[0], rank.data())) goto label_end;
+  if (st_estimate_sort(presence[0].data(), rank.data())) goto label_end;
 
   /* Loop on the grid nodes */
 
@@ -3387,7 +3384,7 @@ label_end:
   }
   for (i = 0; i < 2; i++)
   {
-    mem_free((char*)presence[i]);
+    presence[i].clear();
     if (error)
       for (isimu = 0; isimu < nbsimu; isimu++)
         db->deleteColumnByUID(iatt_sim[i] + isimu);

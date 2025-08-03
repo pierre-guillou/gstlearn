@@ -667,11 +667,11 @@ void ut_trace_discretize(int nseg,
  ** \param[in]  radius Neighborhood radius
  **
  ** \param[out] ns_arg     Number of sampled points
- ** \param[out] xs_arg     Array of first coordinates of sampled points
- ** \param[out] ys_arg     Array of second coordinates of sampled points
- ** \param[out] rks_arg    Array of sample indices (starting from 1)
- ** \param[out] lys_arg    Array of layer indices of sampled points
- ** \param[out] typ_arg    Array of data type
+ ** \param[out] xs         Array of first coordinates of sampled points
+ ** \param[out] ys         Array of second coordinates of sampled points
+ ** \param[out] rks        Array of sample indices (starting from 1)
+ ** \param[out] lys        Array of layer indices of sampled points
+ ** \param[out] typ        Array of data type
  **                        1 for hard data in Z or TIME
  **                        2 for lower bound
  **                        3 for upper bound
@@ -1337,7 +1337,7 @@ static int st_get_next(DbGrid* dbgrid,
  **
  ** \param[out] nbline_loc Number of streamline steps
  ** \param[out] npline_loc Number of values per line vertex
- ** \param[out] line_loc   Array of streamline steps (Dimension: 5 * nbline)
+ ** \param[out] line       Array of streamline steps (Dimension: 5 * nbline)
  **
  ** \remarks The returned array 'line_loc' must be freed by the calling function
  ** \remarks Use get_keypone("Streamline_Skip",1) to define the skipping ratio
