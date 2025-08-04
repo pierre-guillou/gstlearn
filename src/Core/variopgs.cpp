@@ -98,9 +98,13 @@ typedef struct
 #define LAG_UNUSED(idir, ilag)                                        \
   (vario->getSwByIndex(idir, vario->getNLag(idir) + ilag + 1) <= 0 || \
    vario->getUtilizeByIndex(idir, vario->getNLag(idir) + ilag + 1) == 0)
-#define TABOUT(i, j) tabout[(j) * neq + (i)]
-#define EIGVEC(i, j) eigvec[(i) * neq + (j)]
-#define DIVS(is, i)  (divs[(is) * ncur + (i)])
+#define TABOUT(i, j)   tabout[(j) * neq + (i)]
+#define EIGVEC(i, j)   eigvec[(i) * neq + (j)]
+#define RULES(ir, i)   (rules[(ir) * NRULE + (i)])
+#define RULES1(ir, i)  (rules1[(ir) * NRULE + (i)])
+#define RULES2(ir, i)  (rules2[(ir) * NRULE + (i)])
+#define DIVS(is, i)    (divs[(is) * ncur + (i)])
+#define FIPOSAD(ir, i) ((ir) * NCOLOR + (i))
 
 #define QUANT_DIR 10000
 #define F(i, j)   (st_index(i, j))
@@ -149,13 +153,13 @@ static Relem* st_relem_alloc(Split* old_split)
 
   /* Initializations of the New Relem structure */
 
-  relem          = new Relem;
-  relem->nsplit  = 0;
-  relem->nrule   = 0;
-  relem->nbyrule = 0;
-  relem->facies  = VectorInt();
-  relem->Rrules.clear();
-  relem->Rfipos.clear();
+  relem            = new Relem;
+  relem->nsplit    = 0;
+  relem->nrule     = 0;
+  relem->nbyrule   = 0;
+  relem->facies    = VectorInt();
+  relem->Rrules    = nullptr;
+  relem->Rfipos    = nullptr;
   relem->old_split = old_split;
   return (relem);
 }
@@ -181,8 +185,8 @@ static Split* st_split_alloc(Relem* old_relem)
   split->nrule     = 0;
   split->nbyrule   = 0;
   split->old_relem = old_relem;
-  split->Srules.clear();
-  split->Sfipos.clear();
+  split->Srules    = nullptr;
+  split->Sfipos    = nullptr;
   split->relems.resize(2);
   for (int i = 0; i < 2; i++)
     split->relems[i] = nullptr;
@@ -238,7 +242,7 @@ static void st_relem_define(Relem* relem,
   }
 
   relem->facies.resize(number, 0);
-  relem->Rfipos.resize(NCOLOR);
+  relem->Rfipos = (int*)mem_alloc(sizeof(int) * NCOLOR, 1);
   for (int i = 0; i < NCOLOR; i++)
     relem->Rfipos[i] = 0;
 
@@ -258,8 +262,8 @@ static void st_relem_define(Relem* relem,
  *****************************************************************************/
 static void st_rule_print(int rank,
                           int nbyrule,
-                          const VectorVectorInt& rules,
-                          VectorVectorInt& fipos,
+                          const int* rules,
+                          int* fipos,
                           bool flag_rank,
                           int flag_similar,
                           int flag_igrf,
@@ -275,7 +279,7 @@ static void st_rule_print(int rank,
 
   for (int ic = 0; ic < nbyrule; ic++)
   {
-    value = rules[rank][ic];
+    value = RULES(rank, ic);
     if (value == 1001)
       message("  S");
     else if (value == 1002)
@@ -296,7 +300,7 @@ static void st_rule_print(int rank,
 
   message(" (");
   for (int ic = 0; ic < NCOLOR; ic++)
-    message(" %3d", fipos[rank][ic]);
+    message(" %3d", fipos[FIPOSAD(rank, ic)]);
   message(" )");
 
   // Print the similar score
@@ -328,8 +332,8 @@ static void st_rule_print(int rank,
 static void st_rules_print(const char* title,
                            int nrule,
                            int nbyrule,
-                           VectorVectorInt& rules,
-                           VectorVectorInt& fipos)
+                           int* rules,
+                           int* fipos)
 {
   if (nrule <= 0) return;
   message("%s (Nrule=%d, Nbyrule=%d):\n", title, nrule, nbyrule);
@@ -411,8 +415,8 @@ static Split* st_split_free(Split* split)
 
   /* Free the local arrays */
 
-  split->Srules.clear();
-  split->Sfipos.clear();
+  split->Srules = (int*)mem_free((char*)split->Srules);
+  split->Sfipos = (int*)mem_free((char*)split->Sfipos);
 
   /* Free the Split structure itself */
 
@@ -442,8 +446,8 @@ static Relem* st_relem_free(Relem* relem)
 
   /* Free the local arrays */
 
-  relem->Rrules.clear();
-  relem->Rfipos.clear();
+  relem->Rrules = (int*)mem_free((char*)relem->Rrules);
+  relem->Rfipos = (int*)mem_free((char*)relem->Rfipos);
 
   /* Free the Relem structure itself */
 
@@ -835,8 +839,8 @@ static int st_vario_pgs_variable(int mode,
  *****************************************************************************/
 static Rule* st_rule_encode(const int* string)
 {
-  VectorInt n_type(NRULE);
-  VectorInt n_facs(NRULE);
+  VectorInt n_type = VectorInt(NRULE);
+  VectorInt n_facs = VectorInt(NRULE);
 
   for (int i = 0; i < NRULE; i++)
   {
@@ -1453,15 +1457,15 @@ static int st_same_score(Relem* relem,
                          VectorInt& fgrf,
                          VectorInt& fcmp)
 {
-  int flag_same;
+  int *fipos, flag_same;
 
-  VectorVectorInt& fipos = relem->Rfipos;
+  fipos = relem->Rfipos;
   if (ir0 <= 0) return (-1);
 
   // Modify the orientation of 'grf' for the current 'fipos'
 
   for (int ic = 0; ic < NCOLOR; ic++)
-    fcmp[ic] = st_update_orientation(fipos[ir0][ic], igrf_cas, fgrf);
+    fcmp[ic] = st_update_orientation(fipos[FIPOSAD(ir0, ic)], igrf_cas, fgrf);
 
   // Look if the same 'fipos' has already been calculated
 
@@ -1470,7 +1474,7 @@ static int st_same_score(Relem* relem,
     flag_same = 1;
     for (int ic = 0; ic < NCOLOR && flag_same; ic++)
     {
-      if (fipos[ir][ic] != fcmp[ic]) flag_same = 0;
+      if (fipos[FIPOSAD(ir, ic)] != fcmp[ic]) flag_same = 0;
     }
     if (flag_same) return (ir);
   }
@@ -1491,18 +1495,19 @@ static VectorDouble st_relem_evaluate(Relem* relem,
                                       int* nscore,
                                       int* r_opt)
 {
+  int *rules, *fipos;
   int nrule, indice, nmax, flag_check, igrf_cas, number, igrf_opt;
   double score_ref;
   VectorDouble scores;
 
   /* Initializations */
 
-  flag_check             = (int)get_keypone("Multi_Score_Check", 0.);
-  nmax                   = (int)pow(2., (double)NGRF);
-  nrule                  = relem->nrule;
-  VectorVectorInt& rules = relem->Rrules;
-  VectorVectorInt& fipos = relem->Rfipos;
-  *nscore                = nrule;
+  flag_check = (int)get_keypone("Multi_Score_Check", 0.);
+  nmax       = (int)pow(2., (double)NGRF);
+  nrule      = relem->nrule;
+  rules      = relem->Rrules;
+  fipos      = relem->Rfipos;
+  *nscore    = nrule;
 
   /* Core allocation */
 
@@ -1528,7 +1533,7 @@ static VectorDouble st_relem_evaluate(Relem* relem,
     else
     {
       number++;
-      scores[ir] = st_rule_calcul(local_pgs, rules[ir].data());
+      scores[ir] = st_rule_calcul(local_pgs, &RULES(ir, 0));
       propdef_reset(local_pgs->propdef);
     }
 
@@ -1537,7 +1542,7 @@ static VectorDouble st_relem_evaluate(Relem* relem,
 
     if (flag_check && indice >= 0)
     {
-      score_ref = st_rule_calcul(local_pgs, rules[ir].data());
+      score_ref = st_rule_calcul(local_pgs, &RULES(ir, 0));
       if (ABS(scores[ir] - score_ref) > 1.e-10 * score_ref)
       {
         messerr("Warning: Difference between score stored and re-evaluated:");
@@ -1560,6 +1565,12 @@ static VectorDouble st_relem_evaluate(Relem* relem,
     if (scores[ir] < scores[*r_opt]) *r_opt = ir;
   }
 
+  // Store the different rules as well as the scores in keypair mechanism
+
+  set_keypair("rule_auto_scores", 1, 1, nrule, scores.data());
+  set_keypair_int("rule_auto_allrules", 1, nrule, NRULE, rules);
+  set_keypair_int("rule_auto_best_rule", 1, 1, NRULE, &RULES(*r_opt, 0));
+
   return (scores);
 }
 
@@ -1571,10 +1582,10 @@ static VectorDouble st_relem_evaluate(Relem* relem,
 static void st_rule_glue(Relem* relem,
                          int nrule1,
                          int nbyrule1,
-                         const VectorVectorInt& rules1,
-                         const VectorVectorInt& fipos1)
+                         const int* rules1,
+                         const int* fipos1)
 {
-  int nrule, ir, nnew;
+  int *rules, *fipos, nrule, ir, nnew;
 
   if (relem == (Relem*)NULL) return;
   if (nrule1 <= 0) return;
@@ -1582,17 +1593,17 @@ static void st_rule_glue(Relem* relem,
   nrule = ir = relem->nrule;
   nnew       = nrule + nrule1;
 
-  relem->Rrules.resize(nnew);
-  for (int i = 0; i < nnew; i++) relem->Rrules[i].resize(NRULE);
-  relem->Rfipos.resize(nnew);
-  for (int i = 0; i < nnew; i++) relem->Rfipos[i].resize(NCOLOR);
+  relem->Rrules = rules = (int*)mem_realloc((char*)relem->Rrules,
+                                            sizeof(int) * NRULE * nnew, 1);
+  relem->Rfipos = fipos = (int*)mem_realloc((char*)relem->Rfipos,
+                                            sizeof(int) * NCOLOR * nnew, 1);
 
   for (int i1 = 0; i1 < nrule1; i1++, ir++)
   {
     for (int ic = 0; ic < nbyrule1; ic++)
-      relem->Rrules[ir][ic] = rules1[i1][ic];
+      RULES(ir, ic) = RULES1(i1, ic);
     for (int ic = 0; ic < NCOLOR; ic++)
-      relem->Rfipos[ir][ic] = fipos1[i1][ic];
+      fipos[FIPOSAD(ir, ic)] = fipos1[FIPOSAD(i1, ic)];
   }
 
   relem->nrule   = nnew;
@@ -1608,24 +1619,22 @@ static void st_rule_product(Split* split,
                             int nprod,
                             int nrule1,
                             int nbyrule1,
-                            VectorVectorInt& rules1,
-                            VectorVectorInt& fipos1,
+                            int* rules1,
+                            int* fipos1,
                             int nrule2,
                             int nbyrule2,
-                            VectorVectorInt& rules2,
-                            VectorVectorInt& fipos2)
+                            int* rules2,
+                            int* fipos2)
 {
-  int ir, ic, oper;
+  int *rules, *fipos, ir, ic, oper;
   int flag_debug = 0;
 
-  split->Srules.resize(nprod);
-  for (int i = 0; i < nprod; i++)
-    split->Srules[i].resize(NRULE, 0);
-  VectorVectorInt& rules = split->Srules;
-  split->Sfipos.resize(nprod);
-  for (int i = 0; i < nprod; i++)
-    split->Sfipos[i].resize(NCOLOR, 0);
-  VectorVectorInt& fipos = split->Sfipos;
+  split->Srules = rules = (int*)mem_alloc(sizeof(int) * NRULE * nprod, 1);
+  for (int i = 0; i < NRULE * nprod; i++)
+    rules[i] = 0;
+  split->Sfipos = fipos = (int*)mem_alloc(sizeof(int) * NCOLOR * nprod, 1);
+  for (int i = 0; i < NCOLOR * nprod; i++)
+    fipos[i] = 0;
 
   ir = 0;
   for (int i1 = 0; i1 < nrule1; i1++)
@@ -1633,7 +1642,7 @@ static void st_rule_product(Split* split,
     {
       ic              = 0;
       oper            = split->oper;
-      rules[ir][ic++] = 1000 + oper;
+      RULES(ir, ic++) = 1000 + oper;
 
       if (flag_debug)
       {
@@ -1643,15 +1652,15 @@ static void st_rule_product(Split* split,
       }
 
       for (int i = 0; i < nbyrule1; i++)
-        rules[ir][ic++] = rules1[i1][i];
+        RULES(ir, ic++) = RULES1(i1, i);
       for (int i = 0; i < nbyrule2; i++)
-        rules[ir][ic++] = rules2[i2][i];
+        RULES(ir, ic++) = RULES2(i2, i);
       for (int i = 0; i < NCOLOR; i++)
       {
-        if (fipos1[i1][i] > 0)
-          fipos[ir][i] = fipos1[i1][i] * BASE + st_define_fipos(oper, 1);
-        if (fipos2[i2][i] > 0)
-          fipos[ir][i] = fipos2[i2][i] * BASE + st_define_fipos(oper, 0);
+        if (fipos1[FIPOSAD(i1, i)] > 0)
+          fipos[FIPOSAD(ir, i)] = fipos1[FIPOSAD(i1, i)] * BASE + st_define_fipos(oper, 1);
+        if (fipos2[FIPOSAD(i2, i)] > 0)
+          fipos[FIPOSAD(ir, i)] = fipos2[FIPOSAD(i2, i)] * BASE + st_define_fipos(oper, 0);
       }
 
       if (flag_debug)
@@ -1674,8 +1683,7 @@ static void st_split_collapse(Split* split, int verbose)
 
 {
   Relem* relem;
-  int num[2], nby[2], nprod;
-  VectorVectorInt ptr[2];
+  int num[2], nby[2], *ptr[2], nprod;
 
   if (split == (Split*)NULL) return;
 
@@ -1695,8 +1703,7 @@ static void st_split_collapse(Split* split, int verbose)
       {
         num[i] = 1;
         nby[i] = 1;
-        ptr[i].resize(1);
-        ptr[i][0] = relem->facies;
+        ptr[i] = relem->facies.data();
       }
       else
       {
@@ -1712,9 +1719,9 @@ static void st_split_collapse(Split* split, int verbose)
     split->nbyrule = nby[0] + nby[1] + 1;
     if (nprod > 0)
     {
-      st_rule_product(split, nprod,
-                      num[0], nby[0], ptr[0], split->relems[0]->Rfipos,
-                      num[1], nby[1], ptr[1], split->relems[1]->Rfipos);
+      st_rule_product(split, nprod, num[0], nby[0], ptr[0],
+                      split->relems[0]->Rfipos, num[1], nby[1], ptr[1],
+                      split->relems[1]->Rfipos);
       if (verbose)
         st_rules_print("Split", split->nrule, split->nbyrule, split->Srules,
                        split->Sfipos);
@@ -5240,7 +5247,7 @@ Rule* _rule_auto(Db* db,
   const Db* dbprop            = ruleprop->getDbprop();
 
   int nscore, r_opt;
-  int flag_rho, flag_correl, opt_correl;
+  int *rules, flag_rho, flag_correl, opt_correl;
   Vario* vario    = nullptr;
   Vario* varioind = nullptr;
   Local_Pgs local_pgs;
@@ -5368,7 +5375,8 @@ Rule* _rule_auto(Db* db,
     st_rule_print(r_opt, NRULE, Pile_Relem->Rrules, Pile_Relem->Rfipos, false,
                   -1, -1, TEST);
   }
-  rule  = st_rule_encode(Pile_Relem->Rrules[r_opt].data());
+  rules = Pile_Relem->Rrules;
+  rule  = st_rule_encode(&RULES(r_opt, 0));
 
   /* Clean the geometry (non-stationary case) */
 
