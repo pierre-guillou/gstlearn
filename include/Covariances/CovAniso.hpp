@@ -181,7 +181,7 @@ public:
   FORWARD_METHOD(getCorAniso, getScadef, TEST)
   FORWARD_METHOD(getCorAniso, getParMax, TEST)
   FORWARD_METHOD(getCorAniso, getMaxNDim, ITEST)
-  FORWARD_METHOD(getCorAniso, getMinOrder, TEST)
+  FORWARD_METHOD(getCorAniso, getMinOrder, ITEST)
   FORWARD_METHOD(getCorAniso, hasInt1D, false)
   FORWARD_METHOD(getCorAniso, hasInt2D, false)
   FORWARD_METHOD(getCorAniso, hasRange, false)
