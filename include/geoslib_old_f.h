@@ -252,11 +252,6 @@ GSTLEARN_EXPORT void db_sample_print(Db* db,
                                      int flag_nerr = 0,
                                      int flag_blk  = 0);
 GSTLEARN_EXPORT int db_center(Db* db, double* center);
-GSTLEARN_EXPORT void db_extension_rotated(Db* db,
-                                          double* rotmat,
-                                          VectorDouble& mini,
-                                          VectorDouble& maxi,
-                                          VectorDouble& delta);
 GSTLEARN_EXPORT int db_selref(int ndim,
                               const int* nx,
                               const int* ref,

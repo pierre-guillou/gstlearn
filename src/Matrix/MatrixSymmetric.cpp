@@ -287,7 +287,7 @@ bool MatrixSymmetric::isDefinitePositive()
 {
   /* Calculate the eigen values and vectors */
 
-  if (computeEigen() != 0) messageAbort("matrix_eigen");
+  if (computeEigen() != 0) messageAbort("Abort in computeEigen");
 
   // Get the Eigen values
 

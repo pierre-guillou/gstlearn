@@ -161,8 +161,8 @@ struct Local_Split
   int oper;               // Rank of operator
   int nrule;              // Number of generated rules
   int nbyrule;            // Number of symbols in the Rules
-  int* Srules;            // List of rules (Dim: [nitem][NRULE])
-  int* Sfipos;            // Position of facies (Dim: [nprod][NCOLOR])
+  VectorInt Srules;       // List of rules (Dim: [nitem][NRULE])
+  VectorInt Sfipos;       // Position of facies (Dim: [nprod][NCOLOR])
   Local_Relem* old_relem; // Not allocated
   std::vector<Local_Relem*> relems;
 };
@@ -173,8 +173,8 @@ struct Local_Relem
   int nrule;              // Number of generated rules
   int nbyrule;            // Number of symbols in the Rules
   int nsplit;             // Number of splits
-  int* Rrules;            // List of rules (Dim: [nitem][NRULE])
-  int* Rfipos;            // Position of facies (Dim: [nprod][NCOLOR])
+  VectorInt Rrules;       // List of rules (Dim: [nitem][NRULE])
+  VectorInt Rfipos;       // Position of facies (Dim: [nprod][NCOLOR])
   Local_Split* old_split; // Not allocated
   std::vector<Local_Split*> splits;
 };

@@ -368,7 +368,7 @@ static void st_keypair_copy(Keypair* keypair, int type, int start, void* values)
  ** \param[in]  ncol           Number of columns
  ** \param[in]  values         Array of values (Dimension: nrow * ncol)
  **
- ** \remarks All keypair related function use malloc 
+ ** \remarks All keypair related function use malloc
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
@@ -459,7 +459,7 @@ void app_keypair(const char* keyword,
  ** \param[in]  ncol           Number of columns
  ** \param[in]  values         Array of values (Dimension: nrow * ncol)
  **
- ** \remarks All keypair related function use malloc 
+ ** \remarks All keypair related function use malloc
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
@@ -546,7 +546,7 @@ void app_keypair_int(const char* keyword,
  **
  ** \param[in]  indice    Index of the Keyword to be deleted
  **
- ** \remarks All keypair related function use malloc 
+ ** \remarks All keypair related function use malloc
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
@@ -581,7 +581,7 @@ static void del_keypone(int indice)
  ** \param[in]  keyword    Keyword to be deleted
  ** \param[in]  flag_exact 1 if Exact keyword matching is required
  **
- ** \remarks All keypair related function use malloc 
+ ** \remarks All keypair related function use malloc
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
@@ -684,7 +684,7 @@ double get_keypone(const char* keyword, double valdef)
  **
  ** \remark  The returned array must be freed by the calling function
  **
- ** \remarks All keypair related function use malloc 
+ ** \remarks All keypair related function use malloc
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
@@ -728,7 +728,7 @@ int get_keypair(const char* keyword, int* nrow, int* ncol, double** values)
  **
  ** \remark  The returned array must be freed by the calling function
  **
- ** \remarks All keypair related function use malloc 
+ ** \remarks All keypair related function use malloc
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
@@ -876,7 +876,7 @@ void ut_distance_allocated(int ndim, double** tab1, double** tab2)
  **                           -1 to concatenate the string to the last message
  ** \param[in]  string         Current string
  **
- ** \remarks All keypair related function use malloc 
+ ** \remarks All keypair related function use malloc
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
@@ -974,14 +974,14 @@ void print_last_message(void)
 int* ut_split_into_two(int ncolor, int flag_half, int verbose, int* nposs)
 {
   int p, nmax, ncomb, np, lec;
-  int *mattab, *comb;
+  int* mattab;
 
   /* Initializations */
 
   p      = (flag_half) ? static_cast<int>(floor((double)ncolor / 2.)) : ncolor - 1;
   nmax   = static_cast<int>(pow(2, ncolor));
-  mattab = comb = nullptr;
-  np            = 0;
+  mattab = nullptr;
+  np     = 0;
 
   /* Core allocation */
 
@@ -991,8 +991,8 @@ int* ut_split_into_two(int ncolor, int flag_half, int verbose, int* nposs)
 
   for (int nsub = 1; nsub <= p; nsub++)
   {
-    comb = ut_combinations(ncolor, nsub, &ncomb);
-    lec  = 0;
+    VectorInt comb = ut_combinations(ncolor, nsub, &ncomb);
+    lec            = 0;
     for (int i = 0; i < ncomb; i++)
     {
       for (int j = 0; j < nsub; j++, lec++)
@@ -1000,7 +1000,6 @@ int* ut_split_into_two(int ncolor, int flag_half, int verbose, int* nposs)
       np++;
     }
   }
-  mem_free((char*)comb);
 
   /* Resize */
 
@@ -1039,4 +1038,4 @@ char* convert(const std::string& s)
   return pc;
 }
 
-}
+} // namespace gstlrn
