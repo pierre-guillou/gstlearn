@@ -44,16 +44,16 @@ public:
   void setOrigin(const VectorDouble& origin) override;
 
   /// Get the number of dimensions
-  unsigned int getNDim(int ispace = -1) const override;
+  size_t getNDim(int ispace = -1) const override;
 
   /// Get the offset index for coordinates
-  unsigned int getOffset(int ispace = -1) const override;
-  
+  size_t getOffset(int ispace = -1) const override;
+
   /// Return the space origin coordinates
   const VectorDouble& getOrigin(int ispace = -1) const override;
 
   /// Get the number of space components
-  unsigned int getNComponents() const override;
+  size_t getNComponents() const override;
 
   /// Return the space component at index ispace
   ASpaceSharedPtr getComponent(int ispace = -1) const override;

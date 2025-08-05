@@ -362,7 +362,7 @@ static int st_only_blanks(char* string)
 int _file_read(FILE* file, const char* format, va_list ap)
 {
   int flag_com;
-  unsigned int ideb, i;
+  size_t ideb, i;
   const char* fmt;
   int* ret_i;
   float* ret_f;
@@ -559,7 +559,7 @@ void _erase_current_string(void)
 int _buffer_read(char** buffer, const char* format, va_list ap)
 {
   int flag_com;
-  unsigned int ideb, i;
+  size_t ideb, i;
   const char* fmt;
   int* ret_i;
   float* ret_f;

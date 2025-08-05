@@ -22,7 +22,7 @@ namespace gstlrn
 class GSTLEARN_EXPORT Tensor : public AStringable /// TODO : public ASpaceObject
 {
 public:
-  Tensor(unsigned int ndim = 2);
+  Tensor(size_t ndim = 2);
   Tensor(const Tensor &r);
   Tensor& operator= (const Tensor &r);
   virtual ~Tensor();
@@ -35,11 +35,11 @@ public:
 
   void setRadiusIsotropic(double radius);
   void setRadiusVec(const VectorDouble& radius);
-  void setRadiusDir(unsigned int idim, double radius);
+  void setRadiusDir(size_t idim, double radius);
 
   void setRotation(const Rotation& rot);
   void setRotationAngles(const VectorDouble& angles);
-  void setRotationAngle(unsigned int idim, double angle);
+  void setRotationAngle(size_t idim, double angle);
 
   void setRotationAnglesAndRadius(const VectorDouble& angles = VectorDouble(),
                                   const VectorDouble& radius = VectorDouble());
@@ -76,7 +76,7 @@ private:
   void _direct2ToInverse2();
 
 private:
-  unsigned int _nDim;                      /// Number of dimensions
+  size_t _nDim;                     /// Number of dimensions
   MatrixSquare   _tensorDirect;     /// Direct Tensor matrix (definite positive)
   MatrixSquare   _tensorInverse;    /// Inverse Tensor matrix (definite positive)
   MatrixSymmetric _tensorDirect2;    /// Square of Direct tensor

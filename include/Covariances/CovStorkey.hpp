@@ -26,7 +26,7 @@ public:
   CovStorkey& operator= (const CovStorkey &r);
   virtual ~CovStorkey();
 
-  unsigned int getMaxNDim()   const  override { return 1; }
+  size_t getMaxNDim() const override { return 1; }
 
   String         getCovName() const override { return "Storkey"; }
   int            getMinOrder() const override { return -1; }

@@ -111,7 +111,7 @@ void DriftList::addDrift(const ADrift* drift)
   resetDriftList();
 }
 
-void DriftList::delDrift(unsigned int rank)
+void DriftList::delDrift(size_t rank)
 {
   if (_drifts.empty()) return;
   if (!_isDriftIndexValid(rank)) return;

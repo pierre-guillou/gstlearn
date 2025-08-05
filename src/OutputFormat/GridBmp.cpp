@@ -266,7 +266,7 @@ int GridBmp::writeInFile()
  ** \param[in]  ival  Integer value to be written
  **
  *****************************************************************************/
-void GridBmp::_writeOut(int mode, unsigned int ival)
+void GridBmp::_writeOut(int mode, size_t ival)
 {
   switch (mode)
   {

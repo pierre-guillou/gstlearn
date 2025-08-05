@@ -68,7 +68,7 @@ public:
   // Add one elementary drift structure
   void addDrift(const ADrift* drift);
   // Remove an elementary drift structure
-  void delDrift(unsigned int rank);
+  void delDrift(size_t rank);
   // Remove all elementary drift structures
   void delAllDrifts();
 

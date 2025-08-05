@@ -64,7 +64,7 @@ VectorDouble ASpaceObject::getUnitaryVector() const
   return _space->getUnitaryVector();
 }
 
-unsigned int ASpaceObject::getNDim(int ispace) const
+size_t ASpaceObject::getNDim(int ispace) const
 {
   return (_space->getNDim(ispace));
 }
@@ -125,7 +125,7 @@ void ASpaceObject::setNDim(int ndim)
  * @param ndim Number of dimensions
  * @param param Optional space parameter (ex: radius of the sphere)
  */
-void defineDefaultSpace(const ESpaceType& type, unsigned int ndim, double param)
+void defineDefaultSpace(const ESpaceType& type, size_t ndim, double param)
 {
 
   switch (type.getValue())

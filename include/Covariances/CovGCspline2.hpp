@@ -28,7 +28,7 @@ public:
   virtual ~CovGCspline2();
 
   int          getMinOrder()  const override { return 1; }
-  unsigned int getMaxNDim()   const  override { return 3; }
+  size_t getMaxNDim() const override { return 3; }
   String       getCovName() const override { return "Spline-2 G.C."; }
   bool         getCompatibleSpaceR() const override { return true; }
   bool hasCovDerivative() const override { return true; }

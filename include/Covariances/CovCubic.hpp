@@ -27,7 +27,7 @@ public:
   CovCubic& operator= (const CovCubic &r);
   virtual ~CovCubic();
 
-  unsigned int getMaxNDim()   const  override { return 3; }
+  size_t getMaxNDim() const override { return 3; }
 
   String getFormula() const override;
   String         getCovName() const override { return "Cubic"; }

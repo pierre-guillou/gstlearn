@@ -63,7 +63,7 @@ public:
   /// Shortcuts to ASpace methods
 
   /// Return the number of dimension of the current space context
-  unsigned int getNDim(int ispace = -1) const;
+  size_t getNDim(int ispace = -1) const;
   /// Return the current space context origin coordinates
   const VectorDouble& getOrigin(int ispace = -1) const;
 
@@ -101,8 +101,8 @@ private:
 
 /// (Re)Defining the unique default global space
 GSTLEARN_EXPORT void defineDefaultSpace(const ESpaceType& type,
-                                        unsigned int ndim = 2,
-                                        double param      = 0.);
+                                        size_t ndim  = 2,
+                                        double param = 0.);
 /// Set the unique default global space from another one
 GSTLEARN_EXPORT void setDefaultSpace(const ASpaceSharedPtr& space);
 

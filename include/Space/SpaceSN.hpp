@@ -22,7 +22,7 @@ class SpacePoint;
 class GSTLEARN_EXPORT SpaceSN: public ASpace
 {
 private:
-  SpaceSN(unsigned int ndim, double radius);
+  SpaceSN(size_t ndim, double radius);
   SpaceSN(const SpaceSN &r);
   SpaceSN& operator=(const SpaceSN &r);
  

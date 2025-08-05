@@ -90,8 +90,8 @@ double law_uniform(double mini, double maxi)
 
   if (Random_Old_Style)
   {
-    unsigned int random_product;
-    random_product = Random_factor * Random_value;
+    unsigned random_product;
+    random_product = static_cast<unsigned>(Random_factor * Random_value);
     Random_value   = random_product % Random_congruent;
     value          = (double)Random_value / (double)Random_congruent;
     value          = mini + value * (maxi - mini);

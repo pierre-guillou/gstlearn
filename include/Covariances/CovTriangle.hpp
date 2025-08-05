@@ -25,7 +25,7 @@ public:
   CovTriangle& operator= (const CovTriangle &r);
   virtual ~CovTriangle();
 
-  unsigned int   getMaxNDim()   const  override { return 1; }
+  size_t getMaxNDim() const override { return 1; }
 
   String         getCovName() const override { return "Triangle"; }
   int            getMinOrder() const override { return -1; }

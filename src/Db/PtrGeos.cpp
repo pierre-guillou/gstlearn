@@ -151,7 +151,7 @@ int getLocatorTypeFromName(const String& name_type)
     if (*it != ELoc::UNKNOWN)
     {
       auto i           = it.getValue();
-      unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[i].SREF));
+      auto lng         = static_cast<size_t>(strlen(DEF_LOCATOR[i].SREF));
       if (name_type.compare(0, lng, DEF_LOCATOR[i].SREF) == 0) return i;
     }
     it.toNext();
@@ -186,7 +186,7 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
     if (*it != ELoc::UNKNOWN)
     {
       auto i           = it.getValue();
-      unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[i].SREF));
+      auto lng         = static_cast<size_t>(strlen(DEF_LOCATOR[i].SREF));
       if (string_loc.compare(0, lng, DEF_LOCATOR[i].SREF) == 0) found = i;
     }
     it.toNext();
@@ -201,7 +201,7 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
   }
 
   // Decode the remaining characteristics
-  unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[found].SREF));
+  size_t lng = static_cast<size_t>(strlen(DEF_LOCATOR[found].SREF));
   if (string_loc.size() > lng) inum = atoi(&string_loc[lng]);
   mult = (DEF_LOCATOR[found].IREF == 0);
   if (!mult && inum > 1)

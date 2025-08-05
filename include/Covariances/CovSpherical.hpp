@@ -26,7 +26,7 @@ public:
   CovSpherical& operator= (const CovSpherical &r);
   virtual ~CovSpherical();
 
-  unsigned int   getMaxNDim() const override { return 3; }
+  size_t getMaxNDim() const override { return 3; }
   String         getFormula() const override;
   String         getCovName() const override { return "Spherical"; }
   int            getMinOrder() const override { return -1; }

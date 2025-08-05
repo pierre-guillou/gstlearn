@@ -17,7 +17,7 @@
 
 namespace gstlrn
 {
-SpaceSN::SpaceSN(unsigned int ndim, double radius)
+SpaceSN::SpaceSN(size_t ndim, double radius)
   : ASpace(ndim)
   , _radius(radius)
 {
@@ -80,7 +80,7 @@ void SpaceSN::_move(SpacePoint &p1, const VectorDouble &vec) const
   /// TODO : SpaceSN::_move
   auto offset = getOffset();
   auto ndim   = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  for (size_t i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
   }
@@ -147,7 +147,7 @@ void SpaceSN::_getIncrementInPlace(const SpacePoint& p1,
   int j = 0;
   auto offset = getOffset();
   auto ndim   = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  for (size_t i = offset; i < ndim + offset; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
 }
 } // namespace gstlrn

@@ -65,7 +65,7 @@ public:
     return 1.;
   }
   virtual bool         isConsistent() const;
-  virtual unsigned int getMaxNDim()   const { return MAX_INT; } // No Space Dimension limit
+  virtual size_t getMaxNDim() const { return MAX_INT; }    // No Space Dimension limit
   virtual int          getMinOrder()  const { return -1; } // Valid for FAST
   virtual bool         getCompatibleSpaceR() const { return false; }
   virtual bool         getCompatibleSpaceS() const { return false; }

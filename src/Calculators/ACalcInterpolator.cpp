@@ -58,7 +58,7 @@ bool ACalcInterpolator::_check()
   /* Cross-checking the Space Dimension consistency */
   /**************************************************/
 
-  unsigned int ndim = _getNDim();
+  size_t ndim = _getNDim();
   if (_model != nullptr)
   {
     if (ndim > 0)

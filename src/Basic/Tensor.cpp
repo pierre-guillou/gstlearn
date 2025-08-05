@@ -17,7 +17,7 @@
 
 namespace gstlrn
 {
-Tensor::Tensor(unsigned int ndim)
+Tensor::Tensor(size_t ndim)
   : AStringable()
   , _nDim(ndim)
   , _tensorDirect()
@@ -118,7 +118,7 @@ void Tensor::setRadiusVec(const VectorDouble& radius)
   _fillTensors();
 }
 
-void Tensor::setRadiusDir(unsigned int idim, double radius)
+void Tensor::setRadiusDir(size_t idim, double radius)
 {
   if (idim >= _nDim)
     my_throw("Wrong index of dimension");
@@ -146,7 +146,7 @@ void Tensor::setRotationAngles(const VectorDouble& angles)
   _fillTensors();
 }
 
-void Tensor::setRotationAngle(unsigned int idim, double angle)
+void Tensor::setRotationAngle(size_t idim, double angle)
 {
   if ((_nDim == 2 && idim != 0) ||
       (_nDim > 2 && idim >= _nDim))

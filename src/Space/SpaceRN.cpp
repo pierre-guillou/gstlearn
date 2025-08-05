@@ -19,7 +19,7 @@
 
 namespace gstlrn
 {
-SpaceRN::SpaceRN(unsigned int ndim)
+SpaceRN::SpaceRN(size_t ndim)
   : ASpace(ndim)
 {
 }
@@ -50,7 +50,7 @@ void SpaceRN::_move(SpacePoint& p1, const VectorDouble& vec) const
 {
   auto offset = getOffset();
   auto ndim   = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  for (size_t i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
   }
@@ -76,7 +76,7 @@ double SpaceRN::_getDistance(const SpacePoint& p1,
   double delta        = 0.;
   auto offset         = getOffset();
   auto ndim           = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  for (size_t i = offset; i < ndim + offset; i++)
   {
     delta = p2.getCoord(i) - p1.getCoord(i);
     dist += delta * delta;
@@ -130,8 +130,8 @@ void SpaceRN::_getIncrementInPlace(const SpacePoint& p1,
   int j                  = 0;
   auto offset            = getOffset();
   auto ndim              = getNDim();
-  unsigned int maxlength = ndim + offset;
-  for (unsigned int i = offset; i < maxlength; i++)
+  size_t maxlength       = ndim + offset;
+  for (size_t i = offset; i < maxlength; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
 }
 
@@ -149,7 +149,7 @@ void SpaceRN::getDistancePointVectInPlace(const SpacePoint& p1,
   {
     s       = 0.;
     auto pt = p2[i].getCoords();
-    for (unsigned int idim = 0; idim < _nDim; idim++)
+    for (size_t idim = 0; idim < _nDim; idim++)
     {
       ti = pt1[idim] - pt[idim];
       s += ti * ti;

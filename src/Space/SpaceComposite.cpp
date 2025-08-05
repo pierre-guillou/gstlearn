@@ -75,14 +75,14 @@ void SpaceComposite::setOrigin(const VectorDouble& origin)
   }
 }
 
-unsigned int SpaceComposite::getNDim(int ispace) const
+size_t SpaceComposite::getNDim(int ispace) const
 {
   if (ispace < 0 || ispace >= (int)getNComponents())
     return ASpace::getNDim();
   return _comps[ispace]->getNDim();
 }
 
-unsigned int SpaceComposite::getOffset(int ispace) const
+size_t SpaceComposite::getOffset(int ispace) const
 {
   if (ispace < 0 || ispace >= (int)getNComponents())
     return ASpace::getOffset();
@@ -96,7 +96,7 @@ const VectorDouble& SpaceComposite::getOrigin(int ispace) const
   return _comps[ispace]->getOrigin();
 }
 
-unsigned int SpaceComposite::getNComponents() const
+size_t SpaceComposite::getNComponents() const
 {
   return (int)_comps.size();
 }
@@ -120,7 +120,7 @@ String SpaceComposite::toString(const AStringFormat* strfmt, int ispace) const
   sstr << ASpace::toString(strfmt, -1);
   if (strfmt != nullptr && strfmt->getLevel() == 0) sstr << ": ";
   auto nc = getNComponents();
-  for (unsigned int idx = 0; idx < nc; idx++)
+  for (size_t idx = 0; idx < nc; idx++)
   {
     const auto c = getComponent(idx);
     sstr << c->toString(strfmt, idx);
@@ -134,7 +134,7 @@ bool SpaceComposite::isEqual(const ASpace* space) const
 {
   if (!ASpace::isEqual(space)) return false;
   auto nc = getNComponents();
-  for (unsigned int idx = 0; idx < nc; idx++)
+  for (size_t idx = 0; idx < nc; idx++)
   {
     const auto c1 = getComponent(idx);
     const auto c2 = space->getComponent(idx);

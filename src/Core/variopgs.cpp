@@ -4111,7 +4111,7 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
   MatrixSquare covh(nvar);
 
   /* Calculate the covariance for the zero distance */
-  for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+  for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
     local_pgs->d0[i] = 0.;
   local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, cov0);
 
@@ -4136,19 +4136,19 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
     cov[0]               = covh.getValue(0, 0);                                     /* C11(h)  */
     cov[5]               = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 1); /* C22(h)  */
 
-    for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
       local_pgs->d0[i] = ruleshift->getShift(i);
 
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[1] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(s)  */
     cov[4] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(s)  */
 
-    for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
       local_pgs->d0[i] = local_pgs->d1[i] - ruleshift->getShift(i);
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[2] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(h-s) */
 
-    for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
       local_pgs->d0[i] = local_pgs->d1[i] + ruleshift->getShift(i);
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[3] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(h+s)  */

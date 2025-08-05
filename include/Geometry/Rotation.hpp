@@ -22,14 +22,14 @@ namespace gstlrn
 class GSTLEARN_EXPORT Rotation: public AStringable /// TODO : public ASpaceObject
 {
 public:
-  Rotation(unsigned int ndim = 2);
+  Rotation(size_t ndim = 2);
   Rotation(const Rotation& r);
   Rotation& operator=(const Rotation& r);
   virtual ~Rotation();
 
   static bool isMatrixRotation(const MatrixSquare& rotmat, bool verbose);
 
-  unsigned int getNDim() const { return _nDim; }
+  size_t getNDim() const { return _nDim; }
   bool isRotated() const { return _flagRot; }
   const MatrixSquare& getMatrixDirect() const { return _rotMat; }
   const MatrixSquare& getMatrixInverse() const { return _rotInv; }
@@ -37,7 +37,7 @@ public:
   double getAngle(int idim) const { return _angles[idim]; }
   int getDerivativesInPlace(std::vector<MatrixSquare>& res) const;
   std::vector<MatrixSquare> getDerivatives() const;
-  void resetFromSpaceDimension(unsigned int ndim);
+  void resetFromSpaceDimension(size_t ndim);
   String toString(const AStringFormat* strfmt = nullptr) const override;
   int setMatrixDirect(const MatrixSquare& rotmat);
   int setMatrixDirectVec(const VectorDouble& rotmat);
@@ -61,7 +61,7 @@ private:
   void _inverseToDirect();
 
 private:
-  unsigned int _nDim;
+  size_t _nDim;
   bool _flagRot; // true if a Rotation is defined other than Identity
   VectorDouble _angles;
   MatrixSquare _rotMat;

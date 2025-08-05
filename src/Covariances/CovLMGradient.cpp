@@ -77,7 +77,7 @@ void CovLMGradient::evalZAndGradients(const SpacePoint& p1,
 {
   _initGradients(covVal, covGp, covGG, flagGrad);
 
-  for (unsigned int i = 0, n = getNCov(); i < n; i++)
+  for (size_t i = 0, n = getNCov(); i < n; i++)
   {
     ACovGradient* covloc = dynamic_cast<ACovGradient *>(_covs[i].get());
     if (covloc != nullptr)

@@ -232,7 +232,7 @@ void CorAniso::setRanges(const VectorDouble& ranges)
     messerr("Inconsistency on Space Dimension");
     return;
   }
-  for (unsigned int i = 0; i < ranges.size(); i++)
+  for (size_t i = 0; i < ranges.size(); i++)
   {
     if (ranges[i] <= EPSILON10)
     {
@@ -273,7 +273,7 @@ void CorAniso::setScale(double scale)
 void CorAniso::setScales(const VectorDouble& scales)
 {
   if (!hasRange()) return;
-  for (unsigned int i = 0; i < scales.size(); i++)
+  for (size_t i = 0; i < scales.size(); i++)
   {
     if (scales[i] <= EPSILON20) // should be less strict than setRange
     {
@@ -352,7 +352,7 @@ void CorAniso::setRotationAnglesAndRadius(const VectorDouble& angles,
       messerr("Inconsistency on Space Dimension");
       return;
     }
-    for (unsigned int i = 0; i < scales.size(); i++)
+    for (size_t i = 0; i < scales.size(); i++)
     {
       if (scales[i] <= EPSILON20) // should be less strict than setRange
       {
@@ -370,7 +370,7 @@ void CorAniso::setRotationAnglesAndRadius(const VectorDouble& angles,
       messerr("Inconsistency on Space Dimension");
       return;
     }
-    for (unsigned int i = 0; i < ranges.size(); i++)
+    for (size_t i = 0; i < ranges.size(); i++)
     {
       if (ranges[i] <= EPSILON10)
       {
@@ -410,7 +410,7 @@ bool CorAniso::isConsistent(const ASpace* space) const
   if (getSpace()->getType() == ESpaceType::SN && !_corfunc->getCompatibleSpaceS()) return false;
 
   // Check against the space dimension
-  unsigned int maxndim = _corfunc->getMaxNDim();
+  size_t maxndim = _corfunc->getMaxNDim();
   return maxndim <= 0 || (maxndim >= space->getNDim());
 }
 

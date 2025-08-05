@@ -308,7 +308,7 @@ int Db::getColIdxByUID(int iuid) const
 VectorInt Db::getColIdxsByUID(const VectorInt& iuids) const
 {
   VectorInt cols(iuids.size());
-  for (unsigned int i = 0; i < iuids.size(); i++)
+  for (size_t i = 0; i < iuids.size(); i++)
     cols[i] = getColIdxByUID(iuids[i]);
   return cols;
 }
@@ -1146,7 +1146,7 @@ void Db::setLocators(const VectorString& names,
 
   if (locatorIndex < 0) locatorIndex = _getNextLocator(locatorType);
 
-  for (unsigned int i = 0; i < iuids.size(); i++)
+  for (size_t i = 0; i < iuids.size(); i++)
     setLocatorByUID(iuids[i], locatorType, locatorIndex + i);
 }
 
@@ -1169,7 +1169,7 @@ void Db::setLocator(const String& name,
 
   if (locatorIndex < 0) locatorIndex = _getNextLocator(locatorType);
 
-  for (unsigned int i = 0; i < iuids.size(); i++)
+  for (size_t i = 0; i < iuids.size(); i++)
     setLocatorByUID(iuids[i], locatorType, locatorIndex + i);
 }
 
@@ -1616,7 +1616,7 @@ void Db::deleteColumn(const String& name)
   VectorInt iuids = _ids(name, false);
   if (iuids.empty()) return;
 
-  for (unsigned int i = 0; i < iuids.size(); i++)
+  for (size_t i = 0; i < iuids.size(); i++)
     deleteColumnByUID(iuids[i]);
 }
 
@@ -1629,7 +1629,7 @@ void Db::deleteColumns(const VectorString& names)
   VectorInt iuids = _ids(names, false);
   if (iuids.empty()) return;
 
-  for (unsigned int i = 0; i < iuids.size(); i++)
+  for (size_t i = 0; i < iuids.size(); i++)
     deleteColumnByUID(iuids[i]);
 }
 
@@ -1644,7 +1644,7 @@ void Db::deleteColumnsByColIdx(const VectorInt& icols)
   // Reverse order of the columns in order to start by the furthest one.
   VectorInt v = VH::sort(icols, false);
 
-  for (unsigned int i = 0; i < v.size(); i++)
+  for (size_t i = 0; i < v.size(); i++)
     deleteColumnByColIdx(v[i]);
 }
 
@@ -1656,7 +1656,7 @@ void Db::deleteColumnsByUID(const VectorInt& iuids)
 {
   if (iuids.empty()) return;
 
-  for (unsigned int i = 0; i < iuids.size(); i++)
+  for (size_t i = 0; i < iuids.size(); i++)
     deleteColumnByUID(iuids[i]);
 }
 
@@ -1917,7 +1917,7 @@ int Db::deleteSamples(const VectorInt& e_dels)
   // Reverse order of the samples in order to start by the furthest one.
   VectorInt v = VH::sort(e_dels, false);
 
-  for (unsigned int i = 0; i < v.size(); i++)
+  for (size_t i = 0; i < v.size(); i++)
     if (deleteSample(v[i]) != 0) return 1;
 
   return 0;
@@ -4629,7 +4629,7 @@ VectorInt Db::_getUIDsBasic(const VectorString& names) const
   if (names.empty()) return VectorInt();
 
   VectorInt iuids;
-  for (unsigned int i = 0; i < names.size(); i++)
+  for (size_t i = 0; i < names.size(); i++)
   {
     auto icol = getRankInList(_colNames, names[i]);
     if (icol < 0) return VectorInt();
@@ -5124,7 +5124,7 @@ bool Db::_isCountValid(const VectorInt& iuids, bool flagOne, bool verbose) const
     {
       messerr("You wanted to designate a SINGLE variable.");
       messerr("There are several variables matching your criterion:");
-      for (unsigned int i = 0; i < iuids.size(); i++)
+      for (size_t i = 0; i < iuids.size(); i++)
         messerr("- %s", getNameByUID(iuids[i]).c_str());
     }
     return false;

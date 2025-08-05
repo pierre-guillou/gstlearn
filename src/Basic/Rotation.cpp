@@ -17,7 +17,7 @@
 
 namespace gstlrn
 {
-Rotation::Rotation(unsigned int ndim)
+Rotation::Rotation(size_t ndim)
   : AStringable()
   , _nDim(ndim)
   , _flagRot(false)
@@ -48,7 +48,7 @@ Rotation::~Rotation()
 {
 }
 
-void Rotation::resetFromSpaceDimension(unsigned int ndim)
+void Rotation::resetFromSpaceDimension(size_t ndim)
 {
   _nDim    = ndim;
   _flagRot = false;

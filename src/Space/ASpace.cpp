@@ -19,7 +19,7 @@
 
 namespace gstlrn
 {
-ASpace::ASpace(unsigned int ndim)
+ASpace::ASpace(size_t ndim)
   : AStringable()
   , _nDim(ndim)
   , _origin(VectorDouble(ndim, 0.))
@@ -79,14 +79,14 @@ void ASpace::setOrigin(const VectorDouble& origin)
 }
 
 /// Get the number of dimensions
-unsigned int ASpace::getNDim(int ispace) const
+size_t ASpace::getNDim(int ispace) const
 {
   DECLARE_UNUSED(ispace)
   return _nDim;
 }
 
 /// Get the offset index for coordinates
-unsigned int ASpace::getOffset(int ispace) const
+size_t ASpace::getOffset(int ispace) const
 {
   DECLARE_UNUSED(ispace)
   return _offset;
@@ -106,7 +106,7 @@ ASpaceSharedPtr ASpace::getDefaultSpaceIfNull(const ASpaceSharedPtr& space)
 }
 
 /// Get the number of space components
-unsigned int ASpace::getNComponents() const
+size_t ASpace::getNComponents() const
 {
   return 1;
 }

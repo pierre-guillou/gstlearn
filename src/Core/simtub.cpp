@@ -354,7 +354,7 @@ static int st_check_simtub_environment(Db* dbin,
   int nvar          = 0;
   int nfex          = 0;
   bool flag_cond    = (dbin != nullptr);
-  unsigned int ndim = dbout->getNDim();
+  size_t ndim       = dbout->getNDim();
 
   /**************************************************************/
   /* Check if the Space dimension is compatible with the method */

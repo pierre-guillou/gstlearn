@@ -35,7 +35,7 @@ class Tensor;
 class GSTLEARN_EXPORT ASpace: public AStringable, public ICloneable
 {
 protected:
-  ASpace(unsigned int ndim);
+  ASpace(size_t ndim);
   ASpace(const ASpace& r);
   ASpace& operator=(const ASpace& r);
 
@@ -56,16 +56,16 @@ public:
   virtual void setOrigin(const VectorDouble& origin);
 
   /// Get the number of dimensions
-  virtual unsigned int getNDim(int ispace = -1) const;
+  virtual size_t getNDim(int ispace = -1) const;
 
   /// Get the offset index for coordinates
-  virtual unsigned int getOffset(int ispace = -1) const;
+  virtual size_t getOffset(int ispace = -1) const;
 
   /// Return the space origin coordinates
   virtual const VectorDouble& getOrigin(int ispace = -1) const;
 
   /// Get the number of space components
-  virtual unsigned int getNComponents() const;
+  virtual size_t getNComponents() const;
 
   /// Return the space component at index ispace
   virtual std::shared_ptr<const ASpace> getComponent(int ispace = -1) const;
@@ -128,7 +128,7 @@ VectorDouble getUnitaryVector() const;
   
   /// Customize the dimension offset index of the current space
   /// TODO : to be made private
-  void setOffset(unsigned int offset) { _offset = offset; }
+  void setOffset(size_t offset) { _offset = offset; }
 
   static std::shared_ptr<const ASpace> getDefaultSpaceIfNull(const std::shared_ptr<const ASpace>& space);
 protected:
@@ -167,15 +167,15 @@ protected:
 
 protected:
   /// Customize the dimension offset index of the current space
-  //void _setOffset(unsigned int offset) { _offset = offset; }
-  
+  // void _setOffset(size_t offset) { _offset = offset; }
+
 protected:
   /// Number of space dimensions
-  unsigned int _nDim;
+  size_t _nDim;
   /// Coordinates of the origin (size = _nDim)
   VectorDouble _origin;
   /// Dimension offset index (0 if single space, relative if sub-space)
-  unsigned int _offset;
+  size_t _offset;
 
   /// The next vectors are specified as working members in order to avoid too many allocations
   mutable VectorDouble _work1;

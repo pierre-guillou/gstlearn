@@ -23,7 +23,7 @@ class Tensor;
 class GSTLEARN_EXPORT SpaceRN: public ASpace
 {
 private:
-  SpaceRN(unsigned int ndim);
+  SpaceRN(size_t ndim);
   SpaceRN(const SpaceRN& r);
   SpaceRN& operator=(const SpaceRN& r);
 

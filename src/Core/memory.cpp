@@ -134,7 +134,7 @@ static void st_memory_leak_add(const char* call_file,
  **
  *****************************************************************************/
 static void st_memory_leak_delete(const char* call_file,
-                                  unsigned int call_line,
+                                  size_t call_line,
                                   void* ptr)
 {
   MemChunk* chunk;
@@ -189,7 +189,7 @@ static void st_memory_leak_delete(const char* call_file,
  **
  *****************************************************************************/
 static void st_mem_message(const char* call_file,
-                           unsigned int call_line,
+                           size_t call_line,
                            const char* format,
                            int oper,
                            int size)
@@ -220,7 +220,7 @@ static void st_mem_message(const char* call_file,
  ** \param[in]  tab       Array to be freed
  **
  *****************************************************************************/
-char* mem_free_(const char* call_file, unsigned int call_line, char* tab)
+char* mem_free_(const char* call_file, size_t call_line, char* tab)
 {
   int size_eff;
   char* tab_aux;
@@ -257,7 +257,7 @@ char* mem_free_(const char* call_file, unsigned int call_line, char* tab)
  **
  *****************************************************************************/
 char* mem_alloc_(const char* call_file,
-                 unsigned int call_line,
+                 size_t call_line,
                  int size,
                  int flag_fatal)
 {
@@ -306,7 +306,7 @@ char* mem_alloc_(const char* call_file,
  **
  *****************************************************************************/
 char* mem_copy_(const char* call_file,
-                unsigned int call_line,
+                size_t call_line,
                 char* tabin,
                 int size,
                 int flag_fatal)
@@ -361,7 +361,7 @@ char* mem_copy_(const char* call_file,
  **
  *****************************************************************************/
 char* mem_calloc_(const char* call_file,
-                  unsigned int call_line,
+                  size_t call_line,
                   int size,
                   int size_elem,
                   int flag_fatal)
@@ -411,7 +411,7 @@ char* mem_calloc_(const char* call_file,
  *
  *****************************************************************************/
 char* mem_realloc_(const char* call_file,
-                   unsigned int call_line,
+                   size_t call_line,
                    char* tab,
                    int size,
                    int flag_fatal)
