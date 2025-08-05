@@ -1673,7 +1673,7 @@ static void st_split_collapse(Split* split, int verbose)
 {
   Relem* relem;
   int num[2], nby[2], nprod;
-  VectorInt ptr[2];
+  VectorInt *ptr[2];
 
   if (split == (Split*)NULL) return;
 
@@ -1693,13 +1693,13 @@ static void st_split_collapse(Split* split, int verbose)
       {
         num[i] = 1;
         nby[i] = 1;
-        ptr[i] = relem->facies;
+        ptr[i] = &relem->facies;
       }
       else
       {
         num[i] = relem->nrule;
         nby[i] = relem->nbyrule;
-        ptr[i] = relem->Rrules;
+        ptr[i] = &relem->Rrules;
       }
     }
 
@@ -1710,8 +1710,8 @@ static void st_split_collapse(Split* split, int verbose)
     if (nprod > 0)
     {
       st_rule_product(split, nprod,
-                      num[0], nby[0], ptr[0], split->relems[0]->Rfipos,
-                      num[1], nby[1], ptr[1], split->relems[1]->Rfipos);
+                      num[0], nby[0], *ptr[0], split->relems[0]->Rfipos,
+                      num[1], nby[1], *ptr[1], split->relems[1]->Rfipos);
       if (verbose)
         st_rules_print("Split", split->nrule, split->nbyrule,
                        split->Srules, split->Sfipos);
