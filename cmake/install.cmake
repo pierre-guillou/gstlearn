@@ -28,14 +28,47 @@ target_include_directories(shared PUBLIC
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}/${PROJECT_NAME}>"
 )
 
-# Install the shared library
-install(
-  TARGETS shared
-  EXPORT ${PROJECT_NAME}_corelibs
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib
-  ARCHIVE DESTINATION lib
+target_include_directories(static PUBLIC
+  # Installed includes are made PUBLIC for client who links the static library
+  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
+  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}/${PROJECT_NAME}>"
 )
+
+# Install the library.
+#
+# The static library is only installed if explicitely requested with:
+#   cmake --install /path/to/build/dir --component static
+# This is to make it possible to install it, but only if it has been compiled
+# (to save time), though maybe that's trying too hard to be nice.
+#
+# This only works on Linux because on Windows the ARCHIVE part is used both
+# for static libraries and dll export files (.lib for both). The latter must
+# always be installed, so the former cannot be skipped, so the whole static
+# target is skipped in this case (only the shared target can be installed).
+# I do not know how to fix this.
+#
+# LIBRARY is for .so so not needed on Windows, RUNTIME is for .dll so not
+# needed on not-Windows.
+if (WIN32)
+  install(
+    TARGETS shared
+    EXPORT ${PROJECT_NAME}_corelibs
+    RUNTIME DESTINATION lib # for DLL, default destination is bin
+    ARCHIVE
+  )
+else()
+  install(
+    TARGETS shared static gmtsph # NLopt::nlopt
+    EXPORT ${PROJECT_NAME}_corelibs
+    LIBRARY
+    ARCHIVE COMPONENT static EXCLUDE_FROM_ALL
+  )
+  install(
+    DIRECTORY ${NLopt_DIR}/../../../
+    DESTINATION NLopt
+    COMPONENT static EXCLUDE_FROM_ALL
+  )
+endif()
 
 # Install the includes
 install(
