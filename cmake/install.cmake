@@ -74,6 +74,7 @@ endif()
 install(
   DIRECTORY   ${INCLUDES}
   DESTINATION include/${PROJECT_NAME}/${PROJECT_NAME}
+  MESSAGE_NEVER
 )
 
 # Install the export header file
