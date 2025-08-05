@@ -1070,7 +1070,6 @@ MatrixSparse* MatrixSparse::glue(const MatrixSparse* A1,
   int ncol = (flagShiftCol) ? A1->getNCols() + A2->getNCols() : MAX(A1->getNCols(), A2->getNCols());
 
   return MatrixSparse::createFromTriplet(T1, nrow, ncol, -1);
-  return MatrixSparse::createFromTriplet(T1, nrow, ncol, -1);
 }
 
 /* Extract a sparse sub-matrix */
