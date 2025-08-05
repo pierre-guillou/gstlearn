@@ -110,8 +110,8 @@ int GibbsMMulti::covmatAlloc(bool verbose, bool verboseTimer)
   if (verbose) mestitle(1, "Gibbs using Moving Neighborhood");
   Db* db                = getDb();
   Model* model          = getModel();
-  int nvar              = _getNVar();
-  int nact              = _getSampleRankNumber();
+  auto nvar             = _getNVar();
+  auto nact             = _getSampleRankNumber();
   int nvardb            = db->getNLoc(ELoc::Z);
   bool flag_var_defined = nvardb > 0;
 
@@ -177,8 +177,8 @@ void GibbsMMulti::update(VectorVectorDouble& y, int isimu, int ipgs, int iter)
 {
   double valsim, yk, vk;
 
-  int nvar = _getNVar();
-  int nact = _getSampleRankNumber();
+  auto nvar = _getNVar();
+  auto nact = _getSampleRankNumber();
 
   /* Print the title */
 
@@ -189,11 +189,11 @@ void GibbsMMulti::update(VectorVectorDouble& y, int isimu, int ipgs, int iter)
 
   for (int ivar0 = 0; ivar0 < nvar; ivar0++)
   {
-    int icase = getRank(ipgs, ivar0);
+    auto icase = getRank(ipgs, ivar0);
     for (int iact0 = 0; iact0 < nact; iact0++)
     {
       // Load the vector of weights
-      int icol = _getColumn(iact0, ivar0);
+      auto icol = _getColumn(iact0, ivar0);
       _getWeights(icol);
 
       if (!_isConstraintTight(icase, iact0, &valsim))
@@ -226,20 +226,20 @@ int GibbsMMulti::_getNVar() const
 
 int GibbsMMulti::_getSize() const
 {
-  int nact = _getSampleRankNumber();
-  int nvar = _getNVar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = _getNVar();
   return nact * nvar;
 }
 
 int GibbsMMulti::_getColumn(int iact, int ivar) const
 {
-  int nact = _getSampleRankNumber();
+  auto nact = _getSampleRankNumber();
   return (iact + ivar * nact);
 }
 
 void GibbsMMulti::_splitCol(int icol, int* iact, int* ivar) const
 {
-  int nact = _getSampleRankNumber();
+  auto nact = _getSampleRankNumber();
   *ivar    = icol / nact;
   *iact    = icol - nact * (*ivar);
 }
@@ -281,7 +281,7 @@ void GibbsMMulti::_updateStatWeights(int* nzero)
 
 int GibbsMMulti::_storeAllWeights(bool verbose)
 {
-  int nrow = _getSize();
+  auto nrow = _getSize();
   VectorDouble b(nrow);
 
   // Decide if weights are stored internally or not
@@ -420,8 +420,8 @@ double GibbsMMulti::_getEstimate(int ipgs,
   }
   else
   {
-    int nvar = _getNVar();
-    int nact = _getSampleRankNumber();
+    auto nvar = _getNVar();
+    auto nact = _getSampleRankNumber();
     int irow = 0;
     for (jvar = 0; jvar < nvar; jvar++)
     {

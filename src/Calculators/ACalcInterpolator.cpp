@@ -101,7 +101,7 @@ bool ACalcInterpolator::_check()
   /* Cross-Checking the Variable Number consistency */
   /**************************************************/
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (_model != nullptr)
   {
     if (nvar > 0)

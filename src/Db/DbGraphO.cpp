@@ -281,7 +281,7 @@ DbGraphO* DbGraphO::createFromNF(const String& NFFilename, bool verbose)
 bool DbGraphO::isConsistent() const
 {
   // Check on the count of addresses
-  int nech = getNNode();
+  auto nech = getNNode();
   if (_downArcs.getNRows() > nech)
   {
     messerr("Number of rows of '_connectedArcs' (%d)", _downArcs.getNRows());
@@ -329,7 +329,7 @@ bool DbGraphO::_isValidArcRank(int iarc) const
     messerr("Argument 'iarc' (%d) should not be negative", iarc);
     return false;
   }
-  int narcs = getNArc();
+  auto narcs = getNArc();
   if (iarc >= narcs)
   {
     messerr("Argument 'iarc' (%d) should be smaller than Number of arcs (%d)", iarc, narcs);
@@ -345,7 +345,7 @@ bool DbGraphO::_isValidNode(int node) const
     messerr("Argument 'node' (%d) should not be negative", node);
     return false;
   }
-  int nodeNumber = getNNode();
+  auto nodeNumber = getNNode();
   if (node >= nodeNumber)
   {
     messerr("Argument 'node' (%d) should be smaller than Number of Samples (%d)",
@@ -406,7 +406,7 @@ VectorInt DbGraphO::_getRanks(const VectorDouble& v)
 VectorInt DbGraphO::getIndicesNextDown(int node) const
 {
   if (!_isValidNode(node)) return VectorInt();
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
@@ -418,7 +418,7 @@ VectorInt DbGraphO::getIndicesNextDown(int node) const
 VectorInt DbGraphO::getIndicesNextUp(int node) const
 {
   if (!_isValidNode(node)) return VectorInt();
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
@@ -445,7 +445,7 @@ bool DbGraphO::areConnected(int node1, int node2) const
 {
   if (!_isValidNode(node1)) return false;
   if (!_isValidNode(node2)) return false;
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorInt order(nech, 0);
   VectorDouble v1(nech, 0.);
@@ -464,7 +464,7 @@ bool DbGraphO::areConnected(int node1, int node2) const
 VectorInt DbGraphO::getEndsDown() const
 {
   VectorInt vec;
-  int nech = getNNode();
+  auto nech = getNNode();
   for (int iech = 0; iech < nech; iech++)
     if (isEndDown(iech)) vec.push_back(iech);
   return vec;
@@ -473,7 +473,7 @@ VectorInt DbGraphO::getEndsDown() const
 VectorInt DbGraphO::getEndsUp() const
 {
   VectorInt vec;
-  int nech = getNNode();
+  auto nech = getNNode();
   for (int iech = 0; iech < nech; iech++)
     if (isEndUp(iech)) vec.push_back(iech);
   return vec;
@@ -482,7 +482,7 @@ VectorInt DbGraphO::getEndsUp() const
 VectorInt DbGraphO::getOrphans() const
 {
   VectorInt vec;
-  int nech = getNNode();
+  auto nech = getNNode();
   for (int iech = 0; iech < nech; iech++)
     if (isEndUp(iech) && isEndDown(iech)) vec.push_back(iech);
   return vec;
@@ -491,7 +491,7 @@ VectorInt DbGraphO::getOrphans() const
 VectorInt DbGraphO::getOrderDown(int node) const
 {
   if (!_isValidNode(node)) return VectorInt();
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorInt order(nech, 0);
   VectorDouble v1(nech, 0.);
@@ -552,7 +552,7 @@ void DbGraphO::_iterateCumul(const VectorInt& inds,
 VectorDouble DbGraphO::getCumulDown(int node) const
 {
   if (!_isValidNode(node)) return VectorDouble();
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);

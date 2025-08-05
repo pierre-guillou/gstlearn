@@ -71,7 +71,7 @@ String FracDesc::toString(const AStringFormat* strfmt) const
 
 void FracDesc::addPoint(double x, double y)
 {
-  int np = getNPoint();
+  auto np = getNPoint();
   _x.resize(np + 1);
   _y.resize(np + 1);
   _x[np] = x;

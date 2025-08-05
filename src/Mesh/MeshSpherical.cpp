@@ -28,7 +28,7 @@ MeshSpherical::MeshSpherical(const MatrixDense &apices,
       _apices(apices),
       _meshes(meshes)
 {
-  int ndim = apices.getNCols();
+  auto ndim = apices.getNCols();
   _setNDim(ndim);
 }
 
@@ -267,7 +267,7 @@ void MeshSpherical::getEmbeddedCoorPerApex(int iapex, VectorDouble& coords) cons
  */
 VectorDouble MeshSpherical::_defineUnits(void) const
 {
-  int nmeshes = getNMeshes();
+  auto nmeshes = getNMeshes();
   VectorDouble units(nmeshes);
   for (int imesh=0; imesh<nmeshes; imesh++)
   {
@@ -282,7 +282,7 @@ void MeshSpherical::_defineBoundingBox(void)
   VectorDouble extendmin;
   VectorDouble extendmax;
   double coor,mini,maxi;
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   // Initializations
   extendmin.resize(ndim);
@@ -377,7 +377,7 @@ void MeshSpherical::_checkConsistency() const
   for (int imesh = 0; imesh < getNMeshes(); imesh++)
     for (int ic = 0; ic < getNApexPerMesh(); ic++)
     {
-      int apex = getApex(imesh, ic);
+      auto apex = getApex(imesh, ic);
       if (apex < 0 || apex >= getNApices())
       {
         my_throw("Mesh indices are not compatible with the Points");
@@ -387,8 +387,8 @@ void MeshSpherical::_checkConsistency() const
 
 void MeshSpherical::getBarycenterInPlace(int imesh, vect coord) const
 {
-  int ndimE   = getEmbeddedNDim();
-  int ncorner = getNApexPerMesh();
+  auto ndimE   = getEmbeddedNDim();
+  auto ncorner = getNApexPerMesh();
 
   // Calculate the center of gravity (in the Embedded space)
   VectorVectorDouble coordE = getEmbeddedCoordinatesPerMesh(imesh);

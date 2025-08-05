@@ -245,8 +245,8 @@ void CholeskyDense::matProductInPlace(int mode,
                                       MatrixDense& x)
 {
   if (_computeTL()) return;
-  int n1 = a.getNRows();
-  int n2 = a.getNCols();
+  auto n1 = a.getNRows();
+  auto n2 = a.getNCols();
   x.reset(n1, n2);
 
   int neq;

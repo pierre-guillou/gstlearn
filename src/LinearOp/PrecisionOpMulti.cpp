@@ -21,8 +21,8 @@
 
 #define EVALOP(IN, OUT, TAB, getmat, OP, IY, COMPUTEOP, XORY, START, END, IVAR, JVAR)                    \
   {                                                                                                      \
-    int nvar       = _getNVar();                                                                         \
-    int ncov       = _getNCov();                                                                         \
+    auto nvar      = _getNVar();                                                                         \
+    auto ncov      = _getNCov();                                                                         \
     int iad_x      = 0;                                                                                  \
     int iad_struct = 0;                                                                                  \
     vect y;                                                                                              \
@@ -253,8 +253,8 @@ int PrecisionOpMulti::getSize() const
 }
 void PrecisionOpMulti::_computeSize()
 {
-  int nvar = _getNVar();
-  int ncov = _getNCov();
+  auto nvar = _getNVar();
+  auto ncov = _getNCov();
   _size    = 0;
   for (int i = 0; i < ncov; i++)
   {
@@ -276,7 +276,7 @@ int PrecisionOpMulti::_buildLocalMatricesNoStat(int icov)
 {
 
   CovAniso* cova = _model->getCovAniso(icov);
-  int nvar       = _getNVar();
+  auto nvar      = _getNVar();
   cova->informMeshByApexForSills(_meshes[icov]);
   int nvertex = _meshes[icov]->getNApices();
   int nterms  = nvar * (nvar + 1) / 2;
@@ -315,7 +315,7 @@ int PrecisionOpMulti::_buildMatrices()
   if (_model == nullptr) return 1;
   if (_getNVar() == 1) return 0;
 
-  int ncov = _getNCov();
+  auto ncov = _getNCov();
 
   // Do nothing if the array has already been calculated (correct dimension)
   if (ncov == (int)_cholSillsStat.size()) return 0;

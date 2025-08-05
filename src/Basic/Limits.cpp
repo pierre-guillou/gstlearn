@@ -193,7 +193,7 @@ VectorDouble Limits::getBound(int iclass, int mode) const
 
 VectorDouble Limits::getLowerBounds() const
 {
-  int nclass = getNLimit();
+  auto nclass = getNLimit();
   VectorDouble lower(nclass);
   for (int i = 0; i < nclass; i++)
     lower[i] = _bounds[i].getVmin();
@@ -202,7 +202,7 @@ VectorDouble Limits::getLowerBounds() const
 
 VectorDouble Limits::getUpperBounds() const
 {
-  int nclass = getNLimit();
+  auto nclass = getNLimit();
   VectorDouble upper(nclass);
   for (int i = 0; i < nclass; i++)
     upper[i] = _bounds[i].getVmax();
@@ -211,7 +211,7 @@ VectorDouble Limits::getUpperBounds() const
 
 VectorBool Limits::getLowerIncluded() const
 {
-  int nclass = getNLimit();
+  auto nclass = getNLimit();
   VectorBool mininc(nclass);
   for (int i = 0; i < nclass; i++)
     mininc[i] = _bounds[i].getMinIncluded();
@@ -220,7 +220,7 @@ VectorBool Limits::getLowerIncluded() const
 
 VectorBool Limits::getUpperIncluded() const
 {
-  int nclass = getNLimit();
+  auto nclass = getNLimit();
   VectorBool maxinc(nclass);
   for (int i = 0; i < nclass; i++)
     maxinc[i] = _bounds[i].getMaxIncluded();

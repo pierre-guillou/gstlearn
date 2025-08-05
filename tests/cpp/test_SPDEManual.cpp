@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 
   //////////
   // Kriging
-  int napices = S.getSize();
+  auto napices = S.getSize();
   VectorDouble rhs(napices);
   B.point2mesh(datval, rhs);
 

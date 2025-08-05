@@ -645,7 +645,7 @@ bool CalcMigrate::_preprocess()
 {
   if (!ACalcDbToDb::_preprocess()) return false;
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   _iattOut = _addVariableDb(2, 1, ELoc::UNKNOWN, 0, nvar, 0.);
   return (_iattOut >= 0);
 }
@@ -655,7 +655,7 @@ bool CalcMigrate::_postprocess()
   /* Free the temporary variables */
   _cleanVariableDb(2);
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   _renameVariable(2, getDbin()->getNamesByUID(_iuids), ELoc::UNKNOWN, nvar,
                   _iattOut, String(), 1);
 
@@ -679,7 +679,7 @@ void CalcMigrate::_rollback()
  *****************************************************************************/
 bool CalcMigrate::_run()
 {
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
 
   // Perform the migrations
 
@@ -917,7 +917,7 @@ int manageExternalInformation(int mode,
   //  VectorDouble tab;
 
   if (dbin == nullptr) return 0;
-  int ninfo = get_LOCATOR_NITEM(dbout, locatorType);
+  auto ninfo = get_LOCATOR_NITEM(dbout, locatorType);
   if (ninfo <= 0) return 0;
 
   /* Case when the Output Db is not a grid */

@@ -122,7 +122,7 @@ DriftList* DriftFactory::createDriftListFromIRF(int order,
                                                 const CovContext& ctxt)
 {
   auto* drifts = new DriftList(ctxt);
-  int ndim          = ctxt.getNDim();
+  auto ndim    = ctxt.getNDim();
 
   // Standard monomials
   switch (order)
@@ -192,7 +192,7 @@ DriftList* DriftFactory::createDriftListForGradients(const DriftList* olddrifts,
   DriftM drft;
   auto* newdrifts = new DriftList(ctxt);
   newdrifts->setFlagLinked(true);
-  int ndim  = ctxt.getNDim();
+  auto ndim = ctxt.getNDim();
   int order = olddrifts->getDriftMaxIRFOrder();
 
   if (olddrifts->hasExternalDrift())

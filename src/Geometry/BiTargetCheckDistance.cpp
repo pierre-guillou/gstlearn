@@ -148,7 +148,7 @@ double BiTargetCheckDistance::getNormalizedDistance(const VectorDouble& dd) cons
 
 void BiTargetCheckDistance::_calculateDistance() const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   /* Anisotropic neighborhood */
 
@@ -176,7 +176,7 @@ void BiTargetCheckDistance::_calculateDistance() const
 bool BiTargetCheckDistance::isOK(const SpaceTarget& T1,
                                  const SpaceTarget& T2) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   for (int idim = 0; idim < ndim; idim++)
     _movingIncr[idim] = T1.getCoord(idim) - T2.getCoord(idim);
 

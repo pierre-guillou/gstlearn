@@ -264,7 +264,7 @@ VectorDouble CalcSimuSubstitution::_transToProp(const SimuSubstitutionParam& sub
 
   /* Initializations */
 
-  int nfacies = subparam.getNfacies();
+  auto nfacies = subparam.getNfacies();
   if (nfacies <= 0 || subparam.getTrans().empty()) return props;
   props.resize(nfacies);
   propold.resize(nfacies);
@@ -337,7 +337,7 @@ bool CalcSimuSubstitution::_check()
   if (!ACalcSimulation::_check()) return false;
 
   if (!hasDbout()) return false;
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   if (ndim > 3)
   {
     messerr("The Substitution Method is not a relevant simulation model");

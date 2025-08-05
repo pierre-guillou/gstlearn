@@ -113,7 +113,7 @@ VectorDouble Table::getRange(int icol) const
 
 VectorDouble Table::getAllRange() const
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   VectorDouble limits(2);
   limits[0] = MAXIMUM_BIG;
   limits[1] = MINIMUM_BIG;
@@ -178,8 +178,8 @@ String Table::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
   if (empty()) return sstr.str();
-  int ncols = getNCols();
-  int nrows = getNRows();
+  auto ncols = getNCols();
+  auto nrows = getNRows();
 
   // Title
   if (!_skipTitle)
@@ -253,7 +253,7 @@ void Table::setColumnNames(const VectorString& colNames)
 void Table::setColumnName(int icol, const String& name)
 {
   if (!_isColumnValid(icol)) return;
-  int ncols = getNCols();
+  auto ncols = getNCols();
   if (_colNames.empty())
     _colNames.resize(ncols, "  ");
   _colNames[icol] = name;
@@ -262,7 +262,7 @@ void Table::setColumnName(int icol, const String& name)
 void Table::setRowName(int irow, const String& name)
 {
   if (!_isRowValid(irow)) return;
-  int nrows = getNRows();
+  auto nrows = getNRows();
   if (_rowNames.empty())
     _rowNames.resize(nrows, "  ");
   _rowNames[irow] = name;

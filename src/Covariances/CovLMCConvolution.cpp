@@ -95,7 +95,7 @@ int CovLMCConvolution::init(const EConvType& conv_type,
 
   /* Load the CovLMCConvolution parameters */
 
-  int ndim        = getNDim();
+  auto ndim       = getNDim();
   _convType       = conv_type;
   _convDir        = conv_idir;
   _convDiscNumber = conv_ndisc;

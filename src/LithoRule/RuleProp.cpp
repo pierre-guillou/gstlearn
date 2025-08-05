@@ -75,7 +75,7 @@ int RuleProp::resetFromDb(const Db* dbprop, const VectorDouble& propcst)
   if (! _checkConsistency()) return 1;
 
   // A generic rule is created on the fly
-  int nfacies = _getNFacies();
+  auto nfacies = _getNFacies();
   _rules.push_back(Rule::createFromFaciesCount(nfacies));
 
   return 0;

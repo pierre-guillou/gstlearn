@@ -1825,7 +1825,7 @@ VectorVectorDouble GeometryHelper::sphBarCoord(const VectorVectorDouble& sphPts,
                                                const MatrixInt& meshes)
 {
   int np      = (int)sphPts.size();
-  int nmeshes = meshes.getNRows();
+  auto nmeshes = meshes.getNRows();
 
   // Dimension the output storage
   VectorVectorDouble res(4);

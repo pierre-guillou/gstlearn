@@ -66,7 +66,7 @@ ProjConvolution::~ProjConvolution()
 
 void ProjConvolution::_buildGridSeis2D()
 {
-  int ndim          = _getNDim();
+  auto ndim         = _getNDim();
   VectorInt nx_seis = _gridSeismic->getNXs();
   nx_seis.resize(ndim - 1);
   VectorDouble dx_seis = _gridSeismic->getDXs();
@@ -163,7 +163,7 @@ int ProjConvolution::_addPoint2mesh(const constvect valonseismic,
 {
   if (!_isVecDimCorrect(valonseismic, valonvertex)) return 1;
 
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
 
   // Get the characteristics of the R-R grid
   int slice_R = _gridRes2D->getNSample();
@@ -194,7 +194,7 @@ int ProjConvolution::_addMesh2point(const constvect valonvertex,
 {
   if (!_isVecDimCorrect(valonseismic, valonvertex)) return 1;
 
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
 
   // Get the characteristics of the R-R grid
   int slice_R = _gridRes2D->getNSample();
@@ -221,7 +221,7 @@ void ProjConvolution::_convolve(const constvect valonvertex,
                                 vect valonseismic) const
 {
   int count   = (int)valonseismic.size();
-  int size    = _getConvSize();
+  auto size   = _getConvSize();
   double valp = 0.;
   double valm = 0.;
   int id      = 0;
@@ -248,7 +248,7 @@ void ProjConvolution::_convolveT(const constvect valonseismic,
 {
   std::fill(valonvertex.begin(), valonvertex.end(), 0.);
   int count   = (int)valonseismic.size();
-  int size    = _getConvSize();
+  auto size   = _getConvSize();
   double valm = 0.;
   int id      = 0;
   for (int is = 0; is < count; is++)

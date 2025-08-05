@@ -163,7 +163,7 @@ DbMeshTurbo* DbMeshTurbo::createFromNF(const String& NFFilename, bool verbose)
 bool DbMeshTurbo::isConsistent() const
 {
   // Check on the count of addresses
-  int nech = getNSample();
+  auto nech = getNSample();
   if (_mesh.getNApices() > nech)
   {
     messerr("Number of meshes (%d)", _mesh.getNApices());

@@ -134,7 +134,7 @@ bool CalcKriging::_postprocess()
   /* Free the temporary variables */
   _cleanVariableDb(2);
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (_flagXvalid)
   {
     if (_flagXvalidStd > 0)

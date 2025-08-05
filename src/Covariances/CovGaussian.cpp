@@ -94,10 +94,10 @@ double CovGaussian::simulateTurningBand(double t0, TurningBandOperate& operTB) c
 
 MatrixDense CovGaussian::simulateSpectralOmega(int nb) const
 {
-  int ndim = getContext().getNDim();
+  auto ndim = getContext().getNDim();
   MatrixDense mat(nb, ndim);
   for (int irow = 0; irow < nb; irow++)
-    for (int icol = 0; icol < ndim; icol++)
+    for (size_t icol = 0; icol < ndim; icol++)
       mat.setValue(irow, icol, law_gaussian());
   return mat;
 }

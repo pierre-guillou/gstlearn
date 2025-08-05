@@ -92,7 +92,7 @@ void MatrixSquare::innerMatrix(const MatrixSquare& x,
                                const AMatrix& r1,
                                const AMatrix& r2)
 {
-  int n = x.getNSize();
+  auto n = x.getNSize();
   if (n != r1.getNRows())
   {
     my_throw("Incompatible matrix dimensions");
@@ -148,7 +148,7 @@ void MatrixSquare::divideDiagByVector(const VectorDouble& diag)
 
 double MatrixSquare::determinant(void) const
 {
-  int neq = getNRows();
+  auto neq = getNRows();
 
   /* Dispatch according to the matrix dimension */
 
@@ -216,7 +216,7 @@ double MatrixSquare::normVec(const VectorDouble& vec)
  *****************************************************************************/
 void MatrixSquare::prodByDiagInPlace(int mode, const VectorDouble& c)
 {
-  int neq = getNRows();
+  auto neq = getNRows();
   for (int i1 = 0; i1 < neq; i1++)
     for (int i2 = 0; i2 < neq; i2++)
     {
@@ -311,7 +311,7 @@ int MatrixSquare::decomposeLU(MatrixSquare& tls,
                               MatrixSquare& tus,
                               double eps)
 {
-  int neq = getNRows();
+  auto neq = getNRows();
   tls.fill(0.);
   tus.fill(0.);
 
@@ -357,7 +357,7 @@ int MatrixSquare::decomposeLU(MatrixSquare& tls,
 
 int MatrixSquare::_invertLU()
 {
-  int neq = getNRows();
+  auto neq = getNRows();
 
   // Perform the LU decomposition
   MatrixSquare tls(neq);
@@ -392,7 +392,7 @@ int MatrixSquare::_solveLU(const MatrixSquare& tus,
                            const double* b,
                            double* x)
 {
-  int neq = getNRows();
+  auto neq = getNRows();
   VectorDouble y(neq);
   if (_forwardLU(tls, b, y.data())) return 1;
   if (_backwardLU(tus, y.data(), x)) return 1;
@@ -415,7 +415,7 @@ int MatrixSquare::_solveLU(const MatrixSquare& tus,
  *****************************************************************************/
 int MatrixSquare::_forwardLU(const MatrixSquare& tls, const double* b, double* x, double eps)
 {
-  int neq = getNRows();
+  auto neq = getNRows();
   for (int i = 0; i < neq; i++) x[i] = 0.;
   for (int i = 0; i < neq; i++)
   {
@@ -449,7 +449,7 @@ int MatrixSquare::_forwardLU(const MatrixSquare& tls, const double* b, double* x
  *****************************************************************************/
 int MatrixSquare::_backwardLU(const MatrixSquare& tus, const double* b, double* x, double eps)
 {
-  int neq = getNRows();
+  auto neq = getNRows();
   for (int i = neq - 1; i >= 0; i--)
   {
     double tmp = b[i];

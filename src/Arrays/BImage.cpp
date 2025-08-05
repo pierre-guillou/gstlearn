@@ -52,13 +52,13 @@ void BImage::init(const VectorInt& ndims)
 
 void BImage::_update()
 {
-  int nchar = getAllocSize();
+  auto nchar = getAllocSize();
   _values.resize(nchar, 0);
 }
 
 int BImage::getAllocSize() const
 {
-  int npixels = getNPixels();
+  auto npixels = getNPixels();
   if (npixels <= 0) return 0;
   int nred = ((npixels - 1) / 8 + 1);
   return nred;
@@ -104,11 +104,11 @@ String BImage::toString(const AStringFormat* strfmt) const
     // Default values
 
     int izmin = 0;
-    int izmax = getNDims(2);
+    auto izmax = getNDims(2);
     int iymin = 0;
-    int iymax = getNDims(1);
+    auto iymax = getNDims(1);
     int ixmin = 0;
-    int ixmax = getNDims(0);
+    auto ixmax = getNDims(0);
     char zero = '0';
     char one  = '1';
     if (strfmt != nullptr)
@@ -148,11 +148,11 @@ String BImage::toString(const AStringFormat* strfmt) const
 
       for (int iy = iymin; iy < iymax; iy++)
       {
-        int jy = getNDims(1) - iy - 1;
+        auto jy = getNDims(1) - iy - 1;
         sstr << (iy + 1) % 10 << " ";
         for (int ix = ixmin; ix < ixmax; ix++)
         {
-          int val = getValue(ix, jy, iz);
+          auto val = getValue(ix, jy, iz);
           if (val > 0)
             sstr << one;
           else

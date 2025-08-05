@@ -51,7 +51,7 @@ static int st_save(Db* dbgrid,
                    const VectorDouble& z)
 {
   int iptr;
-  int nech = dbgrid->getNSample();
+  auto nech = dbgrid->getNSample();
 
   /* Add the terms to 'dbgrid' */
 
@@ -234,7 +234,7 @@ static int st_gibbs(int niter,
 
       for (int ic = 0, nc = (int)ind.size(); ic < nc; ic++)
       {
-        int i         = ind[ic];
+        auto i        = ind[ic];
         double valmin = (!consmin.empty()) ? consmin[i] : -10.;
         double valmax = (!consmax.empty()) ? consmax[i] : +10.;
         z[i]          = st_simcond(iter, niter, valmin, valmax, krig[ic], sigma[i]);
@@ -300,7 +300,7 @@ int main(int argc, char* argv[])
   auto P                   = PrecisionOpMatrix(&mesh, model1->getCovAniso(0));
   const MatrixSparse* Qref = P.getQ();
   auto* Q                  = new MatrixSparse(*Qref);
-  int nvertex              = mesh.getNApices();
+  auto nvertex             = mesh.getNApices();
 
   // Coding the various colors
 

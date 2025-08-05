@@ -166,7 +166,7 @@ VectorDouble morpho_labelling(int option,
 
   /* Attempt to allocate the initial quantum */
 
-  int nxyz = imagin.getNPixels();
+  auto nxyz = imagin.getNPixels();
   size     = MIN(quantum, nxyz);
   list_array.resize(size);
   compnum.resize(nxyz);
@@ -691,7 +691,7 @@ void morpho_image2double(const BImage& imagin,
                          bool verbose)
 {
   VectorInt NX = imagin.getNDimsExt(3);
-  int nxyz     = imagin.getNPixels();
+  auto nxyz    = imagin.getNPixels();
   if (verbose)
     message("Translation: %d / %d\n", morpho_count(imagin), nxyz);
 
@@ -728,7 +728,7 @@ void morpho_distance(int option,
                      bool verbose)
 {
   BImage imagout = imagin;
-  int nxyz       = imagin.getNPixels();
+  auto nxyz      = imagin.getNPixels();
 
   /* Copy the initial image in the distance array */
 

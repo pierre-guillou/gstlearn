@@ -206,7 +206,7 @@ void MatrixSymmetric::normMatrix(const AMatrix& y, const MatrixSquare& x, bool t
     }
   }
 
-  int nout = getNSize();
+  auto nout = getNSize();
   for (int irow = 0; irow < nout; irow++)
     for (int icol = 0; icol <= irow; icol++)
     {
@@ -260,7 +260,7 @@ int MatrixSymmetric::_terminateEigen(const VectorDouble& eigenValues,
                                      bool optionPositive,
                                      bool changeOrder)
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
 
   _eigenValues = eigenValues;
 
@@ -368,7 +368,7 @@ MatrixSymmetric* MatrixSymmetric::createFromTriangle(int mode,
 
 int MatrixSymmetric::_getTriangleSize() const
 {
-  int neq  = getNRows();
+  auto neq = getNRows();
   int size = neq * (neq + 1) / 2;
   return size;
 }
@@ -430,7 +430,7 @@ int MatrixSymmetric::_matrix_qoc(bool flag_invert,
 
   /* Initializations */
 
-  int neq = getNRows();
+  auto neq = getNRows();
 
   /* Core allocation */
 
@@ -535,9 +535,9 @@ int MatrixSymmetric::minimizeWithConstraintsInPlace(const VectorDouble& gmat,
 
   /* Initializations */
 
-  int neq   = getNRows();
-  int nae   = aemat.getNCols();
-  int nai   = aimat.getNCols();
+  auto neq  = getNRows();
+  auto nae  = aemat.getNCols();
+  auto nai  = aimat.getNCols();
   int namax = nae + nai;
 
   /* Case when there is no equality nor inequality constraints */
@@ -669,8 +669,8 @@ int MatrixSymmetric::_constraintsError(const VectorInt& active,
 {
   double eps = EPSILON10;
 
-  int neq    = getNRows();
-  int nai    = aimat.getNCols();
+  auto neq   = getNRows();
+  auto nai   = aimat.getNCols();
   int number = 0;
   int ecr    = 0;
   for (int i = 0; i < nai; i++)
@@ -841,7 +841,7 @@ int MatrixSymmetric::computeGeneralizedInverse(MatrixSymmetric& tabout,
 
   /* Calculate the generalized inverse */
 
-  int neq = getNRows();
+  auto neq = getNRows();
   for (int i = 0; i < neq; i++)
     for (int j = 0; j < neq; j++)
     {
@@ -871,7 +871,7 @@ bool MatrixSymmetric::sample(MatrixSymmetric& res,
                              const VectorInt& rowKeep,
                              bool flagInvert)
 {
-  int ntotal     = A.getNRows();
+  auto ntotal    = A.getNRows();
   VectorInt rows = rowKeep;
   if (rows.empty()) rows = VH::sequence(ntotal);
   if (flagInvert) rows = VH::complement(VH::sequence(ntotal), rows);
@@ -902,8 +902,8 @@ MatrixSymmetric* MatrixSymmetric::createRandomDefinitePositive(int neq, int seed
 
 MatrixSymmetric MatrixSymmetric::compress0MatLC(const MatrixDense& matLC)
 {
-  int nvar            = getNCols();
-  int nvarCL          = matLC.getNRows();
+  auto nvar           = getNCols();
+  auto nvarCL         = matLC.getNRows();
   MatrixSymmetric mat(nvarCL);
   for (int jvarCL = 0; jvarCL < nvarCL; jvarCL++)
     for (int ivarCL = 0; ivarCL <= jvarCL; ivarCL++)

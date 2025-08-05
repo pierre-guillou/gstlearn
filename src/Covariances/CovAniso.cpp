@@ -69,7 +69,7 @@ CovAniso::CovAniso(const ECov& type,
     _sillCur.setValue(0, 0, sill);
   else
   {
-    int nvar = ctxt.getNVar();
+    auto nvar = ctxt.getNVar();
     _sillCur.fill(0);
     for (int ivar = 0; ivar < nvar; ivar++)
       _sillCur.setValue(ivar, ivar, sill);
@@ -215,7 +215,7 @@ String CovAniso::toString(const AStringFormat* strfmt) const
   {
     sstr << toTitle(1, "Non-Stationary Parameters");
     sstr << _tabNoStat->toString(strfmt);
-    int i = getTabNoStatSills()->getNSills();
+    auto i = getTabNoStatSills()->getNSills();
     sstr << getCorAniso()->toStringNoStat(strfmt, i);
   }
   return sstr.str();
@@ -298,7 +298,7 @@ CovAniso* CovAniso::createIsotropicMulti(const CovContext& ctxt,
                                          bool flagRange)
 {
   auto* cov = new CovAniso(type, ctxt);
-  int nvar      = sills.getNSize();
+  auto nvar = sills.getNSize();
   if (ctxt.getNVar() != nvar)
   {
     messerr(
@@ -324,7 +324,7 @@ CovAniso* CovAniso::createAnisotropicMulti(const CovContext& ctxt,
                                            bool flagRange)
 {
 
-  int nvar = sills.getNSize();
+  auto nvar = sills.getNSize();
   if (ctxt.getNVar() != nvar)
   {
     messerr(

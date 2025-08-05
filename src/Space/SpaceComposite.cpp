@@ -119,7 +119,7 @@ String SpaceComposite::toString(const AStringFormat* strfmt, int ispace) const
   std::stringstream sstr;
   sstr << ASpace::toString(strfmt, -1);
   if (strfmt != nullptr && strfmt->getLevel() == 0) sstr << ": ";
-  unsigned int nc = getNComponents();
+  auto nc = getNComponents();
   for (unsigned int idx = 0; idx < nc; idx++)
   {
     const auto c = getComponent(idx);
@@ -133,7 +133,7 @@ String SpaceComposite::toString(const AStringFormat* strfmt, int ispace) const
 bool SpaceComposite::isEqual(const ASpace* space) const
 {
   if (!ASpace::isEqual(space)) return false;
-  unsigned int nc = getNComponents();
+  auto nc = getNComponents();
   for (unsigned int idx = 0; idx < nc; idx++)
   {
     const auto c1 = getComponent(idx);
@@ -258,4 +258,4 @@ void SpaceComposite::_getIncrementInPlace(const SpacePoint& p1,
     _comps[ispace]->getIncrementInPlace(p1, p2, ptemp);
   }
 }
-}
+} // namespace gstlrn

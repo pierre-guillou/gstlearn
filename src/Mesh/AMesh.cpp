@@ -189,7 +189,7 @@ void AMesh::_recopy(const AMesh& m)
 VectorDouble AMesh::getCoordinatesPerApex(int idim) const
 {
   if (!_isSpaceDimensionValid(idim)) return VectorDouble();
-  int np = getNApices();
+  auto np = getNApices();
   VectorDouble coor(np);
   for (int ip = 0; ip < np; ip++)
     coor[ip] = getApexCoor(ip, idim);
@@ -204,7 +204,7 @@ VectorDouble AMesh::getCoordinatesPerApex(int idim) const
  */
 VectorVectorDouble AMesh::getAllCoordinates() const
 {
-  int napices = getNApices();
+  auto napices = getNApices();
   VectorDouble local(_nDim);
   VectorVectorDouble coords(_nDim);
   for (int idim = 0; idim < _nDim; idim++)
@@ -227,8 +227,8 @@ VectorVectorDouble AMesh::getAllCoordinates() const
  */
 MatrixInt AMesh::getAllMeshes() const
 {
-  int nper    = getNApexPerMesh();
-  int nmeshes = getNMeshes();
+  auto nper    = getNApexPerMesh();
+  auto nmeshes = getNMeshes();
   MatrixInt meshes(nmeshes, nper);
 
   for (int imesh = 0; imesh < nmeshes; imesh++)
@@ -246,7 +246,7 @@ MatrixInt AMesh::getAllMeshes() const
 double AMesh::getCenterCoordinate(int imesh, int idim) const
 {
   double coor = 0.;
-  int ncorner = getNApexPerMesh();
+  auto ncorner = getNApexPerMesh();
   for (int icorner = 0; icorner < ncorner; icorner++)
     coor += getCoor(imesh, icorner, idim);
   return (coor / (double)ncorner);
@@ -254,8 +254,8 @@ double AMesh::getCenterCoordinate(int imesh, int idim) const
 
 VectorVectorDouble AMesh::getAllCenterCoordinates() const
 {
-  int ncorner = getNApexPerMesh();
-  int nmeshes = getNMeshes();
+  auto ncorner = getNApexPerMesh();
+  auto nmeshes = getNMeshes();
   VectorVectorDouble coords(_nDim);
   for (int idim = 0; idim < _nDim; idim++)
     coords[idim].resize(nmeshes);
@@ -281,7 +281,7 @@ VectorVectorDouble AMesh::getAllCenterCoordinates() const
  */
 MatrixDense AMesh::getAllApices() const
 {
-  int napices = getNApices();
+  auto napices = getNApices();
   MatrixDense apices(napices, _nDim);
   for (int ip = 0; ip < napices; ip++)
     for (int idim = 0; idim < _nDim; idim++)
@@ -292,7 +292,7 @@ MatrixDense AMesh::getAllApices() const
 VectorInt AMesh::getMeshByApexPair(int apex1, int apex2) const
 {
   VectorInt list;
-  int ncorner = getNApexPerMesh();
+  auto ncorner = getNApexPerMesh();
   int found, apex0;
 
   for (int imesh = 0; imesh < getNMeshes(); imesh++)
@@ -325,10 +325,10 @@ VectorInt AMesh::getMeshByApexPair(int apex1, int apex2) const
 *****************************************************************************/
 void AMesh::getElements(MatrixDense& apices, MatrixInt& meshes) const
 {
-  int nmeshes = getNMeshes();
-  int ndim    = getNDim();
-  int napices = getNApices();
-  int ncorner = getNApexPerMesh();
+  auto nmeshes = getNMeshes();
+  auto ndim    = getNDim();
+  auto napices = getNApices();
+  auto ncorner = getNApexPerMesh();
 
   // Dimension the returned containers
 
@@ -368,7 +368,7 @@ VectorDouble AMesh::getExtrema(int idim) const
 VectorDouble AMesh::getCoordinatesPerMesh(int imesh, int idim, bool flagClose) const
 {
   VectorDouble vec;
-  int ncorner = getNApexPerMesh();
+  auto ncorner = getNApexPerMesh();
 
   if (flagClose)
     vec.resize(ncorner + 1);
@@ -419,7 +419,7 @@ ProjMatrix* AMesh::createProjMatrix(const Db* db, int rankZ, bool verbose) const
  */
 void AMesh::getEmbeddedCoordinatesPerMeshInPlace(int imesh, VectorVectorDouble& vec) const
 {
-  int ncorner = getNApexPerMesh();
+  auto ncorner = getNApexPerMesh();
 
   for (int ic = 0; ic < ncorner; ic++)
     getEmbeddedCoorPerMesh(imesh, ic, vec[ic]);
@@ -433,8 +433,8 @@ void AMesh::getEmbeddedCoordinatesPerMeshInPlace(int imesh, VectorVectorDouble& 
  */
 VectorVectorDouble AMesh::getEmbeddedCoordinatesPerMesh(int imesh) const
 {
-  int ndim    = getEmbeddedNDim();
-  int ncorner = getNApexPerMesh();
+  auto ndim    = getEmbeddedNDim();
+  auto ncorner = getNApexPerMesh();
   VectorVectorDouble vec(ncorner);
   for (auto& e: vec)
     e = VectorDouble(ndim);
@@ -445,8 +445,8 @@ VectorVectorDouble AMesh::getEmbeddedCoordinatesPerMesh(int imesh) const
 
 VectorVectorDouble AMesh::getCoordinatesPerMesh(int imesh) const
 {
-  int ndim    = getNDim();
-  int ncorner = getNApexPerMesh();
+  auto ndim    = getNDim();
+  auto ncorner = getNApexPerMesh();
   VectorVectorDouble vec(ncorner);
   for (auto& e: vec)
     e = VectorDouble(ndim);
@@ -464,8 +464,8 @@ VectorVectorDouble AMesh::getCoordinatesPerMesh(int imesh) const
  */
 VectorVectorDouble AMesh::getEmbeddedCoordinatesPerApex() const
 {
-  int ndim    = getEmbeddedNDim();
-  int napices = getNApices();
+  auto ndim    = getEmbeddedNDim();
+  auto napices = getNApices();
   VectorVectorDouble vec(ndim);
   for (auto& e: vec)
     e = VectorDouble(napices);
@@ -514,9 +514,9 @@ VectorDouble AMesh::getDistances(int iapex0, const VectorInt& japices) const
  */
 VectorVectorInt AMesh::getNeighborhoodPerMesh() const
 {
-  int napices  = getNApices();
-  int nmeshes  = getNMeshes();
-  int npermesh = getNApexPerMesh();
+  auto napices  = getNApices();
+  auto nmeshes  = getNMeshes();
+  auto npermesh = getNApexPerMesh();
 
   VectorVectorInt Vmesh;
   Vmesh.resize(napices);
@@ -529,7 +529,7 @@ VectorVectorInt AMesh::getNeighborhoodPerMesh() const
 
     for (int rank = 0; rank < npermesh; rank++)
     {
-      int ip = getApex(imesh, rank);
+      auto ip = getApex(imesh, rank);
       Vmesh[ip].push_back(imesh);
     }
   }
@@ -545,8 +545,8 @@ VectorVectorInt AMesh::getNeighborhoodPerMesh() const
  */
 VectorVectorInt AMesh::getNeighborhoodPerApex() const
 {
-  int napices  = getNApices();
-  int npermesh = getNApexPerMesh();
+  auto napices  = getNApices();
+  auto npermesh = getNApexPerMesh();
 
   VectorVectorInt Vapex;
   Vapex.resize(napices);
@@ -568,7 +568,7 @@ VectorVectorInt AMesh::getNeighborhoodPerApex() const
       // Loop on the apices of the neighboring mesh
       for (int rank = 0; rank < npermesh; rank++)
       {
-        int jp = getApex(imesh, rank);
+        auto jp = getApex(imesh, rank);
 
         // Skip the target apex itself
         if (jp == ip) continue;
@@ -642,8 +642,8 @@ bool AMesh::_weightsInMesh(const VectorDouble& coor,
   static double FACDIM[] = {0., 1., 2., 6.};
 
   // Initializations
-  int ncorner = getNApexPerMesh();
-  int ndim    = getNDim();
+  auto ncorner = getNApexPerMesh();
+  auto ndim    = getNDim();
 
   // Loop on the vertices
   double total = 0.;
@@ -683,8 +683,8 @@ double AMesh::_getMeshUnit(const VectorVectorDouble& corners) const
   static double facdim[] = {0., 1., 2., 6.};
 
   // Initializations
-  int ndim    = getNDim();
-  int ncorner = getNApexPerMesh();
+  auto ndim    = getNDim();
+  auto ncorner = getNApexPerMesh();
 
   // Calculate the mesh size
   MatrixSquare mat;
@@ -699,9 +699,9 @@ double AMesh::_getMeshUnit(const VectorVectorDouble& corners) const
 
 void AMesh::_printMeshListByCoordinates(int nline_max) const
 {
-  int ndim    = getNDim();
-  int nmesh   = getNMeshes();
-  int ncorner = getNApexPerMesh();
+  auto ndim    = getNDim();
+  auto nmesh   = getNMeshes();
+  auto ncorner = getNApexPerMesh();
 
   int iline = 0;
   for (int imesh = 0; imesh < nmesh; imesh++)
@@ -722,8 +722,8 @@ void AMesh::_printMeshListByCoordinates(int nline_max) const
 
 void AMesh::_printMeshListByIndices(int nline_max) const
 {
-  int nmesh   = getNMeshes();
-  int ncorner = getNApexPerMesh();
+  auto nmesh   = getNMeshes();
+  auto ncorner = getNApexPerMesh();
 
   int iline = 0;
   for (int imesh = 0; imesh < nmesh; imesh++)
@@ -740,8 +740,8 @@ void AMesh::_printMeshListByIndices(int nline_max) const
 
 void AMesh::getBarycenterInPlace(int imesh, vect coord) const
 {
-  int ndim    = getNDim();
-  int ncorner = getNApexPerMesh();
+  auto ndim    = getNDim();
+  auto ncorner = getNApexPerMesh();
 
   VectorVectorDouble coords = getCoordinatesPerMesh(imesh);
 
@@ -772,11 +772,11 @@ void AMesh::resetProjFromDb(ProjMatrix* m,
                             int rankZ,
                             bool verbose) const
 {
-  int ndim    = getNDim();
-  int nvertex = getNApices();
-  int ncorner = getNApexPerMesh();
+  auto ndim    = getNDim();
+  auto nvertex = getNApices();
+  auto ncorner = getNApexPerMesh();
   int nech    = db->getNSample();
-  int nmeshes = getNMeshes();
+  auto nmeshes = getNMeshes();
   VectorDouble units(nmeshes, 0.);
   if (getVariety() != 1)
     units = _defineUnits();
@@ -837,7 +837,7 @@ void AMesh::resetProjFromDb(ProjMatrix* m,
       if (verbose) message("Sample %4d in Mesh %4d :", jech + 1, found + 1);
       for (int icorn = 0; icorn < ncorner; icorn++)
       {
-        int ip = getApex(found, icorn);
+        auto ip = getApex(found, icorn);
         if (ip > ip_max) ip_max = ip;
         if (verbose) message(" %4d (%4.2lf)", ip, weight[icorn]);
         NF_T.add(iech, ip, weight[icorn]);
@@ -890,7 +890,7 @@ int AMesh::_findBarycenter(const VectorDouble& target,
 
 VectorDouble AMesh::_defineUnits(void) const
 {
-  int nmeshes = getNMeshes();
+  auto nmeshes = getNMeshes();
   VectorDouble units(nmeshes);
   for (int imesh = 0; imesh < nmeshes; imesh++)
     units[imesh] = getMeshSize(imesh);

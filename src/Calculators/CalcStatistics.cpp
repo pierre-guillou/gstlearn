@@ -48,7 +48,7 @@ bool CalcStatistics::_check()
   if (!hasDbin()) return false;
   if (!hasDbout()) return false;
 
-  int nvar = getDbin()->getNLoc(ELoc::Z);
+  auto nvar = getDbin()->getNLoc(ELoc::Z);
   if (nvar <= 0)
   {
     messerr("These methods require some variable to be defined");

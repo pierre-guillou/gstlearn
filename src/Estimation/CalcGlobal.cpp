@@ -240,8 +240,8 @@ int CalcGlobal::_globalKriging()
 int CalcGlobal::_globalArithmetic()
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  int ntot       = getDbin()->getNSample(false);
-  int np         = getDbin()->getNSample(true);
+  auto ntot      = getDbin()->getNSample(false);
+  auto np        = getDbin()->getNSample(true);
   int ng         = dbgrid->getNSample(true);
   double surface = ng * dbgrid->getCellSize();
 
@@ -262,7 +262,7 @@ int CalcGlobal::_globalArithmetic()
 
   /* Calculating basic statistics */
 
-  int iatt = getDbin()->getUIDByLocator(ELoc::Z, _ivar0);
+  auto iatt = getDbin()->getUIDByLocator(ELoc::Z, _ivar0);
   double wtot;
   double ave;
   double var;

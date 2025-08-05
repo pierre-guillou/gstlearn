@@ -83,10 +83,10 @@ double MeshEStandard::getMeshSize(int imesh) const
 
 int MeshEStandard::resetFromTurbo(const MeshETurbo& turbo, bool verbose)
 {
-  int ndim     = turbo.getNDim();
-  int napices  = turbo.getNApices();
-  int nmeshes  = turbo.getNMeshes();
-  int npermesh = turbo.getNApexPerMesh();
+  auto ndim     = turbo.getNDim();
+  auto napices  = turbo.getNApices();
+  auto nmeshes  = turbo.getNMeshes();
+  auto npermesh = turbo.getNApexPerMesh();
 
   // Dimension the members
 
@@ -135,7 +135,7 @@ int MeshEStandard::reset(const MatrixDense& apices,
                          const MatrixInt& meshes,
                          bool verbose)
 {
-  int ndim = apices.getNCols();
+  auto ndim = apices.getNCols();
   _setNDim(ndim);
 
   // Core allocation
@@ -364,7 +364,7 @@ void MeshEStandard::_checkConsistency() const
   for (int imesh = 0; imesh < getNMeshes(); imesh++)
     for (int ic = 0; ic < getNApexPerMesh(); ic++)
     {
-      int apex = getApex(imesh, ic);
+      auto apex = getApex(imesh, ic);
       if (apex < 0 || apex >= getNApices())
       {
         my_throw("Mesh indices are not compatible with the Points");
@@ -431,13 +431,13 @@ void MeshEStandard::_validate()
   // If equal to , the mesh numbering must be modified in order to start from 0
   // This code is temporary and there to cope with different numberings
 
-  int nmeshes = getNMeshes();
-  int ncorner = getNApexPerMesh();
+  auto nmeshes  = getNMeshes();
+  auto ncorner  = getNApexPerMesh();
   int shift_min = 1000;
   for (int imesh = 0; imesh < nmeshes; imesh++)
     for (int ic = 0; ic < ncorner; ic++)
     {
-      int ipos = getApex(imesh, ic);
+      auto ipos = getApex(imesh, ic);
       if (ipos < shift_min) shift_min = ipos;
     }
 
@@ -456,7 +456,7 @@ void MeshEStandard::_defineBoundingBox(void)
 {
   VectorDouble extendmin, extendmax;
   double coor,mini,maxi;
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   // Initializations
   extendmin.resize(ndim);

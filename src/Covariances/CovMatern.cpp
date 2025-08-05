@@ -123,7 +123,7 @@ String CovMatern::getFormula() const
 
 double CovMatern::evaluateSpectrum(double freq) const
 {
-  int ndim     = getContext().getNDim();
+  auto ndim    = getContext().getNDim();
   double alpha = (double)ndim / 2. + getParam();
   return 1. / pow(1. + freq, alpha);
 }
@@ -133,7 +133,7 @@ void CovMatern::computeMarkovCoeffs(int ndim)
   double param  = getParam();
   double ndims2 = ((double)ndim) / 2.;
   double alpha  = param + ndims2;
-  int p         = getClosestInteger(alpha);
+  auto p        = getClosestInteger(alpha);
   int ndimp     = p + 1;
   _markovCoeffs.resize(ndimp);
   for (int i = 0; i < ndimp; i++)
@@ -167,14 +167,14 @@ double CovMatern::simulateTurningBand(double t0, TurningBandOperate& operTB) con
 
 MatrixDense CovMatern::simulateSpectralOmega(int nb) const
 {
-  int ndim     = getContext().getNDim();
+  auto ndim    = getContext().getNDim();
   double param = getParam();
   MatrixDense mat(nb, ndim);
 
   for (int irow = 0; irow < nb; irow++)
   {
     double scale = sqrt(param / law_gamma(param));
-    for (int icol = 0; icol < ndim; icol++)
+    for (size_t icol = 0; icol < ndim; icol++)
       mat.setValue(irow, icol, scale * law_gaussian());
   }
   return mat;
@@ -199,4 +199,4 @@ void bessel_set_old_style(bool style)
 {
   bessel_Old_Style = style;
 }
-}
+} // namespace gstlrn

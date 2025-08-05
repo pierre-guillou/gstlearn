@@ -2639,7 +2639,7 @@ MatrixDense fluid_extract(DbGrid* dbgrid,
 
     totnum += 1;
     totvol += volume;
-    int itime = st_getTimeInterval(date, ntime, time0, dtime);
+    auto itime = st_getTimeInterval(date, ntime, time0, dtime);
     if (itime < 0) continue;
     locnum += 1;
     locvol += volume;

@@ -241,7 +241,7 @@ double TurboOptimizer::_getCoor(int node, int idim0) const
 double TurboOptimizer::_getCoorByMesh(int imesh, int rank, int idim0) const
 {
   VectorInt indice(TO_ndim);
-  int node = _getVertex(imesh, rank);
+  auto node = _getVertex(imesh, rank);
   return _getCoor(node, idim0);
 }
 
@@ -404,8 +404,8 @@ VectorDouble TurboOptimizer::_buildS(const VectorDouble& TildeC) const
           for (int l = 0; l < TO_ndim; l++)
             value += W(k, irow) * H(k, l) * W(l, icol);
 
-        int ip1 = _getVertex(imesh, irow);
-        int ip2 = _getVertex(imesh, icol);
+        auto ip1 = _getVertex(imesh, irow);
+        auto ip2 = _getVertex(imesh, icol);
         ss[GETADR(nvertex_red, ip1, ip2)] += _getMeshSize() * value;
       }
   }
@@ -489,7 +489,7 @@ void TurboOptimizer::run(bool verbose)
 
 VectorDouble TurboOptimizer::_buildTildeC() const
 {
-  int nvertex = _getNVertices();
+  auto nvertex = _getNVertices();
   VectorDouble TildeC(nvertex, 0.);
 
   /* Loop on the meshes */
@@ -498,7 +498,7 @@ VectorDouble TurboOptimizer::_buildTildeC() const
   {
     for (int icorn = 0; icorn < TO_ncorner; icorn++)
     {
-      int jp = _getVertex(imesh, icorn);
+      auto jp = _getVertex(imesh, icorn);
       TildeC[jp] += _getMeshSize();
     }
   }
@@ -513,7 +513,7 @@ VectorDouble TurboOptimizer::_buildTildeC() const
 
 VectorDouble TurboOptimizer::_buildLambda(const VectorDouble& TildeC) const
 {
-  int nvertex = _getNVertices();
+  auto nvertex = _getNVertices();
   VectorDouble Lambda(nvertex, 0);
   double value = _scale * _scale;
   for (int ip = 0; ip < _getNVertices(); ip++)
@@ -562,7 +562,7 @@ VectorDouble TurboOptimizer::_buildQ(const VectorDouble& ss,
                                      const VectorDouble& blin,
                                      const VectorDouble& lambda) const
 {
-  int nvertex = _getNVertices();
+  auto nvertex = _getNVertices();
   int nblin   = static_cast<int>(blin.size());
   VectorDouble qq(nvertex * nvertex, 0.);
   VectorDouble bi(nvertex * nvertex, 0.);
@@ -680,7 +680,7 @@ void TurboOptimizer::_getRankInTemplate(VectorInt& indice1,
 
 VectorDouble TurboOptimizer::_getVectorFromTemplate(const VectorDouble& vecin) const
 {
-  int nvertex = _getNVertices();
+  auto nvertex = _getNVertices();
   VectorDouble vecout(nvertex, 0.);
   if (!_isCalculated)
     my_throw("You must use the method 'run' beforehand");

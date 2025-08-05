@@ -154,13 +154,13 @@ double MeshETurbo::getMeshSize(int /*imesh*/) const
 int MeshETurbo::getApex(int imesh, int rank) const
 {
   int node, icas;
-  int ndim = getNDim();
+  auto ndim = getNDim();
   _indg.resize(ndim);
 
   int jmesh = _meshIndirect.getRToA(imesh);
   _getGridFromMesh(jmesh, &node, &icas);
   _grid.rankToIndice(node, _indg);
-  int ipol = _getPolarized(_indg);
+  auto ipol = _getPolarized(_indg);
 
   for (int idim = 0; idim < ndim; idim++)
     _indg[idim] += MSS(ndim, ipol, icas, rank, idim);
@@ -180,7 +180,7 @@ double MeshETurbo::getCoor(int imesh, int rank, int idim) const
 {
   _indg.resize(getNDim());
 
-  int irel = getApex(imesh, rank);
+  auto irel = getApex(imesh, rank);
   int iabs = _gridIndirect.getRToA(irel);
   _grid.rankToIndice(iabs, _indg);
   return _grid.indiceToCoordinate(idim, _indg);
@@ -190,7 +190,7 @@ void MeshETurbo::getCoordinatesPerMeshInPlace(int imesh, int rank, VectorDouble&
 {
   _indg.resize(getNDim());
 
-  int irel = getApex(imesh, rank);
+  auto irel = getApex(imesh, rank);
   int iabs = _gridIndirect.getRToA(irel);
   _grid.rankToCoordinatesInPlace(iabs, coords);
 }
@@ -267,7 +267,7 @@ int MeshETurbo::_initFromGridInternal(const VectorDouble& sel,
                                       bool flag_polarized,
                                       bool verbose)
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   // Get grid extension
   // TODO: the grid extension should be calculated in Grid and take
@@ -312,9 +312,9 @@ void MeshETurbo::_buildMaskInMeshing(const VectorDouble& sel)
   // Creating the Masking information for Meshing 'meshActiveToAbsolute'
   // which gives the Absolute meshing index from its Active index
 
-  int ndim    = getNDim();
+  auto ndim    = getNDim();
   int nmesh   = _nmeshInCompleteGrid();
-  int ncorner = getNApexPerMesh();
+  auto ncorner = getNApexPerMesh();
   VectorInt indg0(ndim);
   _indg.resize(ndim);
 
@@ -324,7 +324,7 @@ void MeshETurbo::_buildMaskInMeshing(const VectorDouble& sel)
   {
     _getGridFromMesh(imesh, &node, &icas);
     _grid.rankToIndice(node, indg0);
-    int ipol = _getPolarized(indg0);
+    auto ipol = _getPolarized(indg0);
 
     // Loop on the corners of the mesh (polarization is taken into account)
     bool flagMasked = false;
@@ -357,7 +357,7 @@ void MeshETurbo::_buildMaskInMeshing(const VectorDouble& sel)
     int jmesh = _meshIndirect.getRToA(imesh);
     _getGridFromMesh(jmesh, &node, &icas);
     _grid.rankToIndice(node, indg0);
-    int ipol = _getPolarized(indg0);
+    auto ipol = _getPolarized(indg0);
     for (int icorner = 0; icorner < ncorner; icorner++)
     {
       for (int idim = 0; idim < ndim; idim++)
@@ -482,7 +482,7 @@ bool MeshETurbo::_addElementToTriplet(NF_Triplet& NF_T,
                                       const VectorInt& indg0,
                                       bool verbose) const
 {
-  int ncorner = getNApexPerMesh();
+  auto ncorner = getNApexPerMesh();
   _indices.resize(ncorner);
   _lambdas.resize(ncorner);
 
@@ -511,14 +511,14 @@ int MeshETurbo::getMeshFromCoordinates(const VectorDouble& coor,
                                        VectorInt& indices,
                                        VectorDouble& lambdas) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   VectorInt indg0(ndim);
   if (_grid.coordinateToIndicesInPlace(coor, indg0) != 0)
   {
     messerr("The target coordinate does not belong to the Meshing");
     return -1;
   }
-  int ncorner = getNApexPerMesh();
+  auto ncorner = getNApexPerMesh();
   indices.resize(ncorner);
   lambdas.resize(ncorner);
 
@@ -556,7 +556,7 @@ void MeshETurbo::resetProjFromDb(ProjMatrix* m,
                                  int rankZ,
                                  bool verbose) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   VectorInt indg0(ndim);
   VectorDouble coor(ndim);
   _grid.initThread();
@@ -715,7 +715,7 @@ int MeshETurbo::_defineGrid(const VectorDouble& cellsize)
 
 void MeshETurbo::_setNElementPerCell()
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   if (ndim == 1)
     _nPerCell = 1;
@@ -746,9 +746,9 @@ int MeshETurbo::_addWeights(int icas,
                             const vect lambda,
                             bool verbose) const
 {
-  int ndim    = getNDim();
-  int ncorner = getNApexPerMesh();
-  int ipol    = _getPolarized(indg0);
+  auto ndim    = getNDim();
+  auto ncorner = getNApexPerMesh();
+  auto ipol    = _getPolarized(indg0);
   MatrixSquare lhs;
   _rhs.resize(ncorner);
   _indgg.resize(ndim);
@@ -806,7 +806,7 @@ int MeshETurbo::_addWeights(int icas,
 
 int MeshETurbo::_getPolarized(const constvectint indg) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   if (!_isPolarized) return (0);
 
   // Polarization has only been coded for the 2-D case
@@ -842,7 +842,7 @@ int MeshETurbo::initFromCova(const CovAniso& cova,
                              bool verbose)
 {
   // Initializations
-  int ndim = cova.getNDim();
+  auto ndim = cova.getNDim();
   int nval = (int)pow(2., ndim);
 
   // Get the rotation linked to the covariance

@@ -215,7 +215,7 @@ int Selectivity::calculateFromArray(const VectorDouble& tab,
 
   // Allocate the returned structure
 
-  int ncut = getNCuts();
+  auto ncut = getNCuts();
 
   // Define the cutoffs (optional)
 
@@ -344,7 +344,7 @@ Selectivity* Selectivity::createInterpolation(const VectorDouble& zcuts,
 {
   double tval, qval;
 
-  int nclass = selecin.getNCuts();
+  auto nclass = selecin.getNCuts();
   int ncuts  = (int)zcuts.size();
 
   auto* selectivity = new Selectivity(ncuts);
@@ -502,7 +502,7 @@ void Selectivity::defineRecoveries(const std::vector<ESelectivity>& codes,
   {
     const ESelectivity& code = codes[icode];
 
-    int key = code.getValue();
+    auto key = code.getValue();
     switch (code.toEnum())
     {
       case ESelectivity::E_UNKNOWN:
@@ -593,7 +593,7 @@ void Selectivity::defineRecoveries(const std::vector<ESelectivity>& codes,
 
   /* Count the total number of variables */
 
-  int ntotal = getNVar();
+  auto ntotal = getNVar();
   if (ntotal <= 0)
   {
     messerr("The number of variables calculated is zero");
@@ -798,7 +798,7 @@ bool Selectivity::isUsed(const ESelectivity& code) const
 {
   if (code == ESelectivity::UNKNOWN) return false;
   if (!_isRecoveryDefined()) return false;
-  int key = code.getValue();
+  auto key = code.getValue();
   if (_numberQT.getValue(key, 0) > 0) return true;
   if (_numberQT.getValue(key, 1) > 0) return true;
   return false;
@@ -808,14 +808,14 @@ bool Selectivity::isUsedEst(const ESelectivity& code) const
 {
   if (code == ESelectivity::UNKNOWN) return false;
   if (!_isRecoveryDefined()) return false;
-  int key = code.getValue();
+  auto key = code.getValue();
   return (_numberQT.getValue(key, 0) > 0);
 }
 
 bool Selectivity::isUsedStD(const ESelectivity& code) const
 {
   if (code == ESelectivity::UNKNOWN) return false;
-  int key = code.getValue();
+  auto key = code.getValue();
   return (_numberQT.getValue(key, 1) > 0);
 }
 
@@ -839,7 +839,7 @@ bool Selectivity::isNeededQ() const
 int Selectivity::getAddressQTEst(const ESelectivity& code, int iptr0, int rank) const
 {
   if (code == ESelectivity::UNKNOWN) return -1;
-  int key = code.getValue();
+  auto key = code.getValue();
   if (rank < 0 || rank >= _numberQT.getValue(key, 0)) return -1;
   return (iptr0 + _rankQT.getValue(key, 0) + rank);
 }
@@ -848,7 +848,7 @@ int Selectivity::getAddressQTStd(const ESelectivity& code, int iptr0, int rank) 
 {
   if (code == ESelectivity::UNKNOWN) return -1;
   if (!_isRecoveryDefined()) return -1;
-  int key = code.getValue();
+  auto key = code.getValue();
   if (rank < 0 || rank >= _numberQT.getValue(key, 1)) return -1;
   return (iptr0 + _rankQT.getValue(key, 1) + rank);
 }
@@ -863,7 +863,7 @@ void Selectivity::calculateBenefitAndGrade()
 {
   int iclass;
   double zval, tval, qval;
-  int nclass = getNCuts();
+  auto nclass = getNCuts();
 
   for (iclass = 0; iclass < nclass; iclass++)
   {
@@ -882,7 +882,7 @@ void Selectivity::calculateBenefitAndGrade()
  *****************************************************************************/
 void Selectivity::dumpGini() const
 {
-  int nclass = getNCuts();
+  auto nclass = getNCuts();
 
   double gini = 1.;
   for (int iclass = 0; iclass < nclass - 1; iclass++)
@@ -900,7 +900,7 @@ void Selectivity::dumpGini() const
 void Selectivity::correctTonnageOrder()
 {
   if (!isFlagTonnageCorrect()) return;
-  int nclass = getNCuts();
+  auto nclass = getNCuts();
   VectorDouble ta(nclass);
   VectorDouble tb(nclass);
 
@@ -991,7 +991,7 @@ void Selectivity::storeInDb(Db* db,
                             double zestim,
                             double zstdev) const
 {
-  int ncut = getNCuts();
+  auto ncut = getNCuts();
 
   /* Store the recovered grade */
 
@@ -1054,7 +1054,7 @@ void Selectivity::interpolateSelectivity(const Selectivity* selecin)
 
   double z_max = getZmax();
   int nclass   = selecin->getNCuts();
-  int ncutmine = getNCuts();
+  auto ncutmine = getNCuts();
   VectorDouble zz(nclass + 2);
   VectorDouble TT(nclass + 2);
   VectorDouble QQ(nclass + 2);
@@ -1119,7 +1119,7 @@ VectorString Selectivity::_getAllNames()
 String Selectivity::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
-  int ncut = getNCuts();
+  auto ncut = getNCuts();
   if (ncut <= 0) return sstr.str();
   sstr << toTitle(0, "Selectivity Curves");
   sstr << _stats.toString();
@@ -1150,7 +1150,7 @@ void Selectivity::_defineAutomaticCutoffs(const VectorDouble& tab, double eps)
 {
   double zmin = VH::minimum(tab);
   double zmax = VH::maximum(tab) + eps;
-  int ncuts   = getNCuts();
+  auto ncuts  = getNCuts();
 
   if (ncuts <= 1)
   {

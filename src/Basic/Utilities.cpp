@@ -29,7 +29,7 @@ static EDbg _debugOptions = EDbg::DB;
 
 bool isInteger(double value, double eps)
 {
-  int iclose = getClosestInteger(value);
+  auto iclose = getClosestInteger(value);
   return (ABS((double)iclose - value) <= eps);
 }
 

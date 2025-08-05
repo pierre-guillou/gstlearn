@@ -2167,7 +2167,7 @@ VectorVectorInt hscatterPairs(Db* db,
 
       /* Get the rank of the lag */
 
-      int ipasloc = dirparam.getLagRank(dist);
+      auto ipasloc = dirparam.getLagRank(dist);
       if (IFFFF(ipasloc)) continue;
       if (ilag != ipasloc) continue;
 

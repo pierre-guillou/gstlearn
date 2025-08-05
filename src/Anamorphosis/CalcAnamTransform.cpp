@@ -132,7 +132,7 @@ bool CalcAnamTransform::_hasSelectivity() const
 
 bool CalcAnamTransform::_hasVariableNumber(bool equal1) const
 {
-  int number = getDb()->getNLoc(ELoc::Z);
+  auto number = getDb()->getNLoc(ELoc::Z);
   if (!equal1)
   {
     if (number <= 0)
@@ -175,7 +175,7 @@ bool CalcAnamTransform::_check()
   {
     if (!_hasVariableNumber(true)) return false;
     int nmax  = _anam->getNFactor();
-    int nfact = _getNfact();
+    auto nfact = _getNfact();
     for (int ifac = 0; ifac < nfact; ifac++)
       if (_ifacs[ifac] < 1 || _ifacs[ifac] > nmax)
       {
@@ -225,21 +225,21 @@ bool CalcAnamTransform::_preprocess()
 
   if (_flagVars)
   {
-    int nvar = _getNVar();
+    auto nvar = _getNVar();
     _iattVar = getDb()->addColumnsByConstant(nvar);
     return (_iattVar >= 0);
   }
 
   if (_flagToFactors)
   {
-    int nfact = _getNfact();
+    auto nfact = _getNfact();
     _iattFac  = getDb()->addColumnsByConstant(nfact);
     return (_iattFac >= 0);
   }
 
   if (_flagDisjKrig)
   {
-    int nvarout = _getNSel();
+    auto nvarout = _getNSel();
     _iattSel    = getDb()->addColumnsByConstant(nvarout, TEST);
     if (_iattSel < 0) return 1;
     return true;
@@ -247,7 +247,7 @@ bool CalcAnamTransform::_preprocess()
 
   if (_flagCondExp)
   {
-    int nvarout = _getNSel();
+    auto nvarout = _getNSel();
     _iattSel    = getDb()->addColumnsByConstant(nvarout, TEST);
     if (_iattSel < 0) return 1;
     return true;
@@ -255,7 +255,7 @@ bool CalcAnamTransform::_preprocess()
 
   if (_flagUniCond)
   {
-    int nvarout = _getNSel();
+    auto nvarout = _getNSel();
     _iattSel    = getDb()->addColumnsByConstant(nvarout, TEST);
     if (_iattSel < 0) return 1;
     return true;
@@ -271,21 +271,21 @@ bool CalcAnamTransform::_postprocess()
 
   if (_flagVars)
   {
-    int nvar = _getNVar();
+    auto nvar = _getNVar();
     _renameVariable(nvar, _iattVar, ELoc::Z, String(), 1);
     return true;
   }
 
   if (_flagToFactors)
   {
-    int nfact = _getNfact();
+    auto nfact = _getNfact();
     _renameVariable(1, _iattFac, ELoc::Z, String(), nfact);
     return true;
   }
 
   if (_flagDisjKrig)
   {
-    int nsel = _getNSel();
+    auto nsel = _getNSel();
     for (int i = 0; i < nsel; i++)
       _renameVariable(1, _iattSel + i, ELoc::UNKNOWN, _selectivity->getVariableName(i), 1);
     return true;
@@ -293,7 +293,7 @@ bool CalcAnamTransform::_postprocess()
 
   if (_flagCondExp)
   {
-    int nsel = _getNSel();
+    auto nsel = _getNSel();
     for (int i = 0; i < nsel; i++)
       _renameVariable(1, _iattSel + i, ELoc::Z, _selectivity->getVariableName(i), 1);
     return true;
@@ -301,7 +301,7 @@ bool CalcAnamTransform::_postprocess()
 
   if (_flagUniCond)
   {
-    int nsel = _getNSel();
+    auto nsel = _getNSel();
     for (int i = 0; i < nsel; i++)
       _renameVariable(1, _iattSel + i, ELoc::Z, _selectivity->getVariableName(i), 1);
     return true;
@@ -373,8 +373,8 @@ bool CalcAnamTransform::_run()
 
 bool CalcAnamTransform::_ZToYByNormalScore()
 {
-  int nech = getDb()->getNSample();
-  int nvar = _getNVar();
+  auto nech = getDb()->getNSample();
+  auto nvar = _getNVar();
 
   // Reading the optional weight
 
@@ -398,7 +398,7 @@ bool CalcAnamTransform::_ZToYByNormalScore()
 
 bool CalcAnamTransform::_ZToYByHermite()
 {
-  int nvar                    = _getNVar();
+  auto nvar                   = _getNVar();
   const AnamContinuous* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
 
   for (int ivar = 0; ivar < nvar; ivar++)
@@ -413,7 +413,7 @@ bool CalcAnamTransform::_ZToYByHermite()
 
 bool CalcAnamTransform::_YToZByHermite()
 {
-  int nvar                    = _getNVar();
+  auto nvar                   = _getNVar();
   const AnamContinuous* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
 
   for (int ivar = 0; ivar < nvar; ivar++)
@@ -428,7 +428,7 @@ bool CalcAnamTransform::_YToZByHermite()
 
 bool CalcAnamTransform::_ZToFactors()
 {
-  int nfact = _getNfact();
+  auto nfact = _getNfact();
 
   for (int iech = 0; iech < getDb()->getNSample(); iech++)
   {

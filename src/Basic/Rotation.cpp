@@ -256,7 +256,7 @@ bool Rotation::isMatrixRotation(const MatrixSquare& rotmat, bool verbose)
 
   /* Check product of matrix by its transpose and compare to unity matrix */
 
-  int neq = rotmat.getNRows();
+  auto neq = rotmat.getNRows();
   for (int i = 0; i < neq; i++)
     for (int j = 0; j < neq; j++)
     {

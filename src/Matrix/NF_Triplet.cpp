@@ -112,7 +112,7 @@ double NF_Triplet::getValue(int i) const
 
 VectorDouble NF_Triplet::getValues() const
 {
-  int n = getNElements();
+  auto n = getNElements();
   VectorDouble vec(n);
   for (int i = 0; i < n; i++)
     vec[i] = _eigenT[i].value();
@@ -121,7 +121,7 @@ VectorDouble NF_Triplet::getValues() const
 
 VectorInt NF_Triplet::getRows(bool flag_from_1) const
 {
-  int n     = getNElements();
+  auto n    = getNElements();
   int shift = (flag_from_1) ? 1 : 0;
   VectorInt vec(n);
   for (int i = 0; i < n; i++)
@@ -131,7 +131,7 @@ VectorInt NF_Triplet::getRows(bool flag_from_1) const
 
 VectorInt NF_Triplet::getCols(bool flag_from_1) const
 {
-  int n     = getNElements();
+  auto n    = getNElements();
   int shift = (flag_from_1) ? 1 : 0;
   VectorInt vec(n);
   for (int i = 0; i < n; i++)
@@ -150,8 +150,8 @@ void NF_Triplet::appendInPlace(const NF_Triplet& T2)
   // Update the maxima for rows and columns
   for (int i = 0, n = T2.getNElements(); i < n; i++)
   {
-    int irow = T2.getRow(i);
-    int icol = T2.getCol(i);
+    auto irow = T2.getRow(i);
+    auto icol = T2.getCol(i);
     if (irow > _nrowmax) _nrowmax = irow;
     if (icol > _ncolmax) _ncolmax = icol;
   }

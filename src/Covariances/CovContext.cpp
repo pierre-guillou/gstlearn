@@ -139,7 +139,7 @@ bool CovContext::isEqual(const CovContext& r) const
 
 double CovContext::getCovar0(int ivar, int jvar) const
 {
-  int rank = _getIndex(ivar, jvar);
+  auto rank = _getIndex(ivar, jvar);
   if (rank < 0 || rank >= (int)_covar0.size())
     my_throw("Invalid argument in _setCovar0");
   return _covar0[rank];
@@ -157,7 +157,7 @@ void CovContext::setCovar0s(const VectorDouble& covar0)
 
 void CovContext::setCovar0(int ivar, int jvar, double covar0)
 {
-  int rank = _getIndex(ivar, jvar);
+  auto rank = _getIndex(ivar, jvar);
   if (rank < 0 || rank >= (int)_covar0.size())
     my_throw("Invalid argument in _setCovar0");
   _covar0[rank] = covar0;
@@ -203,7 +203,7 @@ const CovContext* CovContext::createReduce(const VectorInt& validVars) const
 {
   int ecr, lec;
   int nvar = (int)validVars.size();
-  int ndim = getNDim();
+  auto ndim = getNDim();
   VectorBool valids(_nVar, false);
   for (int ivar = 0; ivar < nvar; ivar++) valids[validVars[ivar]] = true;
 

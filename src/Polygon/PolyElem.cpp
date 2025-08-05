@@ -84,7 +84,7 @@ void PolyElem::getExtension(double *xmin,
 
 double PolyElem::getSurface() const
 {
-  int np = getNPoints();
+  auto np        = getNPoints();
   double x0 = getX(0);
   double y0 = getY(0);
   double surface = 0.;
@@ -148,7 +148,7 @@ PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
 
 bool PolyElem::_isClosed() const
 {
-  int nvert = getNPoints();
+  auto nvert = getNPoints();
   return (ABS(getX(0) - getX(nvert - 1)) <= EPSILON5 &&
           ABS(getY(0) - getY(nvert - 1)) <= EPSILON5);
 }
@@ -175,7 +175,7 @@ bool PolyElem::inside(const VectorDouble& coor)
   double dx, dy, xj0, xj1, yj0, yj1, xinter;
 
   int inter = 0;
-  int np = getNPoints();
+  auto np   = getNPoints();
   double xx = coor[0];
   double yy = coor[1];
 
@@ -261,7 +261,7 @@ bool PolyElem::inside3D(double zz) const
 
 PolyElem PolyElem::reduceComplexity(double distmin) const
 {
-  int np = getNPoints();
+  auto np      = getNPoints();
   double dmin2 = distmin * distmin;
   PolyElem newpolyelem;
 

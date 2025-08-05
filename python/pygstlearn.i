@@ -380,8 +380,8 @@
       messerr("Could not extract shape from sparse matrix");
       return SWIG_TypeError;
     }
-    int nrows = PyLong_AsLong(PyTuple_GetItem(shape, 0));
-    int ncols = PyLong_AsLong(PyTuple_GetItem(shape, 1));
+    auto nrows = PyLong_AsLong(PyTuple_GetItem(shape, 0));
+    auto ncols = PyLong_AsLong(PyTuple_GetItem(shape, 1));
     
     // Reading the storage format
     PyObject* format_obj = PyObject_GetAttrString(obj, "format");
@@ -706,8 +706,8 @@ namespace gstlrn
       return SWIG_OK;
     
     // Conversion to a 2D numpy array
-    int nrows = mat.getNRows();
-    int ncols = mat.getNCols();
+    auto nrows = mat.getNRows();
+    auto ncols = mat.getNCols();
 
     NF_Triplet NFT = mat.getMatrixToTriplet();
     const npy_intp nnz = NFT.getNElements();

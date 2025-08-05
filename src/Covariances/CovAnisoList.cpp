@@ -568,7 +568,7 @@ void CovAnisoList::appendParams(ListParams& listParams,
 
   // Find the first structure with a rotation
   bool found = false;
-  int ncov   = getNCov();
+  auto ncov  = getNCov();
   std::vector<ParamInfo>* paramscur;
   std::vector<ParamInfo>* paramsref;
   std::vector<size_t> anglesrefLoc;

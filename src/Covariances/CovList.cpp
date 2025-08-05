@@ -123,7 +123,7 @@ void CovList::addCov(const CovBase& cov)
 
 void CovList::_updateLists()
 {
-  int ncov          = getNCov();
+  auto ncov         = getNCov();
   _allActiveCovList = VH::sequence(ncov);
 
   _activeCovList.clear();
@@ -412,7 +412,7 @@ double CovList::getTotalSill(int ivar, int jvar) const
 
 MatrixSymmetric CovList::getTotalSills() const
 {
-  int nvar = getNVar();
+  auto nvar = getNVar();
   MatrixSymmetric mat(nvar);
   for (int ivar = 0; ivar < nvar; ivar++)
     for (int jvar = 0; jvar <= ivar; jvar++)
@@ -537,14 +537,14 @@ void CovList::appendParams(ListParams& listParams,
 
 void CovList::initParams(const MatrixSymmetric& vars, double href)
 {
-  int ncov                         = getNCov();
+  auto ncov                        = getNCov();
   MatrixSymmetric varsPerStructure = vars;
   LowerTriangularRange itRange(getNVar());
   for (const auto& [ivar, jvar]: itRange)
     varsPerStructure.setValue(ivar, jvar, vars.getValue(ivar, jvar) / ncov);
 
   int jcov      = 0;
-  int ntotal    = getNCovNuggetExcluded();
+  auto ntotal   = getNCovNuggetExcluded();
   double hlocal = href / ntotal / 2;
   for (int icov = 0, ncov = getNCov(); icov < ncov; icov++)
   {

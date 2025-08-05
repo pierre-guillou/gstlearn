@@ -73,7 +73,7 @@ String PolyLine2D::toString(const AStringFormat* strfmt) const
   std::stringstream sstr;
   AStringFormat sf;
   if (strfmt != nullptr) sf = *strfmt;
-  int npoints = getNPoints();
+  auto npoints = getNPoints();
 
   sstr << "Number of Vertices = " << npoints << std::endl;
 
@@ -170,7 +170,7 @@ void PolyLine2D::init(const VectorDouble& x, const VectorDouble& y)
 
 void PolyLine2D::addPoint(double x, double y)
 {
-  int n = getNPoints();
+  auto n = getNPoints();
   _x.resize(n+1);
   _y.resize(n+1);
   _x[n] = x;
@@ -200,7 +200,7 @@ PolyPoint2D PolyLine2D::getPLIndex(const VectorDouble &xy0) const
 
   double xx, yy, dist;
   int nint;
-  int nvert = getNPoints();
+  auto nvert = getNPoints();
 
   // Structure allocation
 
@@ -381,7 +381,7 @@ void PolyLine2D::_getInterval(const PolyPoint2D &pldist,
                               int *rfrom,
                               int *rto) const
 {
-  int npoint = getNPoints();
+  auto npoint = getNPoints();
   int rank = pldist.rank;
   if (rank == npoint - 1) rank--;
   *rfrom = MAX(0, rank - nb_neigh);
@@ -453,7 +453,7 @@ int dbUnfoldPolyline(Db *db,
 
   /* Initializations */
 
-  int nvert = polyline.getNPoints();
+  auto nvert = polyline.getNPoints();
 
   /* Preliminary checks */
 
@@ -520,7 +520,7 @@ int dbFoldPolyline(DbGrid *dbin,
 
   /* Initializations */
 
-  int nvert = polyline.getNPoints();
+  auto nvert = polyline.getNPoints();
 
   /* Preliminary checks */
 

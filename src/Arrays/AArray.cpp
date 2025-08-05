@@ -63,7 +63,7 @@ String AArray::toString(const AStringFormat* /*strfmt*/) const
 int AArray::indiceToRank(const VectorInt& indice) const
 {
   if (! _isValidIndice(indice)) return ITEST;
-  int ndim = getNDim();
+  auto ndim = getNDim();
   int ival = indice[ndim-1];
   if (ival < 0 || ival >= _ndims[ndim-1])
     return(-1);
@@ -78,7 +78,7 @@ int AArray::indiceToRank(const VectorInt& indice) const
 
 void AArray::rankToIndice(int rank, VectorInt& indices) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   if ((int)indices.size() != ndim)
   {
     messerr("Argument indices should have the correct size. Output argument 'indices' not modified");
@@ -98,7 +98,7 @@ void AArray::rankToIndice(int rank, VectorInt& indices) const
 
 VectorInt AArray::rankToIndice(int rank) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   VectorInt indices(ndim);
   rankToIndice(rank,indices);
   return indices;
@@ -120,7 +120,7 @@ VectorInt AArray::getNDimsExt(int ndimMax) const
 
 bool AArray::_isValidIndice(const VectorInt& indice) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   if ((int) indice.size() != ndim)
   {
     messerr("Argument 'indice' does not have the correct dimension (%d)",(int) indice.size());

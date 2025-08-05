@@ -116,7 +116,7 @@ namespace gstlrn
 
   VectorDouble DbLine::getLineLengths() const
   {
-    int nline = getNLine();
+    auto nline = getNLine();
     VectorDouble lengths(nline);
     for (int iline = 0; iline < nline; iline++)
       lengths[iline] = getLineLength(iline);
@@ -218,7 +218,7 @@ namespace gstlrn
   int DbLine::_lineLinkageById(const VectorInt& linesId,
                                const VectorInt& ranksPerId)
   {
-    int nech = getNSample();
+    auto nech = getNSample();
 
     // Preliminary checks by dimensions
     if ((int)linesId.size() != nech)
@@ -488,7 +488,7 @@ namespace gstlrn
   bool DbLine::isConsistent() const
   {
     // Check on the count of addresses
-    int nech = getNSample();
+    auto nech = getNSample();
     if (nech != getNTotal())
     {
       messerr("The number of samples contained in the Db (%d)",
@@ -510,7 +510,7 @@ namespace gstlrn
           messerr("Sample %d is reached twice:", iadd);
           messerr("- Line %d:", iline);
           VH::dump("Adds_1", _lineAdds[iline]);
-          int jline = getLineBySample(iadd);
+          auto jline = getLineBySample(iadd);
           messerr("- Line %d:", jline);
           VH::dump("Adds_1", _lineAdds[jline]);
           return false;
@@ -538,7 +538,7 @@ namespace gstlrn
 
   VectorDouble DbLine::_getHeaderCoordinate(int idim) const
   {
-    int nbline = getNLine();
+    auto nbline = getNLine();
     VectorDouble vec(nbline);
     for (int iline = 0; iline < nbline; iline++)
     {
@@ -553,7 +553,7 @@ namespace gstlrn
     VectorDouble vec;
     if (!_isLineNumberValid(iline)) return vec;
 
-    int number = getNSamplePerLine(iline);
+    auto number = getNSamplePerLine(iline);
     vec.resize(number);
     for (int i = 0; i < number; i++)
       vec[i] = getCoordinate(_lineAdds[iline][i], idim);
@@ -583,7 +583,7 @@ namespace gstlrn
     }
 
     // Add the line length as variable
-    int nbline = getNLine();
+    auto nbline = getNLine();
     VectorDouble tab(nbline);
     for (int iline = 0; iline < nbline; iline++)
       tab[iline] = getNSamplePerLine(iline);
@@ -608,7 +608,7 @@ namespace gstlrn
               iline, getNLine());
       return -1;
     }
-    int nsample = getNSamplePerLine(iline);
+    auto nsample = getNSamplePerLine(iline);
     if (isample < 0 || isample >= nsample)
     {
       messerr(
@@ -626,7 +626,7 @@ namespace gstlrn
                                          int byZ)
   {
     // Preliminary checks
-    int ndim = grid.getNDim();
+    auto ndim = grid.getNDim();
     if (ndim != 3)
     {
       messerr("This method is coded to extract wells from a 3-D Grid only");
@@ -639,7 +639,7 @@ namespace gstlrn
     }
     int nvar    = (int)names.size();
     int nwells  = (int)xranks.size();
-    int nz      = grid.getNX(2);
+    auto nz     = grid.getNX(2);
     int nbywell = nz / byZ;
     int nsample = nwells * nbywell;
     VectorDouble tab(nsample * (3 + nvar));
@@ -693,7 +693,7 @@ namespace gstlrn
                                         const VectorDouble& cuts)
   {
     // Preliminary checks
-    int ndim = grid.getNDim();
+    auto ndim = grid.getNDim();
     if (ndim != 3)
     {
       messerr("This method is coded to extract wells from a 3-D Grid only");
@@ -706,7 +706,7 @@ namespace gstlrn
     }
     int ncuts  = (int)cuts.size();
     int nwells = (int)xranks.size();
-    int nz     = grid.getNX(2);
+    auto nz    = grid.getNX(2);
     VectorDouble tab;
     VectorInt lineCounts(nwells);
     VectorDouble coor(3);

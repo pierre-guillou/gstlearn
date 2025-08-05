@@ -50,7 +50,7 @@ void Array::init(const VectorInt& ndims)
 
 void Array::_update()
 {
-  int total = getNPixels();
+  auto total = getNPixels();
   _values.resize(total,0.);
 }
 

@@ -263,7 +263,7 @@ int RankHandler::identifyVariableRank(int ipos) const
   int ntotal = 0;
   for (int ivar = 0; ivar < _nvar; ivar++)
   {
-    int size = getCount(ivar);
+    auto size = getCount(ivar);
     if (ipos < ntotal + size)
       return ivar; // Found the variable
     ntotal += size;
@@ -276,7 +276,7 @@ int RankHandler::identifySampleRank(int ipos) const
   int ntotal = 0;
   for (int ivar = 0; ivar < _nvar; ivar++)
   {
-    int size = getCount(ivar);
+    auto size = getCount(ivar);
     if (ipos < ntotal + size)
     {
       int jpos = ipos - ntotal;
@@ -304,7 +304,7 @@ void RankHandler::dump(bool flagFull) const
   for (int ivar = 0, lec = 0; ivar < _nvar; ivar++)
   {
     message("Variable= %d: \n", ivar);
-    int size = getCount(ivar);
+    auto size = getCount(ivar);
     for (int i = 0; i < size; i++, lec++)
       message("- Sample= %2d : Variable value= %lf\n", _index[ivar][i], (*_Zflatten)[lec]);
     message("\n");

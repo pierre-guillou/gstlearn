@@ -97,9 +97,9 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
 
   Db* db       = getDb();
   Model* model = getModels(0);
-  int nact     = _getSampleRankNumber();
+  auto nact    = _getSampleRankNumber();
   int ndim     = model->getNDim();
-  int icase    = getRank(ipgs, 0);
+  auto icase   = getRank(ipgs, 0);
 
   double eps = getEps();
   double r   = getRval();
@@ -119,7 +119,7 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
 
   for (int iact = 0; iact < nact; iact++)
   {
-    int iech = getSampleRank(iact);
+    auto iech = getSampleRank(iact);
 
     /* Covariance vector between the current datum and the other samples */
 
@@ -144,7 +144,7 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
     for (int jact = 0; jact < nact; jact++)
     {
       if (iter > 0 && !img[nact * iact + jact]) continue;
-      int jech = getSampleRank(jact);
+      auto jech = getSampleRank(jact);
 
       double sigloc;
       for (int idim = 0; idim < ndim; idim++)

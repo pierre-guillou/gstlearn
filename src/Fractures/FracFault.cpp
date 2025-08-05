@@ -99,7 +99,7 @@ void FracFault::addFaultPerFamily(double thetal,
                                   double rangel,
                                   double ranger)
 {
-  int nfam = getNFamilies();
+  auto nfam = getNFamilies();
   _thetal.resize(nfam + 1);
   _thetar.resize(nfam + 1);
   _rangel.resize(nfam + 1);
@@ -114,7 +114,7 @@ void FracFault::addFaultPerFamily(double thetal,
 bool FracFault::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   bool ret = true;
-  int nfam = getNFamilies();
+  auto nfam = getNFamilies();
   ret      = ret && _recordRead<double>(is, "Abscissa of the first Fault point", _coord);
   ret      = ret && _recordRead<double>(is, "Fault orientation", _orient);
   ret      = ret && _recordRead<int>(is, "Number of Families", nfam);

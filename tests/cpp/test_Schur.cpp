@@ -37,7 +37,7 @@ static Db* _dataComplement(Db* data, Db* target, const VectorDouble& valuesTarge
   DbStringFormat* dbfmt =
     DbStringFormat::createFromFlags(false, false, false, false, true);
 
-  int iech = datap->addSamples(1);
+  auto iech = datap->addSamples(1);
   datap->setSampleCoordinates(iech, target->getSampleCoordinates(0));
   datap->setLocVariables(ELoc::Z, iech, valuesTarget);
   datap->display(dbfmt);
@@ -157,7 +157,7 @@ static void _secondTest(Db* data, Db* target, ModelGeneric* model, const VectorD
 {
   auto* modelc = dynamic_cast<Model*>(model);
   // Local parameters
-  int nvar            = modelc->getNVar();
+  auto nvar           = modelc->getNVar();
   VectorInt varColCok = {0, -1, 2}; // Ranks of collcated variables (dim = nvar)
   bool debugSchur     = false;
   if (nvar <= 1)
@@ -176,7 +176,7 @@ static void _secondTest(Db* data, Db* target, ModelGeneric* model, const VectorD
   VectorDouble valuesTarget(nvar, TEST);
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int jvar = varColCok[ivar];
+    auto jvar = varColCok[ivar];
     if (jvar >= 0) valuesTarget[varColCok[jvar]] = law_gaussian();
   }
   Db* dataP = _dataComplement(data, target, valuesTarget);

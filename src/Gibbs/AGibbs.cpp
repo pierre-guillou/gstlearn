@@ -157,8 +157,8 @@ int AGibbs::_boundsCheck(int ipgs,
                          double* vmax_arg) const
 {
   const Db* db = getDb();
-  int icase    = getRank(ipgs, ivar);
-  int iech     = getSampleRank(iact);
+  auto icase   = getRank(ipgs, ivar);
+  auto iech    = getSampleRank(iact);
   double vmin  = db->getLocVariable(ELoc::L, iech, icase);
   double vmax  = db->getLocVariable(ELoc::U, iech, icase);
 
@@ -195,8 +195,8 @@ void AGibbs::_printInequalities(int iact,
 
   /* Initializations */
 
-  int iech = getSampleRank(iact);
-  int nvar = getNvar();
+  auto iech = getSampleRank(iact);
+  auto nvar = getNvar();
   flag_min = flag_max = 1;
   if (FFFF(vmin)) flag_min = 0;
   if (FFFF(vmax)) flag_max = 0;
@@ -245,8 +245,8 @@ void AGibbs::_displayCurrentVector(bool flag_init,
                                    int isimu,
                                    int ipgs) const
 {
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNvar();
 
   if (flag_init)
   {
@@ -264,13 +264,13 @@ void AGibbs::_displayCurrentVector(bool flag_init,
   for (int ivar = 0; ivar < nvar; ivar++)
   {
     mestitle(2, "Variable %d", ivar + 1);
-    int icase = getRank(ipgs, ivar);
+    auto icase = getRank(ipgs, ivar);
 
     /* Loop on the samples */
 
     for (int iact = 0; iact < nact; iact++)
     {
-      int iech    = getSampleRank(iact);
+      auto iech   = getSampleRank(iact);
       double vmin = _db->getLocVariable(ELoc::L, iech, icase);
       double vmax = _db->getLocVariable(ELoc::U, iech, icase);
       _printInequalities(iact, ivar, y[icase][iact], vmin, vmax);
@@ -298,7 +298,7 @@ int AGibbs::getRank(int ipgs, int ivar) const
  */
 VectorVectorDouble AGibbs::allocY() const
 {
-  int nact = _getSampleRankNumber();
+  auto nact = _getSampleRankNumber();
   VectorVectorDouble y(_getDimension());
   for (int i = 0, nsize = (int)y.size(); i < nsize; i++)
     y[i].resize(nact);
@@ -317,22 +317,22 @@ void AGibbs::storeResult(const VectorVectorDouble& y,
                          int isimu,
                          int ipgs)
 {
-  int nsize = _getDimension();
-  int nact  = _getSampleRankNumber();
-  int nvar  = getNvar();
+  auto nsize = _getDimension();
+  auto nact  = _getSampleRankNumber();
+  auto nvar = getNvar();
 
   /* Loop on the variables */
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs, ivar);
+    auto icase = getRank(ipgs, ivar);
     int rank  = icase + nsize * isimu;
 
     /* Loop on the samples */
 
     for (int iact = 0; iact < nact; iact++)
     {
-      int iech = getSampleRank(iact);
+      auto iech = getSampleRank(iact);
       _db->setFromLocator(ELoc::GAUSFAC, iech, rank, y[icase][iact]);
     }
   }
@@ -399,7 +399,7 @@ void AGibbs::_updateStats(const VectorVectorDouble& y,
 
     int jcol;
     double result;
-    int icol      = getRank(ipgs, ivar);
+    auto icol     = getRank(ipgs, ivar);
     double residu = 1. - amort;
     double oldw   = (1. - pow(amort, (double)iter)) / residu;
     double neww   = (1. - pow(amort, (double)iter + 1)) / residu;
@@ -454,7 +454,7 @@ int AGibbs::_getNColStats() const
  */
 int AGibbs::_getColRankStats(int ipgs, int ivar, int mode) const
 {
-  int rank = getRank(ipgs, ivar);
+  auto rank = getRank(ipgs, ivar);
   if (mode == 0)
     return (2 * rank);
   return (2 * rank + 1);
@@ -471,7 +471,7 @@ bool AGibbs::_isConstraintTight(int icase,
                                 int iact,
                                 double* value) const
 {
-  int iech = getSampleRank(iact);
+  auto iech = getSampleRank(iact);
 
   double vmin = _db->getLocVariable(ELoc::L, iech, icase);
   double vmax = _db->getLocVariable(ELoc::U, iech, icase);
@@ -518,7 +518,7 @@ void AGibbs::_getBoundsDecay(int iter, double* vmin, double* vmax) const
  */
 int AGibbs::_getRelativeRank(int iech)
 {
-  int nact = _getSampleRankNumber();
+  auto nact = _getSampleRankNumber();
   for (int iact = 0; iact < nact; iact++)
   {
     if (getSampleRank(iact) == iech) return iact;

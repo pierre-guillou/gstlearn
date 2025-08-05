@@ -85,7 +85,7 @@ int ShiftOpStencil::_addToDest(const constvect inv, vect outv) const
     currentWeights = &_weights;
   }
 
-  int nw = _getNWeights();
+  auto nw                     = _getNWeights();
   int size = (int) inv.size();
   const Indirection& indirect = _mesh->getGridIndirect();
 
@@ -231,7 +231,7 @@ int ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
 
   // Display the vector of the 'S' matrix for the center Apex
   MatrixSparse* S           = shiftMat.getS();
-  int centerApex            = localMesh.getNApices() / 2;
+  auto centerApex           = localMesh.getNApices() / 2;
   VectorDouble centerColumn = S->getColumn(centerApex);
 
   // Fill lambda
@@ -254,7 +254,7 @@ int ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
     _relativeShifts.push_back(other);
     _weights.push_back(weight);
   }
-  int nw = _getNWeights();
+  auto nw = _getNWeights();
 
   // Calculate the shifts (from the center cell) for each weight
   // This is calculated for a reference pixel (center of the grid)
@@ -294,7 +294,7 @@ int ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
 
 void ShiftOpStencil::_printStencil() const
 {
-  int nweight = _getNWeights();
+  auto nweight = _getNWeights();
   int ndim    = _mesh->getNDim();
   int size    = _mesh->getNApices();
   mestitle(0, "Stencil contents");

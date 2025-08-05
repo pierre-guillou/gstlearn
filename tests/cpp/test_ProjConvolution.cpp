@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 
   // Simulating on the initial grid
   (void)simtub(nullptr, grid_data, model);
-  int uid_in = grid_data->getLastUID();
+  auto uid_in = grid_data->getLastUID();
 
   // Save the initial grid in a NF
   (void)grid_data->dumpToNF("Initial.NF");

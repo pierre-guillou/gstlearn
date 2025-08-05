@@ -53,7 +53,7 @@ int CalcSimuRefine::_simulate()
   db1 = db2 = nullptr;
   db1       = dbin;
   law_set_random_seed(getSeed());
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
 
   /* Store information from the input grid */
 
@@ -130,7 +130,7 @@ int CalcSimuRefine::_simulate()
 void CalcSimuRefine::_dim_1_to_2(DbGrid* db)
 
 {
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
 
   /* Input file */
 
@@ -167,7 +167,7 @@ void CalcSimuRefine::_dim_1_to_2(DbGrid* db)
 void CalcSimuRefine::_dim_2_to_1(DbGrid* db)
 
 {
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
 
   /* Input file */
 
@@ -299,7 +299,7 @@ double CalcSimuRefine::_read(DbGrid* db,
                              int idy,
                              int idz)
 {
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   VectorInt ind(ndim, 0);
   if (ndim >= 1)
   {
@@ -381,7 +381,7 @@ void CalcSimuRefine::_truncate_result(DbGrid* db2, int iatt2, DbGrid* db1, int i
 int CalcSimuRefine::_kriging_solve(int type, int rank, int nb, bool verbose)
 {
   int neq  = (_param.isFlagSK()) ? nb : nb + 1;
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   VectorDouble d1(ndim);
   VectorDouble lhs(36);
   VectorDouble rhs(6);

@@ -78,8 +78,8 @@ bool SpaceSN::isEqual(const ASpace *space) const
 void SpaceSN::_move(SpacePoint &p1, const VectorDouble &vec) const
 {
   /// TODO : SpaceSN::_move
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
+  auto offset = getOffset();
+  auto ndim   = getNDim();
   for (unsigned int i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
@@ -91,7 +91,7 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
                              int ispace) const
 {
   DECLARE_UNUSED(ispace)
-  unsigned int offset = getOffset();
+  auto offset = getOffset();
   return GH::geodeticAngularDistance(p1.getCoord(offset),
                                      p1.getCoord(offset + 1),
                                      p2.getCoord(offset),
@@ -107,7 +107,7 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getDistance with tensor
   DECLARE_UNUSED(tensor);
-  unsigned int offset = getOffset();
+  auto offset = getOffset();
   return GH::geodeticAngularDistance(p1.getCoord(offset),
                                      p1.getCoord(offset + 1),
                                      p2.getCoord(offset),
@@ -145,9 +145,9 @@ void SpaceSN::_getIncrementInPlace(const SpacePoint& p1,
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getIncrementInPlace
   int j = 0;
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
+  auto offset = getOffset();
+  auto ndim   = getNDim();
   for (unsigned int i = offset; i < ndim + offset; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
 }
-}
+} // namespace gstlrn

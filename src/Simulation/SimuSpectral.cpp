@@ -405,7 +405,7 @@ void SimuSpectral::_computeOnSphere(Db* dbout, int iuid, bool verbose)
   {
     nb += _spSims[is]._countP + _spSims[is]._countM;
     K_list.push_back(_spSims[is]._k);
-    int nmax = _getKey1Maximum(_spSims[is]);
+    auto nmax = _getKey1Maximum(_spSims[is]);
     if (nmax > N_max) N_max = nmax;
   }
   int K_max = VH::maximum(K_list);

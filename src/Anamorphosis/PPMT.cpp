@@ -186,7 +186,7 @@ double PPMT::_gaussianizeBackward(double Yi, const AnamHermite* anam)
 
 void PPMT::_initGaussianizeForward(AMatrix* Y)
 {
-  int ncol = getNdim();
+  auto ncol = getNdim();
 
   for (int icol = 0; icol < ncol; icol++)
   {
@@ -198,7 +198,7 @@ void PPMT::_initGaussianizeForward(AMatrix* Y)
 
 void PPMT::_initGaussianizeBackward(AMatrix* Y)
 {
-  int ncol = getNdim();
+  auto ncol = getNdim();
 
   for (int icol = 0; icol < ncol; icol++)
   {
@@ -280,7 +280,7 @@ void PPMT::_shiftForward(AMatrix* Y,
                          const VectorDouble& N0) const
 {
   int np   = Y->getNRows();
-  int ndim = getNdim();
+  auto ndim = getNdim();
 
   for (int ip = 0; ip < np; ip++)
   {
@@ -299,7 +299,7 @@ void PPMT::_shiftBackward(AMatrix* Y,
                           const VectorDouble& Y0) const
 {
   int np   = Y->getNRows();
-  int ndim = getNdim();
+  auto ndim = getNdim();
 
   for (int ip = 0; ip < np; ip++)
   {
@@ -321,7 +321,7 @@ void PPMT::_shiftBackward(AMatrix* Y,
 void PPMT::_projectOnDirection(const AMatrix* Y, int id, VectorDouble& Y0)
 {
   int np   = Y->getNRows();
-  int ndim = getNdim();
+  auto ndim = getNdim();
 
   for (int ip = 0; ip < np; ip++)
   {
@@ -364,7 +364,7 @@ void PPMT::_iterationBackward(AMatrix* Y, const VectorDouble& N0, int iter)
 
 void PPMT::_generateAllDirections()
 {
-  int ndir = getNdir();
+  auto ndir = getNdir();
 
   MatrixDense* Umat;
   if (getMethodDir() == EDirGen::VDC)
@@ -382,7 +382,7 @@ void PPMT::_generateAllDirections()
 
 void PPMT::_fitInitHermite(AMatrix* Y)
 {
-  int ncol = getNdim();
+  auto ncol = getNdim();
 
   for (int icol = 0; icol < ncol; icol++)
   {
@@ -502,7 +502,7 @@ int PPMT::rawToGaussian(Db* db,
     messerr("You must Fit PPMT beforehand");
     return 1;
   }
-  int np = Y.getNRows();
+  auto np = Y.getNRows();
   if (niter <= 0) niter = getNiter();
   niter = MIN(niter, getNiter());
 
@@ -556,7 +556,7 @@ int PPMT::gaussianToRaw(Db* db,
     messerr("You must Fit PPMT beforehand");
     return 1;
   }
-  int np = Y.getNRows();
+  auto np = Y.getNRows();
   if (niter <= 0) niter = getNiter();
   niter = MIN(niter, getNiter());
 

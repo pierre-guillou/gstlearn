@@ -160,8 +160,8 @@ int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
                                   const MatrixDense& driftMat,
                                   const VectorDouble& driftCoeffs)
 {
-  int nrows = driftMat.getNRows();
-  int ncols = driftMat.getNCols();
+  auto nrows = driftMat.getNRows();
+  auto ncols = driftMat.getNCols();
   if (nrows != (int)Z.size())
   {
     messerr("Error in number of Rows of drift matrix (%d) and size of data vector (%d)",
@@ -238,7 +238,7 @@ VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
  */
 VectorDouble ASPDEOp::stdev(const VectorDouble& dat, int nMC, int seed) const
 {
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
   law_set_random_seed(seed);
 
   // Standard Deviation using Monte-Carlo simulations
@@ -436,7 +436,7 @@ double ASPDEOp::computeLogDetInvNoise() const
 // We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + log|Noise|
 double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
 {
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
 
   law_set_random_seed(seed);
   double a1 = computeLogDetOp(nMC);

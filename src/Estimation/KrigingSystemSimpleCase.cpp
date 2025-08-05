@@ -592,7 +592,7 @@ int KrigingSystemSimpleCase::updKrigOptEstim(int iptrEst,
 int KrigingSystemSimpleCase::setKrigOptDataWeights(int iptrWeights, bool flagSet)
 {
   _isReady = false;
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (iptrWeights >= 0 && nvar > 1)
   {
     messerr("The storage of the weights is only coded for Monovariate case");

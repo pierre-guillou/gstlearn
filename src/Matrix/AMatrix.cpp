@@ -227,8 +227,8 @@ bool AMatrix::isSame(const AMatrix& m, double eps, bool printWhyNot)
 {
   if (!isSameSize(m)) return false;
 
-  int ncols = getNCols();
-  int nrows = getNRows();
+  auto ncols = getNCols();
+  auto nrows = getNRows();
   for (int icol = 0; icol < ncols; icol++)
     for (int irow = 0; irow < nrows; irow++)
     {
@@ -784,8 +784,8 @@ bool AMatrix::_isColVectorConsistent(const VectorDouble& tab) const
 
 bool AMatrix::_isVectorSizeConsistent(const VectorDouble& tab) const
 {
-  int nrows = getNRows();
-  int ncols = getNCols();
+  auto nrows = getNRows();
+  auto ncols = getNCols();
   if ((int)tab.size() != nrows * ncols)
   {
     messerr("The argument 'tab'(%d) does not have correct dimension (%d)",
@@ -797,7 +797,7 @@ bool AMatrix::_isVectorSizeConsistent(const VectorDouble& tab) const
 
 bool AMatrix::_isColumnSizeConsistent(const VectorDouble& tab) const
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
   if ((int)tab.size() != nrows)
   {
     messerr("The argument 'tab'(%d) does not have correct dimension (%d)",
@@ -809,7 +809,7 @@ bool AMatrix::_isColumnSizeConsistent(const VectorDouble& tab) const
 
 bool AMatrix::_isRowSizeConsistent(const VectorDouble& tab) const
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   if ((int)tab.size() != ncols)
   {
     messerr("The argument 'tab'(%d) does not have correct dimension (%d)",

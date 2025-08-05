@@ -104,7 +104,7 @@ void AnamDiscreteIR::calculateMeanAndVariance()
 
   /* Loop on the classes */
 
-  int nclass = getNClass();
+  auto nclass = getNClass();
   var = mean = 0.;
   for (int iclass = 0; iclass < nclass; iclass++)
   {
@@ -126,8 +126,8 @@ int AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
   /* Initializations */
 
   int nech   = static_cast<int>(tab.size());
-  int nclass = getNClass();
-  int ncut   = getNCut();
+  auto nclass = getNClass();
+  auto ncut   = getNCut();
 
   /* Core allocation */
 
@@ -194,7 +194,7 @@ int AnamDiscreteIR::_stats_residuals(int verbose,
 
   /* Initializations */
 
-  int ncut = getNCut();
+  auto ncut = getNCut();
   nactive = (*nsorted) = 0;
   moyenne              = 0.;
   for (icut = 0; icut < ncut; icut++)
@@ -332,7 +332,7 @@ bool AnamDiscreteIR::_deserializeAscii(std::istream& is, bool verbose)
 double AnamDiscreteIR::computeVariance(double sval) const
 {
   if (!allowChangeSupport()) return TEST;
-  int nclass = getNClass();
+  auto nclass = getNClass();
 
   double var = 0.;
   for (int iclass = 0; iclass < nclass - 1; iclass++)
@@ -351,7 +351,7 @@ int AnamDiscreteIR::updatePointToBlock(double r_coef)
   if (!allowChangeSupport()) return 1;
   setRCoef(r_coef);
 
-  int nclass = getNClass();
+  auto nclass = getNClass();
   double zie = 0.;
   double zik = 0.;
   double zje = 0.;

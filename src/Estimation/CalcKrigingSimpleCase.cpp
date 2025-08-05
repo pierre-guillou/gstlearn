@@ -94,7 +94,7 @@ bool CalcKrigingSimpleCase::_postprocess()
   /* Free the temporary variables */
   _cleanVariableDb(2);
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
 
   _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrVarZ, "varz", 1);
   _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrStd, "stdev", 1);
@@ -150,7 +150,7 @@ bool CalcKrigingSimpleCase::_run()
   SpacePoint pin(getModel()->getSpace());
   SpacePoint pout(getModel()->getSpace());
   ModelGeneric model(*ksys.getModel());
-  int ndim                        = getModel()->getSpace()->getNDim();
+  auto ndim                       = getModel()->getSpace()->getNDim();
   const VectorVectorDouble coords = getDbout()->getAllCoordinates();
   static ANeigh* neigh            = nullptr;
 #pragma omp threadprivate(neigh)
@@ -168,7 +168,7 @@ bool CalcKrigingSimpleCase::_run()
       neigh->reset();
     }
     // TODO : encapsulate in Db (threadsafe)
-    for (int idim = 0; idim < ndim; idim++)
+    for (size_t idim = 0; idim < ndim; idim++)
     {
       pin.setCoord(idim, coords[idim][iech_out]);
     }

@@ -113,7 +113,7 @@ void CalcSimuFFT::_alloc()
   {
     if (i < _getNDim())
     {
-      int nval = _getNOptimalEven(_shift[i] + dbgrid->getNX(i));
+      auto nval = _getNOptimalEven(_shift[i] + dbgrid->getNX(i));
       _dims[i] = nval;
       _dim2[i] = nval / 2;
     }
@@ -380,7 +380,7 @@ bool CalcSimuFFT::_checkCorrect(const VectorVectorDouble& xyz,
                                 int iz,
                                 double percent)
 {
-  int ndim            = _getNDim();
+  auto ndim           = _getNDim();
   ModelGeneric* model = getModel();
 
   /* Calculate the reference C(0) value */
@@ -1052,8 +1052,8 @@ bool CalcSimuFFT::_check()
 
   if (!hasDbout()) return false;
   if (!hasModel()) return false;
-  int ndim = getModel()->getNDim();
-  int nvar = getModel()->getNVar();
+  auto ndim = getModel()->getNDim();
+  auto nvar = getModel()->getNVar();
   if (ndim < 1 || ndim > 3)
   {
     messerr("The FFT Method is not a relevant simulation model");

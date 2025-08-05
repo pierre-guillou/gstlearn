@@ -162,8 +162,8 @@ int MatrixDense::_getIndexToRank(int irow, int icol) const
 
 void MatrixDense::_transposeInPlace()
 {
-  int nrows = getNRows();
-  int ncols = getNCols();
+  auto nrows = getNRows();
+  auto ncols = getNCols();
   eigenMat().transposeInPlace();
   _setNCols(nrows);
   _setNRows(ncols);
@@ -575,8 +575,8 @@ int MatrixDense::_terminateEigen(const Eigen::VectorXd& eigenValues,
                                  bool optionPositive,
                                  bool changeOrder)
 {
-  int nrows = getNRows();
-  int ncols = getNCols();
+  auto nrows = getNRows();
+  auto ncols = getNCols();
 
   _eigenValues                                                         = VectorDouble(nrows);
   Eigen::Map<Eigen::VectorXd>(_eigenValues.data(), eigenValues.size()) = eigenValues;
@@ -733,8 +733,8 @@ MatrixDense* MatrixDense::glue(const AMatrix* A1,
 
 void MatrixDense::addRow(int nrow_added)
 {
-  int nrows = getNRows();
-  int ncols = getNCols();
+  auto nrows = getNRows();
+  auto ncols = getNCols();
 
   AMatrix* statsSave = this->clone();
   reset(nrows + nrow_added, ncols);
@@ -746,8 +746,8 @@ void MatrixDense::addRow(int nrow_added)
 
 void MatrixDense::addColumn(int ncolumn_added)
 {
-  int nrows = getNRows();
-  int ncols = getNCols();
+  auto nrows = getNRows();
+  auto ncols = getNCols();
 
   AMatrix* statsSave = this->clone();
   reset(nrows, ncols + ncolumn_added);
@@ -775,8 +775,8 @@ bool MatrixDense::sample(MatrixDense& res,
                          bool flagInvertRow,
                          bool flagInvertCol)
 {
-  int nrowtotal  = A.getNRows();
-  int ncoltotal  = A.getNCols();
+  auto nrowtotal = A.getNRows();
+  auto ncoltotal = A.getNCols();
   VectorInt rows = rowKeep;
   if (rows.empty()) rows = VH::sequence(nrowtotal);
   if (flagInvertRow) rows = VH::complement(VH::sequence(nrowtotal), rows);
@@ -819,8 +819,8 @@ void MatrixDense::unsample(const AMatrix* A,
                            bool flagInvertRow,
                            bool flagInvertCol)
 {
-  int nrowtotal  = getNRows();
-  int ncoltotal  = getNCols();
+  auto nrowtotal = getNRows();
+  auto ncoltotal = getNCols();
   VectorInt rows = rowFetch;
   if (rows.empty()) rows = VH::sequence(nrowtotal);
   if (flagInvertRow) rows = VH::complement(VH::sequence(nrowtotal), rows);
@@ -860,10 +860,10 @@ void MatrixDense::unsample(const AMatrix* A,
 MatrixDense MatrixDense::compressMatLC(const MatrixDense& matLC,
                                        bool transpose)
 {
-  int nrows  = getNRows();
-  int ncols  = getNCols();
-  int nrowCL = matLC.getNRows();
-  int ncolCL = matLC.getNCols();
+  auto nrows = getNRows();
+  auto ncols = getNCols();
+  auto nrowCL = matLC.getNRows();
+  auto ncolCL = matLC.getNCols();
   MatrixDense mat;
 
   if (!transpose)

@@ -48,8 +48,8 @@ ASpaceSharedPtr SpaceRN::create(int ndim)
 
 void SpaceRN::_move(SpacePoint& p1, const VectorDouble& vec) const
 {
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
+  auto offset = getOffset();
+  auto ndim   = getNDim();
   for (unsigned int i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
@@ -74,8 +74,8 @@ double SpaceRN::_getDistance(const SpacePoint& p1,
   DECLARE_UNUSED(ispace);
   double dist         = 0.;
   double delta        = 0.;
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
+  auto offset         = getOffset();
+  auto ndim           = getNDim();
   for (unsigned int i = offset; i < ndim + offset; i++)
   {
     delta = p2.getCoord(i) - p1.getCoord(i);
@@ -128,8 +128,8 @@ void SpaceRN::_getIncrementInPlace(const SpacePoint& p1,
 {
   DECLARE_UNUSED(ispace);
   int j                  = 0;
-  unsigned int offset    = getOffset();
-  unsigned int ndim      = getNDim();
+  auto offset            = getOffset();
+  auto ndim              = getNDim();
   unsigned int maxlength = ndim + offset;
   for (unsigned int i = offset; i < maxlength; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);

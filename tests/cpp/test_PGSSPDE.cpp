@@ -84,7 +84,7 @@ static void _thirdTest(const CovAniso* cov1,
 
 static void _clearModels(std::vector<Model*>& models)
 {
-  for (int i = 0, n = models.size(); i < n; i++)
+  for (size_t i = 0, n = models.size(); i < n; i++)
   {
     delete models[i];
   }

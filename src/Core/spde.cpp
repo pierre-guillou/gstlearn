@@ -273,7 +273,7 @@ static void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const do
   DECLARE_UNUSED(work);
   DECLARE_UNUSED(work);
   if (DEBUG) message("Cholesky Inversion\n");
-  int n = qchol_getNCols(qctt);
+  auto n = qchol_getNCols(qctt);
 
   VectorDouble rhsVD(n);
   for (int i = 0; i < n; i++) rhsVD[i] = rhs[i];
@@ -294,7 +294,7 @@ static void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const do
 static void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
 {
   if (DEBUG) message("Cholesky Simulation\n");
-  int n = qchol_getNCols(qctt);
+  auto n = qchol_getNCols(qctt);
 
   VectorDouble simuVD(n);
   VectorDouble workVD(n);
@@ -3027,7 +3027,7 @@ label_end:
 static void st_matelem_manage(int mode)
 
 {
-  int ncova           = st_get_ncova();
+  auto ncova          = st_get_ncova();
   SPDE_SS_Environ* SS = MATGRF(SPDE_CURRENT_IGRF);
 
   /* Dispatch */

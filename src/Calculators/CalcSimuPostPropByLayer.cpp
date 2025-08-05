@@ -74,7 +74,7 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
 {
   int nlayer = (int) Z_n_k_s.size();
   int ndim_out = getDbout()->getNDim();
-  int iechout = _getIechout();
+  auto iechout = _getIechout();
 
   double z_ref  = _dbgrid->getCoordinate(iechout, ndim_out-1);
   double h_max  = _dbgrid->getDX(ndim_out - 1);

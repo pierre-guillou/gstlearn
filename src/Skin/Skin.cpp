@@ -108,7 +108,7 @@ double Skin::_getWeight(int ipos, int idir)
 int Skin::_gridShift(const VectorInt& indg0, int dir)
 {
   VectorInt indg = indg0;
-  int ndim       = _getNDim();
+  auto ndim      = _getNDim();
 
   /* Shift the target grid node and check if it belongs to the grid */
 
@@ -132,7 +132,7 @@ int Skin::_gridShift(const VectorInt& indg0, int dir)
  *****************************************************************************/
 int Skin::gridShift(int lec, int dir)
 {
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   VectorInt indg(ndim);
 
   /* Convert an absolute address into the grid indices */
@@ -237,7 +237,7 @@ int Skin::_cellAdd(int ipos, double energy)
  *****************************************************************************/
 int Skin::init(bool verbose)
 {
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   if (_skf == nullptr || ndim <= 0)
   {
     messerr("SKF and DbGrid must be defined beforehand");
@@ -373,7 +373,7 @@ void Skin::getNext(int* rank, int* ipos)
  *****************************************************************************/
 int Skin::unstack(int rank0, int ipos0)
 {
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   VectorInt indg(ndim);
 
   /* Suppress the current cell from the skin */

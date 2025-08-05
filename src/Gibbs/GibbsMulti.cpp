@@ -72,8 +72,8 @@ int GibbsMulti::calculInitialize(VectorVectorDouble& y,
                                  int ipgs)
 {
   const Model* model = getModel();
-  int nact           = _getSampleRankNumber();
-  int nvar           = getNvar();
+  auto nact          = _getSampleRankNumber();
+  auto nvar          = getNvar();
 
   /* Print the title */
 
@@ -85,7 +85,7 @@ int GibbsMulti::calculInitialize(VectorVectorDouble& y,
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs, ivar);
+    auto icase = getRank(ipgs, ivar);
 
     /* Loop on the samples */
 
@@ -131,7 +131,7 @@ double GibbsMulti::getSimulate(VectorVectorDouble& /*y*/,
 
   // Define the environment
 
-  int iech = getSampleRank(iact);
+  auto iech = getSampleRank(iact);
 
   // Read the Bounds
 
@@ -172,8 +172,8 @@ double GibbsMulti::getSimulate(VectorVectorDouble& /*y*/,
 int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
 {
   Db* db   = getDb();
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNvar();
   mestitle(1, "Checking gaussian values from Gibbs vs. bounds (PGS=%d Simu=%d)",
            ipgs + 1, isimu + 1);
 
@@ -183,13 +183,13 @@ int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs, ivar);
+    auto icase = getRank(ipgs, ivar);
 
     /* Loop on the data */
 
     for (int iact = 0; iact < nact; iact++)
     {
-      int iech    = getSampleRank(iact);
+      auto iech   = getSampleRank(iact);
       double vmin = db->getLocVariable(ELoc::L, iech, icase);
       double vmax = db->getLocVariable(ELoc::U, iech, icase);
       if (FFFF(vmin)) vmin = MINIMUM_BIG;

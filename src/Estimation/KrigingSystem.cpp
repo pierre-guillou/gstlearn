@@ -228,8 +228,8 @@ void KrigingSystem::_resetMemoryGeneral()
  *****************************************************************************/
 bool KrigingSystem::_isAuthorized() const
 {
-  int ncov   = getCovSize();
-  int ndrift = getDriftSize();
+  auto ncov   = getCovSize();
+  auto ndrift = getDriftSize();
   return ncov > 0 && ncov >= ndrift;
 }
 
@@ -1069,7 +1069,7 @@ int KrigingSystem::updKrigOptNeighOnly(int iptrNeigh)
 int KrigingSystem::setKrigOptDataWeights(int iptrWeights, bool flagSet)
 {
   _isReady = false;
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (iptrWeights >= 0 && nvar > 1)
   {
     messerr("The storage of the weights is only coded for Monovariate case");
@@ -1148,7 +1148,7 @@ int KrigingSystem::setKrigOptBayes(bool flag_bayes,
                                    const MatrixSymmetric& prior_cov)
 {
   _isReady = false;
-  int nfeq = _getNFeq();
+  auto nfeq = _getNFeq();
   if (flag_bayes)
   {
     VectorDouble local_mean   = prior_mean;
@@ -1245,7 +1245,7 @@ int KrigingSystem::setKrigOptAnamophosis(AAnam* anam)
 {
 
   _isReady = false;
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (nvar != 1)
   {
     messerr("This procedure is limited to the monovariate case");
@@ -1587,7 +1587,7 @@ int KrigingSystem::_bayesPreCalculations()
 void KrigingSystem::_bayesPreSimulate()
 {
   if (_nfeq <= 0) return;
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
   CholeskyDense postCovChol;
 
   // Dimension '_postSimu' to store simulated posterior mean

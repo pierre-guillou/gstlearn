@@ -413,7 +413,7 @@ int ACalcDbToDb::_expandInformation(int mode, const ELoc& locatorType) const
 
   // Check the corresponding number of variables in the Input File
 
-  int ninfoIn = getDbin()->getNLoc(locatorType);
+  auto ninfoIn = getDbin()->getNLoc(locatorType);
   if (ninfo == ninfoIn) return 0;
 
   /* Case when the Output Db is not a grid */

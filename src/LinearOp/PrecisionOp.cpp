@@ -429,7 +429,7 @@ void PrecisionOp::evalInverse(const constvect vecin,
 VectorDouble PrecisionOp::computeCov(int imesh)
 {
 
-  int n = getSize();
+  auto n = getSize();
   VectorDouble result(n);
   std::vector<double> ei(n);
   vect eis(ei);
@@ -445,7 +445,7 @@ VectorDouble PrecisionOp::computeCov(int imesh)
 
 VectorVectorDouble PrecisionOp::simulate(int nbsimu)
 {
-  int n = getSize();
+  auto n = getSize();
   VectorVectorDouble vectv(nbsimu);
   VectorDouble whitenoise(n);
 
@@ -462,7 +462,7 @@ VectorVectorDouble PrecisionOp::simulate(int nbsimu)
 
 VectorDouble PrecisionOp::simulateOne()
 {
-  int n = getSize();
+  auto n = getSize();
   VectorDouble vectv(n);
   VectorDouble whitenoise(n);
   VH::simulateGaussianInPlace(whitenoise);
@@ -532,7 +532,7 @@ VectorDouble PrecisionOp::extractDiag() const
     messerr("Only available for ShiftOpMatrix\n");
     return VectorDouble();
   }
-  int size = getSize();
+  auto size = getSize();
   VectorDouble vec(size, 0.);
   const EPowerPT& power = EPowerPT::ONE;
 

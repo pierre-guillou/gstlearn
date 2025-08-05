@@ -142,7 +142,7 @@ bool CalcKrigingFactors::_postprocess()
 
   getDbin()->setLocatorsByUID(_iuidFactors, ELoc::Z, 0);
 
-  int nfactor = _getNFactors();
+  auto nfactor = _getNFactors();
   _renameVariable(2, VectorString(), ELoc::Z, nfactor, _iptrStd, "stdev", 1);
   _renameVariable(2, VectorString(), ELoc::Z, nfactor, _iptrEst, "estim", 1);
 
@@ -179,7 +179,7 @@ bool CalcKrigingFactors::_run()
 
   // Loop on the targets to be processed
 
-  int ntotal = getDbout()->getNSample() * _getNFactors();
+  auto ntotal = getDbout()->getNSample() * _getNFactors();
   int iproc  = 0;
   for (int iclass = 1; iclass <= _getNFactors(); iclass++)
   {

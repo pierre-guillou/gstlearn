@@ -130,8 +130,8 @@ VectorVectorDouble OptimCostColored::minimize(const VectorDouble& facies,
   {
     if (! isInitialized()) 
       my_throw("'OptimCostColored' must be initialized beforehand");
-    int npoint  = getNPoint();
-    int nvertex = getNVertex();
+    auto npoint  = getNPoint();
+    auto nvertex = getNVertex();
     int nlevel  = _nprop - 1;
     propfacs.resize(_nprop, VectorDouble(nvertex, 0));
 
@@ -194,8 +194,8 @@ void OptimCostColored::_getFaciesToIndic(const VectorDouble& facies,
                                          VectorDouble& indic) const
 {
   int facloc;
-  int npoint = getNPoint();
-  
+  auto npoint = getNPoint();
+
   for (int i=0; i<npoint; i++)
   {
     facloc = static_cast<int> (facies[i]);
@@ -256,7 +256,7 @@ double OptimCostColored::_getFaciesToProportion(const VectorInt& split) const
 *****************************************************************************/
 int OptimCostColored::_checkFacies(const VectorDouble& facies) const
 {
-  int npoint = getNPoint();
+  auto npoint = getNPoint();
 
   int nerr = 0;
   for (int i=0; i<npoint; i++)
@@ -437,7 +437,7 @@ void OptimCostColored::_copyMultProportions(int level,
                                             const VectorDouble& propfac,
                                             VectorVectorDouble& propfacs)
 {
-  int nvertex = getNVertex();
+  auto nvertex = getNVertex();
   int mode = _splits[level][ip];
   if (mode == 0) return;
 
@@ -490,4 +490,4 @@ VectorVectorInt OptimCostColored::initSplit(int nfacies, bool verbose) const
 
   return splits;
 }
-}
+} // namespace gstlrn

@@ -121,7 +121,7 @@ DbMeshStandard::createFromExternal(const MatrixDense& apices,
   }
   if (!tab.empty())
   {
-    int nech = apices.getNCols();
+    auto nech = apices.getNCols();
     (void)dbmesh->resetFromSamples(nech, order, tab, names, locatorNames);
   }
   return dbmesh;
@@ -191,7 +191,7 @@ DbMeshStandard* DbMeshStandard::createFromNF(const String& NFFilename, bool verb
 bool DbMeshStandard::isConsistent() const
 {
   // Check on the count of addresses
-  int nech = getNSample();
+  auto nech = getNSample();
   if (_mesh.getNApices() > nech)
   {
     messerr("Number of meshes (%d)", _mesh.getNApices());

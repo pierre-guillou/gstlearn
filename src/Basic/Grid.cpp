@@ -850,7 +850,7 @@ VectorDouble Grid::getAxis(int idim) const
   VectorDouble vect;
   if (idim < 0 || idim >= getNDim()) return (vect);
 
-  int nvect     = getNX(idim);
+  auto nvect    = getNX(idim);
   double origin = getX0(idim);
   double pas    = getDX(idim);
   vect.resize(nvect);

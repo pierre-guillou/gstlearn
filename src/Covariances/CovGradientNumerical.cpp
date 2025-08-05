@@ -64,7 +64,7 @@ double CovGradientNumerical::_evalZGrad(int ivar,
                                         const CovCalcMode* mode) const
 {
   SpacePoint paux;
-  int ndim = getContext().getNDim();
+  auto ndim = getContext().getNDim();
   VectorDouble vec(ndim, 0);
 
   vec[idim] = _ballRadius / 2.;
@@ -89,7 +89,7 @@ double CovGradientNumerical::_evalGradGrad(int ivar,
                                            const CovCalcMode* mode) const
 {
   SpacePoint paux;
-  int ndim = getContext().getNDim();
+  auto ndim = getContext().getNDim();
   VectorDouble vec(ndim, 0);
 
   double cov;

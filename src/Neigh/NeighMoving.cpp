@@ -111,7 +111,7 @@ NeighMoving& NeighMoving::operator=(const NeighMoving& r)
 
 NeighMoving::~NeighMoving()
 {
-  int number = _getNBiPts();
+  auto number = _getNBiPts();
   for (int ipt = 0; ipt < number; ipt++)
     delete _bipts[ipt];
   _bipts.clear();
@@ -140,7 +140,7 @@ String NeighMoving::toString(const AStringFormat* strfmt) const
 
   sstr << _biPtDist->toString(strfmt);
 
-  int number = _getNBiPts();
+  auto number = _getNBiPts();
   for (int ipt = 0; ipt < number; ipt++)
   {
     sstr << _bipts[ipt]->toString(strfmt);
@@ -160,7 +160,7 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
   ret      = ret && ANeigh::_deserializeAscii(is, verbose);
   if (!ret) return ret;
 
-  int ndim = getNDim();
+  auto ndim = getNDim();
   VectorDouble radius(ndim);
   VectorDouble nbgh_coeffs;
   VectorDouble nbgh_rotmat;
@@ -181,15 +181,15 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
   if (flag_aniso)
   {
     nbgh_coeffs.resize(ndim);
-    for (int idim = 0; ret && idim < ndim; idim++)
+    for (size_t idim = 0; ret && idim < ndim; idim++)
       ret = ret && _recordRead<double>(is, "Anisotropy Coefficient", nbgh_coeffs[idim]);
     ret = ret && _recordRead<int>(is, "Anisotropy Rotation Flag", flag_rotation);
     if (flag_rotation)
     {
       nbgh_rotmat.resize(ndim * ndim);
       int lec = 0;
-      for (int idim = 0; ret && idim < ndim; idim++)
-        for (int jdim = 0; ret && jdim < ndim; jdim++, lec++)
+      for (size_t idim = 0; ret && idim < ndim; idim++)
+        for (size_t jdim = 0; ret && jdim < ndim; jdim++, lec++)
           ret = ret && _recordRead<double>(is, "Anisotropy Rotation Matrix", nbgh_rotmat[lec]);
     }
   }
@@ -380,7 +380,7 @@ int NeighMoving::attach(const Db* dbin, const Db* dbout)
   }
 
   int nech     = _dbin->getNSample();
-  int nsect    = getNSect();
+  auto nsect   = getNSect();
   _movingInd   = VectorInt(nech);
   _movingDst   = VectorDouble(nech);
   _movingIsect = VectorInt(nsect);

@@ -424,7 +424,7 @@ void FracList::_checkFractureIntersect(double cote, int ifrac0)
 
   if (!_flagCheck) return;
   FracDesc& desc = _descs[ifrac0];
-  int npoint     = desc.getNPoint();
+  auto npoint    = desc.getNPoint();
   double xd1     = desc.getXXF(npoint - 2);
   double yd1     = desc.getYYF(npoint - 2);
   double xe1     = desc.getXXF(npoint - 1);
@@ -592,7 +592,7 @@ void FracList::_correctDensity(const FracFamily& family,
 
     /* Loop on the segments of the fault */
 
-    int npoint = desc.getNPoint();
+    auto npoint = desc.getNPoint();
     for (int i = 0; i < npoint - 1; i++)
     {
       if (ABS(desc.getYYF(i) - cote) <= _eps)
@@ -655,7 +655,7 @@ double FracList::_extendFractures(const FracFamily& family,
   for (int ifrac = 0; ifrac < getNFracs(); ifrac++)
   {
     const FracDesc& desc = _descs[ifrac];
-    int npoint           = desc.getNPoint();
+    auto npoint          = desc.getNPoint();
     if (desc.getFamily() != ifam + 1) continue;
     if (ABS(desc.getYYF(npoint - 1) - cote) > _eps) continue;
     double angle = desc.getOrient();
@@ -988,7 +988,7 @@ int FracList::_simulateFractures(const FracEnviron& envir,
 
     /* Get the rank of the discretized cell */
 
-    int idisc    = _getDiscretizedRank(cumdens, denstab);
+    auto idisc   = _getDiscretizedRank(cumdens, denstab);
     double xdeb  = _xorigin + _step * (idisc);
     double xfin  = _xorigin + _step * (idisc + 1);
     double xx    = law_uniform(xdeb, xfin);
@@ -1040,7 +1040,7 @@ int FracList::_getDiscretizedRank(double cumdens, const VectorDouble& denstab) c
  *****************************************************************************/
 MatrixDense FracList::fractureExport() const
 {
-  int ntotal = _getEndPointCount();
+  auto ntotal = _getEndPointCount();
   MatrixDense segs(ntotal, NBYFRAC);
 
   /* Loading the fractures */
@@ -1216,14 +1216,14 @@ int FracList::fractureToBlock(DbGrid* dbgrid,
   for (int ifrac = 0; ifrac < getNFracs(); ifrac++)
   {
     FracDesc& desc = _descs[ifrac];
-    int ifam       = desc.getFamily();
+    auto ifam      = desc.getFamily();
     double perm    = 0.;
     if (ifam < (int)permtab.size()) perm = permtab[ifam];
     if (perm <= 0.) continue;
 
     /* Loop on the segments */
 
-    int npoint = desc.getNPoint();
+    auto npoint = desc.getNPoint();
 
     if (verbose)
       message("Fracture %d/%d (Number of end-points = %d)\n", ifrac + 1, getNFracs(), npoint);
@@ -1342,8 +1342,8 @@ VectorDouble FracList::fractureToWell(int nval,
     for (int ifrac = 0; ifrac < getNFracs(); ifrac++)
     {
       FracDesc& desc = _descs[ifrac];
-      int ifam       = desc.getFamily();
-      int npoint     = desc.getNPoint();
+      auto ifam      = desc.getFamily();
+      auto npoint    = desc.getNPoint();
 
       /* Loop on the segments */
 
@@ -1464,7 +1464,7 @@ VectorDouble FracList::fractureExtractLength(int ifam,
  *****************************************************************************/
 VectorDouble FracList::fractureExtractDist(int ifam, double cote, double dcote)
 {
-  int number = _getEndPointCount();
+  auto number = _getEndPointCount();
   VectorDouble tab(number, 0);
 
   /* Loading the abcissae of the fracture (with the target layer) */
@@ -1473,7 +1473,7 @@ VectorDouble FracList::fractureExtractDist(int ifam, double cote, double dcote)
   for (int i = 0; i < getNFracs(); i++)
   {
     FracDesc& desc = _descs[i];
-    int npoint     = desc.getNPoint();
+    auto npoint    = desc.getNPoint();
 
     /* Loop on the end points */
 
@@ -1629,7 +1629,7 @@ int FracList::fractureWellToBlock(DbGrid* dbgrid,
               ifrac + 1, ip + 1, desc.getNPoint());
       continue;
     }
-    int npoint = desc.getNPoint();
+    auto npoint = desc.getNPoint();
 
     /* Paint the blocks with the stationary permeability */
 

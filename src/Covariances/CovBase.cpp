@@ -92,7 +92,7 @@ CovBase::~CovBase()
 void CovBase::setCor(ACov* cor)
 {
   _cor     = std::dynamic_pointer_cast<ACov>(cor->cloneShared());
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if (cor != nullptr)
   {
     _ctxt = cor->getContextCopy();
@@ -107,7 +107,7 @@ void CovBase::_setContext(const CovContext& ctxt)
 
 void CovBase::setSill(double sill) const
 {
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if (nvar > 0 && nvar != 1)
   {
     messerr("Number of provided sill doesn't match number of variables");
@@ -118,7 +118,7 @@ void CovBase::setSill(double sill) const
 
 void CovBase::setSill(const MatrixSymmetric& sill) const
 {
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if (nvar > 0 && nvar != sill.getNCols())
   {
     messerr("Number of provided sills doesn't match number of variables");
@@ -130,7 +130,7 @@ void CovBase::setSill(const MatrixSymmetric& sill) const
 void CovBase::setSill(const VectorDouble& sill) const
 {
   int size = static_cast<int>(sill.size());
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if (size != nvar * nvar)
   {
     messerr("Number of provided sills doesn't match number of variables");
@@ -328,7 +328,7 @@ void CovBase::makeSillStationary(int ivar, int jvar)
 
 bool CovBase::_checkSill(int ivar, int jvar) const
 {
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if ((ivar > nvar) || (jvar > nvar))
   {
     messerr("Your model has only %d variables.", nvar);
@@ -339,7 +339,7 @@ bool CovBase::_checkSill(int ivar, int jvar) const
 
 bool CovBase::_checkDims(int idim, int jdim) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   if ((idim > ndim) || (jdim > ndim))
   {
     messerr("Your model is only in dimension %d.", ndim);

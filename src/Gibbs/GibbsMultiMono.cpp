@@ -72,8 +72,8 @@ int GibbsMultiMono::calculInitialize(VectorVectorDouble& y,
                                      int isimu,
                                      int ipgs)
 {
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNvar();
 
   /* Print the title */
 
@@ -85,7 +85,7 @@ int GibbsMultiMono::calculInitialize(VectorVectorDouble& y,
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs, ivar);
+    auto icase = getRank(ipgs, ivar);
 
     /* Loop on the samples */
 
@@ -128,7 +128,7 @@ double GibbsMultiMono::getSimulate(VectorVectorDouble& y,
 {
   // Define the environment
 
-  int iech = getSampleRank(iact);
+  auto iech = getSampleRank(iact);
 
   // Read the Bounds
 
@@ -146,7 +146,7 @@ double GibbsMultiMono::getSimulate(VectorVectorDouble& y,
   double sval;
   if (ivar > 0)
   {
-    int icase0 = getRank(ipgs, 0);
+    auto icase0 = getRank(ipgs, 0);
     double rho = getRho();
     double sqr = sqrt(1. - rho * rho);
     yval       = yk * sqr + rho * y[icase0][iact];
@@ -184,8 +184,8 @@ double GibbsMultiMono::getSimulate(VectorVectorDouble& y,
 int GibbsMultiMono::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
 {
   Db* db   = getDb();
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNvar();
   mestitle(1, "Checking gaussian values from Gibbs vs. bounds (PGS=%d Simu=%d)",
            ipgs + 1, isimu + 1);
 
@@ -196,14 +196,14 @@ int GibbsMultiMono::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int icase  = getRank(ipgs, ivar);
-    int icase0 = getRank(ipgs, 0);
+    auto icase = getRank(ipgs, ivar);
+    auto icase0 = getRank(ipgs, 0);
 
     /* Loop on the data */
 
     for (int iact = 0; iact < nact; iact++)
     {
-      int iech    = getSampleRank(iact);
+      auto iech   = getSampleRank(iact);
       double vmin = db->getLocVariable(ELoc::L, iech, icase);
       double vmax = db->getLocVariable(ELoc::U, iech, icase);
       if (FFFF(vmin)) vmin = MINIMUM_BIG;

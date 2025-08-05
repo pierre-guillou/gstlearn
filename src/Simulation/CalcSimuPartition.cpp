@@ -50,7 +50,7 @@ CalcSimuPartition::~CalcSimuPartition()
 bool CalcSimuPartition::_voronoi()
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  int ndim       = _getNDim();
+  auto ndim      = _getNDim();
   VectorDouble simgrid(dbgrid->getNSample());
 
   /************************************/
@@ -245,7 +245,7 @@ bool CalcSimuPartition::_check()
 
   if (!hasDbout()) return false;
   if (!hasModel()) return false;
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   if (ndim > 3)
   {
     messerr("The Partition Method is not a relevant simulation model");

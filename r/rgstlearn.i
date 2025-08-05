@@ -456,8 +456,8 @@ namespace gstlrn {
   int matrixDenseFromCpp(SEXP* obj, const MatrixDense& mat)
   {
     // Local definitions
-    int nrows = mat.getNRows();
-    int ncols = mat.getNCols();
+    auto nrows = mat.getNRows();
+    auto ncols = mat.getNCols();
 
     // Create a Matrix
     PROTECT(*obj = Rf_allocMatrix(REALSXP, nrows, ncols));
@@ -481,9 +481,9 @@ namespace gstlrn {
   int matrixSparseFromCpp(SEXP* obj, const MatrixSparse& mat)
   {
     // Type definitions
-    int nrows = mat.getNRows();
-    int ncols = mat.getNCols();
-    int nnz   = mat.getNonZeros();
+    auto nrows = mat.getNRows();
+    auto ncols = mat.getNCols();
+    auto nnz   = mat.getNonZeros();
 
     // Transform the input Matrix into a Triplet
     NF_Triplet NFT = mat.getMatrixToTriplet();

@@ -69,7 +69,7 @@ DirParam::DirParam(const DbGrid* dbgrid,
   , _codir()
   , _grincr(grincr)
 {
-  int ndim = getDefaultSpaceDimension();
+  auto ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
   _codir      = dbgrid->getCodir(grincr);
@@ -182,7 +182,7 @@ void DirParam::_completeDefinition(double angle2D)
     if (_breaks.size() < 2) _breaks.clear();
   }
 
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   if (!FFFF(angle2D))
   {
@@ -215,7 +215,7 @@ bool DirParam::isDimensionValid(int idim) const
 bool DirParam::isLagValid(int ilag, bool flagAsym, bool flagCheck) const
 {
   if (!flagCheck) return true;
-  int nlag = getNLag();
+  auto nlag = getNLag();
   if (flagAsym) nlag = 2 * nlag + 1;
   return checkArg("Lag Index", ilag, nlag);
 }
@@ -262,7 +262,7 @@ bool DirParam::isConsistent(const ASpace* /*space*/) const
 String DirParam::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   if (getNLag() > 0)
     sstr << "Number of lags              = " << getNLag() << std::endl;
@@ -332,7 +332,7 @@ std::vector<DirParam> DirParam::createMultiple(int ndir,
                                                double angref,
                                                const ASpaceSharedPtr& space)
 {
-  int ndim = getDefaultSpaceDimension();
+  auto ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
   VectorDouble angles(1);
@@ -358,7 +358,7 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
                                                 const ASpaceSharedPtr& space)
 {
   std::vector<DirParam> dirs;
-  int ndim = getDefaultSpaceDimension();
+  auto ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
   if (ndim != 2)
   {
@@ -394,7 +394,7 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
  */
 std::vector<DirParam> DirParam::createMultipleInSpace(int nlag, double dlag, const ASpaceSharedPtr& space)
 {
-  int ndim = getDefaultSpaceDimension();
+  auto ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
   VectorDouble codir(ndim);

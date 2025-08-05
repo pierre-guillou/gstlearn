@@ -494,9 +494,9 @@ double CalcSimuEden::getWeight(int ipos, int idir) const
     value = 1.;
   else
   {
-    int ifacies = _getFACIES(ipos);
-    int ifluid  = _getFLUID(ipos);
-    int perm    = _getPERM(ipos);
+    auto ifacies = _getFACIES(ipos);
+    auto ifluid  = _getFLUID(ipos);
+    auto perm    = _getPERM(ipos);
     int ind     = (idir) + 6 * ((ifacies - 1) * _nfluids + (ifluid - 1));
     value       = perm * _speeds[ind];
   }
@@ -558,8 +558,8 @@ void CalcSimuEden::_checkInconsistency(bool verbose)
   int n_shale_fluid = 0;
   for (int iech = 0; iech < _nxyz; iech++)
   {
-    int ifluid  = _getFLUID_OLD(iech);
-    int ifacies = _getFACIES(iech);
+    auto ifluid  = _getFLUID_OLD(iech);
+    auto ifacies = _getFACIES(iech);
     double perm = _getPERM(iech);
 
     if (ifacies == SHALE || perm <= 0)
@@ -682,7 +682,7 @@ int CalcSimuEden::_checkMax(double number_max, double volume_max)
   for (int ifluid = 0; ifluid < _nfluids; ifluid++)
     for (int ifacies = 0; ifacies < _nfacies; ifacies++)
     {
-      int number    = _getStatCount(ifacies, ifluid);
+      auto number   = _getStatCount(ifacies, ifluid);
       double volume = _getStatVolume(ifacies, ifluid);
       totnum += number;
       totvol += volume;
@@ -718,7 +718,7 @@ int CalcSimuEden::_fluidModify(Skin* skin, int ipos, int* ref_fluid_loc)
     {
       if (isAlreadyFilled(ecr))
       {
-        int fluid = _getFLUID(ecr);
+        auto fluid = _getFLUID(ecr);
 
         if (ref_fluid == UNDEF_FLUID)
         {
@@ -786,7 +786,7 @@ void CalcSimuEden::_statsPrint(const char* title)
   for (int ifluid = 0; ifluid < _nfluids; ifluid++)
     for (int ifacies = 0; ifacies < _nfacies; ifacies++)
     {
-      int number    = _getStatCount(ifacies, ifluid);
+      auto number   = _getStatCount(ifacies, ifluid);
       double volume = _getStatVolume(ifacies, ifluid);
       totnum += number;
       totvol += volume;
@@ -854,7 +854,7 @@ void CalcSimuEden::_calculateCumul(void)
 
     /* Update the Fluid statistics */
 
-    int ifluid = _getFLUID(iech);
+    auto ifluid = _getFLUID(iech);
     if (ifluid > 0) dbgrid->updArray(iech, _iptrStatFluid + ifluid - 1, EOperator::ADD, 1);
 
     /* Update the Cork statistics */
@@ -885,7 +885,7 @@ void CalcSimuEden::_updateResults(int reset_facies, int show_fluid)
 
   for (int iech = 0; iech < _nxyz; iech++)
   {
-    int ifluid  = _getFLUID_OLD(iech);
+    auto ifluid = _getFLUID_OLD(iech);
     int ifacies = (int)dbgrid->getArray(iech, _indFacies);
 
     /* Update the Facies information */
@@ -962,7 +962,7 @@ bool CalcSimuEden::_check()
   if (!ACalcSimulation::_check()) return false;
 
   if (!hasDbout()) return false;
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
   if (ndim > 3)
   {
     messerr("The Turning Band Method is not a relevant simulation model");

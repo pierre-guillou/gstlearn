@@ -3004,7 +3004,7 @@ static int st_distance_to_isoline(DbGrid* dbout)
 {
   int radius = 1;
   int seed   = 3432521;
-  int memo   = law_get_random_seed();
+  auto memo  = law_get_random_seed();
   double eps = 1.e-3;
 
   // Highlight the isoline of interest

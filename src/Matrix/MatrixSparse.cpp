@@ -115,8 +115,8 @@ void MatrixSparse::fillRandom(int seed, double zeroPercent)
 {
   law_set_random_seed(seed);
 
-  int nrow = getNRows();
-  int ncol = getNCols();
+  auto nrow = getNRows();
+  auto ncol = getNCols();
   NF_Triplet NF_T;
   for (int irow = 0; irow < nrow; irow++)
     for (int icol = 0; icol < ncol; icol++)
@@ -150,7 +150,7 @@ MatrixSparse* MatrixSparse::transpose() const
  */
 void MatrixSparse::setColumn(int icol, const VectorDouble& tab)
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
   if (getFlagMatrixCheck())
   {
     if (!_isColumnValid(icol)) return;
@@ -162,7 +162,7 @@ void MatrixSparse::setColumn(int icol, const VectorDouble& tab)
 
 void MatrixSparse::setColumnToConstant(int icol, double value)
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
   if (getFlagMatrixCheck())
   {
     if (!_isColumnValid(icol)) return;
@@ -181,7 +181,7 @@ void MatrixSparse::setColumnToConstant(int icol, double value)
  */
 void MatrixSparse::setRow(int irow, const VectorDouble& tab)
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   if (getFlagMatrixCheck())
   {
     if (!_isRowValid(irow)) return;
@@ -193,7 +193,7 @@ void MatrixSparse::setRow(int irow, const VectorDouble& tab)
 
 void MatrixSparse::setRowToConstant(int irow, double value)
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   if (getFlagMatrixCheck())
   {
     if (!_isRowValid(irow)) return;
@@ -272,8 +272,8 @@ int MatrixSparse::_getMatrixPhysicalSize() const
  */
 void MatrixSparse::fill(double value)
 {
-  int nrow = getNRows();
-  int ncol = getNCols();
+  auto nrow = getNRows();
+  auto ncol = getNCols();
   NF_Triplet NF_T;
   for (int irow = 0; irow < nrow; irow++)
     for (int icol = 0; icol < ncol; icol++)
@@ -852,7 +852,7 @@ int MatrixSparse::_invert()
 {
   if (!isSquare())
     my_throw("Invert method is restricted to Square matrices");
-  int n = getNCols();
+  auto n = getNCols();
   Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;
   solver.compute(eigenMat());
   Eigen::SparseMatrix<double> I(n, n);
@@ -1001,7 +1001,7 @@ VectorInt MatrixSparse::colorCoding() const
 {
   int next_col = 0;
   int ncol     = 0;
-  int nmesh    = getNCols();
+  auto nmesh   = getNCols();
 
   /* Core allocation */
 
@@ -1122,7 +1122,7 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
 
   /* Core allocation */
 
-  int n = getNCols();
+  auto n = getNCols();
   VectorInt u_row(n);
   VectorInt u_col(n);
 
@@ -1204,7 +1204,7 @@ void MatrixSparse::setDiagonal(const Eigen::Map<const Eigen::VectorXd>& tab)
 /*! Extract a Row */
 MatrixSparse* MatrixSparse::getRowAsMatrixSparse(int irow, double coeff) const
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   auto* res = new MatrixSparse(1, ncols);
 
   // The input sparse matrix being symmetrical, we benefit from its
@@ -1219,7 +1219,7 @@ MatrixSparse* MatrixSparse::getRowAsMatrixSparse(int irow, double coeff) const
 /*! Extract a Column */
 MatrixSparse* MatrixSparse::getColumnAsMatrixSparse(int icol, double coeff) const
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
   auto* res = new MatrixSparse(nrows, 1);
 
   for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), icol); it; ++it)

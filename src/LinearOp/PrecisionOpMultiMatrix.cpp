@@ -51,7 +51,7 @@ MatrixSparse PrecisionOpMultiMatrix::_prepareMatrixStationary(int icov, const Ma
 MatrixSparse PrecisionOpMultiMatrix::_prepareMatrixNoStat(int icov, const MatrixSparse* Q) const
 {
   int n = PrecisionOpMulti::size(icov);
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   const MatrixSparse empty(n,n);
   MatrixSparse diag(n,n);
 

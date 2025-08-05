@@ -182,7 +182,7 @@ int CalcSimuPost::_defineVaroutNumber()
 
   // Loop on the statistic options
 
-  int nvarin = _getNEff();
+  auto nvarin = _getNEff();
   _nvarOut   = 0;
   for (int ioption = 0, noption = _getNStats(); ioption < noption; ioption++)
   {
@@ -206,7 +206,7 @@ int CalcSimuPost::_defineVaroutNumber()
  */
 void CalcSimuPost::_readIn(int iech, const VectorInt& indices, VectorDouble& tabin) const
 {
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   for (int ivar = 0; ivar < nvar; ivar++)
     tabin[ivar] = getDbin()->getArray(iech, _iuids[ivar][indices[ivar]]);
 
@@ -301,9 +301,9 @@ void CalcSimuPost::_upscaleFunction(const VectorVectorDouble& Y_p_k_s, VectorDou
 void CalcSimuPost::_statisticsFunction(const VectorVectorDouble& Y_p,
                                        VectorDouble& tabout) const
 {
-  int niter   = _getNiter();
-  int nvarout = _getNEff();
-  int nstat   = _getNStats();
+  auto niter   = _getNiter();
+  auto nvarout = _getNEff();
+  auto nstat   = _getNStats();
 
   int ecr = 0;
   for (int ivar = 0; ivar < nvarout; ivar++)
@@ -368,7 +368,7 @@ void CalcSimuPost::_statisticsFunction(const VectorVectorDouble& Y_p,
 
 void CalcSimuPost::_printIndices(const VectorVectorInt& indices) const
 {
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   message("  Iteration (1-based) %3d/%3d -> Indices:", _iter + 1, _niter);
   for (int ivar = 0; ivar < nvar; ivar++)
     message(" %d/%d", indices[_iter][ivar] + 1, _nfact[ivar]);
@@ -377,8 +377,8 @@ void CalcSimuPost::_printIndices(const VectorVectorInt& indices) const
 
 VectorVectorInt CalcSimuPost::_getIndices() const
 {
-  int nvar  = _getNVar();
-  int niter = _getNiter();
+  auto nvar  = _getNVar();
+  auto niter = _getNiter();
   VectorVectorInt indices(niter);
 
   // Loop on the iterations
@@ -535,8 +535,8 @@ int CalcSimuPost::_getSortingCase() const
 
 int CalcSimuPost::_process()
 {
-  int nechout = getDbout()->getNSample();
-  int niter   = _getNiter();
+  auto nechout = getDbout()->getNSample();
+  auto niter   = _getNiter();
   VectorDouble sampleIn(_getNVar());
   VectorDouble sampleOut;
   if (_getTransfoNvar() > 0)
@@ -550,7 +550,7 @@ int CalcSimuPost::_process()
   // There is no need to check that 'dbout' is a grid (see _check)
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   VectorInt indblock;
-  int icase = _getSortingCase();
+  auto icase = _getSortingCase();
   if (icase == 1)
     indblock = dbgrid->locateDataInGrid(getDbin(), VectorInt(), true);
 

@@ -251,7 +251,7 @@ void Vecchia::_buildRHS(int icase2,
  */
 void Vecchia::_loadDataFlattened()
 {
-  int icase = _getCase();
+  auto icase = _getCase();
   int ecr   = 0;
   if (icase == 1)
   {
@@ -337,9 +337,9 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
     for (int isample = 0; isample < nsample; isample++)
     {
       int target = Ranks(isample, 0);
-      int icase1 = _getSampleCase(target);
-      int iabs1  = _getAddressAbsolute(target);
-      int irel1  = _getAddressInMatrix(target, ivar);
+      auto icase1 = _getSampleCase(target);
+      auto iabs1  = _getAddressAbsolute(target);
+      auto irel1  = _getAddressInMatrix(target, ivar);
 
       // Build the list of neighboring information
       int nitems = _buildNeighborhood(Ranks, isample, ivar, nb_neigh, neighDescr);
@@ -405,8 +405,8 @@ int Vecchia::computeLower(const MatrixT<int>& Ranks, bool verbose)
 // Calculate LdY = Ldat %*% Y
 VectorDouble Vecchia::calculateLdY(const VectorDouble& Y) const
 {
-  int nd = getND();
-  int nt = getNT();
+  auto nd = getND();
+  auto nt = getNT();
   VectorDouble LdY(nd);
 
   for (int id = 0; id < nd; id++)
@@ -422,8 +422,8 @@ VectorDouble Vecchia::calculateLdY(const VectorDouble& Y) const
 // Calculate FtLdY = Ft %*% Ldat %*% Y
 VectorDouble Vecchia::calculateFtLdY(const VectorDouble& LdY) const
 {
-  int nd = getND();
-  int nt = getNT();
+  auto nd = getND();
+  auto nt = getNT();
   VectorDouble FtLdY(nt);
   for (int it = 0; it < nt; it++)
   {
@@ -437,8 +437,8 @@ VectorDouble Vecchia::calculateFtLdY(const VectorDouble& LdY) const
 
 MatrixSparse* Vecchia::calculateW(const VectorDouble& D_dd) const
 {
-  int nd = getND();
-  int nt = getNT();
+  auto nd = getND();
+  auto nt = getNT();
 
   // Extract sub-part of 'Diagonal' vector
   VectorDouble D_tt(nt);
@@ -486,8 +486,8 @@ int krigingVecchia(Db* dbin,
 
   // Extract sub-part of 'Diagonal' vector
   VectorDouble DFull = V.getDFull();
-  int nd             = V.getND();
-  int nt             = V.getNT();
+  auto nd            = V.getND();
+  auto nt            = V.getNT();
   int nvar           = model->getNVar();
   VectorDouble D_dd(nd);
   VH::extractInPlace(DFull, D_dd, nt);
@@ -532,8 +532,8 @@ void Vecchia::productVecchia(constvect Y, vect res) const
 
 void Vecchia::productMatVecchia(const MatrixDense& X, MatrixDense& resmat) const
 {
-  int nrows = X.getNRows();
-  int ncols = X.getNCols();
+  auto nrows = X.getNRows();
+  auto ncols = X.getNCols();
   resmat.resize(nrows, ncols);
 
   // Loop on the columns

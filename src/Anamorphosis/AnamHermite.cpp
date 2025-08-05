@@ -64,7 +64,7 @@ AnamHermite::~AnamHermite()
 String AnamHermite::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
-  int nbpoly = getNbPoly();
+  auto nbpoly = getNbPoly();
   if (nbpoly <= 0) return sstr.str();
 
   sstr << toTitle(1, "Hermitian Anamorphosis");
@@ -275,7 +275,7 @@ double AnamHermite::transformToRawValue(double y) const
  */
 double AnamHermite::computeVariance(double chh) const
 {
-  int nbpoly = getNbPoly();
+  auto nbpoly = getNbPoly();
   double rho = 1.;
   double var = 0.;
   for (int ih = 1; ih < nbpoly; ih++)
@@ -290,7 +290,7 @@ VectorDouble AnamHermite::cumulateVarianceRatio(double chh) const
 {
   VectorDouble vec;
 
-  int nbpoly   = getNbPoly();
+  auto nbpoly  = getNbPoly();
   double rho   = 1.;
   double var   = 0.;
   double total = getVariance();
@@ -324,7 +324,7 @@ int AnamHermite::fitFromArray(const VectorDouble& tab, const VectorDouble& wt)
   int nech = static_cast<int>(tab.size());
   if (nech <= 0) return 1;
 
-  int nbpoly = getNbPoly();
+  auto nbpoly = getNbPoly();
   zs.resize(nech + 2);
   ys.resize(nech + 2);
   _psiHn.resize(nbpoly, 0.);
@@ -665,7 +665,7 @@ int AnamHermite::updatePointToBlock(double r_coef)
  *****************************************************************************/
 void AnamHermite::_globalSelectivity(Selectivity* selectivity)
 {
-  int nbpoly = getNbPoly();
+  auto nbpoly = getNbPoly();
   setFlagBound(0);
   int ncut = selectivity->getNCuts();
 
@@ -709,7 +709,7 @@ int AnamHermite::factor2Selectivity(Db* db,
                                     int iptr0)
 {
   setFlagBound(1);
-  int nbpoly  = getNbPoly();
+  auto nbpoly = getNbPoly();
   bool need_T = selectivity->isNeededT();
   bool need_Q = selectivity->isNeededQ();
   int ncut    = selectivity->getNCuts();

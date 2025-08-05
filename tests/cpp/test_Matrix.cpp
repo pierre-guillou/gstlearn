@@ -602,7 +602,7 @@ int main(int argc, char* argv[])
 
   // Get a Dense matrix
   VectorDouble temp     = MSS.getValues();
-  int ntemp             = MSS.getNRows();
+  auto ntemp            = MSS.getNRows();
   MatrixSymmetric* MEig = MatrixSymmetric::createFromVD(temp);
   MEig->display();
   MatrixSymmetric* MNoEig = MatrixSymmetric::createFromVD(temp);

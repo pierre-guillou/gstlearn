@@ -169,7 +169,7 @@ int AnamDiscreteDD::fitFromArray(const VectorDouble& tab,
 int AnamDiscreteDD::_stats(int nech, const VectorDouble& tab)
 {
   double zmin, zmax;
-  int nclass = getNClass();
+  auto nclass = getNClass();
 
   /* Reset the statistics */
 
@@ -214,7 +214,7 @@ VectorDouble AnamDiscreteDD::factors_exp(bool verbose)
 
   /* Initializations */
 
-  int nclass = getNClass();
+  auto nclass = getNClass();
 
   /* Core allocation */
 
@@ -306,8 +306,8 @@ VectorDouble AnamDiscreteDD::factors_exp(bool verbose)
 VectorDouble AnamDiscreteDD::factors_maf(bool verbose)
 {
   VectorDouble maf, tab;
-  int ncut   = getNCut();
-  int nclass = getNClass();
+  auto ncut   = getNCut();
+  auto nclass = getNClass();
 
   /* Core allocation */
 
@@ -354,7 +354,7 @@ VectorDouble AnamDiscreteDD::_generator(const VectorDouble& vecc,
 
   /* Initializations */
 
-  int nclass = getNClass();
+  auto nclass = getNClass();
 
   /* Preliminary checks */
 
@@ -416,7 +416,7 @@ VectorDouble AnamDiscreteDD::_generator(const VectorDouble& vecc,
 
 void AnamDiscreteDD::_lambdaToMul()
 {
-  int nclass   = getNClass();
+  auto nclass  = getNClass();
   double scoef = getSCoef();
   double mu    = getMu();
 
@@ -432,7 +432,7 @@ VectorDouble AnamDiscreteDD::z2factor(double z, const VectorInt& ifacs) const
   int nfact = (int)ifacs.size();
   factors.resize(nfact, 0);
 
-  int nclass = getNClass();
+  auto nclass = getNClass();
   for (int ifac = 0; ifac < nfact; ifac++)
   {
     double value = 0.;
@@ -452,7 +452,7 @@ VectorDouble AnamDiscreteDD::factors_mod()
 
   /* Initializations */
 
-  int nclass = getNClass();
+  auto nclass = getNClass();
   int ntri   = nclass * (nclass + 1) / 2;
 
   /* Core allocation */
@@ -559,7 +559,7 @@ VectorDouble AnamDiscreteDD::factors_mod()
  */
 MatrixSquare AnamDiscreteDD::chi2I(const VectorDouble& chi, int mode)
 {
-  int nclass = getNClass();
+  auto nclass = getNClass();
   MatrixSquare chi2i(nclass);
   MatrixSquare mati(nclass);
   chi2i.fill(0.);
@@ -619,7 +619,7 @@ bool AnamDiscreteDD::_deserializeAscii(std::istream& is, bool verbose)
   ret      = ret && _recordRead<double>(is, "Anamorphosis 's' coefficient", s);
   ret      = ret && _recordRead<double>(is, "Anamorphosis 'mu' coefficient", mu);
 
-  int ncut = getNCut();
+  auto ncut = getNCut();
   if (ret)
   {
     VectorDouble local(ncut * ncut);
@@ -647,7 +647,7 @@ bool AnamDiscreteDD::_deserializeAscii(std::istream& is, bool verbose)
 double AnamDiscreteDD::computeVariance(double sval) const
 {
   if (!allowChangeSupport()) return TEST;
-  int nclass = getNClass();
+  auto nclass = getNClass();
 
   // At this stage (point -> block)) cnorm designate the point C_i
 
@@ -664,7 +664,7 @@ int AnamDiscreteDD::updatePointToBlock(double r_coef)
 {
   if (!allowChangeSupport()) return 1;
   setRCoef(r_coef);
-  int nclass = getNClass();
+  auto nclass = getNClass();
 
   /* Update the coefficients mul */
 
@@ -717,7 +717,7 @@ int AnamDiscreteDD::updatePointToBlock(double r_coef)
  *****************************************************************************/
 void AnamDiscreteDD::_blockAnamorphosis(const VectorDouble& chi)
 {
-  int nclass = getNClass();
+  auto nclass = getNClass();
 
   /* Block anamorphosis on the indicators */
 
@@ -812,7 +812,7 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
                                        const VectorInt& cols_std,
                                        int iptr0)
 {
-  int nclass      = getNClass();
+  auto nclass     = getNClass();
   int nech        = db->getNSample();
   int nb_est      = (int)cols_est.size();
   int nb_std      = (int)cols_std.size();
@@ -830,7 +830,7 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
 
   /* Get the number of initial cutoffs */
 
-  int nmax = getNClass();
+  auto nmax = getNClass();
   if (nvar >= nmax)
   {
     messerr("Number of factors (%d) must be smaller than Number of classes (%d)",
@@ -991,7 +991,7 @@ bool AnamDiscreteDD::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbos
 
   if (ret)
   {
-    int ncut = getNCut();
+    auto ncut = getNCut();
 
     setRCoef(s);
     setMu(mu);

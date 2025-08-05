@@ -201,8 +201,8 @@ int computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
                                int idx)
 {
   MatrixDense F1loc = _transformF(F1, type, idx);
-  int nech          = F1.getNRows();
-  int nvar          = Sigma.getNRows() / nech;
+  auto nech         = F1.getNRows();
+  auto nvar         = Sigma.getNRows() / nech;
   cov.resize(nech, nech);
 
   for (int iech = 0; iech < nech; iech++)
@@ -239,9 +239,9 @@ int computeCovMatSVCRHSInPlace(MatrixDense& cov,
 {
   MatrixDense F1loc = _transformF(F1, type1, idx1);
   MatrixDense F2loc = _transformF(F2, type2, idx2);
-  int nech1         = F1.getNRows();
-  int nech2         = F2.getNRows();
-  int nvar          = Sigma.getNCols();
+  auto nech1        = F1.getNRows();
+  auto nech2        = F2.getNRows();
+  auto nvar         = Sigma.getNCols();
   cov.resize(nech1, nech2);
 
   for (int iech = 0; iech < nech1; iech++)

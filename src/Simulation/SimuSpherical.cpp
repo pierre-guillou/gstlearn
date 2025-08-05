@@ -42,8 +42,8 @@ int SimuSpherical::simulate(DbGrid* db,
                             int iptr,
                             bool verbose)
 {
-  int special = sphepar.getSpecial();
-  int degmax  = sphepar.getDegmax();
+  auto special = sphepar.getSpecial();
+  auto degmax  = sphepar.getDegmax();
   int nx      = db->getNX(0);
   int ny      = db->getNX(1);
   int nech    = db->getNSample();
@@ -162,9 +162,9 @@ VectorDouble SimuSpherical::simulate_mesh(MeshSpherical* mesh,
                                           const SimuSphericalParam& sphepar,
                                           bool verbose)
 {
-  int nbf     = sphepar.getNbf();
-  int special = sphepar.getSpecial();
-  int degmax  = sphepar.getDegmax();
+  auto nbf     = sphepar.getNbf();
+  auto special = sphepar.getSpecial();
+  auto degmax  = sphepar.getDegmax();
   int nech    = mesh->getNApices();
   law_set_random_seed(getSeed());
 
@@ -348,7 +348,7 @@ VectorDouble SimuSpherical::_spectrum_exponential(Model* model,
 VectorDouble SimuSpherical::_spectrum_any(Model* model,
                                           const SimuSphericalParam& sphepar)
 {
-  int ndisc = sphepar.getNdisc();
+  auto ndisc = sphepar.getNdisc();
   ndisc     = (int)get_keypone("Simsph_Ndisc", ndisc);
   VectorDouble freqs;
   VectorDouble dd(2);

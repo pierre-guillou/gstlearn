@@ -123,7 +123,7 @@ bool ACovFunc::hasCovOnSphere() const
 /// Test consistency with the current context
 bool ACovFunc::isConsistent() const
 {
-  unsigned int maxndim = getMaxNDim();
+  auto maxndim = getMaxNDim();
   if (maxndim <= 0.) return true;
   if (maxndim >= _ctxt.getNDim()) return true;
   /// TODO : Test irfDegree vs getMinOrder in CovElem because zonal anisotropies

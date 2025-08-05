@@ -78,14 +78,14 @@ VarioParam::~VarioParam()
 
 bool VarioParam::isDefinedForGrid() const
 {
-  int ndir = getNDir();
+  auto ndir = getNDir();
   if (ndir <= 0) return false;
   return _dirparams[0].isDefinedForGrid();
 }
 
 bool VarioParam::_validDefinedFromGrid(const DirParam& dirparam) const
 {
-  int ndir = getNDir();
+  auto ndir            = getNDir();
   bool definedFromGrid = dirparam.isDefinedForGrid();
   if (ndir > 0)
   {
@@ -223,7 +223,7 @@ VarioParam* VarioParam::createFromSpaceDimension(int nlag,
                                                  const VectorDouble &dates,
                                                  const ASpaceSharedPtr& space)
 {
-  int ndim = getDefaultSpaceDimension();
+  auto ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
   auto* varioparam = new VarioParam(scale, dates);
@@ -307,7 +307,7 @@ String VarioParam::toString(const AStringFormat* strfmt) const
 String VarioParam::toStringMain(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
-  int ndir = getNDir();
+  auto ndir = getNDir();
 
   /* General parameters */
 
@@ -498,7 +498,7 @@ Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam)
 
         /* Get the rank of the lag */
 
-        int ilag = dirparam.getLagRank(dist);
+        auto ilag = dirparam.getLagRank(dist);
         if (IFFFF(ilag)) continue;
 
         // The pair is kept

@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   // Creating the small Grid Db
   // All characteristics along X and Y are different (on purpose)
   DbGrid* grid = DbGrid::create({5, 4}, {1., 2.}, {10., 20.});
-  int nech     = grid->getNSample();
+  auto nech    = grid->getNSample();
 
   // Add a selection to the Grid
   VectorDouble x1 = grid->getColumn("x1");
@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
   const Indirection& indirect = mesh.getGridIndirect();
   int igrid_rel               = 3;
   message("Starting from the Relative grid node = %d\n", igrid_rel);
-  int igrid_abs = indirect.getRToA(igrid_rel);
+  auto igrid_abs = indirect.getRToA(igrid_rel);
   message("Corresponding absolute grid node = %d\n", igrid_abs);
-  int igrid_rel2 = indirect.getAToR(igrid_abs);
+  auto igrid_rel2 = indirect.getAToR(igrid_abs);
   message("Ending Relative grid node = %d\n", igrid_rel2);
 
   // Performing the same task with the Indirection stored in Integer Arrays

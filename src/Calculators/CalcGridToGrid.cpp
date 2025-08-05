@@ -62,7 +62,7 @@ bool CalcGridToGrid::_check()
   /* Cross-Checking the Variable Number consistency */
   /**************************************************/
 
-  int nvar = _getNVar();
+  auto nvar          = _getNVar();
   int nvar_requested = (_flagInter) ? 2 : 1;
   if (nvar != nvar_requested)
   {
@@ -266,7 +266,7 @@ void CalcGridToGrid::_reduceIndices(const VectorInt& indgIn, VectorInt& indgOut)
 
 bool CalcGridToGrid::_g2gCopy()
 {
-  int nech = getDbin()->getNSample();
+  auto nech = getDbin()->getNSample();
 
   for (int iech = 0; iech < nech; iech++)
   {
@@ -400,7 +400,7 @@ double CalcGridToGrid::_interpolate(int nvar,
   double delta;
   if (FFFF(valTop) || FFFF(valBot)) return TEST;
 
-  int shift = getDbin()->getNDim();
+  auto shift = getDbin()->getNDim();
   double dT0 = 0.;
   double dB0 = 0.;
   for (int ivar = 0; ivar < nvar; ivar++)

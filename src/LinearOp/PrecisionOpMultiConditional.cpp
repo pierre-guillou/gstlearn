@@ -193,7 +193,7 @@ double PrecisionOpMultiConditional::computeLogDetNoise() const
 
 double PrecisionOpMultiConditional::computeTotalLogDet(int nMC, bool verbose, int seed) const
 {
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
 
   law_set_random_seed(seed);
   double a1 = computeLogDetOp(nMC);

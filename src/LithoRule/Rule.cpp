@@ -347,7 +347,7 @@ int Rule::getNFacies() const
 
 int Rule::getNGRF() const
 {
-  int ny2 = getNY2();
+  auto ny2 = getNY2();
   return (ny2 > 0 ? 2 : 1);
 }
 
@@ -646,7 +646,7 @@ int Rule::setProportions(const VectorDouble& proportions) const
   _props.resize(proportions.size());
   if (_props.empty())
   {
-    int nfacies = getNFacies();
+    auto nfacies = getNFacies();
     _props.clear();
     _props.resize(nfacies, 1. / (double) nfacies);
   } else {
@@ -866,7 +866,7 @@ int Rule::gaus2facData(PropDef* propdef,
 
     for (int igrf=0; igrf<2; igrf++)
     {
-      int icase = get_rank_from_propdef(propdef,ipgs,igrf);
+      auto icase = get_rank_from_propdef(propdef, ipgs, igrf);
       y[igrf] = (flag_used[igrf]) ?
         dbin->getSimvar(ELoc::GAUSFAC,iech,isimu,0,icase,nbsimu,1) : 0.;
     }

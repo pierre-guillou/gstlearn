@@ -307,7 +307,7 @@ void CorAniso::setAnisoRotationMat(const Rotation& rot)
 void CorAniso::setAnisoRotation(const VectorDouble& rot)
 {
   if (!hasRange()) return;
-  int ndim = getNDim();
+  auto ndim = getNDim();
   if ((int)rot.size() != ndim * ndim)
   {
     messerr(
@@ -826,7 +826,7 @@ double CorAniso::getParam() const
 
 void CorAniso::_initFromContext()
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   _aniso.init(ndim);
   updateFromContext();
   setOptimEnabled(true);
@@ -884,7 +884,7 @@ void CorAniso::_updateFromContext()
  */
 double CorAniso::getIntegralRange(int ndisc, double hmax) const
 {
-  int ndim = getNDim();
+  auto ndim = getNDim();
   SpacePoint dd(VectorDouble(ndim), -1);
   double delta = hmax / ndisc;
   double total = 0.;
@@ -933,7 +933,7 @@ bool CorAniso::_isVariableValid(int ivar) const
 
 int CorAniso::getNGradParam() const
 {
-  int ndim   = getNDim();
+  auto ndim  = getNDim();
   int number = 0;
 
   // Anisotropy ranges
@@ -1349,7 +1349,7 @@ void CorAniso::updateCovByPoints(int icas1, int iech1, int icas2, int iech2)
   if (!getTabNoStatCovAniso()->isNoStat()) return;
   double val1, val2;
 
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   const auto paramsnostat = getTabNoStatCovAniso()->getTable();
   // Loop on the elements that can be updated one-by-one
@@ -1475,7 +1475,7 @@ void CorAniso::updateCovByMesh(int imesh, bool aniso) const
   // If no non-stationary parameter is defined, simply skip
   if (!getTabNoStatCovAniso()->isNoStat()) return;
 
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   // Loop on the elements that can be updated one-by-one
   if (!aniso)

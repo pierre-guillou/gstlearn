@@ -216,7 +216,7 @@ int SimuBoolean::_generatePrimary(Db* dbin,
     /* Look for a non-covered grain */
 
     int rank = (int)(draw_more * law_uniform(0., 1.));
-    int iref = _getRankUncovered(dbin, rank);
+    auto iref = _getRankUncovered(dbin, rank);
     if (iref < 0) return 1;
     dbin->getCoordinatesInPlace(cdgrain, iref);
 
@@ -272,7 +272,7 @@ int SimuBoolean::_generateSecondary(Db* dbin,
     iter++;
     if (iter >= boolparam.getMaxiter()) break;
 
-    int nbObject = _getNObjects();
+    auto nbObject = _getNObjects();
     // The next line is not correct but is kept for compatibility.
     // The correct version should be implemented on next case study
     // update.
@@ -360,10 +360,10 @@ int SimuBoolean::_deleteObject(int mode, Db* dbin)
 {
   /* Search for the object to be deleted */
 
-  int count = _getNObjects(mode);
+  auto count = _getNObjects(mode);
   if (count <= 0) return 1;
   int rank = (int)(count * law_uniform(0., 1.));
-  int iref = _getObjectRank(mode, rank);
+  auto iref = _getObjectRank(mode, rank);
   if (iref < 0) return 1;
 
   /* Check if the object can be deleted */

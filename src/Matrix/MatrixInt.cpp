@@ -50,7 +50,7 @@ MatrixInt::~MatrixInt()
 int MatrixInt::getValue(int irow, int icol) const
 {
   if (!_isIndexValid(irow, icol)) return ITEST;
-  int rank = _getIndexToRank(irow, icol);
+  auto rank = _getIndexToRank(irow, icol);
   return _rectMatrix[rank];
 }
 
@@ -62,7 +62,7 @@ int MatrixInt::getValue(int irank) const
 
 int& MatrixInt::_getValueRef(int irow, int icol)
 {
-  int rank = _getIndexToRank(irow, icol);
+  auto rank = _getIndexToRank(irow, icol);
   return _rectMatrix[rank];
 }
 
@@ -75,7 +75,7 @@ void MatrixInt::setValueByRank(int irank, int value)
 void MatrixInt::setValue(int irow, int icol, int value)
 {
   if (!_isIndexValid(irow, icol)) return;
-  int rank          = _getIndexToRank(irow, icol);
+  auto rank         = _getIndexToRank(irow, icol);
   _rectMatrix[rank] = value;
 }
 
@@ -84,14 +84,14 @@ void MatrixInt::transposeInPlace()
   VectorInt old(getNRows() * getNCols());
   _transposeInPlace(getNRows(), getNCols(), _rectMatrix.data(), old.data());
   _rectMatrix = old;
-  int temp    = getNCols();
+  auto temp   = getNCols();
   setNCols(getNRows());
   setNRows(temp);
 }
 
 void MatrixInt::fill(int value)
 {
-  int size = getMatrixSize();
+  auto size = getMatrixSize();
   for (int i = 0; i < size; i++)
     _rectMatrix[i] = value;
 }
@@ -138,7 +138,7 @@ VectorInt MatrixInt::getValues() const
   for (int icol = 0; icol < _nCols; icol++)
     for (int irow = 0; irow < _nRows; irow++)
     {
-      int value = getValue(irow, icol);
+      auto value = getValue(irow, icol);
       vect.push_back(value);
     }
   return vect;
@@ -149,7 +149,7 @@ VectorInt MatrixInt::getValuesPerRow(int irow) const
   VectorInt vect;
   for (int icol = 0; icol < _nCols; icol++)
   {
-    int value = getValue(irow, icol);
+    auto value = getValue(irow, icol);
     vect.push_back(value);
   }
   return vect;
@@ -160,7 +160,7 @@ VectorInt MatrixInt::getValuesPerColumn(int icol) const
   VectorInt vect;
   for (int irow = 0; irow < _nRows; irow++)
   {
-    int value = getValue(irow, icol);
+    auto value = getValue(irow, icol);
     vect.push_back(value);
   }
   return vect;
@@ -175,7 +175,7 @@ VectorVectorInt MatrixInt::getMatrix() const
     vect[irow].resize(_nCols);
     for (int icol = 0; icol < _nCols; icol++)
     {
-      int value        = getValue(irow, icol);
+      auto value       = getValue(irow, icol);
       vect[irow][icol] = value;
     }
   }

@@ -87,8 +87,8 @@ int ACholesky::solveMatrix(const MatrixDense& b, MatrixDense& x) const
 {
   if (!isReady()) return 1;
 
-  int nrows = b.getNRows();
-  int ncols = b.getNCols();
+  auto nrows = b.getNRows();
+  auto ncols = b.getNCols();
   x.resize(nrows, ncols);
 
   VectorDouble xcol(nrows);

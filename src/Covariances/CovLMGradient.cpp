@@ -32,7 +32,7 @@ CovLMGradient::CovLMGradient(const CovAnisoList& r)
   : CovAnisoList(r.getContext())
 {
   setOptimEnabled(false);
-  for (int icov = r.getNCov() - 1; icov >= 0; icov--)
+  for (auto icov = r.getNCov() - 1; icov >= 0; icov--)
   {
     const CovAniso* cov = r.getCovAniso(icov);
     if (!cov->hasCovDerivative())

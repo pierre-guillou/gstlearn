@@ -259,8 +259,8 @@ Model* Model::createFromVario(Vario* vario,
 String Model::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
-  int ncov   = getNCov();
-  int ndrift = getNDrift();
+  auto ncov   = getNCov();
+  auto ndrift = getNDrift();
   if (ncov <= 0 && ndrift <= 0) return sstr.str();
 
   sstr << toTitle(0, "Model characteristics");
@@ -318,30 +318,30 @@ void Model::addCovFromParamOldStyle(const ECov& type,
 {
   // Check consistency with parameters of the model
 
-  int ndim = getNDim();
+  auto ndim = getNDim();
   if (!ranges.empty())
   {
-    if (ndim > 0 && (int)ranges.size() != ndim)
+    if (ndim > 0 && ranges.size() != ndim)
     {
       messerr("Mismatch between the dimension of 'ranges' (%d)", (int)ranges.size());
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return;
     }
-    ndim = (int)ranges.size();
+    ndim = ranges.size();
   }
   if (!angles.empty())
   {
-    if (ndim > 0 && (int)angles.size() != ndim)
+    if (ndim > 0 && angles.size() != ndim)
     {
       messerr("Mismatch between the dimension of 'angles' (%d)", (int)angles.size());
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return;
     }
-    ndim = (int)angles.size();
+    ndim = angles.size();
   }
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if (!sills.empty())
   {
     if (nvar > 0 && (int)sills.size() != nvar * nvar)
@@ -412,10 +412,10 @@ void Model::addCovFromParam(const ECov& type,
 {
   // Check consistency with parameters of the model
 
-  int ndim = getNDim();
+  auto ndim = getNDim();
   if (!ranges.empty())
   {
-    if (ndim > 0 && (int)ranges.size() != ndim)
+    if (ndim > 0 && ranges.size() != ndim)
     {
       messerr("Mismatch between the dimension of 'ranges' (%d)",
               (int)ranges.size());
@@ -423,11 +423,11 @@ void Model::addCovFromParam(const ECov& type,
       messerr("Operation is cancelled");
       return;
     }
-    ndim = (int)ranges.size();
+    ndim = ranges.size();
   }
   if (!angles.empty())
   {
-    if (ndim > 0 && (int)angles.size() != ndim)
+    if (ndim > 0 && angles.size() != ndim)
     {
       messerr("Mismatch between the dimension of 'angles' (%d)",
               (int)angles.size());
@@ -435,9 +435,9 @@ void Model::addCovFromParam(const ECov& type,
       messerr("Operation is cancelled");
       return;
     }
-    ndim = (int)angles.size();
+    ndim = angles.size();
   }
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if (!sills.empty())
   {
     if (nvar > 0 && nvar != sills.getNCols())
@@ -1218,10 +1218,10 @@ CovAnisoList* Model::_castInCovAnisoList(int icov)
  *****************************************************************************/
 int Model::stabilize(double percent, bool verbose)
 {
-  int nvar = getNVar();
+  auto nvar = getNVar();
   if (nvar > 1) return 0;
   if (percent <= 0.) return 0;
-  int ncov = getNCov();
+  auto ncov = getNCov();
 
   /* Check if the model only contains GAUSSIAN components */
 
@@ -1262,8 +1262,8 @@ int Model::stabilize(double percent, bool verbose)
 int Model::standardize(bool verbose)
 
 {
-  int nvar = getNVar();
-  int ncov = getNCov();
+  auto nvar = getNVar();
+  auto ncov = getNCov();
   VectorDouble total(nvar, 0.);
 
   /* Calculate the total sills for each variable */

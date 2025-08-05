@@ -528,7 +528,7 @@ int csv_table_read(const String& filename,
                    VectorDouble& tab)
 {
   bool flag_header = csvfmt.getFlagHeader();
-  int nskip        = csvfmt.getNSkip();
+  auto nskip       = csvfmt.getNSkip();
   char char_sep    = csvfmt.getCharSep();
   char char_dec    = csvfmt.getCharDec();
   String na_string = csvfmt.getNaString();

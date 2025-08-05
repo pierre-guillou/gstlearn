@@ -77,7 +77,7 @@ String PtrGeos::dumpLocator(int rank, const ELoc& locatorType) const
 {
   std::stringstream sstr;
 
-  int i = locatorType.getValue();
+  auto i = locatorType.getValue();
   sstr << rank + 1 << " - Locator: " << DEF_LOCATOR[i].SREF << std::endl;
   sstr << "- Attributes = ";
   for (int locatorIndex = 0; locatorIndex < getNLoc(); locatorIndex++)
@@ -110,7 +110,7 @@ String getLocatorName(const ELoc& locatorType, int locatorIndex)
   {
     return STRING_NA;
   }
-  int i = locatorType.getValue();
+  auto i = locatorType.getValue();
   if (DEF_LOCATOR[i].IREF == 1)
   {
     sstr << DEF_LOCATOR[i].SREF;
@@ -150,7 +150,7 @@ int getLocatorTypeFromName(const String& name_type)
   {
     if (*it != ELoc::UNKNOWN)
     {
-      int i            = it.getValue();
+      auto i           = it.getValue();
       unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[i].SREF));
       if (name_type.compare(0, lng, DEF_LOCATOR[i].SREF) == 0) return i;
     }
@@ -185,7 +185,7 @@ int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex,
   {
     if (*it != ELoc::UNKNOWN)
     {
-      int i            = it.getValue();
+      auto i           = it.getValue();
       unsigned int lng = static_cast<unsigned int>(strlen(DEF_LOCATOR[i].SREF));
       if (string_loc.compare(0, lng, DEF_LOCATOR[i].SREF) == 0) found = i;
     }
@@ -227,7 +227,7 @@ void printLocatorList()
   {
     if (*it != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      auto i = it.getValue();
       if (DEF_LOCATOR[i].IREF == 1)
         message(" %10s %s\n", DEF_LOCATOR[i].SREF, DEF_LOCATOR[i].COMMENT);
       else
@@ -246,7 +246,7 @@ VectorString getLocatorNames()
   {
     if (*it != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      auto i = it.getValue();
       strings.push_back(DEF_LOCATOR[i].SREF);
     }
     it.toNext();
@@ -262,7 +262,7 @@ VectorInt getLocatorMultiples()
   {
     if (*it != ELoc::UNKNOWN)
     {
-      int i = it.getValue();
+      auto i = it.getValue();
       mult.push_back(DEF_LOCATOR[i].IREF);
     }
     it.toNext();

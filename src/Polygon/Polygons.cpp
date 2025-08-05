@@ -474,7 +474,7 @@ void Polygons::setY(int ipol, const VectorDouble& y)
 
 bool Polygons::_isValidPolyElemIndex(int ipol) const
 {
-  int npol = getNPolyElem();
+  auto npol = getNPolyElem();
   if (ipol < 0 || ipol >= npol)
   {
     messerr("PolyElem Index %d is not valid. It should lie in [0,%d[",

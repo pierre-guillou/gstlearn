@@ -69,8 +69,8 @@ int GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
   // Initialization
 
   if (verbose) mestitle(1, "Gibbs using Unique Neighborhood in MultiMono case");
-  int nact = _getSampleRankNumber();
-  int nvar = getNVar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNVar();
   _covmat.resize(nvar);
 
   // Loop on the variables
@@ -104,13 +104,13 @@ int GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 
 double GibbsUMultiMono::_getVariance(int ivar, int iact) const
 {
-  int nact = _getSampleRankNumber();
+  auto nact = _getSampleRankNumber();
   return (1. / COVMAT(ivar, iact, iact));
 }
 
 double GibbsUMultiMono::_getEstimate(int icase, int ivar, int iact, VectorVectorDouble& y) const
 {
-  int nact = _getSampleRankNumber();
+  auto nact = _getSampleRankNumber();
 
   double yk = 0.;
   for (int jact = 0; jact < nact; jact++)
@@ -136,8 +136,8 @@ void GibbsUMultiMono::update(VectorVectorDouble& y,
                              int iter)
 {
   double valsim;
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNvar();
 
   /* Print the title */
 
@@ -149,7 +149,7 @@ void GibbsUMultiMono::update(VectorVectorDouble& y,
 
   for (int ivar = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs, ivar);
+    auto icase = getRank(ipgs, ivar);
     for (int iact = 0; iact < nact; iact++)
     {
       if (!_isConstraintTight(icase, iact, &valsim))

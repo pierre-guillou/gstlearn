@@ -93,7 +93,7 @@ void VMap::_setResult(int iech1,
   DECLARE_UNUSED(iech2);
   DECLARE_UNUSED(orient);
   DECLARE_UNUSED(dist);
-  int ijvar = _get_variable_order(nvar, ivar, jvar);
+  auto ijvar = _get_variable_order(nvar, ivar, jvar);
   _dbmap->updArray(ilag, IPTV + ijvar, EOperator::ADD, ww * value);
   _dbmap->updArray(ilag, IPTW + ijvar, EOperator::ADD, ww);
 }

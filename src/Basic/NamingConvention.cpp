@@ -412,7 +412,7 @@ void NamingConvention::_setNames(Db *dbout,
                                  const String& qualifier,
                                  int nitems) const
 {
-  int nloc = _getNameCount(names, nvar);
+  auto nloc             = _getNameCount(names, nvar);
   VectorString outnames = _createNames(names, nloc, qualifier, nitems);
 
   int ecr = 0;

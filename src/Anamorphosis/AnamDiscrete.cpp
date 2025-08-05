@@ -64,9 +64,9 @@ AnamDiscrete::~AnamDiscrete()
 
 void AnamDiscrete::_resize()
 {
-  int ncut   = getNCut();
-  int nclass = getNClass();
-  int nelem  = getNElem();
+  auto ncut   = getNCut();
+  auto nclass = getNClass();
+  auto nelem  = getNElem();
 
   _zCut.resize(ncut, 0.);
   _stats.resetFromValue(nclass, nelem, 0.);
@@ -294,8 +294,8 @@ void AnamDiscrete::setNElem(int nelem)
 
 void AnamDiscrete::setStats(const VectorDouble& stats)
 {
-  int nclass = getNClass();
-  int nelem  = getNElem();
+  auto nclass = getNClass();
+  auto nelem  = getNElem();
   if ((int)stats.size() != nclass * nelem)
   {
     messerr("Argument 'stats' incorrect. Its dimension (%d) should be %d * %d",

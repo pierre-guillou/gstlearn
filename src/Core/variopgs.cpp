@@ -2103,7 +2103,7 @@ void vario_order_get_bounds(Vario_Order* vorder,
  *****************************************************************************/
 static int invgen(MatrixSymmetric& a, MatrixSymmetric& tabout)
 {
-  int neq = a.getNRows();
+  auto neq = a.getNRows();
   tabout.fill(0.);
 
   /* Calculate the eigen vectors */
@@ -2828,7 +2828,7 @@ static double st_calcul_stat(Local_Pgs* local_pgs,
   {
     for (int ifac2 = 0; ifac2 < local_pgs->nfacies; ifac2++)
     {
-      int nfifj = st_get_count(local_pgs, ifac1 + 1, ifac2 + 1);
+      auto nfifj = st_get_count(local_pgs, ifac1 + 1, ifac2 + 1);
       if (nfifj <= 0) continue;
 
       /* Get the bounds */
@@ -3429,7 +3429,7 @@ static int st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
 
       /* Get the rank of the lag */
 
-      int ilag = dirparam.getLagRank(dist);
+      auto ilag = dirparam.getLagRank(dist);
       if (IFFFF(ilag)) continue;
 
       /* Add the sample (only positive lags are of interest) */

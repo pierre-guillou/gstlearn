@@ -57,7 +57,7 @@ bool CalcImage::_check()
   if (!ACalcInterpolator::_check()) return false;
 
   if (!hasDbin()) return false;
-  int nvar = getDbin()->getNLoc(ELoc::Z);
+  auto nvar = getDbin()->getNLoc(ELoc::Z);
   if (!getDbin()->isGrid())
   {
     messerr("This method requires the Db to be a Grid");
@@ -109,7 +109,7 @@ bool CalcImage::_preprocess()
 {
   if (!ACalcInterpolator::_preprocess()) return false;
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (_flagFilter)
     _iattOut = _addVariableDb(2, 1, ELoc::UNKNOWN, 0, nvar, 0.);
 
@@ -183,14 +183,14 @@ bool CalcImage::_filterImage(DbGrid* dbgrid, const ModelCovList* model)
   if (model->getNDrift() == 0) means = model->getMeans();
 
   int ndim = dbgrid->getNDim();
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
 
   const NeighImage* neighI = dynamic_cast<const NeighImage*>(getNeigh());
   DbGrid* dblocal          = neighI->buildImageGrid(dbgrid, _seed);
   VectorVectorInt ranks    = _getActiveRanks(dblocal);
 
   Db* target = Db::createFromOnePoint(VectorDouble(ndim));
-  int iuid   = target->addColumnsByConstant(nvar);
+  auto iuid  = target->addColumnsByConstant(nvar);
 
   // We perform a Kriging of the center 'dbaux' in Unique Neighborhood
   NeighUnique* neighU = NeighUnique::create();
@@ -239,7 +239,7 @@ DbGrid* CalcImage::_buildMarpat(const NeighImage* neigh,
 {
   int nbneigh = (int)ranks.size();
   int ndim    = (int)ranks[0].size();
-  int nvar    = wgt.getNCols();
+  auto nvar   = wgt.getNCols();
   VectorInt nx(ndim);
   for (int i = 0; i < ndim; i++)
     nx[i] = 2 * neigh->getImageRadius(i) + 1;
