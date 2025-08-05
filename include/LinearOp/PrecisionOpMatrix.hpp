@@ -24,7 +24,6 @@ class ShiftOpMatrix;
 /** This class is just a specialization of PrecisionOp when the shift
 * Operator is built with sparse matrices and therefore algebra can be performed with Cholesky.
 * It allows to return the precision matrix as a Sparse Matrix. */
-
 class GSTLEARN_EXPORT PrecisionOpMatrix : public PrecisionOp
 {
 public:

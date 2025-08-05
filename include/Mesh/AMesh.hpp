@@ -80,7 +80,7 @@ public:
   VectorDouble getMeshSizes() const;
 
   /*! Print the list of meshes and apices */
-  void printMesh(int imesh0) const;
+  void printMesh(int imesh0 = -1) const;
   void printMeshes(int level=0, int nline_max=-1) const;
   /*! Returns Vector of Apex coordinates for space index */
   VectorDouble getCoordinatesPerApex(int idim) const;

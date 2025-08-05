@@ -39,17 +39,25 @@ namespace gstlrn
 /**
  * The class constructor with the following arguments:
  *
+ * @param dbin Input file (nullptr for non conditional simulation)
+ * @param dbout Output File (nullptr for LogLikelihood calculation)
  * @param model  This compulsory argument is a LMC of Matern's (or Markov?) basic structures with possibly a nugget effect
+ * @param flagSimu TRUE for simulations (either conditional or non-conditional)
  * @param useCholesky Define the choice regarding Cholesky
  * @param params Set of SPDE parameters
  */
-SPDE::SPDE(Model* model,
+SPDE::SPDE(const Db* dbin,
+           Db* dbout,
+           Model* model,
+           bool flagSimu,
            int useCholesky,
            const SPDEParam& params)
-  : _dbin()
-  , _dbout()
+  : _dbin(dbin)
+  , _dbout(dbout)
   , _model(model)
   , _flagCholesky(false)
+  , _flagSimu(flagSimu)
+  , _flagCond(dbin != nullptr)
   , _driftCoeffs()
   , _createMeshesK(false)
   , _meshesK()
@@ -67,6 +75,7 @@ SPDE::SPDE(Model* model,
   , _QopS(nullptr)
   , _Qom(nullptr)
   , _invnoiseobj(nullptr)
+  , _spdeop(nullptr)
   , _params(params)
 {
   _defineFlagCholesky(useCholesky, model);
@@ -93,6 +102,7 @@ SPDE::~SPDE()
   delete _QopK;
   delete _QopS;
   delete _invnoiseobj;
+  delete _spdeop;
 }
 
 /**
@@ -317,9 +327,9 @@ int SPDE::_defineProjection(bool flagIn,
   return 0;
 }
 
-SPDEOp* SPDE::defineShiftOperator(bool flagSimu, bool verbose)
+int SPDE::defineShiftOperator(bool verbose)
 {
-  SPDEOp* spdeop = nullptr;
+  delete _spdeop;
 
   _invnoiseobj = new InvNuggetOp(_dbin, _model, _params, !_flagCholesky);
 
@@ -327,32 +337,31 @@ SPDEOp* SPDE::defineShiftOperator(bool flagSimu, bool verbose)
   {
     if (!_meshesK.empty())
     {
-      _Qom   = new PrecisionOpMultiMatrix(_model, _meshesK);
-      spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutK);
+      _Qom    = new PrecisionOpMultiMatrix(_model, _meshesK);
+      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutK);
     }
     else
     {
-      _Qom   = new PrecisionOpMultiMatrix(_model, _meshesS);
-      spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutS);
+      _Qom    = new PrecisionOpMultiMatrix(_model, _meshesS);
+      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutS);
     }
   }
   else
   {
     _QopK = new PrecisionOpMulti(_model, _meshesK, _params.getUseStencil());
-    if (flagSimu)
+    if (_flagSimu)
       _QopS = new PrecisionOpMulti(_model, _meshesS, _params.getUseStencil());
 
-    spdeop = new SPDEOp(_QopK, _AinK, _invnoiseobj, _QopS, _AinS, _AoutK, _AoutS);
-    spdeop->setMaxIterations(_params.getCGparams().getNIterMax());
-    spdeop->setTolerance(_params.getCGparams().getEps());
+    _spdeop = new SPDEOp(_QopK, _AinK, _invnoiseobj, _QopS, _AinS, _AoutK, _AoutS);
+    _spdeop->setMaxIterations(_params.getCGparams().getNIterMax());
+    _spdeop->setTolerance(_params.getCGparams().getEps());
   }
 
-  spdeop->setVerbose(verbose);
-  return spdeop;
+  _spdeop->setVerbose(verbose);
+  return 0;
 }
 
-int SPDE::defineMeshes(bool flagSimu,
-                       const VectorMeshes& meshesK,
+int SPDE::defineMeshes(const VectorMeshes& meshesK,
                        const VectorMeshes& meshesS,
                        bool verbose)
 {
@@ -360,36 +369,34 @@ int SPDE::defineMeshes(bool flagSimu,
   {
     if (_defineMesh(true, meshesK, verbose)) return 1;
   }
-  if (flagSimu)
+  if (_flagSimu)
   {
     if (_defineMesh(false, meshesS, verbose)) return 1;
   }
   return 0;
 }
 
-int SPDE::defineProjections(bool flagSimu,
-                            bool flagCond,
-                            const ProjMultiMatrix* projInK,
+int SPDE::defineProjections(const ProjMultiMatrix* projInK,
                             const ProjMultiMatrix* projInS,
                             bool verbose)
 {
-  if (flagCond && _dbin != nullptr)
+  if (_flagCond && _dbin != nullptr)
   {
     // Projection of Data for Kriging
     if (_defineProjection(true, true, projInK, verbose)) return 1;
-    if (flagSimu)
+    if (_flagSimu)
     {
       // Projection of Data for Simulation
       if (_defineProjection(true, false, projInS, verbose)) return 1;
     }
   }
 
-  if (flagCond && _dbout != nullptr)
+  if (_flagCond && _dbout != nullptr)
   {
     // Projection of Target for Kriging
     if (_defineProjection(false, true, nullptr, verbose)) return 1;
   }
-  if (flagSimu)
+  if (_flagSimu)
   {
     // Projection of Target for Simulation
     if (_defineProjection(false, false, nullptr, verbose)) return 1;
@@ -397,7 +404,7 @@ int SPDE::defineProjections(bool flagSimu,
   return 0;
 }
 
-int SPDE::centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z, bool verbose)
+int SPDE::centerDataByDriftInPlace(VectorDouble& Z, bool verbose)
 {
   if (Z.empty()) return 1;
   _driftCoeffs.clear();
@@ -406,7 +413,7 @@ int SPDE::centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z, bool v
   if (mustEvaluateDrift)
   {
     MatrixDense driftMat = _model->evalDriftMatByRanks(_dbin);
-    _driftCoeffs         = spdeop->computeDriftCoeffs(Z, driftMat);
+    _driftCoeffs         = _spdeop->computeDriftCoeffs(Z, driftMat);
     ASPDEOp::centerDataByDriftMat(Z, driftMat, _driftCoeffs);
     if (verbose) VH::dump("Drift coefficients = ", _driftCoeffs);
   }
@@ -509,25 +516,22 @@ VectorDouble trendSPDE(Db* dbin,
   if (model == nullptr) return 1;
 
   // Instantiate SPDE class
-  SPDE spde(model, useCholesky, params);
-  spde.setDbin(dbin);
-  spde.setDbout(dbout);
+  SPDE spde(dbin, dbout, model, false, useCholesky, params);
   if (verbose) mestitle(1, "Trend in SPDE framework (Cholesky=%d)", (int)spde.getFlagCholesky());
 
   // Define Meshes
-  if (spde.defineMeshes(false, meshesK, VectorMeshes(), verbose)) return 1;
+  if (spde.defineMeshes(meshesK, VectorMeshes(), verbose)) return 1;
 
   // Define projections
-  if (spde.defineProjections(false, true, projInK, nullptr, verbose)) return 1;
+  if (spde.defineProjections(projInK, nullptr, verbose)) return 1;
 
   // Define the Shift operator
-  auto* spdeop = spde.defineShiftOperator(false);
+  if (spde.defineShiftOperator()) return 1;
 
   // Read information from the input Db and center it
   VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
+  if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
 
-  delete spdeop;
   return spde.getDriftCoefficients();
 }
 
@@ -587,24 +591,22 @@ int krigingSPDE(Db* dbin,
   if (model == nullptr) return 1;
 
   // Instantiate SPDE class
-  SPDE spde(model, useCholesky, params);
-  bool flagSimu = flag_std && !spde.getFlagCholesky();
-  spde.setDbin(dbin);
-  spde.setDbout(dbout);
+  SPDE spde(dbin, dbout, model, false, useCholesky, params);
+
   if (verbose) mestitle(1, "Kriging in SPDE framework (Cholesky=%d)", (int)spde.getFlagCholesky());
 
   // Define Meshes
-  if (spde.defineMeshes(flagSimu, meshesK, meshesS, verbose)) return 1;
+  if (spde.defineMeshes(meshesK, meshesS, verbose)) return 1;
 
   // Define projections
-  if (spde.defineProjections(flagSimu, true, projInK, projInS, verbose)) return 1;
+  if (spde.defineProjections(projInK, projInS, verbose)) return 1;
 
   // Define the Shift operator
-  auto* spdeop = spde.defineShiftOperator(flagSimu);
+  if (spde.defineShiftOperator()) return 1;
 
   // Read information from the input Db and center it
   VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
+  if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
 
   // Performing the task and storing results in 'dbout'
   // This is performed in ONE step to avoid additional core allocation
@@ -612,7 +614,7 @@ int krigingSPDE(Db* dbin,
   VectorDouble result;
   if (flag_est)
   {
-    result = spdeop->kriging(Z);
+    result = spde.getSPDEOp()->kriging(Z);
     spde.uncenterResultByDriftInPlace(result);
     int iuid = dbout->addColumns(result, "estim", ELoc::Z, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
@@ -620,13 +622,12 @@ int krigingSPDE(Db* dbin,
   }
   if (flag_std)
   {
-    result   = spdeop->stdev(Z, spde.getNMC(), spde.getSeed());
+    result   = spde.getSPDEOp()->stdev(Z, spde.getNMC(), spde.getSeed());
     int iuid = dbout->addColumns(result, "stdev", ELoc::UNKNOWN, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                                 "stdev");
   }
 
-  delete spdeop;
   return 0;
 }
 
@@ -678,31 +679,28 @@ int simulateSPDE(Db* dbin,
 {
   if (dbout == nullptr) return 1;
   if (model == nullptr) return 1;
-  bool flagCond = (dbin != nullptr);
 
   // Instantiate SPDE class
-  SPDE spde(model, useCholesky, params);
-  spde.setDbin(dbin);
-  spde.setDbout(dbout);
+  SPDE spde(dbin, dbout, model, true, useCholesky, params);
   if (verbose) mestitle(1, "Simulation in SPDE framework (cond=%d, Cholesky=%d)",
-                        (int)flagCond, (int)spde.getFlagCholesky());
+                        dbin != nullptr, (int)spde.getFlagCholesky());
 
   // Define Meshes
-  if (spde.defineMeshes(true, meshesK, meshesS, verbose)) return 1;
+  if (spde.defineMeshes(meshesK, meshesS, verbose)) return 1;
 
   // Define
-  if (spde.defineProjections(true, flagCond, projInK, projInS, verbose)) return 1;
+  if (spde.defineProjections(projInK, projInS, verbose)) return 1;
 
   // Define the Shift operator
-  auto* spdeop = spde.defineShiftOperator(true);
+  if (spde.defineShiftOperator()) return 1;
 
   VectorDouble Z;
   VectorDouble driftCoeffs;
-  if (flagCond)
+  if (spde.getFlagCond())
   {
     // Read information from the input Db and center it
     Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-    if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
+    if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
   }
 
   // Perform the Simulation and storage.
@@ -715,7 +713,7 @@ int simulateSPDE(Db* dbin,
 
   for (int isimu = 0; isimu < nbsimu; isimu++)
   {
-    result = (flagCond) ? spdeop->simCond(Z) : spdeop->simNonCond();
+    result = (spde.getFlagCond()) ? spde.getSPDEOp()->simCond(Z) : spde.getSPDEOp()->simNonCond();
     spde.addNuggetToResult(result);
     spde.uncenterResultByDriftInPlace(result);
 
@@ -729,7 +727,6 @@ int simulateSPDE(Db* dbin,
   namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                               "", nbsimu);
 
-  delete spdeop;
   return 0;
 }
 
@@ -783,30 +780,27 @@ int simPGSSPDE(Db* dbin,
 {
   if (dbout == nullptr) return 1;
   if (model == nullptr) return 1;
-  bool flagCond = (dbin != nullptr);
 
   // Instantiate SPDE class
-  SPDE spde(model, useCholesky, params);
-  spde.setDbin(dbin);
-  spde.setDbout(dbout);
+  SPDE spde(dbin, dbout, model, true, useCholesky, params);
   if (verbose) mestitle(1, "PluriGaussian Simulation in SPDE framework (cond=%d, Cholesky=%d)",
-                        (int)flagCond, (int)spde.getFlagCholesky());
+                        dbin != nullptr, (int)spde.getFlagCholesky());
 
   // Define Meshes
-  if (spde.defineMeshes(true, meshesK, meshesS, verbose)) return 1;
+  if (spde.defineMeshes(meshesK, meshesS, verbose)) return 1;
 
   // Define projections
-  if (spde.defineProjections(true, flagCond, projInK, projInS, verbose)) return 1;
+  if (spde.defineProjections(projInK, projInS, verbose)) return 1;
 
   // Define the Shift operator
-  auto* spdeop = spde.defineShiftOperator(true);
+  if (spde.defineShiftOperator()) return 1;
 
   VectorDouble Z;
-  if (flagCond)
+  if (spde.getFlagCond())
   {
     // Read information from the input Db and center it
     Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-    if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
+    if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
   }
 
   // Perform the Simulation and storage.
@@ -817,7 +811,7 @@ int simPGSSPDE(Db* dbin,
   VectorDouble local(nechred);
   VectorDouble result;
 
-  if (flagCond)
+  if (spde.getFlagCond())
     ruleprop.categoryToThresh(dbin);
 
   // Loop on the simulations
@@ -825,7 +819,7 @@ int simPGSSPDE(Db* dbin,
   {
     int iuid = dbout->addColumnsByConstant(nvar);
 
-    result = (flagCond) ? spdeop->simCond(Z) : spdeop->simNonCond();
+    result = (spde.getFlagCond()) ? spde.getSPDEOp()->simCond(Z) : spde.getSPDEOp()->simNonCond();
     spde.addNuggetToResult(result);
     spde.uncenterResultByDriftInPlace(result);
 
@@ -842,7 +836,6 @@ int simPGSSPDE(Db* dbin,
     dbout->deleteColumnsByUID(VH::sequence(nvar, iuid));
   }
 
-  delete spdeop;
   return 0;
 }
 
@@ -875,28 +868,27 @@ double logLikelihoodSPDE(Db* dbin,
   }
 
   // Instantiate SPDE class
-  SPDE spde(model, useCholesky, params);
-  spde.setDbin(dbin);
+  SPDE spde(dbin, nullptr, model, false, useCholesky, params);
   if (verbose) mestitle(1, "Log-likelhood calculation in SPDE framework( Cholesky=%d)",
                         (int)spde.getFlagCholesky());
 
   // Define Meshes
-  if (spde.defineMeshes(true, meshes, VectorMeshes(), verbose)) return 1;
+  if (spde.defineMeshes(meshes, VectorMeshes(), verbose)) return 1;
 
   // Define projections
-  if (spde.defineProjections(false, true, projIn, nullptr, verbose)) return 1;
+  if (spde.defineProjections(projIn, nullptr, verbose)) return 1;
 
   // Define the Shift operator
-  auto* spdeop = spde.defineShiftOperator(false, verbose);
+  if (spde.defineShiftOperator(verbose)) return 1;
 
   // Read information from the input Db and center it
   VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(spdeop, Z, verbose)) return 1;
+  if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
 
   // Performing the task
   int size       = (int)Z.size();
-  double logdet  = spdeop->computeTotalLogDet(spde.getNMC(), spde.getSeed());
-  double quad    = spdeop->computeQuadratic(Z);
+  double logdet  = spde.getSPDEOp()->computeTotalLogDet(spde.getNMC(), spde.getSeed());
+  double quad    = spde.getSPDEOp()->computeQuadratic(Z);
   double loglike = TEST;
   if (!FFFF(logdet) && !FFFF(quad))
     loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
@@ -913,7 +905,6 @@ double logLikelihoodSPDE(Db* dbin,
   }
 
   // Cleaning phase
-  delete spdeop;
   return loglike;
 }
 

@@ -32,8 +32,7 @@ public:
 
 private:
 #ifndef SWIG
-  virtual int _addToDest(const constvect vecin,
-                         vect vecout) const override;
+  int _addToDest(const constvect vecin, vect vecout) const override;
 #endif
   MatrixSparse _prepareMatrixNoStat(int icov, const MatrixSparse* Q) const;
   MatrixSparse _prepareMatrixStationary(int icov, const MatrixSparse* Q) const;

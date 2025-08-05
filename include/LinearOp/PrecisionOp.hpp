@@ -20,7 +20,8 @@
 #include <map>
 #include <memory>
 
-namespace gstlrn {
+namespace gstlrn
+{
 class APolynomial;
 class AMesh;
 
@@ -31,7 +32,6 @@ class AMesh;
 // which handles the sills matrix (possibly non stationary)
 class GSTLEARN_EXPORT PrecisionOp: public ASimulable
 {
-
 public:
   PrecisionOp();
   PrecisionOp(AShiftOp* shiftop,
@@ -96,6 +96,10 @@ public:
   void evalPower(const constvect inm,
                  vect outm,
                  const EPowerPT& power = EPowerPT::fromKey("ONE"));
+  void evalPower(const VectorDouble& inv,
+                 VectorDouble& outv,
+                 const EPowerPT& power = EPowerPT::fromKey("ONE"));
+
 #endif
   VectorDouble computeCov(int imesh);
   VectorDouble simulateOne();
@@ -115,11 +119,6 @@ protected:
   APolynomial* getPoly(const EPowerPT& power);
 
 #ifndef SWIG
-
-public:
-  void evalPower(const VectorDouble& inv, VectorDouble& outv, const EPowerPT& power = EPowerPT::fromKey("ONE"));
-
-protected:
   int _addEvalPoly(const EPowerPT& power,
                    const constvect inv,
                    vect outv) const;
@@ -158,4 +157,4 @@ protected:
   mutable std::vector<std::vector<double>> _workPoly;
 #endif
 };
-}
+} // namespace gstlrn

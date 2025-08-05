@@ -52,14 +52,13 @@ int main(int argc, char* argv[])
   auto proj      = ProjMatrix(grid, mesh);
   auto projmulti = ProjMultiMatrix({{&proj}});
 
-  bool verbose = true;
-  auto spde    = SPDE(model, 1);
-  (void)spde.setDbout(grid);
-  (void)spde.defineMeshes(true, meshes, VectorMeshes(), verbose);
-  (void)spde.defineProjections(false, true, &projmulti, nullptr, verbose);
-  auto* spdeop = spde.defineShiftOperator(false, verbose);
+  bool verbose  = true;
+  bool flagSimu = true;
+  auto spde     = SPDE(nullptr, grid, model, flagSimu, 1);
+  (void)spde.defineMeshes(meshes, VectorMeshes(), verbose);
+  (void)spde.defineProjections(&projmulti, nullptr, verbose);
+  (void)spde.defineShiftOperator();
 
-  delete spdeop;
   delete model;
 
   return (0);
