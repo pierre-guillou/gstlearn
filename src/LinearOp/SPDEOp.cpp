@@ -24,16 +24,12 @@ ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
                  const ProjMulti* const projInKriging,
                  const ASimulable* invNoise,
                  const PrecisionOpMulti* const popSimu,
-                 const ProjMulti* const projInSimu,
-                 const ProjMulti* const projOutKriging,
-                 const ProjMulti* const projOutSimu)
+                 const ProjMulti* const projInSimu)
   : _QKriging(popKriging)
   , _projInKriging(projInKriging)
   , _invNoise(invNoise)
   , _QSimu(popSimu == nullptr ? popKriging : popSimu)
   , _projInSimu(projInSimu == nullptr ? projInKriging : projInSimu)
-  , _projOutKriging(projOutKriging)
-  , _projOutSimu(projOutSimu == nullptr ? projOutKriging : projOutSimu)
   , _solver(nullptr)
   , _verbose(false)
   , _ndat(0)
@@ -276,11 +272,7 @@ VectorDouble ASPDEOp::stdev(const VectorDouble& dat,
 
   law_set_random_seed(memo);
 
-  // Project the result on the output mesh (optional)
-  if (projK == nullptr) return temp_mean;
-  VectorDouble result(projK->getNPoint());
-  projK->mesh2point(temp_mean, result);
-  return result;
+  return temp_mean;
 }
 
 VectorDouble ASPDEOp::krigingWithGuess(const VectorDouble& dat,

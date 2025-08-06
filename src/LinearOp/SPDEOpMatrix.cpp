@@ -19,15 +19,8 @@ namespace gstlrn
 {
 SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
                            const ProjMultiMatrix* A,
-                           const InvNuggetOp* invNoise,
-                           const ProjMultiMatrix* projOut)
-  : SPDEOp(pop,
-           A,
-           invNoise,
-           nullptr,
-           nullptr,
-           projOut,
-           projOut)
+                           const InvNuggetOp* invNoise)
+  : SPDEOp(pop, A, invNoise, nullptr, nullptr)
   , _QpAinvNoiseAt(std::make_shared<MatrixSparse>(0, 0))
   , _chol(nullptr)
 {

@@ -431,7 +431,7 @@ Id SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
 
   if (src == nullptr)
   {
-    *dest      = ProjMultiMatrix::createFromDbAndMeshes(db, meshes, ncov, nvar, false);
+    *dest      = ProjMultiMatrix::createFromDbAndMeshes(db, meshes, ncov, nvar, flagIn);
     createProj = true;
     if (verbose)
     {
@@ -459,12 +459,12 @@ Id SPDE::defineSpdeOperator(bool verbose)
     if (!_meshesK.empty())
     {
       _Qom    = new PrecisionOpMultiMatrix(_model, _meshesK);
-      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutK);
+      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj);
     }
     else
     {
       _Qom    = new PrecisionOpMultiMatrix(_model, _meshesS);
-      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj, _AoutS);
+      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj);
     }
   }
   else
@@ -473,7 +473,7 @@ Id SPDE::defineSpdeOperator(bool verbose)
     if (_flagSimu)
       _QopS = new PrecisionOpMulti(_model, _meshesS, _params.getUseStencil());
 
-    _spdeop = new SPDEOp(_QopK, _AinK, _invnoiseobj, _QopS, _AinS, _AoutK, _AoutS);
+    _spdeop = new SPDEOp(_QopK, _AinK, _invnoiseobj, _QopS, _AinS);
     _spdeop->setMaxIterations(_params.getCGparams().getNIterMax());
     _spdeop->setTolerance(_params.getCGparams().getEps());
   }
@@ -704,7 +704,7 @@ Id krigingSPDE(Db* dbin,
   if (model == nullptr) return 1;
 
   // Instantiate SPDE class
-  SPDE spde(dbin, model, true, false, useCholesky, params);
+  SPDE spde(dbin, model, true, flag_std, useCholesky, params);
   spde.setMeshes(true, meshesK);
   spde.setMeshes(false, meshesS);
   spde.setProjIn(true, projInK);
