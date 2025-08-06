@@ -59,8 +59,8 @@ Id GridArcGis::writeInFile()
 
   /* Write a comment */
 
-  fprintf(_file, "NCOLS %d\n", _dbgrid->getNX(0));
-  fprintf(_file, "NROWS %d\n", _dbgrid->getNX(1));
+  fprintf(_file, "NCOLS %ld\n", _dbgrid->getNX(0));
+  fprintf(_file, "NROWS %ld\n", _dbgrid->getNX(1));
   fprintf(_file, "XLLCORNER %lf\n", _dbgrid->getX0(0));
   fprintf(_file, "YLLCORNER %lf\n", _dbgrid->getX0(1));
   fprintf(_file, "CELLSIZE %lf\n", _dbgrid->getDX(0));

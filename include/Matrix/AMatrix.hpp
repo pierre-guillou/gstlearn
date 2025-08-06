@@ -309,8 +309,8 @@ private:
 };
 
 /* Shortcut functions for C style aficionados */
-GSTLEARN_EXPORT void setMultiThread(Id nthreads);
-GSTLEARN_EXPORT Id getMultiThread();
+GSTLEARN_EXPORT void setMultiThread(int nthreads);
+GSTLEARN_EXPORT int getMultiThread();
 GSTLEARN_EXPORT bool isMultiThread();
 GSTLEARN_EXPORT bool getFlagMatrixCheck();
 GSTLEARN_EXPORT void setFlagMatrixCheck(bool flag);

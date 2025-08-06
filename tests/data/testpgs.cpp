@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
   DbStringFormat dbfmt;
   double total;
   Id i, j, lec, nbsimu, seed, nbtuba, npgs, ntot, nfac[2];
-  int flag_vario, flag_grid, iatt_z, iatt_ind, ifac, nclass;
+  Id flag_vario, flag_grid, iatt_z, iatt_ind, ifac, nclass;
   VectorDouble props;
   RuleProp* ruleprop;
   static int niter    = 100;

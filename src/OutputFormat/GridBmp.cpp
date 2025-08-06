@@ -190,11 +190,11 @@ Id GridBmp::writeInFile()
 
   /* Figure out the constants */
 
-  Id infosize   = 40;
-  Id headersize = 14;
-  Id width      = _nmult * N_SAMPLE(nx, _nsamplex);
-  Id height     = _nmult * N_SAMPLE(ny, _nsampley);
-  Id imagesize  = 3 * width * height;
+  int infosize   = 40;
+  int headersize = 14;
+  auto width     = static_cast<int>(_nmult * N_SAMPLE(nx, _nsamplex));
+  auto height    = static_cast<int>(_nmult * N_SAMPLE(ny, _nsampley));
+  auto imagesize = 3 * width * height;
 
   /* Write the file header, bitmap information, and bitmap pixel data... */
   _writeOut(0, BF_TYPE);
@@ -266,7 +266,7 @@ Id GridBmp::writeInFile()
  ** \param[in]  ival  Integer value to be written
  **
  *****************************************************************************/
-void GridBmp::_writeOut(Id mode, size_t ival)
+void GridBmp::_writeOut(Id mode, int ival)
 {
   switch (mode)
   {
@@ -283,7 +283,7 @@ void GridBmp::_writeOut(Id mode, size_t ival)
       break;
 
     case 2: /* Signed 32-bit */
-      Id jval = (Id)ival;
+      auto jval = ival;
       putc(jval, _file);
       putc(jval >> 8, _file);
       putc(jval >> 16, _file);

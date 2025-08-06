@@ -36,8 +36,8 @@ public:
   void setYwell(double ywell) { _ywell = ywell; }
 
 private:
-  Id _readFind(Id s_length, const char *target, Id *numline, char *string);
-  Id _readNext(Id s_length, Id flag_up, Id *numline, char *string);
+  Id _readFind(int s_length, const char* target, Id* numline, char* string);
+  Id _readNext(int s_length, Id flag_up, Id* numline, char* string);
   static void _stringToUppercase(char *string);
 
 private:
@@ -45,4 +45,4 @@ private:
   double _ywell;
   double _cwell;
 };
-}
+} // namespace gstlrn

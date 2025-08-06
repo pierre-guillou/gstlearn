@@ -334,7 +334,6 @@ private:
   bool _optimNoAniso;   // All ranges should be equal
   bool _optimLockIso2d; // Range U and V should be equal
   mutable std::vector<MatrixSquare> _dRot;
-  mutable double _derivCache;
   const std::array<EConsElem, 4> _listaniso = {EConsElem::RANGE,
                                                EConsElem::SCALE,
                                                EConsElem::TENSOR,

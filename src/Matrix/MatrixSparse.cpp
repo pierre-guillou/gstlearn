@@ -892,7 +892,7 @@ void MatrixSparse::_allocate(Id nrow, Id ncol, Id ncolmax)
 
   if (ncolmax > 0)
   {
-    eigenMat().reserve(Eigen::VectorXi::Constant(nrow, ncolmax));
+    eigenMat().reserve(Eigen::VectorXi::Constant(nrow, static_cast<int>(ncolmax)));
   }
   _nColMax = ncolmax;
 }
@@ -911,7 +911,7 @@ void MatrixSparse::_allocate()
 
     if (_nColMax > 0)
     {
-      eigenMat().reserve(Eigen::VectorXi::Constant(getNCols(), _nColMax));
+      eigenMat().reserve(Eigen::VectorXi::Constant(getNCols(), static_cast<int>(_nColMax)));
     }
     if (isMultiThread()) omp_set_num_threads(getMultiThread());
   }

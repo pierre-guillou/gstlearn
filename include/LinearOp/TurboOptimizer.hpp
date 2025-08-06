@@ -194,8 +194,8 @@ private:
   double _indiceToCoordinate(Id idim0, const VectorInt& indice) const;
   static void _printVector(const std::string& title,
                            VectorDouble& uu,
-                           Id width = 10,
-                           Id ndec  = 3);
+                           int width = 10,
+                           int ndec  = 3);
   static void _printMatrix(const std::string& title,
                            Id nrow,
                            Id ncol,
@@ -203,8 +203,8 @@ private:
                            Id nper_batch,
                            Id row_shift = 0,
                            Id col_shift = 0,
-                           Id width     = 10,
-                           Id ndec      = 6);
+                           int width    = 10,
+                           int ndec     = 6);
   static void _invert_3x3(VectorDouble& uu, VectorDouble& vv, double tol = 1.e-6);
   static void _prodMatrix(Id size,
                           const VectorDouble& aa,
@@ -241,4 +241,4 @@ private:
                                              Id col_end,
                                              const TripletND& triplet) const;
 };
-}
+} // namespace gstlrn

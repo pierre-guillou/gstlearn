@@ -26,7 +26,7 @@ namespace gstlrn
 typedef std::string String;
 typedef unsigned char UChar;
 
-using Id = int;
+using Id = long;
 
 #define EPSILON1  1.e-1
 #define EPSILON2  1.e-2

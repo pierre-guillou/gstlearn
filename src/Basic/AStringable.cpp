@@ -55,7 +55,7 @@ static Id _getDecimalNumber()
 }
 static double _getThresh()
 {
-  Id ndec      = (Id)OptCst::query(ECst::NTDEC);
+  Id ndec       = (Id)OptCst::query(ECst::NTDEC);
   double thresh = (0.5 * pow(10, -ndec));
   return thresh;
 }
@@ -131,8 +131,9 @@ String AStringable::toString(const AStringFormat* /*strfmt*/) const
 std::stringstream _formatColumn(const EJustify& justify, Id localSize = 0)
 {
   std::stringstream sstr;
-  Id size = (localSize > 0) ? localSize : _getColumnSize();
-  sstr << std::fixed << std::setw(size) << std::setprecision(_getDecimalNumber());
+  auto size = static_cast<int>((localSize > 0) ? localSize : _getColumnSize());
+  auto prec = static_cast<int>(_getDecimalNumber());
+  sstr << std::fixed << std::setw(size) << std::setprecision(prec);
   if (justify == EJustify::LEFT)
     sstr << std::left;
   else
@@ -145,8 +146,8 @@ String _tabPrintString(const String& string,
                        Id localSize = 0)
 {
   std::stringstream sstr = _formatColumn(justify, localSize);
-  Id size               = static_cast<Id>(string.size());
-  Id truncSize          = (localSize > 0) ? localSize : _getColumnSize();
+  Id size                = static_cast<Id>(string.size());
+  Id truncSize           = (localSize > 0) ? localSize : _getColumnSize();
   if (size > truncSize)
   {
     // String must be truncated
@@ -192,20 +193,22 @@ String _tabPrintInt(Id value, const EJustify& justify, Id localSize = 0)
 String _tabPrintRowColumn(Id icase, Id value, Id flagAdd)
 {
   std::stringstream sstr;
-  sstr << std::setw(_getColumnSize() - _getColumnRank() - 1) << std::right;
+  int rank  = static_cast<int>(_getColumnRank());
+  int width = static_cast<int>(_getColumnSize() - _getColumnRank() - 1);
+  sstr << std::setw(width) << std::right;
   if (icase == CASE_ROW)
   {
     if (!flagAdd)
-      sstr << "[" << std::setw(_getColumnRank()) << value << ",]";
+      sstr << "[" << std::setw(rank) << value << ",]";
     else
-      sstr << "[" << std::setw(_getColumnRank()) << value << "+]";
+      sstr << "[" << std::setw(rank) << value << "+]";
   }
   else
   {
     if (!flagAdd)
-      sstr << "[," << std::setw(_getColumnRank()) << value << "]";
+      sstr << "[," << std::setw(rank) << value << "]";
     else
-      sstr << "[ " << std::setw(_getColumnRank()) << value << "]";
+      sstr << "[ " << std::setw(rank) << value << "]";
   }
   return sstr.str();
 }
@@ -420,7 +423,7 @@ void mes_process(const char* string, Id ntot, Id iech)
   /* Calculate the current quantile */
 
   double ratio = nproc * (double)jech / (double)ntot;
-  Id quant    = (Id)(ratio);
+  Id quant     = (Id)(ratio);
 
   /* Conditional printout */
 
@@ -593,7 +596,7 @@ String toMatrix(const String& title,
   Id nrutil = nrows;
   if (_getMaxNCols() > 0 && ncutil > _getMaxNCols() && !flagOverride) ncutil = _getMaxNCols();
   if (_getMaxNRows() > 0 && nrutil > _getMaxNRows() && !flagOverride) nrutil = _getMaxNRows();
-  Id npass      = (Id)ceil((double)ncutil / (double)_getNBatch());
+  Id npass       = (Id)ceil((double)ncutil / (double)_getNBatch());
   bool multi_row = nrutil > 1 || npass > 1;
 
   Id colSize = 0;
@@ -688,7 +691,7 @@ String toMatrix(const String& title,
   Id nrutil = nrows;
   if (_getMaxNCols() > 0 && ncutil > _getMaxNCols() && !flagOverride) ncutil = _getMaxNCols();
   if (_getMaxNRows() > 0 && nrutil > _getMaxNRows() && !flagOverride) nrutil = _getMaxNRows();
-  Id npass      = (Id)ceil((double)ncutil / (double)_getNBatch());
+  Id npass       = (Id)ceil((double)ncutil / (double)_getNBatch());
   bool multi_row = nrutil > 1 || npass > 1;
 
   Id colSize = 0;
@@ -1493,7 +1496,7 @@ void print_vector(const char* title,
   /* Initializations */
 
   if (ntab <= 0) return;
-  Id nby        = (flag_limit && (Id)OptCst::query(ECst::NTCOL) >= 0) ? (Id)OptCst::query(ECst::NTCOL) : nby_def;
+  Id nby         = (flag_limit && (Id)OptCst::query(ECst::NTCOL) >= 0) ? (Id)OptCst::query(ECst::NTCOL) : nby_def;
   bool flag_many = (ntab > nby);
 
   if (title != NULL)
@@ -1540,7 +1543,7 @@ void print_ivector(const char* title, Id flag_limit, Id ntab, const Id* itab)
   /* Initializations */
 
   if (ntab <= 0) return;
-  Id nby        = (flag_limit && (Id)OptCst::query(ECst::NTCOL) >= 0) ? (Id)OptCst::query(ECst::NTCOL) : nby_def;
+  Id nby         = (flag_limit && (Id)OptCst::query(ECst::NTCOL) >= 0) ? (Id)OptCst::query(ECst::NTCOL) : nby_def;
   bool flag_many = (ntab > nby);
 
   if (title != NULL)

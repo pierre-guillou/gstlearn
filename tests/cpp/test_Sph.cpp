@@ -56,7 +56,7 @@ static void st_test_1(void)
 
     if (!INTER) break;
     message("Continue (1) or Stop(0) : ");
-    if (gslScanf("%d", &test) == EOF) return;
+    if (gslScanf("%ld", &test) == EOF) return;
   }
 }
 
@@ -109,7 +109,7 @@ static void st_test_2(void)
 
     if (!INTER) break;
     message("Continue (1) or Stop(0) : ");
-    if (gslScanf("%d", &test) == EOF) return;
+    if (gslScanf("%ld", &test) == EOF) return;
   }
 }
 
@@ -124,9 +124,9 @@ static void st_test_3(void)
   if (INTER)
   {
     message("nx = ");
-    if (gslScanf("%d", &nx) == EOF) return;
+    if (gslScanf("%ld", &nx) == EOF) return;
     message("ny = ");
-    if (gslScanf("%d", &ny) == EOF) return;
+    if (gslScanf("%ld", &ny) == EOF) return;
   }
   dy = 90. / (double)ny;
   dx = 360. / (double)nx;

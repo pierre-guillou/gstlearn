@@ -68,7 +68,7 @@ Id GridZycor::writeInFile()
 
   /* Title line */
 
-  fprintf(_file, "@GRID ZYCOR FILE    ,   GRID,  %d\n", nbyline);
+  fprintf(_file, "@GRID ZYCOR FILE    ,   GRID,  %ld\n", nbyline);
   fprintf(_file, "     15, %13lg,    ,    0,     1\n", testval);
 
   /* Grid description */
@@ -82,7 +82,7 @@ Id GridZycor::writeInFile()
   }
 
   rbid = 0.;
-  fprintf(_file, "%6d, %6d, %13lf, %13lf, %13lf, %13lf\n", nx[1], nx[0], x0[0],
+  fprintf(_file, "%6ld, %6ld, %13lf, %13lf, %13lf, %13lf\n", nx[1], nx[0], x0[0],
           xf[0], x0[1], xf[1]);
   fprintf(_file, " %15lf, %15lf, %15lf\n", rbid, rbid, rbid);
   fprintf(_file, "@\n");

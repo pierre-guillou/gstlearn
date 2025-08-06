@@ -169,5 +169,5 @@ int main(int argc, char* argv[])
   delete vario;
   delete varioDerived;
 
-  return error;
+  return static_cast<int>(error);
 }

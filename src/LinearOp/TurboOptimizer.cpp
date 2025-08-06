@@ -205,7 +205,7 @@ void TurboOptimizer::_rankToIndice(Id rank, VectorInt& indice, bool minusOne) co
 {
   if ((Id)indice.size() < 2)
     my_throw("Argument indice should have the correct size");
-  Id nval  = minusOne ? (_ny - 1) : _ny;
+  Id nval   = minusOne ? (_ny - 1) : _ny;
   indice[1] = rank / nval;
   rank -= indice[1] * nval;
   indice[0] = rank;
@@ -247,8 +247,8 @@ double TurboOptimizer::_getCoorByMesh(Id imesh, Id rank, Id idim0) const
 
 void TurboOptimizer::_printVector(const std::string& title,
                                   VectorDouble& uu,
-                                  Id width,
-                                  Id ndec)
+                                  int width,
+                                  int ndec)
 {
   Id nval = static_cast<Id>(uu.size());
   std::cout << title << std::endl;
@@ -268,8 +268,8 @@ void TurboOptimizer::_printMatrix(const std::string& title,
                                   Id nper_batch,
                                   Id row_shift,
                                   Id col_shift,
-                                  Id width,
-                                  Id ndec)
+                                  int width,
+                                  int ndec)
 {
   // Initializations
   Id nbatch = 1 + (ncol - 1) / nper_batch;
@@ -421,10 +421,10 @@ VectorDouble TurboOptimizer::_buildS(const VectorDouble& TildeC) const
 Id TurboOptimizer::_determineInternalGrid(bool verbose)
 {
   Id nblin = _param + 2;
-  _half     = nblin - 1;
-  _poncif   = 2 * _half + 1;
-  _nxred    = (1 + _half) + _poncif + (1 + _half);
-  _center   = (1 + _half) + _half;
+  _half    = nblin - 1;
+  _poncif  = 2 * _half + 1;
+  _nxred   = (1 + _half) + _poncif + (1 + _half);
+  _center  = (1 + _half) + _half;
 
   if (verbose)
   {
@@ -455,8 +455,8 @@ void TurboOptimizer::run(bool verbose)
 
   // Modify the Grid dimension to the Template one
   if (_determineInternalGrid(verbose)) my_throw("Incompatible Grid sizes");
-  _nx             = _nxred;
-  _ny             = _nxred;
+  _nx            = _nxred;
+  _ny            = _nxred;
   Id nvertex_red = _getNVertices();
 
   if (verbose)
@@ -563,7 +563,7 @@ VectorDouble TurboOptimizer::_buildQ(const VectorDouble& ss,
                                      const VectorDouble& lambda) const
 {
   auto nvertex = _getNVertices();
-  Id nblin   = static_cast<Id>(blin.size());
+  Id nblin     = static_cast<Id>(blin.size());
   VectorDouble qq(nvertex * nvertex, 0.);
   VectorDouble bi(nvertex * nvertex, 0.);
   VectorDouble be(nvertex * nvertex, 0.);
@@ -692,10 +692,10 @@ VectorDouble TurboOptimizer::_getVectorFromTemplate(const VectorDouble& vecin) c
     {
       indice[0] = ix;
       indice[1] = iy;
-      Id ecr   = _indiceToRank(indice);
+      Id ecr    = _indiceToRank(indice);
       _updateMargin(0, indice);
       _updateMargin(1, indice);
-      Id lec     = _indiceToRank(indice, false);
+      Id lec      = _indiceToRank(indice, false);
       vecout[ecr] = vecin[lec];
     }
   return vecout;
@@ -744,8 +744,8 @@ TripletND TurboOptimizer::_getMatrixFromTemplate(const VectorDouble& matin,
           indice1[1] = iy1;
           indice2[0] = ix2;
           indice2[1] = iy2;
-          Id ecr1   = _indiceToRank(indice1, true);
-          Id ecr2   = _indiceToRank(indice2, true);
+          Id ecr1    = _indiceToRank(indice1, true);
+          Id ecr2    = _indiceToRank(indice2, true);
           _getRankInTemplate(indice1, indice2);
           Id lec1 = _indiceToRank(indice1, false);
           Id lec2 = _indiceToRank(indice2, false);
@@ -825,26 +825,26 @@ TripletND TurboOptimizer::getQ() const
 }
 
 Id TurboOptimizer::_coordinateToIndice(double x,
-                                        double y,
-                                        VectorInt& indice) const
+                                       double y,
+                                       VectorInt& indice) const
 {
   if ((Id)indice.size() < 2)
     my_throw("Argument indice should have the correct size");
   Id ix = (Id)floor((x - _x0) / _dx);
   if (ix < 0 || ix >= _nx) return 1;
   indice[0] = ix;
-  Id iy    = (Id)floor((y - _y0) / _dy);
+  Id iy     = (Id)floor((y - _y0) / _dy);
   if (iy < 0 || iy >= _ny) return 1;
   indice[1] = iy;
   return 0;
 }
 
 Id TurboOptimizer::_addWeights(Id icas,
-                                double x,
-                                double y,
-                                const VectorInt& indg0,
-                                VectorInt& indices,
-                                VectorDouble& lambda) const
+                               double x,
+                               double y,
+                               const VectorInt& indg0,
+                               VectorInt& indices,
+                               VectorDouble& lambda) const
 {
   VectorDouble lhs(TO_ncorner * TO_ncorner);
   VectorDouble lhsinv(TO_ncorner * TO_ncorner);
@@ -991,8 +991,8 @@ void TurboOptimizer::printS(Id nper_batch,
 
   VectorDouble temp = _expandTripletToMatrix(row_begin, row_end,
                                              col_begin, col_end, getS());
-  Id nrows         = row_end - row_begin + 1;
-  Id ncols         = col_end - col_begin + 1;
+  Id nrows          = row_end - row_begin + 1;
+  Id ncols          = col_end - col_begin + 1;
   _printMatrix("Matrix S", nrows, ncols, temp, nper_batch, row_begin, col_begin);
 }
 
@@ -1012,8 +1012,8 @@ void TurboOptimizer::printQ(Id nper_batch,
 
   VectorDouble temp = _expandTripletToMatrix(row_begin, row_end,
                                              col_begin, col_end, getQ());
-  Id nrows         = row_end - row_begin + 1;
-  Id ncols         = col_end - col_begin + 1;
+  Id nrows          = row_end - row_begin + 1;
+  Id ncols          = col_end - col_begin + 1;
   _printMatrix("Matrix Q", nrows, ncols, temp, nper_batch, row_begin, col_begin);
 }
 } // namespace gstlrn

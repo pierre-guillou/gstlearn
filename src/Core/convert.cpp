@@ -282,7 +282,7 @@ void csv_print_double(double value)
   else
   {
     if (CSV_ENCODE->flagInteger)
-      (void)fprintf(CSV_ENCODE->file, "%d", (Id)value);
+      (void)fprintf(CSV_ENCODE->file, "%ld", (Id)value);
     else
       (void)fprintf(CSV_ENCODE->file, "%lf", value);
   }

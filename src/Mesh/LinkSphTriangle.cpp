@@ -134,7 +134,7 @@ Id meshes_2D_sph_from_db(Db* db, SphTriangle* t)
     t->sph_z[ecr] = zz;
     ecr++;
   }
-  t->n_nodes = nold + neff;
+  t->n_nodes = static_cast<int>(nold + neff);
 
   /* Set the error return code */
 
@@ -190,7 +190,7 @@ Id meshes_2D_sph_from_points(Id nech, double* x, double* y, SphTriangle* t)
     t->sph_z[ecr] = zz;
     ecr++;
   }
-  t->n_nodes = nold + nech;
+  t->n_nodes = static_cast<int>(nold + nech);
 
   /* Set the error return code */
 
@@ -316,7 +316,7 @@ Id meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
   if (t->sph_y == nullptr) goto label_end;
   t->sph_z = (double*)mem_realloc((char*)t->sph_z, sizeof(double) * nech, 0);
   if (t->sph_z == nullptr) goto label_end;
-  t->n_nodes = nech;
+  t->n_nodes = static_cast<int>(nech);
 
   /* Set the error return code */
 
@@ -373,7 +373,7 @@ Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
   /* Initializations */
 
   error    = 1;
-  skip_rnd = (Id)get_keypone("Skip_Random", 0);
+  skip_rnd = (int)get_keypone("Skip_Random", 0);
   loc_near = loc_next = loc_lnew = nullptr;
   loc_dist                       = nullptr;
   if (t == (SphTriangle*)NULL || t->n_nodes < 3) return (1);
@@ -410,7 +410,7 @@ Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
 
   if (!skip_rnd)
   {
-    seed_memo = law_get_random_seed();
+    seed_memo = static_cast<int>(law_get_random_seed());
     law_set_random_seed(132231);
     ampli = 1.e-2;
     for (int i = 0; i < 3; i++)

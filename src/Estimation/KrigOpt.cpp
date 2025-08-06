@@ -376,7 +376,7 @@ void KrigOpt::dumpOptions() const
       for (Id idim = 0; idim < _nDiscDim; idim++)
       {
         if (idim != 0) message(" x ");
-        message("%d", getDisc(idim));
+        message("%ld", getDisc(idim));
       }
       message("\n");
       break;
@@ -396,4 +396,4 @@ void KrigOpt::dumpOptions() const
   }
   message("\n");
 }
-}
+} // namespace gstlrn

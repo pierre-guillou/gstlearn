@@ -81,7 +81,7 @@ Db* FileLAS::readFromFile()
   Db* db = nullptr;
   char string[1000], *lcur, sep_blank[2], sep_point[2], *token;
   double value;
-  static Id s_length = 1000;
+  static int s_length = 1000;
   VectorString names = { "X", "Y", "CODE" };
 
   /* Open the file */
@@ -198,10 +198,10 @@ Db* FileLAS::readFromFile()
  ** \param[out]     string     New line
  **
  *****************************************************************************/
-Id FileLAS::_readFind(Id s_length,
-                       const char *target,
-                       Id *numline,
-                       char *string)
+Id FileLAS::_readFind(int s_length,
+                      const char* target,
+                      Id* numline,
+                      char* string)
 {
   /* Check the current line */
   if (strcasestr(string, target)) return (0);
@@ -228,7 +228,7 @@ Id FileLAS::_readFind(Id s_length,
  ** TODO : Replace char* by String
  **
  *****************************************************************************/
-Id FileLAS::_readNext(Id s_length, Id flag_up, Id *numline, char *string)
+Id FileLAS::_readNext(int s_length, Id flag_up, Id* numline, char* string)
 {
   Id size;
 
@@ -259,4 +259,4 @@ void FileLAS::_stringToUppercase(char *string)
     if (string[i] >= 'a' && string[i] <= 'z')
       string[i] = ('A' + string[i] - 'a');
 }
-}
+} // namespace gstlrn

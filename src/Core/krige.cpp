@@ -1227,7 +1227,7 @@ void krige_rhs_print(Id nvar,
         for (idim = 0; idim < KOPTION->ndim; idim++)
         {
           if (idim != 0) message(" x ");
-          message("%d", KOPTION->ndisc[idim]);
+          message("%ld", KOPTION->ndisc[idim]);
         }
         message("\n");
         break;
@@ -2619,7 +2619,7 @@ static void st_vario_dump(FILE* file,
   Id ix, iy, iz, num;
   double cov;
 
-  fprintf(file, "*%3d %3d\n", ix0, iy0);
+  fprintf(file, "*%3ld %3ld\n", ix0, iy0);
 
   for (ix = -cov_nn[0]; ix <= cov_nn[0]; ix++)
     for (iy = -cov_nn[1]; iy <= cov_nn[1]; iy++)
@@ -2627,7 +2627,7 @@ static void st_vario_dump(FILE* file,
       {
         num = (num_tot == nullptr) ? 0 : NUM_TOT(ix, iy, iz);
         cov = COV_TOT(ix, iy, iz);
-        fprintf(file, "%3d %3d %3d %3d %lf\n", ix, iy, iz, num, cov);
+        fprintf(file, "%3ld %3ld %3ld %3ld %lf\n", ix, iy, iz, num, cov);
       }
 }
 

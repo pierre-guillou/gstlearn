@@ -196,7 +196,7 @@ CovAniso CovAnisoList::extractCova(Id icov) const
 Id CovAnisoList::getCovMinIRFOrder() const
 {
   Id nmini = -1;
-  for (unsigned i = 0, n = getNCov(); i < n; i++)
+  for (Id i = 0, n = getNCov(); i < n; i++)
   {
     const CovAniso* covaniso = _getCovAniso(i);
     if (covaniso == nullptr) continue;

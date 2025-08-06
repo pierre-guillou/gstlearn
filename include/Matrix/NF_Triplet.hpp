@@ -23,7 +23,7 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 #  include <Eigen/Sparse>
 DISABLE_WARNING_POP
 
-typedef Eigen::Triplet<double> T;
+typedef Eigen::Triplet<double, gstlrn::Id> T;
 #endif
 
 namespace gstlrn
