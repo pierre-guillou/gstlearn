@@ -30,18 +30,18 @@ class GSTLEARN_EXPORT ScaleOp:
 {
 
 public:
-  ScaleOp(int n, double scale = 1.);
+  ScaleOp(Id n, double scale = 1.);
   virtual ~ScaleOp();
 
-  int getSize() const override { return _n; }
+  Id getSize() const override { return _n; }
 
 #ifndef SWIG
 protected:
-  int _addToDest(const gstlrn::constvect inv, gstlrn::vect outv) const override;
+  Id _addToDest(const gstlrn::constvect inv, gstlrn::vect outv) const override;
 #endif
 
 private:
-  int _n;
+  Id _n;
   double _scale;
 };
 

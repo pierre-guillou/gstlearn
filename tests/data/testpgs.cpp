@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   RuleStringFormat rulefmt;
   DbStringFormat dbfmt;
   double total;
-  int i, j, lec, nbsimu, seed, nbtuba, npgs, ntot, nfac[2];
+  Id i, j, lec, nbsimu, seed, nbtuba, npgs, ntot, nfac[2];
   int flag_vario, flag_grid, iatt_z, iatt_ind, ifac, nclass;
   VectorDouble props;
   RuleProp* ruleprop;

@@ -69,8 +69,8 @@ License: BSD 3-clause
  namespace gstlrn
 {
 static FILE *fp = NULL;
-static int useBinary = 0;
-static int numInColumn = 0;
+static Id useBinary = 0;
+static Id numInColumn = 0;
  
 /* ****************************************************************************
  *  Function: end_line
@@ -157,11 +157,11 @@ static void close_file(void)
  
 static void force_big_endian(unsigned char *bytes)
 {
-  static int doneTest = 0;
-  static int shouldSwap = 0;
+  static Id doneTest = 0;
+  static Id shouldSwap = 0;
   if (!doneTest)
   {
-    int tmp1 = 1;
+    Id tmp1 = 1;
     unsigned char *tmp2 = (unsigned char *) &tmp1;
     if (*tmp2 != 0)
       shouldSwap = 1;
@@ -238,12 +238,12 @@ static void new_section(void)
  *
  * ************************************************************************* */
  
-static void write_int(int val)
+static void write_int(Id val)
 {
   if (useBinary)
   {
     force_big_endian((unsigned char *) &val);
-    fwrite(&val, sizeof(int), 1, fp);
+    fwrite(&val, sizeof(Id), 1, fp);
   }
   else
   {
@@ -339,17 +339,17 @@ static void write_header(void)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
-void write_variables(int nvars,
-                     const int* vardim,
-                     const int* centering,
+void write_variables(Id nvars,
+                     const Id* vardim,
+                     const Id* centering,
                      const char* const* varname,
                      float** vars,
-                     int npts,
-                     int ncells)
+                     Id npts,
+                     Id ncells)
 {
   char str[1024];
-  int i, j, first_scalar, first_vector;
-  int num_scalars, num_vectors;
+  Id i, j, first_scalar, first_vector;
+  Id num_scalars, num_vectors;
  
   new_section();
   gslSPrintf(str, "CELL_DATA %d\n", ncells);
@@ -367,8 +367,8 @@ void write_variables(int nvars,
   {
     if (centering[i] == 0)
     {
-      int num_to_write = 0;
-      int should_write = 0;
+      Id num_to_write = 0;
+      Id should_write = 0;
  
       if (vardim[i] == 1)
       {
@@ -421,7 +421,7 @@ void write_variables(int nvars,
     write_string(str);
     for (i = 0 ; i < nvars ; i++)
     {
-      int should_write = 0;
+      Id should_write = 0;
       if (centering[i] == 0)
       {
         if (vardim[i] == 1)
@@ -441,7 +441,7 @@ void write_variables(int nvars,
  
       if (should_write)
       {
-        int num_to_write = ncells*vardim[i];
+        Id num_to_write = ncells*vardim[i];
         for (j = 0 ; j < num_to_write ; j++)
         {
           write_float(vars[i][j]);
@@ -458,7 +458,7 @@ void write_variables(int nvars,
     write_string(str);
     for (i = 0 ; i < nvars ; i++)
     {
-      int should_write = 0;
+      Id should_write = 0;
       if (centering[i] == 0)
       {
         if (vardim[i] == 3)
@@ -478,7 +478,7 @@ void write_variables(int nvars,
  
       if (should_write)
       {
-        int num_to_write = ncells*vardim[i];
+        Id num_to_write = ncells*vardim[i];
         for (j = 0 ; j < num_to_write ; j++)
         {
           write_float(vars[i][j]);
@@ -504,8 +504,8 @@ void write_variables(int nvars,
   {
     if (centering[i] != 0)
     {
-      int num_to_write = 0;
-      int should_write = 0;
+      Id num_to_write = 0;
+      Id should_write = 0;
  
       if (vardim[i] == 1)
       {
@@ -558,7 +558,7 @@ void write_variables(int nvars,
     write_string(str);
     for (i = 0 ; i < nvars ; i++)
     {
-      int should_write = 0;
+      Id should_write = 0;
       if (centering[i] != 0)
       {
         if (vardim[i] == 1)
@@ -578,7 +578,7 @@ void write_variables(int nvars,
  
       if (should_write)
       {
-        int num_to_write = npts*vardim[i];
+        Id num_to_write = npts*vardim[i];
         for (j = 0 ; j < num_to_write ; j++)
         {
           write_float(vars[i][j]);
@@ -595,7 +595,7 @@ void write_variables(int nvars,
     write_string(str);
     for (i = 0 ; i < nvars ; i++)
     {
-      int should_write = 0;
+      Id should_write = 0;
       if (centering[i] != 0)
       {
         if (vardim[i] == 3)
@@ -615,7 +615,7 @@ void write_variables(int nvars,
  
       if (should_write)
       {
-        int num_to_write = npts*vardim[i];
+        Id num_to_write = npts*vardim[i];
         for (j = 0 ; j < num_to_write ; j++)
         {
           write_float(vars[i][j]);
@@ -653,15 +653,15 @@ void write_variables(int nvars,
 //
 // ***************************************************************************/
 void write_point_mesh(const char* filename,
-                      int ub,
-                      int npts,
+                      Id ub,
+                      Id npts,
                       float* pts,
-                      int nvars,
-                      int* vardim,
+                      Id nvars,
+                      Id* vardim,
                       const char* const* varnames,
                       float** vars)
 {
-  int   i;
+  Id   i;
   char  str[128];
   VectorInt centering;
  
@@ -714,9 +714,9 @@ void write_point_mesh(const char* filename,
  *
  * ************************************************************************* */
  
-static int num_points_for_cell(int celltype)
+static Id num_points_for_cell(Id celltype)
 {
-  int npts = 0;
+  Id npts = 0;
   switch (celltype)
   {
     case VISIT_VERTEX:
@@ -780,22 +780,22 @@ static int num_points_for_cell(int celltype)
 //
 // ***************************************************************************/
 void write_unstructured_mesh(const char* filename,
-                             int ub,
-                             int npts,
+                             Id ub,
+                             Id npts,
                              float* pts,
-                             int ncells,
-                             int* celltypes,
-                             int* conn,
-                             int nvars,
-                             int* vardim,
-                             int* centering,
+                             Id ncells,
+                             Id* celltypes,
+                             Id* conn,
+                             Id nvars,
+                             Id* vardim,
+                             Id* centering,
                              const char* const* varnames,
                              float** vars)
 {
-  int   i, j;
+  Id   i, j;
   char  str[128];
-  int   conn_size = 0;
-  int  *curr_conn = conn;
+  Id   conn_size = 0;
+  Id  *curr_conn = conn;
  
   useBinary = ub;
   open_file(filename);
@@ -812,14 +812,14 @@ void write_unstructured_mesh(const char* filename,
   new_section();
   for (i = 0 ; i < ncells ; i++)
   {
-    int npts_loc = num_points_for_cell(celltypes[i]);
+    Id npts_loc = num_points_for_cell(celltypes[i]);
     conn_size += npts_loc + 1;
   }
   gslSPrintf(str, "CELLS %d %d\n", ncells, conn_size);
   write_string(str);
   for (i = 0 ; i < ncells ; i++)
   {
-    int npts_per_cell = num_points_for_cell(celltypes[i]);
+    Id npts_per_cell = num_points_for_cell(celltypes[i]);
     write_int(npts_per_cell);
     for (j = 0 ; j < npts_per_cell ; j++)
       write_int(*curr_conn++);
@@ -879,24 +879,24 @@ void write_unstructured_mesh(const char* filename,
 //
 // ***************************************************************************/
 void write_rectilinear_mesh(const char* filename,
-                            int ub,
-                            int* dims,
+                            Id ub,
+                            Id* dims,
                             float* x,
                             float* y,
                             float* z,
-                            int nvars,
-                            int* vardim,
-                            int* centering,
+                            Id nvars,
+                            Id* vardim,
+                            Id* centering,
                             const char* const* varnames,
                             float** vars)
 {
-  int   i;
+  Id   i;
   char  str[128];
-  int npts = dims[0]*dims[1]*dims[2];
-  int ncX = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
-  int ncY = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
-  int ncZ = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
-  int ncells = ncX*ncY*ncZ;
+  Id npts = dims[0]*dims[1]*dims[2];
+  Id ncX = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
+  Id ncY = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
+  Id ncZ = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
+  Id ncells = ncX*ncY*ncZ;
  
   useBinary = ub;
   open_file(filename);
@@ -959,15 +959,15 @@ void write_rectilinear_mesh(const char* filename,
 //
 // ***************************************************************************/
 void write_regular_mesh(const char* filename,
-                        int ub,
-                        int* dims,
-                        int nvars,
-                        int* vardim,
-                        int* centering,
+                        Id ub,
+                        Id* dims,
+                        Id nvars,
+                        Id* vardim,
+                        Id* centering,
                         const char* const* varnames,
                         float** vars)
 {
-  int  i;
+  Id  i;
  
   VectorFloat x(dims[0]);
   VectorFloat y(dims[1]);
@@ -1023,22 +1023,22 @@ void write_regular_mesh(const char* filename,
 //
 // ***************************************************************************/
 void write_curvilinear_mesh(const char* filename,
-                            int ub,
-                            int* dims,
+                            Id ub,
+                            Id* dims,
                             float* pts,
-                            int nvars,
-                            int* vardim,
-                            int* centering,
+                            Id nvars,
+                            Id* vardim,
+                            Id* centering,
                             const char* const* varnames,
                             float** vars)
 {
-  int   i;
+  Id   i;
   char  str[128];
-  int npts = dims[0]*dims[1]*dims[2];
-  int ncX = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
-  int ncY = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
-  int ncZ = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
-  int ncells = ncX*ncY*ncZ;
+  Id npts = dims[0]*dims[1]*dims[2];
+  Id ncX = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
+  Id ncY = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
+  Id ncZ = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
+  Id ncells = ncX*ncY*ncZ;
  
   useBinary = ub;
   open_file(filename);

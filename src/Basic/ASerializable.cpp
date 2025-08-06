@@ -151,7 +151,7 @@ bool ASerializable::_commentWrite(std::ostream& os, const String& comment)
 
 bool ASerializable::_tableWrite(std::ostream& os,
                                 const String& string,
-                                int ntab,
+                                Id ntab,
                                 const VectorDouble& tab)
 {
   return SerializeNeutralFile::tableWrite(os, string, ntab, tab);
@@ -159,7 +159,7 @@ bool ASerializable::_tableWrite(std::ostream& os,
 
 bool ASerializable::_tableRead(std::istream& is,
                                const String& string,
-                               int ntab,
+                               Id ntab,
                                double* tab)
 {
   return SerializeNeutralFile::tableRead(is, string, ntab, tab);
@@ -172,7 +172,7 @@ bool ASerializable::_tableRead(std::istream& is,
  * @param ensureDirExist When TRUE, the Directory is created if not already existing
  * @return
  */
-String ASerializable::buildFileName(int status, const String& filename, bool ensureDirExist)
+String ASerializable::buildFileName(Id status, const String& filename, bool ensureDirExist)
 {
   // In the case of Output File (2), 'filename' is appended after the 'containerName' and 'prefixName'
   // In the case of Input file (1), the process depends on the contents of 'filename':
@@ -231,7 +231,7 @@ String ASerializable::getFileIdentity(const String& filename, bool verbose)
     message("Input File Path = %s\n", filepath.c_str());
 
   // Open the file according to various formats
-  int ret_type = -1;
+  Id ret_type = -1;
   String classType;
 
 #ifdef HDF5

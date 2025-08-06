@@ -88,7 +88,7 @@ double CovMatern::_besselK(double nu, double h)
 {
 #if defined(__APPLE__)
   double TAB[MAXTAB];
-  int nb = (int)floor(nu);
+  Id nb = (Id)floor(nu);
   if (nu <= 0 || nb >= MAXTAB) return (0.);
   double alpha = nu - nb;
   if (besselk(h, alpha, nb + 1, TAB) < nb + 1) return 0.;
@@ -103,7 +103,7 @@ double CovMatern::_oldMatern(double h) const
   double TAB[MAXTAB];
   double cov   = 0.;
   double third = getParam();
-  int nb       = (int)floor(third);
+  Id nb       = (Id)floor(third);
   double alpha = third - nb;
   if (third <= 0 || nb >= MAXTAB) return (0.);
   double coeff = (h > 0) ? pow(h / 2., third) : 1.;
@@ -128,22 +128,22 @@ double CovMatern::evaluateSpectrum(double freq) const
   return 1. / pow(1. + freq, alpha);
 }
 
-void CovMatern::computeMarkovCoeffs(int ndim)
+void CovMatern::computeMarkovCoeffs(Id ndim)
 {
   double param  = getParam();
   double ndims2 = ((double)ndim) / 2.;
   double alpha  = param + ndims2;
   auto p        = getClosestInteger(alpha);
-  int ndimp     = p + 1;
+  Id ndimp     = p + 1;
   _markovCoeffs.resize(ndimp);
-  for (int i = 0; i < ndimp; i++)
+  for (Id i = 0; i < ndimp; i++)
   {
     _markovCoeffs[i] = (double)ut_cnp(p, i);
   }
   computeCorrec(ndim);
 }
 
-void CovMatern::computeCorrec(int ndim)
+void CovMatern::computeCorrec(Id ndim)
 {
   double g0, ndims2, gammap, gammaa;
   ndims2  = ((double)ndim) / 2.;
@@ -165,13 +165,13 @@ double CovMatern::simulateTurningBand(double t0, TurningBandOperate& operTB) con
   return operTB.spectralOne(t0);
 }
 
-MatrixDense CovMatern::simulateSpectralOmega(int nb) const
+MatrixDense CovMatern::simulateSpectralOmega(Id nb) const
 {
   auto ndim    = getContext().getNDim();
   double param = getParam();
   MatrixDense mat(nb, ndim);
 
-  for (int irow = 0; irow < nb; irow++)
+  for (Id irow = 0; irow < nb; irow++)
   {
     double scale = sqrt(param / law_gamma(param));
     for (size_t icol = 0; icol < ndim; icol++)
@@ -180,7 +180,7 @@ MatrixDense CovMatern::simulateSpectralOmega(int nb) const
   return mat;
 }
 
-VectorDouble CovMatern::_evaluateSpectrumOnSphere(int n, double scale) const
+VectorDouble CovMatern::_evaluateSpectrumOnSphere(Id n, double scale) const
 {
   double scale2 = scale * scale;
   double mu     = getParam();
@@ -188,7 +188,7 @@ VectorDouble CovMatern::_evaluateSpectrumOnSphere(int n, double scale) const
 
   VectorDouble sp(1 + n, 0.);
 
-  for (int k = 0; k <= n; k++)
+  for (Id k = 0; k <= n; k++)
     sp[k] = (2. * k + 1.) / (4. * GV_PI) / pow(1. + scale2 * k * (k + 1.), alpha);
 
   VH::normalize(sp, 1);

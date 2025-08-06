@@ -188,7 +188,7 @@ public:
   void setCov(const ACov* cova);
   
   void setDriftList(const DriftList* driftlist);
-  void setDriftIRF(int order = 0, int nfex = 0);
+  void setDriftIRF(Id order = 0, Id nfex = 0);
   void addDrift(const ADrift* drift); // TODO: check that the same driftM has not been already defined
   void setDrifts(const VectorString& driftSymbols);
 
@@ -204,7 +204,7 @@ public:
               const DbGrid* dbmap        = nullptr,
               Constraints* constraints   = nullptr,
               const ModelOptimParam& mop = ModelOptimParam(),
-              int nb_neighVecchia        = 30,
+              Id nb_neighVecchia        = 30,
               bool verbose               = false,
               bool trace                 = false,
               bool reml                  = false);
@@ -219,22 +219,22 @@ protected:               // TODO : pass into private to finish clean
   CovContext _ctxt;      /* Context */
 };
 
-GSTLEARN_EXPORT int computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
+GSTLEARN_EXPORT Id computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
                                                const MatrixSymmetric& Sigma,
                                                const MatrixDense& F1,
-                                               int type = 1,
-                                               int idx  = 0);
-GSTLEARN_EXPORT int computeCovMatSVCRHSInPlace(MatrixDense& cov,
+                                               Id type = 1,
+                                               Id idx  = 0);
+GSTLEARN_EXPORT Id computeCovMatSVCRHSInPlace(MatrixDense& cov,
                                                const MatrixSymmetric& Sigma,
                                                const MatrixDense& F1,
                                                const MatrixDense& F2,
-                                               int type1 = 1,
-                                               int idx1  = 0,
-                                               int type2 = 1,
-                                               int idx2  = 0);
-GSTLEARN_EXPORT int computeDriftMatSVCRHSInPlace(MatrixDense& mat,
+                                               Id type1 = 1,
+                                               Id idx1  = 0,
+                                               Id type2 = 1,
+                                               Id idx2  = 0);
+GSTLEARN_EXPORT Id computeDriftMatSVCRHSInPlace(MatrixDense& mat,
                                                  const MatrixDense& F,
-                                                 int type                 = 1,
-                                                 int idx                  = 0,
+                                                 Id type                 = 1,
+                                                 Id idx                  = 0,
                                                  bool flagCenteredFactors = true);
 }

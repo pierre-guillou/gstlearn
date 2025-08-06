@@ -76,7 +76,7 @@ public:
   VectorDouble rawToGaussianVector(const VectorDouble& z) const;
   VectorDouble gaussianToRawVector(const VectorDouble& y) const;
 
-  AnamContinuousFit sample(int ndisc    = 100,
+  AnamContinuousFit sample(Id ndisc    = 100,
                            double aymin = -10,
                            double aymax = +10);
 

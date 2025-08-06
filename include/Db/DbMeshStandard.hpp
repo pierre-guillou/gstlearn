@@ -29,8 +29,8 @@ namespace gstlrn
 class GSTLEARN_EXPORT DbMeshStandard: public Db
 {
 public:
-  DbMeshStandard(int ndim                         = 0,
-                 int napexpermesh                 = 1,
+  DbMeshStandard(Id ndim                         = 0,
+                 Id napexpermesh                 = 1,
                  const VectorDouble& apices       = VectorDouble(),
                  const VectorInt& meshes          = VectorInt(),
                  const ELoadBy& order             = ELoadBy::fromKey("SAMPLE"),
@@ -55,8 +55,8 @@ public:
   bool isConsistent() const override;
 
   static DbMeshStandard*
-  create(int ndim,
-         int napexpermesh,
+  create(Id ndim,
+         Id napexpermesh,
          const VectorDouble& apices,
          const VectorInt& meshes,
          const ELoadBy& order             = ELoadBy::fromKey("SAMPLE"),
@@ -74,14 +74,14 @@ public:
                      const VectorString& locatorNames = VectorString(),
                      bool verbose                     = false);
 
-  int getNApices() const { return _mesh.getNApices(); }
-  int getNMeshes() const { return _mesh.getNMeshes(); }
-  int getApex(int imesh, int rank) const { return _mesh.getApex(imesh, rank); }
-  double getCoor(int imesh, int rank, int idim) const;
-  void getCoordinatesPerMeshInPlace(int imesh, int rank, VectorDouble& coords) const;
-  double getApexCoor(int i, int idim) const;
-  void getApexCoordinatesInPlace(int i, VectorDouble& coords) const;
-  VectorDouble getCoordinatesPerMesh(int imesh, int idim, bool flagClose = false) const;
+  Id getNApices() const { return _mesh.getNApices(); }
+  Id getNMeshes() const { return _mesh.getNMeshes(); }
+  Id getApex(Id imesh, Id rank) const { return _mesh.getApex(imesh, rank); }
+  double getCoor(Id imesh, Id rank, Id idim) const;
+  void getCoordinatesPerMeshInPlace(Id imesh, Id rank, VectorDouble& coords) const;
+  double getApexCoor(Id i, Id idim) const;
+  void getApexCoordinatesInPlace(Id i, VectorDouble& coords) const;
+  VectorDouble getCoordinatesPerMesh(Id imesh, Id idim, bool flagClose = false) const;
   
 protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;

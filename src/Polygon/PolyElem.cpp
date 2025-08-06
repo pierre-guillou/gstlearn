@@ -88,7 +88,7 @@ double PolyElem::getSurface() const
   double x0 = getX(0);
   double y0 = getY(0);
   double surface = 0.;
-  for (int i=1; i<np-2; i++)
+  for (Id i=1; i<np-2; i++)
   {
     double x1 = getX(i) - x0;
     double y1 = getY(i) - y0;
@@ -174,14 +174,14 @@ bool PolyElem::inside(const VectorDouble& coor)
 {
   double dx, dy, xj0, xj1, yj0, yj1, xinter;
 
-  int inter = 0;
+  Id inter = 0;
   auto np   = getNPoints();
   double xx = coor[0];
   double yy = coor[1];
 
   /* Loop on the polygon vertices */
 
-  for (int j = 0; j < np - 1; j++)
+  for (Id j = 0; j < np - 1; j++)
   {
     xj0 = getX(j);
     xj1 = getX(j+1);
@@ -271,7 +271,7 @@ PolyElem PolyElem::reduceComplexity(double distmin) const
   double ycur = getY(0);
   newpolyelem.addPoint(xcur, ycur);
 
-  int ecr = 1;
+  Id ecr = 1;
   while (ecr < np)
   {
     double xnext = getX(ecr);

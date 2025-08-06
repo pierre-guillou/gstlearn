@@ -40,22 +40,22 @@ public:
   InvNuggetOp(const InvNuggetOp& m)            = delete;
   InvNuggetOp& operator=(const InvNuggetOp& m) = delete;
   virtual ~InvNuggetOp();
-  int getSize() const override;
+  Id getSize() const override;
   const MatrixSparse* getInvNuggetMatrix() const { return dynamic_cast<const MatrixSparse*>(this); }
   const MatrixSparse* cloneInvNuggetMatrix() const;
   const MatrixSparse* cloneCholNuggetMatrix() const;
-  double computeLogDet(int nMC = 1) const override;
+  double computeLogDet(Id nMC = 1) const override;
   double getMinEigenValue() const { return _rangeEigenVal.first; }
   double getMaxEigenValue() const { return _rangeEigenVal.second; }
   std::pair<double, double> getRangeEigenValue() const { return _rangeEigenVal; }
 
 protected:
-  int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
+  Id _addSimulateToDest(const constvect whitenoise, vect outv) const override;
 
 private:
   void _updateMatrix(MatrixSymmetric& invsill,
                      CholeskyDense& cholsill,
-                     int ndef,
+                     Id ndef,
                      const VectorInt& position,
                      const VectorInt& identity);
   double _updateQuantities(MatrixSymmetric& sillsinv);

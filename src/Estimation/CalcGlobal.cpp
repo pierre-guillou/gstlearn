@@ -22,7 +22,7 @@
 
 namespace gstlrn
 {
-CalcGlobal::CalcGlobal(int ivar0, bool verbose)
+CalcGlobal::CalcGlobal(Id ivar0, bool verbose)
   : ACalcInterpolator()
   , _flagArithmetic(false)
   , _flagKriging(false)
@@ -108,13 +108,13 @@ bool CalcGlobal::_run()
   return true;
 }
 
-int CalcGlobal::_globalKriging()
+Id CalcGlobal::_globalKriging()
 {
   VectorDouble rhsCum;
   Db* dbin  = getDbin();
   Db* dbout = getDbout();
-  int nvar  = _modelLocal->getNVar();
-  int ng    = 0;
+  Id nvar  = _modelLocal->getNVar();
+  Id ng    = 0;
   VectorDouble wgt;
 
   KrigOpt krigopt;
@@ -143,7 +143,7 @@ int CalcGlobal::_globalKriging()
   MatrixSymmetric Sigma00;
 
   /* Loop on the targets to be processed */
-  for (int iech = 0, nech = dbout->getNSample(); iech < nech; iech++)
+  for (Id iech = 0, nech = dbout->getNSample(); iech < nech; iech++)
   {
     mes_process("Kriging sample", dbout->getNSample(), iech);
     if (!dbout->isActive(iech)) continue;
@@ -177,8 +177,8 @@ int CalcGlobal::_globalKriging()
 
   /* Preliminary checks */
 
-  int ntot       = dbin->getNSample(false);
-  int np         = dbin->getNSample(true);
+  Id ntot       = dbin->getNSample(false);
+  Id np         = dbin->getNSample(true);
   double cell    = 1.;
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(dbout);
   if (dbgrid != nullptr) cell = dbgrid->getCellSize();
@@ -237,12 +237,12 @@ int CalcGlobal::_globalKriging()
   return 0;
 }
 
-int CalcGlobal::_globalArithmetic()
+Id CalcGlobal::_globalArithmetic()
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   auto ntot      = getDbin()->getNSample(false);
   auto np        = getDbin()->getNSample(true);
-  int ng         = dbgrid->getNSample(true);
+  Id ng         = dbgrid->getNSample(true);
   double surface = ng * dbgrid->getCellSize();
 
   /* Average covariance over the data */
@@ -324,7 +324,7 @@ int CalcGlobal::_globalArithmetic()
 Global_Result global_arithmetic(Db* dbin,
                                 DbGrid* dbgrid,
                                 ModelGeneric* model,
-                                int ivar0,
+                                Id ivar0,
                                 bool verbose)
 {
   Global_Result gres;
@@ -342,7 +342,7 @@ Global_Result global_arithmetic(Db* dbin,
 Global_Result global_kriging(Db* dbin,
                              Db* dbout,
                              ModelGeneric* model,
-                             int ivar0,
+                             Id ivar0,
                              bool verbose)
 {
   Global_Result gres;

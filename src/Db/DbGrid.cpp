@@ -99,7 +99,7 @@ String DbGrid::toString(const AStringFormat* strfmt) const
  * @param flagAddSampleRank If true, add an automatic rank variable
  * @param flagAddCoordinates If TRUE, add the grid coordinates
  */
-int DbGrid::reset(const VectorInt& nx,
+Id DbGrid::reset(const VectorInt& nx,
                   const VectorDouble& dx,
                   const VectorDouble& x0,
                   const VectorDouble& angles,
@@ -112,15 +112,15 @@ int DbGrid::reset(const VectorInt& nx,
 {
   _clear();
 
-  int ndim = static_cast<int>(nx.size());
-  int nech = 1;
-  for (int idim = 0; idim < ndim; idim++)
+  Id ndim = static_cast<Id>(nx.size());
+  Id nech = 1;
+  for (Id idim = 0; idim < ndim; idim++)
     nech *= nx[idim];
-  int ntab   = (tab.empty()) ? 0 : (int)(tab.size() / nech);
-  int number = 0;
+  Id ntab   = (tab.empty()) ? 0 : (Id)(tab.size() / nech);
+  Id number = 0;
   if (flagAddSampleRank) number += 1;
   if (flagAddCoordinates) number += ndim;
-  int ncol = number + ntab;
+  Id ncol = number + ntab;
 
   // Create the grid
 
@@ -145,7 +145,7 @@ int DbGrid::reset(const VectorInt& nx,
 
   if (flagAddCoordinates)
   {
-    int jcol = 0;
+    Id jcol = 0;
     if (flagAddSampleRank) jcol++;
     setLocatorsByUID(ndim, jcol, ELoc::X, 0);
     _defineDefaultLocators(number, locatorNames);
@@ -165,42 +165,42 @@ int DbGrid::reset(const VectorInt& nx,
  *
  * @remarks Arguments 'nodes' and 'dcell' are disjunctive. If both defined, 'dcell' prevails
  */
-int DbGrid::resetCoveringDb(const Db* db,
+Id DbGrid::resetCoveringDb(const Db* db,
                             const VectorInt& nx,
                             const VectorDouble& dx,
                             const VectorDouble& x0,
                             const VectorDouble& margin)
 {
   _clear();
-  int ndim = db->getNDim();
+  Id ndim = db->getNDim();
 
   // Derive the Grid parameters
 
   VectorInt nx_new(ndim);
   VectorDouble x0_new(ndim);
   VectorDouble dx_new(ndim);
-  int nech = 1;
-  for (int idim = 0; idim < ndim; idim++)
+  Id nech = 1;
+  for (Id idim = 0; idim < ndim; idim++)
   {
     VectorDouble coor = db->getExtrema(idim, true);
 
     double marge = 0.;
-    if (ndim == (int)margin.size()) marge = margin[idim];
+    if (ndim == (Id)margin.size()) marge = margin[idim];
 
     double x0loc = coor[0];
-    if (ndim == (int)x0.size()) x0loc = x0[idim];
+    if (ndim == (Id)x0.size()) x0loc = x0[idim];
     x0loc -= marge;
 
     double ext = coor[1] - x0loc + marge;
 
     // Constraints specified by the number of nodes
-    int nxloc = 10;
-    if (ndim == (int)nx.size())
+    Id nxloc = 10;
+    if (ndim == (Id)nx.size())
       nxloc = nx[idim];
     double dxloc = ext / ((double)nxloc - 1.);
 
     // Constraints specified by the cell sizes
-    if (ndim == (int)dx.size())
+    if (ndim == (Id)dx.size())
     {
       dxloc = dx[idim];
       nxloc = ceil((ext - dxloc / 2.) / dxloc) + 1;
@@ -223,7 +223,7 @@ int DbGrid::resetCoveringDb(const Db* db,
 
   // Create the locators
 
-  int jcol = 0;
+  Id jcol = 0;
   setLocatorsByUID(ndim, jcol, ELoc::X, 0);
 
   return 0;
@@ -237,14 +237,14 @@ int DbGrid::resetCoveringDb(const Db* db,
  * @param dcell      Vector of the expected dimensions for the grid cells
  * @param flagAddSampleRank true if the sample rank must be generated
  */
-int DbGrid::resetFromPolygon(Polygons* polygon,
+Id DbGrid::resetFromPolygon(Polygons* polygon,
                              const VectorInt& nodes,
                              const VectorDouble& dcell,
                              bool flagAddSampleRank)
 {
   _clear();
   double xmin, xmax, ymin, ymax;
-  int ndim = 2;
+  Id ndim = 2;
 
   polygon->getExtension(&xmin, &xmax, &ymin, &ymax);
 
@@ -253,23 +253,23 @@ int DbGrid::resetFromPolygon(Polygons* polygon,
   VectorInt nx_tab;
   VectorDouble x0_tab;
   VectorDouble dx_tab;
-  int nech = 1;
-  for (int idim = 0; idim < ndim; idim++)
+  Id nech = 1;
+  for (Id idim = 0; idim < ndim; idim++)
   {
     double x0  = (idim == 0) ? xmin : ymin;
     double ext = (idim == 0) ? xmax - xmin : ymax - ymin;
 
-    int nx    = 10;
+    Id nx    = 10;
     double dx = ext / (double)nx;
-    if (ndim == (int)nodes.size())
+    if (ndim == (Id)nodes.size())
     {
       nx = nodes[idim];
       dx = ext / (double)nx;
     }
-    if (ndim == (int)dcell.size())
+    if (ndim == (Id)dcell.size())
     {
       dx = dcell[idim];
-      nx = static_cast<int>(ext / dx);
+      nx = static_cast<Id>(ext / dx);
     }
 
     nx_tab.push_back(nx);
@@ -277,7 +277,7 @@ int DbGrid::resetFromPolygon(Polygons* polygon,
     dx_tab.push_back(dx);
     nech *= nx;
   }
-  int ncol = (flagAddSampleRank) ? ndim + 1 : ndim;
+  Id ncol = (flagAddSampleRank) ? ndim + 1 : ndim;
 
   // Create the grid
 
@@ -291,7 +291,7 @@ int DbGrid::resetFromPolygon(Polygons* polygon,
 
   // Create the locators
 
-  int jcol = 0;
+  Id jcol = 0;
   if (flagAddSampleRank) jcol++;
   setLocatorsByUID(ndim, jcol, ELoc::X, 0);
 
@@ -362,7 +362,7 @@ DbGrid* DbGrid::createCoarse(DbGrid* dbin,
                              bool flagAddSampleRank)
 {
   DbGrid* dbgrid;
-  int ndim = dbin->getNDim();
+  Id ndim = dbin->getNDim();
 
   // Get the new grid characteristics
   VectorInt nx(ndim);
@@ -402,18 +402,18 @@ DbGrid* DbGrid::createFromGridExtend(const DbGrid& gridIn,
 {
   DbGrid* gridnew = new DbGrid;
 
-  int ncoor = (int)nxnew.size();
+  Id ncoor = (Id)nxnew.size();
   if (ncoor <= 0)
   {
     messerr("You must provide a non-empty vector of meshing dimensions");
     return gridnew;
   }
-  if (ncoor != (int)tops.size())
+  if (ncoor != (Id)tops.size())
   {
     messerr("Arguments 'tops' and 'nxnew' should have the same dimension");
     return gridnew;
   }
-  if (ncoor != (int)bots.size())
+  if (ncoor != (Id)bots.size())
   {
     messerr("Arguments 'bots' and 'nxnew' should have the same dimension");
     return gridnew;
@@ -424,7 +424,7 @@ DbGrid* DbGrid::createFromGridExtend(const DbGrid& gridIn,
   VectorDouble mini(ncoor);
   VectorDouble maxi(ncoor);
   double coteB, coteT;
-  for (int icoor = 0; icoor < ncoor; icoor++)
+  for (Id icoor = 0; icoor < ncoor; icoor++)
   {
     coteB = gridIn.getMinimum(bots[icoor]);
     coteT = gridIn.getMinimum(tops[icoor]);
@@ -471,13 +471,13 @@ DbGrid* DbGrid::createFromGridExtend(const DbGrid& gridIn,
   VectorDouble angles = gridIn.getAngles();
 
   // Extend the characteristics for the new file dimension
-  int ndimnew = ndim + ncoor;
+  Id ndimnew = ndim + ncoor;
   nx.resize(ndimnew);
   dx.resize(ndimnew);
   x0.resize(ndimnew);
   angles.resize(ndimnew);
 
-  for (int icoor = 0; icoor < ncoor; icoor++)
+  for (Id icoor = 0; icoor < ncoor; icoor++)
   {
     double delta         = maxi[icoor] - mini[icoor];
     nx[ndim + icoor]     = nxnew[icoor];
@@ -504,7 +504,7 @@ DbGrid* DbGrid::createFromGridShrink(const DbGrid& gridIn,
   auto* gridnew = new DbGrid();
   auto ndim     = gridIn.getNDim();
 
-  for (int i = 0; i < (int)deletedRanks.size(); i++)
+  for (Id i = 0; i < (Id)deletedRanks.size(); i++)
   {
     if (i < 0 || i >= ndim)
     {
@@ -526,7 +526,7 @@ DbGrid* DbGrid::createFromGridShrink(const DbGrid& gridIn,
   VectorDouble angles = gridIn.getAngles();
 
   // Suppress the dimensions of the grid
-  for (int i = 0; i < (int)ranks.size(); i++)
+  for (Id i = 0; i < (Id)ranks.size(); i++)
   {
     nx.erase(nx.begin() + ranks[i]);
     dx.erase(dx.begin() + ranks[i]);
@@ -540,7 +540,7 @@ DbGrid* DbGrid::createFromGridShrink(const DbGrid& gridIn,
   return gridnew;
 }
 
-VectorInt DbGrid::getNXsExt(int ndimMax) const
+VectorInt DbGrid::getNXsExt(Id ndimMax) const
 {
   VectorInt nxs = getNXs();
   nxs.resize(ndimMax, 1);
@@ -558,7 +558,7 @@ DbGrid* DbGrid::createRefine(DbGrid* dbin,
                              bool flagAddSampleRank)
 {
   DbGrid* dbgrid;
-  int ndim = dbin->getNDim();
+  Id ndim = dbin->getNDim();
 
   // Get the new grid characteristics
   VectorInt nx(ndim);
@@ -589,12 +589,12 @@ DbGrid* DbGrid::createRefine(DbGrid* dbin,
 bool DbGrid::migrateAllVariables(Db* dbin, bool flag_fill, bool flag_inter, bool flag_ball, bool flagAddSampleRank)
 {
   ELoc locatorType;
-  int locatorIndex;
+  Id locatorIndex;
 
   // Constitute the list of Variables to be migrated
 
   VectorInt icols;
-  for (int icol = 0; icol < dbin->getNColumn(); icol++)
+  for (Id icol = 0; icol < dbin->getNColumn(); icol++)
   {
     // Skip the rank
     if (flagAddSampleRank && icol == 0) continue;
@@ -607,7 +607,7 @@ bool DbGrid::migrateAllVariables(Db* dbin, bool flag_fill, bool flag_inter, bool
     }
     icols.push_back(icol);
   }
-  int ncol = (int)icols.size();
+  Id ncol = (Id)icols.size();
   if (ncol <= 0) return true;
 
   // Migrate the variables
@@ -617,7 +617,7 @@ bool DbGrid::migrateAllVariables(Db* dbin, bool flag_fill, bool flag_inter, bool
     return false;
 
   // Duplicate the locators
-  for (int icol = 0; icol < ncol; icol++)
+  for (Id icol = 0; icol < ncol; icol++)
   {
     if (dbin->getLocatorByColIdx(icols[icol], &locatorType, &locatorIndex))
       setLocatorByColIdx(icolOut + icol, locatorType, locatorIndex);
@@ -631,13 +631,13 @@ bool DbGrid::migrateAllVariables(Db* dbin, bool flag_fill, bool flag_inter, bool
  * Paint the ndim columns starting from 'icol0' with grid coordinates
  * @param icol0 Starting column
  */
-void DbGrid::_createGridCoordinates(int icol0)
+void DbGrid::_createGridCoordinates(Id icol0)
 {
   auto ndim = getNDim();
 
   // Set the Names
 
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     _setNameByColIdx(icol0 + idim, getLocatorName(ELoc::X, idim));
 
   // Set the locators
@@ -647,13 +647,13 @@ void DbGrid::_createGridCoordinates(int icol0)
   // Generate the vector of coordinates
 
   std::vector<double> coors(ndim);
-  std::vector<int> indices;
+  std::vector<Id> indices;
   _grid.iteratorInit();
-  for (int iech = 0; iech < getNSample(); iech++)
+  for (Id iech = 0; iech < getNSample(); iech++)
   {
     _grid.iteratorNext(indices);
     _grid.indicesToCoordinateInPlace(indices, coors);
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       setArray(iech, icol0 + idim, coors[idim]);
   }
 }
@@ -668,7 +668,7 @@ bool DbGrid::isSameGrid(const Grid& grid) const
   return _grid.isSame(grid);
 }
 
-void DbGrid::gridCopyParams(int mode, const Grid& gridaux)
+void DbGrid::gridCopyParams(Id mode, const Grid& gridaux)
 {
   _grid.copyParams(mode, gridaux);
 }
@@ -706,7 +706,7 @@ bool DbGrid::isGridRotated() const
  * @param flag_rotate Use the rotation (only for Grid)
  * @return
  */
-double DbGrid::getCoordinate(int iech, int idim, bool flag_rotate) const
+double DbGrid::getCoordinate(Id iech, Id idim, bool flag_rotate) const
 {
   if (idim >= getNDim()) return TEST;
   return _grid.getCoordinate(iech, idim, flag_rotate);
@@ -716,13 +716,13 @@ void DbGrid::initThread() const
 {
   _grid.initThread();
 }
-void DbGrid::getCoordinatesInPlace(VectorDouble& coor, int iech, bool flag_rotate) const
+void DbGrid::getCoordinatesInPlace(VectorDouble& coor, Id iech, bool flag_rotate) const
 {
   const VectorDouble& vec = _grid.getCoordinatesByRank(iech, flag_rotate);
   std::copy(vec.begin(), vec.begin() + getNDim(), coor.begin());
 }
 
-int DbGrid::getNDim() const
+Id DbGrid::getNDim() const
 {
   return (_grid.getNDim());
 }
@@ -732,9 +732,9 @@ int DbGrid::getNDim() const
  * @param ncol Number of columns (= variables)
  * @param nech Number of samples (ignore in case of Grid)
  */
-void DbGrid::resetDims(int ncol, int /*nech*/)
+void DbGrid::resetDims(Id ncol, Id /*nech*/)
 {
-  int nech = _grid.getNTotal();
+  Id nech = _grid.getNTotal();
   Db::resetDims(ncol, nech);
 }
 
@@ -805,12 +805,12 @@ bool DbGrid::_serializeH5(H5::Group& grp, bool verbose) const
 }
 #endif
 
-double DbGrid::getUnit(int idim) const
+double DbGrid::getUnit(Id idim) const
 {
   return _grid.getDX(idim);
 }
 
-int DbGrid::gridDefine(const VectorInt& nx,
+Id DbGrid::gridDefine(const VectorInt& nx,
                        const VectorDouble& dx,
                        const VectorDouble& x0,
                        const VectorDouble& angles)
@@ -836,8 +836,8 @@ DbGrid* DbGrid::createFromNF(const String& NFFilename, bool verbose)
 }
 
 VectorDouble DbGrid::getColumnSubGrid(const String& name,
-                                      int idim0,
-                                      int rank,
+                                      Id idim0,
+                                      Id rank,
                                       bool useSel)
 {
   VectorDouble vec;
@@ -855,11 +855,11 @@ VectorDouble DbGrid::getColumnSubGrid(const String& name,
   // Loop on the samples
 
   _grid.iteratorInit();
-  for (int iech = 0; iech < getNSample(); iech++)
+  for (Id iech = 0; iech < getNSample(); iech++)
   {
     VectorInt indices = _grid.iteratorNext();
     if (indices[idim0] != rank) continue;
-    int iabs = _grid.indiceToRank(indices);
+    Id iabs = _grid.indiceToRank(indices);
 
     double value = getValue(name, iabs);
     if (useSel && !sel.empty() && sel[iech] == 0) value = TEST;
@@ -868,19 +868,19 @@ VectorDouble DbGrid::getColumnSubGrid(const String& name,
   return vec;
 }
 
-void DbGrid::getGridPileInPlace(int iuid,
+void DbGrid::getGridPileInPlace(Id iuid,
                                 const VectorInt& indg,
-                                int idim0,
+                                Id idim0,
                                 VectorDouble& vec) const
 {
   auto nz = getNX(idim0);
-  if (nz != (int)vec.size()) vec.resize(nz);
+  if (nz != (Id)vec.size()) vec.resize(nz);
 
   // Loop on the samples
 
   VectorInt indices = indg;
   VectorInt iechs(nz);
-  for (int iz = 0; iz < nz; iz++)
+  for (Id iz = 0; iz < nz; iz++)
   {
     indices[idim0] = iz;
     iechs[iz]      = _grid.indiceToRank(indices);
@@ -888,19 +888,19 @@ void DbGrid::getGridPileInPlace(int iuid,
   getArrayVec(iechs, iuid, vec);
 }
 
-void DbGrid::setGridPileInPlace(int iuid,
+void DbGrid::setGridPileInPlace(Id iuid,
                                 const VectorInt& indg,
-                                int idim0,
+                                Id idim0,
                                 const VectorDouble& vec)
 {
   auto nz = getNX(idim0);
-  if ((int)vec.size() != nz) return;
+  if ((Id)vec.size() != nz) return;
 
   // Loop on the samples
 
   VectorInt indices = indg;
   VectorInt iechs(nz);
-  for (int iz = 0; iz < nz; iz++)
+  for (Id iz = 0; iz < nz; iz++)
   {
     indices[idim0] = iz;
     iechs[iz]      = _grid.indiceToRank(indices);
@@ -918,10 +918,10 @@ void DbGrid::generateCoordinates(const String& radix)
   auto ndim = getNDim();
   VectorDouble coors(ndim);
   (void)addColumnsByConstant(ndim, 0., radix, ELoc::X);
-  for (int iech = 0; iech < getNSample(); iech++)
+  for (Id iech = 0; iech < getNSample(); iech++)
   {
     _grid.rankToCoordinatesInPlace(iech, coors);
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       setCoordinate(iech, idim, coors[idim]);
   }
 }
@@ -939,8 +939,8 @@ void DbGrid::generateCoordinates(const String& radix)
  * @remarks extracted section. Obviously corner[posx] and corner[posy] are not used
  */
 VectorDouble DbGrid::getOneSlice(const String& name,
-                                 int posx,
-                                 int posy,
+                                 Id posx,
+                                 Id posy,
                                  const VectorInt& corner,
                                  bool useSel) const
 {
@@ -969,7 +969,7 @@ VectorDouble DbGrid::getOneSlice(const String& name,
   VectorInt cornloc = corner;
   if (cornloc.empty())
     cornloc.resize(ndim, 0);
-  if (ndim != (int)cornloc.size())
+  if (ndim != (Id)cornloc.size())
   {
     messerr("The dimension of 'corner' should be equal to 'ndim'");
     return tab;
@@ -987,13 +987,13 @@ VectorDouble DbGrid::getOneSlice(const String& name,
 
   VectorInt indices = cornloc;
 
-  int ecr = 0;
-  for (int i2 = 0; i2 < n2; i2++)
-    for (int i1 = 0; i1 < n1; i1++, ecr++)
+  Id ecr = 0;
+  for (Id i2 = 0; i2 < n2; i2++)
+    for (Id i1 = 0; i1 < n1; i1++, ecr++)
     {
       indices[posx] = i1;
       indices[posy] = i2;
-      int iech      = indiceToRank(indices);
+      Id iech      = indiceToRank(indices);
       if (!useSel || isActive(iech))
         tab[ecr] = getArray(iech, iuid);
       else
@@ -1019,9 +1019,9 @@ VectorDouble DbGrid::getOneSlice(const String& name,
  * @remark extracted section. Obviously corner[posx] and corner[posy] are not used
  *
  */
-VectorDouble DbGrid::getOneSliceForCoordinate(int idim,
-                                              int posx,
-                                              int posy,
+VectorDouble DbGrid::getOneSliceForCoordinate(Id idim,
+                                              Id posx,
+                                              Id posy,
                                               const VectorInt& corner,
                                               bool useSel) const
 {
@@ -1050,7 +1050,7 @@ VectorDouble DbGrid::getOneSliceForCoordinate(int idim,
   VectorInt cornloc = corner;
   if (cornloc.empty())
     cornloc.resize(ndim, 0);
-  if (ndim != (int)cornloc.size())
+  if (ndim != (Id)cornloc.size())
   {
     messerr("The dimension of 'corner' should be equal to 'ndim'");
     return tab;
@@ -1074,15 +1074,15 @@ VectorDouble DbGrid::getOneSliceForCoordinate(int idim,
   VectorInt indices = cornloc;
   VectorDouble coord(ndim);
 
-  int ecr = 0;
-  for (int i2 = 0; i2 < n2; i2++)
-    for (int i1 = 0; i1 < n1; i1++, ecr++)
+  Id ecr = 0;
+  for (Id i2 = 0; i2 < n2; i2++)
+    for (Id i1 = 0; i1 < n1; i1++, ecr++)
     {
       indices[posx] = i1;
       indices[posy] = i2;
 
       indicesToCoordinateInPlace(indices, coord);
-      int iech = indiceToRank(indices);
+      Id iech = indiceToRank(indices);
       if (!useSel || isActive(iech))
         tab[ecr] = coord[idim];
       else
@@ -1100,9 +1100,9 @@ VectorDouble DbGrid::getOneSliceForCoordinate(int idim,
  * @param value  Assigned value
  * @param useSel Use the selection
  */
-int DbGrid::assignGridColumn(const String& name,
-                             int idim,
-                             int rank,
+Id DbGrid::assignGridColumn(const String& name,
+                             Id idim,
+                             Id rank,
                              double value,
                              bool useSel)
 {
@@ -1120,7 +1120,7 @@ int DbGrid::assignGridColumn(const String& name,
   }
 
   _grid.iteratorInit();
-  for (int iech = 0; iech < getNSample(); iech++)
+  for (Id iech = 0; iech < getNSample(); iech++)
   {
     VectorInt indices = _grid.iteratorNext();
     if (indices[idim] != rank) continue;
@@ -1130,7 +1130,7 @@ int DbGrid::assignGridColumn(const String& name,
   return 0;
 }
 
-int DbGrid::coordinateToRank(const VectorDouble& coor,
+Id DbGrid::coordinateToRank(const VectorDouble& coor,
                              bool centered,
                              double eps) const
 {
@@ -1144,7 +1144,7 @@ VectorInt DbGrid::coordinateToIndices(const VectorDouble& coor,
   return _grid.coordinateToIndices(coor, centered, eps);
 }
 
-int DbGrid::coordinateToIndicesInPlace(const VectorDouble& coor,
+Id DbGrid::coordinateToIndicesInPlace(const VectorDouble& coor,
                                        VectorInt& indices,
                                        bool centered,
                                        double eps) const
@@ -1152,11 +1152,11 @@ int DbGrid::coordinateToIndicesInPlace(const VectorDouble& coor,
   return _grid.coordinateToIndicesInPlace(coor, indices, centered, eps);
 }
 
-int DbGrid::centerCoordinateInPlace(VectorDouble& coor, bool centered, bool stopIfOut, double eps) const
+Id DbGrid::centerCoordinateInPlace(VectorDouble& coor, bool centered, bool stopIfOut, double eps) const
 {
-  int ndim = (int)coor.size();
+  Id ndim = (Id)coor.size();
   VectorInt indice(ndim);
-  int err = coordinateToIndicesInPlace(coor, indice, centered, eps);
+  Id err = coordinateToIndicesInPlace(coor, indice, centered, eps);
   if (stopIfOut && err > 0) return -1;
   indicesToCoordinateInPlace(indice, coor);
   return 0;
@@ -1174,12 +1174,12 @@ int DbGrid::centerCoordinateInPlace(VectorDouble& coor, bool centered, bool stop
  * @remarks values are returned but set to TEST
  */
 VectorVectorDouble DbGrid::getSlice(const String& name,
-                                    int pos,
-                                    int indice,
+                                    Id pos,
+                                    Id indice,
                                     bool useSel) const
 {
   VectorVectorDouble tab;
-  int nvect = 4;
+  Id nvect = 4;
   if (getNDim() != 3)
   {
     messerr("This method is limited to 3-D Grid data base");
@@ -1203,18 +1203,18 @@ VectorVectorDouble DbGrid::getSlice(const String& name,
     auto n1  = getNX(1);
     auto n2  = getNX(2);
     auto n3  = getNX(0);
-    int nech = n1 * n2;
-    for (int i = 0; i < nvect; i++) tab[i].resize(nech, TEST);
+    Id nech = n1 * n2;
+    for (Id i = 0; i < nvect; i++) tab[i].resize(nech, TEST);
     if (!checkArg("Error in argument 'indice'", indice, n3)) return VectorVectorDouble();
     indices[0] = indice;
 
-    int ecr = 0;
-    for (int i1 = 0; i1 < n1; i1++)
-      for (int i2 = 0; i2 < n2; i2++, ecr++)
+    Id ecr = 0;
+    for (Id i1 = 0; i1 < n1; i1++)
+      for (Id i2 = 0; i2 < n2; i2++, ecr++)
       {
         indices[1] = i1;
         indices[2] = i2;
-        int iech   = indiceToRank(indices);
+        Id iech   = indiceToRank(indices);
         getCoordinatesInPlace(coor, iech);
         tab[0][ecr] = coor[0];
         tab[1][ecr] = coor[1];
@@ -1231,19 +1231,19 @@ VectorVectorDouble DbGrid::getSlice(const String& name,
     auto n1  = getNX(0);
     auto n2  = getNX(2);
     auto n3  = getNX(1);
-    int nech = n1 * n2;
-    for (int i = 0; i < nvect; i++)
+    Id nech = n1 * n2;
+    for (Id i = 0; i < nvect; i++)
       tab[i].resize(nech, TEST);
     if (!checkArg("Error in argument 'indice'", indice, n3)) return VectorVectorDouble();
     indices[1] = indice;
 
-    int ecr = 0;
-    for (int i1 = 0; i1 < n1; i1++)
-      for (int i2 = 0; i2 < n2; i2++, ecr++)
+    Id ecr = 0;
+    for (Id i1 = 0; i1 < n1; i1++)
+      for (Id i2 = 0; i2 < n2; i2++, ecr++)
       {
         indices[0] = i1;
         indices[2] = i2;
-        int iech   = indiceToRank(indices);
+        Id iech   = indiceToRank(indices);
         getCoordinatesInPlace(coor, iech);
         tab[0][ecr] = coor[0];
         tab[1][ecr] = coor[1];
@@ -1260,18 +1260,18 @@ VectorVectorDouble DbGrid::getSlice(const String& name,
     auto n1  = getNX(0);
     auto n2  = getNX(1);
     auto n3  = getNX(2);
-    int nech = n1 * n2;
-    for (int i = 0; i < nvect; i++) tab[i].resize(nech, TEST);
+    Id nech = n1 * n2;
+    for (Id i = 0; i < nvect; i++) tab[i].resize(nech, TEST);
     if (!checkArg("Error in argument 'indice'", indice, n3)) return VectorVectorDouble();
     indices[2] = indice;
 
-    int ecr = 0;
-    for (int i1 = 0; i1 < n1; i1++)
-      for (int i2 = 0; i2 < n2; i2++, ecr++)
+    Id ecr = 0;
+    for (Id i1 = 0; i1 < n1; i1++)
+      for (Id i2 = 0; i2 < n2; i2++, ecr++)
       {
         indices[0] = i1;
         indices[1] = i2;
-        int iech   = indiceToRank(indices);
+        Id iech   = indiceToRank(indices);
         getCoordinatesInPlace(coor, iech);
         tab[0][ecr] = coor[0];
         tab[1][ecr] = coor[1];
@@ -1292,7 +1292,7 @@ VectorVectorDouble DbGrid::getSlice(const String& name,
  *                      even if a variable block extension is defined
  * @return
  */
-VectorVectorDouble DbGrid::getCellEdges(int node, bool forceGridMesh) const
+VectorVectorDouble DbGrid::getCellEdges(Id node, bool forceGridMesh) const
 {
   VectorVectorDouble coords(2);
   coords[0].resize(5);
@@ -1353,7 +1353,7 @@ VectorVectorDouble DbGrid::getAllCellsEdges(bool forceGridMesh) const
   VectorDouble dxsPerCell;
   if (forceGridMesh) dxsPerCell = getDXs();
 
-  for (int node = 0; node < getNTotal(); node++)
+  for (Id node = 0; node < getNTotal(); node++)
   {
     if (!forceGridMesh) dxsPerCell = getBlockExtensions(node);
 
@@ -1439,7 +1439,7 @@ VectorDouble DbGrid::getCodir(const VectorInt& grincr) const
   return codir;
 }
 
-VectorDouble DbGrid::getBlockExtensions(int node) const
+VectorDouble DbGrid::getBlockExtensions(Id node) const
 {
   VectorDouble dxsPerCell;
   if (!hasLocVariable(ELoc::BLEX))
@@ -1452,10 +1452,10 @@ VectorDouble DbGrid::getBlockExtensions(int node) const
   return dxsPerCell;
 }
 
-int DbGrid::morpho(const EMorpho& oper,
+Id DbGrid::morpho(const EMorpho& oper,
                    double vmin,
                    double vmax,
-                   int option,
+                   Id option,
                    const VectorInt& radius,
                    bool flagDistErode,
                    bool verbose,
@@ -1464,8 +1464,8 @@ int DbGrid::morpho(const EMorpho& oper,
   return dbMorpho(this, oper, vmin, vmax, option, radius, flagDistErode, verbose, namconv);
 }
 
-int DbGrid::smooth(ANeigh* neigh,
-                   int type,
+Id DbGrid::smooth(ANeigh* neigh,
+                   Id type,
                    double range,
                    const NamingConvention& namconv)
 {
@@ -1493,8 +1493,8 @@ int DbGrid::smooth(ANeigh* neigh,
  **
  *****************************************************************************/
 DbGrid* DbGrid::createGrid2D(const ELoadBy& order,
-                             int nx,
-                             int ny,
+                             Id nx,
+                             Id ny,
                              double x0,
                              double y0,
                              double dx,
@@ -1545,31 +1545,31 @@ DbGrid* DbGrid::createGrid2D(const ELoadBy& order,
  * values are generated according to Normal distribution.
  */
 DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
-                                 int nvar,
-                                 int nfex,
-                                 int ncode,
+                                 Id nvar,
+                                 Id nfex,
+                                 Id ncode,
                                  double varmax,
                                  double selRatio,
                                  const VectorDouble& heteroRatio,
                                  const VectorDouble& means,
                                  const VectorDouble& x0,
-                                 int seed)
+                                 Id seed)
 {
   // Set the seed
   law_set_random_seed(seed);
 
   // Create the Db
-  int ndim = (int)nx.size();
+  Id ndim = (Id)nx.size();
   VectorDouble dx(ndim);
-  for (int idim = 0; idim < ndim; idim++) dx[idim] = 1. / nx[idim];
+  for (Id idim = 0; idim < ndim; idim++) dx[idim] = 1. / nx[idim];
   DbGrid* dbgrid = DbGrid::create(nx, dx, x0);
-  int ndat       = VH::product(nx);
+  Id ndat       = VH::product(nx);
 
   // Generate the Vectors of Variance of measurement error (optional)
   if (varmax > 0.)
   {
     VectorVectorDouble varm(nvar);
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
       varm[ivar] = VH::simulateUniform(ndat, 0., varmax);
     dbgrid->addColumnsByVVD(varm, "v", ELoc::V);
   }
@@ -1578,7 +1578,7 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
   if (nfex > 0)
   {
     VectorVectorDouble fex(nfex);
-    for (int ifex = 0; ifex < nfex; ifex++) fex[ifex] = VH::simulateGaussian(ndat);
+    for (Id ifex = 0; ifex < nfex; ifex++) fex[ifex] = VH::simulateGaussian(ndat);
     dbgrid->addColumnsByVVD(fex, "f", ELoc::F);
   }
 
@@ -1587,21 +1587,21 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
   {
     VectorDouble sel(ndat);
     VectorDouble rnd = VH::simulateUniform(ndat);
-    for (int idat = 0; idat < ndat; idat++) sel[idat] = (rnd[idat] > selRatio) ? 1. : 0.;
+    for (Id idat = 0; idat < ndat; idat++) sel[idat] = (rnd[idat] > selRatio) ? 1. : 0.;
     dbgrid->addColumns(sel, "sel", ELoc::SEL);
   }
 
   // Generate the variables
-  bool flag_hetero = ((int)heteroRatio.size() == nvar);
+  bool flag_hetero = ((Id)heteroRatio.size() == nvar);
   VectorVectorDouble vars(nvar);
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     double mean = (means.empty()) ? 0. : means[ivar];
     vars[ivar]  = VH::simulateGaussian(ndat, mean);
     if (flag_hetero)
     {
       VectorDouble rnd = VH::simulateUniform(ndat);
-      for (int idat = 0; idat < ndat; idat++)
+      for (Id idat = 0; idat < ndat; idat++)
         if (rnd[idat] <= heteroRatio[ivar]) vars[ivar][idat] = TEST;
     }
   }
@@ -1611,7 +1611,7 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
   if (ncode > 0)
   {
     VectorDouble codes = VH::simulateUniform(ndat);
-    for (int idat = 0; idat < ndat; idat++) codes[idat] = floor(ncode * codes[idat]);
+    for (Id idat = 0; idat < ndat; idat++) codes[idat] = floor(ncode * codes[idat]);
     dbgrid->addColumns(codes, "code", ELoc::C);
   }
 
@@ -1619,13 +1619,13 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
 }
 
 void DbGrid::_interpolate(const DbGrid* grid3D,
-                          int idim0,
+                          Id idim0,
                           double top,
                           double bot,
                           const VectorDouble& vecin,
                           VectorDouble& vecout) const
 {
-  int nzin     = grid3D->getNX(idim0);
+  Id nzin     = grid3D->getNX(idim0);
   double z0out = getX0(idim0);
   double dzout = getDX(idim0);
   auto nzout   = getNX(idim0);
@@ -1634,16 +1634,16 @@ void DbGrid::_interpolate(const DbGrid* grid3D,
   vecout.fill(TEST);
 
   // Get the top and bottom indices in the output vector
-  int indtop = ceil((top - z0out) / dzout);
-  int indbot = floor((bot - z0out) / dzout);
+  Id indtop = ceil((top - z0out) / dzout);
+  Id indbot = floor((bot - z0out) / dzout);
 
-  for (int iz = indbot; iz <= indtop; iz++)
+  for (Id iz = indbot; iz <= indtop; iz++)
   {
     if (iz < 0 || iz >= nzout) continue;
     double zz = z0out + iz * dzout;
 
     // Find the index in the input vector
-    int izin = (int)(double(nzin) * (zz - bot) / (top - bot));
+    Id izin = (Id)(double(nzin) * (zz - bot) / (top - bot));
     if (izin < 0 || izin <= nzin) continue;
 
     // Assign the value
@@ -1662,10 +1662,10 @@ DbGrid* DbGrid::createSubGrid(const DbGrid* gridIn, VectorVectorInt limits, bool
 {
   DbGrid* gridOut = nullptr;
   if (gridIn == nullptr) return gridOut;
-  int ndim = gridIn->getNDim();
+  Id ndim = gridIn->getNDim();
 
   // Preliminary checks
-  if (ndim != (int)limits.size())
+  if (ndim != (Id)limits.size())
   {
     messerr("The argument 'limits' should have dimension ndim x 2");
     return gridOut;
@@ -1674,7 +1674,7 @@ DbGrid* DbGrid::createSubGrid(const DbGrid* gridIn, VectorVectorInt limits, bool
   // Get the list of variables to be copied (rank and coordinates excluded)
   VectorString names = gridIn->getAllNames(true);
   VectorInt iuidIn   = gridIn->getUIDs(names);
-  int nvar           = (int)names.size();
+  Id nvar           = (Id)names.size();
 
   // Create the characteristics of the new grid
   VectorInt NXs       = gridIn->getNXs();
@@ -1682,7 +1682,7 @@ DbGrid* DbGrid::createSubGrid(const DbGrid* gridIn, VectorVectorInt limits, bool
   VectorDouble X0s    = gridIn->getX0s();
   VectorDouble angles = gridIn->getAngles();
 
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     NXs[idim] = limits[idim][1] - limits[idim][0];
     X0s[idim] += limits[idim][0] * DXs[idim];
@@ -1695,27 +1695,27 @@ DbGrid* DbGrid::createSubGrid(const DbGrid* gridIn, VectorVectorInt limits, bool
 
   // Add the variables of interest
   VectorInt iuidOut(nvar);
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     iuidOut[ivar] = gridOut->addColumnsByConstant(1, TEST, names[ivar]);
 
   // Loop on the nodes of the output sub-grid
   VectorInt indg(ndim);
   double value;
-  int igin;
-  for (int igout = 0, nout = gridOut->getNSample(); igout < nout; igout++)
+  Id igin;
+  for (Id igout = 0, nout = gridOut->getNSample(); igout < nout; igout++)
   {
     // Get the indices in the output grid
     gridOut->rankToIndice(igout, indg);
 
     // Convert them to the indices in the input grid
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       indg[idim] += limits[idim][0];
 
     // Convert in rank in the input grid
     igin = gridIn->indiceToRank(indg);
 
     // Loop on the variables
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       value = gridIn->getArray(igin, iuidIn[ivar]);
       gridOut->setArray(igout, iuidOut[ivar], value);
@@ -1748,7 +1748,7 @@ DbGrid* DbGrid::createSqueezeAndStretchForward(const DbGrid* grid3Din,
                                                const String& nameTop,
                                                const String& nameBot,
                                                const VectorString& names,
-                                               int nzout,
+                                               Id nzout,
                                                double thickmin)
 {
   DbGrid* grid3Dout = nullptr;
@@ -1782,9 +1782,9 @@ DbGrid* DbGrid::createSqueezeAndStretchForward(const DbGrid* grid3Din,
     messerr("You must designate variable(s) to be copied from input to output 3D grid");
     return grid3Dout;
   }
-  int ndim  = 3;
-  int idim0 = ndim - 1;
-  int nvar  = (int)names.size();
+  Id ndim  = 3;
+  Id idim0 = ndim - 1;
+  Id nvar  = (Id)names.size();
 
   // Getting relevant information from the top and bottom surfaces (using the selection)
   VectorDouble botArray = surf2D->getColumn(nameBot, true);
@@ -1805,7 +1805,7 @@ DbGrid* DbGrid::createSqueezeAndStretchForward(const DbGrid* grid3Din,
 
   // Modify these characteristics for the output 3D Grid
 
-  int nzin  = NXs[idim0];
+  Id nzin  = NXs[idim0];
   double z0 = X0s[idim0];
   double dz = DXs[idim0];
 
@@ -1818,24 +1818,24 @@ DbGrid* DbGrid::createSqueezeAndStretchForward(const DbGrid* grid3Din,
                      VectorDouble(), VectorString(), VectorString(), 1, false);
 
   // Create the variables in the 3D grid and identify their UIDs
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     grid3Dout->addColumnsByConstant(1, TEST, names[ivar]);
   VectorInt iuids = grid3Dout->getUIDs(names);
 
   // Define local variables
-  int iuidTop = surf2D->getUID(nameTop);
-  int iuidBot = surf2D->getUID(nameBot);
+  Id iuidTop = surf2D->getUID(nameTop);
+  Id iuidBot = surf2D->getUID(nameBot);
   VectorDouble vecin(nzin);
   VectorDouble vecout(nzout);
   VectorInt indg(ndim, 0);
-  int ig2D;
+  Id ig2D;
   double top;
   double bot;
   double thick;
 
   // Loop on the 3-D vertical columns of the 3-D grid
-  for (int ix = 0, nx = grid3Dout->getNX(0); ix < nx; ix++)
-    for (int iy = 0, ny = grid3Dout->getNX(1); iy < ny; iy++)
+  for (Id ix = 0, nx = grid3Dout->getNX(0); ix < nx; ix++)
+    for (Id iy = 0, ny = grid3Dout->getNX(1); iy < ny; iy++)
     {
       indg[0] = ix;
       indg[1] = iy;
@@ -1852,7 +1852,7 @@ DbGrid* DbGrid::createSqueezeAndStretchForward(const DbGrid* grid3Din,
       if (thick < thickmin) continue;
 
       // Loop on the variables to be transformed
-      for (int ivar = 0; ivar < nvar; ivar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
       {
         // Read the pile from the 3D input grid
         grid3Din->getGridPileInPlace(iuids[ivar], indg, idim0, vecin);
@@ -1890,7 +1890,7 @@ DbGrid* DbGrid::createSqueezeAndStretchBackward(const DbGrid* grid3Din,
                                                 const String& nameTop,
                                                 const String& nameBot,
                                                 const VectorString& names,
-                                                int nzout,
+                                                Id nzout,
                                                 double z0out,
                                                 double dzout)
 {
@@ -1920,9 +1920,9 @@ DbGrid* DbGrid::createSqueezeAndStretchBackward(const DbGrid* grid3Din,
     messerr("You must designate variable(s) to be copied from input to output 3D grid");
     return grid3Dout;
   }
-  int ndim  = 3;
-  int idim0 = ndim - 1;
-  int nvar  = (int)names.size();
+  Id ndim  = 3;
+  Id idim0 = ndim - 1;
+  Id nvar  = (Id)names.size();
 
   // Getting relevant information from the top and bottom surfaces (using the selection)
   VectorDouble botArray = surf2D->getColumn(nameBot, true);
@@ -1942,7 +1942,7 @@ DbGrid* DbGrid::createSqueezeAndStretchBackward(const DbGrid* grid3Din,
   VectorDouble angles = grid3Din->getAngles();
 
   // Modify these characteristics for the output 3D Grid
-  int nzin   = NXs[idim0];
+  Id nzin   = NXs[idim0];
   NXs[idim0] = nzout;
   DXs[idim0] = dzout;
   X0s[idim0] = z0out;
@@ -1952,23 +1952,23 @@ DbGrid* DbGrid::createSqueezeAndStretchBackward(const DbGrid* grid3Din,
                      VectorDouble(), VectorString(), VectorString(), 1, false);
 
   // Create the variables in the 3D grid and identify their UIDs
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     grid3Dout->addColumnsByConstant(1, TEST, names[ivar]);
   VectorInt iuids = grid3Dout->getUIDs(names);
 
   // Define local variables
-  int iuidTop = surf2D->getUID(nameTop);
-  int iuidBot = surf2D->getUID(nameBot);
+  Id iuidTop = surf2D->getUID(nameTop);
+  Id iuidBot = surf2D->getUID(nameBot);
   VectorDouble vecin(nzin);
   VectorDouble vecout(nzout);
   VectorInt indg(ndim, 0);
-  int ig2D;
+  Id ig2D;
   double top;
   double bot;
 
   // Loop on the 3-D vertical columns of the 3-D grid
-  for (int ix = 0, nx = grid3Dout->getNX(0); ix < nx; ix++)
-    for (int iy = 0, ny = grid3Dout->getNX(1); iy < ny; iy++)
+  for (Id ix = 0, nx = grid3Dout->getNX(0); ix < nx; ix++)
+    for (Id iy = 0, ny = grid3Dout->getNX(1); iy < ny; iy++)
     {
       indg[0] = ix;
       indg[1] = iy;
@@ -1983,7 +1983,7 @@ DbGrid* DbGrid::createSqueezeAndStretchBackward(const DbGrid* grid3Din,
       bot = surf2D->getArray(ig2D, iuidBot);
 
       // Loop on the variables to be transformed
-      for (int ivar = 0; ivar < nvar; ivar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
       {
         // Read the pile from the 3D input grid
         grid3Din->getGridPileInPlace(iuids[ivar], indg, idim0, vecin);
@@ -2015,7 +2015,7 @@ VectorVectorInt DbGrid::getLimitsFromVariableExtend(const String& nameTop,
 {
   auto ndim = getNDim();
   VectorVectorInt vec(ndim);
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     vec[idim].resize(2);
     vec[idim][0] = 0;
@@ -2029,10 +2029,10 @@ VectorVectorInt DbGrid::getLimitsFromVariableExtend(const String& nameTop,
   VectorInt indmin(ndim, 10000000);
   VectorInt indmax(ndim, -10000000);
   VectorInt indg(ndim);
-  int iuid_top = getUID(nameTop);
-  int iuid_bot = getUID(nameBot);
+  Id iuid_top = getUID(nameTop);
+  Id iuid_bot = getUID(nameBot);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     // Discard not relevant pixels
     if (!isActive(iech)) continue;
@@ -2041,9 +2041,9 @@ VectorVectorInt DbGrid::getLimitsFromVariableExtend(const String& nameTop,
     if (FFFF(top) || FFFF(bot) || bot > top) continue;
 
     rankToIndice(iech, indg);
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
-      int indloc = indg[idim];
+      Id indloc = indg[idim];
       if (indloc < indmin[idim]) indmin[idim] = indloc;
       if (indloc > indmax[idim]) indmax[idim] = indloc;
     }
@@ -2052,7 +2052,7 @@ VectorVectorInt DbGrid::getLimitsFromVariableExtend(const String& nameTop,
   // Discard the case where the sub-grid does not exist
 
   bool flag_exist = true;
-  for (int idim = 0; idim < ndim && flag_exist; idim++)
+  for (Id idim = 0; idim < ndim && flag_exist; idim++)
   {
     if (indmin[idim] > indmax[idim]) flag_exist = false;
   }
@@ -2061,14 +2061,14 @@ VectorVectorInt DbGrid::getLimitsFromVariableExtend(const String& nameTop,
   // Get the sub-grid characteristics
 
   vec.resize(ndim);
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     vec[idim].resize(2);
     vec[idim][0] = indmin[idim];
     vec[idim][1] = indmax[idim];
   }
 
-  for (int iexc = 0, nexc = (int)dimExclude.size(); iexc < nexc; iexc++)
+  for (Id iexc = 0, nexc = (Id)dimExclude.size(); iexc < nexc; iexc++)
   {
     vec[iexc][0] = 0;
     vec[iexc][1] = getNX(iexc);
@@ -2087,20 +2087,20 @@ VectorVectorInt DbGrid::getLimitsFromVariableExtend(const String& nameTop,
  * but not correctly ordered.
  * This is the reason why this method cannot be 'const'
  */
-int DbGrid::setSelectionFromVariableExtend(const String& nameTop, const String& nameBot)
+Id DbGrid::setSelectionFromVariableExtend(const String& nameTop, const String& nameBot)
 {
   // Create the selection new variable
-  int iuidSel = addColumnsByConstant(1, 1, "SelLayer", ELoc::SEL);
+  Id iuidSel = addColumnsByConstant(1, 1, "SelLayer", ELoc::SEL);
 
   if (nameTop.empty() || nameBot.empty()) return -1;
 
   // Find the set of Min and Max indices of the subgrid
 
   auto nech    = getNSample(true);
-  int iuid_top = getUID(nameTop);
-  int iuid_bot = getUID(nameBot);
+  Id iuid_top = getUID(nameTop);
+  Id iuid_bot = getUID(nameBot);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     // Discard not relevant pixels
     if (!isActive(iech)) continue;
@@ -2154,31 +2154,31 @@ void DbGrid::clean3DFromSurfaces(const VectorString& names,
   }
 
   bool limitsDefined = !nameTop.empty() && !nameBot.empty();
-  int nvar           = (int)names.size();
+  Id nvar           = (Id)names.size();
 
   // Loop on the vertical columns of the 3-D grid
 
-  int ndim    = 3;
-  int idim0   = ndim - 1;
+  Id ndim    = 3;
+  Id idim0   = ndim - 1;
   double top  = MAXIMUM_BIG;
   double bot  = MINIMUM_BIG;
   double z0   = getX0(idim0);
   double dz   = getDX(idim0);
   auto nz     = getNX(idim0);
-  int indzmin = 0; // included
-  int indzmax;
+  Id indzmin = 0; // included
+  Id indzmax;
   VectorInt indg(ndim, 0);
   VectorDouble vec(nz);
   VectorDouble vecempty(nz, TEST);
   VectorInt iuids = getUIDs(names);
 
-  int nmodif3D  = 0;
-  int nmodif2D  = 0;
-  int rank2D    = 0;
+  Id nmodif3D  = 0;
+  Id nmodif2D  = 0;
+  Id rank2D    = 0;
   double thick  = 0;
   double thickA = 0;
-  for (int ix = 0, nx = getNX(0); ix < nx; ix++)
-    for (int iy = 0, ny = getNX(1); iy < ny; iy++)
+  for (Id ix = 0, nx = getNX(0); ix < nx; ix++)
+    for (Id iy = 0, ny = getNX(1); iy < ny; iy++)
     {
       indg[0] = ix;
       indg[1] = iy;
@@ -2226,15 +2226,15 @@ void DbGrid::clean3DFromSurfaces(const VectorString& names,
       // Loop on the variables
       if (flagRead)
       {
-        for (int ivar = 0; ivar < nvar; ivar++)
+        for (Id ivar = 0; ivar < nvar; ivar++)
         {
           // Partial update
           getGridPileInPlace(iuids[ivar], indg, idim0, vec);
 
           // Blank out
-          for (int iz = 0; iz < indzmin; iz++, nmodif3D++)
+          for (Id iz = 0; iz < indzmin; iz++, nmodif3D++)
             vec[iz] = TEST;
-          for (int iz = indzmax; iz < nz; iz++, nmodif3D++)
+          for (Id iz = indzmax; iz < nz; iz++, nmodif3D++)
             vec[iz] = TEST;
 
           setGridPileInPlace(iuids[ivar], indg, idim0, vec);
@@ -2244,7 +2244,7 @@ void DbGrid::clean3DFromSurfaces(const VectorString& names,
       {
         // Complete update
         nmodif2D++;
-        for (int ivar = 0; ivar < nvar; ivar++, nmodif3D++)
+        for (Id ivar = 0; ivar < nvar; ivar++, nmodif3D++)
         {
           setGridPileInPlace(iuids[ivar], indg, idim0, vecempty);
         }
@@ -2278,7 +2278,7 @@ VectorInt DbGrid::locateDataInGrid(const Db* data,
 
     // Locate the samples defined by their ranks stored in 'rankIn'
 
-    for (int ip = 0; ip < (int)rankIn.size(); ip++)
+    for (Id ip = 0; ip < (Id)rankIn.size(); ip++)
     {
       VectorDouble coor = data->getSampleCoordinates(rankIn[ip]);
       rankOut.push_back(coordinateToRank(coor, centered));
@@ -2289,7 +2289,7 @@ VectorInt DbGrid::locateDataInGrid(const Db* data,
 
     // Locate all samples (using useSel criterion)
 
-    for (int ip = 0, np = data->getNSample(useSel); ip < np; ip++)
+    for (Id ip = 0, np = data->getNSample(useSel); ip < np; ip++)
     {
       if (data->isActive(ip) || !useSel)
       {
@@ -2303,7 +2303,7 @@ VectorInt DbGrid::locateDataInGrid(const Db* data,
 
 bool DbGrid::hasSingleBlock() const
 {
-  for (int idim = 0; idim < getNDim(); idim++)
+  for (Id idim = 0; idim < getNDim(); idim++)
     if (getNX(idim) == 1) return true;
   return false;
 }
@@ -2319,10 +2319,10 @@ bool DbGrid::hasSingleBlock() const
  * @param namconv Naming convention
  * @return
  */
-int DbGrid::addSelectionFromDbByMorpho(Db* db,
-                                       int nmin,
-                                       int radius,
-                                       int option,
+Id DbGrid::addSelectionFromDbByMorpho(Db* db,
+                                       Id nmin,
+                                       Id radius,
+                                       Id option,
                                        const VectorInt& dilation,
                                        bool verbose,
                                        const NamingConvention& namconv)
@@ -2336,21 +2336,21 @@ int DbGrid::addSelectionFromDbByMorpho(Db* db,
   auto nech = getNSample();
 
   VectorString names = db->getNamesByColIdx({0});
-  int iuid           = addColumnsByConstant(1);
+  Id iuid           = addColumnsByConstant(1);
   if (dbStatisticsInGridTool(db, this, names, EStatOption::NUM, radius, iuid)) return 1;
   VectorDouble stats = getColumnByUID(iuid, false, false);
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
     stats[iech] = (stats[iech] <= nmin) ? 0. : 1.;
   setColumnByUID(stats, iuid, false);
   setLocatorByUID(iuid, ELoc::Z, 0, true);
 
-  int err = morpho(EMorpho::DILATION, 0.5, 1.5, option, dilation, false, verbose, namconv);
+  Id err = morpho(EMorpho::DILATION, 0.5, 1.5, option, dilation, false, verbose, namconv);
 
   deleteColumnByUID(iuid);
   return err;
 }
 
-void DbGrid::getSampleAsSTInPlace(int iech, SpaceTarget& P) const
+void DbGrid::getSampleAsSTInPlace(Id iech, SpaceTarget& P) const
 {
   // Initiate the SpacePoint (performed in Db class)
   Db::getSampleAsSTInPlace(iech, P);
@@ -2374,30 +2374,30 @@ void DbGrid::getSampleAsSTInPlace(int iech, SpaceTarget& P) const
  * random numbers.
  */
 VectorVectorDouble DbGrid::getDiscretizedBlock(const VectorInt& ndiscs,
-                                               int iech,
+                                               Id iech,
                                                bool flagPerCell,
                                                bool flagRandom,
-                                               int seed) const
+                                               Id seed) const
 {
   auto ndim = getNDim();
-  int ntot = VH::product(ndiscs);
+  Id ntot = VH::product(ndiscs);
   auto memo = law_get_random_seed();
   law_set_random_seed(seed);
   VectorVectorDouble discs(ntot);
-  for (int i = 0; i < ntot; i++) discs[i].resize(ndim);
+  for (Id i = 0; i < ntot; i++) discs[i].resize(ndim);
 
   /* Loop on the discretization points */
 
-  for (int i = 0; i < ntot; i++)
+  for (Id i = 0; i < ntot; i++)
   {
-    int jech = i;
-    int nval = ntot;
-    for (int idim = ndim - 1; idim >= 0; idim--)
+    Id jech = i;
+    Id nval = ntot;
+    for (Id idim = ndim - 1; idim >= 0; idim--)
     {
       double taille = (!flagPerCell) ? getDX(idim) : getLocVariable(ELoc::BLEX, iech, idim);
-      int nd        = ndiscs[idim];
+      Id nd        = ndiscs[idim];
       nval /= nd;
-      int j = jech / nval;
+      Id j = jech / nval;
       jech -= j * nval;
       double local = taille * ((j + 0.5) / nd - 0.5);
       if (!flagRandom)
@@ -2428,7 +2428,7 @@ DbGrid* DbGrid::createMultiple(DbGrid* dbin,
 {
   DbGrid* dbout = nullptr;
   if (dbin == nullptr) return (dbin);
-  int ndim = dbin->getNDim();
+  Id ndim = dbin->getNDim();
 
   /* Core allocation */
 
@@ -2467,7 +2467,7 @@ DbGrid* DbGrid::createDivider(DbGrid* dbin,
   DbGrid* dbout = nullptr;
   if (dbin == nullptr) return dbin;
 
-  int ndim = dbin->getNDim();
+  Id ndim = dbin->getNDim();
   VectorInt nx(ndim);
   VectorDouble dx(ndim);
   VectorDouble x0(ndim);
@@ -2492,15 +2492,15 @@ VectorDouble DbGrid::getDistanceToOrigin(const VectorInt& origin,
   auto nech           = getNSample();
   VectorDouble coor0  = getCoordinatesByIndice(origin);
   VectorDouble radloc = radius;
-  if (ndim != (int)radloc.size()) radloc = VectorDouble(ndim, 1.);
+  if (ndim != (Id)radloc.size()) radloc = VectorDouble(ndim, 1.);
 
   VectorDouble coor(ndim);
   VectorDouble distvec(nech, 0.);
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     getCoordinatesInPlace(coor, iech);
     double dist = 0.;
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
       double delta = (coor[idim] - coor0[idim]) / radloc[idim];
       dist += delta * delta;

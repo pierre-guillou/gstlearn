@@ -55,7 +55,7 @@ MeshSphericalExt::~MeshSphericalExt()
 ** \param[in]  verbose         Verbose flag
 **
 *****************************************************************************/
-int MeshSphericalExt::resetFromDb(Db* dbin,
+Id MeshSphericalExt::resetFromDb(Db* dbin,
                                   Db* dbout,
                                   const String& triswitch,
                                   bool verbose)
@@ -64,7 +64,7 @@ int MeshSphericalExt::resetFromDb(Db* dbin,
 
   /* Initializations */
 
-  int ndim_ref = 2;
+  Id ndim_ref = 2;
 
   /* Define the environment */
 
@@ -113,12 +113,12 @@ void MeshSphericalExt::_meshesSphLoadVertices(SphTriangle* t)
   int ecr, lec, nt, error;
   double rlong, rlat;
 
-  int natt = 2;
-  int ntab = t->n_nodes;
+  Id natt = 2;
+  Id ntab = t->n_nodes;
 
   ecr = 0;
   VectorDouble rtab(ntab * natt, 0);
-  for (int i = 0; i < ntab; i++)
+  for (Id i = 0; i < ntab; i++)
   {
     GH::convertCart2Sph(t->sph_x[i], t->sph_y[i], t->sph_z[i], &rlong, &rlat);
     rtab[ecr++] = rlong;
@@ -128,7 +128,7 @@ void MeshSphericalExt::_meshesSphLoadVertices(SphTriangle* t)
   ecr      = 0;
   lec      = 0;
   int nrow = 6;
-  VectorInt ltri(2 * nrow * t->n_nodes, 0);
+  std::vector<int> ltri(2 * nrow * t->n_nodes, 0);
   (void)trlist_(&t->n_nodes, t->sph_list, t->sph_lptr, t->sph_lend, &nrow,
                 &nt, ltri.data(), &error);
   if (error) return;
@@ -136,9 +136,9 @@ void MeshSphericalExt::_meshesSphLoadVertices(SphTriangle* t)
   natt = 3;
   ntab = nt;
   VectorInt itab(ntab * natt, 0);
-  for (int i = 0; i < ntab; i++)
+  for (Id i = 0; i < ntab; i++)
   {
-    for (int j = 0; j < natt; j++)
+    for (Id j = 0; j < natt; j++)
       itab[ecr + j] = ltri[lec + j] - 1;
     ecr += natt;
     lec += nrow;
@@ -168,7 +168,7 @@ AMesh* MeshSphericalExt::spde_mesh_load(Db* dbin,
 {
   DECLARE_UNUSED(gext);
 
-  int ndim_loc = 0;
+  Id ndim_loc = 0;
   if (dbin != nullptr) ndim_loc = MAX(ndim_loc, dbin->getNDim());
   if (dbout != nullptr) ndim_loc = MAX(ndim_loc, dbout->getNDim());
   bool flag_sphere = isDefaultSpaceSphere();

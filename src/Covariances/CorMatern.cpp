@@ -32,15 +32,15 @@ CorMatern::CorMatern(const VectorDouble &ranges,
                      const VectorDouble& params ,
                      bool flagRange)
   : ACov()
-  , _nVar((int)params.size())
-  , _corRef(CorAniso::createAnisotropic(CovContext(1, (int)ranges.size()), ECov::MATERN, ranges, params[0], angles, flagRange))
+  , _nVar((Id)params.size())
+  , _corRef(CorAniso::createAnisotropic(CovContext(1, (Id)ranges.size()), ECov::MATERN, ranges, params[0], angles, flagRange))
   , _corMatern(*_corRef)
   , _coeffScales(coeffScales)
   , _params(params)
   , _corMax(_nVar)
   , _angles(angles)
 {
-  if ((int)_coeffScales.size() != _nVar - 1)
+  if ((Id)_coeffScales.size() != _nVar - 1)
   {
     messerr("CorMatern: inconsistent size between coeffScales and params");
     messerr("CorMatern: coeffScales size = %d, params size = %d", _coeffScales.size(), _nVar);
@@ -53,10 +53,10 @@ CorMatern::CorMatern(const VectorDouble &ranges,
   _coeffScales.push_front(1.);
   setContext(_corMatern.getContext());
   _ctxt.setNVar(_nVar);
-  for (int ivar = 0; ivar < _nVar; ivar++)
+  for (Id ivar = 0; ivar < _nVar; ivar++)
   {
     _corMax.setValue(ivar, ivar, 1.);
-    for (int jvar = ivar + 1; jvar < _nVar; jvar++)
+    for (Id jvar = ivar + 1; jvar < _nVar; jvar++)
     {
       double scalei  = _coeffScales[ivar];
       double scalej  = _coeffScales[jvar];
@@ -103,7 +103,7 @@ CorMatern& CorMatern::operator=(const CorMatern& r)
   return *this;
 }
 
-double CorMatern::computeScale(int ivar, int jvar) const
+double CorMatern::computeScale(Id ivar, Id jvar) const
 {
   if (ivar == jvar)
   {
@@ -115,7 +115,7 @@ double CorMatern::computeScale(int ivar, int jvar) const
   return sqrt(0.5 * (ci2 + cj2));
 }
 
-double CorMatern::computeParam(int ivar, int jvar) const
+double CorMatern::computeParam(Id ivar, Id jvar) const
 {
   if (ivar == jvar)
   {
@@ -135,7 +135,7 @@ void CorMatern::_optimizationSetTarget(SpacePoint& pt) const
   DECLARE_UNUSED(pt)
 }
 
-void CorMatern::_optimizationPreProcess(int mode, const std::vector<SpacePoint>& ps) const
+void CorMatern::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
 {
   DECLARE_UNUSED(mode)
   DECLARE_UNUSED(ps)
@@ -151,8 +151,8 @@ void CorMatern::_optimizationPostProcess() const
 
 double CorMatern::_eval(const SpacePoint& p1,
                         const SpacePoint& p2,
-                        int ivar,
-                        int jvar,
+                        Id ivar,
+                        Id jvar,
                         const CovCalcMode* mode) const
 {
   _corMatern.setParam(computeParam(ivar, jvar));
@@ -160,7 +160,7 @@ double CorMatern::_eval(const SpacePoint& p1,
     VectorDouble scales = _corRef->getScales();
   
     double correcScale = computeScale(ivar, jvar);
-    for (int idim = 0; idim < (int)getSpace()->getNDim(); idim++)
+    for (Id idim = 0; idim < (Id)getSpace()->getNDim(); idim++)
     {
         scales[idim] *= correcScale;
     }

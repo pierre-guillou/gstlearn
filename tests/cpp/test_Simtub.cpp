@@ -30,12 +30,12 @@
 
 using namespace gstlrn;
 
-static Db* createLocalDb(int nech, int ndim, int nvar)
+static Db* createLocalDb(Id nech, Id ndim, Id nvar)
 {
   // Coordinates
   VectorDouble tab = VH::simulateUniform(ndim * nech, 0., 50.);
   // Variable
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     VectorDouble tabvar = VH::simulateGaussian(nech);
     tab.insert(tab.end(), tabvar.begin(), tabvar.end());
@@ -48,7 +48,7 @@ static Db* createLocalDb(int nech, int ndim, int nvar)
   data->setLocatorByUID(1, ELoc::X, 0);
   data->setLocatorByUID(2, ELoc::X, 1);
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     data->setNameByUID(3 + ivar, "Var");
     data->setLocatorByUID(3 + ivar, ELoc::Z, ivar);
@@ -60,11 +60,11 @@ static Db* createLocalDb(int nech, int ndim, int nvar)
  * Test of heterotopic kriging and simulation
  * Returns 1 if the rest of the test must be discarded
  */
-int st_mini_test()
+Id st_mini_test()
 {
   // Global parameters
-  int nbsimu    = 2;
-  int mode      = 0; // 1: NCsimu; 2: Kriging; 3: CDsimu; 0: All
+  Id nbsimu     = 2;
+  Id mode       = 0; // 1: NCsimu; 2: Kriging; 3: CDsimu; 0: All
   bool debug    = true;
   bool end_test = false;
   OptCst::define(ECst::NTCOL, -1);
@@ -144,9 +144,9 @@ int main(int argc, char* argv[])
   // Global parameters
   law_set_random_seed(32131);
   bool verbose     = 1;
-  int ndim         = 2;
-  int nvar         = 1;
-  int nbsimu       = 3;
+  Id ndim          = 2;
+  Id nvar          = 1;
+  Id nbsimu        = 3;
   DbGrid* grid_res = nullptr;
   defineDefaultSpace(ESpaceType::RN, ndim);
   DbStringFormat dbfmt(FLAG_STATS, {"Simu*"});
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
   grid->display();
 
   // Generate the data base
-  int nech = 100;
+  Id nech  = 100;
   Db* data = createLocalDb(nech, ndim, nvar);
   data->display(&dbfmt);
 

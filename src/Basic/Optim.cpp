@@ -15,7 +15,7 @@
 
 namespace gstlrn
 {
-Optim::Optim(opt_algorithm algo, int dim)
+Optim::Optim(opt_algorithm algo, Id dim)
   : _opt(nlopt_create((nlopt_algorithm)algo, dim))
   , _authorizedAnalyticalGradients(true)
 {

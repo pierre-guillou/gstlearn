@@ -27,7 +27,7 @@ public:
 
   double         getScadef() const override;
   String         getCovName() const override { return "1-D Regularized"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
   size_t getMaxNDim() const override { return 1; }

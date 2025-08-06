@@ -63,14 +63,14 @@ public:
   /// Shortcuts to ASpace methods
 
   /// Return the number of dimension of the current space context
-  size_t getNDim(int ispace = -1) const;
+  size_t getNDim(Id ispace = -1) const;
   /// Return the current space context origin coordinates
-  const VectorDouble& getOrigin(int ispace = -1) const;
+  const VectorDouble& getOrigin(Id ispace = -1) const;
 
   /// Return the distance between two space points for the current space context
   double getDistance(const SpacePoint& p1,
                      const SpacePoint& p2,
-                     int ispace = 0) const;
+                     Id ispace = 0) const;
 
   /// Return all the distances (space composits) between two space points for the current space context
   VectorDouble getDistances(const SpacePoint& p1,
@@ -79,16 +79,16 @@ public:
   /// Return the increment vector between two space points for the current space context
   VectorDouble getIncrement(const SpacePoint& p1,
                             const SpacePoint& p2,
-                            int ispace = 0) const;
+                            Id ispace = 0) const;
   void getIncrementInPlace(const SpacePoint& p1,
                            const SpacePoint& p2,
                            VectorDouble& ptemp,
-                           int ispace = -1) const;
+                           Id ispace = -1) const;
 
 protected:
   /// Modify the Space dimension of an already created item (and create RN space)
   /// (To be used only during creation ... in particular when reading NF)
-  void setNDim(int ndim);
+  void setNDim(Id ndim);
 
 protected:
   /// Current space context of the object
@@ -109,7 +109,7 @@ GSTLEARN_EXPORT void setDefaultSpace(const ASpaceSharedPtr& space);
 /// Return a clone of the unique default global space
 
 GSTLEARN_EXPORT ESpaceType getDefaultSpaceType();
-GSTLEARN_EXPORT int getDefaultSpaceDimension();
+GSTLEARN_EXPORT Id getDefaultSpaceDimension();
 GSTLEARN_EXPORT const ASpace* getDefaultSpace();
 GSTLEARN_EXPORT ASpaceSharedPtr getDefaultSpaceSh();
 

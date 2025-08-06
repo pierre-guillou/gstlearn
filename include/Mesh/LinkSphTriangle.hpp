@@ -20,15 +20,15 @@ namespace gstlrn
 class Db;
 
 GSTLEARN_EXPORT void meshes_2D_sph_init(SphTriangle* t);
-GSTLEARN_EXPORT void meshes_2D_sph_free(SphTriangle* t, int mode);
-GSTLEARN_EXPORT int meshes_2D_sph_from_db(Db* db, SphTriangle* t);
-GSTLEARN_EXPORT int meshes_2D_sph_from_points(int nech,
+GSTLEARN_EXPORT void meshes_2D_sph_free(SphTriangle* t, Id mode);
+GSTLEARN_EXPORT Id meshes_2D_sph_from_db(Db* db, SphTriangle* t);
+GSTLEARN_EXPORT Id meshes_2D_sph_from_points(Id nech,
                                               double* x,
                                               double* y,
                                               SphTriangle* t);
-GSTLEARN_EXPORT int meshes_2D_sph_from_auxiliary(const String& triswitch,
+GSTLEARN_EXPORT Id meshes_2D_sph_from_auxiliary(const String& triswitch,
                                                  SphTriangle* t);
-GSTLEARN_EXPORT void meshes_2D_sph_print(SphTriangle* t, int brief);
-GSTLEARN_EXPORT int meshes_2D_sph_create(int verbose, SphTriangle* t);
+GSTLEARN_EXPORT void meshes_2D_sph_print(SphTriangle* t, Id brief);
+GSTLEARN_EXPORT Id meshes_2D_sph_create(Id verbose, SphTriangle* t);
 
 } // namespace gstlrn

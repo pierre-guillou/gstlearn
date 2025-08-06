@@ -41,17 +41,17 @@ int main(int argc, char* argv[])
   OptCustom::define("ompthreads", 5);
   bool flag_std = true;
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Generate the data base
-  int nech     = 100;
-  int nvar     = 1;
+  Id nech      = 100;
+  Id nvar      = 1;
   bool verbose = false;
   Db* data     = Db::createFillRandom(nech, ndim, nvar);
 
   // Generate the output grid
-  int ncell       = 100;
+  Id ncell        = 100;
   VectorInt nx    = {ncell, ncell};
   VectorDouble dx = {1. / ncell, 1. / ncell};
   DbGrid* grid    = DbGrid::create(nx, dx);

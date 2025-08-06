@@ -43,13 +43,13 @@ int main(int argc, char* argv[])
   // Next flag indicates if the format is NF (true) or H5 (false)
   bool flagNeutral = false;
   bool verbose     = false;
-  int mode         = 0;
+  Id mode          = 0;
 
   // =================
   // Preliminary tasks
   // =================
 
-  int nech          = 20;
+  Id nech           = 20;
   Db* db            = Db::createFromBox(nech, {0., 0.}, {1., 1.}, 32432);
   VectorDouble vec1 = VH::simulateGaussian(nech);
   db->addColumns(vec1, "myvar1", ELoc::Z, 0);
@@ -214,11 +214,11 @@ int main(int argc, char* argv[])
   if (mode == 0 || mode == 6)
   {
     VectorVectorDouble table;
-    int ncols     = 3;
-    int nrows     = 10;
+    Id ncols      = 3;
+    Id nrows      = 10;
     Table* table1 = Table::create(nrows, ncols);
-    for (int irow = 0; irow < nrows; irow++)
-      for (int icol = 0; icol < ncols; icol++)
+    for (Id irow = 0; irow < nrows; irow++)
+      for (Id icol = 0; icol < ncols; icol++)
         table1->setValue(irow, icol, law_uniform());
     table1->display();
 
@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
 
   if (mode == 0 || mode == 8)
   {
-    int npolyline          = 100;
+    Id npolyline           = 100;
     VectorDouble xpolyline = VH::simulateGaussian(npolyline);
     VectorDouble ypolyline = VH::simulateGaussian(npolyline);
     auto* polyline1  = new PolyLine2D(xpolyline, ypolyline);
@@ -304,11 +304,11 @@ int main(int argc, char* argv[])
 
   if (mode == 0 || mode == 9)
   {
-    int nmaxi           = 20;
+    Id nmaxi            = 20;
     double radius       = 4.;
-    int nmini           = 2;
-    int nsect           = 5;
-    int nsmax           = 3;
+    Id nmini            = 2;
+    Id nsect            = 5;
+    Id nsmax            = 3;
     VectorDouble coeffs = {2., 3.};
     VectorDouble angles = {25., 0.};
     bool useBallTree    = true;

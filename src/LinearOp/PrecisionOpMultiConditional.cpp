@@ -45,7 +45,7 @@ PrecisionOpMultiConditional::~PrecisionOpMultiConditional()
 std::vector<std::vector<double>> PrecisionOpMultiConditional::computeRhs(const std::vector<double>& datVal) const
 {
   std::vector<std::vector<double>> rhs(sizes());
-  for (int i = 0, n = sizes(); i < n; i++)
+  for (Id i = 0, n = sizes(); i < n; i++)
   {
     rhs[i].resize(size(i));
   }
@@ -57,12 +57,12 @@ void PrecisionOpMultiConditional::computeRhsInPlace(const std::vector<double>& d
 {
   std::vector<double> temp(datVal.size());
 
-  for (int i = 0; i < static_cast<int>(datVal.size()); i++)
+  for (Id i = 0; i < static_cast<Id>(datVal.size()); i++)
   {
     temp[i] = datVal[i] / getVarianceData(i);
   }
 
-  for (int i = 0, n = sizes(); i < n; i++)
+  for (Id i = 0, n = sizes(); i < n; i++)
   {
     constvect tempm(temp);
     vect rhsm(rhs[i]);
@@ -70,7 +70,7 @@ void PrecisionOpMultiConditional::computeRhsInPlace(const std::vector<double>& d
   }
 }
 
-int PrecisionOpMultiConditional::push_back(PrecisionOp* pmatElem,
+Id PrecisionOpMultiConditional::push_back(PrecisionOp* pmatElem,
                                            IProj* projDataElem)
 {
   if (sizes() == 0 && projDataElem != nullptr)
@@ -83,9 +83,9 @@ int PrecisionOpMultiConditional::push_back(PrecisionOp* pmatElem,
 
   // Check that '_ndat' is the same for all IProj
 
-  for (int i = 0, n = sizes(); i < n; i++)
+  for (Id i = 0, n = sizes(); i < n; i++)
   {
-    int ndatloc = _multiProjData[i]->getNPoint();
+    Id ndatloc = _multiProjData[i]->getNPoint();
     if (ndatloc != _ndat)
     {
       messerr("The Projection matrix for element %d refers to %d data", i, ndatloc);
@@ -105,7 +105,7 @@ std::pair<double, double> PrecisionOpMultiConditional::rangeEigenValQ() const
 {
   std::pair<double, double> result = _multiPrecisionOp[0]->getRangeEigenVal();
 
-  for (int i = 1; i < (int)_multiPrecisionOp.size(); i++)
+  for (Id i = 1; i < (Id)_multiPrecisionOp.size(); i++)
   {
     std::pair<double, double> vals = _multiPrecisionOp[i]->getRangeEigenVal();
     result.first                   = MIN(result.first, vals.first);
@@ -149,14 +149,14 @@ void PrecisionOpMultiConditional::preparePoly(Chebychev& logPoly) const
   logPoly.fit(f, a, b, 2 * EPSILON4 / (a + b));
 }
 
-double PrecisionOpMultiConditional::computeLogDetOp(int nbsimu) const
+double PrecisionOpMultiConditional::computeLogDetOp(Id nbsimu) const
 {
   Chebychev logPoly;
   preparePoly(logPoly);
   double val = 0.;
-  for (int i = 0; i < nbsimu; i++)
+  for (Id i = 0; i < nbsimu; i++)
   {
-    for (int j = 0; j < _ncova; j++)
+    for (Id j = 0; j < _ncova; j++)
     {
       VH::simulateGaussianInPlace(_work1);
       std::fill(_work1bis.begin(), _work1bis.end(), 0.);
@@ -169,7 +169,7 @@ double PrecisionOpMultiConditional::computeLogDetOp(int nbsimu) const
   return val / nbsimu;
 }
 
-double PrecisionOpMultiConditional::computeLogDetQ(int nMC) const
+double PrecisionOpMultiConditional::computeLogDetQ(Id nMC) const
 {
   double result = 0.;
   for (const auto& e: _multiPrecisionOp)
@@ -191,7 +191,7 @@ double PrecisionOpMultiConditional::computeLogDetNoise() const
 
 // We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + Sum(log sigma_i^2)
 
-double PrecisionOpMultiConditional::computeTotalLogDet(int nMC, bool verbose, int seed) const
+double PrecisionOpMultiConditional::computeTotalLogDet(Id nMC, bool verbose, Id seed) const
 {
   auto memo = law_get_random_seed();
 
@@ -223,7 +223,7 @@ void PrecisionOpMultiConditional::_AtA(const std::vector<std::vector<double>>& i
 {
   std::fill(_workdata.begin(), _workdata.end(), 0.);
 
-  for (int imod = 0; imod < sizes(); imod++)
+  for (Id imod = 0; imod < sizes(); imod++)
   {
     constvect invs(inv[imod]);
     vect w1s(_work1);
@@ -233,7 +233,7 @@ void PrecisionOpMultiConditional::_AtA(const std::vector<std::vector<double>>& i
 
   VH::divideInPlace(_workdata, _varianceData);
 
-  for (int imod = 0; imod < sizes(); imod++)
+  for (Id imod = 0; imod < sizes(); imod++)
   {
     constvect wds(_workdata);
     vect outs(outv[imod]);
@@ -258,7 +258,7 @@ void PrecisionOpMultiConditional::_evalDirect(const std::vector<std::vector<doub
 {
   prepare();
   _AtA(inv, _work2);
-  for (int imod = 0; imod < sizes(); imod++)
+  for (Id imod = 0; imod < sizes(); imod++)
   {
     constvect invm(inv[imod]);
     vect outm(outv[imod]);
@@ -269,12 +269,12 @@ void PrecisionOpMultiConditional::_evalDirect(const std::vector<std::vector<doub
 
 void PrecisionOpMultiConditional::simulateOnMeshings(std::vector<std::vector<double>>& result) const
 {
-  for (int icov = 0, ncov = (int)_multiPrecisionOp.size(); icov < ncov; icov++)
+  for (Id icov = 0, ncov = (Id)_multiPrecisionOp.size(); icov < ncov; icov++)
     simulateOnMeshing(result[icov], icov);
 }
 
 void PrecisionOpMultiConditional::simulateOnMeshing(std::vector<double>& result,
-                                                    int icov) const
+                                                    Id icov) const
 {
   VectorDouble gauss(_multiPrecisionOp[icov]->getSize());
   VH::simulateGaussianInPlace(gauss);
@@ -290,7 +290,7 @@ void PrecisionOpMultiConditional::simulateOnDataPointFromMeshings(const std::vec
   result.resize(_ndat);
   std::fill(result.begin(), result.end(), 0.);
 
-  for (int icov = 0; icov < sizes(); icov++)
+  for (Id icov = 0; icov < sizes(); icov++)
   {
     constvect simuss(simus[icov]);
     vect w1s(_work1);
@@ -298,13 +298,13 @@ void PrecisionOpMultiConditional::simulateOnDataPointFromMeshings(const std::vec
     VH::addInPlace(result, _work1);
   }
 
-  for (int idat = 0; idat < _ndat; idat++)
+  for (Id idat = 0; idat < _ndat; idat++)
   {
     result[idat] += sqrt(_varianceData[idat]) * law_gaussian();
   }
 }
 
-void PrecisionOpMultiConditional::_allocate(int i) const
+void PrecisionOpMultiConditional::_allocate(Id i) const
 {
   if (i == 1)
   {
@@ -324,7 +324,7 @@ void PrecisionOpMultiConditional::_allocate(int i) const
   {
     _work3.resize(sizes());
 
-    for (int j = 0; j < sizes(); j++)
+    for (Id j = 0; j < sizes(); j++)
     {
       if (_work3[j].size() == 0)
       {
@@ -357,10 +357,10 @@ void PrecisionOpMultiConditional::evalInvCov(const constvect inv,
   _allocate(3);
   _allocate(4);
 
-  for (int idat = 0; idat < _ndat; idat++)
+  for (Id idat = 0; idat < _ndat; idat++)
     result[idat] = inv[idat] / _varianceData[idat];
 
-  for (int icov = 0; icov < sizes(); icov++)
+  for (Id icov = 0; icov < sizes(); icov++)
   {
     constvect results(result);
     vect w2s(_work2[icov]);
@@ -368,13 +368,13 @@ void PrecisionOpMultiConditional::evalInvCov(const constvect inv,
   }
   evalInverse(_work2, _work3);
 
-  for (int icov = 0; icov < sizes(); icov++)
+  for (Id icov = 0; icov < sizes(); icov++)
   {
     constvect w3s(_work3[icov]);
     vect w1bis(_work1bis);
     _multiProjData[icov]->mesh2point(w3s, w1bis);
 
-    for (int idat = 0; idat < _ndat; idat++)
+    for (Id idat = 0; idat < _ndat; idat++)
       result[idat] -= 1. / _varianceData[idat] * _work1bis[idat];
   }
 }
@@ -383,12 +383,12 @@ VectorDouble PrecisionOpMultiConditional::computeCoeffs(const VectorDouble& Y,
                                                         const VectorVectorDouble& X) const
 {
   _allocate(4);
-  int xsize = static_cast<int>(X.size());
-  VectorDouble XtInvSigmaZ(static_cast<int>(xsize));
+  Id xsize = static_cast<Id>(X.size());
+  VectorDouble XtInvSigmaZ(static_cast<Id>(xsize));
   MatrixSymmetric XtInvSigmaX(xsize);
   VectorDouble result(xsize);
 
-  for (int i = 0; i < xsize; i++)
+  for (Id i = 0; i < xsize; i++)
   {
     constvect xm(X[i].data(), X[i].size());
     evalInvCov(xm, _work1ter);
@@ -397,7 +397,7 @@ VectorDouble PrecisionOpMultiConditional::computeCoeffs(const VectorDouble& Y,
     constvect w1i(_work1ter);
     XtInvSigmaZ[i] = VH::innerProduct(Ys, w1i);
 
-    for (int j = i; j < xsize; j++)
+    for (Id j = i; j < xsize; j++)
     {
       constvect xmj(X[j].data(), X[j].size());
       double prod = VH::innerProduct(xmj, w1i);

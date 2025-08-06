@@ -54,7 +54,7 @@ double CovGaussian::_evaluateCov(double h) const
   return (cov);
 }
 
-double CovGaussian::_evaluateCovDerivative(int degree, double h) const
+double CovGaussian::_evaluateCovDerivative(Id degree, double h) const
 {
   double r2 = h * h;
   if (r2 > MAX_EXP) return 0.;
@@ -92,11 +92,11 @@ double CovGaussian::simulateTurningBand(double t0, TurningBandOperate& operTB) c
   return operTB.cosineOne(t0);
 }
 
-MatrixDense CovGaussian::simulateSpectralOmega(int nb) const
+MatrixDense CovGaussian::simulateSpectralOmega(Id nb) const
 {
   auto ndim = getContext().getNDim();
   MatrixDense mat(nb, ndim);
-  for (int irow = 0; irow < nb; irow++)
+  for (Id irow = 0; irow < nb; irow++)
     for (size_t icol = 0; icol < ndim; icol++)
       mat.setValue(irow, icol, law_gaussian());
   return mat;

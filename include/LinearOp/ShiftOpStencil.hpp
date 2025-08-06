@@ -52,18 +52,18 @@ class GSTLEARN_EXPORT ShiftOpStencil: public AShiftOp
     void multiplyByValueAndAddDiagonal(double v1 = 1., double v2 = 0.) const override;
     void resetModif() const override;
     
-    double getLambda(int iapex) const override;
+    double getLambda(Id iapex) const override;
     double logDetLambda() const override;
 
 #ifndef SWIG
-  int _addToDest(const constvect inv, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
 #endif
 
 private:
   double _getMaxEigenValue() const override;
-  int _buildInternal(const MeshETurbo* mesh, const CovAniso* cova, bool verbose);
+  Id _buildInternal(const MeshETurbo* mesh, const CovAniso* cova, bool verbose);
   void _printStencil() const;
-  int _getNWeights() const { return (int) _weights.size(); }
+  Id _getNWeights() const { return (Id) _weights.size(); }
 
 private:
   VectorVectorInt _relativeShifts;

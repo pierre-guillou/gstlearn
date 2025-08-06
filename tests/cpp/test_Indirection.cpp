@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
   // Add a selection to the Grid
   VectorDouble x1 = grid->getColumn("x1");
   VectorDouble sel;
-  for (int i = 0; i < nech; i++)
+  for (Id i = 0; i < nech; i++)
   {
     double value = (x1[i] > 12.) ? 1. : 0.;
     sel.push_back(value);
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
   // Check back-and-forth between relative and absolute
   const Indirection& indirect = mesh.getGridIndirect();
-  int igrid_rel               = 3;
+  Id igrid_rel                = 3;
   message("Starting from the Relative grid node = %d\n", igrid_rel);
   auto igrid_abs = indirect.getRToA(igrid_rel);
   message("Corresponding absolute grid node = %d\n", igrid_abs);

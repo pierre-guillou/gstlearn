@@ -126,8 +126,8 @@ void CovLMGradient::_initGradients(double& covVal,
                                    bool flagGrad)
 {
   covVal = 0.;
-  for (int i = 0; i < 3; i++) covGp[i] = 0.;
+  for (Id i = 0; i < 3; i++) covGp[i] = 0.;
   if (flagGrad)
-    for (int i = 0; i < 9; i++) covGG[i] = 0.;
+    for (Id i = 0; i < 9; i++) covGG[i] = 0.;
 }
 }

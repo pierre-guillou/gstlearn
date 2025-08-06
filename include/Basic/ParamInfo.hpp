@@ -53,7 +53,7 @@ public:
     double getUserMax() const {return _userBounds[1];};
     void   setFixed(bool isFixed) {_isFixed = isFixed;};
     bool   isFixed() const {return _isFixed;};
-    void   setAddress(int addr) const {_address = addr;};
+    void   setAddress(Id addr) const {_address = addr;};
     size_t getAddress() const {return _address;};
     String toString(const AStringFormat* strfmt = nullptr) const override;
 

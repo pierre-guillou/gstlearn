@@ -67,7 +67,7 @@ bool CalcKrigingSimpleCase::_preprocess()
 {
   if (!ACalcInterpolator::_preprocess()) return false;
 
-  int status = 1;
+  Id status = 1;
   if (_iechSingleTarget >= 0) status = 2;
 
   if (_flagEst)
@@ -110,7 +110,7 @@ void CalcKrigingSimpleCase::_rollback()
 
 void CalcKrigingSimpleCase::_storeResultsForExport(const KrigingSystemSimpleCase& ksys,
                                                    KrigingAlgebraSimpleCase& algebra,
-                                                   int iechout)
+                                                   Id iechout)
 {
   _ktest.ndim = ksys.getNDim();
   _ktest.nvar = ksys.getNVar();
@@ -143,8 +143,8 @@ bool CalcKrigingSimpleCase::_run()
 
   KrigingAlgebraSimpleCase algebra(ksys.getAlgebra());
   bool use_parallel = !getModel()->isNoStat();
-  int nech_out      = getDbout()->getNSample();
-  int nbthread      = OptCustom::query("ompthreads", 1); // TODO : would like to use more threads
+  Id nech_out      = getDbout()->getNSample();
+  Id nbthread      = OptCustom::query("ompthreads", 1); // TODO : would like to use more threads
   omp_set_num_threads(nbthread);
 
   SpacePoint pin(getModel()->getSpace());
@@ -155,7 +155,7 @@ bool CalcKrigingSimpleCase::_run()
   static ANeigh* neigh            = nullptr;
 #pragma omp threadprivate(neigh)
 #pragma omp parallel for firstprivate(pin, pout, tabwork, algebra, model) schedule(guided) if (use_parallel)
-  for (int iech_out = 0; iech_out < nech_out; iech_out++)
+  for (Id iech_out = 0; iech_out < nech_out; iech_out++)
   {
     if (!getDbout()->isActive(iech_out)) continue;
     if (neigh == nullptr)

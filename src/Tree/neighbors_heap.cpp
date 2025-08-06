@@ -29,13 +29,13 @@ License: BSD 3-clause
 
 namespace gstlrn
 {
-void dual_swap(double* darr, int* iarr, int i1, int i2)
+void dual_swap(double* darr, Id* iarr, Id i1, Id i2)
 {
   std::swap(darr[i1], darr[i2]);
   std::swap(iarr[i1], iarr[i2]);
 }
 
-void t_nheap::resize(int n_pts, int n_nbrs)
+void t_nheap::resize(Id n_pts, Id n_nbrs)
 {
   this->n_pts  = n_pts;
   this->n_nbrs = n_nbrs;
@@ -46,23 +46,23 @@ void t_nheap::resize(int n_pts, int n_nbrs)
 void t_nheap::load(const t_btree& b, const MatrixT<double>& x)
 {
   double dist;
-  for (int i = 0; i < n_pts; i++)
+  for (Id i = 0; i < n_pts; i++)
   {
     dist = b.min_dist(0, x.getRow(i));
     b.query_depth_first(0, x.getRow(i), i, *this, dist);
   }
 }
 
-double t_nheap::largest(int row) const
+double t_nheap::largest(Id row) const
 {
   return distances.getRow(row)[0];
 }
 
-int t_nheap::push(int row, double val, int i_val)
+Id t_nheap::push(Id row, double val, Id i_val)
 {
-  int ic1, ic2, i_swap;
+  Id ic1, ic2, i_swap;
 
-  int size      = n_nbrs;
+  Id size      = n_nbrs;
   auto dist_arr = distances.getRow(row);
   auto ind_arr  = indices.getRow(row);
 
@@ -74,7 +74,7 @@ int t_nheap::push(int row, double val, int i_val)
   ind_arr[0]  = i_val;
 
   // descend the heap, swapping values until the max heap criterion is met
-  int i = 0;
+  Id i = 0;
   while (true)
   {
     ic1 = 2 * i + 1;
@@ -114,9 +114,9 @@ int t_nheap::push(int row, double val, int i_val)
   return (0);
 }
 
-void simultaneous_sort(double* dist, int* idx, int size)
+void simultaneous_sort(double* dist, Id* idx, Id size)
 {
-  int pivot_idx, store_idx;
+  Id pivot_idx, store_idx;
   double pivot_val;
 
   if (size <= 1)
@@ -146,7 +146,7 @@ void simultaneous_sort(double* dist, int* idx, int size)
     pivot_val = dist[size - 1];
 
     store_idx = 0;
-    for (int i = 0; i < size - 1; i++)
+    for (Id i = 0; i < size - 1; i++)
     {
       if (dist[i] < pivot_val)
       {
@@ -165,7 +165,7 @@ void simultaneous_sort(double* dist, int* idx, int size)
 
 void t_nheap::sort()
 {
-  for (int row = 0; row < n_pts; row++)
+  for (Id row = 0; row < n_pts; row++)
     simultaneous_sort(distances.getRow(row).data(), indices.getRow(row).data(), n_nbrs);
 }
 } // namespace gstlrn

@@ -32,13 +32,13 @@ public:
 
   size_t getMaxNDim() const override { return 3; }
   String         getCovName() const override { return "Wendland-4,2"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
   bool   hasCovDerivative() const override { return true; }
 
 protected:
   double _evaluateCov(double h) const override;
-  double _evaluateCovDerivative(int degree, double h) const override;
+  double _evaluateCovDerivative(Id degree, double h) const override;
 };
 
 }

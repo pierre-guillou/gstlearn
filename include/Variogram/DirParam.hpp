@@ -51,12 +51,12 @@ class DbGrid;
 class GSTLEARN_EXPORT DirParam : public ASpaceObject
 {
 public:
-  DirParam(int nlag = 10,
+  DirParam(Id nlag = 10,
            double dlag = 1.,
            double toldis = 0.5,
            double tolang = 90.,
-           int opt_code = 0,
-           int idate = 0,
+           Id opt_code = 0,
+           Id idate = 0,
            double bench = TEST,
            double cylrad = TEST,
            double tolcode = 0.,
@@ -65,19 +65,19 @@ public:
            double angle2D = TEST,
            const ASpaceSharedPtr& space = ASpaceSharedPtr());
   DirParam(const DbGrid *dbgrid,
-           int nlag,
+           Id nlag,
            const VectorInt &grincr,
            const ASpaceSharedPtr& space);
   DirParam(const DirParam& r);
   DirParam& operator=(const DirParam& r);
   virtual ~DirParam();
 
-  static DirParam* create(int nlag = 10,
+  static DirParam* create(Id nlag = 10,
                           double dlag = 1.,
                           double toldis = 0.5,
                           double tolang = 90.,
-                          int opt_code = 0,
-                          int idate = 0,
+                          Id opt_code = 0,
+                          Id idate = 0,
                           double bench = TEST,
                           double cylrad = TEST,
                           double tolcode = 0.,
@@ -85,33 +85,33 @@ public:
                           const VectorDouble& codir = VectorDouble(),
                           double angle2D = TEST,
                           const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static DirParam* createOmniDirection(int nlag = 10,
+  static DirParam* createOmniDirection(Id nlag = 10,
                                        double dlag = 1.,
                                        double toldis = 0.5,
-                                       int opt_code = 0,
-                                       int idate = 0,
+                                       Id opt_code = 0,
+                                       Id idate = 0,
                                        double bench = TEST,
                                        double cylrad = TEST,
                                        double tolcode = 0.,
                                        const VectorDouble& breaks = VectorDouble(),
                                        const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static DirParam* createFromGrid(const DbGrid* dbgrid,
-                                  int nlag = 10,
+                                  Id nlag = 10,
                                   const VectorInt& grincr = VectorInt(),
                                   const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static std::vector<DirParam> createMultiple(int ndir,
-                                              int nlag = 10,
+  static std::vector<DirParam> createMultiple(Id ndir,
+                                              Id nlag = 10,
                                               double dlag = 1.,
                                               double toldis = 0.5,
                                               double angref = 0.,
                                               const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static std::vector<DirParam> createSeveral2D(const VectorDouble& angles,
-                                               int nlag = 10,
+                                               Id nlag = 10,
                                                double dlag = 1.,
                                                double toldis = 0.5,
                                                double tolang = TEST,
                                                const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static std::vector<DirParam> createMultipleInSpace(int nlag,
+  static std::vector<DirParam> createMultipleInSpace(Id nlag,
                                                      double dlag = 1.,
                                                      const ASpaceSharedPtr& space = ASpaceSharedPtr());
 
@@ -124,29 +124,29 @@ public:
 
   double getBench() const { return _bench; }
   const  VectorDouble& getBreaks() const { return _breaks; }
-  double getBreak(int i) const;
+  double getBreak(Id i) const;
   const  VectorDouble& getCodirs() const { return _codir; }
-  double getCodir(int i) const;
+  double getCodir(Id i) const;
   double getCylRad() const { return _cylRad; }
   double getDPas() const { return _dLag; }
   double getLag() const { return _dLag; }
-  int    getIdate() const { return _idate; }
-  int    getNLag() const { return _nLag; }
-  int    getOptionCode() const { return _optionCode; }
+  Id    getIdate() const { return _idate; }
+  Id    getNLag() const { return _nLag; }
+  Id    getOptionCode() const { return _optionCode; }
   double getTolAngle() const { return _tolAngle; }
   double getTolCode() const { return _tolCode; }
   double getTolDist() const { return _tolDist; }
 
   VectorInt getGrincrs() const { return _grincr; }
-  int    getGrincr(int i) const;
+  Id    getGrincr(Id i) const;
   double getMaximumDistance() const;
 
-  int  getNBreak() const { return ((int) _breaks.size() / 2); }
+  Id  getNBreak() const { return ((Id) _breaks.size() / 2); }
   bool getFlagRegular() const { return (getNBreak() <= 0); }
 
-  void setNLag(int nlag) {_nLag = nlag; }
-  void setOptionCode(int option_code) {_optionCode = option_code; }
-  void setIdate(int idate) {_idate = idate; }
+  void setNLag(Id nlag) {_nLag = nlag; }
+  void setOptionCode(Id option_code) {_optionCode = option_code; }
+  void setIdate(Id idate) {_idate = idate; }
   void setDPas(double dlag) {_dLag = dlag; }
   void setDLag(double dlag) {_dLag = dlag; }
   void setDPas(const DbGrid* db);
@@ -160,19 +160,19 @@ public:
   void setCodir(const VectorDouble& codir) {_codir = codir; }
   void setGrincr(const VectorInt &grincr) { _grincr = grincr; }
 
-  bool isLagValid(int ilag, bool flagAsym = false, bool flagCheck = true) const;
-  bool isDimensionValid(int idim) const;
+  bool isLagValid(Id ilag, bool flagAsym = false, bool flagCheck = true) const;
+  bool isDimensionValid(Id idim) const;
   bool isDefinedForGrid() const { return ! _grincr.empty(); }
 
-  int getLagRank(double dist) const;
+  Id getLagRank(double dist) const;
 
 private:
   void _completeDefinition(double angle2D = TEST);
 
 private:
-  int    _nLag;
-  int    _optionCode;
-  int    _idate;
+  Id    _nLag;
+  Id    _optionCode;
+  Id    _idate;
   double _dLag;
   double _bench;
   double _cylRad;

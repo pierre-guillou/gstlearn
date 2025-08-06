@@ -29,7 +29,7 @@ public:
   size_t getMaxNDim() const override { return 1; }
 
   String         getCovName() const override { return "Cosinus"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
 protected:

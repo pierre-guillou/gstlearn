@@ -33,7 +33,7 @@ public:
   size_t getMaxNDim() const override { return 3; }
 
   String         getCovName() const override { return "Wendland-3,1"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
 protected:

@@ -52,12 +52,12 @@ AGibbs::AGibbs(Db* db)
 }
 
 AGibbs::AGibbs(Db* db,
-               int npgs,
-               int nvar,
-               int nburn,
-               int niter,
-               int seed,
-               int flag_order,
+               Id npgs,
+               Id nvar,
+               Id nburn,
+               Id niter,
+               Id seed,
+               Id flag_order,
                bool flag_decay)
   : AStringable()
   , _npgs(1)
@@ -112,12 +112,12 @@ AGibbs::~AGibbs()
 {
 }
 
-void AGibbs::init(int npgs,
-                  int nvar,
-                  int nburn,
-                  int niter,
-                  int seed,
-                  int flag_order,
+void AGibbs::init(Id npgs,
+                  Id nvar,
+                  Id nburn,
+                  Id niter,
+                  Id seed,
+                  Id flag_order,
                   bool flag_decay)
 {
   _npgs      = npgs;
@@ -150,9 +150,9 @@ void AGibbs::init(int npgs,
 ** \remark Attributes ELoc::GAUSFAC are mandatory
 **
 *****************************************************************************/
-int AGibbs::_boundsCheck(int ipgs,
-                         int ivar,
-                         int iact,
+Id AGibbs::_boundsCheck(Id ipgs,
+                         Id ivar,
+                         Id iact,
                          double* vmin_arg,
                          double* vmax_arg) const
 {
@@ -185,13 +185,13 @@ int AGibbs::_boundsCheck(int ipgs,
 ** \param[in]  vmax      Upper threshold
 **
 *****************************************************************************/
-void AGibbs::_printInequalities(int iact,
-                                int ivar,
+void AGibbs::_printInequalities(Id iact,
+                                Id ivar,
                                 double simval,
                                 double vmin,
                                 double vmax) const
 {
-  int flag_min, flag_max, idim;
+  Id flag_min, flag_max, idim;
 
   /* Initializations */
 
@@ -242,8 +242,8 @@ void AGibbs::_printInequalities(int iact,
  *****************************************************************************/
 void AGibbs::_displayCurrentVector(bool flag_init,
                                    const VectorVectorDouble& y,
-                                   int isimu,
-                                   int ipgs) const
+                                   Id isimu,
+                                   Id ipgs) const
 {
   auto nact = _getSampleRankNumber();
   auto nvar = getNvar();
@@ -261,14 +261,14 @@ void AGibbs::_displayCurrentVector(bool flag_init,
 
   /* Loop on the variables */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     mestitle(2, "Variable %d", ivar + 1);
     auto icase = getRank(ipgs, ivar);
 
     /* Loop on the samples */
 
-    for (int iact = 0; iact < nact; iact++)
+    for (Id iact = 0; iact < nact; iact++)
     {
       auto iech   = getSampleRank(iact);
       double vmin = _db->getLocVariable(ELoc::L, iech, icase);
@@ -278,15 +278,15 @@ void AGibbs::_displayCurrentVector(bool flag_init,
   }
 }
 
-int AGibbs::_getDimension() const
+Id AGibbs::_getDimension() const
 {
-  int nsize = _npgs * _nvar;
+  Id nsize = _npgs * _nvar;
   return nsize;
 }
 
-int AGibbs::getRank(int ipgs, int ivar) const
+Id AGibbs::getRank(Id ipgs, Id ivar) const
 {
-  int rank = ivar + _nvar * (ipgs);
+  Id rank = ivar + _nvar * (ipgs);
   return rank;
 }
 
@@ -300,7 +300,7 @@ VectorVectorDouble AGibbs::allocY() const
 {
   auto nact = _getSampleRankNumber();
   VectorVectorDouble y(_getDimension());
-  for (int i = 0, nsize = (int)y.size(); i < nsize; i++)
+  for (Id i = 0, nsize = (Id)y.size(); i < nsize; i++)
     y[i].resize(nact);
   return y;
 }
@@ -314,8 +314,8 @@ VectorVectorDouble AGibbs::allocY() const
  * @param ipgs  Rank of the GS
  */
 void AGibbs::storeResult(const VectorVectorDouble& y,
-                         int isimu,
-                         int ipgs)
+                         Id isimu,
+                         Id ipgs)
 {
   auto nsize = _getDimension();
   auto nact  = _getSampleRankNumber();
@@ -323,14 +323,14 @@ void AGibbs::storeResult(const VectorVectorDouble& y,
 
   /* Loop on the variables */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     auto icase = getRank(ipgs, ivar);
-    int rank  = icase + nsize * isimu;
+    Id rank  = icase + nsize * isimu;
 
     /* Loop on the samples */
 
-    for (int iact = 0; iact < nact; iact++)
+    for (Id iact = 0; iact < nact; iact++)
     {
       auto iech = getSampleRank(iact);
       _db->setFromLocator(ELoc::GAUSFAC, iech, rank, y[icase][iact]);
@@ -353,28 +353,28 @@ VectorInt AGibbs::_calculateSampleRanks() const
     return VH::sequence(_db->getNSample());
 
   VectorInt ranks;
-  for (int iech = 0; iech < _db->getNSample(); iech++)
+  for (Id iech = 0; iech < _db->getNSample(); iech++)
   {
     if (_db->isActive(iech)) ranks.push_back(iech);
   }
   return ranks;
 }
 
-int AGibbs::_getSampleRankNumber() const
+Id AGibbs::_getSampleRankNumber() const
 {
   if (_ranks.empty())
     return _db->getNSample();
-  return static_cast<int>(_ranks.size());
+  return static_cast<Id>(_ranks.size());
 }
 
-int AGibbs::getSampleRank(int i) const
+Id AGibbs::getSampleRank(Id i) const
 {
   if (_ranks.empty())
     return i;
   return _ranks[i];
 }
 
-int AGibbs::getNSample() const
+Id AGibbs::getNSample() const
 {
   if (_db == nullptr)
     return 0;
@@ -382,22 +382,22 @@ int AGibbs::getNSample() const
 }
 
 void AGibbs::_updateStats(const VectorVectorDouble& y,
-                          int ipgs,
-                          int jter,
+                          Id ipgs,
+                          Id jter,
                           double amort)
 {
   if (_optionStats == 0) return;
   if (jter < _nburn) return;
-  int iter = jter - _nburn;
+  Id iter = jter - _nburn;
 
   // Loop on the columns
 
-  for (int ivar = 0; ivar < getNvar(); ivar++)
+  for (Id ivar = 0; ivar < getNvar(); ivar++)
   {
 
     // Update statistics
 
-    int jcol;
+    Id jcol;
     double result;
     auto icol     = getRank(ipgs, ivar);
     double residu = 1. - amort;
@@ -425,9 +425,9 @@ void AGibbs::_updateStats(const VectorVectorDouble& y,
  * This number is based on the number of iterations, exclusing the burnout
  * @return
  */
-int AGibbs::_getNRowStats() const
+Id AGibbs::_getNRowStats() const
 {
-  int nrows = _niter - _nburn;
+  Id nrows = _niter - _nburn;
   return nrows;
 }
 
@@ -439,9 +439,9 @@ int AGibbs::_getNRowStats() const
  * - the storage of mean and standard deviation
  * @return
  */
-int AGibbs::_getNColStats() const
+Id AGibbs::_getNColStats() const
 {
-  int ncols = 2 * _getDimension();
+  Id ncols = 2 * _getDimension();
   return ncols;
 }
 
@@ -452,7 +452,7 @@ int AGibbs::_getNColStats() const
  * @param mode  0 for Mean and 1 for Standard Deviation
  * @return
  */
-int AGibbs::_getColRankStats(int ipgs, int ivar, int mode) const
+Id AGibbs::_getColRankStats(Id ipgs, Id ivar, Id mode) const
 {
   auto rank = getRank(ipgs, ivar);
   if (mode == 0)
@@ -467,8 +467,8 @@ int AGibbs::_getColRankStats(int ipgs, int ivar, int mode) const
  * @param value Constraining value (if sample is an active constraint)
  * @return
  */
-bool AGibbs::_isConstraintTight(int icase,
-                                int iact,
+bool AGibbs::_isConstraintTight(Id icase,
+                                Id iact,
                                 double* value) const
 {
   auto iech = getSampleRank(iact);
@@ -497,7 +497,7 @@ void AGibbs::_statsInit()
  * @param vmin: Lower bound (in/out)
  * @param vmax: Upper bound (in/out)
  */
-void AGibbs::_getBoundsDecay(int iter, double* vmin, double* vmax) const
+void AGibbs::_getBoundsDecay(Id iter, double* vmin, double* vmax) const
 {
   // Do not modify the bounds if no Decay is defined
   if (!_flagDecay) return;
@@ -516,10 +516,10 @@ void AGibbs::_getBoundsDecay(int iter, double* vmin, double* vmax) const
  * @param iech Absolute sample rank
  * @return The rank within the vector if relative ranks (or -1)
  */
-int AGibbs::_getRelativeRank(int iech)
+Id AGibbs::_getRelativeRank(Id iech)
 {
   auto nact = _getSampleRankNumber();
-  for (int iact = 0; iact < nact; iact++)
+  for (Id iact = 0; iact < nact; iact++)
   {
     if (getSampleRank(iact) == iech) return iact;
   }
@@ -535,7 +535,7 @@ int AGibbs::_getRelativeRank(int iech)
  * @param flagCheck True if the checks must be performed
  * @return
  */
-int AGibbs::run(VectorVectorDouble& y, int ipgs0, int isimu0, bool verboseTimer, bool flagCheck)
+Id AGibbs::run(VectorVectorDouble& y, Id ipgs0, Id isimu0, bool verboseTimer, bool flagCheck)
 {
   if (calculInitialize(y, isimu0, ipgs0)) return 1;
   if (flagCheck)
@@ -544,7 +544,7 @@ int AGibbs::run(VectorVectorDouble& y, int ipgs0, int isimu0, bool verboseTimer,
   /* Iterations of the Gibbs sampler */
 
   Timer timer;
-  for (int iter = 0; iter < getNiter(); iter++)
+  for (Id iter = 0; iter < getNiter(); iter++)
     update(y, isimu0, ipgs0, iter);
   if (verboseTimer) timer.displayIntervalMilliseconds("Gibbs iterations");
 

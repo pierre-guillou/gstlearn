@@ -76,7 +76,7 @@ class GSTLEARN_EXPORT Model : public AStringable, public ASerializable, public M
 {
 public:
   Model(const CovContext& ctxt = CovContext());
-  Model(int nvar, int ndim = 2);
+  Model(Id nvar, Id ndim = 2);
   Model(const Model &m);
   Model& operator= (const Model &m);
   virtual ~Model();
@@ -89,22 +89,22 @@ public:
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
 public:
-  const CovAnisoList* castInCovAnisoListConst(int icov = -1) const;
+  const CovAnisoList* castInCovAnisoListConst(Id icov = -1) const;
   const CovLMCTapering* castInCovLMCTaperingConst() const;
   const CovLMGradient* castInCovLMGradientConst() const;
   const CovLMCAnamorphosis* castInCovLMCAnamorphosisConst() const;
 
 public:
-  CovAnisoList* _castInCovAnisoList(int icov = -1);
+  CovAnisoList* _castInCovAnisoList(Id icov = -1);
   CovLMCTapering* _castInCovLMCTapering();
   CovLMGradient* _castInCovLMGradient();
   CovLMCAnamorphosis* _castInCovLMCAnamorphosis();
 
 public:
-  int resetFromDb(const Db* db);
+  Id resetFromDb(const Db* db);
   static Model* create(const CovContext& ctxt = CovContext());
-  static Model* createFromEnvironment(int nvar, int ndim = 2);
-  static Model* createNugget(int nvar, int ndim = 2, double sill = 1.);
+  static Model* createFromEnvironment(Id nvar, Id ndim = 2);
+  static Model* createNugget(Id nvar, Id ndim = 2, double sill = 1.);
   static Model* createFromParam(const ECov& type             = ECov::fromKey("NUGGET"),
                                 double range                 = 1.,
                                 double sill                  = 1.,
@@ -131,13 +131,13 @@ public:
                                 const Option_VarioFit& optvar  = Option_VarioFit(),
                                 const Option_AutoFit& mauto    = Option_AutoFit(),
                                 bool verbose                   = false);
-  static Model* createFillRandom(int ndim,
-                                 int nvar,
+  static Model* createFillRandom(Id ndim,
+                                 Id nvar,
                                  const std::vector<ECov>& types = ECov::fromKeys({"SPHERICAL"}),
                                  double hmax                    = 1,
-                                 int order                      = -1,
-                                 int nfex                       = 0,
-                                 int seed                       = 13242);
+                                 Id order                      = -1,
+                                 Id nfex                       = 0,
+                                 Id seed                       = 13242);
   void setCovAnisoList(const CovAnisoList* covalist);
   void addCovAniso(const CovAniso& cov);
   void addCovFromParam(const ECov& type,
@@ -204,8 +204,8 @@ public:
   FORWARD_METHOD_NON_CONST(_castInCovLMCTapering, setTapeRange)
   FORWARD_METHOD(castInCovLMGradientConst, evalZAndGradients)
   
-  int    setAnam(const AAnam* anam, const VectorInt& strcnt = VectorInt());
-  int    unsetAnam();
+  Id    setAnam(const AAnam* anam, const VectorInt& strcnt = VectorInt());
+  Id    unsetAnam();
   bool   isFlagGradient() const;
   bool   isFlagGradientNumerical() const;
   bool   isFlagGradientFunctional() const;
@@ -217,36 +217,36 @@ public:
   CovAnisoList* getCovAnisoListModify();  
   
   double evalCovFromIncr(const VectorDouble& incr,
-                         int icov = 0,
+                         Id icov = 0,
                          const ECalcMember& member = ECalcMember::fromKey("LHS")) const;
 
   Model* duplicate() const;
   Model* createReduce(const VectorInt& validVars) const;
 
-  int getNVar() const;
+  Id getNVar() const;
 
-  int fitFromCovIndices(Vario *vario,
+  Id fitFromCovIndices(Vario *vario,
                         const VectorECov &types = ECov::fromKeys({"EXPONENTIAL"}),
                         const Constraints& constraints = Constraints(),
                         const Option_VarioFit& optvar = Option_VarioFit(),
                         const Option_AutoFit& mauto = Option_AutoFit(),
                         bool verbose = false);
-  int fit(Vario* vario,
+  Id fit(Vario* vario,
           const VectorECov& types        = ECov::fromKeys({"SPHERICAL"}),
           const Constraints& constraints = Constraints(),
           const Option_VarioFit& optvar = Option_VarioFit(),
           const Option_AutoFit& mauto = Option_AutoFit(),
           bool verbose = false);
 
-  int fitFromVMap(DbGrid *dbmap,
+  Id fitFromVMap(DbGrid *dbmap,
                   const VectorECov &types = ECov::fromKeys({"SPHERICAL"}),
                   const Constraints &constraints = Constraints(),
                   const Option_VarioFit& optvar = Option_VarioFit(),
                   const Option_AutoFit& mauto = Option_AutoFit(),
                   bool verbose = false);
   
-  int stabilize(double percent, bool verbose = false);
-  int standardize(bool verbose = false);
+  Id stabilize(double percent, bool verbose = false);
+  Id standardize(bool verbose = false);
 
   static void gofDisplay(double gof,
                          bool byValue                   = true,

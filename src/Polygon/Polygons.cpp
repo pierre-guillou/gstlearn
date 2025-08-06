@@ -55,7 +55,7 @@ Polygons::~Polygons()
 {
 }
 
-int Polygons::resetFromDb(const Db* db, double dilate, bool verbose)
+Id Polygons::resetFromDb(const Db* db, double dilate, bool verbose)
 {
   if (db == nullptr) return 1;
 
@@ -81,15 +81,15 @@ int Polygons::resetFromDb(const Db* db, double dilate, bool verbose)
  * @param nrow_max Maximum number of rows
  * @return
  */
-int Polygons::resetFromCSV(const String& filename,
+Id Polygons::resetFromCSV(const String& filename,
                            const CSVformat& csv,
                            bool verbose,
-                           int ncol_max,
-                           int nrow_max)
+                           Id ncol_max,
+                           Id nrow_max)
 {
   VectorString names;
   VectorDouble tab;
-  int ncol, nrow;
+  Id ncol, nrow;
 
   // Free the previous contents
 
@@ -109,9 +109,9 @@ int Polygons::resetFromCSV(const String& filename,
   }
 
   // Loop on the contents of the first column to look for polyelems
-  int ideb = 0;
-  int ifin = nrow;
-  for (int i = 0; i < nrow; i++)
+  Id ideb = 0;
+  Id ifin = nrow;
+  for (Id i = 0; i < nrow; i++)
   {
     if (FFFF(tab[ncol * i]))
     {
@@ -137,11 +137,11 @@ int Polygons::resetFromCSV(const String& filename,
  * @param nrow_max Maximum number of rows
  * @return
  */
-int Polygons::resetFromWKT(const String& filename,
+Id Polygons::resetFromWKT(const String& filename,
                            const CSVformat& csv,
                            bool verbose,
-                           int ncol_max,
-                           int nrow_max)
+                           Id ncol_max,
+                           Id nrow_max)
 {
   DECLARE_UNUSED(nrow_max);
   DECLARE_UNUSED(ncol_max);
@@ -165,7 +165,7 @@ int Polygons::resetFromWKT(const String& filename,
   // Has header ?
   if (csv.getFlagHeader())
   {
-    int i = 0;
+    Id i = 0;
     // Skip first lines
     // while(std::getline(file, line) && i < csv.getNSkip())
     while (gslSafeGetline(file, line) && i < csv.getNSkip())
@@ -229,7 +229,7 @@ String Polygons::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
 
-  int npol = static_cast<int>(_polyelems.size());
+  Id npol = static_cast<Id>(_polyelems.size());
 
   sstr << toTitle(1, "Polygons");
   sstr << "Number of Polygon Sets = " << npol << std::endl;
@@ -237,7 +237,7 @@ String Polygons::toString(const AStringFormat* strfmt) const
   if (strfmt != nullptr) sf = *strfmt;
 
   if (sf.getLevel() > 1)
-    for (int i = 0; i < npol; i++)
+    for (Id i = 0; i < npol; i++)
     {
       sstr << toTitle(2, "PolyElem #%d", i + 1);
       sstr << _polyelems[i].toString(strfmt);
@@ -252,7 +252,7 @@ void Polygons::getExtension(double* xmin,
 {
   double xmin_loc, xmax_loc, ymin_loc, ymax_loc;
 
-  for (int ipol = 0; ipol < getNPolyElem(); ipol++)
+  for (Id ipol = 0; ipol < getNPolyElem(); ipol++)
   {
     _polyelems[ipol].getExtension(&xmin_loc, &xmax_loc, &ymin_loc, &ymax_loc);
     if (xmin_loc < *xmin) (*xmin) = xmin_loc;
@@ -265,24 +265,24 @@ void Polygons::getExtension(double* xmin,
 double Polygons::getSurface() const
 {
   double surface = 0.;
-  for (int ipol = 0; ipol < getNPolyElem(); ipol++)
+  for (Id ipol = 0; ipol < getNPolyElem(); ipol++)
   {
     surface += _polyelems[ipol].getSurface();
   }
   return (surface);
 }
 
-PolyElem Polygons::_extractFromTab(int ideb,
-                                   int ifin,
-                                   int ncol,
+PolyElem Polygons::_extractFromTab(Id ideb,
+                                   Id ifin,
+                                   Id ncol,
                                    const VectorDouble& tab)
 {
-  int nval = ifin - ideb;
+  Id nval = ifin - ideb;
   VectorDouble x(nval);
   VectorDouble y(nval);
-  for (int j = ideb; j < ifin; j++)
+  for (Id j = ideb; j < ifin; j++)
   {
-    int i = j - ideb;
+    Id i = j - ideb;
     x[i]  = tab[ncol * j + 0];
     y[i]  = tab[ncol * j + 1];
   }
@@ -326,7 +326,7 @@ PolyElem Polygons::_extractFromWKT(const CSVformat& csv, String& polye)
 
 bool Polygons::_deserializeAscii(std::istream& is, bool verbose)
 {
-  int npol = 0;
+  Id npol = 0;
 
   // Clear previous contents
 
@@ -335,11 +335,11 @@ bool Polygons::_deserializeAscii(std::istream& is, bool verbose)
   /* Create the Model structure */
 
   bool ret = true;
-  ret      = ret && _recordRead<int>(is, "Number of Polygons", npol);
+  ret      = ret && _recordRead<Id>(is, "Number of Polygons", npol);
 
   /* Loop on the PolyElems */
 
-  for (int ipol = 0; ret && ipol < npol; ipol++)
+  for (Id ipol = 0; ret && ipol < npol; ipol++)
   {
     PolyElem polyelem;
     ret = ret && polyelem._deserializeAscii(is, verbose);
@@ -357,11 +357,11 @@ bool Polygons::_deserializeAscii(std::istream& is, bool verbose)
 bool Polygons::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret      = ret && _recordWrite<int>(os, "Number of Polygons", getNPolyElem());
+  ret      = ret && _recordWrite<Id>(os, "Number of Polygons", getNPolyElem());
 
   /* Writing the covariance part */
 
-  for (int ipol = 0; ret && ipol < getNPolyElem(); ipol++)
+  for (Id ipol = 0; ret && ipol < getNPolyElem(); ipol++)
   {
     const PolyElem& polyelem = getPolyElem(ipol);
     ret                      = ret && polyelem._serializeAscii(os, verbose);
@@ -392,9 +392,9 @@ Polygons* Polygons::createFromNF(const String& NFFilename, bool verbose)
 
 Polygons* Polygons::createFromCSV(const String& filename,
                                   const CSVformat& csv,
-                                  int verbose,
-                                  int ncol_max,
-                                  int nrow_max)
+                                  Id verbose,
+                                  Id ncol_max,
+                                  Id nrow_max)
 {
   auto* polygons = new Polygons();
   if (polygons->resetFromCSV(filename, csv, verbose, ncol_max, nrow_max))
@@ -408,9 +408,9 @@ Polygons* Polygons::createFromCSV(const String& filename,
 
 Polygons* Polygons::createFromWKT(const String& filename,
                                   const CSVformat& csv,
-                                  int verbose,
-                                  int ncol_max,
-                                  int nrow_max)
+                                  Id verbose,
+                                  Id ncol_max,
+                                  Id nrow_max)
 {
   auto* polygons = new Polygons();
   if (polygons->resetFromWKT(filename, csv, verbose, ncol_max, nrow_max))
@@ -434,13 +434,13 @@ Polygons* Polygons::createFromDb(const Db* db, double dilate, bool verbose)
   return polygons;
 }
 
-const PolyElem& Polygons::getPolyElem(int ipol) const
+const PolyElem& Polygons::getPolyElem(Id ipol) const
 {
   if (!_isValidPolyElemIndex(ipol)) return _emptyElem;
   return _polyelems[ipol];
 }
 
-PolyElem Polygons::getClosedPolyElem(int ipol) const
+PolyElem Polygons::getClosedPolyElem(Id ipol) const
 {
   if (!_isValidPolyElemIndex(ipol)) return PolyElem();
   PolyElem polyelem = getPolyElem(ipol);
@@ -448,31 +448,31 @@ PolyElem Polygons::getClosedPolyElem(int ipol) const
   return polyelem;
 }
 
-const VectorDouble& Polygons::getX(int ipol) const
+const VectorDouble& Polygons::getX(Id ipol) const
 {
   if (!_isValidPolyElemIndex(ipol)) return _emptyVec;
   return _polyelems[ipol].getX();
 }
 
-const VectorDouble& Polygons::getY(int ipol) const
+const VectorDouble& Polygons::getY(Id ipol) const
 {
   if (!_isValidPolyElemIndex(ipol)) return _emptyVec;
   return _polyelems[ipol].getY();
 }
 
-void Polygons::setX(int ipol, const VectorDouble& x)
+void Polygons::setX(Id ipol, const VectorDouble& x)
 {
   if (!_isValidPolyElemIndex(ipol)) return;
   return _polyelems[ipol].setX(x);
 }
 
-void Polygons::setY(int ipol, const VectorDouble& y)
+void Polygons::setY(Id ipol, const VectorDouble& y)
 {
   if (!_isValidPolyElemIndex(ipol)) return;
   return _polyelems[ipol].setY(y);
 }
 
-bool Polygons::_isValidPolyElemIndex(int ipol) const
+bool Polygons::_isValidPolyElemIndex(Id ipol) const
 {
   auto npol = getNPolyElem();
   if (ipol < 0 || ipol >= npol)
@@ -509,11 +509,11 @@ bool Polygons::_isValidPolyElemIndex(int ipol) const
  ** \remarks 3 : put maximum distance
  **
  *****************************************************************************/
-int dbPolygonDistance(Db* db,
+Id dbPolygonDistance(Db* db,
                       Polygons* polygon,
                       double dmax,
-                      int scale,
-                      int polin,
+                      Id scale,
+                      Id polin,
                       const NamingConvention& namconv)
 {
   PolyPoint2D pldist;
@@ -521,24 +521,24 @@ int dbPolygonDistance(Db* db,
 
   // Initializations
 
-  int nech = db->getNSample();
+  Id nech = db->getNSample();
 
   // Create a new attribute
 
-  int iptr = db->addColumnsByConstant(1, TEST);
+  Id iptr = db->addColumnsByConstant(1, TEST);
   if (iptr < 0) return (1);
 
   // Loop on the polyelems
 
   double distmax = 0.;
   double distmin = TEST;
-  for (int iset = 0; iset < polygon->getNPolyElem(); iset++)
+  for (Id iset = 0; iset < polygon->getNPolyElem(); iset++)
   {
     const PolyElem& polyelem = polygon->getPolyElem(iset);
 
     // Loop on the samples
 
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
       if (!db->isActive(iech)) continue;
       target[0] = db->getCoordinate(iech, 0);
@@ -563,14 +563,14 @@ int dbPolygonDistance(Db* db,
   {
     distmin = MAXIMUM_BIG;
     distmax = 0.;
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
       if (!db->isActive(iech)) continue;
       double distloc = db->getArray(iech, iptr);
       if (FFFF(distloc)) continue;
       if (polin != 0)
       {
-        int inside = polygon->inside(db->getCoordinate(iech, 0),
+        Id inside = polygon->inside(db->getCoordinate(iech, 0),
                                      db->getCoordinate(iech, 1));
         if (polin > 0)
         {
@@ -592,7 +592,7 @@ int dbPolygonDistance(Db* db,
   {
     if (scale > 0)
     {
-      for (int iech = 0; iech < nech; iech++)
+      for (Id iech = 0; iech < nech; iech++)
       {
         if (!db->isActive(iech)) continue;
         double distloc = db->getArray(iech, iptr);
@@ -603,7 +603,7 @@ int dbPolygonDistance(Db* db,
     }
     else
     {
-      for (int iech = 0; iech < nech; iech++)
+      for (Id iech = 0; iech < nech; iech++)
       {
         if (!db->isActive(iech)) continue;
         double distloc = db->getArray(iech, iptr);
@@ -623,9 +623,9 @@ int dbPolygonDistance(Db* db,
     double valtest = TEST;
     if (ABS(polin) == 2) valtest = distmin;
     if (ABS(polin) == 3) valtest = distmax;
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
-      int inside = polygon->inside(db->getCoordinate(iech, 0),
+      Id inside = polygon->inside(db->getCoordinate(iech, 0),
                                    db->getCoordinate(iech, 1));
       if (polin > 0 && !inside) db->setArray(iech, iptr, valtest);
       if (polin < 0 && inside) db->setArray(iech, iptr, valtest);
@@ -657,11 +657,11 @@ int dbPolygonDistance(Db* db,
  *****************************************************************************/
 bool Polygons::inside(const VectorDouble& coor, bool flag_nested) const
 {
-  bool flag3d = (int)coor.size() > 2;
+  bool flag3d = (Id)coor.size() > 2;
   if (flag_nested)
   {
-    int number = 0;
-    for (int ipol = 0; ipol < getNPolyElem(); ipol++)
+    Id number = 0;
+    for (Id ipol = 0; ipol < getNPolyElem(); ipol++)
     {
       PolyElem polyelem = getClosedPolyElem(ipol);
       if (flag3d)
@@ -674,7 +674,7 @@ bool Polygons::inside(const VectorDouble& coor, bool flag_nested) const
   }
   else
   {
-    for (int ipol = 0; ipol < getNPolyElem(); ipol++)
+    for (Id ipol = 0; ipol < getNPolyElem(); ipol++)
     {
       PolyElem polyelem = getClosedPolyElem(ipol);
       if (flag3d)
@@ -700,16 +700,16 @@ bool Polygons::inside(const VectorDouble& coor, bool flag_nested) const
 VectorInt Polygons::_getHullIndices(const VectorDouble& x,
                                     const VectorDouble& y)
 {
-  int number = (int)x.size();
+  Id number = (Id)x.size();
   VectorInt index(number + 1);
 
   /* Calculate the center of gravity and the leftmost point */
 
-  int rank  = 0;
-  int np    = 0;
+  Id rank  = 0;
+  Id np    = 0;
   double xg = 0.;
   double yg = 0.;
-  for (int i = 0; i < number; i++)
+  for (Id i = 0; i < number; i++)
   {
     xg += x[i];
     yg += y[i];
@@ -730,7 +730,7 @@ VectorInt Polygons::_getHullIndices(const VectorDouble& x,
     double x21 = xg - x1;
     double y21 = yg - y1;
 
-    for (int i = 0; i < number; i++)
+    for (Id i = 0; i < number; i++)
     {
       if ((x[i] - x1) * y21 - (y[i] - y1) * x21 <= 0.) continue;
       x21  = x[i] - x1;
@@ -769,9 +769,9 @@ void Polygons::_polygonHullPrint(const VectorInt& index,
 {
   mestitle(1, "Polygon Hull");
   message("Ranks (1-based) and coordinates of the Active Samples included in the Convex Hull\n");
-  for (int i = 0; i < (int)index.size(); i++)
+  for (Id i = 0; i < (Id)index.size(); i++)
   {
-    int j = index[i];
+    Id j = index[i];
     message("%3d : %lf %lf\n", j + 1, x[j], y[j]);
   }
 }
@@ -786,21 +786,21 @@ void Polygons::_polygonHullPrint(const VectorInt& index,
 void Polygons::_getExtend(double ext,
                           VectorDouble& x,
                           VectorDouble& y,
-                          int nsect)
+                          Id nsect)
 {
-  int ninit = (int)x.size();
+  Id ninit = (Id)x.size();
 
   x.resize(nsect * ninit);
   y.resize(nsect * ninit);
 
-  for (int j = 0; j < ninit; j++)
+  for (Id j = 0; j < ninit; j++)
   {
-    int i     = ninit - j - 1;
+    Id i     = ninit - j - 1;
     double x0 = x[i];
     double y0 = y[i];
 
-    int iad = i * nsect;
-    for (int k = 0; k < nsect; k++)
+    Id iad = i * nsect;
+    for (Id k = 0; k < nsect; k++)
     {
       double angle = 2. * GV_PI * k / (double)nsect;
       x[iad + k]   = x0 + ext * cos(angle);
@@ -820,7 +820,7 @@ void Polygons::_getExtend(double ext,
  ** \param[in]  verbose Verbose flag
  **
  *****************************************************************************/
-int Polygons::_buildHull(const Db* db, double dilate, bool verbose)
+Id Polygons::_buildHull(const Db* db, double dilate, bool verbose)
 
 {
   /* Preliminary check */
@@ -830,7 +830,7 @@ int Polygons::_buildHull(const Db* db, double dilate, bool verbose)
     messerr("The input Db must be contain at least 2 coordinates");
     return 1;
   }
-  int number = db->getNSample(true);
+  Id number = db->getNSample(true);
   if (number <= 0)
   {
     messerr("No active data in the input Db. Convex Hull impossible");
@@ -852,10 +852,10 @@ int Polygons::_buildHull(const Db* db, double dilate, bool verbose)
 
   /* Create the polygons */
 
-  int np = (int)index.size();
+  Id np = (Id)index.size();
   VectorDouble xret(np);
   VectorDouble yret(np);
-  for (int i = 0; i < np; i++)
+  for (Id i = 0; i < np; i++)
   {
     xret[i] = xinit[index[i]];
     yret[i] = yinit[index[i]];
@@ -869,10 +869,10 @@ int Polygons::_buildHull(const Db* db, double dilate, bool verbose)
     _getExtend(dilate, xinit, yinit);
     index = _getHullIndices(xinit, yinit);
 
-    np = (int)index.size();
+    np = (Id)index.size();
     xret.resize(np);
     yret.resize(np);
-    for (int i = 0; i < np; i++)
+    for (Id i = 0; i < np; i++)
     {
       xret[i] = xinit[index[i]];
       yret[i] = yinit[index[i]];
@@ -891,7 +891,7 @@ Polygons Polygons::reduceComplexity(double distmin) const
 {
   Polygons newpolygon;
 
-  for (int ipol = 0, npol = getNPolyElem(); ipol < npol; ipol++)
+  for (Id ipol = 0, npol = getNPolyElem(); ipol < npol; ipol++)
   {
     PolyElem newpolyelem = getPolyElem(ipol).reduceComplexity(distmin);
     newpolygon.addPolyElem(newpolyelem);
@@ -928,15 +928,15 @@ void db_polygon(Db* db,
 {
   // Adding a new variable
 
-  int iatt = db->addColumnsByConstant(1);
+  Id iatt = db->addColumnsByConstant(1);
 
   /* Loop on the samples */
 
   VectorDouble coor(3, TEST);
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     mes_process("Checking if sample belongs to a polygon", db->getNSample(), iech);
-    int selval = 0;
+    Id selval = 0;
     if (!flag_sel || db->isActive(iech))
     {
       db->getCoordinatesInPlace(coor, iech);
@@ -974,7 +974,7 @@ void db_polygon(Db* db,
  ** \remark The Naming Convention locator Type is overwritten to ELoc::SEL
  **
  *****************************************************************************/
-int db_selhull(Db* db1,
+Id db_selhull(Db* db1,
                Db* db2,
                double dilate,
                bool verbose,
@@ -987,19 +987,19 @@ int db_selhull(Db* db1,
 
   // Create the variable in the output Db
 
-  int isel = db2->addColumnsByConstant(1, 1.);
+  Id isel = db2->addColumnsByConstant(1, 1.);
 
   /* Loop on the samples of the second Db */
   // Note that all samples must be checked as a sample, initially masked, can be
   // masked OFF as it belongs to the convex hull.
 
-  int ntotal  = db2->getNSample();
-  int nactive = 0;
-  int nout    = 0;
-  int nin     = 0;
+  Id ntotal  = db2->getNSample();
+  Id nactive = 0;
+  Id nout    = 0;
+  Id nin     = 0;
 
   VectorDouble coor(3, TEST);
-  for (int iech = 0; iech < ntotal; iech++)
+  for (Id iech = 0; iech < ntotal; iech++)
   {
     db2->getCoordinatesInPlace(coor, iech);
     if (!polygons->inside(coor, false))
@@ -1042,7 +1042,7 @@ bool Polygons::_deserializeH5(H5::Group& grp, bool verbose)
 
   auto polylineG = SerializeHDF5::getGroup(*polygonsG, "PolyLines");
   if (!polylineG) return false;
-  int ipol = 0;
+  Id ipol = 0;
 
   PolyElem polyOne;
   while (1)

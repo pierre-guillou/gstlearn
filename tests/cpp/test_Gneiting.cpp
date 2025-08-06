@@ -77,9 +77,9 @@ int main(int argc, char* argv[])
   std::cout << "Value of Gneiting (by Covariance) = " << cres <<std::endl;
 
   // Create the Data Base
-  int ndim = 3;
-  int ndat = 10;
-  int nvar = 1;
+  Id ndim  = 3;
+  Id ndat  = 10;
+  Id nvar  = 1;
   Db* data = Db::createFillRandom(ndat, ndim, nvar);
 
   // Create the Target

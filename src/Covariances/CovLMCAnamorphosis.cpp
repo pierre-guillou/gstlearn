@@ -76,11 +76,11 @@ CovLMCAnamorphosis::~CovLMCAnamorphosis()
 {
 }
 
-int CovLMCAnamorphosis::getAnamNClass() const
+Id CovLMCAnamorphosis::getAnamNClass() const
 {
   return _anam->getNClass();
 }
-int CovLMCAnamorphosis::init(const VectorInt& anam_strcnt)
+Id CovLMCAnamorphosis::init(const VectorInt& anam_strcnt)
 {
   for (auto& e: _covs)
   {
@@ -100,14 +100,14 @@ int CovLMCAnamorphosis::init(const VectorInt& anam_strcnt)
   }
   if (type == EAnam::DISCRETE_IR)
   {
-    int nfact = _anam->getNFactor();
-    if ((int)anam_strcnt.size() != nfact)
+    Id nfact = _anam->getNFactor();
+    if ((Id)anam_strcnt.size() != nfact)
     {
       messerr("Argument 'anam_strcnt' must be dimensioned to the number of factors (%d)", nfact);
       return 1;
     }
     auto ncov = getNCov();
-    for (int i = 0; i < nfact; i++)
+    for (Id i = 0; i < nfact; i++)
     {
       if (anam_strcnt[i] < 0 || anam_strcnt[i] >= ncov)
       {
@@ -139,8 +139,8 @@ String CovLMCAnamorphosis::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-double CovLMCAnamorphosis::eval0(int ivar,
-                                 int jvar,
+double CovLMCAnamorphosis::eval0(Id ivar,
+                                 Id jvar,
                                  const CovCalcMode* mode) const
 {
   if (_anam == nullptr) return TEST;
@@ -179,8 +179,8 @@ double CovLMCAnamorphosis::eval0(int ivar,
 
 double CovLMCAnamorphosis::_eval(const SpacePoint& p1,
                                  const SpacePoint& p2,
-                                 int ivar,
-                                 int jvar,
+                                 Id ivar,
+                                 Id jvar,
                                  const CovCalcMode* mode) const
 {
   if (_anam == nullptr) return TEST;
@@ -217,8 +217,8 @@ double CovLMCAnamorphosis::_eval(const SpacePoint& p1,
   return value;
 }
 
-double CovLMCAnamorphosis::_evalHermite(int ivar,
-                                        int jvar,
+double CovLMCAnamorphosis::_evalHermite(Id ivar,
+                                        Id jvar,
                                         const SpacePoint& p1,
                                         const SpacePoint& p2,
                                         const CovCalcMode* mode) const
@@ -254,7 +254,7 @@ double CovLMCAnamorphosis::_evalHermite(int ivar,
     double rhon = 1.;
     double rn   = 1.;
     double val  = 0.;
-    for (int jclass = 1; jclass < getAnamNClass(); jclass++)
+    for (Id jclass = 1; jclass < getAnamNClass(); jclass++)
     {
       rhon *= rho;
       rn *= r;
@@ -304,8 +304,8 @@ double CovLMCAnamorphosis::_evalHermite(int ivar,
   return cov;
 }
 
-double CovLMCAnamorphosis::_evalHermite0(int ivar,
-                                         int jvar,
+double CovLMCAnamorphosis::_evalHermite0(Id ivar,
+                                         Id jvar,
                                          const CovCalcMode* mode) const
 {
   const AnamHermite* anamH = dynamic_cast<const AnamHermite*>(_anam);
@@ -328,7 +328,7 @@ double CovLMCAnamorphosis::_evalHermite0(int ivar,
 
     cov       = 0.;
     double rn = 1.;
-    for (int jclass = 1; jclass < getAnamNClass(); jclass++)
+    for (Id jclass = 1; jclass < getAnamNClass(); jclass++)
     {
       rn *= r;
       double psin = anamH->getPsiHn(jclass);
@@ -359,8 +359,8 @@ double CovLMCAnamorphosis::_evalHermite0(int ivar,
   return cov;
 }
 
-double CovLMCAnamorphosis::_evalDiscreteDD(int ivar,
-                                           int jvar,
+double CovLMCAnamorphosis::_evalDiscreteDD(Id ivar,
+                                           Id jvar,
                                            const SpacePoint& p1,
                                            const SpacePoint& p2,
                                            const CovCalcMode* mode) const
@@ -380,7 +380,7 @@ double CovLMCAnamorphosis::_evalDiscreteDD(int ivar,
     // Structure for the whole discretized variables
 
     double cov = 0.;
-    for (int jclass = 1; jclass < getAnamNClass(); jclass++)
+    for (Id jclass = 1; jclass < getAnamNClass(); jclass++)
     {
       double li  = anamDD->getDDStatLambda(iclass);
       double csi = anamDD->getDDStatCnorm(iclass);
@@ -421,8 +421,8 @@ double CovLMCAnamorphosis::_evalDiscreteDD(int ivar,
   return coeff * exp(-li * gamma);
 }
 
-double CovLMCAnamorphosis::_evalDiscreteDD0(int /*ivar*/,
-                                            int /*jvar*/,
+double CovLMCAnamorphosis::_evalDiscreteDD0(Id /*ivar*/,
+                                            Id /*jvar*/,
                                             const CovCalcMode* mode) const
 {
   if (mode == nullptr)
@@ -436,7 +436,7 @@ double CovLMCAnamorphosis::_evalDiscreteDD0(int /*ivar*/,
     // Structure for the whole discretized variable
 
     cov = 0.;
-    for (int jclass = 1; jclass < getAnamNClass(); jclass++)
+    for (Id jclass = 1; jclass < getAnamNClass(); jclass++)
     {
       double csi = anamDD->getDDStatCnorm(iclass);
       double mui = anamDD->getDDStatMul(iclass);
@@ -481,15 +481,15 @@ double CovLMCAnamorphosis::_evalDiscreteDD0(int /*ivar*/,
   return cov;
 }
 
-void CovLMCAnamorphosis::_transformCovCalcModeIR(int iclass) const
+void CovLMCAnamorphosis::_transformCovCalcModeIR(Id iclass) const
 {
-  int from = 0;
+  Id from = 0;
   if (iclass > 0) from = _anamStrCount[iclass - 1];
   setActiveCovListFromInterval(from, _anamStrCount[iclass]);
 }
 
-double CovLMCAnamorphosis::_evalDiscreteIR(int ivar,
-                                           int jvar,
+double CovLMCAnamorphosis::_evalDiscreteIR(Id ivar,
+                                           Id jvar,
                                            const SpacePoint& p1,
                                            const SpacePoint& p2,
                                            const CovCalcMode* mode) const
@@ -512,7 +512,7 @@ double CovLMCAnamorphosis::_evalDiscreteIR(int ivar,
     double cov  = 0.;
     double cov1 = 0.;
     double cov2 = 1.;
-    for (int jclass = 1; jclass < getAnamNClass(); jclass++)
+    for (Id jclass = 1; jclass < getAnamNClass(); jclass++)
     {
       double bi = anamIR->getIRStatB(jclass);
       cov1      = cov2;
@@ -536,8 +536,8 @@ double CovLMCAnamorphosis::_evalDiscreteIR(int ivar,
   return (cov2 - cov1);
 }
 
-double CovLMCAnamorphosis::_evalDiscreteIR0(int /*ivar*/,
-                                            int /*jvar*/,
+double CovLMCAnamorphosis::_evalDiscreteIR0(Id /*ivar*/,
+                                            Id /*jvar*/,
                                             const CovCalcMode* mode) const
 {
   if (mode == nullptr)
@@ -555,7 +555,7 @@ double CovLMCAnamorphosis::_evalDiscreteIR0(int /*ivar*/,
     // Structure for the whole discretized variable
 
     double cov = 0.;
-    for (int jclass = 1; jclass < getAnamNClass(); jclass++)
+    for (Id jclass = 1; jclass < getAnamNClass(); jclass++)
     {
       double bi   = anamIR->getIRStatB(jclass);
       double cov2 = pow(anamIR->getIRStatR(jclass), r);
@@ -568,7 +568,7 @@ double CovLMCAnamorphosis::_evalDiscreteIR0(int /*ivar*/,
   return pow(anamIR->getIRStatR(iclass - 1), r);
 }
 
-void CovLMCAnamorphosis::setActiveFactor(int anam_iclass)
+void CovLMCAnamorphosis::setActiveFactor(Id anam_iclass)
 {
   if (anam_iclass != 0 && anam_iclass > _anam->getNFactor())
   {

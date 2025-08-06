@@ -27,9 +27,9 @@ public:
   ALinearOp(const ALinearOp& m)            = delete;
   ALinearOp& operator=(const ALinearOp& m) = delete;
   virtual ~ALinearOp() {}
-  virtual int getSize() const = 0;
+  virtual Id getSize() const = 0;
 
-  int evalDirect(const VectorDouble& inv, VectorDouble& outv) const;
+  Id evalDirect(const VectorDouble& inv, VectorDouble& outv) const;
   VectorDouble evalDirect(const VectorDouble& in) const;
   virtual void multiplyByValueAndAddDiagonal(double v1 = 1., double v2 = 0.) const;
   virtual void resetModif() const;
@@ -37,12 +37,12 @@ public:
 #ifndef SWIG
 
 public:
-  int evalDirect(constvect inv, vect outv) const;
-  int addToDest(const constvect inv, vect outv) const;
-  int addToDest(const ::Eigen::VectorXd& inv, ::Eigen::VectorXd& outv) const;
+  Id evalDirect(constvect inv, vect outv) const;
+  Id addToDest(const constvect inv, vect outv) const;
+  Id addToDest(const ::Eigen::VectorXd& inv, ::Eigen::VectorXd& outv) const;
 
 protected:
-  virtual int _addToDest(constvect inv, vect outv) const = 0;
+  virtual Id _addToDest(constvect inv, vect outv) const = 0;
 #endif
 
 private:

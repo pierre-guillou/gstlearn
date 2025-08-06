@@ -38,26 +38,26 @@ struct t_btree;
 struct t_nheap
 {
   MatrixT<double> distances;
-  MatrixT<int> indices;
-  int n_pts;
-  int n_nbrs;
+  MatrixT<Id> indices;
+  Id n_pts;
+  Id n_nbrs;
 
   t_nheap() = default;
-  void resize(int n_pts, int n_nbrs);
+  void resize(Id n_pts, Id n_nbrs);
 
   /*
   ** neighbors_heap.c
   */
-  double largest(int row) const;
-  int push(int row, double val, int i_val);
+  double largest(Id row) const;
+  Id push(Id row, double val, Id i_val);
   void sort();
   void load(const t_btree& b, const MatrixT<double>& x);
 };
 
 struct t_nodedata
 {
-  int idx_start;
-  int idx_end;
+  Id idx_start;
+  Id idx_end;
   double radius;
   bool is_leaf;
 };
@@ -70,33 +70,33 @@ struct t_btree
   std::vector<t_nodedata> node_data;
   MatrixT<double> node_bounds;
 
-  int n_samples;
-  int n_features;
+  Id n_samples;
+  Id n_features;
 
-  int leaf_size;
-  int n_levels;
-  int n_nodes;
-  int default_distance_function {1};
+  Id leaf_size;
+  Id n_levels;
+  Id n_nodes;
+  Id default_distance_function {1};
 
   t_btree() = default;
   t_btree(MatrixT<double>&& data,
-          int n_samples,
-          int n_features,
+          Id n_samples,
+          Id n_features,
           bool has_constraints,
-          int leaf_size,
-          int default_distance_function);
+          Id leaf_size,
+          Id default_distance_function);
 
-  void display(int level = -1) const;
-  int init_node(int i_node, int idx_start, int idx_end);
-  void recursive_build(int i_node, int idx_start, int idx_end);
-  double min_dist(int i_node, const constvect pt) const;
-  int query_depth_first(int i_node, const constvect pt, int i_pt, t_nheap& heap, double dist) const;
+  void display(Id level = -1) const;
+  Id init_node(Id i_node, Id idx_start, Id idx_end);
+  void recursive_build(Id i_node, Id idx_start, Id idx_end);
+  double min_dist(Id i_node, const constvect pt) const;
+  Id query_depth_first(Id i_node, const constvect pt, Id i_pt, t_nheap& heap, double dist) const;
 };
 
 /*
 ** metrics.c
 */
-double manhattan_distance(const double* x1, const double* x2, int n_features);
-double euclidean_distance(const double* x1, const double* x2, int n_features);
+double manhattan_distance(const double* x1, const double* x2, Id n_features);
+double euclidean_distance(const double* x1, const double* x2, Id n_features);
 
 } // namespace gstlrn

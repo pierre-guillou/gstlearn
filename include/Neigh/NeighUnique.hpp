@@ -44,9 +44,9 @@ public:
 
   IMPLEMENT_CLONING(NeighUnique)
   /// Interface for ANeigh
-  void getNeigh(int iech_out, VectorInt& ranks) override;
-  int getNSampleMax(const Db* db) const override;
-  bool hasChanged(int iech_out) const override;
+  void getNeigh(Id iech_out, VectorInt& ranks) override;
+  Id getNSampleMax(const Db* db) const override;
+  bool hasChanged(Id iech_out) const override;
   ENeigh getType() const override { return ENeigh::fromKey("UNIQUE"); }
 
   /// Interface for AStringable
@@ -65,6 +65,6 @@ protected:
   String _getNFName() const override { return "NeighUnique"; }
 
 private:
-  void _unique(int iech_out, VectorInt& ranks);
+  void _unique(Id iech_out, VectorInt& ranks);
 };
 }

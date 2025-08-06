@@ -59,7 +59,7 @@ void Rotation::resetFromSpaceDimension(size_t ndim)
   _rotInv.setIdentity();
 }
 
-int Rotation::setMatrixDirect(const MatrixSquare& rotmat)
+Id Rotation::setMatrixDirect(const MatrixSquare& rotmat)
 {
   if (!rotmat.empty())
   {
@@ -75,11 +75,11 @@ int Rotation::setMatrixDirect(const MatrixSquare& rotmat)
   return 0;
 }
 
-int Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
+Id Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
 {
   if (!rotmat.empty())
   {
-    if ((int)rotmat.size() != _rotMat.size())
+    if ((Id)rotmat.size() != _rotMat.size())
       my_throw("The argument 'rotmat' does not have same dimension as 'this'");
     MatrixSquare local(_nDim);
     local.setValues(rotmat);
@@ -92,7 +92,7 @@ int Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
   return 0;
 }
 
-int Rotation::setAngles(const VectorDouble& angles)
+Id Rotation::setAngles(const VectorDouble& angles)
 {
   if (!angles.empty())
   {
@@ -112,7 +112,7 @@ int Rotation::setAngles(const VectorDouble& angles)
   return 0;
 }
 
-int Rotation::getDerivativesInPlace(std::vector<MatrixSquare>& res) const
+Id Rotation::getDerivativesInPlace(std::vector<MatrixSquare>& res) const
 {
 
   GH::rotationMatrixDerivativesInPlace(_nDim, _angles, res);
@@ -134,7 +134,7 @@ std::vector<MatrixSquare> Rotation::getDerivatives() const
   else if (_nDim == 3)
   {
     res.resize(3);
-    for (int i = 0; i < 3; i++)
+    for (Id i = 0; i < 3; i++)
       res[i].reset(3, 3);
   }
   getDerivativesInPlace(res);
@@ -143,7 +143,7 @@ std::vector<MatrixSquare> Rotation::getDerivatives() const
 
 void Rotation::setIdentity()
 {
-  for (int idim = 0; idim < (int)_nDim; idim++)
+  for (Id idim = 0; idim < (Id)_nDim; idim++)
     VH::fill(_angles, 0.);
   _rotMat.setIdentity();
   _rotInv.setIdentity();
@@ -226,14 +226,14 @@ bool Rotation::isSame(const Rotation& rot) const
 {
   /* Find the minimum space dimension */
 
-  int ndim = MIN(_nDim, rot.getNDim());
+  Id ndim = MIN(_nDim, rot.getNDim());
 
   /* Compare the rotations */
 
   if (_flagRot != isRotated()) return 0;
   if (_flagRot)
   {
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       if (_angles[idim] != getAngle(idim)) return 0;
   }
   return 1;
@@ -257,11 +257,11 @@ bool Rotation::isMatrixRotation(const MatrixSquare& rotmat, bool verbose)
   /* Check product of matrix by its transpose and compare to unity matrix */
 
   auto neq = rotmat.getNRows();
-  for (int i = 0; i < neq; i++)
-    for (int j = 0; j < neq; j++)
+  for (Id i = 0; i < neq; i++)
+    for (Id j = 0; j < neq; j++)
     {
       double prod = 0.;
-      for (int k = 0; k < neq; k++)
+      for (Id k = 0; k < neq; k++)
         prod += rotmat.getValue(i, k) * rotmat.getValue(j, k);
       double comp = (i == j) ? 1 : 0.;
       if (ABS(prod - comp) > EPSILON6)

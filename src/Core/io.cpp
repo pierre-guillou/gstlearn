@@ -147,13 +147,13 @@ void redefine_exit(void (*exit_func)(void))
  ** \param[in]  flag_lead 1 to strip only the leading blanks
  **
  *****************************************************************************/
-void string_strip_blanks(char* string, int flag_lead)
+void string_strip_blanks(char* string, Id flag_lead)
 
 {
-  int i, ecr, length, flag_test;
+  Id i, ecr, length, flag_test;
 
   flag_test = 0;
-  length    = static_cast<int>(strlen(string));
+  length    = static_cast<Id>(strlen(string));
   for (i = ecr = 0; i < length; i++)
   {
     if (string[i] == ' ' && !flag_test) continue;
@@ -177,13 +177,13 @@ void string_strip_blanks(char* string, int flag_lead)
 void string_strip_quotes(char* string)
 
 {
-  int ecr, length;
+  Id ecr, length;
 
-  length = static_cast<int>(strlen(string));
+  length = static_cast<Id>(strlen(string));
 
   if (string[0] != '"') return;
   ecr = 0;
-  for (int i = 1; i < length; i++)
+  for (Id i = 1; i < length; i++)
   {
     if (string[i] == '"')
     {
@@ -261,7 +261,7 @@ void exit_extern()
  ** \param[in]  nbyte  number of bytes to be allocated
  **
  ****************************************************************************/
-void mem_error(int nbyte)
+void mem_error(Id nbyte)
 
 {
   message("Error: Core allocation problem.\n");
@@ -280,7 +280,7 @@ void mem_error(int nbyte)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-FILE* _file_open(const char* filename, int mode)
+FILE* _file_open(const char* filename, Id mode)
 {
   FILE* file;
 
@@ -332,12 +332,12 @@ void print_current_line(void)
  ** \param[in]  string     String to be checked
  **
  *****************************************************************************/
-static int st_only_blanks(char* string)
+static Id st_only_blanks(char* string)
 {
-  int number;
+  Id number;
 
-  number = static_cast<int>(strlen(string));
-  for (int i = 0; i < number; i++)
+  number = static_cast<Id>(strlen(string));
+  for (Id i = 0; i < number; i++)
   {
     if (string[i] != ' ') return (0);
   }
@@ -359,12 +359,12 @@ static int st_only_blanks(char* string)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _file_read(FILE* file, const char* format, va_list ap)
+Id _file_read(FILE* file, const char* format, va_list ap)
 {
-  int flag_com;
+  Id flag_com;
   size_t ideb, i;
   const char* fmt;
-  int* ret_i;
+  Id* ret_i;
   float* ret_f;
   double* ret_d;
   char* ret_s;
@@ -433,10 +433,10 @@ int _file_read(FILE* file, const char* format, va_list ap)
     }
     else if (!strcmp(fmt, "%d"))
     {
-      ret_i = va_arg(ap, int*);
+      ret_i = va_arg(ap, Id*);
       if (gslSScanf(LCUR, "%d", ret_i) <= 0) return (1);
       ideb += 2;
-      if (*ret_i == (int)ASCII_TEST) *ret_i = ITEST;
+      if (*ret_i == (Id)ASCII_TEST) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
     }
     else if (!strcmp(fmt, "%f"))
@@ -484,10 +484,10 @@ int _file_read(FILE* file, const char* format, va_list ap)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _file_get_ncol(FILE* file)
+Id _file_get_ncol(FILE* file)
 
 {
-  int ncol, flag_com, i;
+  Id ncol, flag_com, i;
 
   /* Initializations */
 
@@ -502,7 +502,7 @@ int _file_get_ncol(FILE* file)
   /* Eliminate the comments */
 
   flag_com = 0;
-  for (i = 0; i < (int)strlen(LINE); i++)
+  for (i = 0; i < (Id)strlen(LINE); i++)
   {
     if (LINE[i] == DEL_COM)
     {
@@ -556,12 +556,12 @@ void _erase_current_string(void)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _buffer_read(char** buffer, const char* format, va_list ap)
+Id _buffer_read(char** buffer, const char* format, va_list ap)
 {
-  int flag_com;
+  Id flag_com;
   size_t ideb, i;
   const char* fmt;
-  int* ret_i;
+  Id* ret_i;
   float* ret_f;
   double* ret_d;
   char* ret_s;
@@ -630,10 +630,10 @@ int _buffer_read(char** buffer, const char* format, va_list ap)
     }
     else if (!strcmp(fmt, "%d"))
     {
-      ret_i = va_arg(ap, int*);
+      ret_i = va_arg(ap, Id*);
       if (gslSScanf(LCUR, "%d", ret_i) <= 0) return (1);
       ideb += 2;
-      if (*ret_i == (int)ASCII_TEST) *ret_i = ITEST;
+      if (*ret_i == (Id)ASCII_TEST) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
     }
     else if (!strcmp(fmt, "%f"))
@@ -683,7 +683,7 @@ int _buffer_read(char** buffer, const char* format, va_list ap)
  *****************************************************************************/
 void _file_write(FILE* file, const char* format, va_list ap)
 {
-  int ret_i, no_blank;
+  Id ret_i, no_blank;
   double ret_d;
   char* ret_s;
 
@@ -701,7 +701,7 @@ void _file_write(FILE* file, const char* format, va_list ap)
   }
   else if (!strcmp(format, "%d"))
   {
-    ret_i = va_arg(ap, int);
+    ret_i = va_arg(ap, Id);
     if (ret_i == TEST)
       fprintf(file, "%5.1lf", ASCII_TEST);
     else
@@ -768,7 +768,7 @@ void _file_write(FILE* file, const char* format, va_list ap)
  *****************************************************************************/
 void _buffer_write(char* buffer, const char* format, va_list ap)
 {
-  int ret_i, no_blank;
+  Id ret_i, no_blank;
   double ret_d;
   char* ret_s;
 
@@ -786,7 +786,7 @@ void _buffer_write(char* buffer, const char* format, va_list ap)
   }
   else if (!strcmp(format, "%d"))
   {
-    ret_i = va_arg(ap, int);
+    ret_i = va_arg(ap, Id);
     if (ret_i == TEST)
       (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
@@ -854,7 +854,7 @@ void _buffer_write(char* buffer, const char* format, va_list ap)
  **
  *****************************************************************************/
 void _lire_string(const char* question,
-                  int flag_def,
+                  Id flag_def,
                   const char* valdef,
                   char* answer)
 {
@@ -906,13 +906,13 @@ loop:
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _lire_int(const char* question,
-              int flag_def,
-              int valdef,
-              int valmin,
-              int valmax)
+Id _lire_int(const char* question,
+              Id flag_def,
+              Id valdef,
+              Id valmin,
+              Id valmax)
 {
-  int rep;
+  Id rep;
 
 loop:
 
@@ -990,7 +990,7 @@ loop:
  **
  *****************************************************************************/
 double _lire_double(const char* question,
-                    int flag_def,
+                    Id flag_def,
                     double valdef,
                     double valmin,
                     double valmax)
@@ -1069,7 +1069,7 @@ loop:
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _lire_logical(const char* question, int flag_def, int valdef)
+Id _lire_logical(const char* question, Id flag_def, Id valdef)
 {
 loop:
 
@@ -1140,10 +1140,10 @@ void record_close(void)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-int _record_read(FILE* file, const char* format, ...)
+Id _record_read(FILE* file, const char* format, ...)
 {
   va_list ap;
-  int error;
+  Id error;
 
   error = 0;
   va_start(ap, format);

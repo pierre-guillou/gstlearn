@@ -29,7 +29,7 @@ public:
 
   String getFormula() const override;
   String         getCovName() const override { return "Gaussian"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   double         getScadef() const override;
   bool   hasCovDerivative() const override { return true; }
   bool           getCompatibleSpaceR() const override { return true; }
@@ -38,11 +38,11 @@ public:
   double simulateTurningBand(double t0, TurningBandOperate &operTB) const override;
 
   bool isValidForSpectral() const override { return true; }
-  MatrixDense simulateSpectralOmega(int nb) const override;
+  MatrixDense simulateSpectralOmega(Id nb) const override;
 
 protected:
   double _evaluateCov(double h)  const override;
-  double _evaluateCovDerivative(int degree, double h) const override;
+  double _evaluateCovDerivative(Id degree, double h) const override;
 };
 
 }

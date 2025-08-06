@@ -42,7 +42,7 @@ namespace gstlrn
 class GSTLEARN_EXPORT AnamEmpirical: public AnamContinuous
 {
 public:
-  AnamEmpirical(int ndisc         = 100,
+  AnamEmpirical(Id ndisc         = 100,
                 double sigma2e    = TEST,
                 bool flagDilution = false,
                 bool flagGaussian = true);
@@ -59,7 +59,7 @@ public:
   /// ASerializable Interface
   static AnamEmpirical* createFromNF(const String& NFFilename, bool verbose = true);
 
-  void reset(int ndisc,
+  void reset(Id ndisc,
              double pymin,
              double pzmin,
              double pymax,
@@ -74,8 +74,8 @@ public:
 
   /// AAnam Interface
   const EAnam& getType() const override { return EAnam::fromKey("EMPIRICAL"); }
-  int getNFactor() const override { return _nDisc; }
-  int fitFromArray(const VectorDouble& tab,
+  Id getNFactor() const override { return _nDisc; }
+  Id fitFromArray(const VectorDouble& tab,
                    const VectorDouble& wt = VectorDouble()) override;
 
   /// AnamContinuous Interface
@@ -84,8 +84,8 @@ public:
   double transformToRawValue(double yy) const override;
   bool isChangeSupportDefined() const override { return false; }
 
-  static AnamEmpirical* create(int ndisc = 100, double sigma2e = TEST);
-  int getNDisc() const { return _nDisc; }
+  static AnamEmpirical* create(Id ndisc = 100, double sigma2e = TEST);
+  Id getNDisc() const { return _nDisc; }
   double getSigma2e() const { return _sigma2e; }
   const VectorDouble& getZDisc() const { return _ZDisc; }
   const VectorDouble& getYDisc() const { return _YDisc; }
@@ -93,7 +93,7 @@ public:
   bool isFlagGaussian() const { return _flagGaussian; }
 
   void setSigma2e(double sigma2e) { _sigma2e = sigma2e; }
-  void setNDisc(int ndisc);
+  void setNDisc(Id ndisc);
   void setDisc(const VectorDouble& zdisc, const VectorDouble& ydisc);
   void setFlagDilution(bool flagDilution) { _flagDilution = flagDilution; }
   void setFlagGaussian(bool flagGaussian) { _flagGaussian = flagGaussian; }
@@ -108,21 +108,21 @@ protected:
   String _getNFName() const override { return "AnamEmpirical"; }
 
 private:
-  static int _getStatistics(const VectorDouble& tab,
-                            int* count,
+  static Id _getStatistics(const VectorDouble& tab,
+                            Id* count,
                             double* mean,
                             double* mean2,
                             double* mini,
                             double* maxi,
                             double* var);
-  int _fitWithDilutionGaussian(const VectorDouble& tab);
-  int _fitWithDilutionLognormal(const VectorDouble& tab);
-  int _fitNormalScore(const VectorDouble& tab);
+  Id _fitWithDilutionGaussian(const VectorDouble& tab);
+  Id _fitWithDilutionLognormal(const VectorDouble& tab);
+  Id _fitNormalScore(const VectorDouble& tab);
 
 private:
   bool _flagDilution;
   bool _flagGaussian;
-  int _nDisc;
+  Id _nDisc;
   double _sigma2e;
   VectorDouble _ZDisc;
   VectorDouble _YDisc;

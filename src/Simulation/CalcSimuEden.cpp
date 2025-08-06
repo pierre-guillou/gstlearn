@@ -26,9 +26,9 @@
 
 namespace gstlrn
 {
-static int invdir[6] = {1, 0, 3, 2, 5, 4};
+static Id invdir[6] = {1, 0, 3, 2, 5, 4};
 
-CalcSimuEden::CalcSimuEden(int nfacies, int nfluids, int niter, int nbsimu, int seed, bool verbose)
+CalcSimuEden::CalcSimuEden(Id nfacies, Id nfluids, Id niter, Id nbsimu, Id seed, bool verbose)
   : ACalcSimulation(nbsimu, seed)
   , AStringable()
   , _verbose(verbose)
@@ -95,9 +95,9 @@ bool CalcSimuEden::_simulate()
 
   /* Loop on the iterations */
 
-  for (int iter = 0; iter < _niter; iter++)
+  for (Id iter = 0; iter < _niter; iter++)
   {
-    int seed_memo = law_get_random_seed();
+    Id seed_memo = law_get_random_seed();
     _statsReset();
 
     /* Check the consistency */
@@ -116,7 +116,7 @@ bool CalcSimuEden::_simulate()
 
     /* Modifying the peripheral cells using a random walk */
 
-    int idate = 0;
+    Id idate = 0;
     while (skin->remains(_verbose))
     {
 
@@ -127,13 +127,13 @@ bool CalcSimuEden::_simulate()
 
       /* Find the next cell to be processed */
 
-      int rank;
-      int ipos;
+      Id rank;
+      Id ipos;
       skin->getNext(&rank, &ipos);
 
       /* Find the new value of the target cell according to its neighborhood */
 
-      int ref_fluid;
+      Id ref_fluid;
       if (_fluidModify(skin, ipos, &ref_fluid))
       {
         _ncork++;
@@ -202,9 +202,9 @@ bool CalcSimuEden::_fluid_check(void)
 
   /* Check that there is no zero value */
 
-  for (int ifluid = 0; ifluid < _nfluids; ifluid++)
-    for (int ifacies = 0; ifacies < _nfacies; ifacies++)
-      for (int idir = 0; idir < 6; idir++)
+  for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
+    for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
+      for (Id idir = 0; idir < 6; idir++)
       {
         if (_getWT(ifacies + 1, ifluid + 1, 1, idir) <= 0)
         {
@@ -218,11 +218,11 @@ bool CalcSimuEden::_fluid_check(void)
 
   /* Check that at least one speed is defined (for each facies/fluid pair) */
 
-  for (int ifluid = 0; ifluid < _nfluids; ifluid++)
-    for (int ifacies = 0; ifacies < _nfacies; ifacies++)
+  for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
+    for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
     {
       double total = 0;
-      for (int idir = 0; idir < 6; idir++)
+      for (Id idir = 0; idir < 6; idir++)
         total += _getWT(ifacies + 1, ifluid + 1, 1, idir);
       if (total <= 0.)
       {
@@ -234,10 +234,10 @@ bool CalcSimuEden::_fluid_check(void)
 
   /* Check for wrong order relationship for velocities */
 
-  for (int ifacies = 0; ifacies < _nfacies; ifacies++)
-    for (int ifluid = 1; ifluid < _nfluids; ifluid++)
+  for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
+    for (Id ifluid = 1; ifluid < _nfluids; ifluid++)
     {
-      int jfluid = ifluid - 1;
+      Id jfluid = ifluid - 1;
 
       /* Z+ Speed */
 
@@ -282,9 +282,9 @@ bool CalcSimuEden::_fluid_check(void)
  ** \param[in]  idir    Direction value
  **
  *****************************************************************************/
-int CalcSimuEden::_getWT(int ifacies, int ifluid, int perm, int idir)
+Id CalcSimuEden::_getWT(Id ifacies, Id ifluid, Id perm, Id idir)
 {
-  int ind, value;
+  Id ind, value;
 
   if (_speeds.empty())
     value = 1;
@@ -310,11 +310,11 @@ void CalcSimuEden::_printParams(bool verbose)
   message("Number of facies = %d\n", _nfacies);
   message("Number of fluids = %d\n", _nfluids);
 
-  for (int ifacies = 0; ifacies < _nfacies; ifacies++)
-    for (int ifluid = 0; ifluid < _nfluids; ifluid++)
+  for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
+    for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
     {
       message("Facies=%d - Fluid=%d -", ifacies + 1, ifluid + 1);
-      for (int idir = 0; idir < 6; idir++)
+      for (Id idir = 0; idir < 6; idir++)
         message(" Dir #%d=%d", idir + 1,
                 _getWT(ifacies + 1, ifluid + 1, 1, idir));
       message("\n");
@@ -342,7 +342,7 @@ void CalcSimuEden::_statsDefine(void)
  ** \param[in]  ipos   Absolute grid index of the input grid node
  **
  *****************************************************************************/
-int CalcSimuEden::isAlreadyFilled(int ipos) const
+Id CalcSimuEden::isAlreadyFilled(Id ipos) const
 {
   bool answer = _getFACIES(ipos) > 0 &&
                 _getPERM(ipos) > 0 &&
@@ -359,7 +359,7 @@ int CalcSimuEden::isAlreadyFilled(int ipos) const
  ** \param[in]  ipos   Absolute grid index of the input grid node
  **
  *****************************************************************************/
-int CalcSimuEden::isToBeFilled(int ipos) const
+Id CalcSimuEden::isToBeFilled(Id ipos) const
 {
   bool answer = _getFACIES(ipos) > 0 &&
                 _getPERM(ipos) > 0 &&
@@ -376,10 +376,10 @@ int CalcSimuEden::isToBeFilled(int ipos) const
  ** \param[in]  iech  Rank of the sample
  **
  *****************************************************************************/
-int CalcSimuEden::_getFACIES(int iech) const
+Id CalcSimuEden::_getFACIES(Id iech) const
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  int ifacies    = (int)dbgrid->getArray(iech, _indFacies);
+  Id ifacies    = (Id)dbgrid->getArray(iech, _indFacies);
   if (ifacies < 0 || ifacies > _nfacies || IFFFF(ifacies)) ifacies = SHALE;
   return (ifacies);
 }
@@ -393,13 +393,13 @@ int CalcSimuEden::_getFACIES(int iech) const
  ** \param[in]  iech  Rank of the sample
  **
  *****************************************************************************/
-int CalcSimuEden::_getPERM(int iech) const
+Id CalcSimuEden::_getPERM(Id iech) const
 {
   if (_indPerm <= 0) return (1);
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   double perm    = dbgrid->getArray(iech, _indPerm);
   if (FFFF(perm) || perm < 0.) perm = 0.;
-  return ((int)perm);
+  return ((Id)perm);
 }
 
 /****************************************************************************/
@@ -411,7 +411,7 @@ int CalcSimuEden::_getPERM(int iech) const
  ** \param[in]  iech  Rank of the sample
  **
  *****************************************************************************/
-double CalcSimuEden::_getDATE(int iech)
+double CalcSimuEden::_getDATE(Id iech)
 {
   double date;
 
@@ -432,10 +432,10 @@ double CalcSimuEden::_getDATE(int iech)
  ** \param[in]  iech  Rank of the grid node
  **
  *****************************************************************************/
-int CalcSimuEden::_getFLUID(int iech) const
+Id CalcSimuEden::_getFLUID(Id iech) const
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  int ifluid     = (int)dbgrid->getArray(iech, _indFluid);
+  Id ifluid     = (Id)dbgrid->getArray(iech, _indFluid);
   if (ifluid < 0 || ifluid > _nfluids || IFFFF(ifluid)) ifluid = UNDEF_FLUID;
   return (ifluid);
 }
@@ -450,12 +450,12 @@ int CalcSimuEden::_getFLUID(int iech) const
  ** \param[in]  iech  Rank of the grid node
  **
  *****************************************************************************/
-int CalcSimuEden::_getFLUID_OLD(int iech) const
+Id CalcSimuEden::_getFLUID_OLD(Id iech) const
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   double ifluid  = dbgrid->getArray(iech, _indFluid);
   if (ifluid < 0 || ifluid > _nfluids) ifluid = UNDEF_FLUID;
-  return ((int)ifluid);
+  return ((Id)ifluid);
 }
 
 /****************************************************************************/
@@ -467,7 +467,7 @@ int CalcSimuEden::_getFLUID_OLD(int iech) const
  ** \param[in]  iech  Rank of the sample
  **
  *****************************************************************************/
-double CalcSimuEden::_getPORO(int iech) const
+double CalcSimuEden::_getPORO(Id iech) const
 {
   if (_indPoro <= 0) return (1);
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
@@ -487,7 +487,7 @@ double CalcSimuEden::_getPORO(int iech) const
  ** \param[in]  idir    Direction value
  **
  *****************************************************************************/
-double CalcSimuEden::getWeight(int ipos, int idir) const
+double CalcSimuEden::getWeight(Id ipos, Id idir) const
 {
   double value;
   if (_speeds.empty())
@@ -497,7 +497,7 @@ double CalcSimuEden::getWeight(int ipos, int idir) const
     auto ifacies = _getFACIES(ipos);
     auto ifluid  = _getFLUID(ipos);
     auto perm    = _getPERM(ipos);
-    int ind     = (idir) + 6 * ((ifacies - 1) * _nfluids + (ifluid - 1));
+    Id ind     = (idir) + 6 * ((ifacies - 1) * _nfluids + (ifluid - 1));
     value       = perm * _speeds[ind];
   }
   return (value);
@@ -512,35 +512,35 @@ void CalcSimuEden::_statsReset()
 
 {
   _ncork = 0;
-  for (int ifluid = 0; ifluid < _nfluids; ifluid++)
-    for (int ifacies = 0; ifacies < _nfacies; ifacies++)
+  for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
+    for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
     {
       _setStatCount(ifacies, ifluid, 0);
       _setStatVolume(ifacies, ifluid, 0.);
     }
 }
 
-void CalcSimuEden::_setStatCount(int ifacies, int ifluid, int value)
+void CalcSimuEden::_setStatCount(Id ifacies, Id ifluid, Id value)
 {
   _numbers[ifacies * _nfluids + ifluid] = value;
 }
-void CalcSimuEden::_setStatVolume(int ifacies, int ifluid, double value)
+void CalcSimuEden::_setStatVolume(Id ifacies, Id ifluid, double value)
 {
   _volumes[ifacies * _nfluids + ifluid] = value;
 }
-void CalcSimuEden::_addStatCount(int ifacies, int ifluid, int value)
+void CalcSimuEden::_addStatCount(Id ifacies, Id ifluid, Id value)
 {
   _numbers[ifacies * _nfluids + ifluid] += value;
 }
-void CalcSimuEden::_addStatVolume(int ifacies, int ifluid, double value)
+void CalcSimuEden::_addStatVolume(Id ifacies, Id ifluid, double value)
 {
   _volumes[ifacies * _nfluids + ifluid] += value;
 }
-int CalcSimuEden::_getStatCount(int ifacies, int ifluid) const
+Id CalcSimuEden::_getStatCount(Id ifacies, Id ifluid) const
 {
   return _numbers[ifacies * _nfluids + ifluid];
 }
-double CalcSimuEden::_getStatVolume(int ifacies, int ifluid) const
+double CalcSimuEden::_getStatVolume(Id ifacies, Id ifluid) const
 {
   return _volumes[ifacies * _nfluids + ifluid];
 }
@@ -555,8 +555,8 @@ void CalcSimuEden::_checkInconsistency(bool verbose)
 
   /* Loop on the cells of the matrix */
 
-  int n_shale_fluid = 0;
-  for (int iech = 0; iech < _nxyz; iech++)
+  Id n_shale_fluid = 0;
+  for (Id iech = 0; iech < _nxyz; iech++)
   {
     auto ifluid  = _getFLUID_OLD(iech);
     auto ifacies = _getFACIES(iech);
@@ -599,7 +599,7 @@ void CalcSimuEden::_checkInconsistency(bool verbose)
  ** \param[in]  ifluid Fluid value
  **
  *****************************************************************************/
-void CalcSimuEden::_setFLUID(int iech, int ifluid)
+void CalcSimuEden::_setFLUID(Id iech, Id ifluid)
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   dbgrid->setArray(iech, _indFluid, ifluid);
@@ -613,7 +613,7 @@ void CalcSimuEden::_setFLUID(int iech, int ifluid)
  ** \param[in]  ifacies Facies value
  **
  *****************************************************************************/
-void CalcSimuEden::_setFACIES(int iech, int ifacies)
+void CalcSimuEden::_setFACIES(Id iech, Id ifacies)
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   dbgrid->setArray(iech, _indFacies, ifacies);
@@ -626,10 +626,10 @@ void CalcSimuEden::_setFACIES(int iech, int ifacies)
  ** \param[in]  iech   Rank of the grid node
  **
  *****************************************************************************/
-void CalcSimuEden::_setFACIES_CORK(int iech)
+void CalcSimuEden::_setFACIES_CORK(Id iech)
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  int ifacies    = (int)dbgrid->getArray(iech, _indFacies);
+  Id ifacies    = (Id)dbgrid->getArray(iech, _indFacies);
   dbgrid->setArray(iech, _indFacies, -ifacies);
 }
 
@@ -641,7 +641,7 @@ void CalcSimuEden::_setFACIES_CORK(int iech)
  ** \param[in]  idate  Rank of the iteration
  **
  *****************************************************************************/
-void CalcSimuEden::_setDATE(int iech, int idate)
+void CalcSimuEden::_setDATE(Id iech, Id idate)
 {
   double value   = (IFFFF(idate)) ? TEST : idate;
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
@@ -655,7 +655,7 @@ void CalcSimuEden::_setDATE(int iech, int idate)
  *****************************************************************************/
 void CalcSimuEden::_statsInit()
 {
-  for (int lec = 0; lec < _nxyz; lec++)
+  for (Id lec = 0; lec < _nxyz; lec++)
   {
     if (!isAlreadyFilled(lec)) continue;
 
@@ -671,7 +671,7 @@ void CalcSimuEden::_statsInit()
  **  Check that the Maximum quantities have been reached
  **
  *****************************************************************************/
-int CalcSimuEden::_checkMax(double number_max, double volume_max)
+Id CalcSimuEden::_checkMax(double number_max, double volume_max)
 {
   if (FFFF(number_max) && FFFF(volume_max)) return (0);
 
@@ -679,8 +679,8 @@ int CalcSimuEden::_checkMax(double number_max, double volume_max)
 
   double totnum = 0;
   double totvol = 0.;
-  for (int ifluid = 0; ifluid < _nfluids; ifluid++)
-    for (int ifacies = 0; ifacies < _nfacies; ifacies++)
+  for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
+    for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
     {
       auto number   = _getStatCount(ifacies, ifluid);
       double volume = _getStatVolume(ifacies, ifluid);
@@ -704,14 +704,14 @@ int CalcSimuEden::_checkMax(double number_max, double volume_max)
  ** \param[out] ref_fluid_loc Current fluid value for the target cell
  **
  *****************************************************************************/
-int CalcSimuEden::_fluidModify(Skin* skin, int ipos, int* ref_fluid_loc)
+Id CalcSimuEden::_fluidModify(Skin* skin, Id ipos, Id* ref_fluid_loc)
 {
-  int ecr;
-  int ref_fluid = UNDEF_FLUID;
+  Id ecr;
+  Id ref_fluid = UNDEF_FLUID;
 
   /* Loop on the directions */
 
-  for (int dir = 0; dir < 6; dir++)
+  for (Id dir = 0; dir < 6; dir++)
   {
     ecr = skin->gridShift(ipos, dir);
     if (!IFFFF(ecr))
@@ -783,8 +783,8 @@ void CalcSimuEden::_statsPrint(const char* title)
 
   double totnum = 0;
   double totvol = 0.;
-  for (int ifluid = 0; ifluid < _nfluids; ifluid++)
-    for (int ifacies = 0; ifacies < _nfacies; ifacies++)
+  for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
+    for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
     {
       auto number   = _getStatCount(ifacies, ifluid);
       double volume = _getStatVolume(ifacies, ifluid);
@@ -816,11 +816,11 @@ void CalcSimuEden::_statsEmpty(const char* title)
   /* Print the statistics */
 
   double total   = 0;
-  int flag_title = 1;
-  for (int ifacies = 0; ifacies < _nfacies; ifacies++)
+  Id flag_title = 1;
+  for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
   {
-    int number = 0;
-    for (int i = 0; i < _nxyz; i++)
+    Id number = 0;
+    for (Id i = 0; i < _nxyz; i++)
     {
       if (!isToBeFilled(i)) continue;
       if (_getFACIES(i) == (ifacies + 1)) number++;
@@ -849,7 +849,7 @@ void CalcSimuEden::_calculateCumul(void)
 
   /* Loop on the cells of the matrix */
 
-  for (int iech = 0; iech < _nxyz; iech++)
+  for (Id iech = 0; iech < _nxyz; iech++)
   {
 
     /* Update the Fluid statistics */
@@ -859,7 +859,7 @@ void CalcSimuEden::_calculateCumul(void)
 
     /* Update the Cork statistics */
 
-    int ifacies = (int)dbgrid->getArray(iech, _indFacies);
+    Id ifacies = (Id)dbgrid->getArray(iech, _indFacies);
     if (ifacies < 0) dbgrid->updArray(iech, _iptrStatCork, EOperator::ADD, 1);
   }
 }
@@ -876,17 +876,17 @@ void CalcSimuEden::_calculateCumul(void)
  ** \li                       the cork (different from shale)
  **
  *****************************************************************************/
-void CalcSimuEden::_updateResults(int reset_facies, int show_fluid)
+void CalcSimuEden::_updateResults(Id reset_facies, Id show_fluid)
 
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
 
   /* Loop on the cells of the matrix */
 
-  for (int iech = 0; iech < _nxyz; iech++)
+  for (Id iech = 0; iech < _nxyz; iech++)
   {
     auto ifluid = _getFLUID_OLD(iech);
-    int ifacies = (int)dbgrid->getArray(iech, _indFacies);
+    Id ifacies = (Id)dbgrid->getArray(iech, _indFacies);
 
     /* Update the Facies information */
 
@@ -920,19 +920,19 @@ void CalcSimuEden::_updateResults(int reset_facies, int show_fluid)
  ** \param[in]  niter  Number of iterations
  **
  *****************************************************************************/
-void CalcSimuEden::_normalizeCumul(int niter)
+void CalcSimuEden::_normalizeCumul(Id niter)
 
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
 
   /* Loop on the cells of the matrix */
 
-  for (int iech = 0; iech < _nxyz; iech++)
+  for (Id iech = 0; iech < _nxyz; iech++)
   {
 
     /* Normalize the Fluid statistics */
 
-    for (int ifluid = 0; ifluid < _nfluids; ifluid++)
+    for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
       dbgrid->updArray(iech, _iptrStatFluid + ifluid, EOperator::DIVIDE, (double)niter);
 
     /* Update the Cork statistics */
@@ -941,18 +941,18 @@ void CalcSimuEden::_normalizeCumul(int niter)
   }
 }
 
-int CalcSimuEden::_countAlreadyFilled() const
+Id CalcSimuEden::_countAlreadyFilled() const
 {
-  int count = 0;
-  for (int lec = 0; lec < _nxyz; lec++)
+  Id count = 0;
+  for (Id lec = 0; lec < _nxyz; lec++)
     count += isAlreadyFilled(lec);
   return count;
 }
 
-int CalcSimuEden::_countIsToBeFilled() const
+Id CalcSimuEden::_countIsToBeFilled() const
 {
-  int count = 0;
-  for (int lec = 0; lec < _nxyz; lec++)
+  Id count = 0;
+  for (Id lec = 0; lec < _nxyz; lec++)
     count += isToBeFilled(lec);
   return count;
 }
@@ -1081,19 +1081,19 @@ void CalcSimuEden::_rollback()
 ** \remark  it is always <= number of cells invaded.
 **
 *****************************************************************************/
-int fluid_propagation(DbGrid* dbgrid,
+Id fluid_propagation(DbGrid* dbgrid,
                       const String& name_facies,
                       const String& name_fluid,
                       const String& name_perm,
                       const String& name_poro,
-                      int nfacies,
-                      int nfluids,
-                      int niter,
+                      Id nfacies,
+                      Id nfluids,
+                      Id niter,
                       const VectorInt& speeds,
                       bool show_fluid,
                       double number_max,
                       double volume_max,
-                      int seed,
+                      Id seed,
                       bool verbose,
                       const NamingConvention& namconv)
 {
@@ -1113,7 +1113,7 @@ int fluid_propagation(DbGrid* dbgrid,
   seden.setVolumeMax(volume_max);
 
   // Run the calculator
-  int error = (seden.run()) ? 0 : 1;
+  Id error = (seden.run()) ? 0 : 1;
   return error;
 }
 

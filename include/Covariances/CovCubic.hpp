@@ -31,7 +31,7 @@ public:
 
   String getFormula() const override;
   String         getCovName() const override { return "Cubic"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
   bool   hasCovDerivative() const override { return true; }
 
@@ -40,7 +40,7 @@ public:
 
 protected:
   double _evaluateCov(double h) const override;
-  double _evaluateCovDerivative(int degree, double h) const override;
+  double _evaluateCovDerivative(Id degree, double h) const override;
 };
 
 }

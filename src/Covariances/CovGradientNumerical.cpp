@@ -47,8 +47,8 @@ CovGradientNumerical::~CovGradientNumerical()
 {
 }
 
-double CovGradientNumerical::_evalZZ(int ivar,
-                                     int jvar,
+double CovGradientNumerical::_evalZZ(Id ivar,
+                                     Id jvar,
                                      const SpacePoint& p1,
                                      const SpacePoint& p2,
                                      const CovCalcMode* mode) const
@@ -56,9 +56,9 @@ double CovGradientNumerical::_evalZZ(int ivar,
   return ACovGradient::_eval(p1, p2, ivar, jvar, mode);
 }
 
-double CovGradientNumerical::_evalZGrad(int ivar,
-                                        int jvar,
-                                        int idim,
+double CovGradientNumerical::_evalZGrad(Id ivar,
+                                        Id jvar,
+                                        Id idim,
                                         const SpacePoint& p1,
                                         const SpacePoint& p2,
                                         const CovCalcMode* mode) const
@@ -80,10 +80,10 @@ double CovGradientNumerical::_evalZGrad(int ivar,
   return (cov);
 }
 
-double CovGradientNumerical::_evalGradGrad(int ivar,
-                                           int jvar,
-                                           int idim,
-                                           int jdim,
+double CovGradientNumerical::_evalGradGrad(Id ivar,
+                                           Id jvar,
+                                           Id idim,
+                                           Id jdim,
                                            const SpacePoint& p1,
                                            const SpacePoint& p2,
                                            const CovCalcMode* mode) const
@@ -175,21 +175,21 @@ void CovGradientNumerical::evalZAndGradients(const SpacePoint& p1,
 
   //  Calculate covariance between point and gradient
 
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
     covGp[i] += _evalZGrad(0, 0, i, p1, p2, mode);
 
   //  Calculate the covariance between gradient and gradient
 
   if (flagGrad)
   {
-    int ecr = 0;
-    for (int i = 0; i < 3; i++)
-      for (int j = 0; j < 3; j++)
+    Id ecr = 0;
+    for (Id i = 0; i < 3; i++)
+      for (Id j = 0; j < 3; j++)
         covGG[ecr++] += _evalGradGrad(0, 0, i, j, p1, p2, mode);
   }
 }
 
-double CovGradientNumerical::eval0(int ivar, int jvar, const CovCalcMode* mode) const
+double CovGradientNumerical::eval0(Id ivar, Id jvar, const CovCalcMode* mode) const
 {
   SpacePoint p1;
   SpacePoint p2;
@@ -207,8 +207,8 @@ double CovGradientNumerical::eval0(int ivar, int jvar, const CovCalcMode* mode) 
  */
 double CovGradientNumerical::_eval(const SpacePoint& p1,
                                    const SpacePoint& p2,
-                                   int ivar,
-                                   int jvar,
+                                   Id ivar,
+                                   Id jvar,
                                    const CovCalcMode* mode) const
 {
   double cov = 0.;
@@ -217,8 +217,8 @@ double CovGradientNumerical::_eval(const SpacePoint& p1,
     cov = _evalZZ(ivar, jvar, p1, p2, mode);
   else
   {
-    int idim = ivar - 1;
-    int jdim = jvar - 1;
+    Id idim = ivar - 1;
+    Id jdim = jvar - 1;
     if (ivar == 0)
       cov = -_evalZGrad(0, 0, jdim, p1, p2, mode);
     else if (jvar == 0)

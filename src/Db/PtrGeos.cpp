@@ -21,7 +21,7 @@ namespace gstlrn
 typedef struct
 {
   char SREF[LOCAL_SIZE];       /* Name of the Locator */
-  int IREF;                    /* Unicity of the locator */
+  Id IREF;                    /* Unicity of the locator */
   char COMMENT[STRING_LENGTH]; /* Meaning */
 } Def_Locator;
 
@@ -61,33 +61,33 @@ void PtrGeos::clear()
   _r.clear();
 }
 
-void PtrGeos::erase(int locatorIndex)
+void PtrGeos::erase(Id locatorIndex)
 {
   _r.erase(_r.begin() + locatorIndex);
 }
 
-int PtrGeos::findUIDInLocator(int iuid) const
+Id PtrGeos::findUIDInLocator(Id iuid) const
 {
-  for (int locatorIndex = 0; locatorIndex < getNLoc(); locatorIndex++)
+  for (Id locatorIndex = 0; locatorIndex < getNLoc(); locatorIndex++)
     if (getLocatorByIndex(locatorIndex) == iuid) return (locatorIndex);
   return -1;
 }
 
-String PtrGeos::dumpLocator(int rank, const ELoc& locatorType) const
+String PtrGeos::dumpLocator(Id rank, const ELoc& locatorType) const
 {
   std::stringstream sstr;
 
   auto i = locatorType.getValue();
   sstr << rank + 1 << " - Locator: " << DEF_LOCATOR[i].SREF << std::endl;
   sstr << "- Attributes = ";
-  for (int locatorIndex = 0; locatorIndex < getNLoc(); locatorIndex++)
+  for (Id locatorIndex = 0; locatorIndex < getNLoc(); locatorIndex++)
     sstr << _r[locatorIndex] << " ";
   sstr << std::endl;
 
   return sstr.str();
 }
 
-bool PtrGeos::isLocatorIndexValid(int locatorIndex) const
+bool PtrGeos::isLocatorIndexValid(Id locatorIndex) const
 {
   return checkArg("Locator Index", locatorIndex, getNLoc());
 }
@@ -98,7 +98,7 @@ bool PtrGeos::isLocatorIndexValid(int locatorIndex) const
  * @param locatorIndex   Rank within the locator starting from 1 (can be <0 for the keyword only)
  * @return
  */
-String getLocatorName(const ELoc& locatorType, int locatorIndex)
+String getLocatorName(const ELoc& locatorType, Id locatorIndex)
 {
   std::stringstream sstr;
   if (locatorType == ELoc::UNKNOWN)
@@ -143,7 +143,7 @@ bool isLocatorTypeValid(const ELoc& locatorType, bool unknownValid)
   return true;
 }
 
-int getLocatorTypeFromName(const String& name_type)
+Id getLocatorTypeFromName(const String& name_type)
 {
   auto it = ELoc::getIterator();
   while (it.hasNext())
@@ -167,13 +167,13 @@ int getLocatorTypeFromName(const String& name_type)
  * @param ret_mult   Resulting Locator multiplicity (1: unique; 0: multiple)
  * @return Error code
  */
-int locatorIdentify(String string, ELoc* ret_locatorType, int* ret_locatorIndex, int* ret_mult)
+Id locatorIdentify(String string, ELoc* ret_locatorType, Id* ret_locatorIndex, Id* ret_mult)
 {
   *ret_locatorType  = ELoc::UNKNOWN;
   *ret_locatorIndex = -1;
   *ret_mult         = 1;
-  int inum          = -1;
-  int found         = -1;
+  Id inum          = -1;
+  Id found         = -1;
   bool mult         = 0;
 
   // Transform the input argument into lower case for comparison

@@ -50,7 +50,7 @@ SPDE::SPDE(const Db* dbin,
            Db* dbout,
            Model* model,
            bool flagSimu,
-           int useCholesky,
+           Id useCholesky,
            const SPDEParam& params)
   : _dbin(dbin)
   , _dbout(dbout)
@@ -85,12 +85,12 @@ SPDE::~SPDE()
 {
   if (_createMeshesK && !_meshesK.empty())
   {
-    for (int i = 0, n = _meshesK.size(); i < n; i++)
+    for (Id i = 0, n = _meshesK.size(); i < n; i++)
       delete _meshesK[i];
   }
   if (_createMeshesS && !_meshesS.empty())
   {
-    for (int i = 0, n = _meshesS.size(); i < n; i++)
+    for (Id i = 0, n = _meshesS.size(); i < n; i++)
       delete _meshesS[i];
   }
 
@@ -111,7 +111,7 @@ SPDE::~SPDE()
  * @param model: The ModelGeneric to use
  * @param verbose: Verbose flag
  */
-void SPDE::_defineFlagCholesky(int useCholesky, const Model* model, bool verbose)
+void SPDE::_defineFlagCholesky(Id useCholesky, const Model* model, bool verbose)
 {
   if (useCholesky == -1)
   {
@@ -139,13 +139,13 @@ VectorMeshes SPDE::_defineMeshFromDbs(bool flagKrige)
   bool isBuilt     = false;
   const Db* domain = Db::coverSeveralDbs(_dbin, _dbout, &isBuilt);
 
-  int refine  = (flagKrige) ? _params.getRefineK() : _params.getRefineS();
-  int ncovtot = _model->getNCov(false);
-  int ncov    = _model->getNCov(true);
+  Id refine  = (flagKrige) ? _params.getRefineK() : _params.getRefineS();
+  Id ncovtot = _model->getNCov(false);
+  Id ncov    = _model->getNCov(true);
   VectorMeshes meshes(ncov);
 
   // Create as many meshes as they are structures (nugget excluded)
-  for (int jcov = 0, icov = 0; jcov < ncovtot; jcov++)
+  for (Id jcov = 0, icov = 0; jcov < ncovtot; jcov++)
   {
     if (_model->getCovType(jcov) == ECov::NUGGET) continue;
     const CovAniso* cova = _model->getCovAniso(jcov);
@@ -161,8 +161,8 @@ VectorMeshes SPDE::_defineMeshFromDbs(bool flagKrige)
 
 void SPDE::_printMeshesDetails(const VectorMeshes& meshes)
 {
-  int nmesh = (int)meshes.size();
-  for (int imesh = 0; imesh < nmesh; imesh++)
+  Id nmesh = (Id)meshes.size();
+  for (Id imesh = 0; imesh < nmesh; imesh++)
   {
     message("- Mesh #%d/%d: NMeshes = %d, NApices = %d\n",
             imesh + 1, nmesh, meshes[imesh]->getNMeshes(), meshes[imesh]->getNApices());
@@ -175,13 +175,13 @@ void SPDE::_printMeshesDetails(const VectorMeshes& meshes)
  * @param flagKrige True if this method is used for Kriging (rather than Simulation)
  * @param meshesIn Input Set of Mesh (one per structure, nugget excluded)
  * @param verbose Verbose flag
- * @return int Error return code
+ * @return Id Error return code
  */
-int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose)
+Id SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose)
 {
   auto& meshes     = flagKrige ? _meshesK : _meshesS;
   auto& createMesh = flagKrige ? _createMeshesK : _createMeshesS;
-  int ncov         = _model->getNCov(true);
+  Id ncov         = _model->getNCov(true);
   auto nmesh       = meshesIn.size();
 
   createMesh = false;
@@ -205,11 +205,11 @@ int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose
       }
     }
   }
-  else if (nmesh == 1 && (int)nmesh != ncov)
+  else if (nmesh == 1 && (Id)nmesh != ncov)
   {
     // Particular case of a single mesh: simply duplicate it (without creating new contents)
     meshes.resize(ncov);
-    for (int icov = 0; icov < ncov; icov++)
+    for (Id icov = 0; icov < ncov; icov++)
       meshes[icov] = meshesIn[0];
     if (verbose)
     {
@@ -217,7 +217,7 @@ int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose
       _printMeshesDetails(meshes);
     }
   }
-  else if ((int)nmesh == ncov)
+  else if ((Id)nmesh == ncov)
   {
     // If the dimensions 'nmesh' and 'ncov' match: copy pointer of the input VectorMeshes
     meshes = meshesIn;
@@ -241,7 +241,7 @@ int SPDE::_defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose
  * @param verbose Verbose flag
  * @return Pointer to the ProjMultiMatrix used in output (or nullptr)
  */
-int SPDE::_defineProjection(bool flagIn,
+Id SPDE::_defineProjection(bool flagIn,
                             bool flagKrige,
                             const ProjMultiMatrix* projIn,
                             bool verbose)
@@ -260,8 +260,8 @@ int SPDE::_defineProjection(bool flagIn,
   if (meshes.empty()) return 0;
 
   // Get the number of structures
-  int ncov = _model->getNCov(true);
-  int nvar = _model->getNVar();
+  Id ncov = _model->getNCov(true);
+  Id nvar = _model->getNVar();
 
   // Case where the projection matrix has not been provided, create it
   if (projIn == nullptr)
@@ -289,32 +289,32 @@ int SPDE::_defineProjection(bool flagIn,
   }
 
   // The projection matrix is provided: check consistency of its dimensions
-  int npoint  = projIn->getNPoint();
-  int napices = projIn->getNApex();
+  Id npoint  = projIn->getNPoint();
+  Id napices = projIn->getNApex();
 
-  int ncol = 0;
-  for (int icov = 0; icov < ncov; icov++)
-    for (int ivar = 0; ivar < nvar; ivar++)
+  Id ncol = 0;
+  for (Id icov = 0; icov < ncov; icov++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
       ncol += meshes[icov]->getNApices();
   if (ncol != napices)
   {
     messerr("Number of Columns of 'projm' (%d) is not correct", napices);
     messerr("- Number of covariances = %d", ncov);
     messerr("- Number of variables = %d", nvar);
-    for (int icov = 0; icov < nvar; icov++)
+    for (Id icov = 0; icov < nvar; icov++)
       messerr("- Number of apices for Meshing (%d) = %d",
               icov + 1, meshes[icov]->getNApices());
     return 1;
   }
 
-  int nrow = 0;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  Id nrow = 0;
+  for (Id ivar = 0; ivar < nvar; ivar++)
     nrow += db->getNSampleActiveAndDefined(ivar);
   if (nrow != npoint)
   {
     messerr("Number of Rows of 'projm' (%d) is not correct", npoint);
     messerr("- Number of variables = %d", nvar);
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
       messerr("- Number of samples for variable %d = %d\n",
               ivar, db->getNSampleActiveAndDefined(ivar));
     return 1;
@@ -327,7 +327,7 @@ int SPDE::_defineProjection(bool flagIn,
   return 0;
 }
 
-int SPDE::defineShiftOperator(bool verbose)
+Id SPDE::defineShiftOperator(bool verbose)
 {
   delete _spdeop;
 
@@ -361,7 +361,7 @@ int SPDE::defineShiftOperator(bool verbose)
   return 0;
 }
 
-int SPDE::defineMeshes(const VectorMeshes& meshesK,
+Id SPDE::defineMeshes(const VectorMeshes& meshesK,
                        const VectorMeshes& meshesS,
                        bool verbose)
 {
@@ -376,7 +376,7 @@ int SPDE::defineMeshes(const VectorMeshes& meshesK,
   return 0;
 }
 
-int SPDE::defineProjections(const ProjMultiMatrix* projInK,
+Id SPDE::defineProjections(const ProjMultiMatrix* projInK,
                             const ProjMultiMatrix* projInS,
                             bool verbose)
 {
@@ -404,7 +404,7 @@ int SPDE::defineProjections(const ProjMultiMatrix* projInK,
   return 0;
 }
 
-int SPDE::centerDataByDriftInPlace(VectorDouble& Z, bool verbose)
+Id SPDE::centerDataByDriftInPlace(VectorDouble& Z, bool verbose)
 {
   if (Z.empty()) return 1;
   _driftCoeffs.clear();
@@ -427,17 +427,17 @@ int SPDE::centerDataByDriftInPlace(VectorDouble& Z, bool verbose)
 
 void SPDE::uncenterResultByDriftInPlace(VectorDouble& result)
 {
-  int nvar               = _model->getNVar();
-  int nech               = _dbout->getNSample();
-  int nechred            = _dbout->getNSample(true);
+  Id nvar               = _model->getNVar();
+  Id nech               = _dbout->getNSample();
+  Id nechred            = _dbout->getNSample(true);
   bool mustEvaluateDrift = (_model->getNDrift() > 0);
 
   // Loop on the samples of the output file
 
   double value;
-  int ncols = 0;
+  Id ncols = 0;
   MatrixDense mat;
-  for (int jech = 0, iech = 0; jech < nech; jech++)
+  for (Id jech = 0, iech = 0; jech < nech; jech++)
   {
     if (!_dbout->isActive(jech)) continue;
 
@@ -450,12 +450,12 @@ void SPDE::uncenterResultByDriftInPlace(VectorDouble& result)
 
     // Loop on the variables
 
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       value = 0.;
       if (mustEvaluateDrift)
       {
-        for (int icol = 0; icol < ncols; icol++)
+        for (Id icol = 0; icol < ncols; icol++)
           value += mat.getValue(ivar, icol) * _driftCoeffs[icol];
       }
       else
@@ -476,13 +476,13 @@ void SPDE::uncenterResultByDriftInPlace(VectorDouble& result)
  */
 void SPDE::addNuggetToResult(VectorDouble& result)
 {
-  int rankNugget = _model->getRankNugget();
+  Id rankNugget = _model->getRankNugget();
   if (rankNugget < 0) return;
-  int nvar = _model->getNVar();
-  for (int ivar = 0, ecr = 0; ivar < nvar; ivar++)
+  Id nvar = _model->getNVar();
+  for (Id ivar = 0, ecr = 0; ivar < nvar; ivar++)
   {
     double nugget = _model->getSill(rankNugget, ivar, ivar);
-    for (int iech = 0, nech = (int)result.size(); iech < nech; iech++, ecr++)
+    for (Id iech = 0, nech = (Id)result.size(); iech < nech; iech++, ecr++)
       result[iech] += law_gaussian(0., sqrt(nugget));
   }
 }
@@ -504,7 +504,7 @@ void SPDE::addNuggetToResult(VectorDouble& result)
 VectorDouble trendSPDE(Db* dbin,
                        Db* dbout,
                        Model* model,
-                       int useCholesky,
+                       Id useCholesky,
                        const VectorMeshes& meshesK,
                        const ProjMultiMatrix* projInK,
                        const SPDEParam& params,
@@ -517,7 +517,7 @@ VectorDouble trendSPDE(Db* dbin,
 
   // Instantiate SPDE class
   SPDE spde(dbin, dbout, model, false, useCholesky, params);
-  if (verbose) mestitle(1, "Trend in SPDE framework (Cholesky=%d)", (int)spde.getFlagCholesky());
+  if (verbose) mestitle(1, "Trend in SPDE framework (Cholesky=%d)", (Id)spde.getFlagCholesky());
 
   // Define Meshes
   if (spde.defineMeshes(meshesK, VectorMeshes(), verbose)) return 1;
@@ -571,12 +571,12 @@ VectorDouble trendSPDE(Db* dbin,
  *
  * 'meshesS' and 'projInS' are used only if 'flag_std' is true and useCholesky=0
  */
-int krigingSPDE(Db* dbin,
+Id krigingSPDE(Db* dbin,
                 Db* dbout,
                 Model* model,
                 bool flag_est,
                 bool flag_std,
-                int useCholesky,
+                Id useCholesky,
                 const VectorMeshes& meshesK,
                 const ProjMultiMatrix* projInK,
                 const VectorMeshes& meshesS,
@@ -593,7 +593,7 @@ int krigingSPDE(Db* dbin,
   // Instantiate SPDE class
   SPDE spde(dbin, dbout, model, false, useCholesky, params);
 
-  if (verbose) mestitle(1, "Kriging in SPDE framework (Cholesky=%d)", (int)spde.getFlagCholesky());
+  if (verbose) mestitle(1, "Kriging in SPDE framework (Cholesky=%d)", (Id)spde.getFlagCholesky());
 
   // Define Meshes
   if (spde.defineMeshes(meshesK, meshesS, verbose)) return 1;
@@ -610,20 +610,20 @@ int krigingSPDE(Db* dbin,
 
   // Performing the task and storing results in 'dbout'
   // This is performed in ONE step to avoid additional core allocation
-  int nvar = model->getNVar();
+  Id nvar = model->getNVar();
   VectorDouble result;
   if (flag_est)
   {
     result = spde.getSPDEOp()->kriging(Z);
     spde.uncenterResultByDriftInPlace(result);
-    int iuid = dbout->addColumns(result, "estim", ELoc::Z, 0, true, 0., nvar);
+    Id iuid = dbout->addColumns(result, "estim", ELoc::Z, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                                 "estim");
   }
   if (flag_std)
   {
     result   = spde.getSPDEOp()->stdev(Z, spde.getNMC(), spde.getSeed());
-    int iuid = dbout->addColumns(result, "stdev", ELoc::UNKNOWN, 0, true, 0., nvar);
+    Id iuid = dbout->addColumns(result, "stdev", ELoc::UNKNOWN, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                                 "stdev");
   }
@@ -664,11 +664,11 @@ int krigingSPDE(Db* dbin,
  * - If 'mesheS' does not exist, 'meshesK' is used instead
  * - If 'projInS' does not exist, 'projInK' is used instead
  */
-int simulateSPDE(Db* dbin,
+Id simulateSPDE(Db* dbin,
                  Db* dbout,
                  Model* model,
-                 int nbsimu,
-                 int useCholesky,
+                 Id nbsimu,
+                 Id useCholesky,
                  const VectorMeshes& meshesK,
                  const ProjMultiMatrix* projInK,
                  const VectorMeshes& meshesS,
@@ -683,7 +683,7 @@ int simulateSPDE(Db* dbin,
   // Instantiate SPDE class
   SPDE spde(dbin, dbout, model, true, useCholesky, params);
   if (verbose) mestitle(1, "Simulation in SPDE framework (cond=%d, Cholesky=%d)",
-                        dbin != nullptr, (int)spde.getFlagCholesky());
+                        dbin != nullptr, (Id)spde.getFlagCholesky());
 
   // Define Meshes
   if (spde.defineMeshes(meshesK, meshesS, verbose)) return 1;
@@ -705,22 +705,22 @@ int simulateSPDE(Db* dbin,
 
   // Perform the Simulation and storage.
   // All is done in ONE step to avoid additional storage
-  int nvar    = model->getNVar();
-  int iuid    = dbout->addColumnsByConstant(nvar * nbsimu);
-  int nechred = dbout->getNSample(true);
+  Id nvar    = model->getNVar();
+  Id iuid    = dbout->addColumnsByConstant(nvar * nbsimu);
+  Id nechred = dbout->getNSample(true);
   VectorDouble local(nechred);
   VectorDouble result;
 
-  for (int isimu = 0; isimu < nbsimu; isimu++)
+  for (Id isimu = 0; isimu < nbsimu; isimu++)
   {
     result = (spde.getFlagCond()) ? spde.getSPDEOp()->simCond(Z) : spde.getSPDEOp()->simNonCond();
     spde.addNuggetToResult(result);
     spde.uncenterResultByDriftInPlace(result);
 
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       VH::extractInPlace(result, local, ivar * nechred);
-      int juid = iuid + ivar * nbsimu + isimu;
+      Id juid = iuid + ivar * nbsimu + isimu;
       dbout->setColumnByUID(local, juid, true);
     }
   }
@@ -764,12 +764,12 @@ int simulateSPDE(Db* dbin,
  * - If 'mesheS' does not exist, 'meshesK' is used instead
  * - If 'projInS' does not exist, 'projInK' is used instead
  */
-int simPGSSPDE(Db* dbin,
+Id simPGSSPDE(Db* dbin,
                Db* dbout,
                Model* model,
                const RuleProp& ruleprop,
-               int nbsimu,
-               int useCholesky,
+               Id nbsimu,
+               Id useCholesky,
                const VectorMeshes& meshesK,
                const ProjMultiMatrix* projInK,
                const VectorMeshes& meshesS,
@@ -784,7 +784,7 @@ int simPGSSPDE(Db* dbin,
   // Instantiate SPDE class
   SPDE spde(dbin, dbout, model, true, useCholesky, params);
   if (verbose) mestitle(1, "PluriGaussian Simulation in SPDE framework (cond=%d, Cholesky=%d)",
-                        dbin != nullptr, (int)spde.getFlagCholesky());
+                        dbin != nullptr, (Id)spde.getFlagCholesky());
 
   // Define Meshes
   if (spde.defineMeshes(meshesK, meshesS, verbose)) return 1;
@@ -805,9 +805,9 @@ int simPGSSPDE(Db* dbin,
 
   // Perform the Simulation and storage.
   // All is done in ONE step to avoid additional storage
-  int nvar = model->getNVar();
+  Id nvar = model->getNVar();
 
-  int nechred = dbout->getNSample(true);
+  Id nechred = dbout->getNSample(true);
   VectorDouble local(nechred);
   VectorDouble result;
 
@@ -815,16 +815,16 @@ int simPGSSPDE(Db* dbin,
     ruleprop.categoryToThresh(dbin);
 
   // Loop on the simulations
-  for (int isimu = 0; isimu < nbsimu; isimu++)
+  for (Id isimu = 0; isimu < nbsimu; isimu++)
   {
-    int iuid = dbout->addColumnsByConstant(nvar);
+    Id iuid = dbout->addColumnsByConstant(nvar);
 
     result = (spde.getFlagCond()) ? spde.getSPDEOp()->simCond(Z) : spde.getSPDEOp()->simNonCond();
     spde.addNuggetToResult(result);
     spde.uncenterResultByDriftInPlace(result);
 
     // Loop on the variables
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       VH::extractInPlace(result, local, ivar * nechred);
       dbout->setColumnByUID(local, iuid + ivar, true);
@@ -853,7 +853,7 @@ int simPGSSPDE(Db* dbin,
  */
 double logLikelihoodSPDE(Db* dbin,
                          Model* model,
-                         int useCholesky,
+                         Id useCholesky,
                          const VectorMeshes& meshes,
                          const ProjMultiMatrix* projIn,
                          const SPDEParam& params,
@@ -870,7 +870,7 @@ double logLikelihoodSPDE(Db* dbin,
   // Instantiate SPDE class
   SPDE spde(dbin, nullptr, model, false, useCholesky, params);
   if (verbose) mestitle(1, "Log-likelhood calculation in SPDE framework( Cholesky=%d)",
-                        (int)spde.getFlagCholesky());
+                        (Id)spde.getFlagCholesky());
 
   // Define Meshes
   if (spde.defineMeshes(meshes, VectorMeshes(), verbose)) return 1;
@@ -886,7 +886,7 @@ double logLikelihoodSPDE(Db* dbin,
   if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
 
   // Performing the task
-  int size       = (int)Z.size();
+  Id size       = (Id)Z.size();
   double logdet  = spde.getSPDEOp()->computeTotalLogDet(spde.getNMC(), spde.getSeed());
   double quad    = spde.getSPDEOp()->computeQuadratic(Z);
   double loglike = TEST;

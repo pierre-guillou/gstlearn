@@ -48,7 +48,7 @@
 
 namespace gstlrn
 {
-int NDIM_LOCAL = 0;
+Id NDIM_LOCAL = 0;
 VectorDouble X1_LOCAL;
 VectorDouble X2_LOCAL;
 
@@ -67,15 +67,15 @@ Model* model_duplicate_for_gradient(const Model* model, double ball_radius)
 {
   Model* new_model;
   const CovAniso* cova;
-  int new_nvar, nfact;
+  Id new_nvar, nfact;
   double sill;
 
   // Preliminary checks
 
   new_model = nullptr;
-  int nvar  = model->getNVar();
-  int ndim  = model->getNDim();
-  int ncova = model->getNCov();
+  Id nvar  = model->getNVar();
+  Id ndim  = model->getNDim();
+  Id ncova = model->getNCov();
 
   // Create the new model (linked drift functions)
 
@@ -98,12 +98,12 @@ Model* model_duplicate_for_gradient(const Model* model, double ball_radius)
 
   CovAnisoList* covs = new CovLMGradient(ctxt);
 
-  int lec = 0;
-  for (int icov = 0; icov < ncova; icov++)
+  Id lec = 0;
+  for (Id icov = 0; icov < ncova; icov++)
   {
     cova = model->getCovAniso(icov);
     sill = model->getSill(icov, 0, 0);
-    for (int ifact = 0; ifact < nfact; ifact++, lec++)
+    for (Id ifact = 0; ifact < nfact; ifact++, lec++)
     {
       CovAniso* covnew = nullptr;
       covnew           = new CovGradientNumerical(cova->getType(), ball_radius, ctxt);
@@ -182,15 +182,15 @@ Model* model_duplicate_for_gradient(const Model* model, double ball_radius)
  *****************************************************************************/
 void model_covupdt(Model* model,
                    const double* c0,
-                   int flag_verbose,
-                   int* flag_nugget,
+                   Id flag_verbose,
+                   Id* flag_nugget,
                    double* nugget)
 {
   /// TODO : dead code ?
   CovAniso* cova;
   double diff;
-  int i, icov, jcov, nvar, ncova, rank_nugget, rank_exceed, ivar, jvar;
-  int flag_update, flag_rescale;
+  Id i, icov, jcov, nvar, ncova, rank_nugget, rank_exceed, ivar, jvar;
+  Id flag_update, flag_rescale;
   VectorInt rank;
   VectorDouble range;
   VectorDouble silltot;
@@ -334,14 +334,14 @@ void model_covupdt(Model* model,
  *****************************************************************************/
 void model_cova_characteristics(const ECov& type,
                                 char cov_name[STRING_LENGTH],
-                                int* flag_range,
-                                int* flag_param,
-                                int* min_order,
-                                int* max_ndim,
-                                int* flag_int_1d,
-                                int* flag_int_2d,
-                                int* flag_aniso,
-                                int* flag_rotation,
+                                Id* flag_range,
+                                Id* flag_param,
+                                Id* min_order,
+                                Id* max_ndim,
+                                Id* flag_int_1d,
+                                Id* flag_int_2d,
+                                Id* flag_aniso,
+                                Id* flag_rotation,
                                 double* scale,
                                 double* parmax)
 {
@@ -436,7 +436,7 @@ Model* model_combine(const Model* model1, const Model* model2, double r)
   model->setMeans(mean);
   /* Add the covariance of the first Model */
 
-  for (int i = 0; i < model1->getNCov(); i++)
+  for (Id i = 0; i < model1->getNCov(); i++)
   {
     const CovAniso* cova = model1->getCovAniso(i);
     sill.setValue(0, 0, cova->getSill(0, 0));
@@ -448,7 +448,7 @@ Model* model_combine(const Model* model1, const Model* model2, double r)
 
   /* Add the covariance of the second Model */
 
-  for (int i = 0; i < model2->getNCov(); i++)
+  for (Id i = 0; i < model2->getNCov(); i++)
   {
     const CovAniso* cova = model2->getCovAniso(i);
     sill.setValue(0, 0, 0.);
@@ -498,21 +498,21 @@ Model* model_combine(const Model* model1, const Model* model2, double r)
  ** \remark must provide the coordinates of the origin point.
  **
  *****************************************************************************/
-int model_covmat_inchol(int verbose,
+Id model_covmat_inchol(Id verbose,
                         Db* db,
                         Model* model,
                         double eta,
-                        int npivot_max,
-                        int nsize1,
-                        const int* ranks1,
+                        Id npivot_max,
+                        Id nsize1,
+                        const Id* ranks1,
                         const double* center,
-                        int flag_sort,
-                        int* npivot_arg,
-                        int** Pret,
+                        Id flag_sort,
+                        Id* npivot_arg,
+                        Id** Pret,
                         double** Gret,
                         const CovCalcMode* mode)
 {
-  int *pvec, i, j, npivot, jstar, nech, error, flag_incr;
+  Id *pvec, i, j, npivot, jstar, nech, error, flag_incr;
   double *G, *Gmatrix, g, residual, maxdiag, tol, b, c00;
   VectorDouble d1;
   VectorDouble diag;
@@ -529,7 +529,7 @@ int model_covmat_inchol(int verbose,
   d1.resize(db->getNDim());
   diag.resize(nech);
   crit.resize(1 + nech);
-  pvec = (int*)mem_alloc(sizeof(int) * nech, 0);
+  pvec = (Id*)mem_alloc(sizeof(Id) * nech, 0);
   if (pvec == nullptr) goto label_end;
   c00 = model->evaluateOneGeneric(nullptr, VectorDouble(), 1., mode);
   for (i = 0; i < nech; i++)
@@ -542,7 +542,7 @@ int model_covmat_inchol(int verbose,
     {
       double covar2 = 0.;
 
-      for (int idim = 0; idim < 3; idim++)
+      for (Id idim = 0; idim < 3; idim++)
         d1[idim] = db->getCoordinate(pvec[i], idim) - center[idim];
       covar2  = model->evaluateOneGeneric(nullptr, d1, 1., mode);
       diag[i] = 2. * (c00 - covar2);
@@ -617,11 +617,11 @@ int model_covmat_inchol(int verbose,
         (void)distance_intra(db, pvec[i], pvec[npivot], d1.data());
         covar1 = model->evaluateOneGeneric(nullptr, d1, 1., mode);
 
-        for (int idim = 0; idim < 3; idim++)
+        for (Id idim = 0; idim < 3; idim++)
           d1[idim] = db->getCoordinate(pvec[npivot], idim) - center[idim];
         covar2 = model->evaluateOneGeneric(nullptr, d1, 1., mode);
 
-        for (int idim = 0; idim < 3; idim++)
+        for (Id idim = 0; idim < 3; idim++)
           d1[idim] = db->getCoordinate(pvec[i], idim) - center[idim];
         covar3 = model->evaluateOneGeneric(nullptr, d1, 1., mode);
 
@@ -650,7 +650,7 @@ int model_covmat_inchol(int verbose,
       {
         double covar2 = 0.;
 
-        for (int idim = 0; idim < 3; idim++)
+        for (Id idim = 0; idim < 3; idim++)
           d1[idim] = db->getCoordinate(pvec[i], idim) - center[idim];
         covar2 = model->evaluateOneGeneric(nullptr, d1, 1., mode);
 

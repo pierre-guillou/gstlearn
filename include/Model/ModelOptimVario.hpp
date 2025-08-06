@@ -47,17 +47,17 @@ public:
 protected:
   struct OneLag
   {
-    int _ivar;
-    int _jvar;
+    Id _ivar;
+    Id _jvar;
     double _weight;
     double _gg;
     SpacePoint _P;
   };
 
 private:
-  int  _buildExperimental();
+  Id  _buildExperimental();
   bool _checkConsistency();
-  OneLag _createOneLag(int ndim, int idir, int ivar, int jvar, double gg, double dist) const;
+  OneLag _createOneLag(Id ndim, Id idir, Id ivar, Id jvar, double gg, double dist) const;
   VectorDouble _resid;
 protected:
   // Model fitting options

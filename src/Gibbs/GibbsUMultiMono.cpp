@@ -62,7 +62,7 @@ GibbsUMultiMono::~GibbsUMultiMono()
 ** \param[in]  verboseTimer True to show elapse times
 **
 *****************************************************************************/
-int GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
+Id GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 {
   Db* db = getDb();
 
@@ -75,7 +75,7 @@ int GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 
   // Loop on the variables
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     Model* model = getModels(ivar);
     _covmat[ivar].resize(nact * nact, 0.);
@@ -102,18 +102,18 @@ int GibbsUMultiMono::covmatAlloc(bool verbose, bool /*verboseTimer*/)
   return 0;
 }
 
-double GibbsUMultiMono::_getVariance(int ivar, int iact) const
+double GibbsUMultiMono::_getVariance(Id ivar, Id iact) const
 {
   auto nact = _getSampleRankNumber();
   return (1. / COVMAT(ivar, iact, iact));
 }
 
-double GibbsUMultiMono::_getEstimate(int icase, int ivar, int iact, VectorVectorDouble& y) const
+double GibbsUMultiMono::_getEstimate(Id icase, Id ivar, Id iact, VectorVectorDouble& y) const
 {
   auto nact = _getSampleRankNumber();
 
   double yk = 0.;
-  for (int jact = 0; jact < nact; jact++)
+  for (Id jact = 0; jact < nact; jact++)
   {
     yk -= y[icase][jact] * COVMAT(ivar, iact, jact);
   }
@@ -131,9 +131,9 @@ double GibbsUMultiMono::_getEstimate(int icase, int ivar, int iact, VectorVector
 **
 *****************************************************************************/
 void GibbsUMultiMono::update(VectorVectorDouble& y,
-                             int isimu,
-                             int ipgs,
-                             int iter)
+                             Id isimu,
+                             Id ipgs,
+                             Id iter)
 {
   double valsim;
   auto nact = _getSampleRankNumber();
@@ -147,10 +147,10 @@ void GibbsUMultiMono::update(VectorVectorDouble& y,
 
   /* Loop on the target */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     auto icase = getRank(ipgs, ivar);
-    for (int iact = 0; iact < nact; iact++)
+    for (Id iact = 0; iact < nact; iact++)
     {
       if (!_isConstraintTight(icase, iact, &valsim))
       {

@@ -38,7 +38,7 @@ ACalcDbToDb::~ACalcDbToDb()
 
 bool ACalcDbToDb::_checkSpaceDimension()
 {
-   int ndim = 0;
+   Id ndim = 0;
    if (_dbin != nullptr)
    {
      if (ndim > 0)
@@ -80,7 +80,7 @@ bool ACalcDbToDb::_checkSpaceDimension()
    return true;
 }
 
-bool ACalcDbToDb::_setNvar(int nvar, bool flagForce)
+bool ACalcDbToDb::_setNvar(Id nvar, bool flagForce)
 {
   if (nvar <= 0) return true;
   if (_nvar <= 0 || flagForce)
@@ -99,7 +99,7 @@ bool ACalcDbToDb::_setNvar(int nvar, bool flagForce)
   return true;
 }
 
-bool ACalcDbToDb::_setNdim(int ndim, bool flagForce)
+bool ACalcDbToDb::_setNdim(Id ndim, bool flagForce)
 {
   if (ndim <= 0) return true;
   if (_ndim <= 0 || flagForce)
@@ -120,7 +120,7 @@ bool ACalcDbToDb::_setNdim(int ndim, bool flagForce)
 
 bool ACalcDbToDb::_checkVariableNumber()
 {
-  int nvar = 0;
+  Id nvar = 0;
   if (_dbin != nullptr)
   {
     if (nvar > 0)
@@ -172,7 +172,7 @@ bool ACalcDbToDb::_preprocess()
  * @param whichDb 1 for 'dbin'  and 2 for 'dbout'
  * @return A pointer to the Db or nullptr
  */
-Db* ACalcDbToDb::_whichDb(int whichDb)
+Db* ACalcDbToDb::_whichDb(Id whichDb)
 {
   Db *db;
   if (whichDb == 1)
@@ -186,7 +186,7 @@ Db* ACalcDbToDb::_whichDb(int whichDb)
   return db;
 }
 
-String ACalcDbToDb::_identifyVariable(int iuid) const
+String ACalcDbToDb::_identifyVariable(Id iuid) const
 {
   return _dbin->getNameByUID(iuid);
 }
@@ -197,23 +197,23 @@ String ACalcDbToDb::_identifyVariable(int iuid) const
  * @param status  1 for variables to be stored; 2 for Temporary variable
  * @param iuids   Vector of UIDs of the new variable
  */
-void ACalcDbToDb::_storeInVariableList(int whichDb,
-                                       int status,
+void ACalcDbToDb::_storeInVariableList(Id whichDb,
+                                       Id status,
                                        const VectorInt &iuids)
 {
-  int number = (int) iuids.size();
+  Id number = (Id) iuids.size();
   if (number <= 0) return;
 
   if (whichDb == 1)
   {
     if (status == 1)
     {
-      for (int i = 0; i < number; i++)
+      for (Id i = 0; i < number; i++)
         _listVariablePermDbIn.push_back(iuids[i]);
     }
     else
     {
-      for (int i = 0; i < number; i++)
+      for (Id i = 0; i < number; i++)
         _listVariableTempDbIn.push_back(iuids[i]);
     }
   }
@@ -221,26 +221,26 @@ void ACalcDbToDb::_storeInVariableList(int whichDb,
   {
     if (status == 1)
     {
-      for (int i = 0; i < number; i++)
+      for (Id i = 0; i < number; i++)
         _listVariablePermDbOut.push_back(iuids[i]);
     }
     else
     {
-      for (int i = 0; i < number; i++)
+      for (Id i = 0; i < number; i++)
         _listVariableTempDbOut.push_back(iuids[i]);
     }
   }
 }
-int ACalcDbToDb::_addVariableDb(int whichDb,
-                                int status,
+Id ACalcDbToDb::_addVariableDb(Id whichDb,
+                                Id status,
                                 const ELoc& locatorType,
-                                int locatorIndex,
-                                int number,
+                                Id locatorIndex,
+                                Id number,
                                 double valinit)
 {
   Db *db = _whichDb(whichDb);
   if (db == nullptr) return -1;
-  int iuid = db->addColumnsByConstant(number, valinit, String(), locatorType,
+  Id iuid = db->addColumnsByConstant(number, valinit, String(), locatorType,
                                       locatorIndex);
   if (iuid < 0) return -1;
   VectorInt iuids = VH::sequence(number, iuid);
@@ -260,15 +260,15 @@ int ACalcDbToDb::_addVariableDb(int whichDb,
  * @param flagSetLocator True if the locator must be defined
  * @param locatorShift Shift to calculate the rank of the locator currently defined
  */
-void ACalcDbToDb::_renameVariable(int whichDb,
+void ACalcDbToDb::_renameVariable(Id whichDb,
                                   const VectorString& names,
                                   const ELoc& locatorType,
-                                  int nvar,
-                                  int iptr,
+                                  Id nvar,
+                                  Id iptr,
                                   const String& qualifier,
-                                  int count,
+                                  Id count,
                                   bool flagSetLocator,
-                                  int locatorShift)
+                                  Id locatorShift)
 {
   if (whichDb == 1)
     _namconv.setNamesAndLocators(_dbin, names, locatorType, nvar,
@@ -280,7 +280,7 @@ void ACalcDbToDb::_renameVariable(int whichDb,
                                  locatorShift);
 }
 
-void ACalcDbToDb::_cleanVariableDb(int status)
+void ACalcDbToDb::_cleanVariableDb(Id status)
 {
   // Dispatch
 
@@ -289,7 +289,7 @@ void ACalcDbToDb::_cleanVariableDb(int status)
     // In 'dbin'
     if (!_listVariablePermDbIn.empty())
     {
-      for (int i = 0; i < (int) _listVariablePermDbIn.size(); i++)
+      for (Id i = 0; i < (Id) _listVariablePermDbIn.size(); i++)
         _dbin->deleteColumnByUID(_listVariablePermDbIn[i]);
     }
     _listVariablePermDbIn.clear();
@@ -297,7 +297,7 @@ void ACalcDbToDb::_cleanVariableDb(int status)
     // In 'dbout'
     if (!_listVariablePermDbOut.empty())
     {
-      for (int i = 0; i < (int) _listVariablePermDbOut.size(); i++)
+      for (Id i = 0; i < (Id) _listVariablePermDbOut.size(); i++)
       {
         _dbout->deleteColumnByUID(_listVariablePermDbOut[i]);
       }
@@ -309,7 +309,7 @@ void ACalcDbToDb::_cleanVariableDb(int status)
     // In 'dbin'
     if (!_listVariableTempDbIn.empty())
     {
-      for (int i = 0; i < (int) _listVariableTempDbIn.size(); i++)
+      for (Id i = 0; i < (Id) _listVariableTempDbIn.size(); i++)
         _dbin->deleteColumnByUID(_listVariableTempDbIn[i]);
     }
     _listVariableTempDbIn.clear();
@@ -317,7 +317,7 @@ void ACalcDbToDb::_cleanVariableDb(int status)
     // In 'dbout'
     if (!_listVariableTempDbOut.empty())
     {
-      for (int i = 0; i < (int) _listVariableTempDbOut.size(); i++)
+      for (Id i = 0; i < (Id) _listVariableTempDbOut.size(); i++)
         _dbout->deleteColumnByUID(_listVariableTempDbOut[i]);
     }
     _listVariableTempDbOut.clear();
@@ -398,13 +398,13 @@ DbGrid* ACalcDbToDb::getGridout() const
  ** \remark When called with mode=-1, the variables are deleted (by type)
  **
  *****************************************************************************/
-int ACalcDbToDb::_expandInformation(int mode, const ELoc& locatorType) const
+Id ACalcDbToDb::_expandInformation(Id mode, const ELoc& locatorType) const
 {
   if (getDbin() == nullptr || getDbout() == nullptr) return 0;
 
   // Check the number of fields to be expanded
 
-  int ninfo;
+  Id ninfo;
   if (getDbout()->isGrid() && locatorType == ELoc::X)
     ninfo = getDbout()->getNDim();
   else
@@ -434,7 +434,7 @@ int ACalcDbToDb::_expandInformation(int mode, const ELoc& locatorType) const
     // locator of the newly created variables
     NamingConvention* namconv = NamingConvention::create("Migrate");
     namconv->setLocatorOutType(locatorType);
-    int error = migrateByLocator(dbgrid, getDbin(), locatorType, 1,
+    Id error = migrateByLocator(dbgrid, getDbin(), locatorType, 1,
                                  VectorDouble(), false, false, false, *namconv);
     delete namconv;
     if (error != 0) return 1;

@@ -40,9 +40,9 @@ public:
   const SpacePoint& getCoordAsSP() const { return *this; }
 
   const VectorDouble& getExtend() const { return _extend; }
-  double getExtend(int idim) const { return _extend[idim]; }
+  double getExtend(Id idim) const { return _extend[idim]; }
   void setExtend(const VectorDouble& extend) { _extend = extend; }
-  void setExtend(int i, double val){ _extend[i] = val; }
+  void setExtend(Id i, double val){ _extend[i] = val; }
   const double* getExtendP() const {return _extend.data(); }
   double* getExtendPM() {return _extend.data(); }
   void setCode(double code) { _code = code; }

@@ -53,41 +53,41 @@ public:
   KrigingSystem& operator=(const KrigingSystem& m) = delete;
   virtual ~KrigingSystem();
 
-  int resetData();
-  int setKrigOpt(const KrigOpt& krigopt);
-  int setKrigOptCalcul(const EKrigOpt& calcul,
+  Id resetData();
+  Id setKrigOpt(const KrigOpt& krigopt);
+  Id setKrigOptCalcul(const EKrigOpt& calcul,
                        const VectorInt& ndiscs = VectorInt(),
                        bool flag_per_cell      = false);
-  int setKrigOptXValid(bool flag_xvalid,
+  Id setKrigOptXValid(bool flag_xvalid,
                        bool flag_kfold,
                        bool optionXValidEstim = false,
                        bool optionXValidStdev = false,
                        bool optionXValidVarZ  = false);
-  int setKrigOptBayes(bool flag_bayes,
+  Id setKrigOptBayes(bool flag_bayes,
                       const VectorDouble& prior_mean,
                       const MatrixSymmetric& prior_cov);
-  int setKrigOptDataWeights(int iptrWeights, bool flagSet = true);
-  int setKrigOptFlagSimu(bool flagSimu, int nbsimu = 0, int rankPGS = -1);
-  int setKrigOptFlagGlobal(bool flag_global);
-  int setKrigOptFlagLTerm(bool flag_lterm);
-  int setKrigOptAnamophosis(AAnam* anam);
-  int setKrigOptFactorKriging(bool flag_factor_kriging);
+  Id setKrigOptDataWeights(Id iptrWeights, bool flagSet = true);
+  Id setKrigOptFlagSimu(bool flagSimu, Id nbsimu = 0, Id rankPGS = -1);
+  Id setKrigOptFlagGlobal(bool flag_global);
+  Id setKrigOptFlagLTerm(bool flag_lterm);
+  Id setKrigOptAnamophosis(AAnam* anam);
+  Id setKrigOptFactorKriging(bool flag_factor_kriging);
 
   // The subsequent methods do not require isReady() validation
-  int  updKrigOptEstim(int iptrEst, int iptrStd, int iptrVarZ, bool forceNoDual = false);
-  int  updKrigOptIclass(int index_class, int nclasses);
-  int  updKrigOptNeighOnly(int iptrNeigh);
+  Id  updKrigOptEstim(Id iptrEst, Id iptrStd, Id iptrVarZ, bool forceNoDual = false);
+  Id  updKrigOptIclass(Id index_class, Id nclasses);
+  Id  updKrigOptNeighOnly(Id iptrNeigh);
   bool isReady();
-  int  estimate(int iech_out);
+  Id  estimate(Id iech_out);
   void conclusion();
 
   // Methods used to return algebraic internal information
-  int getNDim() const { return (_model != nullptr) ? _model->getNDim() : 0; }
-  int getNVar() const { return (_model != nullptr) ? _model->getNVar() : 0; }
-  int getNech() const { return (int)_nbgh.size(); }
-  int getCovSize() const { return (!_Sigma.empty()) ? _Sigma.getNRows() : 0; }
-  int getDriftSize() const { return (!_X.empty()) ? _X.getNCols() : 0; }
-  int getNrhs() const { return (!_Sigma0.empty()) ? _Sigma0.getNCols() : 0; }
+  Id getNDim() const { return (_model != nullptr) ? _model->getNDim() : 0; }
+  Id getNVar() const { return (_model != nullptr) ? _model->getNVar() : 0; }
+  Id getNech() const { return (Id)_nbgh.size(); }
+  Id getCovSize() const { return (!_Sigma.empty()) ? _Sigma.getNRows() : 0; }
+  Id getDriftSize() const { return (!_X.empty()) ? _X.getNCols() : 0; }
+  Id getNrhs() const { return (!_Sigma0.empty()) ? _Sigma0.getNCols() : 0; }
 
   VectorInt             getSampleNbgh() const { return _nbgh; }
   VectorVectorDouble    getSampleCoordinates() const;
@@ -102,42 +102,42 @@ public:
   double                getLTerm() const { return _algebra.getLTerm(); }
 
 private:
-  int    _getNVar() const;
-  int    _getNVarCL() const;
-  int    _getNbfl() const;
-  int    _getNeq() const;
-  int    _getNFeq() const;
+  Id    _getNVar() const;
+  Id    _getNVarCL() const;
+  Id    _getNbfl() const;
+  Id    _getNeq() const;
+  Id    _getNFeq() const;
 
   void _resetMemoryGeneral();
   bool _isAuthorized() const;
 
   void _rhsDump();
   void _wgtDump();
-  void _estimateCalcul(int status);
-  void _simulateCalcul(int status);
-  void _neighCalcul(int status, const VectorDouble& tab);
-  void _estimateVarZ(int status);
-  void _estimateStdv(int status);
-  void _estimateEstim(int status);
-  void _dumpKrigingResults(int status);
-  void _dumpSimulationResults(int status);
+  void _estimateCalcul(Id status);
+  void _simulateCalcul(Id status);
+  void _neighCalcul(Id status, const VectorDouble& tab);
+  void _estimateVarZ(Id status);
+  void _estimateStdv(Id status);
+  void _estimateEstim(Id status);
+  void _dumpKrigingResults(Id status);
+  void _dumpSimulationResults(Id status);
   bool _isCorrect();
   bool _preparNoStat();
 
-  int    _bayesPreCalculations();
+  Id    _bayesPreCalculations();
   void   _bayesPreSimulate();
   void   _transformGaussianToRaw();
 
   void   _setInternalShortCutVariablesGeneral();
   void   _setInternalShortCutVariablesModel();
-  int    _setInternalShortCutVariablesNeigh();
+  Id    _setInternalShortCutVariablesNeigh();
 
   Model* _castInOldModel();
   VectorInt _xvalidUniqueIndices() const;
-  int  _updateForColCokMoving();
+  Id  _updateForColCokMoving();
 
   // Deprecated function
-  double _continuousMultiplier(int rank1, int rank2, double eps = EPSILON4);
+  double _continuousMultiplier(Id rank1, Id rank2, double eps = EPSILON4);
 
 private:
   Db* _dbin;
@@ -162,23 +162,23 @@ private:
   VectorDouble           _meansTarget; // Means for target (possible using matLC)
 
   /// UID for storage
-  int  _iptrEst;
-  int  _iptrStd;
-  int  _iptrVarZ;
+  Id  _iptrEst;
+  Id  _iptrStd;
+  Id  _iptrVarZ;
   bool _flagEst;
   bool _flagStd;
   bool _flagVarZ;
   bool _flagDataChanged;
 
   /// Option for Weights at Data locations
-  int  _iptrWeights;
+  Id  _iptrWeights;
   bool _flagWeights;
   bool _flagSet;
 
   /// Option for Simulation
   bool _flagSimu;
-  int  _nbsimu;
-  int  _rankPGS;
+  Id  _nbsimu;
+  Id  _rankPGS;
 
   /// Option for Cross_validation
   bool _xvalidEstim;
@@ -199,8 +199,8 @@ private:
 
   /// Option for (Disjunctive) Kriging of Factor
   bool _flagFactorKriging;
-  int  _nclasses;
-  int  _factorClass;
+  Id  _nclasses;
+  Id  _factorClass;
 
   /// Option for asking for Z * A-1 * Z
   bool _flagLTerm;
@@ -210,16 +210,16 @@ private:
 
   /// Option for Neighboring test
   bool _flagNeighOnly;
-  int _iptrNeigh;
+  Id _iptrNeigh;
 
   /// Local variables
-  int _iechOut;
-  int _ndim;
-  int _nvar;
-  int _nvarCL;
-  int _nech;
-  int _nfeq;
-  int _neq;
+  Id _iechOut;
+  Id _ndim;
+  Id _nvar;
+  Id _nvarCL;
+  Id _nech;
+  Id _nfeq;
+  Id _neq;
 
   /// Working arrays
   mutable VectorInt    _nbgh;

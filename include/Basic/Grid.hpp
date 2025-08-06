@@ -25,7 +25,7 @@ class GSTLEARN_EXPORT Grid: public AStringable, public ASerializable
 {
 
 public:
-  Grid(int ndim               = 0,
+  Grid(Id ndim               = 0,
        const VectorInt& nx    = VectorInt(),
        const VectorDouble& x0 = VectorDouble(),
        const VectorDouble& dx = VectorDouble());
@@ -40,39 +40,39 @@ public:
                                bool startFromZero = true,
                                bool invert        = true,
                                bool verbose       = false);
-  static int generateMirrorIndex(int nx, int ix);
+  static Id generateMirrorIndex(Id nx, Id ix);
 
-  void resetFromSpaceDimension(int ndim);
+  void resetFromSpaceDimension(Id ndim);
   void resetFromGrid(Grid* grid);
-  int resetFromVector(const VectorInt& nx        = VectorInt(),
+  Id resetFromVector(const VectorInt& nx        = VectorInt(),
                       const VectorDouble& dx     = VectorDouble(),
                       const VectorDouble& x0     = VectorDouble(),
                       const VectorDouble& angles = VectorDouble());
-  void setX0(int idim, double value);
-  void setDX(int idim, double value);
-  void setNX(int idim, int value);
+  void setX0(Id idim, double value);
+  void setDX(Id idim, double value);
+  void setNX(Id idim, Id value);
   void setRotationByMatrix(const MatrixSquare& rotmat);
   void setRotationByVector(const VectorDouble& rotmat);
   void setRotationByAngles(const VectorDouble& angles);
   void setRotationByAngle(double angle);
 
-  int getNDim() const { return _nDim; }
-  double getX0(int idim) const;
-  double getDX(int idim) const;
-  int getNX(int idim) const;
-  int getNTotal() const;
+  Id getNDim() const { return _nDim; }
+  double getX0(Id idim) const;
+  double getDX(Id idim) const;
+  Id getNX(Id idim) const;
+  Id getNTotal() const;
   double getCellSize() const;
-  double getExtend(int idim, bool flagCell = false) const;
+  double getExtend(Id idim, bool flagCell = false) const;
   double getVolume(bool flagCell = false) const;
   VectorDouble getExtends(bool flagCell = false) const;
 
   /// Interface to AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  void copyParams(int mode, const Grid& gridaux);
-  double getCoordinate(int rank, int idim, bool flag_rotate = true) const;
-  VectorDouble getCoordinatesByRank(int rank, bool flag_rotate = true) const;
-  void getCoordinatesByRankInPlace(VectorDouble& coor, int rank, bool flag_rotate) const;
+  void copyParams(Id mode, const Grid& gridaux);
+  double getCoordinate(Id rank, Id idim, bool flag_rotate = true) const;
+  VectorDouble getCoordinatesByRank(Id rank, bool flag_rotate = true) const;
+  void getCoordinatesByRankInPlace(VectorDouble& coor, Id rank, bool flag_rotate) const;
   VectorDouble getCoordinatesByIndice(const VectorInt& indice,
                                       bool flag_rotate               = true,
                                       const VectorInt& shift         = VectorInt(),
@@ -84,15 +84,15 @@ public:
                                      const VectorDouble& dxsPerCell = VectorDouble()) const;
   VectorDouble getCoordinatesByCorner(const VectorInt& icorner) const;
   void getCoordinatesByCornerInPlace(VectorDouble& coor, const VectorInt& icorner) const;
-  VectorDouble getCellCoordinatesByCorner(int node,
+  VectorDouble getCellCoordinatesByCorner(Id node,
                                           const VectorInt& shift         = VectorInt(),
                                           const VectorDouble& dxsPerCell = VectorDouble()) const;
   void getCellCoordinatesByCornerInPlace(VectorDouble& coor,
-                                         int node,
+                                         Id node,
                                          const VectorInt& shift         = VectorInt(),
                                          const VectorDouble& dxsPerCell = VectorDouble()) const;
 #ifndef SWIG
-  double indiceToCoordinate(int idim0,
+  double indiceToCoordinate(Id idim0,
                             const constvectint indice,
                             const constvect percent = {},
                             bool flag_rotate        = true) const;
@@ -105,17 +105,17 @@ public:
                                   const constvect percent = {},
                                   bool flag_rotate        = true) const;
 #endif // SWIG
-  double rankToCoordinate(int idim0,
-                          int rank,
+  double rankToCoordinate(Id idim0,
+                          Id rank,
                           const VectorDouble& percent = VectorDouble()) const;
-  VectorDouble rankToCoordinates(int rank,
+  VectorDouble rankToCoordinates(Id rank,
                                  const VectorDouble& percent = VectorDouble()) const;
-  void rankToCoordinatesInPlace(int rank,
+  void rankToCoordinatesInPlace(Id rank,
                                 VectorDouble& coor,
                                 const VectorDouble& percent = VectorDouble()) const;
 #ifndef SWIG
-  int indiceToRank(const constvectint indice) const;
-  void rankToIndice(int rank, vectint indices, bool minusOne = false) const;
+  Id indiceToRank(const constvectint indice) const;
+  void rankToIndice(Id rank, vectint indices, bool minusOne = false) const;
 #endif // SWIG
   VectorInt coordinateToIndices(const VectorDouble& coor,
                                 bool centered = false,
@@ -124,11 +124,11 @@ public:
                                   const VectorDouble& coor,
                                   bool centered,
                                   double eps) const;
-  int coordinateToIndicesInPlace(const VectorDouble& coor,
+  Id coordinateToIndicesInPlace(const VectorDouble& coor,
                                  VectorInt& indice,
                                  bool centered = false,
                                  double eps    = EPSILON6) const;
-  int coordinateToRank(const VectorDouble& coor,
+  Id coordinateToRank(const VectorDouble& coor,
                        bool centered = false,
                        double eps    = EPSILON6) const;
   VectorInt getCenterIndices(bool flagSup = false) const;
@@ -144,11 +144,11 @@ public:
                            const VectorDouble& center,
                            const VectorDouble& dxsPerCell = VectorDouble()) const;
   bool sampleBelongsToCell(const VectorDouble& coor,
-                           int rank,
+                           Id rank,
                            const VectorDouble& dxsPerCell = VectorDouble()) const;
   VectorDouble getRotAngles() const { return _rotation.getAngles(); }
   VectorDouble getRotMat() const { return _rotation.getMatrixDirect().getValues(); }
-  double getRotAngle(int idim) const { return _rotation.getAngle(idim); }
+  double getRotAngle(Id idim) const { return _rotation.getAngle(idim); }
   VectorInt getNXs() const { return _nx; }
   VectorDouble getX0s() const { return _x0; }
   VectorDouble getDXs() const { return _dx; }
@@ -157,14 +157,14 @@ public:
   bool isSameMesh(const Grid& grid) const;
   bool isRotated() const { return _rotation.isRotated(); }
   bool isSameRotation(const Grid& grid) const { return _rotation.isSame(grid.getRotation()); }
-  VectorDouble getAxis(int idim) const;
+  VectorDouble getAxis(Id idim) const;
 
   void iteratorInit(const VectorInt& order = VectorInt());
   VectorInt iteratorNext(void);
-  void iteratorNext(std::vector<int>& indices);
+  void iteratorNext(std::vector<Id>& indices);
   bool empty() const;
 
-  void dilate(int mode,
+  void dilate(Id mode,
               const VectorInt& nshift,
               VectorInt& nx,
               VectorDouble& dx,
@@ -179,7 +179,7 @@ public:
                VectorInt& nx,
                VectorDouble& dx,
                VectorDouble& x0) const;
-  int getMirrorIndex(int idim, int ix) const;
+  Id getMirrorIndex(Id idim, Id ix) const;
   bool isInside(const VectorInt& indices) const;
 
 protected:
@@ -196,10 +196,10 @@ private:
   const MatrixSquare& _getRotInv() const { return _rotation.getMatrixInverse(); }
   void _allocate();
   void _recopy(const Grid& r);
-  bool _isSpaceDimensionValid(int idim) const;
+  bool _isSpaceDimensionValid(Id idim) const;
 
 private:
-  int _nDim;
+  Id _nDim;
   VectorInt _nx;
   VectorDouble _x0;
   VectorDouble _dx;
@@ -207,9 +207,9 @@ private:
 
   // Iterator
 
-  int _iter;
-  int _nprod;
-  std::vector<int> _counts;
+  Id _iter;
+  Id _nprod;
+  std::vector<Id> _counts;
   VectorInt _order;
   VectorInt _indices;
   mutable VectorInt _dummy;

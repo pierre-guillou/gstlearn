@@ -102,8 +102,8 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_PGSSPDE-");
-  int error = 0;
-  int ndim  = 2;
+  Id error = 0;
+  Id ndim  = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Prepare the Discrete process with Discretized Option
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
   // Prepare dimension variables
   auto ndata = 100;
-  int nx     = 101;
+  Id nx      = 101;
   double dx  = 1. / (nx - 1);
 
   // Prepare the output Grid
@@ -120,9 +120,9 @@ int main(int argc, char* argv[])
   // Prepare facies proportions and corresponding Grid
   DbGrid* dbprop = DbGrid::create({nx, nx}, {dx, dx});
   VectorDouble props({0.2, 0.5, 0.3});
-  int nfac           = (int)props.size();
+  Id nfac            = (Id)props.size();
   VectorString names = generateMultipleNames("Props", nfac);
-  for (int ifac = 0; ifac < nfac; ifac++)
+  for (Id ifac = 0; ifac < nfac; ifac++)
     dbprop->addColumnsByConstant(1, props[ifac], names[ifac]);
   dbprop->setLocators(names, ELoc::P, 0);
 
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   std::vector<Model*> models;
   Rule rule;
   RuleProp ruleprop;
-  int mode = 3;
+  Id mode = 3;
 
   // IMPORTANT NOTE: the two following tests have been temporarily discraded.
   // They use the old class PGSSPDE which is now deprecated.
@@ -207,5 +207,5 @@ int main(int argc, char* argv[])
   delete dbprop;
   delete dat;
 
-  return (error);
+  return static_cast<int>(error);
 }

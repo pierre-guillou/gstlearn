@@ -45,12 +45,12 @@ SpaceSN::~SpaceSN()
 {
 }
 
-ASpaceSharedPtr SpaceSN::create(int ndim, double radius)
+ASpaceSharedPtr SpaceSN::create(Id ndim, double radius)
 {
   return std::shared_ptr<SpaceSN>(new SpaceSN(ndim, radius));
 }
 
-String SpaceSN::toString(const AStringFormat* strfmt, int idx) const
+String SpaceSN::toString(const AStringFormat* strfmt, Id idx) const
 {
   std::stringstream sstr;
   sstr << ASpace::toString(strfmt, idx);
@@ -88,7 +88,7 @@ void SpaceSN::_move(SpacePoint &p1, const VectorDouble &vec) const
 
 double SpaceSN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   auto offset = getOffset();
@@ -102,7 +102,7 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
 double SpaceSN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
                              const Tensor& tensor,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getDistance with tensor
@@ -118,7 +118,7 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
 double SpaceSN::_getFrequentialDistance(const SpacePoint& p1,
                                         const SpacePoint& p2,
                                         const Tensor& tensor,
-                                        int ispace) const
+                                        Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getFrequentialDistance
@@ -130,7 +130,7 @@ double SpaceSN::_getFrequentialDistance(const SpacePoint& p1,
 
 VectorDouble SpaceSN::_getIncrement(const SpacePoint& p1,
                                     const SpacePoint& p2,
-                                    int ispace) const
+                                    Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   _getIncrementInPlace(p1, p2, _work1);
@@ -140,11 +140,11 @@ VectorDouble SpaceSN::_getIncrement(const SpacePoint& p1,
 void SpaceSN::_getIncrementInPlace(const SpacePoint& p1,
                                    const SpacePoint& p2,
                                    VectorDouble& ptemp,
-                                   int ispace) const
+                                   Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getIncrementInPlace
-  int j = 0;
+  Id j = 0;
   auto offset = getOffset();
   auto ndim   = getNDim();
   for (size_t i = offset; i < ndim + offset; i++)

@@ -61,7 +61,7 @@ String AShape::toString(const AStringFormat* /*strfmt*/) const
   sstr << getType().getDescr() << " - Proportion=" << _proportion
       << std::endl;
 
-  for (int ipar = 0; ipar < getNParams(); ipar++)
+  for (Id ipar = 0; ipar < getNParams(); ipar++)
   {
     sstr << "- " << getParamName(ipar) << ":" << getParam(ipar).toString();
   }
@@ -76,36 +76,36 @@ String AShape::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-void AShape::initParams(int count)
+void AShape::initParams(Id count)
 {
   _paramNames.resize(count);
   _params.resize(count);
 
-  for (int ipar = 0; ipar < count; ipar++)
+  for (Id ipar = 0; ipar < count; ipar++)
   {
     _params[ipar] = ShapeParameter();
   }
 }
 
-void AShape::setLaw(int ipar, const ELaw& law)
+void AShape::setLaw(Id ipar, const ELaw& law)
 {
   if (! _isValidParamIndex(ipar)) return;
   _params[ipar].setLaw(law);
 }
 
-void AShape::setParam(int ipar, int iarg, double value)
+void AShape::setParam(Id ipar, Id iarg, double value)
 {
   if (! _isValidParamIndex(ipar)) return;
   _params[ipar].setValarg(iarg, value);
 }
 
-void AShape::setParamName(int ipar, const String& name)
+void AShape::setParamName(Id ipar, const String& name)
 {
   if (! _isValidParamIndex(ipar)) return;
   _paramNames[ipar] = name;
 }
 
-void AShape::setParamDefault(int ipar,
+void AShape::setParamDefault(Id ipar,
                              const String& name,
                              double value)
 {
@@ -114,34 +114,34 @@ void AShape::setParamDefault(int ipar,
   _params[ipar].setValarg(0, value);
 }
 
-String AShape::getParamName(int ipar) const
+String AShape::getParamName(Id ipar) const
 {
   if (! _isValidParamIndex(ipar)) return String();
   return _paramNames[ipar];
 }
 
-double AShape::getParam(int ipar, int iarg) const
+double AShape::getParam(Id ipar, Id iarg) const
 {
   if (! _isValidParamIndex(ipar)) return TEST;
   return _params[ipar].getValarg(iarg);
 }
 
-const ShapeParameter& AShape::getParam(int ipar) const
+const ShapeParameter& AShape::getParam(Id ipar) const
 {
   if (! _isValidParamIndex(ipar))
     my_throw("Argument invalid");
   return _params[ipar];
 }
 
-double AShape::generateParam(int ipar) const
+double AShape::generateParam(Id ipar) const
 {
   if (! _isValidParamIndex(ipar)) return TEST;
  return _params[ipar].generateValue();
 }
 
-bool AShape::_isValidParamIndex(int ipar) const
+bool AShape::_isValidParamIndex(Id ipar) const
 {
-  int npar = (int) _params.size();
+  Id npar = (Id) _params.size();
   if (ipar < 0 || ipar >= npar)
   {
     messerr("Index %d is not valid. It should lie in [0,%d[",

@@ -26,7 +26,7 @@ namespace gstlrn
  * @param rank_fex Rank of the External Drift variable
  * @return
  */
-ADrift* DriftFactory::createDriftByRank(int rank, int rank_fex)
+ADrift* DriftFactory::createDriftByRank(Id rank, Id rank_fex)
 {
   switch (rank)
   {
@@ -79,7 +79,7 @@ ADrift* DriftFactory::createDriftBySymbol(const String& symbol)
   if (ds == "Z3") return new DriftM({0, 0, 3});
   if (ds == "F")
   {
-    int rank_fex = 0;
+    Id rank_fex = 0;
     if (decodeInString("F", symbol, &rank_fex, false) == 0)
       rank_fex = rank_fex - 1;
     drift = new DriftF(rank_fex);
@@ -117,8 +117,8 @@ ADrift* DriftFactory::createDriftByIdentifier(const String& driftname)
  *
  * @remarks: this function is limited to order<=2 and ndim<= 3
  */
-DriftList* DriftFactory::createDriftListFromIRF(int order,
-                                                int nfex,
+DriftList* DriftFactory::createDriftListFromIRF(Id order,
+                                                Id nfex,
                                                 const CovContext& ctxt)
 {
   auto* drifts = new DriftList(ctxt);
@@ -171,7 +171,7 @@ DriftList* DriftFactory::createDriftListFromIRF(int order,
   if (nfex > 0)
   {
     // Adding the external drift(s)
-    for (int ifex = 0; ifex < nfex; ifex++)
+    for (Id ifex = 0; ifex < nfex; ifex++)
       drifts->addDrift(new DriftF(ifex));
   }
 
@@ -193,7 +193,7 @@ DriftList* DriftFactory::createDriftListForGradients(const DriftList* olddrifts,
   auto* newdrifts = new DriftList(ctxt);
   newdrifts->setFlagLinked(true);
   auto ndim = ctxt.getNDim();
-  int order = olddrifts->getDriftMaxIRFOrder();
+  Id order = olddrifts->getDriftMaxIRFOrder();
 
   if (olddrifts->hasExternalDrift())
   {
@@ -300,7 +300,7 @@ DriftList* DriftFactory::createDriftListForGradients(const DriftList* olddrifts,
   }
 
   // Copy the 'filter' status
-  for (int il = 0, ndrift = olddrifts->getNDrift(); il < ndrift; il++)
+  for (Id il = 0, ndrift = olddrifts->getNDrift(); il < ndrift; il++)
   {
     newdrifts->setFiltered(il, olddrifts->isDriftFiltered(il));
   }

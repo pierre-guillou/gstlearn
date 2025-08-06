@@ -30,13 +30,13 @@ public:
   ACholesky& operator=(const ACholesky& m);
   virtual ~ACholesky() {}
 
-  int getSize() const override { return _size; }
-  int solve(const constvect vecin, vect vecout) const;
-  int InvLtX(const constvect whitenoise, vect vecout) const;
-  int LtX(const constvect whitenoise, vect vecout) const;
-  int LX(const constvect whitenoise, vect vecout) const;
-  int InvLX(const constvect whitenoise, vect vecout) const;
-  int solveMatrix(const MatrixDense& b, MatrixDense& x) const;
+  Id getSize() const override { return _size; }
+  Id solve(const constvect vecin, vect vecout) const;
+  Id InvLtX(const constvect whitenoise, vect vecout) const;
+  Id LtX(const constvect whitenoise, vect vecout) const;
+  Id LX(const constvect whitenoise, vect vecout) const;
+  Id InvLX(const constvect whitenoise, vect vecout) const;
+  Id solveMatrix(const MatrixDense& b, MatrixDense& x) const;
   bool isReady() const { return _ready; }
   VectorDouble invLtX(const VectorDouble& vecin) const;
   VectorDouble LtX(const VectorDouble& vecin) const;
@@ -45,22 +45,22 @@ public:
   VectorDouble solveX(const VectorDouble& vecin) const;
   
   virtual double computeLogDeterminant() const                    = 0;
-  virtual int addSolveX(const constvect vecin, vect vecout) const = 0;
-  virtual int addInvLtX(const constvect vecin, vect vecout) const = 0;
-  virtual int addLtX(const constvect vecin, vect vecout) const    = 0;
-  virtual int addLX(const constvect vecin, vect vecout) const     = 0;
-  virtual int addInvLX(const constvect vecin, vect vecout) const  = 0;
+  virtual Id addSolveX(const constvect vecin, vect vecout) const = 0;
+  virtual Id addInvLtX(const constvect vecin, vect vecout) const = 0;
+  virtual Id addLtX(const constvect vecin, vect vecout) const    = 0;
+  virtual Id addLX(const constvect vecin, vect vecout) const     = 0;
+  virtual Id addInvLX(const constvect vecin, vect vecout) const  = 0;
 
 protected:
   void _setReady() const { _ready = true; _empty = false; }
 
 private:
-  int _addToDest(const constvect vecin, vect vecout) const override;
-  int _addSimulateToDest(const constvect whitenoise, vect vecout) const override;
-  double computeLogDet(int nMC = 1) const override; //just for ASimulable interface
+  Id _addToDest(const constvect vecin, vect vecout) const override;
+  Id _addSimulateToDest(const constvect whitenoise, vect vecout) const override;
+  double computeLogDet(Id nMC = 1) const override; //just for ASimulable interface
 
 protected:
-  int _size;
+  Id _size;
   mutable bool _ready;
   mutable bool _empty;
 };

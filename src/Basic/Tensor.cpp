@@ -71,7 +71,7 @@ Tensor::~Tensor()
 {
 }
 
-void Tensor::init(int ndim)
+void Tensor::init(Id ndim)
 {
   _nDim = ndim;
   _radius.resize(_nDim, 1.);
@@ -99,7 +99,7 @@ void Tensor::setRadiusIsotropic(double radius)
 {
   if (isZero(radius))
     my_throw("Ellipsoid radius cannot be null");
-  VH::fill(_radius, radius, static_cast<int>(_radius.size()));
+  VH::fill(_radius, radius, static_cast<Id>(_radius.size()));
   _isotropic = true;
   _fillTensors();
 }

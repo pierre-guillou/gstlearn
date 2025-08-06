@@ -40,8 +40,8 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_PGS-");
-  int error = 0;
-  int ndim  = 2;
+  Id error = 0;
+  Id ndim  = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   CovContext ctxt(1, 2, 1.);
 
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   bool flagStationary = false;
 
   // Creating a Point Data base in the 1x1 square with 'nech' samples
-  int nech = 1000;
+  Id nech  = 1000;
   Db* db   = Db::createFromBox(nech, {0., 0.}, {1., 1.}, 432432);
   DbStringFormat dbfmt(FLAG_STATS);
   db->display(&dbfmt);
@@ -60,9 +60,9 @@ int main(int argc, char* argv[])
 
   // Setting constant global proportions
   VectorDouble props({0.2, 0.5, 0.3});
-  int nfac           = (int)props.size();
+  Id nfac            = (Id)props.size();
   VectorString names = generateMultipleNames("Props", nfac);
-  for (int ifac = 0; ifac < nfac; ifac++)
+  for (Id ifac = 0; ifac < nfac; ifac++)
     dbprop->addColumnsByConstant(1, props[ifac], names[ifac], ELoc::P, ifac);
   dbprop->display();
 
@@ -98,12 +98,12 @@ int main(int argc, char* argv[])
   db->display(&dbfmt);
 
   // Design of several VarioParams
-  int nlag1          = 19;
+  Id nlag1 = 19;
   DirParam dirparam1(nlag1, 0.5 / nlag1);
   VarioParam varioparam1;
   varioparam1.addDir(dirparam1);
 
-  int nlag2          = 3;
+  Id nlag2 = 3;
   DirParam dirparam2(nlag2, 0.1);
   VarioParam varioparam2;
   varioparam2.addDir(dirparam2);

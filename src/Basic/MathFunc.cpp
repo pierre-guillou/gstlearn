@@ -30,7 +30,7 @@ namespace gstlrn
 {
 typedef struct
 {
-  int ntri;
+  Id ntri;
   VectorDouble coor;
 } Reg_Coor;
 
@@ -46,11 +46,11 @@ static double c_b11 = 1.;
  *
  * @note The base should be a prime number
  */
-static VectorDouble _corputVector(int n, int b)
+static VectorDouble _corputVector(Id n, Id b)
 {
   VectorDouble retval(n, 0.);
 
-  int L = (int)ceil(log(n - 1) / log(b));
+  Id L = (Id)ceil(log(n - 1) / log(b));
   VectorDouble un(L, 0.);
   un[0] = 1.;
 
@@ -58,18 +58,18 @@ static VectorDouble _corputVector(int n, int b)
 
   if (L == 1)
   {
-    for (int l = 0; l < n; l++)
+    for (Id l = 0; l < n; l++)
       retval[l] = (double)(l + 1.) / (double)b;
   }
   else
   {
     d.setValue(0, 0, 1.);
-    for (int l = 1; l < n; l++)
+    for (Id l = 1; l < n; l++)
     {
-      for (int p = 0; p < L; p++)
+      for (Id p = 0; p < L; p++)
         d.setValue(l, p, d.getValue(l - 1, p) + un[p]);
 
-      for (int p = 0; p < L - 1; p++)
+      for (Id p = 0; p < L - 1; p++)
       {
         if (d.getValue(l, p) == b)
         {
@@ -79,10 +79,10 @@ static VectorDouble _corputVector(int n, int b)
       }
     }
 
-    for (int l = 0; l < n; l++)
+    for (Id l = 0; l < n; l++)
     {
       double total = 0.;
-      for (int p = 0; p < L; p++)
+      for (Id p = 0; p < L; p++)
         total += d.getValue(l, p) * pow(1. / b, (double)p + 1.);
       retval[l] = total;
     }
@@ -162,7 +162,7 @@ static double st_mvnphi(const double* z)
 **  Multivariate Normal Probability (local function)
 **
 *****************************************************************************/
-static void st_mvnlms(double* a, double* b, const int* infin, double* lower, double* upper)
+static void st_mvnlms(double* a, double* b, const Id* infin, double* lower, double* upper)
 {
   *lower = 0.;
   *upper = 1.;
@@ -199,19 +199,19 @@ static void st_dkswap(double* x,
 ** Swaps rows and columns P and Q in situ, with P <= Q
 **
 *****************************************************************************/
-static void st_rcswp(const int* p,
-                     const int* q,
+static void st_rcswp(const Id* p,
+                     const Id* q,
                      double* a,
                      double* b,
-                     int* infin,
-                     const int* n,
+                     Id* infin,
+                     const Id* n,
                      double* c)
 {
   /* System generated locals */
-  int i__1;
+  Id i__1;
 
   /* Local variables */
-  static int i, j, ii, jj;
+  static Id i, j, ii, jj;
 
   /* Parameter adjustments */
   --c;
@@ -254,29 +254,29 @@ static void st_rcswp(const int* p,
 ** Subroutine to sort integration limits and determine Cholesky factor
 **
 *****************************************************************************/
-static void st_covsrt(int* n,
+static void st_covsrt(Id* n,
                       double* lower,
                       double* upper,
                       double* correl,
-                      int* infin,
+                      Id* infin,
                       double* y,
-                      int* infis,
+                      Id* infis,
                       double* a,
                       double* b,
                       double* cov,
-                      int* infi)
+                      Id* infi)
 {
   /* System generated locals */
-  int i__1, i__2, i__3, i__4;
+  Id i__1, i__2, i__3, i__4;
   double d__1;
 
   /* Local variables */
   static double amin, bmin, dmin_, emin;
-  static int jmin;
+  static Id jmin;
   static double d, e;
-  static int i, j, k, l, m;
+  static Id i, j, k, l, m;
   static double sumsq, aj, bj;
-  static int ii, ij, il;
+  static Id ii, ij, il;
   static double cvdiag, yl, yu;
   static double sum;
 
@@ -715,16 +715,16 @@ static double st_bvu(const double* sh,
 #define x ((double*)&equiv_100)
 
   /* System generated locals */
-  int i__1;
+  Id i__1;
   double ret_val, d__1, d__2, d__3, d__4;
 
   /* Local variables */
   static double a, b, c, d, h;
-  static int i;
+  static Id i;
   static double k;
-  static int lg;
+  static Id lg;
   static double as;
-  static int ng;
+  static Id ng;
   static double bs, hk, hs, sn, rs, xs;
   static double bvn, asr;
 
@@ -837,7 +837,7 @@ static double st_bvu(const double* sh,
 *****************************************************************************/
 static double st_bvnmvn(double* lower,
                         double* upper,
-                        int* infin,
+                        Id* infin,
                         double* correl)
 {
   double ret_val = 0., d__1, d__2, d__3, d__4;
@@ -911,26 +911,26 @@ static double st_bvnmvn(double* lower,
 ** Integrand subroutine
 **
 *****************************************************************************/
-static double st_mvndfn_0(int n__,
-                          int* n,
+static double st_mvndfn_0(Id n__,
+                          Id* n,
                           double* w,
                           double* correl,
                           double* lower,
                           double* upper,
-                          int* infin,
-                          int* infis,
+                          Id* infin,
+                          Id* infis,
                           double* d,
                           double* e)
 {
-  int i__1, i__2;
+  Id i__1, i__2;
   double ret_val, d__1, d__2;
 
   /* Local variables */
-  static int infa, infb, infi[100];
+  static Id infa, infb, infi[100];
   static double a[100], b[100];
-  static int i, j;
+  static Id i, j;
   static double y[100], ai, bi, di, ei;
-  static int ij, ik;
+  static Id ij, ik;
   static double cov[5050], sum;
 
   /* Parameter adjustments */
@@ -1069,12 +1069,12 @@ L_mvndnt:
 ** st_mvndnt
 **
 *****************************************************************************/
-static double st_mvndnt(int* n,
+static double st_mvndnt(Id* n,
                         double* correl,
                         double* lower,
                         double* upper,
-                        int* infin,
-                        int* infis,
+                        Id* infin,
+                        Id* infis,
                         double* d,
                         double* e)
 {
@@ -1094,25 +1094,25 @@ static double st_mvndnt(int* n,
 ** \param[out] quasi a new quasi-random S-vector
 **
 *****************************************************************************/
-static void st_dkrcht(const int* s,
+static void st_dkrcht(const Id* s,
                       double* quasi)
 {
   /* Initialized data */
 
-  static int olds      = 0;
-  static int prime[80] = {
+  static Id olds      = 0;
+  static Id prime[80] = {
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
     59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
     149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229,
     233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317,
     331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409};
 
-  int i__1;
+  Id i__1;
   double d__1;
 
   /* Local variables */
   static double psqt[80];
-  static int i, n[49], hisum;
+  static Id i, n[49], hisum;
   static double rn;
 
   /* Parameter adjustments */
@@ -1166,20 +1166,20 @@ L10:
 ** st_dksmrc
 **
 *****************************************************************************/
-static void st_dksmrc(int* ndim,
-                      const int* klim,
+static void st_dksmrc(Id* ndim,
+                      const Id* klim,
                       double* sumkro,
-                      const int* prime,
+                      const Id* prime,
                       double* vk,
-                      double (*functn)(int*, double*),
+                      double (*functn)(Id*, double*),
                       double* x)
 {
   /* System generated locals */
-  int i__1, i__2;
+  Id i__1, i__2;
   double d__1;
 
   /* Local variables */
-  static int j, k, nk, jp;
+  static Id j, k, nk, jp;
   static double xt;
 
   /* Parameter adjustments */
@@ -1192,7 +1192,7 @@ static void st_dksmrc(int* ndim,
   i__1    = nk - 1;
   for (j = 1; j <= i__1; ++j)
   {
-    jp     = (int)(j + law_uniform(0., 1.) * (nk + 1 - j));
+    jp     = (Id)(j + law_uniform(0., 1.) * (nk + 1 - j));
     xt     = vk[j];
     vk[j]  = vk[jp];
     vk[jp] = xt;
@@ -1286,23 +1286,23 @@ static void st_dksmrc(int* ndim,
 **                     estimated absolute accuracy ABSERR.
 **
 *****************************************************************************/
-static void st_dkbvrc(int* ndim,
-                      int* minvls,
-                      const int* maxvls,
-                      double (*functn)(int*, double*),
+static void st_dkbvrc(Id* ndim,
+                      Id* minvls,
+                      const Id* maxvls,
+                      double (*functn)(Id*, double*),
                       const double* abseps,
                       const double* releps,
                       double* abserr,
                       double* finest,
-                      int* inform)
+                      Id* inform)
 {
   /* Initialized data */
 
-  static int p[25] = {
+  static Id p[25] = {
     31, 47, 73, 113, 173, 263, 397, 593, 907, 1361, 2053, 3079,
     4621, 6947, 10427, 15641, 23473, 35221, 52837, 79259, 118891, 178349,
     267523, 401287, 601942};
-  static int c[475] = {
+  static Id c[475] = {
     12, 13, 27, 35, 64, 111, 163,
     246, 347, 505, 794, 1189, 1763, 2872, 4309, 6610, 9861, 10327, 19540, 34566,
     31929, 40701, 103650, 165843, 130365, 9, 11, 28, 27, 66, 42, 154, 189, 402, 220,
@@ -1338,20 +1338,20 @@ static void st_dkbvrc(int* ndim,
     113675, 35867, 172319, 12, 9, 14, 21, 10, 10, 116, 49, 167, 158, 381, 508, 127,
     103, 915, 6227, 2563, 8585, 25950, 18624, 32948, 86478, 34987, 121694, 28881};
 
-  int i__1, i__2;
+  Id i__1, i__2;
   double d__1, d__2;
 
   /* Local variables */
-  static int i;
+  static Id i;
   static double x[200];
-  static int klimi;
+  static Id klimi;
   static double value;
-  static int np = 0;
+  static Id np = 0;
   static double vk[20], difint, finval;
   static double varprd;
-  static int sampls    = 0;
+  static Id sampls    = 0;
   static double varest = 0, varsqr;
-  static int intvls;
+  static Id intvls;
 
   *inform = 1;
   intvls  = 0;
@@ -1437,10 +1437,10 @@ L10:
 ** st_mvndfn
 **
 *****************************************************************************/
-static double st_mvndfn(int* n,
+static double st_mvndfn(Id* n,
                         double* w)
 {
-  return st_mvndfn_0(0, n, w, (double*)0, (double*)0, (double*)0, (int*)0, (int*)0, (double*)0, (double*)0);
+  return st_mvndfn_0(0, n, w, (double*)0, (double*)0, (double*)0, (Id*)0, (Id*)0, (double*)0, (double*)0);
 }
 
 /****************************************************************************/
@@ -1477,25 +1477,25 @@ static double st_mvndfn(int* n,
 ** \remark      Email : AlanGenz@wsu.edu
 **
 *****************************************************************************/
-void mvndst(int n,
+void mvndst(Id n,
             double* lower,
             double* upper,
-            int* infin,
+            Id* infin,
             double* correl,
-            int maxpts,
+            Id maxpts,
             double abseps,
             double releps,
             double* error,
             double* value,
-            int* inform)
+            Id* inform)
 {
-  int seed_memo;
-  int i__1;
+  Id seed_memo;
+  Id i__1;
 
   /* Local variables */
   static double d, e;
-  static int infis;
-  int ivls;
+  static Id infis;
+  Id ivls;
 
   /* Parameter adjustments */
   --correl;
@@ -1516,7 +1516,7 @@ void mvndst(int n,
   }
   else
   {
-    *inform = (int)st_mvndnt(&n, &correl[1], &lower[1], &upper[1], &infin[1], &infis, &d, &e);
+    *inform = (Id)st_mvndnt(&n, &correl[1], &lower[1], &upper[1], &infin[1], &infis, &d, &e);
     if (n - infis == 0)
     {
       *value = 1.;
@@ -1560,23 +1560,23 @@ void mvndst(int n,
 void mvndst4(double* lower,
              double* upper,
              const double* correl,
-             int maxpts,
+             Id maxpts,
              double abseps,
              double releps,
              double* error,
              double* value,
-             int* inform)
+             Id* inform)
 {
-  int infin[4];
+  Id infin[4];
   double corloc[6];
 
   /* Initializations */
 
-  int ecr = 0;
-  for (int i = 0; i < 4; i++)
+  Id ecr = 0;
+  for (Id i = 0; i < 4; i++)
   {
     infin[i] = mvndst_infin(lower[i], upper[i]);
-    for (int j = 0; j < i; j++, ecr++)
+    for (Id j = 0; j < i; j++, ecr++)
       corloc[ecr] = M_R(correl, 4, i, j);
   }
 
@@ -1605,14 +1605,14 @@ void mvndst2n(const double* lower,
               const double* upper,
               const double* means,
               double* correl,
-              int maxpts,
+              Id maxpts,
               double abseps,
               double releps,
               double* error,
               double* value,
-              int* inform)
+              Id* inform)
 {
-  int i, infin[2];
+  Id i, infin[2];
   double scale, covar, low[2], upp[2];
 
   /* Initializations */
@@ -1641,7 +1641,7 @@ void mvndst2n(const double* lower,
 ** \param[in]  sup Upper integration bound
 **
 *****************************************************************************/
-int mvndst_infin(double low, double sup)
+Id mvndst_infin(double low, double sup)
 {
   if (low == THRESH_INF && sup == THRESH_SUP) return (-1);
   if (low == THRESH_INF) return (0);
@@ -1649,7 +1649,7 @@ int mvndst_infin(double low, double sup)
   return (2);
 }
 
-double besselj(double x, int n)
+double besselj(double x, Id n)
 {
   VectorDouble tab(n + 1);
   if (x <= 0.) return 1.;
@@ -1691,7 +1691,7 @@ double besselj(double x, int n)
 ** \remark  J., NBS Jour. of Res. B. 77B, 1973, pp 125-132.
 **
 *****************************************************************************/
-int besselj_table(double x, double alpha, int nb, double* b)
+Id besselj_table(double x, double alpha, Id nb, double* b)
 {
   static double enten    = 1e38;
   static double ensig    = 1e17;
@@ -1711,13 +1711,13 @@ int besselj_table(double x, double alpha, int nb, double* b)
   static double capp, capq, pold, gnu, xin, sum, vcos, test, vsin;
   static double p, s, t, z, alpem, halfx, tempa, tempb, tempc, psave;
   static double plast, tover, t1, alp2em, em, en, xc, xk, xm, psavel;
-  static int i, j, k, l, m, n, nstart, nbmx, nend, magx;
-  int ncalc;
+  static Id i, j, k, l, m, n, nstart, nbmx, nend, magx;
+  Id ncalc;
 
   /* Start */
 
   --b;
-  magx = (int)(x);
+  magx = (Id)(x);
   if (nb > 0 && x >= 0. && x <= xlarge && alpha >= 0. && alpha < 1.)
   {
 
@@ -2091,7 +2091,7 @@ int besselj_table(double x, double alpha, int nb, double* b)
 ** \remark  Research Council, Canada.
 **
 *****************************************************************************/
-int besselk(double x, double alpha, int nb, double* bk)
+Id besselk(double x, double alpha, Id nb, double* bk)
 {
   static const double p[] = {
     .805629875690432845, 20.4045500205365151,
@@ -2128,7 +2128,7 @@ int besselk(double x, double alpha, int nb, double* bk)
 
   double x2by4, twox, c, blpha, dm, ex, bk1, bk2, enu;
   double ratio, wminf, d1, d2, d3, f0, f1, f2, p0, q0, t1, t2, twonu;
-  int i, j, k, m, iend {}, itemp {}, mplus1, ncalc;
+  Id i, j, k, m, iend {}, itemp {}, mplus1, ncalc;
 
   /* Parameter adjustments */
 
@@ -2287,7 +2287,7 @@ int besselk(double x, double alpha, int nb, double* bk)
         /*  Calculation of K(ALPHA+1,X)/K(ALPHA,X),  1.0 <= X <= 4.0 */
 
         d2 = floor(estm[0] / ex + estm[1]);
-        m  = (int)d2;
+        m  = (Id)d2;
         d1 = d2 + d2;
         d2 -= 0.5;
         d2 *= d2;
@@ -2302,7 +2302,7 @@ int besselk(double x, double alpha, int nb, double* bk)
         /*    recurrence and K(ALPHA,X) from the wronskian */
 
         d2 = floor(estm[2] * ex + estm[3]);
-        m  = (int)d2;
+        m  = (Id)d2;
         c  = ABS(enu);
         d3 = c + c;
         d1 = d3 - 1.;
@@ -2338,7 +2338,7 @@ int besselk(double x, double alpha, int nb, double* bk)
         /*  by backward recurrence, for  X > 4.0 */
 
         dm = floor(estm[4] / ex + estm[5]);
-        m  = (int)dm;
+        m  = (Id)dm;
         d2 = dm - 0.5;
         d2 *= d2;
         d1 = dm + dm;
@@ -2372,7 +2372,7 @@ int besselk(double x, double alpha, int nb, double* bk)
     if (iend == 1) return (ncalc);
 
     /* Computing MIN */
-    m = MIN((int)(wminf - enu), iend);
+    m = MIN((Id)(wminf - enu), iend);
     for (i = 2; i <= m; ++i)
     {
       t1  = bk1;
@@ -2451,12 +2451,12 @@ double loggamma(double parameter)
        846.0755362020782, 262.3083470269460, 24.43519662506312,
        0.40977929210926}};
   double sval[2], x, xe, p, dalgam;
-  int m, k;
+  Id m, k;
 
   x  = parameter;
   xe = floor(x);
   if (x - xe > 0.5) xe += 1.;
-  m = (int)(ceil(xe) - 1);
+  m = (Id)(ceil(xe) - 1);
 
   xe = x;
   if (m == -1) xe = x + 1.;
@@ -2500,7 +2500,7 @@ double loggamma(double parameter)
  ** \return Value of the Legendre polynomial.
  **
  *****************************************************************************/
-double ut_legendre(int n, double v, bool flagNorm)
+double ut_legendre(Id n, double v, bool flagNorm)
 {
   if (!flagNorm)
   {
@@ -2516,7 +2516,7 @@ double ut_legendre(int n, double v, bool flagNorm)
   {
     P0 = 1.;
     P1 = v * sqrt(2. * 1. + 1.);
-    for (int ii = 1; ii < n; ii++)
+    for (Id ii = 1; ii < n; ii++)
     {
       double i = (double)ii;
       double a = sqrt((2. * i + 1.) * (2. * i + 3.)) / (i + 1.);
@@ -2530,26 +2530,26 @@ double ut_legendre(int n, double v, bool flagNorm)
   return value;
 }
 
-VectorDouble ut_legendreVec(int n, const VectorDouble& vecin, bool flagNorm)
+VectorDouble ut_legendreVec(Id n, const VectorDouble& vecin, bool flagNorm)
 {
-  int size = (int)vecin.size();
+  Id size = (Id)vecin.size();
   VectorDouble vecout(size);
-  for (int i = 0; i < size; i++)
+  for (Id i = 0; i < size; i++)
     vecout[i] = ut_legendre(n, vecin[i], flagNorm);
   return vecout;
 }
 
-MatrixDense ut_legendreMatNorm(int n, const VectorDouble& v)
+MatrixDense ut_legendreMatNorm(Id n, const VectorDouble& v)
 {
-  int nrow = (int)v.size();
-  int ncol = n + 1;
+  Id nrow = (Id)v.size();
+  Id ncol = n + 1;
   MatrixDense res(nrow, ncol);
 
   VectorDouble P0(nrow, 0.);
   VectorDouble P1(nrow, 0.);
   VectorDouble val(nrow);
   double l;
-  for (int ll = 0; ll <= n; ll++)
+  for (Id ll = 0; ll <= n; ll++)
   {
     l = (double)ll;
     if (ll == 0)
@@ -2558,14 +2558,14 @@ MatrixDense ut_legendreMatNorm(int n, const VectorDouble& v)
     }
     else if (ll == 1)
     {
-      for (int k = 0; k < nrow; k++)
+      for (Id k = 0; k < nrow; k++)
         val[k] = v[k] * sqrt(2. * l + 1.);
     }
     else
     {
       double a = sqrt((2. * l + 1.) * (2. * l - 1.)) / l;
       double b = (l - 1.) / l * sqrt((2. * l + 1.) / (2. * l - 3.));
-      for (int k = 0; k < nrow; k++)
+      for (Id k = 0; k < nrow; k++)
         val[k] = a * v[k] * P1[k] - b * P0[k];
     }
     res.setColumn(l, val);
@@ -2611,17 +2611,17 @@ MatrixDense ut_legendreMatNorm(int n, const VectorDouble& v)
  **       P_l^m (x) for 0 <= m <= l
  **
  *****************************************************************************/
-MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm)
+MatrixDense ut_legendreAssociatedMat(Id l, const VectorDouble& v, bool flagNorm)
 {
-  int nrow = (int)v.size();
-  int ncol = l + 1;
+  Id nrow = (Id)v.size();
+  Id ncol = l + 1;
   MatrixDense res(nrow, ncol);
 
   VectorDouble w(nrow);
   VectorDouble Pmm(nrow);
   double m, n;
 
-  for (int k = 0; k < nrow; k++)
+  for (Id k = 0; k < nrow; k++)
     w[k] = sqrt(1. - v[k] * v[k]);
 
   if (flagNorm)
@@ -2630,7 +2630,7 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
     VectorDouble P1(nrow);
     VectorDouble Plm(nrow);
 
-    for (int mm = 0; mm <= l; mm++)
+    for (Id mm = 0; mm <= l; mm++)
     {
       m = (double)mm;
 
@@ -2641,12 +2641,12 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
       }
       else
       {
-        for (int k = 0; k < nrow; k++)
+        for (Id k = 0; k < nrow; k++)
           Pmm[k] = -sqrt((2. * m + 1.) / (2. * m)) * w[k] * Pmm[k];
       }
 
       // From n-1 to n
-      for (int nn = mm; nn <= l; nn++)
+      for (Id nn = mm; nn <= l; nn++)
       {
         n = (double)nn;
         if (nn == mm)
@@ -2659,7 +2659,7 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
         {
           double a = sqrt((2. * n + 1.) * (2. * n - 1.) / (n - m) / (n + m));
           double b = sqrt((2. * n + 1.) / (2. * n - 3.) * (n - 1. - m) / (n - m) * (n - 1. + m) / (n + m));
-          for (int k = 0; k < nrow; k++)
+          for (Id k = 0; k < nrow; k++)
             Plm[k] = a * v[k] * P1[k] - b * P2[k];
           P2 = P1;
           P1 = Plm;
@@ -2682,24 +2682,24 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
     if (l > 0)
     {
       // evaluation of P_l^m (m > 0)
-      for (int mm = 1; mm <= l; mm++)
+      for (Id mm = 1; mm <= l; mm++)
       {
         m = (double)mm;
         // computing P_{m}^{m} from P_{m-1}^{m-1}
         double a0 = (2. * m - 1.);
-        for (int k = 0; k < nrow; k++)
+        for (Id k = 0; k < nrow; k++)
           Pmm[k] = -a0 * w[k] * Pmm[k];
 
         if (mm < l)
         {
           Pn2m.fill(0.);
           Pn1m = Pmm;
-          for (int nn = mm + 1; nn <= l; nn++)
+          for (Id nn = mm + 1; nn <= l; nn++)
           {
             n        = (double)nn;
             double a = (2. * n - 1.) / (n - m);
             double b = (n + m - 1.) / (n - m);
-            for (int k = 0; k < nrow; k++)
+            for (Id k = 0; k < nrow; k++)
               Pnm[k] = a * v[k] * Pn1m[k] - b * Pn2m[k];
             Pn2m = Pn1m;
             Pn1m = Pnm;
@@ -2735,9 +2735,9 @@ MatrixDense ut_legendreAssociatedMat(int l, const VectorDouble& v, bool flagNorm
  ** \param[in]  flagNorm    for normalized and 0 otherwise
  **
  *****************************************************************************/
-double ut_flegendre(int n, int k0, double theta, bool flagNorm)
+double ut_flegendre(Id n, Id k0, double theta, bool flagNorm)
 {
-  int m                       = ABS(k0);
+  Id m                       = ABS(k0);
   double phi                  = 0.;
   std::complex<double> resbis = boost::math::spherical_harmonic<double, double>(
     n, m, theta, phi);
@@ -2761,21 +2761,21 @@ double ut_flegendre(int n, int k0, double theta, bool flagNorm)
  ** \param[in]  phi         Longitude angle in radian (0 <= phi <= 2* pi)
  **
  *****************************************************************************/
-double ut_sphericalHarmonic(int n, int k, double theta, double phi)
+double ut_sphericalHarmonic(Id n, Id k, double theta, double phi)
 {
   return boost::math::spherical_harmonic<double, double>(
            n, k, theta, phi)
     .real();
 }
 
-VectorDouble ut_sphericalHarmonicVec(int n,
-                                     int k,
+VectorDouble ut_sphericalHarmonicVec(Id n,
+                                     Id k,
                                      VectorDouble theta,
                                      VectorDouble phi)
 {
-  int size = (int)theta.size();
+  Id size = (Id)theta.size();
   VectorDouble res(size);
-  for (int i = 0; i < size; i++)
+  for (Id i = 0; i < size; i++)
     res[i] = ut_sphericalHarmonic(n, k, theta[i], phi[i]);
   return res;
 }
@@ -2805,7 +2805,7 @@ double golden_search(double (*func_evaluate)(double test, void* user_data),
                      double* niter)
 {
   double phi, resphi, b, x, fb, fx, result, a, c;
-  int flag_test;
+  Id flag_test;
 
   /* Initializations */
 
@@ -2875,13 +2875,13 @@ double golden_search(double (*func_evaluate)(double test, void* user_data),
  ** \param[in]  blin       Array of coefficients for polynomial expansion
  **
  *****************************************************************************/
-int ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
+Id ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
                        Cheb_Elem* cheb_elem,
                        double x,
                        const VectorDouble& blin)
 {
   double y, y0, T1, Tx, Tm1, Tm2, power, a, b, tol;
-  int ncmax;
+  Id ncmax;
 
   // Initializations
 
@@ -2903,7 +2903,7 @@ int ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
   if (ABS(y * y - y0 * y0) / (y * y) < tol) return (2);
   Tm1 = T1;
   Tm2 = 1.;
-  for (int i = 2; i < ncmax; i++)
+  for (Id i = 2; i < ncmax; i++)
   {
     Tx = 2. * T1 * Tm1 - Tm2;
     y += coeffs[i] * Tx;
@@ -2926,12 +2926,12 @@ int ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
  ** \param[in]  blin      Array of coefficients for polynomial expansion
  **
  *****************************************************************************/
-int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
+Id ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
                         Cheb_Elem* cheb_elem,
                         const VectorDouble& blin)
 {
   double minsubdiv, theta, ct, val1, val2, coeff, power, a, b;
-  int n, ncmax;
+  Id n, ncmax;
 
   /* Initializations */
 
@@ -2943,9 +2943,9 @@ int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
 
   minsubdiv = pow(2., 20.);
   if (minsubdiv >= (ncmax + 1.) / 2.)
-    n = static_cast<int>(minsubdiv);
+    n = static_cast<Id>(minsubdiv);
   else
-    n = static_cast<int>(ceil((double)(ncmax + 1) / 2));
+    n = static_cast<Id>(ceil((double)(ncmax + 1) / 2));
 
   /* Core allocation */
 
@@ -2956,7 +2956,7 @@ int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
 
   /* Filling the arrays */
 
-  for (int i = 0; i < n; i++)
+  for (Id i = 0; i < n; i++)
   {
     theta = 2. * GV_PI * ((double)i) / ((double)n);
     ct    = cos(theta / 2.);
@@ -2976,9 +2976,9 @@ int ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
   /* Store the coefficients */
 
   coeff = 2. / (double)n;
-  for (int i = 0; i < ncmax; i++)
+  for (Id i = 0; i < ncmax; i++)
     coeffs[i] = 0.;
-  for (int i = 0; i < n; i++)
+  for (Id i = 0; i < n; i++)
   {
     if (2 * i >= ncmax) break;
     coeffs[2 * i] = coeff * x1[i];
@@ -3003,13 +3003,13 @@ static void st_init_rotation(double* ct, double* st, double* a)
 {
   double rd, theta;
 
-  for (int k = 0; k < 3; k++)
+  for (Id k = 0; k < 3; k++)
     a[k] = law_gaussian();
   rd = 0.;
-  for (int k = 0; k < 3; k++)
+  for (Id k = 0; k < 3; k++)
     rd += a[k] * a[k];
   rd = sqrt(rd);
-  for (int k = 0; k < 3; k++)
+  for (Id k = 0; k < 3; k++)
     a[k] /= rd;
 
   theta = 2. * GV_PI * law_uniform(0., 1.);
@@ -3030,24 +3030,24 @@ static void st_init_rotation(double* ct, double* st, double* a)
  **                       (Dimension: 3*ntri)
  **
  *****************************************************************************/
-void ut_vandercorput(int n,
-                     int flag_sym,
-                     int flag_rot,
-                     int* ntri_arg,
+void ut_vandercorput(Id n,
+                     Id flag_sym,
+                     Id flag_rot,
+                     Id* ntri_arg,
                      VectorDouble& coord)
 {
-  int j, ri;
+  Id j, ri;
   double base, u, v, ct, st, a[3];
 
   /* Core allocation */
 
-  int ntri = 2 * n;
+  Id ntri = 2 * n;
   coord.resize(3 * ntri);
 
   /* Processing */
 
-  int nb = 0;
-  for (int i = 0; i < n; i++)
+  Id nb = 0;
+  for (Id i = 0; i < n; i++)
   {
 
     // Binary decomposition
@@ -3095,7 +3095,7 @@ void ut_vandercorput(int n,
   if (flag_rot)
   {
     st_init_rotation(&ct, &st, a);
-    for (int i = 0; i < ntri; i++)
+    for (Id i = 0; i < ntri; i++)
       GH::rotationGetRandomDirection(ct, st, a, &coord[3 * i]);
   }
 
@@ -3113,14 +3113,14 @@ static void st_addTriangle(const double v1[3],
                            const double v3[3],
                            Reg_Coor* R_coor)
 {
-  int n = R_coor->ntri;
+  Id n = R_coor->ntri;
   R_coor->coor.resize(3 * (n + 3));
 
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
     RCOORD(i, n) = v1[i];
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
     RCOORD(i, n + 1) = v2[i];
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
     RCOORD(i, n + 2) = v3[i];
   R_coor->ntri += 3;
 }
@@ -3138,7 +3138,7 @@ static void st_normalize(double v[3])
 void st_subdivide(double v1[3],
                   double v2[3],
                   double v3[3],
-                  int depth,
+                  Id depth,
                   Reg_Coor* R_coor)
 {
   if (depth == 0)
@@ -3150,7 +3150,7 @@ void st_subdivide(double v1[3],
   /* calculate midpoints of each side */
   double v12[3], v23[3], v31[3];
 
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
   {
     v12[i] = (v1[i] + v2[i]) / 2.0;
     v23[i] = (v2[i] + v3[i]) / 2.0;
@@ -3169,18 +3169,18 @@ void st_subdivide(double v1[3],
   st_subdivide(v12, v23, v31, depth - 1, R_coor);
 }
 
-static int st_already_present(Reg_Coor* R_coor,
-                              int i0,
-                              int ntri,
+static Id st_already_present(Reg_Coor* R_coor,
+                              Id i0,
+                              Id ntri,
                               const VectorDouble& coord,
                               double eps = EPSILON3)
 {
   if (ntri <= 0) return (0);
 
-  int found;
-  for (int itri = 0; itri < ntri; itri++)
+  Id found;
+  for (Id itri = 0; itri < ntri; itri++)
   {
-    for (int k = found = 0; k < 3; k++)
+    for (Id k = found = 0; k < 3; k++)
       if (ABS(COORD(k, itri) - RCOORD(k, i0)) > eps) found = k + 1;
     if (found == 0) return (1);
   }
@@ -3204,7 +3204,7 @@ static int st_already_present(Reg_Coor* R_coor,
  ** \remarks is fixed here
  **
  *****************************************************************************/
-int ut_icosphere(int n, int flag_rot, int* ntri_arg, VectorDouble& coord)
+Id ut_icosphere(Id n, Id flag_rot, Id* ntri_arg, VectorDouble& coord)
 {
 #define X 0.525731112119133696
 #define Z 0.850650808352039932
@@ -3225,7 +3225,7 @@ int ut_icosphere(int n, int flag_rot, int* ntri_arg, VectorDouble& coord)
                                 {-Z, -X, 0.0}};
 
   /* triangle indices */
-  static int tindices[20][3] = {{1, 4, 0}, {4, 9, 0}, {4, 5, 9}, {8, 5, 4}, {1, 8, 4}, {1, 10, 8}, {10, 3, 8}, {8, 3, 5}, {3, 2, 5}, {3, 7, 2}, {3, 10, 7}, {10, 6, 7}, {6, 11, 7}, {6, 0, 11}, {6, 1, 0}, {10, 1, 6}, {11, 0, 9}, {2, 11, 9}, {5, 2, 9}, {11, 2, 7}};
+  static Id tindices[20][3] = {{1, 4, 0}, {4, 9, 0}, {4, 5, 9}, {8, 5, 4}, {1, 8, 4}, {1, 10, 8}, {10, 3, 8}, {8, 3, 5}, {3, 2, 5}, {3, 7, 2}, {3, 10, 7}, {10, 6, 7}, {6, 11, 7}, {6, 0, 11}, {6, 1, 0}, {10, 1, 6}, {11, 0, 9}, {2, 11, 9}, {5, 2, 9}, {11, 2, 7}};
 
   if (n > 10)
   {
@@ -3234,12 +3234,12 @@ int ut_icosphere(int n, int flag_rot, int* ntri_arg, VectorDouble& coord)
   }
   R_coor.ntri   = 0;
   R_coor.coor.clear();
-  int seed_memo = law_get_random_seed();
+  Id seed_memo = law_get_random_seed();
   law_set_random_seed(43241);
 
   /* Subdivide the initial icosahedron */
 
-  for (int i = 0; i < 20; i++)
+  for (Id i = 0; i < 20; i++)
   {
     st_subdivide(&vdata[tindices[i][0]][0],
                  &vdata[tindices[i][1]][0],
@@ -3249,12 +3249,12 @@ int ut_icosphere(int n, int flag_rot, int* ntri_arg, VectorDouble& coord)
 
   /* Recopy while suppressing repeated triangle vertices */
 
-  int ntri = 0;
+  Id ntri = 0;
   coord.resize(3 * R_coor.ntri);
-  for (int i = 0; i < R_coor.ntri; i++)
+  for (Id i = 0; i < R_coor.ntri; i++)
   {
     if (st_already_present(&R_coor, i, ntri, coord)) continue;
-    for (int k = 0; k < 3; k++)
+    for (Id k = 0; k < 3; k++)
       COORD(k, ntri) = R_coor.coor[3 * i + k];
     ntri++;
   }
@@ -3269,7 +3269,7 @@ int ut_icosphere(int n, int flag_rot, int* ntri_arg, VectorDouble& coord)
   {
     double ct, st, a[3];
     st_init_rotation(&ct, &st, a);
-    for (int i = 0; i < ntri; i++)
+    for (Id i = 0; i < ntri; i++)
       GH::rotationGetRandomDirection(ct, st, a, &coord[3 * i]);
   }
 
@@ -3298,9 +3298,9 @@ int ut_icosphere(int n, int flag_rot, int* ntri_arg, VectorDouble& coord)
  ** \param[out] factor  logarithm of factorials
  **
  *****************************************************************************/
-void ut_log_factorial(int nbpoly, double* factor)
+void ut_log_factorial(Id nbpoly, double* factor)
 {
-  int i;
+  Id i;
 
   factor[0] = 0;
   for (i = 1; i < nbpoly; i++)
@@ -3316,12 +3316,12 @@ void ut_log_factorial(int nbpoly, double* factor)
  ** \param[in]  k     Value
  **
  *****************************************************************************/
-double ut_factorial(int k)
+double ut_factorial(Id k)
 {
   double val;
 
   val = 1;
-  for (int i = 1; i <= k; i++)
+  for (Id i = 1; i <= k; i++)
     val *= (double)i;
   return (val);
 }
@@ -3335,20 +3335,20 @@ DISABLE_WARNING_POP
  * @return A matrix of dimensions [n,nd] with the sequence values (between 0 and 1)
  * @note The dimension nd should be lower or equal to 50.
  */
-MatrixDense* vanDerCorput(int n, int nd)
+MatrixDense* vanDerCorput(Id n, Id nd)
 {
   VectorDouble primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
                          73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149,
                          151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229};
 
-  if (nd > (int)primes.size())
+  if (nd > (Id)primes.size())
   {
     messerr("Argument 'nd' should be smaller than 50.");
     return nullptr;
   }
 
   auto* res = new MatrixDense(n, nd);
-  for (int k = 0; k < nd; k++)
+  for (Id k = 0; k < nd; k++)
   {
     VectorDouble local = _corputVector(n, primes[k]);
     res->setColumn(k, local);
@@ -3356,15 +3356,15 @@ MatrixDense* vanDerCorput(int n, int nd)
   return res;
 }
 
-MatrixDense fillLegendreMatrix(const VectorDouble& r, int legendreOrder)
+MatrixDense fillLegendreMatrix(const VectorDouble& r, Id legendreOrder)
 {
-  int nrow = (int)r.size();
-  int ncol = legendreOrder + 1;
+  Id nrow = (Id)r.size();
+  Id ncol = legendreOrder + 1;
   MatrixDense lp(nrow, ncol);
 
   // Initialization
 
-  for (int i = 0; i < nrow; i++)
+  for (Id i = 0; i < nrow; i++)
   {
     lp.setValue(i, 0, 1.);
     lp.setValue(i, 1, r[i]);
@@ -3372,8 +3372,8 @@ MatrixDense fillLegendreMatrix(const VectorDouble& r, int legendreOrder)
 
   // Recursion
 
-  for (int j = 1; j < legendreOrder; j++)
-    for (int i = 0; i < nrow; i++)
+  for (Id j = 1; j < legendreOrder; j++)
+    for (Id i = 0; i < nrow; i++)
     {
       lp.setValue(i, j + 1,
                   ((2 * j + 1) * r[i] * lp.getValue(i, j) - (j)*lp.getValue(i, j - 1)) / (j + 1));
@@ -3394,7 +3394,7 @@ MatrixDense fillLegendreMatrix(const VectorDouble& r, int legendreOrder)
  ** \remarks When the solution is double, the returned number os 1.
  **
  *****************************************************************************/
-int solve_P2(double a, double b, double c, VectorDouble& x)
+Id solve_P2(double a, double b, double c, VectorDouble& x)
 {
   double delta;
 
@@ -3432,10 +3432,10 @@ int solve_P2(double a, double b, double c, VectorDouble& x)
  ** \remarks When the solution is double, the returned number os 1.
  **
  *****************************************************************************/
-int solve_P3(double a, double b, double c, double d, VectorDouble& x)
+Id solve_P3(double a, double b, double c, double d, VectorDouble& x)
 {
   double delta, p, q, ecart, u, v, s1;
-  int k;
+  Id k;
 
   if (a == 0.) return (solve_P2(b, c, d, x));
 

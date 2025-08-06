@@ -63,7 +63,7 @@ String FracDesc::toString(const AStringFormat* strfmt) const
   if (sf.getLevel() > 1)
   {
     sstr << "     X           Y" << std::endl;
-    for (int j = 0; j < getNPoint(); j++)
+    for (Id j = 0; j < getNPoint(); j++)
       sstr << " " << getXXF(j) << " " << getYYF(j) << std::endl;
   }
   return sstr.str();
@@ -91,7 +91,7 @@ void FracDesc::addPoint(double x, double y)
 double FracDesc::fractureExtension(double cote, double dcote) const
 {
   double dist = 0.;
-  for (int i = 0; i < getNPoint() - 1; i++)
+  for (Id i = 0; i < getNPoint() - 1; i++)
   {
     double distx = getXXF(i + 1) - getXXF(i);
     double disty = getYYF(i + 1) - getYYF(i);

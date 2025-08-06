@@ -74,15 +74,15 @@ public:
 
   /// Db Interface
   inline bool isGrid() const override { return true; }
-  double getCoordinate(int iech, int idim, bool flag_rotate = true) const override;
+  double getCoordinate(Id iech, Id idim, bool flag_rotate = true) const override;
   void getCoordinatesInPlace(VectorDouble& coor,
-                             int iech,
+                             Id iech,
                              bool flag_rotate = true) const override;
 
-  double getUnit(int idim = 0) const override;
-  int getNDim() const override;
+  double getUnit(Id idim = 0) const override;
+  Id getNDim() const override;
   bool mayChangeSampleNumber() const override { return false; }
-  void resetDims(int ncol, int nech) override;
+  void resetDims(Id ncol, Id nech) override;
   bool isConsistent() const override;
 
   static DbGrid* createFromNF(const String& NFFilename, bool verbose = true);
@@ -122,8 +122,8 @@ public:
   static DbGrid* createFromGridShrink(const DbGrid& gridIn,
                                       const VectorInt& deletedRanks);
   static DbGrid* createGrid2D(const ELoadBy& order,
-                              int nx,
-                              int ny,
+                              Id nx,
+                              Id ny,
                               double x0               = 0.,
                               double y0               = 0.,
                               double dx               = 1.,
@@ -136,14 +136,14 @@ public:
                                                 const String& nameTop,
                                                 const String& nameBot,
                                                 const VectorString& names,
-                                                int nzout,
+                                                Id nzout,
                                                 double thickmin = 0.);
   static DbGrid* createSqueezeAndStretchBackward(const DbGrid* grid3Din,
                                                  const DbGrid* surf2D,
                                                  const String& nameTop,
                                                  const String& nameBot,
                                                  const VectorString& names,
-                                                 int nzout,
+                                                 Id nzout,
                                                  double z0out,
                                                  double dzout);
   static DbGrid* createSubGrid(const DbGrid* gridin,
@@ -152,17 +152,17 @@ public:
   static DbGrid* createMultiple(DbGrid* dbin, const VectorInt& nmult, bool flagAddSampleRank);
   static DbGrid* createDivider(DbGrid* dbin, const VectorInt& nmult, bool flagAddSampleRank);
   static DbGrid* createFillRandom(const VectorInt& nx,
-                                  int nvar                        = 1,
-                                  int nfex                        = 0,
-                                  int ncode                       = 0,
+                                  Id nvar                        = 1,
+                                  Id nfex                        = 0,
+                                  Id ncode                       = 0,
                                   double varmax                   = 0.,
                                   double selRatio                 = 0.,
                                   const VectorDouble& heteroRatio = VectorDouble(),
                                   const VectorDouble& means       = VectorDouble(),
                                   const VectorDouble& x0          = VectorDouble(),
-                                  int seed                        = 1367843);
+                                  Id seed                        = 1367843);
 
-  int reset(const VectorInt& nx,
+  Id reset(const VectorInt& nx,
             const VectorDouble& dx           = VectorDouble(),
             const VectorDouble& x0           = VectorDouble(),
             const VectorDouble& angles       = VectorDouble(),
@@ -172,12 +172,12 @@ public:
             const VectorString& locatorNames = VectorString(),
             bool flagAddSampleRank           = true,
             bool flagAddCoordinates          = true);
-  int resetCoveringDb(const Db* db,
+  Id resetCoveringDb(const Db* db,
                       const VectorInt& nx        = VectorInt(),
                       const VectorDouble& dx     = VectorDouble(),
                       const VectorDouble& x0     = VectorDouble(),
                       const VectorDouble& margin = VectorDouble());
-  int resetFromPolygon(Polygons* polygon,
+  Id resetFromPolygon(Polygons* polygon,
                        const VectorInt& nodes,
                        const VectorDouble& dcell,
                        bool flagAddSampleRank = true);
@@ -189,41 +189,41 @@ public:
   void generateCoordinates(const String& radix = "x");
 
   VectorDouble getColumnSubGrid(const String& name,
-                                int idim0,
-                                int rank,
+                                Id idim0,
+                                Id rank,
                                 bool useSel = false);
 
-  int gridDefine(const VectorInt& nx,
+  Id gridDefine(const VectorInt& nx,
                  const VectorDouble& dx     = VectorDouble(),
                  const VectorDouble& x0     = VectorDouble(),
                  const VectorDouble& angles = VectorDouble());
-  void gridCopyParams(int mode, const Grid& gridaux);
+  void gridCopyParams(Id mode, const Grid& gridaux);
   bool isSameGrid(const Grid& grid) const;
   bool isSameGridMesh(const DbGrid& dbaux) const;
   bool isSameGridRotation(const DbGrid& dbaux) const;
   bool isGridRotated() const;
 
-  int getNTotal() const { return _grid.getNTotal(); }
+  Id getNTotal() const { return _grid.getNTotal(); }
   double getCellSize() const { return _grid.getCellSize(); }
   double getVolume() const { return _grid.getVolume(); }
   VectorDouble getExtends() const { return _grid.getExtends(); }
-  double getExtend(int idim) const { return _grid.getExtend(idim); }
+  double getExtend(Id idim) const { return _grid.getExtend(idim); }
 
-  int getNX(int idim) const { return _grid.getNX(idim); }
+  Id getNX(Id idim) const { return _grid.getNX(idim); }
   VectorInt getNXs() const { return _grid.getNXs(); }
-  VectorInt getNXsExt(int ndimMax) const;
+  VectorInt getNXsExt(Id ndimMax) const;
   bool hasSingleBlock() const;
-  double getDX(int idim) const { return _grid.getDX(idim); }
+  double getDX(Id idim) const { return _grid.getDX(idim); }
   VectorDouble getDXs() const { return _grid.getDXs(); }
-  double getX0(int idim) const { return _grid.getX0(idim); }
+  double getX0(Id idim) const { return _grid.getX0(idim); }
   VectorDouble getX0s() const { return _grid.getX0s(); }
-  double getAngle(int idim) const { return _grid.getRotAngle(idim); }
+  double getAngle(Id idim) const { return _grid.getRotAngle(idim); }
   VectorDouble getAngles() const { return _grid.getRotAngles(); }
   VectorDouble getRotMat() const { return _grid.getRotMat(); }
-  void setNX(int idim, int value) { _grid.setNX(idim, value); }
-  void setX0(int idim, double value) { _grid.setX0(idim, value); }
-  void setDX(int idim, double value) { _grid.setDX(idim, value); }
-  VectorDouble getGridAxis(int idim) const { return _grid.getAxis(idim); }
+  void setNX(Id idim, Id value) { _grid.setNX(idim, value); }
+  void setX0(Id idim, double value) { _grid.setX0(idim, value); }
+  void setDX(Id idim, double value) { _grid.setDX(idim, value); }
+  VectorDouble getGridAxis(Id idim) const { return _grid.getAxis(idim); }
   VectorDouble getCoordinateFromCorner(const VectorInt& icorner) const
   {
     return _grid.getCoordinatesByCorner(icorner);
@@ -247,21 +247,21 @@ public:
   {
     _grid.getCoordinatesByIndiceInPlace(coor, indice, flag_rotate, shift, dxsPerCell);
   }
-  VectorDouble getCoordinatesPerSample(int iech, bool flag_rotate = true) const
+  VectorDouble getCoordinatesPerSample(Id iech, bool flag_rotate = true) const
   {
     return _grid.getCoordinatesByRank(iech, flag_rotate);
   }
-  void getCoordinatesPerSampleInPlace(VectorDouble& coor, int iech, bool flag_rotate = true) const
+  void getCoordinatesPerSampleInPlace(VectorDouble& coor, Id iech, bool flag_rotate = true) const
   {
     _grid.getCoordinatesByRankInPlace(coor, iech, flag_rotate);
   }
-  int coordinateToRank(const VectorDouble& coor,
+  Id coordinateToRank(const VectorDouble& coor,
                        bool centered = false,
                        double eps    = EPSILON6) const;
   VectorInt coordinateToIndices(const VectorDouble& coor,
                                 bool centered = false,
                                 double eps    = EPSILON6) const;
-  int coordinateToIndicesInPlace(const VectorDouble& coor,
+  Id coordinateToIndicesInPlace(const VectorDouble& coor,
                                  VectorInt& indices,
                                  bool centered = false,
                                  double eps    = EPSILON6) const;
@@ -269,21 +269,21 @@ public:
   {
     return _grid.getCenterIndices(flagSup);
   }
-  int indiceToRank(const VectorInt& indice) const
+  Id indiceToRank(const VectorInt& indice) const
   {
     return _grid.indiceToRank(indice);
   }
-  void rankToIndice(int node, VectorInt& indices, bool minusOne = false) const
+  void rankToIndice(Id node, VectorInt& indices, bool minusOne = false) const
   {
     _grid.rankToIndice(node, indices, minusOne);
   }
-  void rankToCoordinatesInPlace(int rank,
+  void rankToCoordinatesInPlace(Id rank,
                                 VectorDouble& coor,
                                 const VectorDouble& percent = VectorDouble()) const
   {
     _grid.rankToCoordinatesInPlace(rank, coor, percent);
   }
-  VectorDouble rankToCoordinates(int rank,
+  VectorDouble rankToCoordinates(Id rank,
                                  const VectorDouble& percent = VectorDouble()) const
   {
     return _grid.rankToCoordinates(rank, percent);
@@ -301,13 +301,13 @@ public:
     return _grid.indicesToCoordinate(indice, percent);
   }
   bool sampleBelongsToCell(const VectorDouble& coor,
-                           int rank,
+                           Id rank,
                            const VectorDouble& dxsPerCell = VectorDouble()) const
   {
     return _grid.sampleBelongsToCell(coor, rank, dxsPerCell);
   }
 
-  int centerCoordinateInPlace(VectorDouble& coor,
+  Id centerCoordinateInPlace(VectorDouble& coor,
                               bool centered  = false,
                               bool stopIfOut = false,
                               double eps     = EPSILON6) const;
@@ -317,81 +317,81 @@ public:
                              bool centered           = false,
                              bool useSel             = false) const;
 
-  int getMirrorIndex(int idim, int ix) const
+  Id getMirrorIndex(Id idim, Id ix) const
   {
     return _grid.getMirrorIndex(idim, ix);
   }
 
   VectorVectorDouble getSlice(const String& name,
-                              int pos     = 0,
-                              int indice  = 0,
+                              Id pos     = 0,
+                              Id indice  = 0,
                               bool useSel = false) const;
   VectorDouble getOneSlice(const String& name,
-                           int posx                = 0,
-                           int posy                = 1,
+                           Id posx                = 0,
+                           Id posy                = 1,
                            const VectorInt& corner = VectorInt(),
                            bool useSel             = false) const;
-  VectorDouble getOneSliceForCoordinate(int idim,
-                                        int posx                = 0,
-                                        int posy                = 1,
+  VectorDouble getOneSliceForCoordinate(Id idim,
+                                        Id posx                = 0,
+                                        Id posy                = 1,
                                         const VectorInt& corner = VectorInt(),
                                         bool useSel             = false) const;
-  int assignGridColumn(const String& name,
-                       int idim,
-                       int rank,
+  Id assignGridColumn(const String& name,
+                       Id idim,
+                       Id rank,
                        double value,
                        bool useSel = false);
-  VectorDouble getBlockExtensions(int node) const;
-  VectorVectorDouble getCellEdges(int node = 0, bool forceGridMesh = false) const;
+  VectorDouble getBlockExtensions(Id node) const;
+  VectorVectorDouble getCellEdges(Id node = 0, bool forceGridMesh = false) const;
   VectorVectorDouble getAllCellsEdges(bool forceGridMesh = false) const;
   VectorVectorDouble getGridEdges() const;
   VectorDouble getCodir(const VectorInt& grincr) const;
   VectorVectorInt getLimitsFromVariableExtend(const String& nameTop,
                                               const String& nameBot,
                                               const VectorInt& dimExclude = VectorInt()) const;
-  int setSelectionFromVariableExtend(const String& nameTop, const String& nameBot);
+  Id setSelectionFromVariableExtend(const String& nameTop, const String& nameBot);
   void clean3DFromSurfaces(const VectorString& names,
                            const DbGrid* surf2D,
                            const String& nameTop = String(),
                            const String& nameBot = String(),
                            bool verbose          = false);
 
-  int morpho(const EMorpho& oper,
+  Id morpho(const EMorpho& oper,
              double vmin                     = 0.5,
              double vmax                     = 1.5,
-             int option                      = 0,
+             Id option                      = 0,
              const VectorInt& radius         = VectorInt(),
              bool flagDistErode              = false,
              bool verbose                    = false,
              const NamingConvention& namconv = NamingConvention("Morpho"));
-  int smooth(ANeigh* neigh,
-             int type                        = 1,
+  Id smooth(ANeigh* neigh,
+             Id type                        = 1,
              double range                    = 1.,
              const NamingConvention& namconv = NamingConvention("Smooth"));
 
-  int addSelectionFromDbByMorpho(Db* db,
-                                 int nmin                        = 0,
-                                 int radius                      = 0,
-                                 int option                      = 0,
+  Id addSelectionFromDbByMorpho(Db* db,
+                                 Id nmin                        = 0,
+                                 Id radius                      = 0,
+                                 Id option                      = 0,
                                  const VectorInt& dilation       = VectorInt(),
                                  bool verbose                    = false,
                                  const NamingConvention& namconv = NamingConvention("Morpho", false, false, true, ELoc::fromKey("SEL")));
 
-  void getSampleAsSTInPlace(int iech, SpaceTarget& P) const override;
+  void getSampleAsSTInPlace(Id iech, SpaceTarget& P) const override;
 
   VectorVectorDouble getDiscretizedBlock(const VectorInt& ndiscs,
-                                         int iech         = 0,
+                                         Id iech         = 0,
                                          bool flagPerCell = false,
                                          bool flagRandom  = false,
-                                         int seed         = 132433) const;
+                                         Id seed         = 132433) const;
 
-  void getGridPileInPlace(int iuid,
+  void getGridPileInPlace(Id iuid,
                           const VectorInt& indg,
-                          int idim0,
+                          Id idim0,
                           VectorDouble& vec) const;
-  void setGridPileInPlace(int iuid,
+  void setGridPileInPlace(Id iuid,
                           const VectorInt& indg,
-                          int idim0,
+                          Id idim0,
                           const VectorDouble& vec);
   VectorDouble getDistanceToOrigin(const VectorInt& origin,
                                    const VectorDouble& radius = VectorDouble());
@@ -407,9 +407,9 @@ protected:
   String _getNFName() const override { return "DbGrid"; }
 
 private:
-  void _createGridCoordinates(int icol0);
+  void _createGridCoordinates(Id icol0);
   void _interpolate(const DbGrid* grid3D,
-                    int idim0,
+                    Id idim0,
                     double top,
                     double bot,
                     const VectorDouble& vecin,

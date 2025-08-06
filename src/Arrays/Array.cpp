@@ -57,14 +57,14 @@ void Array::_update()
 double Array::getValue(const VectorInt& indice) const
 {
   if (! _isValidIndice(indice)) return TEST;
-  int iad = indiceToRank(indice);
+  Id iad = indiceToRank(indice);
   return _values[iad];
 }
 
 void Array::setValue(const VectorInt& indice, double value)
 {
   if (! _isValidIndice(indice)) return;
-  int iad = indiceToRank(indice);
+  Id iad = indiceToRank(indice);
   _values[iad] = value;
 }
 }

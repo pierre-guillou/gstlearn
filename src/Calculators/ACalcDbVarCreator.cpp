@@ -29,13 +29,13 @@ ACalcDbVarCreator::~ACalcDbVarCreator()
 {
 }
 
-int ACalcDbVarCreator::_getNDim() const
+Id ACalcDbVarCreator::_getNDim() const
 {
   if (_db == nullptr) return -1;
   return  _db->getNDim();
 }
 
-int ACalcDbVarCreator::_getNVar() const
+Id ACalcDbVarCreator::_getNVar() const
 {
   if (_db == nullptr) return -1;
   return  _db->getNLoc(ELoc::Z);
@@ -46,47 +46,47 @@ int ACalcDbVarCreator::_getNVar() const
  * @param status  1 for variables to be stored; 2 for Temporary variable
  * @param iuids   Vector of UIDs of the new variable
  */
-void ACalcDbVarCreator::_storeInVariableList(int status, const VectorInt& iuids)
+void ACalcDbVarCreator::_storeInVariableList(Id status, const VectorInt& iuids)
 {
-  int number = (int) iuids.size();
+  Id number = (Id) iuids.size();
   if (number <= 0) return;
 
   if (status == 1)
   {
-    for (int i = 0; i < number; i++)
+    for (Id i = 0; i < number; i++)
       _listVariablePermDb.push_back(iuids[i]);
   }
   else
   {
-    for (int i = 0; i < number; i++)
+    for (Id i = 0; i < number; i++)
       _listVariableTempDb.push_back(iuids[i]);
   }
 }
 
-int ACalcDbVarCreator::_addVariableDb(int status,
+Id ACalcDbVarCreator::_addVariableDb(Id status,
                                       const ELoc& locatorType,
-                                      int locatorIndex,
-                                      int number,
+                                      Id locatorIndex,
+                                      Id number,
                                       double valinit)
 {
   if (_db == nullptr) return -1;
-  int iuid = _db->addColumnsByConstant(number, valinit, String(), locatorType, locatorIndex);
+  Id iuid = _db->addColumnsByConstant(number, valinit, String(), locatorType, locatorIndex);
   if (iuid < 0) return -1;
   VectorInt iuids = VH::sequence(number, iuid);
   _storeInVariableList(status, iuids);
   return iuid;
 }
 
-void ACalcDbVarCreator::_renameVariable(int nvar,
-                                        int iptr,
+void ACalcDbVarCreator::_renameVariable(Id nvar,
+                                        Id iptr,
                                         const ELoc& locatorInType,
                                         const String &qualifier,
-                                        int count)
+                                        Id count)
 {
   _namconv.setNamesAndLocators(_db, VectorString(), locatorInType, nvar, _db, iptr, qualifier, count);
 }
 
-void ACalcDbVarCreator::_cleanVariableDb(int status)
+void ACalcDbVarCreator::_cleanVariableDb(Id status)
 {
   // Dispatch
 
@@ -94,7 +94,7 @@ void ACalcDbVarCreator::_cleanVariableDb(int status)
   {
     if (!_listVariablePermDb.empty())
     {
-      for (int i = 0; i < (int) _listVariablePermDb.size(); i++)
+      for (Id i = 0; i < (Id) _listVariablePermDb.size(); i++)
         _db->deleteColumnByUID(_listVariablePermDb[i]);
     }
     _listVariablePermDb.clear();
@@ -103,7 +103,7 @@ void ACalcDbVarCreator::_cleanVariableDb(int status)
   {
     if (!_listVariableTempDb.empty())
     {
-      for (int i = 0; i < (int) _listVariableTempDb.size(); i++)
+      for (Id i = 0; i < (Id) _listVariableTempDb.size(); i++)
         _db->deleteColumnByUID(_listVariableTempDb[i]);
     }
     _listVariableTempDb.clear();

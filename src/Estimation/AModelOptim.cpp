@@ -27,15 +27,15 @@ AModelOptim::AModelOptim(ModelGeneric* model, bool verbose)
   bool useGradient = (bool)OptCustom::query("UseGradient", 1);
   _params          = _model->generateListParams();
 
-  // int nvar                 = _model->getNVar();
+  // Id nvar                 = _model->getNVar();
   // MatrixSymmetric varsUnit = MatrixSymmetric(nvar);
-  // for (int ivar = 0; ivar < nvar; ivar++) varsUnit.setValue(ivar, ivar, 1.);
+  // for (Id ivar = 0; ivar < nvar; ivar++) varsUnit.setValue(ivar, ivar, 1.);
   // _model->initParams(varsUnit, 1.);
   _x    = _params->getOptimizableValues();
   if (useGradient)
-    _opt = new Optim(LBFGS, (int)_x.size());
+    _opt = new Optim(LBFGS, (Id)_x.size());
   else
-    _opt = new Optim(NELDERMEAD, (int)_x.size());
+    _opt = new Optim(NELDERMEAD, (Id)_x.size());
 
   _opt->setXtolRel(EPSILON6);
   _opt->setObjective([this](const std::vector<double>& x)
@@ -159,7 +159,7 @@ void AModelOptim::_printSummary(double minf, const std::vector<double>& x) const
   AModelFitSills* amf = mcv->getFitSills();
   if (amf != nullptr)
   {
-    int nitergCum = mcv->getCovList()->getNitergCum();
+    Id nitergCum = mcv->getCovList()->getNitergCum();
     amf->printFitSillSummary(nitergCum);
   }
 }

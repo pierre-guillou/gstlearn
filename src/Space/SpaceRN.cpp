@@ -41,7 +41,7 @@ SpaceRN& SpaceRN::operator=(const SpaceRN& r)
 SpaceRN::~SpaceRN()
 {
 }
-ASpaceSharedPtr SpaceRN::create(int ndim)
+ASpaceSharedPtr SpaceRN::create(Id ndim)
 {
   return std::shared_ptr<const SpaceRN>(new SpaceRN(ndim));
 }
@@ -69,7 +69,7 @@ void SpaceRN::_move(SpacePoint& p1, const VectorDouble& vec) const
  */
 double SpaceRN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   double dist         = 0.;
@@ -87,7 +87,7 @@ double SpaceRN::_getDistance(const SpacePoint& p1,
 double SpaceRN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
                              const Tensor& tensor,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   _getIncrementInPlace(p1, p2, _work1);
@@ -104,7 +104,7 @@ double SpaceRN::_getDistance(const SpacePoint& p1,
 double SpaceRN::_getFrequentialDistance(const SpacePoint& p1,
                                         const SpacePoint& p2,
                                         const Tensor& tensor,
-                                        int ispace) const
+                                        Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   _getIncrementInPlace(p1, p2, _work1);
@@ -114,7 +114,7 @@ double SpaceRN::_getFrequentialDistance(const SpacePoint& p1,
 
 VectorDouble SpaceRN::_getIncrement(const SpacePoint& p1,
                                     const SpacePoint& p2,
-                                    int ispace) const
+                                    Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   _getIncrementInPlace(p1, p2, _work1);
@@ -124,10 +124,10 @@ VectorDouble SpaceRN::_getIncrement(const SpacePoint& p1,
 void SpaceRN::_getIncrementInPlace(const SpacePoint& p1,
                                    const SpacePoint& p2,
                                    VectorDouble& ptemp,
-                                   int ispace) const
+                                   Id ispace) const
 {
   DECLARE_UNUSED(ispace);
-  int j                  = 0;
+  Id j                  = 0;
   auto offset            = getOffset();
   auto ndim              = getNDim();
   size_t maxlength       = ndim + offset;

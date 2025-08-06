@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
   // Calculating the experimental variogram
   double diagonal        = db->getExtensionDiagonal();
-  int nlag               = 10;
+  Id nlag                = 10;
   double dlag            = diagonal / 2. / nlag;
   VarioParam* varioparam = VarioParam::createMultiple(4, nlag, dlag);
   Vario* vario           = Vario::computeFromDb(*varioparam, db);

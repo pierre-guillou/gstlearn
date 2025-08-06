@@ -21,14 +21,14 @@ namespace gstlrn
 
 Ball::Ball(const Db* dbin,
            const Db* dbout,
-           int leaf_size,
+           Id leaf_size,
            bool has_constraints,
-           int default_distance_function,
+           Id default_distance_function,
            bool useSel)
   : _tree()
 {
-  int n_samples;
-  int n_features;
+  Id n_samples;
+  Id n_features;
   auto internal = _getInformationFromDb(dbin, dbout, useSel, &n_samples, &n_features);
   if (internal.empty()) return;
 
@@ -46,12 +46,12 @@ Ball::Ball(const Db* dbin,
  * @param default_distance_function 1 for Euclidean distance, 2 for Manhattan
  */
 Ball::Ball(const AMesh* mesh,
-           int leaf_size,
+           Id leaf_size,
            bool has_constraints,
-           int default_distance_function)
+           Id default_distance_function)
 {
-  int n_samples;
-  int n_features;
+  Id n_samples;
+  Id n_features;
   auto internal = _getInformationFromMesh(mesh, &n_samples, &n_features);
   if (internal.empty()) return;
 
@@ -60,29 +60,29 @@ Ball::Ball(const AMesh* mesh,
 }
 
 void Ball::init(const Db* db,
-                int leaf_size,
-                int default_distance_function,
+                Id leaf_size,
+                Id default_distance_function,
                 bool useSel)
 {
-  int n_samples;
-  int n_features;
+  Id n_samples;
+  Id n_features;
   auto internal = _getInformationFromDb(db, nullptr, useSel, &n_samples, &n_features);
   if (internal.empty()) return;
 
   _tree = t_btree(std::move(internal), n_samples, n_features, false, leaf_size, default_distance_function);
 }
 
-KNN Ball::queryAsVVD(const VectorVectorDouble& test, int n_neighbors)
+KNN Ball::queryAsVVD(const VectorVectorDouble& test, Id n_neighbors)
 {
   KNN knn;
   if (test.empty()) return knn;
-  int n_samples  = (int)test[0].size();
-  int n_features = (int)test.size();
+  Id n_samples  = (Id)test[0].size();
+  Id n_features = (Id)test.size();
   MatrixT<double> internal(n_samples, n_features);
   // transpose
-  for (int i = 0; i < n_samples; ++i)
+  for (Id i = 0; i < n_samples; ++i)
   {
-    for (int j = 0; j < n_features; ++j)
+    for (Id j = 0; j < n_features; ++j)
     {
       internal(i, j) = test[j][i];
     }
@@ -91,11 +91,11 @@ KNN Ball::queryAsVVD(const VectorVectorDouble& test, int n_neighbors)
   return knn;
 }
 
-KNN Ball::queryOne(const double* test, int n_features, int n_neighbors)
+KNN Ball::queryOne(const double* test, Id n_features, Id n_neighbors)
 {
   KNN knn;
   MatrixT<double> internal(1, n_features);
-  for (int i = 0; i < n_features; ++i)
+  for (Id i = 0; i < n_features; ++i)
   {
     internal(0, i) = test[i];
   }
@@ -103,12 +103,12 @@ KNN Ball::queryOne(const double* test, int n_features, int n_neighbors)
   return knn;
 }
 
-KNN Ball::queryOneAsVD(const VectorDouble& test, int n_neighbors)
+KNN Ball::queryOneAsVD(const VectorDouble& test, Id n_neighbors)
 {
   KNN knn;
-  int n_features = (int)test.size();
+  Id n_features = (Id)test.size();
   MatrixT<double> internal(1, n_features);
-  for (int i = 0; i < n_features; ++i)
+  for (Id i = 0; i < n_features; ++i)
   {
     internal(0, i) = test[i];
   }
@@ -116,12 +116,12 @@ KNN Ball::queryOneAsVD(const VectorDouble& test, int n_neighbors)
   return knn;
 }
 
-KNN Ball::queryOneAsVDFromSP(const SpacePoint& Pt, int n_neighbors)
+KNN Ball::queryOneAsVDFromSP(const SpacePoint& Pt, Id n_neighbors)
 {
   KNN knn;
-  int n_features = Pt.getNDim();
+  Id n_features = Pt.getNDim();
   MatrixT<double> internal(1, n_features);
-  for (int i = 0; i < n_features; ++i)
+  for (Id i = 0; i < n_features; ++i)
   {
     internal(0, i) = Pt.getCoord(i);
   }
@@ -129,18 +129,18 @@ KNN Ball::queryOneAsVDFromSP(const SpacePoint& Pt, int n_neighbors)
   return knn;
 }
 
-VectorInt Ball::getIndices(const SpacePoint& Pt, int n_neighbors)
+VectorInt Ball::getIndices(const SpacePoint& Pt, Id n_neighbors)
 {
   KNN knn = queryOneAsVDFromSP(Pt, n_neighbors);
   return {knn.getIndices(0).begin(), knn.getIndices(0).end()};
 }
 
-int Ball::queryClosest(const VectorDouble& test)
+Id Ball::queryClosest(const VectorDouble& test)
 {
   KNN knn;
-  int n_features = (int)test.size();
+  Id n_features = (Id)test.size();
   MatrixT<double> internal(1, n_features);
-  for (int i = 0; i < n_features; ++i)
+  for (Id i = 0; i < n_features; ++i)
   {
     internal(0, i) = test[i];
   }
@@ -148,16 +148,16 @@ int Ball::queryClosest(const VectorDouble& test)
   return knn.getIndex(0, 0);
 }
 
-int Ball::queryOneInPlace(const VectorDouble& test,
-                          int n_neighbors,
+Id Ball::queryOneInPlace(const VectorDouble& test,
+                          Id n_neighbors,
                           VectorInt& indices,
                           VectorDouble& distances,
-                          int rank)
+                          Id rank)
 {
   KNN knn;
-  int n_features = (int)test.size();
+  Id n_features = (Id)test.size();
   MatrixT<double> internal(1, n_features);
-  for (int i = 0; i < n_features; ++i)
+  for (Id i = 0; i < n_features; ++i)
   {
     internal(0, i) = test[i];
   }
@@ -173,7 +173,7 @@ int Ball::queryOneInPlace(const VectorDouble& test,
  *               0 List of the different nodes
  *               1 List of Leaves and attached list of samples
  */
-void Ball::display(int level) const
+void Ball::display(Id level) const
 {
   _tree.display(level);
 }
@@ -188,7 +188,7 @@ bool Ball::_isConstraintDefined() const
   return true;
 }
 
-int Ball::setConstraint(int rank, bool status)
+Id Ball::setConstraint(Id rank, bool status)
 {
   if (empty()) return 1;
   if (!_isConstraintDefined()) return 1;
@@ -197,27 +197,27 @@ int Ball::setConstraint(int rank, bool status)
   return 0;
 }
 
-int Ball::resetConstraints(bool status)
+Id Ball::resetConstraints(bool status)
 {
   if (empty()) return 1;
   if (!_isConstraintDefined()) return 1;
-  for (int i = 0, n = _tree.n_samples; i < n; i++)
+  for (Id i = 0, n = _tree.n_samples; i < n; i++)
     _tree.accept[i] = status;
   return 0;
 }
 
-MatrixT<int> findNN(const Db* dbin,
+MatrixT<Id> findNN(const Db* dbin,
                     const Db* dbout,
-                    int nb_neigh,
+                    Id nb_neigh,
                     bool flagShuffle,
                     bool verbose,
-                    int leaf_size,
-                    int default_distance_function)
+                    Id leaf_size,
+                    Id default_distance_function)
 {
-  MatrixT<int> mat;
+  MatrixT<Id> mat;
 
   // Preliminary checks
-  int ndim = dbin->getNDim();
+  Id ndim = dbin->getNDim();
   if (dbout != nullptr && ndim != dbout->getNDim())
   {
     messerr("Dbin(%d) and Dbout(%d) should have the same dimension",
@@ -230,8 +230,8 @@ MatrixT<int> findNN(const Db* dbin,
   if (verbose) ball.display(1);
 
   // Dimensioning the output matrix
-  int n1 = dbin->getNSample(true);
-  int n2 = (dbout != nullptr) ? dbout->getNSample(true) : 0;
+  Id n1 = dbin->getNSample(true);
+  Id n2 = (dbout != nullptr) ? dbout->getNSample(true) : 0;
   mat.resize(n1 + n2, nb_neigh);
 
   // Loop on the samples for the FNN search
@@ -244,13 +244,13 @@ MatrixT<int> findNN(const Db* dbin,
     mestitle(1, "List of Neighbors for NN search");
 
   ranks = (flagShuffle) ? law_random_path(n1) : VH::sequence(n1);
-  for (int jech = 0; jech < n1; jech++)
+  for (Id jech = 0; jech < n1; jech++)
   {
-    int iech = ranks[jech];
+    Id iech = ranks[jech];
     dbin->getSampleAsSPInPlace(pt, iech);
     ball.setConstraint(iech, true);
     (void)ball.queryOneInPlace(pt.getCoordUnprotected(), nb_neigh, neighs, distances);
-    for (int i = 0; i < nb_neigh; i++) mat(jech, i) = neighs[i];
+    for (Id i = 0; i < nb_neigh; i++) mat(jech, i) = neighs[i];
 
     if (verbose)
     {
@@ -262,13 +262,13 @@ MatrixT<int> findNN(const Db* dbin,
   if (dbout != nullptr)
   {
     ranks = (flagShuffle) ? law_random_path(n2) : VH::sequence(n2);
-    for (int jech = 0; jech < n2; jech++)
+    for (Id jech = 0; jech < n2; jech++)
     {
-      int iech = ranks[jech];
+      Id iech = ranks[jech];
       dbout->getSampleAsSPInPlace(pt, iech);
       ball.setConstraint(iech + n1, true);
       (void)ball.queryOneInPlace(pt.getCoordUnprotected(), nb_neigh, neighs, distances);
-      for (int i = 0; i < nb_neigh; i++) mat(n1 + jech, i) = neighs[i];
+      for (Id i = 0; i < nb_neigh; i++) mat(n1 + jech, i) = neighs[i];
 
       if (verbose)
       {
@@ -283,12 +283,12 @@ MatrixT<int> findNN(const Db* dbin,
 MatrixT<double> Ball::_getInformationFromDb(const Db* dbin,
                                             const Db* dbout,
                                             bool useSel,
-                                            int* n_samples,
-                                            int* n_features)
+                                            Id* n_samples,
+                                            Id* n_features)
 {
   VectorDouble oneColumn;
-  int ncol    = dbin->getNLoc(ELoc::X);
-  int nrowtot = dbin->getNSample(useSel);
+  Id ncol    = dbin->getNLoc(ELoc::X);
+  Id nrowtot = dbin->getNSample(useSel);
   if (dbout != nullptr)
   {
     if (ncol != dbout->getNLoc(ELoc::X))
@@ -303,14 +303,14 @@ MatrixT<double> Ball::_getInformationFromDb(const Db* dbin,
   MatrixT<double> internal(nrowtot, ncol);
 
   // Loading the information from dbin
-  int ns = 0;
+  Id ns = 0;
   if (dbin != nullptr)
   {
-    int nrow = dbin->getNSample(useSel);
-    for (int icol = 0; icol < ncol; icol++)
+    Id nrow = dbin->getNSample(useSel);
+    for (Id icol = 0; icol < ncol; icol++)
     {
       oneColumn = dbin->getOneCoordinate(icol, useSel);
-      for (int irow = 0; irow < nrow; irow++)
+      for (Id irow = 0; irow < nrow; irow++)
         internal(ns + irow, icol) = oneColumn[irow];
     }
     ns += nrow;
@@ -319,11 +319,11 @@ MatrixT<double> Ball::_getInformationFromDb(const Db* dbin,
   // Loading information from dbout
   if (dbout != nullptr)
   {
-    int nrow = dbout->getNSample(useSel);
-    for (int icol = 0; icol < ncol; icol++)
+    Id nrow = dbout->getNSample(useSel);
+    for (Id icol = 0; icol < ncol; icol++)
     {
       oneColumn = dbout->getOneCoordinate(icol, useSel);
-      for (int irow = 0; irow < nrow; irow++)
+      for (Id irow = 0; irow < nrow; irow++)
         internal(ns + irow, icol) = oneColumn[irow];
     }
     ns += nrow;
@@ -335,18 +335,18 @@ MatrixT<double> Ball::_getInformationFromDb(const Db* dbin,
 }
 
 MatrixT<double> Ball::_getInformationFromMesh(const AMesh* mesh,
-                                              int* n_samples,
-                                              int* n_features)
+                                              Id* n_samples,
+                                              Id* n_features)
 {
   VectorDouble oneColumn;
-  int ndim  = mesh->getNDim();
-  int nmesh = mesh->getNMeshes();
+  Id ndim  = mesh->getNDim();
+  Id nmesh = mesh->getNMeshes();
 
   // Core allocation
   MatrixT<double> internal(nmesh, ndim);
 
   // Loading the information from mesh
-  for (int imesh = 0; imesh < nmesh; imesh++)
+  for (Id imesh = 0; imesh < nmesh; imesh++)
   {
     mesh->getBarycenterInPlace(imesh, internal.getRow(imesh));
   }

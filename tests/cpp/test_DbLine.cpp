@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
   copy(z1.begin(), z1.end(), std::back_inserter(tab));
   copy(z2.begin(), z2.end(), std::back_inserter(tab));
   DbLine* dbline =
-    DbLine::createFromSamples((int)x1.size(), ELoadBy::COLUMN, tab, lineCounts,
+    DbLine::createFromSamples((Id)x1.size(), ELoadBy::COLUMN, tab, lineCounts,
                               {"x1", "x2", "z1", "z2"},
                               {"x1", "x2", "z1", "z2"});
   if (dbline == nullptr) return 1;
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
   VectorInt lineIds    = {2, 2, 2, 5, 5, 5, 5, 1, 1, 6, 6, 6};
   VectorInt ranksPerId = {1, 2, 3, 10, 11, 12, 13, 1, 2, 1, 2, 3};
   DbLine* dbline3      = DbLine::createFromSamplesById(
-         (int)x1.size(), ELoadBy::COLUMN, tab, lineIds, ranksPerId,
-         {"x1", "x2", "z1", "z2"}, {"x1", "x2", "z1", "z2"});
+    (Id)x1.size(), ELoadBy::COLUMN, tab, lineIds, ranksPerId,
+    {"x1", "x2", "z1", "z2"}, {"x1", "x2", "z1", "z2"});
   if (dbline3 == nullptr) return 1;
   mestitle(1, "DbLine created using alternative solution");
   dbline3->display();

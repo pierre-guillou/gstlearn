@@ -34,14 +34,14 @@ public:
   const MatrixSquare& getMatrixDirect() const { return _rotMat; }
   const MatrixSquare& getMatrixInverse() const { return _rotInv; }
   const VectorDouble& getAngles() const { return _angles; }
-  double getAngle(int idim) const { return _angles[idim]; }
-  int getDerivativesInPlace(std::vector<MatrixSquare>& res) const;
+  double getAngle(Id idim) const { return _angles[idim]; }
+  Id getDerivativesInPlace(std::vector<MatrixSquare>& res) const;
   std::vector<MatrixSquare> getDerivatives() const;
   void resetFromSpaceDimension(size_t ndim);
   String toString(const AStringFormat* strfmt = nullptr) const override;
-  int setMatrixDirect(const MatrixSquare& rotmat);
-  int setMatrixDirectVec(const VectorDouble& rotmat);
-  int setAngles(const VectorDouble& angles);
+  Id setMatrixDirect(const MatrixSquare& rotmat);
+  Id setMatrixDirectVec(const VectorDouble& rotmat);
+  Id setAngles(const VectorDouble& angles);
   void setIdentity();
   void rotateDirect(const VectorDouble& inv, VectorDouble& outv) const;
   void rotateInverse(const VectorDouble& inv, VectorDouble& outv) const;
@@ -51,8 +51,8 @@ public:
   VectorDouble getMatrixDirectVec() const { return _rotMat.getValues(); }
   VectorDouble getMatrixInverseVec() const { return _rotInv.getValues(); }
 
-  double getMatrixDirect(int idim, int jdim) const { return _rotMat.getValue(idim, jdim); }
-  double getMatrixInverse(int idim, int jdim) const { return _rotInv.getValue(idim, jdim); }
+  double getMatrixDirect(Id idim, Id jdim) const { return _rotMat.getValue(idim, jdim); }
+  double getMatrixInverse(Id idim, Id jdim) const { return _rotInv.getValue(idim, jdim); }
 
 private:
   void _recopy(const Rotation& r);

@@ -67,9 +67,9 @@ GibbsMulti::~GibbsMulti()
 ** \param[in]  ipgs          Rank of the GS
 **
 *****************************************************************************/
-int GibbsMulti::calculInitialize(VectorVectorDouble& y,
-                                 int isimu,
-                                 int ipgs)
+Id GibbsMulti::calculInitialize(VectorVectorDouble& y,
+                                 Id isimu,
+                                 Id ipgs)
 {
   const Model* model = getModel();
   auto nact          = _getSampleRankNumber();
@@ -83,14 +83,14 @@ int GibbsMulti::calculInitialize(VectorVectorDouble& y,
 
   /* Loop on the variables */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     auto icase = getRank(ipgs, ivar);
 
     /* Loop on the samples */
 
     double sk = sqrt(model->getTotalSill(ivar, ivar));
-    for (int iact = 0; iact < nact; iact++)
+    for (Id iact = 0; iact < nact; iact++)
     {
       double vmin, vmax;
       if (_boundsCheck(ipgs, ivar, iact, &vmin, &vmax)) return 1;
@@ -120,11 +120,11 @@ int GibbsMulti::calculInitialize(VectorVectorDouble& y,
 double GibbsMulti::getSimulate(VectorVectorDouble& /*y*/,
                                double yk,
                                double sk,
-                               int icase,
-                               int ipgs,
-                               int ivar,
-                               int iact,
-                               int iter)
+                               Id icase,
+                               Id ipgs,
+                               Id ivar,
+                               Id iact,
+                               Id iter)
 {
   DECLARE_UNUSED(ivar);
   DECLARE_UNUSED(ipgs);
@@ -169,7 +169,7 @@ double GibbsMulti::getSimulate(VectorVectorDouble& /*y*/,
 ** \param[in]  ipgs       Rank of the GS
 **
 *****************************************************************************/
-int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
+Id GibbsMulti::checkGibbs(const VectorVectorDouble& y, Id isimu, Id ipgs)
 {
   Db* db   = getDb();
   auto nact = _getSampleRankNumber();
@@ -177,17 +177,17 @@ int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
   mestitle(1, "Checking gaussian values from Gibbs vs. bounds (PGS=%d Simu=%d)",
            ipgs + 1, isimu + 1);
 
-  int nerror = 0;
+  Id nerror = 0;
 
   /* Loop on the variables */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     auto icase = getRank(ipgs, ivar);
 
     /* Loop on the data */
 
-    for (int iact = 0; iact < nact; iact++)
+    for (Id iact = 0; iact < nact; iact++)
     {
       auto iech   = getSampleRank(iact);
       double vmin = db->getLocVariable(ELoc::L, iech, icase);

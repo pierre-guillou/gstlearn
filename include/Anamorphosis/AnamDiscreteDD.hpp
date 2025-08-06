@@ -43,13 +43,13 @@ public:
   /// AAnam Interface
   const EAnam& getType() const override { return EAnam::fromKey("DISCRETE_DD"); }
   bool hasFactor() const override { return true; }
-  int getNFactor() const override { return 0; }
+  Id getNFactor() const override { return 0; }
   VectorDouble z2factor(double z, const VectorInt& ifacs) const override;
   double computeVariance(double sval) const override;
-  int updatePointToBlock(double r_coef) override;
+  Id updatePointToBlock(double r_coef) override;
   bool allowChangeSupport() const override { return true; }
   bool isChangeSupportDefined() const override { return (_sCoef > 0.); }
-  int fitFromArray(const VectorDouble& tab,
+  Id fitFromArray(const VectorDouble& tab,
                    const VectorDouble& wt = VectorDouble()) override;
 
   /// AnamDiscrete Interface
@@ -58,10 +58,10 @@ public:
   VectorDouble factors_exp(bool verbose = false);
   VectorDouble factors_maf(bool verbose = false);
   VectorDouble factors_mod();
-  MatrixSquare chi2I(const VectorDouble& chi, int mode);
+  MatrixSquare chi2I(const VectorDouble& chi, Id mode);
 
   static AnamDiscreteDD* create(double mu = 1., double scoef = 0.);
-  void reset(int ncut,
+  void reset(Id ncut,
              double scoef,
              double mu,
              const VectorDouble& zcut,
@@ -82,11 +82,11 @@ public:
   void setPcaF2Z(const MatrixSquare& pcaf2z) { _maf.setF2Zs(pcaf2z); }
   void setI2Chi(const MatrixSquare& i2Chi) { _i2Chi = i2Chi; }
 
-  int factor2Selectivity(Db* db,
+  Id factor2Selectivity(Db* db,
                          Selectivity* selectivity,
                          const VectorInt& cols_est,
                          const VectorInt& cols_std,
-                         int iptr0);
+                         Id iptr0);
 
 protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;
@@ -98,7 +98,7 @@ protected:
   String _getNFName() const override { return "AnamDiscreteDD"; }
 
 private:
-  int _stats(int nech, const VectorDouble& tab);
+  Id _stats(Id nech, const VectorDouble& tab);
   VectorDouble _generator(const VectorDouble& vecc,
                           const VectorDouble& veca,
                           const VectorDouble& vecb,

@@ -26,6 +26,8 @@ namespace gstlrn
 typedef std::string String;
 typedef unsigned char UChar;
 
+using Id = int;
+
 #define EPSILON1  1.e-1
 #define EPSILON2  1.e-2
 #define EPSILON3  1.e-3
@@ -103,13 +105,13 @@ DISABLE_WARNING_BASE_NOT_EXPORTED_FROM_DLL
 #  ifdef USE_BOOST_SPAN
 typedef boost::span<const double> constvect;
 typedef boost::span<double> vect;
-using constvectint = boost::span<const int>;
-using vectint      = boost::span<int>;
+using constvectint = boost::span<const Id>;
+using vectint      = boost::span<Id>;
 #  else
 typedef std::span<const double> constvect;
 typedef std::span<double> vect;
-using constvectint = std::span<const int>;
-using vectint      = std::span<int>;
+using constvectint = std::span<const Id>;
+using vectint      = std::span<Id>;
 #  endif
 
 #endif

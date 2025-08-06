@@ -38,23 +38,23 @@ public:
   // Interface for PrecisionOp class
 #ifndef SWIG
   void evalInverse(const constvect vecin, std::vector<double>& vecout) override;
-  int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
-  int _addToDest(const constvect inv, vect outv) const override;
+  Id _addSimulateToDest(const constvect whitenoise, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
 #endif
 
-  double computeLogDet(int nMC = 1) const override;
+  double computeLogDet(Id nMC = 1) const override;
   VectorDouble extractDiag() const override;
 
-  //void evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,int iapex,int igparam) override;
+  //void evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,Id iapex,Id igparam) override;
 #ifndef SWIG
   void evalDeriv(const constvect inv,
                  vect outv,
-                 int iapex,
-                 int igparam,
+                 Id iapex,
+                 Id igparam,
                  const EPowerPT& power) override;
   void evalDerivOptim(vect outv,
-                      int iapex,
-                      int igparam,
+                      Id iapex,
+                      Id igparam,
                       const EPowerPT& power) override;
   void gradYQX(const constvect X,
                const constvect Y,

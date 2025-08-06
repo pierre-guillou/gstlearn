@@ -32,7 +32,7 @@ static void st_test_1(void)
 {
   mestitle(1, "Testing the distance between two points");
 
-  int test     = 1;
+  Id test      = 1;
   double long1 = 10.;
   double lat1  = 4.;
   double long2 = 20.;
@@ -67,7 +67,7 @@ static void st_test_2(void)
 
   mestitle(1, "Testing angles of a spherical triangle");
 
-  int test     = 1;
+  Id test      = 1;
   double long1 = 10.;
   double lat1  = 23.;
   double long2 = 5.;
@@ -118,8 +118,8 @@ static void st_test_3(void)
   double dx, dy, s1, s2, x1, x2, y1, y2, total;
 
   mestitle(1, "Covering half-sphere with spherical triangles");
-  int nx = 40;
-  int ny = 40;
+  Id nx = 40;
+  Id ny = 40;
 
   if (INTER)
   {
@@ -132,11 +132,11 @@ static void st_test_3(void)
   dx = 360. / (double)nx;
 
   total = 0.;
-  for (int iy = 0; iy < ny; iy++)
+  for (Id iy = 0; iy < ny; iy++)
   {
     y1 = dy * (double)(iy);
     y2 = dy * (double)(iy + 1.);
-    for (int ix = 0; ix < nx; ix++)
+    for (Id ix = 0; ix < nx; ix++)
     {
       x1 = dx * (double)(ix);
       x2 = dx * (double)(ix + 1.);
@@ -161,9 +161,9 @@ int main(int argc, char* argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  int flag_1 = 1;
-  int flag_2 = 1;
-  int flag_3 = 1;
+  Id flag_1 = 1;
+  Id flag_2 = 1;
+  Id flag_3 = 1;
 
   /* 1.c - Setup constants */
 

@@ -38,16 +38,16 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_Model-");
-  int seed = 10355;
-  int ndim = 2;
-  int nvar = 1;
+  Id seed = 10355;
+  Id ndim = 2;
+  Id nvar = 1;
   law_set_random_seed(seed);
 
   ///////////////////////
   // Creating the Db
-  auto nx            = {2, 3};
-  auto x0            = {5.2, 8.3};
-  auto dx            = {1.3, 0.6};
+  VectorInt nx       = {2, 3};
+  VectorDouble x0    = {5.2, 8.3};
+  VectorDouble dx    = {1.3, 0.6};
   DbGrid* workingDbc = DbGrid::create(nx, dx, x0);
 
   // Building the Covariance Context
@@ -230,8 +230,8 @@ int main(int argc, char* argv[])
   // Testing Models on the Sphere
 
   defineDefaultSpace(ESpaceType::SN, 2);
-  int ns            = 20;
-  int nincr         = 30;
+  Id ns             = 20;
+  Id nincr          = 30;
   VectorDouble incr = VH::sequence(0., GV_PI + EPSILON10, GV_PI / (nincr - 1.));
   double mu         = 1.0;
   double kappa      = 2.0;

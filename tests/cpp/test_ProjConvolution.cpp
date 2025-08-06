@@ -31,33 +31,33 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_ProjConvolution-");
-  int seed = 10355;
-  int ndim = 2;
+  Id seed = 10355;
+  Id ndim = 2;
   law_set_random_seed(seed);
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   ///////////////////////
   // Creating the Db
-  int ngrid         = 101;
-  int nxval         = 101;
+  Id ngrid          = 101;
+  Id nxval          = 101;
   VectorInt nx      = {nxval, ngrid};
   DbGrid* grid_data = DbGrid::create(nx);
 
-  int conv_dim = 11;
+  Id conv_dim  = 11;
   double range = 3.;
   double total = 0.;
   VectorDouble convolution(conv_dim);
-  for (int i = 0; i < conv_dim; i++)
+  for (Id i = 0; i < conv_dim; i++)
   {
     double dist    = (i - conv_dim / 2.) / range;
     convolution[i] = exp(-dist * dist);
     total += convolution[i];
   }
-  for (int i = 0; i < conv_dim; i++)
+  for (Id i = 0; i < conv_dim; i++)
     convolution[i] /= total;
   VH::dump("Convolution", convolution);
 
-  int ngrid_seismic    = ngrid - (conv_dim - 1);
+  Id ngrid_seismic     = ngrid - (conv_dim - 1);
   nx                   = VectorInt({nxval, ngrid_seismic});
   DbGrid* grid_seismic = DbGrid::create(nx);
 

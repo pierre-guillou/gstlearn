@@ -34,7 +34,7 @@ using namespace gstlrn;
 *****************************************************************************/
 int main()
 {
-  int iptr;
+  Id iptr;
   bool flag_inter = false;
 
   int nx             = 50;

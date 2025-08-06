@@ -79,12 +79,12 @@ void CovGradientFunctional::_calculateTrTtr(const VectorDouble& d,
 
   // Calculate the t(Tr) %*% Tr matrix
 
-  int ecr = 0;
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
+  Id ecr = 0;
+  for (Id i = 0; i < 3; i++)
+    for (Id j = 0; j < 3; j++)
     {
       double prod = 0.;
-      for (int k = 0; k < 3; k++) prod += TR(k, i) * TR(k, j);
+      for (Id k = 0; k < 3; k++) prod += TR(k, i) * TR(k, j);
       trttr[ecr++] = prod;
     }
 
@@ -135,8 +135,8 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
 
   double h        = getSpace()->getDistance(p1, p2, getAniso());
   VectorDouble d1 = VH::subtract(p1.getCoords(), p2.getCoords());
-  for (int i = 0; i < 3; i++)
-    d[i] = (i < (int)d1.size()) ? d1[i] : 0.;
+  for (Id i = 0; i < 3; i++)
+    d[i] = (i < (Id)d1.size()) ? d1[i] : 0.;
 
   //  Calculate the covariance
 
@@ -153,7 +153,7 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
   {
     if (flagGrad)
     {
-      for (int i = 0; i < 9; i++)
+      for (Id i = 0; i < 9; i++)
         covGG[i] -= dcovsr * trttr[i];
     }
   }
@@ -162,7 +162,7 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
 
     //  Calculate covariance between point and gradient
 
-    for (int i = 0; i < 3; i++)
+    for (Id i = 0; i < 3; i++)
     {
       covGp[i] += u[i] * dcovsr;
     }
@@ -179,9 +179,9 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
         //  Isotropic case
 
         double b = dcovsr * trttr[0];
-        int ecr  = 0;
-        for (int i = 0; i < 3; i++)
-          for (int j = 0; j < 3; j++)
+        Id ecr  = 0;
+        for (Id i = 0; i < 3; i++)
+          for (Id j = 0; j < 3; j++)
           {
             covGG[ecr] += a * u[i] * u[j];
             if (i == j) covGG[ecr] -= b;
@@ -193,9 +193,9 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
 
         //  Anisotropic case
 
-        int ecr = 0;
-        for (int i = 0; i < 3; i++)
-          for (int j = 0; j < 3; j++)
+        Id ecr = 0;
+        for (Id i = 0; i < 3; i++)
+          for (Id j = 0; j < 3; j++)
           {
             covGG[ecr] += a * u[i] * u[j] - dcovsr * trttr[ecr];
             ecr++;

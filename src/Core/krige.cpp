@@ -84,31 +84,31 @@ static VectorDouble d1_2_global;
 static double *covaux_global, *var0_global;
 static VectorDouble d1_global, d1_t_global;
 static double *lhs_global, *rhs_global, *wgt_global, *zam1_global;
-static int* flag_global;
-static int KRIGE_INIT = 0;
-static int MODEL_INIT = 0;
-static int IECH_OUT   = -1;
-static int FLAG_COLK, FLAG_SIMU, FLAG_EST, FLAG_STD, FLAG_VARZ, FLAG_PROF;
-static int IPTR_EST, IPTR_STD, IPTR_VARZ, IPTR_NBGH;
-static int* RANK_COLCOK;
+static Id* flag_global;
+static Id KRIGE_INIT = 0;
+static Id MODEL_INIT = 0;
+static Id IECH_OUT   = -1;
+static Id FLAG_COLK, FLAG_SIMU, FLAG_EST, FLAG_STD, FLAG_VARZ, FLAG_PROF;
+static Id IPTR_EST, IPTR_STD, IPTR_VARZ, IPTR_NBGH;
+static Id* RANK_COLCOK;
 static Db *DBIN, *DBOUT;
 static Koption* KOPTION;
-static int INH_FLAG_VERBOSE = 0;
-static int INH_FLAG_LIMIT   = 1;
+static Id INH_FLAG_VERBOSE = 0;
+static Id INH_FLAG_LIMIT   = 1;
 static char string[100];
 
 static CovInternal COVINT;
 
 typedef struct
 {
-  int ndtot;
-  int rank1;
-  int rank2;
+  Id ndtot;
+  Id rank1;
+  Id rank2;
   Model* model;
-  int nugget_opt;
-  int nostd;
+  Id nugget_opt;
+  Id nostd;
   ECalcMember member;
-  int icov_r;
+  Id icov_r;
   double weight;
 } Disc_Structure;
 
@@ -122,10 +122,10 @@ typedef struct
  ** \param[in]  nco   Number of columns
  **
  *****************************************************************************/
-static double* st_core(int nli, int nco)
+static double* st_core(Id nli, Id nco)
 {
   double *tab, rsize;
-  int size, i;
+  Id size, i;
 
   /* Initialization */
 
@@ -162,9 +162,9 @@ static double* st_core(int nli, int nco)
  ** \param[in]  nco   Number of columns
  **
  *****************************************************************************/
-static int* st_icore(int nli, int nco)
+static Id* st_icore(Id nli, Id nco)
 {
-  int *tab, size, i;
+  Id *tab, size, i;
 
   /* Initialization */
 
@@ -173,7 +173,7 @@ static int* st_icore(int nli, int nco)
 
   /* Allocation */
 
-  tab = (int*)mem_alloc(sizeof(int) * size, 0);
+  tab = (Id*)mem_alloc(sizeof(Id) * size, 0);
   if (tab != nullptr)
     for (i = 0; i < size; i++)
       tab[i] = 0;
@@ -190,18 +190,18 @@ static int* st_icore(int nli, int nco)
  ** \param[in]  rel_arg Relative position array (used for deletion)
  **
  *****************************************************************************/
-static int* st_relative_position_array(int mode, int neq, int* rel_arg)
+static Id* st_relative_position_array(Id mode, Id neq, Id* rel_arg)
 {
-  int* rel = nullptr;
+  Id* rel = nullptr;
   if (mode > 0)
   {
 
     /* Creation */
 
-    rel = (int*)st_icore(neq, 1);
+    rel = (Id*)st_icore(neq, 1);
     if (rel == nullptr) return (rel);
-    int j = 0;
-    for (int i = 0; i < neq; i++)
+    Id j = 0;
+    for (Id i = 0; i < neq; i++)
     {
       // Comment: the next code has been commented out as it seems to be unused
       // The whole function should probably disappear soon.
@@ -217,7 +217,7 @@ static int* st_relative_position_array(int mode, int neq, int* rel_arg)
     /* Deletion */
 
     rel = rel_arg;
-    rel = (int*)mem_free((char*)rel);
+    rel = (Id*)mem_free((char*)rel);
   }
   return (rel);
 }
@@ -256,7 +256,7 @@ static void st_global_init(Db* dbin, Db* dbout)
  ** \param[in]  idim   Rank of the coordinate
  **
  *****************************************************************************/
-static double st_get_idim(int loc_rank, int idim)
+static double st_get_idim(Id loc_rank, Id idim)
 {
   double value;
 
@@ -293,14 +293,14 @@ static double st_get_idim(int loc_rank, int idim)
 // **
 // *****************************************************************************/
 // static void st_cov(Model *model,
-//                   int flag_init,
-//                   int nugget_opt,
-//                   int nostd,
+//                   Id flag_init,
+//                   Id nugget_opt,
+//                   Id nostd,
 //                   const ECalcMember &member,
-//                   int icov_r,
+//                   Id icov_r,
 //                   double weight,
-//                   int rank1,
-//                   int rank2,
+//                   Id rank1,
+//                   Id rank2,
 //                   VectorDouble d1loc,
 //                   double *covtab_loc)
 //{
@@ -350,7 +350,7 @@ static double st_get_idim(int loc_rank, int idim)
 // ** \param[in]  it     Pointer to the Internal Disc_Structure
 // **
 // *****************************************************************************/
-// static void st_data_discretize_dd(int idim, int jdim, Disc_Structure *it)
+// static void st_data_discretize_dd(Id idim, Id jdim, Disc_Structure *it)
 //{
 //  double exts2, dsize, decal;
 //
@@ -425,7 +425,7 @@ static double st_get_idim(int loc_rank, int idim)
 //    // End of implicit loop on dimensions
 //
 //    it->ndtot++;
-//    for (int i = 0; i < it->model->getNDim(); i++)
+//    for (Id i = 0; i < it->model->getNDim(); i++)
 //      d1_t_global[i] = d1_global[i] + d1_1_global[i] + d1_2_global[i];
 //    st_cov(it->model, 0, it->nugget_opt, it->nostd, it->member, it->icov_r,
 //           it->weight, it->rank1, it->rank2, d1_t_global, covaux_global);
@@ -451,7 +451,7 @@ void set_DBOUT(Db* dbout)
 // ** \param[in]  it     Pointer to the Internal Disc_Structure
 // **
 // *****************************************************************************/
-// static void st_data_discretize_dg(int idim, Disc_Structure *it)
+// static void st_data_discretize_dg(Id idim, Disc_Structure *it)
 //{
 //  double exts2, dsize, decal;
 //
@@ -496,7 +496,7 @@ void set_DBOUT(Db* dbout)
 //    // End of implicit loop on dimensions
 //
 //    it->ndtot++;
-//    for (int i = 0; i < it->model->getNDim(); i++)
+//    for (Id i = 0; i < it->model->getNDim(); i++)
 //      d1_t_global[i] = d1_global[i] + d1_1_global[i];
 //    st_cov(it->model, 0, it->nugget_opt, it->nostd, it->member, it->icov_r,
 //           it->weight, it->rank1, it->rank2, d1_t_global, covaux_global);
@@ -516,10 +516,10 @@ void set_DBOUT(Db* dbout)
  ** \remarks   of the calculations
  **
  *****************************************************************************/
-static double st_get_ivar(int rank, int ivar)
+static double st_get_ivar(Id rank, Id ivar)
 {
   double value;
-  int jvar;
+  Id jvar;
 
   if (rank >= 0)
   {
@@ -561,7 +561,7 @@ static double st_get_ivar(int rank, int ivar)
  ** \param[in]  ivar   Rank of the variable
  **
  *****************************************************************************/
-static double st_get_verr(int rank, int ivar)
+static double st_get_verr(Id rank, Id ivar)
 {
   double value;
 
@@ -590,11 +590,11 @@ static double st_get_verr(int rank, int ivar)
  ** \remarks static variable
  **
  *****************************************************************************/
-static int st_check_environment(int flag_in,
-                                int flag_out,
+static Id st_check_environment(Id flag_in,
+                                Id flag_out,
                                 Model* model)
 {
-  int error, ndim, nvar, nfex;
+  Id error, ndim, nvar, nfex;
 
   /* Initializations */
 
@@ -643,7 +643,7 @@ static int st_check_environment(int flag_in,
               model->getNDim());
       goto label_end;
     }
-    if ((int)model->getNDim() != ndim)
+    if ((Id)model->getNDim() != ndim)
     {
       messerr("The Space Dimension of the Db structure (%d)", ndim);
       messerr("Does not correspond to the Space Dimension of the model (%d)",
@@ -720,10 +720,10 @@ label_end:
  ** \remarks  equal to the number of variables in the Model
  **
  *****************************************************************************/
-static int st_model_manage(int mode, Model* model)
+static Id st_model_manage(Id mode, Model* model)
 
 {
-  int nvar;
+  Id nvar;
 
   /* Initializations */
 
@@ -737,7 +737,7 @@ static int st_model_manage(int mode, Model* model)
     /* Allocation */
 
     if (MODEL_INIT) return (1);
-    int ndim = DBIN->getNDim();
+    Id ndim = DBIN->getNDim();
     d1_global.resize(ndim);
     d1_1_global.resize(ndim);
     d1_2_global.resize(ndim);
@@ -769,14 +769,14 @@ static int st_model_manage(int mode, Model* model)
  ** \param[in]  nfeq   Number of drift equations
  **
  *****************************************************************************/
-static int st_krige_manage_basic(int mode,
-                                 int nech,
-                                 int nmax,
-                                 int nvar,
-                                 int nfeq)
+static Id st_krige_manage_basic(Id mode,
+                                 Id nech,
+                                 Id nmax,
+                                 Id nvar,
+                                 Id nfeq)
 {
   DECLARE_UNUSED(nech);
-  int neqmax, ncmax;
+  Id neqmax, ncmax;
 
   /* Initializations */
 
@@ -813,7 +813,7 @@ static int st_krige_manage_basic(int mode,
     /* Deallocation */
 
     if (!KRIGE_INIT) return (1);
-    flag_global = (int*)mem_free((char*)flag_global);
+    flag_global = (Id*)mem_free((char*)flag_global);
     lhs_global  = (double*)mem_free((char*)lhs_global);
     rhs_global  = (double*)mem_free((char*)rhs_global);
     zam1_global = (double*)mem_free((char*)zam1_global);
@@ -833,7 +833,7 @@ static int st_krige_manage_basic(int mode,
  ** \param[in]  neigh ANeigh structure
  **
  *****************************************************************************/
-static int st_get_nmax(ANeigh* neigh)
+static Id st_get_nmax(ANeigh* neigh)
 {
   return neigh->getNSampleMax(DBIN);
 }
@@ -856,12 +856,12 @@ static int st_get_nmax(ANeigh* neigh)
  ** \remarks  as an argument
  **
  *****************************************************************************/
-static int st_krige_manage(int mode,
-                           int nvar,
+static Id st_krige_manage(Id mode,
+                           Id nvar,
                            Model* model,
                            ANeigh* neigh)
 {
-  int nech, nfeq, nmax;
+  Id nech, nfeq, nmax;
 
   /* Initializations */
 
@@ -881,12 +881,12 @@ static int st_krige_manage(int mode,
  ** \param[in]  ndiscs     Discretization parameters (or NULL)
  **
  *****************************************************************************/
-static int st_block_discretize_alloc(int ndim, const VectorInt& ndiscs)
+static Id st_block_discretize_alloc(Id ndim, const VectorInt& ndiscs)
 {
-  int ntot;
+  Id ntot;
 
   ntot = 1;
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     ntot *= ndiscs[idim];
   if (ntot <= 0) return (1);
   KOPTION->ntot = ntot;
@@ -897,7 +897,7 @@ static int st_block_discretize_alloc(int ndim, const VectorInt& ndiscs)
   if (KOPTION->disc1 == nullptr) return (1);
   KOPTION->disc2 = st_core(ndim, ntot);
   if (KOPTION->disc2 == nullptr) return (1);
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     KOPTION->ndisc[idim] = ndiscs[idim];
   return (0);
 }
@@ -909,10 +909,10 @@ static int st_block_discretize_alloc(int ndim, const VectorInt& ndiscs)
  ** \param[in] ndim    Space dimension
  **
  *****************************************************************************/
-static void st_data_discretize_alloc(int ndim)
+static void st_data_discretize_alloc(Id ndim)
 
 {
-  int nrow, ncol;
+  Id nrow, ncol;
 
   KOPTION->flag_data_disc = 0;
   if (DBIN->getNLoc(ELoc::BLEX) > 0)
@@ -964,9 +964,9 @@ static void st_data_discretize_alloc(int ndim)
  ** \param[in]  iech      rank of the variable (used when mode=1)
  **
  *****************************************************************************/
-static void st_block_discretize(int mode, int flag_rand, int iech)
+static void st_block_discretize(Id mode, Id flag_rand, Id iech)
 {
-  int i, j, jech, ntot, nd, nval, ndim, idim, memo;
+  Id i, j, jech, ntot, nd, nval, ndim, idim, memo;
   double taille;
 
   /* Initializations */
@@ -1015,13 +1015,13 @@ static void st_block_discretize(int mode, int flag_rand, int iech)
  ** \remark  This function manages the global structure KOPTION
  **
  *****************************************************************************/
-int krige_koption_manage(int mode,
-                         int flag_check,
+Id krige_koption_manage(Id mode,
+                         Id flag_check,
                          const EKrigOpt& calcul,
-                         int flag_rand,
+                         Id flag_rand,
                          const VectorInt& ndiscs)
 {
-  int ndim, error;
+  Id ndim, error;
 
   /* Initializations */
 
@@ -1094,7 +1094,7 @@ int krige_koption_manage(int mode,
   label_dealloc:
     if (KOPTION != nullptr)
     {
-      KOPTION->ndisc = (int*)mem_free((char*)KOPTION->ndisc);
+      KOPTION->ndisc = (Id*)mem_free((char*)KOPTION->ndisc);
       KOPTION->disc1 = (double*)mem_free((char*)KOPTION->disc1);
       KOPTION->disc2 = (double*)mem_free((char*)KOPTION->disc2);
       KOPTION->dsize = (double*)mem_free((char*)KOPTION->dsize);
@@ -1115,13 +1115,13 @@ int krige_koption_manage(int mode,
  ** \param[in]  lhs     Kriging L.H.S
  **
  *****************************************************************************/
-void krige_lhs_print(int nech,
-                     int neq,
-                     int nred,
-                     const int* flag,
+void krige_lhs_print(Id nech,
+                     Id neq,
+                     Id nred,
+                     const Id* flag,
                      const double* lhs)
 {
-  int *rel, i, j, ipass, npass, ideb, ifin;
+  Id *rel, i, j, ipass, npass, ideb, ifin;
 
   /* Initializations */
 
@@ -1190,14 +1190,14 @@ void krige_lhs_print(int nech,
  ** \param[in]  rhs      Kriging R.H.S. matrix
  **
  *****************************************************************************/
-void krige_rhs_print(int nvar,
-                     int nech,
-                     int neq,
-                     int nred,
-                     const int* flag,
+void krige_rhs_print(Id nvar,
+                     Id nech,
+                     Id neq,
+                     Id nred,
+                     const Id* flag,
                      double* rhs)
 {
-  int *rel, i, ivar, idim;
+  Id *rel, i, ivar, idim;
 
   /* Initializations */
 
@@ -1283,23 +1283,23 @@ void krige_rhs_print(int nvar,
  ** \remark printed as it changes for every sample, per simulation
  **
  *****************************************************************************/
-static void st_krige_wgt_print(int status,
-                               int nvar,
-                               int nvar_m,
-                               int nfeq,
+static void st_krige_wgt_print(Id status,
+                               Id nvar,
+                               Id nvar_m,
+                               Id nfeq,
                                const VectorInt& nbgh_ranks,
-                               int nred,
-                               int icase,
-                               const int* flag,
+                               Id nred,
+                               Id icase,
+                               const Id* flag,
                                const double* wgt)
 {
   double *sum, value;
-  int iwgt, ivar, jvar_m, ivar_m, iech, lec, cumflag, idim, ndim, ib, number,
+  Id iwgt, ivar, jvar_m, ivar_m, iech, lec, cumflag, idim, ndim, ib, number,
     flag_value, nech;
 
   /* Initializations */
 
-  nech = (int)nbgh_ranks.size();
+  nech = (Id)nbgh_ranks.size();
   ndim = DBIN->getNDim();
   sum  = (double*)st_core(nvar_m, 1);
   if (sum == nullptr) return;
@@ -1429,9 +1429,9 @@ static void st_krige_wgt_print(int status,
  ** \param[in]  status       Kriging error status
  **
  *****************************************************************************/
-static void st_result_kriging_print(int flag_xvalid, int nvar, int status)
+static void st_result_kriging_print(Id flag_xvalid, Id nvar, Id status)
 {
-  int ivar;
+  Id ivar;
   double value;
 
   /* Header */
@@ -1501,15 +1501,15 @@ static void st_result_kriging_print(int flag_xvalid, int nvar, int status)
  ** \remark: coefficient as soon as flag_dgm is TRUE
  **
  *****************************************************************************/
-int _krigsim(Db* dbin,
+Id _krigsim(Db* dbin,
              Db* dbout,
              const Model* model,
              ANeigh* neigh,
              bool flag_bayes,
              const VectorDouble& dmean,
              const MatrixSymmetric& dcov,
-             int icase,
-             int nbsimu,
+             Id icase,
+             Id nbsimu,
              bool flag_dgm)
 {
   // Preliminary checks
@@ -1522,7 +1522,7 @@ int _krigsim(Db* dbin,
 
   /* Add the attributes for storing the results */
 
-  int iptr_est = dbout->getColIdxByLocator(ELoc::SIMU, 0);
+  Id iptr_est = dbout->getColIdxByLocator(ELoc::SIMU, 0);
   if (iptr_est < 0) return 1;
 
   /* Setting options */
@@ -1538,7 +1538,7 @@ int _krigsim(Db* dbin,
 
   /* Loop on the targets to be processed */
 
-  for (int iech_out = 0; iech_out < dbout->getNSample(); iech_out++)
+  for (Id iech_out = 0; iech_out < dbout->getNSample(); iech_out++)
   {
     mes_process("Conditional Simulation", dbout->getNSample(), iech_out);
     if (ksys.estimate(iech_out)) return 1;
@@ -1566,16 +1566,16 @@ int _krigsim(Db* dbin,
  ** \param[out]  cvtrans     CV transitive
  **
  *****************************************************************************/
-int global_transitive(DbGrid* dbgrid,
+Id global_transitive(DbGrid* dbgrid,
                       Model* model,
-                      int flag_verbose,
-                      int flag_regular,
-                      int ndisc,
+                      Id flag_verbose,
+                      Id flag_regular,
+                      Id ndisc,
                       double* abundance,
                       double* sse,
                       double* cvtrans)
 {
-  int i, ix, iy, ix1, ix2, iy1, iy2, nx, ny, flag_value;
+  Id i, ix, iy, ix1, ix2, iy1, iy2, nx, ny, flag_value;
   double c00, cvv, dx, dy, dsum, gint, dsse, wtot, value;
   CovCalcMode mode;
 
@@ -1585,7 +1585,7 @@ int global_transitive(DbGrid* dbgrid,
   st_global_init(dbgrid, dbgrid);
   if (st_check_environment(0, 1, model)) return 1;
   ;
-  int ndim = dbgrid->getNDim();
+  Id ndim = dbgrid->getNDim();
   VectorDouble d1(ndim, 0.);
 
   if (ndim < 1 || ndim > 2)
@@ -1767,9 +1767,9 @@ int global_transitive(DbGrid* dbgrid,
  ** \param[out] ifin    Index of the ending sample
  **
  *****************************************************************************/
-static int st_get_limits(DbGrid* db, double top, double bot, int* ideb, int* ifin)
+static Id st_get_limits(DbGrid* db, double top, double bot, Id* ideb, Id* ifin)
 {
-  int ndim, nz, iad;
+  Id ndim, nz, iad;
   double z0, dz;
 
   /* Initializations */
@@ -1790,14 +1790,14 @@ static int st_get_limits(DbGrid* db, double top, double bot, int* ideb, int* ifi
   if (FFFF(bot))
     iad = 0;
   else
-    iad = (int)((bot - z0) / dz);
+    iad = (Id)((bot - z0) / dz);
   if (bot > z0 + iad * dz) iad++;
   *ideb = MAX(0, MIN(iad, nz - 1));
 
   if (FFFF(top))
     iad = nz - 1;
   else
-    iad = (int)((top - z0) / dz);
+    iad = (Id)((top - z0) / dz);
   *ifin = MAX(0, MIN(iad, nz - 1));
   return (0);
 }
@@ -1818,14 +1818,14 @@ static int st_get_limits(DbGrid* db, double top, double bot, int* ideb, int* ifi
  ** \param[out] nafter        Number of samples in neighborhood after target
  **
  *****************************************************************************/
-static int st_get_neigh(int ideb,
-                        int ifin,
-                        int neigh_radius,
-                        int* status,
-                        int* nbefore,
-                        int* nafter)
+static Id st_get_neigh(Id ideb,
+                        Id ifin,
+                        Id neigh_radius,
+                        Id* status,
+                        Id* nbefore,
+                        Id* nafter)
 {
-  int iad;
+  Id iad;
 
   *status = 1;
   if (IECH_OUT < ideb || IECH_OUT > ifin) return (1);
@@ -1850,7 +1850,7 @@ static int st_get_neigh(int ideb,
  ** \param[in]  flag_sym      1 for symmetrized covariance
  **
  *****************************************************************************/
-static double st_cov_exp(int dist, const double* cov, int cov_radius, int flag_sym)
+static double st_cov_exp(Id dist, const double* cov, Id cov_radius, Id flag_sym)
 {
   double val1, val2, val;
 
@@ -1882,14 +1882,14 @@ static double st_cov_exp(int dist, const double* cov, int cov_radius, int flag_s
  **
  *****************************************************************************/
 static void st_lhs_exp(double* covdd,
-                       int cov_radius,
-                       int flag_sym,
-                       int nfeq,
-                       int nbefore,
-                       int nafter,
-                       int neq)
+                       Id cov_radius,
+                       Id flag_sym,
+                       Id nfeq,
+                       Id nbefore,
+                       Id nafter,
+                       Id neq)
 {
-  int i, j;
+  Id i, j;
 
   /* Covariance part */
 
@@ -1928,14 +1928,14 @@ static void st_lhs_exp(double* covdd,
  **
  *****************************************************************************/
 static void st_rhs_exp(double* covd0,
-                       int cov_radius,
-                       int flag_sym,
-                       int nfeq,
-                       int nbefore,
-                       int nafter,
-                       int neq)
+                       Id cov_radius,
+                       Id flag_sym,
+                       Id nfeq,
+                       Id nbefore,
+                       Id nafter,
+                       Id neq)
 {
-  int i;
+  Id i;
 
   /* Covariance part */
 
@@ -1959,9 +1959,9 @@ static void st_rhs_exp(double* covd0,
  ** \param[in]  nafter        Number of samples in neighborhood after target
  **
  *****************************************************************************/
-static double st_estim_exp(Db* db, const double* wgt, int nbefore, int nafter)
+static double st_estim_exp(Db* db, const double* wgt, Id nbefore, Id nafter)
 {
-  int i;
+  Id i;
   double result;
 
   /* Perform the estimation */
@@ -1991,18 +1991,18 @@ static double st_estim_exp(Db* db, const double* wgt, int nbefore, int nafter)
  ** \param[in]  nfeq          0 or 1 drift function(s)
  **
  *****************************************************************************/
-int anakexp_f(DbGrid* db,
+Id anakexp_f(DbGrid* db,
               double* covdd,
               double* covd0,
               double top,
               double bot,
-              int cov_radius,
-              int neigh_radius,
-              int flag_sym,
-              int nfeq)
+              Id cov_radius,
+              Id neigh_radius,
+              Id flag_sym,
+              Id nfeq)
 {
-  int i, ndim, nvarin, nech, size, error, ideb, ifin, neq, status;
-  int nbefore, nafter, nbefore_mem, nafter_mem;
+  Id i, ndim, nvarin, nech, size, error, ideb, ifin, neq, status;
+  Id nbefore, nafter, nbefore_mem, nafter_mem;
   double result;
   VectorInt ranks;
 
@@ -2164,10 +2164,10 @@ label_end:
 static void st_calculate_covres(DbGrid* db,
                                 Model* model,
                                 const double* cov_ref,
-                                int cov_radius,
-                                int flag_sym,
-                                const int cov_ss[3],
-                                const int cov_nn[3],
+                                Id cov_radius,
+                                Id flag_sym,
+                                const Id cov_ss[3],
+                                const Id cov_nn[3],
                                 double* cov_res)
 {
   double covtab, covver;
@@ -2182,9 +2182,9 @@ static void st_calculate_covres(DbGrid* db,
 
   /* Evaluate the array of experimental covariance of the residual variable */
 
-  for (int ix = -cov_nn[0]; ix <= cov_nn[0]; ix++)
-    for (int iy = -cov_nn[1]; iy <= cov_nn[1]; iy++)
-      for (int iz = -cov_nn[2]; iz <= cov_nn[2]; iz++)
+  for (Id ix = -cov_nn[0]; ix <= cov_nn[0]; ix++)
+    for (Id iy = -cov_nn[1]; iy <= cov_nn[1]; iy++)
+      for (Id iz = -cov_nn[2]; iz <= cov_nn[2]; iz++)
       {
         if (!flag_sym)
           covver = COV_REF(iz);
@@ -2215,21 +2215,21 @@ static void st_calculate_covres(DbGrid* db,
  **
  *****************************************************************************/
 static void st_calculate_covtot(DbGrid* db,
-                                int ix0,
-                                int iy0,
-                                int flag_sym,
-                                const int cov_ss[3],
-                                const int cov_nn[3],
-                                int* num_tot,
+                                Id ix0,
+                                Id iy0,
+                                Id flag_sym,
+                                const Id cov_ss[3],
+                                const Id cov_nn[3],
+                                Id* num_tot,
                                 double* cov_tot)
 {
-  int ix, iy, iz, ix1, iy1, iz1, jx1, jy1, jz1, jx2, jy2, jz2;
-  int idx, idy, idz, jdx, jdy, iad, jad;
+  Id ix, iy, iz, ix1, iy1, iz1, jx1, jy1, jz1, jx2, jy2, jz2;
+  Id idx, idy, idz, jdx, jdy, iad, jad;
   double val1, val2, val, ratio;
 
   /* Initialization */
 
-  int ndim = db->getNDim();
+  Id ndim = db->getNDim();
   VectorInt indg(ndim, 0);
   for (ix = -cov_nn[0]; ix <= cov_nn[0]; ix++)
     for (iy = -cov_nn[1]; iy <= cov_nn[1]; iy++)
@@ -2358,16 +2358,16 @@ static void st_calculate_covtot(DbGrid* db,
  **
  *****************************************************************************/
 static VectorInt st_neigh_find(DbGrid* db,
-                               int ix0,
-                               int iy0,
-                               int iz0,
-                               const int nei_ss[3],
-                               const int nei_nn[3],
-                               int* nei_cur)
+                               Id ix0,
+                               Id iy0,
+                               Id iz0,
+                               const Id nei_ss[3],
+                               const Id nei_nn[3],
+                               Id* nei_cur)
 {
-  int ix, iy, iz, jx, jy, jz, number, locrank;
+  Id ix, iy, iz, jx, jy, jz, number, locrank;
   VectorInt nbgh_ranks;
-  int ndim = db->getNDim();
+  Id ndim = db->getNDim();
   VectorInt indg(ndim, 0);
 
   /* Loop on the pixels of the neighborhood */
@@ -2412,12 +2412,12 @@ static VectorInt st_neigh_find(DbGrid* db,
  ** \param[in]  nei_cur       Array containing the current neighborhood
  **
  *****************************************************************************/
-static int st_neigh_diff(const int nei_ss[3],
-                         const int nei_nn[3],
-                         int* nei_ref,
-                         const int* nei_cur)
+static Id st_neigh_diff(const Id nei_ss[3],
+                         const Id nei_nn[3],
+                         Id* nei_ref,
+                         const Id* nei_cur)
 {
-  int ix, iy, iz, flag1, flag2, flag_diff;
+  Id ix, iy, iz, flag1, flag2, flag_diff;
 
   /* Loop on the pixels of the neighborhood */
 
@@ -2459,17 +2459,17 @@ label_end:
  ** \param[in]  nugget        Amount of additional Nugget Effect
  **
  *****************************************************************************/
-static void st_lhs_exp_3D(int nech,
-                          int nfeq,
-                          const int nei_ss[3],
-                          const int nei_nn[3],
-                          const int cov_ss[3],
-                          const int cov_nn[3],
-                          const int* nei_cur,
+static void st_lhs_exp_3D(Id nech,
+                          Id nfeq,
+                          const Id nei_ss[3],
+                          const Id nei_nn[3],
+                          const Id cov_ss[3],
+                          const Id cov_nn[3],
+                          const Id* nei_cur,
                           const double* cov_tot,
                           double nugget)
 {
-  int ix, iy, iz, jx, jy, jz, i, j, neq;
+  Id ix, iy, iz, jx, jy, jz, i, j, neq;
   double value;
 
   /* Initializations */
@@ -2524,16 +2524,16 @@ static void st_lhs_exp_3D(int nech,
  ** \param[in]  cov_res       Array containing the residual variable covariance
  **
  *****************************************************************************/
-static void st_rhs_exp_3D(int nech,
-                          int nfeq,
-                          const int nei_ss[3],
-                          const int nei_nn[3],
-                          const int cov_ss[3],
-                          const int cov_nn[3],
-                          const int* nei_cur,
+static void st_rhs_exp_3D(Id nech,
+                          Id nfeq,
+                          const Id nei_ss[3],
+                          const Id nei_nn[3],
+                          const Id cov_ss[3],
+                          const Id cov_nn[3],
+                          const Id* nei_cur,
                           const double* cov_res)
 {
-  int ix, iy, iz, neq, i;
+  Id ix, iy, iz, neq, i;
 
   /* Initializations */
 
@@ -2571,12 +2571,12 @@ static void st_rhs_exp_3D(int nech,
  **
  *****************************************************************************/
 static double st_estim_exp_3D(Db* db,
-                              const int nei_ss[3],
-                              const int nei_nn[3],
-                              int* nei_cur,
+                              const Id nei_ss[3],
+                              const Id nei_nn[3],
+                              Id* nei_cur,
                               const double* weight)
 {
-  int i, ix, iy, iz;
+  Id i, ix, iy, iz;
   double result;
 
   /* Initializations */
@@ -2609,14 +2609,14 @@ static double st_estim_exp_3D(Db* db,
  **
  *****************************************************************************/
 static void st_vario_dump(FILE* file,
-                          int ix0,
-                          int iy0,
-                          const int cov_ss[3],
-                          const int cov_nn[3],
-                          const int* num_tot,
+                          Id ix0,
+                          Id iy0,
+                          const Id cov_ss[3],
+                          const Id cov_nn[3],
+                          const Id* num_tot,
                           const double* cov_tot)
 {
-  int ix, iy, iz, num;
+  Id ix, iy, iz, num;
   double cov;
 
   fprintf(file, "*%3d %3d\n", ix0, iy0);
@@ -2658,22 +2658,22 @@ static void st_vario_dump(FILE* file,
  ** \remark  If dbg_ix < -1 || dbg_iy < -1, no variogram debug file is created
  **
  *****************************************************************************/
-int anakexp_3D(DbGrid* db,
+Id anakexp_3D(DbGrid* db,
                double* cov_ref,
-               int cov_radius,
-               int neigh_ver,
-               int neigh_hor,
-               int flag_sym,
+               Id cov_radius,
+               Id neigh_ver,
+               Id neigh_hor,
+               Id flag_sym,
                Model* model,
                double nugget,
-               int nfeq,
-               int dbg_ix,
-               int dbg_iy)
+               Id nfeq,
+               Id dbg_ix,
+               Id dbg_iy)
 {
-  int i, ix, iy, iz, ndim, nvarin, nech, error, neq, status, ecr;
-  int size_cov, size_nei, flag_new, flag_col;
-  int cov_ss[3], cov_nn[3], nei_ss[3], nei_nn[3];
-  int *num_tot, *nei_cur, *nei_ref;
+  Id i, ix, iy, iz, ndim, nvarin, nech, error, neq, status, ecr;
+  Id size_cov, size_nei, flag_new, flag_col;
+  Id cov_ss[3], cov_nn[3], nei_ss[3], nei_nn[3];
+  Id *num_tot, *nei_cur, *nei_ref;
   double *cov_tot, *cov_res, result;
   FILE* fildmp;
   VectorInt nbgh_ranks;
@@ -2816,7 +2816,7 @@ int anakexp_3D(DbGrid* db,
         /* Look for the neighborhood */
 
         nbgh_ranks = st_neigh_find(db, ix, iy, iz, nei_ss, nei_nn, nei_cur);
-        nech       = (int)nbgh_ranks.size();
+        nech       = (Id)nbgh_ranks.size();
         if (nech <= 0) continue;
         neq = (nfeq == 0) ? nech : nech + 1;
 
@@ -2900,14 +2900,14 @@ label_end:
  ** \remark  - the constraints is stored in "sum" (only used in dbout)
  **
  *****************************************************************************/
-int krigsum(Db* dbin,
+Id krigsum(Db* dbin,
             Db* dbout,
             Model* model,
             ANeigh* neigh,
             bool flag_positive,
             const NamingConvention& namconv)
 {
-  int nvar = dbin->getNLoc(ELoc::Z);
+  Id nvar = dbin->getNLoc(ELoc::Z);
   if (model->getNVar() != 1)
   {
     messerr("This procedure requires a monovariate model");
@@ -2923,7 +2923,7 @@ int krigsum(Db* dbin,
 
   /* Add the attributes for storing the results */
 
-  int iptr_est = dbout->addColumnsByConstant(nvar, 0.);
+  Id iptr_est = dbout->addColumnsByConstant(nvar, 0.);
   if (iptr_est < 0) return 1;
   VectorInt active(nvar);
   VectorDouble lterm(nvar);
@@ -2941,7 +2941,7 @@ int krigsum(Db* dbin,
 
   /* Loop on the variables */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     dbin->clearLocators(ELoc::Z);
     dbin->setLocatorByUID(iuids[ivar], ELoc::Z, 0);
@@ -2951,7 +2951,7 @@ int krigsum(Db* dbin,
 
     /* Loop on the targets to be processed */
 
-    for (int iech_out = 0; iech_out < dbout->getNSample(); iech_out++)
+    for (Id iech_out = 0; iech_out < dbout->getNSample(); iech_out++)
     {
       mes_process(string, dbout->getNSample(), iech_out);
       if (ksys.estimate(iech_out)) return 1;
@@ -2966,10 +2966,10 @@ int krigsum(Db* dbin,
 
   // Posterior scaling
 
-  for (int iech_out = 0; iech_out < dbout->getNSample(); iech_out++)
+  for (Id iech_out = 0; iech_out < dbout->getNSample(); iech_out++)
   {
     bool correct = false;
-    for (int ivar = 0; ivar < nvar; ivar++) active[ivar] = 0;
+    for (Id ivar = 0; ivar < nvar; ivar++) active[ivar] = 0;
 
     /* Implicit loop until the solution is acceptable */
 
@@ -2977,7 +2977,7 @@ int krigsum(Db* dbin,
     {
       double seistot = 0.;
       double seisloc = dbout->getFromLocator(ELoc::SUM, iech_out);
-      for (int ivar = 0; ivar < nvar; ivar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
       {
         if (active[ivar]) continue;
         double estim = dbout->getArray(iech_out, iptr_est + ivar);
@@ -2990,7 +2990,7 @@ int krigsum(Db* dbin,
         return 1;
       }
 
-      for (int ivar = 0; ivar < nvar; ivar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
       {
         double estim = 0.;
         if (!active[ivar])
@@ -3003,7 +3003,7 @@ int krigsum(Db* dbin,
 
       if (flag_positive)
       {
-        for (int ivar = 0; ivar < nvar; ivar++)
+        for (Id ivar = 0; ivar < nvar; ivar++)
         {
           active[ivar] = (dbout->getArray(iech_out, iptr_est + ivar) < 0);
           if (active[ivar]) correct = false;
@@ -3015,7 +3015,7 @@ int krigsum(Db* dbin,
   /* Reset the locators and rename the output variables */
 
   dbin->clearLocators(ELoc::Z);
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     dbin->setLocatorByUID(iuids[ivar], ELoc::Z, ivar);
   namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iptr_est, "estim");
 
@@ -3035,16 +3035,16 @@ int krigsum(Db* dbin,
  ** \remarks The output array must be free by the calling function
  **
  *****************************************************************************/
-static VectorInt st_ranks_other(int nech,
+static VectorInt st_ranks_other(Id nech,
                                 const VectorInt& ranks1,
                                 const VectorInt& ranks2)
 {
   VectorInt rother(nech, 0);
-  for (int i = 0; i < nech; i++)
+  for (Id i = 0; i < nech; i++)
     rother[i] = i;
-  for (int i = 0, nsize1 = (int)ranks1.size(); i < nsize1; i++)
+  for (Id i = 0, nsize1 = (Id)ranks1.size(); i < nsize1; i++)
     rother[ranks1[i]] = -1;
-  for (int i = 0, nsize2 = (int)ranks2.size(); i < nsize2; i++)
+  for (Id i = 0, nsize2 = (Id)ranks2.size(); i < nsize2; i++)
     rother[ranks2[i]] = -1;
   return rother;
 }
@@ -3069,19 +3069,19 @@ static VectorInt st_ranks_other(int nech,
  ** \param[out] invsig_arg Returned array for Inverse Sigma
  **
  *****************************************************************************/
-static int st_sampling_krige_data(Db* db,
+static Id st_sampling_krige_data(Db* db,
                                   Model* model,
                                   double beta,
                                   VectorInt& ranks1,
                                   VectorInt& ranks2,
                                   VectorInt& rother,
-                                  int* ntot_arg,
-                                  int* nutil_arg,
+                                  Id* ntot_arg,
+                                  Id* nutil_arg,
                                   VectorInt& rutil,
                                   double** tutil_arg,
                                   double** invsig_arg)
 {
-  int i, j, ecr, nmax;
+  Id i, j, ecr, nmax;
   double *utab, *tutil, *invsig, sumval;
   VectorInt ralls;
   VectorInt isort;
@@ -3089,13 +3089,13 @@ static int st_sampling_krige_data(Db* db,
 
   /* Initializations */
 
-  int error  = 1;
-  int ndat   = db->getNSample(true);
-  int nsize1 = (int)ranks1.size();
-  int nsize2 = (int)ranks2.size();
-  int ntot   = nsize1 + nsize2;
-  int npart  = ndat - nsize1;
-  int nutil  = 0;
+  Id error  = 1;
+  Id ndat   = db->getNSample(true);
+  Id nsize1 = (Id)ranks1.size();
+  Id nsize2 = (Id)ranks2.size();
+  Id ntot   = nsize1 + nsize2;
+  Id npart  = ndat - nsize1;
+  Id nutil  = 0;
   MatrixSymmetric mat_s;
 
   utab = tutil = invsig = nullptr;
@@ -3171,7 +3171,7 @@ static int st_sampling_krige_data(Db* db,
         isort[i] = i;
       }
       ut_sort_double(1, npart, isort.data(), vsort.data());
-      nmax = MIN(npart, (int)(beta * (double)npart));
+      nmax = MIN(npart, (Id)(beta * (double)npart));
       for (i = 0; i < nmax; i++)
         for (j = 0; j < nsize2; j++)
           spart->setValue(isort[i], j, 0.);
@@ -3257,17 +3257,17 @@ label_end:
  ** \param[out] data_var  Array of estimation variance at samples
  **
  *****************************************************************************/
-int st_krige_data(Db* db,
+Id st_krige_data(Db* db,
                   Model* model,
                   double beta,
                   VectorInt& ranks1,
                   VectorInt& ranks2,
                   VectorInt& rother,
-                  int flag_abs,
+                  Id flag_abs,
                   double* data_est,
                   double* data_var)
 {
-  int ntot, nutil, i, iech, nech;
+  Id ntot, nutil, i, iech, nech;
   double *tutil, *invsig, *s, *c00;
   double estim, variance, true_value;
   VectorInt rutil;
@@ -3356,21 +3356,21 @@ int st_krige_data(Db* db,
  ** \param[out] crit       Array of criterion
  **
  *****************************************************************************/
-int st_crit_global(Db* db,
+Id st_crit_global(Db* db,
                    Model* model,
                    VectorInt& ranks1,
                    VectorInt& rother,
                    double* crit)
 {
-  int ecr;
+  Id ecr;
   double *c00, *invc, *cs, *cs1;
   double *temp_loc, estim, sigma, value;
 
   /* Initializations */
 
-  int nsize1 = (int)ranks1.size();
-  int ndat   = db->getNSample(true);
-  int nutil  = ndat - nsize1;
+  Id nsize1 = (Id)ranks1.size();
+  Id ndat   = db->getNSample(true);
+  Id nutil  = ndat - nsize1;
   c00 = invc = cs = cs1 = nullptr;
   if (nsize1 <= 0) return 1;
 
@@ -3391,12 +3391,12 @@ int st_crit_global(Db* db,
   /* Set the data vector (corrected by the mean */
 
   VectorDouble data = db->getColumnByLocator(ELoc::Z);
-  for (int i = 0; i < nsize1; i++)
+  for (Id i = 0; i < nsize1; i++)
     datm[i] = data[ranks1[i]] - model->getMean(0);
 
   /* Loop on the non-pivots */
 
-  for (int iech = ecr = 0; iech < ndat; iech++)
+  for (Id iech = ecr = 0; iech < ndat; iech++)
   {
     temp_loc = &temp[ecr * nsize1];
     if (!db->isActive(iech)) continue;
@@ -3423,7 +3423,7 @@ int st_crit_global(Db* db,
 
   /* Loop on the candidates */
 
-  for (int iech = ecr = 0; iech < ndat; iech++)
+  for (Id iech = ecr = 0; iech < ndat; iech++)
   {
     crit[iech] = TEST;
     if (!db->isActive(iech)) continue;
@@ -3441,7 +3441,7 @@ int st_crit_global(Db* db,
     matrix_combine(nutil, 1, olderr.data(), -olddiv[ecr], cs1, cs1);
 
     value = 0.;
-    for (int i = 0; i < nutil; i++)
+    for (Id i = 0; i < nutil; i++)
       value += cs1[i] * cs1[i];
     crit[iech] = value / nutil;
 
@@ -3479,25 +3479,25 @@ int st_crit_global(Db* db,
  ** \param[in]  verbose    1 for a verbose output
  **
  *****************************************************************************/
-int sampling_f(Db* db,
+Id sampling_f(Db* db,
                Model* model,
                double beta,
-               int method1,
-               int nsize1_max,
+               Id method1,
+               Id nsize1_max,
                VectorInt& ranks1,
-               int method2,
-               int nsize2_max,
+               Id method2,
+               Id nsize2_max,
                VectorInt& ranks2,
-               int verbose)
+               Id verbose)
 {
-  int best_rank;
+  Id best_rank;
   double best_ecart;
 
   /* Initializations */
 
-  int nsize1 = (int)ranks1.size();
-  int nsize2 = (int)ranks2.size();
-  int nech   = db->getNSample();
+  Id nsize1 = (Id)ranks1.size();
+  Id nsize2 = (Id)ranks2.size();
+  Id nech   = db->getNSample();
 
   /* Preliminary checks */
 
@@ -3595,32 +3595,32 @@ int sampling_f(Db* db,
  ** \param[in]  verbose    Verbose flag
  **
  *****************************************************************************/
-int krigsampling_f(Db* dbin,
+Id krigsampling_f(Db* dbin,
                    Db* dbout,
                    Model* model,
                    double beta,
                    VectorInt& ranks1,
                    VectorInt& ranks2,
                    bool flag_std,
-                   int verbose)
+                   Id verbose)
 {
-  int ntot, nutil, i;
+  Id ntot, nutil, i;
   double *tutil, *invsig, *s, *c00;
   double estim;
   VectorInt rutil;
 
   /* Preliminary checks */
 
-  int nsize1   = (int)ranks1.size();
-  int nsize2   = (int)ranks2.size();
+  Id nsize1   = (Id)ranks1.size();
+  Id nsize2   = (Id)ranks2.size();
   double sigma = 0.;
   tutil = invsig = s = c00 = nullptr;
   st_global_init(dbin, dbout);
   FLAG_EST = true;
   FLAG_STD = flag_std;
   if (st_check_environment(1, 1, model)) return 1;
-  int nvar = model->getNVar();
-  int nech = dbin->getNSample();
+  Id nvar = model->getNVar();
+  Id nech = dbin->getNSample();
 
   /* Preliminary checks */
 
@@ -3759,14 +3759,14 @@ int krigsampling_f(Db* dbin,
  ** \param[in]  iptr      Rank of the weighting variable
  **
  *****************************************************************************/
-static void st_declustering_stats(int mode, int method, Db* db, int iptr)
+static void st_declustering_stats(Id mode, Id method, Db* db, Id iptr)
 {
   double mean, var, zval, coeff, mini, maxi, sumwgt;
 
   mean = var = sumwgt = 0.;
   mini                = MAXIMUM_BIG;
   maxi                = MINIMUM_BIG;
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     zval = db->getZVariable(iech, 0);
@@ -3816,14 +3816,14 @@ static void st_declustering_stats(int mode, int method, Db* db, int iptr)
  ** \param[in]  iptr      Rank of the Weight variable
  **
  *****************************************************************************/
-static void st_declustering_truncate_and_rescale(Db* db, int iptr)
+static void st_declustering_truncate_and_rescale(Db* db, Id iptr)
 {
   double total, coeff;
 
   /* Truncate the negative weights */
 
   total = 0;
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     if (FFFF(db->getZVariable(iech, 0))) continue;
@@ -3836,7 +3836,7 @@ static void st_declustering_truncate_and_rescale(Db* db, int iptr)
 
   /* Rescale */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     if (FFFF(db->getZVariable(iech, 0))) continue;
@@ -3855,9 +3855,9 @@ static void st_declustering_truncate_and_rescale(Db* db, int iptr)
  ** \param[in]  radius    Array of neighborhood radius
  **
  *****************************************************************************/
-static int st_declustering_1(Db* db, int iptr, const VectorDouble& radius)
+static Id st_declustering_1(Db* db, Id iptr, const VectorDouble& radius)
 {
-  int ndim = db->getNDim();
+  Id ndim = db->getNDim();
   VectorDouble vect(ndim);
 
   if (radius.empty())
@@ -3868,14 +3868,14 @@ static int st_declustering_1(Db* db, int iptr, const VectorDouble& radius)
 
   /* Loop on the target sample */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     if (FFFF(db->getZVariable(iech, 0))) continue;
 
     /* Loop on the second sample */
 
-    for (int jech = 0; jech < db->getNSample(); jech++)
+    for (Id jech = 0; jech < db->getNSample(); jech++)
     {
       if (!db->isActive(jech)) continue;
       double value = db->getZVariable(iech, 0);
@@ -3885,7 +3885,7 @@ static int st_declustering_1(Db* db, int iptr, const VectorDouble& radius)
       /* Normalize the distance */
 
       double dist = 0.;
-      for (int idim = 0; idim < db->getNDim(); idim++)
+      for (Id idim = 0; idim < db->getNDim(); idim++)
       {
         vect[idim] /= radius[idim];
         dist += vect[idim] * vect[idim];
@@ -3898,13 +3898,13 @@ static int st_declustering_1(Db* db, int iptr, const VectorDouble& radius)
   /* Normalization step */
 
   double total = 0.;
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     if (FFFF(db->getZVariable(iech, 0))) continue;
     total += 1. / db->getArray(iech, iptr);
   }
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     if (FFFF(db->getZVariable(iech, 0))) continue;
@@ -3925,10 +3925,10 @@ static int st_declustering_1(Db* db, int iptr, const VectorDouble& radius)
  ** \param[in]  iptr       Rank of the declustering weight
  **
  *****************************************************************************/
-static int st_declustering_2(Db* db,
+static Id st_declustering_2(Db* db,
                              Model* model,
                              ANeigh* neigh,
-                             int iptr)
+                             Id iptr)
 {
   KrigOpt krigopt;
   krigopt.setOptionCalcul(EKrigOpt::DRIFT);
@@ -3960,12 +3960,12 @@ static int st_declustering_2(Db* db,
  ** \param[in]  iptr       Rank of the declustering weight
  **
  *****************************************************************************/
-static int st_declustering_3(Db* db,
+static Id st_declustering_3(Db* db,
                              Db* dbgrid,
                              Model* model,
                              ANeigh* neigh,
                              const VectorInt& ndiscs,
-                             int iptr)
+                             Id iptr)
 {
   // Preliminary checks
 
@@ -3995,7 +3995,7 @@ static int st_declustering_3(Db* db,
 
   /* Loop on the targets to be processed */
 
-  for (int iech_out = 0; iech_out < dbgrid->getNSample(); iech_out++)
+  for (Id iech_out = 0; iech_out < dbgrid->getNSample(); iech_out++)
   {
     mes_process("Kriging sample", dbgrid->getNSample(), iech_out);
     if (ksys.estimate(iech_out)) return 1;
@@ -4027,21 +4027,21 @@ static int st_declustering_3(Db* db,
  ** \param[in]  verbose    Verbose option
  **
  *****************************************************************************/
-int declustering(Db* dbin,
+Id declustering(Db* dbin,
                  Model* model,
-                 int method,
+                 Id method,
                  ANeigh* neigh,
                  DbGrid* dbgrid,
                  const VectorDouble& radius,
                  const VectorInt& ndiscs,
-                 int flag_sel,
+                 Id flag_sel,
                  bool verbose)
 {
   if (!dbin->isNVarComparedTo(1)) return 1;
 
   /* Add the kriging weight as a new variable */
 
-  int iptr = dbin->addColumnsByConstant(1, 0.);
+  Id iptr = dbin->addColumnsByConstant(1, 0.);
   if (iptr < 0) return 1;
 
   /* Produce statistics on the target variable before declustering */
@@ -4090,9 +4090,9 @@ int declustering(Db* dbin,
 
   if (flag_sel)
   {
-    int iptr_sel = dbin->addColumnsByConstant(1, 0.);
+    Id iptr_sel = dbin->addColumnsByConstant(1, 0.);
     if (iptr_sel < 0) return 1;
-    for (int iech = 0; iech < dbin->getNSample(); iech++)
+    for (Id iech = 0; iech < dbin->getNSample(); iech++)
     {
       dbin->setArray(iech, iptr_sel, 0.);
       if (!dbin->isActive(iech)) continue;
@@ -4126,12 +4126,12 @@ int declustering(Db* dbin,
  *****************************************************************************/
 static double* st_calcul_covmat(const char* title,
                                 Db* db1,
-                                int test_def1,
+                                Id test_def1,
                                 Db* db2,
-                                int test_def2,
+                                Id test_def2,
                                 Model* model)
 {
-  int n1, n2, i1, i2;
+  Id n1, n2, i1, i2;
   double* covgen;
 
   /* Initializations */
@@ -4144,7 +4144,7 @@ static double* st_calcul_covmat(const char* title,
   covgen = (double*)mem_alloc(sizeof(double) * n1 * n2, 0);
   if (covgen == nullptr) return (covgen);
 
-  for (int ii1 = i1 = 0; ii1 < db1->getNSample(); ii1++)
+  for (Id ii1 = i1 = 0; ii1 < db1->getNSample(); ii1++)
   {
     if (test_def1)
     {
@@ -4155,7 +4155,7 @@ static double* st_calcul_covmat(const char* title,
       if (!db1->isActive(ii1)) continue;
     }
 
-    for (int ii2 = i2 = 0; ii2 < db2->getNSample(); ii2++)
+    for (Id ii2 = i2 = 0; ii2 < db2->getNSample(); ii2++)
     {
       if (test_def2)
       {
@@ -4166,7 +4166,7 @@ static double* st_calcul_covmat(const char* title,
         if (!db2->isActive(ii2)) continue;
       }
 
-      for (int idim = 0; idim < db1->getNDim(); idim++)
+      for (Id idim = 0; idim < db1->getNDim(); idim++)
         d1_global[idim] = db1->getDistance1D(ii1, ii2, idim);
 
       COVGEN(i1, i2) = model->evaluateOneGeneric(nullptr, d1_global);
@@ -4199,10 +4199,10 @@ static double* st_calcul_covmat(const char* title,
  *****************************************************************************/
 static double* st_calcul_drfmat(const char* title,
                                 Db* db1,
-                                int test_def1,
+                                Id test_def1,
                                 Model* model)
 {
-  int i1, n1, nbfl;
+  Id i1, n1, nbfl;
   double* drftab;
 
   /* Initializations */
@@ -4218,7 +4218,7 @@ static double* st_calcul_drfmat(const char* title,
   /* Loop on the samples */
 
   i1 = 0;
-  for (int ii1 = 0; ii1 < db1->getNSample(); ii1++)
+  for (Id ii1 = 0; ii1 < db1->getNSample(); ii1++)
   {
     if (test_def1)
     {
@@ -4260,12 +4260,12 @@ static double* st_calcul_drfmat(const char* title,
  *****************************************************************************/
 static double* st_calcul_distmat(const char* title,
                                  Db* db1,
-                                 int test_def1,
+                                 Id test_def1,
                                  Db* db2,
-                                 int test_def2,
+                                 Id test_def2,
                                  double power)
 {
-  int n1, ns, i1, is, ndim;
+  Id n1, ns, i1, is, ndim;
   double *distgen, dist;
 
   /* Initializations */
@@ -4279,7 +4279,7 @@ static double* st_calcul_distmat(const char* title,
   distgen = (double*)mem_alloc(sizeof(double) * n1 * ns, 0);
   if (distgen == nullptr) return (distgen);
 
-  for (int ii1 = i1 = 0; ii1 < db1->getNSample(); ii1++)
+  for (Id ii1 = i1 = 0; ii1 < db1->getNSample(); ii1++)
   {
     if (test_def1)
     {
@@ -4290,7 +4290,7 @@ static double* st_calcul_distmat(const char* title,
       if (!db1->isActive(ii1)) continue;
     }
 
-    for (int iis = is = 0; iis < db2->getNSample(); iis++)
+    for (Id iis = is = 0; iis < db2->getNSample(); iis++)
     {
       if (test_def2)
       {
@@ -4302,7 +4302,7 @@ static double* st_calcul_distmat(const char* title,
       }
 
       dist = 0.;
-      for (int idim = 0; idim < ndim; idim++)
+      for (Id idim = 0; idim < ndim; idim++)
       {
         d1_global[idim] = db1->getDistance1D(ii1, iis, idim);
         dist += d1_global[idim] * d1_global[idim];
@@ -4338,8 +4338,8 @@ static double* st_calcul_distmat(const char* title,
  **
  *****************************************************************************/
 static double* st_calcul_product(const char* title,
-                                 int n1,
-                                 int ns,
+                                 Id n1,
+                                 Id ns,
                                  const double* covss,
                                  const double* distgen)
 {
@@ -4348,11 +4348,11 @@ static double* st_calcul_product(const char* title,
   prodgen = (double*)mem_alloc(sizeof(double) * n1 * ns, 0);
   if (prodgen == nullptr) return (prodgen);
 
-  for (int i1 = 0; i1 < n1; i1++)
-    for (int is = 0; is < ns; is++)
+  for (Id i1 = 0; i1 < n1; i1++)
+    for (Id is = 0; is < ns; is++)
     {
       PRODGEN(i1, is) = 0.;
-      for (int js = 0; js < ns; js++)
+      for (Id js = 0; js < ns; js++)
         PRODGEN(i1, is) += COVSS(is, js) * DISTGEN(i1, js);
     }
 
@@ -4384,7 +4384,7 @@ static double* st_inhomogeneous_covpp(Db* dbdat,
                                       const double* prodps)
 {
   double* covpp;
-  int np, ns, error;
+  Id np, ns, error;
 
   /* Initializations */
 
@@ -4401,9 +4401,9 @@ static double* st_inhomogeneous_covpp(Db* dbdat,
 
   /* Calculate the LHS matrix */
 
-  for (int ip = 0; ip < np; ip++)
-    for (int jp = ip; jp < np; jp++)
-      for (int is = 0; is < ns; is++)
+  for (Id ip = 0; ip < np; ip++)
+    for (Id jp = ip; jp < np; jp++)
+      for (Id is = 0; is < ns; is++)
       {
         COVPP(ip, jp) += DISTPS(ip, is) * PRODPS(jp, is);
         if (jp > ip) COVPP(jp, ip) = COVPP(ip, jp);
@@ -4439,14 +4439,14 @@ label_end:
 static double* st_inhomogeneous_covgp(Db* dbdat,
                                       Db* dbsrc,
                                       Db* dbout,
-                                      int flag_source,
+                                      Id flag_source,
                                       Model* model_dat,
                                       const double* distps,
                                       const double* prodps,
                                       const double* prodgs)
 {
   double* covgp;
-  int np, ns, ng, error;
+  Id np, ns, ng, error;
 
   /* Initializations */
 
@@ -4466,15 +4466,15 @@ static double* st_inhomogeneous_covgp(Db* dbdat,
 
   if (!flag_source)
   {
-    for (int ig = 0; ig < ng; ig++)
-      for (int ip = 0; ip < np; ip++)
-        for (int is = 0; is < ns; is++)
+    for (Id ig = 0; ig < ng; ig++)
+      for (Id ip = 0; ip < np; ip++)
+        for (Id is = 0; is < ns; is++)
           COVGP(ig, ip) += DISTPS(ip, is) * PRODGS(ig, is);
   }
   else
   {
-    for (int ig = 0; ig < ng; ig++)
-      for (int ip = 0; ip < np; ip++)
+    for (Id ig = 0; ig < ng; ig++)
+      for (Id ip = 0; ip < np; ip++)
         COVGP(ig, ip) = PRODPS(ip, ig);
   }
 
@@ -4505,13 +4505,13 @@ label_end:
  *****************************************************************************/
 static VectorDouble st_inhomogeneous_covgg(Db* dbsrc,
                                            Db* dbout,
-                                           int flag_source,
+                                           Id flag_source,
                                            Model* model_dat,
                                            const double* distgs,
                                            const double* prodgs)
 {
-  int ns = dbsrc->getNSample(true);
-  int ng = dbout->getNSample(true);
+  Id ns = dbsrc->getNSample(true);
+  Id ng = dbout->getNSample(true);
   VectorDouble covgg(ng, 0);
 
   /* Calculate the variance term (for a zero-distance) */
@@ -4522,16 +4522,16 @@ static VectorDouble st_inhomogeneous_covgg(Db* dbsrc,
 
   if (!flag_source)
   {
-    for (int ig = 0; ig < ng; ig++)
+    for (Id ig = 0; ig < ng; ig++)
     {
       covgg[ig] = c00;
-      for (int is = 0; is < ns; is++)
+      for (Id is = 0; is < ns; is++)
         covgg[ig] += DISTGS(ig, is) * PRODGS(ig, is);
     }
   }
   else
   {
-    for (int ig = 0; ig < ng; ig++)
+    for (Id ig = 0; ig < ng; ig++)
       covgg[ig] = c00;
   }
   return covgg;
@@ -4555,15 +4555,15 @@ static VectorDouble st_inhomogeneous_covgg(Db* dbsrc,
  ** \remarks calling function
  **
  *****************************************************************************/
-static int st_drift_prepar(int np,
-                           int nbfl,
+static Id st_drift_prepar(Id np,
+                           Id nbfl,
                            const double* covpp,
                            const double* drftab,
                            double** yloc,
                            double** zloc)
 {
   double *ymat, *zmat, value;
-  int error, ecr;
+  Id error, ecr;
 
   /* Initialization */
 
@@ -4576,11 +4576,11 @@ static int st_drift_prepar(int np,
   if (ymat == nullptr) goto label_end;
 
   ecr = 0;
-  for (int il = 0; il < nbfl; il++)
-    for (int ip = 0; ip < np; ip++)
+  for (Id il = 0; il < nbfl; il++)
+    for (Id ip = 0; ip < np; ip++)
     {
       value = 0.;
-      for (int jp = 0; jp < np; jp++)
+      for (Id jp = 0; jp < np; jp++)
         value += COVPP(ip, jp) * DRFTAB(jp, il);
       ymat[ecr++] = value;
     }
@@ -4591,11 +4591,11 @@ static int st_drift_prepar(int np,
   if (zmat == nullptr) goto label_end;
 
   ecr = 0;
-  for (int il = 0; il < nbfl; il++)
-    for (int jl = 0; jl < nbfl; jl++)
+  for (Id il = 0; il < nbfl; il++)
+    for (Id jl = 0; jl < nbfl; jl++)
     {
       value = 0.;
-      for (int ip = 0; ip < np; ip++)
+      for (Id ip = 0; ip < np; ip++)
         value += YMAT(ip, il) * DRFTAB(ip, jl);
       zmat[ecr++] = value;
     }
@@ -4635,8 +4635,8 @@ label_end:
  ** \param[out] mu          Vector of Lagrange parameters
  **
  *****************************************************************************/
-static void st_drift_update(int np,
-                            int nbfl,
+static void st_drift_update(Id np,
+                            Id nbfl,
                             const double* covgp,
                             const double* driftg,
                             const double* ymat,
@@ -4649,10 +4649,10 @@ static void st_drift_update(int np,
 
   /* Calculate the Lagrange vector */
 
-  for (int il = 0; il < nbfl; il++)
+  for (Id il = 0; il < nbfl; il++)
   {
     value = 0.;
-    for (int ip = 0; ip < np; ip++)
+    for (Id ip = 0; ip < np; ip++)
       value = YMAT(ip, il) * covgp[ip] - driftg[il];
     maux[il] = value;
   }
@@ -4660,8 +4660,8 @@ static void st_drift_update(int np,
 
   /* Update the vector of kriging weights */
 
-  for (int ip = 0; ip < np; ip++)
-    for (int il = 0; il < nbfl; il++)
+  for (Id ip = 0; ip < np; ip++)
+    for (Id il = 0; il < nbfl; il++)
       lambda[ip] -= YMAT(ip, il) * mu[il];
 }
 
@@ -4680,15 +4680,15 @@ static void st_drift_update(int np,
  ** \param[in]  model_src   Model structure for the sources
  **
  *****************************************************************************/
-int inhomogeneous_kriging(Db* dbdat,
+Id inhomogeneous_kriging(Db* dbdat,
                           Db* dbsrc,
                           Db* dbout,
                           double power,
-                          int flag_source,
+                          Id flag_source,
                           Model* model_dat,
                           Model* model_src)
 {
-  int error, np, ip, ns, ng, nvar, neq, nred, nfeq, nbfl;
+  Id error, np, ip, ns, ng, nvar, neq, nred, nfeq, nbfl;
   double *covss, *distps, *distgs, *covpp, *covgp, *prodps, *prodgs;
   double *driftp, *ymat, *zmat, *rhs;
   double estim, stdev, auxval;
@@ -4757,7 +4757,7 @@ int inhomogeneous_kriging(Db* dbdat,
 
   /* Constitute the Data vector */
 
-  for (int iip = ip = 0; iip < dbdat->getNSample(); iip++)
+  for (Id iip = ip = 0; iip < dbdat->getNSample(); iip++)
   {
     if (!dbdat->isActiveAndDefined(iip, 0)) continue;
     data[ip] = dbdat->getZVariable(iip, 0);

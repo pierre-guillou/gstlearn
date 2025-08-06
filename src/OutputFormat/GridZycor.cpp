@@ -47,13 +47,13 @@ GridZycor::~GridZycor()
 {
 }
 
-int GridZycor::writeInFile()
+Id GridZycor::writeInFile()
 {
-  int nx[2];
+  Id nx[2];
   double rbid, x0[2], xf[2], dx[2];
   double buff[5]; /* Size = nbyline */
   char card[100]; /* Size = nbyline * 20 */
-  static int nbyline    = 5;
+  static Id nbyline    = 5;
   static double testval = MAXIMUM_BIG;
 
   /* Open the file */
@@ -73,7 +73,7 @@ int GridZycor::writeInFile()
 
   /* Grid description */
 
-  for (int i = 0; i < 2; i++)
+  for (Id i = 0; i < 2; i++)
   {
     nx[i] = _dbgrid->getNX(i);
     x0[i] = _dbgrid->getX0(i);
@@ -89,19 +89,19 @@ int GridZycor::writeInFile()
 
   /* The set of values */
 
-  for (int jj = nx[0] - 1; jj >= 0; jj--)
+  for (Id jj = nx[0] - 1; jj >= 0; jj--)
   {
-    int kk = 0;
-    int ii = ((nx[1] * nx[0]) - (jj + 1));
-    for (int loop = 1; loop <= nx[1]; loop++)
+    Id kk = 0;
+    Id ii = ((nx[1] * nx[0]) - (jj + 1));
+    for (Id loop = 1; loop <= nx[1]; loop++)
     {
       buff[kk++] = _dbgrid->getArray(ii, _cols[0]);
       ii -= nx[0];
       if (kk == nbyline)
       {
-        for (int yy = 0; yy < nbyline; yy++)
+        for (Id yy = 0; yy < nbyline; yy++)
         {
-          int ind = yy * 15;
+          Id ind = yy * 15;
           if (!FFFF(buff[yy]))
           {
             gslSPrintf(&card[ind], "%15g", buff[yy]);
@@ -119,9 +119,9 @@ int GridZycor::writeInFile()
 
     if (kk > 0)
     {
-      for (int yy = 0; yy < kk; yy++)
+      for (Id yy = 0; yy < kk; yy++)
       {
-        int ind = yy * 15;
+        Id ind = yy * 15;
         if (!FFFF(buff[yy]))
         {
           gslSPrintf(&card[ind], "%15g", buff[yy]);
@@ -145,7 +145,7 @@ DbGrid* GridZycor::readGridFromFile()
   DbGrid* dbgrid = nullptr;
   char string[100];
   double xf[2], rbid1, rbid2, rbid3, test, value;
-  int nval, ibid1, ibid2, ibid3;
+  Id nval, ibid1, ibid2, ibid3;
   VectorInt nx(2);
   VectorDouble dx(2);
   VectorDouble x0(2);
@@ -206,13 +206,13 @@ DbGrid* GridZycor::readGridFromFile()
 
   /* Core allocation */
 
-  int size = nx[0] * nx[1];
+  Id size = nx[0] * nx[1];
   VectorDouble tab(size);
 
   /* Read the array of real values */
 
-  for (int ix = 0; ix < nx[0]; ix++)
-    for (int iy = 0; iy < nx[1]; iy++)
+  for (Id ix = 0; ix < nx[0]; ix++)
+    for (Id iy = 0; iy < nx[1]; iy++)
     {
       if (_record_read(_file, "%lf", &value)) break;
       if (value == test) value = TEST;

@@ -20,7 +20,7 @@ namespace gstlrn
 class GSTLEARN_EXPORT SimuBooleanParam: public AStringable
 {
 public:
-  SimuBooleanParam(int maxiter = 100000,
+  SimuBooleanParam(Id maxiter = 100000,
                    double tmax = 100.,
                    double background = TEST,
                    double facies = 1.,
@@ -36,17 +36,17 @@ public:
   void setBackground(double background) { _background = background; }
   double getFacies() const { return _facies; }
   void setFacies(double facies) { _facies = facies; }
-  int getMaxiter() const { return _maxiter; }
-  void setMaxiter(int maxiter) { _maxiter = maxiter; }
+  Id getMaxiter() const { return _maxiter; }
+  void setMaxiter(Id maxiter) { _maxiter = maxiter; }
   double getTmax() const { return _tmax; }
   void setTmax(double tmax) { _tmax = tmax; }
   const VectorDouble& getDilate() const { return _dilate; }
   void setDilate(const VectorDouble& dilate) { _dilate = dilate; }
-  double getDilate(int idim) const;
+  double getDilate(Id idim) const;
   bool isDilate() const { return ! _dilate.empty(); }
 
 private:
-  int    _maxiter;
+  Id    _maxiter;
   double _tmax;
   double _background;
   double _facies;

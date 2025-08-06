@@ -10,6 +10,7 @@
 /******************************************************************************/
 #pragma once
 
+#include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
 #include <cstdlib>
@@ -24,25 +25,25 @@ namespace gstlrn
 {
 GSTLEARN_EXPORT char* mem_alloc_(const char* call_file,
                                  size_t call_line,
-                                 int size,
-                                 int flag_fatal);
+                                 Id size,
+                                 Id flag_fatal);
 GSTLEARN_EXPORT char* mem_calloc_(const char* call_file,
                                   size_t call_line,
-                                  int size_t,
-                                  int size,
-                                  int flag_fatal);
+                                  Id size_t,
+                                  Id size,
+                                  Id flag_fatal);
 GSTLEARN_EXPORT char* mem_realloc_(const char* call_file,
                                    size_t call_line,
                                    char* tab,
-                                   int size,
-                                   int flag_fatal);
+                                   Id size,
+                                   Id flag_fatal);
 GSTLEARN_EXPORT char* mem_copy_(const char* call_file,
                                 size_t call_line,
                                 char* tabin,
-                                int size,
-                                int flag_fatal);
+                                Id size,
+                                Id flag_fatal);
 GSTLEARN_EXPORT char* mem_free_(const char* call_file, size_t call_line, char* tab);
-GSTLEARN_EXPORT double** mem_tab_free(double** tab, int nvar);
-GSTLEARN_EXPORT double** mem_tab_alloc(int nvar, int size, int flag_fatal);
+GSTLEARN_EXPORT double** mem_tab_free(double** tab, Id nvar);
+GSTLEARN_EXPORT double** mem_tab_alloc(Id nvar, Id size, Id flag_fatal);
 GSTLEARN_EXPORT unsigned long long getTotalSystemMemory();
 } // namespace gstlrn

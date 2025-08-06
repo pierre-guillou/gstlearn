@@ -67,7 +67,7 @@ MatrixSymmetricSim::~MatrixSymmetricSim()
   _factor = nullptr;
 }
 
-int MatrixSymmetricSim::_addToDest(const constvect inv, vect outv) const
+Id MatrixSymmetricSim::_addToDest(const constvect inv, vect outv) const
 {
   if (_inverse)
   {
@@ -77,24 +77,24 @@ int MatrixSymmetricSim::_addToDest(const constvect inv, vect outv) const
   return _factor->addSolveX(inv, outv);
 }
 
-int MatrixSymmetricSim::_addSimulateToDest(const constvect whitenoise,
+Id MatrixSymmetricSim::_addSimulateToDest(const constvect whitenoise,
                                            vect outv) const
 {
   if (_inverse) return _factor->addInvLtX(whitenoise, outv);
   return _factor->addLX(whitenoise, outv);
 }
 
-int MatrixSymmetricSim::getSize() const
+Id MatrixSymmetricSim::getSize() const
 {
   if (_factor == nullptr) return 0;
   return _factor->getSize();
 }
 
-double MatrixSymmetricSim::computeLogDet(int nMC) const
+double MatrixSymmetricSim::computeLogDet(Id nMC) const
 {
   DECLARE_UNUSED(nMC);
   if (_factor == nullptr) return TEST;
-  int sign = _inverse ? -1 : 1;
+  Id sign = _inverse ? -1 : 1;
   return sign * _factor->computeLogDeterminant();
 }
 } // namespace gstlrn

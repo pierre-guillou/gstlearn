@@ -83,7 +83,7 @@ String BooleanObject::toString(const AStringFormat* /*strfmt*/) const
 
 void BooleanObject::setCenter(const VectorDouble& center)
 {
-  for (int idim = 0; idim < (int) center.size(); idim++)
+  for (Id idim = 0; idim < (Id) center.size(); idim++)
     _center[idim] = center[idim];
 }
 
@@ -139,8 +139,8 @@ void BooleanObject::_drawCoordinate(const DbGrid *dbout,
                              const SimuBooleanParam& boolparam,
                              VectorDouble& coor)
 {
-  int ndim = dbout->getNDim();
-  for (int idim = 0; idim < ndim; idim++)
+  Id ndim = dbout->getNDim();
+  for (Id idim = 0; idim < ndim; idim++)
   {
     double origin = dbout->getX0(idim);
     origin -= boolparam.getDilate(idim);
@@ -161,11 +161,11 @@ BooleanObject* BooleanObject::generate(const DbGrid* dbout,
                                        const SimuBooleanParam& boolparam,
                                        double eps)
 {
-  int ndim = dbout->getNDim();
+  Id ndim = dbout->getNDim();
 
   // Define the (primary) location of the object
 
-  int iter = 0;
+  Id iter = 0;
   VectorDouble coor(ndim);
   if (! cdgrain.empty())
   {
@@ -203,7 +203,7 @@ BooleanObject* BooleanObject::generate(const DbGrid* dbout,
         delete object;
         return nullptr;
       }
-      for (int idim = 0; idim < ndim; idim++)
+      for (Id idim = 0; idim < ndim; idim++)
       {
         if (idim < 2)
         {
@@ -270,7 +270,7 @@ BooleanObject* BooleanObject::generate(const DbGrid* dbout,
    }
    else
    {
-     int iech = dbout->coordinateToRank(coor, false, eps);
+     Id iech = dbout->coordinateToRank(coor, false, eps);
      theta    = dbout->getLocVariable(ELoc::P, iech, 0);
    }
    return (law_uniform(0., 1.) > theta);
@@ -286,10 +286,10 @@ BooleanObject* BooleanObject::generate(const DbGrid* dbout,
  ** \param[in]  ndim     Space dimension
  **
  *****************************************************************************/
-bool BooleanObject::_isInObject(const VectorDouble& coor, int ndim)
+bool BooleanObject::_isInObject(const VectorDouble& coor, Id ndim)
 {
   VectorDouble incr(ndim);
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     incr[idim] = coor[idim] - _center[idim];
 
   if (_orientation)
@@ -337,10 +337,10 @@ bool BooleanObject::_isInObject(const VectorDouble& coor, int ndim)
  ** \param[in]  ndim     Space dimension
  **
  *****************************************************************************/
-bool BooleanObject::_isInBoundingBox(const VectorDouble& coor, int ndim)
+bool BooleanObject::_isInBoundingBox(const VectorDouble& coor, Id ndim)
 
 {
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     if (coor[idim] < _box[idim][0]) return false;
     if (coor[idim] > _box[idim][1]) return false;
@@ -348,22 +348,22 @@ bool BooleanObject::_isInBoundingBox(const VectorDouble& coor, int ndim)
   return true;
 }
 
-bool BooleanObject::_isPore(const Db* db, int iech)
+bool BooleanObject::_isPore(const Db* db, Id iech)
 {
   return (db->getZVariable(iech, 0) == 0);
 }
 
-bool BooleanObject::_isGrain(const Db* db, int iech)
+bool BooleanObject::_isGrain(const Db* db, Id iech)
 {
   return (db->getZVariable(iech, 0) != 0);
 }
 
-int BooleanObject::_getCoverageAtSample(const Db* db, int iptr_cover, int iech)
+Id BooleanObject::_getCoverageAtSample(const Db* db, Id iptr_cover, Id iech)
 {
-  return (int) db->getArray(iech, iptr_cover);
+  return (Id) db->getArray(iech, iptr_cover);
 }
 
-void BooleanObject::_updateCoverageAtSample(Db* db, int iptr_cover, int iech, int ival)
+void BooleanObject::_updateCoverageAtSample(Db* db, Id iptr_cover, Id iech, Id ival)
 {
   db->setArray(iech, iptr_cover, db->getArray(iech, iptr_cover) + ival);
 }
@@ -380,8 +380,8 @@ void BooleanObject::_updateCoverageAtSample(Db* db, int iptr_cover, int iech, in
 bool BooleanObject::isCompatiblePore(const Db* db)
 {
   if (db == nullptr) return true;
-  int ndim = db->getNDim();
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  Id ndim = db->getNDim();
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (! db->isActive(iech)) continue;
     if (! _isPore(db, iech)) continue;
@@ -403,8 +403,8 @@ bool BooleanObject::isCompatibleGrainAdd(const Db* db)
 {
   if (db == nullptr) return true;
 
-  int ndim = db->getNDim();
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  Id ndim = db->getNDim();
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (! db->isActive(iech)) continue;
     if (! _isGrain(db,iech)) continue;
@@ -423,12 +423,12 @@ bool BooleanObject::isCompatibleGrainAdd(const Db* db)
  ** \param[in]  iptr_cover UIUD for coverage variable
  **
  *****************************************************************************/
-bool BooleanObject::isCompatibleGrainDelete(const Db* db, int iptr_cover)
+bool BooleanObject::isCompatibleGrainDelete(const Db* db, Id iptr_cover)
 {
   if (db == nullptr) return true;
-  int ndim = db->getNDim();
+  Id ndim = db->getNDim();
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (! db->isActive(iech)) continue;
     if (! _isGrain(db, iech)) continue;
@@ -453,12 +453,12 @@ bool BooleanObject::isCompatibleGrainDelete(const Db* db, int iptr_cover)
  **                      1 for addition; -1 for deletion
  **
  *****************************************************************************/
-int BooleanObject::coverageUpdate(Db* db, int iptr_cover, int val)
+Id BooleanObject::coverageUpdate(Db* db, Id iptr_cover, Id val)
 {
   if (db == nullptr) return 0;
-  int ndim = db->getNDim();
-  int not_covered = 0;
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  Id ndim = db->getNDim();
+  Id not_covered = 0;
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (! db->isActive(iech)) continue;
     if (! _isGrain(db, iech)) continue;
@@ -485,13 +485,13 @@ int BooleanObject::coverageUpdate(Db* db, int iptr_cover, int val)
 }
 
 void BooleanObject::projectToGrid(DbGrid *dbout,
-                                  int iptr_simu,
-                                  int iptr_rank,
-                                  int facies,
-                                  int rank)
+                                  Id iptr_simu,
+                                  Id iptr_rank,
+                                  Id facies,
+                                  Id rank)
 {
-  int ix0, ix1, iy0, iy1, iz0, iz1;
-  int ndim = dbout->getNDim();
+  Id ix0, ix1, iy0, iy1, iz0, iz1;
+  Id ndim = dbout->getNDim();
   VectorDouble coor(ndim);
   VectorInt indice(ndim);
 
@@ -499,9 +499,9 @@ void BooleanObject::projectToGrid(DbGrid *dbout,
 
   if (ndim >= 1)
   {
-    ix0 = (int) ((_box[0][0] - dbout->getX0(0)) / dbout->getDX(0) - 1);
+    ix0 = (Id) ((_box[0][0] - dbout->getX0(0)) / dbout->getDX(0) - 1);
     ix0 = MAX(ix0, 0);
-    ix1 = (int) ((_box[0][1] - dbout->getX0(0)) / dbout->getDX(0) + 1);
+    ix1 = (Id) ((_box[0][1] - dbout->getX0(0)) / dbout->getDX(0) + 1);
     ix1 = MIN(ix1, dbout->getNX(0) - 1);
   }
   else
@@ -511,9 +511,9 @@ void BooleanObject::projectToGrid(DbGrid *dbout,
   }
   if (ndim >= 2)
   {
-    iy0 = (int) ((_box[1][0] - dbout->getX0(1)) / dbout->getDX(1) - 1);
+    iy0 = (Id) ((_box[1][0] - dbout->getX0(1)) / dbout->getDX(1) - 1);
     iy0 = MAX(iy0, 0);
-    iy1 = (int) ((_box[1][1] - dbout->getX0(1)) / dbout->getDX(1) + 1);
+    iy1 = (Id) ((_box[1][1] - dbout->getX0(1)) / dbout->getDX(1) + 1);
     iy1 = MIN(iy1, dbout->getNX(1) - 1);
   }
   else
@@ -523,9 +523,9 @@ void BooleanObject::projectToGrid(DbGrid *dbout,
   }
   if (ndim >= 3)
   {
-    iz0 = (int) ((_box[2][0] - dbout->getX0(2)) / dbout->getDX(2) - 1);
+    iz0 = (Id) ((_box[2][0] - dbout->getX0(2)) / dbout->getDX(2) - 1);
     iz0 = MAX(iz0, 0);
-    iz1 = (int) ((_box[2][1] - dbout->getX0(2)) / dbout->getDX(2) + 1);
+    iz1 = (Id) ((_box[2][1] - dbout->getX0(2)) / dbout->getDX(2) + 1);
     iz1 = MIN(iz1, dbout->getNX(2) - 1);
   }
   else
@@ -536,9 +536,9 @@ void BooleanObject::projectToGrid(DbGrid *dbout,
 
   /* Check the pixels within the box */
 
-  for (int ix = ix0; ix <= ix1; ix++)
-    for (int iy = iy0; iy <= iy1; iy++)
-      for (int iz = iz0; iz <= iz1; iz++)
+  for (Id ix = ix0; ix <= ix1; ix++)
+    for (Id iy = iy0; iy <= iy1; iy++)
+      for (Id iz = iz0; iz <= iz1; iz++)
       {
         if (ndim >= 1)
           coor[0] = dbout->getX0(0) + ix * dbout->getDX(0);
@@ -553,7 +553,7 @@ void BooleanObject::projectToGrid(DbGrid *dbout,
         if (ndim >= 2) indice[1] = iy;
         if (ndim >= 3) indice[2] = iz;
 
-        int iad = dbout->indiceToRank(indice);
+        Id iad = dbout->indiceToRank(indice);
 
         /* Bypass writing if the cell is masked off */
 

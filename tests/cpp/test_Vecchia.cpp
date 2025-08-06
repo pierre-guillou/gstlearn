@@ -31,9 +31,9 @@
 
 using namespace gstlrn;
 
-static Db* _createDb(int nvar = 1, int ndat = 5, bool verbose = false)
+static Db* _createDb(Id nvar = 1, Id ndat = 5, bool verbose = false)
 {
-  int ndim = 2;
+  Id ndim  = 2;
   Db* db   = Db::createFillRandom(ndat, ndim, nvar);
   // db->setZVariable(3, 0, TEST);
   DbStringFormat dbfmt1(FLAG_ARRAY);
@@ -41,7 +41,7 @@ static Db* _createDb(int nvar = 1, int ndat = 5, bool verbose = false)
   return db;
 }
 
-static Model* _createModel(int nvar = 1, double range = 0.5, bool verbose = false)
+static Model* _createModel(Id nvar = 1, double range = 0.5, bool verbose = false)
 {
   MatrixSymmetric* sills = MatrixSymmetric::createRandomDefinitePositive(nvar);
   Model* model           = Model::createFromParam(ECov::EXPONENTIAL, range, TEST, 1., VectorDouble(), *sills);
@@ -50,15 +50,15 @@ static Model* _createModel(int nvar = 1, double range = 0.5, bool verbose = fals
   return model;
 }
 
-static DbGrid* _createGrid(int nx = 2)
+static DbGrid* _createGrid(Id nx = 2)
 {
   DbGrid* grid = DbGrid::create({nx, nx}, {1. / nx, 1. / nx});
   return grid;
 }
 
-static void _dumpLimit(int mode)
+static void _dumpLimit(Id mode)
 {
-  int limit = (mode > 0) ? -1 : 7;
+  Id limit = (mode > 0) ? -1 : 7;
   OptCst::define(ECst::NTCOL, limit);
   OptCst::define(ECst::NTROW, limit);
 }
@@ -75,8 +75,8 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   // Global parameters
-  int mode       = 0;
-  int nb_vecchia = 3;
+  Id mode       = 0;
+  Id nb_vecchia = 3;
   DbStringFormat dbfmt(FLAG_STATS, {"Vecchia*"});
 
   if (mode == 0 || mode == 1)
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     Db* db             = _createDb(1, 5, true);
     Model* model       = _createModel(1);
     Vecchia V(model, nb_vecchia, db);
-    MatrixT<int> Ranks = findNN(db, nullptr, nb_vecchia + 1, false, true);
+    auto Ranks = findNN(db, nullptr, nb_vecchia + 1, false, true);
     (void)V.computeLower(Ranks, true);
     delete db;
     delete model;

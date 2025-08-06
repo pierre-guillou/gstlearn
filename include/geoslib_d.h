@@ -24,21 +24,21 @@ class Koption
 {
 public:
   EKrigOpt calcul;    /* Type of calculation (EKrigOpt) */
-  int ndim;           /* Space dimension */
-  int ntot;           /* Number of discretization points */
-  int* ndisc;         /* Array of discretization counts */
+  Id ndim;           /* Space dimension */
+  Id ntot;           /* Number of discretization points */
+  Id* ndisc;         /* Array of discretization counts */
   double* disc1;      /* Discretization coordinates */
   double* disc2;      /* Discretization randomized coordinates */
-  int flag_data_disc; /* Discretization flag */
+  Id flag_data_disc; /* Discretization flag */
   double* dsize;
 };
 
 class Model;
 typedef struct
 {
-  int norder;
-  int nmodel;
-  int npar_init;
+  Id norder;
+  Id nmodel;
+  Id npar_init;
   Model* models[2];
   Option_VarioFit optvar;
   void* user_data;
@@ -49,15 +49,15 @@ typedef struct
 class Db;
 typedef struct
 {
-  int case_facies;      /* TRUE when Gibbs used for Facies */
-  int case_stat;        /* TRUE if proportions are constant */
-  int case_prop_interp; /* TRUE when props are given in proportion file */
-  int ngrf[2];          /* Number of GRF for the PGSs */
-  int nfac[2];          /* Number of facies for the PGSs */
-  int nfaccur;          /* Number of facies for current PGS */
-  int nfacprod;         /* Product of the number of facies */
-  int nfacmax;          /* Maximum number of facies over all PGS */
-  int mode;             /* Type of process */
+  Id case_facies;      /* TRUE when Gibbs used for Facies */
+  Id case_stat;        /* TRUE if proportions are constant */
+  Id case_prop_interp; /* TRUE when props are given in proportion file */
+  Id ngrf[2];          /* Number of GRF for the PGSs */
+  Id nfac[2];          /* Number of facies for the PGSs */
+  Id nfaccur;          /* Number of facies for current PGS */
+  Id nfacprod;         /* Product of the number of facies */
+  Id nfacmax;          /* Maximum number of facies over all PGS */
+  Id mode;             /* Type of process */
   VectorDouble propfix;
   VectorDouble propmem;
   VectorDouble propwrk;
@@ -70,8 +70,8 @@ class Rule;
 class PropDef;
 typedef struct
 {
-  int ipgs;
-  int flag_used[2];
+  Id ipgs;
+  Id flag_used[2];
   const Rule* rule;
   PropDef* propdef;
 } Modif_Categorical;
@@ -86,7 +86,7 @@ typedef struct
 
 typedef struct
 {
-  int nplan;
+  Id nplan;
   std::vector<SubPlan> plans;
 } SubPlanes;
 
@@ -100,9 +100,9 @@ typedef struct
 class Cheb_Elem
 {
 public:
-  int ncoeffs;  /* Number of coefficients */
-  int ncmax;    /* Maximum number of polynomials */
-  int ndisc;    /* Number of discretizations */
+  Id ncoeffs;  /* Number of coefficients */
+  Id ncmax;    /* Maximum number of polynomials */
+  Id ndisc;    /* Number of discretizations */
   double power; /* Power of the transform */
   double a;
   double b;
@@ -142,9 +142,9 @@ typedef struct
 
 typedef struct
 {
-  int nconf;              // Number of covariance configurations
-  int ndisc;              // Number of discretization steps
-  int flag_cumul;         // 1 if storing integer from -infinity to value
+  Id nconf;              // Number of covariance configurations
+  Id ndisc;              // Number of discretization steps
+  Id flag_cumul;         // 1 if storing integer from -infinity to value
                           // 0 if storing the value per discretized class
   double cmin;            // Minimum correlation value
   double cmax;            // Maximum correlation value
@@ -158,9 +158,9 @@ struct Local_Relem;
 
 struct Local_Split
 {
-  int oper;               // Rank of operator
-  int nrule;              // Number of generated rules
-  int nbyrule;            // Number of symbols in the Rules
+  Id oper;               // Rank of operator
+  Id nrule;              // Number of generated rules
+  Id nbyrule;            // Number of symbols in the Rules
   VectorInt Srules;       // List of rules (Dim: [nitem][NRULE])
   VectorInt Sfipos;       // Position of facies (Dim: [nprod][NCOLOR])
   Local_Relem* old_relem; // Not allocated
@@ -170,9 +170,9 @@ struct Local_Split
 struct Local_Relem
 {
   VectorInt facies;       // List of facies
-  int nrule;              // Number of generated rules
-  int nbyrule;            // Number of symbols in the Rules
-  int nsplit;             // Number of splits
+  Id nrule;              // Number of generated rules
+  Id nbyrule;            // Number of symbols in the Rules
+  Id nsplit;             // Number of splits
   VectorInt Rrules;       // List of rules (Dim: [nitem][NRULE])
   VectorInt Rfipos;       // Position of facies (Dim: [nprod][NCOLOR])
   Local_Split* old_split; // Not allocated

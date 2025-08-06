@@ -38,7 +38,7 @@
 namespace gstlrn
 {
 static const VectorString symbol = {"F","S","T"};
-static int GAUSS_MODE = 1;
+static Id GAUSS_MODE = 1;
 
 /****************************************************************************/
 /*!
@@ -51,7 +51,7 @@ static int GAUSS_MODE = 1;
 ** \remarks by proportions rather than in gaussian scale
 **
 *****************************************************************************/
-void set_rule_mode(int rule_mode)
+void set_rule_mode(Id rule_mode)
 {
   GAUSS_MODE = rule_mode;
 }
@@ -63,7 +63,7 @@ void set_rule_mode(int rule_mode)
 ** \return  Returns the current mode (1 for Gaussian; 0 for Raw)
 **
 *****************************************************************************/
-int get_rule_mode(void)
+Id get_rule_mode(void)
 {
   return(GAUSS_MODE);
 }
@@ -77,7 +77,7 @@ int get_rule_mode(void)
 ** \param[in]  mode    <0 for lower bound; >0 for upper bound
 **
 *****************************************************************************/
-double get_rule_extreme(int mode)
+double get_rule_extreme(Id mode)
 {
   if (mode < 0)
   {
@@ -139,7 +139,7 @@ void Rule::_clear()
  * @param rho GRFs correlation coefficient
  * @return
  */
-int Rule::resetFromNumericalCoding(const VectorInt& n_type, const VectorInt& n_facs, double rho)
+Id Rule::resetFromNumericalCoding(const VectorInt& n_type, const VectorInt& n_facs, double rho)
 {
   _clear();
   _modeRule = ERule::STD;
@@ -148,7 +148,7 @@ int Rule::resetFromNumericalCoding(const VectorInt& n_type, const VectorInt& n_f
   return 0;
 }
 
-int Rule::resetFromFaciesCount(int nfacies, double rho)
+Id Rule::resetFromFaciesCount(Id nfacies, double rho)
 {
   _clear();
   _modeRule = ERule::STD;
@@ -158,7 +158,7 @@ int Rule::resetFromFaciesCount(int nfacies, double rho)
   return 0;
 }
 
-int Rule::resetFromNames(const VectorString& nodnames, double rho)
+Id Rule::resetFromNames(const VectorString& nodnames, double rho)
 {
   _clear();
   _modeRule = ERule::STD;
@@ -167,7 +167,7 @@ int Rule::resetFromNames(const VectorString& nodnames, double rho)
   return 0;
 }
 
-int Rule::resetFromCodes(const VectorInt& nodes, double rho)
+Id Rule::resetFromCodes(const VectorInt& nodes, double rho)
 {
   _clear();
   _modeRule = ERule::STD;
@@ -187,15 +187,15 @@ int Rule::resetFromCodes(const VectorInt& nodes, double rho)
  * 5 : Rank of the facies
  * @return Newly created Rule structure
  */
-int Rule::setMainNodeFromNodNames(const VectorInt& nodes)
+Id Rule::setMainNodeFromNodNames(const VectorInt& nodes)
 {
-  int nb_node = static_cast<int> (nodes.size()) / 6;
+  Id nb_node = static_cast<Id> (nodes.size()) / 6;
   std::vector<Node *> n1tab(nb_node, nullptr);
   std::vector<Node *> n2tab(nb_node, nullptr);
 
   // Loop on the nodes
 
-  for (int inode = 0; inode < nb_node; inode++)
+  for (Id inode = 0; inode < nb_node; inode++)
   {
 
     /* Check the validity of the current node information */
@@ -226,8 +226,8 @@ int Rule::setMainNodeFromNodNames(const VectorInt& nodes)
 
     if (inode > 0)
     {
-      int found = -1;
-      for (int jnode = 0; jnode < inode && found < 0; jnode++)
+      Id found = -1;
+      for (Id jnode = 0; jnode < inode && found < 0; jnode++)
       {
         if (FROM_TYPE(inode) == NODE_TYPE(jnode) &&
             FROM_RANK(inode) == NODE_RANK(jnode)) found = jnode;
@@ -243,7 +243,7 @@ int Rule::setMainNodeFromNodNames(const VectorInt& nodes)
 
     /* Create the nodes */
 
-    int facies = (NODE_TYPE(inode) == THRESH_IDLE) ? FACIES(inode) : 0;
+    Id facies = (NODE_TYPE(inode) == THRESH_IDLE) ? FACIES(inode) : 0;
 
     std::stringstream name;
     if (NODE_TYPE(inode) == THRESH_IDLE)
@@ -296,7 +296,7 @@ String Rule::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
   if (_mainNode == nullptr) return sstr.str();
-  int node_tot,nfac_tot,nmax_tot,ny1_tot,ny2_tot;
+  Id node_tot,nfac_tot,nmax_tot,ny1_tot,ny2_tot;
   double prop_tot;
 
   const RuleStringFormat* rulefmt = dynamic_cast<const RuleStringFormat*>(strfmt);
@@ -336,32 +336,32 @@ String Rule::displaySpecific() const
   return sstr.str();
 }
 
-int Rule::getNFacies() const
+Id Rule::getNFacies() const
 {
-  int node_tot, nfac_tot, nmax_tot, ny1_tot, ny2_tot;
+  Id node_tot, nfac_tot, nmax_tot, ny1_tot, ny2_tot;
   double prop_tot;
   if (statistics(0, &node_tot, &nfac_tot, &nmax_tot, &ny1_tot, &ny2_tot,
                  &prop_tot)) return 0;
   return nfac_tot;
 }
 
-int Rule::getNGRF() const
+Id Rule::getNGRF() const
 {
   auto ny2 = getNY2();
   return (ny2 > 0 ? 2 : 1);
 }
 
-int Rule::getNY1() const
+Id Rule::getNY1() const
 {
-  int node_tot, nfac, nmax, ny1, ny2;
+  Id node_tot, nfac, nmax, ny1, ny2;
   double prop;
   if (statistics(0, &node_tot, &nfac, &nmax, &ny1, &ny2, &prop)) return 0;
   return ny1;
 }
 
-int Rule::getNY2() const
+Id Rule::getNY2() const
 {
-  int node_tot, nfac, nmax, ny1, ny2;
+  Id node_tot, nfac, nmax, ny1, ny2;
   double prop;
   if (statistics(0, &node_tot, &nfac, &nmax, &ny1, &ny2, &prop)) return 0;
   if (getModeRule() == ERule::SHADOW || getModeRule() == ERule::SHIFT) ny2 = 0;
@@ -369,7 +369,7 @@ int Rule::getNY2() const
   return ny2;
 }
 
-bool Rule::isYUsed(int igrf) const
+bool Rule::isYUsed(Id igrf) const
 {
   if (igrf == 0)
     return getNY1() > 0;
@@ -379,7 +379,7 @@ bool Rule::isYUsed(int igrf) const
 VectorInt Rule::whichGRFUsed() const
 {
   VectorInt flag(2);
-  for (int igrf = 0; igrf < 2; igrf++)
+  for (Id igrf = 0; igrf < 2; igrf++)
     flag[igrf] = isYUsed(igrf);
   return flag;
 }
@@ -403,15 +403,15 @@ VectorInt Rule::whichGRFUsed() const
 ** \remark using set_keypair("TolSumProportions",newtol)
 **
 *****************************************************************************/
-int Rule::statistics(int  verbose,
-                     int *node_tot,
-                     int *nfac_tot,
-                     int *nmax_tot,
-                     int *ny1_tot,
-                     int *ny2_tot,
+Id Rule::statistics(Id  verbose,
+                     Id *node_tot,
+                     Id *nfac_tot,
+                     Id *nmax_tot,
+                     Id *ny1_tot,
+                     Id *ny2_tot,
                      double *prop_tot) const
 {
-  int nfac,ifac,ntot;
+  Id nfac,ifac,ntot;
 
   /* Establish the statistics on the Lithotype Rule */
 
@@ -488,16 +488,16 @@ int Rule::statistics(int  verbose,
 ** \param[in]  flag_stat       1 for stationary; 0 otherwise
 **
 *****************************************************************************/
-int Rule::particularities(Db* /*db*/,
+Id Rule::particularities(Db* /*db*/,
                           const Db* /*dbprop*/,
                           Model* /*model*/,
-                          int /*flag_grid_check*/,
-                          int /*flag_stat*/) const
+                          Id /*flag_grid_check*/,
+                          Id /*flag_stat*/) const
 {
   return(0);
 }
 
-bool Rule::checkModel(const Model* /*model*/, int /*nvar*/) const
+bool Rule::checkModel(const Model* /*model*/, Id /*nvar*/) const
 {
   return true;
 }
@@ -517,11 +517,11 @@ void Rule::_nodNamesToIds(const VectorString& nodes,
                           VectorInt& n_type,
                           VectorInt& n_facs)
 {
-  int nb_node = static_cast<int> (nodes.size());
+  Id nb_node = static_cast<Id> (nodes.size());
   n_type.resize(nb_node,0);
   n_facs.resize(nb_node,0);
 
-  for (int i = 0; i < nb_node; i++)
+  for (Id i = 0; i < nb_node; i++)
   {
     decodeInList(symbol,nodes[i],&n_type[i],&n_facs[i]);
 
@@ -542,7 +542,7 @@ void Rule::_nodNamesToIds(const VectorString& nodes,
  * @param facies Facies rank (starting from 1)
  * @return Proportion of the given Facies
  */
-double Rule::getProportion(int facies)
+double Rule::getProportion(Id facies)
 {
   double prop;
   if (_mainNode->getProportion(facies,&prop))
@@ -555,10 +555,10 @@ double Rule::getProportion(int facies)
  * @param facies Rank of the target facies (starting from 1)
  * @return The vector of bounds organized as [t1min, t1max, t2min, t2max]
  */
-std::array<double, 4> Rule::getThresh(int facies) const
+std::array<double, 4> Rule::getThresh(Id facies) const
 {
-  int fac_ret;
-  int rank = 0;
+  Id fac_ret;
+  Id rank = 0;
   double t1min, t1max, t2min, t2max;
 
   if (!_mainNode->getThresh(1, facies, &rank, &fac_ret, &t1min, &t1max, &t2min,
@@ -572,11 +572,11 @@ std::array<double, 4> Rule::getThresh(int facies) const
   return bounds;
 }
 
-VectorDouble Rule::getThreshFromRectangle(int rect, int *facies)
+VectorDouble Rule::getThreshFromRectangle(Id rect, Id *facies)
 {
   VectorDouble bounds;
 
-  int rank = 0;
+  Id rank = 0;
   double t1min, t1max, t2min, t2max;
 
   if (!_mainNode->getThresh(2, rect, &rank, facies, &t1min, &t1max, &t2min,
@@ -601,13 +601,13 @@ VectorDouble Rule::getThreshFromRectangle(int rect, int *facies)
 ** \remark  If one of the two GRF is undefined, the resulting facies is 0
 **
 *****************************************************************************/
-int Rule::getFaciesFromGaussian(double y1, double y2) const
+Id Rule::getFaciesFromGaussian(double y1, double y2) const
 {
   double facies;
 
   if (FFFF(y1) || FFFF(y2)) return(0);
   if (! _mainNode->gaussianToFacies(y1,y2,&facies)) return(0);
-  return((int) facies);
+  return((Id) facies);
 }
 
 VectorInt Rule::getNodes() const
@@ -615,10 +615,10 @@ VectorInt Rule::getNodes() const
   VectorInt nodes;
   if (_mainNode == nullptr) return nodes;
 
-  int nb_node     = 0;
-  int nfac_tot    = 0;
-  int ny1_tot     = 0;
-  int ny2_tot     = 0;
+  Id nb_node     = 0;
+  Id nfac_tot    = 0;
+  Id ny1_tot     = 0;
+  Id ny2_tot     = 0;
   double prop_tot = 0.;
   _mainNode->getStatistics(&nb_node, &nfac_tot, &ny1_tot, &ny2_tot, &prop_tot);
 
@@ -636,9 +636,9 @@ VectorInt Rule::getNodes() const
  * If absent, all proportions are considered equal.
  * @return
  */
-int Rule::setProportions(const VectorDouble& proportions) const
+Id Rule::setProportions(const VectorDouble& proportions) const
 {
-  int    node_tot,nfac_tot,nmax_tot,ny1_tot,ny2_tot;
+  Id    node_tot,nfac_tot,nmax_tot,ny1_tot,ny2_tot;
   double prop_tot;
 
   // Set the proportions when the input argument is left empty
@@ -683,11 +683,11 @@ bool Rule::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   /* Create the Rule structure */
 
-  int mrule = 0;
-  int nb_node = 0;
+  Id mrule = 0;
+  Id nb_node = 0;
   bool ret = true;
 
-  ret = ret && _recordRead<int>(is, "Rule definition", mrule);
+  ret = ret && _recordRead<Id>(is, "Rule definition", mrule);
   ret = ret && _recordRead<double>(is, "Correlation Coefficient of GRFs", _rho);
   if (! ret) return ret;
 
@@ -695,7 +695,7 @@ bool Rule::_deserializeAscii(std::istream& is, bool /*verbose*/)
 
   /* Read the number of nodes */
 
-  ret = ret && _recordRead<int>(is, "Number of Rule Nodes", nb_node);
+  ret = ret && _recordRead<Id>(is, "Number of Rule Nodes", nb_node);
   if (! ret) return ret;
 
   VectorInt nodes(6 * nb_node);
@@ -707,10 +707,10 @@ bool Rule::_deserializeAscii(std::istream& is, bool /*verbose*/)
   /* - node_type: 0 (idle) - 1 (Thresh along Y1) - 2 (Thresh along Y2) */
   /* - node_rank: Rank of the node (starting from 1) */
   /* - facies   : Rank of the facies */
-  int lec = 0;
-  for (int inode =  0; ret && inode < nb_node; inode++)
-    for (int i = 0; ret && i < 6; i++)
-      ret = ret && _recordRead<int>(is, "Rule Node Definition", nodes[lec++]);
+  Id lec = 0;
+  for (Id inode =  0; ret && inode < nb_node; inode++)
+    for (Id i = 0; ret && i < 6; i++)
+      ret = ret && _recordRead<Id>(is, "Rule Node Definition", nodes[lec++]);
   if (ret) setMainNodeFromNodNames(nodes);
 
   return ret;
@@ -718,20 +718,20 @@ bool Rule::_deserializeAscii(std::istream& is, bool /*verbose*/)
 
 bool Rule::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
-  int nb_node, nfacies, nmax_tot, ny1_tot, ny2_tot, rank;
+  Id nb_node, nfacies, nmax_tot, ny1_tot, ny2_tot, rank;
   double prop_tot;
   bool ret = true;
 
   /* Create the Rule structure */
 
-  ret = ret && _recordWrite<int>(os, "Type of Rule", getModeRule().getValue());
+  ret = ret && _recordWrite<Id>(os, "Type of Rule", getModeRule().getValue());
   ret = ret && _recordWrite<double>(os, "Correlation coefficient between GRFs", getRho());
 
   /* Count the number of nodes */
 
   if (ret)
     statistics(0,&nb_node,&nfacies,&nmax_tot,&ny1_tot,&ny2_tot,&prop_tot);
-  ret = ret && _recordWrite<int>(os, "Number of nodes", nb_node);
+  ret = ret && _recordWrite<Id>(os, "Number of nodes", nb_node);
 
   /* Fill the nodes characteristics recursively */
 
@@ -743,27 +743,27 @@ bool Rule::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 
 void Rule::_ruleDefine(std::ostream& os,
                        const Node *node,
-                       int from_type,
-                       int from_rank,
-                       int from_vers,
-                       int *rank) const
+                       Id from_type,
+                       Id from_rank,
+                       Id from_vers,
+                       Id *rank) const
 {
-  int cur_rank;
+  Id cur_rank;
 
   /* Calling node */
 
-  bool ret = _recordWrite<int>(os, "", from_type);
-  ret = ret && _recordWrite<int>(os, "", from_rank);
-  ret = ret && _recordWrite<int>(os, "", from_vers);
+  bool ret = _recordWrite<Id>(os, "", from_type);
+  ret = ret && _recordWrite<Id>(os, "", from_rank);
+  ret = ret && _recordWrite<Id>(os, "", from_vers);
 
   /* Current node */
 
-  ret = ret && _recordWrite<int>(os, "", node->getOrient());
+  ret = ret && _recordWrite<Id>(os, "", node->getOrient());
   if (node->getFacies() <= 0)
   {
     cur_rank = *rank = (*rank) + 1;
-    ret = ret && _recordWrite<int>(os, "", cur_rank);
-    ret = ret && _recordWrite<int>(os, "", 0);
+    ret = ret && _recordWrite<Id>(os, "", cur_rank);
+    ret = ret && _recordWrite<Id>(os, "", 0);
   }
   else
   {
@@ -783,14 +783,14 @@ void Rule::_ruleDefine(std::ostream& os,
     _ruleDefine(os, node->getR2(), node->getOrient(), cur_rank, 2, rank);
 }
 
-VectorString Rule::buildNodNames(int nfacies)
+VectorString Rule::buildNodNames(Id nfacies)
 {
   VectorString nodnames;
 
-  for (int i = 1; i < nfacies; i++)
+  for (Id i = 1; i < nfacies; i++)
     nodnames.push_back("S");
 
-  for (int i = 0; i < nfacies; i++)
+  for (Id i = 0; i < nfacies; i++)
     nodnames.push_back(incrementStringVersion("F",i+1,""));
 
   return nodnames;
@@ -799,10 +799,10 @@ VectorString Rule::buildNodNames(int nfacies)
 void Rule::setMainNodeFromNodNames(const VectorInt& n_type,
                                    const VectorInt& n_facs)
 {
-  int ipos = 0;
-  int n_fac = 0;
-  int n_y1 = 0;
-  int n_y2 = 0;
+  Id ipos = 0;
+  Id n_fac = 0;
+  Id n_y1 = 0;
+  Id n_y2 = 0;
   _mainNode = new Node("main", n_type, n_facs, &ipos, &n_fac, &n_y1, &n_y2);
 }
 
@@ -811,10 +811,10 @@ void Rule::setMainNodeFromNodNames(const VectorString& nodnames)
   VectorInt n_type;
   VectorInt n_facs;
   _nodNamesToIds(nodnames, n_type, n_facs);
-  int ipos = 0;
-  int n_fac = 0;
-  int n_y1 = 0;
-  int n_y2 = 0;
+  Id ipos = 0;
+  Id n_fac = 0;
+  Id n_y1 = 0;
+  Id n_y2 = 0;
   _mainNode = new Node("main", n_type, n_facs, &ipos, &n_fac, &n_y1, &n_y2);
 }
 
@@ -836,13 +836,13 @@ void Rule::setMainNodeFromNodNames(const VectorString& nodnames)
 ** \remark Attributes ELoc::FACIES are mandatory
 **
 *****************************************************************************/
-int Rule::gaus2facData(PropDef* propdef,
+Id Rule::gaus2facData(PropDef* propdef,
                        Db* dbin,
                        Db* /*dbout*/,
-                       int *flag_used,
-                       int ipgs,
-                       int isimu,
-                       int nbsimu)
+                       Id *flag_used,
+                       Id ipgs,
+                       Id isimu,
+                       Id nbsimu)
 {
   double y[2],facies,t1min,t1max,t2min,t2max;
 
@@ -852,19 +852,19 @@ int Rule::gaus2facData(PropDef* propdef,
 
   /* Processing the translation */
 
-  for (int iech=0; iech<dbin->getNSample(); iech++)
+  for (Id iech=0; iech<dbin->getNSample(); iech++)
   {
     if (! dbin->isActive(iech)) continue;
 
     /* Initializations */
 
     facies = TEST;
-    for (int igrf=0; igrf<2; igrf++) y[igrf] = TEST;
+    for (Id igrf=0; igrf<2; igrf++) y[igrf] = TEST;
     if (rule_thresh_define(propdef,dbin,this,ITEST,
                            iech,isimu,nbsimu,1,
                            &t1min,&t1max,&t2min,&t2max)) return 1;
 
-    for (int igrf=0; igrf<2; igrf++)
+    for (Id igrf=0; igrf<2; igrf++)
     {
       auto icase = get_rank_from_propdef(propdef, ipgs, igrf);
       y[igrf] = (flag_used[igrf]) ?
@@ -895,14 +895,14 @@ int Rule::gaus2facData(PropDef* propdef,
 ** \remark Attributes ELoc::FACIES and ELoc::SIMU are mandatory
 **
 *****************************************************************************/
-int Rule::gaus2facResult(PropDef  *propdef,
+Id Rule::gaus2facResult(PropDef  *propdef,
                          Db *dbout,
-                         int *flag_used,
-                         int ipgs,
-                         int isimu,
-                         int nbsimu) const
+                         Id *flag_used,
+                         Id ipgs,
+                         Id isimu,
+                         Id nbsimu) const
 {
-  int    ndim,iech,igrf,icase;
+  Id    ndim,iech,igrf,icase;
   double t1min,t1max,t2min,t2max,facies,y[2];
 
   /* Initializations */
@@ -952,12 +952,12 @@ int Rule::gaus2facResult(PropDef  *propdef,
 ** \param[in]  jech       Rank of the replicate
 **
 *****************************************************************************/
-int Rule::replicateInvalid(Db *dbin, Db *dbout, int jech)
+Id Rule::replicateInvalid(Db *dbin, Db *dbout, Id jech)
 {
-  for (int iech=0; iech<jech; iech++)
+  for (Id iech=0; iech<jech; iech++)
   {
     bool similar = false;
-    for (int idim=0; idim<dbin->getNDim() && ! similar; idim++)
+    for (Id idim=0; idim<dbin->getNDim() && ! similar; idim++)
     {
       double delta = ABS(dbin->getCoordinate(iech, idim) -
                          dbin->getCoordinate(jech, idim));
@@ -987,15 +987,15 @@ int Rule::replicateInvalid(Db *dbin, Db *dbout, int jech)
 ** \param[in]  nbsimu     Number of simulations (if EProcessOper::CONDITIONAL)
 **
 *****************************************************************************/
-int Rule::evaluateBounds(PropDef* propdef,
+Id Rule::evaluateBounds(PropDef* propdef,
                          Db* dbin,
                          Db* /*dbout*/,
-                         int isimu,
-                         int igrf,
-                         int ipgs,
-                         int nbsimu) const
+                         Id isimu,
+                         Id igrf,
+                         Id ipgs,
+                         Id nbsimu) const
 {
-  int    iech,nadd,nech,facies;
+  Id    iech,nadd,nech,facies;
   double t1min,t1max,t2min,t2max;
 
   /* Initializations */
@@ -1009,7 +1009,7 @@ int Rule::evaluateBounds(PropDef* propdef,
   for (iech = 0; iech < nech; iech++)
   {
     if (!dbin->isActive(iech)) continue;
-    facies = (int) dbin->getZVariable(iech, 0);
+    facies = (Id) dbin->getZVariable(iech, 0);
     if (rule_thresh_define(propdef, dbin, this, facies, iech, isimu, nbsimu, 1,
                            &t1min, &t1max, &t2min, &t2max)) return (1);
     if (igrf == 0)
@@ -1084,7 +1084,7 @@ Rule* Rule::createFromNumericalCoding(const VectorInt& n_type,
   }
   return rule;
 }
-Rule* Rule::createFromFaciesCount(int nfacies, double rho)
+Rule* Rule::createFromFaciesCount(Id nfacies, double rho)
 {
   auto* rule = new Rule();
   if (rule->resetFromFaciesCount(nfacies, rho))
@@ -1107,7 +1107,7 @@ bool Rule::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   /* Read the grid characteristics */
   bool ret = true;
 
-  int type;
+  Id type;
   double rho;
   VectorInt nodes;
 

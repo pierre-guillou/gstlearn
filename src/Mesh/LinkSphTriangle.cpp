@@ -57,7 +57,7 @@ void meshes_2D_sph_init(SphTriangle* t)
  **                    0 for total deallocation
  **
  *****************************************************************************/
-void meshes_2D_sph_free(SphTriangle* t, int mode)
+void meshes_2D_sph_free(SphTriangle* t, Id mode)
 {
   if (t == (SphTriangle*)NULL) return;
   if (mode == 0)
@@ -85,9 +85,9 @@ void meshes_2D_sph_free(SphTriangle* t, int mode)
  ** \remarks (longitude,latitude) into 3-D coordinates
  **
  *****************************************************************************/
-int meshes_2D_sph_from_db(Db* db, SphTriangle* t)
+Id meshes_2D_sph_from_db(Db* db, SphTriangle* t)
 {
-  int error, nech, ndim, neff, nold, ecr;
+  Id error, nech, ndim, neff, nold, ecr;
   double xx, yy, zz;
 
   /* Initializations */
@@ -124,7 +124,7 @@ int meshes_2D_sph_from_db(Db* db, SphTriangle* t)
 
   /* Load the points */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActive(iech)) continue;
     GH::convertSph2Cart(db->getCoordinate(iech, 0), db->getCoordinate(iech, 1),
@@ -157,9 +157,9 @@ label_end:
  ** \remarks SphTriangle structure
  **
  *****************************************************************************/
-int meshes_2D_sph_from_points(int nech, double* x, double* y, SphTriangle* t)
+Id meshes_2D_sph_from_points(Id nech, double* x, double* y, SphTriangle* t)
 {
-  int error, ecr, nold;
+  Id error, ecr, nold;
   double xx, yy, zz;
 
   /* Initializations */
@@ -182,7 +182,7 @@ int meshes_2D_sph_from_points(int nech, double* x, double* y, SphTriangle* t)
 
   /* Load the information */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     GH::convertSph2Cart(x[iech], y[iech], &xx, &yy, &zz);
     t->sph_x[ecr] = xx;
@@ -211,9 +211,9 @@ label_end:
  ** \remarks This function adds the vertices to an existing SphTriangle structure
  **
  *****************************************************************************/
-int meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
+Id meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
 {
-  int error, npoint, ecr, found_close, nech, nold, ndecode, flag_reg, flag_vdc;
+  Id error, npoint, ecr, found_close, nech, nold, ndecode, flag_reg, flag_vdc;
   double c1[3], c2[3], dist;
   static double eps = 1.e-3;
 
@@ -233,13 +233,13 @@ int meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
   if (triswitch[0] == '-' && triswitch[1] == 'n')
   {
     flag_vdc = 1;
-    ndecode  = (int)strtod(&triswitch[2], nullptr);
+    ndecode  = (Id)strtod(&triswitch[2], nullptr);
     if (ndecode <= 0) return (0);
   }
   if (triswitch[0] == '-' && triswitch[1] == 'r')
   {
     flag_reg = 1;
-    ndecode  = (int)strtod(&triswitch[2], nullptr);
+    ndecode  = (Id)strtod(&triswitch[2], nullptr);
     if (ndecode <= 0) return (0);
   }
   if (triswitch[0] == '-' && triswitch[1] == 'h')
@@ -277,7 +277,7 @@ int meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
   /* Check that random points are not too close from hard nodes */
 
   ecr = nold;
-  for (int lec = 0; lec < npoint; lec++)
+  for (Id lec = 0; lec < npoint; lec++)
   {
     c1[0] = COORD(0, lec);
     c1[1] = COORD(1, lec);
@@ -286,7 +286,7 @@ int meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
     /* Loop on the old points */
 
     found_close = -1;
-    for (int i = 0; i < t->n_nodes && found_close < 0; i++)
+    for (Id i = 0; i < t->n_nodes && found_close < 0; i++)
     {
       c2[0] = t->sph_x[i];
       c2[1] = t->sph_y[i];
@@ -296,7 +296,7 @@ int meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
       /* which requires long-lat information */
 
       dist = 0.;
-      for (int j = 0; j < 3; j++)
+      for (Id j = 0; j < 3; j++)
         dist += (c1[j] - c2[j]) * (c1[j] - c2[j]);
       if (dist < eps) found_close = i;
     }
@@ -335,7 +335,7 @@ label_end:
  ** \param[in]  brief     1 for a brief output; 0 otherwise
  **
  *****************************************************************************/
-void meshes_2D_sph_print(SphTriangle* t, int brief)
+void meshes_2D_sph_print(SphTriangle* t, Id brief)
 {
   double rlong, rlat;
 
@@ -344,7 +344,7 @@ void meshes_2D_sph_print(SphTriangle* t, int brief)
   if (!brief && t->n_nodes > 0 && t->sph_x != nullptr && t->sph_y != nullptr && t->sph_z != nullptr)
   {
     message("\nCoordinates in Cartesian (R=1); then in Longitude - Latitude\n");
-    for (int i = 0; i < t->n_nodes; i++)
+    for (Id i = 0; i < t->n_nodes; i++)
     {
       message("%3d", i + 1);
       GH::convertCart2Sph(t->sph_x[i], t->sph_y[i], t->sph_z[i], &rlong, &rlat);
@@ -365,7 +365,7 @@ void meshes_2D_sph_print(SphTriangle* t, int brief)
  ** \param[in]  t          SphTriangle structure
  **
  *****************************************************************************/
-int meshes_2D_sph_create(int verbose, SphTriangle* t)
+Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
 {
   int *loc_near, *loc_next, *loc_lnew, error, skip_rnd, seed_memo;
   double *loc_dist, memo[3][3], ampli, value, cste;
@@ -373,7 +373,7 @@ int meshes_2D_sph_create(int verbose, SphTriangle* t)
   /* Initializations */
 
   error    = 1;
-  skip_rnd = (int)get_keypone("Skip_Random", 0);
+  skip_rnd = (Id)get_keypone("Skip_Random", 0);
   loc_near = loc_next = loc_lnew = nullptr;
   loc_dist                       = nullptr;
   if (t == (SphTriangle*)NULL || t->n_nodes < 3) return (1);
@@ -382,9 +382,9 @@ int meshes_2D_sph_create(int verbose, SphTriangle* t)
 
   meshes_2D_sph_free(t, 1);
   t->sph_size = 6 * t->n_nodes - 12;
-  t->sph_list = (int*)mem_alloc(sizeof(int) * t->sph_size, 0);
+  t->sph_list = (int*)mem_alloc(sizeof(Id) * t->sph_size, 0);
   if (t->sph_list == nullptr) goto label_end;
-  for (int i = 0; i < t->sph_size; i++)
+  for (Id i = 0; i < t->sph_size; i++)
     t->sph_list[i] = ITEST;
   t->sph_lptr = (int*)mem_alloc(sizeof(int) * t->sph_size, 0);
   if (t->sph_lptr == nullptr) goto label_end;

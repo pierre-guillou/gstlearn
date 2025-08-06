@@ -45,7 +45,7 @@ public:
                              const DbGrid* dbmap,
                              Constraints* constraints,
                              const ModelOptimParam& mop,
-                             int nb_neighVecchia = ITEST,
+                             Id nb_neighVecchia = ITEST,
                              bool reml           = false);
 };
 } // namespace gstlrn

@@ -32,35 +32,35 @@ namespace gstlrn
 typedef struct
 {
   char keyword[STRING_LENGTH];
-  int origin;
-  int nrow;
-  int ncol;
+  Id origin;
+  Id nrow;
+  Id ncol;
   double* values;
 } Keypair;
 
 typedef struct
 {
-  int actif;
+  Id actif;
 } Projec_Environ;
 
 typedef struct
 {
-  int curech;
-  int ndim;
-  int* nx;
-  int* order;
-  int* indg;
+  Id curech;
+  Id ndim;
+  Id* nx;
+  Id* order;
+  Id* indg;
   double* tab;
 } Dim_Loop;
 
 static Projec_Environ PROJEC = {0};
-static int KEYPAIR_NTAB      = 0;
+static Id KEYPAIR_NTAB      = 0;
 static Keypair* KEYPAIR_TABS = NULL;
-static int DISTANCE_NDIM     = 0;
+static Id DISTANCE_NDIM     = 0;
 static double* DISTANCE_TAB1 = NULL;
 static double* DISTANCE_TAB2 = NULL;
 static char** LAST_MESSAGE   = NULL;
-static int NB_LAST_MESSAGE   = 0;
+static Id NB_LAST_MESSAGE   = 0;
 
 /****************************************************************************/
 /*!
@@ -73,9 +73,9 @@ static int NB_LAST_MESSAGE   = 0;
  ** \li              else : Do not modify the flag
  **
  *****************************************************************************/
-void projec_toggle(int mode)
+void projec_toggle(Id mode)
 {
-  int projec_actif;
+  Id projec_actif;
 
   /* Process the toggling */
 
@@ -107,7 +107,7 @@ void projec_toggle(int mode)
  ** \param[out]  actif activity flag
  **
  *****************************************************************************/
-void projec_query(int* actif)
+void projec_query(Id* actif)
 
 {
   *actif = PROJEC.actif;
@@ -139,7 +139,7 @@ void projec_print(void)
  ** \param[in]  flag_exact 1 if Exact keyword matching is required
  **
  *****************************************************************************/
-static int st_match_keypair(const char* keyword, int flag_exact)
+static Id st_match_keypair(const char* keyword, Id flag_exact)
 {
   Keypair* keypair;
   char keyloc[STRING_LENGTH];
@@ -147,7 +147,7 @@ static int st_match_keypair(const char* keyword, int flag_exact)
   (void)gslStrcpy(keyloc, keyword);
   string_strip_blanks(keyloc, 0);
 
-  for (int i = 0; i < KEYPAIR_NTAB; i++)
+  for (Id i = 0; i < KEYPAIR_NTAB; i++)
   {
     keypair = &KEYPAIR_TABS[i];
     if (flag_exact)
@@ -181,7 +181,7 @@ static Keypair* st_get_keypair_address(const char* keyword)
 {
   Keypair* keypair;
   char keyloc[STRING_LENGTH];
-  int found, flag_new;
+  Id found, flag_new;
 
   /* Check the length of the keyword */
 
@@ -237,10 +237,10 @@ static Keypair* st_get_keypair_address(const char* keyword)
  **
  *****************************************************************************/
 static void st_keypair_attributes(Keypair* keypair,
-                                  int mode,
-                                  int origin,
-                                  int /*nrow*/,
-                                  int ncol)
+                                  Id mode,
+                                  Id origin,
+                                  Id /*nrow*/,
+                                  Id ncol)
 {
   /* Dispatch */
 
@@ -290,9 +290,9 @@ static void st_keypair_attributes(Keypair* keypair,
  ** \param[in]  ncol           Number of columns
  **
  *****************************************************************************/
-static void st_keypair_allocate(Keypair* keypair, int nrow, int ncol)
+static void st_keypair_allocate(Keypair* keypair, Id nrow, Id ncol)
 {
-  int old_size, new_size;
+  Id old_size, new_size;
 
   new_size = nrow * ncol;
   old_size = keypair->nrow * keypair->ncol;
@@ -338,22 +338,22 @@ static void st_keypair_allocate(Keypair* keypair, int nrow, int ncol)
  ** \param[in]  values         Array to be copied
  **
  *****************************************************************************/
-static void st_keypair_copy(Keypair* keypair, int type, int start, void* values)
+static void st_keypair_copy(Keypair* keypair, Id type, Id start, void* values)
 {
-  int *icopy, size;
+  Id *icopy, size;
   double* rcopy;
 
   size = keypair->nrow * keypair->ncol;
   if (type == 1)
   {
-    icopy = (int*)values;
-    for (int i = 0; i < size; i++)
+    icopy = (Id*)values;
+    for (Id i = 0; i < size; i++)
       keypair->values[i + start] = icopy[i];
   }
   else
   {
     rcopy = (double*)values;
-    for (int i = 0; i < size; i++)
+    for (Id i = 0; i < size; i++)
       keypair->values[i + start] = rcopy[i];
   }
 }
@@ -373,9 +373,9 @@ static void st_keypair_copy(Keypair* keypair, int type, int start, void* values)
  **
  *****************************************************************************/
 void set_keypair(const char* keyword,
-                 int origin,
-                 int nrow,
-                 int ncol,
+                 Id origin,
+                 Id nrow,
+                 Id ncol,
                  const double* values)
 {
   Keypair* keypair;
@@ -414,13 +414,13 @@ void set_keypair(const char* keyword,
  **
  *****************************************************************************/
 void app_keypair(const char* keyword,
-                 int origin,
-                 int nrow,
-                 int ncol,
+                 Id origin,
+                 Id nrow,
+                 Id ncol,
                  double* values)
 {
   Keypair* keypair;
-  int start, newrow;
+  Id start, newrow;
 
   /* Get the Keypair address */
 
@@ -464,10 +464,10 @@ void app_keypair(const char* keyword,
  **
  *****************************************************************************/
 void set_keypair_int(const char* keyword,
-                     int origin,
-                     int nrow,
-                     int ncol,
-                     int* values)
+                     Id origin,
+                     Id nrow,
+                     Id ncol,
+                     Id* values)
 {
   Keypair* keypair;
 
@@ -505,13 +505,13 @@ void set_keypair_int(const char* keyword,
  **
  *****************************************************************************/
 void app_keypair_int(const char* keyword,
-                     int origin,
-                     int nrow,
-                     int ncol,
-                     int* values)
+                     Id origin,
+                     Id nrow,
+                     Id ncol,
+                     Id* values)
 {
   Keypair* keypair;
-  int newrow, start;
+  Id newrow, start;
 
   /* Get the Keypair address */
 
@@ -550,7 +550,7 @@ void app_keypair_int(const char* keyword,
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
-static void del_keypone(int indice)
+static void del_keypone(Id indice)
 {
   Keypair* keypair;
 
@@ -566,7 +566,7 @@ static void del_keypone(int indice)
 
   /* Shift all subsequent keypairs */
 
-  for (int i = indice + 1; i < KEYPAIR_NTAB; i++)
+  for (Id i = indice + 1; i < KEYPAIR_NTAB; i++)
     KEYPAIR_TABS[i - 1] = KEYPAIR_TABS[i];
 
   KEYPAIR_NTAB--;
@@ -585,9 +585,9 @@ static void del_keypone(int indice)
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
-void del_keypair(const char* keyword, int flag_exact)
+void del_keypair(const char* keyword, Id flag_exact)
 {
-  int found;
+  Id found;
 
   if (strlen(keyword) > STRING_LENGTH)
     messageAbort("Keyword %s too long", keyword);
@@ -596,17 +596,17 @@ void del_keypair(const char* keyword, int flag_exact)
 
   if (!strcmp(keyword, "all"))
   {
-    for (int i = KEYPAIR_NTAB - 1; i >= 0; i--)
+    for (Id i = KEYPAIR_NTAB - 1; i >= 0; i--)
       del_keypone(i);
   }
   else if (!strcmp(keyword, "allC"))
   {
-    for (int i = KEYPAIR_NTAB - 1; i >= 0; i--)
+    for (Id i = KEYPAIR_NTAB - 1; i >= 0; i--)
       if (KEYPAIR_TABS[i].origin == 1) del_keypone(i);
   }
   else if (!strcmp(keyword, "allR"))
   {
-    for (int i = KEYPAIR_NTAB - 1; i >= 0; i--)
+    for (Id i = KEYPAIR_NTAB - 1; i >= 0; i--)
       if (KEYPAIR_TABS[i].origin == 2) del_keypone(i);
   }
   else if (flag_exact)
@@ -649,7 +649,7 @@ void del_keypair(const char* keyword, int flag_exact)
  *****************************************************************************/
 double get_keypone(const char* keyword, double valdef)
 {
-  int found;
+  Id found;
   double *rtab, retval;
   Keypair* keypair;
 
@@ -688,9 +688,9 @@ double get_keypone(const char* keyword, double valdef)
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
-int get_keypair(const char* keyword, int* nrow, int* ncol, double** values)
+Id get_keypair(const char* keyword, Id* nrow, Id* ncol, double** values)
 {
-  int found, size;
+  Id found, size;
   double* valloc;
   Keypair* keypair;
 
@@ -707,7 +707,7 @@ int get_keypair(const char* keyword, int* nrow, int* ncol, double** values)
   size    = (*nrow) * (*ncol);
 
   valloc = (double*)malloc(sizeof(double) * size);
-  for (int i = 0; i < size; i++)
+  for (Id i = 0; i < size; i++)
     valloc[i] = keypair->values[i];
   *values = valloc;
 
@@ -732,9 +732,9 @@ int get_keypair(const char* keyword, int* nrow, int* ncol, double** values)
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
-int get_keypair_int(const char* keyword, int* nrow, int* ncol, int** values)
+Id get_keypair_int(const char* keyword, Id* nrow, Id* ncol, Id** values)
 {
-  int *valloc, found, size;
+  Id *valloc, found, size;
   Keypair* keypair;
 
   /* Check if the keyword has been defined */
@@ -749,9 +749,9 @@ int get_keypair_int(const char* keyword, int* nrow, int* ncol, int** values)
   *ncol   = keypair->ncol;
   size    = (*nrow) * (*ncol);
 
-  valloc = (int*)malloc(sizeof(int) * size);
-  for (int i = 0; i < size; i++)
-    valloc[i] = (int)keypair->values[i];
+  valloc = (Id*)malloc(sizeof(Id) * size);
+  for (Id i = 0; i < size; i++)
+    valloc[i] = (Id)keypair->values[i];
   *values = valloc;
 
   return (0);
@@ -764,10 +764,10 @@ int get_keypair_int(const char* keyword, int* nrow, int* ncol, int** values)
  ** \param[in]  flag_short  1 for a short output
  **
  *****************************************************************************/
-void print_keypair(int flag_short)
+void print_keypair(Id flag_short)
 
 {
-  int i;
+  Id i;
   Keypair* keypair;
 
   if (KEYPAIR_NTAB <= 0)
@@ -802,7 +802,7 @@ void print_keypair(int flag_short)
  ** \param[in]  tab2   Array corresponding to the second endpoint
  **
  *****************************************************************************/
-double ut_distance(int ndim, const double* tab1, const double* tab2)
+double ut_distance(Id ndim, const double* tab1, const double* tab2)
 {
   double distance, v1, v2, delta;
 
@@ -824,7 +824,7 @@ double ut_distance(int ndim, const double* tab1, const double* tab2)
   {
     /* Case of the euclidean coordinates */
 
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
       v1 = tab1[idim];
       if (FFFF(v1)) return (TEST);
@@ -852,7 +852,7 @@ double ut_distance(int ndim, const double* tab1, const double* tab2)
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
-void ut_distance_allocated(int ndim, double** tab1, double** tab2)
+void ut_distance_allocated(Id ndim, double** tab1, double** tab2)
 {
   if (DISTANCE_NDIM < ndim)
   {
@@ -880,10 +880,10 @@ void ut_distance_allocated(int ndim, double** tab1, double** tab2)
  ** \remarks not to show up in the memory leak calculations
  **
  *****************************************************************************/
-void set_last_message(int mode, const char* string)
+void set_last_message(Id mode, const char* string)
 {
   char* address;
-  int size, sizaux;
+  Id size, sizaux;
 
   /* Dispatch */
 
@@ -891,7 +891,7 @@ void set_last_message(int mode, const char* string)
   {
     case 0:
       if (NB_LAST_MESSAGE <= 0) return;
-      for (int i = 0; i < NB_LAST_MESSAGE; i++)
+      for (Id i = 0; i < NB_LAST_MESSAGE; i++)
       {
         free((char*)LAST_MESSAGE[i]);
         LAST_MESSAGE[i] = nullptr;
@@ -901,7 +901,7 @@ void set_last_message(int mode, const char* string)
       break;
 
     case 1: // Add string to array of messages
-      size = static_cast<int>(strlen(string));
+      size = static_cast<Id>(strlen(string));
       if (size <= 0) return;
 
       if (NB_LAST_MESSAGE <= 0)
@@ -918,7 +918,7 @@ void set_last_message(int mode, const char* string)
       break;
 
     case -1: // Concatenate
-      size = static_cast<int>(strlen(string));
+      size = static_cast<Id>(strlen(string));
       if (size <= 0) return;
 
       if (NB_LAST_MESSAGE <= 0)
@@ -927,7 +927,7 @@ void set_last_message(int mode, const char* string)
         return;
       }
 
-      sizaux                            = static_cast<int>(strlen(LAST_MESSAGE[NB_LAST_MESSAGE - 1]));
+      sizaux                            = static_cast<Id>(strlen(LAST_MESSAGE[NB_LAST_MESSAGE - 1]));
       LAST_MESSAGE[NB_LAST_MESSAGE - 1] = address = (char*)realloc(
         (char*)LAST_MESSAGE[NB_LAST_MESSAGE - 1], size + sizaux + 2);
       address[sizaux] = ' ';
@@ -947,7 +947,7 @@ void print_last_message(void)
   if (NB_LAST_MESSAGE <= 0) return;
 
   mestitle(0, "Last Message");
-  for (int i = 0; i < NB_LAST_MESSAGE; i++)
+  for (Id i = 0; i < NB_LAST_MESSAGE; i++)
   {
     message(">>> %s\n", LAST_MESSAGE[i]);
   }
@@ -971,31 +971,31 @@ void print_last_message(void)
  ** \remarks The elements of each row are set to 0 or 1 (subset rank)
  **
  *****************************************************************************/
-int* ut_split_into_two(int ncolor, int flag_half, int verbose, int* nposs)
+Id* ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
 {
-  int p, nmax, ncomb, np, lec;
-  int* mattab;
+  Id p, nmax, ncomb, np, lec;
+  Id* mattab;
 
   /* Initializations */
 
-  p      = (flag_half) ? static_cast<int>(floor((double)ncolor / 2.)) : ncolor - 1;
-  nmax   = static_cast<int>(pow(2, ncolor));
+  p      = (flag_half) ? static_cast<Id>(floor((double)ncolor / 2.)) : ncolor - 1;
+  nmax   = static_cast<Id>(pow(2, ncolor));
   mattab = nullptr;
   np     = 0;
 
   /* Core allocation */
 
-  mattab = (int*)mem_alloc(sizeof(int) * ncolor * nmax, 1);
-  for (int i = 0; i < ncolor * nmax; i++)
+  mattab = (Id*)mem_alloc(sizeof(Id) * ncolor * nmax, 1);
+  for (Id i = 0; i < ncolor * nmax; i++)
     mattab[i] = 0;
 
-  for (int nsub = 1; nsub <= p; nsub++)
+  for (Id nsub = 1; nsub <= p; nsub++)
   {
     VectorInt comb = ut_combinations(ncolor, nsub, &ncomb);
     lec            = 0;
-    for (int i = 0; i < ncomb; i++)
+    for (Id i = 0; i < ncomb; i++)
     {
-      for (int j = 0; j < nsub; j++, lec++)
+      for (Id j = 0; j < nsub; j++, lec++)
         MATTAB(np, comb[lec] - 1) = 1;
       np++;
     }
@@ -1003,7 +1003,7 @@ int* ut_split_into_two(int ncolor, int flag_half, int verbose, int* nposs)
 
   /* Resize */
 
-  mattab = (int*)mem_realloc((char*)mattab, sizeof(int) * ncolor * np, 1);
+  mattab = (Id*)mem_realloc((char*)mattab, sizeof(Id) * ncolor * np, 1);
   *nposs = np;
 
   /* Verbose option */
@@ -1012,9 +1012,9 @@ int* ut_split_into_two(int ncolor, int flag_half, int verbose, int* nposs)
   {
     message("Initial number of values = %d (Half=%d)\n", ncolor, flag_half);
     lec = 0;
-    for (int i = 0; i < np; i++)
+    for (Id i = 0; i < np; i++)
     {
-      for (int j = 0; j < ncolor; j++, lec++)
+      for (Id j = 0; j < ncolor; j++, lec++)
         message(" %d", mattab[lec]);
       message("\n");
     }

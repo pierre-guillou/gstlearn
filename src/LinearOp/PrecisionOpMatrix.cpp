@@ -65,7 +65,7 @@ void PrecisionOpMatrix::gradYQX(const constvect X,
   evalPower(X, w3s, power);
   evalPower(Y, w4s, power);
   double temp, val;
-  int iadress;
+  Id iadress;
   const AShiftOp* sopt = getShiftOp();
   const auto* soptmat  = dynamic_cast<const ShiftOpMatrix*>(sopt);
   if (soptmat == nullptr)
@@ -74,10 +74,10 @@ void PrecisionOpMatrix::gradYQX(const constvect X,
     return;
   }
 
-  for (int igparam = 0; igparam < soptmat->getNCovAnisoGradParam();
+  for (Id igparam = 0; igparam < soptmat->getNCovAnisoGradParam();
        igparam++)
   {
-    for (int iapex = 0; iapex < getSize(); iapex++)
+    for (Id iapex = 0; iapex < getSize(); iapex++)
     {
       iadress = soptmat->getSGradAddress(iapex, igparam);
       if (igparam < soptmat->getLambdaGradSize()) // range parameters
@@ -92,7 +92,7 @@ void PrecisionOpMatrix::gradYQX(const constvect X,
         result[iadress] = 0.;
       }
       evalDeriv(X, w2s, iapex, igparam, power);
-      for (int i = 0; i < getSize(); i++)
+      for (Id i = 0; i < getSize(); i++)
       {
         result[iadress] += _work2[i] * Y[i];
       }
@@ -118,7 +118,7 @@ void PrecisionOpMatrix::gradYQXOptim(const constvect X,
   evalPower(X, w4s, power);
 
   double temp, val;
-  int iadress;
+  Id iadress;
 
   const AShiftOp* sopt = getShiftOp();
   const auto* soptmat  = dynamic_cast<const ShiftOpMatrix*>(sopt);
@@ -127,10 +127,10 @@ void PrecisionOpMatrix::gradYQXOptim(const constvect X,
     messerr("Method only available for ShiftOpMatrix\n");
     return;
   }
-  for (int igparam = 0; igparam < soptmat->getNCovAnisoGradParam();
+  for (Id igparam = 0; igparam < soptmat->getNCovAnisoGradParam();
        igparam++)
   {
-    for (int iapex = 0; iapex < getSize(); iapex++)
+    for (Id iapex = 0; iapex < getSize(); iapex++)
     {
       iadress         = soptmat->getSGradAddress(iapex, igparam);
       result[iadress] = 0.;
@@ -143,7 +143,7 @@ void PrecisionOpMatrix::gradYQXOptim(const constvect X,
       }
 
       evalDerivOptim(w2s, iapex, igparam, power);
-      for (int i = 0; i < getSize(); i++)
+      for (Id i = 0; i < getSize(); i++)
       {
         result[iadress] += _work2[i] * Y[i];
       }
@@ -151,12 +151,12 @@ void PrecisionOpMatrix::gradYQXOptim(const constvect X,
   }
 }
 
-int PrecisionOpMatrix::_addToDest(const constvect inv, vect outv) const
+Id PrecisionOpMatrix::_addToDest(const constvect inv, vect outv) const
 {
   return _Q->addToDest(inv, outv);
 }
 
-int PrecisionOpMatrix::_addSimulateToDest(const constvect whitenoise,
+Id PrecisionOpMatrix::_addSimulateToDest(const constvect whitenoise,
                                           vect outv) const
 {
   if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
@@ -171,7 +171,7 @@ void PrecisionOpMatrix::evalInverse(const constvect vecin,
   _chol->solve(vecin, vecout);
 }
 
-double PrecisionOpMatrix::computeLogDet(int nMC) const
+double PrecisionOpMatrix::computeLogDet(Id nMC) const
 {
   DECLARE_UNUSED(nMC);
   if (_chol == nullptr) _chol = new CholeskySparse(*_Q);
@@ -181,8 +181,8 @@ double PrecisionOpMatrix::computeLogDet(int nMC) const
 void PrecisionOpMatrix::evalDeriv(
   const constvect inv,
   vect outv,
-  int iapex,
-  int igparam,
+  Id iapex,
+  Id igparam,
   const EPowerPT& power)
 {
   DECLARE_UNUSED(iapex, igparam)
@@ -210,8 +210,8 @@ void PrecisionOpMatrix::evalDeriv(
 }
 
 void PrecisionOpMatrix::evalDerivOptim(vect outv,
-                                       int iapex,
-                                       int igparam,
+                                       Id iapex,
+                                       Id igparam,
                                        const EPowerPT& power)
 {
   DECLARE_UNUSED(iapex, igparam)
@@ -236,7 +236,7 @@ void PrecisionOpMatrix::evalDerivOptim(vect outv,
   getShiftOp()->prodLambda(outv, outv, EPowerPT::ONE);
 }
 
-// void PrecisionOpMatrix::evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,int iapex,int igparam)
+// void PrecisionOpMatrix::evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,Id iapex,Id igparam)
 //{
 //
 //   if(getPower() == EPowerPT::ONE)
@@ -273,8 +273,8 @@ MatrixSparse* PrecisionOpMatrix::_build_Q()
   auto* S           = ((ShiftOpMatrix*)getShiftOp())->getS();
   auto Lambda       = getShiftOp()->getLambdas();
   VectorDouble blin = getPoly(EPowerPT::ONE)->getCoeffs();
-  int nblin         = static_cast<int>(blin.size());
-  int nvertex       = S->getNCols();
+  Id nblin         = static_cast<Id>(blin.size());
+  Id nvertex       = S->getNCols();
   if (nvertex <= 0)
   {
     messerr("You must define a valid Meshing beforehand");
@@ -296,7 +296,7 @@ MatrixSparse* PrecisionOpMatrix::_build_Q()
 
   /* Loop on the different terms */
 
-  for (int iterm = 1; iterm < nblin; iterm++)
+  for (Id iterm = 1; iterm < nblin; iterm++)
   {
     Q->addMat(*Bi, 1., blin[iterm]);
     if (iterm < nblin - 1) Bi->prodMat(S);

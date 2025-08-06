@@ -53,7 +53,7 @@ ShapeHalfParaboloid::~ShapeHalfParaboloid()
  ** \param[in]  ndim    Space dimension
  **
  *****************************************************************************/
-BooleanObject* ShapeHalfParaboloid::generateObject(int ndim)
+BooleanObject* ShapeHalfParaboloid::generateObject(Id ndim)
 
 {
   auto* object = new BooleanObject(this);
@@ -74,7 +74,7 @@ BooleanObject* ShapeHalfParaboloid::generateObject(int ndim)
 bool ShapeHalfParaboloid::belongObject(const VectorDouble& coor,
                                        const BooleanObject* object) const
 {
-  int ndim = (int) coor.size();
+  Id ndim = (Id) coor.size();
   double dx = (ndim >= 1) ? coor[0] / (object->getExtension(0) / 2.) : 0.;
   double dy = (ndim >= 2) ? coor[1] / (object->getExtension(1) / 2.) : 0.;
   double dz = (ndim >= 3) ? coor[2] / (object->getExtension(2))      : 0.;

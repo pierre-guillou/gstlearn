@@ -75,30 +75,30 @@ void SpaceComposite::setOrigin(const VectorDouble& origin)
   }
 }
 
-size_t SpaceComposite::getNDim(int ispace) const
+size_t SpaceComposite::getNDim(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
     return ASpace::getNDim();
   return _comps[ispace]->getNDim();
 }
 
-size_t SpaceComposite::getOffset(int ispace) const
+size_t SpaceComposite::getOffset(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
     return ASpace::getOffset();
   return _comps[ispace]->getOffset();
 }
 
-const VectorDouble& SpaceComposite::getOrigin(int ispace) const
+const VectorDouble& SpaceComposite::getOrigin(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
     return ASpace::getOrigin();
   return _comps[ispace]->getOrigin();
 }
 
 size_t SpaceComposite::getNComponents() const
 {
-  return (int)_comps.size();
+  return (Id)_comps.size();
 }
 
 std::shared_ptr<SpaceComposite> SpaceComposite::create(const std::vector<ASpaceSharedPtr>& vectspace)
@@ -106,14 +106,14 @@ std::shared_ptr<SpaceComposite> SpaceComposite::create(const std::vector<ASpaceS
   return std::shared_ptr<SpaceComposite>(new SpaceComposite(vectspace));
 }
 
-ASpaceSharedPtr SpaceComposite::getComponent(int ispace) const
+ASpaceSharedPtr SpaceComposite::getComponent(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
     return ASpace::getComponent(); // Return this if wrong ispace
   return _comps[ispace];
 }
 
-String SpaceComposite::toString(const AStringFormat* strfmt, int ispace) const
+String SpaceComposite::toString(const AStringFormat* strfmt, Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   std::stringstream sstr;
@@ -187,9 +187,9 @@ void SpaceComposite::_move(SpacePoint& p1, const VectorDouble& vec) const
 /// Return the distance between two space points
 double SpaceComposite::_getDistance(const SpacePoint& p1,
                                     const SpacePoint& p2,
-                                    int ispace) const
+                                    Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
     return getDistances(p1, p2).norm(); // Return the norm of sub-distances vector
   return _comps[ispace]->getDistance(p1, p2);
 }
@@ -198,9 +198,9 @@ double SpaceComposite::_getDistance(const SpacePoint& p1,
 double SpaceComposite::_getDistance(const SpacePoint& p1,
                                     const SpacePoint& p2,
                                     const Tensor& tensor,
-                                    int ispace) const
+                                    Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
   {
     std::cout << "Error: Inconsistent space dimension. Return TEST."
               << std::endl;
@@ -214,9 +214,9 @@ double SpaceComposite::_getDistance(const SpacePoint& p1,
 double SpaceComposite::_getFrequentialDistance(const SpacePoint& p1,
                                               const SpacePoint& p2,
                                               const Tensor& tensor,
-                                              int ispace) const
+                                              Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
   {
     std::cout << "Error: Inconsistent space dimension. Return TEST."
               << std::endl;
@@ -228,7 +228,7 @@ double SpaceComposite::_getFrequentialDistance(const SpacePoint& p1,
 /// Return the increment vector between two space points
 VectorDouble SpaceComposite::_getIncrement(const SpacePoint& p1,
                                            const SpacePoint& p2,
-                                           int ispace) const
+                                           Id ispace) const
 {
   _getIncrementInPlace(p1, p2, _work1, ispace);
   return _work1;
@@ -238,11 +238,11 @@ VectorDouble SpaceComposite::_getIncrement(const SpacePoint& p1,
 void SpaceComposite::_getIncrementInPlace(const SpacePoint& p1,
                                           const SpacePoint& p2,
                                           VectorDouble& ptemp,
-                                          int ispace) const
+                                          Id ispace) const
 {
   ptemp.clear();
   VectorDouble inc;
-  if (ispace < 0 || ispace >= (int)getNComponents())
+  if (ispace < 0 || ispace >= (Id)getNComponents())
   {
     for (const auto& sp: _comps)
     {

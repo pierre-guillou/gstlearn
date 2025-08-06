@@ -42,15 +42,15 @@ public:
 protected:
   bool _check() override;
   bool _preprocess() override;
-  int _getNCov() const { return _ncova; }
-  bool _setNCov(int ncova);
+  Id _getNCov() const { return _ncova; }
+  bool _setNCov(Id ncova);
 
-  int _centerDataToGrid(DbGrid* dbgrid);
+  Id _centerDataToGrid(DbGrid* dbgrid);
 
 private:
   ModelGeneric* _model;
   ANeigh* _neigh;
   KrigOpt _krigopt;
-  int _ncova;
+  Id _ncova;
 };
 } // namespace gstlrn

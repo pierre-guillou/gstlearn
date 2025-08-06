@@ -140,7 +140,7 @@ void ModelGeneric::setCov(const ACov* cova)
  * - the space dimension
  * - the number of variables
  */
-void ModelGeneric::setDriftIRF(int order, int nfex)
+void ModelGeneric::setDriftIRF(Id order, Id nfex)
 {
   delete _driftList;
   _driftList = DriftFactory::createDriftListFromIRF(order, nfex, _ctxt);
@@ -164,14 +164,14 @@ void ModelGeneric::setDrifts(const VectorString& driftSymbols)
   else
     delAllDrifts();
 
-  for (int i = 0; i < (int)driftSymbols.size(); i++)
+  for (Id i = 0; i < (Id)driftSymbols.size(); i++)
   {
     ADrift* drift = DriftFactory::createDriftBySymbol(driftSymbols[i]);
     addDrift(drift);
   }
 }
 
-static MatrixDense _transformF(const MatrixDense& F1, int type, int idx)
+static MatrixDense _transformF(const MatrixDense& F1, Id type, Id idx)
 {
   MatrixDense F1loc;
   switch (type)
@@ -187,36 +187,36 @@ static MatrixDense _transformF(const MatrixDense& F1, int type, int idx)
     case 4:
       F1loc = F1;
       F1loc.fill(0.);
-      for (int i = 0; i < F1.getNRows(); i++)
+      for (Id i = 0; i < F1.getNRows(); i++)
         F1loc.setValue(i, idx, 1.);
       break;
   }
   return (F1loc);
 }
 
-int computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
+Id computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
                                const MatrixSymmetric& Sigma,
                                const MatrixDense& F1,
-                               int type,
-                               int idx)
+                               Id type,
+                               Id idx)
 {
   MatrixDense F1loc = _transformF(F1, type, idx);
   auto nech         = F1.getNRows();
   auto nvar         = Sigma.getNRows() / nech;
   cov.resize(nech, nech);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
-    for (int jech = 0; jech < nech; jech++)
+    for (Id jech = 0; jech < nech; jech++)
     {
       if (iech > jech) continue;
       double value = 0.;
-      for (int lvar = 0; lvar < nvar; lvar++)
+      for (Id lvar = 0; lvar < nvar; lvar++)
       {
-        for (int pvar = 0; pvar < nvar; pvar++)
+        for (Id pvar = 0; pvar < nvar; pvar++)
         {
-          int shifti = lvar * nech;
-          int shiftj = pvar * nech;
+          Id shifti = lvar * nech;
+          Id shiftj = pvar * nech;
           value += Sigma.getValue(shifti + iech, shiftj + jech) *
                    F1loc.getValue(iech, lvar) *
                    F1loc.getValue(jech, pvar);
@@ -228,14 +228,14 @@ int computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
   return 0;
 }
 
-int computeCovMatSVCRHSInPlace(MatrixDense& cov,
+Id computeCovMatSVCRHSInPlace(MatrixDense& cov,
                                const MatrixSymmetric& Sigma,
                                const MatrixDense& F1,
                                const MatrixDense& F2,
-                               int type1,
-                               int idx1,
-                               int type2,
-                               int idx2)
+                               Id type1,
+                               Id idx1,
+                               Id type2,
+                               Id idx2)
 {
   MatrixDense F1loc = _transformF(F1, type1, idx1);
   MatrixDense F2loc = _transformF(F2, type2, idx2);
@@ -244,17 +244,17 @@ int computeCovMatSVCRHSInPlace(MatrixDense& cov,
   auto nvar         = Sigma.getNCols();
   cov.resize(nech1, nech2);
 
-  for (int iech = 0; iech < nech1; iech++)
+  for (Id iech = 0; iech < nech1; iech++)
   {
-    for (int jech = 0; jech < nech2; jech++)
+    for (Id jech = 0; jech < nech2; jech++)
     {
       double value = 0.;
-      for (int lvar = 0; lvar < nvar; lvar++)
+      for (Id lvar = 0; lvar < nvar; lvar++)
       {
-        for (int pvar = 0; pvar < nvar; pvar++)
+        for (Id pvar = 0; pvar < nvar; pvar++)
         {
-          int shifti = lvar * nech1;
-          int shiftj = pvar * nech2;
+          Id shifti = lvar * nech1;
+          Id shiftj = pvar * nech2;
           value += Sigma.getValue(shifti + iech, shiftj + jech) *
                    F1loc.getValue(iech, lvar) *
                    F2loc.getValue(jech, pvar);
@@ -266,10 +266,10 @@ int computeCovMatSVCRHSInPlace(MatrixDense& cov,
   return 0;
 }
 
-int computeDriftMatSVCRHSInPlace(MatrixDense& mat,
+Id computeDriftMatSVCRHSInPlace(MatrixDense& mat,
                                  const MatrixDense& F,
-                                 int type,
-                                 int idx,
+                                 Id type,
+                                 Id idx,
                                  bool flagCenteredFactors)
 {
   if (flagCenteredFactors)
@@ -373,7 +373,7 @@ void ModelGeneric::fitNew(const Db* db,
                           const DbGrid* dbmap,
                           Constraints* constraints,
                           const ModelOptimParam& mop,
-                          int nb_neighVecchia,
+                          Id nb_neighVecchia,
                           bool verbose,
                           bool trace,
                           bool reml)

@@ -43,15 +43,15 @@ public:
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;
 
-  void add(int irow, int icol, double value);
-  int getNElements() const { return (int)_eigenT.size(); }
-  int getNRows() const { return _nrowmax; }
-  int getNCols() const { return _ncolmax; }
-  void force(int nrow, int ncol);
+  void add(Id irow, Id icol, double value);
+  Id getNElements() const { return (Id)_eigenT.size(); }
+  Id getNRows() const { return _nrowmax; }
+  Id getNCols() const { return _ncolmax; }
+  void force(Id nrow, Id ncol);
 
-  int getRow(int i) const;
-  int getCol(int i) const;
-  double getValue(int i) const;
+  Id getRow(Id i) const;
+  Id getCol(Id i) const;
+  double getValue(Id i) const;
   VectorDouble getValues() const;
   VectorInt getRows(bool flag_from_1 = false) const;
   VectorInt getCols(bool flag_from_1 = false) const;
@@ -60,12 +60,12 @@ public:
 #ifndef SWIG
   ::Eigen::SparseMatrix<double> buildEigenFromTriplet() const;
 
-  static NF_Triplet createFromEigen(const Eigen::SparseMatrix<double>& mat, int shiftRow = 0, int shiftCol = 0);
+  static NF_Triplet createFromEigen(const Eigen::SparseMatrix<double>& mat, Id shiftRow = 0, Id shiftCol = 0);
 #endif
 
 private:
-  int _nrowmax;
-  int _ncolmax;
+  Id _nrowmax;
+  Id _ncolmax;
 #ifndef SWIG
   std::vector<T> _eigenT; // Triplet in Eigen format
 #endif

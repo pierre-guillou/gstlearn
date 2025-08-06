@@ -25,7 +25,7 @@ public:
   ProjMatrix();
   ProjMatrix(const Db* db,
              const AMesh* a_mesh,
-             int rankZ    = -1,
+             Id rankZ    = -1,
              bool verbose = false);
   ProjMatrix(const ProjMatrix& m);
   ProjMatrix(const MatrixSparse& m);
@@ -46,22 +46,22 @@ public:
 #ifndef SWIG
 
 protected:
-  int _addMesh2point(const constvect inv, vect outv) const override;
-  int _addPoint2mesh(const constvect inv, vect outv) const override;
+  Id _addMesh2point(const constvect inv, vect outv) const override;
+  Id _addPoint2mesh(const constvect inv, vect outv) const override;
 #endif
 
 public:
-  int getNApex() const override { return getNCols(); }
-  int getNPoint() const override { return getNRows(); }
+  Id getNApex() const override { return getNCols(); }
+  Id getNPoint() const override { return getNRows(); }
 
   static ProjMatrix* create(const Db* db,
                             const AMesh* a_mesh,
-                            int rankZ    = -1,
+                            Id rankZ    = -1,
                             bool verbose = false);
   void resetFromMeshAndDb(const Db* db,
                           const AMesh* a_mesh,
-                          int rankZ    = -1,
+                          Id rankZ    = -1,
                           bool verbose = false);
-  void dumpVerticesUsed(int npmax = -1) const;
+  void dumpVerticesUsed(Id npmax = -1) const;
 };
 } // namespace gstlrn

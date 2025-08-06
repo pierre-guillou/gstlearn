@@ -27,10 +27,10 @@ public:
 
   String getFormula() const override;
   String         getCovName() const override { return "Nugget Effect"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
-  int    hasRange() const override { return 0; }
+  Id    hasRange() const override { return 0; }
 
   bool isValidForTurningBand() const override { return true; }
 

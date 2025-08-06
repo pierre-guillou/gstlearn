@@ -73,7 +73,7 @@ AnamDiscreteDD* AnamDiscreteDD::create(double mu, double scoef)
   return new AnamDiscreteDD(mu, scoef);
 }
 
-void AnamDiscreteDD::reset(int ncut,
+void AnamDiscreteDD::reset(Id ncut,
                            double scoef,
                            double mu,
                            const VectorDouble& zcut,
@@ -126,7 +126,7 @@ void AnamDiscreteDD::calculateMeanAndVariance()
   double var, mean;
 
   mean = var = 0.;
-  for (int iclass = 0; iclass < getNClass(); iclass++)
+  for (Id iclass = 0; iclass < getNClass(); iclass++)
   {
     double prop = getDDStatProp(iclass);
     double zval = getDDStatZmoy(iclass);
@@ -138,12 +138,12 @@ void AnamDiscreteDD::calculateMeanAndVariance()
   setVariance(var);
 }
 
-int AnamDiscreteDD::fitFromArray(const VectorDouble& tab,
+Id AnamDiscreteDD::fitFromArray(const VectorDouble& tab,
                                  const VectorDouble& /*wt*/)
 {
   VectorDouble chi;
 
-  int nech = static_cast<int>(tab.size());
+  Id nech = static_cast<Id>(tab.size());
 
   // Calculate statistics on data
 
@@ -166,14 +166,14 @@ int AnamDiscreteDD::fitFromArray(const VectorDouble& tab,
   return 1;
 }
 
-int AnamDiscreteDD::_stats(int nech, const VectorDouble& tab)
+Id AnamDiscreteDD::_stats(Id nech, const VectorDouble& tab)
 {
   double zmin, zmax;
   auto nclass = getNClass();
 
   /* Reset the statistics */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     setDDStatProp(iclass, 0.);
     setDDStatZmoy(iclass, 0.);
@@ -181,12 +181,12 @@ int AnamDiscreteDD::_stats(int nech, const VectorDouble& tab)
 
   /* Loop on the samples */
 
-  int nactive = 0;
-  for (int iech = 0; iech < nech; iech++)
+  Id nactive = 0;
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (FFFF(tab[iech])) continue;
     nactive++;
-    for (int iclass = 0; iclass < nclass; iclass++)
+    for (Id iclass = 0; iclass < nclass; iclass++)
     {
       zmin = (iclass == 0) ? 0 : getZCut(iclass - 1);
       zmax = (iclass == nclass - 1) ? MAXIMUM_BIG : getZCut(iclass);
@@ -200,7 +200,7 @@ int AnamDiscreteDD::_stats(int nech, const VectorDouble& tab)
     messerr("No active sample");
     return (1);
   }
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     setDDStatZmoy(iclass, getDDStatZmoy(iclass) / getDDStatProp(iclass));
     setDDStatProp(iclass, getDDStatProp(iclass) / nactive);
@@ -231,17 +231,17 @@ VectorDouble AnamDiscreteDD::factors_exp(bool verbose)
 
   /* Calculate the array 'F1' (based on the first MAF) */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
     f1[iclass] = maf[iclass] / maf[0];
 
   /* Establish the tri-diagonal matrix */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     veca[iclass] = vecb[iclass] = vecc[iclass] = 0.;
     if (iclass < nclass - 1)
     {
-      for (int jclass = 0; jclass <= iclass; jclass++)
+      for (Id jclass = 0; jclass <= iclass; jclass++)
         veca[iclass] -= getDDStatProp(jclass) * f1[jclass];
       veca[iclass] /= getDDStatProp(iclass) * (f1[iclass + 1] - f1[iclass]);
     }
@@ -258,13 +258,13 @@ VectorDouble AnamDiscreteDD::factors_exp(bool verbose)
 
   /* Calculate the lambda vector from eigen values */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
     setDDStatLambda(iclass, -eigval[iclass]);
   lambda.resize(nclass);
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
     lambda[iclass] = getDDStatLambda(iclass);
   VH::sortInPlace(lambda);
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
     setDDStatLambda(iclass, lambda[iclass]);
   setDDStatLambda(0, 0.);
   setDDStatLambda(1, 1.);
@@ -275,10 +275,10 @@ VectorDouble AnamDiscreteDD::factors_exp(bool verbose)
 
   /* Calculate the spectrum weighting function */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double sum = 0.;
-    for (int jclass = 0; jclass < nclass; jclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
       sum += getDDStatProp(jclass) *
              EIGVEC(iclass, jclass) * EIGVEC(iclass, jclass);
     setDDStatU(iclass, getDDStatProp(0) / sum);
@@ -286,10 +286,10 @@ VectorDouble AnamDiscreteDD::factors_exp(bool verbose)
 
   /* Calculate the array of point C_i (normalized polynomials) */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double value = 0.;
-    for (int jclass = 0; jclass < nclass; jclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
       value += getDDStatZmoy(jclass) * getDDStatProp(jclass) *
                CHI(iclass, jclass);
     setDDStatCnorm(iclass, value);
@@ -316,9 +316,9 @@ VectorDouble AnamDiscreteDD::factors_maf(bool verbose)
 
   /* Calculate the experimental MAF array */
 
-  int ecr = 0;
-  for (int icut = 0; icut < ncut; icut++)
-    for (int iclass = 0; iclass < nclass; iclass++, ecr++)
+  Id ecr = 0;
+  for (Id icut = 0; icut < ncut; icut++)
+    for (Id iclass = 0; iclass < nclass; iclass++, ecr++)
     {
       double bval = (iclass >= icut) ? 1 : 0;
       double cval = (iclass >= (icut + 1)) ? 1 : 0;
@@ -358,7 +358,7 @@ VectorDouble AnamDiscreteDD::_generator(const VectorDouble& vecc,
 
   /* Preliminary checks */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     if (veca[iclass] < 0)
     {
@@ -386,16 +386,16 @@ VectorDouble AnamDiscreteDD::_generator(const VectorDouble& vecc,
 
   /* Choose to set the Hn(0) = 1 */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
-    for (int jclass = nclass - 1; jclass >= 0; jclass--)
+  for (Id iclass = 0; iclass < nclass; iclass++)
+    for (Id jclass = nclass - 1; jclass >= 0; jclass--)
       EIGVEC(iclass, jclass) /= EIGVEC(iclass, 0);
 
   /* Calculate the statistics on the factors */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double sum = 0.;
-    for (int jclass = 0; jclass < nclass; jclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
       sum += getDDStatProp(jclass) *
              EIGVEC(iclass, jclass) * EIGVEC(iclass, jclass);
     hvar[iclass] = sum;
@@ -403,8 +403,8 @@ VectorDouble AnamDiscreteDD::_generator(const VectorDouble& vecc,
 
   /* Normalize the factors */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
-    for (int jclass = 0; jclass < nclass; jclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
     {
       if (iclass == 0)
         CHI(iclass, jclass) = 1.;
@@ -422,21 +422,21 @@ void AnamDiscreteDD::_lambdaToMul()
 
   /* Loop on the classes */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
     setDDStatMul(iclass, pow(mu / (mu + getDDStatLambda(iclass)), scoef / 2.));
 }
 
 VectorDouble AnamDiscreteDD::z2factor(double z, const VectorInt& ifacs) const
 {
   VectorDouble factors;
-  int nfact = (int)ifacs.size();
+  Id nfact = (Id)ifacs.size();
   factors.resize(nfact, 0);
 
   auto nclass = getNClass();
-  for (int ifac = 0; ifac < nfact; ifac++)
+  for (Id ifac = 0; ifac < nfact; ifac++)
   {
     double value = 0.;
-    for (int iclass = 0; iclass < nclass; iclass++)
+    for (Id iclass = 0; iclass < nclass; iclass++)
     {
       double zmax = (iclass == nclass - 1) ? MAXIMUM_BIG : getZCut(iclass);
       value += _i2Chi.getValue(iclass, ifacs[ifac]);
@@ -453,7 +453,7 @@ VectorDouble AnamDiscreteDD::factors_mod()
   /* Initializations */
 
   auto nclass = getNClass();
-  int ntri   = nclass * (nclass + 1) / 2;
+  Id ntri   = nclass * (nclass + 1) / 2;
 
   /* Core allocation */
 
@@ -472,22 +472,22 @@ VectorDouble AnamDiscreteDD::factors_mod()
 
   /* Calculate the monomials */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
-    for (int jclass = 0; jclass < nclass; jclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
     {
       double value = 0.;
-      for (int ic = 0; ic < nclass; ic++)
+      for (Id ic = 0; ic < nclass; ic++)
         value += getDDStatU(ic) * pow(getDDStatLambda(ic), iclass);
       ptab.setValue(iclass, jclass, pow(getDDStatLambda(jclass), iclass) / sqrt(value));
     }
 
   /* Covariance of monomials in L2(R,u) */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
-    for (int jclass = 0; jclass <= iclass; jclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
+    for (Id jclass = 0; jclass <= iclass; jclass++)
     {
       double value = 0.;
-      for (int ic = 0; ic < nclass; ic++)
+      for (Id ic = 0; ic < nclass; ic++)
         value += ptab.getValue(iclass, ic) * getDDStatU(ic) * ptab.getValue(jclass, ic);
       c_s.setValue(iclass, jclass, value);
     }
@@ -497,15 +497,15 @@ VectorDouble AnamDiscreteDD::factors_mod()
   VectorDouble tri1 = c_sChol.getLowerTriangle();
   c_sChol.matProductInPlace(2, ptab, q_s);
 
-  for (int jclass = nclass - 1; jclass >= 0; jclass--)
-    for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id jclass = nclass - 1; jclass >= 0; jclass--)
+    for (Id iclass = 0; iclass < nclass; iclass++)
       q_s.setValue(iclass, jclass, q_s.getValue(iclass, jclass) / q_s.getValue(iclass, 0));
 
   double sum = 0.;
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double value = 0.;
-    for (int ic = 0; ic < nclass; ic++)
+    for (Id ic = 0; ic < nclass; ic++)
       value += q_s.getValue(iclass, ic) * getDDStatU(ic) * q_s.getValue(iclass, ic);
     q2_s[iclass] = value;
     sum += 1. / q2_s[iclass];
@@ -513,15 +513,15 @@ VectorDouble AnamDiscreteDD::factors_mod()
 
   /* Derive the Stationary probabilities */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
     setDDStatProp(iclass, (1. / q2_s[iclass]) / sum);
 
   /* Calculation of the diffusion coefficients */
 
-  for (int iclass = 0; iclass < nclass - 1; iclass++)
+  for (Id iclass = 0; iclass < nclass - 1; iclass++)
   {
     double local = 0.;
-    for (int ic = 0; ic < nclass; ic++)
+    for (Id ic = 0; ic < nclass; ic++)
       local -= (getDDStatLambda(ic) * q_s.getValue(iclass, ic) *
                 getDDStatU(ic) * q_s.getValue(iclass + 1, ic));
     veca[iclass] = local / q2_s[iclass + 1];
@@ -529,16 +529,16 @@ VectorDouble AnamDiscreteDD::factors_mod()
   veca[nclass - 1] = 0.;
 
   vecb[0] = 0.;
-  for (int iclass = 1; iclass < nclass; iclass++)
+  for (Id iclass = 1; iclass < nclass; iclass++)
   {
     double local = 0.;
-    for (int ic = 0; ic < nclass; ic++)
+    for (Id ic = 0; ic < nclass; ic++)
       local -= (getDDStatLambda(ic) * q_s.getValue(iclass, ic) *
                 getDDStatU(ic) * q_s.getValue(iclass - 1, ic));
     vecb[iclass] = local / q2_s[iclass - 1];
   }
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
     vecc[iclass] = -(veca[iclass] + vecb[iclass]);
 
   /* Calculate the infinitesimal generator */
@@ -557,7 +557,7 @@ VectorDouble AnamDiscreteDD::factors_mod()
  **  i.e. Indicator, Metal Quantity or Benefit (according to mode)
  **  (Diffusion Discrete)
  */
-MatrixSquare AnamDiscreteDD::chi2I(const VectorDouble& chi, int mode)
+MatrixSquare AnamDiscreteDD::chi2I(const VectorDouble& chi, Id mode)
 {
   auto nclass = getNClass();
   MatrixSquare chi2i(nclass);
@@ -567,8 +567,8 @@ MatrixSquare AnamDiscreteDD::chi2I(const VectorDouble& chi, int mode)
 
   /* 'mati' contains the matrix of indicators */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
-    for (int jclass = 0; jclass < nclass; jclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
       switch (mode)
       {
         case 1:
@@ -586,11 +586,11 @@ MatrixSquare AnamDiscreteDD::chi2I(const VectorDouble& chi, int mode)
 
   /* Calculate the matrix for CHI_2_I */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
-    for (int jclass = 0; jclass < nclass; jclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
     {
       double value = 0;
-      for (int ic = 0; ic < nclass; ic++)
+      for (Id ic = 0; ic < nclass; ic++)
         value += mati.getValue(iclass, ic) * getDDStatProp(ic) * CHI(jclass, ic);
       chi2i.setValue(iclass, jclass, value);
     }
@@ -652,7 +652,7 @@ double AnamDiscreteDD::computeVariance(double sval) const
   // At this stage (point -> block)) cnorm designate the point C_i
 
   double var = 0.;
-  for (int iclass = 1; iclass < nclass; iclass++)
+  for (Id iclass = 1; iclass < nclass; iclass++)
   {
     double ci = getDDStatCnorm(iclass);
     var += ci * ci * pow(_mu / (_mu + getDDStatLambda(iclass)), sval);
@@ -660,7 +660,7 @@ double AnamDiscreteDD::computeVariance(double sval) const
   return (var);
 }
 
-int AnamDiscreteDD::updatePointToBlock(double r_coef)
+Id AnamDiscreteDD::updatePointToBlock(double r_coef)
 {
   if (!allowChangeSupport()) return 1;
   setRCoef(r_coef);
@@ -673,7 +673,7 @@ int AnamDiscreteDD::updatePointToBlock(double r_coef)
   /* Spectral measure */
 
   double sum = 0.;
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double mul  = getDDStatMul(iclass);
     double newU = getDDStatU(iclass) / (mul * mul);
@@ -681,7 +681,7 @@ int AnamDiscreteDD::updatePointToBlock(double r_coef)
     sum += newU;
   }
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double value = getDDStatU(iclass) / sum;
     setDDStatU(iclass, value);
@@ -689,7 +689,7 @@ int AnamDiscreteDD::updatePointToBlock(double r_coef)
 
   /* Update the C_i from point to block */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double cnorm = getDDStatCnorm(iclass);
     double mul   = getDDStatMul(iclass);
@@ -721,10 +721,10 @@ void AnamDiscreteDD::_blockAnamorphosis(const VectorDouble& chi)
 
   /* Block anamorphosis on the indicators */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double sum = 0.;
-    for (int jclass = 0; jclass < nclass; jclass++)
+    for (Id jclass = 0; jclass < nclass; jclass++)
       sum += getDDStatCnorm(jclass) * CHI(jclass, iclass);
     setDDStatZmoy(iclass, sum);
   }
@@ -755,18 +755,18 @@ void AnamDiscreteDD::_globalSelectivity(Selectivity* selectivity)
     selloc = selectivity->clone();
     selloc->resetCuts(getZCut());
   }
-  int ncut = selloc->getNCuts();
+  Id ncut = selloc->getNCuts();
 
   /* Calculate the Grade-Tonnage curves */
 
-  for (int icut = 0; icut < ncut; icut++)
+  for (Id icut = 0; icut < ncut; icut++)
   {
     double zval = (icut == ncut - 1) ? 0. : getZCut(ncut - icut - 2);
     double tval = 0.;
     double qval = 0.;
-    for (int jclass = 0; jclass <= icut; jclass++)
+    for (Id jclass = 0; jclass <= icut; jclass++)
     {
-      int ic = ncut - jclass - 1;
+      Id ic = ncut - jclass - 1;
       tval += getDDStatProp(ic);
       qval += getDDStatProp(ic) * getDDStatZmoy(ic);
     }
@@ -806,17 +806,17 @@ void AnamDiscreteDD::_globalSelectivity(Selectivity* selectivity)
  ** \param[in]  iptr0        Rank for storing the results
  **
  *****************************************************************************/
-int AnamDiscreteDD::factor2Selectivity(Db* db,
+Id AnamDiscreteDD::factor2Selectivity(Db* db,
                                        Selectivity* selectivity,
                                        const VectorInt& cols_est,
                                        const VectorInt& cols_std,
-                                       int iptr0)
+                                       Id iptr0)
 {
   auto nclass     = getNClass();
-  int nech        = db->getNSample();
-  int nb_est      = (int)cols_est.size();
-  int nb_std      = (int)cols_std.size();
-  int ncleff      = MAX(nb_est, nb_std);
+  Id nech        = db->getNSample();
+  Id nb_est      = (Id)cols_est.size();
+  Id nb_std      = (Id)cols_std.size();
+  Id ncleff      = MAX(nb_est, nb_std);
   bool cutDefined = (selectivity->getNCuts() > 0);
 
   /* Preliminary checks */
@@ -826,7 +826,7 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
     messerr("You must define a Db");
     return 1;
   }
-  int nvar = MAX(nb_est, nb_std);
+  Id nvar = MAX(nb_est, nb_std);
 
   /* Get the number of initial cutoffs */
 
@@ -859,16 +859,16 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
 
   /* Calculate the Recovery Functions from the factors */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (_isSampleSkipped(db, iech, cols_est, cols_std)) continue;
 
     /* Tonnage: Estimation */
 
-    for (int iclass = 0; iclass < ncleff; iclass++)
+    for (Id iclass = 0; iclass < ncleff; iclass++)
     {
       double total = ct.getValue(0, iclass);
-      for (int ivar = 0; ivar < nb_est; ivar++)
+      for (Id ivar = 0; ivar < nb_est; ivar++)
       {
         double value = db->getArray(iech, cols_est[ivar]);
         total += value * ct.getValue(ivar + 1, iclass);
@@ -884,10 +884,10 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
 
     if (selectivity->isUsedStD(ESelectivity::T))
     {
-      for (int iclass = 0; iclass < ncleff; iclass++)
+      for (Id iclass = 0; iclass < ncleff; iclass++)
       {
         double total = 0.;
-        for (int ivar = 0; ivar < ncleff - 1; ivar++)
+        for (Id ivar = 0; ivar < ncleff - 1; ivar++)
         {
           double value = (ivar < nb_std) ? db->getArray(iech, cols_std[ivar]) : 1.;
           double prod  = value * ct.getValue(ivar + 1, iclass);
@@ -902,7 +902,7 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
     if (selectivity->isUsedEst(ESelectivity::Q))
     {
       selloc->setQest(nclass - 1, getDDStatZmoy(ncleff - 1) * selloc->getTest(ncleff - 1));
-      for (int iclass = ncleff - 2; iclass >= 0; iclass--)
+      for (Id iclass = ncleff - 2; iclass >= 0; iclass--)
         selloc->setQest(iclass, selloc->getQest(iclass + 1) + getDDStatZmoy(iclass) *
                                                                 (selloc->getTest(iclass) - selloc->getTest(iclass + 1)));
     }
@@ -911,10 +911,10 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
 
     if (selectivity->isUsedStD(ESelectivity::Q))
     {
-      for (int iclass = 0; iclass < ncleff; iclass++)
+      for (Id iclass = 0; iclass < ncleff; iclass++)
       {
         double total = 0.;
-        for (int ivar = 0; ivar < ncleff - 1; ivar++)
+        for (Id ivar = 0; ivar < ncleff - 1; ivar++)
         {
           double value = (ivar < nb_std) ? db->getArray(iech, cols_std[ivar]) : 1.;
           double prod  = value * cq.getValue(ivar + 1, iclass);
@@ -930,7 +930,7 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
     if (selectivity->isUsedEst(ESelectivity::Z))
     {
       zestim = getDDStatZmoy(ncleff - 1) * selloc->getTest(ncleff - 1);
-      for (int iclass = 0; iclass < ncleff - 1; iclass++)
+      for (Id iclass = 0; iclass < ncleff - 1; iclass++)
         zestim += getDDStatZmoy(iclass) * (selloc->getTest(iclass) - selloc->getTest(iclass + 1));
     }
 
@@ -940,7 +940,7 @@ int AnamDiscreteDD::factor2Selectivity(Db* db,
     if (selectivity->isUsedStD(ESelectivity::Z))
     {
       double total = 0;
-      for (int ivar = 0; ivar < ncleff - 1; ivar++)
+      for (Id ivar = 0; ivar < ncleff - 1; ivar++)
       {
         double value = (ivar < nb_std) ? db->getArray(iech, cols_std[ivar]) : 1.;
         double prod  = value * getDDStatCnorm(ivar);

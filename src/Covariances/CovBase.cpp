@@ -129,7 +129,7 @@ void CovBase::setSill(const MatrixSymmetric& sill) const
 
 void CovBase::setSill(const VectorDouble& sill) const
 {
-  int size = static_cast<int>(sill.size());
+  Id size = static_cast<Id>(sill.size());
   auto nvar = getNVar();
   if (size != nvar * nvar)
   {
@@ -139,7 +139,7 @@ void CovBase::setSill(const VectorDouble& sill) const
   _sillCur.setValues(sill);
 }
 
-void CovBase::setSill(int ivar, int jvar, double sill) const
+void CovBase::setSill(Id ivar, Id jvar, double sill) const
 {
   if (!_isVariableValid(ivar)) return;
   if (!_isVariableValid(jvar)) return;
@@ -148,7 +148,7 @@ void CovBase::setSill(int ivar, int jvar, double sill) const
   _sillCur.setValue(ivar, jvar, sill);
 }
 
-void CovBase::setCholSill(int ivar, int jvar, double val) const
+void CovBase::setCholSill(Id ivar, Id jvar, double val) const
 {
   if (!_isVariableValid(ivar)) return;
   if (!_isVariableValid(jvar)) return;
@@ -160,7 +160,7 @@ void CovBase::setCholSill(int ivar, int jvar, double val) const
   _cholSills.setValue(ivar, jvar, val);
 }
 
-bool CovBase::_isVariableValid(int ivar) const
+bool CovBase::_isVariableValid(Id ivar) const
 {
   return checkArg("Rank of the Variable", ivar, getNVar());
 }
@@ -182,9 +182,9 @@ bool CovBase::isConsistent(const ASpace* space) const
   return _cor->isConsistent(space);
 }
 
-int CovBase::addEvalCovVecRHSInPlace(vect vect,
+Id CovBase::addEvalCovVecRHSInPlace(vect vect,
                                      const VectorInt& index1,
-                                     int iech2,
+                                     Id iech2,
                                      const KrigOpt& krigopt,
                                      SpacePoint& pin,
                                      SpacePoint& pout,
@@ -198,14 +198,14 @@ int CovBase::addEvalCovVecRHSInPlace(vect vect,
 
 double CovBase::_eval(const SpacePoint& p1,
                       const SpacePoint& p2,
-                      int ivar,
-                      int jvar,
+                      Id ivar,
+                      Id jvar,
                       const CovCalcMode* mode) const
 {
   return getSill(ivar, jvar) * _cor->evalCov(p1, p2, ivar, jvar, mode);
 }
 
-double CovBase::getSill(int ivar, int jvar) const
+double CovBase::getSill(Id ivar, Id jvar) const
 {
   return _sillCur.getValue(ivar, jvar);
 }
@@ -240,12 +240,12 @@ void CovBase::_copyCovContext(const CovContext& ctxt)
  * @param mode 1 for p1As; 2for p2As
  * @param ps vector of SpacePoints
  */
-void CovBase::_optimizationPreProcess(int mode, const std::vector<SpacePoint>& ps) const
+void CovBase::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
 {
   _cor->optimizationPreProcess(mode, ps);
 }
 
-SpacePoint& CovBase::_optimizationLoadInPlace(int iech, int mode, int rank) const
+SpacePoint& CovBase::_optimizationLoadInPlace(Id iech, Id mode, Id rank) const
 {
   return _cor->optimizationLoadInPlace(iech, mode, rank);
 }
@@ -261,7 +261,7 @@ bool CovBase::isOptimizationInitialized(const Db* db) const
 {
   if (_p1As.empty()) return false;
   if (db == nullptr) return true;
-  int n = (int)_p1As.size();
+  Id n = (Id)_p1As.size();
   return n == db->getNSample();
 }
 
@@ -283,9 +283,9 @@ void CovBase::_attachNoStatDb(const Db* db)
   }
 }
 
-int CovBase::makeElemNoStat(const EConsElem& econs, int iv1, int iv2, const AFunctional* func, const Db* db, const String& namecol)
+Id CovBase::makeElemNoStat(const EConsElem& econs, Id iv1, Id iv2, const AFunctional* func, const Db* db, const String& namecol)
 {
-  int a = ACov::makeElemNoStat(econs, iv1, iv2, func, db, namecol);
+  Id a = ACov::makeElemNoStat(econs, iv1, iv2, func, db, namecol);
   if (a) return 1;
 
   return _cor->makeElemNoStat(econs, iv1, iv2, func, db, namecol);
@@ -293,14 +293,14 @@ int CovBase::makeElemNoStat(const EConsElem& econs, int iv1, int iv2, const AFun
 
 ///////////////////// Sill ////////////////////////
 
-void CovBase::makeSillNoStatDb(const String& namecol, int ivar, int jvar, const Db* db)
+void CovBase::makeSillNoStatDb(const String& namecol, Id ivar, Id jvar, const Db* db)
 {
   if (!_checkSill(ivar, jvar)) return;
   makeElemNoStat(EConsElem::SILL, ivar, jvar, nullptr, db, namecol);
   //_cor->checkAndManageNoStatDb(db, namecol);
 }
 
-void CovBase::makeSillNoStatFunctional(const AFunctional* func, int ivar, int jvar)
+void CovBase::makeSillNoStatFunctional(const AFunctional* func, Id ivar, Id jvar)
 {
   if (!_checkSill(ivar, jvar)) return;
   makeElemNoStat(EConsElem::SILL, ivar, jvar, func);
@@ -315,7 +315,7 @@ void CovBase::makeSillsStationary(bool silent)
   }
   _tabNoStat->clear();
 }
-void CovBase::makeSillStationary(int ivar, int jvar)
+void CovBase::makeSillStationary(Id ivar, Id jvar)
 {
   if (!_checkSill(ivar, jvar)) return;
   if (_tabNoStat->removeElem(EConsElem::SILL, ivar, jvar) == 0)
@@ -326,7 +326,7 @@ void CovBase::makeSillStationary(int ivar, int jvar)
 
 /////////////////////////// Check functions ////////////////////:
 
-bool CovBase::_checkSill(int ivar, int jvar) const
+bool CovBase::_checkSill(Id ivar, Id jvar) const
 {
   auto nvar = getNVar();
   if ((ivar > nvar) || (jvar > nvar))
@@ -337,7 +337,7 @@ bool CovBase::_checkSill(int ivar, int jvar) const
   return true;
 }
 
-bool CovBase::_checkDims(int idim, int jdim) const
+bool CovBase::_checkDims(Id idim, Id jdim) const
 {
   auto ndim = getNDim();
   if ((idim > ndim) || (jdim > ndim))
@@ -370,7 +370,7 @@ void CovBase::informDbOut(const Db* dbout) const
   _cor->informDbOut(dbout);
 }
 
-double CovBase::getValue(const EConsElem& econs, int iv1, int iv2) const
+double CovBase::getValue(const EConsElem& econs, Id iv1, Id iv2) const
 {
   double val = _cor->getValue(econs, iv1, iv2);
   if (val == TEST)
@@ -383,8 +383,8 @@ double CovBase::getValue(const EConsElem& econs, int iv1, int iv2) const
 
 VectorDouble CovBase::informCoords(const VectorVectorDouble& coords,
                                    const EConsElem& econs,
-                                   int iv1,
-                                   int iv2) const
+                                   Id iv1,
+                                   Id iv2) const
 {
   if (econs == EConsElem::SILL)
   {
@@ -423,7 +423,7 @@ void CovBase::informDbOutForSills(const Db* dbout) const
  * @param icas2 Type of first Db: 1 for Input; 2 for Output
  * @param iech2 Rank of the target within Dbout (or -2)
  */
-void CovBase::updateCovByPoints(int icas1, int iech1, int icas2, int iech2) const
+void CovBase::updateCovByPoints(Id icas1, Id iech1, Id icas2, Id iech2) const
 {
   // If no non-stationary parameter is defined, simply skip
   if (!isNoStat()) return;
@@ -439,15 +439,15 @@ void CovBase::updateCovByPoints(int icas1, int iech1, int icas2, int iech2) cons
 
     if (type == EConsElem::SILL)
     {
-      int iv1 = e.first.getIV1();
-      int iv2 = e.first.getIV2();
+      Id iv1 = e.first.getIV1();
+      Id iv2 = e.first.getIV2();
       setSill(iv1, iv2, sqrt(val1 * val2));
     }
   }
   _cor->updateCovByPoints(icas1, iech1, icas2, iech2);
 }
 
-void CovBase::updateCovByMesh(int imesh, bool aniso) const
+void CovBase::updateCovByMesh(Id imesh, bool aniso) const
 {
   // If no non-stationary parameter is defined, simply skip
   if (!isNoStat()) return;
@@ -462,8 +462,8 @@ void CovBase::updateCovByMesh(int imesh, bool aniso) const
       if (type == EConsElem::SILL)
       {
         double sill = e.second->getValueOnMeshByApex(imesh);
-        int iv1     = e.first.getIV1();
-        int iv2     = e.first.getIV2();
+        Id iv1     = e.first.getIV1();
+        Id iv2     = e.first.getIV2();
         setSill(iv1, iv2, sill);
       }
     }
@@ -515,7 +515,7 @@ bool CovBase::_isNoStat() const
   return _cor->isNoStat() || isNoStatForVariance();
 }
 
-int CovBase::getNSills() const
+Id CovBase::getNSills() const
 {
   TabNoStatSills* tabnostat = getTabNoStatSills();
   if (tabnostat == nullptr) return 0;
@@ -529,7 +529,7 @@ bool CovBase::isNoStatForVariance() const
   return tabnostat->isDefinedForVariance();
 }
 
-void CovBase::_multiplyCorDerivativesBySills(int oldSize, std::vector<covmaptype>* gradFuncs)
+void CovBase::_multiplyCorDerivativesBySills(Id oldSize, std::vector<covmaptype>* gradFuncs)
 {
   // Multiply the derivatives of the correlation functions by the sills
   // This is done to ensure that the gradient functions reflect the sill scaling
@@ -539,7 +539,7 @@ void CovBase::_multiplyCorDerivativesBySills(int oldSize, std::vector<covmaptype
   for (size_t i = oldSize; i < newSize; ++i)
   {
     const covmaptype f = (*gradFuncs)[i];
-    (*gradFuncs)[i]    = [f, this](const SpacePoint& p1, const SpacePoint& p2, int ivar, int jvar, const CovCalcMode* mode)
+    (*gradFuncs)[i]    = [f, this](const SpacePoint& p1, const SpacePoint& p2, Id ivar, Id jvar, const CovCalcMode* mode)
     {
       double result = f(p1, p2, ivar, jvar, mode) * this->getSill(ivar, jvar);
       return result;
@@ -581,19 +581,19 @@ void CovBase::appendParams(ListParams& listParams,
   {
     if (_cholSillsInfo(ivard, jvard).isFixed()) continue; // Skip fixed parameters
     gradFuncs->emplace_back(
-      [ivard, jvard, this](const SpacePoint& p1, const SpacePoint& p2, int ivar, int jvar, const CovCalcMode* mode) -> double
+      [ivard, jvard, this](const SpacePoint& p1, const SpacePoint& p2, Id ivar, Id jvar, const CovCalcMode* mode) -> double
       {
         MatrixSymmetric dSillDChol(this->getNVar());
         dSillDChol.fill(0.);
-        for (int i = jvard; i < this->getNVar(); i++)
+        for (Id i = jvard; i < this->getNVar(); i++)
         {
           double val = this->_cholSillsInfo.getValue(i, jvard).getValue();
-          if (i == (int)jvard)
+          if (i == (Id)jvard)
           {
             double grad_softplus = softplusDerivative(val);
             val = grad_softplus * softplus(val); // Apply softplus to ensure positive values
           }
-          if (i == (int)ivard)
+          if (i == (Id)ivard)
           {
             val *= 2; // Derivative of the diagonal element is 2
           }
@@ -623,7 +623,7 @@ void CovBase::initParams(const MatrixSymmetric& vars, double href)
 void CovBase::updateCov()
 {
   _cor->updateCov();
-  int nvaroptim = 0;
+  Id nvaroptim = 0;
   for (const auto& [ivar, jvar]: _itRange)
   {
     if (_cholSillsInfo(ivar, jvar).isFixed()) continue;

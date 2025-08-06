@@ -68,6 +68,9 @@ License: BSD 3-clause
 #define NFACTOR    11
 /*! \endcond */
 
+namespace gstlrn
+{
+
 /* Static parameters - for memory management */
 static size_t SpaceAlloced   = 0;
 static size_t MaxPermAlloced = 0;
@@ -77,12 +80,10 @@ static void* Tmp0 = NULL; /* temp space for real part */
 static void* Tmp1 = NULL; /* temp space for imaginary part */
 static void* Tmp2 = NULL; /* temp space for Cosine values */
 static void* Tmp3 = NULL; /* temp space for Sine values */
-static int* Perm  = NULL; /* Permutation vector */
+static Id* Perm  = NULL; /* Permutation vector */
 
-static int factor[NFACTOR];
+static Id factor[NFACTOR];
 
-namespace gstlrn
-{
 /******************************************************************************/
 /*!
  *    Free the arrays allocated for FFT
@@ -119,10 +120,10 @@ static void fft_free(void)
 }
 
 /* return the number of factors */
-static int factorize(int nPass, int* kt)
+static Id factorize(Id nPass, Id* kt)
 {
-  int nFactor = 0;
-  int j, jj;
+  Id nFactor = 0;
+  Id j, jj;
 
   *kt = 0;
   /* determine the factors of n */
@@ -185,17 +186,17 @@ static int factorize(int nPass, int* kt)
  * could move allocation out to fftn(), but leave it here so that it's
  * possible to make this a standalone function
  */
-static int fftradix(double Re[],
+static Id fftradix(double Re[],
                     double Im[],
                     size_t nTotal,
                     size_t nPass,
                     size_t nSpan,
-                    int iSign,
-                    int maxFactors,
-                    int maxPerm)
+                    Id iSign,
+                    Id maxFactors,
+                    Id maxPerm)
 {
-  int ii, nFactor, kspan, ispan, inc;
-  int j, jc, jf, jj, k, k1, k3, kk, kt, nn, ns, nt;
+  Id ii, nFactor, kspan, ispan, inc;
+  Id j, jc, jf, jj, k, k1, k3, kk, kt, nn, ns, nt;
 
   double radf;
   double c1, c2, c3, cd;
@@ -232,17 +233,17 @@ static int fftradix(double Re[],
   else
   {
     /* allow full use of alloc'd space */
-    maxFactors = static_cast<int>(SpaceAlloced / sizeof(double));
+    maxFactors = static_cast<Id>(SpaceAlloced / sizeof(double));
   }
   if (MaxPermAlloced < (size_t)maxPerm)
   {
-    Perm           = (int*)realloc((char*)Perm, maxPerm * sizeof(int));
+    Perm           = (Id*)realloc((char*)Perm, maxPerm * sizeof(Id));
     MaxPermAlloced = maxPerm;
   }
   else
   {
     /* allow full use of alloc'd space */
-    maxPerm = static_cast<int>(MaxPermAlloced);
+    maxPerm = static_cast<Id>(MaxPermAlloced);
   }
   if (!Tmp0 || !Tmp1 || !Tmp2 || !Tmp3 || !Perm) goto Memory_Error;
 
@@ -265,12 +266,12 @@ static int fftradix(double Re[],
   }
 
   /* adjust for strange increments */
-  nt    = static_cast<int>(inc * nTotal);
-  ns    = static_cast<int>(inc * nSpan);
+  nt    = static_cast<Id>(inc * nTotal);
+  ns    = static_cast<Id>(inc * nSpan);
   kspan = ns;
 
   nn   = nt - inc;
-  jc   = static_cast<int>(ns / nPass);
+  jc   = static_cast<Id>(ns / nPass);
   radf = pi2 * (double)jc;
   pi2 *= 2.0; /* use 2 PI from here on */
 
@@ -278,7 +279,7 @@ static int fftradix(double Re[],
   jf = 0;
   /* determine the factors of n */
 
-  nFactor = factorize(static_cast<int>(nPass), &kt);
+  nFactor = factorize(static_cast<Id>(nPass), &kt);
   /* test that nFactors is in range */
   if (nFactor > NFACTOR)
   {
@@ -308,7 +309,7 @@ static int fftradix(double Re[],
           {
             double tmpr;
             double tmpi;
-            int k2;
+            Id k2;
 
             k2          = kk + kspan;
             tmpr        = Re_Data(k2);
@@ -325,7 +326,7 @@ static int fftradix(double Re[],
         /* end of infinite loop */
         do
         {
-          int k2;
+          Id k2;
 
           c1 = 1.0 - cd;
           s1 = sd;
@@ -377,7 +378,7 @@ static int fftradix(double Re[],
             {
               double ajm, ajp, akm, akp;
               double bjm, bjp, bkm, bkp;
-              int k2;
+              Id k2;
 
               k1  = kk + kspan;
               k2  = k1 + kspan;
@@ -467,7 +468,7 @@ static int fftradix(double Re[],
               {
                 double aj, tmpr;
                 double bj, tmpi;
-                int k2;
+                Id k2;
 
                 k1          = kk + kspan;
                 k2          = k1 + kspan;
@@ -500,7 +501,7 @@ static int fftradix(double Re[],
               {
                 double aa, aj, ak, ajm, ajp, akm, akp;
                 double bb, bj, bk, bjm, bjp, bkm, bkp;
-                int k2, k4;
+                Id k2, k4;
 
                 k1          = kk + kspan;
                 k2          = k1 + kspan;
@@ -568,7 +569,7 @@ static int fftradix(double Re[],
               {
                 double aa, ak;
                 double bb, bk;
-                int k2;
+                Id k2;
 
                 aa = ak = Re_Data(kk);
                 bb = bk = Im_Data(kk);
@@ -679,7 +680,7 @@ Permute_Results:
   Perm[0] = ns;
   if (kt)
   {
-    int k2;
+    Id k2;
 
     k = kt + kt + 1;
     if (k > nFactor) k--;
@@ -803,7 +804,7 @@ Permute_Results:
   j = jj = 0;
   for (;;)
   {
-    int k2;
+    Id k2;
 
     k  = kt + 1;
     k2 = factor[kt - 1];
@@ -864,7 +865,7 @@ Permute_Results:
       jj = jc;
       do
       {
-        int k2;
+        Id k2;
 
         if (jj < maxFactors)
           kspan = jj;
@@ -928,15 +929,15 @@ Memory_Error:
  ** \return  Error return code
  **
  *****************************************************************************/
-int fftn(int ndim,
-         const int dims[],
+Id fftn(Id ndim,
+         const Id dims[],
          double Re[],
          double Im[],
-         int iSign,
+         Id iSign,
          double scaling)
 {
   size_t nTotal;
-  int maxFactors, maxPerm;
+  Id maxFactors, maxPerm;
 
   /*
    * tally the number of elements in the data array
@@ -944,7 +945,7 @@ int fftn(int ndim,
    */
   nTotal = 1;
   {
-    int i;
+    Id i;
     /* number of dimensions was specified */
     for (i = 0; i < ndim; i++)
     {
@@ -959,7 +960,7 @@ int fftn(int ndim,
    * worry about excess allocation.  May be someone else will do it?
    */
   {
-    int i;
+    Id i;
     for (maxFactors = maxPerm = 1, i = 0; i < ndim; i++)
     {
       if (dims[i] > maxFactors) maxFactors = dims[i];
@@ -972,11 +973,11 @@ int fftn(int ndim,
   if (dims != NULL)
   {
     size_t nSpan = 1;
-    int i;
+    Id i;
 
     for (i = 0; i < ndim; i++)
     {
-      int ret;
+      Id ret;
       nSpan *= dims[i];
       ret = fftradix(Re, Im, nTotal, dims[i], nSpan, iSign, maxFactors,
                      maxPerm);
@@ -986,7 +987,7 @@ int fftn(int ndim,
   }
   else
   {
-    int ret;
+    Id ret;
     ret = fftradix(Re, Im, nTotal, nTotal, nTotal, iSign, maxFactors, maxPerm);
     /* end, clean-up already done */
     if (ret) return ret;
@@ -995,11 +996,11 @@ int fftn(int ndim,
   /* Divide through by the normalizing constant: */
   if (scaling && scaling != 1.0)
   {
-    int i;
+    Id i;
     if (iSign < 0) iSign = -iSign;
     if (scaling < 0.0) scaling = (scaling < -1.0) ? sqrt(nTotal) : nTotal;
     scaling = 1.0 / scaling; /* multiply is often faster */
-    for (i = 0; i < (int)nTotal; i += iSign)
+    for (i = 0; i < (Id)nTotal; i += iSign)
     {
       Re_Data(i) *= scaling;
       Im_Data(i) *= scaling;

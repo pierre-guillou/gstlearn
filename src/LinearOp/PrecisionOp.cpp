@@ -190,19 +190,19 @@ PrecisionOp* PrecisionOp::create(const AMesh* mesh,
   return new PrecisionOp(mesh, cova, stencil, verbose);
 }
 
-int PrecisionOp::_addToDest(const constvect inv, vect outv) const
+Id PrecisionOp::_addToDest(const constvect inv, vect outv) const
 {
   _addEvalPower(inv, outv, EPowerPT::ONE);
   return 0;
 }
 
-int PrecisionOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
+Id PrecisionOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
 {
   _addEvalPower(whitenoise, outv, EPowerPT::MINUSHALF);
   return 0;
 }
 
-int PrecisionOp::_preparePoly(const EPowerPT& power, bool force) const
+Id PrecisionOp::_preparePoly(const EPowerPT& power, bool force) const
 {
   // Polynomial already exists. Nothing to be done
   if (_polynomials.find(power) != _polynomials.end() && !force) return 0;
@@ -235,7 +235,7 @@ void PrecisionOp::setPolynomialFromPoly(APolynomial* polynomial)
   _preparePoly(EPowerPT::LOG, true);
 }
 
-int PrecisionOp::_prepareChebychev(const EPowerPT& power) const
+Id PrecisionOp::_prepareChebychev(const EPowerPT& power) const
 {
   // Polynomial already exists. Nothing to be done
   if (_cova == nullptr && _polynomials.find(EPowerPT::ONE) != _polynomials.end()) return 1;
@@ -271,13 +271,13 @@ int PrecisionOp::_prepareChebychev(const EPowerPT& power) const
   return 0;
 }
 
-int PrecisionOp::reset(const AShiftOp* shiftop,
+Id PrecisionOp::reset(const AShiftOp* shiftop,
                        const CovAniso* cova,
                        bool verbose)
 {
   // Initializations
 
-  int error = 0;
+  Id error = 0;
 
   try
   {
@@ -361,7 +361,7 @@ void PrecisionOp::_addEvalPower(const constvect inv,
   VH::addInPlace(worksp2, outv);
 }
 
-int PrecisionOp::_evalPoly(const EPowerPT& power,
+Id PrecisionOp::_evalPoly(const EPowerPT& power,
                            const constvect inv,
                            vect outv) const
 {
@@ -370,7 +370,7 @@ int PrecisionOp::_evalPoly(const EPowerPT& power,
   return 0;
 }
 
-int PrecisionOp::_addEvalPoly(const EPowerPT& power,
+Id PrecisionOp::_addEvalPoly(const EPowerPT& power,
                               const constvect inv,
                               vect outv) const
 {
@@ -381,7 +381,7 @@ int PrecisionOp::_addEvalPoly(const EPowerPT& power,
   if (_preparePoly(power) != 0) return 1;
   if (getTraining())
   {
-    int degree = _polynomials[power]->getDegree();
+    Id degree = _polynomials[power]->getDegree();
 
     if (_workPoly.empty())
     {
@@ -402,7 +402,7 @@ int PrecisionOp::_addEvalPoly(const EPowerPT& power,
     }
     ((ClassicalPolynomial*)_polynomials[power].get())->evalOpTraining(a->getS(), invs, _workPoly, _work5);
 
-    for (int i = 0; i < (int)inv.size(); i++)
+    for (Id i = 0; i < (Id)inv.size(); i++)
     {
       outv[i] += _workPoly[0][i];
     }
@@ -426,7 +426,7 @@ void PrecisionOp::evalInverse(const constvect vecin,
   _shiftOp->prodLambda(works, vecouts, EPowerPT::MINUSONE);
 }
 
-VectorDouble PrecisionOp::computeCov(int imesh)
+VectorDouble PrecisionOp::computeCov(Id imesh)
 {
 
   auto n = getSize();
@@ -443,7 +443,7 @@ VectorDouble PrecisionOp::computeCov(int imesh)
   return result;
 }
 
-VectorVectorDouble PrecisionOp::simulate(int nbsimu)
+VectorVectorDouble PrecisionOp::simulate(Id nbsimu)
 {
   auto n = getSize();
   VectorVectorDouble vectv(nbsimu);
@@ -471,7 +471,7 @@ VectorDouble PrecisionOp::simulateOne()
   return vectv;
 }
 
-int PrecisionOp::_preparePrecisionPoly() const
+Id PrecisionOp::_preparePrecisionPoly() const
 {
   if (_cova == nullptr) return 1;
   if (!_cova->hasMarkovCoeffs()) return 1;
@@ -485,7 +485,7 @@ int PrecisionOp::_preparePrecisionPoly() const
 /* discretized over ndiscr points */
 /* and return the min and the max */
 
-std::pair<double, double> PrecisionOp::getRangeEigenVal(int ndiscr)
+std::pair<double, double> PrecisionOp::getRangeEigenVal(Id ndiscr)
 {
   std::pair<double, double> rangeVals;
   double sill  = _cova->getSill(0, 0); // TODO handle non constant sill
@@ -497,7 +497,7 @@ std::pair<double, double> PrecisionOp::getRangeEigenVal(int ndiscr)
   rangeVals.first  = val;
   rangeVals.second = val;
 
-  for (int i = 1; i < ndiscr; i++)
+  for (Id i = 1; i < ndiscr; i++)
   {
     x += delta;
     val              = _polynomials[EPowerPT::ONE]->eval(x);
@@ -540,7 +540,7 @@ VectorDouble PrecisionOp::extractDiag() const
 
   if (_preparePoly(power) != 0) return vec;
 
-  for (int i = 0; i < size; i++)
+  for (Id i = 0; i < size; i++)
   {
     double lambda = lambdas[i];
     vec[i]        = _polynomials[power]->evalOpByRank(a->getS(), i) * lambda * lambda;
@@ -554,14 +554,14 @@ VectorDouble PrecisionOp::extractDiag() const
  * @return The computed value or TEST if problem
  * 
  */
-double PrecisionOp::computeLogDet(int nMC) const
+double PrecisionOp::computeLogDet(Id nMC) const
 {
   VectorDouble gauss;
   VectorDouble result;
   gauss.resize(getSize());
   result.resize(getSize());
   double val1 = 0.;
-  for (int isimu = 0; isimu < nMC; isimu++)
+  for (Id isimu = 0; isimu < nMC; isimu++)
   {
     VH::simulateGaussianInPlace(gauss);
     vect results(result);

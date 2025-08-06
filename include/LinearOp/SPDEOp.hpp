@@ -40,14 +40,14 @@ public:
           const ProjMulti* const projOutSimu       = nullptr);
   virtual ~ASPDEOp();
 
-  virtual VectorDouble stdev(const VectorDouble& dat, int nMC = 1, int seed = 134343) const;
+  virtual VectorDouble stdev(const VectorDouble& dat, Id nMC = 1, Id seed = 134343) const;
 
-  int getSize() const override;
-  int getSizeSimu() const;
-  int getIterations() const { return _solver->getIterations(); }
+  Id getSize() const override;
+  Id getSizeSimu() const;
+  Id getIterations() const { return _solver->getIterations(); }
   double getError() const { return _solver->getError(); }
 
-  void setMaxIterations(int n) { _solver->setMaxIterations(n); }
+  void setMaxIterations(Id n) { _solver->setMaxIterations(n); }
   void setTolerance(double tol) { _solver->setTolerance(tol); }
 
   VectorDouble kriging(const VectorDouble& dat) const;
@@ -68,39 +68,39 @@ public:
 #ifndef SWIG
 
 public:
-  int krigingWithGuess(const constvect inv,
+  Id krigingWithGuess(const constvect inv,
                        const constvect guess,
                        vect out) const;
   void evalInvCov(const constvect inv, vect result) const;
   void simCond(const constvect data, vect outv) const;
   void simNonCond(vect outv) const;
-  virtual double computeLogDetOp(int nbsimu) const;
+  virtual double computeLogDetOp(Id nbsimu) const;
   double computeQuadratic(const std::vector<double>& x) const;
-  double computeTotalLogDet(int nMC = 5, int seed = 13132) const;
-  double computeLogDetQ(int nMC = 5) const;
+  double computeTotalLogDet(Id nMC = 5, Id seed = 13132) const;
+  double computeLogDetQ(Id nMC = 5) const;
   double computeLogDetInvNoise() const;
-  static int centerDataByDriftMat(VectorDouble& Z,
+  static Id centerDataByDriftMat(VectorDouble& Z,
                                   const MatrixDense& driftMat,
                                   const VectorDouble& driftCoeffs);
-  static int centerDataByMeanVec(VectorDouble& Z,
+  static Id centerDataByMeanVec(VectorDouble& Z,
                                  const VectorDouble& meanVec);
   void setVerbose(bool v) { _verbose = v; }
 
 protected:
-  int _addToDest(const constvect inv, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
 
 private:
   std::pair<double, double> _computeRangeEigenVal() const;
   void _preparePoly(Chebychev& logPoly) const;
-  int _kriging(const constvect inv, vect out) const;
+  Id _kriging(const constvect inv, vect out) const;
   void _simNonCond(vect outv) const;
   void _simCond(const constvect data, vect outvK, vect outvS) const;
-  int _getNDat() const { return _ndat; }
-  virtual int _solve(const constvect in, vect out) const;
-  int _solveWithGuess(const constvect in,
+  Id _getNDat() const { return _ndat; }
+  virtual Id _solve(const constvect in, vect out) const;
+  Id _solveWithGuess(const constvect in,
                       const constvect guess,
                       vect out) const;
-  int _buildRhs(const constvect inv) const;
+  Id _buildRhs(const constvect inv) const;
 #endif
 
 private:
@@ -118,7 +118,7 @@ protected:
   bool _verbose;
 
 private:
-  int _ndat;
+  Id _ndat;
   mutable VectorDouble _workdat1;
   mutable VectorDouble _workdat2;
   mutable VectorDouble _workdat3;

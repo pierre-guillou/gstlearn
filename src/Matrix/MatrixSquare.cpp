@@ -19,7 +19,7 @@
 
 namespace gstlrn
 {
-MatrixSquare::MatrixSquare(int nrow)
+MatrixSquare::MatrixSquare(Id nrow)
   : MatrixDense(nrow, nrow)
 {
 }
@@ -53,7 +53,7 @@ MatrixSquare::~MatrixSquare()
 {
 }
 
-void MatrixSquare::_setNSize(int nval)
+void MatrixSquare::_setNSize(Id nval)
 {
   _setNRows(nval);
   _setNCols(nval);
@@ -62,8 +62,8 @@ void MatrixSquare::_setNSize(int nval)
 void MatrixSquare::resetFromVVD(const VectorVectorDouble& tab, bool byCol)
 {
   if (tab.empty()) return;
-  int n1 = (int)tab.size();
-  int n2 = (int)tab[0].size();
+  Id n1 = (Id)tab.size();
+  Id n2 = (Id)tab[0].size();
   if (n1 != n2)
   {
     messerr("The Matrix should be square");
@@ -76,7 +76,7 @@ void MatrixSquare::resetFromVVD(const VectorVectorDouble& tab, bool byCol)
 double MatrixSquare::trace() const
 {
   double res = 0.;
-  for (int irow = 0; irow < getNSize(); irow++)
+  for (Id irow = 0; irow < getNSize(); irow++)
     res += getValue(irow, irow);
   return res;
 }
@@ -102,14 +102,14 @@ void MatrixSquare::innerMatrix(const MatrixSquare& x,
     my_throw("Incompatible matrix dimensions");
   }
 
-  for (int irow = 0; irow < n; irow++)
+  for (Id irow = 0; irow < n; irow++)
   {
-    for (int icol = 0; icol < n; icol++)
+    for (Id icol = 0; icol < n; icol++)
     {
       double value = 0.;
-      for (int k = 0; k < n; k++)
+      for (Id k = 0; k < n; k++)
       {
-        for (int l = 0; l < n; l++)
+        for (Id l = 0; l < n; l++)
         {
           value += r1.getValue(k, irow) * x.getValue(k, l) * r2.getValue(l, icol);
           value += r2.getValue(k, irow) * x.getValue(k, l) * r1.getValue(l, icol);
@@ -123,10 +123,10 @@ void MatrixSquare::innerMatrix(const MatrixSquare& x,
 /*! Multiply the diagonal by a vector */
 void MatrixSquare::prodDiagByVector(const VectorDouble& diag)
 {
-  if ((int)diag.size() != getNRows())
+  if ((Id)diag.size() != getNRows())
     my_throw("Argument 'Diag' must match Matrix dimension");
 
-  for (int i = 0; i < getNRows(); i++)
+  for (Id i = 0; i < getNRows(); i++)
   {
     setValue(i, i, getValue(i, i) * diag[i]);
   }
@@ -135,10 +135,10 @@ void MatrixSquare::prodDiagByVector(const VectorDouble& diag)
 /*! Divide the diagonal by a vector */
 void MatrixSquare::divideDiagByVector(const VectorDouble& diag)
 {
-  if ((int)diag.size() != getNRows())
+  if ((Id)diag.size() != getNRows())
     my_throw("Argument 'Diag' must match Matrix dimension");
 
-  for (int i = 0; i < getNRows(); i++)
+  for (Id i = 0; i < getNRows(); i++)
   {
     if (isZero(diag[i]))
       my_throw("Argument 'Diag' may not have too small values");
@@ -168,15 +168,15 @@ double MatrixSquare::determinant(void) const
       break;
 
     default:
-      int neqm1 = neq - 1;
+      Id neqm1 = neq - 1;
       MatrixSquare c(neqm1); // TODO Merge MatrixSquare and MatrixSquare into MatrixSquare
 
-      for (int j1 = 0; j1 < neq; j1++)
+      for (Id j1 = 0; j1 < neq; j1++)
       {
-        for (int i = 1; i < neq; i++)
+        for (Id i = 1; i < neq; i++)
         {
-          int j2 = 0;
-          for (int j = 0; j < neq; j++)
+          Id j2 = 0;
+          for (Id j = 0; j < neq; j++)
           {
             if (j == j1) continue;
             c.setValue(i - 1, j2, getValue(i, j));
@@ -193,14 +193,14 @@ double MatrixSquare::determinant(void) const
 
 double MatrixSquare::normVec(const VectorDouble& vec)
 {
-  if (getNRows() != (int)vec.size())
+  if (getNRows() != (Id)vec.size())
   {
     messerr("Wrong dimension of 'vec' argument");
     return TEST;
   }
   double value = 0.;
-  for (int irow = 0; irow < getNRows(); irow++)
-    for (int icol = 0; icol < getNCols(); icol++)
+  for (Id irow = 0; irow < getNRows(); irow++)
+    for (Id icol = 0; icol < getNCols(); icol++)
       value += vec[irow] * getValue(irow, icol) * vec[icol];
 
   return value;
@@ -214,11 +214,11 @@ double MatrixSquare::normVec(const VectorDouble& vec)
  ** \param[in]  c     vector
  **
  *****************************************************************************/
-void MatrixSquare::prodByDiagInPlace(int mode, const VectorDouble& c)
+void MatrixSquare::prodByDiagInPlace(Id mode, const VectorDouble& c)
 {
   auto neq = getNRows();
-  for (int i1 = 0; i1 < neq; i1++)
-    for (int i2 = 0; i2 < neq; i2++)
+  for (Id i1 = 0; i1 < neq; i1++)
+    for (Id i2 = 0; i2 < neq; i2++)
     {
       double val = c[i2];
       if (mode == 1)
@@ -231,7 +231,7 @@ void MatrixSquare::prodByDiagInPlace(int mode, const VectorDouble& c)
     }
 }
 
-bool MatrixSquare::_isNumbersValid(int nrows, int ncols) const
+bool MatrixSquare::_isNumbersValid(Id nrows, Id ncols) const
 {
   AMatrix::_isNumbersValid(nrows, ncols);
   if (nrows != ncols)
@@ -251,8 +251,8 @@ bool MatrixSquare::_isNumbersValid(int nrows, int ncols) const
  */
 MatrixSquare* MatrixSquare::createFromVVD(const VectorVectorDouble& X)
 {
-  int nrow = (int)X.size();
-  int ncol = (int)X[0].size();
+  Id nrow = (Id)X.size();
+  Id ncol = (Id)X[0].size();
   if (nrow != ncol)
   {
     messerr("The matrix does not seem to be square");
@@ -265,34 +265,34 @@ MatrixSquare* MatrixSquare::createFromVVD(const VectorVectorDouble& X)
 }
 
 MatrixSquare* MatrixSquare::createFromVD(const VectorDouble& X,
-                                         int nrow,
+                                         Id nrow,
                                          bool byCol,
                                          bool invertColumnOrder)
 {
-  int ncol = nrow;
-  if (nrow * ncol != (int)X.size())
+  Id ncol = nrow;
+  if (nrow * ncol != (Id)X.size())
   {
     messerr("Inconsistency between arguments 'nrow'(%d) and 'ncol'(%d)", nrow, ncol);
-    messerr("and the dimension of the input Vector (%d)", (int)X.size());
+    messerr("and the dimension of the input Vector (%d)", (Id)X.size());
   }
   auto* mat = new MatrixSquare(nrow);
 
-  int lec = 0;
+  Id lec = 0;
   if (byCol)
   {
-    for (int irow = 0; irow < nrow; irow++)
-      for (int icol = 0; icol < ncol; icol++)
+    for (Id irow = 0; irow < nrow; irow++)
+      for (Id icol = 0; icol < ncol; icol++)
       {
-        int jcol = (invertColumnOrder) ? ncol - icol - 1 : icol;
+        Id jcol = (invertColumnOrder) ? ncol - icol - 1 : icol;
         mat->setValue(irow, jcol, X[lec++]);
       }
   }
   else
   {
-    for (int icol = 0; icol < ncol; icol++)
-      for (int irow = 0; irow < nrow; irow++)
+    for (Id icol = 0; icol < ncol; icol++)
+      for (Id irow = 0; irow < nrow; irow++)
       {
-        int jcol = (invertColumnOrder) ? ncol - icol - 1 : icol;
+        Id jcol = (invertColumnOrder) ? ncol - icol - 1 : icol;
         mat->setValue(irow, jcol, X[lec++]);
       }
   }
@@ -307,7 +307,7 @@ MatrixSquare* MatrixSquare::createFromVD(const VectorDouble& X,
  *
  * @remarks The output matrices 'tus'  and 'tls' must be dimensioned beforehand
  */
-int MatrixSquare::decomposeLU(MatrixSquare& tls,
+Id MatrixSquare::decomposeLU(MatrixSquare& tls,
                               MatrixSquare& tus,
                               double eps)
 {
@@ -315,20 +315,20 @@ int MatrixSquare::decomposeLU(MatrixSquare& tls,
   tls.fill(0.);
   tus.fill(0.);
 
-  for (int i = 0; i < neq; i++)
+  for (Id i = 0; i < neq; i++)
     tls.setValue(i, i, 1.);
 
-  for (int i = 0; i < neq; i++)
+  for (Id i = 0; i < neq; i++)
   {
-    int ip1 = i + 1;
-    int im1 = i - 1;
+    Id ip1 = i + 1;
+    Id im1 = i - 1;
 
-    for (int j = 0; j < neq; j++)
+    for (Id j = 0; j < neq; j++)
     {
       tus.setValue(i, j, getValue(i, j));
       if (im1 >= 0)
       {
-        for (int k = 0; k <= im1; k++)
+        for (Id k = 0; k <= im1; k++)
         {
           tus.setValue(i, j, tus.getValue(i, j) - tls.getValue(i, k) * tus.getValue(k, j));
         }
@@ -336,12 +336,12 @@ int MatrixSquare::decomposeLU(MatrixSquare& tls,
     }
     if (ip1 < neq)
     {
-      for (int j = ip1; j < neq; j++)
+      for (Id j = ip1; j < neq; j++)
       {
         tls.setValue(j, i, getValue(j, i));
         if (im1 >= 0)
         {
-          for (int k = 0; k <= im1; k++)
+          for (Id k = 0; k <= im1; k++)
           {
             tls.setValue(j, i, tls.getValue(j, i) - tls.getValue(j, k) * tus.getValue(k, i));
           }
@@ -355,7 +355,7 @@ int MatrixSquare::decomposeLU(MatrixSquare& tls,
   return 0;
 }
 
-int MatrixSquare::_invertLU()
+Id MatrixSquare::_invertLU()
 {
   auto neq = getNRows();
 
@@ -368,7 +368,7 @@ int MatrixSquare::_invertLU()
 
   VectorDouble b(neq);
   VectorDouble x(neq);
-  for (int i = 0; i < neq; i++)
+  for (Id i = 0; i < neq; i++)
   {
     // Preparing the right-hand side vector (column of the identity matrix)
     VH::fill(b, 0.);
@@ -376,18 +376,18 @@ int MatrixSquare::_invertLU()
 
     if (_solveLU(tus, tls, b.data(), x.data())) return 1;
 
-    for (int j = 0; j < neq; j++)
+    for (Id j = 0; j < neq; j++)
       ais.setValue(i, j, x[j]);
   }
 
   // Copy the inverse matrix in the input matrix
-  for (int irow = 0; irow < neq; irow++)
-    for (int icol = 0; icol < neq; icol++)
+  for (Id irow = 0; irow < neq; irow++)
+    for (Id icol = 0; icol < neq; icol++)
       setValue(irow, icol, ais.getValue(irow, icol));
   return 0;
 }
 
-int MatrixSquare::_solveLU(const MatrixSquare& tus,
+Id MatrixSquare::_solveLU(const MatrixSquare& tus,
                            const MatrixSquare& tls,
                            const double* b,
                            double* x)
@@ -413,14 +413,14 @@ int MatrixSquare::_solveLU(const MatrixSquare& tus,
  ** \param[out] x    resulting matrix (dimension neq)
  **
  *****************************************************************************/
-int MatrixSquare::_forwardLU(const MatrixSquare& tls, const double* b, double* x, double eps)
+Id MatrixSquare::_forwardLU(const MatrixSquare& tls, const double* b, double* x, double eps)
 {
   auto neq = getNRows();
-  for (int i = 0; i < neq; i++) x[i] = 0.;
-  for (int i = 0; i < neq; i++)
+  for (Id i = 0; i < neq; i++) x[i] = 0.;
+  for (Id i = 0; i < neq; i++)
   {
     double tmp = b[i];
-    for (int j = 0; j < i; j++)
+    for (Id j = 0; j < i; j++)
       tmp -= tls.getValue(i, j) * x[j];
 
     double pivot = tls.getValue(i, i);
@@ -447,13 +447,13 @@ int MatrixSquare::_forwardLU(const MatrixSquare& tls, const double* b, double* x
  ** \remark as the transposed version of a lower triangle
  **
  *****************************************************************************/
-int MatrixSquare::_backwardLU(const MatrixSquare& tus, const double* b, double* x, double eps)
+Id MatrixSquare::_backwardLU(const MatrixSquare& tus, const double* b, double* x, double eps)
 {
   auto neq = getNRows();
-  for (int i = neq - 1; i >= 0; i--)
+  for (Id i = neq - 1; i >= 0; i--)
   {
     double tmp = b[i];
-    for (int j = i + 1; j < neq; j++)
+    for (Id j = i + 1; j < neq; j++)
       tmp -= tus.getValue(i, j) * x[j];
 
     double pivot = tus.getValue(i, i);
@@ -467,7 +467,7 @@ MatrixSquare* prodNormMatMat(const MatrixDense* a,
                              const MatrixDense* m,
                              bool transpose)
 {
-  int nrow  = (transpose) ? a->getNCols() : a->getNRows();
+  Id nrow  = (transpose) ? a->getNCols() : a->getNRows();
   auto* mat = new MatrixSquare(nrow);
   mat->prodNormMatMatInPlace(a, m, transpose);
   return mat;
@@ -475,7 +475,7 @@ MatrixSquare* prodNormMatMat(const MatrixDense* a,
 
 MatrixSquare* prodNormMat(const MatrixDense& a, bool transpose)
 {
-  int nsym  = (transpose) ? a.getNCols() : a.getNRows();
+  Id nsym  = (transpose) ? a.getNCols() : a.getNRows();
   auto* mat = new MatrixSquare(nsym);
   mat->prodNormMatInPlace(&a, transpose);
   return mat;
@@ -483,7 +483,7 @@ MatrixSquare* prodNormMat(const MatrixDense& a, bool transpose)
 
 MatrixSquare* prodNormMatVec(const MatrixDense& a, const VectorDouble& vec, bool transpose)
 {
-  int nsym  = (transpose) ? a.getNCols() : a.getNRows();
+  Id nsym  = (transpose) ? a.getNCols() : a.getNRows();
   auto* mat = new MatrixSquare(nsym);
   mat->prodNormMatVecInPlace(&a, vec, transpose);
   return mat;

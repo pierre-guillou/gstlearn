@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   law_set_random_seed(32131);
   defineDefaultSpace(ESpaceType::RN, ndim);
   DbStringFormat dbfmt(FLAG_STATS);
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   panel->display();
 
   // Discretization with blocs
-  int nx_B      = 5;
+  Id nx_B       = 5;
   double x0_B   = x0_P + dx_P / nx_B / 2.;
   double dx_B   = dx_P / nx_B;
   DbGrid* blocs = DbGrid::create({nx_B, nx_B}, {dx_B, dx_B}, {x0_B, x0_B});
@@ -80,13 +80,13 @@ int main(int argc, char* argv[])
   double m_Z        = 1.5;
   double s_Z        = 0.5;
   VectorDouble Zval = grid->getColumn("Y");
-  for (int i = 0; i < (int)Zval.size(); i++)
+  for (Id i = 0; i < (Id)Zval.size(); i++)
     Zval[i] = m_Z * exp(s_Z * Zval[i] - 0.5 * s_Z * s_Z);
   grid->addColumns(Zval, "Z");
   grid->display(&dbfmt);
 
   // Data extraction
-  int np   = 500;
+  Id np    = 500;
   Db* data = Db::createSamplingDb(grid, 0., np, {"x1", "x2", "Y", "Z"});
   data->setLocator("Z", ELoc::Z, 0);
   data->display(&dbfmt);
@@ -136,8 +136,8 @@ int main(int argc, char* argv[])
   model->display();
 
   // Creating a Moving Neighborhood
-  int nmini           = 5;
-  int nmaxi           = 5;
+  Id nmini            = 5;
+  Id nmaxi            = 5;
   double radius       = 1.;
   NeighMoving* neighM = NeighMoving::create(false, nmaxi, radius, nmini);
   neighM->display();
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
   model->setAnam(anam);
 
   // Computing the Point factors
-  int nfactor = 3;
+  Id nfactor = 3;
   (void)anam->rawToFactor(data, nfactor);
   data->display();
 

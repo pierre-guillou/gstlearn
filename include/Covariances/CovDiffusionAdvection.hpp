@@ -51,7 +51,7 @@ public:
   bool isNoneMarkovR() const { return _markovR == nullptr; }
 
   std::complex<double> evalSpatialSpectrum(VectorDouble freq, double time) const;
-  Array evalCovFFT(const VectorDouble& hmax, double time = 0, int N = 128) const;
+  Array evalCovFFT(const VectorDouble& hmax, double time = 0, Id N = 128) const;
 
 private:
   void _init();
