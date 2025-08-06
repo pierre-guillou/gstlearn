@@ -12,8 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
-#include "Enum/ELaw.hpp"
 #include "Basic/AStringable.hpp"
+#include "Enum/ELaw.hpp"
 
 namespace gstlrn
 {
@@ -23,8 +23,8 @@ class GSTLEARN_EXPORT ShapeParameter: public AStringable
 {
 public:
   ShapeParameter(const ELaw& law = ELaw::fromKey("CONSTANT"), double value = 0.);
-  ShapeParameter(const ShapeParameter &r);
-  ShapeParameter& operator=(const ShapeParameter &r);
+  ShapeParameter(const ShapeParameter& r);
+  ShapeParameter& operator=(const ShapeParameter& r);
   virtual ~ShapeParameter();
 
   /// Interface to AStringable
@@ -33,7 +33,7 @@ public:
   ELaw getLaw() const { return _law; }
   const VectorDouble& getValarg() const { return _valarg; }
   double getValarg(Id iarg) const;
-  Id getNbValarg() const { return (Id) _valarg.size(); }
+  Id getNbValarg() const { return static_cast<Id>(_valarg.size()); }
 
   void setLaw(const ELaw& law) { _law = law; }
   void setValarg(Id iarg, double value);
@@ -44,7 +44,7 @@ private:
   bool _isValidArgIndex(Id iarg) const;
 
 private:
-  ELaw _law; /* Type of law */
+  ELaw _law;            /* Type of law */
   VectorDouble _valarg; /* Randomization arguments */
 };
-}
+} // namespace gstlrn

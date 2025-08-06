@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
         SPDEParam params;
         params.setNMC(10);
         (void)krigingSPDE(dat, grid, model, true, true, useCholesky,
-                          VectorMeshes(), nullptr, VectorMeshes(), nullptr, params, verbose,
+                          nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, params, verbose,
                           NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 400);
       }
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
         namconv.append(sncov);
         law_set_random_seed(seed);
         (void)simulateSPDE(nullptr, grid, model, nsim, useCholesky,
-                           VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                           nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
                            SPDEParam(), verbose,
                            NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 1350);
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
         namconv.append(sncov);
         law_set_random_seed(seed);
         (void)simulateSPDE(dat, grid, model, nsim, useCholesky,
-                           VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                           nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
                            SPDEParam(), verbose,
                            NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 3130);

@@ -218,7 +218,7 @@ bool KrigOpt::_isValidCalcul(const Db* dbout, const ANeigh* neigh) const
   // Check the Block calculation
   if (_calcul == EKrigOpt::BLOCK)
   {
-    const DbGrid* dbgrid = dynamic_cast<const DbGrid*>(dbout);
+    const auto* dbgrid = dynamic_cast<const DbGrid*>(dbout);
     _dbgrid              = dbgrid;
     if (dbgrid == nullptr)
     {
@@ -304,7 +304,7 @@ bool KrigOpt::_isValidDGM(const Db* dbout, const ModelGeneric* model) const
     messerr("For DGM option, the argument 'dbout'  should be a Grid");
     return false;
   }
-  const Model* modelAniso = dynamic_cast<const Model*>(model);
+  const auto* modelAniso = dynamic_cast<const Model*>(model);
   if (modelAniso == nullptr)
   {
     messerr("The option DGM is limited to model Aniso");

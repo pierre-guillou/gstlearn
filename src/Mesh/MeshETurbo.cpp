@@ -1040,7 +1040,7 @@ bool isTurbo(const VectorMeshes& meshes)
   if (meshes.empty()) return false;
   for (Id imesh = 0, nmesh = (Id)meshes.size(); imesh < nmesh; imesh++)
   {
-    const MeshETurbo* mTurbo = dynamic_cast<const MeshETurbo*>(meshes[imesh]);
+    const auto* mTurbo = dynamic_cast<const MeshETurbo*>(meshes[imesh]);
     if (mTurbo == nullptr) return false;
   }
   return true;

@@ -1003,7 +1003,7 @@ PropDef* proportion_manage(Id mode,
           messerr("either in the input 'Db' or in 'dbprop'");
           goto label_end;
         }
-        const DbGrid* db_loc_grid = dynamic_cast<const DbGrid*>(db_loc);
+        const auto* db_loc_grid = dynamic_cast<const DbGrid*>(db_loc);
         if (db_loc_grid == nullptr)
         {
           messerr("The 'Db' used for Proportions must be a Grid");

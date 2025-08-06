@@ -116,8 +116,8 @@ void CalcKrigingSimpleCase::_storeResultsForExport(const KrigingSystemSimpleCase
   _ktest.nvar = ksys.getNVar();
   _ktest.xyz  = ksys.getSampleCoordinates(algebra, iechout);
   //_ktest.lhs   = ksys.getLHS();
-  _ktest.wgt = ksys.getWeights(algebra);
-  _ktest.mu  = ksys.getMu(algebra);
+  _ktest.wgt = gstlrn::KrigingSystemSimpleCase::getWeights(algebra);
+  _ktest.mu  = gstlrn::KrigingSystemSimpleCase::getMu(algebra);
   // _ktest.var   = ksys.getVariance();
 }
 

@@ -207,7 +207,7 @@ bool ACalcInterpolator::_preprocess()
 
   if (_model != nullptr)
   {
-    const ModelCovList* modelcovlist = dynamic_cast<const ModelCovList*>(_model);
+    const auto* modelcovlist = dynamic_cast<const ModelCovList*>(_model);
     if (modelcovlist != nullptr)
     {
       if (!_setNCov(modelcovlist->getNCov())) return false;

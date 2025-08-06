@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   Id useCholesky = 0;
   law_set_random_seed(13256);
   (void)simulateSPDE(nullptr, dat, model, 1, useCholesky,
-                     VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(), false,
+                     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, SPDEParam(), false,
                      NamingConvention("Data", true, false));
   (void)dat->dumpToNF("Data.NF");
 

@@ -40,7 +40,11 @@ public:
           const ProjMulti* const projOutSimu       = nullptr);
   virtual ~ASPDEOp();
 
-  virtual VectorDouble stdev(const VectorDouble& dat, Id nMC = 1, Id seed = 134343) const;
+  virtual VectorDouble stdev(const VectorDouble& dat,
+                             Id nMC                 = 1,
+                             Id seed                = 134343,
+                             const ProjMulti* projK = nullptr,
+                             const ProjMulti* projS = nullptr) const;
 
   Id getSize() const override;
   Id getSizeSimu() const;
@@ -50,14 +54,14 @@ public:
   void setMaxIterations(Id n) { _solver->setMaxIterations(n); }
   void setTolerance(double tol) { _solver->setTolerance(tol); }
 
-  VectorDouble kriging(const VectorDouble& dat) const;
+  VectorDouble kriging(const VectorDouble& dat, const ProjMulti* proj = nullptr) const;
   VectorDouble krigingWithGuess(const VectorDouble& dat, const VectorDouble& guess) const;
 
   VectorDouble computeDriftCoeffs(const VectorDouble& Z,
                                   const MatrixDense& driftMat,
                                   bool verbose = false) const;
-  VectorDouble simCond(const VectorDouble& dat) const;
-  VectorDouble simNonCond() const;
+  VectorDouble simCond(const VectorDouble& dat, const ProjMulti* projK, const ProjMulti* projS) const;
+  VectorDouble simNonCond(const ProjMulti* proj) const;
 
   const PrecisionOpMulti* getQKriging() const { return _QKriging; }
   const ProjMulti* getProjKriging() const { return _projInKriging; }
@@ -69,8 +73,8 @@ public:
 
 public:
   Id krigingWithGuess(const constvect inv,
-                       const constvect guess,
-                       vect out) const;
+                      const constvect guess,
+                      vect out) const;
   void evalInvCov(const constvect inv, vect result) const;
   void simCond(const constvect data, vect outv) const;
   void simNonCond(vect outv) const;
@@ -80,10 +84,10 @@ public:
   double computeLogDetQ(Id nMC = 5) const;
   double computeLogDetInvNoise() const;
   static Id centerDataByDriftMat(VectorDouble& Z,
-                                  const MatrixDense& driftMat,
-                                  const VectorDouble& driftCoeffs);
+                                 const MatrixDense& driftMat,
+                                 const VectorDouble& driftCoeffs);
   static Id centerDataByMeanVec(VectorDouble& Z,
-                                 const VectorDouble& meanVec);
+                                const VectorDouble& meanVec);
   void setVerbose(bool v) { _verbose = v; }
 
 protected:
@@ -98,8 +102,8 @@ private:
   Id _getNDat() const { return _ndat; }
   virtual Id _solve(const constvect in, vect out) const;
   Id _solveWithGuess(const constvect in,
-                      const constvect guess,
-                      vect out) const;
+                     const constvect guess,
+                     vect out) const;
   Id _buildRhs(const constvect inv) const;
 #endif
 

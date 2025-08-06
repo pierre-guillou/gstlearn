@@ -12,8 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
-#include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
+#include "Basic/AStringable.hpp"
 
 namespace gstlrn
 {
@@ -39,7 +39,7 @@ public:
   double getThetal(Id i) const { return _thetal[i]; }
   double getThetar(Id i) const { return _thetar[i]; }
 
-  Id getNFamilies() const { return  (Id) _thetal.size(); }
+  Id getNFamilies() const { return static_cast<Id>(_thetal.size()); }
   double faultAbscissae(double cote) const;
 
   void addFaultPerFamily(double thetal,
@@ -54,7 +54,7 @@ public:
 
 protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;
-  bool _serializeAscii(std::ostream& os,bool verbose = false) const override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
 #ifdef HDF5
   bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
   bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
@@ -62,13 +62,13 @@ protected:
   String _getNFName() const override { return "FracFault"; }
 
 private:
-  double _coord;                //!< Abscissas of the first Fault point
-  double _orient;               //!< Fault orientation
-  VectorDouble _thetal;         //!< Maximum density on left
-  VectorDouble _thetar;         //!< Maximum density on right
-  VectorDouble _rangel;         //!< Decrease range on left
-  VectorDouble _ranger;         //!< Decrease range on right
+  double _coord;        //!< Abscissas of the first Fault point
+  double _orient;       //!< Fault orientation
+  VectorDouble _thetal; //!< Maximum density on left
+  VectorDouble _thetar; //!< Maximum density on right
+  VectorDouble _rangel; //!< Decrease range on left
+  VectorDouble _ranger; //!< Decrease range on right
 
   friend class FracEnviron;
 };
-}
+} // namespace gstlrn

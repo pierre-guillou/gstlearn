@@ -239,7 +239,7 @@ String ProjMulti::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
 
-  const ProjMultiMatrix* test = dynamic_cast<const ProjMultiMatrix*>(this);
+  const auto* test = dynamic_cast<const ProjMultiMatrix*>(this);
   if (test != nullptr)
     sstr << "Description of the ProjMultiMatrix" << std::endl;
   else

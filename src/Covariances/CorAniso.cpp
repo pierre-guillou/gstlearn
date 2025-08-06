@@ -552,7 +552,7 @@ double CorAniso::evalCovOnSphere(double alpha,
 {
   if (!_corfunc->hasCovOnSphere()) return TEST;
   const ASpace* space    = getDefaultSpaceSh().get();
-  const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
+  const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
   if (spaceSn == nullptr) return TEST;
 
   double scale = getScaleIso();
@@ -575,7 +575,7 @@ VectorDouble CorAniso::evalSpectrumOnSphere(Id n, bool flagNormDistance, bool fl
 {
   if (!_corfunc->hasSpectrumOnSphere()) return VectorDouble();
   const ASpace* space    = getDefaultSpaceSh().get();
-  const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
+  const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
   if (spaceSn == nullptr) return VectorDouble();
 
   double scale = getScaleIso();
@@ -662,7 +662,7 @@ double CorAniso::evalSpectrum(const VectorDouble& freq, Id ivar, Id jvar) const
 double CorAniso::normalizeOnSphere(Id n) const
 {
   const ASpace* space    = getDefaultSpaceSh().get();
-  const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
+  const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
   double scale           = getScaleIso();
   double radius          = spaceSn->getRadius();
   scale                  = scale / radius;

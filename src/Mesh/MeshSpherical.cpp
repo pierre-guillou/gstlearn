@@ -244,7 +244,7 @@ void MeshSpherical::_getCoordOnSphere(double longitude,
   if (isDefaultSpaceSphere())
   {
     const ASpace* space    = getDefaultSpaceSh().get();
-    const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
+    const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
     if (spaceSn != nullptr) radius = spaceSn->getRadius();
   }
   GH::convertSph2Cart(longitude, latitude,

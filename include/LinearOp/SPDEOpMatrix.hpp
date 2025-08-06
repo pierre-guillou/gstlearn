@@ -33,7 +33,11 @@ public:
 
   double computeLogDetOp(Id nbsimu) const override;
 
-  VectorDouble stdev(const VectorDouble& dat, Id nMC, Id seed) const override;
+  VectorDouble stdev(const VectorDouble& dat,
+                     Id nMC                 = 1,
+                     Id seed                = 134343,
+                     const ProjMulti* projK = nullptr,
+                     const ProjMulti* projS = nullptr) const override;
 
 #ifndef SWIG
 

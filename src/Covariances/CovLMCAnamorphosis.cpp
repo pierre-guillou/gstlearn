@@ -223,7 +223,7 @@ double CovLMCAnamorphosis::_evalHermite(Id ivar,
                                         const SpacePoint& p2,
                                         const CovCalcMode* mode) const
 {
-  const AnamHermite* anamH = dynamic_cast<const AnamHermite*>(_anam);
+  const auto* anamH = dynamic_cast<const AnamHermite*>(_anam);
 
   CovCalcMode modeloc(*mode);
   modeloc.setAsVario(false);
@@ -234,7 +234,7 @@ double CovLMCAnamorphosis::_evalHermite(Id ivar,
   double r = 1.;
   if (anamH->isChangeSupportDefined()) r = anamH->getRCoef();
 
-  double cov = TEST;
+  double cov  = TEST;
   auto iclass = getActiveFactor();
 
   if (iclass == 0)
@@ -308,8 +308,8 @@ double CovLMCAnamorphosis::_evalHermite0(Id ivar,
                                          Id jvar,
                                          const CovCalcMode* mode) const
 {
-  const AnamHermite* anamH = dynamic_cast<const AnamHermite*>(_anam);
-  auto iclass              = getActiveFactor();
+  const auto* anamH = dynamic_cast<const AnamHermite*>(_anam);
+  auto iclass       = getActiveFactor();
 
   double r = 1.;
   if (anamH->isChangeSupportDefined()) r = anamH->getRCoef();
@@ -365,8 +365,8 @@ double CovLMCAnamorphosis::_evalDiscreteDD(Id ivar,
                                            const SpacePoint& p2,
                                            const CovCalcMode* mode) const
 {
-  const AnamDiscreteDD* anamDD = dynamic_cast<const AnamDiscreteDD*>(_anam);
-  auto iclass                  = getActiveFactor();
+  const auto* anamDD = dynamic_cast<const AnamDiscreteDD*>(_anam);
+  auto iclass        = getActiveFactor();
 
   double gamma = 0.;
   if (getSpace()->getDistance(p1, p2) > 0.)
@@ -427,8 +427,8 @@ double CovLMCAnamorphosis::_evalDiscreteDD0(Id /*ivar*/,
 {
   if (mode == nullptr)
     messageAbort("In _evalHermite, mode MUST be defined");
-  const AnamDiscreteDD* anamDD = dynamic_cast<const AnamDiscreteDD*>(_anam);
-  auto iclass                  = getActiveFactor();
+  const auto* anamDD = dynamic_cast<const AnamDiscreteDD*>(_anam);
+  auto iclass        = getActiveFactor();
 
   double cov = TEST;
   if (iclass == 0)
@@ -496,8 +496,8 @@ double CovLMCAnamorphosis::_evalDiscreteIR(Id ivar,
 {
   if (mode == nullptr)
     messageAbort("In _evalHermite, mode MUST be defined");
-  const AnamDiscreteIR* anamIR = dynamic_cast<const AnamDiscreteIR*>(_anam);
-  auto iclass                  = getActiveFactor();
+  const auto* anamIR = dynamic_cast<const AnamDiscreteIR*>(_anam);
+  auto iclass        = getActiveFactor();
   CovCalcMode modeloc(*mode);
 
   double r          = 1.;
@@ -542,8 +542,8 @@ double CovLMCAnamorphosis::_evalDiscreteIR0(Id /*ivar*/,
 {
   if (mode == nullptr)
     messageAbort("In _evalHermite, mode MUST be defined");
-  const AnamDiscreteIR* anamIR = dynamic_cast<const AnamDiscreteIR*>(_anam);
-  auto iclass                  = getActiveFactor();
+  const auto* anamIR = dynamic_cast<const AnamDiscreteIR*>(_anam);
+  auto iclass        = getActiveFactor();
   CovCalcMode modeloc(*mode);
 
   double r = 1.;
@@ -601,4 +601,4 @@ void CovLMCAnamorphosis::addCov(const CovBase& cov)
   }
   CovAnisoList::addCov(cov);
 }
-}
+} // namespace gstlrn

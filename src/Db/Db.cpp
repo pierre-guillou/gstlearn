@@ -3534,7 +3534,7 @@ String Db::_toStringCommon(const AStringFormat* strfmt) const
   std::stringstream sstr;
   static Id MAX_NCLASS = 50;
 
-  const DbStringFormat* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
+  const auto* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
   DbStringFormat dsf;
   if (dbfmt != nullptr) dsf = *dbfmt;
 
@@ -3581,7 +3581,7 @@ String Db::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
 
-  const DbStringFormat* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
+  const auto* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
   DbStringFormat dsf;
   if (dbfmt != nullptr) dsf = *dbfmt;
 
@@ -5393,7 +5393,7 @@ Id Db::resetReduce(const Db* dbin,
   {
     // Extract vector of coordinates from input 'Db' (converted into a
     // 'DbGrid')
-    const DbGrid* dbgrid = dynamic_cast<const DbGrid*>(dbin);
+    const auto* dbgrid = dynamic_cast<const DbGrid*>(dbin);
     if (dbgrid != nullptr)
     {
       Id ndim                 = dbin->getNDim();

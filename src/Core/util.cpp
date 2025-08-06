@@ -814,8 +814,8 @@ double ut_distance(Id ndim, const double* tab1, const double* tab2)
     /* Case of the spherical coordinates */
     /* Longitude = 1st coord; Latitude = 2nd coord (in degrees) */
 
-    const ASpace* space    = getDefaultSpaceSh().get();
-    const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
+    const ASpace* space = getDefaultSpaceSh().get();
+    const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
     if (space == nullptr) return TEST;
     double R = spaceSn->getRadius();
     distance = GH::geodeticAngularDistance(tab1[0], tab1[1], tab2[0], tab2[1], R);

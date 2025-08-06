@@ -11,15 +11,15 @@
 #pragma once
 
 #include "Anamorphosis/AAnam.hpp"
-#include "gstlearn_export.hpp"
 #include "geoslib_define.h"
+#include "gstlearn_export.hpp"
 
+#include "Basic/ASerializable.hpp"
+#include "Covariances/CovCalcMode.hpp"
 #include "Db/DbGrid.hpp"
+#include "Geometry/ABiTargetCheck.hpp"
 #include "Variogram/AVario.hpp"
 #include "Variogram/VarioParam.hpp"
-#include "Covariances/CovCalcMode.hpp"
-#include "Basic/ASerializable.hpp"
-#include "Geometry/ABiTargetCheck.hpp"
 
 namespace gstlrn
 {
@@ -88,8 +88,7 @@ class DirParam;
  *
  */
 
-
-class GSTLEARN_EXPORT Vario : public AVario, public ASerializable
+class GSTLEARN_EXPORT Vario: public AVario, public ASerializable
 {
 public:
   Vario(const VarioParam& varioparam);
@@ -108,7 +107,7 @@ public:
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// AVario Interface
-  double _getIVAR(const Db *db, Id iech, Id ivar) const override;
+  double _getIVAR(const Db* db, Id iech, Id ivar) const override;
   void _setResult(Id iech1,
                   Id iech2,
                   Id nvar,
@@ -133,28 +132,28 @@ public:
   static Vario* createTransformYToZ(const Vario& varioY,
                                     const AAnam* anam);
   static Vario* createReduce(const Vario& varioIn,
-                             const VectorInt &varcols,
-                             const VectorInt &dircols,
+                             const VectorInt& varcols,
+                             const VectorInt& dircols,
                              bool asSymmetric = false);
   static Vario* computeFromDb(const VarioParam& varioparam,
                               Db* db,
                               const ECalcVario& calcul = ECalcVario::fromKey("VARIOGRAM"),
-                              bool flag_sample = false,
-                              bool verr_mode = false,
-                              Model *model = nullptr,
-                              Id niter_UK = 0,
-                              bool verbose = false);
+                              bool flag_sample         = false,
+                              bool verr_mode           = false,
+                              Model* model             = nullptr,
+                              Id niter_UK              = 0,
+                              bool verbose             = false);
 
-  void resetReduce(const VectorInt &varcols,
-                   const VectorInt &dircols,
+  void resetReduce(const VectorInt& varcols,
+                   const VectorInt& dircols,
                    bool asSymmetric = false);
 
-  bool              getFlagAsym() const { return _flagAsym; }
-  bool              drawOnlyPositiveX(Id ivar, Id jvar) const;
-  bool              drawOnlyPositiveY(Id ivar, Id jvar) const;
+  bool getFlagAsym() const { return _flagAsym; }
+  bool drawOnlyPositiveX(Id ivar, Id jvar) const;
+  bool drawOnlyPositiveY(Id ivar, Id jvar) const;
 
-  Id    getNVar() const { return _nVar; }
-  const  VectorDouble& getMeans() const { return _means; }
+  Id getNVar() const { return _nVar; }
+  const VectorDouble& getMeans() const { return _means; }
   double getMean(Id ivar) const;
 
   double getVar(Id ivar, Id jvar) const;
@@ -162,8 +161,8 @@ public:
   double getVarIndex(Id ijvar) const;
   const VectorDouble& getVars() const { return _vars; }
   void setMeans(const VectorDouble& means);
-  void setMean(double mean, Id ivar=0);
-  void setVar(double value, Id ivar=0, Id jvar=0);
+  void setMean(double mean, Id ivar = 0);
+  void setVar(double value, Id ivar = 0, Id jvar = 0);
   void setVars(const VectorDouble& vars);
   void setVarIndex(Id ijvar, double value);
   void setDb(Db* db);
@@ -175,44 +174,44 @@ public:
   double getSwByIndex(Id idir = 0, Id i = 0) const;
   double getUtilizeByIndex(Id idir = 0, Id i = 0) const;
 
-  double getGg(Id idir = 0,
-               Id ivar = 0,
-               Id jvar = 0,
-               Id ilag = 0,
-               bool asCov = false,
+  double getGg(Id idir             = 0,
+               Id ivar             = 0,
+               Id jvar             = 0,
+               Id ilag             = 0,
+               bool asCov          = false,
                bool flagNormalized = false) const;
   double getHh(Id idir = 0, Id ivar = 0, Id jvar = 0, Id ilag = 0) const;
   double getSw(Id idir = 0, Id ivar = 0, Id jvar = 0, Id ilag = 0) const;
   double getUtilize(Id idir = 0, Id ivar = 0, Id jvar = 0, Id ilag = 0) const;
 
   VectorVectorDouble getVec(Id idir = 0, Id ivar = 0, Id jvar = 0) const;
-  VectorDouble getGgVec(Id idir = 0,
-                        Id ivar = 0,
-                        Id jvar = 0,
-                        bool asCov = false,
+  VectorDouble getGgVec(Id idir             = 0,
+                        Id ivar             = 0,
+                        Id jvar             = 0,
+                        bool asCov          = false,
                         bool flagNormalized = false,
+                        bool compress       = true) const;
+  VectorDouble getHhVec(Id idir       = 0,
+                        Id ivar       = 0,
+                        Id jvar       = 0,
                         bool compress = true) const;
-  VectorDouble getHhVec(Id idir = 0,
-                        Id ivar = 0,
-                        Id jvar = 0,
+  VectorDouble getSwVec(Id idir       = 0,
+                        Id ivar       = 0,
+                        Id jvar       = 0,
                         bool compress = true) const;
-  VectorDouble getSwVec(Id idir = 0,
-                        Id ivar = 0,
-                        Id jvar = 0,
-                        bool compress = true) const;
-  VectorDouble getUtilizeVec(Id idir = 0,
-                             Id ivar = 0,
-                             Id jvar = 0,
+  VectorDouble getUtilizeVec(Id idir       = 0,
+                             Id ivar       = 0,
+                             Id jvar       = 0,
                              bool compress = true) const;
 
   void setSwVec(Id idir, Id ivar, Id jvar, const VectorDouble& sw);
   void setHhVec(Id idir, Id ivar, Id jvar, const VectorDouble& hh);
   void setGgVec(Id idir, Id ivar, Id jvar, const VectorDouble& gg);
 
-  VectorDouble getGgs(Id idir = 0,
-                      Id ivar = 0,
-                      Id jvar = 0,
-                      const VectorInt &ilag = VectorInt()) const;
+  VectorDouble getGgs(Id idir               = 0,
+                      Id ivar               = 0,
+                      Id jvar               = 0,
+                      const VectorInt& ilag = VectorInt()) const;
   VectorDouble setGgs(Id idir, Id ivar, Id jvar, const VectorInt& ilag, const VectorDouble& values);
 
   const VectorDouble& getAllGg(Id idir = 0) const;
@@ -242,66 +241,66 @@ public:
   Id getCenter(Id ivar = 0, Id jvar = 0, Id idir = 0) const;
   Id getNext(Id ivar = 0, Id jvar = 0, Id idir = 0, Id shift = 1) const;
 
-  Id  internalVariableResize();
+  Id internalVariableResize();
   void internalDirectionResize(Id ndir = 0, bool flagDirs = true);
 
-  double getHmax(Id ivar=-1, Id jvar=-1, Id idir=-1) const;
-  VectorDouble getHRange(Id ivar=-1, Id jvar=-1, Id idir=-1) const;
-  double getGmax(Id ivar = -1,
-                 Id jvar = -1,
-                 Id idir = -1,
-                 bool flagAbs = false,
+  double getHmax(Id ivar = -1, Id jvar = -1, Id idir = -1) const;
+  VectorDouble getHRange(Id ivar = -1, Id jvar = -1, Id idir = -1) const;
+  double getGmax(Id ivar       = -1,
+                 Id jvar       = -1,
+                 Id idir       = -1,
+                 bool flagAbs  = false,
                  bool flagSill = false) const;
-  VectorDouble getGRange(Id ivar = -1,
-                         Id jvar = -1,
-                         Id idir = -1,
+  VectorDouble getGRange(Id ivar       = -1,
+                         Id jvar       = -1,
+                         Id idir       = -1,
                          bool flagSill = false) const;
 
   void patchCenter(Id idir, Id nech, double rho);
 
   Id fill(Id idir,
-           const VectorDouble& sw,
-           const VectorDouble& gg,
-           const VectorDouble& hh);
+          const VectorDouble& sw,
+          const VectorDouble& gg,
+          const VectorDouble& hh);
 
   Id getDirAddress(Id idir,
-                    Id ivar,
-                    Id jvar,
-                    Id ilag,
-                    bool flag_abs = false,
-                    Id sens      = 0,
-                    bool flagCheck = true) const;
+                   Id ivar,
+                   Id jvar,
+                   Id ilag,
+                   bool flag_abs  = false,
+                   Id sens        = 0,
+                   bool flagCheck = true) const;
   Id getVarAddress(Id ivar, Id jvar) const;
   Id getNLagTotal(Id idir) const;
 
   Id compute(Db* db,
-              const ECalcVario& calcul = ECalcVario::fromKey("VARIOGRAM"),
-              bool flag_sample = false,
-              bool verr_mode = false,
-              const Model* model = nullptr,
-              Id niter_UK = 0,
-              bool verbose = false);
+             const ECalcVario& calcul = ECalcVario::fromKey("VARIOGRAM"),
+             bool flag_sample         = false,
+             bool verr_mode           = false,
+             const Model* model       = nullptr,
+             Id niter_UK              = 0,
+             bool verbose             = false);
   Id computeIndic(Db* db,
-                   const ECalcVario& calcul = ECalcVario::fromKey("VARIOGRAM"),
-                   bool flag_sample = false,
-                   bool verr_mode = false,
-                   const Model* model = nullptr,
-                   Id niter_UK = 0,
-                   bool verbose = false,
-                   Id nfacmax = -1);
-  Id computeGeometry(Db *db, Vario_Order *vorder, Id *npair);
-  Id computeVarioVect(Db *db, Id ncomp);
-  Id computeGeometryMLayers(Db *db, VectorInt& seltab, Vario_Order *vorder) const;
+                  const ECalcVario& calcul = ECalcVario::fromKey("VARIOGRAM"),
+                  bool flag_sample         = false,
+                  bool verr_mode           = false,
+                  const Model* model       = nullptr,
+                  Id niter_UK              = 0,
+                  bool verbose             = false,
+                  Id nfacmax               = -1);
+  Id computeGeometry(Db* db, Vario_Order* vorder, Id* npair);
+  Id computeVarioVect(Db* db, Id ncomp);
+  Id computeGeometryMLayers(Db* db, VectorInt& seltab, Vario_Order* vorder) const;
 
-  Id regularizeFromModel(const Model &model,
-                          const VectorDouble &ext,
-                          const VectorInt &ndisc,
-                          const VectorDouble &angles = VectorDouble(),
-                          const CovCalcMode *mode = nullptr,
-                          bool asCov = false);
+  Id regularizeFromModel(const Model& model,
+                         const VectorDouble& ext,
+                         const VectorInt& ndisc,
+                         const VectorDouble& angles = VectorDouble(),
+                         const CovCalcMode* mode    = nullptr,
+                         bool asCov                 = false);
   Id regularizeFromDbGrid(Model* model,
-                           const Db& db,
-                           const CovCalcMode *mode = nullptr);
+                          const Db& db,
+                          const CovCalcMode* mode = nullptr);
   void getExtension(Id ivar,
                     Id jvar,
                     Id idir0,
@@ -311,14 +310,14 @@ public:
                     double distmax,
                     double varmin,
                     double varmax,
-                    Id *flag_hneg,
-                    Id *flag_gneg,
-                    double *c0,
-                    double *hmin,
-                    double *hmax,
-                    double *gmin,
-                    double *gmax);
-  Id sampleModel(Model *model, const CovCalcMode*  mode = nullptr);
+                    Id* flag_hneg,
+                    Id* flag_gneg,
+                    double* c0,
+                    double* hmin,
+                    double* hmax,
+                    double* gmin,
+                    double* gmax);
+  Id sampleModel(Model* model, const CovCalcMode* mode = nullptr);
 
   // Pipe to the DirParam
   const DirParam& getDirParam(Id idir) const { return _varioparam.getDirParam(idir); }
@@ -347,21 +346,21 @@ public:
   bool isDefinedForGrid() const { return _varioparam.isDefinedForGrid(); }
   void setNVar(Id nvar) { _nVar = nvar; }
   void setCalculByName(const String& calcul_name);
-  void setVariableNames(const VectorString &variableNames) { _variableNames = variableNames; }
-  void setVariableName(Id ivar, const String &variableName);
+  void setVariableNames(const VectorString& variableNames) { _variableNames = variableNames; }
+  void setVariableName(Id ivar, const String& variableName);
 
-  Id  prepare(const ECalcVario &calcul = ECalcVario::fromKey("VARIOGRAM"), bool defineList = true);
+  Id prepare(const ECalcVario& calcul = ECalcVario::fromKey("VARIOGRAM"), bool defineList = true);
 
   const VarioParam& getVarioParam() const { return _varioparam; }
   Id getNBiPtsPerDir() const { return _biPtsPerDirection; }
   const ABiTargetCheck* getBipts(Id idir, Id rank) const { return _bipts[_getBiPtsRank(idir, rank)]; }
-  bool keepPair(Id idir, SpaceTarget &T1, SpaceTarget &T2, double *dist) const;
+  bool keepPair(Id idir, SpaceTarget& T1, SpaceTarget& T2, double* dist) const;
   Id getRankFromDirAndDate(Id idir, Id idate) const;
   const VectorString& getVariableNames() const { return _variableNames; }
   String getVariableName(Id ivar) const;
 
   Id transformCut(Id nh, double ycut);
-  Id transformZToY(const AAnam *anam);
+  Id transformZToY(const AAnam* anam);
   Id transformYToZ(const AAnam* anam);
 
   bool isLagCorrect(Id idir, Id k) const;
@@ -386,7 +385,7 @@ private:
   bool _isAddressValid(Id i, Id idir, bool flagCheck = true) const;
   void _initMeans();
   void _initVars();
-  Id  _getNVar(const Db* db);
+  Id _getNVar(const Db* db);
   VectorInt _getVariableInterval(Id ivar) const;
   VectorInt _getDirectionInterval(Id idir) const;
   String _toStringByDirection(const AStringFormat* strfmt, Id idir) const;
@@ -397,49 +396,49 @@ private:
   void _clearBiTargetCheck();
   void _addBiTargetCheck(ABiTargetCheck* abpc);
   void _setListBiTargetCheck();
-  Id  _getNBiPts() const { return (Id) _bipts.size(); }
-  Id  _getBiPtsRank(Id idir, Id rank) const;
+  Id _getNBiPts() const { return static_cast<Id>(_bipts.size()); }
+  Id _getBiPtsRank(Id idir, Id rank) const;
 
-  Id _compute(Db *db,
-               Id flag_sample,
-               Id verr_mode,
-               const Model* model,
-               Id niter_UK,
-               bool verbose);
-  Id _calculateGeneral(Db *db,
-                        Id flag_sample,
-                        Id verr_mode);
-  Id  _calculateGenOnLine(Db *db, Id norder);
-  Id  _calculateGenOnGrid(DbGrid *db, Id norder);
-  Id  _calculateOnGrid(DbGrid *db);
+  Id _compute(Db* db,
+              Id flag_sample,
+              Id verr_mode,
+              const Model* model,
+              Id niter_UK,
+              bool verbose);
+  Id _calculateGeneral(Db* db,
+                       Id flag_sample,
+                       Id verr_mode);
+  Id _calculateGenOnLine(Db* db, Id norder);
+  Id _calculateGenOnGrid(DbGrid* db, Id norder);
+  Id _calculateOnGrid(DbGrid* db);
 
-  static Id  _getRelativeSampleRank(Db *db, Id iech0);
-  Id  _updateUK(Db *db, Vario_Order *vorder);
-  void _patchC00(Db *db, Id idir);
-  Id  _get_generalized_variogram_order();
-  void _getStatistics(Db *db);
-  Id  _updateVerr(Db *db, Id idir, Vario_Order *vorder, Id verr_mode);
-  static double _s(Db *db, Id iech, Id jech);
-  double _g(Db *db, Id iech, Id jech) const;
-  void _calculateBiasLocal(Db *db,
+  static Id _getRelativeSampleRank(Db* db, Id iech0);
+  Id _updateUK(Db* db, Vario_Order* vorder);
+  void _patchC00(Db* db, Id idir);
+  Id _get_generalized_variogram_order();
+  void _getStatistics(Db* db);
+  Id _updateVerr(Db* db, Id idir, Vario_Order* vorder, Id verr_mode);
+  static double _s(Db* db, Id iech, Id jech);
+  double _g(Db* db, Id iech, Id jech) const;
+  void _calculateBiasLocal(Db* db,
                            Id idir,
                            Id ilag,
-                           Vario_Order *vorder,
+                           Vario_Order* vorder,
                            Id ifirst,
                            Id ilast);
-  void _calculateBiasGlobal(Db *db);
+  void _calculateBiasGlobal(Db* db);
   double _getBias(Id iiech, Id jjech);
 
-  void _calculateFromGeometry(Db *db, Id idir, Vario_Order *vorder);
-  Id  _calculateGeneralSolution1(Db *db, Id idir, const Id *rindex, Vario_Order *vorder);
-  Id  _calculateGeneralSolution2(Db *db, Id idir, const Id *rindex);
-  Id  _calculateOnGridSolution(DbGrid *db, Id idir);
-  Id  _calculateGenOnGridSolution(DbGrid *db, Id idir, Id norder);
-  Id  _calculateVarioVectSolution(Db *db, Id idir, Id ncomp, const Id *rindex);
-  void _calculateOnLineSolution(Db *db, Id idir, Id norder);
+  void _calculateFromGeometry(Db* db, Id idir, Vario_Order* vorder);
+  Id _calculateGeneralSolution1(Db* db, Id idir, const Id* rindex, Vario_Order* vorder);
+  Id _calculateGeneralSolution2(Db* db, Id idir, const Id* rindex);
+  Id _calculateOnGridSolution(DbGrid* db, Id idir);
+  Id _calculateGenOnGridSolution(DbGrid* db, Id idir, Id norder);
+  Id _calculateVarioVectSolution(Db* db, Id idir, Id ncomp, const Id* rindex);
+  void _calculateOnLineSolution(Db* db, Id idir, Id norder);
 
-  void _driftManage(Db *db);
-  Id  _driftEstimateCoefficients(Db *db);
+  void _driftManage(Db* db);
+  Id _driftEstimateCoefficients(Db* db);
 
   static void _printDebug(Id iech1,
                           Id iech2,
@@ -448,26 +447,26 @@ private:
                           Id ilag,
                           double scale,
                           double value);
-  void _centerCovariance(Db *db, Id idir);
-  void _getVarioVectStatistics(Db *db, Id ncomp);
+  void _centerCovariance(Db* db, Id idir);
+  void _getVarioVectStatistics(Db* db, Id ncomp);
   void _rescale(Id idir);
-  bool _isCompatible(const Db *db) const;
+  bool _isCompatible(const Db* db) const;
   static double _linear_interpolate(Id n,
                                     const VectorDouble& x,
                                     const VectorDouble& y,
                                     double x0);
-  MatrixSquare _evalAverageDbIncr(Model *model,
-                                         const Db &db,
-                                         const VectorDouble &incr = VectorDouble(),
-                                         const CovCalcMode *mode = nullptr) const;
+  MatrixSquare _evalAverageDbIncr(Model* model,
+                                  const Db& db,
+                                  const VectorDouble& incr = VectorDouble(),
+                                  const CovCalcMode* mode  = nullptr) const;
 
 private:
-  Id                _nVar;
-  VarioParam         _varioparam;
-  VectorDouble       _means;
-  VectorDouble       _vars;
-  bool               _flagSample;
-  Db*                _db;
+  Id _nVar;
+  VarioParam _varioparam;
+  VectorDouble _means;
+  VectorDouble _vars;
+  bool _flagSample;
+  Db* _db;
   VectorVectorDouble _sw;      /* Array for number of lags */
   VectorVectorDouble _gg;      /* Array for average variogram values */
   VectorVectorDouble _hh;      /* Array for average distance values */
@@ -475,20 +474,20 @@ private:
 
   Id _biPtsPerDirection;
   std::vector<ABiTargetCheck*> _bipts;
-  mutable bool       _flagAsym;
+  mutable bool _flagAsym;
 
   bool _verbose;
   bool _flag_UK;
-  Id  _niter_UK;
+  Id _niter_UK;
 
-  VectorString          _variableNames;
-  mutable Model*        _model;  // Model pointer (not to be deleted) for drift removal
-  mutable VectorDouble  _BETA;
-  mutable VectorDouble  _DRFDIAG;
-  mutable MatrixDense   _DRFXA;
-  mutable MatrixDense   _DRFGX;
-  mutable MatrixDense   _DRFTAB;
-  mutable MatrixSquare  _DRFXGX;
+  VectorString _variableNames;
+  mutable Model* _model; // Model pointer (not to be deleted) for drift removal
+  mutable VectorDouble _BETA;
+  mutable VectorDouble _DRFDIAG;
+  mutable MatrixDense _DRFXA;
+  mutable MatrixDense _DRFGX;
+  mutable MatrixDense _DRFTAB;
+  mutable MatrixSquare _DRFXGX;
 };
 
 GSTLEARN_EXPORT Vario_Order*
@@ -500,19 +499,27 @@ GSTLEARN_EXPORT void vario_order_print(Vario_Order* vorder,
                                        Id ipas_target,
                                        Id verbose);
 GSTLEARN_EXPORT void vario_order_get_bounds(
-  Vario_Order* vorder, Id idir, Id ilag, Id* ifirst, Id* ilast);
+  Vario_Order* vorder,
+  Id idir,
+  Id ilag,
+  Id* ifirst,
+  Id* ilast);
 GSTLEARN_EXPORT void vario_order_get_indices(
-  Vario_Order* vorder, Id ipair, Id* iech, Id* jech, double* dist);
+  Vario_Order* vorder,
+  Id ipair,
+  Id* iech,
+  Id* jech,
+  double* dist);
 GSTLEARN_EXPORT void vario_order_get_auxiliary(Vario_Order* vorder,
                                                Id ipair,
                                                char* aux_iech,
                                                char* aux_jech);
 GSTLEARN_EXPORT Id vario_order_add(Vario_Order* vorder,
-                                    Id iech,
-                                    Id jech,
-                                    void* aux_iech,
-                                    void* aux_jech,
-                                    Id ilag,
-                                    Id idir,
-                                    double dist);
-}
+                                   Id iech,
+                                   Id jech,
+                                   void* aux_iech,
+                                   void* aux_jech,
+                                   Id ilag,
+                                   Id idir,
+                                   double dist);
+} // namespace gstlrn

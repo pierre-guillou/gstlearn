@@ -71,7 +71,7 @@ String SpaceSN::toString(const AStringFormat* strfmt, Id idx) const
 bool SpaceSN::isEqual(const ASpace *space) const
 {
   if (!ASpace::isEqual(space)) return false;
-  const SpaceSN* s = dynamic_cast<const SpaceSN*>(space);
+  const auto* s = dynamic_cast<const SpaceSN*>(space);
   return s != nullptr && _radius == s->_radius;
 }
 

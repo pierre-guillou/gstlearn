@@ -4371,7 +4371,7 @@ bool Vario::keepPair(Id idir, SpaceTarget& T1, SpaceTarget& T2, double* dist) co
   {
     const ABiTargetCheck* bipts = getBipts(idir, ipt);
     if (!bipts->isOK(T1, T2)) return false;
-    const BiTargetCheckGeometry* bigeom = dynamic_cast<const BiTargetCheckGeometry*>(bipts);
+    const auto* bigeom = dynamic_cast<const BiTargetCheckGeometry*>(bipts);
     if (bigeom != nullptr) *dist = bigeom->getDist();
   }
   return true;

@@ -281,7 +281,7 @@ void AnamDiscrete::setNCut(Id ncut)
 
 void AnamDiscrete::setZCut(const VectorDouble& zcut)
 {
-  _nCut = (Id)zcut.size();
+  _nCut = static_cast<Id>(zcut.size());
   _resize();
   _zCut = zcut;
 };
@@ -296,7 +296,7 @@ void AnamDiscrete::setStats(const VectorDouble& stats)
 {
   auto nclass = getNClass();
   auto nelem  = getNElem();
-  if ((Id)stats.size() != nclass * nelem)
+  if (static_cast<Id>(stats.size()) != nclass * nelem)
   {
     messerr("Argument 'stats' incorrect. Its dimension (%d) should be %d * %d",
             stats.size(), nclass, nelem);
@@ -314,7 +314,7 @@ bool AnamDiscrete::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   }
 
   /* Read the grid characteristics */
-  bool ret   = true;
+  bool ret  = true;
   Id ncut   = 0;
   Id nclass = 0;
   Id nelem  = 0;

@@ -13,11 +13,11 @@
 #include "Space/ASpace.hpp"
 #include "gstlearn_export.hpp"
 
-#include "Variogram/DirParam.hpp"
-#include "Faults/Faults.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Basic/ICloneable.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/ICloneable.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Faults/Faults.hpp"
+#include "Variogram/DirParam.hpp"
 
 namespace gstlrn
 {
@@ -37,12 +37,12 @@ class Model;
  * Note that this class also stores a pointer to any Faults definition, if to be used during the
  * calculation of the Spatial Characteristics.
  */
-class GSTLEARN_EXPORT VarioParam : public AStringable, public ICloneable
+class GSTLEARN_EXPORT VarioParam: public AStringable, public ICloneable
 {
 public:
-  VarioParam(double scale = 0.,
+  VarioParam(double scale              = 0.,
              const VectorDouble& dates = VectorDouble(),
-             const Faults* faults = nullptr);
+             const Faults* faults      = nullptr);
   VarioParam(const VarioParam& VarioParam,
              const VectorInt& dircols,
              const Faults* faults = nullptr);
@@ -58,46 +58,46 @@ public:
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Shortcuts
-  static VarioParam* createOmniDirection(Id nlag = 10,
-                                         double dlag = 1.,
-                                         double toldis = 0.5,
-                                         Id opt_code = 0,
-                                         Id idate = 0,
-                                         double bench = TEST,
-                                         double cylrad = TEST,
-                                         double tolcode = 0.,
-                                         const VectorDouble& breaks = VectorDouble(),
-                                         double scale = 0.,
-                                         const VectorDouble& dates = VectorDouble(),
+  static VarioParam* createOmniDirection(Id nlag                      = 10,
+                                         double dlag                  = 1.,
+                                         double toldis                = 0.5,
+                                         Id opt_code                  = 0,
+                                         Id idate                     = 0,
+                                         double bench                 = TEST,
+                                         double cylrad                = TEST,
+                                         double tolcode               = 0.,
+                                         const VectorDouble& breaks   = VectorDouble(),
+                                         double scale                 = 0.,
+                                         const VectorDouble& dates    = VectorDouble(),
                                          const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static VarioParam* createMultiple(Id ndir,
-                                    Id nlag = 10,
-                                    double dlag = 1.,
-                                    double toldis = 0.5,
-                                    double angref = 0.,
-                                    double scale = 0.,
-                                    const VectorDouble& dates = VectorDouble(),
+                                    Id nlag                      = 10,
+                                    double dlag                  = 1.,
+                                    double toldis                = 0.5,
+                                    double angref                = 0.,
+                                    double scale                 = 0.,
+                                    const VectorDouble& dates    = VectorDouble(),
                                     const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static VarioParam* createMultipleFromGrid(const DbGrid* dbgrid,
                                             Id nlag,
                                             double scale                 = 0.,
                                             const VectorDouble& dates    = VectorDouble(),
                                             const ASpaceSharedPtr& space = ASpaceSharedPtr(),
-                                            Id ndimax                   = 0);
-  static VarioParam* createFromSpaceDimension(Id nlag = 10,
-                                              double dlag = 1.,
-                                              double toldis = 0.5,
-                                              double tolang = 45.,
-                                              double scale = 0.,
-                                              const VectorDouble &dates = VectorDouble(),
+                                            Id ndimax                    = 0);
+  static VarioParam* createFromSpaceDimension(Id nlag                      = 10,
+                                              double dlag                  = 1.,
+                                              double toldis                = 0.5,
+                                              double tolang                = 45.,
+                                              double scale                 = 0.,
+                                              const VectorDouble& dates    = VectorDouble(),
                                               const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static VarioParam* createSeveral2D(const VectorDouble &angles,
-                                     Id nlag = 10,
-                                     double dlag = 1.,
-                                     double toldis = 0.5,
-                                     double tolang = TEST,
-                                     double scale = 0.,
-                                     const VectorDouble& dates = VectorDouble(),
+  static VarioParam* createSeveral2D(const VectorDouble& angles,
+                                     Id nlag                      = 10,
+                                     double dlag                  = 1.,
+                                     double toldis                = 0.5,
+                                     double tolang                = TEST,
+                                     double scale                 = 0.,
+                                     const VectorDouble& dates    = VectorDouble(),
                                      const ASpaceSharedPtr& space = ASpaceSharedPtr());
 
   void addDir(const DirParam& dirparam);
@@ -107,8 +107,8 @@ public:
 
   ASpaceSharedPtr getSpace() const { return _dirparams[0].getSpace(); }
   double getScale() const { return _scale; }
-  Id    getNDate() const { return (Id) _dates.size() / 2; }
-  Id    getNDir() const { return (Id) _dirparams.size(); }
+  Id getNDate() const { return static_cast<Id>(_dates.size() / 2); }
+  Id getNDir() const { return static_cast<Id>(_dirparams.size()); }
   const VectorDouble& getDates() const { return _dates; }
   double getDate(Id idate, Id icas) const;
   Id getNLag(Id idir) const;
@@ -119,11 +119,11 @@ public:
   bool isDefinedForGrid() const;
 
   Id hasDate() const { return (getNDate() > 0 && (_dates[0] > MINIMUM_BIG || _dates[1] < MAXIMUM_BIG)); }
-  bool isDateUsed(const Db *db1, const Db *db2 = nullptr) const;
+  bool isDateUsed(const Db* db1, const Db* db2 = nullptr) const;
 
   void setScale(double scale) { _scale = scale; }
   void setDates(const VectorDouble& dates) { _dates = dates; }
-  void setDPas(Id idir,const DbGrid* db);
+  void setDPas(Id idir, const DbGrid* db);
   void setGrincr(Id idir, const VectorInt& grincr);
 
   String toStringMain(const AStringFormat* strfmt = nullptr) const;
@@ -133,7 +133,7 @@ public:
   void addFaults(const Faults* faults) { _faults = faults; }
 
 private:
-  Id  _getAddress(Id ivar, Id jvar) const;
+  Id _getAddress(Id ivar, Id jvar) const;
   bool _isVariableValid(Id ivar) const;
   bool _isDirectionValid(Id idir) const;
   bool _isBivariableValid(Id i) const;
@@ -144,11 +144,11 @@ private:
   bool _validDefinedFromGrid(const DirParam& dirparam) const;
 
 private:
-  double                _scale;
-  VectorDouble          _dates;
+  double _scale;
+  VectorDouble _dates;
   std::vector<DirParam> _dirparams;
-  const Faults*         _faults; // Pointer copy (not to be deleted)
+  const Faults* _faults; // Pointer copy (not to be deleted)
 };
 
-GSTLEARN_EXPORT Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam);
-}
+GSTLEARN_EXPORT Db* buildDbFromVarioParam(Db* db, const VarioParam& varioparam);
+} // namespace gstlrn

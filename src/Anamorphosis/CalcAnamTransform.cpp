@@ -82,7 +82,7 @@ bool CalcAnamTransform::_hasInputVarDefined(Id mode) const
   }
 
   // Check that the UID are valid
-  for (Id i = 0; i < (Id)_iptrEst.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(_iptrEst.size()); i++)
     if (_iptrEst[i] < 0)
     {
       messerr("An estimation variable is not correctly defined");
@@ -100,7 +100,7 @@ bool CalcAnamTransform::_hasInputVarDefined(Id mode) const
   }
 
   // Check that the UID are valid
-  for (Id i = 0; i < (Id)_iptrStd.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(_iptrStd.size()); i++)
     if (_iptrStd[i] < 0)
     {
       if (mode == 0)
@@ -174,7 +174,7 @@ bool CalcAnamTransform::_check()
   if (_flagToFactors)
   {
     if (!_hasVariableNumber(true)) return false;
-    Id nmax  = _anam->getNFactor();
+    Id nmax    = _anam->getNFactor();
     auto nfact = _getNfact();
     for (Id ifac = 0; ifac < nfact; ifac++)
       if (_ifacs[ifac] < 1 || _ifacs[ifac] > nmax)
@@ -226,21 +226,21 @@ bool CalcAnamTransform::_preprocess()
   if (_flagVars)
   {
     auto nvar = _getNVar();
-    _iattVar = getDb()->addColumnsByConstant(nvar);
+    _iattVar  = getDb()->addColumnsByConstant(nvar);
     return (_iattVar >= 0);
   }
 
   if (_flagToFactors)
   {
     auto nfact = _getNfact();
-    _iattFac  = getDb()->addColumnsByConstant(nfact);
+    _iattFac   = getDb()->addColumnsByConstant(nfact);
     return (_iattFac >= 0);
   }
 
   if (_flagDisjKrig)
   {
     auto nvarout = _getNSel();
-    _iattSel    = getDb()->addColumnsByConstant(nvarout, TEST);
+    _iattSel     = getDb()->addColumnsByConstant(nvarout, TEST);
     if (_iattSel < 0) return 1;
     return true;
   }
@@ -248,7 +248,7 @@ bool CalcAnamTransform::_preprocess()
   if (_flagCondExp)
   {
     auto nvarout = _getNSel();
-    _iattSel    = getDb()->addColumnsByConstant(nvarout, TEST);
+    _iattSel     = getDb()->addColumnsByConstant(nvarout, TEST);
     if (_iattSel < 0) return 1;
     return true;
   }
@@ -256,7 +256,7 @@ bool CalcAnamTransform::_preprocess()
   if (_flagUniCond)
   {
     auto nvarout = _getNSel();
-    _iattSel    = getDb()->addColumnsByConstant(nvarout, TEST);
+    _iattSel     = getDb()->addColumnsByConstant(nvarout, TEST);
     if (_iattSel < 0) return 1;
     return true;
   }
@@ -398,8 +398,8 @@ bool CalcAnamTransform::_ZToYByNormalScore()
 
 bool CalcAnamTransform::_ZToYByHermite()
 {
-  auto nvar                   = _getNVar();
-  const AnamContinuous* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
+  int nvar          = _getNVar();
+  const auto* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
 
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
@@ -413,8 +413,8 @@ bool CalcAnamTransform::_ZToYByHermite()
 
 bool CalcAnamTransform::_YToZByHermite()
 {
-  auto nvar                   = _getNVar();
-  const AnamContinuous* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
+  int nvar          = _getNVar();
+  const auto* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
 
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
@@ -489,11 +489,11 @@ bool CalcAnamTransform::_FactorsToSelectivity()
  **
  *****************************************************************************/
 Id DisjunctiveKriging(Db* db,
-                       AAnam* anam,
-                       Selectivity* selectivity,
-                       const VectorString& name_est,
-                       const VectorString& name_std,
-                       const NamingConvention& namconv)
+                      AAnam* anam,
+                      Selectivity* selectivity,
+                      const VectorString& name_est,
+                      const VectorString& name_std,
+                      const NamingConvention& namconv)
 {
   CalcAnamTransform transfo(anam);
   transfo.setDb(db);
@@ -526,14 +526,14 @@ Id DisjunctiveKriging(Db* db,
  **
  *****************************************************************************/
 Id ConditionalExpectation(Db* db,
-                           AAnam* anam,
-                           Selectivity* selectivity,
-                           const String& name_est,
-                           const String& name_std,
-                           bool flag_OK,
-                           double proba,
-                           Id nbsimu,
-                           const NamingConvention& namconv)
+                          AAnam* anam,
+                          Selectivity* selectivity,
+                          const String& name_est,
+                          const String& name_std,
+                          bool flag_OK,
+                          double proba,
+                          Id nbsimu,
+                          const NamingConvention& namconv)
 {
   CalcAnamTransform transfo(anam);
   transfo.setDb(db);
@@ -569,11 +569,11 @@ Id ConditionalExpectation(Db* db,
  **
  *****************************************************************************/
 Id UniformConditioning(Db* db,
-                        AAnam* anam,
-                        Selectivity* selectivity,
-                        const String& name_est,
-                        const String& name_varz,
-                        const NamingConvention& namconv)
+                       AAnam* anam,
+                       Selectivity* selectivity,
+                       const String& name_est,
+                       const String& name_varz,
+                       const NamingConvention& namconv)
 {
   CalcAnamTransform transfo(anam);
   transfo.setDb(db);
@@ -606,21 +606,21 @@ Id UniformConditioning(Db* db,
  **
  *****************************************************************************/
 Id CalcAnamTransform::_conditionalExpectation(Db* db,
-                                               AAnam* anam,
-                                               const Selectivity* selectivity,
-                                               Id iptr0,
-                                               Id col_est,
-                                               Id col_std,
-                                               bool flag_OK,
-                                               double proba,
-                                               Id nbsimu)
+                                              AAnam* anam,
+                                              const Selectivity* selectivity,
+                                              Id iptr0,
+                                              Id col_est,
+                                              Id col_std,
+                                              bool flag_OK,
+                                              double proba,
+                                              Id nbsimu)
 {
   AnamHermite* anam_hermite = dynamic_cast<AnamHermite*>(anam);
 
   /* Analyzing the codes */
 
   VectorDouble ycuts = anam_hermite->rawToTransformVec(selectivity->getZcut());
-  Id need_T         = selectivity->isNeededT();
+  Id need_T          = selectivity->isNeededT();
 
   /* Computing the estimation */
 
@@ -708,11 +708,11 @@ Id CalcAnamTransform::_conditionalExpectation(Db* db,
  **
  *****************************************************************************/
 Id CalcAnamTransform::_uniformConditioning(Db* db,
-                                            AnamHermite* anam,
-                                            Selectivity* selectivity,
-                                            Id iptr0,
-                                            Id col_est,
-                                            Id col_var)
+                                           AnamHermite* anam,
+                                           Selectivity* selectivity,
+                                           Id iptr0,
+                                           Id col_est,
+                                           Id col_var)
 {
   //  anam->setFlagBound(1);
   Id nbpoly = anam->getNbPoly();
@@ -795,7 +795,7 @@ Id CalcAnamTransform::_uniformConditioning(Db* db,
                               sqrt(1. - (sv / r_coef) * (sv / r_coef)));
       VectorDouble hn = hermitePolynomials(yv, 1., nbpoly);
       for (Id ih = 0; ih < nbpoly; ih++)
-        hn[ih] *= pow(sv / r_coef, (double)ih);
+        hn[ih] *= pow(sv / r_coef, static_cast<double>(ih));
       double metal;
       matrix_product_safe(1, nbpoly, 1, hn.data(), phi_b_zc[icut].data(),
                           &metal);
@@ -906,13 +906,13 @@ void CalcAnamTransform::_getVectorsForCE(Db* db,
  **
  *****************************************************************************/
 Id CalcAnamTransform::_ceZ(Db* db,
-                            const AnamHermite* anam,
-                            const Selectivity* selectivity,
-                            Id iptr0,
-                            Id col_est,
-                            Id col_std,
-                            Id nbsimu,
-                            bool flag_OK)
+                           const AnamHermite* anam,
+                           const Selectivity* selectivity,
+                           Id iptr0,
+                           Id col_est,
+                           Id col_std,
+                           Id nbsimu,
+                           bool flag_OK)
 {
   VectorDouble krigest, krigstd, valest, valstd;
 
@@ -960,14 +960,14 @@ Id CalcAnamTransform::_ceZ(Db* db,
  **
  *****************************************************************************/
 Id CalcAnamTransform::_ceT(Id mode,
-                            Db* db,
-                            const Selectivity* selectivity,
-                            Id iptr0,
-                            Id col_est,
-                            Id col_std,
-                            const VectorDouble& ycuts,
-                            Id nbsimu,
-                            bool flag_OK)
+                           Db* db,
+                           const Selectivity* selectivity,
+                           Id iptr0,
+                           Id col_est,
+                           Id col_std,
+                           const VectorDouble& ycuts,
+                           Id nbsimu,
+                           bool flag_OK)
 {
   VectorDouble krigest, krigstd, valest, valstd;
 
@@ -1029,13 +1029,13 @@ Id CalcAnamTransform::_ceT(Id mode,
  **
  *****************************************************************************/
 Id CalcAnamTransform::_ceQuant(Db* db,
-                                const AnamHermite* anam,
-                                const Selectivity* selectivity,
-                                Id iptr0,
-                                Id col_est,
-                                Id col_std,
-                                double proba,
-                                bool flag_OK)
+                               const AnamHermite* anam,
+                               const Selectivity* selectivity,
+                               Id iptr0,
+                               Id col_est,
+                               Id col_std,
+                               double proba,
+                               bool flag_OK)
 {
   double krigest, krigstd;
 
@@ -1069,14 +1069,14 @@ Id CalcAnamTransform::_ceQuant(Db* db,
  **
  *****************************************************************************/
 Id CalcAnamTransform::_ceQ(Db* db,
-                            const AnamHermite* anam,
-                            const Selectivity* selectivity,
-                            Id iptr0,
-                            Id col_est,
-                            Id col_std,
-                            const VectorDouble& ycuts,
-                            Id nbsimu,
-                            bool flag_OK)
+                           const AnamHermite* anam,
+                           const Selectivity* selectivity,
+                           Id iptr0,
+                           Id col_est,
+                           Id col_std,
+                           const VectorDouble& ycuts,
+                           Id nbsimu,
+                           bool flag_OK)
 {
   VectorDouble krigest, krigstd, valest, valstd;
 
@@ -1127,9 +1127,9 @@ Id CalcAnamTransform::_ceQ(Db* db,
  **
  *****************************************************************************/
 Id CalcAnamTransform::_ceB(Db* db,
-                            const Selectivity* selectivity,
-                            Id iptr0,
-                            const VectorDouble& ycuts)
+                           const Selectivity* selectivity,
+                           Id iptr0,
+                           const VectorDouble& ycuts)
 {
   double t, q;
 

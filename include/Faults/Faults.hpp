@@ -12,10 +12,9 @@
 
 #include "gstlearn_export.hpp"
 
-#include "Basic/PolyLine2D.hpp"
-#include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
-
+#include "Basic/AStringable.hpp"
+#include "Basic/PolyLine2D.hpp"
 
 namespace gstlrn
 {
@@ -34,13 +33,13 @@ public:
 
   static Faults* createFromNF(const String& NFFilename, bool verbose = true);
 
-  Id getNFaults() const { return (Id) _faults.size(); }
+  Id getNFaults() const { return static_cast<Id>(_faults.size()); }
   void addFault(const PolyLine2D& fault);
 
   inline const std::vector<PolyLine2D>& getFaults() const { return _faults; }
   inline const PolyLine2D& getFault(Id ifault) const { return _faults[ifault]; }
 
-  bool isSplitByFault(double xt1,double yt1, double xt2, double yt2) const;
+  bool isSplitByFault(double xt1, double yt1, double xt2, double yt2) const;
   bool isSplitByFaultSP(const SpacePoint& P1, const SpacePoint& P2) const;
 
 protected:
@@ -55,4 +54,4 @@ protected:
 private:
   std::vector<PolyLine2D> _faults;
 };
-}
+} // namespace gstlrn

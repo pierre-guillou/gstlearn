@@ -158,8 +158,8 @@ Id CalcSimuTurningBands::_generateDirections(const Db* dbout)
 
     for (Id id = 0; id < 2; id++)
     {
-      Id n    = 1 + ibs;
-      Id p    = id + 2;
+      Id n     = 1 + ibs;
+      Id p     = id + 2;
       x[id]    = 0;
       double d = id + 2;
       while (n > 0)
@@ -247,8 +247,8 @@ Id CalcSimuTurningBands::_generateDirections(const Db* dbout)
 
         if (dbout->isGrid())
         {
-          const DbGrid* dbgrid = dynamic_cast<const DbGrid*>(dbout);
-          double t00           = _codirs[ibs].projectGrid(dbgrid, 0, 0, 0);
+          const auto* dbgrid = dynamic_cast<const DbGrid*>(dbout);
+          double t00         = _codirs[ibs].projectGrid(dbgrid, 0, 0, 0);
           _setCodirT00(ibs, t00);
           _setCodirDXP(ibs, _codirs[ibs].projectGrid(dbgrid, 1, 0, 0) - t00);
           _setCodirDYP(ibs, _codirs[ibs].projectGrid(dbgrid, 0, 1, 0) - t00);
@@ -291,8 +291,8 @@ void CalcSimuTurningBands::_dumpBands() const
 void CalcSimuTurningBands::_rotateDirections(double a[3], double theta)
 {
   double dirs[3];
-  double ct  = cos(theta);
-  double st  = sin(theta);
+  double ct   = cos(theta);
+  double st   = sin(theta);
   auto nbands = getNDirs();
 
   /* Loop on the direction coefficients */
@@ -322,10 +322,10 @@ void CalcSimuTurningBands::_minmax(const Db* db)
 
   if (db->isGrid())
   {
-    const DbGrid* dbgrid = dynamic_cast<const DbGrid*>(db);
-    Id nx               = (dbgrid->getNDim() >= 1) ? dbgrid->getNX(0) : 1;
-    Id ny               = (dbgrid->getNDim() >= 2) ? dbgrid->getNX(1) : 1;
-    Id nz               = (dbgrid->getNDim() >= 3) ? dbgrid->getNX(2) : 1;
+    const auto* dbgrid = dynamic_cast<const DbGrid*>(db);
+    Id nx              = (dbgrid->getNDim() >= 1) ? dbgrid->getNX(0) : 1;
+    Id ny              = (dbgrid->getNDim() >= 2) ? dbgrid->getNX(1) : 1;
+    Id nz              = (dbgrid->getNDim() >= 3) ? dbgrid->getNX(2) : 1;
 
     /* Case when the data obeys to a grid organization */
     /* This test is programmed for 3-D (maximum) grid  */
@@ -828,7 +828,7 @@ double CalcSimuTurningBands::_spline1DInit(Id ibs,
   static double twoPI, twokp1s2, log3s2, logkp3s2, logkp1, coeff;
   static Id twok  = 0;
   static Id k_mem = -1;
-  double scale     = _getCodirScale(ibs);
+  double scale    = _getCodirScale(ibs);
 
   if (ibs == 0 || k != k_mem)
   {
@@ -958,7 +958,7 @@ VectorDouble CalcSimuTurningBands::_createAIC()
     for (Id ivar = 0; ivar < nvar; ivar++)
       for (Id jvar = 0; jvar < nvar; jvar++)
       {
-        Id ijvar                       = ivar + nvar * jvar;
+        Id ijvar                        = ivar + nvar * jvar;
         aic[icov * nvar * nvar + ijvar] = vecpro->getValue(ivar, jvar) * sqrt(valpro[ivar]);
       }
   }
@@ -984,7 +984,7 @@ void CalcSimuTurningBands::_spreadRegularOnGrid(Id nx,
   double dyp = _getCodirDYP(ibs);
   double dzp = _getCodirDZP(ibs);
 
-  t0z     = t00;
+  t0z    = t00;
   Id ind = 0;
   for (Id iz = 0; iz < nz; iz++)
   {
@@ -1102,7 +1102,7 @@ void CalcSimuTurningBands::_simulatePoint(Db* db,
                                           Id icase,
                                           Id shift)
 {
-  Id nech      = db->getNSample();
+  Id nech       = db->getNSample();
   auto ncova    = _getNCov();
   auto nvar     = _getNVar();
   auto nbsimu   = getNbSimu();
@@ -1256,11 +1256,11 @@ void CalcSimuTurningBands::_simulateGrid(DbGrid* db,
   double theta1          = 1. / _theta;
   auto nvar              = _getNVar();
   auto ncova             = _getNCov();
-  Id ndim               = db->getNDim();
-  Id nx                 = (ndim >= 1) ? db->getNX(0) : 1;
-  Id ny                 = (ndim >= 2) ? db->getNX(1) : 1;
-  Id nz                 = (ndim >= 3) ? db->getNX(2) : 1;
-  Id nech               = nx * ny * nz;
+  Id ndim                = db->getNDim();
+  Id nx                  = (ndim >= 1) ? db->getNX(0) : 1;
+  Id ny                  = (ndim >= 2) ? db->getNX(1) : 1;
+  Id nz                  = (ndim >= 3) ? db->getNX(2) : 1;
+  Id nech                = nx * ny * nz;
   double norme           = sqrt(1. / _nbtuba);
   VectorBool activeArray = db->getActiveArray();
 
@@ -1408,8 +1408,8 @@ void CalcSimuTurningBands::_simulateGradient(Db* dbgrd,
                                              double delta)
 {
   Id jsimu;
-  Id icase              = 0;
-  Id ndim               = dbgrd->getNDim();
+  Id icase               = 0;
+  Id ndim                = dbgrd->getNDim();
   auto nbsimu            = getNbSimu();
   VectorBool activeArray = dbgrd->getActiveArray();
 
@@ -1483,7 +1483,7 @@ void CalcSimuTurningBands::_simulateTangent(Db* dbtgt,
                                             const VectorDouble& aic,
                                             double delta)
 {
-  Id icase              = 0;
+  Id icase               = 0;
   auto nvar              = _getNVar();
   auto nbsimu            = getNbSimu();
   VectorBool activeArray = dbtgt->getActiveArray();
@@ -1588,7 +1588,7 @@ void CalcSimuTurningBands::_simulateNugget(Db* db,
                                            const VectorDouble& aic,
                                            Id icase)
 {
-  Id nech               = db->getNSample();
+  Id nech                = db->getNSample();
   auto ncova             = _getNCov();
   auto nvar              = _getNVar();
   auto nbsimu            = getNbSimu();
@@ -1661,11 +1661,11 @@ void CalcSimuTurningBands::_difference(Db* dbin,
 {
   auto nbsimu = getNbSimu();
   auto nvar   = _getNVar();
-  double r   = 1.;
+  double r    = 1.;
   if (flag_dgm)
   {
-    const AnamHermite* anamH = dynamic_cast<const AnamHermite*>(model->getAnam());
-    r                        = anamH->getRCoef();
+    const auto* anamH = dynamic_cast<const AnamHermite*>(model->getAnam());
+    r                 = anamH->getRCoef();
   }
 
   /* Transform the non conditional simulation into simulation error */
@@ -1744,7 +1744,7 @@ void CalcSimuTurningBands::_meanCorrect(Db* dbout, Id icase)
   if (_flagBayes) return;
   auto nbsimu = getNbSimu();
   auto nvar   = _getNVar();
-  Id nech   = dbout->getNSample();
+  Id nech     = dbout->getNSample();
 
   VectorBool activeArray = dbout->getActiveArray();
 
@@ -1794,7 +1794,7 @@ void CalcSimuTurningBands::_updateData2ToTarget(Db* dbin,
   if (dbin->getNSample() <= 0) return;
   if (flag_dgm) return;
   auto nvar   = _getNVar();
-  Id ndim   = dbin->getNDim();
+  Id ndim     = dbin->getNDim();
   auto nbsimu = getNbSimu();
 
   /* Calculate the field extension */
@@ -1998,16 +1998,16 @@ bool CalcSimuTurningBands::_run()
  **
  *****************************************************************************/
 Id CalcSimuTurningBands::simulate(Db* dbin,
-                                   Db* dbout,
-                                   Model* model,
-                                   ANeigh* neigh,
-                                   Id icase,
-                                   Id flag_bayes,
-                                   const VectorDouble& dmean,
-                                   const MatrixSymmetric& dcov,
-                                   bool flag_pgs,
-                                   bool flag_gibbs,
-                                   bool flag_dgm)
+                                  Db* dbout,
+                                  Model* model,
+                                  ANeigh* neigh,
+                                  Id icase,
+                                  Id flag_bayes,
+                                  const VectorDouble& dmean,
+                                  const MatrixSymmetric& dcov,
+                                  bool flag_pgs,
+                                  bool flag_gibbs,
+                                  bool flag_dgm)
 {
   setDbin(dbin);
   setDbout(dbout);
@@ -2040,11 +2040,11 @@ Id CalcSimuTurningBands::simulate(Db* dbin,
  **
  *****************************************************************************/
 Id CalcSimuTurningBands::simulatePotential(Db* dbiso,
-                                            Db* dbgrd,
-                                            Db* dbtgt,
-                                            Db* dbout,
-                                            Model* model,
-                                            double delta)
+                                           Db* dbgrd,
+                                           Db* dbtgt,
+                                           Db* dbout,
+                                           Model* model,
+                                           double delta)
 {
   setDbout(dbout);
   setModel(model);
@@ -2350,15 +2350,15 @@ void CalcSimuTurningBands::_rollback()
  **
  *****************************************************************************/
 Id simtub(Db* dbin,
-           Db* dbout,
-           Model* model,
-           ANeigh* neigh,
-           Id nbsimu,
-           Id seed,
-           Id nbtuba,
-           bool flag_dgm,
-           bool flag_check,
-           const NamingConvention& namconv)
+          Db* dbout,
+          Model* model,
+          ANeigh* neigh,
+          Id nbsimu,
+          Id seed,
+          Id nbtuba,
+          bool flag_dgm,
+          bool flag_check,
+          const NamingConvention& namconv)
 {
   // Instantiate the Calculator
   CalcSimuTurningBands situba(nbsimu, nbtuba, flag_check, seed);
@@ -2401,16 +2401,16 @@ Id simtub(Db* dbin,
  **
  *****************************************************************************/
 Id simbayes(Db* dbin,
-             Db* dbout,
-             Model* model,
-             ANeigh* neigh,
-             Id nbsimu,
-             Id seed,
-             const VectorDouble& dmean,
-             const MatrixSymmetric& dcov,
-             Id nbtuba,
-             bool flag_check,
-             const NamingConvention& namconv)
+            Db* dbout,
+            Model* model,
+            ANeigh* neigh,
+            Id nbsimu,
+            Id seed,
+            const VectorDouble& dmean,
+            const MatrixSymmetric& dcov,
+            Id nbtuba,
+            bool flag_check,
+            const NamingConvention& namconv)
 {
   // Instantiate the Calculator
   CalcSimuTurningBands situba(nbsimu, nbtuba, flag_check, seed);

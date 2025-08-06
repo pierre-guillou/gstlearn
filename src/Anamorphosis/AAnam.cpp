@@ -156,7 +156,7 @@ bool AAnam::_isSampleSkipped(Db* db,
 
   if (!db->isActive(iech)) return true;
 
-  Id nb_est = (Id)cols_est.size();
+  Id nb_est = static_cast<Id>(cols_est.size());
   if (!cols_est.empty())
   {
     for (Id ivar = 0; ivar < nb_est; ivar++)
@@ -166,7 +166,7 @@ bool AAnam::_isSampleSkipped(Db* db,
     }
   }
 
-  Id nb_std = (Id)cols_std.size();
+  Id nb_std = static_cast<Id>(cols_std.size());
   if (!cols_std.empty())
   {
     for (Id ivar = 0; ivar < nb_std; ivar++)
@@ -225,7 +225,7 @@ void AAnam::_printQTvars(const char* title, Id type, Id number)
 VectorDouble AAnam::rawToTransformVec(const VectorDouble& z) const
 {
   VectorDouble y(z.size(), TEST);
-  for (Id i = 0; i < (Id)z.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(z.size()); i++)
     y[i] = rawToTransformValue(z[i]);
   return y;
 }
@@ -233,7 +233,7 @@ VectorDouble AAnam::rawToTransformVec(const VectorDouble& z) const
 VectorDouble AAnam::transformToRawVec(const VectorDouble& y) const
 {
   VectorDouble z(y.size(), TEST);
-  for (Id i = 0; i < (Id)z.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(z.size()); i++)
     z[i] = transformToRawValue(y[i]);
   return z;
 }
@@ -290,8 +290,8 @@ Id AAnam::rawToGaussianByLocator(Db* db, const NamingConvention& namconv)
 }
 
 Id AAnam::rawToGaussian(Db* db,
-                         const String& name,
-                         const NamingConvention& namconv)
+                        const String& name,
+                        const NamingConvention& namconv)
 {
   if (db == nullptr) return 1;
   db->setLocator(name, ELoc::Z, 0, true);
@@ -322,8 +322,8 @@ Id AAnam::gaussianToRawByLocator(Db* db, const NamingConvention& namconv)
 }
 
 Id AAnam::gaussianToRaw(Db* db,
-                         const String& name,
-                         const NamingConvention& namconv)
+                        const String& name,
+                        const NamingConvention& namconv)
 {
   if (db == nullptr) return 1;
   db->setLocator(name, ELoc::Z, 0, true);
@@ -352,8 +352,8 @@ Id AAnam::gaussianToRaw(Db* db,
  **
  *****************************************************************************/
 Id AAnam::normalScore(Db* db,
-                       const String& name,
-                       const NamingConvention& namconv)
+                      const String& name,
+                      const NamingConvention& namconv)
 {
   if (db == nullptr) return 1;
   db->setLocator(name, ELoc::Z, 0, true);
@@ -382,8 +382,8 @@ Id AAnam::normalScore(Db* db,
  **
  *****************************************************************************/
 Id AAnam::rawToFactorByRanks(Db* db,
-                              const VectorInt& ifacs,
-                              const NamingConvention& namconv)
+                             const VectorInt& ifacs,
+                             const NamingConvention& namconv)
 {
   CalcAnamTransform transfo(this);
   transfo.setDb(db);
@@ -408,8 +408,8 @@ Id AAnam::rawToFactorByRanks(Db* db,
  **
  *****************************************************************************/
 Id AAnam::rawToFactor(Db* db,
-                       Id nfactor,
-                       const NamingConvention& namconv)
+                      Id nfactor,
+                      const NamingConvention& namconv)
 {
   CalcAnamTransform transfo(this);
   transfo.setDb(db);

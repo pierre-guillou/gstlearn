@@ -71,7 +71,7 @@ public:
              double r,
              const VectorDouble& psi_hn);
 
-  Id getNbPoly() const { return (Id)_psiHn.size(); }
+  Id getNbPoly() const { return static_cast<Id>(_psiHn.size()); }
   VectorDouble getPsiHns() const;
   double getPsiHn(Id ih) const;
   double getRCoef() const { return _rCoef; }

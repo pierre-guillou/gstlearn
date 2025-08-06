@@ -115,10 +115,6 @@ int main(int argc, char* argv[])
   // TODO: this code should be developed (using new interfaces for SPDE class)
   // before we can get rid of PrecisionOpMultiConditional class
   //
-  // SPDE spde(dat, grid, model, false, 1);
-  // spde.defineMeshes({&mesh});
-  // spde.defineProjections();
-  // spde.defineShiftOperator();
 
   // Statistics
   DbStringFormat dsf(FLAG_RESUME | FLAG_STATS);

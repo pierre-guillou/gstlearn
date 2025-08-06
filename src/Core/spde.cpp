@@ -1166,9 +1166,9 @@ static void st_calcul_init(Id ndim)
   Calcul.hh.resize(ndim * ndim, 0.);
   if (Calcul.flag_sphere)
   {
-    const ASpace* space    = getDefaultSpaceSh().get();
-    const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
-    Calcul.R               = spaceSn->getRadius();
+    const ASpace* space = getDefaultSpaceSh().get();
+    const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
+    Calcul.R            = spaceSn->getRadius();
     Calcul.srot.resize(2, 0.);
   }
   Calcul.vv.resize(ndim, 0.);
