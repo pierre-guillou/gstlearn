@@ -177,6 +177,10 @@ target_compile_options(r_build PRIVATE
   -Wno-cast-function-type
   -Wno-cast-function-type-mismatch)
 
+if (CLANG OR APPLE)
+  target_compile_options(r_build PRIVATE -Wno-shorten-64-to-32)
+endif()
+
 # Find appropriate R.h
 target_include_directories(r_build PRIVATE ${R_INCLUDE_DIRS})
 
