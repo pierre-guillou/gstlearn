@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     mestitle(0, "Traditional use of the Ball Tree");
 
     // Constructing the Ball Tree
-    Ball ball(data, nullptr, nullptr, 10, false);
+    Ball ball(data, nullptr, 10, false);
     if (verbose) ball.display(0);
 
     // My target sample
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     verbose              = true;
 
     // Constructing the Ball Tree from Db(s)
-    Ball ball(data, nullptr, nullptr, 10, has_constraints);
+    Ball ball(data, nullptr, 10, has_constraints);
     if (verbose) ball.display(1);
 
     // Loop on the samples for the FNN search

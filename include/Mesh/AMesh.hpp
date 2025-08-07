@@ -60,7 +60,7 @@ public:
   virtual int  getEmbeddedNDim() const { return _nDim; }
   virtual void getEmbeddedCoorPerMesh(int imesh, int ic, VectorDouble& coords) const;
   virtual void getEmbeddedCoorPerApex(int iapex, VectorDouble& coords) const;
-  virtual void getBarycenterInPlace(int imesh, VectorDouble& coord) const;
+  virtual void getBarycenterInPlace(int imesh, vect coord) const;
 
   /*! Returns the Sparse Matrix for projecting the Mesh to a Db */
   ProjMatrix* createProjMatrix(const Db* db, int rankZ = -1, bool verbose = false) const;

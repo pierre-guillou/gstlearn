@@ -42,7 +42,7 @@ public:
   int     getEmbeddedNDim() const override { return 3; }
   void    getEmbeddedCoorPerMesh(int imesh, int ic, VectorDouble& coords) const override;
   void    getEmbeddedCoorPerApex(int iapex, VectorDouble& coords) const override;
-  void    getBarycenterInPlace(int imesh, VectorDouble& coord) const override;
+  void    getBarycenterInPlace(int imesh, vect coord) const override;
 
   static MeshSpherical* createFromNF(const String& NFFilename, bool verbose = true);
   static MeshSpherical* create(const MatrixDense& apices = MatrixDense(),

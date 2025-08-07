@@ -385,7 +385,7 @@ void MeshSpherical::_checkConsistency() const
     }
 }
 
-void MeshSpherical::getBarycenterInPlace(int imesh, VectorDouble& coord) const
+void MeshSpherical::getBarycenterInPlace(int imesh, vect coord) const
 {
   int ndimE   = getEmbeddedNDim();
   int ncorner = getNApexPerMesh();
@@ -404,7 +404,7 @@ void MeshSpherical::getBarycenterInPlace(int imesh, VectorDouble& coord) const
 
   // Turn the gravity center from embedded to long/lat coordinates
   GH::convertCart2Sph(centerE[0], centerE[1], centerE[2],
-                      &coord.at(0), &coord.at(1), TEST);
+                      &coord[0], &coord[1], TEST);
 }
 
 #ifdef HDF5

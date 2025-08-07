@@ -738,7 +738,7 @@ void AMesh::_printMeshListByIndices(int nline_max) const
   }
 }
 
-void AMesh::getBarycenterInPlace(int imesh, VectorDouble& coord) const
+void AMesh::getBarycenterInPlace(int imesh, vect coord) const
 {
   int ndim    = getNDim();
   int ncorner = getNApexPerMesh();
@@ -786,7 +786,7 @@ void AMesh::resetProjFromDb(ProjMatrix* m,
 
   /* Instantiate a Ball Tree for quick search */
   // Note: this Ball tree is defined in 3D despite the space dimension of mesh
-  Ball ball(this, nullptr, 10, false, 1);
+  Ball ball(this, 10, false);
   if (verbose) ball.display(1);
 
   /* Instantiate a Sparse matrix structrue (Triplets) */

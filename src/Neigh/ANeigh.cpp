@@ -103,9 +103,7 @@ int ANeigh::attach(const Db* dbin, const Db* dbout)
   return 0;
 }
 
-void ANeigh::attachBall(double (*dist_function)(const double* x1,
-                                                const double* x2,
-                                                int size))
+void ANeigh::attachBall()
 {
   // Attach the Ball only if the option is switched ON
   if (!_useBallSearch) return;
@@ -113,7 +111,7 @@ void ANeigh::attachBall(double (*dist_function)(const double* x1,
   // Nothing can be done unless the Input Db is specifiied
   if (_dbin == nullptr) return;
 
-  _ball.init(_dbin, dist_function, _ballLeafSize);
+  _ball.init(_dbin, _ballLeafSize);
 }
 
 void ANeigh::setIsChanged(bool status)
