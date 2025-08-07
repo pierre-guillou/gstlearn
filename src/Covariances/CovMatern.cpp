@@ -86,7 +86,7 @@ double CovMatern::_evaluateCovDerivative(double h) const
 
 double CovMatern::_besselK(double nu, double h)
 {
-#if defined(__APPLE__)
+#if !defined(__cpp_lib_math_special_functions)
   double TAB[MAXTAB];
   Id nb = (Id)floor(nu);
   if (nu <= 0 || nb >= MAXTAB) return (0.);
