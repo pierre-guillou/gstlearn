@@ -104,6 +104,7 @@ private:
   const ProjMultiMatrix* _projOutKInit;
   const ProjMultiMatrix* _projOutSInit;
 
+  // Local information
   bool _flagCholesky;
   bool _flagKrig;
   bool _flagSimu;
