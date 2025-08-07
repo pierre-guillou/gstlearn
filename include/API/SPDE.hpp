@@ -93,9 +93,10 @@ private:
   void _cleanSpdeOperator();
 
 private:
-  const Db* _dbin;  // External Pointer
-  const Db* _dbout; // External pointer
-  Model* _model;    // External pointer
+  // External pointers
+  const Db* _dbin;
+  const Db* _dbout;
+  Model* _model;
   const VectorMeshes* _meshesKInit;
   const VectorMeshes* _meshesSInit;
   const ProjMultiMatrix* _projInKInit;
