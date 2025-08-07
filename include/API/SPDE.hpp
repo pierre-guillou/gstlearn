@@ -44,7 +44,8 @@ public:
        bool flagKrig,
        bool flagSimu,
        Id useCholesky          = -1,
-       const SPDEParam& params = SPDEParam());
+       const SPDEParam& params = SPDEParam(),
+       const Db* domain        = nullptr);
   SPDE(const SPDE& r)            = delete;
   SPDE& operator=(const SPDE& r) = delete;
   virtual ~SPDE();
@@ -96,6 +97,7 @@ private:
   // External pointers
   const Db* _dbin;
   const Db* _dbout;
+  const Db* _domain;
   Model* _model;
   const VectorMeshes* _meshesKInit;
   const VectorMeshes* _meshesSInit;

@@ -45,15 +45,18 @@ namespace gstlrn
  * @param flagSimu TRUE for simulations (either conditional or non-conditional)
  * @param useCholesky Define the choice regarding Cholesky
  * @param params Set of SPDE parameters
+ * @param domain Db used to define the domain for meshing (in union with dbin)
  */
 SPDE::SPDE(const Db* dbin,
            Model* model,
            bool flagKrig,
            bool flagSimu,
            Id useCholesky,
-           const SPDEParam& params)
+           const SPDEParam& params,
+           const Db* domain)
   : _dbin(dbin)
   , _dbout()
+  , _domain(domain)
   , _model(model)
   , _meshesKInit(nullptr)
   , _meshesSInit(nullptr)
@@ -312,8 +315,8 @@ VectorMeshes SPDE::_duplicateMeshes(bool flagForKrige)
 VectorMeshes SPDE::_defineMeshesFromDbs(bool flagKrige)
 {
   // Create the domain (by merging dbin and dbout)
-  bool isBuilt     = false;
-  const Db* domain = Db::coverSeveralDbs(_dbin, _dbout, &isBuilt);
+  bool isBuilt          = false;
+  const Db* localDomain = Db::coverSeveralDbs(_dbin, _domain, &isBuilt);
 
   Id refine  = (flagKrige) ? _params.getRefineK() : _params.getRefineS();
   Id ncovtot = _model->getNCov(false);
@@ -325,12 +328,12 @@ VectorMeshes SPDE::_defineMeshesFromDbs(bool flagKrige)
   {
     if (_model->getCovType(jcov) == ECov::NUGGET) continue;
     const CovAniso* cova = _model->getCovAniso(jcov);
-    meshes[icov++]       = MeshETurbo::createFromCova(*cova, domain, refine,
+    meshes[icov++]       = MeshETurbo::createFromCova(*cova, localDomain, refine,
                                                       _params.getBorder(),
                                                       _params.isPolarized(), true,
                                                       _params.getNxMax());
   }
-  if (isBuilt) delete domain;
+  if (isBuilt) delete localDomain;
 
   return meshes;
 }
@@ -439,7 +442,7 @@ void SPDE::_cleanProjection(bool flagIn, bool flagForKrige)
       : (flagForKrige ? _createAoutK : _createAoutS);
 
   if (createProj) delete dest;
-  dest = nullptr;
+  dest       = nullptr;
   createProj = false;
 }
 
@@ -751,7 +754,7 @@ Id krigingSPDE(Db* dbin,
   if (model == nullptr) return 1;
 
   // Instantiate SPDE class
-  SPDE spde(dbin, model, true, flag_std, useCholesky, params);
+  SPDE spde(dbin, model, true, flag_std, useCholesky, params, dbout);
   spde.setMeshes(true, meshesK);
   spde.setMeshes(false, meshesS);
   spde.setProjIn(true, projInK);
@@ -845,7 +848,7 @@ Id simulateSPDE(Db* dbin,
 
   // Instantiate SPDE class
   bool flagKrig = dbin != nullptr;
-  SPDE spde(dbin, model, flagKrig, true, useCholesky, params);
+  SPDE spde(dbin, model, flagKrig, true, useCholesky, params, dbout);
   spde.setMeshes(true, meshesK);
   spde.setMeshes(false, meshesS);
   spde.setProjIn(true, projInK);
@@ -951,7 +954,7 @@ Id simPGSSPDE(Db* dbin,
   if (model == nullptr) return 1;
 
   bool flagKrig = dbin != nullptr;
-  SPDE spde(dbin, model, flagKrig, true, useCholesky, params);
+  SPDE spde(dbin, model, flagKrig, true, useCholesky, params, dbout);
   spde.setMeshes(true, meshesK);
   spde.setMeshes(false, meshesS);
   spde.setProjIn(true, projInK);
