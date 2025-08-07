@@ -738,7 +738,7 @@ void AMesh::_printMeshListByIndices(int nline_max) const
   }
 }
 
-void AMesh::getBarycenterInPlace(int imesh, VectorDouble& coord) const
+void AMesh::getBarycenterInPlace(int imesh, vect coord) const
 {
   int ndim    = getNDim();
   int ncorner = getNApexPerMesh();
