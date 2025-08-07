@@ -10,14 +10,28 @@
 /******************************************************************************/
 #pragma once
 
+#include "Basic/VectorNumT.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
-
-class SphTriangle;
 
 namespace gstlrn
 {
 class Db;
+
+class SphTriangle
+{
+public:
+  int n_nodes; /* Number of nodes */
+  int sph_size; /* Size of arrays sph_list and sph_lptr */
+  VectorDouble sph_x; /* Array of X-coordinates for nodes */
+  VectorDouble sph_y; /* Array of Y-coordinates for nodes */
+  VectorDouble sph_z; /* Array of Z-coordinates for nodes */
+  std::vector<int> sph_list; /* Set of nodal indexes */
+  std::vector<int> sph_lptr; /* Set of pointers (sph_list indexes) */
+  std::vector<int> sph_lend; /* Set of pointers to adjacency lists */
+};
+
+
 
 GSTLEARN_EXPORT void meshes_2D_sph_init(SphTriangle* t);
 GSTLEARN_EXPORT void meshes_2D_sph_free(SphTriangle* t, Id mode);
