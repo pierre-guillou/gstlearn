@@ -429,10 +429,10 @@ void SPDE::_defineMeshes(bool flagForKrige, bool verbose)
 
 void SPDE::_cleanProjection(bool flagIn, bool flagForKrige)
 {
-  const ProjMultiMatrix** dest =
+  const ProjMultiMatrix* dest =
     flagIn
-      ? (flagForKrige ? &_AinK : &_AinS)
-      : (flagForKrige ? &_AoutK : &_AoutS);
+      ? (flagForKrige ? _AinK : _AinS)
+      : (flagForKrige ? _AoutK : _AoutS);
   auto& createProj =
     flagIn
       ? (flagForKrige ? _createAinK : _createAinS)
@@ -440,6 +440,7 @@ void SPDE::_cleanProjection(bool flagIn, bool flagForKrige)
 
   if (createProj) delete dest;
   dest = nullptr;
+  createProj = false;
 }
 
 int SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
