@@ -1015,11 +1015,6 @@ static int st_subtract_optimal_drift(LMlayers* lmlayers,
   double drext, coor[2];
   int nlayers, error, iech, iiech, ifois, ilayer, nbfl, neq, ipos;
   int flag_subtract = 1;
-  VectorDouble props;
-  VectorDouble drift;
-  VectorDouble coeff;
-  VectorDouble atab;
-  VectorDouble btab;
 
   /* Initializations */
 
@@ -1030,11 +1025,11 @@ static int st_subtract_optimal_drift(LMlayers* lmlayers,
 
   /* Core allocation */
 
-  coeff.resize(neq);
-  drift.resize(neq, 0);
-  props.resize(nlayers);
-  atab.resize(neq * neq, 0.);
-  btab.resize(neq, 0.);
+  VectorDouble props(nlayers);
+  VectorDouble drift(neq);
+  VectorDouble coeff(neq);
+  VectorDouble atab(neq * neq);
+  VectorDouble btab(neq);
 
   /* Find the vector of optimal mean values */
 

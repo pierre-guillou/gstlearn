@@ -143,7 +143,7 @@ GSTLEARN_EXPORT int gslFScanf(FILE *stream, const char *format, ...);
  int size_s = std::snprintf( nullptr, 0, fmt.c_str(), args ... ) + 1; // Extra space for '\0'
  if( size_s <= 0 ){ throw std::runtime_error( "Error during formatting." ); }
  size_t size = static_cast<size_t>( size_s );
- char* buf = new char(size_s); // make_unique not yet available in c++11
+ auto* buf = new char(size_s); // make_unique not yet available in c++11
  std::snprintf( buf, size, fmt.c_str(), args ... );
  dst = std::string( buf, buf + size - 1 ); // We don't want the '\0' inside
  delete buf;

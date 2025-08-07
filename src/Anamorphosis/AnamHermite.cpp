@@ -85,7 +85,7 @@ String AnamHermite::toString(const AStringFormat* strfmt) const
 
 AnamHermite* AnamHermite::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamHermite* anam = new AnamHermite();
+  auto* anam = new AnamHermite();
   if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
   delete anam;
   return nullptr;

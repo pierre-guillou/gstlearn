@@ -79,10 +79,10 @@ CovDiffusionAdvection::~CovDiffusionAdvection()
 CovDiffusionAdvection* CovDiffusionAdvection::create(CovAniso* markovL,
                                                      CovAniso* markovR,
                                                      double scaleTime,
-                                                     VectorDouble vel,
+                                                     const VectorDouble& vel,
                                                      double sigma2)
 {
-  CovDiffusionAdvection* cov = new CovDiffusionAdvection();
+  auto* cov = new CovDiffusionAdvection();
   cov->setMarkovL(markovL);
   cov->setMarkovR(markovR);
   cov->setScaleTime(scaleTime);
@@ -210,4 +210,4 @@ Array CovDiffusionAdvection::evalCovFFT(const VectorDouble& hmax, double time, i
 
   return evalCovFFTTimeSlice(hmax, time, N, funcSpectrum);
 }
-}
+} // namespace gstlrn

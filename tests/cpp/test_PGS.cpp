@@ -99,21 +99,21 @@ int main(int argc, char* argv[])
 
   // Design of several VarioParams
   int nlag1          = 19;
-  DirParam dirparam1 = DirParam(nlag1, 0.5 / nlag1);
+  DirParam dirparam1(nlag1, 0.5 / nlag1);
   VarioParam varioparam1;
   varioparam1.addDir(dirparam1);
 
   int nlag2          = 3;
-  DirParam dirparam2 = DirParam(nlag2, 0.1);
+  DirParam dirparam2(nlag2, 0.1);
   VarioParam varioparam2;
   varioparam2.addDir(dirparam2);
 
   // Determination of the variogram of the Underlying GRF
   Vario* vario = variogram_pgs(db, &varioparam1, ruleprop);
   vario->display();
-  Vario vario1 = Vario(*vario);
+  Vario vario1(*vario);
   vario1.resetReduce({0}, VectorInt(), true);
-  Vario vario2 = Vario(*vario);
+  Vario vario2(*vario);
   vario2.resetReduce({1}, VectorInt(), true);
   vario1.display();
   vario2.display();
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
   // Fitting the experimental variogram of Underlying GRF (with constraint that total sill is 1)
   Model modelPGS1(ctxt);
   Model modelPGS2(ctxt);
-  Constraints constraints = Constraints();
+  Constraints constraints;
   constraints.setConstantSillValue(1.);
 
   VectorECov covs {ECov::MATERN, ECov::EXPONENTIAL};
@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
   varioDerived->dumpToNF("modelpgs.NF");
   varioDerived->display();
 
-  Vario varioIndic = Vario(varioparam1);
+  Vario varioIndic(varioparam1);
   varioIndic.computeIndic(db, ECalcVario::VARIOGRAM);
   (void)varioIndic.dumpToNF("varioindic.NF");
 

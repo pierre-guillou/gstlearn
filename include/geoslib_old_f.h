@@ -99,11 +99,11 @@ GSTLEARN_EXPORT void ut_trace_sample(Db* db,
                                      const double* dd,
                                      double radius,
                                      int* ns_arg,
-                                     double** xs_arg,
-                                     double** ys_arg,
-                                     int** rks_arg,
-                                     int** lys_arg,
-                                     int** typ_arg);
+                                     VectorDouble& xs,
+                                     VectorDouble& ys,
+                                     VectorInt& rks,
+                                     VectorInt& lys,
+                                     VectorInt& typ);
 GSTLEARN_EXPORT double ut_distance(int ndim, const double* tab1, const double* tab2);
 GSTLEARN_EXPORT void ut_distance_allocated(int ndim,
                                            double** tab1,
@@ -252,11 +252,6 @@ GSTLEARN_EXPORT void db_sample_print(Db* db,
                                      int flag_nerr = 0,
                                      int flag_blk  = 0);
 GSTLEARN_EXPORT int db_center(Db* db, double* center);
-GSTLEARN_EXPORT void db_extension_rotated(Db* db,
-                                          double* rotmat,
-                                          VectorDouble& mini,
-                                          VectorDouble& maxi,
-                                          VectorDouble& delta);
 GSTLEARN_EXPORT int db_selref(int ndim,
                               const int* nx,
                               const int* ref,
@@ -336,7 +331,7 @@ GSTLEARN_EXPORT int db_streamline(DbGrid* dbgrid,
                                   int save_grad,
                                   int* nbline_loc,
                                   int* npline_loc,
-                                  double** line_loc);
+                                  VectorDouble& line);
 GSTLEARN_EXPORT void db_monostat(Db* db,
                                  int iatt,
                                  double* wtot,

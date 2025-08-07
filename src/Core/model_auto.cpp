@@ -971,7 +971,7 @@ static void st_load_ge(const Vario* vario,
   if (vario->getCalcul() == ECalcVario::GENERAL2) norder = 2;
   if (vario->getCalcul() == ECalcVario::GENERAL3) norder = 3;
   VectorDouble d1(ndim);
-  CovCalcMode mode = CovCalcMode(ECalcMember::LHS);
+  CovCalcMode mode(ECalcMember::LHS);
   mode.setAsVario(true);
   mode.setUnitary(true);
   mode.setOrderVario(norder);

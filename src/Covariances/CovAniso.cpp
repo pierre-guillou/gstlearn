@@ -279,7 +279,7 @@ CovAniso* CovAniso::createAnisotropic(const CovContext& ctxt,
     return nullptr;
   }
 
-  CovAniso* cov = new CovAniso(type, ctxt);
+  auto* cov = new CovAniso(type, ctxt);
   if (flagRange)
     cov->setRanges(ranges);
   else
@@ -297,7 +297,7 @@ CovAniso* CovAniso::createIsotropicMulti(const CovContext& ctxt,
                                          double param,
                                          bool flagRange)
 {
-  CovAniso* cov = new CovAniso(type, ctxt);
+  auto* cov = new CovAniso(type, ctxt);
   int nvar      = sills.getNSize();
   if (ctxt.getNVar() != nvar)
   {
@@ -340,7 +340,7 @@ CovAniso* CovAniso::createAnisotropicMulti(const CovContext& ctxt,
     return nullptr;
   }
 
-  CovAniso* cov = new CovAniso(type, ctxt);
+  auto* cov = new CovAniso(type, ctxt);
   if (flagRange)
     cov->setRanges(ranges);
   else
@@ -423,7 +423,7 @@ CovAniso* CovAniso::createFromParam(const ECov& type,
   // Define the covariance
 
   const CovContext& ctxt = CovContext(nvar, space);
-  CovAniso* cov          = new CovAniso(type, ctxt);
+  auto* cov          = new CovAniso(type, ctxt);
 
   // Define the Third parameter
   double parmax = cov->getParMax();
@@ -491,7 +491,7 @@ CovAniso* CovAniso::createReduce(const VectorInt& validVars) const
 
   // Modify the CovContext
   int nvar        = (int)validVars.size();
-  CovContext ctxt = CovContext(nvar);
+  CovContext ctxt(nvar);
 
   // Modify the Matrix of sills
   newCovAniso->setContext(ctxt);
@@ -502,7 +502,7 @@ CovAniso* CovAniso::createReduce(const VectorInt& validVars) const
 
 double scale2range(const ECov& type, double scale, double param)
 {
-  CovContext ctxt = CovContext(1, 1);
+  CovContext ctxt(1, 1);
   ACovFunc* cova  = CovFactory::createCovFunc(type, ctxt);
   cova->setParam(param);
   double scadef = cova->getScadef();
@@ -511,7 +511,7 @@ double scale2range(const ECov& type, double scale, double param)
 
 double range2scale(const ECov& type, double range, double param)
 {
-  CovContext ctxt = CovContext(1, 1);
+  CovContext ctxt(1, 1);
   ACovFunc* cova  = CovFactory::createCovFunc(type, ctxt);
   cova->setParam(param);
   double scadef = cova->getScadef();

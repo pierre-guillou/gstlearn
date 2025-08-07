@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
   double slope           = 0.5;
   double shdown          = -0.2;
   double shdsup          = +0.5;
-  RuleShadow* ruleshadow = new RuleShadow(slope, shdsup, shdown, shift);
+  auto* ruleshadow = new RuleShadow(slope, shdsup, shdown, shift);
   ruleshadow->display();
   (void)ruleshadow->dumpToNF("PGSruleshadow.NF");
 

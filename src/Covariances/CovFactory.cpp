@@ -218,7 +218,7 @@ ECov CovFactory::identifyCovariance(const String& cov_name,
 
 double CovFactory::getScaleFactor(const ECov& type, double param)
 {
-  CovContext ctxt = CovContext(1, 1);
+  CovContext ctxt(1, 1);
   ACovFunc* cova  = CovFactory::createCovFunc(type, ctxt);
   cova->setParam(param);
   double scadef = cova->getScadef();

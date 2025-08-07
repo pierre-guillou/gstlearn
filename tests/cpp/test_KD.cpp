@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
   vario_raw->display();
 
   // Fitting the Model on the Raw variable
-  Model* model_raw = new Model(1, ndim);
+  auto* model_raw = new Model(1, ndim);
   (void)model_raw->fit(vario_raw);
   model_raw->display();
 
@@ -130,8 +130,8 @@ int main(int argc, char* argv[])
   vario->display();
 
   // Fitting the Model on the Gaussian transformed variable
-  Model* model            = new Model(1, ndim);
-  Constraints constraints = Constraints(1.);
+  auto* model            = new Model(1, ndim);
+  Constraints constraints(1.);
   (void)model->fit(vario, {ECov::EXPONENTIAL, ECov::EXPONENTIAL}, constraints);
   model->display();
 
@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
   Vario* vario_b1_Y = Vario::createTransformZToY(*vario_b1_Z, anam);
 
   // Fitting the regularized model on the point Gaussian variable
-  Model* model_b1_Y = new Model(1, ndim);
+  auto* model_b1_Y = new Model(1, ndim);
   constraints.setConstantSillValue(1);
   (void)model_b1_Y->fit(vario_b1_Y, {ECov::CUBIC, ECov::EXPONENTIAL}, constraints);
 
@@ -259,7 +259,7 @@ int main(int argc, char* argv[])
                                                        ndisc_B, blocs->getAngles());
 
   // Fitting the regularized model on the point Gaussian variable
-  Model* model_b2_Y = new Model(1, ndim);
+  auto* model_b2_Y = new Model(1, ndim);
   constraints.setConstantSillValue(r2 * r2);
   (void)model_b2_Y->fit(vario_b2_Y, {ECov::CUBIC, ECov::EXPONENTIAL}, constraints);
 

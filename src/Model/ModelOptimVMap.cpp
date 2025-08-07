@@ -242,7 +242,7 @@ ModelOptimVMap* ModelOptimVMap::createForOptim(ModelGeneric* model,
 {
   auto* optim = new ModelOptimVMap(model, constraints, mop);
 
-  MatrixSymmetric vars = MatrixSymmetric(model->getNVar());
+  MatrixSymmetric vars(model->getNVar());
   double hmax          = dbmap->getExtensionDiagonal();
   optim->setEnvironment(vars, hmax);
   optim->_dbmap = dbmap;

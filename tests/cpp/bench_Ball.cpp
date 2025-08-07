@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     defineDefaultSpace(ESpaceType::SN, 2);
 
     // Constructing the Meshing on the Sphere
-    MeshSphericalExt mesh = MeshSphericalExt();
+    MeshSphericalExt mesh;
     mesh.resetFromDb(NULL, NULL, "-r3");
     if (verbose) mesh.display();
 

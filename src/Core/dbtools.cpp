@@ -10,7 +10,6 @@
 /******************************************************************************/
 #include "Basic/Grid.hpp"
 #include "Basic/Law.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "Basic/PolyLine2D.hpp"
 #include "Basic/String.hpp"
@@ -668,11 +667,11 @@ void ut_trace_discretize(int nseg,
  ** \param[in]  radius Neighborhood radius
  **
  ** \param[out] ns_arg     Number of sampled points
- ** \param[out] xs_arg     Array of first coordinates of sampled points
- ** \param[out] ys_arg     Array of second coordinates of sampled points
- ** \param[out] rks_arg    Array of sample indices (starting from 1)
- ** \param[out] lys_arg    Array of layer indices of sampled points
- ** \param[out] typ_arg    Array of data type
+ ** \param[out] xs         Array of first coordinates of sampled points
+ ** \param[out] ys         Array of second coordinates of sampled points
+ ** \param[out] rks        Array of sample indices (starting from 1)
+ ** \param[out] lys        Array of layer indices of sampled points
+ ** \param[out] typ        Array of data type
  **                        1 for hard data in Z or TIME
  **                        2 for lower bound
  **                        3 for upper bound
@@ -686,23 +685,21 @@ void ut_trace_sample(Db* db,
                      const double* dd,
                      double radius,
                      int* ns_arg,
-                     double** xs_arg,
-                     double** ys_arg,
-                     int** rks_arg,
-                     int** lys_arg,
-                     int** typ_arg)
+                     VectorDouble& xs,
+                     VectorDouble& ys,
+                     VectorInt& rks,
+                     VectorInt& lys,
+                     VectorInt& typ)
 {
-  int *lys, *typ, *rks, iech, ip, ns, ipmin, nvar;
-  double *xs, *ys, cote, layer, bound[2];
+  int iech, ip, ns, ipmin, nvar;
+  double cote, layer, bound[2];
   double radcarre, xx, yy, delx, dely, dist, ddmin;
 
   /* Initializations */
 
   radcarre = radius * radius;
-  xs = ys = nullptr;
-  lys = typ = rks = nullptr;
-  ns              = 0;
-  nvar            = db->getNInterval();
+  ns       = 0;
+  nvar     = db->getNInterval();
 
   /* Loop on the samples */
 
@@ -735,12 +732,12 @@ void ut_trace_sample(Db* db,
     cote = db->getFromLocator(ptype, iech);
     if (!FFFF(cote))
     {
-      layer   = db->getFromLocator(ELoc::LAYER, iech);
-      xs      = (double*)mem_realloc((char*)xs, sizeof(double) * (ns + 1), 1);
-      ys      = (double*)mem_realloc((char*)ys, sizeof(double) * (ns + 1), 1);
-      lys     = (int*)mem_realloc((char*)lys, sizeof(int) * (ns + 1), 1);
-      typ     = (int*)mem_realloc((char*)typ, sizeof(int) * (ns + 1), 1);
-      rks     = (int*)mem_realloc((char*)rks, sizeof(int) * (ns + 1), 1);
+      layer = db->getFromLocator(ELoc::LAYER, iech);
+      xs.resize(ns + 1);
+      ys.resize(ns + 1);
+      lys.resize(ns + 1);
+      typ.resize(ns + 1);
+      rks.resize(ns + 1);
       xs[ns]  = dd[ipmin];
       ys[ns]  = cote;
       lys[ns] = (FFFF(layer)) ? 1 : (int)layer + 1;
@@ -758,11 +755,11 @@ void ut_trace_sample(Db* db,
       for (int ib = 0; ib < 2; ib++)
       {
         if (FFFF(bound[ib])) continue;
-        xs      = (double*)mem_realloc((char*)xs, sizeof(double) * (ns + 1), 1);
-        ys      = (double*)mem_realloc((char*)ys, sizeof(double) * (ns + 1), 1);
-        lys     = (int*)mem_realloc((char*)lys, sizeof(int) * (ns + 1), 1);
-        typ     = (int*)mem_realloc((char*)typ, sizeof(int) * (ns + 1), 1);
-        rks     = (int*)mem_realloc((char*)rks, sizeof(int) * (ns + 1), 1);
+        xs.resize(ns + 1);
+        ys.resize(ns + 1);
+        lys.resize(ns + 1);
+        typ.resize(ns + 1);
+        rks.resize(ns + 1);
         xs[ns]  = dd[ipmin];
         ys[ns]  = bound[ib];
         lys[ns] = ivar + 1;
@@ -775,12 +772,7 @@ void ut_trace_sample(Db* db,
 
   /* Returning arguments */
 
-  *ns_arg  = ns;
-  *xs_arg  = xs;
-  *ys_arg  = ys;
-  *lys_arg = lys;
-  *typ_arg = typ;
-  *rks_arg = rks;
+  *ns_arg = ns;
 }
 
 /*****************************************************************************/
@@ -1345,7 +1337,7 @@ static int st_get_next(DbGrid* dbgrid,
  **
  ** \param[out] nbline_loc Number of streamline steps
  ** \param[out] npline_loc Number of values per line vertex
- ** \param[out] line_loc   Array of streamline steps (Dimension: 5 * nbline)
+ ** \param[out] line       Array of streamline steps (Dimension: 5 * nbline)
  **
  ** \remarks The returned array 'line_loc' must be freed by the calling function
  ** \remarks Use get_keypone("Streamline_Skip",1) to define the skipping ratio
@@ -1360,11 +1352,11 @@ int db_streamline(DbGrid* dbgrid,
                   int save_grad,
                   int* nbline_loc,
                   int* npline_loc,
-                  double** line_loc)
+                  VectorDouble& line)
 {
   int error, npline, idim, ecr;
   int iptr_time, iptr_accu, iptr_grad, nbline, knd, nquant, nbyech, ndim;
-  double *line, surf, date;
+  double surf, date;
   static int quant = 1000;
   VectorDouble coor;
   VectorDouble coor0;
@@ -1374,7 +1366,6 @@ int db_streamline(DbGrid* dbgrid,
   error  = 1;
   nbline = nquant = 0;
   iptr_grad       = -1;
-  line            = nullptr;
   if (dbpoint == nullptr) dbpoint = dbgrid;
   nbyech = (int)get_keypone("Streamline_Skip", 1.);
 
@@ -1434,8 +1425,7 @@ int db_streamline(DbGrid* dbgrid,
     if (nbline >= nquant * quant)
     {
       nquant++;
-      line = (double*)mem_realloc((char*)line,
-                                  sizeof(double) * npline * nquant * quant, 1);
+      line.resize(npline * nquant * quant);
     }
     for (idim = ecr = 0; idim < ndim; idim++)
       LINE(nbline, ecr++) = coor[idim];
@@ -1455,9 +1445,7 @@ int db_streamline(DbGrid* dbgrid,
       if (nbline >= nquant * quant)
       {
         nquant++;
-        line = (double*)mem_realloc((char*)line,
-                                    sizeof(double) * npline * nquant * quant,
-                                    1);
+        line.resize(npline * nquant * quant);
       }
       for (idim = ecr = 0; idim < ndim; idim++)
         LINE(nbline, ecr++) = coor[idim];
@@ -1478,8 +1466,7 @@ int db_streamline(DbGrid* dbgrid,
     if (nbline >= nquant * quant)
     {
       nquant++;
-      line = (double*)mem_realloc((char*)line,
-                                  sizeof(double) * npline * nquant * quant, 1);
+      line.resize(npline * nquant * quant);
     }
     for (idim = ecr = 0; idim < ndim; idim++)
       LINE(nbline, ecr++) = TEST;
@@ -1491,13 +1478,12 @@ int db_streamline(DbGrid* dbgrid,
 
   /* Final reallocation */
 
-  line = (double*)mem_realloc((char*)line, sizeof(double) * npline * nbline, 1);
+  line.resize(npline * nbline);
 
   /* Set the error return code */
 
   *nbline_loc = nbline;
   *npline_loc = npline;
-  *line_loc   = line;
   error       = 0;
 
 label_end:
@@ -2103,17 +2089,17 @@ int db_proportion_estimate(Db* dbin,
 
   // Define the environment
 
-  MeshETurbo mesh     = MeshETurbo(dbout);
-  ShiftOpMatrix S     = ShiftOpMatrix(&mesh, model->getCovAniso(0), dbout);
-  PrecisionOp Qprop   = PrecisionOp(&S, model->getCovAniso(0));
-  ProjMatrix AprojDat = ProjMatrix(dbin, &mesh);
-  ProjMatrix AprojOut = ProjMatrix(dbout, &mesh);
+  MeshETurbo mesh(dbout);
+  ShiftOpMatrix S(&mesh, model->getCovAniso(0), dbout);
+  PrecisionOp Qprop(&S, model->getCovAniso(0));
+  ProjMatrix AprojDat(dbin, &mesh);
+  ProjMatrix AprojOut(dbout, &mesh);
 
   // Invoke the calculation
 
   VectorDouble propGlob = dbStatisticsFacies(dbin);
   int ncat              = static_cast<int>(propGlob.size());
-  OptimCostColored Oc   = OptimCostColored(ncat, &Qprop, &AprojDat);
+  OptimCostColored Oc(ncat, &Qprop, &AprojDat);
 
   VectorDouble facies      = dbin->getColumnByLocator(ELoc::Z);
   VectorVectorDouble props = Oc.minimize(facies, splits, propGlob, verbose, niter);

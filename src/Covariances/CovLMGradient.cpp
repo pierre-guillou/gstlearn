@@ -42,7 +42,7 @@ CovLMGradient::CovLMGradient(const CovAnisoList& r)
     }
     else
     {
-      CovGradientFunctional newcov = CovGradientFunctional(*cov);
+      CovGradientFunctional newcov(*cov);
       addCov(newcov);
     }
   }

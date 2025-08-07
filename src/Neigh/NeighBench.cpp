@@ -9,11 +9,11 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Neigh/NeighBench.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Basic/SerializeHDF5.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
-#include "Basic/OptDbg.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/SerializeHDF5.hpp"
 
 namespace gstlrn
 {
@@ -28,7 +28,7 @@ NeighBench::NeighBench(bool flag_xvalid,
   , _T1(space)
   , _T2(space)
 {
-  setFlagXvalid (flag_xvalid);
+  setFlagXvalid(flag_xvalid);
 
   setBallSearch(useBallTree, leaf_size);
 
@@ -36,11 +36,11 @@ NeighBench::NeighBench(bool flag_xvalid,
 }
 
 NeighBench::NeighBench(const NeighBench& r)
-    : ANeigh(r),
-      _width(r._width),
-      _biPtBench(r._biPtBench->clone()),
-      _T1(r._T1),
-      _T2(r._T2)
+  : ANeigh(r)
+  , _width(r._width)
+  , _biPtBench(r._biPtBench->clone())
+  , _T1(r._T1)
+  , _T2(r._T2)
 {
 }
 
@@ -49,11 +49,11 @@ NeighBench& NeighBench::operator=(const NeighBench& r)
   if (this != &r)
   {
     ANeigh::operator=(r);
-    _width = r._width;
+    _width     = r._width;
     _biPtBench = r._biPtBench->clone();
-    _T1 = r._T1;
-    _T2 = r._T2;
-   }
+    _T1        = r._T1;
+    _T2        = r._T2;
+  }
   return *this;
 }
 
@@ -62,11 +62,11 @@ NeighBench::~NeighBench()
   delete _biPtBench;
 }
 
-int NeighBench::attach(const Db *dbin, const Db *dbout)
+int NeighBench::attach(const Db* dbin, const Db* dbout)
 {
   if (ANeigh::attach(dbin, dbout)) return 1;
 
-  if (! _biPtBench->isValid(dbin, dbout)) return 1;
+  if (!_biPtBench->isValid(dbin, dbout)) return 1;
 
   return 0;
 }
@@ -77,7 +77,7 @@ String NeighBench::toString(const AStringFormat* strfmt) const
 
   std::stringstream sstr;
 
-  sstr << toTitle(0,"Bench Neighborhood");
+  sstr << toTitle(0, "Bench Neighborhood");
 
   sstr << _biPtBench->toString();
 
@@ -87,9 +87,9 @@ String NeighBench::toString(const AStringFormat* strfmt) const
 bool NeighBench::_deserializeAscii(std::istream& is, bool verbose)
 {
   double width = 0.;
-  bool ret = true;
-  ret = ret && ANeigh::_deserializeAscii(is, verbose);
-  ret = ret && _recordRead<double>(is, "Bench Width", width);
+  bool ret     = true;
+  ret          = ret && ANeigh::_deserializeAscii(is, verbose);
+  ret          = ret && _recordRead<double>(is, "Bench Width", width);
 
   _biPtBench = BiTargetCheckBench::create(-1, width); // idim_bench will be updated in 'attach'
 
@@ -99,8 +99,8 @@ bool NeighBench::_deserializeAscii(std::istream& is, bool verbose)
 bool NeighBench::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serializeAscii(os, verbose);
-  ret = ret && _recordWrite<double>(os, "Bench Width", _biPtBench->getWidth());
+  ret      = ret && ANeigh::_serializeAscii(os, verbose);
+  ret      = ret && _recordWrite<double>(os, "Bench Width", _biPtBench->getWidth());
   return ret;
 }
 
@@ -121,7 +121,7 @@ NeighBench* NeighBench::create(bool flag_xvalid,
  */
 NeighBench* NeighBench::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighBench* neigh = new NeighBench();
+  auto* neigh = new NeighBench();
   if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
   delete neigh;
   return nullptr;
@@ -135,12 +135,12 @@ NeighBench* NeighBench::createFromNF(const String& NFFilename, bool verbose)
 int NeighBench::getNSampleMax(const Db* db) const
 {
   bool useSel = false;
-  int nech = db->getNSample();
-  int ndim = db->getNDim();
+  int nech    = db->getNSample();
+  int ndim    = db->getNDim();
   if (db->getNDim() <= 2) return nech;
 
   /* Read the vector of the last coordinates */
-  VectorDouble vec = db->getOneCoordinate(ndim-1, useSel);
+  VectorDouble vec = db->getOneCoordinate(ndim - 1, useSel);
 
   /* Sort the third coordinate vector */
   VectorDouble tab = VH::sort(vec, true);
@@ -233,7 +233,7 @@ void NeighBench::_bench(int iech_out, VectorInt& ranks)
   {
     /* Discard the masked input sample */
 
-    if (! _dbin->isActive(iech)) continue;
+    if (!_dbin->isActive(iech)) continue;
 
     /* Discard samples where all variables are undefined */
 
@@ -250,7 +250,7 @@ void NeighBench::_bench(int iech_out, VectorInt& ranks)
 
     /* Discard sample located outside the bench */
 
-    if (! _biPtBench->isOK(_T1, _T2)) continue;
+    if (!_biPtBench->isOK(_T1, _T2)) continue;
 
     ranks[iech] = 0;
   }
@@ -266,7 +266,7 @@ bool NeighBench::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   }
 
   /* Read the grid characteristics */
-  bool ret = true;
+  bool ret     = true;
   double width = 0.;
 
   ret = ret && SerializeHDF5::readValue(*neighG, "Bench", width);
@@ -290,4 +290,4 @@ bool NeighBench::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
-}
+} // namespace gstlrn

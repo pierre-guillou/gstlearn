@@ -551,7 +551,7 @@ static MeshEStandard* st_ultimate_regular_grid(Db* dbgrid,
 
   // Store the information in the returned AMesh structure
 
-  MeshEStandard* amesh = new MeshEStandard();
+  auto* amesh = new MeshEStandard();
   amesh->reset(ndim, ncorner, points, meshes, false);
 
   return amesh;

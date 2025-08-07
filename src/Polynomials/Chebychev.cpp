@@ -37,7 +37,7 @@ Chebychev::~Chebychev()
 
 Chebychev* Chebychev::createFromCoeffs(const VectorDouble& coeffs)
 {
-  Chebychev* cheb = new Chebychev();
+  auto* cheb = new Chebychev();
   cheb->setCoeffs(coeffs);
   return cheb;
 }

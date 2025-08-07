@@ -2836,8 +2836,7 @@ static int st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
 
   /* Calculate the polynomials */
 
-  cheb_elem->coeffs = (double*)mem_alloc(sizeof(double) * cheb_elem->ncmax, 0);
-  if (cheb_elem->coeffs == nullptr) goto label_end;
+  cheb_elem->coeffs.resize(cheb_elem->ncmax);
 
   /* Evaluate the coefficients of the Chebychev approximation */
 
@@ -2860,16 +2859,13 @@ static int st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
     message("Chebychev Polynomial Approximation:\n");
     message("- Power = %lf\n", cheb_elem->power);
     message("- Performed using %d terms\n", number);
-    message("- between %lf and %lf (Nb. discretization steps=%d)\n", a, b,
-            ndisc);
+    message("- between %lf and %lf (Nb. discretization steps=%d)\n", a, b, ndisc);
     message("- with a tolerance of %lg\n", cheb_elem->tol);
   }
 
   /* Core Reallocation */
 
-  cheb_elem->coeffs = (double*)mem_realloc((char*)cheb_elem->coeffs,
-                                           sizeof(double) * number, 0);
-  if (cheb_elem->coeffs == nullptr) goto label_end;
+  cheb_elem->coeffs.resize(number);
   cheb_elem->ncoeffs = number;
 
   /* Set the error return code */
@@ -2965,7 +2961,7 @@ static Cheb_Elem* st_spde_cheb_manage(int mode,
 
     cheb_elem = new Cheb_Elem();
     if (cheb_elem == nullptr) goto label_end;
-    cheb_elem->coeffs = nullptr;
+    cheb_elem->coeffs.clear();
 
     ncmax = (int)get_keypone("Number_Polynomials_Chebychev", 10001.);
     ndisc = (int)get_keypone("Number_Discretization_Chebychev", 100.);
@@ -2989,7 +2985,7 @@ static Cheb_Elem* st_spde_cheb_manage(int mode,
     cheb_elem->ndisc   = ndisc;
     cheb_elem->tol     = tol;
     cheb_elem->ncoeffs = 0;
-    cheb_elem->coeffs  = nullptr;
+    cheb_elem->coeffs.clear();
 
     /* Get the optimal count of Chebychev coefficients */
 
@@ -3002,8 +2998,7 @@ static Cheb_Elem* st_spde_cheb_manage(int mode,
     // Deallocation
 
     cheb_elem = cheb_old;
-    if (cheb_elem != nullptr)
-      cheb_elem->coeffs = (double*)mem_free((char*)cheb_elem->coeffs);
+    if (cheb_elem != nullptr) cheb_elem->coeffs.clear();
     delete cheb_elem;
     cheb_elem = nullptr;
   }

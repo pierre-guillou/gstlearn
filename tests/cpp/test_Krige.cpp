@@ -104,14 +104,14 @@ static Model* createModel(int nvar, int typecov, int typedrift, int typemean)
 
   if (typedrift == 1)
   {
-    DriftM drift1 = DriftM();
+    DriftM drift1;
     model->addDrift(&drift1);
   }
   else if (typedrift == 2)
   {
-    DriftM drift1 = DriftM();
-    DriftM driftx = DriftM(VectorInt({1}));
-    DriftM drifty = DriftM({0, 1});
+    DriftM drift1;
+    DriftM driftx(VectorInt({1}));
+    DriftM drifty({0, 1});
     model->addDrift(&drift1);
     model->addDrift(&driftx);
     model->addDrift(&drifty);

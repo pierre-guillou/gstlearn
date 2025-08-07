@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
 
       nclass        = nfac[i];
       iatt_ind      = dbin->getNColumn();
-      Limits limits = Limits(nclass);
+      Limits limits(nclass);
       limits.toIndicator(dbin);
       dbin->setLocatorsByUID(nclass, iatt_ind, ELoc::Z, 0);
 

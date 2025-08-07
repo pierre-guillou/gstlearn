@@ -115,7 +115,7 @@ String CovContext::toString(const AStringFormat* strfmt) const
 
 CovContext* CovContext::create(int nvar, int ndim)
 {
-  CovContext* ctxt = new CovContext(nvar, ndim);
+  auto* ctxt = new CovContext(nvar, ndim);
   return ctxt;
 }
 
@@ -220,7 +220,7 @@ const CovContext* CovContext::createReduce(const VectorInt& validVars) const
       lec++;
     }
 
-  CovContext* newctxt = new CovContext(nvar, ndim, covar0);
+  auto* newctxt = new CovContext(nvar, ndim, covar0);
   return newctxt;
 }
 }

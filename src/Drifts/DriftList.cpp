@@ -784,7 +784,7 @@ const DriftList* DriftList::createReduce(const VectorInt& validVars) const
     }
     lec++;
   }
-  DriftList* driftlist = new DriftList(_ctxt);
+  auto* driftlist = new DriftList(_ctxt);
   driftlist->setMeans(mean);
   return driftlist;
 }

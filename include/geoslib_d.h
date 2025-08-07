@@ -108,8 +108,8 @@ public:
   double b;
   double v1;
   double v2;
-  double tol;     /* Tolerance */
-  double* coeffs; /* Array of coefficients */
+  double tol;          /* Tolerance */
+  VectorDouble coeffs; /* Array of coefficients */
 };
 
 #ifndef SWIG
@@ -142,21 +142,16 @@ typedef struct
 
 typedef struct
 {
-  VectorDouble res;
-} CTable;
-
-typedef struct
-{
-  int nconf;      // Number of covariance configurations
-  int ndisc;      // Number of discretization steps
-  int flag_cumul; // 1 if storing integer from -infinity to value
-                  // 0 if storing the value per discretized class
-  double cmin;    // Minimum correlation value
-  double cmax;    // Maximum correlation value
-  double dc;      // Covariance class interval
-  double dp;      // Probability quantum for discretization
-  double* v;      // Array of thresholds (Dim: ndisc+1)
-  CTable** CT;
+  int nconf;              // Number of covariance configurations
+  int ndisc;              // Number of discretization steps
+  int flag_cumul;         // 1 if storing integer from -infinity to value
+                          // 0 if storing the value per discretized class
+  double cmin;            // Minimum correlation value
+  double cmax;            // Maximum correlation value
+  double dc;              // Covariance class interval
+  double dp;              // Probability quantum for discretization
+  VectorDouble v;         // Vector of thresholds (Dim: ndisc+1)
+  VectorVectorDouble res; // Dimension: [nconf][size]
 } CTables;
 
 struct Local_Relem;
@@ -166,8 +161,8 @@ struct Local_Split
   int oper;               // Rank of operator
   int nrule;              // Number of generated rules
   int nbyrule;            // Number of symbols in the Rules
-  int* Srules;            // List of rules (Dim: [nitem][NRULE])
-  int* Sfipos;            // Position of facies (Dim: [nprod][NCOLOR])
+  VectorInt Srules;       // List of rules (Dim: [nitem][NRULE])
+  VectorInt Sfipos;       // Position of facies (Dim: [nprod][NCOLOR])
   Local_Relem* old_relem; // Not allocated
   std::vector<Local_Relem*> relems;
 };
@@ -178,8 +173,8 @@ struct Local_Relem
   int nrule;              // Number of generated rules
   int nbyrule;            // Number of symbols in the Rules
   int nsplit;             // Number of splits
-  int* Rrules;            // List of rules (Dim: [nitem][NRULE])
-  int* Rfipos;            // Position of facies (Dim: [nprod][NCOLOR])
+  VectorInt Rrules;       // List of rules (Dim: [nitem][NRULE])
+  VectorInt Rfipos;       // Position of facies (Dim: [nprod][NCOLOR])
   Local_Split* old_split; // Not allocated
   std::vector<Local_Split*> splits;
 };

@@ -445,9 +445,9 @@ MatrixSparse* Vecchia::calculateW(const VectorDouble& D_dd) const
   VH::extractInPlace(getDFull(), D_tt, 0);
 
   // Extracting information from 'LFull'
-  VectorInt indT = VectorInt(nt + nd, -1);
+  VectorInt indT(nt + nd, -1);
   for (int it = 0; it < nt; it++) indT[it] = it;
-  VectorInt indD = VectorInt(nt + nd, -1);
+  VectorInt indD(nt + nd, -1);
   for (int id = 0; id < nd; id++) indD[id + nt] = id;
   MatrixSparse* Ltt = getLFull().extractSubmatrixByRanks(indT, indT);
   Ltt->forceDimension(nt, nt);
@@ -479,7 +479,7 @@ int krigingVecchia(Db* dbin,
                    bool verbose,
                    const NamingConvention& namconv)
 {
-  Vecchia V = Vecchia(model, nb_neigh, dbout, dbin);
+  Vecchia V(model, nb_neigh, dbout, dbin);
 
   MatrixT<int> Ranks = findNN(dbout, dbin, nb_neigh + 1, false, verbose);
   if (V.computeLower(Ranks, verbose)) return 1;

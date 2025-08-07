@@ -501,7 +501,7 @@ DbGrid* DbGrid::createFromGridExtend(const DbGrid& gridIn,
 DbGrid* DbGrid::createFromGridShrink(const DbGrid& gridIn,
                                      const VectorInt& deletedRanks)
 {
-  DbGrid* gridnew = new DbGrid();
+  auto* gridnew = new DbGrid();
   int ndim        = gridIn.getNDim();
 
   for (int i = 0; i < (int)deletedRanks.size(); i++)

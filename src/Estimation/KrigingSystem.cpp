@@ -800,13 +800,13 @@ int KrigingSystem::_updateForColCokMoving()
   _sampleRanks = newVVI;
 
   // Update Z vector
-  VectorDouble newZ = VectorDouble(newSize);
+  VectorDouble newZ(newSize);
   for (int i = 0; i < newSize; i++)
     newZ[i] = (adds[i] > 0) ? _Z[adds[i] - 1] : newValues[-adds[i] - 1];
   _Z = newZ;
 
   // Update _Sigma (symmetric square matrix)
-  MatrixSymmetric newS = MatrixSymmetric(newSize);
+  MatrixSymmetric newS(newSize);
   for (int i = 0; i < newSize; i++)
     for (int j = 0; j <= i; j++)
     {
@@ -830,7 +830,7 @@ int KrigingSystem::_updateForColCokMoving()
   _Sigma = newS;
 
   // Update X
-  MatrixDense newX = MatrixDense(newSize, nbfl);
+  MatrixDense newX(newSize, nbfl);
   for (int i = 0; i < newSize; i++)
     for (int j = 0; j < nbfl; j++)
     {
@@ -844,7 +844,7 @@ int KrigingSystem::_updateForColCokMoving()
   _X = newX;
 
   // Update Sigma0
-  MatrixDense newS0 = MatrixDense(newSize, nrhs);
+  MatrixDense newS0(newSize, nrhs);
   for (int i = 0; i < newSize; i++)
     for (int j = 0; j < nrhs; j++)
     {

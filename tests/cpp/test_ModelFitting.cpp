@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
   const ECalcVario calcul = ECalcVario::VARIOGRAM;
 
   // Creating the Model used to simulate the Data
-  Model* model_simu           = new Model(nvar);
+  auto* model_simu           = new Model(nvar);
   MatrixSymmetric sill_nugget = _buildSillMatrix(nvar, 2.);
   model_simu->addCovFromParam(ECov::NUGGET, 0., 0., 0., VectorDouble(),
                               sill_nugget);
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
   bool verbose = false;
   bool trace   = false;
   Model* model_test;
-  ModelOptimParam mop = ModelOptimParam();
+  ModelOptimParam mop;
   mop.setWmode(2);
 
   OptCustom::define("UseGradient", 1);

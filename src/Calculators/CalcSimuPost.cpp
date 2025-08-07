@@ -343,7 +343,7 @@ void CalcSimuPost::_statisticsFunction(const VectorVectorDouble& Y_p,
 
   if (_mustBeChecked(0) && !Y_p.empty())
   {
-    Table stat_table = Table(_getNEff(), _getNStats());
+    Table stat_table(_getNEff(), _getNStats());
     stat_table.setTitle("Statistics");
     stat_table.setSkipTitle(true);
     stat_table.setSkipDescription(true);

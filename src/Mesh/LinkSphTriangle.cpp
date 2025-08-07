@@ -244,7 +244,7 @@ int meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
   }
   if (triswitch[0] == '-' && triswitch[1] == 'h')
   {
-    message("  usage [-nrh]\n");
+    message("  usage [-n|r|h]\n");
     message("  -n  Use Van der Corput algorithm to generate N points.\n");
     message("  -r  Generate points from N iterated sphere discretization.\n");
     message("  -h  Help:  A brief instruction.\n");

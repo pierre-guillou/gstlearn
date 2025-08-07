@@ -10,15 +10,11 @@
 /******************************************************************************/
 #include "Basic/Law.hpp"
 #include "Basic/MathFunc.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/Utilities.hpp"
 #include "geoslib_d.h"
 
 /*! \cond */
-#define INTRESX(ic, i)        (ctables->CT[ic]->res[(i)])
-#define COVAL(ctables, iconf) (ctables->cmin + iconf * ctables->dc)
-#define NELEM(ctables)        ((ctables->flag_cumul) ? ctables->ndisc + 1 : ctables->ndisc)
-#define INTRESX(ic, i)        (ctables->CT[ic]->res[(i)])
+#define INTRESX(ic, i)        (ctables->res[ic][i])
 #define COVAL(ctables, iconf) (ctables->cmin + iconf * ctables->dc)
 #define NELEM(ctables)        ((ctables->flag_cumul) ? ctables->ndisc + 1 : ctables->ndisc)
 /*! \endcond */
@@ -36,7 +32,7 @@ namespace gstlrn
  **
  ** IN_ARGS:  ctables : Pointer to the CTables structure
  ** IN_ARGS:  mode    : 1 for allocation; -1 for deallocation
- ** IN_ARGS:  rank    : rank of the CTable structure
+ ** IN_ARGS:  rank    : rank within the CTables structure
  **
  ** OUT_ARGS: nb_used : Number of defined items for this discretization level
  **                     0 if the discretization level has not been used
@@ -65,28 +61,23 @@ static void st_tableone_manage(CTables* ctables,
 
     // Allocation
 
-    if (ctables->CT[rank] == nullptr)
+    if (ctables->res[rank].empty())
     {
-      if (ctables->CT[rank] == NULL)
-      {
-        ctables->CT[rank] = (CTable*)mem_alloc(sizeof(CTable), 1);
-        ctables->CT[rank]->res.resize(size);
-        for (int i = 0; i < size; i++)
-          INTRESX(rank, i) = TEST;
-        return;
-      }
+      ctables->res[rank].resize(size);
+      for (int i = 0; i < size; i++)
+        INTRESX(rank, i) = TEST;
+      return;
     }
   }
   else
   {
-    if (ctables->CT[rank] != nullptr)
+    if (ctables->res[rank].empty())
     {
       number = 0;
       for (int i = 0; i < size; i++)
         if (FFFF(INTRESX(rank, i))) number++;
-      ctables->CT[rank]->res.clear();
+      ctables->res[rank].clear();
       *nb_used          = number;
-      ctables->CT[rank] = (CTable*)mem_alloc(sizeof(CTable), 1);
       return;
     }
   }
@@ -154,7 +145,7 @@ double ct_INTRES2(CTables* ctables,
 
   // Check if integral has already been defined
 
-  if (ctables->CT[iconf0] == nullptr)
+  if (ctables->res[iconf0].empty())
     st_tableone_manage(ctables, 1, iconf0, &nb_used, &nb_max);
 
   // Dispatch
@@ -247,7 +238,7 @@ double ct_INTRES3(CTables* ctables,
 
   // Check if integral has already been defined
 
-  if (ctables->CT[iconf0] == nullptr)
+  if (ctables->res[iconf0].empty())
     st_tableone_manage(ctables, 1, iconf0, &nb_used, &nb_max);
 
   // Dispatch
@@ -349,9 +340,9 @@ void ct_tables_print(CTables* ctables, int flag_print)
 
   message("\n");
   message("Number of Probability Discretizations       = %d\n", ndisc);
-  if (ctables->v != nullptr)
+  if (!ctables->v.empty())
     print_matrix("List of Gaussian Thresholds", 0, 1, 1, ctables->ndisc + 1,
-                 NULL, ctables->v);
+                 NULL, ctables->v.data());
 
   if (flag_print > 0)
   {
@@ -359,14 +350,14 @@ void ct_tables_print(CTables* ctables, int flag_print)
 
     for (int iconf = 0; iconf < ctables->nconf; iconf++)
     {
-      if (ctables->CT[iconf] == NULL) continue;
+      if (ctables->res[iconf].empty()) continue;
 
       if (flag_print > 0)
         message("- Configuration %d/%d (Cov=%lf)\n", iconf + 1, ctables->nconf,
                 COVAL(ctables, iconf));
 
       if (flag_print == 2)
-        print_matrix(NULL, 0, 1, nelem, nelem, NULL, ctables->CT[iconf]->res.data());
+        print_matrix(NULL, 0, 1, nelem, nelem, NULL, ctables->res[iconf].data());
     }
     message("\n");
   }
@@ -401,7 +392,6 @@ CTables* ct_tables_manage(int mode,
                           CTables* ctables_old)
 {
   CTables* ctables;
-  double* v;
   int n_used, nb_used, nb_max;
 
   /* Dispatch */
@@ -413,7 +403,7 @@ CTables* ct_tables_manage(int mode,
     if (verbose)
       message("Allocating CTables (%dx%d) for %d possible configurations\n",
               ndisc, ndisc, nconf);
-    ctables             = (CTables*)mem_alloc(sizeof(CTables), 1);
+    ctables             = new CTables;
     ctables->flag_cumul = flag_cumul;
     ctables->nconf      = nconf;
     ctables->ndisc      = ndisc;
@@ -422,17 +412,17 @@ CTables* ct_tables_manage(int mode,
     ctables->dc         = (ctables->cmax - ctables->cmin) / (double)(nconf - 1);
     ctables->dp         = 1. / (double)ndisc;
 
-    ctables->CT = (CTable**)mem_alloc(sizeof(CTable*) * ctables->nconf, 1);
+    ctables->res.resize(ctables->nconf);
     for (int iconf = 0; iconf < ctables->nconf; iconf++)
-      ctables->CT[iconf] = nullptr;
+      ctables->res[iconf].clear();
 
     // Define the array of thresholds
 
-    v = ctables->v = (double*)mem_alloc(sizeof(double) * (ndisc + 1), 1);
-    v[0]           = THRESH_INF;
-    v[ndisc]       = THRESH_SUP;
+    ctables->v.resize(ndisc + 1);
+    ctables->v[0]     = THRESH_INF;
+    ctables->v[ndisc] = THRESH_SUP;
     for (int idisc = 0; idisc < ndisc; idisc++)
-      v[idisc] = law_invcdf_gaussian((double)idisc * ctables->dp);
+      ctables->v[idisc] = law_invcdf_gaussian((double)idisc * ctables->dp);
   }
   else
   {
@@ -441,7 +431,7 @@ CTables* ct_tables_manage(int mode,
 
     ctables = ctables_old;
     if (ctables == nullptr) return (ctables);
-    ctables->v = (double*)mem_free((char*)ctables->v);
+    ctables->v.clear();
     if (verbose)
       message("Freeing CTables from %d configuration(s)\n", ctables->nconf);
 
@@ -458,7 +448,8 @@ CTables* ct_tables_manage(int mode,
       }
     }
     if (verbose) message("Total of configurations actually used: %d\n", n_used);
-    ctables = (CTables*)mem_free((char*)ctables);
+    delete ctables;
+    ctables = nullptr;
   }
   return (ctables);
 }

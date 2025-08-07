@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
   (void) simtub(nullptr,grid,model);
 
   // Defining a Fault system
-  Faults* faults = new Faults();
+  auto* faults = new Faults();
   PolyLine2D polyline({0.1, 0.6, 0.7}, {0.1, 0.4, 0.9});
   faults->addFault(polyline);
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
   double angle2D = 30.;
   DirParam dirparam = DirParam(nlag, dlag, toldis, tolang, optcode, 0, TEST, TEST, tolcode,
                                 VectorDouble(), VectorDouble(), angle2D);
-  VarioParam varioparamC = VarioParam();
+  VarioParam varioparamC;
   varioparamC.addDir(dirparam);
   varioparamC.addFaults(faults);
   Vario* varioC = Vario::computeFromDb(varioparamC,db,ECalcVario::VARIOGRAM);

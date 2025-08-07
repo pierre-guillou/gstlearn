@@ -253,7 +253,7 @@ int Rule::setMainNodeFromNodNames(const VectorInt& nodes)
 
     // Allocate the new node
 
-    Node* node_loc = new Node(name.str(), NODE_TYPE(inode), facies);
+    auto* node_loc = new Node(name.str(), NODE_TYPE(inode), facies);
     if (inode == 0) _mainNode = node_loc;
 
     /* Link to the previous pointer */
@@ -1051,7 +1051,7 @@ Rule* Rule::createFromNF(const String& NFFilename, bool verbose)
 
 Rule* Rule::createFromNames(const VectorString& nodnames,double rho)
 {
-  Rule* rule = new Rule();
+  auto* rule = new Rule();
   if (rule->resetFromNames(nodnames, rho))
   {
     messerr("Problem when creating Rule from a vector of Names");
@@ -1062,7 +1062,7 @@ Rule* Rule::createFromNames(const VectorString& nodnames,double rho)
 }
 Rule* Rule::createFromCodes(const VectorInt& nodes,double rho)
 {
-  Rule* rule = new Rule();
+  auto* rule = new Rule();
   if (rule->resetFromCodes(nodes, rho))
   {
     messerr("Problem when creating Rule from a vector of Codes");
@@ -1075,7 +1075,7 @@ Rule* Rule::createFromNumericalCoding(const VectorInt& n_type,
                                       const VectorInt& n_facs,
                                       double rho)
 {
-  Rule* rule = new Rule();
+  auto* rule = new Rule();
   if (rule->resetFromNumericalCoding(n_type, n_facs, rho))
   {
     messerr("Problem when creating Rule from Numerical Coding");
@@ -1086,7 +1086,7 @@ Rule* Rule::createFromNumericalCoding(const VectorInt& n_type,
 }
 Rule* Rule::createFromFaciesCount(int nfacies, double rho)
 {
-  Rule* rule = new Rule();
+  auto* rule = new Rule();
   if (rule->resetFromFaciesCount(nfacies, rho))
   {
     messerr("Problem when creating Rule from a number of Facies");

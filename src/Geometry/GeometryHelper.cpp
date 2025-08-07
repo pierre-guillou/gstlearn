@@ -1264,11 +1264,11 @@ double util_rotation_gradXYToAngle(double dzoverdx, double dzoverdy)
   int ndim = 3;
 
   // Vector orthogonal to the horizontal plane/ i.e. the vertical axis
-  VectorDouble vert = VectorDouble(3, 0.);
+  VectorDouble vert(3, 0.);
   vert[ndim - 1]    = -1.;
 
   // Vector orthogonal to the tilted plane
-  VectorDouble vort = VectorDouble(ndim);
+  VectorDouble vort(ndim);
   vort[0]           = dzoverdx;
   vort[1]           = dzoverdy;
   vort[2]           = -1.;
@@ -1304,11 +1304,11 @@ MatrixSquare GeometryHelper::gradXYToRotmat(double dzoverdx,
   VectorDouble axis(ndim, 0.);
 
   // Vector orthogonal to the horizontal plane/ i.e. the vertical axis
-  VectorDouble vert = VectorDouble(3, 0.);
+  VectorDouble vert(3, 0.);
   vert[ndim - 1]    = -1.;
 
   // Vector orthogonal to the tilted plane
-  VectorDouble vort = VectorDouble(ndim);
+  VectorDouble vort(ndim);
   vort[0]           = dzoverdx;
   vort[1]           = dzoverdy;
   vort[2]           = -1.;
@@ -1515,7 +1515,7 @@ MatrixDense* GeometryHelper::getDirectionsInR3(const MatrixDense* U)
     return nullptr;
   }
 
-  MatrixDense* X = new MatrixDense(np, 3);
+  auto* X = new MatrixDense(np, 3);
   for (int ip = 0; ip < np; ip++)
   {
     double u1 = U->getValue(ip, 0);
@@ -1727,7 +1727,7 @@ MatrixDense* GeometryHelper::getDirectionsInRn(const MatrixDense* U)
     return nullptr;
   }
 
-  MatrixDense* Y = new MatrixDense(np, nd);
+  auto* Y = new MatrixDense(np, nd);
   for (int ip = 0; ip < np; ip++)
   {
     double total = 0.;

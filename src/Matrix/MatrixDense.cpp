@@ -661,7 +661,7 @@ MatrixDense* MatrixDense::createFromVVD(const VectorVectorDouble& X)
   int nrow = (int)X.size();
   int ncol = (int)X[0].size();
 
-  MatrixDense* mat = new MatrixDense(nrow, ncol);
+  auto* mat = new MatrixDense(nrow, ncol);
   mat->_fillFromVVD(X);
   return mat;
 }
@@ -677,7 +677,7 @@ MatrixDense* MatrixDense::createFromVD(const VectorDouble& X,
     messerr("Inconsistency between arguments 'nrow'(%d) and 'ncol'(%d)", nrow, ncol);
     messerr("and the dimension of the input Vector (%d)", (int)X.size());
   }
-  MatrixDense* mat = new MatrixDense(nrow, ncol);
+  auto* mat = new MatrixDense(nrow, ncol);
 
   int lec = 0;
   if (byCol)
@@ -713,7 +713,7 @@ MatrixDense* MatrixDense::glue(const AMatrix* A1,
   int nrows = (flagShiftRow) ? A1->getNRows() + A2->getNRows() : MAX(A1->getNRows(), A2->getNRows());
   int ncols = (flagShiftCol) ? A1->getNCols() + A2->getNCols() : MAX(A1->getNCols(), A2->getNCols());
 
-  MatrixDense* mat = new MatrixDense(nrows, ncols);
+  auto* mat = new MatrixDense(nrows, ncols);
   mat->fill(0.);
 
   // Copy the first input matrix

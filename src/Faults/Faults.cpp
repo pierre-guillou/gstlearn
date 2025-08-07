@@ -89,7 +89,7 @@ bool Faults::_deserializeAscii(std::istream& is, bool verbose)
 
 Faults* Faults::createFromNF(const String& NFFilename, bool verbose)
 {
-  Faults* faults = new Faults();
+  auto* faults = new Faults();
   if (faults->_fileOpenAndDeserialize(NFFilename, verbose)) return faults;
   delete faults;
   return nullptr;

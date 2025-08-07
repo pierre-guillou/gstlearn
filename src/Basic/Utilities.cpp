@@ -799,12 +799,11 @@ static void st_combinations(int* v,
                             int k,
                             int maxk,
                             int* ncomb,
-                            int** comb)
+                            VectorInt& comb)
 {
-  int i, nloc, ndeb, *cloc;
+  int i, nloc, ndeb;
 
   nloc = *ncomb;
-  cloc = *comb;
 
   /* k here counts through positions in the maxk-element v.
    * if k > maxk, then the v is complete and we can use it.
@@ -812,12 +811,11 @@ static void st_combinations(int* v,
   if (k > maxk)
   {
     /* insert code here to use combinations as you please */
-    cloc = (int*)mem_realloc((char*)cloc, sizeof(int) * maxk * (nloc + 1), 1);
+    comb.resize(maxk * (nloc + 1));
     ndeb = nloc * maxk;
     for (i = 0; i < maxk; i++)
-      cloc[ndeb + i] = v[i + 1];
+      comb[ndeb + i] = v[i + 1];
     *ncomb = nloc + 1;
-    *comb  = cloc;
     return;
   }
 
@@ -848,19 +846,16 @@ static void st_combinations(int* v,
  ** \remarks The calling function must free the returned array.
  **
  *****************************************************************************/
-int* ut_combinations(int n, int maxk, int* ncomb)
+VectorInt ut_combinations(int n, int maxk, int* ncomb)
 {
-  int *v, *comb;
-
-  v = (int*)mem_alloc(sizeof(int) * n, 1);
+  VectorInt v(n);
   for (int i = 0; i < n; i++)
     v[i] = i;
 
-  (*ncomb) = 0;
-  comb     = nullptr;
-  st_combinations(v, 1, n, 1, maxk, ncomb, &comb);
-  mem_free((char*)v);
-  return (comb);
+  (*ncomb)  = 0;
+  VectorInt comb;
+  st_combinations(v.data(), 1, n, 1, maxk, ncomb, comb);
+  return comb;
 }
 
 /****************************************************************************/

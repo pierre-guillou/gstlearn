@@ -70,7 +70,7 @@ SpaceTarget* SpaceTarget::create(const VectorDouble& center,
                                  double date,
                                  const ASpaceSharedPtr& space)
 {
-  SpaceTarget* st = new SpaceTarget(space);
+  auto* st = new SpaceTarget(space);
   st->setCoords(center);
   st->setExtend(extend);
   st->setCode(code);

@@ -351,7 +351,7 @@ void MeshETurbo::_buildMaskInMeshing(const VectorDouble& sel)
   // Creating the selection of the active grid nodes
   // It is at least equal to 'sel'. In addition, non active grid nodes are also discarded
 
-  VectorDouble selbis = VectorDouble(sel.size(), 0.);
+  VectorDouble selbis(sel.size(), 0.);
   for (int imesh = 0; imesh < meshNactive; imesh++)
   {
     int jmesh = _meshIndirect.getRToA(imesh);
@@ -391,7 +391,7 @@ MeshETurbo* MeshETurbo::create(const VectorInt& nx,
                                bool flag_polarized,
                                bool verbose)
 {
-  MeshETurbo* mesh = new MeshETurbo(nx, dx, x0, angles, flag_polarized, verbose);
+  auto* mesh = new MeshETurbo(nx, dx, x0, angles, flag_polarized, verbose);
   return mesh;
 }
 
@@ -400,7 +400,7 @@ MeshETurbo* MeshETurbo::createFromGrid(const DbGrid* dbgrid,
                                        bool verbose,
                                        int mode)
 {
-  MeshETurbo* mesh = new MeshETurbo(dbgrid, flag_polarized, verbose, mode);
+  auto* mesh = new MeshETurbo(dbgrid, flag_polarized, verbose, mode);
   return mesh;
 }
 
@@ -409,7 +409,7 @@ MeshETurbo* MeshETurbo::createFromGridInfo(const Grid* grid,
                                            bool verbose,
                                            int mode)
 {
-  MeshETurbo* mesh = new MeshETurbo(mode);
+  auto* mesh = new MeshETurbo(mode);
   if (mesh->initFromGridByMatrix(grid->getNXs(), grid->getDXs(), grid->getX0s(),
                                  grid->getRotMat(), VectorDouble(), flag_polarized,
                                  verbose))

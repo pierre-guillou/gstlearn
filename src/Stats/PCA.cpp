@@ -824,7 +824,7 @@ void PCA::_variogramh(Db* db,
 VectorBool PCA::_getVectorIsotopic(const Db* db)
 {
   int nech           = db->getNSample();
-  VectorBool isoFlag = VectorBool(nech);
+  VectorBool isoFlag(nech);
 
   for (int iech = 0; iech < nech; iech++)
   {
