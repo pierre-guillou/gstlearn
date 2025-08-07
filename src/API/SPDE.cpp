@@ -89,21 +89,19 @@ SPDE::SPDE(const Db* dbin,
 
 SPDE::~SPDE()
 {
-  if (_createMeshesK && !_meshesK.empty())
-  {
-    for (Id i = 0, n = _meshesK.size(); i < n; i++)
-      delete _meshesK[i];
-  }
-  if (_createMeshesS && !_meshesS.empty())
-  {
-    for (Id i = 0, n = _meshesS.size(); i < n; i++)
-      delete _meshesS[i];
-  }
+  _cleanMeshes(true);
+  _cleanMeshes(false);
 
-  if (_createAinK) delete _AinK;
-  if (_createAinS) delete _AinS;
-  if (_createAoutK) delete _AoutK;
-  if (_createAoutS) delete _AoutS;
+  _cleanProjection(true, false);
+  _cleanProjection(true, true);
+  _cleanProjection(false, false);
+  _cleanProjection(false, true);
+
+  _cleanSpdeOperator();
+}
+
+void SPDE::_cleanSpdeOperator()
+{
   delete _Qom;
   delete _QopK;
   delete _QopS;
@@ -356,14 +354,37 @@ void SPDE::_printProjectionDetails(const ProjMultiMatrix* proj)
   message("- Number of Points    = %d\n", proj->getNPoint());
 }
 
-void SPDE::_defineMeshIn(bool flagForKrige, bool verbose)
+void SPDE::_cleanMeshes(bool flagForKrige)
+{
+  if (flagForKrige)
+  {
+    if (_createMeshesK && !_meshesK.empty())
+    {
+      for (int i = 0, n = _meshesK.size(); i < n; i++)
+        delete _meshesK[i];
+    }
+  }
+  else
+  {
+    if (_createMeshesS && !_meshesS.empty())
+    {
+      for (int i = 0, n = _meshesS.size(); i < n; i++)
+        delete _meshesS[i];
+    }
+  }
+}
+
+void SPDE::_defineMeshes(bool flagForKrige, bool verbose)
 {
   const auto* src  = flagForKrige ? _meshesKInit : _meshesSInit;
   auto& dest       = flagForKrige ? _meshesK : _meshesS;
   auto& createMesh = flagForKrige ? _createMeshesK : _createMeshesS;
 
-  Id ncov  = _model->getNCov(true);
-  Id nmesh = (src != nullptr) ? src->size() : 0;
+  int ncov  = _model->getNCov(true);
+  int nmesh = (src != nullptr) ? src->size() : 0;
+
+  // Cleaning already existing meshes inforation
+  _cleanMeshes(flagForKrige);
 
   // Particular case of Simulations: if the corresponding mesh is not defined
   // the meshing dedicated to Kriging is used instead.
@@ -406,7 +427,22 @@ void SPDE::_defineMeshIn(bool flagForKrige, bool verbose)
   }
 }
 
-Id SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
+void SPDE::_cleanProjection(bool flagIn, bool flagForKrige)
+{
+  const ProjMultiMatrix** dest =
+    flagIn
+      ? (flagForKrige ? &_AinK : &_AinS)
+      : (flagForKrige ? &_AoutK : &_AoutS);
+  auto& createProj =
+    flagIn
+      ? (flagForKrige ? _createAinK : _createAinS)
+      : (flagForKrige ? _createAoutK : _createAoutS);
+
+  if (createProj) delete dest;
+  dest = nullptr;
+}
+
+int SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
 {
   const auto* db = flagIn ? _dbin : _dbout;
   if (db == nullptr) return 0;
@@ -420,7 +456,10 @@ Id SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
     flagIn
       ? (flagForKrige ? &_AinK : &_AinS)
       : (flagForKrige ? &_AoutK : &_AoutS);
-  auto& createProj = flagIn ? (flagForKrige ? _createAinK : _createAinS) : (flagForKrige ? _createAoutK : _createAoutS);
+  auto& createProj =
+    flagIn
+      ? (flagForKrige ? _createAinK : _createAinS)
+      : (flagForKrige ? _createAoutK : _createAoutS);
 
   const String option = flagForKrige ? "Kriging" : "Simulations";
   const String file   = flagIn ? "'dbin'" : "'dbout'";
@@ -429,6 +468,10 @@ Id SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
   Id nvar = _model->getNVar();
   if (verbose) message("Projection of %s for %s: ", file.c_str(), option.c_str());
 
+  // Clean existing projection (if necessary)
+  _cleanProjection(flagIn, flagForKrige);
+
+  // Create the new proejction
   if (src == nullptr)
   {
     *dest      = ProjMultiMatrix::createFromDbAndMeshes(db, meshes, ncov, nvar, flagIn);
@@ -451,6 +494,9 @@ Id SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
 Id SPDE::defineSpdeOperator(bool verbose)
 {
   delete _spdeop;
+
+  // Clean previous material (if necessary)
+  _cleanSpdeOperator();
 
   _invnoiseobj = new InvNuggetOp(_dbin, _model, _params, !_flagCholesky);
 
@@ -570,11 +616,11 @@ Id SPDE::makeReady(bool verbose)
   // Define Meshes
   if (_flagKrig)
   {
-    _defineMeshIn(true, verbose);
+    _defineMeshes(true, verbose);
   }
   if (_flagSimu)
   {
-    _defineMeshIn(false, verbose);
+    _defineMeshes(false, verbose);
   }
 
   // Define the projections on Dbin

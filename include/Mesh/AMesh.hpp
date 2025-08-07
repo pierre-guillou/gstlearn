@@ -10,10 +10,9 @@
 /******************************************************************************/
 #pragma once
 
-#include "Basic/VectorNumT.hpp"
-#include "Basic/AStringable.hpp"
 #include "Basic/ASerializable.hpp"
-
+#include "Basic/AStringable.hpp"
+#include "Basic/VectorNumT.hpp"
 
 namespace gstlrn
 {
@@ -21,16 +20,15 @@ class MatrixDense;
 class ProjMatrix;
 class MatrixInt;
 class Db;
-class GSTLEARN_EXPORT AMesh : public AStringable, public ASerializable
+class GSTLEARN_EXPORT AMesh: public AStringable, public ASerializable
 {
-
 public:
-	AMesh();
-  AMesh(const AMesh &m);
-  AMesh& operator= (const AMesh &m);
-	virtual ~AMesh();
+  AMesh();
+  AMesh(const AMesh& m);
+  AMesh& operator=(const AMesh& m);
+  virtual ~AMesh();
 
-	/// Interface to AStringable
+  /// Interface to AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Interface for AMesh
@@ -148,3 +146,7 @@ private:
 
 typedef std::vector<const AMesh*> VectorMeshes;
 }
+
+GSTLEARN_EXPORT void dumpMeshes(const VectorMeshes& meshes);
+
+} // namespace gstlrn

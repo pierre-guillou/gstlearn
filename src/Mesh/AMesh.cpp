@@ -57,7 +57,7 @@ AMesh::~AMesh()
 }
 
 Id AMesh::_setExtend(const VectorDouble& extendmin,
-                      const VectorDouble& extendmax)
+                     const VectorDouble& extendmax)
 {
   _extendMin = extendmin;
   _extendMax = extendmax;
@@ -245,7 +245,7 @@ MatrixInt AMesh::getAllMeshes() const
  */
 double AMesh::getCenterCoordinate(Id imesh, Id idim) const
 {
-  double coor = 0.;
+  double coor  = 0.;
   auto ncorner = getNApexPerMesh();
   for (Id icorner = 0; icorner < ncorner; icorner++)
     coor += getCoor(imesh, icorner, idim);
@@ -775,7 +775,7 @@ void AMesh::resetProjFromDb(ProjMatrix* m,
   auto ndim    = getNDim();
   auto nvertex = getNApices();
   auto ncorner = getNApexPerMesh();
-  Id nech    = db->getNSample();
+  Id nech      = db->getNSample();
   auto nmeshes = getNMeshes();
   VectorDouble units(nmeshes, 0.);
   if (getVariety() != 1)
@@ -873,14 +873,14 @@ void AMesh::resetProjFromDb(ProjMatrix* m,
 }
 
 Id AMesh::_findBarycenter(const VectorDouble& target,
-                           const VectorDouble& units,
-                           Id nb_neigh,
-                           VectorInt& neighs,
-                           VectorDouble& weight) const
+                          const VectorDouble& units,
+                          Id nb_neigh,
+                          VectorInt& neighs,
+                          VectorDouble& weight) const
 {
   for (Id jm = 0; jm < nb_neigh; jm++)
   {
-    Id im                     = neighs[jm];
+    Id im                      = neighs[jm];
     VectorVectorDouble corners = getCoordinatesPerMesh(im);
     if (!_weightsInMesh(target, corners, units[im], weight)) continue;
     return im;
@@ -926,4 +926,13 @@ bool AMesh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   return ret;
 }
 #endif
+
+void dumpMeshes(const VectorMeshes& meshes)
+{
+  mestitle(1, "Contents of the VectorMeshes");
+  int nmesh = meshes.size();
+  for (int imesh = 0; imesh < nmesh; imesh++)
+    messageFlush(meshes[imesh]->toString());
+}
+
 } // namespace gstlrn

@@ -73,10 +73,10 @@ public:
   Id setMeshes(bool flagForKrig, const VectorMeshes* meshes);
   Id setProjIn(bool flagForKrig, const ProjMultiMatrix* proj);
   Id setDbAndProjOut(Db* dbout,
-                      const ProjMultiMatrix* projK = nullptr,
-                      const ProjMultiMatrix* projS = nullptr,
-                      bool flagApply               = true,
-                      bool verbose                 = false);
+                     const ProjMultiMatrix* projK = nullptr,
+                     const ProjMultiMatrix* projS = nullptr,
+                     bool flagApply               = true,
+                     bool verbose                 = false);
   Id makeReady(bool verbose = false);
 
 private:
@@ -88,6 +88,9 @@ private:
   static void _printMeshesDetails(const VectorMeshes& meshes);
   static void _printProjectionDetails(const ProjMultiMatrix* proj);
   bool _isValidProjection(const Db* db, const VectorMeshes* meshes, const ProjMultiMatrix* proj);
+  void _cleanMeshes(bool flagForKrige);
+  void _cleanProjection(bool flagIn, bool flagForKrige);
+  void _cleanSpdeOperator();
 
 private:
   const Db* _dbin;  // External Pointer
