@@ -33,7 +33,7 @@ InvNuggetOp::InvNuggetOp(const Db* dbin, Model* model, const SPDEParam& params, 
   _buildInvNugget(dbin, model, params);
 }
 
-int InvNuggetOp::getSize() const
+Id InvNuggetOp::getSize() const
 {
   return getNRows();
 }
@@ -42,33 +42,33 @@ InvNuggetOp::~InvNuggetOp()
 {
 }
 
-int InvNuggetOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
+Id InvNuggetOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
 {
   return _cholNuggetMatrix->addToDest(whitenoise, outv);
 }
 
 static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef)
 {
-  int nverr = (int)verrDef.size();
+  Id nverr = (Id)verrDef.size();
   if (nverr > 0)
   {
-    for (int iverr = 0; iverr < nverr; iverr++)
+    for (Id iverr = 0; iverr < nverr; iverr++)
       sills.updValue(iverr, iverr, EOperator::ADD, verrDef[iverr]);
   }
 }
 
 static void _checkMinNugget(MatrixSymmetric& sills, const VectorDouble& minNug)
 {
-  int nvar = (int)minNug.size();
+  Id nvar = (Id)minNug.size();
 
   // Check that the diagonal of the Sill matrix is large enough
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     sills.setValue(ivar, ivar, MAX(sills.getValue(ivar, ivar), minNug[ivar]));
 }
 
 static MatrixSymmetric _buildSillPartialMatrix(const MatrixSymmetric& sillsRef,
-                                               int nvar,
-                                               int ndef,
+                                               Id nvar,
+                                               Id ndef,
                                                const VectorInt& identity)
 {
   MatrixSymmetric sills;
@@ -77,27 +77,27 @@ static MatrixSymmetric _buildSillPartialMatrix(const MatrixSymmetric& sillsRef,
   else
   {
     sills = MatrixSymmetric(ndef);
-    for (int idef = 0; idef < ndef; idef++)
-      for (int jdef = 0; jdef <= idef; jdef++)
+    for (Id idef = 0; idef < ndef; idef++)
+      for (Id jdef = 0; jdef <= idef; jdef++)
         sills.setValue(idef, jdef, sillsRef.getValue(identity[idef], identity[jdef]));
   }
   return sills;
 }
 
-static int _loadPositions(int iech,
+static Id _loadPositions(Id iech,
                           const VectorVectorInt& index1,
                           const VectorInt& cumul,
                           VectorInt& positions,
                           VectorInt& identity,
-                          int* rank_arg)
+                          Id* rank_arg)
 {
-  int nvar = (int)cumul.size();
-  int ndef = 0;
-  int rank = 0;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  Id nvar = (Id)cumul.size();
+  Id ndef = 0;
+  Id rank = 0;
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     rank     = 2 * rank;
-    int ipos = VH::whereElement(index1[ivar], iech);
+    Id ipos = VH::whereElement(index1[ivar], iech);
     if (ipos < 0)
       positions[ivar] = -1;
     else
@@ -146,9 +146,9 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
 {
   CholeskyDense chol;
   if (db == nullptr) return;
-  int nech = db->getNSample();
+  Id nech = db->getNSample();
   if (model == nullptr) return;
-  int nvar = db->getNLoc(ELoc::Z);
+  Id nvar = db->getNLoc(ELoc::Z);
   if (nvar != model->getNVar())
   {
     messerr("'db' and 'model' should have the same number of variables");
@@ -157,7 +157,7 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
   bool hasnugget = false;
   CovAniso* cova = nullptr;
 
-  for (int icov = 0; icov < model->getNCov(); icov++)
+  for (Id icov = 0; icov < model->getNCov(); icov++)
   {
     if (model->getCovAniso(icov)->getType() == ECov::NUGGET)
     {
@@ -178,7 +178,7 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
   // Get the minimum value for diagonal terms
   double eps = params.getEpsNugget();
   VectorDouble minNug(nvar);
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     minNug[ivar] = eps * model->getTotalSill(ivar, ivar);
 
   // Play the non-stationarity (if needed)
@@ -201,19 +201,19 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
   // - flag_isotropic: True in Isotopic case
   // - flag_uniqueVerr: True if the Variance of Measurement Error is constant per variable
   // - flag_nostat: True is some non-stationarity is defined
-  int nverr          = db->getNLoc(ELoc::V);
+  Id nverr          = db->getNLoc(ELoc::V);
   bool flag_verr     = (nverr > 0);
   bool flag_isotopic = true;
-  for (int ivar = 1; ivar < nvar && flag_isotopic; ivar++)
+  for (Id ivar = 1; ivar < nvar && flag_isotopic; ivar++)
     if (!VH::isEqual(index1[ivar], index1[0])) flag_isotopic = false;
   bool flag_uniqueVerr = true;
   VectorDouble verrDef(nverr, 0.);
   if (flag_verr)
   {
-    for (int iverr = 0; iverr < nverr && flag_uniqueVerr; iverr++)
+    for (Id iverr = 0; iverr < nverr && flag_uniqueVerr; iverr++)
     {
       VectorDouble verr = db->getColumnByLocator(ELoc::V, iverr);
-      if ((int)VH::unique(verr).size() > 1) flag_uniqueVerr = false;
+      if ((Id)VH::unique(verr).size() > 1) flag_uniqueVerr = false;
       verrDef[iverr] = verr[0];
     }
   }
@@ -221,7 +221,7 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
 
   // Elaborate the Sill matrix for the Nugget Effect component
   MatrixSymmetric sillsRef = cova->getSill();
-  int count                = (int)pow(2, nvar);
+  Id count                = (Id)pow(2, nvar);
   std::vector<MatrixSymmetric> sillsInv(count);
 
   // Pre-calculate the inverse of the sill matrix (if constant)
@@ -241,11 +241,11 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
   }
 
   // Loop on the samples
-  int rank;
-  int ndef = nvar;
+  Id rank;
+  Id ndef = nvar;
   VectorInt position(nvar);
   VectorInt identity(nvar);
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActive(iech)) continue;
 
@@ -287,8 +287,8 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
 
       // Establish a local matrix
       MatrixSymmetric local(ndef);
-      for (int idef = 0; idef < ndef; idef++)
-        for (int jdef = 0; jdef <= idef; jdef++)
+      for (Id idef = 0; idef < ndef; idef++)
+        for (Id jdef = 0; jdef <= idef; jdef++)
         {
           // Load the sill value of the Nugget Effect component
           double value = sillsRef.getValue(identity[idef], identity[jdef]);
@@ -322,14 +322,14 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
   if (!hasnugget)
     delete cova;
 }
-void InvNuggetOp::_updateMatrix(MatrixSymmetric& invsill, CholeskyDense& cholsill, int ndef, const VectorInt& position, const VectorInt& identity)
+void InvNuggetOp::_updateMatrix(MatrixSymmetric& invsill, CholeskyDense& cholsill, Id ndef, const VectorInt& position, const VectorInt& identity)
 {
   {
-    for (int idef = 0; idef < ndef; idef++)
-      for (int jdef = 0; jdef < ndef; jdef++)
+    for (Id idef = 0; idef < ndef; idef++)
+      for (Id jdef = 0; jdef < ndef; jdef++)
       {
-        int pidef = position[identity[idef]];
-        int pjdef = position[identity[jdef]];
+        Id pidef = position[identity[idef]];
+        Id pjdef = position[identity[jdef]];
         setValue(pidef, pjdef, invsill.getValue(idef, jdef));
         if (idef >= jdef)
         {
@@ -345,7 +345,7 @@ std::shared_ptr<MatrixSparse> buildInvNugget(Db* dbin, Model* model, const SPDEP
   return std::make_shared<MatrixSparse>(*invnugg.getInvNuggetMatrix());
 }
 
-double InvNuggetOp::computeLogDet(int nMC) const
+double InvNuggetOp::computeLogDet(Id nMC) const
 {
   DECLARE_UNUSED(nMC)
 

@@ -44,17 +44,17 @@ public:
   bool hasFactor() const override { return true; }
   VectorDouble z2factor(double z, const VectorInt& ifacs) const override;
   double computeVariance(double sval) const override;
-  int updatePointToBlock(double r_coef) override;
+  Id updatePointToBlock(double r_coef) override;
   bool allowChangeSupport() const override { return true; }
   bool isChangeSupportDefined() const override { return (_sCoef > 0.); }
-  int fitFromArray(const VectorDouble& tab,
+  Id fitFromArray(const VectorDouble& tab,
                    const VectorDouble& wt = VectorDouble()) override;
 
   /// AnamDiscrete Interface
   void calculateMeanAndVariance() override;
 
   static AnamDiscreteIR* create(double rcoef = 0.);
-  void reset(int ncut,
+  void reset(Id ncut,
              double r_coef,
              const VectorDouble& zcut,
              const VectorDouble& stats);
@@ -62,11 +62,11 @@ public:
   double getRCoef() const { return _sCoef; }
   void setRCoef(double rcoef) { _sCoef = rcoef; }
 
-  int factor2Selectivity(Db* db,
+  Id factor2Selectivity(Db* db,
                          Selectivity* selectivity,
                          const VectorInt& cols_est,
                          const VectorInt& cols_std,
-                         int iptr0);
+                         Id iptr0);
 
 protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;
@@ -78,15 +78,15 @@ protected:
   String _getNFName() const override { return "AnamDiscreteIR"; }
 
 private:
-  int _stats_residuals(int verbose,
-                       int nech,
+  Id _stats_residuals(Id verbose,
+                       Id nech,
                        const VectorDouble& tab,
-                       int* nsorted,
+                       Id* nsorted,
                        double* mean,
                        double* residuals,
                        double* T,
                        double* Q);
-  double _getResidual(int iclass, double z) const;
+  double _getResidual(Id iclass, double z) const;
   void _globalSelectivity(Selectivity* selectivity);
 
 private:

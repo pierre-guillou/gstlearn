@@ -62,6 +62,6 @@ private:
   bool _verbose;
   bool _trace;
   std::vector<double> _x;
-  int _iter;
+  Id _iter;
 };
 }

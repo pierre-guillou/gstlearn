@@ -44,7 +44,7 @@ public:
   NeighBench(bool flag_xvalid             = false,
              double width                 = 0.,
              bool useBallTree             = false,
-             int leaf_size                = 10,
+             Id leaf_size                = 10,
              const ASpaceSharedPtr& space = ASpaceSharedPtr());
   NeighBench(const NeighBench& r);
   NeighBench& operator=(const NeighBench& r);
@@ -52,10 +52,10 @@ public:
 
   IMPLEMENT_CLONING(NeighBench)
   /// Interface for ANeigh
-  int attach(const Db *dbin, const Db *dbout = nullptr) override;
-  void getNeigh(int iech_out, VectorInt& ranks) override;
-  bool hasChanged(int iech_out) const override;
-  int getNSampleMax(const Db* db) const override;
+  Id attach(const Db *dbin, const Db *dbout = nullptr) override;
+  void getNeigh(Id iech_out, VectorInt& ranks) override;
+  bool hasChanged(Id iech_out) const override;
+  Id getNSampleMax(const Db* db) const override;
   ENeigh getType() const override { return ENeigh::fromKey("BENCH"); }
 
   /// Interface for AStringable
@@ -64,7 +64,7 @@ public:
   static NeighBench* create(bool flag_xvalid             = false,
                             double width                 = 0,
                             bool useBallTree             = false,
-                            int leaf_size                = 10,
+                            Id leaf_size                = 10,
                             const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighBench* createFromNF(const String& NFFilename, bool verbose = true);
 
@@ -80,8 +80,8 @@ protected:
   String _getNFName() const override { return "NeighBench"; }
 
 private:
-  bool _isSameTargetBench(int iech_out) const;
-  void _bench(int iech_out, VectorInt& ranks);
+  bool _isSameTargetBench(Id iech_out) const;
+  void _bench(Id iech_out, VectorInt& ranks);
 
 private:
   double _width;

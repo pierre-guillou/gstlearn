@@ -20,12 +20,12 @@ GSTLEARN_EXPORT void redefine_error(void (*warn_func)(const char*));
 GSTLEARN_EXPORT void redefine_read(void (*read_func)(const char*, char*));
 GSTLEARN_EXPORT void redefine_exit(void (*exit_func)(void));
 #endif
-GSTLEARN_EXPORT void mem_error(int nbyte);
+GSTLEARN_EXPORT void mem_error(Id nbyte);
 
 GSTLEARN_EXPORT void message_extern(const char *string);
 GSTLEARN_EXPORT void exit_extern();
 
-GSTLEARN_EXPORT void string_strip_blanks(char *string, int flag_lead);
+GSTLEARN_EXPORT void string_strip_blanks(char *string, Id flag_lead);
 GSTLEARN_EXPORT void string_strip_quotes(char *string);
 
 #if defined(_WIN32) || defined(_WIN64)

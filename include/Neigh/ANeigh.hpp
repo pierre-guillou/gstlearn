@@ -67,16 +67,24 @@ public:
   bool isConsistent(const ASpace* space) const override { DECLARE_UNUSED(space); return true; }
 
   /// Interface for ANeigh
-  virtual int attach(const Db *dbin, const Db *dbout);
-  virtual void getNeigh(int iech_out, VectorInt& ranks) = 0;
-  virtual int getNSampleMax(const Db* db) const = 0;
-  virtual bool hasChanged(int iech_out) const { DECLARE_UNUSED(iech_out); return true; }
-  virtual VectorDouble summary(int iech_out) { DECLARE_UNUSED(iech_out); return VectorDouble(); }
+  virtual Id attach(const Db* dbin, const Db* dbout);
+  virtual void getNeigh(Id iech_out, VectorInt& ranks) = 0;
+  virtual Id getNSampleMax(const Db* db) const         = 0;
+  virtual bool hasChanged(Id iech_out) const
+  {
+    DECLARE_UNUSED(iech_out);
+    return true;
+  }
+  virtual VectorDouble summary(Id iech_out)
+  {
+    DECLARE_UNUSED(iech_out);
+    return VectorDouble();
+  }
   virtual ENeigh getType() const { return ENeigh::fromKey("UNKNOWN"); }
   virtual bool getFlagContinuous() const { return false; }
 
   void displayDebug(VectorInt& ranks) const;
-  void select(int iech_out, VectorInt& ranks);
+  void select(Id iech_out, VectorInt& ranks);
   bool isUnchanged() const { return _flagIsUnchanged; }
   void setIsChanged(bool status = false);
   void reset();
@@ -88,16 +96,16 @@ public:
   void setFlagKFold(bool flagKFold)   { _flagKFold = flagKFold; }
   void setFlagSimu(bool flagSimu)     { _flagSimu = flagSimu; }
 
-  void setBallSearch(bool status, int leaf_size = 10);
+  void setBallSearch(bool status, Id leaf_size = 10);
   void attachBall();
 
 protected:
   bool _isNbghMemoEmpty() const { return _nbghMemo.empty(); }
   static void _neighCompress(VectorInt& ranks);
   void _display(const VectorInt& ranks) const;
-  bool _discardUndefined(int iech);
-  int  _xvalid(int iech_in, int iech_out, double eps = EPSILON9);
-  bool _isDimensionValid(int idim) const;
+  bool _discardUndefined(Id iech);
+  Id _xvalid(Id iech_in, Id iech_out, double eps = EPSILON9);
+  bool _isDimensionValid(Id idim) const;
   Ball& getBall() { return _ball; }
 
 protected:
@@ -110,20 +118,20 @@ protected:
   String _getNFName() const override { return "ANeigh"; }
 
 private:
-  bool _isSameTarget(int iech_out);
-  void _checkUnchanged(int iech_out, const VectorInt &ranks);
+  bool _isSameTarget(Id iech_out);
+  void _checkUnchanged(Id iech_out, const VectorInt& ranks);
 
 protected:
   const Db* _dbin;
   const Db* _dbout;
   const DbGrid* _dbgrid; // Equivalent to dbout, defined only for grid
 
-  int  _iechMemo;
+  Id _iechMemo;
   bool _flagSimu;
   bool _flagXvalid;    /* True to suppress the target */
   bool _flagKFold;     /* True to perform a KFold Cross-validation */
   bool _useBallSearch; /* If Neighborhood search favors Ball Tree algorithms */
-  int  _ballLeafSize;  /* Dimension of ultimate Leaf for Ball-Tree algorithm */
+  Id _ballLeafSize;    /* Dimension of ultimate Leaf for Ball-Tree algorithm */
 
 private:
   bool _flagIsUnchanged;

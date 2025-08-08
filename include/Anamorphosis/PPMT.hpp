@@ -32,11 +32,11 @@ class AMatrix;
 class GSTLEARN_EXPORT PPMT: public AStringable, public ICloneable
 {
 public:
-  PPMT(int ndir                     = 50,
+  PPMT(Id ndir                     = 50,
        bool flagPreprocessing       = false,
        const EDirGen& methodDir     = EDirGen::fromKey("VDC"),
        const EGaussInv& methodTrans = EGaussInv::fromKey("EMP"),
-       int nbpoly                   = 30,
+       Id nbpoly                   = 30,
        double alpha                 = 2.);
   PPMT(const PPMT& m);
   PPMT& operator=(const PPMT& m);
@@ -48,18 +48,18 @@ public:
   /// ICloneable Interface
   IMPLEMENT_CLONING(PPMT)
 
-  static PPMT* create(int ndir                     = 50,
+  static PPMT* create(Id ndir                     = 50,
                       bool flagPreprocessing       = false,
                       const EDirGen& methodDir     = EDirGen::fromKey("VDC"),
                       const EGaussInv& methodTrans = EGaussInv::fromKey("EMP"),
-                      int nbpoly                   = 30,
+                      Id nbpoly                   = 30,
                       double alpha                 = 2.);
 
-  int getNiter() const { return _niter; }
+  Id getNiter() const { return _niter; }
   double getAlpha() const { return _alpha; }
-  int getNdir() const { return _ndir; }
-  int getNdim() const { return _ndim; }
-  int getNbpoly() const { return _nbpoly; }
+  Id getNdir() const { return _ndir; }
+  Id getNdim() const { return _ndim; }
+  Id getNbpoly() const { return _nbpoly; }
   bool isFitted() const { return _isFitted; }
   const EDirGen& getMethodDir() const { return _methodDir; }
   const EGaussInv& getMethodTrans() const { return _methodTrans; }
@@ -67,20 +67,20 @@ public:
   VectorDouble getSerieAngle() const { return _serieAngle; }
   VectorDouble getSerieScore(bool flagLog = false) const;
 
-  int fit(Db* db,
+  Id fit(Db* db,
           const VectorString& names,
           bool flagStoreInDb              = false,
-          int niter                       = 100,
+          Id niter                       = 100,
           bool verbose                    = false,
           const NamingConvention& namconv = NamingConvention("Y"));
-  int fitFromMatrix(AMatrix* Y, int niter, bool verbose = false);
-  int rawToGaussian(Db* db,
+  Id fitFromMatrix(AMatrix* Y, Id niter, bool verbose = false);
+  Id rawToGaussian(Db* db,
                     const VectorString& names,
-                    int niter                       = 0,
+                    Id niter                       = 0,
                     const NamingConvention& namconv = NamingConvention("Y"));
-  int gaussianToRaw(Db* db,
+  Id gaussianToRaw(Db* db,
                     const VectorString& names,
-                    int niter                       = 0,
+                    Id niter                       = 0,
                     const NamingConvention& namconv = NamingConvention("Z"));
 
 private:
@@ -89,32 +89,32 @@ private:
   void _initGaussianizeForward(AMatrix* Y);
   void _initGaussianizeBackward(AMatrix* Y);
   void _iterationFit(AMatrix* Y, const VectorDouble& N0);
-  void _iterationForward(AMatrix* Y, const VectorDouble& N0, int iter = 0);
-  void _iterationBackward(AMatrix* Y, const VectorDouble& N0, int iter = 0);
+  void _iterationForward(AMatrix* Y, const VectorDouble& N0, Id iter = 0);
+  void _iterationBackward(AMatrix* Y, const VectorDouble& N0, Id iter = 0);
   static double _gaussianizeForward(double Yi,
-                                    int rank,
+                                    Id rank,
                                     const AnamHermite* anam,
                                     const VectorDouble& N0);
   static double _gaussianizeBackward(double Yi, const AnamHermite* anam);
-  void _projectOnDirection(const AMatrix* Y, int id, VectorDouble& Y0);
+  void _projectOnDirection(const AMatrix* Y, Id id, VectorDouble& Y0);
   double _getGaussianDistance(const VectorDouble& Yi,
                               const VectorInt& Ri,
                               const VectorDouble& N0) const;
   void _shiftForward(AMatrix* Y,
-                     int id,
+                     Id id,
                      const AnamHermite* anam,
                      const VectorDouble& Y0,
                      const VectorInt& R0,
                      const VectorDouble& N0) const;
   void _shiftBackward(AMatrix* Y,
-                      int id,
+                      Id id,
                       const AnamHermite* anam,
                       const VectorDouble& Y0) const;
 
 private:
-  int _niter;
-  int _ndir;
-  int _nbpoly;
+  Id _niter;
+  Id _ndir;
+  Id _nbpoly;
   double _alpha;
   EDirGen _methodDir;
   EGaussInv _methodTrans;
@@ -122,7 +122,7 @@ private:
 
   bool _isFitted;
 
-  mutable int _ndim;
+  mutable Id _ndim;
   mutable VectorDouble _serieAngle;
   mutable VectorDouble _serieScore;
   mutable MatrixDense* _dirmat;

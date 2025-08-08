@@ -41,7 +41,7 @@ public:
   void setIptrStd(const VectorInt& iptrStd) { _iptrStd = iptrStd; }
   void setSelectivity(Selectivity* selectivity) { _selectivity = selectivity; }
   void setFlagOk(bool flagOk) { _flagOK = flagOk; }
-  void setNbsimu(int nbsimu) { _nbsimu = nbsimu; }
+  void setNbsimu(Id nbsimu) { _nbsimu = nbsimu; }
   void setProba(double proba) { _proba = proba; }
   void setFlagDisjKrig(bool flagDisjKrig) { _flagDisjKrig = flagDisjKrig; }
   void setFlagCondExp(bool flagCondExp) { _flagCondExp = flagCondExp; }
@@ -60,86 +60,86 @@ private:
   bool _ZToFactors();
   bool _FactorsToSelectivity();
 
-  int _getNfact() const { return (int)_ifacs.size(); }
-  int _getNSel() const { return _selectivity->getNVar(); }
+  Id _getNfact() const { return (Id)_ifacs.size(); }
+  Id _getNSel() const { return _selectivity->getNVar(); }
 
   bool _hasAnam(const EAnam& anamType = EAnam::fromKey("UNKNOWN")) const;
-  bool _hasInputVarDefined(int mode = 0) const;
+  bool _hasInputVarDefined(Id mode = 0) const;
   bool _hasSelectivity() const;
   bool _hasVariableNumber(bool equal1 = false) const;
 
   static void _correctForOK(Db* db,
-                            int iech,
-                            int col_est,
-                            int col_std,
+                            Id iech,
+                            Id col_est,
+                            Id col_std,
                             bool flag_OK,
                             double* krigest,
                             double* krigstd);
   static void _getVectorsForCE(Db* db,
-                               int col_est,
-                               int col_std,
+                               Id col_est,
+                               Id col_std,
                                bool flag_OK,
                                VectorDouble& krigest,
                                VectorDouble& krigstd);
-  static int _conditionalExpectation(Db* db,
+  static Id _conditionalExpectation(Db* db,
                                      AAnam* anam,
                                      const Selectivity* selectivity,
-                                     int iptr0,
-                                     int col_est,
-                                     int col_std,
+                                     Id iptr0,
+                                     Id col_est,
+                                     Id col_std,
                                      bool flag_OK,
                                      double proba,
-                                     int nbsimu);
-  static int _uniformConditioning(Db* db,
+                                     Id nbsimu);
+  static Id _uniformConditioning(Db* db,
                                   AnamHermite* anam,
                                   Selectivity* selectivity,
-                                  int iptr0,
-                                  int col_est,
-                                  int col_var);
-  static int _ceZ(Db* db,
+                                  Id iptr0,
+                                  Id col_est,
+                                  Id col_var);
+  static Id _ceZ(Db* db,
                   const AnamHermite* anam,
                   const Selectivity* selectivity,
-                  int iptr0,
-                  int col_est,
-                  int col_std,
-                  int nbsimu,
+                  Id iptr0,
+                  Id col_est,
+                  Id col_std,
+                  Id nbsimu,
                   bool flag_OK);
-  static int _ceT(int mode,
+  static Id _ceT(Id mode,
                   Db* db,
                   const Selectivity* selectivity,
-                  int iptr0,
-                  int col_est,
-                  int col_std,
+                  Id iptr0,
+                  Id col_est,
+                  Id col_std,
                   const VectorDouble& ycuts,
-                  int nbsimu,
+                  Id nbsimu,
                   bool flag_OK);
-  static int _ceQ(Db* db,
+  static Id _ceQ(Db* db,
                   const AnamHermite* anam,
                   const Selectivity* selectivity,
-                  int iptr0,
-                  int col_est,
-                  int col_std,
+                  Id iptr0,
+                  Id col_est,
+                  Id col_std,
                   const VectorDouble& ycuts,
-                  int nbsimu,
+                  Id nbsimu,
                   bool flag_OK);
-  static int _ceB(Db* db,
+  static Id _ceB(Db* db,
                   const Selectivity* selectivity,
-                  int iptr0,
+                  Id iptr0,
                   const VectorDouble& ycuts);
-  static int _ceM(Db* db, const Selectivity* selectivity, int iptr0);
-  static int _ceQuant(Db* db,
+  static Id _ceM(Db* db, const Selectivity* selectivity, Id iptr0);
+  static Id _ceQuant(Db* db,
                       const AnamHermite* anam,
                       const Selectivity* selectivity,
-                      int iptr0,
-                      int col_est,
-                      int col_std,
+                      Id iptr0,
+                      Id col_est,
+                      Id col_std,
                       double proba,
                       bool flag_OK);
 
 private:
-  int _iattVar;
-  int _iattFac;
-  int _iattSel;
+  Id _iattVar;
+  Id _iattFac;
+  Id _iattSel;
   bool _flagVars;
   bool _flagToFactors;
   bool _flagDisjKrig;
@@ -150,7 +150,7 @@ private:
   VectorInt _ifacs;
   VectorInt _iptrEst;
   VectorInt _iptrStd;
-  int _nbsimu;
+  Id _nbsimu;
   bool _flagOK;
   double _proba;
   AAnam* _anam;
@@ -158,24 +158,24 @@ private:
 };
 
 // TODO : rename functions with a lower case at the beginning
-GSTLEARN_EXPORT int DisjunctiveKriging(Db* db,
+GSTLEARN_EXPORT Id DisjunctiveKriging(Db* db,
                                        AAnam* anam,
                                        Selectivity* selectivity,
                                        const VectorString& name_est,
                                        const VectorString& name_std,
                                        const NamingConvention& namconv = NamingConvention(
                                          "DK"));
-GSTLEARN_EXPORT int ConditionalExpectation(Db* db,
+GSTLEARN_EXPORT Id ConditionalExpectation(Db* db,
                                            AAnam* anam,
                                            Selectivity* selectivity        = nullptr,
                                            const String& name_est          = "",
                                            const String& name_std          = "",
                                            bool flag_OK                    = false,
                                            double proba                    = TEST,
-                                           int nbsimu                      = 0,
+                                           Id nbsimu                      = 0,
                                            const NamingConvention& namconv = NamingConvention(
                                              "CE"));
-GSTLEARN_EXPORT int UniformConditioning(Db* db,
+GSTLEARN_EXPORT Id UniformConditioning(Db* db,
                                         AAnam* anam,
                                         Selectivity* selectivity,
                                         const String& name_est,
@@ -183,8 +183,8 @@ GSTLEARN_EXPORT int UniformConditioning(Db* db,
                                         const NamingConvention& namconv = NamingConvention(
                                           "UC"));
 
-GSTLEARN_EXPORT int anamPointToBlock(AAnam* anam,
-                                     int verbose,
+GSTLEARN_EXPORT Id anamPointToBlock(AAnam* anam,
+                                     Id verbose,
                                      double cvv,
                                      double coeff,
                                      double mu);

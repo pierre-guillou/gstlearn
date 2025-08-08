@@ -47,7 +47,7 @@ VectorDouble ALinearOp::evalDirect(const VectorDouble& in) const
   return res;
 }
 
-int ALinearOp::addToDest(const ::Eigen::VectorXd& inv,
+Id ALinearOp::addToDest(const ::Eigen::VectorXd& inv,
                          ::Eigen::VectorXd& outv) const
 {
   constvect ins(inv.data(), inv.size());
@@ -55,7 +55,7 @@ int ALinearOp::addToDest(const ::Eigen::VectorXd& inv,
   return addToDest(ins, outs);
 }
 
-int ALinearOp::addToDest(const constvect inv, vect outv) const
+Id ALinearOp::addToDest(const constvect inv, vect outv) const
 {
 
   if (!_usefactor)
@@ -64,19 +64,19 @@ int ALinearOp::addToDest(const constvect inv, vect outv) const
   _temp.resize(outv.size());
   vect ctemp(_temp.data(), _temp.size());
   std::fill(ctemp.begin(), ctemp.end(), 0.);
-  int err = _addToDest(inv, ctemp);
-  for (int i = 0; i < (int)outv.size(); i++)
+  Id err = _addToDest(inv, ctemp);
+  for (Id i = 0; i < (Id)outv.size(); i++)
     outv[i] = _idfactor * inv[i] + _factor * ctemp[i];
   return err;
 }
 
-int ALinearOp::evalDirect(constvect inv, vect outv) const
+Id ALinearOp::evalDirect(constvect inv, vect outv) const
 {
   std::fill(outv.begin(), outv.end(), 0.);
   return addToDest(inv, outv);
 }
 
-int ALinearOp::evalDirect(const VectorDouble& inv, VectorDouble& outv) const
+Id ALinearOp::evalDirect(const VectorDouble& inv, VectorDouble& outv) const
 {
   outv.resize(inv.size());
   constvect in(inv);

@@ -172,6 +172,10 @@ if (MSVC OR APPLE)
   target_link_libraries(python_build PRIVATE Python3::Module)
 endif()
 
+if (CLANG)
+  target_compile_options(python_build PRIVATE -Wno-unused-parameter)
+endif()
+
 # Tell that we need to generate docstring files before building python package (if required)
 if (BUILD_DOC)
   add_dependencies(python_build python_doc)

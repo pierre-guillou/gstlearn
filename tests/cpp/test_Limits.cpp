@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   DbStringFormat dbfmt(FLAG_STATS);
 
   ASerializable::setPrefixName("test_Limits-");
-  int seed = 10355;
+  Id seed = 10355;
   law_set_random_seed(seed);
 
   // Creating the Grid Rotated Db

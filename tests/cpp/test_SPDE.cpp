@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 
   /* 1.b - Setup the default space */
 
-  int ndim = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   ASerializable::setPrefixName("test_SPDE-");
 
@@ -67,9 +67,9 @@ int main(int argc, char* argv[])
 
   // Perform the non-conditional simulation
 
-  int seed        = 31415;
-  int nsimu       = 10;
-  int useCholesky = 1;
+  Id seed        = 31415;
+  Id nsimu       = 10;
+  Id useCholesky = 1;
   law_set_random_seed(seed);
   (void)simulateSPDE(nullptr, dbgrid, model, nsimu, useCholesky);
 

@@ -62,8 +62,8 @@ bool CalcGridToGrid::_check()
   /* Cross-Checking the Variable Number consistency */
   /**************************************************/
 
-  int nvar = _getNVar();
-  int nvar_requested = (_flagInter) ? 2 : 1;
+  auto nvar          = _getNVar();
+  Id nvar_requested = (_flagInter) ? 2 : 1;
   if (nvar != nvar_requested)
   {
     messerr("This application requires %d variable(s) to be defined",nvar_requested);
@@ -108,24 +108,24 @@ bool CalcGridToGrid::_check()
       messerr("The Space dimension of 'dbout' should be larger then the one of 'dbin'");
       return false;
     }
-    int ndiff = -_compareInMinusOut();
-    if (ndiff != (int) _nameBots.size())
+    Id ndiff = -_compareInMinusOut();
+    if (ndiff != (Id) _nameBots.size())
     {
       messerr("The argument 'nameBots' (%d) should be dimensioned to %d",
-              (int) _nameBots.size(), ndiff);
+              (Id) _nameBots.size(), ndiff);
       return false;
     }
-    if (ndiff != (int) _nameTops.size())
+    if (ndiff != (Id) _nameTops.size())
     {
       messerr("The argument 'nameTops' (%d) should be dimensioned to %d",
-              (int) _nameTops.size(), ndiff);
+              (Id) _nameTops.size(), ndiff);
       return false;
     }
   }
   return true;
 }
 
-int CalcGridToGrid::_compareInMinusOut() const
+Id CalcGridToGrid::_compareInMinusOut() const
 {
   return getDbin()->getNDim() - getDbout()->getNDim();
 }
@@ -178,7 +178,7 @@ bool CalcGridToGrid::_run()
   return false;
 }
 
-int dbg2gCopy(DbGrid *dbin,
+Id dbg2gCopy(DbGrid *dbin,
               DbGrid *dbout,
               const NamingConvention &namconv)
 {
@@ -190,11 +190,11 @@ int dbg2gCopy(DbGrid *dbin,
   calcul.setFlagCopy(true);
 
   // Run the calculator
-  int error = (calcul.run()) ? 0 : 1;
+  Id error = (calcul.run()) ? 0 : 1;
   return error;
 }
 
-int dbg2gExpand(DbGrid *dbin,
+Id dbg2gExpand(DbGrid *dbin,
                 DbGrid *dbout,
                 const NamingConvention &namconv)
 {
@@ -207,11 +207,11 @@ int dbg2gExpand(DbGrid *dbin,
   calcul.setFlagExpand(true);
 
   // Run the calculator
-  int error = (calcul.run()) ? 0 : 1;
+  Id error = (calcul.run()) ? 0 : 1;
   return error;
 }
 
-int dbg2gInterpolate(DbGrid *dbin,
+Id dbg2gInterpolate(DbGrid *dbin,
                      DbGrid *dbout,
                      const VectorString& tops,
                      const VectorString& bots,
@@ -228,11 +228,11 @@ int dbg2gInterpolate(DbGrid *dbin,
   calcul.setNameTops(tops);
 
   // Run the calculator
-  int error = (calcul.run()) ? 0 : 1;
+  Id error = (calcul.run()) ? 0 : 1;
   return error;
 }
 
-int dbg2gShrink(DbGrid *dbin,
+Id dbg2gShrink(DbGrid *dbin,
                 DbGrid *dbout,
                 const NamingConvention &namconv)
 {
@@ -245,7 +245,7 @@ int dbg2gShrink(DbGrid *dbin,
   calcul.setFlagShrink(true);
 
   // Run the calculator
-  int error = (calcul.run()) ? 0 : 1;
+  Id error = (calcul.run()) ? 0 : 1;
   return error;
 }
 
@@ -258,17 +258,17 @@ int dbg2gShrink(DbGrid *dbin,
  */
 void CalcGridToGrid::_reduceIndices(const VectorInt& indgIn, VectorInt& indgOut)
 {
-  int ndimOut = (int) indgOut.size();
+  Id ndimOut = (Id) indgOut.size();
 
-  for (int i = 0; i < ndimOut; i++)
+  for (Id i = 0; i < ndimOut; i++)
     indgOut[i] = indgIn[i];
 }
 
 bool CalcGridToGrid::_g2gCopy()
 {
-  int nech = getDbin()->getNSample();
+  auto nech = getDbin()->getNSample();
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (! getDbin()->isActive(iech)) continue;
     double value = getDbin()->getZVariable(iech, 0);
@@ -279,18 +279,18 @@ bool CalcGridToGrid::_g2gCopy()
 
 bool CalcGridToGrid::_g2gExpand()
 {
-  int ndim_in  = getDbin()->getNDim();
-  int ndim_out = getDbout()->getNDim();
+  Id ndim_in  = getDbin()->getNDim();
+  Id ndim_out = getDbout()->getNDim();
   VectorInt indgIn(ndim_in);
   VectorInt indgOut(ndim_out);
 
   // Loop on the output file
-  for (int iech_out = 0; iech_out < getDbout()->getNSample(true); iech_out++)
+  for (Id iech_out = 0; iech_out < getDbout()->getNSample(true); iech_out++)
   {
     if (! getDbout()->isActive(iech_out)) continue;
     getGridout()->rankToIndice(iech_out, indgOut);
     _reduceIndices(indgOut, indgIn);
-    int iech_in = getGridin()->indiceToRank(indgIn);
+    Id iech_in = getGridin()->indiceToRank(indgIn);
     double value = getDbin()->getZVariable(iech_in, 0);
     getDbout()->setArray(iech_out, _iattOut, value);
   }
@@ -299,18 +299,18 @@ bool CalcGridToGrid::_g2gExpand()
 
 bool CalcGridToGrid::_g2gShrink()
 {
-  int ndim_in  = getDbin()->getNDim();
-  int ndim_out = getDbout()->getNDim();
+  Id ndim_in  = getDbin()->getNDim();
+  Id ndim_out = getDbout()->getNDim();
   VectorInt indgIn(ndim_in);
   VectorInt indgOut(ndim_out);
 
   // Loop on the input file
-  for (int iech_in = 0; iech_in < getDbin()->getNSample(true); iech_in++)
+  for (Id iech_in = 0; iech_in < getDbin()->getNSample(true); iech_in++)
   {
     if (! getDbin()->isActive(iech_in)) continue;
     getGridin()->rankToIndice(iech_in, indgIn);
     _reduceIndices(indgIn, indgOut);
-    int iech_out = getGridout()->indiceToRank(indgOut);
+    Id iech_out = getGridout()->indiceToRank(indgOut);
     double value = getDbout()->getZVariable(iech_out, 0);
     if (! FFFF(value))
     {
@@ -322,7 +322,7 @@ bool CalcGridToGrid::_g2gShrink()
   }
 
   // Normalization
-  for (int iech_out = 0; iech_out < getDbout()->getNSample(true); iech_out++)
+  for (Id iech_out = 0; iech_out < getDbout()->getNSample(true); iech_out++)
   {
     double ratio = getDbout()->getArray(iech_out, _iattAux);
     if (ratio > 0.)
@@ -338,9 +338,9 @@ bool CalcGridToGrid::_g2gShrink()
 
 bool CalcGridToGrid::_g2gInter()
 {
-  int ndim_in  = getDbin()->getNDim();
-  int ndim_out = getDbout()->getNDim();
-  int nvar = ndim_out - ndim_in;
+  Id ndim_in  = getDbin()->getNDim();
+  Id ndim_out = getDbout()->getNDim();
+  Id nvar = ndim_out - ndim_in;
   VectorInt indgIn(ndim_in);
   VectorInt indgOut(ndim_out);
   VectorDouble coorTop(nvar);
@@ -352,12 +352,12 @@ bool CalcGridToGrid::_g2gInter()
   VectorInt iuidBot = getDbin()->getUIDs(_nameBots);
 
   // Loop on the output file
-  for (int iech_out = 0; iech_out < getDbout()->getNSample(true); iech_out++)
+  for (Id iech_out = 0; iech_out < getDbout()->getNSample(true); iech_out++)
   {
     if (! getDbout()->isActive(iech_out)) continue;
     getGridout()->rankToIndice(iech_out, indgOut);
     _reduceIndices(indgOut, indgIn);
-    int iech_in = getGridin()->indiceToRank(indgIn);
+    Id iech_in = getGridin()->indiceToRank(indgIn);
 
     bool ret = true;
     ret = ret && getDbin()->isActive(iech_in);
@@ -390,7 +390,7 @@ bool CalcGridToGrid::_g2gInter()
  * @remarks The vector 'coorOut' contains the ndimIn first coordinates followed
  * @remarks by the actual 'nvar' coordinates of the target
  */
-double CalcGridToGrid::_interpolate(int nvar,
+double CalcGridToGrid::_interpolate(Id nvar,
                                     double valTop,
                                     double valBot,
                                     const VectorDouble& coorTop,
@@ -400,10 +400,10 @@ double CalcGridToGrid::_interpolate(int nvar,
   double delta;
   if (FFFF(valTop) || FFFF(valBot)) return TEST;
 
-  int shift = getDbin()->getNDim();
+  auto shift = getDbin()->getNDim();
   double dT0 = 0.;
   double dB0 = 0.;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     double zTop = coorTop[ivar];
     double zBot = coorBot[ivar];
@@ -422,12 +422,12 @@ double CalcGridToGrid::_interpolate(int nvar,
   return value;
 }
 
-bool CalcGridToGrid::_loadExtrema(int nvar,
-                                  int iech,
+bool CalcGridToGrid::_loadExtrema(Id nvar,
+                                  Id iech,
                                   const VectorInt &iuids,
                                   VectorDouble &coor)
 {
-  for (int ivar=0; ivar < nvar; ivar++)
+  for (Id ivar=0; ivar < nvar; ivar++)
   {
     coor[ivar] = getDbin()->getArray(iech, iuids[ivar]);
     if (FFFF(coor[ivar])) return false;

@@ -40,9 +40,9 @@ namespace gstlrn
 /*! \cond */
 typedef struct
 {
-  int opt_correl;
-  int npar;
-  int flag_rho;
+  Id opt_correl;
+  Id npar;
+  Id flag_rho;
   double rho;
   VectorDouble params;
   MatrixSymmetric modif;
@@ -50,11 +50,11 @@ typedef struct
 
 typedef struct
 {
-  int flag_trace;
-  int idir;
-  int ilag;
-  int nrow;
-  int ncol;
+  Id flag_trace;
+  Id idir;
+  Id ilag;
+  Id nrow;
+  Id ncol;
   VectorDouble trace;
 } Local_TracePgs;
 
@@ -63,17 +63,17 @@ typedef struct
   Db* db;
   mutable const Rule* rule;
   PropDef* propdef;
-  int flag_stat;
-  int flag_facies;
+  Id flag_stat;
+  Id flag_facies;
   ECalcVario calcul_type;
-  int igrfcur;
-  int idircur;
-  int ipascur;
-  int ngrf;
-  int npair;
-  int nfacies;
-  int ifirst;
-  int ilast;
+  Id igrfcur;
+  Id idircur;
+  Id ipascur;
+  Id ngrf;
+  Id npair;
+  Id nfacies;
+  Id ifirst;
+  Id ilast;
   VectorDouble d0;
   VectorDouble d1;
   VectorDouble memint;
@@ -114,14 +114,14 @@ static double GS_TOLSTOP     = 5.e-02;
 static double GS_TOLSTOP_RHO = 1.e-01;
 static CTables* CTABLES      = NULL;
 static bool TEST_DISCRET     = false;
-static int NCOLOR            = 0;
-static int NGRF              = 0;
-static int NRULE             = 0;
-static int BASE              = 0;
+static Id NCOLOR            = 0;
+static Id NGRF              = 0;
+static Id NRULE             = 0;
+static Id BASE              = 0;
 
 // Needed declarations due to intricated recursions
 static Relem* st_relem_free(Relem* relem);
-static void st_relem_explore(Relem* relem, int verbose);
+static void st_relem_explore(Relem* relem, Id verbose);
 /*! \endcond */
 
 /****************************************************************************
@@ -188,7 +188,7 @@ static Split* st_split_alloc(Relem* old_relem)
   split->Srules.clear();
   split->Sfipos.clear();
   split->relems.resize(2);
-  for (int i = 0; i < 2; i++)
+  for (Id i = 0; i < 2; i++)
     split->relems[i] = nullptr;
   return (split);
 }
@@ -203,9 +203,9 @@ static Split* st_split_alloc(Relem* old_relem)
  ** IN_ARGS:  side  : Side of the operand (1 for left and 0 for right)
  **
  *****************************************************************************/
-static int st_define_fipos(int oper, int side)
+static Id st_define_fipos(Id oper, Id side)
 {
-  int reponse;
+  Id reponse;
 
   if (IFFFF(side))
     reponse = 1;
@@ -223,12 +223,12 @@ static int st_define_fipos(int oper, int side)
  **
  *****************************************************************************/
 static void st_relem_define(Relem* relem,
-                            int nfacies,
+                            Id nfacies,
                             const VectorInt& facies,
-                            int side,
-                            const int* poss)
+                            Id side,
+                            const Id* poss)
 {
-  int ecr, number;
+  Id ecr, number;
 
   if (relem == (Relem*)NULL) return;
 
@@ -237,7 +237,7 @@ static void st_relem_define(Relem* relem,
   else
   {
     number = 0;
-    for (int i = 0; i < nfacies; i++)
+    for (Id i = 0; i < nfacies; i++)
       if (poss[i] == side) number++;
   }
 
@@ -245,7 +245,7 @@ static void st_relem_define(Relem* relem,
   relem->Rfipos.resize(NCOLOR, 0);
 
   ecr = 0;
-  for (int i = 0; i < nfacies; i++)
+  for (Id i = 0; i < nfacies; i++)
   {
     if (poss == nullptr || poss[i] == side) relem->facies[ecr++] = facies[i];
   }
@@ -258,16 +258,16 @@ static void st_relem_define(Relem* relem,
  ** FUNCTION: st_rule_print
  **
  *****************************************************************************/
-static void st_rule_print(int rank,
-                          int nbyrule,
+static void st_rule_print(Id rank,
+                          Id nbyrule,
                           const VectorInt& rules,
                           const VectorInt& fipos,
                           bool flag_rank,
-                          int flag_similar,
-                          int flag_igrf,
+                          Id flag_similar,
+                          Id flag_igrf,
                           double score)
 {
-  int value, iscore, loc0, loc1;
+  Id value, iscore, loc0, loc1;
 
   // Print the Rank (optional)
 
@@ -275,7 +275,7 @@ static void st_rule_print(int rank,
 
   // Print the Rule
 
-  for (int ic = 0; ic < nbyrule; ic++)
+  for (Id ic = 0; ic < nbyrule; ic++)
   {
     value = RULES(rank, ic);
     if (value == 1001)
@@ -290,14 +290,14 @@ static void st_rule_print(int rank,
 
   if (!FFFF(score))
   {
-    iscore = (int)score;
+    iscore = (Id)score;
     message(" -> %d", iscore);
   }
 
   // Print the Facies rank
 
   message(" (");
-  for (int ic = 0; ic < NCOLOR; ic++)
+  for (Id ic = 0; ic < NCOLOR; ic++)
     message(" %3d", fipos[FIPOSAD(rank, ic)]);
   message(" )");
 
@@ -308,7 +308,7 @@ static void st_rule_print(int rank,
     message(" [Same as: %3d (", flag_similar + 1);
 
     loc0 = flag_igrf;
-    for (int igrf = 0; igrf < NGRF; igrf++)
+    for (Id igrf = 0; igrf < NGRF; igrf++)
     {
       loc1 = loc0 / 2;
       if (loc0 - 2 * loc1 > 0) message(" by Symmetry around G%d", igrf + 1);
@@ -328,14 +328,14 @@ static void st_rule_print(int rank,
  **
  *****************************************************************************/
 static void st_rules_print(const char* title,
-                           int nrule,
-                           int nbyrule,
+                           Id nrule,
+                           Id nbyrule,
                            const VectorInt& rules,
                            const VectorInt& fipos)
 {
   if (nrule <= 0) return;
   message("%s (Nrule=%d, Nbyrule=%d):\n", title, nrule, nbyrule);
-  for (int ir = 0; ir < nrule; ir++)
+  for (Id ir = 0; ir < nrule; ir++)
     st_rule_print(ir, nbyrule, rules, fipos, false, -1, -1, TEST);
 }
 
@@ -351,13 +351,13 @@ static void st_rules_print(const char* title,
  ** IN_ARGS: noper   Number of underlying GRF
  **
  *****************************************************************************/
-static void st_relem_subdivide(Relem* relem0, int half, int noper)
+static void st_relem_subdivide(Relem* relem0, Id half, Id noper)
 {
   Split* split;
-  int *divs, ndiv, number, ncur, previous_oper, verbose;
+  Id *divs, ndiv, number, ncur, previous_oper, verbose;
 
   verbose = 0;
-  ncur    = static_cast<int>(relem0->facies.size());
+  ncur    = static_cast<Id>(relem0->facies.size());
   if (ncur <= 1) return;
 
   previous_oper = 1;
@@ -370,15 +370,15 @@ static void st_relem_subdivide(Relem* relem0, int half, int noper)
   relem0->splits.resize(number);
 
   number = 0;
-  for (int oper = 1; oper <= noper; oper++)
+  for (Id oper = 1; oper <= noper; oper++)
   {
     half = (oper == previous_oper);
     divs = ut_split_into_two(ncur, half, verbose, &ndiv);
-    for (int is = 0; is < ndiv; is++, number++)
+    for (Id is = 0; is < ndiv; is++, number++)
     {
       relem0->splits[number] = split = st_split_alloc(relem0);
       split->oper                    = oper;
-      for (int i = 0; i < 2; i++)
+      for (Id i = 0; i < 2; i++)
       {
         split->relems[i] = st_relem_alloc(split);
         st_relem_define(split->relems[i], ncur, relem0->facies, 1 - i,
@@ -408,7 +408,7 @@ static Split* st_split_free(Split* split)
 
   /* Free the descending substructures (relem) */
 
-  for (int i = 0; i < 2; i++)
+  for (Id i = 0; i < 2; i++)
     split->relems[i] = st_relem_free(split->relems[i]);
 
   /* Free the local arrays */
@@ -439,7 +439,7 @@ static Relem* st_relem_free(Relem* relem)
 
   /* Free the descending substructures (Split) */
 
-  for (int is = 0; is < relem->nsplit; is++)
+  for (Id is = 0; is < relem->nsplit; is++)
     relem->splits[is] = st_split_free(relem->splits[is]);
 
   /* Free the local arrays */
@@ -464,9 +464,9 @@ static Relem* st_relem_free(Relem* relem)
  ** \param[in]      ngrf         Number of GRFs
  **
  *****************************************************************************/
-static void st_variogram_define_vars(Vario* vario, const Rule* rule, int ngrf)
+static void st_variogram_define_vars(Vario* vario, const Rule* rule, Id ngrf)
 {
-  int igrf, jgrf;
+  Id igrf, jgrf;
 
   for (igrf = 0; igrf < ngrf; igrf++)
     for (jgrf = 0; jgrf < ngrf; jgrf++)
@@ -484,17 +484,17 @@ static void st_variogram_define_vars(Vario* vario, const Rule* rule, int ngrf)
  **
  *****************************************************************************/
 static void st_set_bounds(Db* db,
-                          int flag_one,
-                          int ngrf,
-                          int nfacies,
-                          int ifac,
-                          int iech,
+                          Id flag_one,
+                          Id ngrf,
+                          Id nfacies,
+                          Id ifac,
+                          Id iech,
                           double t1min,
                           double t1max,
                           double t2min,
                           double t2max)
 {
-  int jfac;
+  Id jfac;
   if (!TEST_DISCRET)
   {
     jfac = (flag_one) ? 0 : ifac;
@@ -533,11 +533,11 @@ static void st_set_bounds(Db* db,
 static void st_set_rho(double rho, Local_Pgs* local_pgs)
 {
   double rho2;
-  int iech, ifac, ngrf;
+  Id iech, ifac, ngrf;
   Db* db           = local_pgs->db;
   PropDef* propdef = local_pgs->propdef;
   const Rule* rule = local_pgs->rule;
-  int flag_stat    = local_pgs->flag_stat;
+  Id flag_stat    = local_pgs->flag_stat;
   double t1min, t1max, t2min, t2max;
 
   local_pgs->corpgs.rho = rho;
@@ -557,7 +557,7 @@ static void st_set_rho(double rho, Local_Pgs* local_pgs)
     for (iech = 0; iech < db->getNSample(); iech++)
     {
       if (!db->isActive(iech)) continue;
-      ifac = (int)db->getZVariable(iech, 0);
+      ifac = (Id)db->getZVariable(iech, 0);
       if (rule_thresh_define(propdef, db, rule, ifac, iech, 0, 0, 0, &t1min,
                              &t1max, &t2min, &t2max)) return;
       st_set_bounds(db, 1, ngrf, local_pgs->nfacies, ifac, iech, t1min, t1max,
@@ -593,14 +593,14 @@ static void st_set_rho(double rho, Local_Pgs* local_pgs)
 static double st_get_proba_ind(double correl,
                                double* low,
                                double* up,
-                               int iconf)
+                               Id iconf)
 {
-  int ier, infin[2];
+  Id ier, infin[2];
   double p1min, p1max, p2min, p2max, proba, err;
 
   double releps = 0.;
   double abseps = EPS;
-  int maxpts    = 8000;
+  Id maxpts    = 8000;
 
   proba = TEST;
 
@@ -637,16 +637,16 @@ static double st_get_proba_ind(double correl,
  ** \param[in]  local_pgs     Local_Pgs structure
  **
  *****************************************************************************/
-static int st_calculate_thresh_stat(Local_Pgs* local_pgs)
+static Id st_calculate_thresh_stat(Local_Pgs* local_pgs)
 
 {
   double t1min, t1max, t2min, t2max, cround;
 
-  int nfacies = local_pgs->nfacies;
-  int ngrf    = local_pgs->ngrf;
-  int iconf0  = 0;
+  Id nfacies = local_pgs->nfacies;
+  Id ngrf    = local_pgs->ngrf;
+  Id iconf0  = 0;
 
-  for (int ifac = 0; ifac < nfacies; ifac++)
+  for (Id ifac = 0; ifac < nfacies; ifac++)
   {
     if (rule_thresh_define(local_pgs->propdef, local_pgs->db, local_pgs->rule,
                            ifac + 1, 0, 0, 0, 0, &t1min, &t1max, &t2min,
@@ -688,7 +688,7 @@ static int st_calculate_thresh_stat(Local_Pgs* local_pgs)
   double low[2], up[2];
   if (TEST_DISCRET) iconf0 = ct_tableone_covrank(CTABLES, correl, &cround);
 
-  for (int ifac = 0; ifac < nfacies; ifac++)
+  for (Id ifac = 0; ifac < nfacies; ifac++)
   {
     low[0]       = STAT_THRESH(ifac, 0, 0);
     up[0]        = STAT_THRESH(ifac, 0, 1);
@@ -724,16 +724,16 @@ static int st_calculate_thresh_stat(Local_Pgs* local_pgs)
  ** \param[in]  rule          Lithotype Rule definition
  **
  *****************************************************************************/
-static int st_vario_pgs_variable(int mode,
-                                 int ngrf,
-                                 int nfacies,
-                                 int flag_one,
-                                 int flag_prop,
+static Id st_vario_pgs_variable(Id mode,
+                                 Id ngrf,
+                                 Id nfacies,
+                                 Id flag_one,
+                                 Id flag_prop,
                                  Db* db,
                                  PropDef* propdef,
                                  const Rule* rule)
 {
-  int number, ifac, jfac, nloop, iptr;
+  Id number, ifac, jfac, nloop, iptr;
   double t1min, t1max, t2min, t2max;
   static bool is_prop_defined;
 
@@ -781,13 +781,13 @@ static int st_vario_pgs_variable(int mode,
       /* Use dummy rho value in order to avoid discarding pairs in geometry */
 
       nloop = (flag_one) ? 1 : nfacies;
-      for (int iech = 0; iech < db->getNSample(); iech++)
+      for (Id iech = 0; iech < db->getNSample(); iech++)
       {
         if (!db->isActive(iech)) continue;
 
-        for (int i = 0; i < nloop; i++)
+        for (Id i = 0; i < nloop; i++)
         {
-          ifac = (flag_one) ? (int)db->getZVariable(iech, 0) : i;
+          ifac = (flag_one) ? (Id)db->getZVariable(iech, 0) : i;
           jfac = (flag_one) ? ifac : ifac + 1;
           if (rule_thresh_define(propdef, db, rule, jfac, iech, 0, 0, 0, &t1min,
                                  &t1max, &t2min, &t2max)) return (1);
@@ -835,12 +835,12 @@ static int st_vario_pgs_variable(int mode,
  ** PURPOSE: that can be used to create a Rule structure
  **
  *****************************************************************************/
-static Rule* st_rule_encode(const int* string)
+static Rule* st_rule_encode(const Id* string)
 {
   VectorInt n_type = VectorInt(NRULE);
   VectorInt n_facs = VectorInt(NRULE);
 
-  for (int i = 0; i < NRULE; i++)
+  for (Id i = 0; i < NRULE; i++)
   {
     if (string[i] <= 1000)
     {
@@ -876,14 +876,14 @@ static double st_extract_trace(Local_Pgs* local_pgs)
 
 {
   Local_TracePgs* tracepgs = &local_pgs->tracepgs;
-  int nrow                 = tracepgs->nrow;
-  int ncol                 = tracepgs->ncol;
+  Id nrow                 = tracepgs->nrow;
+  Id ncol                 = tracepgs->ncol;
   if (nrow <= 0 || ncol <= 0) return TEST;
 
   /* Evaluate the sum of the score */
 
   double totsum = 0.;
-  for (int irow = 0; irow < nrow; irow++)
+  for (Id irow = 0; irow < nrow; irow++)
   {
     totsum += tracepgs->trace[ncol * irow + 2];
     if (ncol >= 5) totsum += tracepgs->trace[ncol * irow + 4];
@@ -908,11 +908,11 @@ static double st_extract_trace(Local_Pgs* local_pgs)
  *****************************************************************************/
 static void st_variogram_patch_C00(Local_Pgs* local_pgs,
                                    Vario* vario,
-                                   int idir,
+                                   Id idir,
                                    double rho)
 {
   Db* db   = local_pgs->db;
-  int nech = (db == nullptr) ? 0 : db->getNSample(true);
+  Id nech = (db == nullptr) ? 0 : db->getNSample(true);
   vario->patchCenter(idir, nech, rho);
 }
 
@@ -926,7 +926,7 @@ static void st_variogram_patch_C00(Local_Pgs* local_pgs,
 static void trace_add_row(Local_Pgs* local_pgs)
 {
   Local_TracePgs* tracepgs;
-  int nrow, ncol, iad;
+  Id nrow, ncol, iad;
 
   /* Initializations */
 
@@ -938,7 +938,7 @@ static void trace_add_row(Local_Pgs* local_pgs)
 
   nrow++;
   tracepgs->trace.resize(nrow * ncol);
-  for (int icol = 0; icol < ncol; icol++)
+  for (Id icol = 0; icol < ncol; icol++)
     tracepgs->trace[iad + icol] = TEST;
   tracepgs->nrow = nrow;
 }
@@ -961,19 +961,19 @@ static double st_func_search_stat(double correl, void* user_data)
   /* Initializations */
 
   local_pgs  = (Local_Pgs*)user_data;
-  int iconf0 = 0;
+  Id iconf0 = 0;
 
-  int nfacies  = local_pgs->nfacies;
-  int ilag     = local_pgs->ipascur;
-  int idir     = local_pgs->idircur;
-  int igrf     = local_pgs->igrfcur;
+  Id nfacies  = local_pgs->nfacies;
+  Id ilag     = local_pgs->ipascur;
+  Id idir     = local_pgs->idircur;
+  Id igrf     = local_pgs->igrfcur;
   Vario* vario = local_pgs->varioind;
 
   if (TEST_DISCRET) iconf0 = ct_tableone_covrank(CTABLES, correl, &cround);
 
   double sum = 0.;
-  for (int ifac1 = 0; ifac1 < nfacies; ifac1++)
-    for (int ifac2 = 0; ifac2 < nfacies; ifac2++)
+  for (Id ifac1 = 0; ifac1 < nfacies; ifac1++)
+    for (Id ifac2 = 0; ifac2 < nfacies; ifac2++)
     {
       low[0]       = STAT_THRESH(ifac1, igrf, 0);
       up[0]        = STAT_THRESH(ifac1, igrf, 1);
@@ -982,7 +982,7 @@ static double st_func_search_stat(double correl, void* user_data)
       double proba = st_get_proba_ind(correl, low, up, iconf0);
 
       double logp = (proba <= 0.) ? MINIMUM_BIG : log(proba);
-      int iad     = vario->getDirAddress(idir, ifac1, ifac2, ilag, false, 1);
+      Id iad     = vario->getDirAddress(idir, ifac1, ifac2, ilag, false, 1);
       double sw   = vario->getSwByIndex(idir, iad);
       double gg   = vario->getGgByIndex(idir, iad);
       iad         = vario->getDirAddress(idir, ifac1, ifac2, ilag, false, -1);
@@ -1006,7 +1006,7 @@ static double st_func_search_stat(double correl, void* user_data)
 static double st_func_search_nostat(double correl, void* user_data)
 {
   double low[2], up[2], proba, sum, dist, w1, w2, logp, cround;
-  int ipair, i, i1, i2, ifac1, ifac2, iconf0;
+  Id ipair, i, i1, i2, ifac1, ifac2, iconf0;
   Local_Pgs* local_pgs;
 
   /* Initializations */
@@ -1018,7 +1018,7 @@ static double st_func_search_nostat(double correl, void* user_data)
 
   /* Reset the pre-calculation array (only if flag_stat) */
   if (local_pgs->flag_stat)
-    for (i = 0; i < (int)local_pgs->stat_proba.size(); i++)
+    for (i = 0; i < (Id)local_pgs->stat_proba.size(); i++)
       local_pgs->stat_proba[i] = TEST;
 
   sum = 0.;
@@ -1034,9 +1034,9 @@ static double st_func_search_nostat(double correl, void* user_data)
 
       /* In the stationary case, search in the lookup table first */
 
-      ifac1 = (int)local_pgs->db->getZVariable(i1, 0) - 1;
+      ifac1 = (Id)local_pgs->db->getZVariable(i1, 0) - 1;
       if (ifac1 < 0 || ifac1 >= local_pgs->nfacies) continue;
-      ifac2 = (int)local_pgs->db->getZVariable(i2, 0) - 1;
+      ifac2 = (Id)local_pgs->db->getZVariable(i2, 0) - 1;
       if (ifac2 < 0 || ifac2 >= local_pgs->nfacies) continue;
       proba = STAT_PROBA(ifac1, ifac2);
     }
@@ -1082,15 +1082,15 @@ static double st_func_search_nostat(double correl, void* user_data)
 static void trace_define(Local_Pgs* local_pgs,
                          double value0,
                          double value1,
-                         int origin,
-                         int number,
+                         Id origin,
+                         Id number,
                          const double* values)
 {
   Local_TracePgs* tracepgs = &local_pgs->tracepgs;
   if (!tracepgs->flag_trace) return;
-  int nrow = tracepgs->nrow;
-  int ncol = tracepgs->ncol;
-  int iad  = ncol * (nrow - 1);
+  Id nrow = tracepgs->nrow;
+  Id ncol = tracepgs->ncol;
+  Id iad  = ncol * (nrow - 1);
   if (2 + origin + number > ncol)
     messageAbort("Error in Trace dimension (ncol=%d origin=%d number=%d)",
                  ncol, origin, number);
@@ -1100,7 +1100,7 @@ static void trace_define(Local_Pgs* local_pgs,
   tracepgs->trace[iad]     = value0;
   tracepgs->trace[iad + 1] = value1;
 
-  for (int i = 0; i < number; i++)
+  for (Id i = 0; i < number; i++)
     tracepgs->trace[iad + 2 + origin + i] = values[i];
 }
 
@@ -1115,11 +1115,11 @@ static void trace_define(Local_Pgs* local_pgs,
  ** \param[in]  ngrf          Number of GRFs
  **
  *****************************************************************************/
-static int st_varcalc_from_vario_stat(Vario* vario,
+static Id st_varcalc_from_vario_stat(Vario* vario,
                                       Local_Pgs* local_pgs,
-                                      int ngrf)
+                                      Id ngrf)
 {
-  int iad;
+  Id iad;
   double result, testval, varloc, niter;
 
   /* Initializations */
@@ -1128,7 +1128,7 @@ static int st_varcalc_from_vario_stat(Vario* vario,
 
   /* Loop on the directions */
 
-  for (int idir = 0; idir < vario->getNDir(); idir++)
+  for (Id idir = 0; idir < vario->getNDir(); idir++)
   {
     local_pgs->idircur = idir;
 
@@ -1138,7 +1138,7 @@ static int st_varcalc_from_vario_stat(Vario* vario,
 
     /* Loop on the lags */
 
-    for (int ilag = 0; ilag < vario->getNLag(idir); ilag++)
+    for (Id ilag = 0; ilag < vario->getNLag(idir); ilag++)
     {
       mes_process("Inverting Variogram Lag", vario->getNLag(idir), ilag);
       local_pgs->ipascur = ilag;
@@ -1146,7 +1146,7 @@ static int st_varcalc_from_vario_stat(Vario* vario,
 
       /* Loop on the GRFs */
 
-      for (int igrf = 0; igrf < ngrf; igrf++)
+      for (Id igrf = 0; igrf < ngrf; igrf++)
       {
         local_pgs->igrfcur = igrf;
         result             = golden_search(st_func_search_stat, (void*)local_pgs,
@@ -1154,7 +1154,7 @@ static int st_varcalc_from_vario_stat(Vario* vario,
         trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf, 1, &testval);
         trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf + 1, 1, &niter);
 
-        for (int jgrf = 0; jgrf <= igrf; jgrf++)
+        for (Id jgrf = 0; jgrf <= igrf; jgrf++)
         {
           varloc = (igrf == jgrf) ? result : 0.;
           iad    = vario->getDirAddress(idir, igrf, jgrf, ilag, false, 1);
@@ -1181,7 +1181,7 @@ static int st_varcalc_from_vario_stat(Vario* vario,
  ** \param[in,out]  local_pgs   Local_Pgs structure
  **
  *****************************************************************************/
-static void st_define_trace(int flag_rho, int flag_correl, Local_Pgs* local_pgs)
+static void st_define_trace(Id flag_rho, Id flag_correl, Local_Pgs* local_pgs)
 {
   Local_TracePgs* tracepgs;
 
@@ -1226,9 +1226,9 @@ static void st_retrace_define(Local_Pgs* local_pgs)
  ** \param[in]   idir      Rank of the direction
  **
  *****************************************************************************/
-static void st_varcalc_uncorrelated_grf(Local_Pgs* local_pgs, int idir)
+static void st_varcalc_uncorrelated_grf(Local_Pgs* local_pgs, Id idir)
 {
-  int ilag, iad, igrf, jgrf, ngrf;
+  Id ilag, iad, igrf, jgrf, ngrf;
   double result, testval, niter, varloc;
   Vario* vario;
 
@@ -1278,7 +1278,7 @@ static void st_varcalc_uncorrelated_grf(Local_Pgs* local_pgs, int idir)
  ** \param[in] string      Rule string
  **
  *****************************************************************************/
-static double st_rule_calcul(Local_Pgs* local_pgs, int* string)
+static double st_rule_calcul(Local_Pgs* local_pgs, Id* string)
 {
   double score;
 
@@ -1303,7 +1303,7 @@ static double st_rule_calcul(Local_Pgs* local_pgs, int* string)
                                 local_pgs->db, local_pgs->propdef,
                                 local_pgs->rule);
     st_set_rho(0., local_pgs);
-    for (int idir = 0; idir < local_pgs->vario->getNDir(); idir++)
+    for (Id idir = 0; idir < local_pgs->vario->getNDir(); idir++)
     {
       local_pgs->idircur = idir;
       st_variogram_patch_C00(local_pgs, local_pgs->vario, idir,
@@ -1325,7 +1325,7 @@ static double st_rule_calcul(Local_Pgs* local_pgs, int* string)
  ** FUNCTION: st_permut
  **
  *****************************************************************************/
-static int st_permut(int value, int igrf)
+static Id st_permut(Id value, Id igrf)
 {
   if (igrf == 0)
   {
@@ -1358,14 +1358,14 @@ static int st_permut(int value, int igrf)
  ** \param[in] fgrf      Array of codes (skipped if < 0)
  **
  *****************************************************************************/
-static int st_fipos_encode(VectorInt& fgrf)
+static Id st_fipos_encode(VectorInt& fgrf)
 {
-  int nmax, found, fipos;
+  Id nmax, found, fipos;
 
   nmax = 1 + NGRF;
 
   found = fipos = 0;
-  for (int i = nmax - 1; i >= 0; i--)
+  for (Id i = nmax - 1; i >= 0; i--)
   {
     if (fgrf[i] > 0) found++;
     if (found == 1) fipos = 1;
@@ -1383,14 +1383,14 @@ static int st_fipos_encode(VectorInt& fgrf)
  ** \param[out] fgrf    Array of codes
  **
  *****************************************************************************/
-static void st_fipos_decode(int fipos, VectorInt& fgrf)
+static void st_fipos_decode(Id fipos, VectorInt& fgrf)
 {
-  int nmax, div;
+  Id nmax, div;
 
   nmax = 1 + NGRF;
-  for (int i = 0; i < nmax; i++)
+  for (Id i = 0; i < nmax; i++)
     fgrf[i] = 0;
-  for (int i = 0; i < nmax; i++)
+  for (Id i = 0; i < nmax; i++)
   {
     fipos = fipos - 1;
     div   = fipos / BASE;
@@ -1404,9 +1404,9 @@ static void st_fipos_decode(int fipos, VectorInt& fgrf)
  ** FUNCTION: st_update_orientation
  **
  *****************************************************************************/
-static int st_update_orientation(int fac0, int igrf_cas, VectorInt& fgrf)
+static Id st_update_orientation(Id fac0, Id igrf_cas, VectorInt& fgrf)
 {
-  int fac, facp, nmax, loc0, loc1;
+  Id fac, facp, nmax, loc0, loc1;
 
   /* Preliminary check */
 
@@ -1421,7 +1421,7 @@ static int st_update_orientation(int fac0, int igrf_cas, VectorInt& fgrf)
   /* Loop on the GRF permutations */
 
   loc0 = igrf_cas;
-  for (int igrf = 0; igrf < NGRF; igrf++)
+  for (Id igrf = 0; igrf < NGRF; igrf++)
   {
     loc1 = loc0 / 2;
     if (loc0 - 2 * loc1 > 0)
@@ -1429,7 +1429,7 @@ static int st_update_orientation(int fac0, int igrf_cas, VectorInt& fgrf)
 
       /* Update the orientation of 'grf' */
 
-      for (int i = 0; i < nmax; i++)
+      for (Id i = 0; i < nmax; i++)
         fgrf[i] = st_permut(fgrf[i], igrf);
     }
     loc0 = loc1;
@@ -1449,9 +1449,9 @@ static int st_update_orientation(int fac0, int igrf_cas, VectorInt& fgrf)
  ** REMARKS In this function, we change the orientation of one or several GRFs
  **
  *****************************************************************************/
-static int st_same_score(Relem* relem,
-                         int ir0,
-                         int igrf_cas,
+static Id st_same_score(Relem* relem,
+                         Id ir0,
+                         Id igrf_cas,
                          VectorInt& fgrf,
                          VectorInt& fcmp)
 {
@@ -1460,15 +1460,15 @@ static int st_same_score(Relem* relem,
 
   // Modify the orientation of 'grf' for the current 'fipos'
 
-  for (int ic = 0; ic < NCOLOR; ic++)
+  for (Id ic = 0; ic < NCOLOR; ic++)
     fcmp[ic] = st_update_orientation(fipos[FIPOSAD(ir0, ic)], igrf_cas, fgrf);
 
   // Look if the same 'fipos' has already been calculated
 
-  for (int ir = 0; ir < ir0; ir++)
+  for (Id ir = 0; ir < ir0; ir++)
   {
     bool flag_same = true;
-    for (int ic = 0; ic < NCOLOR && flag_same; ic++)
+    for (Id ic = 0; ic < NCOLOR && flag_same; ic++)
     {
       if (fipos[FIPOSAD(ir, ic)] != fcmp[ic]) flag_same = false;
     }
@@ -1484,21 +1484,21 @@ static int st_same_score(Relem* relem,
  **
  *****************************************************************************/
 static VectorDouble st_relem_evaluate(Relem* relem,
-                                      int verbose,
+                                      Id verbose,
                                       VectorInt& fgrf,
                                       VectorInt& fcmp,
                                       Local_Pgs* local_pgs,
-                                      int* nscore,
-                                      int* r_opt)
+                                      Id* nscore,
+                                      Id* r_opt)
 {
-  int nrule, indice, nmax, flag_check, igrf_cas, number, igrf_opt;
+  Id nrule, indice, nmax, flag_check, igrf_cas, number, igrf_opt;
   double score_ref;
   VectorDouble scores;
 
   /* Initializations */
 
-  flag_check       = (int)get_keypone("Multi_Score_Check", 0.);
-  nmax             = (int)pow(2., (double)NGRF);
+  flag_check       = (Id)get_keypone("Multi_Score_Check", 0.);
+  nmax             = (Id)pow(2., (double)NGRF);
   nrule            = relem->nrule;
   VectorInt& rules = relem->Rrules;
   VectorInt& fipos = relem->Rfipos;
@@ -1509,7 +1509,7 @@ static VectorDouble st_relem_evaluate(Relem* relem,
   scores.resize(nrule);
 
   *r_opt = number = 0;
-  for (int ir = 0; ir < nrule; ir++)
+  for (Id ir = 0; ir < nrule; ir++)
   {
 
     // Check if the same flag has already been found
@@ -1575,26 +1575,26 @@ static VectorDouble st_relem_evaluate(Relem* relem,
  **
  *****************************************************************************/
 static void st_rule_glue(Relem* relem,
-                         int nrule1,
-                         int nbyrule1,
+                         Id nrule1,
+                         Id nbyrule1,
                          const VectorInt& rules1,
                          const VectorInt& fipos1)
 {
   if (relem == (Relem*)NULL) return;
   if (nrule1 <= 0) return;
-  int nnew = relem->nrule + nrule1;
-  int ir   = relem->nrule;
+  Id nnew = relem->nrule + nrule1;
+  Id ir   = relem->nrule;
 
   relem->Rrules.resize(NRULE * nnew);
   VectorInt& rules = relem->Rrules;
   relem->Rfipos.resize(NCOLOR * nnew);
   VectorInt& fipos = relem->Rfipos;
 
-  for (int i1 = 0; i1 < nrule1; i1++, ir++)
+  for (Id i1 = 0; i1 < nrule1; i1++, ir++)
   {
-    for (int ic = 0; ic < nbyrule1; ic++)
+    for (Id ic = 0; ic < nbyrule1; ic++)
       RULES(ir, ic) = RULES1(i1, ic);
-    for (int ic = 0; ic < NCOLOR; ic++)
+    for (Id ic = 0; ic < NCOLOR; ic++)
       fipos[FIPOSAD(ir, ic)] = fipos1[FIPOSAD(i1, ic)];
   }
 
@@ -1608,13 +1608,13 @@ static void st_rule_glue(Relem* relem,
  **
  *****************************************************************************/
 static void st_rule_product(Split* split,
-                            int nprod,
-                            int nrule1,
-                            int nbyrule1,
+                            Id nprod,
+                            Id nrule1,
+                            Id nbyrule1,
                             const VectorInt& rules1,
                             const VectorInt& fipos1,
-                            int nrule2,
-                            int nbyrule2,
+                            Id nrule2,
+                            Id nbyrule2,
                             const VectorInt& rules2,
                             const VectorInt& fipos2)
 {
@@ -1625,12 +1625,12 @@ static void st_rule_product(Split* split,
   split->Sfipos.resize(NCOLOR * nprod, 0);
   VectorInt& fipos = split->Sfipos;
 
-  int ir = 0;
-  for (int i1 = 0; i1 < nrule1; i1++)
-    for (int i2 = 0; i2 < nrule2; i2++, ir++)
+  Id ir = 0;
+  for (Id i1 = 0; i1 < nrule1; i1++)
+    for (Id i2 = 0; i2 < nrule2; i2++, ir++)
     {
-      int ic          = 0;
-      int oper        = split->oper;
+      Id ic          = 0;
+      Id oper        = split->oper;
       RULES(ir, ic++) = 1000 + oper;
 
       if (flag_debug)
@@ -1640,11 +1640,11 @@ static void st_rule_product(Split* split,
         st_rule_print(i2, nbyrule2, rules2, fipos2, false, -1, -1, TEST);
       }
 
-      for (int i = 0; i < nbyrule1; i++)
+      for (Id i = 0; i < nbyrule1; i++)
         RULES(ir, ic++) = RULES1(i1, i);
-      for (int i = 0; i < nbyrule2; i++)
+      for (Id i = 0; i < nbyrule2; i++)
         RULES(ir, ic++) = RULES2(i2, i);
-      for (int i = 0; i < NCOLOR; i++)
+      for (Id i = 0; i < NCOLOR; i++)
       {
         if (fipos1[FIPOSAD(i1, i)] > 0)
           fipos[FIPOSAD(ir, i)] = fipos1[FIPOSAD(i1, i)] * BASE + st_define_fipos(oper, 1);
@@ -1668,25 +1668,25 @@ static void st_rule_product(Split* split,
  ** FUNCTION: st_split_collapse
  **
  *****************************************************************************/
-static void st_split_collapse(Split* split, int verbose)
+static void st_split_collapse(Split* split, Id verbose)
 
 {
   Relem* relem;
-  int num[2], nby[2], nprod;
+  Id num[2], nby[2], nprod;
   VectorInt *ptr[2];
 
   if (split == (Split*)NULL) return;
 
   // Explore the two Relems
 
-  for (int i = 0; i < 2; i++)
+  for (Id i = 0; i < 2; i++)
     st_relem_explore(split->relems[i], verbose);
 
   // Prepare collapsing
 
   if (split->nrule <= 0)
   {
-    for (int i = 0; i < 2; i++)
+    for (Id i = 0; i < 2; i++)
     {
       relem = split->relems[i];
       if (relem->facies.size() <= 1)
@@ -1724,13 +1724,13 @@ static void st_split_collapse(Split* split, int verbose)
  ** FUNCTION: st_relem_explore
  **
  *****************************************************************************/
-static void st_relem_explore(Relem* relem, int verbose)
+static void st_relem_explore(Relem* relem, Id verbose)
 {
   Split* split;
 
   if (relem == (Relem*)NULL) return;
 
-  for (int is = 0; is < relem->nsplit; is++)
+  for (Id is = 0; is < relem->nsplit; is++)
   {
     split = relem->splits[is];
     st_split_collapse(split, verbose);
@@ -1757,9 +1757,9 @@ static void st_relem_explore(Relem* relem, int verbose)
  ** \param[in]  vorder      Vario_Order structure
  **
  *****************************************************************************/
-Vario_Order* vario_order_manage(int mode,
-                                int flag_dist,
-                                int size_aux,
+Vario_Order* vario_order_manage(Id mode,
+                                Id flag_dist,
+                                Id size_aux,
                                 Vario_Order* vorder)
 {
   Vario_Order* vorder_loc;
@@ -1826,17 +1826,17 @@ Vario_Order* vario_order_manage(int mode,
  ** \param[in]  dist        Calculated distance (only stored if flag_dist == 1)
  **
  *****************************************************************************/
-int vario_order_add(Vario_Order* vorder,
-                    int iech,
-                    int jech,
+Id vario_order_add(Vario_Order* vorder,
+                    Id iech,
+                    Id jech,
                     void* aux_iech,
                     void* aux_jech,
-                    int ilag,
-                    int idir,
+                    Id ilag,
+                    Id idir,
                     double dist)
 {
-  int iad;
-  static int VARIO_ORDER_QUANT = 1000;
+  Id iad;
+  static Id VARIO_ORDER_QUANT = 1000;
 
   if (vorder == (Vario_Order*)NULL) return (0);
 
@@ -1891,11 +1891,11 @@ int vario_order_add(Vario_Order* vorder,
  **
  *****************************************************************************/
 void vario_order_print(Vario_Order* vorder,
-                       int idir_target,
-                       int ipas_target,
-                       int verbose)
+                       Id idir_target,
+                       Id ipas_target,
+                       Id verbose)
 {
-  int i, j, ilag, idir, flag_first;
+  Id i, j, ilag, idir, flag_first;
 
   if (vorder == (Vario_Order*)NULL) return;
 
@@ -1943,9 +1943,9 @@ void vario_order_print(Vario_Order* vorder,
  ** \param[in]  npair       Final number of pairs
  **
  *****************************************************************************/
-Vario_Order* vario_order_final(Vario_Order* vorder, int* npair)
+Vario_Order* vario_order_final(Vario_Order* vorder, Id* npair)
 {
-  int i, error;
+  Id i, error;
 
   *npair = 0;
   if (vorder == (Vario_Order*)NULL) return (vorder);
@@ -2000,12 +2000,12 @@ Vario_Order* vario_order_final(Vario_Order* vorder, int* npair)
  **
  *****************************************************************************/
 void vario_order_get_indices(Vario_Order* vorder,
-                             int ipair,
-                             int* iech,
-                             int* jech,
+                             Id ipair,
+                             Id* iech,
+                             Id* jech,
                              double* dist)
 {
-  int jpair;
+  Id jpair;
 
   if (vorder->tab_sort.empty()) messageAbort("vario_order_get_indices");
   jpair = vorder->tab_sort[ipair];
@@ -2026,11 +2026,11 @@ void vario_order_get_indices(Vario_Order* vorder,
  **
  *****************************************************************************/
 void vario_order_get_auxiliary(Vario_Order* vorder,
-                               int ipair,
+                               Id ipair,
                                char* aux_iech,
                                char* aux_jech)
 {
-  int jpair, iad;
+  Id jpair, iad;
 
   if (vorder->tab_sort.empty()) messageAbort("vario_order_get_auxiliary");
   jpair = vorder->tab_sort[ipair];
@@ -2052,12 +2052,12 @@ void vario_order_get_auxiliary(Vario_Order* vorder,
  **
  *****************************************************************************/
 void vario_order_get_bounds(Vario_Order* vorder,
-                            int idir,
-                            int ilag,
-                            int* ifirst,
-                            int* ilast)
+                            Id idir,
+                            Id ilag,
+                            Id* ifirst,
+                            Id* ilast)
 {
-  int ipair, jpair, ival;
+  Id ipair, jpair, ival;
 
   ival = ilag + idir * QUANT_DIR;
   if (vorder->npair > 0 && vorder->tab_sort.empty())
@@ -2101,9 +2101,9 @@ void vario_order_get_bounds(Vario_Order* vorder,
  ** \param[out] tabout    Inverted matrix
  **
  *****************************************************************************/
-static int invgen(MatrixSymmetric& a, MatrixSymmetric& tabout)
+static Id invgen(MatrixSymmetric& a, MatrixSymmetric& tabout)
 {
-  int neq = a.getNRows();
+  auto neq = a.getNRows();
   tabout.fill(0.);
 
   /* Calculate the eigen vectors */
@@ -2114,11 +2114,11 @@ static int invgen(MatrixSymmetric& a, MatrixSymmetric& tabout)
 
   /* Calculate the generalized inverse */
 
-  for (int i = 0; i < neq; i++)
-    for (int j = 0; j < neq; j++)
+  for (Id i = 0; i < neq; i++)
+    for (Id j = 0; j < neq; j++)
     {
       double value = 0.;
-      for (int k = 0; k < neq; k++)
+      for (Id k = 0; k < neq; k++)
       {
         if (ABS(eigval[k]) > 1e-10)
           value += eigvec->getValue(k, i) * eigvec->getValue(k, j) / eigval[k];
@@ -2137,9 +2137,9 @@ static int invgen(MatrixSymmetric& a, MatrixSymmetric& tabout)
  **
  *****************************************************************************/
 
-static int st_index(int i, int j)
+static Id st_index(Id i, Id j)
 {
-  int value;
+  Id value;
 
   value = 0;
   switch (i)
@@ -2221,7 +2221,7 @@ static void st_build_correl(Local_CorPgs* corpgs,
   double rho          = corpgs->rho;
 
   correl.fill(0.);
-  for (int i = 0; i < 4; i++)
+  for (Id i = 0; i < 4; i++)
     correl.setValue(i, i, 1.);
 
   correl.setValue(2, 0, rho);
@@ -2247,15 +2247,15 @@ static void st_update_constraints(Local_CorPgs* corpgs,
                                   MatrixSymmetric& Hess)
 {
   MatrixSymmetric m;
-  int npar = corpgs->npar;
+  Id npar = corpgs->npar;
 
   /* Update the Grad */
 
   VectorDouble v = Grad;
-  for (int i = 0; i < npar; i++)
+  for (Id i = 0; i < npar; i++)
   {
     double value = 0.;
-    for (int j = 0; j < 4; j++)
+    for (Id j = 0; j < 4; j++)
       value += v[j] * corpgs->modif.getValue(i, j);
     Grad[i] = value;
   }
@@ -2264,10 +2264,10 @@ static void st_update_constraints(Local_CorPgs* corpgs,
 
   m = Hess;
   Hess.fill(0.);
-  for (int i = 0; i < npar; i++)
-    for (int j = 0; j < npar; j++)
-      for (int k = 0; k < 4; k++)
-        for (int l = 0; l < 4; l++)
+  for (Id i = 0; i < npar; i++)
+    for (Id j = 0; j < npar; j++)
+      for (Id k = 0; k < 4; k++)
+        for (Id l = 0; l < 4; l++)
           Hess.updValue(i, j, EOperator::ADD,
                         corpgs->modif.getValue(i, k) * m.getValue(k, l) * corpgs->modif.getValue(j, l));
 }
@@ -2287,7 +2287,7 @@ static void st_update_constraints_with_JJ(Local_CorPgs* corpgs,
                                           MatrixSymmetric& Hess,
                                           MatrixSymmetric& JJ)
 {
-  int npar = corpgs->npar;
+  Id npar = corpgs->npar;
 
   /* Update the Grad and Hessian */
 
@@ -2297,10 +2297,10 @@ static void st_update_constraints_with_JJ(Local_CorPgs* corpgs,
 
   MatrixSymmetric m = JJ;
   JJ.fill(0.);
-  for (int i = 0; i < npar; i++)
-    for (int j = 0; j < npar; j++)
-      for (int k = 0; k < 4; k++)
-        for (int l = 0; l < 4; l++)
+  for (Id i = 0; i < npar; i++)
+    for (Id j = 0; j < npar; j++)
+      for (Id k = 0; k < 4; k++)
+        for (Id l = 0; l < 4; l++)
           JJ.updValue(i, j, EOperator::ADD,
                       corpgs->modif.getValue(i, k) * m.getValue(l, k) * corpgs->modif.getValue(j, l));
 }
@@ -2330,16 +2330,16 @@ static void st_deriv_eigen(Local_CorPgs* corpgs,
   st_build_correl(corpgs, corpgs->params, temp);
   temp.linearCombination(-1., &temp);
 
-  for (int i = 0; i < 4; i++)
+  for (Id i = 0; i < 4; i++)
     temp.updValue(i, i, EOperator::ADD, eigval);
 
   invgen(temp, invGn);
 
-  for (int i = 0; i < 4; i++)
+  for (Id i = 0; i < 4; i++)
     d1[i] = 2 * ev->getValue(3, F(i, 0)) * ev->getValue(3, F(i, 1));
 
-  for (int i = 0; i < 4; i++)
-    for (int j = 0; j < i; j++)
+  for (Id i = 0; i < 4; i++)
+    for (Id j = 0; j < i; j++)
     {
       double value = 0;
       value        = ev->getValue(3, F(i, 0)) * ev->getValue(3, F(j, 0)) * invGn.getValue(F(i, 1), F(j, 1));
@@ -2366,9 +2366,9 @@ static void st_deriv_eigen(Local_CorPgs* corpgs,
  **
  *****************************************************************************/
 static double st_param_expand(Local_Pgs* local_pgs,
-                              int igrf,
-                              int jgrf,
-                              int idir)
+                              Id igrf,
+                              Id jgrf,
+                              Id idir)
 {
   double rho, rho2;
   Local_CorPgs* corpgs;
@@ -2427,7 +2427,7 @@ static void st_set_modif(Local_CorPgs* corpgs)
   {
     case 0: /* Full parameters */
       corpgs->npar = 4;
-      for (int i = 0; i < 4; i++)
+      for (Id i = 0; i < 4; i++)
         corpgs->modif.setValue(i, i, 1.);
       break;
 
@@ -2464,8 +2464,8 @@ static void st_set_modif(Local_CorPgs* corpgs)
  ** \param[in,out]  local_pgs   Local_Pgs structure
  **
  *****************************************************************************/
-static void st_define_corpgs(int option,
-                             int flag_rho,
+static void st_define_corpgs(Id option,
+                             Id flag_rho,
                              double rho,
                              Local_Pgs* local_pgs)
 {
@@ -2490,22 +2490,22 @@ static void st_define_corpgs(int option,
  ** \param[in]  ifac2        Second target facies (starting from 1)
  **
  *****************************************************************************/
-static int st_get_count(Local_Pgs* local_pgs, int ifac1, int ifac2)
+static Id st_get_count(Local_Pgs* local_pgs, Id ifac1, Id ifac2)
 {
-  int i1, i2;
+  Id i1, i2;
   double dist;
 
   /* Initializations */
 
-  int number = 0;
-  for (int ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
+  Id number = 0;
+  for (Id ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
   {
     vario_order_get_indices(local_pgs->vorder, ipair, &i1, &i2, &dist);
     if (ifac1 != local_pgs->db->getZVariable(i1, 0)) continue;
     if (ifac2 != local_pgs->db->getZVariable(i2, 0)) continue;
     double w1 = local_pgs->db->getWeight(i1);
     double w2 = local_pgs->db->getWeight(i2);
-    number += (int)(w1 * w2);
+    number += (Id)(w1 * w2);
   }
   return (number);
 }
@@ -2515,7 +2515,7 @@ static int st_get_count(Local_Pgs* local_pgs, int ifac1, int ifac2)
  ** PRUPOSE: Internal function
  **
  *****************************************************************************/
-static double st_rkl(int maxpts,
+static double st_rkl(Id maxpts,
                      double x,
                      double y,
                      VectorDouble& lower,
@@ -2525,7 +2525,7 @@ static double st_rkl(int maxpts,
                      MatrixSquare& temp)
 {
   double v2, error;
-  int inform;
+  Id inform;
   static double abseps = 1.e-12;
   static double releps = 0.;
 
@@ -2560,9 +2560,9 @@ static double st_rkl(int maxpts,
  ** \param[in]  correl       Correlation matrix (Dimension = 4*4)
  **
  *****************************************************************************/
-static double st_ikl(int maxpts,
-                     int index1,
-                     int index2,
+static double st_ikl(Id maxpts,
+                     Id index1,
+                     Id index2,
                      VectorDouble& lower,
                      VectorDouble& upper,
                      MatrixSymmetric& correl)
@@ -2586,11 +2586,11 @@ static double st_ikl(int maxpts,
 
   // Derive covar
   MatrixSquare covar(2);
-  for (int i = 0; i < 2; i++)
-    for (int j = 0; j < 2; j++)
+  for (Id i = 0; i < 2; i++)
+    for (Id j = 0; j < 2; j++)
     {
       double value = 0;
-      for (int k = 0; k < 2; k++)
+      for (Id k = 0; k < 2; k++)
         value += temp->getValue(k, i) * corrc->getValue(k, j);
       covar.setValue(i, j, corr2->getValue(i, j) - value);
     }
@@ -2628,7 +2628,7 @@ static double st_nkl(VectorDouble& u,
                      double lower,
                      double upper,
                      VectorDouble& invvari,
-                     int index2,
+                     Id index2,
                      double meanj,
                      double varj,
                      double stdj)
@@ -2656,9 +2656,9 @@ static double st_nkl(VectorDouble& u,
  ** \param[in]  correl       Correlation matrix (Dimension = 4*4)
  **
  *****************************************************************************/
-static double st_d2_dkldkl(int maxpts,
-                           int index1,
-                           int index2,
+static double st_d2_dkldkl(Id maxpts,
+                           Id index1,
+                           Id index2,
                            VectorDouble& lower,
                            VectorDouble& upper,
                            MatrixSymmetric& correl)
@@ -2693,14 +2693,14 @@ static double st_d2_dkldij(VectorDouble& lower,
                            VectorDouble& upper,
                            MatrixSymmetric& correl)
 {
-  int grid[4];
+  Id grid[4];
   VectorDouble u(4);
 
   double S = 0.;
-  for (int i4 = 0; i4 < 2; i4++)
-    for (int i3 = 0; i3 < 2; i3++)
-      for (int i2 = 0; i2 < 2; i2++)
-        for (int i1 = 0; i1 < 2; i1++)
+  for (Id i4 = 0; i4 < 2; i4++)
+    for (Id i3 = 0; i3 < 2; i3++)
+      for (Id i2 = 0; i2 < 2; i2++)
+        for (Id i1 = 0; i1 < 2; i1++)
         {
           grid[0] = i1;
           grid[1] = i2;
@@ -2708,7 +2708,7 @@ static double st_d2_dkldij(VectorDouble& lower,
           grid[3] = i4;
 
           bool flag_out = false;
-          for (int i = 0; i < 4 && flag_out == 0; i++)
+          for (Id i = 0; i < 4 && flag_out == 0; i++)
           {
             u[i]     = (grid[i]) ? upper[i] : lower[i];
             flag_out = ISNOT_GAUSS_DEF(u[i]);
@@ -2730,8 +2730,8 @@ static double st_d2_dkldij(VectorDouble& lower,
  ** \param[in]  correl      Correlation matrix (Dimension = 4*4)
  **
  *****************************************************************************/
-static double st_d2_dkldkj(int index1,
-                           int index2,
+static double st_d2_dkldkj(Id index1,
+                           Id index2,
                            VectorDouble& lower,
                            VectorDouble& upper,
                            MatrixSymmetric& correl)
@@ -2754,23 +2754,23 @@ static double st_d2_dkldkj(int index1,
 
   VectorDouble lowi = VH::reduceOne(lower, index2);
   VectorDouble uppi = VH::reduceOne(upper, index2);
-  int lowj          = lower[index2];
-  int uppj          = upper[index2];
+  Id lowj          = lower[index2];
+  Id uppj          = upper[index2];
 
   double S = 0.;
   VectorDouble u(3);
-  int grid[3];
+  Id grid[3];
 
-  for (int i3 = 0; i3 < 2; i3++)
-    for (int i2 = 0; i2 < 2; i2++)
-      for (int i1 = 0; i1 < 2; i1++)
+  for (Id i3 = 0; i3 < 2; i3++)
+    for (Id i2 = 0; i2 < 2; i2++)
+      for (Id i1 = 0; i1 < 2; i1++)
       {
         grid[0] = i1;
         grid[1] = i2;
         grid[2] = i3;
 
         bool flag_out = false;
-        for (int i = 0; i < 3 && !flag_out; i++)
+        for (Id i = 0; i < 3 && !flag_out; i++)
         {
           u[i]     = (grid[i]) ? uppi[i] : lowi[i];
           flag_out = ISNOT_GAUSS_DEF(u[i]);
@@ -2801,19 +2801,19 @@ static double st_d2_dkldkj(int index1,
  **
  *****************************************************************************/
 static double st_calcul_stat(Local_Pgs* local_pgs,
-                             int flag_deriv,
-                             int flag_reset,
+                             Id flag_deriv,
+                             Id flag_reset,
                              MatrixSymmetric& correl,
                              VectorDouble& Grad,
                              MatrixSymmetric& Hess,
                              MatrixSymmetric& JJ)
 {
   double s, rj2, erval, ggval;
-  int inform;
+  Id inform;
   static double abseps = 1.e-6;
   static double releps = 0.;
-  static int maxpts4   = 10000;
-  static int maxpts2   = 4000;
+  static Id maxpts4   = 10000;
+  static Id maxpts2   = 4000;
   MatrixSymmetric hess(4);
   MatrixSymmetric gradgrad(4);
   VectorDouble grad(4);
@@ -2824,11 +2824,11 @@ static double st_calcul_stat(Local_Pgs* local_pgs,
   grad.fill(0.);
   hess.fill(0.);
 
-  for (int ifac1 = 0; ifac1 < local_pgs->nfacies; ifac1++)
+  for (Id ifac1 = 0; ifac1 < local_pgs->nfacies; ifac1++)
   {
-    for (int ifac2 = 0; ifac2 < local_pgs->nfacies; ifac2++)
+    for (Id ifac2 = 0; ifac2 < local_pgs->nfacies; ifac2++)
     {
-      int nfifj = st_get_count(local_pgs, ifac1 + 1, ifac2 + 1);
+      auto nfifj = st_get_count(local_pgs, ifac1 + 1, ifac2 + 1);
       if (nfifj <= 0) continue;
 
       /* Get the bounds */
@@ -2863,8 +2863,8 @@ static double st_calcul_stat(Local_Pgs* local_pgs,
       grad[2] = -st_ikl(maxpts2, 1, 2, lower, upper, correl) / s;
       grad[3] = -st_ikl(maxpts2, 2, 3, lower, upper, correl) / s;
       gradgrad.fill(0.);
-      for (int i = 0; i < 4; i++)
-        for (int j = 0; j <= i; j++)
+      for (Id i = 0; i < 4; i++)
+        for (Id j = 0; j <= i; j++)
           gradgrad.setValue(i, j, grad[i] * grad[j]);
 
       hess.setValue(3, 0, -st_d2_dkldij(lower, upper, correl));
@@ -2878,10 +2878,10 @@ static double st_calcul_stat(Local_Pgs* local_pgs,
       hess.setValue(2, 2, st_d2_dkldkl(maxpts4, 1, 2, lower, upper, correl));
       hess.setValue(3, 3, st_d2_dkldkl(maxpts4, 2, 3, lower, upper, correl));
 
-      for (int i = 0; i < 4; i++)
+      for (Id i = 0; i < 4; i++)
       {
         Grad[i] += nfifj * grad[i];
-        for (int j = 0; j <= i; j++)
+        for (Id j = 0; j <= i; j++)
         {
           ggval = gradgrad.getValue(i, j);
           Hess.updValue(i, j, EOperator::SUBTRACT, nfifj * (hess.getValue(i, j) / s - ggval));
@@ -2910,19 +2910,19 @@ static double st_calcul_stat(Local_Pgs* local_pgs,
  **
  *****************************************************************************/
 static double st_calcul_nostat(Local_Pgs* local_pgs,
-                               int flag_deriv,
-                               int flag_reset,
+                               Id flag_deriv,
+                               Id flag_reset,
                                MatrixSymmetric& correl,
                                VectorDouble& Grad,
                                MatrixSymmetric& Hess,
                                MatrixSymmetric& JJ)
 {
   double s, erval, dist;
-  int i1, i2, inform;
+  Id i1, i2, inform;
   static double abseps = 1.e-6;
   static double releps = 0.;
-  static int maxpts4   = 10000;
-  static int maxpts2   = 4000;
+  static Id maxpts4   = 10000;
+  static Id maxpts2   = 4000;
   VectorDouble grad(4);
   VectorDouble lower(4);
   VectorDouble upper(4);
@@ -2933,11 +2933,11 @@ static double st_calcul_nostat(Local_Pgs* local_pgs,
   grad.fill(0.);
   hess.fill(0.);
 
-  for (int ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
+  for (Id ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
   {
     vario_order_get_indices(local_pgs->vorder, ipair, &i1, &i2, &dist);
-    int ifac1 = (int)local_pgs->db->getZVariable(i1, 0);
-    int ifac2 = (int)local_pgs->db->getZVariable(i2, 0);
+    Id ifac1 = (Id)local_pgs->db->getZVariable(i1, 0);
+    Id ifac2 = (Id)local_pgs->db->getZVariable(i2, 0);
     double w1 = local_pgs->db->getWeight(i1);
     double w2 = local_pgs->db->getWeight(i2);
 
@@ -2969,8 +2969,8 @@ static double st_calcul_nostat(Local_Pgs* local_pgs,
     grad[2] = -st_ikl(maxpts2, 1, 2, lower, upper, correl) / s;
     grad[3] = -st_ikl(maxpts2, 2, 3, lower, upper, correl) / s;
     gradgrad.fill(0.);
-    for (int i = 0; i < 4; i++)
-      for (int j = 0; j <= i; j++)
+    for (Id i = 0; i < 4; i++)
+      for (Id j = 0; j <= i; j++)
         gradgrad.setValue(i, j, grad[i] * grad[j]);
 
     hess.setValue(3, 0, -st_d2_dkldij(lower, upper, correl));
@@ -2984,10 +2984,10 @@ static double st_calcul_nostat(Local_Pgs* local_pgs,
     hess.setValue(2, 2, st_d2_dkldkl(maxpts4, 1, 2, lower, upper, correl));
     hess.setValue(3, 3, st_d2_dkldkl(maxpts4, 2, 3, lower, upper, correl));
 
-    for (int i = 0; i < 4; i++)
+    for (Id i = 0; i < 4; i++)
     {
       Grad[i] += w1 * w2 * grad[i];
-      for (int j = 0; j <= i; j++)
+      for (Id j = 0; j <= i; j++)
       {
         double ggval = gradgrad.getValue(i, j);
         Hess.updValue(i, j, EOperator::SUBTRACT, w1 * w2 * (hess.getValue(i, j) / s - ggval));
@@ -3015,8 +3015,8 @@ static double st_calcul_nostat(Local_Pgs* local_pgs,
  **
  *****************************************************************************/
 static double st_calcul(Local_Pgs* local_pgs,
-                        int flag_deriv,
-                        int flag_reset,
+                        Id flag_deriv,
+                        Id flag_reset,
                         VectorDouble& params,
                         VectorDouble& Grad,
                         MatrixSymmetric& Hess,
@@ -3087,7 +3087,7 @@ static void st_initialize_params(Local_CorPgs* corpgs)
  *****************************************************************************/
 static double st_optim_onelag_pgs(Local_Pgs* local_pgs,
                                   double tolsort,
-                                  int new_val)
+                                  Id new_val)
 {
   MatrixSymmetric invGn(4);
   MatrixSymmetric correl(4);
@@ -3112,12 +3112,12 @@ static double st_optim_onelag_pgs(Local_Pgs* local_pgs,
   double Spen     = 0.;
   double Srpen    = 0.;
   double penalize = 1000;
-  int barrier     = 0;
+  Id barrier     = 0;
 
   /* Initializations */
 
   Local_CorPgs* corpgs = &local_pgs->corpgs;
-  int npar             = corpgs->npar;
+  Id npar             = corpgs->npar;
   double delta         = delta0;
   double mdiminution   = 0.;
 
@@ -3251,7 +3251,7 @@ static double st_optim_onelag_pgs(Local_Pgs* local_pgs,
   if (OptDbg::query(EDbg::CONVERGE))
   {
     message("Lag %d - S = %lf Parameters =", local_pgs->ipascur, Sr);
-    for (int i = 0; i < corpgs->npar; i++)
+    for (Id i = 0; i < corpgs->npar; i++)
       message(" %lf", corpgs->params[i]);
     message("\n");
   }
@@ -3276,7 +3276,7 @@ static double st_optim_onelag_pgs(Local_Pgs* local_pgs,
  ** \param[in]  iech        Rank of the sample
  **
  *****************************************************************************/
-static int st_discard_point(Local_Pgs* local_pgs, int iech)
+static Id st_discard_point(Local_Pgs* local_pgs, Id iech)
 {
   double low, up;
 
@@ -3290,7 +3290,7 @@ static int st_discard_point(Local_Pgs* local_pgs, int iech)
 
   /* Check on the facies */
 
-  int ifac = (int)local_pgs->db->getZVariable(iech, 0);
+  Id ifac = (Id)local_pgs->db->getZVariable(iech, 0);
   if (ifac < 1 || ifac > local_pgs->nfacies) return (1);
 
   /* Check on the thresholds */
@@ -3322,9 +3322,9 @@ static int st_discard_point(Local_Pgs* local_pgs, int iech)
  ** \param[in]  local_pgs   Local_Pgs structure
  **
  *****************************************************************************/
-static int st_variogram_geometry_pgs_final(Local_Pgs* local_pgs)
+static Id st_variogram_geometry_pgs_final(Local_Pgs* local_pgs)
 {
-  int npair;
+  Id npair;
 
   local_pgs->vorder = vario_order_final(local_pgs->vorder, &npair);
   if (local_pgs->vorder == (Vario_Order*)NULL) return (1);
@@ -3346,14 +3346,14 @@ static int st_variogram_geometry_pgs_final(Local_Pgs* local_pgs)
  *****************************************************************************/
 static void st_variogram_geometry_pgs_correct(Local_Pgs* local_pgs,
                                               Vario* vario,
-                                              int idir)
+                                              Id idir)
 {
-  int iad;
+  Id iad;
 
-  int ngrf = local_pgs->ngrf;
-  for (int ilag = 0; ilag < vario->getNLag(idir); ilag++)
-    for (int igrf = 0; igrf < ngrf; igrf++)
-      for (int jgrf = 0; jgrf <= igrf; jgrf++)
+  Id ngrf = local_pgs->ngrf;
+  for (Id ilag = 0; ilag < vario->getNLag(idir); ilag++)
+    for (Id igrf = 0; igrf < ngrf; igrf++)
+      for (Id jgrf = 0; jgrf <= igrf; jgrf++)
       {
         iad = vario->getDirAddress(idir, igrf, jgrf, ilag, false, 1);
         vario->setGgByIndex(idir, iad, st_param_expand(local_pgs, igrf, jgrf, 1));
@@ -3379,19 +3379,19 @@ static void st_variogram_geometry_pgs_correct(Local_Pgs* local_pgs,
  ** \param[in]  idir        Rank of the direction
  **
  *****************************************************************************/
-static int st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
+static Id st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
                                             Vario* vario,
-                                            int idir)
+                                            Id idir)
 {
-  int iad;
+  Id iad;
   SpaceTarget T1(vario->getSpace());
   SpaceTarget T2(vario->getSpace());
 
   /* Retrieve information from Local_pgs structure */
 
   Db* db                   = local_pgs->db;
-  int nech                 = db->getNSample();
-  int nvar                 = vario->getNVar();
+  Id nech                 = db->getNSample();
+  Id nvar                 = vario->getNVar();
   double maxdist           = vario->getMaximumDistance(idir);
   const DirParam& dirparam = vario->getDirParam(idir);
 
@@ -3406,18 +3406,18 @@ static int st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
 
   /* Loop on the first point */
 
-  for (int iiech = 0; iiech < nech - 1; iiech++)
+  for (Id iiech = 0; iiech < nech - 1; iiech++)
   {
-    int iech = rindex[iiech];
+    Id iech = rindex[iiech];
     if (hasSel && !db->isActive(iech)) continue;
     if (hasWeight && FFFF(db->getWeight(iech))) continue;
     if (st_discard_point(local_pgs, iech)) continue;
     db->getSampleAsSTInPlace(iech, T1);
     mes_process("Calculating Variogram Geometry", nech, iech);
 
-    for (int jjech = iiech + 1; jjech < nech; jjech++)
+    for (Id jjech = iiech + 1; jjech < nech; jjech++)
     {
-      int jech = rindex[jjech];
+      Id jech = rindex[jjech];
       if (db->getDistance1D(iech, jech) > maxdist) break;
       if (hasSel && !db->isActive(jech)) continue;
       if (hasWeight && FFFF(db->getWeight(jech))) continue;
@@ -3429,7 +3429,7 @@ static int st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
 
       /* Get the rank of the lag */
 
-      int ilag = dirparam.getLagRank(dist);
+      auto ilag = dirparam.getLagRank(dist);
       if (IFFFF(ilag)) continue;
 
       /* Add the sample (only positive lags are of interest) */
@@ -3441,8 +3441,8 @@ static int st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
 
       /* Update the distance and weight for all GRFs */
 
-      for (int ivar = 0; ivar < nvar; ivar++)
-        for (int jvar = 0; jvar <= ivar; jvar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
+        for (Id jvar = 0; jvar <= ivar; jvar++)
         {
           if (vario->getFlagAsym())
           {
@@ -3477,7 +3477,7 @@ static int st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
  ** \param[out] corpgs  Local_CorPgs structure
  **
  ****************************************************************************/
-static void st_set_opt_correl(int opt, Local_CorPgs* corpgs)
+static void st_set_opt_correl(Id opt, Local_CorPgs* corpgs)
 
 {
   VectorDouble params = st_compute_params(corpgs, corpgs->params);
@@ -3516,15 +3516,15 @@ static void st_set_opt_correl(int opt, Local_CorPgs* corpgs)
  ** \param[in]  idir      Rank of the direction
  **
  *****************************************************************************/
-static double st_varcalc_correlated_grf(Local_Pgs* local_pgs, int idir)
+static double st_varcalc_correlated_grf(Local_Pgs* local_pgs, Id idir)
 {
-  int iad;
+  Id iad;
 
-  int opt_temp = local_pgs->corpgs.opt_correl;
+  Id opt_temp = local_pgs->corpgs.opt_correl;
   double value = 0.;
   Vario* vario = local_pgs->vario;
 
-  for (int ilag = 0; ilag < vario->getNLag(idir); ilag++)
+  for (Id ilag = 0; ilag < vario->getNLag(idir); ilag++)
   {
     mes_process("Inverting Variogram Lag", vario->getNLag(idir), ilag);
     local_pgs->ipascur = ilag;
@@ -3540,8 +3540,8 @@ static double st_varcalc_correlated_grf(Local_Pgs* local_pgs, int idir)
     st_set_opt_correl(opt_temp, &local_pgs->corpgs);
     value += (vario->getUtilizeByIndex(idir, vario->getNLag(idir) + ilag) * st_optim_onelag_pgs(local_pgs, 1e-3, 0));
 
-    for (int igrf = 0; igrf < local_pgs->ngrf; igrf++)
-      for (int jgrf = 0; jgrf <= igrf; jgrf++)
+    for (Id igrf = 0; igrf < local_pgs->ngrf; igrf++)
+      for (Id jgrf = 0; jgrf <= igrf; jgrf++)
       {
         iad = vario->getDirAddress(idir, igrf, jgrf, ilag, false, 1);
         vario->setGgByIndex(idir, iad, st_param_expand(local_pgs, igrf, jgrf, 1));
@@ -3607,7 +3607,7 @@ static void st_manage_trace(Local_TracePgs* local_tracepgs)
  ** \param[in]  calcul_type  Type of the calculation (covariance, variogram, ...)
  **
  *****************************************************************************/
-static void st_manage_pgs(int mode,
+static void st_manage_pgs(Id mode,
                           Local_Pgs* local_pgs,
                           Db* db                        = nullptr,
                           const Rule* rule              = nullptr,
@@ -3615,11 +3615,11 @@ static void st_manage_pgs(int mode,
                           Vario* varioind               = nullptr,
                           Model* model                  = nullptr,
                           PropDef* propdef              = nullptr,
-                          int flag_stat                 = 0,
-                          int flag_facies               = 0,
-                          int flag_dist                 = 0,
-                          int ngrf                      = 0,
-                          int nfacies                   = 0,
+                          Id flag_stat                 = 0,
+                          Id flag_facies               = 0,
+                          Id flag_dist                 = 0,
+                          Id ngrf                      = 0,
+                          Id nfacies                   = 0,
                           const ECalcVario& calcul_type = ECalcVario::UNDEFINED)
 {
   /* Dispatch */
@@ -3669,7 +3669,7 @@ static void st_manage_pgs(int mode,
       local_pgs->model       = model;
       if (model != nullptr)
       {
-        int ndim = model->getNDim();
+        Id ndim = model->getNDim();
         local_pgs->d0.resize(ndim);
         local_pgs->d1.resize(ndim);
       }
@@ -3705,18 +3705,18 @@ static void st_manage_pgs(int mode,
  **                             calling this function
  **
  *****************************************************************************/
-static int st_variopgs_calcul_norho(Vario* vario,
+static Id st_variopgs_calcul_norho(Vario* vario,
                                     const Rule* rule,
                                     Local_Pgs* local_pgs,
-                                    int ngrf,
-                                    int opt_correl,
-                                    int flag_geometry)
+                                    Id ngrf,
+                                    Id opt_correl,
+                                    Id flag_geometry)
 {
   st_set_rho(rule->getRho(), local_pgs);
 
   /* Loop on the directions */
 
-  for (int idir = 0; idir < vario->getNDir(); idir++)
+  for (Id idir = 0; idir < vario->getNDir(); idir++)
   {
     local_pgs->idircur = idir;
 
@@ -3755,8 +3755,8 @@ static int st_variopgs_calcul_norho(Vario* vario,
  *****************************************************************************/
 static void st_make_some_lags_inactive(Vario* vario)
 {
-  for (int idir = 0; idir < vario->getNDir(); idir++)
-    for (int ilag = 0; ilag < vario->getNLag(idir); ilag++)
+  for (Id idir = 0; idir < vario->getNDir(); idir++)
+    for (Id ilag = 0; ilag < vario->getNLag(idir); ilag++)
       vario->setUtilizeByIndex(idir, vario->getNLag(idir) + ilag, 1.);
 }
 
@@ -3769,8 +3769,8 @@ static void st_make_some_lags_inactive(Vario* vario)
  *****************************************************************************/
 static void st_make_all_lags_active(Vario* vario)
 {
-  for (int idir = 0; idir < vario->getNDir(); idir++)
-    for (int ilag = 0; ilag < vario->getNLag(idir); ilag++)
+  for (Id idir = 0; idir < vario->getNDir(); idir++)
+    for (Id ilag = 0; ilag < vario->getNLag(idir); ilag++)
       vario->setUtilizeByIndex(idir, vario->getNLag(idir) + ilag, 1.);
 }
 
@@ -3788,12 +3788,12 @@ static double st_rho_search(double rho, void* user_data)
 {
   double sum           = 0;
   Local_Pgs* local_pgs = (Local_Pgs*)user_data;
-  int ndir             = local_pgs->vario->getNDir();
+  Id ndir             = local_pgs->vario->getNDir();
   st_set_rho(rho, local_pgs);
 
   /* Evaluation of the global cost-function */
 
-  for (int idir = 0; idir < ndir; idir++)
+  for (Id idir = 0; idir < ndir; idir++)
     sum += st_varcalc_correlated_grf(local_pgs, idir);
 
   if (OptDbg::query(EDbg::CONVERGE))
@@ -3814,17 +3814,17 @@ static double st_rho_search(double rho, void* user_data)
  ** \param[in]  opt_correl    0 full model; 1 symetrical; 2 residuals
  **
  *****************************************************************************/
-static int st_variopgs_calcul_rho(Vario* vario,
+static Id st_variopgs_calcul_rho(Vario* vario,
                                   const Rule* rule,
                                   Local_Pgs* local_pgs,
-                                  int ngrf,
-                                  int opt_correl)
+                                  Id ngrf,
+                                  Id opt_correl)
 {
   double testval, niter;
 
   /* Calculate the geometry */
 
-  for (int idir = 0; idir < vario->getNDir(); idir++)
+  for (Id idir = 0; idir < vario->getNDir(); idir++)
   {
     if (st_variogram_geometry_pgs_calcul(local_pgs, vario, idir)) return (1);
     st_variogram_geometry_pgs_correct(local_pgs, vario, idir);
@@ -3860,7 +3860,7 @@ static int st_variopgs_calcul_rho(Vario* vario,
  ** \param[in]  flag_rho    1 if rho has to be calculated, 0 otherwise
  **
  *****************************************************************************/
-static int st_check_test_discret(const ERule& mode, int flag_rho)
+static Id st_check_test_discret(const ERule& mode, Id flag_rho)
 {
   // Avoiding Discretizing calculation is always valid
   if (!TEST_DISCRET) return 0;
@@ -3903,9 +3903,9 @@ static int st_check_test_discret(const ERule& mode, int flag_rho)
  ** \param[in]  rule          Lithotype Rule definition
  **
  *****************************************************************************/
-static int st_vario_pgs_check(int flag_db,
-                              int flag_rule,
-                              int flag_varioind,
+static Id st_vario_pgs_check(Id flag_db,
+                              Id flag_rule,
+                              Id flag_varioind,
                               Db* db,
                               const Db* dbprop,
                               const Vario* vario,
@@ -3999,17 +3999,17 @@ static int st_vario_pgs_check(int flag_db,
  ** \param[in]  opt_correl   0 full model; 1 symmetrical; 2 residuals
  **
  *****************************************************************************/
-static int st_variogram_pgs_nostat(Db* db,
+static Id st_variogram_pgs_nostat(Db* db,
                                    const Db* dbprop,
                                    Vario* vario,
                                    const Rule* rule,
                                    const VectorDouble& propcst,
-                                   int flag_rho,
-                                   int opt_correl)
+                                   Id flag_rho,
+                                   Id opt_correl)
 {
   Local_Pgs local_pgs;
-  int flag_correl, flag_stat;
-  int error, nfacies, ngrf;
+  Id flag_correl, flag_stat;
+  Id error, nfacies, ngrf;
   PropDef* propdef;
 
   /* Initializations */
@@ -4098,20 +4098,20 @@ label_end:
  **
  *****************************************************************************/
 static void st_calcul_covmatrix(Local_Pgs* local_pgs,
-                                int* flag_ind,
-                                int* iconf,
+                                Id* flag_ind,
+                                Id* iconf,
                                 double* cov)
 {
   double cround;
 
   const Rule* rule = local_pgs->rule;
-  int nvar         = local_pgs->model->getNVar();
-  int ngrf         = local_pgs->rule->getNGRF();
+  Id nvar         = local_pgs->model->getNVar();
+  Id ngrf         = local_pgs->rule->getNGRF();
   MatrixSquare cov0(nvar);
   MatrixSquare covh(nvar);
 
   /* Calculate the covariance for the zero distance */
-  for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+  for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
     local_pgs->d0[i] = 0.;
   local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, cov0);
 
@@ -4136,19 +4136,19 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
     cov[0]               = covh.getValue(0, 0);                                     /* C11(h)  */
     cov[5]               = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 1); /* C22(h)  */
 
-    for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
       local_pgs->d0[i] = ruleshift->getShift(i);
 
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[1] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(s)  */
     cov[4] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(s)  */
 
-    for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
       local_pgs->d0[i] = local_pgs->d1[i] - ruleshift->getShift(i);
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[2] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(h-s) */
 
-    for (unsigned int i = 0; i < local_pgs->model->getNDim(); i++)
+    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
       local_pgs->d0[i] = local_pgs->d1[i] + ruleshift->getShift(i);
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[3] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(h+s)  */
@@ -4161,7 +4161,7 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
   (*flag_ind) = 1;
   if (ngrf > 1)
   {
-    for (int i = 1; i <= 4; i++)
+    for (Id i = 1; i <= 4; i++)
       if (ABS(cov[i]) > 1.e-8) (*flag_ind) = 0;
   }
 
@@ -4190,14 +4190,14 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
  **
  *****************************************************************************/
 static double st_get_proba(Local_Pgs* local_pgs,
-                           int flag_ind,
+                           Id flag_ind,
                            double* low,
                            double* up,
-                           int* iconf,
+                           Id* iconf,
                            double* cov)
 {
   double proba = TEST;
-  int ngrf     = local_pgs->ngrf;
+  Id ngrf     = local_pgs->ngrf;
 
   if (ngrf == 1)
   {
@@ -4215,13 +4215,13 @@ static double st_get_proba(Local_Pgs* local_pgs,
 
       if (!TEST_DISCRET)
       {
-        int ier;
+        Id ier;
         double err;
         double releps = 0.;
         double abseps = EPS;
-        int maxpts    = 8000;
+        Id maxpts    = 8000;
 
-        int infin[4];
+        Id infin[4];
         infin[0] = mvndst_infin(low[0], up[0]);
         infin[1] = mvndst_infin(low[1], up[1]);
         infin[2] = mvndst_infin(low[2], up[2]);
@@ -4259,15 +4259,15 @@ static double st_get_proba(Local_Pgs* local_pgs,
  **
  *****************************************************************************/
 static void st_define_bounds(Local_Pgs* local_pgs,
-                             int iech1,
-                             int iech2,
-                             int ifac1,
-                             int ifac2,
+                             Id iech1,
+                             Id iech2,
+                             Id ifac1,
+                             Id ifac2,
                              double* low,
                              double* up,
                              double* ploc)
 {
-  int nfacies = local_pgs->nfacies;
+  Id nfacies = local_pgs->nfacies;
   if (local_pgs->flag_stat)
   {
     ploc[0] = local_pgs->propdef->propfix[ifac1];
@@ -4337,12 +4337,12 @@ static void st_define_bounds(Local_Pgs* local_pgs,
  **
  *****************************************************************************/
 static double st_get_value(Local_Pgs* local_pgs,
-                           int flag_ind,
-                           int iech1,
-                           int iech2,
-                           int ifac1,
-                           int ifac2,
-                           int* iconf,
+                           Id flag_ind,
+                           Id iech1,
+                           Id iech2,
+                           Id ifac1,
+                           Id ifac2,
+                           Id* iconf,
                            double* cov)
 {
   double value, g1, g2, ploc[2], low[4], up[4];
@@ -4380,19 +4380,19 @@ static double st_get_value(Local_Pgs* local_pgs,
  ** \param[in]  idir  Rank of the Direction
  **
  *****************************************************************************/
-static void st_variogram_scale(Vario* vario, int idir)
+static void st_variogram_scale(Vario* vario, Id idir)
 {
-  int nvar = vario->getNVar();
+  Id nvar = vario->getNVar();
 
   /* Scale the experimental variogram quantities */
 
-  int ecr = 0;
-  for (int ivar = 0; ivar < nvar; ivar++)
-    for (int jvar = 0; jvar <= ivar; jvar++)
+  Id ecr = 0;
+  for (Id ivar = 0; ivar < nvar; ivar++)
+    for (Id jvar = 0; jvar <= ivar; jvar++)
     {
-      for (int i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
+      for (Id i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
       {
-        int j = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
+        Id j = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
         if (vario->getSwByIndex(idir, j) <= 0)
         {
           vario->setHhByIndex(idir, j, TEST);
@@ -4414,13 +4414,13 @@ static void st_variogram_scale(Vario* vario, int idir)
 
   if (vario->getCalcul() == ECalcVario::TRANS1)
   {
-    for (int ivar = 0; ivar < nvar; ivar++)
-      for (int jvar = 0; jvar < ivar; jvar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
+      for (Id jvar = 0; jvar < ivar; jvar++)
       {
-        for (int i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
+        for (Id i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
         {
-          int j  = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
-          int j0 = vario->getDirAddress(idir, jvar, jvar, i, true, 0);
+          Id j  = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
+          Id j0 = vario->getDirAddress(idir, jvar, jvar, i, true, 0);
           vario->setGgByIndex(idir, j,
                               -vario->getGgByIndex(idir, j) / vario->getGgByIndex(idir, j0));
         }
@@ -4428,13 +4428,13 @@ static void st_variogram_scale(Vario* vario, int idir)
   }
   else if (vario->getCalcul() == ECalcVario::TRANS2)
   {
-    for (int ivar = 0; ivar < nvar; ivar++)
-      for (int jvar = 0; jvar < ivar; jvar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
+      for (Id jvar = 0; jvar < ivar; jvar++)
       {
-        for (int i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
+        for (Id i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
         {
-          int j  = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
-          int j0 = vario->getDirAddress(idir, ivar, ivar, i, true, 0);
+          Id j  = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
+          Id j0 = vario->getDirAddress(idir, ivar, ivar, i, true, 0);
           vario->setGgByIndex(idir, j,
                               -vario->getGgByIndex(idir, j) / vario->getGgByIndex(idir, j0));
         }
@@ -4442,14 +4442,14 @@ static void st_variogram_scale(Vario* vario, int idir)
   }
   else if (vario->getCalcul() == ECalcVario::BINORMAL)
   {
-    for (int ivar = 0; ivar < nvar; ivar++)
-      for (int jvar = 0; jvar < ivar; jvar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
+      for (Id jvar = 0; jvar < ivar; jvar++)
       {
-        for (int i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
+        for (Id i = 0; i < vario->getNLagTotal(idir); i++, ecr++)
         {
-          int j  = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
-          int j1 = vario->getDirAddress(idir, ivar, ivar, i, true, 0);
-          int j2 = vario->getDirAddress(idir, jvar, jvar, i, true, 0);
+          Id j  = vario->getDirAddress(idir, ivar, jvar, i, true, 0);
+          Id j1 = vario->getDirAddress(idir, ivar, ivar, i, true, 0);
+          Id j2 = vario->getDirAddress(idir, jvar, jvar, i, true, 0);
           vario->setGgByIndex(
             idir,
             j,
@@ -4469,20 +4469,20 @@ static void st_variogram_scale(Vario* vario, int idir)
  ** \param[in]  local_pgs     Local_Pgs structure
  **
  *****************************************************************************/
-static int st_vario_indic_model_nostat(Local_Pgs* local_pgs)
+static Id st_vario_indic_model_nostat(Local_Pgs* local_pgs)
 
 {
   double dist, cov[6];
-  int iech, jech, i, flag_ind, iconf[2];
+  Id iech, jech, i, flag_ind, iconf[2];
 
   /* Initializations */
 
-  int nfacies  = local_pgs->nfacies;
+  Id nfacies  = local_pgs->nfacies;
   Vario* vario = local_pgs->vario;
 
   /* Loop on the directions */
 
-  for (int idir = 0; idir < vario->getNDir(); idir++)
+  for (Id idir = 0; idir < vario->getNDir(); idir++)
   {
     /* Establish the geometry */
 
@@ -4491,7 +4491,7 @@ static int st_vario_indic_model_nostat(Local_Pgs* local_pgs)
 
     /* Loop on the lags */
 
-    for (int ilag = 0; ilag < vario->getNLag(idir); ilag++)
+    for (Id ilag = 0; ilag < vario->getNLag(idir); ilag++)
     {
       vario_order_get_bounds(local_pgs->vorder, idir, ilag,
                              &local_pgs->ifirst, &local_pgs->ilast);
@@ -4499,7 +4499,7 @@ static int st_vario_indic_model_nostat(Local_Pgs* local_pgs)
 
       /* Loop on the pairs of the lag */
 
-      for (int ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
+      for (Id ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
       {
         vario_order_get_indices(local_pgs->vorder, ipair, &iech, &jech, &dist);
 
@@ -4510,8 +4510,8 @@ static int st_vario_indic_model_nostat(Local_Pgs* local_pgs)
 
         /* Loops on the facies */
 
-        for (int ifac = 0; ifac < nfacies; ifac++)
-          for (int jfac = 0; jfac <= ifac; jfac++)
+        for (Id ifac = 0; ifac < nfacies; ifac++)
+          for (Id jfac = 0; jfac <= ifac; jfac++)
           {
             if (local_pgs->vario->getFlagAsym())
             {
@@ -4566,7 +4566,7 @@ static int st_vario_indic_model_nostat(Local_Pgs* local_pgs)
  ** \param[in]  flagGg       True if Gg must be replicated
  **
  *****************************************************************************/
-static int st_copy_swhh(const Vario* vario1,
+static Id st_copy_swhh(const Vario* vario1,
                         Vario* vario2,
                         bool flagSw,
                         bool flagHh,
@@ -4577,7 +4577,7 @@ static int st_copy_swhh(const Vario* vario1,
     messerr("Both variograms should share the same number of Directions");
     return 1;
   }
-  for (int idir = 0; idir < vario1->getNDir(); idir++)
+  for (Id idir = 0; idir < vario1->getNDir(); idir++)
   {
     if (vario1->getNLagTotal(idir) != vario2->getNLagTotal(idir))
     {
@@ -4586,14 +4586,14 @@ static int st_copy_swhh(const Vario* vario1,
       return 1;
     }
   }
-  int nvar = vario2->getNVar();
+  Id nvar = vario2->getNVar();
 
-  for (int idir = 0; idir < vario2->getNDir(); idir++)
+  for (Id idir = 0; idir < vario2->getNDir(); idir++)
   {
-    for (int i = 0; i < vario1->getNLagTotal(idir); i++)
+    for (Id i = 0; i < vario1->getNLagTotal(idir); i++)
     {
-      for (int ivar = 0; ivar < nvar; ivar++)
-        for (int jvar = 0; jvar < nvar; jvar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
+        for (Id jvar = 0; jvar < nvar; jvar++)
         {
           if (flagSw)
             vario2->setSwByIndex(idir, i, vario1->getSwByIndex(idir, i));
@@ -4616,17 +4616,17 @@ static int st_copy_swhh(const Vario* vario1,
  ** \param[in]  local_pgs     Local_Pgs structure
  **
  *****************************************************************************/
-static int st_vario_indic_model_stat(Local_Pgs* local_pgs)
+static Id st_vario_indic_model_stat(Local_Pgs* local_pgs)
 
 {
   double cov[6];
-  int iad, flag_ind, iconf[2];
+  Id iad, flag_ind, iconf[2];
 
   /* Initializations */
 
-  int nfacies  = local_pgs->nfacies;
+  Id nfacies  = local_pgs->nfacies;
   Vario* vario = local_pgs->vario;
-  for (int i = 0; i < 6; i++)
+  for (Id i = 0; i < 6; i++)
     cov[i] = 0.;
 
   // Duplicate Number and Distance for all lags (from the first simple variogram)
@@ -4636,27 +4636,27 @@ static int st_vario_indic_model_stat(Local_Pgs* local_pgs)
 
   /* Loop on the directions */
 
-  for (int idir = 0; idir < vario->getNDir(); idir++)
+  for (Id idir = 0; idir < vario->getNDir(); idir++)
   {
 
     /* Loop on the lags */
 
-    for (int ilag = 0; ilag < vario->getNLag(idir); ilag++)
+    for (Id ilag = 0; ilag < vario->getNLag(idir); ilag++)
     {
 
       /* Calculate the distance vector */
 
-      for (int i = 0; i < vario->getNDim(); i++)
+      for (Id i = 0; i < vario->getNDim(); i++)
       {
-        int jpas         = vario->getDirAddress(idir, 0, 0, ilag, false, 1);
+        Id jpas         = vario->getDirAddress(idir, 0, 0, ilag, false, 1);
         local_pgs->d1[i] = vario->getHhByIndex(idir, jpas) * vario->getCodir(idir, i);
       }
       st_calcul_covmatrix(local_pgs, &flag_ind, iconf, cov);
 
       /* Loops on the facies */
 
-      for (int ifac = 0; ifac < nfacies; ifac++)
-        for (int jfac = 0; jfac <= ifac; jfac++)
+      for (Id ifac = 0; ifac < nfacies; ifac++)
+        for (Id jfac = 0; jfac <= ifac; jfac++)
         {
           if (local_pgs->vario->getFlagAsym())
           {
@@ -4690,14 +4690,14 @@ static int st_vario_indic_model_stat(Local_Pgs* local_pgs)
 static void st_update_variance_stat(Local_Pgs* local_pgs)
 
 {
-  int iad;
+  Id iad;
   Vario* vario = local_pgs->vario;
-  int nfacies  = local_pgs->nfacies;
+  Id nfacies  = local_pgs->nfacies;
 
   /* Evaluate the theoretical variances */
 
-  for (int ivar = 0; ivar < nfacies; ivar++)
-    for (int jvar = 0; jvar < nfacies; jvar++)
+  for (Id ivar = 0; ivar < nfacies; ivar++)
+    for (Id jvar = 0; jvar < nfacies; jvar++)
     {
       double pivar = local_pgs->propdef->propfix[ivar];
       double pjvar = local_pgs->propdef->propfix[jvar];
@@ -4707,7 +4707,7 @@ static void st_update_variance_stat(Local_Pgs* local_pgs)
         vario->setVar(-pivar * pjvar, ivar, jvar);
       if (!vario->getFlagAsym()) continue;
 
-      for (int idir = 0; idir < vario->getNDir(); idir++)
+      for (Id idir = 0; idir < vario->getNDir(); idir++)
       {
         iad = vario->getDirAddress(idir, ivar, jvar, 0, false, 0);
         vario->setSwByIndex(idir, iad, 1);
@@ -4743,10 +4743,10 @@ static void st_update_variance_stat(Local_Pgs* local_pgs)
 static void st_update_variance_nostat(Local_Pgs* local_pgs)
 
 {
-  int number   = 0;
+  Id number   = 0;
   Db* dbin     = local_pgs->db;
   Vario* vario = local_pgs->vario;
-  int nfacies  = local_pgs->nfacies;
+  Id nfacies  = local_pgs->nfacies;
 
   /* Core allocation */
 
@@ -4755,18 +4755,18 @@ static void st_update_variance_nostat(Local_Pgs* local_pgs)
 
   /* Loop on the samples */
 
-  for (int iech = 0; iech < dbin->getNSample(); iech++)
+  for (Id iech = 0; iech < dbin->getNSample(); iech++)
   {
     if (!dbin->isActive(iech)) continue;
 
     /* Loop on the variables */
 
-    for (int ivar = 0; ivar < nfacies; ivar++)
+    for (Id ivar = 0; ivar < nfacies; ivar++)
     {
       double p1 = dbin->getLocVariable(ELoc::P, iech, ivar);
       mean[ivar] += p1;
 
-      for (int jvar = 0; jvar < nfacies; jvar++)
+      for (Id jvar = 0; jvar < nfacies; jvar++)
       {
         double p2 = dbin->getLocVariable(ELoc::P, iech, jvar);
         COVS(ivar, jvar) += p1 * p2;
@@ -4777,25 +4777,25 @@ static void st_update_variance_nostat(Local_Pgs* local_pgs)
 
   /* Normalization */
 
-  for (int ivar = 0; ivar < nfacies; ivar++)
+  for (Id ivar = 0; ivar < nfacies; ivar++)
     mean[ivar] /= (double)number;
-  for (int ivar = 0; ivar < nfacies; ivar++)
-    for (int jvar = 0; jvar < nfacies; jvar++)
+  for (Id ivar = 0; ivar < nfacies; ivar++)
+    for (Id jvar = 0; jvar < nfacies; jvar++)
       COVS(ivar, jvar) = COVS(ivar, jvar) / (double)number - mean[ivar] * mean[jvar];
 
   /* Store the results */
 
-  for (int ivar = 0; ivar < nfacies; ivar++)
-    for (int jvar = 0; jvar < nfacies; jvar++)
+  for (Id ivar = 0; ivar < nfacies; ivar++)
+    for (Id jvar = 0; jvar < nfacies; jvar++)
     {
       vario->setVar(COVS(ivar, jvar), ivar, jvar);
 
       if (!vario->getFlagAsym()) continue;
 
       // Set the C00 term
-      for (int idir = 0; idir < vario->getNDir(); idir++)
+      for (Id idir = 0; idir < vario->getNDir(); idir++)
       {
-        int iad = vario->getDirAddress(idir, ivar, jvar, 0, false, 0);
+        Id iad = vario->getDirAddress(idir, ivar, jvar, 0, false, 0);
         vario->setSwByIndex(idir, iad, dbin->getNSample());
         vario->setHhByIndex(idir, iad, 0);
 
@@ -4850,7 +4850,7 @@ Vario* model_pgs(Db* db,
     messerr("RuleProp must be defined");
     return nullptr;
   }
-  int flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat               = ruleprop->isFlagStat();
   const Rule* rule            = ruleprop->getRule();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
@@ -4863,9 +4863,9 @@ Vario* model_pgs(Db* db,
   /* Initializations */
   /*******************/
 
-  int error   = 1;
-  int nfacies = rule->getNFacies();
-  int ngrf    = rule->getNGRF();
+  Id error   = 1;
+  Id nfacies = rule->getNFacies();
+  Id ngrf    = rule->getNGRF();
   if (rule->getModeRule() == ERule::SHIFT) ngrf++;
 
   new_model = nullptr;
@@ -4907,7 +4907,7 @@ Vario* model_pgs(Db* db,
       messerr("Space Dimension inconsistency between Dbprop and Vario");
       return nullptr;
     }
-    if ((int)new_model->getNDim() != db->getNDim())
+    if ((Id)new_model->getNDim() != db->getNDim())
     {
       messerr("The Space Dimension of the Db structure (%d)", db->getNDim());
       messerr("Does not correspond to the Space Dimension of the model (%d)",
@@ -5008,14 +5008,14 @@ label_end:
  ** \param[in]  propcst      Array of proportions for the facies
  **
  *****************************************************************************/
-static int st_variogram_pgs_stat(Db* db,
+static Id st_variogram_pgs_stat(Db* db,
                                  Vario* vario,
                                  Vario* varioind,
                                  const Rule* rule,
                                  const VectorDouble& propcst)
 {
   Local_Pgs local_pgs;
-  int node_tot, nmax_tot, ny1, ny2, error, nfacies, ngrf, flag_stat;
+  Id node_tot, nmax_tot, ny1, ny2, error, nfacies, ngrf, flag_stat;
   double prop_tot;
   PropDef* propdef;
 
@@ -5099,8 +5099,8 @@ label_end:
 Vario* variogram_pgs(Db* db,
                      const VarioParam* varioparam,
                      const RuleProp* ruleprop,
-                     int flag_rho,
-                     int opt_correl)
+                     Id flag_rho,
+                     Id opt_correl)
 {
   Vario* vario    = nullptr;
   Vario* varioind = nullptr;
@@ -5120,12 +5120,12 @@ Vario* variogram_pgs(Db* db,
     messerr("RuleProp must be defined");
     return nullptr;
   }
-  int flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat               = ruleprop->isFlagStat();
   const Rule* rule            = ruleprop->getRule();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
 
-  int error;
+  Id error;
 
   // Preliminary checks
 
@@ -5141,7 +5141,7 @@ Vario* variogram_pgs(Db* db,
             db->getNLoc(ELoc::Z));
     return nullptr;
   }
-  int nclass = rule->getNFacies();
+  Id nclass = rule->getNFacies();
   if (nclass <= 0)
   {
     messerr("No Facies class have been found");
@@ -5155,10 +5155,10 @@ Vario* variogram_pgs(Db* db,
   {
     if (!propcst.empty())
     {
-      if ((int)propcst.size() != nclass)
+      if ((Id)propcst.size() != nclass)
       {
         messerr("Number of proportions in 'propcst' (%d) should match Number of Facies in 'rule' (%d)",
-                (int)propcst.size(), rule->getNFacies());
+                (Id)propcst.size(), rule->getNFacies());
         return nullptr;
       }
       props = propcst;
@@ -5167,10 +5167,10 @@ Vario* variogram_pgs(Db* db,
     {
       // Calculate the number of Facies in 'Db'
       props = dbStatisticsFacies(db);
-      if ((int)props.size() != nclass)
+      if ((Id)props.size() != nclass)
       {
         messerr("Number of Facies in 'db' (%d) should match Number of facies in 'rule' (%d)",
-                (int)props.size(), rule->getNFacies());
+                (Id)props.size(), rule->getNFacies());
         return nullptr;
       }
     }
@@ -5224,20 +5224,20 @@ Vario* variogram_pgs(Db* db,
 Rule* _rule_auto(Db* db,
                  const VarioParam* varioparam,
                  const RuleProp* ruleprop,
-                 int ngrfmax,
-                 int verbose)
+                 Id ngrfmax,
+                 Id verbose)
 {
   if (ruleprop == nullptr)
   {
     messerr("RuleProp must be defined");
     return nullptr;
   }
-  int flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat               = ruleprop->isFlagStat();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
 
-  int nscore, r_opt;
-  int flag_rho, flag_correl, opt_correl;
+  Id nscore, r_opt;
+  Id flag_rho, flag_correl, opt_correl;
   Vario* vario    = nullptr;
   Vario* varioind = nullptr;
   Local_Pgs local_pgs;
@@ -5248,7 +5248,7 @@ Rule* _rule_auto(Db* db,
 
   /* Initializations */
 
-  int error        = 1;
+  Id error        = 1;
   Rule* rule       = nullptr;
   auto* Pile_Relem = (Relem*)NULL;
   PropDef* propdef = nullptr;
@@ -5264,7 +5264,7 @@ Rule* _rule_auto(Db* db,
   /* Core allocation */
 
   facies.resize(NCOLOR);
-  for (int i = 0; i < NCOLOR; i++)
+  for (Id i = 0; i < NCOLOR; i++)
     facies[i] = i + 1;
 
   /* Preliminary tasks (as in variogram.pgs) */
@@ -5314,7 +5314,7 @@ Rule* _rule_auto(Db* db,
 
     // Prepare the geometry
 
-    for (int idir = 0; idir < vario->getNDir(); idir++)
+    for (Id idir = 0; idir < vario->getNDir(); idir++)
     {
       local_pgs.idircur = idir;
       if (st_variogram_geometry_pgs_calcul(&local_pgs, vario, idir))

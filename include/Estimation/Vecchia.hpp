@@ -31,7 +31,7 @@ class GSTLEARN_EXPORT Vecchia: public ALikelihood
 {
 public:
   Vecchia(ModelGeneric* model,
-          int nb_neigh,
+          Id nb_neigh,
           const Db* db1,
           const Db* db2 = nullptr,
           bool reml     = false);
@@ -42,18 +42,18 @@ public:
 public:
   static Vecchia* createForOptim(ModelGeneric* model,
                                  const Db* db1,
-                                 int nb_neigh = 30,
+                                 Id nb_neigh = 30,
                                  bool reml    = false);
 
-  int computeLower(const MatrixT<int>& Ranks, bool verbose = false);
+  Id computeLower(const MatrixT<Id>& Ranks, bool verbose = false);
   const MatrixSparse& getLFull() const { return _LFull; }
   const VectorDouble& getDFull() const { return _DFull; }
   const VectorDouble& getY() const { return _Y; }
 
-  double getLFull(int i, int j) const { return _LFull.getValue(i, j); }
-  int getND() const { return _Ntot2; }
-  int getNT() const { return _Ntot1; }
-  int getNonZeros() const { return _LFull.getNonZeros(); }
+  double getLFull(Id i, Id j) const { return _LFull.getValue(i, j); }
+  Id getND() const { return _Ntot2; }
+  Id getNT() const { return _Ntot1; }
+  Id getNonZeros() const { return _LFull.getNonZeros(); }
 
   void productMatVecchia(const MatrixDense& X, MatrixDense& resmat) const;
   void productVecchia(constvect Y, vect res) const;
@@ -67,33 +67,33 @@ private:
   void _computeCm1X() override;
   void _computeCm1Y() override;
   double _computeLogDet() const override;
-  int _buildNeighborhood(const MatrixT<int>& Ranks,
-                         int isample,
-                         int ivar,
-                         int nb_neigh,
-                         std::vector<std::array<int, 4>>& neighDescr) const;
-  void _buildLHS(int nitems,
-                 const std::vector<std::array<int, 4>>& neighDescr,
+  Id _buildNeighborhood(const MatrixT<Id>& Ranks,
+                         Id isample,
+                         Id ivar,
+                         Id nb_neigh,
+                         std::vector<std::array<Id, 4>>& neighDescr) const;
+  void _buildLHS(Id nitems,
+                 const std::vector<std::array<Id, 4>>& neighDescr,
                  MatrixSymmetric& _matCov);
-  void _buildRHS(int icase2,
-                 int iabs2,
-                 int ivar2,
-                 int nitems,
-                 const std::vector<std::array<int, 4>>& neighDescr,
+  void _buildRHS(Id icase2,
+                 Id iabs2,
+                 Id ivar2,
+                 Id nitems,
+                 const std::vector<std::array<Id, 4>>& neighDescr,
                  MatrixDense& _vectCov);
   void _loadDataFlattened();
-  int _getAddressInMatrix(int ip, int ivar) const;
-  int _getAddressAbsolute(int ip) const;
-  int _getSampleCase(int ip) const;
-  int _getCase() const;
+  Id _getAddressInMatrix(Id ip, Id ivar) const;
+  Id _getAddressAbsolute(Id ip) const;
+  Id _getSampleCase(Id ip) const;
+  Id _getCase() const;
 
 private:
   // Following members are copies of pointers (not to be deleted)
-  int _nbNeigh;
+  Id _nbNeigh;
   const Db* _db1;
   const Db* _db2;
 
-  MatrixT<int> _Ranks; // Matrix of ranks for the Vecchia approximation
+  MatrixT<Id> _Ranks; // Matrix of ranks for the Vecchia approximation
   MatrixSymmetric _matCov;
   MatrixDense _vectCov;
   VectorDouble _work; // Work vector for calculations
@@ -103,23 +103,23 @@ private:
   mutable MatrixSparse _LFull;
   mutable CholeskyDense* _chol; // Cholesky decomposition of the covariance matrix
   // Local calculation results (to be deleted later)
-  mutable int _Ndb1; // Number of samples in Db1 (used for shift calculations)
-  mutable int _Ntot1;
-  mutable int _Ntot2;
+  mutable Id _Ndb1; // Number of samples in Db1 (used for shift calculations)
+  mutable Id _Ntot1;
+  mutable Id _Ntot2;
   mutable VectorInt _cumulRanks1;
   mutable VectorInt _cumulRanks2;
   mutable VectorVectorInt _varRanks1;
   mutable VectorVectorInt _varRanks2;
 };
 
-GSTLEARN_EXPORT int krigingVecchia(Db* dbin,
+GSTLEARN_EXPORT Id krigingVecchia(Db* dbin,
                                    Db* dbout,
                                    ModelGeneric* model,
-                                   int nb_neigh                    = 5,
+                                   Id nb_neigh                    = 5,
                                    bool verbose                    = false,
                                    const NamingConvention& namconv = NamingConvention("Vecchia"));
 GSTLEARN_EXPORT double logLikelihoodVecchia(const Db* db,
                                             ModelGeneric* model,
-                                            int nb_neigh = 5,
+                                            Id nb_neigh = 5,
                                             bool verbose = false);
 } // namespace gstlrn

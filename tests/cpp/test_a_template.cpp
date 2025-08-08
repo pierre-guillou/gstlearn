@@ -30,13 +30,13 @@ int main(int argc, char* argv[])
   double rangev = 0.2;
   double sill   = 1.;
 
-  int nx           = 200;
+  Id nx            = 200;
   double dx        = 1. / (nx - 1);
   VectorInt nxs    = {nx, nx};
   VectorDouble dxs = {dx, dx};
   VectorDouble x0s = {0., 0.};
 
-  int nxm           = 100;
+  Id nxm            = 100;
   double dxm        = 1.5 / (nxm - 1);
   VectorInt nxms    = {nxm, nxm};
   VectorDouble dxms = {dxm, dxm};

@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
   ASerializable::setPrefixName("test_Vmap3D-");
 
-  int ndim = 3;
+  Id ndim = 3;
   defineDefaultSpace(ESpaceType::RN, ndim);
   CovContext ctxt(1, ndim, 1.); // use default space
 

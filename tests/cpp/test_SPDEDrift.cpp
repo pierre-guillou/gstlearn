@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
   //////////////////////
   /// Kriging using SPDE
-  int useCholesky = 0;
+  Id useCholesky = 0;
   krigingSPDE(temperatures, grid, model, true, false, useCholesky);
 
   ///////////////////////

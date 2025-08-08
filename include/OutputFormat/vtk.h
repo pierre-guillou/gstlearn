@@ -90,14 +90,17 @@
 //  Creation:   September 2, 2004
 //
 // ***************************************************************************/
+
+#include "geoslib_define.h"
+
 namespace gstlrn
 {   
 void write_point_mesh(const char* filename,
-                      int ub,
-                      int npts,
+                      Id ub,
+                      Id npts,
                       float* pts,
-                      int nvars,
-                      int* vardim,
+                      Id nvars,
+                      Id* vardim,
                       const char* const* varnames,
                       float** vars);
 
@@ -143,15 +146,15 @@ void write_point_mesh(const char* filename,
 //      dataset when points are duplicated.
 //
 //      There are two triangles.
-//      int ncells = 2;
+//      Id ncells = 2;
 //
 //      The cells are both triangles.
-//      int celltypes[2] = { VISIT_TRIANGLE, VISIT_TRIANGLE };
+//      Id celltypes[2] = { VISIT_TRIANGLE, VISIT_TRIANGLE };
 //
 //      The connectivity contains indices into the points list.  The indexing
 //      assumes that each point has size 3 (x,y,z).
 //
-//      int conn[6] = { 0, 1, 2, 0, 2, 3 };
+//      Id conn[6] = { 0, 1, 2, 0, 2, 3 };
 //
 //  Hint:
 //      When writing an unstructured mesh, it is easy to get the orientation
@@ -178,15 +181,15 @@ void write_point_mesh(const char* filename,
 #define VISIT_PYRAMID       14
 
 void write_unstructured_mesh(const char* filename,
-                             int ub,
-                             int npts,
+                             Id ub,
+                             Id npts,
                              float* pts,
-                             int ncells,
-                             int* celltypes,
-                             int* conn,
-                             int nvars,
-                             int* vardim,
-                             int* centering,
+                             Id ncells,
+                             Id* celltypes,
+                             Id* conn,
+                             Id nvars,
+                             Id* vardim,
+                             Id* centering,
                              const char* const* varnames,
                              float** vars);
 
@@ -223,11 +226,11 @@ void write_unstructured_mesh(const char* filename,
 //
 // ***************************************************************************/
 void write_regular_mesh(const char* filename,
-                        int ub,
-                        int* dims,
-                        int nvars,
-                        int* vardim,
-                        int* centering,
+                        Id ub,
+                        Id* dims,
+                        Id nvars,
+                        Id* vardim,
+                        Id* centering,
                         const char* const* varnames,
                         float** vars);
 
@@ -270,14 +273,14 @@ void write_regular_mesh(const char* filename,
 //
 // ***************************************************************************/
 void write_rectilinear_mesh(const char* filename,
-                            int ub,
-                            int* dims,
+                            Id ub,
+                            Id* dims,
                             float* x,
                             float* y,
                             float* z,
-                            int nvars,
-                            int* vardim,
-                            int* centering,
+                            Id nvars,
+                            Id* vardim,
+                            Id* centering,
                             const char* const* varnames,
                             float** vars);
 
@@ -314,12 +317,12 @@ void write_rectilinear_mesh(const char* filename,
 //
 // ***************************************************************************/
 void write_curvilinear_mesh(const char* filename,
-                            int ub,
-                            int* dims,
+                            Id ub,
+                            Id* dims,
                             float* pts,
-                            int nvars,
-                            int* vardim,
-                            int* centering,
+                            Id nvars,
+                            Id* vardim,
+                            Id* centering,
                             const char* const* varnames,
                             float** vars);
 }

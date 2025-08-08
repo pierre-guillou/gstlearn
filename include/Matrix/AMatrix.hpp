@@ -40,7 +40,7 @@ class EOperator;
 class GSTLEARN_EXPORT AMatrix: public AStringable, public ICloneable
 {
 public:
-  AMatrix(int nrow = 0, int ncol = 0);
+  AMatrix(Id nrow = 0, Id ncol = 0);
   AMatrix(const AMatrix& m);
   AMatrix& operator=(const AMatrix& m);
   virtual ~AMatrix();
@@ -55,22 +55,22 @@ public:
   /*! Returns if the matrix belongs to the MatrixDense class */
   virtual bool isDense() const = 0;
   /*! Gets the value at row 'irow' and column 'icol' */
-  virtual double getValue(int irow, int icol) const = 0;
+  virtual double getValue(Id irow, Id icol) const = 0;
   /*! Sets the value at row 'irow' and column 'icol' */
-  virtual void setValue(int irow, int icol, double value) = 0;
+  virtual void setValue(Id irow, Id icol, double value) = 0;
   /*! Update the value at row 'irow' and column 'icol' */
-  virtual void updValue(int irow,
-                        int icol,
+  virtual void updValue(Id irow,
+                        Id icol,
                         const EOperator& oper,
                         double value) = 0;
   /*! Set the contents of a Column */
-  virtual void setColumn(int icol, const VectorDouble& tab) = 0;
+  virtual void setColumn(Id icol, const VectorDouble& tab) = 0;
   /*! Set the contents of a Column to a constant value*/
-  virtual void setColumnToConstant(int icol, double value) = 0;
+  virtual void setColumnToConstant(Id icol, double value) = 0;
   /*! Set the contents of a Row */
-  virtual void setRow(int irow, const VectorDouble& tab) = 0;
+  virtual void setRow(Id irow, const VectorDouble& tab) = 0;
   /*! Set the contents of a Row to a constant value*/
-  virtual void setRowToConstant(int irow, double value) = 0;
+  virtual void setRowToConstant(Id irow, double value) = 0;
   /*! Set the contents of the (main) Diagonal */
   virtual void setDiagonal(const VectorDouble& tab) = 0;
   /*! Set the contents of the (main) Diagonal to a constant value */
@@ -99,10 +99,10 @@ public:
   /*! Say if the matrix must be symmetric */
   virtual bool mustBeSymmetric() const { return false; }
 
-  virtual void reset(int nrows, int ncols);
-  virtual void resetFromValue(int nrows, int ncols, double value);
-  virtual void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true);
-  virtual void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true);
+  virtual void reset(Id nrows, Id ncols);
+  virtual void resetFromValue(Id nrows, Id ncols, double value);
+  virtual void resetFromArray(Id nrows, Id ncols, const double* tab, bool byCol = true);
+  virtual void resetFromVD(Id nrows, Id ncols, const VectorDouble& tab, bool byCol = true);
   virtual void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true);
 
   /*! Transpose the matrix in place*/
@@ -111,9 +111,9 @@ public:
   virtual AMatrix* transpose() const;
 
   /*! Extract a Row */
-  virtual VectorDouble getRow(int irow) const;
+  virtual VectorDouble getRow(Id irow) const;
   /*! Extract a Column */
-  virtual VectorDouble getColumn(int icol) const;
+  virtual VectorDouble getColumn(Id icol) const;
 
   /*! Perform 'this' = 'x' * 'y' */
   virtual void prodMatMatInPlace(const AMatrix* x,
@@ -142,18 +142,18 @@ public:
   virtual void addMat(const AMatrix& y, double cx = 1., double cy = 1.);
 
   /*! Extract the contents of the matrix */
-  virtual NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const;
+  virtual NF_Triplet getMatrixToTriplet(Id shiftRow = 0, Id shiftCol = 0) const;
 
   void clear();
   /*! Modify the dimension of the matrix (if needed) */
-  void resize(int nrows, int ncols);
+  void resize(Id nrows, Id ncols);
   /*! Indicate if the given indices are valid for the current matrix size */
-  bool isValid(int irow, int icol, bool printWhyNot = false) const;
+  bool isValid(Id irow, Id icol, bool printWhyNot = false) const;
   /*! Check if the matrix is square and Identity */
   bool isIdentity(bool printWhyNot = false) const;
 
   /*! Add a value to a matrix term */
-  void addValue(int irow, int icol, double value);
+  void addValue(Id irow, Id icol, double value);
   /*! Check if a matrix is the same as me (norm L1) */
   bool isSame(const AMatrix& m, double eps = EPSILON4, bool printWhyNot = false);
   /*! Check that 'm' has the same dimensions as 'this' */
@@ -163,27 +163,27 @@ public:
   /*! Returns the sum of absolute difference between argument and this */
   double compare(const AMatrix& mat) const;
   /*! Returns the number of rows */
-  int getNRows() const { return _nRows; }
+  Id getNRows() const { return _nRows; }
   /*! Returns the number of columns */
-  int getNCols() const { return _nCols; }
+  Id getNCols() const { return _nCols; }
   /*! Get the total number of elements of the (full) matrix */
   /* The name has been chosen by analogy to VectorT class */
-  int size() const { return _nRows * _nCols; }
+  Id size() const { return _nRows * _nCols; }
 
   /*! Returns the contents of the whole matrix as a VectorDouble */
   VectorDouble getValues(bool byCol = true) const;
   /*! Extract a Diagonal (main or secondary) of this */
-  const VectorDouble& getDiagonal(int shift = 0) const;
+  const VectorDouble& getDiagonal(Id shift = 0) const;
   /*! Checks if a Column is valid (contains a non TEST value) */
-  bool isColumnDefined(int icol) const;
+  bool isColumnDefined(Id icol) const;
   /*! Checks if a Row is valid (contains a non TEST value) */
-  bool isRowDefined(int irow) const;
+  bool isRowDefined(Id irow) const;
   /*! Define the number of defined columns */
-  int getNColDefined() const;
+  Id getNColDefined() const;
   /*! Define the number of defined rows */
-  int getNRowDefined() const;
+  Id getNRowDefined() const;
   /*! Extract a portion of a Column */
-  VectorDouble getColumnByRowRange(int icol, int rowFrom, int rowTo) const;
+  VectorDouble getColumnByRowRange(Id icol, Id rowFrom, Id rowTo) const;
   /*! Check if the matrix does not contain any negative element */
   bool isNonNegative(bool verbose = false) const;
 
@@ -209,18 +209,18 @@ public:
   void prodMat(const AMatrix* matY, bool transposeY = false);
 
   /*! Matrix inversion in place */
-  int invert();
+  Id invert();
   /*! Solving the Matrix Linear system */
-  int solve(const VectorDouble& b, VectorDouble& x) const;
+  Id solve(const VectorDouble& b, VectorDouble& x) const;
   /*! Dump a specific range of samples from the internal storage */
-  void dumpElements(const String& title, int ifrom, int ito) const;
+  void dumpElements(const String& title, Id ifrom, Id ito) const;
   /*! Dump statistics on the Matrix */
   void dumpStatistics(const String& title) const;
   /*! Sets the matrix as Identity */
   void setIdentity(double value = 1.);
-  void fillRandom(int seed = 432432, double zeroPercent = 0);
+  void fillRandom(Id seed = 432432, double zeroPercent = 0);
   void setValues(const VectorDouble& values, bool byCol = true);
-  double getMeanByColumn(int icol) const;
+  double getMeanByColumn(Id icol) const;
   double getMinimum() const;
   double getMaximum() const;
   double getNormInf() const;
@@ -235,22 +235,22 @@ public:
 
 #ifndef SWIG
   /*! Get value operator */
-  double operator()(int row, int col) const { return getValue(row, col); }
+  double operator()(Id row, Id col) const { return getValue(row, col); }
   /*! Set value operator */
-  double& operator()(int row, int col) { return _getValueRef(row, col); }
+  double& operator()(Id row, Id col) { return _getValueRef(row, col); }
 #endif
 
 protected:
   virtual void _allocate()                                         = 0;
   virtual void _deallocate()                                       = 0;
-  virtual int _getIndexToRank(int irow, int icol) const            = 0;
-  virtual void _setValueByRank(int rank, double value)             = 0;
+  virtual Id _getIndexToRank(Id irow, Id icol) const            = 0;
+  virtual void _setValueByRank(Id rank, double value)             = 0;
   virtual void _transposeInPlace()                                 = 0;
-  virtual int _invert()                                            = 0;
-  virtual int _solve(const VectorDouble& b, VectorDouble& x) const = 0;
-  virtual int _getMatrixPhysicalSize() const                       = 0;
-  virtual double _getValueByRank(int rank) const                   = 0;
-  virtual double& _getValueRef(int irow, int icol)                 = 0;
+  virtual Id _invert()                                            = 0;
+  virtual Id _solve(const VectorDouble& b, VectorDouble& x) const = 0;
+  virtual Id _getMatrixPhysicalSize() const                       = 0;
+  virtual double _getValueByRank(Id rank) const                   = 0;
+  virtual double& _getValueRef(Id irow, Id icol)                 = 0;
 
 #ifndef SWIG
   virtual void _addProdMatVecInPlacePtr(constvect x,
@@ -261,50 +261,50 @@ protected:
                                         bool transpose = false) const = 0;
 #endif
 
-  virtual bool _needToReset(int nrows, int ncols);
-  virtual bool _isPhysicallyPresent(int /*irow*/, int /*icol*/) const { return true; }
+  virtual bool _needToReset(Id nrows, Id ncols);
+  virtual bool _isPhysicallyPresent(Id /*irow*/, Id /*icol*/) const { return true; }
   virtual void _setValues(const double* values, bool byCol);
 
   virtual void _clear();
-  virtual bool _isNumbersValid(int nrows, int ncols) const;
+  virtual bool _isNumbersValid(Id nrows, Id ncols) const;
 
-  void _setNCols(int ncols) { _nCols = ncols; }
-  void _setNRows(int nrows) { _nRows = nrows; }
-  bool _isColumnValid(int icol) const;
-  bool _isRowValid(int irow) const;
-  bool _isIndexValid(int irow, int icol) const;
+  void _setNCols(Id ncols) { _nCols = ncols; }
+  void _setNRows(Id nrows) { _nRows = nrows; }
+  bool _isColumnValid(Id icol) const;
+  bool _isRowValid(Id irow) const;
+  bool _isIndexValid(Id irow, Id icol) const;
   bool _isRowVectorConsistent(const VectorDouble& tab) const;
   bool _isColVectorConsistent(const VectorDouble& tab) const;
   bool _isVectorSizeConsistent(const VectorDouble& tab) const;
   bool _isColumnSizeConsistent(const VectorDouble& tab) const;
   bool _isRowSizeConsistent(const VectorDouble& tab) const;
-  bool _isRankValid(int rank) const;
+  bool _isRankValid(Id rank) const;
   void _fillFromVVD(const VectorVectorDouble& X);
 
   // Static functions
   static bool _isMatrixCompatible(const String& name,
                                   const AMatrix* mat1 = nullptr,
-                                  int vsize1          = 0,
+                                  Id vsize1          = 0,
                                   bool transpose1     = false,
                                   const AMatrix* mat2 = nullptr,
-                                  int vsize2          = 0,
+                                  Id vsize2          = 0,
                                   bool transpose2     = false,
                                   const AMatrix* mat3 = nullptr,
-                                  int vsize3          = 0,
+                                  Id vsize3          = 0,
                                   bool transpose3     = false);
   static bool _identifyRowAndCol(const AMatrix* mat,
-                                 int vsize,
+                                 Id vsize,
                                  bool transpose,
-                                 int* nrow,
-                                 int* ncol);
+                                 Id* nrow,
+                                 Id* ncol);
 
 private:
-  bool _matrixNeedToReset(int nrows, int ncols);
+  bool _matrixNeedToReset(Id nrows, Id ncols);
 
 private:
   mutable VectorDouble _diagonal;
-  int _nRows;
-  int _nCols;
+  Id _nRows;
+  Id _nCols;
   double _nullTerm; // Used for returning a null constant address
 };
 

@@ -18,7 +18,7 @@
 
 namespace gstlrn
 {
-Table::Table(int nrow, int ncol, bool skip_title, bool skip_description)
+Table::Table(Id nrow, Id ncol, bool skip_title, bool skip_description)
   : MatrixDense(nrow, ncol)
   , ASerializable()
   , _title()
@@ -60,7 +60,7 @@ Table::~Table()
 {
 }
 
-void Table::reset(int nrows, int ncols)
+void Table::reset(Id nrows, Id ncols)
 {
   MatrixDense::reset(nrows, ncols);
   _clearDecoration();
@@ -72,7 +72,7 @@ void Table::_clearDecoration()
   _colNames.clear();
 }
 
-Table* Table::create(int nrow, int ncol)
+Table* Table::create(Id nrow, Id ncol)
 {
   return new Table(nrow, ncol);
 }
@@ -80,8 +80,8 @@ Table* Table::create(int nrow, int ncol)
 Table* Table::createFromNames(const VectorString& rownames,
                               const VectorString& colnames)
 {
-  int nrow    = (int)rownames.size();
-  int ncol    = (int)colnames.size();
+  Id nrow    = (Id)rownames.size();
+  Id ncol    = (Id)colnames.size();
   auto* table = new Table(nrow, ncol);
   table->setRowNames(rownames);
   table->setColumnNames(colnames);
@@ -101,7 +101,7 @@ Table* Table::createFromTable(const Table& table)
   return new Table(table);
 }
 
-VectorDouble Table::getRange(int icol) const
+VectorDouble Table::getRange(Id icol) const
 {
   VectorDouble vec = getColumn(icol);
   if (vec.empty()) return VectorDouble();
@@ -113,11 +113,11 @@ VectorDouble Table::getRange(int icol) const
 
 VectorDouble Table::getAllRange() const
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   VectorDouble limits(2);
   limits[0] = MAXIMUM_BIG;
   limits[1] = MINIMUM_BIG;
-  for (int icol = 0; icol < ncols; icol++)
+  for (Id icol = 0; icol < ncols; icol++)
   {
     VectorDouble local = getRange(icol);
     if (local[0] < limits[0]) limits[0] = local[0];
@@ -129,14 +129,14 @@ VectorDouble Table::getAllRange() const
 bool Table::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
-  ret      = ret && _recordWrite<int>(os, "Number of Columns", getNCols());
-  ret      = ret && _recordWrite<int>(os, "Number of Rows", getNRows());
+  ret      = ret && _recordWrite<Id>(os, "Number of Columns", getNCols());
+  ret      = ret && _recordWrite<Id>(os, "Number of Rows", getNRows());
 
   /* Writing the tail of the file */
 
-  for (int irow = 0; ret && irow < getNRows(); irow++)
+  for (Id irow = 0; ret && irow < getNRows(); irow++)
   {
-    for (int icol = 0; ret && icol < getNCols(); icol++)
+    for (Id icol = 0; ret && icol < getNCols(); icol++)
     {
       ret = ret && _recordWrite<double>(os, "", getValue(irow, icol));
     }
@@ -147,22 +147,22 @@ bool Table::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 
 bool Table::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
-  int nrows    = 0;
-  int ncols    = 0;
+  Id nrows    = 0;
+  Id ncols    = 0;
   double value = 0.;
 
   bool ret = true;
-  ret      = ret && _recordRead<int>(is, "Number of Columns", ncols);
-  ret      = ret && _recordRead<int>(is, "Number of Rows", nrows);
+  ret      = ret && _recordRead<Id>(is, "Number of Columns", ncols);
+  ret      = ret && _recordRead<Id>(is, "Number of Rows", nrows);
   if (!ret) return false;
 
   reset(nrows, ncols);
 
   /* Loop on the lines */
 
-  for (int irow = 0; ret && irow < nrows; irow++)
+  for (Id irow = 0; ret && irow < nrows; irow++)
   {
-    for (int icol = 0; ret && icol < ncols; icol++)
+    for (Id icol = 0; ret && icol < ncols; icol++)
     {
       ret = ret && _recordRead<double>(is, "Numerical value", value);
       if (ret) setValue(irow, icol, value);
@@ -178,8 +178,8 @@ String Table::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
   if (empty()) return sstr.str();
-  int ncols = getNCols();
-  int nrows = getNRows();
+  auto ncols = getNCols();
+  auto nrows = getNRows();
 
   // Title
   if (!_skipTitle)
@@ -197,12 +197,12 @@ String Table::toString(const AStringFormat* /*strfmt*/) const
   }
 
   // For displaying the Row names, find the optimal dimension
-  int rowLengthMax = 1;
+  Id rowLengthMax = 1;
   if (!_rowNames.empty())
   {
-    for (int irow = 0; irow < nrows; irow++)
+    for (Id irow = 0; irow < nrows; irow++)
     {
-      int rowLength = (int)_rowNames[irow].size();
+      Id rowLength = (Id)_rowNames[irow].size();
       if (rowLength > rowLengthMax) rowLengthMax = rowLength;
     }
   }
@@ -211,16 +211,16 @@ String Table::toString(const AStringFormat* /*strfmt*/) const
   if (!_colNames.empty())
   {
     if (!_rowNames.empty()) sstr << toStr(" ", EJustify::fromKey("RIGHT"), rowLengthMax);
-    for (int icol = 0; icol < ncols; icol++)
+    for (Id icol = 0; icol < ncols; icol++)
       sstr << " " << toStr(_colNames[icol]);
     sstr << std::endl;
   }
 
   // Print the contents of the table
-  for (int irow = 0; irow < nrows; irow++)
+  for (Id irow = 0; irow < nrows; irow++)
   {
     if (!_rowNames.empty()) sstr << toStr(_rowNames[irow], EJustify::fromKey("RIGHT"), rowLengthMax);
-    for (int icol = 0; icol < ncols; icol++)
+    for (Id icol = 0; icol < ncols; icol++)
     {
       sstr << " " << toDouble(getValue(irow, icol));
     }
@@ -232,7 +232,7 @@ String Table::toString(const AStringFormat* /*strfmt*/) const
 /**
  * Plot the contents of the statistics
  */
-void Table::plot(int isimu) const
+void Table::plot(Id isimu) const
 {
   if (empty()) return;
   String filename = incrementStringVersion("TableStats", isimu + 1);
@@ -241,28 +241,28 @@ void Table::plot(int isimu) const
 
 void Table::setColumnNames(const VectorString& colNames)
 {
-  if (getNCols() != (int)colNames.size())
+  if (getNCols() != (Id)colNames.size())
   {
     messerr("The size of 'colNames' (%d) does not match the number of columns (%d)",
-            (int)colNames.size(), getNCols());
+            (Id)colNames.size(), getNCols());
     return;
   }
   _colNames = colNames;
 }
 
-void Table::setColumnName(int icol, const String& name)
+void Table::setColumnName(Id icol, const String& name)
 {
   if (!_isColumnValid(icol)) return;
-  int ncols = getNCols();
+  auto ncols = getNCols();
   if (_colNames.empty())
     _colNames.resize(ncols, "  ");
   _colNames[icol] = name;
 }
 
-void Table::setRowName(int irow, const String& name)
+void Table::setRowName(Id irow, const String& name)
 {
   if (!_isRowValid(irow)) return;
-  int nrows = getNRows();
+  auto nrows = getNRows();
   if (_rowNames.empty())
     _rowNames.resize(nrows, "  ");
   _rowNames[irow] = name;
@@ -270,22 +270,22 @@ void Table::setRowName(int irow, const String& name)
 
 void Table::setRowNames(const VectorString& rowNames)
 {
-  if (getNRows() != (int)rowNames.size())
+  if (getNRows() != (Id)rowNames.size())
   {
     messerr("The size of 'rowNames' (%d) does not match the number of rows (%d)",
-            (int)rowNames.size(), getNRows());
+            (Id)rowNames.size(), getNRows());
     return;
   }
   _rowNames = rowNames;
 }
 
-String Table::getColumnName(int icol) const
+String Table::getColumnName(Id icol) const
 {
   if (!_isColumnValid(icol)) return String();
   return _colNames[icol];
 }
 
-String Table::getRowName(int irow) const
+String Table::getRowName(Id irow) const
 {
   if (!_isRowValid(irow)) return String();
   return _rowNames[irow];
@@ -302,8 +302,8 @@ bool Table::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   /* Read the grid characteristics */
   bool ret = true;
 
-  int ncols = 0;
-  int nrows = 0;
+  Id ncols = 0;
+  Id nrows = 0;
   VectorDouble values;
 
   ret = ret && SerializeHDF5::readValue(*tableG, "NCols", ncols);

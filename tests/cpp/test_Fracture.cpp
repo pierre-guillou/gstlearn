@@ -39,9 +39,9 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Fractures-");
 
   // Global parameters
-  int ndim     = 2;
+  Id ndim      = 2;
   bool verbose = true;
-  int ndisc    = 1000.;
+  Id ndisc     = 1000.;
   law_set_random_seed(32131);
 
   defineDefaultSpace(ESpaceType::RN, ndim);
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
   // Simulating fractures
   FracList flist;
-  int seed       = 432431;
+  Id seed = 432431;
   flist.simulate(env, true, true, seed, verbose, VectorDouble());
   flist.display();
 

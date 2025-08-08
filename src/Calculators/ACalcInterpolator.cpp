@@ -32,7 +32,7 @@ ACalcInterpolator::~ACalcInterpolator()
 {
 }
 
-bool ACalcInterpolator::_setNCov(int ncova)
+bool ACalcInterpolator::_setNCov(Id ncova)
 {
   if (ncova <= 0) return true;
   if (_ncova <= 0)
@@ -58,7 +58,7 @@ bool ACalcInterpolator::_check()
   /* Cross-checking the Space Dimension consistency */
   /**************************************************/
 
-  unsigned int ndim = _getNDim();
+  size_t ndim = _getNDim();
   if (_model != nullptr)
   {
     if (ndim > 0)
@@ -91,7 +91,7 @@ bool ACalcInterpolator::_check()
     }
     else
     {
-      ndim = (int) _neigh->getNDim();
+      ndim = (Id) _neigh->getNDim();
     }
     // Attach the input and output files
     _neigh->attach(getDbin(), getDbout());
@@ -101,7 +101,7 @@ bool ACalcInterpolator::_check()
   /* Cross-Checking the Variable Number consistency */
   /**************************************************/
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (_model != nullptr)
   {
     if (nvar > 0)
@@ -124,7 +124,7 @@ bool ACalcInterpolator::_check()
   /* Cross-Checking the number of External Drifts consistency */
   /************************************************************/
 
-  int nfex = 0;
+  Id nfex = 0;
   if (_model != nullptr)
   {
     nfex = _model->getNExtDrift();
@@ -193,7 +193,7 @@ bool ACalcInterpolator::_preprocess()
   }
   if (_neigh != nullptr)
   {
-    if (!_setNdim((int)_neigh->getNDim())) return false;
+    if (!_setNdim((Id)_neigh->getNDim())) return false;
   }
 
   // Number of variables
@@ -244,12 +244,12 @@ bool ACalcInterpolator::hasNeigh(bool verbose) const
   return true;
 }
 
-int ACalcInterpolator::_centerDataToGrid(DbGrid* dbgrid)
+Id ACalcInterpolator::_centerDataToGrid(DbGrid* dbgrid)
 {
-  int iuid_out = _addVariableDb(1, 2, ELoc::UNKNOWN, 0, _getNDim(), TEST);
-  for (int idim = 0; idim < _getNDim(); idim++)
+  Id iuid_out = _addVariableDb(1, 2, ELoc::UNKNOWN, 0, _getNDim(), TEST);
+  for (Id idim = 0; idim < _getNDim(); idim++)
   {
-    int iuid_in = getDbin()->getUIDByLocator(ELoc::X, idim);
+    Id iuid_in = getDbin()->getUIDByLocator(ELoc::X, idim);
     getDbin()->duplicateColumnByUID(iuid_in, iuid_out + idim);
     getDbin()->setLocatorByUID(iuid_out + idim, ELoc::X, idim);
   }

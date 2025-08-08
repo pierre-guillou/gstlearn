@@ -32,30 +32,30 @@ License: BSD 3-clause
 namespace gstlrn
 {
 
-void swap(int* arr, int i1, int i2)
+void swap(Id* arr, Id i1, Id i2)
 {
   std::swap(arr[i1], arr[i2]);
 }
 
-int t_btree::init_node(int i_node, int idx_start, int idx_end)
+Id t_btree::init_node(Id i_node, Id idx_start, Id idx_end)
 {
-  int n_features = this->n_features;
-  int n_points   = idx_end - idx_start;
+  Id n_features = this->n_features;
+  Id n_points   = idx_end - idx_start;
   auto centroid  = this->node_bounds.getRow(i_node);
 
-  for (int j = 0; j < n_features; j++)
+  for (Id j = 0; j < n_features; j++)
     centroid[j] = 0.0;
 
-  for (int i = idx_start; i < idx_end; i++)
-    for (int j = 0; j < n_features; j++)
+  for (Id i = idx_start; i < idx_end; i++)
+    for (Id j = 0; j < n_features; j++)
       centroid[j] += this->data(this->idx_array[i], j);
 
-  for (int j = 0; j < n_features; j++)
+  for (Id j = 0; j < n_features; j++)
     centroid[j] /= n_points;
 
   double radius = 0.0;
   const auto dist_func = this->default_distance_function == 1 ? euclidean_distance : manhattan_distance;
-  for (int i = idx_start; i < idx_end; i++)
+  for (Id i = idx_start; i < idx_end; i++)
     radius = fmax(radius, dist_func(centroid.data(), this->data.getRow(this->idx_array[i]).data(), n_features));
 
   this->node_data[i_node].radius    = radius;
@@ -64,17 +64,17 @@ int t_btree::init_node(int i_node, int idx_start, int idx_end)
   return (0);
 }
 
-int find_node_split_dim(const MatrixT<double>& data, const VectorInt& node_indices, int n_features, int n_points)
+Id find_node_split_dim(const MatrixT<double>& data, const VectorInt& node_indices, Id n_features, Id n_points)
 {
   double min_val, max_val, val, spread;
 
-  int j_max         = 0;
+  Id j_max         = 0;
   double max_spread = 0;
-  for (int j = 0; j < n_features; j++)
+  for (Id j = 0; j < n_features; j++)
   {
     max_val = data(node_indices[0], j);
     min_val = max_val;
-    for (int i = 1; i < n_points; i++)
+    for (Id i = 1; i < n_points; i++)
     {
       val     = data(node_indices[i], j);
       max_val = fmax(max_val, val);
@@ -90,18 +90,18 @@ int find_node_split_dim(const MatrixT<double>& data, const VectorInt& node_indic
   return (j_max);
 }
 
-int partition_node_indices(const MatrixT<double>& data, int* node_indices, int split_dim, int n_points, int split_index)
+Id partition_node_indices(const MatrixT<double>& data, Id* node_indices, Id split_dim, Id n_points, Id split_index)
 {
-  int midindex;
+  Id midindex;
   double d1, d2;
 
-  int left  = 0;
-  int right = n_points - 1;
+  Id left  = 0;
+  Id right = n_points - 1;
 
   while (true)
   {
     midindex = left;
-    for (int i = left; i < right; i++)
+    for (Id i = left; i < right; i++)
     {
       d1 = data(node_indices[i], split_dim);
       d2 = data(node_indices[right], split_dim);
@@ -123,12 +123,12 @@ int partition_node_indices(const MatrixT<double>& data, int* node_indices, int s
   return (0);
 }
 
-void t_btree::recursive_build(int i_node, int idx_start, int idx_end)
+void t_btree::recursive_build(Id i_node, Id idx_start, Id idx_end)
 {
-  int imax;
-  int n_features = this->n_features;
-  int n_points   = idx_end - idx_start;
-  int n_mid      = n_points / 2;
+  Id imax;
+  Id n_features = this->n_features;
+  Id n_points   = idx_end - idx_start;
+  Id n_mid      = n_points / 2;
 
   // initialize the node data
   init_node(i_node, idx_start, idx_end);
@@ -155,11 +155,11 @@ void t_btree::recursive_build(int i_node, int idx_start, int idx_end)
 }
 
 t_btree::t_btree(MatrixT<double>&& data,
-                 int n_samples,
-                 int n_features,
+                 Id n_samples,
+                 Id n_features,
                  bool has_constraints,
-                 int leaf_size,
-                 int default_distance_function)
+                 Id leaf_size,
+                 Id default_distance_function)
   : data(std::move(data))
   , leaf_size(40)
   , n_levels(0)
@@ -183,7 +183,7 @@ t_btree::t_btree(MatrixT<double>&& data,
   this->n_nodes  = pow(2.0, this->n_levels) - 1;
 
   this->idx_array.resize(this->n_samples);
-  for (int i = 0; i < this->n_samples; i++)
+  for (Id i = 0; i < this->n_samples; i++)
     this->idx_array[i] = i;
   this->node_data.resize(this->n_nodes);
   this->node_bounds.resize(this->n_nodes, this->n_features, 0.0);
@@ -199,18 +199,18 @@ t_btree::t_btree(MatrixT<double>&& data,
  * @param pt     Characteristics of the target SpacePoint
  * @return double Minimum distance or 0
  */
-double t_btree::min_dist(int i_node, const constvect pt) const
+double t_btree::min_dist(Id i_node, const constvect pt) const
 {
   const auto dist_func = this->default_distance_function == 1 ? euclidean_distance : manhattan_distance;
   double dist_pt       = dist_func(pt.data(), this->node_bounds.getRow(i_node).data(), this->n_features);
   return (fmax(0.0, dist_pt - this->node_data[i_node].radius));
 }
 
-int t_btree::query_depth_first(int i_node, const constvect pt, int i_pt, t_nheap& heap, double dist) const
+Id t_btree::query_depth_first(Id i_node, const constvect pt, Id i_pt, t_nheap& heap, double dist) const
 {
   t_nodedata node_info = this->node_data[i_node];
   double dist_pt, dist1, dist2;
-  int i1, i2;
+  Id i1, i2;
 
   // case 1: query point is outside node radius: trim it from the query
   if (dist > heap.largest(i_pt))
@@ -221,9 +221,9 @@ int t_btree::query_depth_first(int i_node, const constvect pt, int i_pt, t_nheap
   else if (node_info.is_leaf)
   {
     const auto dist_func = this->default_distance_function == 1 ? euclidean_distance : manhattan_distance;
-    for (int i = node_info.idx_start; i < node_info.idx_end; i++)
+    for (Id i = node_info.idx_start; i < node_info.idx_end; i++)
     {
-      int j = this->idx_array[i];
+      Id j = this->idx_array[i];
       if (!this->accept.empty() && !this->accept[j])
         continue;
       dist_pt = dist_func(pt.data(), this->data.getRow(j).data(), this->n_features);
@@ -252,7 +252,7 @@ int t_btree::query_depth_first(int i_node, const constvect pt, int i_pt, t_nheap
   return (0);
 }
 
-void t_btree::display(int level) const
+void t_btree::display(Id level) const
 {
   mestitle(0, "Ball Tree");
   message("- Number of samples = %d\n", this->n_samples);
@@ -265,20 +265,20 @@ void t_btree::display(int level) const
   // Loop on the nodes
 
   mestitle(1, "List of nodes");
-  for (int i_node = 0; i_node < this->n_nodes; i_node++)
+  for (Id i_node = 0; i_node < this->n_nodes; i_node++)
   {
     const auto& info = this->node_data[i_node];
 
     message("Node #%3d/%3d - Indices [%5d; %5d[ - Radius = %lf - Centroid = ",
             i_node, this->n_nodes, info.idx_start, info.idx_end, info.radius);
-    for (int j = 0; j < this->n_features; j++)
+    for (Id j = 0; j < this->n_features; j++)
       message("%lf ", this->node_bounds(i_node, j));
     message("\n");
 
     if (level > 0 && info.is_leaf)
     {
       message(" Sample indices = ");
-      for (int is = info.idx_start; is < info.idx_end; is++)
+      for (Id is = info.idx_start; is < info.idx_end; is++)
         message(" %d", this->idx_array[is]);
       message("\n");
     }
@@ -292,11 +292,11 @@ void t_btree::display(int level) const
  * @param n_features Number of coordinates
  * @return
  */
-double manhattan_distance(const double* x1, const double* x2, int n_features)
+double manhattan_distance(const double* x1, const double* x2, Id n_features)
 {
   double delta;
   double d1 = 0.;
-  for (int i = 0; i < n_features; i++)
+  for (Id i = 0; i < n_features; i++)
   {
     delta = fabs(x1[i] - x2[i]);
     d1 += delta;
@@ -311,7 +311,7 @@ double manhattan_distance(const double* x1, const double* x2, int n_features)
  * @param n_features Number of coordinates
  * @return
  */
-double euclidean_distance(const double* x1, const double* x2, int n_features)
+double euclidean_distance(const double* x1, const double* x2, Id n_features)
 {
   thread_local SpacePoint p1;
   thread_local SpacePoint p2;

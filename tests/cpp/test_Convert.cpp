@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
   DbGrid* gridnew = nullptr;
 
   // Global parameters
-  int ndim = 2;
-  int nvar = 1;
+  Id ndim = 2;
+  Id nvar = 1;
 
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
   // Perform a non-conditional simulation
   simtub(nullptr, grid, model);
   grid->display(&dbfmt);
-  int icol = grid->getLastUID();
+  auto icol = grid->getLastUID();
   VectorInt cols(1);
   cols[0] = icol;
 

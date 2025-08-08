@@ -108,7 +108,7 @@ typedef enum
 class GSTLEARN_EXPORT Optim
 {
 public:
-  Optim(opt_algorithm algo, int dim);
+  Optim(opt_algorithm algo, Id dim);
   Optim(const Optim&)            = delete;
   Optim& operator=(const Optim&) = delete;
   ~Optim();

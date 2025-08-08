@@ -34,12 +34,12 @@ using namespace gstlrn;
 *****************************************************************************/
 int main()
 {
-  int iptr;
+  Id iptr;
   bool flag_inter = false;
 
-  int nx             = 50;
-  int niter          = 1000;
-  int nburn          = 20;
+  Id nx              = 50;
+  Id niter           = 1000;
+  Id nburn           = 20;
   double range       = 10.;
   double bound       = TEST;
   double eps         = EPSILON6;
@@ -57,7 +57,7 @@ int main()
   }
 
   int seed    = 5452;
-  int ndim    = 2;
+  size_t ndim = 2;
   int nvar    = 1;
   int nbsimu  = 1;
   double sill = 1.;
@@ -129,7 +129,7 @@ int main()
     std::vector<DirParam> dirparams = DirParam::createMultipleInSpace(nlag);
     varioparam.addMultiDirs(dirparams);
     VectorString names = db->getName("gausfac*");
-    for (int isimu = 0; isimu < (int)names.size(); isimu++)
+    for (size_t isimu = 0; isimu < names.size(); isimu++)
     {
       db->clearLocators(ELoc::Z);
       db->setLocator(names[isimu], ELoc::Z, 0);

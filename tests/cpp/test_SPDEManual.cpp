@@ -42,13 +42,13 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_SPDEManual-");
-  int seed     = 10355;
+  Id seed      = 10355;
   bool verbose = true;
   law_set_random_seed(seed);
 
   ///////////////////////
   // Creating the Db Grid
-  auto nx      = {101, 101};
+  VectorInt nx = {101, 101};
   DbGrid* grid = DbGrid::create(nx);
   if (verbose) grid->display();
 
@@ -89,12 +89,12 @@ int main(int argc, char* argv[])
 
   //////////
   // Kriging
-  int napices = S.getSize();
+  auto napices = S.getSize();
   VectorDouble rhs(napices);
   B.point2mesh(datval, rhs);
 
   double nug = 0.1;
-  for (int i = 0; i < napices; i++)
+  for (Id i = 0; i < napices; i++)
     rhs[i] /= nug;
 
   double vardata = 0.01;

@@ -35,14 +35,14 @@ public:
   void setDboutMustBeGrid(bool dboutMustBeGrid) { _dboutMustBeGrid = dboutMustBeGrid; }
 
   void setFlagStats(bool flagStats) { _flagStats = flagStats; }
-  void setRadius(int radius) { _radius = radius; }
+  void setRadius(Id radius) { _radius = radius; }
   void setOper(const EStatOption& oper) { _oper = oper; }
 
   void setFlagRegr(bool flagRegr) { _flagRegr = flagRegr; }
   void setFlagCst(bool flagCst) { _flagCst = flagCst; }
   void setName0(const String& name0) { _nameResp = name0; }
   void setNamaux(const VectorString& namaux) { _nameAux = namaux; }
-  void setRegrMode(int regrMode) { _regrMode = regrMode; }
+  void setRegrMode(Id regrMode) { _regrMode = regrMode; }
   void setModel(const Model* model) { _model = model; }
 
 private:
@@ -53,28 +53,28 @@ private:
   void _rollback() override;
 
 private:
-  int _iattOut;
+  Id _iattOut;
   bool _dboutMustBeGrid;
   bool _flagStats;
   EStatOption _oper;
-  int _radius;
+  Id _radius;
   bool _flagRegr;
   bool _flagCst;
-  int _regrMode;
+  Id _regrMode;
   String _nameResp;
   VectorString _nameAux;
   const Model* _model;
 };
 
-GSTLEARN_EXPORT int dbStatisticsOnGrid(Db* db,
+GSTLEARN_EXPORT Id dbStatisticsOnGrid(Db* db,
                                        DbGrid* dbgrid,
                                        const EStatOption& oper,
-                                       int radius                      = 0,
+                                       Id radius                      = 0,
                                        const NamingConvention& namconv = NamingConvention("Stats"));
-GSTLEARN_EXPORT int dbRegression(Db* db1,
+GSTLEARN_EXPORT Id dbRegression(Db* db1,
                                  const String& nameResp,
                                  const VectorString& nameAux,
-                                 int mode                        = 0,
+                                 Id mode                        = 0,
                                  bool flagCst                    = true,
                                  Db* db2                         = nullptr,
                                  const Model* model              = nullptr,

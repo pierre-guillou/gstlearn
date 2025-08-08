@@ -51,7 +51,7 @@ public:
   virtual void evalInverse(const constvect vecin, std::vector<double>& vecout);
 #endif
   std::vector<double> evalInverse(const VectorDouble& vecin);
-  virtual std::pair<double, double> getRangeEigenVal(int ndiscr = 100);
+  virtual std::pair<double, double> getRangeEigenVal(Id ndiscr = 100);
 
   static PrecisionOp* createFromShiftOp(AShiftOp* shiftop    = nullptr,
                                         const CovAniso* cova = nullptr,
@@ -61,7 +61,7 @@ public:
                              bool stencil = false,
                              bool verbose = false);
 
-  int reset(const AShiftOp* shiftop,
+  Id reset(const AShiftOp* shiftop,
             const CovAniso* cova = nullptr,
             bool verbose         = false);
 
@@ -76,21 +76,21 @@ public:
                             const EPowerPT& /*power*/) {};
   virtual void evalDeriv(const constvect /*inv*/,
                          vect /*outv*/,
-                         int /*iapex*/,
-                         int /*igparam*/,
+                         Id /*iapex*/,
+                         Id /*igparam*/,
                          const EPowerPT& /*power*/) {};
   virtual void evalDerivOptim(vect /*outv*/,
-                              int /*iapex*/,
-                              int /*igparam*/,
+                              Id /*iapex*/,
+                              Id /*igparam*/,
                               const EPowerPT& /*power*/) {};
-  VectorVectorDouble simulate(int nbsimu = 1);
+  VectorVectorDouble simulate(Id nbsimu = 1);
 
 #endif
 
   //  virtual void evalDerivPoly(const Eigen::VectorXd& /*inv*/,
   //                             Eigen::VectorXd& /*outv*/,
-  //                             int /*iapex*/,
-  //                             int /*igparam*/){};
+  //                             Id /*iapex*/,
+  //                             Id /*igparam*/){};
 
 #ifndef SWIG
   void evalPower(const constvect inm,
@@ -101,10 +101,10 @@ public:
                  const EPowerPT& power = EPowerPT::fromKey("ONE"));
 
 #endif
-  VectorDouble computeCov(int imesh);
+  VectorDouble computeCov(Id imesh);
   VectorDouble simulateOne();
 
-  int getSize() const override { return _shiftOp->getSize(); }
+  Id getSize() const override { return _shiftOp->getSize(); }
   bool getTraining() const { return _training; }
   void setTraining(bool tr) { _training = tr; }
   AShiftOp* getShiftOp() const { return _shiftOp; }
@@ -112,28 +112,28 @@ public:
   void setPolynomialFromPoly(APolynomial* polynomial);
   bool isCovaDefined() const { return _cova != nullptr; }
   VectorDouble getCoeffs();
-  double computeLogDet(int nMC = 1) const override;
+  double computeLogDet(Id nMC = 1) const override;
   virtual VectorDouble extractDiag() const;
 
 protected:
   APolynomial* getPoly(const EPowerPT& power);
 
 #ifndef SWIG
-  int _addEvalPoly(const EPowerPT& power,
+  Id _addEvalPoly(const EPowerPT& power,
                    const constvect inv,
                    vect outv) const;
-  int _addToDest(const constvect inv, vect outv) const override;
-  int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
+  Id _addSimulateToDest(const constvect whitenoise, vect outv) const override;
 
   void _addEvalPower(const constvect inv, vect outv, const EPowerPT& power) const;
 #endif
 
 private:
-  int _preparePoly(const EPowerPT& power, bool force = false) const;
-  int _prepareChebychev(const EPowerPT& power) const;
-  int _preparePrecisionPoly() const;
+  Id _preparePoly(const EPowerPT& power, bool force = false) const;
+  Id _prepareChebychev(const EPowerPT& power) const;
+  Id _preparePrecisionPoly() const;
 #ifndef SWIG
-  int _evalPoly(const EPowerPT& power, const constvect inv, vect outv) const;
+  Id _evalPoly(const EPowerPT& power, const constvect inv, vect outv) const;
 #endif
   void _purge();
 

@@ -17,7 +17,7 @@
 
 namespace gstlrn
 {
-SpaceSN::SpaceSN(unsigned int ndim, double radius)
+SpaceSN::SpaceSN(size_t ndim, double radius)
   : ASpace(ndim)
   , _radius(radius)
 {
@@ -45,12 +45,12 @@ SpaceSN::~SpaceSN()
 {
 }
 
-ASpaceSharedPtr SpaceSN::create(int ndim, double radius)
+ASpaceSharedPtr SpaceSN::create(Id ndim, double radius)
 {
   return std::shared_ptr<SpaceSN>(new SpaceSN(ndim, radius));
 }
 
-String SpaceSN::toString(const AStringFormat* strfmt, int idx) const
+String SpaceSN::toString(const AStringFormat* strfmt, Id idx) const
 {
   std::stringstream sstr;
   sstr << ASpace::toString(strfmt, idx);
@@ -78,9 +78,9 @@ bool SpaceSN::isEqual(const ASpace *space) const
 void SpaceSN::_move(SpacePoint &p1, const VectorDouble &vec) const
 {
   /// TODO : SpaceSN::_move
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  auto offset = getOffset();
+  auto ndim   = getNDim();
+  for (size_t i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
   }
@@ -88,10 +88,10 @@ void SpaceSN::_move(SpacePoint &p1, const VectorDouble &vec) const
 
 double SpaceSN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace)
-  unsigned int offset = getOffset();
+  auto offset = getOffset();
   return GH::geodeticAngularDistance(p1.getCoord(offset),
                                      p1.getCoord(offset + 1),
                                      p2.getCoord(offset),
@@ -102,12 +102,12 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
 double SpaceSN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
                              const Tensor& tensor,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getDistance with tensor
   DECLARE_UNUSED(tensor);
-  unsigned int offset = getOffset();
+  auto offset = getOffset();
   return GH::geodeticAngularDistance(p1.getCoord(offset),
                                      p1.getCoord(offset + 1),
                                      p2.getCoord(offset),
@@ -118,7 +118,7 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
 double SpaceSN::_getFrequentialDistance(const SpacePoint& p1,
                                         const SpacePoint& p2,
                                         const Tensor& tensor,
-                                        int ispace) const
+                                        Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getFrequentialDistance
@@ -130,7 +130,7 @@ double SpaceSN::_getFrequentialDistance(const SpacePoint& p1,
 
 VectorDouble SpaceSN::_getIncrement(const SpacePoint& p1,
                                     const SpacePoint& p2,
-                                    int ispace) const
+                                    Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   _getIncrementInPlace(p1, p2, _work1);
@@ -140,14 +140,14 @@ VectorDouble SpaceSN::_getIncrement(const SpacePoint& p1,
 void SpaceSN::_getIncrementInPlace(const SpacePoint& p1,
                                    const SpacePoint& p2,
                                    VectorDouble& ptemp,
-                                   int ispace) const
+                                   Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getIncrementInPlace
-  int j = 0;
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  Id j = 0;
+  auto offset = getOffset();
+  auto ndim   = getNDim();
+  for (size_t i = offset; i < ndim + offset; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
 }
-}
+} // namespace gstlrn

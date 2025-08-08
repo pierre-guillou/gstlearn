@@ -30,25 +30,25 @@ public:
   const VectorUChar& getValues() const { return _values; }
   void setValues(const VectorUChar& values) { _values = values; }
 
-  unsigned char getBImage(int i, int j, int k) const { return _values[_divide(i, j, k)]; }
-  unsigned char getOffset(int i, int j, int k) const;
-  unsigned char getMaskoff(int i, int j, int k) const;
+  unsigned char getBImage(Id i, Id j, Id k) const { return _values[_divide(i, j, k)]; }
+  unsigned char getOffset(Id i, Id j, Id k) const;
+  unsigned char getMaskoff(Id i, Id j, Id k) const;
 
-  unsigned char getValue(int i) const { return _values[i]; }
-  void setValue(int i, unsigned char c) { _values[i] = c; }
+  unsigned char getValue(Id i) const { return _values[i]; }
+  void setValue(Id i, unsigned char c) { _values[i] = c; }
 
-  bool getValue(int i, int j, int k) const;
-  void setMaskoff(int i, int j, int k);
-  void setOffset(int i, int j, int k);
+  bool getValue(Id i, Id j, Id k) const;
+  void setMaskoff(Id i, Id j, Id k);
+  void setOffset(Id i, Id j, Id k);
 
-  int getAllocSize() const;
-  bool isInside(int i, int j, int k) const;
-  int getAddress(int i, int j, int k) const;
+  Id getAllocSize() const;
+  bool isInside(Id i, Id j, Id k) const;
+  Id getAddress(Id i, Id j, Id k) const;
 
 private:
   void _update();
-  int _divide(int i, int j, int k) const { return getAddress(i, j, k) / 8; }
-  int _residu(int i, int j, int k) const { return getAddress(i, j, k) % 8; }
+  Id _divide(Id i, Id j, Id k) const { return getAddress(i, j, k) / 8; }
+  Id _residu(Id i, Id j, Id k) const { return getAddress(i, j, k) % 8; }
 
 private:
   VectorUChar _values;

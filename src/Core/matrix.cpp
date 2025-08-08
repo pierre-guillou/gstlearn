@@ -79,13 +79,13 @@ static double _getEpsMatrix()
  ** \remark  a_in is protected
  **
  *****************************************************************************/
-int matrix_eigen(const double* a_in, int neq, double* value, double* vector)
+Id matrix_eigen(const double* a_in, Id neq, double* value, double* vector)
 
 {
   double a11, a12, a13, a21, a22, a23, a33, a34;
   double bb, cc, co, hold, s, si, v1, v2, bigk, qj, pp, temp;
   double *a, *work[4], *tmp;
-  int *ind, i, j, k, ji, ki, kj, n1, n2, i1, i2, iter, error;
+  Id *ind, i, j, k, ji, ki, kj, n1, n2, i1, i2, iter, error;
 
   /* Initializations */
 
@@ -308,7 +308,7 @@ int matrix_eigen(const double* a_in, int neq, double* value, double* vector)
 
   /* Sort the eigen values and the corresponding vectors */
 
-  ind = (int*)mem_alloc(sizeof(int) * neq, 1);
+  ind = (Id*)mem_alloc(sizeof(Id) * neq, 1);
   tmp = (double*)mem_alloc(sizeof(double) * neq * neq, 1);
   for (i = 0; i < neq; i++) ind[i] = i;
   ut_sort_double(0, neq, ind, value);
@@ -362,9 +362,9 @@ label_end:
  ** \remark  The matrix v3[] may NOT coincide with one of the two initial ones
  **
  *****************************************************************************/
-void matrix_product_safe(int n1, int n2, int n3, const double* v1, const double* v2, double* v3)
+void matrix_product_safe(Id n1, Id n2, Id n3, const double* v1, const double* v2, double* v3)
 {
-  int i1, i2, i3, i4;
+  Id i1, i2, i3, i4;
 
   if (v1 == v3 || v2 == v3)
     messageAbort("Violated protection in matrix_product_safe");
@@ -400,9 +400,9 @@ void matrix_product_safe(int n1, int n2, int n3, const double* v1, const double*
  ** \remarks +1: the optional array A has dimension (n2,n2)
  **
  *****************************************************************************/
-int matrix_prod_norme(int transpose, int n1, int n2, const double* v1, const double* a, double* w)
+Id matrix_prod_norme(Id transpose, Id n1, Id n2, const double* v1, const double* a, double* w)
 {
-  int i1, j1, i2, j2, ecr, neq;
+  Id i1, j1, i2, j2, ecr, neq;
   double value, vala, vi;
 
   ecr = 0;
@@ -474,11 +474,11 @@ int matrix_prod_norme(int transpose, int n1, int n2, const double* v1, const dou
  ** \remark  The matrix w1[] may NOT coincide with v1[]
  **
  *****************************************************************************/
-void matrix_transpose(int n1, int n2, VectorDouble& v1, VectorDouble& w1)
+void matrix_transpose(Id n1, Id n2, VectorDouble& v1, VectorDouble& w1)
 {
-  int ecr = 0;
-  for (int i1 = 0; i1 < n1; i1++)
-    for (int i2 = 0; i2 < n2; i2++)
+  Id ecr = 0;
+  for (Id i1 = 0; i1 < n1; i1++)
+    for (Id i2 = 0; i2 < n2; i2++)
       w1[ecr++] = V1(i1, i2);
 }
 
@@ -500,9 +500,9 @@ void matrix_transpose(int n1, int n2, VectorDouble& v1, VectorDouble& w1)
  ** \remark  It is unnecessary to edit a message if inversion problem occurs
  **
  *****************************************************************************/
-int matrix_invert(double* a, int neq, int rank)
+Id matrix_invert(double* a, Id neq, Id rank)
 {
-  for (int k = 0; k < neq; k++)
+  for (Id k = 0; k < neq; k++)
   {
     double biga = A(k, k);
     if (ABS(biga) < _getTolInvert())
@@ -515,18 +515,18 @@ int matrix_invert(double* a, int neq, int rank)
       return (k + 1);
     }
 
-    for (int i = 0; i < neq; i++)
+    for (Id i = 0; i < neq; i++)
       if (i != k) A(i, k) = -A(i, k) / biga;
 
-    for (int i = 0; i < neq; i++)
+    for (Id i = 0; i < neq; i++)
     {
       double hold = A(i, k);
       if (i != k)
-        for (int j = 0; j < neq; j++)
+        for (Id j = 0; j < neq; j++)
           if (j != k) A(i, j) += hold * A(k, j);
     }
 
-    for (int j = 0; j < neq; j++)
+    for (Id j = 0; j < neq; j++)
       if (j != k) A(k, j) /= biga;
 
     A(k, k) = 1. / biga;
@@ -545,7 +545,7 @@ int matrix_invert(double* a, int neq, int rank)
  ** \param[in]  b      Square matrix to be checked
  **
  *****************************************************************************/
-double matrix_determinant(int neq, const VectorDouble& b)
+double matrix_determinant(Id neq, const VectorDouble& b)
 {
   switch (neq)
   {
@@ -561,15 +561,15 @@ double matrix_determinant(int neq, const VectorDouble& b)
     default:
       /* Core allocation */
       double deter = 0.;
-      int neqm1    = neq - 1;
+      Id neqm1    = neq - 1;
       VectorDouble c(neqm1 * neqm1, 0.);
 
-      for (int j1 = 0; j1 < neq; j1++)
+      for (Id j1 = 0; j1 < neq; j1++)
       {
-        for (int i = 1; i < neq; i++)
+        for (Id i = 1; i < neq; i++)
         {
-          int j2 = 0;
-          for (int j = 0; j < neq; j++)
+          Id j2 = 0;
+          for (Id j = 0; j < neq; j++)
           {
             if (j == j1) continue;
             C(i - 1, j2) = B(i, j);
@@ -598,10 +598,10 @@ double matrix_determinant(int neq, const VectorDouble& b)
  ** \remark  the matrix a[] is destroyed during the calculations
  **
  *****************************************************************************/
-int matrix_cholesky_decompose(const double* a, double* tl, int neq)
+Id matrix_cholesky_decompose(const double* a, double* tl, Id neq)
 {
   double prod;
-  int ip, jp, kp;
+  Id ip, jp, kp;
 
   for (ip = 0; ip < neq; ip++)
     for (jp = 0; jp <= ip; jp++)
@@ -647,14 +647,14 @@ int matrix_cholesky_decompose(const double* a, double* tl, int neq)
  ** \param[out] x    resulting matrix (dimension neq * nrhs)
  **
  *****************************************************************************/
-void matrix_cholesky_product(int mode,
-                             int neq,
-                             int nrhs,
+void matrix_cholesky_product(Id mode,
+                             Id neq,
+                             Id nrhs,
                              const double* tl,
                              const double* a,
                              double* x)
 {
-  int irhs, i, j, n1, n2;
+  Id irhs, i, j, n1, n2;
   double val, *v2;
   const double* v1;
 
@@ -750,14 +750,14 @@ void matrix_cholesky_product(int mode,
  ** \remark  Matrix c[] can coincide with matrices a[] or b[]
  **
  *****************************************************************************/
-void matrix_combine(int nval,
+void matrix_combine(Id nval,
                     double coeffa,
                     const double* a,
                     double coeffb,
                     const double* b,
                     double* c)
 {
-  int i;
+  Id i;
   double value;
 
   for (i = 0; i < nval; i++)
@@ -788,15 +788,15 @@ void matrix_combine(int nval,
  ** \remark and zero only when both factors are zero
  **
  *****************************************************************************/
-int matrix_eigen_tridiagonal(const double* vecdiag,
+Id matrix_eigen_tridiagonal(const double* vecdiag,
                              const double* vecinf,
                              const double* vecsup,
-                             int neq,
+                             Id neq,
                              double* eigvec,
                              double* eigval)
 {
   double *b, *e, h;
-  int i, j;
+  Id i, j;
 
   /* Initializations */
 

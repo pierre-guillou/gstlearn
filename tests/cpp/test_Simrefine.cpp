@@ -38,9 +38,9 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Simrefine-");
 
   // Global parameters
-  int ndim   = 2;
-  int seed   = 3322;
-  int nxcell = 5;
+  Id ndim   = 2;
+  Id seed   = 3322;
+  Id nxcell = 5;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Generate the output grid
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
   // ====================== Create Parameter File ===================
   message("\n<----- Creating Parameter File ----->\n");
-  int nmult = 5;
+  Id nmult = 5;
   SimuRefineParam param(nmult);
   param.display();
 

@@ -20,17 +20,17 @@ public:
   ASimulable();
   virtual ~ASimulable() {}
 
-  int evalSimulate(const VectorDouble& whitenoise, VectorDouble& outv) const;
+  Id evalSimulate(const VectorDouble& whitenoise, VectorDouble& outv) const;
   VectorDouble evalSimulate(const VectorDouble& whitenoise) const;
   VectorDouble simulate() const;
-  virtual double computeLogDet(int nMC = 1) const; 
+  virtual double computeLogDet(Id nMC = 1) const; 
 
 #ifndef SWIG
 public:
-  int evalSimulate(const constvect whitenoise, vect result) const;
-  int addSimulateToDest(const constvect whitenoise, vect outv) const;
+  Id evalSimulate(const constvect whitenoise, vect result) const;
+  Id addSimulateToDest(const constvect whitenoise, vect outv) const;
 protected:
-  virtual int _addSimulateToDest(const constvect whitenoise, vect outv) const = 0;
+  virtual Id _addSimulateToDest(const constvect whitenoise, vect outv) const = 0;
 #endif
 };
 }

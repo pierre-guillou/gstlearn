@@ -43,8 +43,8 @@ public:
                              double mean = 0.,
                              double stdev = 0.);
 
-  int getNFamilies() const { return (int) _families.size(); }
-  int getNFaults() const { return (int) _faults.size(); }
+  Id getNFamilies() const { return (Id) _families.size(); }
+  Id getNFaults() const { return (Id) _faults.size(); }
 
   double getDeltax() const { return _deltax; }
   double getDeltay() const { return _deltay; }
@@ -54,8 +54,8 @@ public:
   double getYmax() const { return _ymax; }
   double getXextend() const;
 
-  const FracFault& getFault(int i) const { return _faults[i]; }
-  const FracFamily& getFamily(int i) const { return _families[i]; }
+  const FracFault& getFault(Id i) const { return _faults[i]; }
+  const FracFamily& getFamily(Id i) const { return _families[i]; }
 
   void addFamily(const FracFamily& family) { _families.push_back(family); }
   void addFault(const FracFault& fault) { _faults.push_back(fault); }

@@ -86,7 +86,7 @@ ANeigh::~ANeigh()
 {
 }
 
-int ANeigh::attach(const Db* dbin, const Db* dbout)
+Id ANeigh::attach(const Db* dbin, const Db* dbout)
 {
   if (dbin == nullptr || dbout == nullptr) return 1;
   _dbin  = dbin;
@@ -136,7 +136,7 @@ void ANeigh::reset()
  * @param iech_out Rank of the target point (in 'dbout')
  * @param ranks Input / Output vector of neighboring sample ranks
  */
-void ANeigh::select(int iech_out, VectorInt& ranks)
+void ANeigh::select(Id iech_out, VectorInt& ranks)
 {
   // Validating the call with respect to the input and output Dbs
   if (_dbin == nullptr || _dbout == nullptr)
@@ -176,7 +176,7 @@ void ANeigh::select(int iech_out, VectorInt& ranks)
   }
 
   // Stop the neighborhood search if not enough point is available
-  if ((int)ranks.size() <= 0) return;
+  if ((Id)ranks.size() <= 0) return;
 }
 
 /**
@@ -187,7 +187,7 @@ void ANeigh::select(int iech_out, VectorInt& ranks)
  * @param iech_out Rank of the current target sample
  * @return
  */
-bool ANeigh::_isSameTarget(int iech_out)
+bool ANeigh::_isSameTarget(Id iech_out)
 {
   // Check if the target remained unchanged
   bool flagSame = true;
@@ -198,7 +198,7 @@ bool ANeigh::_isSameTarget(int iech_out)
   return flagSame;
 }
 
-void ANeigh::_checkUnchanged(int iech_out, const VectorInt& ranks)
+void ANeigh::_checkUnchanged(Id iech_out, const VectorInt& ranks)
 {
   VectorInt rsorted = ranks;
   std::sort(rsorted.begin(), rsorted.end());
@@ -239,12 +239,12 @@ void ANeigh::displayDebug(VectorInt& ranks) const
 void ANeigh::_display(const VectorInt& ranks) const
 {
   String string;
-  int ndim  = _dbin->getNDim();
-  int nech  = _dbin->getNSample();
-  int nerr  = _dbin->getNLoc(ELoc::V);
-  int ncode = _dbin->getNLoc(ELoc::C);
-  int nblex = _dbin->getNLoc(ELoc::BLEX);
-  int nvar  = _dbin->getNLoc(ELoc::Z);
+  Id ndim  = _dbin->getNDim();
+  Id nech  = _dbin->getNSample();
+  Id nerr  = _dbin->getNLoc(ELoc::V);
+  Id ncode = _dbin->getNLoc(ELoc::C);
+  Id nblex = _dbin->getNLoc(ELoc::BLEX);
+  Id nvar  = _dbin->getNLoc(ELoc::Z);
   nvar      = 0;
 
   /* Title */
@@ -262,7 +262,7 @@ void ANeigh::_display(const VectorInt& ranks) const
     tab_prints(NULL, "Code");
 
   // Coordinates
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     string = getLocatorName(ELoc::X, idim);
     tab_prints(NULL, string.c_str());
@@ -271,7 +271,7 @@ void ANeigh::_display(const VectorInt& ranks) const
   // Variables
   if (nvar > 0)
   {
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       string = getLocatorName(ELoc::Z, ivar);
       tab_prints(NULL, string.c_str());
@@ -281,7 +281,7 @@ void ANeigh::_display(const VectorInt& ranks) const
   // Variance of measurement errors
   if (nerr > 0)
   {
-    for (int ierr = 0; ierr < nerr; ierr++)
+    for (Id ierr = 0; ierr < nerr; ierr++)
     {
       string = getLocatorName(ELoc::V, ierr);
       tab_prints(NULL, string.c_str());
@@ -291,7 +291,7 @@ void ANeigh::_display(const VectorInt& ranks) const
   // Variable Block extensions
   if (nblex > 0)
   {
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
       string = getLocatorName(ELoc::BLEX, idim);
       tab_prints(NULL, string.c_str());
@@ -305,8 +305,8 @@ void ANeigh::_display(const VectorInt& ranks) const
 
   /* Loop on the sample points */
 
-  int nsel = 0;
-  for (int iech = 0; iech < nech; iech++)
+  Id nsel = 0;
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (ranks[iech] < 0) continue;
 
@@ -318,24 +318,24 @@ void ANeigh::_display(const VectorInt& ranks) const
 
     // Code
     if (ncode > 0)
-      tab_printi(NULL, static_cast<int>(_dbin->getLocVariable(ELoc::C, iech, 0)));
+      tab_printi(NULL, static_cast<Id>(_dbin->getLocVariable(ELoc::C, iech, 0)));
 
     // Coordinates
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       tab_printg(NULL, _dbin->getCoordinate(iech, idim));
 
     // Variables
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
       tab_printg(NULL, _dbin->getLocVariable(ELoc::Z, iech, ivar));
 
     // Variance of measurement errors
-    for (int ierr = 0; ierr < nerr; ierr++)
+    for (Id ierr = 0; ierr < nerr; ierr++)
       tab_printg(NULL, _dbin->getLocVariable(ELoc::V, iech, ierr));
 
     // Variable block extension
     if (nblex > 0)
     {
-      for (int idim = 0; idim < ndim; idim++)
+      for (Id idim = 0; idim < ndim; idim++)
         tab_printg(NULL, _dbin->getLocVariable(ELoc::BLEX, iech, idim));
     }
 
@@ -361,7 +361,7 @@ void ANeigh::_display(const VectorInt& ranks) const
  ** \remarks on ELoc::SIMU rather than on ELoc::Z
  **
  *****************************************************************************/
-bool ANeigh::_discardUndefined(int iech)
+bool ANeigh::_discardUndefined(Id iech)
 {
   if (_dbin->getNLoc(ELoc::Z) <= 0) return 0;
 
@@ -389,7 +389,7 @@ bool ANeigh::_discardUndefined(int iech)
  ** \param[in]  eps      Tolerance
  **
  *****************************************************************************/
-int ANeigh::_xvalid(int iech_in, int iech_out, double eps)
+Id ANeigh::_xvalid(Id iech_in, Id iech_out, double eps)
 {
   if (!getFlagXvalid()) return 0;
   if (!getFlagKFold())
@@ -405,9 +405,9 @@ int ANeigh::_xvalid(int iech_in, int iech_out, double eps)
   return 0;
 }
 
-bool ANeigh::_isDimensionValid(int idim) const
+bool ANeigh::_isDimensionValid(Id idim) const
 {
-  if (idim < 0 || idim >= (int)getNDim())
+  if (idim < 0 || idim >= (Id)getNDim())
   {
     messerr("Error in 'idim'(%d). It should lie within [0,%d[", idim, getNDim());
     return false;
@@ -417,10 +417,10 @@ bool ANeigh::_isDimensionValid(int idim) const
 
 bool ANeigh::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
-  int ndim = 0;
+  Id ndim = 0;
 
   bool ret = true;
-  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
+  ret      = ret && _recordRead<Id>(is, "Space Dimension", ndim);
   if (ret) setNDim(ndim);
   return ret;
 }
@@ -428,12 +428,12 @@ bool ANeigh::_deserializeAscii(std::istream& is, bool /*verbose*/)
 bool ANeigh::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
-  ret      = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+  ret      = ret && _recordWrite<Id>(os, "Space Dimension", getNDim());
 
   return ret;
 }
 
-void ANeigh::setBallSearch(bool status, int leaf_size)
+void ANeigh::setBallSearch(bool status, Id leaf_size)
 {
   if (leaf_size <= 0) status = false;
   _useBallSearch = status;
@@ -442,9 +442,9 @@ void ANeigh::setBallSearch(bool status, int leaf_size)
 
 void ANeigh::_neighCompress(VectorInt& ranks)
 {
-  int necr   = 0;
-  int number = (int)ranks.size();
-  for (int i = 0; i < number; i++)
+  Id necr   = 0;
+  Id number = (Id)ranks.size();
+  for (Id i = 0; i < number; i++)
     if (ranks[i] >= 0) ranks[necr++] = i;
   ranks.resize(necr);
 }
@@ -459,7 +459,7 @@ bool ANeigh::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   /* Read the grid characteristics */
   bool ret = true;
-  int ndim = 0;
+  Id ndim = 0;
 
   ret = ret && SerializeHDF5::readValue(*aneighG, "NDim", ndim);
 
@@ -474,7 +474,7 @@ bool ANeigh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 
   bool ret = true;
 
-  ret = ret && SerializeHDF5::writeValue(aneighG, "NDim", (int)getNDim());
+  ret = ret && SerializeHDF5::writeValue(aneighG, "NDim", (Id)getNDim());
 
   return ret;
 }

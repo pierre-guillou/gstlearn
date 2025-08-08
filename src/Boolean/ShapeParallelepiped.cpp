@@ -53,7 +53,7 @@ ShapeParallelepiped::~ShapeParallelepiped()
  ** \param[in]  ndim    Space dimension
  **
  *****************************************************************************/
-BooleanObject* ShapeParallelepiped::generateObject(int ndim)
+BooleanObject* ShapeParallelepiped::generateObject(Id ndim)
 
 {
   auto* object = new BooleanObject(this);

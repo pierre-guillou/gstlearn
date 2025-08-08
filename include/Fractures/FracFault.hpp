@@ -34,12 +34,12 @@ public:
   VectorDouble getRanger() const { return _ranger; }
   VectorDouble getThetal() const { return _thetal; }
   VectorDouble getThetar() const { return _thetar; }
-  double getRangel(int i) const { return _rangel[i]; }
-  double getRanger(int i) const { return _ranger[i]; }
-  double getThetal(int i) const { return _thetal[i]; }
-  double getThetar(int i) const { return _thetar[i]; }
+  double getRangel(Id i) const { return _rangel[i]; }
+  double getRanger(Id i) const { return _ranger[i]; }
+  double getThetal(Id i) const { return _thetal[i]; }
+  double getThetar(Id i) const { return _thetar[i]; }
 
-  int getNFamilies() const { return  (int) _thetal.size(); }
+  Id getNFamilies() const { return  (Id) _thetal.size(); }
   double faultAbscissae(double cote) const;
 
   void addFaultPerFamily(double thetal,

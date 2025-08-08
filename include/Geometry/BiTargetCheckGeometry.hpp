@@ -19,7 +19,7 @@ namespace gstlrn
 class GSTLEARN_EXPORT BiTargetCheckGeometry: public ABiTargetCheck
 {
 public:
-  BiTargetCheckGeometry(int ndim,
+  BiTargetCheckGeometry(Id ndim,
                         const VectorDouble &codir = VectorDouble(),
                         double tolang = 90.,
                         double bench = 0.,
@@ -37,7 +37,7 @@ public:
   /// Interface to AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static BiTargetCheckGeometry* create(int ndim,
+  static BiTargetCheckGeometry* create(Id ndim,
                                        const VectorDouble &codir = VectorDouble(),
                                        double tolang = 90.,
                                        double bench = 0.,
@@ -47,7 +47,7 @@ public:
   double getDist() const { return _dist; }
 
 private:
-  int _ndim;
+  Id _ndim;
   VectorDouble _codir;
   double _tolAng;
   double _bench;

@@ -36,7 +36,7 @@ bool CalcSimuPostPropByLayer::_check()
   // This version has some restrictions:
   // - It has been coded for a space dimension of output Grid limited to 3
 
-  int ndim_out = getDbout()->getNDim();
+  Id ndim_out = getDbout()->getNDim();
   if (ndim_out > 3)
   {
     messerr("The current version has been coded for a Space Dimension of 'dbout' (%d) limited to 3",
@@ -57,7 +57,7 @@ bool CalcSimuPostPropByLayer::_check()
  * This number is one more than the number of input simulated variables
  * @return Number of output variables
  */
-int CalcSimuPostPropByLayer::_getTransfoNvar() const
+Id CalcSimuPostPropByLayer::_getTransfoNvar() const
 {
   return _getNVar() + 1;
 }
@@ -72,9 +72,9 @@ int CalcSimuPostPropByLayer::_getTransfoNvar() const
  */
 void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, VectorDouble& Y_p_k_s) const
 {
-  int nlayer = (int) Z_n_k_s.size();
-  int ndim_out = getDbout()->getNDim();
-  int iechout = _getIechout();
+  Id nlayer = (Id) Z_n_k_s.size();
+  Id ndim_out = getDbout()->getNDim();
+  auto iechout = _getIechout();
 
   double z_ref  = _dbgrid->getCoordinate(iechout, ndim_out-1);
   double h_max  = _dbgrid->getDX(ndim_out - 1);
@@ -84,7 +84,7 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
   /* initial implementation
   double previous = 0.;
   double cote = 0.;
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     cote += Z_n_k_s[ilayer];
     Y_p_k_s[ilayer] = MIN(MAX(cote - z_base, 0.), h_max) - previous;
@@ -104,7 +104,7 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
     } else {
         Y_p_k_s[0] = MIN(MAX(cote - z_base, 0.), h_max);
     }
-    for (int ilayer = 1; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 1; ilayer < nlayer; ilayer++)
     {
     	if(_flagTopToBase){
     	      cote -= Z_n_k_s[ilayer];
@@ -117,13 +117,13 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
      Y_p_k_s[nlayer] = h_max;
 
     // compute the layer thickness
-     for (int ilayer = nlayer; ilayer > 0; ilayer--)
+     for (Id ilayer = nlayer; ilayer > 0; ilayer--)
     {
       Y_p_k_s[ilayer] -= Y_p_k_s[ilayer-1];
     }
 
   // Normalize by the extension of the cell
-  for (int ilayer = 0; ilayer <= nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer <= nlayer; ilayer++)
     Y_p_k_s[ilayer] /= h_max;
 
 
@@ -147,7 +147,7 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
 
   // from bottom to top
   double cote = Z_n_k_s[0];
-  for (int ilayer = 1; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 1; ilayer < nlayer; ilayer++)
   {
 	  if(_flagTopToBase) { // from Top to Base
 		    cote -= Z_n_k_s[ilayer];
@@ -161,13 +161,13 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
   Y_p_k_s[nlayer] = h_max;
 
   // from top to bottom
-  for (int ilayer = nlayer; ilayer > 0; ilayer--)
+  for (Id ilayer = nlayer; ilayer > 0; ilayer--)
     {
       Y_p_k_s[ilayer] -= Y_p_k_s[ilayer-1];
     }
 
   // Normalize by the extension of the cell
-  for (int ilayer = 0; ilayer <= nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer <= nlayer; ilayer++)
     Y_p_k_s[ilayer] /= h_max;
     */
 }
@@ -191,7 +191,7 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
  * For a detailed list of arguments, see \link CalcSimuPost.cpp simuPost \endlink
  */
 
-int simuPostPropByLayer(Db* dbin,
+Id simuPostPropByLayer(Db* dbin,
                         DbGrid* dbout,
                         const VectorString& names,
                         bool flag_match,
@@ -200,7 +200,7 @@ int simuPostPropByLayer(Db* dbin,
                         const std::vector<EPostStat>& stats,
                         bool verbose,
                         const VectorInt& check_targets,
-                        int check_level,
+                        Id check_level,
                         const NamingConvention& namconv)
 {
   CalcSimuPostPropByLayer calcul;
@@ -221,7 +221,7 @@ int simuPostPropByLayer(Db* dbin,
   calcul.setNamingConvention(namconv);
   calcul.setMustShareSpaceDimension(false);
 
-  int error = (calcul.run()) ? 0 : 1;
+  Id error = (calcul.run()) ? 0 : 1;
   return error;
 }
 }

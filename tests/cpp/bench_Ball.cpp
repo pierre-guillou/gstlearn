@@ -44,18 +44,18 @@ int main(int argc, char* argv[])
 
   // Global parameters
   bool verbose = false;
-  int ndim     = 2;
-  int mode     = 0;
+  Id ndim      = 2;
+  Id mode      = 0;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Constructing the Data Set
-  int nech = 100;
+  Id nech  = 100;
   Db* data = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
                                   VectorDouble(), VectorDouble(),
                                   VectorDouble(), 131343);
   if (verbose) data->display();
 
-  int nb_neigh = 5;
+  Id nb_neigh = 5;
   VectorInt neighs;
   VectorDouble distances;
 
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
     mestitle(1, "Various ways of inquiring the Ball Tree");
 
     // - for the closest sample
-    int ineigh = ball.queryClosest(target);
+    Id ineigh = ball.queryClosest(target);
     message("The closest sample to the Target is : %d\n", ineigh);
 
     // - for a set of neighboring samples
@@ -108,9 +108,9 @@ int main(int argc, char* argv[])
     SpacePoint pt2;
     // VectorInt ranks = law_random_path(nech);
     VectorInt ranks = VH::sequence(nech);
-    for (int jech = 0; jech < nech; jech++)
+    for (Id jech = 0; jech < nech; jech++)
     {
-      int iech = ranks[jech];
+      Id iech = ranks[jech];
       data->getSampleAsSPInPlace(pt2, iech);
       ball.setConstraint(iech, true);
       (void)ball.queryOneInPlace(pt2.getCoordUnprotected(), nb_neigh, neighs, distances);
@@ -130,14 +130,15 @@ int main(int argc, char* argv[])
     Db* aux          = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
                                             VectorDouble(), VectorDouble(),
                                             VectorDouble(), 24813);
-    MatrixT<int> mat = findNN(data, aux, nb_neigh, flagShuffle);
-    int nrows        = (int)mat.getNRows();
-    int ncols        = (int)mat.getNCols();
-    for (int irow = 0; irow < nrows; irow++)
+
+    auto mat         = findNN(data, aux, nb_neigh, flagShuffle);
+    auto nrows       = (Id)mat.getNRows();
+    auto ncols       = (Id)mat.getNCols();
+    for (Id irow = 0; irow < nrows; irow++)
     {
-      for (int icol = 0; icol < ncols; icol++)
+      for (Id icol = 0; icol < ncols; icol++)
       {
-        int value = mat(irow, icol);
+        Id value = mat(irow, icol);
         if (IFFFF(value))
           message("   NA");
         else
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
     mestitle(1, "Various ways of inquiring the Ball Tree");
 
     // - for the closest sample
-    int ineigh = ball.queryClosest(target);
+    Id ineigh = ball.queryClosest(target);
     message("The closest sample to the Target is : %d\n", ineigh);
 
     // - for a set of neighboring samples

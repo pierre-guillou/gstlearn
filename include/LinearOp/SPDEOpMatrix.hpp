@@ -31,15 +31,15 @@ public:
                const ProjMultiMatrix* projOut    = nullptr);
   virtual ~SPDEOpMatrix();
 
-  double computeLogDetOp(int nbsimu) const override;
+  double computeLogDetOp(Id nbsimu) const override;
 
-  VectorDouble stdev(const VectorDouble& dat, int nMC, int seed) const override;
+  VectorDouble stdev(const VectorDouble& dat, Id nMC, Id seed) const override;
 
 #ifndef SWIG
 
 private:
-  int _addToDest(const constvect inv, vect outv) const override;
-  int _solve(const constvect inv, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
+  Id _solve(const constvect inv, vect outv) const override;
 #endif
 
 private:

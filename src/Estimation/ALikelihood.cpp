@@ -60,20 +60,20 @@ ALikelihood::~ALikelihood()
 
 void ALikelihood::init(bool verbose)
 {
-  int nvar = _db->getNLoc(ELoc::Z);
+  Id nvar = _db->getNLoc(ELoc::Z);
   if (nvar < 1)
   {
     messerr("The 'db' should have at least one variable defined");
   }
 
   // Establish the vector of multivariate data
-  int nDrift = _model->getNDriftEquation();
+  Id nDrift = _model->getNDriftEquation();
   if (nDrift > 0)
     _Y = _db->getColumnsByLocator(ELoc::Z, true, true);
   else
     _Y = _db->getColumnsByLocator(ELoc::Z, true, true, _model->getMeans());
 
-  int size = (int)_Y.size();
+  Id size = (Id)_Y.size();
   if (verbose)
   {
     message("Likelihood calculation:\n");
@@ -148,7 +148,7 @@ double ALikelihood::computeLogLikelihood(bool verbose)
   double quad = VH::innerProduct(_Y, _Cm1Y);
 
   // Derive the log-likelihood
-  int size       = (int)_Y.size();
+  Id size       = (Id)_Y.size();
   double loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
   if (_reml && _model->getNDriftEquation() > 0)
   {

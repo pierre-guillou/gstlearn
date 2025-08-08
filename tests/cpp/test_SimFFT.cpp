@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_SimFFT-");
 
   // Global parameters
-  int ndim   = 2;
-  int seed   = 3322;
-  int nxcell = 100;
+  Id ndim   = 2;
+  Id seed   = 3322;
+  Id nxcell = 100;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Generate the output grid

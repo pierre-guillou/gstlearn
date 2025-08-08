@@ -37,7 +37,7 @@ DISABLE_WARNING_POP
 namespace gstlrn
 {
 
-MatrixSparse::MatrixSparse(int nrow, int ncol, int ncolmax)
+MatrixSparse::MatrixSparse(Id nrow, Id ncol, Id ncolmax)
   : AMatrix(nrow, ncol)
   , _eigenMatrix()
   , _nColMax(ncolmax)
@@ -71,7 +71,7 @@ MatrixSparse::~MatrixSparse()
   _deallocate();
 }
 
-void MatrixSparse::resetFromValue(int nrows, int ncols, double value)
+void MatrixSparse::resetFromValue(Id nrows, Id ncols, double value)
 {
   DECLARE_UNUSED(nrows);
   DECLARE_UNUSED(ncols);
@@ -79,7 +79,7 @@ void MatrixSparse::resetFromValue(int nrows, int ncols, double value)
   _forbiddenForSparse("resetFromValue");
 }
 
-void MatrixSparse::resetFromArray(int nrows, int ncols, const double* tab, bool byCol)
+void MatrixSparse::resetFromArray(Id nrows, Id ncols, const double* tab, bool byCol)
 {
   DECLARE_UNUSED(nrows);
   DECLARE_UNUSED(ncols);
@@ -88,7 +88,7 @@ void MatrixSparse::resetFromArray(int nrows, int ncols, const double* tab, bool 
   _forbiddenForSparse("resetFromArray");
 }
 
-void MatrixSparse::resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol)
+void MatrixSparse::resetFromVD(Id nrows, Id ncols, const VectorDouble& tab, bool byCol)
 {
   DECLARE_UNUSED(nrows);
   DECLARE_UNUSED(ncols);
@@ -111,15 +111,15 @@ void MatrixSparse::resetFromTriplet(const NF_Triplet& NF_T)
   _setNCols(eigenMat().cols());
 }
 
-void MatrixSparse::fillRandom(int seed, double zeroPercent)
+void MatrixSparse::fillRandom(Id seed, double zeroPercent)
 {
   law_set_random_seed(seed);
 
-  int nrow = getNRows();
-  int ncol = getNCols();
+  auto nrow = getNRows();
+  auto ncol = getNCols();
   NF_Triplet NF_T;
-  for (int irow = 0; irow < nrow; irow++)
-    for (int icol = 0; icol < ncol; icol++)
+  for (Id irow = 0; irow < nrow; irow++)
+    for (Id icol = 0; icol < ncol; icol++)
     {
       if (law_uniform(0., 1.) < zeroPercent) continue;
       NF_T.add(irow, icol, law_gaussian());
@@ -148,26 +148,26 @@ MatrixSparse* MatrixSparse::transpose() const
  * @param icol Column rank
  * @param tab  Vector containing the information (Dimension: nrows)
  */
-void MatrixSparse::setColumn(int icol, const VectorDouble& tab)
+void MatrixSparse::setColumn(Id icol, const VectorDouble& tab)
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
   if (getFlagMatrixCheck())
   {
     if (!_isColumnValid(icol)) return;
     if (!_isColumnSizeConsistent(tab)) return;
   }
-  for (int irow = 0; irow < nrows; irow++)
+  for (Id irow = 0; irow < nrows; irow++)
     eigenMat().coeffRef(irow, icol) = tab[irow];
 }
 
-void MatrixSparse::setColumnToConstant(int icol, double value)
+void MatrixSparse::setColumnToConstant(Id icol, double value)
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
   if (getFlagMatrixCheck())
   {
     if (!_isColumnValid(icol)) return;
   }
-  for (int irow = 0; irow < nrows; irow++)
+  for (Id irow = 0; irow < nrows; irow++)
     eigenMat().coeffRef(irow, icol) = value;
 }
 
@@ -179,26 +179,26 @@ void MatrixSparse::setColumnToConstant(int icol, double value)
  *
  * @warning: This method only copies the values at the non-zero existing entries
  */
-void MatrixSparse::setRow(int irow, const VectorDouble& tab)
+void MatrixSparse::setRow(Id irow, const VectorDouble& tab)
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   if (getFlagMatrixCheck())
   {
     if (!_isRowValid(irow)) return;
     if (!_isRowSizeConsistent(tab)) return;
   }
-  for (int icol = 0; icol < ncols; icol++)
+  for (Id icol = 0; icol < ncols; icol++)
     eigenMat().coeffRef(irow, icol) = tab[icol];
 }
 
-void MatrixSparse::setRowToConstant(int irow, double value)
+void MatrixSparse::setRowToConstant(Id irow, double value)
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   if (getFlagMatrixCheck())
   {
     if (!_isRowValid(irow)) return;
   }
-  for (int icol = 0; icol < ncols; icol++)
+  for (Id icol = 0; icol < ncols; icol++)
     eigenMat().coeffRef(irow, icol) = value;
 }
 
@@ -224,14 +224,14 @@ void MatrixSparse::setDiagonalToConstant(double value)
 }
 
 /*! Gets the value for rank 'rank' */
-double MatrixSparse::_getValueByRank(int rank) const
+double MatrixSparse::_getValueByRank(Id rank) const
 {
   DECLARE_UNUSED(rank);
   _forbiddenForSparse("_getValueByRank");
   return TEST;
 }
 
-double& MatrixSparse::_getValueRef(int irow, int icol)
+double& MatrixSparse::_getValueRef(Id irow, Id icol)
 {
   DECLARE_UNUSED(irow);
   DECLARE_UNUSED(icol);
@@ -239,21 +239,21 @@ double& MatrixSparse::_getValueRef(int irow, int icol)
   return _eigenMatrix.coeffRef(irow, icol);
 }
 
-void MatrixSparse::_setValueByRank(int rank, double value)
+void MatrixSparse::_setValueByRank(Id rank, double value)
 {
   DECLARE_UNUSED(rank);
   DECLARE_UNUSED(value);
   _forbiddenForSparse("_setValueByRank");
 }
 
-void MatrixSparse::setValue(int irow, int icol, double value)
+void MatrixSparse::setValue(Id irow, Id icol, double value)
 {
   if (getFlagMatrixCheck() && !_isIndexValid(irow, icol)) return;
   eigenMat().coeffRef(irow, icol) = value;
 }
 
-void MatrixSparse::updValue(int irow,
-                            int icol,
+void MatrixSparse::updValue(Id irow,
+                            Id icol,
                             const EOperator& oper,
                             double value)
 {
@@ -262,7 +262,7 @@ void MatrixSparse::updValue(int irow,
   eigenMat().coeffRef(irow, icol) = newval;
 }
 
-int MatrixSparse::_getMatrixPhysicalSize() const
+Id MatrixSparse::_getMatrixPhysicalSize() const
 {
   return eigenMat().nonZeros();
 }
@@ -272,11 +272,11 @@ int MatrixSparse::_getMatrixPhysicalSize() const
  */
 void MatrixSparse::fill(double value)
 {
-  int nrow = getNRows();
-  int ncol = getNCols();
+  auto nrow = getNRows();
+  auto ncol = getNCols();
   NF_Triplet NF_T;
-  for (int irow = 0; irow < nrow; irow++)
-    for (int icol = 0; icol < ncol; icol++)
+  for (Id irow = 0; irow < nrow; irow++)
+    for (Id icol = 0; icol < ncol; icol++)
       NF_T.add(irow, icol, value);
 
   resetFromTriplet(NF_T);
@@ -285,12 +285,12 @@ void MatrixSparse::fill(double value)
 /*! Multiply a Matrix row-wise */
 void MatrixSparse::multiplyRow(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNRows() != (int)vec.size())
+  if (getFlagMatrixCheck() && getNRows() != (Id)vec.size())
   {
     messerr("The size of 'vec' must match the number of rows. Nothing is done");
     return;
   }
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() *= vec[it.row()];
 }
@@ -298,12 +298,12 @@ void MatrixSparse::multiplyRow(const VectorDouble& vec)
 /*! Multiply a Matrix column-wise */
 void MatrixSparse::multiplyColumn(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNCols() != (int)vec.size())
+  if (getFlagMatrixCheck() && getNCols() != (Id)vec.size())
   {
     messerr("The size of 'vec' must match the number of columns. Nothing is done");
     return;
   }
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() *= vec[it.col()];
 }
@@ -311,12 +311,12 @@ void MatrixSparse::multiplyColumn(const VectorDouble& vec)
 /*! Divide a Matrix row-wise */
 void MatrixSparse::divideRow(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNRows() != (int)vec.size())
+  if (getFlagMatrixCheck() && getNRows() != (Id)vec.size())
   {
     messerr("The size of 'vec' must match the number of rows. Nothing is done");
     return;
   }
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() /= vec[it.row()];
 }
@@ -324,12 +324,12 @@ void MatrixSparse::divideRow(const VectorDouble& vec)
 /*! Divide a Matrix column-wise */
 void MatrixSparse::divideColumn(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNCols() != (int)vec.size())
+  if (getFlagMatrixCheck() && getNCols() != (Id)vec.size())
   {
     messerr("The size of 'vec' must match the number of columns. Nothing is done");
     return;
   }
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() /= vec[it.col()];
 }
@@ -364,15 +364,15 @@ MatrixSparse* MatrixSparse::create(const MatrixSparse* mat)
   return new MatrixSparse(*mat);
 }
 
-MatrixSparse* MatrixSparse::create(int nrow, int ncol)
+MatrixSparse* MatrixSparse::create(Id nrow, Id ncol)
 {
   return new MatrixSparse(nrow, ncol);
 }
 
 MatrixSparse* MatrixSparse::createFromTriplet(const NF_Triplet& NF_T,
-                                              int nrow,
-                                              int ncol,
-                                              int nrowmax)
+                                              Id nrow,
+                                              Id ncol,
+                                              Id nrowmax)
 {
   // If 'nrow' a  nd 'ncol' are not defined, derive them from NF_T
   if (nrow <= 0 || ncol <= 0)
@@ -386,10 +386,10 @@ MatrixSparse* MatrixSparse::createFromTriplet(const NF_Triplet& NF_T,
   return mat;
 }
 
-MatrixSparse* MatrixSparse::Identity(int nrow, double value)
+MatrixSparse* MatrixSparse::Identity(Id nrow, double value)
 {
   auto* mat = new MatrixSparse(nrow, nrow);
-  for (int i = 0; i < nrow; i++)
+  for (Id i = 0; i < nrow; i++)
   {
     mat->eigenMat().coeffRef(i, i) += value;
   }
@@ -408,14 +408,14 @@ MatrixSparse* MatrixSparse::addMatMat(const MatrixSparse* x,
 
 MatrixSparse* MatrixSparse::diagVec(const VectorDouble& vec)
 {
-  int size  = (int)vec.size();
+  Id size  = (Id)vec.size();
   auto* mat = new MatrixSparse(size, size);
 
   mat->setDiagonal(vec);
   return mat;
 }
 
-MatrixSparse* MatrixSparse::diagConstant(int number, double value)
+MatrixSparse* MatrixSparse::diagConstant(Id number, double value)
 {
   auto* mat = new MatrixSparse(number, number);
   mat->setDiagonalToConstant(value);
@@ -428,7 +428,7 @@ MatrixSparse* MatrixSparse::diagConstant(int number, double value)
  * @param oper_choice: Operation on the diagonal term (see Utilities::operate_XXX)
  * @return
  */
-MatrixSparse* MatrixSparse::diagMat(MatrixSparse* A, int oper_choice)
+MatrixSparse* MatrixSparse::diagMat(MatrixSparse* A, Id oper_choice)
 {
   if (!A->isSquare())
   {
@@ -441,7 +441,7 @@ MatrixSparse* MatrixSparse::diagMat(MatrixSparse* A, int oper_choice)
   return MatrixSparse::diagVec(diag);
 }
 
-bool MatrixSparse::_isElementPresent(int irow, int icol) const
+bool MatrixSparse::_isElementPresent(Id irow, Id icol) const
 {
   for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), icol); it; ++it)
   {
@@ -450,13 +450,13 @@ bool MatrixSparse::_isElementPresent(int irow, int icol) const
   return false;
 }
 
-void MatrixSparse::addValue(int row, int col, double value)
+void MatrixSparse::addValue(Id row, Id col, double value)
 {
   if (ABS(value) <= EPSILON10) return;
   eigenMat().coeffRef(row, col) += value;
 }
 
-double MatrixSparse::getValue(int row, int col) const
+double MatrixSparse::getValue(Id row, Id col) const
 {
   if (getFlagMatrixCheck() && !_isIndexValid(row, col)) return TEST;
   return eigenMat().coeff(row, col);
@@ -467,7 +467,7 @@ double MatrixSparse::L1Norm() const
   return (Eigen::RowVectorXd::Ones(eigenMat().rows()) * eigenMat().cwiseAbs()).maxCoeff();
 }
 
-void MatrixSparse::getStats(int* nrows, int* ncols, int* count, double* percent) const
+void MatrixSparse::getStats(Id* nrows, Id* ncols, Id* count, double* percent) const
 {
   *nrows   = getNRows();
   *ncols   = getNCols();
@@ -477,7 +477,7 @@ void MatrixSparse::getStats(int* nrows, int* ncols, int* count, double* percent)
     (*percent) = ((100. * (double)(*count)) / ((double)(*nrows) * (double)(*ncols)));
 }
 
-VectorDouble MatrixSparse::extractDiag(int oper_choice) const
+VectorDouble MatrixSparse::extractDiag(Id oper_choice) const
 {
   VectorDouble diag(std::min(getNCols(), getNRows()));
   Eigen::Map<Eigen::VectorXd> ym(diag.data(), diag.size());
@@ -486,14 +486,14 @@ VectorDouble MatrixSparse::extractDiag(int oper_choice) const
   return diag;
 }
 
-int MatrixSparse::addVecInPlaceEigen(const Eigen::Map<const Eigen::VectorXd>& xm,
+Id MatrixSparse::addVecInPlaceEigen(const Eigen::Map<const Eigen::VectorXd>& xm,
                                      Eigen::Map<Eigen::VectorXd>& ym) const
 {
   ym = eigenMat() * xm + ym;
   return 0;
 }
 
-int MatrixSparse::addVecInPlace(const constvect xm, vect ym) const
+Id MatrixSparse::addVecInPlace(const constvect xm, vect ym) const
 {
   Eigen::Map<const Eigen::VectorXd> xmm(xm.data(), xm.size());
   Eigen::Map<Eigen::VectorXd> ymm(ym.data(), ym.size());
@@ -501,7 +501,7 @@ int MatrixSparse::addVecInPlace(const constvect xm, vect ym) const
   return 0;
 }
 
-int MatrixSparse::addVecInPlaceVD(const VectorDouble& x, VectorDouble& y) const
+Id MatrixSparse::addVecInPlaceVD(const VectorDouble& x, VectorDouble& y) const
 {
   Eigen::Map<const Eigen::VectorXd> xm(x.data(), x.size());
   Eigen::Map<Eigen::VectorXd> ym(y.data(), y.size());
@@ -511,12 +511,12 @@ int MatrixSparse::addVecInPlaceVD(const VectorDouble& x, VectorDouble& y) const
 
 void MatrixSparse::setConstant(double value)
 {
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() = value;
 }
 
-int MatrixSparse::scaleByDiag()
+Id MatrixSparse::scaleByDiag()
 {
   VectorDouble diag = extractDiag(-1);
   Eigen::Map<const Eigen::VectorXd> ym(diag.data(), diag.size());
@@ -531,7 +531,7 @@ int MatrixSparse::scaleByDiag()
 void MatrixSparse::addScalar(double v)
 {
   if (isZero(v)) return;
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() += v;
 }
@@ -544,7 +544,7 @@ void MatrixSparse::addScalarDiag(double v)
 {
   if (isZero(v)) return;
 
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
     {
       if (it.col() == it.row())
@@ -559,7 +559,7 @@ void MatrixSparse::addScalarDiag(double v)
 void MatrixSparse::prodScalar(double v)
 {
   if (isOne(v)) return;
-  for (int k = 0; k < eigenMat().outerSize(); ++k)
+  for (Id k = 0; k < eigenMat().outerSize(); ++k)
     for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), k); it; ++it)
       it.valueRef() *= v;
 }
@@ -642,8 +642,8 @@ MatrixSparse* prodNormMatMat(const MatrixSparse* a,
                              const MatrixSparse* m,
                              bool transpose)
 {
-  int nrow  = (transpose) ? a->getNCols() : a->getNRows();
-  int ncol  = (transpose) ? a->getNRows() : a->getNCols();
+  Id nrow  = (transpose) ? a->getNCols() : a->getNRows();
+  Id ncol  = (transpose) ? a->getNRows() : a->getNCols();
   auto* mat = new MatrixSparse(nrow, ncol);
   mat->prodNormMatMatInPlace(a, m, transpose);
   return mat;
@@ -651,7 +651,7 @@ MatrixSparse* prodNormMatMat(const MatrixSparse* a,
 
 MatrixSparse* prodNormMatVec(const MatrixSparse* a, const VectorDouble& vec, bool transpose)
 {
-  int nsym  = (transpose) ? a->getNCols() : a->getNRows();
+  Id nsym  = (transpose) ? a->getNCols() : a->getNRows();
   auto* mat = new MatrixSparse(nsym, nsym);
   mat->prodNormMatVecInPlace(a, vec, transpose);
   return mat;
@@ -659,7 +659,7 @@ MatrixSparse* prodNormMatVec(const MatrixSparse* a, const VectorDouble& vec, boo
 
 MatrixSparse* prodNormMat(const MatrixSparse* a, bool transpose)
 {
-  int nsym  = (transpose) ? a->getNCols() : a->getNRows();
+  Id nsym  = (transpose) ? a->getNCols() : a->getNRows();
   auto* mat = new MatrixSparse(nsym, nsym);
   mat->prodNormMatInPlace(a, transpose);
   return mat;
@@ -667,10 +667,10 @@ MatrixSparse* prodNormMat(const MatrixSparse* a, bool transpose)
 
 MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
                               const VectorDouble& vec,
-                              int oper_choice)
+                              Id oper_choice)
 {
-  int nrow  = a->getNRows();
-  int ncol  = a->getNCols();
+  Id nrow  = a->getNRows();
+  Id ncol  = a->getNCols();
   auto* mat = new MatrixSparse(nrow, ncol, -1);
 
   // Perform the transformation of the input vector
@@ -688,17 +688,17 @@ MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
  * @param vec  Input Vector
  * @param oper_choice Type of transformation
  */
-void MatrixSparse::prodNormDiagVecInPlace(const VectorDouble& vec, int oper_choice)
+void MatrixSparse::prodNormDiagVecInPlace(const VectorDouble& vec, Id oper_choice)
 {
   if (!isSquare())
   {
     messerr("This method is limited to square matrices");
     return;
   }
-  if (getNRows() != (int)vec.size())
+  if (getNRows() != (Id)vec.size())
   {
     messerr("Matrix dimension (%d) does not match vector dimension (%d)",
-            getNRows(), (int)vec.size());
+            getNRows(), (Id)vec.size());
     return;
   }
 
@@ -848,11 +848,11 @@ void MatrixSparse::addMat(const AMatrix& y, double cx, double cy)
   }
 }
 
-int MatrixSparse::_invert()
+Id MatrixSparse::_invert()
 {
   if (!isSquare())
     my_throw("Invert method is restricted to Square matrices");
-  int n = getNCols();
+  auto n = getNCols();
   Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;
   solver.compute(eigenMat());
   Eigen::SparseMatrix<double> I(n, n);
@@ -862,11 +862,11 @@ int MatrixSparse::_invert()
   return 0;
 }
 
-int MatrixSparse::_solve(const VectorDouble& b, VectorDouble& x) const
+Id MatrixSparse::_solve(const VectorDouble& b, VectorDouble& x) const
 {
   if (!isSquare())
     my_throw("Invert method is limited to Square Matrices");
-  if ((int)b.size() != getNRows() || (int)x.size() != getNRows())
+  if ((Id)b.size() != getNRows() || (Id)x.size() != getNRows())
     my_throw("b' and 'x' should have the same dimension as the Matrix");
 
   Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;
@@ -884,7 +884,7 @@ String MatrixSparse::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-void MatrixSparse::_allocate(int nrow, int ncol, int ncolmax)
+void MatrixSparse::_allocate(Id nrow, Id ncol, Id ncolmax)
 {
   eigenMat() = Eigen::SparseMatrix<double>(nrow, ncol);
   _setNCols(ncol);
@@ -892,7 +892,7 @@ void MatrixSparse::_allocate(int nrow, int ncol, int ncolmax)
 
   if (ncolmax > 0)
   {
-    eigenMat().reserve(Eigen::VectorXi::Constant(nrow, ncolmax));
+    eigenMat().reserve(Eigen::VectorXi::Constant(nrow, static_cast<int>(ncolmax)));
   }
   _nColMax = ncolmax;
 }
@@ -911,7 +911,7 @@ void MatrixSparse::_allocate()
 
     if (_nColMax > 0)
     {
-      eigenMat().reserve(Eigen::VectorXi::Constant(getNCols(), _nColMax));
+      eigenMat().reserve(Eigen::VectorXi::Constant(getNCols(), static_cast<int>(_nColMax)));
     }
     if (isMultiThread()) omp_set_num_threads(getMultiThread());
   }
@@ -931,7 +931,7 @@ void MatrixSparse::_forbiddenForSparse(const String& func)
   messerr("This function is not available in Sparse Matrix");
 }
 
-void MatrixSparse::dumpElements(const String& title, int ifrom, int ito)
+void MatrixSparse::dumpElements(const String& title, Id ifrom, Id ito)
 {
   DECLARE_UNUSED(title);
   DECLARE_UNUSED(ifrom);
@@ -944,7 +944,7 @@ void MatrixSparse::dumpElements(const String& title, int ifrom, int ito)
  * (specific format for creating efficiently a Sparse matrix)
  * It only takes the only non-zero elements of the matrix
  */
-NF_Triplet MatrixSparse::getMatrixToTriplet(int shiftRow, int shiftCol) const
+NF_Triplet MatrixSparse::getMatrixToTriplet(Id shiftRow, Id shiftCol) const
 {
   return NF_Triplet::createFromEigen(eigenMat(), shiftRow, shiftCol);
 }
@@ -956,7 +956,7 @@ void MatrixSparse::_clear()
   _allocate();
 }
 
-int MatrixSparse::_getIndexToRank(int irow, int icol) const
+Id MatrixSparse::_getIndexToRank(Id irow, Id icol) const
 {
   DECLARE_UNUSED(irow);
   DECLARE_UNUSED(icol);
@@ -972,8 +972,8 @@ MatrixSparse* createFromAnyMatrix(const AMatrix* matin)
                                          -1);
 }
 
-int MatrixSparse::_eigen_findColor(int imesh,
-                                   int ncolor,
+Id MatrixSparse::_eigen_findColor(Id imesh,
+                                   Id ncolor,
                                    VectorInt& colors,
                                    VectorInt& temp) const
 {
@@ -984,13 +984,13 @@ int MatrixSparse::_eigen_findColor(int imesh,
   for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), imesh); it; ++it)
   {
     if (isZero(it.value())) continue;
-    int irow = it.row();
+    Id irow = it.row();
     if (!IFFFF(colors[irow])) temp[colors[irow] - 1]++;
   }
 
   /* Look for a free color */
 
-  for (int j = 0; j < ncolor; j++)
+  for (Id j = 0; j < ncolor; j++)
   {
     if (temp[j] == 0) return (j + 1);
   }
@@ -999,9 +999,9 @@ int MatrixSparse::_eigen_findColor(int imesh,
 
 VectorInt MatrixSparse::colorCoding() const
 {
-  int next_col = 0;
-  int ncol     = 0;
-  int nmesh    = getNCols();
+  Id next_col = 0;
+  Id ncol     = 0;
+  auto nmesh   = getNCols();
 
   /* Core allocation */
 
@@ -1010,7 +1010,7 @@ VectorInt MatrixSparse::colorCoding() const
 
   /* Loop on the nodes of the mesh */
 
-  for (int imesh = 0; imesh < nmesh; imesh++)
+  for (Id imesh = 0; imesh < nmesh; imesh++)
   {
     next_col = _eigen_findColor(imesh, ncol, colors, temp);
     next_col = _eigen_findColor(imesh, ncol, colors, temp);
@@ -1033,8 +1033,8 @@ void MatrixSparse::glueInPlace(MatrixSparse* A1,
                                bool flagShiftRow,
                                bool flagShiftCol)
 {
-  int shiftRow  = (flagShiftRow) ? A1->getNRows() : 0;
-  int shiftCol  = (flagShiftCol) ? A1->getNCols() : 0;
+  Id shiftRow  = (flagShiftRow) ? A1->getNRows() : 0;
+  Id shiftCol  = (flagShiftCol) ? A1->getNCols() : 0;
   NF_Triplet T1 = A1->getMatrixToTriplet();
   NF_Triplet T2 = A2->getMatrixToTriplet(shiftRow, shiftCol);
 
@@ -1042,8 +1042,8 @@ void MatrixSparse::glueInPlace(MatrixSparse* A1,
   T1.appendInPlace(T2);
 
   // Create the new matrix from the resulting triplet list
-  int nrow = (flagShiftRow) ? A1->getNRows() + A2->getNRows() : MAX(A1->getNRows(), A2->getNRows());
-  int ncol = (flagShiftCol) ? A1->getNCols() + A2->getNCols() : MAX(A1->getNCols(), A2->getNCols());
+  Id nrow = (flagShiftRow) ? A1->getNRows() + A2->getNRows() : MAX(A1->getNRows(), A2->getNRows());
+  Id ncol = (flagShiftCol) ? A1->getNCols() + A2->getNCols() : MAX(A1->getNCols(), A2->getNCols());
 
   A1->resetFromTriplet(T1);
   A1->_setNRows(nrow);
@@ -1055,8 +1055,8 @@ MatrixSparse* MatrixSparse::glue(const MatrixSparse* A1,
                                  bool flagShiftRow,
                                  bool flagShiftCol)
 {
-  int shiftRow = (flagShiftRow) ? A1->getNRows() : 0;
-  int shiftCol = (flagShiftCol) ? A1->getNCols() : 0;
+  Id shiftRow = (flagShiftRow) ? A1->getNRows() : 0;
+  Id shiftCol = (flagShiftCol) ? A1->getNCols() : 0;
 
   // Create the two triplet lists
   NF_Triplet T1 = A1->getMatrixToTriplet();
@@ -1066,8 +1066,8 @@ MatrixSparse* MatrixSparse::glue(const MatrixSparse* A1,
   T1.appendInPlace(T2);
 
   // Create the new matrix from the resulting triplet list
-  int nrow = (flagShiftRow) ? A1->getNRows() + A2->getNRows() : MAX(A1->getNRows(), A2->getNRows());
-  int ncol = (flagShiftCol) ? A1->getNCols() + A2->getNCols() : MAX(A1->getNCols(), A2->getNCols());
+  Id nrow = (flagShiftRow) ? A1->getNRows() + A2->getNRows() : MAX(A1->getNRows(), A2->getNRows());
+  Id ncol = (flagShiftCol) ? A1->getNCols() + A2->getNCols() : MAX(A1->getNCols(), A2->getNCols());
 
   return MatrixSparse::createFromTriplet(T1, nrow, ncol, -1);
 }
@@ -1079,14 +1079,14 @@ MatrixSparse* MatrixSparse::glue(const MatrixSparse* A1,
 MatrixSparse* MatrixSparse::extractSubmatrixByRanks(const VectorInt& rank_rows,
                                                     const VectorInt& rank_cols) const
 {
-  int old_row, old_col, new_row, new_col;
+  Id old_row, old_col, new_row, new_col;
 
   NF_Triplet NF_Tin = getMatrixToTriplet();
   NF_Triplet NF_Tout;
 
   /* Fill the new sparse triplet */
 
-  for (int i = 0; i < NF_Tin.getNElements(); i++)
+  for (Id i = 0; i < NF_Tin.getNElements(); i++)
   {
     old_row = NF_Tin.getRow(i);
     old_col = NF_Tin.getCol(i);
@@ -1108,7 +1108,7 @@ MatrixSparse* MatrixSparse::extractSubmatrixByRanks(const VectorInt& rank_rows,
 /* - the color of its column number is equal to 'ref-color' if 'col_ok'==TRUE*/
 /*   or different if 'col_ok'== FALSE */
 MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
-                                                    int ref_color,
+                                                    Id ref_color,
                                                     bool row_ok,
                                                     bool col_ok)
 {
@@ -1122,12 +1122,12 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
 
   /* Core allocation */
 
-  int n = getNCols();
+  auto n = getNCols();
   VectorInt u_row(n);
   VectorInt u_col(n);
 
-  int ir = 0;
-  for (int i = 0; i < n; i++)
+  Id ir = 0;
+  for (Id i = 0; i < n; i++)
   {
     u_row[i] = -1;
     if (row_ok && colors[i] != ref_color) continue;
@@ -1135,8 +1135,8 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
     u_row[i] = ir++;
   }
 
-  int ic = 0;
-  for (int i = 0; i < n; i++)
+  Id ic = 0;
+  for (Id i = 0; i < n; i++)
   {
     u_col[i] = -1;
     if (col_ok && colors[i] != ref_color) continue;
@@ -1146,7 +1146,7 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
 
   /* Fill the new sparse triplet */
 
-  for (int i = 0; i < NF_Tin.getNElements(); i++)
+  for (Id i = 0; i < NF_Tin.getNElements(); i++)
   {
     ir = u_row[NF_Tin.getRow(i)];
     ic = u_col[NF_Tin.getCol(i)];
@@ -1157,7 +1157,7 @@ MatrixSparse* MatrixSparse::extractSubmatrixByColor(const VectorInt& colors,
   return MatrixSparse::createFromTriplet(NF_Tout, 0, 0, -1);
 }
 
-void MatrixSparse::gibbs(int iech,
+void MatrixSparse::gibbs(Id iech,
                          const VectorDouble& zcur,
                          double* yk,
                          double* sk)
@@ -1168,7 +1168,7 @@ void MatrixSparse::gibbs(int iech,
   {
     double coeff = it.valueRef();
     if (ABS(coeff) <= 0.) continue;
-    int jech = it.row();
+    Id jech = it.row();
     {
       if (iech == jech)
         *sk = coeff;
@@ -1182,7 +1182,7 @@ void MatrixSparse::gibbs(int iech,
   (*sk) = sqrt(1. / (*sk));
 }
 
-int MatrixSparse::_addToDest(const constvect inv, vect outv) const
+Id MatrixSparse::_addToDest(const constvect inv, vect outv) const
 {
   Eigen::Map<const Eigen::VectorXd> inm(inv.data(), inv.size());
   Eigen::Map<Eigen::VectorXd> outm(outv.data(), outv.size());
@@ -1202,14 +1202,14 @@ void MatrixSparse::setDiagonal(const Eigen::Map<const Eigen::VectorXd>& tab)
 }
 
 /*! Extract a Row */
-MatrixSparse* MatrixSparse::getRowAsMatrixSparse(int irow, double coeff) const
+MatrixSparse* MatrixSparse::getRowAsMatrixSparse(Id irow, double coeff) const
 {
-  int ncols = getNCols();
+  auto ncols = getNCols();
   auto* res = new MatrixSparse(1, ncols);
 
   // The input sparse matrix being symmetrical, we benefit from its
   // column-major storage (setting icol = irow)
-  int icol = irow;
+  Id icol = irow;
   for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), icol); it; ++it)
     res->eigenMat().coeffRef(0, it.row()) = coeff * it.value();
 
@@ -1217,9 +1217,9 @@ MatrixSparse* MatrixSparse::getRowAsMatrixSparse(int irow, double coeff) const
 }
 
 /*! Extract a Column */
-MatrixSparse* MatrixSparse::getColumnAsMatrixSparse(int icol, double coeff) const
+MatrixSparse* MatrixSparse::getColumnAsMatrixSparse(Id icol, double coeff) const
 {
-  int nrows = getNRows();
+  auto nrows = getNRows();
   auto* res = new MatrixSparse(nrows, 1);
 
   for (Eigen::SparseMatrix<double>::InnerIterator it(eigenMat(), icol); it; ++it)
@@ -1236,7 +1236,7 @@ Eigen::SparseMatrix<double> AtMA(const Eigen::SparseMatrix<double>& A,
   return A.transpose() * M * A;
 }
 
-int MatrixSparse::forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLower) const
+Id MatrixSparse::forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLower) const
 {
   Eigen::Map<const Eigen::VectorXd> bm(b.data(), b.size());
   Eigen::Map<Eigen::VectorXd> xm(x.data(), x.size());
@@ -1254,7 +1254,7 @@ int MatrixSparse::forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLow
   return 0;
 }
 
-void MatrixSparse::forceDimension(int maxRows, int maxCols)
+void MatrixSparse::forceDimension(Id maxRows, Id maxCols)
 {
   // Redimensionner les matrices si nécessaire
   if (eigenMat().rows() < maxRows || eigenMat().cols() < maxCols)

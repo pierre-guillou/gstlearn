@@ -40,7 +40,7 @@ void _printEmpty()
   message("Found an empty argument. This is correct\n");
 }
 
-void _printInt(int value)
+void _printInt(Id value)
 {
   if (IFFFF(value))
    _test();
@@ -63,27 +63,27 @@ void _printString(const String& value)
 
 void _printVectorInt(const VectorInt& values)
 {
-  for (int i = 0; i < (int) values.size(); i++)
+  for (Id i = 0; i < (Id) values.size(); i++)
     _printInt(values[i]);
 }
 
 void _printVectorDouble(const VectorDouble& values)
 {
-  for (int i = 0; i < (int) values.size(); i++)
+  for (Id i = 0; i < (Id) values.size(); i++)
     _printDouble(values[i]);
 }
 
 void _printVectorString(const VectorString& values)
 {
-  for (int i = 0; i < (int) values.size(); i++)
+  for (Id i = 0; i < (Id) values.size(); i++)
     _printString(values[i]);
 }
 
 void _printVectorVectorInt(const VectorVectorInt& values)
 {
-  for (int i = 0; i < (int) values.size(); i++)
+  for (Id i = 0; i < (Id) values.size(); i++)
   {
-    for (int j = 0; j < (int) values[i].size(); j++)
+    for (Id j = 0; j < (Id) values[i].size(); j++)
     {
       message("[%d][%d] : ",j+1,i+1);
       _printInt(values[i][j]);
@@ -94,9 +94,9 @@ void _printVectorVectorInt(const VectorVectorInt& values)
 
 void _printVectorVectorDouble(const VectorVectorDouble& values)
 {
-  for (int i = 0; i < (int) values.size(); i++)
+  for (Id i = 0; i < (Id) values.size(); i++)
   {
-    for (int j = 0; j < (int) values[i].size(); j++)
+    for (Id j = 0; j < (Id) values[i].size(); j++)
     {
       message("[%d][%d] : ",j+1,i+1);
       _printDouble(values[i][j]);
@@ -109,7 +109,7 @@ void _printVectorVectorDouble(const VectorVectorDouble& values)
  * Function to test Integer argument
  * @param value Integer input argument
  */
-void argumentTestInt(int value)
+void argumentTestInt(Id value)
 {
   _introduction("Integer");
   _printInt(value);
@@ -176,7 +176,7 @@ void argumentTestStringOverload(const String& value)
   _endOfLine();
 }
 
-void argumentTestIntOverload(int value)
+void argumentTestIntOverload(Id value)
 {
   _introduction("Int (Overload)");
   _printInt(value);
@@ -216,7 +216,7 @@ void argumentTestEnum(const ETests& value)
   message("Case : Value = %d - Descr = %s\n", value.getValue(),value.getDescr().data());
 }
 
-int argumentReturnInt(int value)
+Id argumentReturnInt(Id value)
 {
   _introduction("Integer");
   _printInt(value);
@@ -264,7 +264,7 @@ VectorVectorDouble argumentReturnVectorVectorDouble(const VectorVectorDouble& va
   return values;
 }
 
-void argumentDefTestInt(int argInt)
+void argumentDefTestInt(Id argInt)
 {
   _introduction("Integer");
   _printInt(argInt);
@@ -327,9 +327,9 @@ void argumentTestMatrixSymmetric(const MatrixSymmetric& mat)
 {
   if (!mat.empty()) mat.display();
 }
-MatrixDense argumentReturnMatrix(int nrows,
-                                       int ncols,
-                                       int seed)
+MatrixDense argumentReturnMatrix(Id nrows,
+                                       Id ncols,
+                                       Id seed)
 {
   MatrixDense mat(nrows, ncols);
   mat.fillRandom(seed);
@@ -341,10 +341,10 @@ void argumentTestMatrixSparse(const MatrixSparse& mat)
   if (!mat.empty()) mat.display();
 }
 
-MatrixSparse argumentReturnMatrixSparse(int nrows,
-                                        int ncols,
+MatrixSparse argumentReturnMatrixSparse(Id nrows,
+                                        Id ncols,
                                         double zeroPercent,
-                                        int seed)
+                                        Id seed)
 {
   MatrixSparse mat(nrows, ncols);
   mat.fillRandom(seed, zeroPercent);

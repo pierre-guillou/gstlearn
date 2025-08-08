@@ -43,7 +43,7 @@ GridIfpEn::~GridIfpEn()
 {
 }
 
-int GridIfpEn::writeInFile()
+Id GridIfpEn::writeInFile()
 {
   static double valnull = 3.0;
 
@@ -52,11 +52,11 @@ int GridIfpEn::writeInFile()
   if (_fileWriteOpen()) return 1;
 
   // Preliminary calculations
-  int ncol = (int) _cols.size();
+  Id ncol = (Id) _cols.size();
   VectorInt nx = _dbgrid->getNXsExt(3);
   VectorDouble angles = _dbgrid->getAngles();
-  int ntot = 1;
-  for (int idim = 0; idim < 3; idim++)
+  Id ntot = 1;
+  for (Id idim = 0; idim < 3; idim++)
   {
     ntot *= nx[idim];
   }
@@ -89,8 +89,8 @@ int GridIfpEn::writeInFile()
 
   /* Grid description */
 
-  for (int j = 0; j < ncol; j++)
-    for (int i = 0; i < ntot; i++)
+  for (Id j = 0; j < ncol; j++)
+    for (Id i = 0; i < ntot; i++)
     {
       double value = _dbgrid->getArray(i, _cols[j]);
       _writeLine( 2, NULL, 0, value, NULL);
@@ -114,9 +114,9 @@ int GridIfpEn::writeInFile()
  ** \param[in]  combis     Second comment (or NULL)
  **
  *****************************************************************************/
-void GridIfpEn::_writeLine(int mode,
+void GridIfpEn::_writeLine(Id mode,
                           const char *comment,
-                          int valint,
+                          Id valint,
                           double valrel,
                           const char *combis)
 {
@@ -162,7 +162,7 @@ void GridIfpEn::_writeLine(int mode,
 DbGrid* GridIfpEn::readGridFromFile()
 {
   DbGrid* dbgrid = nullptr;
-  int dumint, ncol;
+  Id dumint, ncol;
   double dumrel, test, value;
   VectorDouble x0(3);
   VectorDouble dx(3);
@@ -175,7 +175,7 @@ DbGrid* GridIfpEn::readGridFromFile()
 
   /* Read the grid characteristics */
 
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
   {
     nx[i] = 1;
     dx[i] = 1.;
@@ -209,14 +209,14 @@ DbGrid* GridIfpEn::readGridFromFile()
 
   /* Read the array of real values */
 
-  int lec = 0;
-  int nech = nx[0] * nx[1] * nx[2];
+  Id lec = 0;
+  Id nech = nx[0] * nx[1] * nx[2];
   VectorDouble tab(nech * ncol);
 
-  for (int icol = 0; icol < ncol; icol++)
-    for (int ix = 0; ix < nx[0]; ix++)
-      for (int iy = 0; iy < nx[1]; iy++)
-        for (int iz = 0; iz < nx[2]; iz++)
+  for (Id icol = 0; icol < ncol; icol++)
+    for (Id ix = 0; ix < nx[0]; ix++)
+      for (Id iy = 0; iy < nx[1]; iy++)
+        for (Id iz = 0; iz < nx[2]; iz++)
         {
           if (_record_read(_file, "%lf", &value)) break;
           if (value == test) value = TEST;
@@ -258,13 +258,13 @@ DbGrid* GridIfpEn::readGridFromFile()
  ** \param[out]  valrel     Float value
  **
  *****************************************************************************/
-int GridIfpEn::_readLine(int mode,
+Id GridIfpEn::_readLine(Id mode,
                          const char *comment,
-                         int *valint,
+                         Id *valint,
                          double *valrel)
 {
   char line[100];
-  int start;
+  Id start;
 
   /* Reading the line */
 
@@ -277,14 +277,14 @@ int GridIfpEn::_readLine(int mode,
   if (comment != NULL)
   {
     if (strcmp(line, comment) < 0) return (1);
-    start = static_cast<int>(strlen(comment));
+    start = static_cast<Id>(strlen(comment));
   }
 
   /* Decoding the value */
 
   if (mode == 1)
   {
-    if (gslSScanf(&line[start], "%d", valint) != 1) return (1);
+    if (gslSScanf(&line[start], "%ld", valint) != 1) return (1);
   }
   else if (mode == 2)
   {

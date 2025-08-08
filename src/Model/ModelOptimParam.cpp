@@ -79,8 +79,8 @@ ModelOptimParam* ModelOptimParam::create(bool auth_aniso,
                                          bool lock_iso2d,
                                          bool flag_goulard,
                                          bool flag_intrinsic,
-                                         int wmode,
-                                         int maxiter,
+                                         Id wmode,
+                                         Id maxiter,
                                          double tolred)
 {
   auto* mop = new ModelOptimParam();

@@ -21,7 +21,7 @@ ProjMatrix::ProjMatrix()
 
 ProjMatrix::ProjMatrix(const Db* db,
                        const AMesh* a_mesh,
-                       int rankZ,
+                       Id rankZ,
                        bool verbose)
   : MatrixSparse()
 {
@@ -52,12 +52,12 @@ ProjMatrix::~ProjMatrix()
 {
 }
 
-ProjMatrix* ProjMatrix::create(const Db* db, const AMesh* a_mesh, int rankZ, bool verbose)
+ProjMatrix* ProjMatrix::create(const Db* db, const AMesh* a_mesh, Id rankZ, bool verbose)
 {
   return new ProjMatrix(db, a_mesh, rankZ, verbose);
 }
 
-void ProjMatrix::resetFromMeshAndDb(const Db* db, const AMesh* a_mesh, int rankZ, bool verbose)
+void ProjMatrix::resetFromMeshAndDb(const Db* db, const AMesh* a_mesh, Id rankZ, bool verbose)
 {
   if (a_mesh == nullptr)
   {
@@ -75,15 +75,15 @@ void ProjMatrix::resetFromMeshAndDb(const Db* db, const AMesh* a_mesh, int rankZ
   }
 }
 
-int ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
+Id ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
 {
-  if ((int)inv.size() != getNApex())
+  if ((Id)inv.size() != getNApex())
   {
     messerr("_addMesh2point: Error in the dimension of argument 'inv'(%d). It should be (%d)",
             inv.size(), getNApex());
     return 1;
   }
-  if ((int)outv.size() != getNPoint())
+  if ((Id)outv.size() != getNPoint())
   {
     messerr("_addMesh2point: Error in the dimension of argument 'outv'(%d). It should be (%d)",
             outv.size(), getNPoint());
@@ -94,15 +94,15 @@ int ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
   return 0;
 }
 
-int ProjMatrix::_addPoint2mesh(const constvect inv, vect outv) const
+Id ProjMatrix::_addPoint2mesh(const constvect inv, vect outv) const
 {
-  if ((int)inv.size() != getNPoint())
+  if ((Id)inv.size() != getNPoint())
   {
     messerr("_addPoint2mesh: Error in the dimension of argument 'inv'(%d). It should be (%d)",
             inv.size(), getNPoint());
     return 1;
   }
-  if ((int)outv.size() != getNApex())
+  if ((Id)outv.size() != getNApex())
   {
     messerr("_addPoint2mesh: Error in the dimension of argument 'outv'(%d). It should be (%d)",
             outv.size(), getNApex());
@@ -118,15 +118,15 @@ String ProjMatrix::toString(const AStringFormat* strfmt) const
   return MatrixSparse::toString(strfmt);
 }
 
-void ProjMatrix::dumpVerticesUsed(int npmax) const
+void ProjMatrix::dumpVerticesUsed(Id npmax) const
 {
   mestitle(1, "Vertices used in the projection matrix");
   if (npmax > 0) message("(Display is limited to %d samples)\n", npmax);
-  int np = (npmax > 0) ? npmax : getNPoint();
-  for (int ip = 0; ip < np; ip++)
+  Id np = (npmax > 0) ? npmax : getNPoint();
+  for (Id ip = 0; ip < np; ip++)
   {
     message("Sample %3d: ", ip);
-    for (int ic = 0, nc = getNApex(); ic < nc; ic++)
+    for (Id ic = 0, nc = getNApex(); ic < nc; ic++)
     {
       if (getValue(ip, ic) > 0)
         message(" %3d [%5.2lf]", ic, getValue(ip, ic));

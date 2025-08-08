@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   Option_AutoFit mauto;
   Option_VarioFit options;
   Constraints constraints;
-  int nbsimu, nbtuba, seed, flag_norm_sill, flag_goulard_used;
+  Id nbsimu, nbtuba, seed, flag_norm_sill, flag_goulard_used;
   double gof;
   static bool verbose = false;
 

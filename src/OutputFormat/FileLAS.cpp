@@ -95,11 +95,11 @@ Db* FileLAS::readFromFile()
   sep_blank[1] = '\0';
   sep_point[0] = '.';
   sep_point[1] = '\0';
-  int nvar = (int) names.size();
+  Id nvar = (Id) names.size();
 
   // Loop on the lines
 
-  int numline = 0;
+  Id numline = 0;
   (void) gslStrcpy(string, "");
 
   // Decode the header
@@ -143,7 +143,7 @@ Db* FileLAS::readFromFile()
   if (_readFind(s_length, "~A", &numline, string)) return db;
 
   VectorDouble tab;
-  int nech = 0;
+  Id nech = 0;
   while (1)
   {
     if (_readNext(s_length, 1, &numline, string)) break;
@@ -153,7 +153,7 @@ Db* FileLAS::readFromFile()
     tab.push_back(_xwell);
     tab.push_back(_ywell);
     tab.push_back(_cwell);
-    int nvarlu = 3;
+    Id nvarlu = 3;
 
     // Add other variables
 
@@ -198,10 +198,10 @@ Db* FileLAS::readFromFile()
  ** \param[out]     string     New line
  **
  *****************************************************************************/
-int FileLAS::_readFind(int s_length,
-                       const char *target,
-                       int *numline,
-                       char *string)
+Id FileLAS::_readFind(int s_length,
+                      const char* target,
+                      Id* numline,
+                      char* string)
 {
   /* Check the current line */
   if (strcasestr(string, target)) return (0);
@@ -228,20 +228,20 @@ int FileLAS::_readFind(int s_length,
  ** TODO : Replace char* by String
  **
  *****************************************************************************/
-int FileLAS::_readNext(int s_length, int flag_up, int *numline, char *string)
+Id FileLAS::_readNext(int s_length, Id flag_up, Id* numline, char* string)
 {
-  int size;
+  Id size;
 
   (*numline)++;
   if (fgets(string, s_length, _file) == NULL) return (1);
-  size = static_cast<int>(strlen(string));
+  size = static_cast<Id>(strlen(string));
 
   // Suppress the trailing newline
   if (string[size - 1] == '\n') string[size - 1] = '\0';
-  size = static_cast<int>(strlen(string));
+  size = static_cast<Id>(strlen(string));
 
   // Replace any illegal character from the string by a blank
-  for (int i = 0; i < size; i++)
+  for (Id i = 0; i < size; i++)
   {
     if (string[i] < ' ' || string[i] > '~') string[i] = ' ';
   }
@@ -254,9 +254,9 @@ int FileLAS::_readNext(int s_length, int flag_up, int *numline, char *string)
 
 void FileLAS::_stringToUppercase(char *string)
 {
-  int n = static_cast<int>(strlen(string));
-  for (int i = 0; i < n; i++)
+  Id n = static_cast<Id>(strlen(string));
+  for (Id i = 0; i < n; i++)
     if (string[i] >= 'a' && string[i] <= 'z')
       string[i] = ('A' + string[i] - 'a');
 }
-}
+} // namespace gstlrn

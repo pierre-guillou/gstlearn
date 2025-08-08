@@ -73,14 +73,14 @@ String PolyLine2D::toString(const AStringFormat* strfmt) const
   std::stringstream sstr;
   AStringFormat sf;
   if (strfmt != nullptr) sf = *strfmt;
-  int npoints = getNPoints();
+  auto npoints = getNPoints();
 
   sstr << "Number of Vertices = " << npoints << std::endl;
 
   if (sf.getLevel() > 2)
   {
     VectorDouble tab(2 * npoints);
-    for (int i = 0; i < npoints; i++)
+    for (Id i = 0; i < npoints; i++)
     {
       tab[i] = _x[i];
       tab[i + npoints] = _y[i];
@@ -110,10 +110,10 @@ bool PolyLine2D::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   if (getNPoints() <= 0) return false;
   bool ret = true;
-  ret = ret && _recordWrite<int>(os, "Number of Points", (int) _x.size());
+  ret = ret && _recordWrite<Id>(os, "Number of Points", (Id) _x.size());
 
   VectorDouble buffer(2);
-  for (int i = 0; i < (int) _x.size(); i++)
+  for (Id i = 0; i < (Id) _x.size(); i++)
   {
     buffer[0] = _x[i];
     buffer[1] = _y[i];
@@ -130,10 +130,10 @@ bool PolyLine2D::_serializeAscii(std::ostream& os, bool /*verbose*/) const
  */
 bool PolyLine2D::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
-  int np = 0;
+  Id np = 0;
   bool ret = true;
   VectorDouble buffer(2);
-  ret = ret && _recordRead<int>(is, "Number of Points", np);
+  ret = ret && _recordRead<Id>(is, "Number of Points", np);
   if (np < 0)
   {
     messerr("Something wrong in your file: the Number of Points read is equal to %d",np);
@@ -141,7 +141,7 @@ bool PolyLine2D::_deserializeAscii(std::istream& is, bool /*verbose*/)
   }
   _x.resize(np);
   _y.resize(np);
-  for (int i = 0; i < np; i++)
+  for (Id i = 0; i < np; i++)
   {
     ret = ret && _recordReadVec<double>(is, "", buffer, 2);
     _x[i] = buffer[0];
@@ -152,7 +152,7 @@ bool PolyLine2D::_deserializeAscii(std::istream& is, bool /*verbose*/)
 
 void PolyLine2D::init(const VectorDouble& x, const VectorDouble& y)
 {
-  int nvert = static_cast<int> (x.size());
+  Id nvert = static_cast<Id> (x.size());
 
   /* Load the new Line */
 
@@ -161,7 +161,7 @@ void PolyLine2D::init(const VectorDouble& x, const VectorDouble& y)
 
   /* Copy the arrays */
 
-  for (int i=0; i<nvert; i++)
+  for (Id i=0; i<nvert; i++)
   {
     _x[i] = x[i];
     _y[i] = y[i];
@@ -170,14 +170,14 @@ void PolyLine2D::init(const VectorDouble& x, const VectorDouble& y)
 
 void PolyLine2D::addPoint(double x, double y)
 {
-  int n = getNPoints();
+  auto n = getNPoints();
   _x.resize(n+1);
   _y.resize(n+1);
   _x[n] = x;
   _y[n] = y;
 }
 
-VectorDouble PolyLine2D::getPoint(int i) const
+VectorDouble PolyLine2D::getPoint(Id i) const
 {
   VectorDouble vec(2);
   vec[0] = getX(i);
@@ -199,8 +199,8 @@ PolyPoint2D PolyLine2D::getPLIndex(const VectorDouble &xy0) const
 {
 
   double xx, yy, dist;
-  int nint;
-  int nvert = getNPoints();
+  Id nint;
+  auto nvert = getNPoints();
 
   // Structure allocation
 
@@ -210,7 +210,7 @@ PolyPoint2D PolyLine2D::getPLIndex(const VectorDouble &xy0) const
   /* Dispatch */
 
   double dmin = MAXIMUM_BIG;
-  for (int i = 0; i < nvert - 1; i++)
+  for (Id i = 0; i < nvert - 1; i++)
   {
     dist = GH::distancePointToSegment(xy0[0], xy0[1], getX(i), getY(i), getX(i + 1),
                                       getY(i + 1), &xx, &yy, &nint);
@@ -325,7 +325,7 @@ double PolyLine2D::distanceBetweenPoints(double ap,
 double PolyLine2D::distanceAlongPolyline(const PolyPoint2D &pldist1,
                                          const PolyPoint2D &pldist2) const
 {
-  int i;
+  Id i;
   double dist, local1[2], local2[2];
   PolyPoint2D pl1,pl2;
 
@@ -377,27 +377,27 @@ double PolyLine2D::distanceAlongPolyline(const PolyPoint2D &pldist1,
 }
 
 void PolyLine2D::_getInterval(const PolyPoint2D &pldist,
-                              int nb_neigh,
-                              int *rfrom,
-                              int *rto) const
+                              Id nb_neigh,
+                              Id *rfrom,
+                              Id *rto) const
 {
-  int npoint = getNPoints();
-  int rank = pldist.rank;
+  auto npoint = getNPoints();
+  Id rank = pldist.rank;
   if (rank == npoint - 1) rank--;
   *rfrom = MAX(0, rank - nb_neigh);
   *rto   = MIN(npoint-1, rank + 1 + nb_neigh);
 }
 
-double PolyLine2D::angleAtPolyline(const PolyPoint2D &pldist, int nb_neigh) const
+double PolyLine2D::angleAtPolyline(const PolyPoint2D &pldist, Id nb_neigh) const
 {
-  int rfrom, rto;
+  Id rfrom, rto;
   _getInterval(pldist, nb_neigh, &rfrom, &rto);
 
   // Approach using the Deming regression
 
   VectorDouble x;
   VectorDouble y;
-  for (int i = rfrom; i <= rto; i++)
+  for (Id i = rfrom; i <= rto; i++)
   {
     x.push_back(getX(i));
     y.push_back(getY(i));
@@ -410,19 +410,19 @@ double PolyLine2D::angleAtPolyline(const PolyPoint2D &pldist, int nb_neigh) cons
 
 double PolyLine2D::distanceAtPolyline(const PolyPoint2D &pldist,
                                       const VectorDouble& target,
-                                      int nb_neigh) const
+                                      Id nb_neigh) const
 {
   if (nb_neigh <= 1) return pldist.dist;
 
   VectorDouble local(2);
-  int rfrom, rto;
+  Id rfrom, rto;
   _getInterval(pldist, nb_neigh, &rfrom, &rto);
 
   // Approach using the Deming regression
 
   double dist = 0.;
-  int number = 0;
-  for (int i = rfrom; i <= rto; i++)
+  Id number = 0;
+  for (Id i = rfrom; i <= rto; i++)
   {
     local[0] = getX(i);
     local[1] = getY(i);
@@ -445,7 +445,7 @@ double PolyLine2D::distanceAtPolyline(const PolyPoint2D &pldist,
  ** \param[in]  namconv  Naming convention
  **
  *****************************************************************************/
-int dbUnfoldPolyline(Db *db,
+Id dbUnfoldPolyline(Db *db,
                      const PolyLine2D &polyline,
                      const NamingConvention &namconv)
 {
@@ -453,7 +453,7 @@ int dbUnfoldPolyline(Db *db,
 
   /* Initializations */
 
-  int nvert = polyline.getNPoints();
+  auto nvert = polyline.getNPoints();
 
   /* Preliminary checks */
 
@@ -470,7 +470,7 @@ int dbUnfoldPolyline(Db *db,
 
   /* Add the variables */
 
-  int iptr = db->addColumnsByConstant(2, 0.);
+  Id iptr = db->addColumnsByConstant(2, 0.);
   if (iptr < 0) return 1;
 
   /* Project the starting point */
@@ -479,7 +479,7 @@ int dbUnfoldPolyline(Db *db,
 
   /* Loop on the samples of the Db */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     target[0] = db->getCoordinate(iech, 0);
@@ -510,7 +510,7 @@ int dbUnfoldPolyline(Db *db,
  ** \param[in]  namconv  Naming convention
  **
  *****************************************************************************/
-int dbFoldPolyline(DbGrid *dbin,
+Id dbFoldPolyline(DbGrid *dbin,
                    Db *dbout,
                    const VectorInt& cols,
                    const PolyLine2D &polyline,
@@ -520,7 +520,7 @@ int dbFoldPolyline(DbGrid *dbin,
 
   /* Initializations */
 
-  int nvert = polyline.getNPoints();
+  auto nvert = polyline.getNPoints();
 
   /* Preliminary checks */
 
@@ -542,8 +542,8 @@ int dbFoldPolyline(DbGrid *dbin,
 
   /* Add the variables */
 
-  int ncol = (int) cols.size();
-  int iptr = dbout->addColumnsByConstant(ncol, TEST);
+  Id ncol = (Id) cols.size();
+  Id iptr = dbout->addColumnsByConstant(ncol, TEST);
   if (iptr < 0) return 1;
 
   /* Project the starting point */
@@ -553,7 +553,7 @@ int dbFoldPolyline(DbGrid *dbin,
   /* Loop on the samples of the output Db */
 
   VectorDouble target(2);
-  for (int iech = 0; iech < dbout->getNSample(); iech++)
+  for (Id iech = 0; iech < dbout->getNSample(); iech++)
   {
     if (!dbout->isActive(iech)) continue;
     target[0] = dbout->getCoordinate(iech, 0);
@@ -567,12 +567,12 @@ int dbFoldPolyline(DbGrid *dbin,
 
     /* Locate the sample on the Input Grid */
 
-    int iad = dbin->coordinateToRank(coor);
+    Id iad = dbin->coordinateToRank(coor);
     if (iad < 0) continue;
 
     /* Loop on the variables */
 
-    for (int icol = 0; icol < ncol; icol++)
+    for (Id icol = 0; icol < ncol; icol++)
     {
       double value = dbin->getArray(iad, cols[icol]);
       dbout->setArray(iech, iptr + icol, value);
@@ -601,10 +601,10 @@ int dbFoldPolyline(DbGrid *dbin,
  * @remarks 2 - Distance between Polylines at Target location
  * @remarks 3 - Average angle of Polylines at Target location
  */
-int dbFromPolylines(Db* db,
+Id dbFromPolylines(Db* db,
                     const PolyLine2D& top,
                     const PolyLine2D& bot,
-                    int nb_neigh,
+                    Id nb_neigh,
                     bool flagMask,
                     const NamingConvention &namconv)
 {
@@ -623,13 +623,13 @@ int dbFromPolylines(Db* db,
 
   // Allocate the output variables
 
-  int iptr = db->addColumnsByConstant(3, TEST);
+  Id iptr = db->addColumnsByConstant(3, TEST);
   if (iptr < 0) return 1;
 
   // Loop on the active samples of the Data Base
 
-  int nech = db->getNSample();
-  for (int iech = 0; iech < nech; iech++)
+  Id nech = db->getNSample();
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (! db->isActive(iech)) continue;
     target[0] = db->getCoordinate(iech, 0);

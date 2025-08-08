@@ -84,7 +84,7 @@ static void st_simulation_environment(void)
  ** \param[in]  ipgs       Rank of the GS
  **
  *****************************************************************************/
-static int st_facies(PropDef* propdef, int ipgs, int ifac)
+static Id st_facies(PropDef* propdef, Id ipgs, Id ifac)
 {
   if (ipgs <= 0) return (ifac);
   return (propdef->nfac[0] + ifac);
@@ -100,7 +100,7 @@ static int st_facies(PropDef* propdef, int ipgs, int ifac)
  ** \param[in]  nbsimu    Number of simulations
  **
  *****************************************************************************/
-void simu_func_categorical_transf(Db* db, int verbose, int isimu, int nbsimu)
+void simu_func_categorical_transf(Db* db, Id verbose, Id isimu, Id nbsimu)
 {
   const Rule* rule = ModCat.rule;
 
@@ -124,9 +124,9 @@ void simu_func_categorical_transf(Db* db, int verbose, int isimu, int nbsimu)
  ** \param[in]  nbsimu    Number of simulations (stored)
  **
  *****************************************************************************/
-void simu_func_continuous_update(Db* db, int verbose, int isimu, int nbsimu)
+void simu_func_continuous_update(Db* db, Id verbose, Id isimu, Id nbsimu)
 {
-  int iptr_simu;
+  Id iptr_simu;
   double simval;
 
   /* Preliminary checks */
@@ -137,7 +137,7 @@ void simu_func_continuous_update(Db* db, int verbose, int isimu, int nbsimu)
 
   /* Loop on the grid cells */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     simval = db->getFromLocator(ELoc::SIMU, iech, iptr_simu);
@@ -161,9 +161,9 @@ void simu_func_continuous_update(Db* db, int verbose, int isimu, int nbsimu)
  ** \param[in]  nbsimu    Number of simulations (stored)
  **
  *****************************************************************************/
-void simu_func_categorical_update(Db* db, int verbose, int isimu, int nbsimu)
+void simu_func_categorical_update(Db* db, Id verbose, Id isimu, Id nbsimu)
 {
-  int iptr_simu, facies, rank, ipgs;
+  Id iptr_simu, facies, rank, ipgs;
   double prop;
 
   /* Preliminary checks */
@@ -175,10 +175,10 @@ void simu_func_categorical_update(Db* db, int verbose, int isimu, int nbsimu)
 
   /* Loop on the grid cells */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
-    facies = (int)db->getFromLocator(ELoc::FACIES, iech, iptr_simu) - 1;
+    facies = (Id)db->getFromLocator(ELoc::FACIES, iech, iptr_simu) - 1;
     rank   = st_facies(ModCat.propdef, ipgs, facies);
     prop   = db->getLocVariable(ELoc::P, iech, rank) + 1.;
     db->setLocVariable(ELoc::P, iech, rank, prop);
@@ -199,7 +199,7 @@ void simu_func_categorical_update(Db* db, int verbose, int isimu, int nbsimu)
  ** \param[in]  nbsimu    Number of simulations
  **
  *****************************************************************************/
-void simu_func_continuous_scale(Db* db, int verbose, int nbsimu)
+void simu_func_continuous_scale(Db* db, Id verbose, Id nbsimu)
 {
   double mean, stdv;
 
@@ -209,7 +209,7 @@ void simu_func_continuous_scale(Db* db, int verbose, int nbsimu)
 
   /* Loop on the grid cells */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     mean = db->getZVariable(iech, 0) / nbsimu;
@@ -233,9 +233,9 @@ void simu_func_continuous_scale(Db* db, int verbose, int nbsimu)
  ** \param[in]  nbsimu    Number of simulations
  **
  *****************************************************************************/
-void simu_func_categorical_scale(Db* db, int verbose, int nbsimu)
+void simu_func_categorical_scale(Db* db, Id verbose, Id nbsimu)
 {
-  int rank, nfacies, ipgs;
+  Id rank, nfacies, ipgs;
   double prop;
   PropDef* propdef;
 
@@ -248,10 +248,10 @@ void simu_func_categorical_scale(Db* db, int verbose, int nbsimu)
 
   /* Loop on the grid cells */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
-    for (int ifac = 0; ifac < nfacies; ifac++)
+    for (Id ifac = 0; ifac < nfacies; ifac++)
     {
       rank = st_facies(propdef, ipgs, ifac);
       prop = db->getLocVariable(ELoc::P, iech, rank) / (double)nbsimu;
@@ -293,9 +293,9 @@ void check_mandatory_attribute(const char* method,
  ** \param[in]  type       0 for gaussian; 1 for facies; 2 for proportion
  **
  *****************************************************************************/
-static int st_keep(int flag_gaus, int flag_prop, int file, int type)
+static Id st_keep(Id flag_gaus, Id flag_prop, Id file, Id type)
 {
-  int keep;
+  Id keep;
 
   keep = 0;
 
@@ -346,15 +346,15 @@ label_end:
  ** \param[in]  neigh      ANeigh structure (optional if non conditional)
  **
  *****************************************************************************/
-static int st_check_simtub_environment(Db* dbin,
+static Id st_check_simtub_environment(Db* dbin,
                                        Db* dbout,
                                        Model* model,
                                        ANeigh* neigh)
 {
-  int nvar          = 0;
-  int nfex          = 0;
+  Id nvar          = 0;
+  Id nfex          = 0;
   bool flag_cond    = (dbin != nullptr);
-  unsigned int ndim = dbout->getNDim();
+  size_t ndim       = dbout->getNDim();
 
   /**************************************************************/
   /* Check if the Space dimension is compatible with the method */
@@ -453,7 +453,7 @@ static int st_check_simtub_environment(Db* dbin,
   {
     if (ndim != neigh->getNDim())
     {
-      messerr("The Space Dimension of the Neighborhood (%d)", (int)neigh->getNDim());
+      messerr("The Space Dimension of the Neighborhood (%d)", (Id)neigh->getNDim());
       messerr("does not correspond to the Space Dimension of the first Db (%d)",
               ndim);
       return 1;
@@ -478,7 +478,7 @@ static int st_check_simtub_environment(Db* dbin,
  ** \param[in]  igrf       Rank of the Gaussian
  **
  *****************************************************************************/
-int get_rank_from_propdef(PropDef* propdef, int ipgs, int igrf)
+Id get_rank_from_propdef(PropDef* propdef, Id ipgs, Id igrf)
 {
   if (ipgs <= 0 || propdef == nullptr) return (igrf);
   return (propdef->ngrf[0] + igrf);
@@ -492,9 +492,9 @@ int get_rank_from_propdef(PropDef* propdef, int ipgs, int igrf)
  ** \param[in]  nech    initial number of samples
  **
  *****************************************************************************/
-static void st_suppress_added_samples(Db* db, int nech)
+static void st_suppress_added_samples(Db* db, Id nech)
 {
-  int iech;
+  Id iech;
 
   if (nech <= 0) return;
   for (iech = db->getNSample() - 1; iech >= nech; iech--)
@@ -520,14 +520,14 @@ static void st_suppress_added_samples(Db* db, int nech)
  *****************************************************************************/
 static void st_check_facies_data2grid(Db* dbin,
                                       Db* dbout,
-                                      int flag_check,
-                                      int flag_show,
-                                      int ipgs,
-                                      int nechin,
-                                      int nfacies,
-                                      int nbsimu)
+                                      Id flag_check,
+                                      Id flag_show,
+                                      Id ipgs,
+                                      Id nechin,
+                                      Id nfacies,
+                                      Id nbsimu)
 {
-  int iech, jech, isimu, facdat, facres, number;
+  Id iech, jech, isimu, facdat, facres, number;
 
   /* Initializations */
 
@@ -540,7 +540,7 @@ static void st_check_facies_data2grid(Db* dbin,
 
   /* Core allocation */
 
-  int ndim = dbin->getNDim();
+  Id ndim = dbin->getNDim();
   VectorDouble coor(ndim);
 
   /* Loop on the data */
@@ -548,14 +548,14 @@ static void st_check_facies_data2grid(Db* dbin,
   for (iech = 0; iech < nechin; iech++)
   {
     if (!dbin->isActive(iech)) continue;
-    facdat = (int)dbin->getZVariable(iech, 0);
+    facdat = (Id)dbin->getZVariable(iech, 0);
     if (facdat < 1 || facdat > nfacies) continue;
     jech = index_point_to_grid(dbin, iech, 0, dbgrid, coor.data());
     if (jech < 0) continue;
 
     for (isimu = 0; isimu < nbsimu; isimu++)
     {
-      facres = (int)dbgrid->getSimvar(ELoc::FACIES, jech, isimu, 0, ipgs,
+      facres = (Id)dbgrid->getSimvar(ELoc::FACIES, jech, isimu, 0, ipgs,
                                       nbsimu, 1);
       if (flag_show)
       {
@@ -618,35 +618,35 @@ static void st_check_facies_data2grid(Db* dbin,
  ** \remark  should correspond to the facies index (starting from 1)
  **
  *****************************************************************************/
-int simpgs(Db* dbin,
+Id simpgs(Db* dbin,
            Db* dbout,
            RuleProp* ruleprop,
            Model* model1,
            Model* model2,
            ANeigh* neigh,
-           int nbsimu,
-           int seed,
-           int flag_gaus,
-           int flag_prop,
-           int flag_check,
-           int flag_show,
-           int nbtuba,
-           int gibbs_nburn,
-           int gibbs_niter,
+           Id nbsimu,
+           Id seed,
+           Id flag_gaus,
+           Id flag_prop,
+           Id flag_check,
+           Id flag_show,
+           Id nbtuba,
+           Id gibbs_nburn,
+           Id gibbs_niter,
            double percent,
            const NamingConvention& namconv)
 {
-  int iptr, icase, nfacies, flag_used[2];
-  int iptr_RP, iptr_RF, iptr_DF, iptr_DN, iptr_RN, local_seed;
+  Id iptr, icase, nfacies, flag_used[2];
+  Id iptr_RP, iptr_RF, iptr_DF, iptr_DN, iptr_RN, local_seed;
   Model* models[2];
   PropDef* propdef;
   std::vector<Model*> modvec;
 
   /* Initializations */
 
-  int error      = 1;
-  int nechin     = 0;
-  int ngrf       = 0;
+  Id error      = 1;
+  Id nechin     = 0;
+  Id ngrf       = 0;
   propdef        = nullptr;
   models[0]      = model1;
   models[1]      = model2;
@@ -660,7 +660,7 @@ int simpgs(Db* dbin,
     messerr("RuleProp must be defined");
     return 1;
   }
-  int flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat               = ruleprop->isFlagStat();
   const Rule* rule            = ruleprop->getRule();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
@@ -690,7 +690,7 @@ int simpgs(Db* dbin,
   }
 
   /* Model */
-  for (int igrf = 0; igrf < 2; igrf++)
+  for (Id igrf = 0; igrf < 2; igrf++)
   {
     flag_used[igrf] = rule->isYUsed(igrf);
     if (!flag_used[igrf]) continue;
@@ -795,8 +795,8 @@ int simpgs(Db* dbin,
 
   if (flag_cond)
   {
-    int npgs = 1;
-    int ipgs = 0;
+    Id npgs = 1;
+    Id ipgs = 0;
 
     // Create the Gibbs sampler (multi-mono case)
 
@@ -813,9 +813,9 @@ int simpgs(Db* dbin,
 
     /* Loop on the simulations */
 
-    for (int isimu = 0; isimu < nbsimu; isimu++)
+    for (Id isimu = 0; isimu < nbsimu; isimu++)
     {
-      for (int igrf = 0; igrf < ngrf; igrf++)
+      for (Id igrf = 0; igrf < ngrf; igrf++)
         if (rule->evaluateBounds(propdef, dbin, dbout, isimu, igrf, ipgs,
                                  nbsimu)) goto label_end;
 
@@ -830,7 +830,7 @@ int simpgs(Db* dbin,
   /***************************************************/
 
   local_seed = seed;
-  for (int igrf = 0; igrf < 2; igrf++)
+  for (Id igrf = 0; igrf < 2; igrf++)
   {
     if (!flag_used[igrf]) continue;
     icase = get_rank_from_propdef(propdef, 0, igrf);
@@ -845,7 +845,7 @@ int simpgs(Db* dbin,
 
   if (!flag_gaus)
   {
-    for (int isimu = 0; isimu < nbsimu; isimu++)
+    for (Id isimu = 0; isimu < nbsimu; isimu++)
       simu_func_categorical_transf(dbout, 0, isimu, nbsimu);
   }
 
@@ -853,7 +853,7 @@ int simpgs(Db* dbin,
 
   if (flag_prop)
   {
-    for (int isimu = 0; isimu < nbsimu; isimu++)
+    for (Id isimu = 0; isimu < nbsimu; isimu++)
       simu_func_categorical_update(dbout, 0, isimu, nbsimu);
     simu_func_categorical_scale(dbout, 0, nbsimu);
   }
@@ -958,7 +958,7 @@ label_end:
  ** \remark  f1af2a, f1bf2a, f1cf2a, ..., f1bf2a, f1bf2b, ..., f1nf2m
  **
  *****************************************************************************/
-int simbipgs(Db* dbin,
+Id simbipgs(Db* dbin,
              Db* dbout,
              RuleProp* ruleprop,
              Model* model11,
@@ -966,22 +966,22 @@ int simbipgs(Db* dbin,
              Model* model21,
              Model* model22,
              ANeigh* neigh,
-             int nbsimu,
-             int seed,
-             int flag_gaus,
-             int flag_prop,
-             int flag_check,
-             int flag_show,
-             int nbtuba,
-             int gibbs_nburn,
-             int gibbs_niter,
+             Id nbsimu,
+             Id seed,
+             Id flag_gaus,
+             Id flag_prop,
+             Id flag_check,
+             Id flag_show,
+             Id nbtuba,
+             Id gibbs_nburn,
+             Id gibbs_niter,
              double percent,
              const NamingConvention& namconv)
 {
-  int iptr, iatt_z[2];
-  int npgs, flag_cond, error, icase;
-  int nfac[2], nfactot, flag_used[2][2], nechin, ngrf[2], ngrftot;
-  int iptr_RP, iptr_RF, iptr_DF, iptr_RN, iptr_DN, local_seed;
+  Id iptr, iatt_z[2];
+  Id npgs, flag_cond, error, icase;
+  Id nfac[2], nfactot, flag_used[2][2], nechin, ngrf[2], ngrftot;
+  Id iptr_RP, iptr_RF, iptr_DF, iptr_RN, iptr_DN, local_seed;
   bool verbose;
   Rule* rules[2];
   Model* models[2][2];
@@ -1006,7 +1006,7 @@ int simbipgs(Db* dbin,
     messerr("SimuBiPgs is restricted to Standard Lithotype Rule");
     return 1;
   }
-  int flag_stat = ruleprop->isFlagStat();
+  Id flag_stat = ruleprop->isFlagStat();
   Rule rule1(*ruleprop->getRule(0));
   Rule rule2(*ruleprop->getRule(1));
   const VectorDouble& propcst = ruleprop->getPropCst();
@@ -1024,7 +1024,7 @@ int simbipgs(Db* dbin,
   flag_cond    = (dbin != nullptr);
   iptr_RP = iptr_RF = iptr_DF = iptr_RN = iptr_DN = 0;
   iptr                                            = -1;
-  for (int ipgs = 0; ipgs < 2; ipgs++)
+  for (Id ipgs = 0; ipgs < 2; ipgs++)
   {
     ngrf[ipgs]   = 0;
     iatt_z[ipgs] = -1;
@@ -1058,14 +1058,14 @@ int simbipgs(Db* dbin,
   /* Model */
 
   ngrftot = 0;
-  for (int ipgs = 0; ipgs < npgs; ipgs++)
+  for (Id ipgs = 0; ipgs < npgs; ipgs++)
   {
     ngrf[ipgs] = rules[ipgs]->getNGRF();
     ngrftot += ngrf[ipgs];
 
     /* Check the validity of the model */
 
-    for (int igrf = 0; igrf < 2; igrf++)
+    for (Id igrf = 0; igrf < 2; igrf++)
     {
       flag_used[ipgs][igrf] = rules[ipgs]->isYUsed(igrf);
       if (!flag_used[ipgs][igrf]) continue;
@@ -1099,7 +1099,7 @@ int simbipgs(Db* dbin,
 
   /* Rules */
 
-  for (int ipgs = 0; ipgs < npgs; ipgs++)
+  for (Id ipgs = 0; ipgs < npgs; ipgs++)
   {
     // Check the Rules (only ERule::STD case is authorized)
     if (rules[ipgs]->getModeRule() != ERule::STD)
@@ -1110,7 +1110,7 @@ int simbipgs(Db* dbin,
 
   /* Final checks */
 
-  for (int ipgs = 0; ipgs < 2; ipgs++)
+  for (Id ipgs = 0; ipgs < 2; ipgs++)
   {
     if (flag_cond)
     {
@@ -1187,7 +1187,7 @@ int simbipgs(Db* dbin,
   /* Main loop on the PGS */
   /************************/
 
-  for (int ipgs = 0; ipgs < npgs; ipgs++)
+  for (Id ipgs = 0; ipgs < npgs; ipgs++)
   {
     if (flag_cond)
     {
@@ -1228,12 +1228,12 @@ int simbipgs(Db* dbin,
 
       /* Loop on the simulations */
 
-      for (int isimu = 0; isimu < nbsimu; isimu++)
+      for (Id isimu = 0; isimu < nbsimu; isimu++)
       {
 
         /* Update the proportions */
 
-        for (int igrf = 0; igrf < ngrf[ipgs]; igrf++)
+        for (Id igrf = 0; igrf < ngrf[ipgs]; igrf++)
           if (rules[ipgs]->evaluateBounds(propdef, dbin, dbout, isimu, igrf,
                                           ipgs, nbsimu)) goto label_end;
 
@@ -1242,7 +1242,7 @@ int simbipgs(Db* dbin,
 
       /* Convert gaussian to facies on data point */
 
-      for (int isimu = 0; isimu < nbsimu; isimu++)
+      for (Id isimu = 0; isimu < nbsimu; isimu++)
       {
         if (rules[ipgs]->gaus2facData(propdef, dbin, dbout, flag_used[ipgs],
                                       ipgs, isimu, nbsimu)) goto label_end;
@@ -1258,7 +1258,7 @@ int simbipgs(Db* dbin,
     /* Define the environment variables for printout */
 
     local_seed = seed;
-    for (int igrf = 0; igrf < 2; igrf++)
+    for (Id igrf = 0; igrf < 2; igrf++)
     {
       if (!flag_used[ipgs][igrf]) continue;
       icase = get_rank_from_propdef(propdef, ipgs, igrf);
@@ -1272,14 +1272,14 @@ int simbipgs(Db* dbin,
     /* Convert gaussian to facies at target point */
 
     if (!flag_gaus)
-      for (int isimu = 0; isimu < nbsimu; isimu++)
+      for (Id isimu = 0; isimu < nbsimu; isimu++)
         simu_func_categorical_transf(dbout, 0, isimu, nbsimu);
 
     /* Update facies proportions at target points */
 
     if (flag_prop)
     {
-      for (int isimu = 0; isimu < nbsimu; isimu++)
+      for (Id isimu = 0; isimu < nbsimu; isimu++)
         simu_func_categorical_update(dbout, 0, isimu, nbsimu);
       simu_func_categorical_scale(dbout, 0, nbsimu);
     }
@@ -1361,14 +1361,14 @@ label_end:
  ** \param[out] iptr_cstd_arg Pointer to the Conditional St. Dev. attributes
  **
  *****************************************************************************/
-int db_simulations_to_ce(Db* db,
+Id db_simulations_to_ce(Db* db,
                          const ELoc& locatorType,
-                         int nbsimu,
-                         int nvar,
-                         int* iptr_ce_arg,
-                         int* iptr_cstd_arg)
+                         Id nbsimu,
+                         Id nvar,
+                         Id* iptr_ce_arg,
+                         Id* iptr_cstd_arg)
 {
-  int error, iptr_ce, iptr_cstd, iptr_nb, nech;
+  Id error, iptr_ce, iptr_cstd, iptr_nb, nech;
   double value, count, mean, var;
 
   // Initializations
@@ -1390,17 +1390,17 @@ int db_simulations_to_ce(Db* db,
 
   // Loop on the simulations
 
-  for (int isimu = 0; isimu < nbsimu; isimu++)
+  for (Id isimu = 0; isimu < nbsimu; isimu++)
   {
     // Loop on the samples
 
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
       if (!db->isActive(iech)) continue;
 
       // Loop on the variables
 
-      for (int ivar = 0; ivar < nvar; ivar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
       {
         // Arguments 'simu' and 'nvar' are interchanged to keep correct order
         value = db->getSimvar(locatorType, iech, ivar, isimu, 0, nvar, nbsimu);
@@ -1414,11 +1414,11 @@ int db_simulations_to_ce(Db* db,
 
   // Scale the conditional expectation and variance
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActive(iech)) continue;
 
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       count = db->getArray(iech, iptr_nb + ivar);
       if (count <= 0)
@@ -1486,18 +1486,18 @@ label_end:
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-int gibbs_sampler(Db* dbin,
+Id gibbs_sampler(Db* dbin,
                   Model* model,
-                  int nbsimu,
-                  int seed,
-                  int gibbs_nburn,
-                  int gibbs_niter,
+                  Id nbsimu,
+                  Id seed,
+                  Id gibbs_nburn,
+                  Id gibbs_niter,
                   bool flag_moving,
                   bool flag_norm,
                   bool flag_multi_mono,
                   bool flag_propagation,
                   bool flag_sym_neigh,
-                  int gibbs_optstats,
+                  Id gibbs_optstats,
                   double percent,
                   bool flag_ce,
                   bool flag_cstd,
@@ -1505,7 +1505,7 @@ int gibbs_sampler(Db* dbin,
                   const NamingConvention& namconv)
 {
   DECLARE_UNUSED(flag_sym_neigh);
-  int error, iptr, npgs, nvar, iptr_ce, iptr_cstd;
+  Id error, iptr, npgs, nvar, iptr_ce, iptr_cstd;
   PropDef* propdef;
 
   /* Initializations */
@@ -1593,7 +1593,7 @@ int gibbs_sampler(Db* dbin,
 
     // Invoke the Gibbs calculator
 
-    for (int isimu = 0; isimu < nbsimu; isimu++)
+    for (Id isimu = 0; isimu < nbsimu; isimu++)
       if (gibbs->run(y, 0, isimu)) goto label_end;
 
     delete gibbs;
@@ -1673,12 +1673,12 @@ label_end:
  ** \remarks  have a positive value.
  **
  ** \code
- **   int func_valid(int flag_grid,int ndim,int nech,
- **                  int *nx,double *dx,double *x0,
+ **   Id func_valid(Id flag_grid,Id ndim,Id nech,
+ **                  Id *nx,double *dx,double *x0,
  **                  double nonval, double percent, double *tab)
  **  {
  **    double ratio;
- **    int i,npositive,nvalid;
+ **    Id i,npositive,nvalid;
  **
  **    for (i=0; i<nech; i++)
  **      {
@@ -1692,28 +1692,28 @@ label_end:
  ** \endcode
  **
  *****************************************************************************/
-int simtub_constraints(Db* dbin,
+Id simtub_constraints(Db* dbin,
                        Db* dbout,
                        Model* model,
                        ANeigh* neigh,
-                       int seed,
-                       int nbtuba,
-                       int nbsimu_min,
-                       int nbsimu_quant,
-                       int niter_max,
+                       Id seed,
+                       Id nbtuba,
+                       Id nbsimu_min,
+                       Id nbsimu_quant,
+                       Id niter_max,
                        VectorInt& cols,
-                       int (*func_valid)(int flag_grid,
-                                         int nDim,
-                                         int nech,
-                                         int* nx,
+                       Id (*func_valid)(Id flag_grid,
+                                         Id nDim,
+                                         Id nech,
+                                         Id* nx,
                                          double* dx,
                                          double* x0,
                                          double nonval,
                                          double percent,
                                          VectorDouble& tab))
 {
-  int iatt, retval, nbtest;
-  int error, nbsimu, nvalid, isimu, ndim, iter, nech, flag_grid, i;
+  Id iatt, retval, nbtest;
+  Id error, nbsimu, nvalid, isimu, ndim, iter, nech, flag_grid, i;
   double percent;
   VectorDouble tab;
   VectorDouble dx;
@@ -1839,13 +1839,13 @@ label_end:
  ** \param[in]  iptrs     Pointer to the current selection
  **
  *****************************************************************************/
-static int st_maxstable_mask(Db* dbout,
+static Id st_maxstable_mask(Db* dbout,
                              double seuil,
                              double scale,
-                             int iptrv,
-                             int iptrs)
+                             Id iptrv,
+                             Id iptrs)
 {
-  int iech, number;
+  Id iech, number;
   double valsim;
 
   for (iech = number = 0; iech < dbout->getNSample(); iech++)
@@ -1876,13 +1876,13 @@ static int st_maxstable_mask(Db* dbout,
  *****************************************************************************/
 static void st_maxstable_combine(Db* dbout,
                                  double scale,
-                                 int iter0,
-                                 int iptrg,
-                                 int iptrv,
-                                 int iptrr,
-                                 int* last)
+                                 Id iter0,
+                                 Id iptrg,
+                                 Id iptrv,
+                                 Id iptrr,
+                                 Id* last)
 {
-  int iech;
+  Id iech;
   double valsim, valold;
 
   for (iech = 0; iech < dbout->getNSample(); iech++)
@@ -1918,17 +1918,17 @@ static void st_maxstable_combine(Db* dbout,
  ** \remarks keypair mechanism with keyword "MaxStableThresh".
  **
  *****************************************************************************/
-int simmaxstable(Db* dbout,
+Id simmaxstable(Db* dbout,
                  Model* model,
                  double ratio,
-                 int seed,
-                 int nbtuba,
-                 int flag_simu,
-                 int flag_rank,
-                 int verbose)
+                 Id seed,
+                 Id nbtuba,
+                 Id flag_simu,
+                 Id flag_rank,
+                 Id verbose)
 {
   double tpois, seuil;
-  int error, iptrg, iptrv, iptrr, iptrs, niter, nleft, icov, last;
+  Id error, iptrg, iptrv, iptrr, iptrs, niter, nleft, icov, last;
   static double seuil_ref = 5.;
 
   /* Initializations */
@@ -2040,7 +2040,7 @@ label_end:
  *****************************************************************************/
 static double st_quantile(Db* dbout, double proba, double* sort)
 {
-  int iech, nech, nval, rank;
+  Id iech, nech, nval, rank;
 
   /* Initializations */
 
@@ -2060,7 +2060,7 @@ static double st_quantile(Db* dbout, double proba, double* sort)
 
   /* Calculate the quantile */
 
-  rank = (int)(proba * (double)nval);
+  rank = (Id)(proba * (double)nval);
   return (sort[rank]);
 }
 
@@ -2080,17 +2080,17 @@ static double st_quantile(Db* dbout, double proba, double* sort)
  ** \param[in]  verbose   Verbose flag
  **
  *****************************************************************************/
-int simRI(Db* dbout,
+Id simRI(Db* dbout,
           Model* model,
-          int ncut,
+          Id ncut,
           double* zcut,
           double* wcut,
-          int seed,
-          int nbtuba,
-          int verbose)
+          Id seed,
+          Id nbtuba,
+          Id verbose)
 {
   double cumul, simval, proba, seuil;
-  int icut, error, iptrg, iptrs, nech, iech, count, total;
+  Id icut, error, iptrg, iptrs, nech, iech, count, total;
   VectorDouble sort;
   VectorDouble pton;
   VectorDouble pres;
@@ -2199,7 +2199,7 @@ int simRI(Db* dbout,
 
   for (iech = 0; iech < nech; iech++)
   {
-    icut = (int)dbout->getSimvar(ELoc::SIMU, iech, 0, 0, 0, 1, 1);
+    icut = (Id)dbout->getSimvar(ELoc::SIMU, iech, 0, 0, 0, 1, 1);
     if (icut < 1 || icut > ncut)
       dbout->setSimvar(ELoc::SIMU, iech, 0, 0, 0, 1, 1, TEST);
     else
@@ -2241,21 +2241,21 @@ label_end:
  ** \remarks it is generated internally.
  **
  *****************************************************************************/
-int simcond(Db* dbin,
+Id simcond(Db* dbin,
             Db* dbout,
             Model* model,
-            int seed,
-            int nbsimu,
-            int nbtuba,
-            int gibbs_nburn,
-            int gibbs_niter,
-            int flag_check,
-            int flag_ce,
-            int flag_cstd,
-            int verbose)
+            Id seed,
+            Id nbsimu,
+            Id nbtuba,
+            Id gibbs_nburn,
+            Id gibbs_niter,
+            Id flag_check,
+            Id flag_ce,
+            Id flag_cstd,
+            Id verbose)
 {
   PropDef* propdef;
-  int nvar, error, iptr, iptr_ce, iptr_cstd;
+  Id nvar, error, iptr, iptr_ce, iptr_cstd;
 
   /* Initializations */
 
@@ -2324,7 +2324,7 @@ int simcond(Db* dbin,
 
     /* Loop on the simulations */
 
-    for (int isimu = 0; isimu < nbsimu; isimu++)
+    for (Id isimu = 0; isimu < nbsimu; isimu++)
     {
       if (gibbs->run(y, 0, isimu, verbose)) goto label_end;
     }
@@ -2391,14 +2391,14 @@ label_end:
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-int simsph(DbGrid* db,
+Id simsph(DbGrid* db,
            Model* model,
            const SimuSphericalParam& sphepar,
-           int seed,
+           Id seed,
            bool verbose,
            const NamingConvention& namconv)
 {
-  int flag_sphere;
+  Id flag_sphere;
 
   /* Preliminary checks */
 
@@ -2413,7 +2413,7 @@ int simsph(DbGrid* db,
     messerr("The Simulation on Sphere is restricted to 2-D case");
     return 1;
   }
-  for (int icova = 0; icova < model->getNCov(); icova++)
+  for (Id icova = 0; icova < model->getNCov(); icova++)
   {
     if (model->getCovAniso(icova)->getFlagAniso())
     {
@@ -2424,7 +2424,7 @@ int simsph(DbGrid* db,
 
   /* Create the new variable in the Data base */
 
-  int iptr = db->addColumnsByConstant(1, 0., String(), ELoc::SIMU);
+  Id iptr = db->addColumnsByConstant(1, 0., String(), ELoc::SIMU);
 
   SimuSpherical simsphe(1, seed);
   if (simsphe.simulate(db, model, sphepar, iptr, verbose)) return 1;
@@ -2449,8 +2449,8 @@ int simsph(DbGrid* db,
 VectorDouble simsph_mesh(MeshSpherical* mesh,
                          Model* model,
                          const SimuSphericalParam& sphepar,
-                         int seed,
-                         int verbose)
+                         Id seed,
+                         Id verbose)
 {
   VectorDouble simu;
 
@@ -2460,7 +2460,7 @@ VectorDouble simsph_mesh(MeshSpherical* mesh,
     messerr("The Spherical Simulation is restricted to Spherical coordinates");
     return simu;
   }
-  for (int icova = 0; icova < model->getNCov(); icova++)
+  for (Id icova = 0; icova < model->getNCov(); icova++)
   {
     if (model->getCovAniso(icova)->getFlagAniso())
     {
@@ -2487,12 +2487,12 @@ VectorDouble simsph_mesh(MeshSpherical* mesh,
  ** \param[in]  dtime    Time interval
  **
  *****************************************************************************/
-static int st_getTimeInterval(double date,
-                              int ntime,
+static Id st_getTimeInterval(double date,
+                              Id ntime,
                               double time0,
                               double dtime)
 {
-  for (int itime = 0; itime < ntime; itime++)
+  for (Id itime = 0; itime < ntime; itime++)
   {
     double time_deb = time0 + dtime * itime;
     double time_fin = time0 + dtime * (itime + 1);
@@ -2501,14 +2501,14 @@ static int st_getTimeInterval(double date,
   return (-1);
 }
 
-static int st_getFACIES(const DbGrid* dbgrid, int nfacies, int indFacies, int iech)
+static Id st_getFACIES(const DbGrid* dbgrid, Id nfacies, Id indFacies, Id iech)
 {
-  int ifacies = (int)dbgrid->getArray(iech, indFacies);
+  Id ifacies = (Id)dbgrid->getArray(iech, indFacies);
   if (ifacies < 0 || ifacies > nfacies || IFFFF(ifacies)) ifacies = 0;
   return (ifacies);
 }
 
-static double st_getPORO(const DbGrid* dbgrid, int indPoro, int iech)
+static double st_getPORO(const DbGrid* dbgrid, Id indPoro, Id iech)
 {
   if (indPoro <= 0) return (1);
   double poro = dbgrid->getArray(iech, indPoro);
@@ -2516,7 +2516,7 @@ static double st_getPORO(const DbGrid* dbgrid, int indPoro, int iech)
   return (poro);
 }
 
-static double st_getDATE(const DbGrid* dbgrid, int indDate, int iech)
+static double st_getDATE(const DbGrid* dbgrid, Id indDate, Id iech)
 {
   double date;
 
@@ -2527,9 +2527,9 @@ static double st_getDATE(const DbGrid* dbgrid, int indDate, int iech)
   return (date);
 }
 
-static int st_getFLUID(const DbGrid* dbgrid, int nfluids, int indFluid, int iech)
+static Id st_getFLUID(const DbGrid* dbgrid, Id nfluids, Id indFluid, Id iech)
 {
-  int ifluid = (int)dbgrid->getArray(iech, indFluid);
+  Id ifluid = (Id)dbgrid->getArray(iech, indFluid);
   if (ifluid < 0 || ifluid > nfluids || IFFFF(ifluid)) ifluid = 0;
   return (ifluid);
 }
@@ -2560,11 +2560,11 @@ MatrixDense fluid_extract(DbGrid* dbgrid,
                           const String& name_fluid,
                           const String& name_poro,
                           const String& name_date,
-                          int nfacies,
-                          int nfluids,
-                          int facies0,
-                          int fluid0,
-                          int ntime,
+                          Id nfacies,
+                          Id nfluids,
+                          Id facies0,
+                          Id fluid0,
+                          Id ntime,
                           double time0,
                           double dtime,
                           bool verbose)
@@ -2589,9 +2589,9 @@ MatrixDense fluid_extract(DbGrid* dbgrid,
 
   /* Define global variables */
 
-  int ind_facies = dbgrid->getUID(name_facies);
-  int ind_fluid  = dbgrid->getUID(name_fluid);
-  int ind_date   = dbgrid->getUID(name_date);
+  Id ind_facies = dbgrid->getUID(name_facies);
+  Id ind_fluid  = dbgrid->getUID(name_fluid);
+  Id ind_date   = dbgrid->getUID(name_date);
   if (ind_facies < 0)
   {
     messerr("Variable 'Facies' must be provided");
@@ -2607,13 +2607,13 @@ MatrixDense fluid_extract(DbGrid* dbgrid,
     messerr("Variable 'Date' must be provided");
     return 1;
   }
-  int ind_poro = dbgrid->getUID(name_poro);
+  Id ind_poro = dbgrid->getUID(name_poro);
 
   /* Initialize the array */
 
   tab      = MatrixDense(ntime, 4);
-  int nxyz = dbgrid->getNSample();
-  for (int itime = 0; itime < ntime; itime++)
+  Id nxyz = dbgrid->getNSample();
+  for (Id itime = 0; itime < ntime; itime++)
   {
     tab.setValue(itime, 0, time0 + dtime * itime);
     tab.setValue(itime, 1, time0 + dtime * (itime + 1));
@@ -2628,7 +2628,7 @@ MatrixDense fluid_extract(DbGrid* dbgrid,
   double locnum = 0.;
   double locvol = 0.;
   double datmax = 0;
-  for (int iech = 0; iech < nxyz; iech++)
+  for (Id iech = 0; iech < nxyz; iech++)
   {
 
     if (st_getFACIES(dbgrid, nfacies, ind_facies, iech) != facies0) continue;
@@ -2639,7 +2639,7 @@ MatrixDense fluid_extract(DbGrid* dbgrid,
 
     totnum += 1;
     totvol += volume;
-    int itime = st_getTimeInterval(date, ntime, time0, dtime);
+    auto itime = st_getTimeInterval(date, ntime, time0, dtime);
     if (itime < 0) continue;
     locnum += 1;
     locvol += volume;

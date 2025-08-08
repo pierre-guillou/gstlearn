@@ -41,7 +41,7 @@ class GSTLEARN_EXPORT NeighImage: public ANeigh
 {
 public:
   NeighImage(const VectorInt &radius = VectorInt(),
-             int skip = 0,
+             Id skip = 0,
              const ASpaceSharedPtr& space = ASpaceSharedPtr());
   NeighImage(const NeighImage& r);
   NeighImage& operator=(const NeighImage& r);
@@ -49,25 +49,25 @@ public:
 
   IMPLEMENT_CLONING(NeighImage)
   /// Interface for ANeigh
-  void getNeigh(int iech_out, VectorInt& ranks) override;
-  int getNSampleMax(const Db* db) const override;
-  bool hasChanged(int iech_out) const override;
+  void getNeigh(Id iech_out, VectorInt& ranks) override;
+  Id getNSampleMax(const Db* db) const override;
+  bool hasChanged(Id iech_out) const override;
   ENeigh getType() const override { return ENeigh::fromKey("IMAGE"); }
 
   /// Interface for AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static NeighImage* create(const VectorInt& radius, int skip = 0, const ASpaceSharedPtr& space = ASpaceSharedPtr());
+  static NeighImage* create(const VectorInt& radius, Id skip = 0, const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighImage* createFromNF(const String& NFFilename, bool verbose = true);
 
-  int getSkip() const { return _skip; }
+  Id getSkip() const { return _skip; }
   const VectorInt& getImageRadius() const { return _imageRadius; }
-  int getImageRadius(int idim) const { return _imageRadius[idim]; }
+  Id getImageRadius(Id idim) const { return _imageRadius[idim]; }
 
   void setImageRadius(const VectorInt& imageRadius) { _imageRadius = imageRadius; }
-  void setSkip(int skip) { _skip = skip; }
+  void setSkip(Id skip) { _skip = skip; }
 
-  DbGrid* buildImageGrid(const DbGrid* dbgrid, int seed) const;
+  DbGrid* buildImageGrid(const DbGrid* dbgrid, Id seed) const;
 
 protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;
@@ -79,10 +79,10 @@ protected:
   String _getNFName() const override { return "NeighImage"; }
 
 private:
-  void _uimage(int iech_out, VectorInt& ranks);
+  void _uimage(Id iech_out, VectorInt& ranks);
 
 private:
-  int _skip;                  /* Skipping factor */
+  Id _skip;                  /* Skipping factor */
   VectorInt _imageRadius;     /* Vector of image neighborhood radius */
 };
 }

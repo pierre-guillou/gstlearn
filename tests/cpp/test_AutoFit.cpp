@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_AutoFit-");
-  int seed = 10355;
+  Id seed = 10355;
   law_set_random_seed(seed);
 
   ////
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   ////
 
   // Defining the Space Dimension
-  int ndim = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   mestitle(0, "Testing Model Fitting in 2-D");
 

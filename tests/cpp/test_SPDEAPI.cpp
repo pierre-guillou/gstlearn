@@ -33,13 +33,13 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_SPDEAPI-");
-  int seed     = 10355;
-  int nbsimu   = 3;
+  Id seed      = 10355;
+  Id nbsimu    = 3;
   bool verbose = false;
   law_set_random_seed(seed);
 
   // Creating the resulting Grid
-  auto nx      = {101, 101};
+  VectorInt nx = {101, 101};
   DbGrid* grid = DbGrid::create(nx);
 
   // Creating the Model
@@ -51,10 +51,10 @@ int main(int argc, char* argv[])
   model->display();
 
   // Creating Data
-  int ndata       = 100;
+  Id ndata        = 100;
   Db* dat         = Db::createFromBox(ndata, {0., 0.}, {100., 100.}, 43246);
   VectorDouble z  = VH::simulateGaussian(ndata);
-  int useCholesky = 0;
+  Id useCholesky  = 0;
   law_set_random_seed(132341);
   (void)simulateSPDE(nullptr, dat, model, 1, useCholesky,
                      VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(), verbose,

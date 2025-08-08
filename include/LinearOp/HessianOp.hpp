@@ -41,7 +41,7 @@ public:
 	HessianOp();
 	virtual ~HessianOp();
 
-  int  init(PrecisionOp*  pmat,
+  Id  init(PrecisionOp*  pmat,
             const ProjMatrix*   projdata,
             const ProjMatrix*   projseis,
             const VectorDouble& indic,
@@ -49,18 +49,18 @@ public:
             const VectorDouble& varseis);
 
   /*!  Returns the dimension of the matrix */
-  int  getSize() const override;
+  Id  getSize() const override;
   /*!  Set the initial vector */
 
  void setLambda(const VectorDouble& lambda) 
   {
-    for (int i = 0; i < (int)_lambda.size(); i++) 
+    for (Id i = 0; i < (Id)_lambda.size(); i++) 
       _lambda[i] = lambda[i]; 
   }
 
 #ifndef SWIG
 protected:
-  int _addToDest(const constvect inv, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
 
 private:
   bool                 _isInitialized;

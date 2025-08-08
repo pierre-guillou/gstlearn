@@ -50,7 +50,7 @@ public:
   String getFormula() const override;
   double getScadef() const override;
   String getCovName() const override { return "Exponential"; }
-  int getMinOrder() const override { return -1; }
+  Id getMinOrder() const override { return -1; }
   bool getCompatibleSpaceR() const override { return true; }
   bool getCompatibleSpaceS() const override { return true; }
   bool hasCovOnSphere() const override { return true; }
@@ -60,7 +60,7 @@ public:
   double simulateTurningBand(double t0, TurningBandOperate& operTB) const override;
 
   bool isValidForSpectral() const override { return true; }
-  MatrixDense simulateSpectralOmega(int nb) const override;
+  MatrixDense simulateSpectralOmega(Id nb) const override;
 
   template<typename T>
   T evalImpl(T h) const
@@ -72,8 +72,8 @@ public:
 protected:
   double _evaluateCovOnSphere(double alpha,
                               double scale = 1.,
-                              int degree   = 50) const override;
-  VectorDouble _evaluateSpectrumOnSphere(int n, double scale = 1.) const override;
+                              Id degree   = 50) const override;
+  VectorDouble _evaluateSpectrumOnSphere(Id n, double scale = 1.) const override;
  // double _evaluateCovDerivative(double h) const override;
 };
 }

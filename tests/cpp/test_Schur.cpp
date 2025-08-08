@@ -37,21 +37,21 @@ static Db* _dataComplement(Db* data, Db* target, const VectorDouble& valuesTarge
   DbStringFormat* dbfmt =
     DbStringFormat::createFromFlags(false, false, false, false, true);
 
-  int iech = datap->addSamples(1);
+  auto iech = datap->addSamples(1);
   datap->setSampleCoordinates(iech, target->getSampleCoordinates(0));
   datap->setLocVariables(ELoc::Z, iech, valuesTarget);
   datap->display(dbfmt);
   return datap;
 }
 
-static Db* _dataTargetDeplement(Db* data, const VectorInt& varXvalid, int iech0)
+static Db* _dataTargetDeplement(Db* data, const VectorInt& varXvalid, Id iech0)
 {
   Db* datap = data->clone();
   DbStringFormat* dbfmt =
     DbStringFormat::createFromFlags(false, false, false, false, true);
 
   // Delete the cross-validation information
-  for (int i = 0, nval = (int)varXvalid.size(); i < nval; i++)
+  for (Id i = 0, nval = (Id)varXvalid.size(); i < nval; i++)
     datap->setLocVariable(ELoc::Z, iech0, varXvalid[i], TEST);
   datap->display(dbfmt);
 
@@ -92,7 +92,7 @@ static void _firstTest(Db* data,
   // Local parameters
   bool debugPrint = false;
   bool debugSchur = false;
-  int iech0       = 0;
+  Id iech0        = 0;
   if (debugPrint) OptDbg::setReference(iech0 + 1);
 
   // Title
@@ -157,7 +157,7 @@ static void _secondTest(Db* data, Db* target, ModelGeneric* model, const VectorD
 {
   auto* modelc = dynamic_cast<Model*>(model);
   // Local parameters
-  int nvar            = modelc->getNVar();
+  auto nvar           = modelc->getNVar();
   VectorInt varColCok = {0, -1, 2}; // Ranks of collcated variables (dim = nvar)
   bool debugSchur     = false;
   if (nvar <= 1)
@@ -174,9 +174,9 @@ static void _secondTest(Db* data, Db* target, ModelGeneric* model, const VectorD
 
   // Creating the Complemented Data Set
   VectorDouble valuesTarget(nvar, TEST);
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
-    int jvar = varColCok[ivar];
+    auto jvar = varColCok[ivar];
     if (jvar >= 0) valuesTarget[varColCok[jvar]] = law_gaussian();
   }
   Db* dataP = _dataComplement(data, target, valuesTarget);
@@ -242,7 +242,7 @@ static void _thirdTest(Db* data, ModelGeneric* model, const VectorDouble& means)
 {
   // Set of ranks of cross-validated information
   VectorInt varXvalid = {1, 2};
-  int iech0           = 1;
+  Id iech0            = 1;
   AStringFormat format;
   bool debugSchur = false;
 
@@ -374,7 +374,7 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   law_set_random_seed(32131);
   AStringFormat format;
 
@@ -385,12 +385,12 @@ int main(int argc, char* argv[])
 
   // Parameters
   bool debugPrint = false;
-  int nech        = 3;
-  int nvar        = 3;
-  int nfex        = 0;
-  int nbfl        = (nfex + 1) * nvar;
+  Id nech         = 3;
+  Id nvar         = 3;
+  Id nfex         = 0;
+  Id nbfl         = (nfex + 1) * nvar;
   bool flagSK     = false;
-  int mode        = 0;
+  Id mode         = 0;
 
   // Generate the data base
   Db* data = Db::createFillRandom(nech, ndim, nvar, nfex);
@@ -423,7 +423,7 @@ int main(int argc, char* argv[])
   NeighUnique* neigh = NeighUnique::create();
 
   // Define the verbose option
-  int iech0 = 0;
+  Id iech0 = 0;
   if (debugPrint) OptDbg::setReference(iech0 + 1);
 
   // Test on Bayesian

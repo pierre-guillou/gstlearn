@@ -115,9 +115,9 @@ String ShapeParameter::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-bool ShapeParameter::_isValidArgIndex(int iarg) const
+bool ShapeParameter::_isValidArgIndex(Id iarg) const
 {
-  int nargs = (int) _valarg.size();
+  Id nargs = (Id) _valarg.size();
   if (iarg < 0 || iarg >= nargs)
   {
     messerr("Index %d is not valid. It should lie in [0,%d[",iarg,nargs);
@@ -126,13 +126,13 @@ bool ShapeParameter::_isValidArgIndex(int iarg) const
   return true;
 }
 
-double ShapeParameter::getValarg(int iarg) const
+double ShapeParameter::getValarg(Id iarg) const
 {
   if (! _isValidArgIndex(iarg)) return TEST;
   return _valarg[iarg];
 }
 
-void ShapeParameter::setValarg(int iarg, double value)
+void ShapeParameter::setValarg(Id iarg, double value)
 {
   if (! _isValidArgIndex(iarg)) return;
   _valarg[iarg] = value;

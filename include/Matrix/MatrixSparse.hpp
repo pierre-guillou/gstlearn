@@ -44,7 +44,7 @@ namespace gstlrn
 class GSTLEARN_EXPORT MatrixSparse: public AMatrix, public virtual ALinearOp
 {
 public:
-  MatrixSparse(int nrow = 0, int ncol = 0, int ncolmax = -1);
+  MatrixSparse(Id nrow = 0, Id ncol = 0, Id ncolmax = -1);
   MatrixSparse(const MatrixSparse& m);
   MatrixSparse& operator=(const MatrixSparse& m);
   virtual ~MatrixSparse();
@@ -60,7 +60,7 @@ public:
 
   /// Interface for ALinearOp
 
-  int getSize() const override { return getNRows(); }
+  Id getSize() const override { return getNRows(); }
 
   /// Interface for AMatrix
 
@@ -70,22 +70,22 @@ public:
   bool isDense() const override { return false; }
 
   /*! Get the value from a matrix cell */
-  double getValue(int row, int col) const override;
+  double getValue(Id row, Id col) const override;
   /*! Set the value for a matrix cell */
-  void setValue(int irow, int icol, double value) override;
+  void setValue(Id irow, Id icol, double value) override;
   /*! Modifies the contents of a matrix cell */
-  void updValue(int irow,
-                int icol,
+  void updValue(Id irow,
+                Id icol,
                 const EOperator& oper,
                 double value) override;
   /*! Set the contents of a Column */
-  void setColumn(int icol, const VectorDouble& tab) override;
+  void setColumn(Id icol, const VectorDouble& tab) override;
   /*! Set the contents of a Column to a constant */
-  void setColumnToConstant(int icol, double value) override;
+  void setColumnToConstant(Id icol, double value) override;
   /*! Set the contents of a Row */
-  void setRow(int irow, const VectorDouble& tab) override;
+  void setRow(Id irow, const VectorDouble& tab) override;
   /*! Set the contents of a Row to a constant*/
-  void setRowToConstant(int irow, double value) override;
+  void setRowToConstant(Id irow, double value) override;
   /*! Set the contents of the (main) Diagonal */
   void setDiagonal(const VectorDouble& tab) override;
   /*! Set the contents of the (main) Diagonal to a constant value */
@@ -107,9 +107,9 @@ public:
   /*! Divide the matrix column-wise */
   void divideColumn(const VectorDouble& vec) override;
 
-  void resetFromValue(int nrows, int ncols, double value) override;
-  void resetFromArray(int nrows, int ncols, const double* tab, bool byCol = true) override;
-  void resetFromVD(int nrows, int ncols, const VectorDouble& tab, bool byCol = true) override;
+  void resetFromValue(Id nrows, Id ncols, double value) override;
+  void resetFromArray(Id nrows, Id ncols, const double* tab, bool byCol = true) override;
+  void resetFromVD(Id nrows, Id ncols, const VectorDouble& tab, bool byCol = true) override;
   void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
 
   /*! Transpose the matrix and return it as a copy*/
@@ -142,31 +142,31 @@ public:
   void addMat(const AMatrix& y, double cx = 1., double cy = 1.) override;
 
   /*! Extract the contents of the matrix */
-  NF_Triplet getMatrixToTriplet(int shiftRow = 0, int shiftCol = 0) const override;
+  NF_Triplet getMatrixToTriplet(Id shiftRow = 0, Id shiftCol = 0) const override;
 
-  MatrixSparse* getRowAsMatrixSparse(int irow, double coeff = 1.) const;
-  MatrixSparse* getColumnAsMatrixSparse(int icol, double coeff = 1.) const;
+  MatrixSparse* getRowAsMatrixSparse(Id irow, double coeff = 1.) const;
+  MatrixSparse* getColumnAsMatrixSparse(Id icol, double coeff = 1.) const;
 
 #ifndef SWIG
-  int addVecInPlaceEigen(const Eigen::Map<const Eigen::VectorXd>& xm,
+  Id addVecInPlaceEigen(const Eigen::Map<const Eigen::VectorXd>& xm,
                          Eigen::Map<Eigen::VectorXd>& ym) const;
 #endif
 
   // Static functions
   static MatrixSparse* create(const MatrixSparse* mat);
-  static MatrixSparse* create(int nrow, int ncol);
+  static MatrixSparse* create(Id nrow, Id ncol);
   static MatrixSparse* createFromTriplet(const NF_Triplet& NF_T,
-                                         int nrow    = 0,
-                                         int ncol    = 0,
-                                         int nrowmax = -1);
-  static MatrixSparse* Identity(int nrow, double value = 1.);
+                                         Id nrow    = 0,
+                                         Id ncol    = 0,
+                                         Id nrowmax = -1);
+  static MatrixSparse* Identity(Id nrow, double value = 1.);
   static MatrixSparse* addMatMat(const MatrixSparse* x,
                                  const MatrixSparse* y,
                                  double cx = 1.,
                                  double cy = 1.);
   static MatrixSparse* diagVec(const VectorDouble& vec);
-  static MatrixSparse* diagConstant(int number, double value = 1.);
-  static MatrixSparse* diagMat(MatrixSparse* A, int oper_choice);
+  static MatrixSparse* diagConstant(Id number, double value = 1.);
+  static MatrixSparse* diagMat(MatrixSparse* A, Id oper_choice);
   static MatrixSparse* glue(const MatrixSparse* A1,
                             const MatrixSparse* A2,
                             bool flagShiftRow,
@@ -176,42 +176,42 @@ public:
                           bool flagShiftRow,
                           bool flagShiftCol);
   /*! Dump a specific range of samples from the internal storage */
-  static void dumpElements(const String& title, int ifrom, int ito);
+  static void dumpElements(const String& title, Id ifrom, Id ito);
 
   void resetFromTriplet(const NF_Triplet& NF_T);
 
   /*! Set all the values of the Matrix with random values */
-  void fillRandom(int seed = 432432, double zeroPercent = 0);
+  void fillRandom(Id seed = 432432, double zeroPercent = 0);
 
 #ifndef SWIG
-  int addVecInPlace(const constvect x, vect y) const;
+  Id addVecInPlace(const constvect x, vect y) const;
 #endif
-  void addValue(int row, int col, double value);
+  void addValue(Id row, Id col, double value);
 
   double L1Norm() const;
-  void getStats(int* nrows, int* ncols, int* count, double* percent) const;
-  int scaleByDiag();
-  int addVecInPlaceVD(const VectorDouble& x, VectorDouble& y) const;
+  void getStats(Id* nrows, Id* ncols, Id* count, double* percent) const;
+  Id scaleByDiag();
+  Id addVecInPlaceVD(const VectorDouble& x, VectorDouble& y) const;
   void setConstant(double value);
-  VectorDouble extractDiag(int oper_choice = 1) const;
-  void prodNormDiagVecInPlace(const VectorDouble& vec, int oper = 1);
+  VectorDouble extractDiag(Id oper_choice = 1) const;
+  void prodNormDiagVecInPlace(const VectorDouble& vec, Id oper = 1);
   MatrixSparse* extractSubmatrixByRanks(const VectorInt& rank_rows,
                                         const VectorInt& rank_cols) const;
   MatrixSparse* extractSubmatrixByColor(const VectorInt& colors,
-                                        int ref_color,
+                                        Id ref_color,
                                         bool row_ok,
                                         bool col_ok);
   VectorInt colorCoding() const;
-  int getNonZeros() const { return _getMatrixPhysicalSize(); }
-  void gibbs(int iech, const VectorDouble& zcur, double* yk, double* sk);
+  Id getNonZeros() const { return _getMatrixPhysicalSize(); }
+  void gibbs(Id iech, const VectorDouble& zcur, double* yk, double* sk);
 
-  int forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLower = true) const;
-  void forceDimension(int maxRows, int maxCols);
+  Id forwardLU(const VectorDouble& b, VectorDouble& x, bool flagLower = true) const;
+  void forceDimension(Id maxRows, Id maxCols);
 
 #ifndef SWIG
 
 protected:
-  int _addToDest(const constvect inv, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
 #endif
 
 #ifndef SWIG
@@ -224,30 +224,30 @@ public:
 protected:
   void _allocate() override;
   void _deallocate() override;
-  int _getIndexToRank(int irow, int icol) const override;
-  void _setValueByRank(int rank, double value) override;
+  Id _getIndexToRank(Id irow, Id icol) const override;
+  void _setValueByRank(Id rank, double value) override;
   void _transposeInPlace() override;
-  int _invert() override;
-  int _solve(const VectorDouble& b, VectorDouble& x) const override;
-  int _getMatrixPhysicalSize() const override;
-  double _getValueByRank(int rank) const override;
-  double& _getValueRef(int irow, int icol) override;
+  Id _invert() override;
+  Id _solve(const VectorDouble& b, VectorDouble& x) const override;
+  Id _getMatrixPhysicalSize() const override;
+  double _getValueByRank(Id rank) const override;
+  double& _getValueRef(Id irow, Id icol) override;
 
 #ifndef SWIG
   void _addProdVecMatInPlacePtr(constvect x, vect y, bool transpose = false) const override;
   void _addProdMatVecInPlacePtr(constvect x, vect y, bool transpose = false) const override;
 #endif
 
-  bool _isPhysicallyPresent(int /*irow*/, int /*icol*/) const override { return true; }
+  bool _isPhysicallyPresent(Id /*irow*/, Id /*icol*/) const override { return true; }
   void _setValues(const double* values, bool byCol) override;
   void _clear() override;
-  bool _isElementPresent(int irow, int icol) const;
-  void _allocate(int nrow, int ncol, int ncolmax);
+  bool _isElementPresent(Id irow, Id icol) const;
+  void _allocate(Id nrow, Id ncol, Id ncolmax);
 
 private:
   static void _forbiddenForSparse(const String& func);
-  int _eigen_findColor(int imesh,
-                       int ncolor,
+  Id _eigen_findColor(Id imesh,
+                       Id ncolor,
                        VectorInt& colors,
                        VectorInt& temp) const;
 
@@ -269,7 +269,7 @@ private:
 #ifndef SWIG
   Eigen::SparseMatrix<double> _eigenMatrix; // Storage (always stored Eigen::ColMajor)
 #endif
-  int _nColMax;
+  Id _nColMax;
 };
 
 /*! Transform any matrix into a Sparse format */
@@ -289,7 +289,7 @@ GSTLEARN_EXPORT MatrixSparse* prodNormMat(const MatrixSparse* a,
 /*! Product 'Diag(vec)' %*% 'A' %*% 'Diag(vec)' */
 GSTLEARN_EXPORT MatrixSparse* prodNormDiagVec(const MatrixSparse* a,
                                               const VectorDouble& vec,
-                                              int oper_choice = 1);
+                                              Id oper_choice = 1);
 
 // Not exported method
 

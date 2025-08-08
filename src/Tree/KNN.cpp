@@ -23,9 +23,9 @@ KNN::KNN()
 
 bool KNN::_query(const t_btree& tree,
                  const MatrixT<double>& x,
-                 int n_samples,
-                 int n_features,
-                 int n_neigh)
+                 Id n_samples,
+                 Id n_features,
+                 Id n_neigh)
 {
   if (n_features != tree.n_features)
   {
@@ -50,11 +50,11 @@ bool KNN::_query(const t_btree& tree,
   return true;
 }
 
-int KNN::btree_query(const t_btree& tree,
+Id KNN::btree_query(const t_btree& tree,
                      const MatrixT<double>& x,
-                     int n_samples,
-                     int n_features,
-                     int n_neigh)
+                     Id n_samples,
+                     Id n_features,
+                     Id n_neigh)
 {
   auto res = _query(tree, x, n_samples, n_features, n_neigh);
   if (!res) return 1;
@@ -65,12 +65,12 @@ int KNN::btree_query(const t_btree& tree,
   return 0;
 }
 
-int KNN::btree_query_inPlace(const t_btree& tree,
+Id KNN::btree_query_inPlace(const t_btree& tree,
                              const MatrixT<double>& x,
-                             int n_samples,
-                             int n_features,
-                             int n_neigh,
-                             int rank,
+                             Id n_samples,
+                             Id n_features,
+                             Id n_neigh,
+                             Id rank,
                              VectorInt& indices,
                              VectorDouble& distances)
 {
@@ -85,26 +85,26 @@ int KNN::btree_query_inPlace(const t_btree& tree,
   return 0;
 }
 
-constvectint KNN::getIndices(int rank) const
+constvectint KNN::getIndices(Id rank) const
 {
   if (rank < 0 || rank >= _n_samples) return {};
   return _heap.indices.getRow(rank);
 }
 
-int KNN::getIndex(int rank, int ineigh) const
+Id KNN::getIndex(Id rank, Id ineigh) const
 {
   if (rank < 0 || rank >= _n_samples) return ITEST;
   if (ineigh < 0 || ineigh >= _n_neighbors) return ITEST;
   return _heap.indices(rank, ineigh);
 }
 
-constvect KNN::getDistances(int rank) const
+constvect KNN::getDistances(Id rank) const
 {
   if (rank < 0 || rank >= _n_samples) return {};
   return _heap.distances.getRow(rank);
 }
 
-double KNN::getDistance(int rank, int ineigh) const
+double KNN::getDistance(Id rank, Id ineigh) const
 {
   if (rank < 0 || rank >= _n_samples) return ITEST;
   if (ineigh < 0 || ineigh >= _n_neighbors) return ITEST;

@@ -44,7 +44,7 @@ SPDEOpMatrix::~SPDEOpMatrix()
   delete _chol;
 }
 
-int SPDEOpMatrix::_solve(const constvect inv, vect outv) const
+Id SPDEOpMatrix::_solve(const constvect inv, vect outv) const
 {
   if (_chol == nullptr)
     _chol = new CholeskySparse(*_QpAinvNoiseAt);
@@ -60,12 +60,12 @@ int SPDEOpMatrix::_solve(const constvect inv, vect outv) const
 ** \param[out] outv    Array of output values
 **
 *****************************************************************************/
-int SPDEOpMatrix::_addToDest(const constvect inv, vect outv) const
+Id SPDEOpMatrix::_addToDest(const constvect inv, vect outv) const
 {
   return _QpAinvNoiseAt->addToDest(inv, outv);
 }
 
-double SPDEOpMatrix::computeLogDetOp(int nbsimu) const
+double SPDEOpMatrix::computeLogDetOp(Id nbsimu) const
 {
   DECLARE_UNUSED(nbsimu);
 
@@ -83,7 +83,7 @@ double SPDEOpMatrix::computeLogDetOp(int nbsimu) const
  * @param seed Random seed for the Monte-Carlo simulations (unused)
  * @return VectorDouble
  */
-VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, int nMC, int seed) const
+VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, Id nMC, Id seed) const
 {
   DECLARE_UNUSED(dat);
   DECLARE_UNUSED(nMC);

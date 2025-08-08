@@ -19,7 +19,7 @@
 
 namespace gstlrn
 {
-SpaceRN::SpaceRN(unsigned int ndim)
+SpaceRN::SpaceRN(size_t ndim)
   : ASpace(ndim)
 {
 }
@@ -41,16 +41,16 @@ SpaceRN& SpaceRN::operator=(const SpaceRN& r)
 SpaceRN::~SpaceRN()
 {
 }
-ASpaceSharedPtr SpaceRN::create(int ndim)
+ASpaceSharedPtr SpaceRN::create(Id ndim)
 {
   return std::shared_ptr<const SpaceRN>(new SpaceRN(ndim));
 }
 
 void SpaceRN::_move(SpacePoint& p1, const VectorDouble& vec) const
 {
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  auto offset = getOffset();
+  auto ndim   = getNDim();
+  for (size_t i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
   }
@@ -69,14 +69,14 @@ void SpaceRN::_move(SpacePoint& p1, const VectorDouble& vec) const
  */
 double SpaceRN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   double dist         = 0.;
   double delta        = 0.;
-  unsigned int offset = getOffset();
-  unsigned int ndim   = getNDim();
-  for (unsigned int i = offset; i < ndim + offset; i++)
+  auto offset         = getOffset();
+  auto ndim           = getNDim();
+  for (size_t i = offset; i < ndim + offset; i++)
   {
     delta = p2.getCoord(i) - p1.getCoord(i);
     dist += delta * delta;
@@ -87,7 +87,7 @@ double SpaceRN::_getDistance(const SpacePoint& p1,
 double SpaceRN::_getDistance(const SpacePoint& p1,
                              const SpacePoint& p2,
                              const Tensor& tensor,
-                             int ispace) const
+                             Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   _getIncrementInPlace(p1, p2, _work1);
@@ -104,7 +104,7 @@ double SpaceRN::_getDistance(const SpacePoint& p1,
 double SpaceRN::_getFrequentialDistance(const SpacePoint& p1,
                                         const SpacePoint& p2,
                                         const Tensor& tensor,
-                                        int ispace) const
+                                        Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   _getIncrementInPlace(p1, p2, _work1);
@@ -114,7 +114,7 @@ double SpaceRN::_getFrequentialDistance(const SpacePoint& p1,
 
 VectorDouble SpaceRN::_getIncrement(const SpacePoint& p1,
                                     const SpacePoint& p2,
-                                    int ispace) const
+                                    Id ispace) const
 {
   DECLARE_UNUSED(ispace);
   _getIncrementInPlace(p1, p2, _work1);
@@ -124,14 +124,14 @@ VectorDouble SpaceRN::_getIncrement(const SpacePoint& p1,
 void SpaceRN::_getIncrementInPlace(const SpacePoint& p1,
                                    const SpacePoint& p2,
                                    VectorDouble& ptemp,
-                                   int ispace) const
+                                   Id ispace) const
 {
   DECLARE_UNUSED(ispace);
-  int j                  = 0;
-  unsigned int offset    = getOffset();
-  unsigned int ndim      = getNDim();
-  unsigned int maxlength = ndim + offset;
-  for (unsigned int i = offset; i < maxlength; i++)
+  Id j                  = 0;
+  auto offset            = getOffset();
+  auto ndim              = getNDim();
+  size_t maxlength       = ndim + offset;
+  for (size_t i = offset; i < maxlength; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
 }
 
@@ -149,7 +149,7 @@ void SpaceRN::getDistancePointVectInPlace(const SpacePoint& p1,
   {
     s       = 0.;
     auto pt = p2[i].getCoords();
-    for (unsigned int idim = 0; idim < _nDim; idim++)
+    for (size_t idim = 0; idim < _nDim; idim++)
     {
       ti = pt1[idim] - pt[idim];
       s += ti * ti;

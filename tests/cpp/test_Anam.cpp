@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_Anam-");
-  int seed = 10355;
+  Id seed = 10355;
   law_set_random_seed(seed);
 
   ///////////////////////
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   VectorInt nx_S    = {100, 100};
   VectorDouble dx_S = {0.01, 0.01};
   double dx_P       = 0.25;
-  int nx_B          = 5;
+  Id nx_B           = 5;
   double dx_B       = dx_P / nx_B;
 
   // Generate initial grid
@@ -61,12 +61,12 @@ int main(int argc, char* argv[])
   double s_Z     = 0.5;
   VectorDouble Y = grid->getColumn("Y");
   VectorDouble Z(Y.size());
-  for (int i = 0; i < (int)Y.size(); i++)
+  for (Id i = 0; i < (Id)Y.size(); i++)
     Z[i] = m_Z * exp(s_Z * Y[i] - 0.5 * s_Z * s_Z);
   grid->addColumns(Z, "Z");
 
   // Extracting a subset
-  int np   = 500;
+  Id np    = 500;
   Db* data = Db::createSamplingDb(grid, 0., np, {"x1", "x2", "Y", "Z"});
   data->setLocator("Z", ELoc::Z, 0);
   data->display();

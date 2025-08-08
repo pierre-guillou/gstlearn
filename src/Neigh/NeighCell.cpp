@@ -16,7 +16,7 @@
 
 namespace gstlrn
 {
-NeighCell::NeighCell(bool flag_xvalid, int nmini, bool useBallTree, int leaf_size, const ASpaceSharedPtr& space)
+NeighCell::NeighCell(bool flag_xvalid, Id nmini, bool useBallTree, Id leaf_size, const ASpaceSharedPtr& space)
   : ANeigh(space)
   , _nMini(nmini)
   , _biPtCell()
@@ -56,7 +56,7 @@ NeighCell::~NeighCell()
 {
 }
 
-int NeighCell::attach(const Db* dbin, const Db* dbout)
+Id NeighCell::attach(const Db* dbin, const Db* dbout)
 {
   if (ANeigh::attach(dbin, dbout)) return 1;
   if (!_biPtCell->isValid(dbin, dbout)) return 1;
@@ -82,7 +82,7 @@ bool NeighCell::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
   ret      = ret && ANeigh::_deserializeAscii(is, verbose);
-  ret      = ret && _recordRead<int>(is, "Minimum Number of samples", _nMini);
+  ret      = ret && _recordRead<Id>(is, "Minimum Number of samples", _nMini);
 
   return ret;
 }
@@ -91,14 +91,14 @@ bool NeighCell::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret      = ret && ANeigh::_serializeAscii(os, verbose);
-  ret      = ret && _recordWrite<int>(os, "", getNMini());
+  ret      = ret && _recordWrite<Id>(os, "", getNMini());
   return ret;
 }
 
 NeighCell* NeighCell::create(bool flag_xvalid,
-                             int nmini,
+                             Id nmini,
                              bool useBallTree,
-                             int leaf_size,
+                             Id leaf_size,
                              const ASpaceSharedPtr& space)
 {
   return new NeighCell(flag_xvalid, nmini, useBallTree, leaf_size, space);
@@ -118,7 +118,7 @@ NeighCell* NeighCell::createFromNF(const String& NFFilename, bool verbose)
   return nullptr;
 }
 
-bool NeighCell::hasChanged(int iech_out) const
+bool NeighCell::hasChanged(Id iech_out) const
 {
   DECLARE_UNUSED(iech_out);
 
@@ -132,7 +132,7 @@ bool NeighCell::hasChanged(int iech_out) const
  * @param iech_out Valid Rank of the sample in the output Db
  * @param ranks Vector of sample ranks in neighborhood (empty when error)
  */
-void NeighCell::getNeigh(int iech_out, VectorInt& ranks)
+void NeighCell::getNeigh(Id iech_out, VectorInt& ranks)
 {
   // Select the neighborhood samples as the target sample has changed
   if (_cell(iech_out, ranks))
@@ -159,9 +159,9 @@ void NeighCell::getNeigh(int iech_out, VectorInt& ranks)
  ** \param[out]  ranks    Vector of samples elected in the Neighborhood
  **
  *****************************************************************************/
-int NeighCell::_cell(int iech_out, VectorInt& ranks)
+Id NeighCell::_cell(Id iech_out, VectorInt& ranks)
 {
-  int nech = _dbin->getNSample();
+  Id nech = _dbin->getNSample();
   ranks.resize(nech);
   ranks.fill(-1);
 
@@ -170,8 +170,8 @@ int NeighCell::_cell(int iech_out, VectorInt& ranks)
 
   /* Loop on samples */
 
-  int nsel = 0;
-  for (int iech = 0; iech < nech; iech++)
+  Id nsel = 0;
+  for (Id iech = 0; iech < nech; iech++)
   {
     /* Discard the masked input sample */
 

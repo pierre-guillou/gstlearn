@@ -40,7 +40,7 @@ private:
   bool _postprocess() override;
   void _rollback() override;
 
-  int _getNFactors() const;
+  Id _getNFactors() const;
   void _storeResultsForExport(const KrigingSystem& ksys);
   bool _hasChangeSupport() const;
 
@@ -50,15 +50,15 @@ private:
 
   VectorString _nameCoord;
 
-  int _iptrEst;
-  int _iptrStd;
+  Id _iptrEst;
+  Id _iptrStd;
 
   VectorInt _iuidFactors;
 
   Model* _modelLocal;
 };
 
-GSTLEARN_EXPORT int krigingFactors(Db* dbin,
+GSTLEARN_EXPORT Id krigingFactors(Db* dbin,
                                    Db* dbout,
                                    Model* model,
                                    ANeigh* neigh,

@@ -36,15 +36,15 @@ class MatrixSymmetric;
 /* Prototyping the functions in krige.c */
 /****************************************/
 
-int _krigsim(Db* dbin,
+Id _krigsim(Db* dbin,
              Db* dbout,
              const Model* model,
              ANeigh* neigh,
              bool flag_bayes,
              const VectorDouble& dmean,
              const MatrixSymmetric& dcov,
-             int icase,
-             int nbsimu,
+             Id icase,
+             Id nbsimu,
              bool flag_dgm);
 
 /*******************************************/
@@ -54,22 +54,22 @@ int _krigsim(Db* dbin,
 Rule* _rule_auto(Db* db,
                  const VarioParam* varioparam,
                  const RuleProp* ruleprop,
-                 int ngrfmax = 1,
-                 int verbose = false);
+                 Id ngrfmax = 1,
+                 Id verbose = false);
 
 /*****************************************/
 /* Prototyping the functions in thresh.c */
 /*****************************************/
 
-int _db_rule(Db* db,
+Id _db_rule(Db* db,
              const RuleProp* ruleprop,
              Model* model                    = nullptr,
              const NamingConvention& namconv = NamingConvention("Facies", true, true, true, ELoc::fromKey("FACIES")));
-int _db_bounds(Db* db,
+Id _db_bounds(Db* db,
                const RuleProp* ruleprop,
                Model* model                    = nullptr,
                const NamingConvention& namconv = NamingConvention("Bounds"));
-int _db_threshold(Db* db,
+Id _db_threshold(Db* db,
                   const RuleProp* ruleprop,
                   Model* model                    = nullptr,
                   const NamingConvention& namconv = NamingConvention("Thresh"));

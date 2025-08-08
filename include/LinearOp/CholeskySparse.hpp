@@ -44,22 +44,22 @@ public:
   CholeskySparse& operator=(const CholeskySparse& m);
   virtual ~CholeskySparse();
 
-  int setMatrix(const MatrixSparse& mat);
-  int stdev(VectorDouble& vcur,
+  Id setMatrix(const MatrixSparse& mat);
+  Id stdev(VectorDouble& vcur,
             const MatrixSparse* proj,
             bool flagStDev = false) const;
 
   double computeLogDeterminant() const override;
-  int addSolveX(const constvect vecin, vect vecout) const override;
-  int addInvLtX(const constvect vecin, vect vecout) const override;
-  int addLtX(const constvect vecin, vect vecout) const override;
-  int addLX(const constvect vecin, vect vecout) const override;
-  int addInvLX(const constvect vecin, vect vecout) const override;
+  Id addSolveX(const constvect vecin, vect vecout) const override;
+  Id addInvLtX(const constvect vecin, vect vecout) const override;
+  Id addLtX(const constvect vecin, vect vecout) const override;
+  Id addLX(const constvect vecin, vect vecout) const override;
+  Id addInvLX(const constvect vecin, vect vecout) const override;
 
 private:
   void _clean();
-  int _prepare(const MatrixSparse& mat) const;
-  int _stdev(VectorDouble& vcur, const MatrixSparse* proj) const;
+  Id _prepare(const MatrixSparse& mat) const;
+  Id _stdev(VectorDouble& vcur, const MatrixSparse* proj) const;
 
 private:
   mutable Eigen::SimplicialLDLT<Sp>* _factor;

@@ -39,9 +39,9 @@ int main(int argc, char* argv[])
   Timer timer;
 
   // Creating the Db
-  int ndat = 1000000;
-  int ndim = 2;
-  int nvar = 10;
+  Id ndat  = 1000000;
+  Id ndim  = 2;
+  Id nvar  = 10;
   Db* db1  = Db::createFillRandom(ndat, ndim, nvar);
   db1->display();
 

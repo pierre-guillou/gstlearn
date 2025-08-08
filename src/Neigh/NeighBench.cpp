@@ -20,7 +20,7 @@ namespace gstlrn
 NeighBench::NeighBench(bool flag_xvalid,
                        double width,
                        bool useBallTree,
-                       int leaf_size,
+                       Id leaf_size,
                        const ASpaceSharedPtr& space)
   : ANeigh(space)
   , _width(width)
@@ -62,7 +62,7 @@ NeighBench::~NeighBench()
   delete _biPtBench;
 }
 
-int NeighBench::attach(const Db* dbin, const Db* dbout)
+Id NeighBench::attach(const Db* dbin, const Db* dbout)
 {
   if (ANeigh::attach(dbin, dbout)) return 1;
 
@@ -107,7 +107,7 @@ bool NeighBench::_serializeAscii(std::ostream& os, bool verbose) const
 NeighBench* NeighBench::create(bool flag_xvalid,
                                double width,
                                bool useBallTree,
-                               int leaf_size,
+                               Id leaf_size,
                                const ASpaceSharedPtr& space)
 {
   return new NeighBench(flag_xvalid, width, useBallTree, leaf_size, space);
@@ -132,11 +132,11 @@ NeighBench* NeighBench::createFromNF(const String& NFFilename, bool verbose)
  * @param db Pointer to the target Db
  * @return
  */
-int NeighBench::getNSampleMax(const Db* db) const
+Id NeighBench::getNSampleMax(const Db* db) const
 {
   bool useSel = false;
-  int nech    = db->getNSample();
-  int ndim    = db->getNDim();
+  Id nech    = db->getNSample();
+  Id ndim    = db->getNDim();
   if (db->getNDim() <= 2) return nech;
 
   /* Read the vector of the last coordinates */
@@ -146,13 +146,13 @@ int NeighBench::getNSampleMax(const Db* db) const
   VectorDouble tab = VH::sort(vec, true);
 
   /* Loop on the first point */
-  int nmax = 0;
-  for (int iech = 0; iech < nech - 1; iech++)
+  Id nmax = 0;
+  for (Id iech = 0; iech < nech - 1; iech++)
   {
 
     /* Loop on the second point */
-    int nloc = 1;
-    for (int jech = iech + 1; jech < nech; jech++)
+    Id nloc = 1;
+    for (Id jech = iech + 1; jech < nech; jech++)
     {
       if (ABS(tab[jech] - tab[iech]) > 2. * _width) break;
       nloc++;
@@ -164,22 +164,22 @@ int NeighBench::getNSampleMax(const Db* db) const
   return nmax;
 }
 
-bool NeighBench::hasChanged(int iech_out) const
+bool NeighBench::hasChanged(Id iech_out) const
 {
   if (_iechMemo < 0 || _isNbghMemoEmpty()) return true;
 
   return _isSameTargetBench(iech_out);
 }
 
-bool NeighBench::_isSameTargetBench(int iech_out) const
+bool NeighBench::_isSameTargetBench(Id iech_out) const
 {
   // Check if current target and previous target belong to the same bench
 
-  int ndim = _dbout->getNDim();
+  Id ndim = _dbout->getNDim();
   if (_dbgrid != nullptr)
   {
-    int nval = 1;
-    for (int idim = 0; idim < ndim - 1; idim++)
+    Id nval = 1;
+    for (Id idim = 0; idim < ndim - 1; idim++)
       nval *= _dbgrid->getNX(idim);
     if ((iech_out / nval) != (_iechMemo / nval)) return false;
   }
@@ -196,7 +196,7 @@ bool NeighBench::_isSameTargetBench(int iech_out) const
  * @param iech_out Valid Rank of the sample in the output Db
  * @param ranks Vector of sample ranks in neighborhood (empty when error)
  */
-void NeighBench::getNeigh(int iech_out, VectorInt& ranks)
+void NeighBench::getNeigh(Id iech_out, VectorInt& ranks)
 {
   // Select the neighborhood samples as the target sample has changed
   _bench(iech_out, ranks);
@@ -218,9 +218,9 @@ void NeighBench::getNeigh(int iech_out, VectorInt& ranks)
  ** \param[out]  ranks    Vector of samples elected in the Neighborhood
  **
  *****************************************************************************/
-void NeighBench::_bench(int iech_out, VectorInt& ranks)
+void NeighBench::_bench(Id iech_out, VectorInt& ranks)
 {
-  int nech = _dbin->getNSample();
+  Id nech = _dbin->getNSample();
   ranks.resize(nech);
   ranks.fill(-1);
 
@@ -229,7 +229,7 @@ void NeighBench::_bench(int iech_out, VectorInt& ranks)
 
   /* Loop on samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     /* Discard the masked input sample */
 

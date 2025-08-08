@@ -35,8 +35,8 @@ public:
   ProjConvolution& operator= (const ProjConvolution &m)= delete;
   virtual ~ProjConvolution();
 
-  int getNApex() const override;
-  int getNPoint() const override;
+  Id getNApex() const override;
+  Id getNPoint() const override;
 
   DbGrid* getResolutionGrid() const;
 
@@ -47,13 +47,13 @@ public:
   const VectorInt& getShiftVector() const { return _shiftVector; }
 
 private:
-  int  _getConvSize() const { return (int) _convolution.size(); }
-  int  _getHalfSize() const { return (_getConvSize() - 1) / 2; }
+  Id  _getConvSize() const { return (Id) _convolution.size(); }
+  Id  _getHalfSize() const { return (_getConvSize() - 1) / 2; }
   void _buildGridSeis2D();
   void _buildGridRes2D();
   void _buildShiftVector();
-  int  _buildAprojHoriz();
-  int  _getNDim() const { return _gridSeismic->getNDim(); }
+  Id  _buildAprojHoriz();
+  Id  _getNDim() const { return _gridSeismic->getNDim(); }
   Grid _getGridCharacteristicsRR(bool delLastDim = false) const;
   Grid _getGridCharacteristicsRS() const;
 
@@ -65,9 +65,9 @@ private:
                           const constvect valonvertex) const;
 
   protected:
-    int _addPoint2mesh(const constvect valonseismic,
+    Id _addPoint2mesh(const constvect valonseismic,
                        vect valonvertex) const override;
-    int _addMesh2point(const constvect valonvertex,
+    Id _addMesh2point(const constvect valonvertex,
                        vect valonseismic) const override;
 #endif
 

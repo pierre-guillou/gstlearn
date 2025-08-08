@@ -15,8 +15,8 @@
 
 namespace gstlrn
 {
-Optim::Optim(opt_algorithm algo, int dim)
-  : _opt(nlopt_create((nlopt_algorithm)algo, dim))
+Optim::Optim(opt_algorithm algo, Id dim)
+  : _opt(nlopt_create((nlopt_algorithm)algo, static_cast<unsigned int>(dim)))
   , _authorizedAnalyticalGradients(true)
 {
   if (!_opt) throw std::runtime_error("Échec de création de l'optimiseur NLopt");
@@ -132,4 +132,4 @@ double Optim::callback(unsigned n, const double* x, double* grad, void* f_data)
   
   return result;
 }
-}
+} // namespace gstlrn

@@ -106,7 +106,7 @@ void CovDiffusionAdvection::_init()
   double correcL = 1.;
 
   _ctxt    = cova->getContext();
-  int ndim = cova->getNDim();
+  Id ndim = cova->getNDim();
 
   VectorDouble temp(ndim, 1.);
   if (_markovL == nullptr)
@@ -161,12 +161,12 @@ void CovDiffusionAdvection::_computeSpatialTrace()
 
   VectorDouble coeffsL = _markovL->getMarkovCoeffs();
   VectorDouble coeffsR = _markovR->getMarkovCoeffs();
-  int degree           = ((int)coeffsL.size() + (int)coeffsR.size() - 2);
+  Id degree           = ((Id)coeffsL.size() + (Id)coeffsR.size() - 2);
   VectorDouble coeffs;
   coeffs.resize(degree + 1, 0.);
 
-  for (int i = 0; i < (int)coeffsR.size(); i++)
-    for (int j = 0; j < (int)coeffsL.size(); j++)
+  for (Id i = 0; i < (Id)coeffsR.size(); i++)
+    for (Id j = 0; j < (Id)coeffsL.size(); j++)
     {
       coeffs[i + j] += coeffsR[i] * coeffsL[j];
     }
@@ -179,7 +179,7 @@ std::complex<double> CovDiffusionAdvection::evalSpatialSpectrum(VectorDouble fre
 
   double velinner = 0.;
 
-  for (int i = 0; i < (int)freq.size(); i++)
+  for (Id i = 0; i < (Id)freq.size(); i++)
   {
     velinner += _vel[i] * freq[i];
   }
@@ -202,7 +202,7 @@ std::complex<double> CovDiffusionAdvection::evalSpatialSpectrum(VectorDouble fre
   return ratio * exp(temp);
 }
 
-Array CovDiffusionAdvection::evalCovFFT(const VectorDouble& hmax, double time, int N) const
+Array CovDiffusionAdvection::evalCovFFT(const VectorDouble& hmax, double time, Id N) const
 {
   std::function<std::complex<double>(VectorDouble, double)> funcSpectrum;
   funcSpectrum = [this](VectorDouble freq, double time)

@@ -42,22 +42,22 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("bench_Tree-");
 
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   bool flag_stats = false; // This is set to FALSE in order to avoid Diff in Time
 
   // Bench marking the Ball tree algorithm in particular
   mestitle(1, "Ball Tree Efficiency");
-  int nfois = 10;
-  int nech  = 10000;
+  Id nfois = 10;
+  Id nech  = 10000;
   VectorInt times(nfois);
   if (!flag_stats)
     message("To get statistics on Ball Tree Efficiency, turn 'flag_stats' to TRUE\n");
 
   message("- Building BallTree: Db(n = %d * k) (in ms per k)\n", nech);
-  for (int ifois = 0; ifois < nfois; ifois++)
+  for (Id ifois = 0; ifois < nfois; ifois++)
   {
-    int number = nech * (ifois + 1);
+    Id number = nech * (ifois + 1);
     timer.reset();
     Db* data1 = Db::createFillRandom(number, ndim, 1, 0, 0, 0., 0.,
                                      VectorDouble(), VectorDouble(),
@@ -71,9 +71,9 @@ int main(int argc, char* argv[])
 
   message("- Migrate P2P: from Db1(n = %d * k) to Db2(n = %d) (in ms per k)\n", nech, nech);
 
-  for (int ifois = 0; ifois < nfois; ifois++)
+  for (Id ifois = 0; ifois < nfois; ifois++)
   {
-    int number = nech * (ifois + 1);
+    Id number = nech * (ifois + 1);
     timer.reset();
     Db* data1 = Db::createFillRandom(number, ndim, 1, 0, 0, 0., 0.,
                                      VectorDouble(), VectorDouble(),
@@ -91,9 +91,9 @@ int main(int argc, char* argv[])
 
   message("- Migrate P2P: from Db1(n = %d) to Db2(n = %d * k) (in ms per k)\n", nech, nech);
 
-  for (int ifois = 0; ifois < nfois; ifois++)
+  for (Id ifois = 0; ifois < nfois; ifois++)
   {
-    int number = nech * (ifois + 1);
+    Id number = nech * (ifois + 1);
     timer.reset();
     Db* data1 = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
                                      VectorDouble(), VectorDouble(), VectorDouble(), 131343);

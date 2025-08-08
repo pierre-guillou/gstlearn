@@ -50,7 +50,7 @@ ASPDEOp::~ASPDEOp()
   delete _solver;
 }
 
-int ASPDEOp::getSize() const
+Id ASPDEOp::getSize() const
 {
   return _QKriging->getSize();
 }
@@ -71,7 +71,7 @@ void ASPDEOp::_prepare(bool w1, bool w2) const
 ** \param[out] outv    Array of output values
 **
 *****************************************************************************/
-// int ASPDEOp::_addToDest(const constvect inv, vect outv) const
+// Id ASPDEOp::_addToDest(const constvect inv, vect outv) const
 // {
 //   _prepare();
 
@@ -83,11 +83,11 @@ void ASPDEOp::_prepare(bool w1, bool w2) const
 //   return _QKriging->addToDest(inv, outv);
 // }
 
-int ASPDEOp::_addToDest(const constvect inv, vect outv) const
+Id ASPDEOp::_addToDest(const constvect inv, vect outv) const
 {
   _prepare();
 
-  int status = _QKriging->addToDest(inv, outv); // TODO: find why outv is set to zero in multistructure case
+  Id status = _QKriging->addToDest(inv, outv); // TODO: find why outv is set to zero in multistructure case
   if (status) return status;
   vect w1s(_workdat1);
   vect w2s(_workdat2);
@@ -98,7 +98,7 @@ int ASPDEOp::_addToDest(const constvect inv, vect outv) const
   return status;
 }
 
-int ASPDEOp::getSizeSimu() const
+Id ASPDEOp::getSizeSimu() const
 {
   return _QSimu->getSize();
 }
@@ -145,7 +145,7 @@ VectorDouble ASPDEOp::kriging(const VectorDouble& dat) const
   constvect datm(dat.data(), dat.size());
   VectorDouble outMeshK(_QKriging->getSize());
   vect outvs(outMeshK);
-  int err = _kriging(datm, outvs);
+  Id err = _kriging(datm, outvs);
   if (err) return VectorDouble();
 
   // Project the result on the output mesh (optional)
@@ -156,19 +156,19 @@ VectorDouble ASPDEOp::kriging(const VectorDouble& dat) const
   return result;
 }
 
-int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
+Id ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
                                   const MatrixDense& driftMat,
                                   const VectorDouble& driftCoeffs)
 {
-  int nrows = driftMat.getNRows();
-  int ncols = driftMat.getNCols();
-  if (nrows != (int)Z.size())
+  auto nrows = driftMat.getNRows();
+  auto ncols = driftMat.getNCols();
+  if (nrows != (Id)Z.size())
   {
     messerr("Error in number of Rows of drift matrix (%d) and size of data vector (%d)",
             nrows, Z.size());
     return 1;
   }
-  if (ncols != (int)driftCoeffs.size())
+  if (ncols != (Id)driftCoeffs.size())
   {
     messerr("Error in number of Columns of drift matrix (%d) and size of drift coefficients (%d)",
             ncols, driftCoeffs.size());
@@ -176,10 +176,10 @@ int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
   }
 
   // Center the data set
-  for (int i = 0; i < nrows; i++)
+  for (Id i = 0; i < nrows; i++)
   {
     double sum = 0.;
-    for (int j = 0; j < ncols; j++)
+    for (Id j = 0; j < ncols; j++)
     {
       sum += driftCoeffs[j] * driftMat.getValue(i, j);
     }
@@ -188,10 +188,10 @@ int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
   return 0;
 }
 
-int ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
+Id ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
                                  const VectorDouble& meanVec)
 {
-  if ((int)Z.size() != (int)meanVec.size())
+  if ((Id)Z.size() != (Id)meanVec.size())
   {
     messerr("Error in size of data vector (%d) and size of mean vector (%d)",
             Z.size(), meanVec.size());
@@ -199,7 +199,7 @@ int ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
   }
 
   // Center the data set
-  for (int i = 0, nrows = (int)Z.size(); i < nrows; i++)
+  for (Id i = 0, nrows = (Id)Z.size(); i < nrows; i++)
     Z[i] -= meanVec[i];
   return 0;
 }
@@ -236,17 +236,17 @@ VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
  * @param seed Random seed for the Monte-Carlo simulations
  * @return VectorDouble
  */
-VectorDouble ASPDEOp::stdev(const VectorDouble& dat, int nMC, int seed) const
+VectorDouble ASPDEOp::stdev(const VectorDouble& dat, Id nMC, Id seed) const
 {
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
   law_set_random_seed(seed);
 
   // Standard Deviation using Monte-Carlo simulations
-  int nout = _projOutSimu->getNPoint();
+  Id nout = _projOutSimu->getNPoint();
   VectorDouble temp_mean(nout, 0.);
   VectorDouble temp_mean2(nout, 0.);
 
-  for (int iMC = 0; iMC < nMC; iMC++)
+  for (Id iMC = 0; iMC < nMC; iMC++)
   {
     VectorDouble temp = simCond(dat);
     VH::addInPlace(temp_mean, temp);
@@ -281,19 +281,19 @@ VectorDouble ASPDEOp::krigingWithGuess(const VectorDouble& dat,
 
   VectorDouble outv(_QKriging->getSize());
   vect outvs(outv);
-  int err = krigingWithGuess(datv, guessv, outvs);
+  Id err = krigingWithGuess(datv, guessv, outvs);
   if (err) return VectorDouble();
   return outv;
 }
 
-int ASPDEOp::_kriging(const constvect inv, vect out) const
+Id ASPDEOp::_kriging(const constvect inv, vect out) const
 {
   _buildRhs(inv);
-  int status = _solve(_rhs, out);
+  Id status = _solve(_rhs, out);
   return status;
 }
 
-int ASPDEOp::krigingWithGuess(const constvect inv,
+Id ASPDEOp::krigingWithGuess(const constvect inv,
                               const constvect guess,
                               vect out) const
 {
@@ -301,13 +301,13 @@ int ASPDEOp::krigingWithGuess(const constvect inv,
   return _solveWithGuess(_rhs, guess, out);
 }
 
-int ASPDEOp::_solve(const constvect in, vect out) const
+Id ASPDEOp::_solve(const constvect in, vect out) const
 {
   _solver->solve(in, out);
   return 0;
 }
 
-int ASPDEOp::_solveWithGuess(const constvect in,
+Id ASPDEOp::_solveWithGuess(const constvect in,
                              const constvect guess,
                              vect out) const
 {
@@ -315,7 +315,7 @@ int ASPDEOp::_solveWithGuess(const constvect in,
   return 0;
 }
 
-int ASPDEOp::_buildRhs(const constvect inv) const
+Id ASPDEOp::_buildRhs(const constvect inv) const
 {
   _rhs.resize(_QKriging->getSize());
   vect w1(_workdat1);
@@ -345,14 +345,14 @@ VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
                                          const MatrixDense& driftMat,
                                          bool verbose) const
 {
-  int xsize = (int)(driftMat.getNCols());
+  Id xsize = (Id)(driftMat.getNCols());
   VectorDouble XtInvSigmaZ(xsize);
   MatrixSymmetric XtInvSigmaX(xsize);
   VectorDouble result(xsize);
 
   _workdat1.resize(_getNDat());
   vect w1s(_workdat1);
-  for (int i = 0; i < xsize; i++)
+  for (Id i = 0; i < xsize; i++)
   {
     auto xm = driftMat.getColumnPtr(i);
     evalInvCov(xm, w1s);
@@ -361,7 +361,7 @@ VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
     constvect wd1(_workdat1.data(), _workdat1.size());
     XtInvSigmaZ[i] = VH::innerProduct(ym, wd1);
 
-    for (int j = i; j < xsize; j++)
+    for (Id j = i; j < xsize; j++)
     {
       constvect xmj = driftMat.getViewOnColumn(j);
       double prod   = VH::innerProduct(xmj, w1s);
@@ -397,14 +397,14 @@ void ASPDEOp::_preparePoly(Chebychev& logPoly) const
               { return log(val); }, a, b, 2 * EPSILON4 / (a + b));
 }
 
-double ASPDEOp::computeLogDetOp(int nbsimu) const
+double ASPDEOp::computeLogDetOp(Id nbsimu) const
 {
   Chebychev logPoly;
   _preparePoly(logPoly);
   _workNoiseMesh.resize(getSize());
   _workmesh.resize(getSize());
   double val = 0.;
-  for (int i = 0; i < nbsimu; i++)
+  for (Id i = 0; i < nbsimu; i++)
   {
     VH::simulateGaussianInPlace(_workNoiseMesh);
     std::fill(_workmesh.begin(), _workmesh.end(), 0.);
@@ -423,7 +423,7 @@ double ASPDEOp::computeQuadratic(const std::vector<double>& x) const
   return VH::innerProduct(w1s, xm);
 }
 
-double ASPDEOp::computeLogDetQ(int nMC) const
+double ASPDEOp::computeLogDetQ(Id nMC) const
 {
   return _QKriging->computeLogDet(nMC);
 }
@@ -434,9 +434,9 @@ double ASPDEOp::computeLogDetInvNoise() const
 }
 
 // We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + log|Noise|
-double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
+double ASPDEOp::computeTotalLogDet(Id nMC, Id seed) const
 {
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
 
   law_set_random_seed(seed);
   double a1 = computeLogDetOp(nMC);

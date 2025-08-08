@@ -44,7 +44,7 @@ public:
     m_val = new T[m_nnz];
 
     T* valptr = m_val;
-    for (int j = 0; j < m_cols; ++j)
+    for (Id j = 0; j < m_cols; ++j)
     {
       typename SpMat::InnerIterator Acol(A, j);
       for (typename SpMat::InnerIterator pattern_col(pattern, j);
@@ -75,7 +75,7 @@ public:
     m_val = new T[m_nnz];
 
     T* valptr = m_val;
-    for (int j = 0; j < m_cols; ++j)
+    for (Id j = 0; j < m_cols; ++j)
     {
       for (typename SpMat::InnerIterator pattern_col(pattern, j);
            pattern_col; ++pattern_col)
@@ -114,7 +114,7 @@ typename SpChol::MatrixType partial_inverse(
   const SpMat& L     = llt.matrixL();
   SpMat Qinv         = L.template selfadjointView<Eigen::Lower>();
 
-  for (int i = ncols - 1; i >= 0; --i)
+  for (Id i = ncols - 1; i >= 0; --i)
   {
     reverse_it QinvcolI(Qinv, i);
     for (reverse_it LcolI_slow(L, i); LcolI_slow; --LcolI_slow)

@@ -59,7 +59,7 @@ ShapeHalfSinusoid::~ShapeHalfSinusoid()
  ** \param[in]  ndim    Space dimension
  **
  *****************************************************************************/
-BooleanObject* ShapeHalfSinusoid::generateObject(int ndim)
+BooleanObject* ShapeHalfSinusoid::generateObject(Id ndim)
 
 {
   auto* object = new BooleanObject(this);
@@ -83,7 +83,7 @@ BooleanObject* ShapeHalfSinusoid::generateObject(int ndim)
 bool ShapeHalfSinusoid::belongObject(const VectorDouble& coor,
                                      const BooleanObject* object) const
 {
-  int ndim    = (int)coor.size();
+  Id ndim    = (Id)coor.size();
   double dx   = (ndim >= 1) ? coor[0] / object->getValue(0) : 0.;
   double dz   = (ndim >= 3) ? coor[2] / object->getExtension(2) : 0.;
   double yloc = object->getValue(1) * cos(2. * GV_PI * dx) / 2.;

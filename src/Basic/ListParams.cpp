@@ -58,9 +58,9 @@ void ListParams::clear()
   _dispatchIndex.clear();
 }
 
-double ListParams::getValue(int index) const
+double ListParams::getValue(Id index) const
 {
-  if (index < 0 || index >= static_cast<int>(_params.size()))
+  if (index < 0 || index >= static_cast<Id>(_params.size()))
   {
     messerr("Index out of range in ListParams::getValue");
     return TEST;
@@ -79,9 +79,9 @@ double ListParams::getOptimizableValue(size_t index) const
   return _params[_dispatchIndex[index]].get().getValue();
 }
 
-void ListParams::setValue(int index, double value)
+void ListParams::setValue(Id index, double value)
 {
-  if (index < 0 || index >= static_cast<int>(_params.size()))
+  if (index < 0 || index >= static_cast<Id>(_params.size()))
   {
     messerr("Index out of range in ListParams::setValue");
     return;
@@ -95,7 +95,7 @@ String ListParams::toString(const AStringFormat* strfmt) const
   DECLARE_UNUSED(strfmt);
   std::stringstream result;
   result << toTitle(1,"List of Parameters:");
-  for (int ipar = 0, jpar = 0, npar = (int) _dispatchIndex.size(); ipar < npar; ipar++)
+  for (Id ipar = 0, jpar = 0, npar = (Id) _dispatchIndex.size(); ipar < npar; ipar++)
   {
     jpar++;
     result << jpar << " - " << _params[_dispatchIndex[ipar]].get().toString() << std::endl;

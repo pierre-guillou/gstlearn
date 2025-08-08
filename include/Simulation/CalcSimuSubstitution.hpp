@@ -27,7 +27,7 @@ class DbGrid;
 class GSTLEARN_EXPORT CalcSimuSubstitution: public ACalcSimulation
 {
 public:
-  CalcSimuSubstitution(int nbsimu = 0, int seed = 4324324, bool verbose = false);
+  CalcSimuSubstitution(Id nbsimu = 0, Id seed = 4324324, bool verbose = false);
   CalcSimuSubstitution(const CalcSimuSubstitution& r)            = delete;
   CalcSimuSubstitution& operator=(const CalcSimuSubstitution& r) = delete;
   virtual ~CalcSimuSubstitution();
@@ -43,21 +43,21 @@ private:
   void _rollback() override;
 
   bool _simulate();
-  void _calculValue(int ip, double factor, const VectorDouble& vector);
+  void _calculValue(Id ip, double factor, const VectorDouble& vector);
   static VectorDouble _transToProp(const SimuSubstitutionParam& subparam,
                                    bool verbose = false,
                                    double eps   = EPSILON5);
 
 private:
   bool _verbose;
-  int _iattOut;
+  Id _iattOut;
   SimuSubstitutionParam _subparam;
   std::vector<Plane> _planes;
 };
 
-GSTLEARN_EXPORT int substitution(DbGrid* dbgrid,
+GSTLEARN_EXPORT Id substitution(DbGrid* dbgrid,
                                  SimuSubstitutionParam& subparam,
-                                 int seed                        = 43242,
-                                 int verbose                     = false,
+                                 Id seed                        = 43242,
+                                 Id verbose                     = false,
                                  const NamingConvention& namconv = NamingConvention("SimSub"));
 } // namespace gstlrn

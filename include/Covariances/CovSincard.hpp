@@ -29,7 +29,7 @@ public:
   double         getScadef() const override;
   String getFormula() const override;
   String         getCovName() const override { return "Cardinal Sine"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
   bool isValidForTurningBand() const override { return true; }

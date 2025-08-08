@@ -58,11 +58,11 @@ public:
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Shortcuts
-  static VarioParam* createOmniDirection(int nlag = 10,
+  static VarioParam* createOmniDirection(Id nlag = 10,
                                          double dlag = 1.,
                                          double toldis = 0.5,
-                                         int opt_code = 0,
-                                         int idate = 0,
+                                         Id opt_code = 0,
+                                         Id idate = 0,
                                          double bench = TEST,
                                          double cylrad = TEST,
                                          double tolcode = 0.,
@@ -70,8 +70,8 @@ public:
                                          double scale = 0.,
                                          const VectorDouble& dates = VectorDouble(),
                                          const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static VarioParam* createMultiple(int ndir,
-                                    int nlag = 10,
+  static VarioParam* createMultiple(Id ndir,
+                                    Id nlag = 10,
                                     double dlag = 1.,
                                     double toldis = 0.5,
                                     double angref = 0.,
@@ -79,12 +79,12 @@ public:
                                     const VectorDouble& dates = VectorDouble(),
                                     const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static VarioParam* createMultipleFromGrid(const DbGrid* dbgrid,
-                                            int nlag,
+                                            Id nlag,
                                             double scale                 = 0.,
                                             const VectorDouble& dates    = VectorDouble(),
                                             const ASpaceSharedPtr& space = ASpaceSharedPtr(),
-                                            int ndimax                   = 0);
-  static VarioParam* createFromSpaceDimension(int nlag = 10,
+                                            Id ndimax                   = 0);
+  static VarioParam* createFromSpaceDimension(Id nlag = 10,
                                               double dlag = 1.,
                                               double toldis = 0.5,
                                               double tolang = 45.,
@@ -92,7 +92,7 @@ public:
                                               const VectorDouble &dates = VectorDouble(),
                                               const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static VarioParam* createSeveral2D(const VectorDouble &angles,
-                                     int nlag = 10,
+                                     Id nlag = 10,
                                      double dlag = 1.,
                                      double toldis = 0.5,
                                      double tolang = TEST,
@@ -102,29 +102,29 @@ public:
 
   void addDir(const DirParam& dirparam);
   void addMultiDirs(const std::vector<DirParam>& dirparams);
-  void delDir(int rank);
+  void delDir(Id rank);
   void delAllDirs();
 
   ASpaceSharedPtr getSpace() const { return _dirparams[0].getSpace(); }
   double getScale() const { return _scale; }
-  int    getNDate() const { return (int) _dates.size() / 2; }
-  int    getNDir() const { return (int) _dirparams.size(); }
+  Id    getNDate() const { return (Id) _dates.size() / 2; }
+  Id    getNDir() const { return (Id) _dirparams.size(); }
   const VectorDouble& getDates() const { return _dates; }
-  double getDate(int idate, int icas) const;
-  int getNLag(int idir) const;
-  VectorDouble getCodirs(int idir = 0) const;
+  double getDate(Id idate, Id icas) const;
+  Id getNLag(Id idir) const;
+  VectorDouble getCodirs(Id idir = 0) const;
   const std::vector<DirParam>& getDirParams() const { return _dirparams; }
-  const DirParam& getDirParam(int idir) const { return _dirparams[idir]; }
-  int getNDim() const;
+  const DirParam& getDirParam(Id idir) const { return _dirparams[idir]; }
+  Id getNDim() const;
   bool isDefinedForGrid() const;
 
-  int hasDate() const { return (getNDate() > 0 && (_dates[0] > MINIMUM_BIG || _dates[1] < MAXIMUM_BIG)); }
+  Id hasDate() const { return (getNDate() > 0 && (_dates[0] > MINIMUM_BIG || _dates[1] < MAXIMUM_BIG)); }
   bool isDateUsed(const Db *db1, const Db *db2 = nullptr) const;
 
   void setScale(double scale) { _scale = scale; }
   void setDates(const VectorDouble& dates) { _dates = dates; }
-  void setDPas(int idir,const DbGrid* db);
-  void setGrincr(int idir, const VectorInt& grincr);
+  void setDPas(Id idir,const DbGrid* db);
+  void setGrincr(Id idir, const VectorInt& grincr);
 
   String toStringMain(const AStringFormat* strfmt = nullptr) const;
 
@@ -133,14 +133,14 @@ public:
   void addFaults(const Faults* faults) { _faults = faults; }
 
 private:
-  int  _getAddress(int ivar, int jvar) const;
-  bool _isVariableValid(int ivar) const;
-  bool _isDirectionValid(int idir) const;
-  bool _isBivariableValid(int i) const;
-  bool _isDateValid(int idate) const;
+  Id  _getAddress(Id ivar, Id jvar) const;
+  bool _isVariableValid(Id ivar) const;
+  bool _isDirectionValid(Id idir) const;
+  bool _isBivariableValid(Id i) const;
+  bool _isDateValid(Id idate) const;
   void _initMeans();
   void _initVars();
-  VectorDouble _getDirectionInterval(int idir) const;
+  VectorDouble _getDirectionInterval(Id idir) const;
   bool _validDefinedFromGrid(const DirParam& dirparam) const;
 
 private:

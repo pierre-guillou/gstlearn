@@ -33,42 +33,42 @@ public:
   /// Interface to AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  int resetFromDb(const Db* db, double dilate = 0., bool verbose = false);
-  int resetFromCSV(const String& filename,
+  Id resetFromDb(const Db* db, double dilate = 0., bool verbose = false);
+  Id resetFromCSV(const String& filename,
                    const CSVformat& csv,
                    bool verbose = false,
-                   int ncol_max = -1,
-                   int nrow_max = -1);
-  int resetFromWKT(const String& filename,
+                   Id ncol_max = -1,
+                   Id nrow_max = -1);
+  Id resetFromWKT(const String& filename,
                    const CSVformat& csv,
                    bool verbose = false,
-                   int ncol_max = -1,
-                   int nrow_max = -1);
+                   Id ncol_max = -1,
+                   Id nrow_max = -1);
 
   static Polygons* create();
   static Polygons* createFromNF(const String& NFFilename, bool verbose = false);
   static Polygons* createFromCSV(const String& filename,
                                  const CSVformat& csv = CSVformat(),
-                                 int verbose          = false,
-                                 int ncol_max         = -1,
-                                 int nrow_max         = -1);
+                                 Id verbose          = false,
+                                 Id ncol_max         = -1,
+                                 Id nrow_max         = -1);
   static Polygons* createFromWKT(const String& filename,
                                  const CSVformat& csv = CSVformat(),
-                                 int verbose          = false,
-                                 int ncol_max         = -1,
-                                 int nrow_max         = -1);
+                                 Id verbose          = false,
+                                 Id ncol_max         = -1,
+                                 Id nrow_max         = -1);
   static Polygons* createFromDb(const Db* db, double dilate = 0., bool verbose = false);
 
-  int getNPolyElem() const { return static_cast<int>(_polyelems.size()); }
+  Id getNPolyElem() const { return static_cast<Id>(_polyelems.size()); }
   void addPolyElem(const PolyElem& polyelem);
 
   const std::vector<PolyElem>& getPolyElems() const { return _polyelems; }
-  const PolyElem& getPolyElem(int ipol) const;
-  PolyElem getClosedPolyElem(int ipol) const;
-  const VectorDouble& getX(int ipol) const;
-  const VectorDouble& getY(int ipol) const;
-  void setX(int ipol, const VectorDouble& x);
-  void setY(int ipol, const VectorDouble& y);
+  const PolyElem& getPolyElem(Id ipol) const;
+  PolyElem getClosedPolyElem(Id ipol) const;
+  const VectorDouble& getX(Id ipol) const;
+  const VectorDouble& getY(Id ipol) const;
+  void setX(Id ipol, const VectorDouble& x);
+  void setY(Id ipol, const VectorDouble& y);
 
   void getExtension(double* xmin,
                     double* xmax,
@@ -89,12 +89,12 @@ protected:
   String _getNFName() const override { return "Polygon"; }
 
 private:
-  static PolyElem _extractFromTab(int ideb, int ifin, int ncol, const VectorDouble& tab);
+  static PolyElem _extractFromTab(Id ideb, Id ifin, Id ncol, const VectorDouble& tab);
   static PolyElem _extractFromWKT(const CSVformat& csv, String& polye);
-  bool _isValidPolyElemIndex(int ipol) const;
+  bool _isValidPolyElemIndex(Id ipol) const;
   static VectorInt _getHullIndices(const VectorDouble& x, const VectorDouble& y);
-  static void _getExtend(double ext, VectorDouble& x, VectorDouble& y, int nsect = 16);
-  int _buildHull(const Db* db, double dilate, bool verbose);
+  static void _getExtend(double ext, VectorDouble& x, VectorDouble& y, Id nsect = 16);
+  Id _buildHull(const Db* db, double dilate, bool verbose);
   static void _polygonHullPrint(const VectorInt& index,
                                 const VectorDouble& x,
                                 const VectorDouble& y);
@@ -112,13 +112,13 @@ GSTLEARN_EXPORT void db_polygon(Db* db,
                                 bool flag_period                = false,
                                 bool flag_nested                = false,
                                 const NamingConvention& namconv = NamingConvention("Polygon", true, true, true, ELoc::fromKey("SEL")));
-GSTLEARN_EXPORT int dbPolygonDistance(Db* db,
+GSTLEARN_EXPORT Id dbPolygonDistance(Db* db,
                                       Polygons* polygon,
                                       double dmax,
-                                      int scale,
-                                      int polin,
+                                      Id scale,
+                                      Id polin,
                                       const NamingConvention& namconv = NamingConvention("Distance"));
-GSTLEARN_EXPORT int db_selhull(Db* db1,
+GSTLEARN_EXPORT Id db_selhull(Db* db1,
                                Db* db2,
                                double dilate                   = 0.,
                                bool verbose                    = false,

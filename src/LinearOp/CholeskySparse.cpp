@@ -66,14 +66,14 @@ void CholeskySparse::_clean()
  ** \param[in]  flagStDev FALSE for a variance calculation, True for StDev.
  **
  *****************************************************************************/
-int CholeskySparse::stdev(VectorDouble& vcur,
+Id CholeskySparse::stdev(VectorDouble& vcur,
                           const MatrixSparse* proj,
                           bool flagStDev) const
 {
   if (_stdev(vcur, proj)) return 1;
 
   if (flagStDev)
-    for (int iech = 0, ntarget = (int)vcur.size(); iech < ntarget; iech++)
+    for (Id iech = 0, ntarget = (Id)vcur.size(); iech < ntarget; iech++)
       vcur[iech] = sqrt(vcur[iech]);
   return 0;
 }
@@ -83,18 +83,18 @@ double CholeskySparse::computeLogDeterminant() const
   if (!isReady()) return TEST;
   double det       = 0.;
   const auto& diag = _factor->vectorD(); // Diagonal of the LDL^t decomposition (don't multiply by 2.!)
-  for (int i = 0; i < _size; ++i)
+  for (Id i = 0; i < _size; ++i)
     det += log(diag[i]);
   return det;
 }
 
-int CholeskySparse::setMatrix(const MatrixSparse& mat)
+Id CholeskySparse::setMatrix(const MatrixSparse& mat)
 {
   _size = mat.getNRows();
   return _prepare(mat);
 }
 
-int CholeskySparse::_prepare(const MatrixSparse& mat) const
+Id CholeskySparse::_prepare(const MatrixSparse& mat) const
 {
   if (_factor != nullptr) return 0;
 
@@ -109,7 +109,7 @@ int CholeskySparse::_prepare(const MatrixSparse& mat) const
   return 0;
 }
 
-int CholeskySparse::addSolveX(const constvect vecin, vect vecout) const
+Id CholeskySparse::addSolveX(const constvect vecin, vect vecout) const
 {
   if (!isReady()) return 1;
   Eigen::Map<const Eigen::VectorXd> bm(vecin.data(), vecin.size());
@@ -118,7 +118,7 @@ int CholeskySparse::addSolveX(const constvect vecin, vect vecout) const
   return 0;
 }
 
-int CholeskySparse::addInvLtX(const constvect vecin, vect vecout) const
+Id CholeskySparse::addInvLtX(const constvect vecin, vect vecout) const
 {
   if (!isReady()) return 1;
   Eigen::VectorXd temp(vecout.size());
@@ -134,7 +134,7 @@ int CholeskySparse::addInvLtX(const constvect vecin, vect vecout) const
   return 0;
 }
 
-int CholeskySparse::addLtX(const constvect vecin, vect vecout) const
+Id CholeskySparse::addLtX(const constvect vecin, vect vecout) const
 {
   if (!isReady()) return 1;
   Eigen::VectorXd temp(vecout.size());
@@ -151,7 +151,7 @@ int CholeskySparse::addLtX(const constvect vecin, vect vecout) const
   return 0;
 }
 
-int CholeskySparse::addLX(const constvect vecin, vect vecout) const
+Id CholeskySparse::addLX(const constvect vecin, vect vecout) const
 {
   if (!isReady()) return 1;
   Eigen::Map<const Eigen::VectorXd> mvecin(vecin.data(), vecin.size());
@@ -167,7 +167,7 @@ int CholeskySparse::addLX(const constvect vecin, vect vecout) const
   return 0;
 }
 
-int CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
+Id CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
 {
   if (!isReady()) return 1;
   Eigen::Map<const Eigen::VectorXd> mvecin(vecin.data(), vecin.size());
@@ -196,7 +196,7 @@ int CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
  * This should be optimally replaced by a more clever version of
  * the original Takahashi algorithm (see sparseinv in old code)
  */
-int CholeskySparse::_stdev(VectorDouble& vcur,
+Id CholeskySparse::_stdev(VectorDouble& vcur,
                            const MatrixSparse* proj) const
 {
   Eigen::Map<Eigen::VectorXd> vcurm(vcur.data(), vcur.size());
@@ -212,11 +212,11 @@ int CholeskySparse::_stdev(VectorDouble& vcur,
   using SpVec    = Eigen::SparseVector<double>;
   using DenseVec = Eigen::VectorXd;
 
-  const int k = P.cols();
-  const int l = P.rows();
+  const Id k = P.cols();
+  const Id l = P.rows();
   SpVec p_i(k);
 
-  for (int i = 0; i < l; ++i)
+  for (Id i = 0; i < l; ++i)
   {
     p_i.setZero();
 

@@ -32,16 +32,16 @@ public:
 
   ELaw getLaw() const { return _law; }
   const VectorDouble& getValarg() const { return _valarg; }
-  double getValarg(int iarg) const;
-  int getNbValarg() const { return (int) _valarg.size(); }
+  double getValarg(Id iarg) const;
+  Id getNbValarg() const { return (Id) _valarg.size(); }
 
   void setLaw(const ELaw& law) { _law = law; }
-  void setValarg(int iarg, double value);
+  void setValarg(Id iarg, double value);
 
   double generateValue() const;
 
 private:
-  bool _isValidArgIndex(int iarg) const;
+  bool _isValidArgIndex(Id iarg) const;
 
 private:
   ELaw _law; /* Type of law */

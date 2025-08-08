@@ -50,35 +50,35 @@ public:
   /// AStringable Interface
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  int getSize() const override;
+  Id getSize() const override;
 
-  double computeLogDet(int nMC = 1) const override;
+  double computeLogDet(Id nMC = 1) const override;
   std::pair<double, double> rangeEigenValQ() const;
 
 protected:
 #ifndef SWIG
-  int _addToDest(const constvect vecin, vect vecout) const override;
-  int _addSimulateToDest(const constvect vecin, vect vecout) const override;
+  Id _addToDest(const constvect vecin, vect vecout) const override;
+  Id _addSimulateToDest(const constvect vecin, vect vecout) const override;
 #endif
 
   void buildQop(bool stencil = false);
-  int size(int imesh) const;
-  int _getNCov() const;
-  int _getCovInd(int i) const { return _covList[i]; }
-  int _getNVar() const;
-  int _getNMesh() const;
+  Id size(Id imesh) const;
+  Id _getNCov() const;
+  Id _getCovInd(Id i) const { return _covList[i]; }
+  Id _getNVar() const;
+  Id _getNMesh() const;
 
 private:
   bool _checkReady() const;
   virtual void _buildQop(bool stencil = false);
   bool _isValidModel(Model* model);
   bool _isValidMeshes(const std::vector<const AMesh*>& meshes);
-  bool _isNoStat(int istruct) const { return _isNoStatForVariance[istruct]; }
+  bool _isNoStat(Id istruct) const { return _isNoStatForVariance[istruct]; }
   bool _matchModelAndMeshes() const;
 
-  int _buildGlobalMatricesStationary(int icov);
-  int _buildLocalMatricesNoStat(int icov);
-  int _buildMatrices();
+  Id _buildGlobalMatricesStationary(Id icov);
+  Id _buildLocalMatricesNoStat(Id icov);
+  Id _buildMatrices();
   void _popsClear();
   void _computeSize();
 
@@ -94,7 +94,7 @@ protected:
 
   Model* _model;                     // Not to be deleted. TODO : make it const
   std::vector<const AMesh*> _meshes; // Not to be deleted
-  int _size;
+  Id _size;
 
 private:
   bool _isValid;
