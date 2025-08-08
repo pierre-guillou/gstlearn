@@ -20,11 +20,11 @@
 
 namespace gstlrn
 {
-static Id Random_factor     = 105;
-static Id Random_congruent  = 20000159;
-static Id Random_value      = 43241421;
-static bool Random_Old_Style = true;
-std::mt19937 Random_gen;
+thread_local Id Random_factor     = 105;
+thread_local Id Random_congruent  = 20000159;
+thread_local Id Random_value      = 43241421;
+thread_local bool Random_Old_Style = true;
+thread_local std::mt19937 Random_gen;
 
 /*! \cond */
 #define TABIN_BY_COL(iech, ivar)   (tabin[(ivar) * nechin + (iech)])
