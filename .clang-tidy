@@ -9,6 +9,7 @@ Checks: >-
   modernize-deprecated-headers,
   modernize-use-auto,
   modernize-use-override,
+  google-readability-casting,
   mpi-*,
   openmp-*,
   -openmp-use-default-none,
