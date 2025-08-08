@@ -78,7 +78,8 @@ public:
   void evalInvCov(const constvect inv, vect result) const;
   void simCond(const constvect data, vect outv) const;
   void simNonCond(vect outv) const;
-  virtual double computeLogDetOp(Id nbsimu) const;
+#endif
+  virtual double computeLogDetOp(Id nbsimu = 1) const;
   double computeQuadratic(const std::vector<double>& x) const;
   double computeTotalLogDet(Id nMC = 5, Id seed = 13132) const;
   double computeLogDetQ(Id nMC = 5) const;
@@ -89,6 +90,8 @@ public:
   static Id centerDataByMeanVec(VectorDouble& Z,
                                 const VectorDouble& meanVec);
   void setVerbose(bool v) { _verbose = v; }
+
+#ifndef SWIG
 
 protected:
   Id _addToDest(const constvect inv, vect outv) const override;

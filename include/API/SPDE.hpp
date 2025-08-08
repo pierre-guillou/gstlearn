@@ -12,6 +12,7 @@
 
 #include "API/SPDEParam.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/InvNuggetOp.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
@@ -66,6 +67,11 @@ public:
   Id getNMC() const { return _params.getNMC(); }
   const SPDEOp* getSPDEOp() const { return _spdeop; }
 
+  const MatrixSparse* getQ() const;
+  const MatrixSparse* getProj() const;
+  const PrecisionOpMulti* getPrecisionKrig() const;
+  const MatrixSparse* getInvNoise() const;
+
   Id defineSpdeOperator(bool verbose = false);
   Id centerDataByDriftInPlace(VectorDouble& Z, bool verbose = false);
   void uncenterResultByDriftInPlace(VectorDouble& result);
@@ -78,6 +84,7 @@ public:
                      const ProjMultiMatrix* projS = nullptr,
                      bool flagApply               = true,
                      bool verbose                 = false);
+  Id setInvNoise(const ASimulable* invnoise);
   Id makeReady(bool verbose = false);
 
 private:
@@ -105,8 +112,10 @@ private:
   const ProjMultiMatrix* _projInSInit;
   const ProjMultiMatrix* _projOutKInit;
   const ProjMultiMatrix* _projOutSInit;
+  const ASimulable* _invnoiseobjInit;
 
   // Local information
+  bool _isReady;
   bool _flagCholesky;
   bool _flagKrig;
   bool _flagSimu;
@@ -126,7 +135,8 @@ private:
   PrecisionOpMulti* _QopK;
   PrecisionOpMulti* _QopS;
   PrecisionOpMultiMatrix* _Qom;
-  InvNuggetOp* _invnoiseobj;
+  bool _createInvNoise;
+  const ASimulable* _invnoiseobj;
   SPDEOp* _spdeop;
   SPDEParam _params;
 };

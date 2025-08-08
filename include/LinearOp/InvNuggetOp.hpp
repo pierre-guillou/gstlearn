@@ -36,7 +36,10 @@ class MatrixSymmetric;
 class GSTLEARN_EXPORT InvNuggetOp: public virtual ASimulable, public virtual MatrixSparse
 {
 public:
-  InvNuggetOp(const Db* dbin = nullptr, Model* model = nullptr, const SPDEParam& params = SPDEParam(), bool = false);
+  InvNuggetOp(const Db* dbin          = nullptr,
+              Model* model            = nullptr,
+              const SPDEParam& params = SPDEParam(),
+              bool flagEigVals        = false);
   InvNuggetOp(const InvNuggetOp& m)            = delete;
   InvNuggetOp& operator=(const InvNuggetOp& m) = delete;
   virtual ~InvNuggetOp();

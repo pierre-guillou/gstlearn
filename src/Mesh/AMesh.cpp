@@ -931,6 +931,7 @@ void dumpMeshes(const VectorMeshes& meshes)
 {
   mestitle(1, "Contents of the VectorMeshes");
   int nmesh = meshes.size();
+  message("It contains %d mesh(es)\n", nmesh);
   for (int imesh = 0; imesh < nmesh; imesh++)
     messageFlush(meshes[imesh]->toString());
 }

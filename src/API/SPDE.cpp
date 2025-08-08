@@ -64,6 +64,8 @@ SPDE::SPDE(const Db* dbin,
   , _projInSInit(nullptr)
   , _projOutKInit(nullptr)
   , _projOutSInit(nullptr)
+  , _invnoiseobjInit(nullptr)
+  , _isReady(false)
   , _flagCholesky(false)
   , _flagKrig(flagKrig)
   , _flagSimu(flagSimu)
@@ -83,6 +85,7 @@ SPDE::SPDE(const Db* dbin,
   , _QopK(nullptr)
   , _QopS(nullptr)
   , _Qom(nullptr)
+  , _createInvNoise(false)
   , _invnoiseobj(nullptr)
   , _spdeop(nullptr)
   , _params(params)
@@ -108,7 +111,7 @@ void SPDE::_cleanSpdeOperator()
   delete _Qom;
   delete _QopK;
   delete _QopS;
-  delete _invnoiseobj;
+  if (_createInvNoise) delete _invnoiseobj;
   delete _spdeop;
 }
 
@@ -191,6 +194,14 @@ Id SPDE::setProjIn(bool flagForKrig, const ProjMultiMatrix* proj)
     if (!_isValidProjection(_dbin, _meshesSInit, proj)) return 1;
     _projInSInit = proj;
   }
+  return 0;
+}
+
+int SPDE::setInvNoise(const ASimulable* invnoise)
+{
+  if (invnoise == nullptr) return 1;
+  if (_dbin == nullptr) return 1;
+  _invnoiseobjInit = invnoise;
   return 0;
 }
 
@@ -404,6 +415,11 @@ void SPDE::_defineMeshes(bool flagForKrige, bool verbose)
   {
     dest       = *src;
     createMesh = false;
+    if (verbose)
+    {
+      message("Input Mesh is provided and used as is\n");
+      _printMeshesDetails(dest);
+    }
     return;
   }
 
@@ -502,20 +518,29 @@ Id SPDE::defineSpdeOperator(bool verbose)
   // Clean previous material (if necessary)
   _cleanSpdeOperator();
 
-  _invnoiseobj = new InvNuggetOp(_dbin, _model, _params, !_flagCholesky);
+  if (_invnoiseobjInit != nullptr)
+  {
+    _invnoiseobj    = _invnoiseobjInit;
+    _createInvNoise = false;
+  }
+  else
+  {
+    _invnoiseobj    = new InvNuggetOp(_dbin, _model, _params, !_flagCholesky);
+    _createInvNoise = true;
+  }
 
   if (_flagCholesky)
   {
-    if (!_meshesK.empty())
+    VectorMeshes& meshes = _meshesK;
+    if (meshes.empty()) meshes = _meshesS;
+    _Qom                 = new PrecisionOpMultiMatrix(_model, meshes);
+    const auto* invnoise = dynamic_cast<const InvNuggetOp*>(_invnoiseobj);
+    if (invnoise == nullptr)
     {
-      _Qom    = new PrecisionOpMultiMatrix(_model, _meshesK);
-      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj);
+      messerr("You must provide 'invnoise' as a InvNuggetOp for Cholesky case");
+      return 1;
     }
-    else
-    {
-      _Qom    = new PrecisionOpMultiMatrix(_model, _meshesS);
-      _spdeop = new SPDEOpMatrix(_Qom, _AinK, _invnoiseobj);
-    }
+    _spdeop = new SPDEOpMatrix(_Qom, _AinK, invnoise);
   }
   else
   {
@@ -648,8 +673,9 @@ Id SPDE::makeReady(bool verbose)
   }
 
   // Define the spde operator
-  if (defineSpdeOperator()) return 1;
+  if (defineSpdeOperator(verbose)) return 1;
 
+  _isReady = true;
   return 0;
 }
 
@@ -1075,6 +1101,57 @@ double logLikelihoodSPDE(Db* dbin,
 
   // Cleaning phase
   return loglike;
+}
+
+const MatrixSparse* SPDE::getQ() const
+{
+  if (!_isReady)
+  {
+    messerr("You must call SPDE::makeReady() beforehand");
+    return nullptr;
+  }
+  auto* spdeopmatrix = dynamic_cast<SPDEOpMatrix*>(_spdeop);
+  if (spdeopmatrix == nullptr) return nullptr;
+
+  const auto* mat = dynamic_cast<const PrecisionOpMultiMatrix*>(spdeopmatrix->getQKriging());
+  return mat->getQ();
+}
+
+const MatrixSparse* SPDE::getInvNoise() const
+{
+  if (!_isReady)
+  {
+    messerr("You must call SPDE::makeReady() beforehand");
+    return nullptr;
+  }
+  const auto* invnoise = dynamic_cast<const InvNuggetOp*>(_invnoiseobj);
+  if (invnoise == nullptr) return nullptr;
+
+  return invnoise->getInvNuggetMatrix();
+}
+
+const MatrixSparse* SPDE::getProj() const
+{
+  if (!_isReady)
+  {
+    messerr("You must call SPDE::makeReady() beforehand");
+    return nullptr;
+  }
+  auto* spdeopmatrix = dynamic_cast<SPDEOpMatrix*>(_spdeop);
+  if (spdeopmatrix == nullptr) return nullptr;
+
+  const auto* mat = dynamic_cast<const ProjMultiMatrix*>(spdeopmatrix->getProjKriging());
+  return mat->getProj();
+}
+
+const PrecisionOpMulti* SPDE::getPrecisionKrig() const
+{
+  if (!_isReady)
+  {
+    messerr("You must call SPDE::makeReady() beforehand");
+    return nullptr;
+  }
+  return _flagCholesky ? _Qom : _QopK;
 }
 
 } // namespace gstlrn
