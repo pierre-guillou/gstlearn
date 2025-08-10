@@ -79,7 +79,7 @@ Id AArray::indiceToRank(const VectorInt& indice) const
 void AArray::rankToIndice(Id rank, VectorInt& indices) const
 {
   auto ndim = getNDim();
-  if ((Id)indices.size() != ndim)
+  if (static_cast<Id>(indices.size()) != ndim)
   {
     messerr("Argument indices should have the correct size. Output argument 'indices' not modified");
     return;
@@ -121,9 +121,9 @@ VectorInt AArray::getNDimsExt(Id ndimMax) const
 bool AArray::_isValidIndice(const VectorInt& indice) const
 {
   auto ndim = getNDim();
-  if ((Id) indice.size() != ndim)
+  if (static_cast<Id>(indice.size()) != ndim)
   {
-    messerr("Argument 'indice' does not have the correct dimension (%d)",(Id) indice.size());
+    messerr("Argument 'indice' does not have the correct dimension (%d)",static_cast<Id>(indice.size()));
     messerr("It should match the AArray dimension (%d)", ndim);
     return false;
   }

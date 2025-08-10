@@ -250,7 +250,7 @@ void NamingConvention::setNamesAndLocators(const Db *dbin,
       // If 'nvar' is defined, it prevails.
       namloc = dbin->getNamesByLocator(locatorInType);
       if (nvar <= 0)
-        nvar = (Id) namloc.size();
+        nvar = static_cast<Id>(namloc.size());
       else
         namloc.resize(nvar);
     }
@@ -264,14 +264,14 @@ void NamingConvention::setNamesAndLocators(const Db *dbin,
   else
   {
     // 'namloc' is defined as input argument
-    if ((Id) namloc.size() == 1 && nvar > 1)
+    if (static_cast<Id>(namloc.size()) == 1 && nvar > 1)
     {
       // Particular case of a single string in 'namloc' but 'nvar' > 1; expand the name
       namloc = generateMultipleNames(namloc[0], nvar);
     }
 
     // The number items in 'namloc' overrides 'nvar'
-    nvar = (Id) namloc.size();
+    nvar = static_cast<Id>(namloc.size());
   }
 
   _setNames(dbout, iattout_start, namloc, nvar, qualifier, nitems);
@@ -385,13 +385,13 @@ Id NamingConvention::_getNameCount(const VectorString& names, Id nvar)
   {
     // Argument 'nvar' is not defined yet
     if (names.empty()) return 1;
-    return (Id)names.size();
+    return static_cast<Id>(names.size());
   }
   // Argument 'nvar' is provided: is it consistent with 'names'
   if (names.empty()) return nvar;
   // Both 'nvar' and 'names' are provided. For safety reasons,
   // the number of variables is the minimum between the two
-  return MIN(nvar, (Id)names.size());
+  return MIN(nvar, static_cast<Id>(names.size()));
 }
 
 /**

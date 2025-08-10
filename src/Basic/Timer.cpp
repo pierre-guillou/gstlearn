@@ -96,7 +96,7 @@ double Timer::getIntervalMilliseconds(bool flag_reset)
   sec fs       = newTime - _refTime;
   ms inter     = std::chrono::duration_cast<ms>(fs);
   if (flag_reset) _refTime = newTime;
-  return ((double)inter.count());
+  return (static_cast<double>(inter.count()));
 }
 
 void Timer::displayMilliseconds(const String& title, double msec, Id expected_time)
@@ -107,4 +107,4 @@ void Timer::displayMilliseconds(const String& title, double msec, Id expected_ti
   else
     messageNoDiff("%s: %d ms.\n", title.c_str(), (Id)msec);
 }
-}
+} // namespace gstlrn

@@ -109,10 +109,15 @@ SPDE::~SPDE()
 void SPDE::_cleanSpdeOperator()
 {
   delete _Qom;
+  _Qom = nullptr;
   delete _QopK;
+  _QopK = nullptr;
   delete _QopS;
+  _QopS = nullptr;
   if (_createInvNoise) delete _invnoiseobj;
+  _invnoiseobj = nullptr;
   delete _spdeop;
+  _spdeop = nullptr;
 }
 
 /**
@@ -166,6 +171,8 @@ Id SPDE::setMeshes(bool flagForKrig, const VectorMeshes* meshes)
     _meshesKInit = meshes;
   else
     _meshesSInit = meshes;
+
+  _isReady = false;
   return 0;
 }
 
@@ -194,14 +201,16 @@ Id SPDE::setProjIn(bool flagForKrig, const ProjMultiMatrix* proj)
     if (!_isValidProjection(_dbin, _meshesSInit, proj)) return 1;
     _projInSInit = proj;
   }
+  _isReady = false;
   return 0;
 }
 
-int SPDE::setInvNoise(const ASimulable* invnoise)
+Id SPDE::setInvNoise(const ASimulable* invnoise)
 {
   if (invnoise == nullptr) return 1;
   if (_dbin == nullptr) return 1;
   _invnoiseobjInit = invnoise;
+  _isReady         = false;
   return 0;
 }
 
@@ -374,7 +383,7 @@ void SPDE::_cleanMeshes(bool flagForKrige)
   {
     if (_createMeshesK && !_meshesK.empty())
     {
-      for (int i = 0, n = _meshesK.size(); i < n; i++)
+      for (Id i = 0, n = _meshesK.size(); i < n; i++)
         delete _meshesK[i];
     }
   }
@@ -382,7 +391,7 @@ void SPDE::_cleanMeshes(bool flagForKrige)
   {
     if (_createMeshesS && !_meshesS.empty())
     {
-      for (int i = 0, n = _meshesS.size(); i < n; i++)
+      for (Id i = 0, n = _meshesS.size(); i < n; i++)
         delete _meshesS[i];
     }
   }
@@ -394,8 +403,8 @@ void SPDE::_defineMeshes(bool flagForKrige, bool verbose)
   auto& dest       = flagForKrige ? _meshesK : _meshesS;
   auto& createMesh = flagForKrige ? _createMeshesK : _createMeshesS;
 
-  int ncov  = _model->getNCov(true);
-  int nmesh = (src != nullptr) ? src->size() : 0;
+  Id ncov  = _model->getNCov(true);
+  Id nmesh = (src != nullptr) ? src->size() : 0;
 
   // Cleaning already existing meshes inforation
   _cleanMeshes(flagForKrige);
@@ -462,7 +471,7 @@ void SPDE::_cleanProjection(bool flagIn, bool flagForKrige)
   createProj = false;
 }
 
-int SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
+Id SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
 {
   const auto* db = flagIn ? _dbin : _dbout;
   if (db == nullptr) return 0;
@@ -513,8 +522,6 @@ int SPDE::_defineProjection(bool flagIn, bool flagForKrige, bool verbose)
 
 Id SPDE::defineSpdeOperator(bool verbose)
 {
-  delete _spdeop;
-
   // Clean previous material (if necessary)
   _cleanSpdeOperator();
 
@@ -959,6 +966,9 @@ Id simulateSPDE(Db* dbin,
  *   - Otherwise an error is raised
  * - If 'mesheS' does not exist, 'meshesK' is used instead
  * - If 'projInS' does not exist, 'projInK' is used instead
+ *
+ * @remark Note that, at this stage of development of this method, the data must be provided
+ * in Gaussian scale.
  */
 Id simPGSSPDE(Db* dbin,
               Db* dbout,
@@ -1002,20 +1012,15 @@ Id simPGSSPDE(Db* dbin,
 
   // Perform the Simulation and storage.
   // All is done in ONE step to avoid additional storage
-  Id nvar = model->getNVar();
-
+  Id nvar    = model->getNVar();
   Id nechred = dbout->getNSample(true);
+  Id iuid    = dbout->addColumnsByConstant(nvar * nbsimu);
   VectorDouble local(nechred);
   VectorDouble result;
-
-  if (spde.getFlagKrig())
-    ruleprop.categoryToThresh(dbin);
 
   // Loop on the simulations
   for (Id isimu = 0; isimu < nbsimu; isimu++)
   {
-    Id iuid = dbout->addColumnsByConstant(nvar);
-
     result = (spde.getFlagKrig())
              ? spde.getSPDEOp()->simCond(Z, spde.getAoutK(), spde.getAoutS())
              : spde.getSPDEOp()->simNonCond(spde.getAoutS());
@@ -1023,16 +1028,19 @@ Id simPGSSPDE(Db* dbin,
     spde.uncenterResultByDriftInPlace(result);
 
     // Loop on the variables
+    VectorInt iuids;
     for (Id ivar = 0; ivar < nvar; ivar++)
     {
       VH::extractInPlace(result, local, ivar * nechred);
-      dbout->setColumnByUID(local, iuid + ivar, true);
-      dbout->setLocatorByUID(iuid + ivar, ELoc::SIMU, ivar);
+      Id juid = iuid + ivar * nbsimu + isimu;
+      dbout->setColumnByUID(local, juid, true);
+      iuids.push_back(juid);
     }
 
     // Convert the resulting simulation into categories
+    dbout->setLocatorsByUID(iuids, ELoc::SIMU);
     ruleprop.gaussToCategory(dbout, namconv);
-    dbout->deleteColumnsByUID(VH::sequence(nvar, iuid));
+    dbout->deleteColumnsByUID(iuids);
   }
 
   return 0;

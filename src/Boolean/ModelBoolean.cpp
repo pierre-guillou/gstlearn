@@ -71,7 +71,7 @@ void ModelBoolean::normalizeProportions()
   if (ABS(total) <= 0.)
   {
     for (Id itok = 0; itok < nb_tokens; itok++)
-      _shapes[itok]->setProportion(1. / (double) nb_tokens);
+      _shapes[itok]->setProportion(1. / static_cast<double>(nb_tokens));
   }
   else
   {

@@ -96,7 +96,7 @@ std::vector<Plane> Plane::poissonPlanesGenerate(DbGrid* dbgrid, Id np)
       ap[idim] /= u;
     }
     // Check position of the Center (in its OWN space dimension)
-    for (Id idim = 0; idim < (Id)center.size(); idim++)
+    for (Id idim = 0; idim < static_cast<Id>(center.size()); idim++)
     {
       d0 -= ap[idim] * center[idim];
     }
@@ -120,14 +120,14 @@ std::vector<Plane> Plane::poissonPlanesGenerate(DbGrid* dbgrid, Id np)
 
 double Plane::getCoor(Id idim) const
 {
-  if (idim < (Id)_coor.size())
+  if (idim < static_cast<Id>(_coor.size()))
     return _coor[idim];
   return 0.;
 }
 
 void Plane::setCoor(Id idim, double value)
 {
-  if (idim < (Id)_coor.size())
+  if (idim < static_cast<Id>(_coor.size()))
     _coor[idim] = value;
 }
 } // namespace gstlrn

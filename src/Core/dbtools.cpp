@@ -71,7 +71,7 @@ typedef struct
   Id flag_rank;
   Id flag_bounds;
 } Edit_Item;
-static Id N_EDIT       = 10;
+static Id N_EDIT        = 10;
 static Edit_Item EDIT[] = {{"P", "Define the Properties", 0, 0},
                            {".", "Same as previous Command", 0, 0},
                            {"S", "Shift the Sample Rank", 1, 0},
@@ -103,11 +103,11 @@ static Edit_Item EDIT[] = {{"P", "Define the Properties", 0, 0},
  **
  *****************************************************************************/
 Id surface(Db* db_point,
-            DbGrid* db_grid,
-            Id /*icol*/,
-            double dlim,
-            double* dtab,
-            double* gtab)
+           DbGrid* db_grid,
+           Id /*icol*/,
+           double dlim,
+           double* dtab,
+           double* gtab)
 {
   bool flagTest;
 
@@ -296,11 +296,11 @@ static void st_edit_display(Db* db, Id nrdv, Id nrds, Id ivar, Id iech)
  **
  *****************************************************************************/
 static Id st_edit_find(Db* db,
-                        Id iech,
-                        Id ivar,
-                        Id orient,
-                        double vmin,
-                        double vmax)
+                       Id iech,
+                       Id ivar,
+                       Id orient,
+                       double vmin,
+                       double vmax)
 {
   double value;
 
@@ -350,8 +350,8 @@ static Id st_edit_ask(Id* item, Id* rank, double* vmin, double* vmax)
 {
   Id found, flag_skip, mem_long;
   char string[STRING_LENGTH], *decode;
-  static Id mem_item    = 1;
-  static Id mem_rank    = 1;
+  static Id mem_item     = 1;
+  static Id mem_rank     = 1;
   static double mem_vmin = 0.;
   static double mem_vmax = 1.;
 
@@ -804,7 +804,7 @@ static VectorDouble st_point_init_homogeneous(Id number,
     return tab;
   }
   VectorDouble extend = VH::subtract(coormin, coormax);
-  Id ndim            = (Id)coormin.size();
+  Id ndim             = (Id)coormin.size();
   VectorDouble coor(ndim);
   VectorDouble delta(ndim);
 
@@ -1054,7 +1054,7 @@ Id db_resind(Db* db, Id ivar, const VectorDouble& zcut)
       if (value >= zcut[icut]) tonnage[icut]++;
   }
   for (Id icut = 0; icut < ncut; icut++)
-    tonnage[icut] /= (double)ntot;
+    tonnage[icut] /= static_cast<double>(ntot);
 
   /* Create the variables */
 
@@ -1074,12 +1074,12 @@ Id db_resind(Db* db, Id ivar, const VectorDouble& zcut)
     for (Id icut = 0; icut < ncut; icut++)
     {
       double zval     = zcut[icut];
-      Id ind_cut0    = (value > zval);
+      Id ind_cut0     = (value > zval);
       zval            = (icut > 0) ? zcut[icut - 1] : 0.;
-      Id ind_cut1    = (value > zval);
+      Id ind_cut1     = (value > zval);
       double ton_cut0 = tonnage[icut];
       double ton_cut1 = (icut > 0) ? tonnage[icut - 1] : 1.;
-      Id ir          = ind_cut0 / ton_cut0 - ind_cut1 / ton_cut1;
+      Id ir           = ind_cut0 / ton_cut0 - ind_cut1 / ton_cut1;
       db->setArray(iech, iptr + icut, ir);
     }
   }
@@ -1300,10 +1300,10 @@ static Id st_is_zero(Db* dbgrid, Id iptr_grad, Id iech)
  **
  *****************************************************************************/
 static Id st_get_next(DbGrid* dbgrid,
-                       Id iptr_grad,
-                       VectorDouble& coor,
-                       Id* knd,
-                       double* surf)
+                      Id iptr_grad,
+                      VectorDouble& coor,
+                      Id* knd,
+                      double* surf)
 {
   Id knd_loc;
   double surf_loc;
@@ -1344,15 +1344,15 @@ static Id st_get_next(DbGrid* dbgrid,
  **
  *****************************************************************************/
 Id db_streamline(DbGrid* dbgrid,
-                  Db* dbpoint,
-                  Id niter,
-                  double step,
-                  Id flag_norm,
-                  Id use_grad,
-                  Id save_grad,
-                  Id* nbline_loc,
-                  Id* npline_loc,
-                  VectorDouble& line)
+                 Db* dbpoint,
+                 Id niter,
+                 double step,
+                 Id flag_norm,
+                 Id use_grad,
+                 Id save_grad,
+                 Id* nbline_loc,
+                 Id* npline_loc,
+                 VectorDouble& line)
 {
   Id error, npline, idim, ecr;
   Id iptr_time, iptr_accu, iptr_grad, nbline, knd, nquant, nbyech, ndim;
@@ -1656,7 +1656,7 @@ Db* db_regularize(Db* db, DbGrid* dbgrid, Id flag_center)
   Id size = ndim + nvar + 1;
 
   VectorDouble codes = db->getCodeList();
-  Id ncode          = (Id)codes.size();
+  Id ncode           = (Id)codes.size();
   VectorDouble coor(ndim, 0);
   VectorDouble wcnt(ncode * nz, 0);
   VectorDouble wcor(ncode * nz * ndim, 0);
@@ -1780,14 +1780,14 @@ label_end:
  **
  *****************************************************************************/
 Id db_grid2point_sampling(DbGrid* dbgrid,
-                           Id nvar,
-                           Id* vars,
-                           const Id* npacks,
-                           Id npcell,
-                           Id nmini,
-                           Id* nech_ret,
-                           VectorDouble& coor,
-                           VectorDouble& data)
+                          Id nvar,
+                          Id* vars,
+                          const Id* npacks,
+                          Id npcell,
+                          Id nmini,
+                          Id* nech_ret,
+                          VectorDouble& coor,
+                          VectorDouble& data)
 {
   Id ndim, ntotal, nech, nret, nfine, iech, ecrc, ecrd, error;
   VectorInt ranks;
@@ -1974,7 +1974,7 @@ Db* db_point_init(Id nech,
                   bool flagAddSampleRank)
 {
   VectorDouble tab;
-  Db* db   = nullptr;
+  Db* db  = nullptr;
   Id ndim = 0;
   if (dbgrid == nullptr)
     ndim = (Id)coormin.size();
@@ -2056,11 +2056,11 @@ Db* db_point_init(Id nech,
  **
  *****************************************************************************/
 Id db_proportion_estimate(Db* dbin,
-                           DbGrid* dbout,
-                           Model* model,
-                           Id niter,
-                           bool verbose,
-                           const NamingConvention& namconv)
+                          DbGrid* dbout,
+                          Model* model,
+                          Id niter,
+                          bool verbose,
+                          const NamingConvention& namconv)
 {
   VectorVectorInt splits;
 
@@ -2098,7 +2098,7 @@ Id db_proportion_estimate(Db* dbin,
   // Invoke the calculation
 
   VectorDouble propGlob = dbStatisticsFacies(dbin);
-  Id ncat              = static_cast<Id>(propGlob.size());
+  Id ncat               = static_cast<Id>(propGlob.size());
   OptimCostColored Oc(ncat, &Qprop, &AprojDat);
 
   VectorDouble facies      = dbin->getColumnByLocator(ELoc::Z);

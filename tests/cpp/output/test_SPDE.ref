@@ -49,28 +49,12 @@ Data Base Statistics
 4 - Name SimuSPDE.1 - Locator z1
  Nb of data          =     120000
  Nb of active values =     120000
- Minimum value       =     -3.171
- Maximum value       =      2.968
- Mean value          =     -0.030
- Standard Deviation  =      0.980
- Variance            =      0.960
-5 - Name SimuSPDE.2 - Locator z2
- Nb of data          =     120000
- Nb of active values =     120000
  Minimum value       =     -3.347
  Maximum value       =      3.070
  Mean value          =     -0.332
  Standard Deviation  =      0.858
  Variance            =      0.737
-6 - Name SimuSPDE.3 - Locator z3
- Nb of data          =     120000
- Nb of active values =     120000
- Minimum value       =     -3.051
- Maximum value       =      2.551
- Mean value          =      0.271
- Standard Deviation  =      0.816
- Variance            =      0.666
-7 - Name SimuSPDE.4 - Locator z4
+5 - Name SimuSPDE.2 - Locator z2
  Nb of data          =     120000
  Nb of active values =     120000
  Minimum value       =     -3.567
@@ -78,15 +62,7 @@ Data Base Statistics
  Mean value          =      0.148
  Standard Deviation  =      1.067
  Variance            =      1.139
-8 - Name SimuSPDE.5 - Locator z5
- Nb of data          =     120000
- Nb of active values =     120000
- Minimum value       =     -2.895
- Maximum value       =      3.002
- Mean value          =      0.197
- Standard Deviation  =      0.969
- Variance            =      0.938
-9 - Name SimuSPDE.6 - Locator z6
+6 - Name SimuSPDE.3 - Locator z3
  Nb of data          =     120000
  Nb of active values =     120000
  Minimum value       =     -3.735
@@ -94,15 +70,7 @@ Data Base Statistics
  Mean value          =     -0.097
  Standard Deviation  =      1.043
  Variance            =      1.087
-10 - Name SimuSPDE.7 - Locator z7
- Nb of data          =     120000
- Nb of active values =     120000
- Minimum value       =     -2.959
- Maximum value       =      3.616
- Mean value          =      0.519
- Standard Deviation  =      0.995
- Variance            =      0.990
-11 - Name SimuSPDE.8 - Locator z8
+7 - Name SimuSPDE.4 - Locator z4
  Nb of data          =     120000
  Nb of active values =     120000
  Minimum value       =     -2.629
@@ -110,15 +78,7 @@ Data Base Statistics
  Mean value          =      0.410
  Standard Deviation  =      0.963
  Variance            =      0.928
-12 - Name SimuSPDE.9 - Locator z9
- Nb of data          =     120000
- Nb of active values =     120000
- Minimum value       =     -3.734
- Maximum value       =      2.430
- Mean value          =     -0.171
- Standard Deviation  =      0.869
- Variance            =      0.755
-13 - Name SimuSPDE.10 - Locator z10
+8 - Name SimuSPDE.5 - Locator z5
  Nb of data          =     120000
  Nb of active values =     120000
  Minimum value       =     -4.301
@@ -126,17 +86,57 @@ Data Base Statistics
  Mean value          =      0.025
  Standard Deviation  =      1.204
  Variance            =      1.449
+9 - Name SimuSPDE.6 - Locator z6
+ Nb of data          =     120000
+ Nb of active values =     120000
+ Minimum value       =     -3.370
+ Maximum value       =      2.757
+ Mean value          =     -0.461
+ Standard Deviation  =      0.942
+ Variance            =      0.887
+10 - Name SimuSPDE.7 - Locator z7
+ Nb of data          =     120000
+ Nb of active values =     120000
+ Minimum value       =     -3.224
+ Maximum value       =      2.873
+ Mean value          =     -0.095
+ Standard Deviation  =      0.961
+ Variance            =      0.923
+11 - Name SimuSPDE.8 - Locator z8
+ Nb of data          =     120000
+ Nb of active values =     120000
+ Minimum value       =     -4.070
+ Maximum value       =      3.119
+ Mean value          =     -0.171
+ Standard Deviation  =      1.226
+ Variance            =      1.503
+12 - Name SimuSPDE.9 - Locator z9
+ Nb of data          =     120000
+ Nb of active values =     120000
+ Minimum value       =     -3.821
+ Maximum value       =      2.711
+ Mean value          =     -0.033
+ Standard Deviation  =      0.874
+ Variance            =      0.764
+13 - Name SimuSPDE.10 - Locator z10
+ Nb of data          =     120000
+ Nb of active values =     120000
+ Minimum value       =     -3.685
+ Maximum value       =      2.451
+ Mean value          =     -0.202
+ Standard Deviation  =      0.944
+ Variance            =      0.891
 
 Data Base Contents
 ------------------
                    rank          x1          x2  SimuSPDE.1  SimuSPDE.2  SimuSPDE.3  SimuSPDE.4
-     [  0,]       1.000       0.000       0.000      -0.123      -1.676       2.140       0.982
-     [  1,]       2.000       1.000       0.000      -0.089      -1.454       2.218       0.981
-     [  2,]       3.000       2.000       0.000      -0.055      -1.231       2.296       0.980
-     [  3,]       4.000       3.000       0.000      -0.022      -1.009       2.375       0.978
-     [  4,]       5.000       4.000       0.000       0.012      -0.786       2.453       0.977
-     [  5,]       6.000       5.000       0.000       0.031      -0.633       2.369       0.981
-     [  6,]       7.000       6.000       0.000       0.040      -0.532       2.163       0.988
+     [  0,]       1.000       0.000       0.000      -1.676       0.982      -1.206       0.597
+     [  1,]       2.000       1.000       0.000      -1.454       0.981      -1.142       0.586
+     [  2,]       3.000       2.000       0.000      -1.231       0.980      -1.079       0.576
+     [  3,]       4.000       3.000       0.000      -1.009       0.978      -1.015       0.565
+     [  4,]       5.000       4.000       0.000      -0.786       0.977      -0.951       0.555
+     [  5,]       6.000       5.000       0.000      -0.633       0.981      -0.922       0.587
+     [  6,]       7.000       6.000       0.000      -0.532       0.988      -0.919       0.652
 (Ncols=7[from 13],Nrows=7[from 120000])
 
 Variables

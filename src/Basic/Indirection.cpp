@@ -95,7 +95,7 @@ void Indirection::setMode(Id mode)
 void Indirection::buildFromSel(const VectorDouble& sel)
 {
   _resetMap();
-  _nabs = (Id) sel.size();
+  _nabs = static_cast<Id>(sel.size());
   if (_mode == 0) _vecAToR.resize(_nabs,-1);
 
   Id irel = 0;
@@ -117,7 +117,7 @@ void Indirection::buildFromMap(const std::map<Id, Id> &map, Id nabs)
 {
   _resetMap();
   _nabs = nabs;
-  _nrel = (Id) map.size();
+  _nrel = static_cast<Id>(map.size());
 
   if (_mode == 0)
     _vecAToR.resize(_nabs, -1);
@@ -137,7 +137,7 @@ void Indirection::buildFromRankRInA(const VectorInt& rels, Id nabs)
 {
   _resetMap();
   _nabs = nabs;
-  _nrel = (Id) rels.size();
+  _nrel = static_cast<Id>(rels.size());
 
   if (_mode == 0) _vecAToR.resize(_nabs,-1);
 

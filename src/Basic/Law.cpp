@@ -750,7 +750,7 @@ double law_df_bigaussian(VectorDouble& vect,
  *****************************************************************************/
 double law_df_quadgaussian(VectorDouble& vect, MatrixSymmetric& correl)
 {
-  Id nvar       = (Id)vect.size();
+  Id nvar       = static_cast<Id>(vect.size());
   double density = -2. * log(2 * GV_PI);
 
   if (correl.computeEigen()) return TEST;
@@ -780,7 +780,7 @@ double law_df_quadgaussian(VectorDouble& vect, MatrixSymmetric& correl)
 double law_df_multigaussian(VectorDouble& vect, MatrixSymmetric& correl)
 
 {
-  Id nvar       = (Id)vect.size();
+  Id nvar       = static_cast<Id>(vect.size());
   double density = -0.5 * nvar * log(2 * GV_PI);
 
   if (correl.computeEigen()) return TEST;
@@ -799,7 +799,7 @@ double law_df_multigaussian(VectorDouble& vect, MatrixSymmetric& correl)
 
 VectorDouble law_df_poisson_vec(VectorInt is, double parameter)
 {
-  Id size = (Id)is.size();
+  Id size = static_cast<Id>(is.size());
   VectorDouble res(size);
   for (Id ii = 0; ii < size; ii++)
     res[ii] = law_df_poisson(is[ii], parameter);
@@ -922,7 +922,7 @@ Id law_binomial(Id n, double p)
   {
     /* Step 0 */
     const double fm      = n * p + p;
-    const Id m          = (Id)fm;
+    const Id m          = static_cast<Id>(fm);
     const double p1      = floor(2.195 * sqrt(n * p * q) - 4.6 * q) + 0.5;
     const double xm      = m + 0.5;
     const double xl      = xm - p1;
@@ -970,7 +970,7 @@ Id law_binomial(Id n, double p)
         v              = v * c + 1.0 - fabs(m - x + 0.5) / p1;
         if (v > 1) continue;
         /* Go to step 5 */
-        y = (Id)x;
+        y = static_cast<Id>(x);
       }
       /* Step 5 */
       /* Step 5.0 */

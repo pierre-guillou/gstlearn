@@ -39,62 +39,62 @@ static char TABSTR[100];
 
 static Id _getColumnRank()
 {
-  return (Id)OptCst::query(ECst::NTRANK);
+  return static_cast<Id>(OptCst::query(ECst::NTRANK));
 }
 static Id _getColumnName()
 {
-  return (Id)OptCst::query(ECst::NTNAME);
+  return static_cast<Id>(OptCst::query(ECst::NTNAME));
 }
 static Id _getColumnSize()
 {
-  return (Id)OptCst::query(ECst::NTCAR);
+  return static_cast<Id>(OptCst::query(ECst::NTCAR));
 }
 static Id _getDecimalNumber()
 {
-  return (Id)OptCst::query(ECst::NTDEC);
+  return static_cast<Id>(OptCst::query(ECst::NTDEC));
 }
 static double _getThresh()
 {
-  Id ndec       = (Id)OptCst::query(ECst::NTDEC);
+  Id ndec       = static_cast<Id>(OptCst::query(ECst::NTDEC));
   double thresh = (0.5 * pow(10, -ndec));
   return thresh;
 }
 static Id _getMaxNCols()
 {
-  return (Id)OptCst::query(ECst::NTCOL);
+  return static_cast<Id>(OptCst::query(ECst::NTCOL));
 }
 static Id _getMaxNRows()
 {
-  return (Id)OptCst::query(ECst::NTROW);
+  return static_cast<Id>(OptCst::query(ECst::NTROW));
 }
 static Id _getNBatch()
 {
-  return (Id)OptCst::query(ECst::NTBATCH);
+  return static_cast<Id>(OptCst::query(ECst::NTBATCH));
 }
 static void _buildFormat(Id mode)
 {
   switch (mode)
   {
     case CASE_INT:
-      (void)gslSPrintf(FORMAT, "%%%dd", (Id)OptCst::query(ECst::NTCAR));
+      (void)gslSPrintf(FORMAT, "%%%dd", static_cast<Id>(OptCst::query(ECst::NTCAR)));
       break;
 
     case CASE_REAL:
-      (void)gslSPrintf(FORMAT, "%%%d.%dlf", (Id)OptCst::query(ECst::NTCAR),
-                       (Id)OptCst::query(ECst::NTDEC));
+      (void)gslSPrintf(FORMAT, "%%%d.%dlf", static_cast<Id>(OptCst::query(ECst::NTCAR)),
+                       static_cast<Id>(OptCst::query(ECst::NTDEC)));
       break;
 
     case CASE_DOUBLE:
-      (void)gslSPrintf(FORMAT, "%%%d.%dlg", (Id)OptCst::query(ECst::NTCAR),
-                       (Id)OptCst::query(ECst::NTDEC));
+      (void)gslSPrintf(FORMAT, "%%%d.%dlg", static_cast<Id>(OptCst::query(ECst::NTCAR)),
+                       static_cast<Id>(OptCst::query(ECst::NTDEC)));
       break;
 
     case CASE_COL:
-      (void)gslSPrintf(FORMAT, "[,%%%dd]", (Id)OptCst::query(ECst::NTCAR) - 3);
+      (void)gslSPrintf(FORMAT, "[,%%%dd]", static_cast<Id>(OptCst::query(ECst::NTCAR)) - 3);
       break;
 
     case CASE_ROW:
-      (void)gslSPrintf(FORMAT, "[%%%dd,]", (Id)OptCst::query(ECst::NTCAR) - 3);
+      (void)gslSPrintf(FORMAT, "[%%%dd,]", static_cast<Id>(OptCst::query(ECst::NTCAR)) - 3);
       break;
   }
 }
@@ -375,7 +375,7 @@ void mestitle(Id level, const char* format, ...)
   va_start(ap, format);
   (void)vsnprintf(STRING, sizeof(STRING), format, ap);
   va_end(ap);
-  Id size = (Id)strlen(STRING);
+  Id size = static_cast<Id>(strlen(STRING));
 
   (void)gslStrcat(STRING, "\n");
   message_extern(STRING);
@@ -416,13 +416,13 @@ void mestitle(Id level, const char* format, ...)
 void mes_process(const char* string, Id ntot, Id iech)
 {
   static Id quant_memo = 0;
-  Id nproc             = (Id)OptCst::query(ECst::NPROC);
+  Id nproc             = static_cast<Id>(OptCst::query(ECst::NPROC));
   if (nproc <= 0) return;
   Id jech = iech + 1;
 
   /* Calculate the current quantile */
 
-  double ratio = nproc * (double)jech / (double)ntot;
+  double ratio = nproc * static_cast<double>(jech) / static_cast<double>(ntot);
   Id quant     = (Id)(ratio);
 
   /* Conditional printout */
@@ -451,7 +451,7 @@ String toTitle(Id level, const char* format, ...)
 
   /* Underline the string */
 
-  Id size = (Id)strlen(STRING);
+  Id size = static_cast<Id>(strlen(STRING));
   (void)gslStrcpy(STRING, "");
   for (Id i = 0; i < size; i++)
   {

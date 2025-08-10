@@ -79,19 +79,19 @@ public:
 
   Id setMeshes(bool flagForKrig, const VectorMeshes* meshes);
   Id setProjIn(bool flagForKrig, const ProjMultiMatrix* proj);
+  Id setInvNoise(const ASimulable* invnoise);
   Id setDbAndProjOut(Db* dbout,
                      const ProjMultiMatrix* projK = nullptr,
                      const ProjMultiMatrix* projS = nullptr,
                      bool flagApply               = true,
                      bool verbose                 = false);
-  Id setInvNoise(const ASimulable* invnoise);
   Id makeReady(bool verbose = false);
 
 private:
   void _defineFlagCholesky(Id useCholesky, const Model* model, bool verbose = false);
   VectorMeshes _defineMeshesFromDbs(bool flagKrige);
   VectorMeshes _duplicateMeshes(bool flagForKrige);
-  void _defineMeshIn(bool flagForKrige, bool verbose);
+  void _defineMeshes(bool flagForKrige, bool verbose);
   Id _defineProjection(bool flagIn, bool flagForKrige, bool verbose);
   static void _printMeshesDetails(const VectorMeshes& meshes);
   static void _printProjectionDetails(const ProjMultiMatrix* proj);

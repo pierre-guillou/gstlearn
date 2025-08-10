@@ -95,7 +95,7 @@ String ListParams::toString(const AStringFormat* strfmt) const
   DECLARE_UNUSED(strfmt);
   std::stringstream result;
   result << toTitle(1,"List of Parameters:");
-  for (Id ipar = 0, jpar = 0, npar = (Id) _dispatchIndex.size(); ipar < npar; ipar++)
+  for (Id ipar = 0, jpar = 0, npar = static_cast<Id>(_dispatchIndex.size()); ipar < npar; ipar++)
   {
     jpar++;
     result << jpar << " - " << _params[_dispatchIndex[ipar]].get().toString() << std::endl;

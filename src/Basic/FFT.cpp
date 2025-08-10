@@ -31,7 +31,7 @@ Id FFTn(Id ndim,
          Id iSign,
          double scaling)
 {
-  Id n = (Id)Re.size();
+  Id n = static_cast<Id>(Re.size());
   Im.resize(n, 0.);
   return fftn(ndim, dims.data(), Re.data(), Im.data(), iSign, scaling);
 }
@@ -49,13 +49,13 @@ Array evalCovFFTTimeSlice(const VectorDouble& hmax,
                           Id N,
                           const std::function<std::complex<double>(VectorDouble, double)>& funcSpectrum)
 {
-  Id ndim = (Id)hmax.size();
+  Id ndim = static_cast<Id>(hmax.size());
   VectorInt nxs(ndim);
   for (Id idim = 0; idim < ndim; idim++)
     nxs[idim] = N;
   Array array(nxs);
 
-  Id ntotal = (Id)pow(N, ndim);
+  Id ntotal = static_cast<Id>(pow(N, ndim));
   VectorDouble a(ndim);
   double coeff = 0;
   double prod  = 1.;
@@ -78,7 +78,7 @@ Array evalCovFFTTimeSlice(const VectorDouble& hmax,
     Id s = 1;
     for (Id idim = 0; idim < ndim; idim++)
     {
-      temp[idim] = a[idim] * ((double)indices[idim] / (N - 1) - 0.5);
+      temp[idim] = a[idim] * (static_cast<double>(indices[idim]) / (N - 1) - 0.5);
       s *= (indices[idim] % 2) ? -1 : 1;
     }
 
@@ -107,13 +107,13 @@ Array evalCovFFTSpatial(const VectorDouble& hmax,
                         Id N,
                         const std::function<double(const VectorDouble&)>& funcSpectrum)
 {
-  Id ndim = (Id)hmax.size();
+  Id ndim = static_cast<Id>(hmax.size());
   VectorInt nxs(ndim);
   for (Id idim = 0; idim < ndim; idim++)
     nxs[idim] = N;
   Array array(nxs);
 
-  Id ntotal = (Id)pow(N, ndim);
+  Id ntotal = static_cast<Id>(pow(N, ndim));
   VectorDouble a(ndim);
   double coeff = 0;
   double prod  = 1.;
@@ -137,7 +137,7 @@ Array evalCovFFTSpatial(const VectorDouble& hmax,
     Id s = 1;
     for (Id idim = 0; idim < ndim; idim++)
     {
-      temp[idim] = a[idim] * ((double)indices[idim] / (N - 1) - 0.5);
+      temp[idim] = a[idim] * (static_cast<double>(indices[idim]) / (N - 1) - 0.5);
       s *= (indices[idim] % 2) ? -1 : 1;
     }
     Re[iad] = s * prod * funcSpectrum(temp);
@@ -195,8 +195,8 @@ static Id _getIndex(Id ndim, const VectorInt& strides, const VectorInt& indices)
 // Fonction pour effectuer un fftshift sur un tenseur nD stocké en 1D
 void fftshift(const VectorInt& dims, VectorDouble& data)
 {
-  Id ndim       = (Id)dims.size();
-  Id total_size = (Id)data.size();
+  Id ndim       = static_cast<Id>(dims.size());
+  Id total_size = static_cast<Id>(data.size());
 
   // Calcul des moitiés des dimensions
   VectorInt half = _computeHalf(ndim, dims);

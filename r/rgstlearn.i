@@ -15,6 +15,7 @@
 // https://stackoverflow.com/a/26035360/3952924
 #%import "doc/documentation.i"
 
+//////////////////////////////////////////////////////////////
 //   Ignore functions that are not exportable with SWIG     //
 //////////////////////////////////////////////////////////////
 
@@ -26,6 +27,7 @@
 %begin %{
 // For isnan
 #include <cmath>
+
 // For isinf
 #include <math.h>
 // For cout
@@ -60,7 +62,7 @@ namespace gstlrn {
     int myres = SWIG_TypeError;
     if (Rf_length(obj) > 0) // Prevent NULL value from becoming NA
     {
-       myres = SWIG_AsVal_double(obj, &value);
+      myres = SWIG_AsVal_double(obj, &value);
       //std::cout << "convertToCpp(double): value=" << value << std::endl;
       if (SWIG_IsOK(myres) && !R_finite(value)) // NA, NaN, Inf or out of bounds value becomes NA
         value = getNA<double>();
@@ -316,13 +318,13 @@ namespace gstlrn {
 }
 
 // Add typecheck typemaps for dispatching functions
-%typemap(rtypecheck, noblock=1) const Id&, Id                                 { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const double&, double                         { length($arg) == 1 &&  is.numeric(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const String&, String                         { length($arg) == 1 &&  is.character(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const std::string_view, std::string_view      { length($arg) == 1 &&  is.character(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const float&, float                           { length($arg) == 1 &&  is.numeric(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const UChar&, UChar                           { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const bool&, bool                             { length($arg) == 1 &&  is.logical(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const Id&, Id                                                 { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const double&, double                                         { length($arg) == 1 &&  is.numeric(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const String&, String                                         { length($arg) == 1 &&  is.character(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const std::string_view, std::string_view                      { length($arg) == 1 &&  is.character(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const float&, float                                           { length($arg) == 1 &&  is.numeric(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const UChar&, UChar                                           { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const bool&, bool                                             { length($arg) == 1 &&  is.logical(unlist($arg)) }
 %typemap(rtypecheck, noblock=1) const gstlrn::VectorInt&, gstlrn::VectorInt                   { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
 %typemap(rtypecheck, noblock=1) const gstlrn::VectorDouble&, gstlrn::VectorDouble             { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
 %typemap(rtypecheck, noblock=1) const gstlrn::VectorString&, gstlrn::VectorString             { length($arg) == 0 || (length($arg) > 0 &&  is.character(unlist($arg))) }
@@ -347,7 +349,7 @@ namespace gstlrn {
   template <typename Type> typename OutTraits<Type>::OutputType convertFromCpp(const Type& value);
   template <> Id convertFromCpp(const Id& value)
   {
-    //std::cout << "convertFromCpp(int): value=" << value << std::endl;
+    //std::cout << "convertFromCpp(Id): value=" << value << std::endl;
     if (isNA<Id>(value))
       return R_NaInt;
     return value;

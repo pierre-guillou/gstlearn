@@ -247,11 +247,11 @@ static Id st_proportion_changed(PropDef* propdef)
  **
  *****************************************************************************/
 static Id st_proportion_define(PropDef* propdef,
-                                const Db* db,
-                                Id iech,
-                                Id isimu,
-                                Id nbsimu,
-                                Id* jech)
+                               const Db* db,
+                               Id iech,
+                               Id isimu,
+                               Id nbsimu,
+                               Id* jech)
 {
   Id ifac, ifac_ref;
 
@@ -335,18 +335,18 @@ static Id st_proportion_define(PropDef* propdef,
  **
  *****************************************************************************/
 Id rule_thresh_define_shadow(PropDef* propdef,
-                              Db* db,
-                              const RuleShadow* rule,
-                              Id facies,
-                              Id iech,
-                              Id isimu,
-                              Id nbsimu,
-                              double* t1min,
-                              double* t1max,
-                              double* t2min,
-                              double* t2max,
-                              double* sh_dsup,
-                              double* sh_down)
+                             Db* db,
+                             const RuleShadow* rule,
+                             Id facies,
+                             Id iech,
+                             Id isimu,
+                             Id nbsimu,
+                             double* t1min,
+                             double* t1max,
+                             double* t2min,
+                             double* t2max,
+                             double* sh_dsup,
+                             double* sh_down)
 {
   Id unmodify, facloc, jech;
 
@@ -429,17 +429,17 @@ Id rule_thresh_define_shadow(PropDef* propdef,
  **
  *****************************************************************************/
 Id rule_thresh_define(PropDef* propdef,
-                       Db* db,
-                       const Rule* rule,
-                       Id facies,
-                       Id iech,
-                       Id isimu,
-                       Id nbsimu,
-                       Id flag_check,
-                       double* t1min,
-                       double* t1max,
-                       double* t2min,
-                       double* t2max)
+                      Db* db,
+                      const Rule* rule,
+                      Id facies,
+                      Id iech,
+                      Id isimu,
+                      Id nbsimu,
+                      Id flag_check,
+                      double* t1min,
+                      double* t1max,
+                      double* t2min,
+                      double* t2max)
 {
   Id unmodify, facloc, jech;
 
@@ -528,12 +528,12 @@ Id rule_thresh_define(PropDef* propdef,
  **
  *****************************************************************************/
 Id db_rule_shadow(Db* db,
-                   Db* dbprop,
-                   RuleShadow* rule,
-                   Model* model,
-                   const VectorDouble& props,
-                   Id flag_stat,
-                   Id nfacies)
+                  Db* dbprop,
+                  RuleShadow* rule,
+                  Model* model,
+                  const VectorDouble& props,
+                  Id flag_stat,
+                  Id nfacies)
 {
   Id iptr, error, flag_used[2], nbsimu, igrf, ngrf;
   PropDef* propdef;
@@ -620,9 +620,9 @@ label_end:
  **
  *****************************************************************************/
 Id _db_rule(Db* db,
-             const RuleProp* ruleprop,
-             Model* model,
-             const NamingConvention& namconv)
+            const RuleProp* ruleprop,
+            Model* model,
+            const NamingConvention& namconv)
 {
   if (db == nullptr)
   {
@@ -634,17 +634,17 @@ Id _db_rule(Db* db,
     messerr("RuleProp must be defined");
     return 1;
   }
-  Id flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat                = ruleprop->isFlagStat();
   const Rule* rule            = ruleprop->getRule();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
 
-  Id error          = 1;
-  Id iptr           = -1;
+  Id error           = 1;
+  Id iptr            = -1;
   PropDef* propdef   = nullptr;
-  Id ngrf           = rule->getNGRF();
+  Id ngrf            = rule->getNGRF();
   VectorInt flagUsed = rule->whichGRFUsed();
-  Id nfacies        = rule->getNFacies();
+  Id nfacies         = rule->getNFacies();
   bool flagReturn    = false;
 
   /* Preliminary checks */
@@ -719,21 +719,21 @@ label_end:
  **
  *****************************************************************************/
 Id db_bounds_shadow(Db* db,
-                     Db* dbprop,
-                     RuleShadow* rule,
-                     Model* model,
-                     const VectorDouble& props,
-                     Id flag_stat,
-                     Id nfacies)
+                    Db* dbprop,
+                    RuleShadow* rule,
+                    Model* model,
+                    const VectorDouble& props,
+                    Id flag_stat,
+                    Id nfacies)
 {
   Id flag_used[2], iptr, igrf;
   VectorDouble coor;
 
   /* Initializations */
 
-  Id error        = 1;
-  Id ngrf         = 0;
-  Id ndim         = 0;
+  Id error         = 1;
+  Id ngrf          = 0;
+  Id ndim          = 0;
   PropDef* propdef = nullptr;
 
   /**********************/
@@ -817,9 +817,9 @@ label_end:
  **
  *****************************************************************************/
 Id _db_bounds(Db* db,
-               const RuleProp* ruleprop,
-               Model* model,
-               const NamingConvention& namconv)
+              const RuleProp* ruleprop,
+              Model* model,
+              const NamingConvention& namconv)
 {
   NamingConvention nc(namconv);
 
@@ -833,7 +833,7 @@ Id _db_bounds(Db* db,
     messerr("RuleProp must be defined");
     return 1;
   }
-  Id flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat                = ruleprop->isFlagStat();
   const Rule* rule            = ruleprop->getRule();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
@@ -843,8 +843,8 @@ Id _db_bounds(Db* db,
   PropDef* propdef = nullptr;
 
   VectorInt flagUsed = rule->whichGRFUsed();
-  Id nfacies        = rule->getNFacies();
-  Id ngrf           = rule->getNGRF();
+  Id nfacies         = rule->getNFacies();
+  Id ngrf            = rule->getNGRF();
 
   /* Input Db */
 
@@ -1027,7 +1027,7 @@ PropDef* proportion_manage(Id mode,
 
         // Stationary case
 
-        double pref = 1. / (double)nfacprod;
+        double pref = 1. / static_cast<double>(nfacprod);
         for (ifac = 0; ifac < nfacprod; ifac++)
         {
           propdef->propfix[ifac] = (propcst.empty()) ? pref : propcst[ifac];
@@ -1084,9 +1084,9 @@ label_end:
  **
  *****************************************************************************/
 Id _db_threshold(Db* db,
-                  const RuleProp* ruleprop,
-                  Model* model,
-                  const NamingConvention& namconv)
+                 const RuleProp* ruleprop,
+                 Model* model,
+                 const NamingConvention& namconv)
 {
   if (db == nullptr)
   {
@@ -1103,7 +1103,7 @@ Id _db_threshold(Db* db,
     messerr("RuleProp must be defined");
     return 1;
   }
-  Id flag_stat    = ruleprop->isFlagStat();
+  Id flag_stat     = ruleprop->isFlagStat();
   const Rule* rule = ruleprop->getRule();
   if (rule->getModeRule() != ERule::STD)
   {
@@ -1118,9 +1118,9 @@ Id _db_threshold(Db* db,
 
   /* Initializations */
 
-  Id error        = 1;
-  Id ngrf         = 0;
-  Id nfacies      = 0;
+  Id error         = 1;
+  Id ngrf          = 0;
+  Id nfacies       = 0;
   PropDef* propdef = nullptr;
 
   /**********************/
@@ -1289,4 +1289,4 @@ Model* model_rule_combine(const Model* model1,
   new_model = model_combine(model1, model2, rho);
   return (new_model);
 }
-}
+} // namespace gstlrn

@@ -102,8 +102,9 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_PGSSPDE-");
-  Id error = 0;
-  Id ndim  = 2;
+  Id error  = 0;
+  Id ndim   = 2;
+  Id nbsimu = 3;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Prepare the Discrete process with Discretized Option
@@ -120,7 +121,7 @@ int main(int argc, char* argv[])
   // Prepare facies proportions and corresponding Grid
   DbGrid* dbprop = DbGrid::create({nx, nx}, {dx, dx});
   VectorDouble props({0.2, 0.5, 0.3});
-  Id nfac            = (Id)props.size();
+  Id nfac            = static_cast<Id>(props.size());
   VectorString names = generateMultipleNames("Props", nfac);
   for (Id ifac = 0; ifac < nfac; ifac++)
     dbprop->addColumnsByConstant(1, props[ifac], names[ifac]);
@@ -129,7 +130,7 @@ int main(int argc, char* argv[])
   // Prepare the input data set
   Db* dat        = Db::createFromBox(ndata, grid->getCoorMinimum(), grid->getCoorMaximum());
   VectorDouble z = VH::simulateGaussian(ndata);
-  dat->addColumns(z, "variable", ELoc::Z);
+  dat->addColumns(z, "Data", ELoc::Z);
   dat->display();
 
   // Creating the covariances involved in the Model(s) of the Underlying GRF(s)
@@ -194,7 +195,7 @@ int main(int argc, char* argv[])
     ruleprop.resetFromRule(&rule, props);
     ruleprop.display();
 
-    (void)simPGSSPDE(dat, grid, models[0], ruleprop);
+    (void)simPGSSPDE(dat, grid, models[0], ruleprop, nbsimu);
 
     _clearModels(models);
   }

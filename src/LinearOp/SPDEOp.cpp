@@ -258,7 +258,7 @@ VectorDouble ASPDEOp::stdev(const VectorDouble& dat,
   law_set_random_seed(seed);
 
   // Standard Deviation using Monte-Carlo simulations
-  Id nout = _projOutSimu->getNPoint();
+  Id nout = projS->getNPoint();
   VectorDouble temp_mean(nout, 0.);
   VectorDouble temp_mean2(nout, 0.);
 

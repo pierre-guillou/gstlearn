@@ -27,9 +27,9 @@ invisible(argumentTestVectorString(a))
 print(a$toTL())
 
 a = VectorInt()
-a$push_back(12)
-a$push_back(13)
-argumentTestVectorInt(a)
+invisible(a$push_back(12))
+invisible(a$push_back(13))
+invisible(argumentTestVectorInt(a))
 print(a$toTL())
 
 a = VectorDouble()

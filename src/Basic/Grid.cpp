@@ -110,9 +110,9 @@ Grid::Grid(Id ndim,
   , _indices()
 {
   _allocate();
-  if ((Id)nx.size() == ndim) _nx = nx;
-  if ((Id)dx.size() == ndim) _dx = dx;
-  if ((Id)x0.size() == ndim) _x0 = x0;
+  if (static_cast<Id>(nx.size()) == ndim) _nx = nx;
+  if (static_cast<Id>(dx.size()) == ndim) _dx = dx;
+  if (static_cast<Id>(x0.size()) == ndim) _x0 = x0;
 }
 
 Grid::Grid(const Grid& r)
@@ -382,7 +382,7 @@ void Grid::getCoordinatesByIndiceInPlace(VectorDouble& coor,
                                          const VectorInt& shift,
                                          const VectorDouble& dxsPerCell) const
 {
-  if ((Id)coor.size() != _nDim) return;
+  if (static_cast<Id>(coor.size()) != _nDim) return;
   /* Calculate the coordinates in the grid system */
 
   for (Id idim = 0; idim < _nDim; idim++)
@@ -422,7 +422,7 @@ VectorDouble Grid::getCoordinatesByCorner(const VectorInt& icorner) const
 
 void Grid::getCoordinatesByCornerInPlace(VectorDouble& coor, const VectorInt& icorner) const
 {
-  if ((Id)coor.size() != _nDim) return;
+  if (static_cast<Id>(coor.size()) != _nDim) return;
   initThread();
   VH::fill(_iwork0, 0);
   for (Id idim = 0; idim < _nDim; idim++)
@@ -451,7 +451,7 @@ void Grid::getCellCoordinatesByCornerInPlace(VectorDouble& coor,
                                              const VectorInt& shift,
                                              const VectorDouble& dxsPerCell) const
 {
-  if ((Id)coor.size() != _nDim) return;
+  if (static_cast<Id>(coor.size()) != _nDim) return;
   rankToIndice(node, _iwork0);
   getCoordinatesByIndiceInPlace(coor, _iwork0, true, shift, dxsPerCell);
 }
@@ -464,7 +464,7 @@ void Grid::getCellCoordinatesByCornerInPlace(VectorDouble& coor,
  */
 void Grid::getCoordinatesByRankInPlace(VectorDouble& coor, Id rank, bool flag_rotate) const
 {
-  if ((Id)coor.size() != _nDim) return;
+  if (static_cast<Id>(coor.size()) != _nDim) return;
 
   /* Convert a sample number into grid indices */
   rankToIndice(rank, _iwork0);
@@ -531,10 +531,10 @@ void Grid::indicesToCoordinateInPlace(const constvectint indice,
                                       const constvect percent,
                                       bool flag_rotate) const
 {
-  if ((Id)coor.size() < _nDim)
+  if (static_cast<Id>(coor.size()) < _nDim)
   {
     messerr("Argument coor (%d) should have the size at least equal to %d.",
-            (Id)coor.size(), _nDim);
+            static_cast<Id>(coor.size()), _nDim);
     return;
   }
 
@@ -623,7 +623,7 @@ void Grid::rankToIndice(Id rank, vectint indices, bool minusOne) const
 
 void Grid::initThread() const
 {
-  if (_nDim > (Id)_iwork0.size())
+  if (_nDim > static_cast<Id>(_iwork0.size()))
   {
     _iwork0.resize(_nDim);
     _work1.resize(_nDim);
@@ -646,7 +646,7 @@ void Grid::coordinateToIndicesInPlace(VectorInt& indices,
                                       bool centered,
                                       double eps) const
 {
-  if ((Id)indices.size() != _nDim) return;
+  if (static_cast<Id>(indices.size()) != _nDim) return;
   if (coordinateToIndicesInPlace(coor, _iwork0, centered, eps)) return;
   for (Id i = 0; i < _nDim; i++)
     indices[i] = _iwork0[i];
@@ -665,7 +665,7 @@ Id Grid::coordinateToIndicesInPlace(const VectorDouble& coor,
                                      bool centered,
                                      double eps) const
 {
-  if ((Id)indice.size() != _nDim)
+  if (static_cast<Id>(indice.size()) != _nDim)
   {
     messerr("Argument 'indice' should have the correct size. Output argument 'indice' not modified.");
     return -1;
@@ -698,7 +698,7 @@ Id Grid::coordinateToIndicesInPlace(const VectorDouble& coor,
     indice[idim] = ix;
     if (ix < 0 || ix >= _nx[idim]) outside = true;
   }
-  return (Id)outside;
+  return static_cast<Id>(outside);
 }
 
 Id Grid::coordinateToRank(const VectorDouble& coor, bool centered, double eps) const
@@ -718,7 +718,7 @@ VectorInt Grid::getCenterIndices(bool flagSup) const
 
 void Grid::getCenterIndicesInPlace(VectorInt& indices, bool flagSup) const
 {
-  if ((Id)indices.size() != _nDim) return;
+  if (static_cast<Id>(indices.size()) != _nDim) return;
   for (Id idim = 0; idim < _nDim; idim++)
     indices[idim] = (flagSup) ? ceil(_nx[idim] / 2.) : floor(_nx[idim] / 2.);
 }
@@ -873,7 +873,7 @@ void Grid::iteratorInit(const VectorInt& order)
   _counts = _nx;
 
   // Define the order
-  if (order.empty() || _nDim != (Id)order.size())
+  if (order.empty() || _nDim != static_cast<Id>(order.size()))
   {
     _order.resize(_nDim, 0);
     for (Id idim = 0; idim < _nDim; idim++)
@@ -1158,7 +1158,7 @@ VectorInt Grid::gridIndices(const VectorInt& nx,
                             bool invert,
                             bool verbose)
 {
-  Id ndim  = (Id)nx.size();
+  Id ndim  = static_cast<Id>(nx.size());
   Id ncell = VH::product(nx);
 
   // Decode the string
@@ -1314,7 +1314,7 @@ bool Grid::sampleBelongsToCell(const VectorDouble& coor,
   VectorDouble center = rankToCoordinates(rank);
 
   // Complement 'coor' to the grid space dimension
-  Id ndim_coor = (Id)coor.size();
+  Id ndim_coor = static_cast<Id>(coor.size());
   VectorDouble coor_loc;
   if (ndim_coor == _nDim)
     coor_loc = coor;
