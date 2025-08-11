@@ -31,7 +31,7 @@ public:
   virtual String toString(const AStringFormat* strfmt = nullptr) const;
 
   virtual void display(const AStringFormat* strfmt = nullptr) const final;
-#ifndef SWIG // TODO : overload not available in SWIG 4.2.0b
+#ifndef SWIG // TODO : overload not available in customized SWIG 4.2.3 and more
   virtual void display(Id level) const final;
 #endif
 };

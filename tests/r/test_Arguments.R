@@ -46,7 +46,7 @@ invisible(argumentTestVectorInt(c(NA)))
 invisible(argumentTestVectorDouble(c(NA)))
 
 # Testing overloading of methods
-# TODO : Not possible anymore with customized swig 4.2.0b
+# TODO : Not possible anymore with customized swig 4.3.0
 #argumentTestIntOverload(12)
 #argumentTestIntOverload(c(21, 32))
 #argumentTestStringOverload("my_String")
