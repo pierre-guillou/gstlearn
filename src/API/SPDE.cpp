@@ -585,7 +585,7 @@ Id SPDE::centerDataByDriftInPlace(VectorDouble& Z, bool verbose)
   return 0;
 }
 
-void SPDE::uncenterResultByDriftInPlace(VectorDouble& result)
+void SPDE::uncenterResultByDriftInPlace(VectorDouble& result) const
 {
   Id nvar                = _model->getNVar();
   Id nech                = _dbout->getNSample();
@@ -634,7 +634,7 @@ void SPDE::uncenterResultByDriftInPlace(VectorDouble& result)
  * @note The nugget component is added to each variable with its correct variance
  * @note but not accounting for the dependency across different variables.
  */
-void SPDE::addNuggetToResult(VectorDouble& result)
+void SPDE::addNuggetToResult(VectorDouble& result) const
 {
   Id rankNugget = _model->getRankNugget();
   if (rankNugget < 0) return;
@@ -708,8 +708,8 @@ VectorDouble trendSPDE(Db* dbin,
                        bool verbose)
 {
   // Preliminary checks
-  if (dbin == nullptr) return 1;
-  if (model == nullptr) return 1;
+  if (dbin == nullptr) return VectorDouble();
+  if (model == nullptr) return VectorDouble();
 
   // Instantiate SPDE class
   SPDE spde(dbin, model, true, false, useCholesky, params);
@@ -718,11 +718,11 @@ VectorDouble trendSPDE(Db* dbin,
   if (verbose) mestitle(1, "Trend in SPDE framework (Cholesky=%ld)", static_cast<Id>(spde.getFlagCholesky()));
 
   // Define Meshes
-  if (spde.makeReady(verbose)) return 1;
+  if (spde.makeReady(verbose)) return VectorDouble();
 
   // Read information from the input Db and center it
-  VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
+  VectorDouble Z = spde.getData(true, verbose);
+  if (Z.empty()) return VectorDouble();
 
   return spde.getDriftCoefficients();
 }
@@ -799,26 +799,23 @@ Id krigingSPDE(Db* dbin,
   if (spde.makeReady(verbose)) return 1;
 
   // Read information from the input Db and center it
-  VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
+  VectorDouble Z = spde.getData(true, verbose);
+  if (Z.empty()) return 1;
 
   // Performing the task and storing results in 'dbout'
   // This is performed in ONE step to avoid additional core allocation
   Id nvar = model->getNVar();
-  VectorDouble result;
   if (flag_est)
   {
-    result = spde.getSPDEOp()->kriging(Z, spde.getAoutK());
-    spde.uncenterResultByDriftInPlace(result);
-    Id iuid = dbout->addColumns(result, "estim", ELoc::Z, 0, true, 0., nvar);
+    VectorDouble result = spde.kriging(Z);
+    Id iuid             = dbout->addColumns(result, "estim", ELoc::Z, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                                 "estim");
   }
   if (flag_std)
   {
-    result  = spde.getSPDEOp()->stdev(Z, spde.getNMC(), spde.getSeed(),
-                                      spde.getAoutK(), spde.getAoutS());
-    Id iuid = dbout->addColumns(result, "stdev", ELoc::UNKNOWN, 0, true, 0., nvar);
+    VectorDouble result = spde.stdev(Z);
+    Id iuid             = dbout->addColumns(result, "stdev", ELoc::UNKNOWN, 0, true, 0., nvar);
     namconv.setNamesAndLocators(dbin, VectorString(), ELoc::Z, nvar, dbout, iuid,
                                 "stdev");
   }
@@ -898,8 +895,8 @@ Id simulateSPDE(Db* dbin,
   if (spde.getFlagKrig())
   {
     // Read information from the input Db and center it
-    Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-    if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
+    Z = spde.getData(true, verbose);
+    if (Z.empty()) return 1;
   }
 
   // Perform the Simulation and storage.
@@ -912,11 +909,7 @@ Id simulateSPDE(Db* dbin,
 
   for (Id isimu = 0; isimu < nbsimu; isimu++)
   {
-    result = (spde.getFlagKrig())
-             ? spde.getSPDEOp()->simCond(Z, spde.getAoutK(), spde.getAoutS())
-             : spde.getSPDEOp()->simNonCond(spde.getAoutS());
-    spde.addNuggetToResult(result);
-    spde.uncenterResultByDriftInPlace(result);
+    result = spde.simulate(Z);
 
     for (Id ivar = 0; ivar < nvar; ivar++)
     {
@@ -1006,8 +999,8 @@ Id simPGSSPDE(Db* dbin,
   if (spde.getFlagKrig())
   {
     // Read information from the input Db and center it
-    Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-    if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
+    Z = spde.getData(true, verbose);
+    if (Z.empty()) return 1;
   }
 
   // Perform the Simulation and storage.
@@ -1021,11 +1014,7 @@ Id simPGSSPDE(Db* dbin,
   // Loop on the simulations
   for (Id isimu = 0; isimu < nbsimu; isimu++)
   {
-    result = (spde.getFlagKrig())
-             ? spde.getSPDEOp()->simCond(Z, spde.getAoutK(), spde.getAoutS())
-             : spde.getSPDEOp()->simNonCond(spde.getAoutS());
-    spde.addNuggetToResult(result);
-    spde.uncenterResultByDriftInPlace(result);
+    result = spde.simulate(Z);
 
     // Loop on the variables
     VectorInt iuids;
@@ -1085,30 +1074,11 @@ double logLikelihoodSPDE(Db* dbin,
   if (spde.makeReady(verbose)) return 1;
 
   // Read information from the input Db and center it
-  VectorDouble Z = dbin->getColumnsActiveAndDefined(ELoc::Z);
-  if (spde.centerDataByDriftInPlace(Z, verbose)) return 1;
+  VectorDouble Z = spde.getData(true, verbose);
+  if (Z.empty()) return 1;
 
   // Performing the task
-  Id size        = static_cast<Id>(Z.size());
-  double logdet  = spde.getSPDEOp()->computeTotalLogDet(spde.getNMC(), spde.getSeed());
-  double quad    = spde.getSPDEOp()->computeQuadratic(Z);
-  double loglike = TEST;
-  if (!FFFF(logdet) && !FFFF(quad))
-    loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
-
-  if (verbose)
-  {
-    message("Likelihood calculation:\n");
-    message("Nb. active samples = %d\n", size);
-    message("Nb. Monte-Carlo    = %d\n", spde.getNMC());
-    message("Cholesky           = %d\n", spde.getFlagCholesky());
-    message("Log-Determinant    = %lf\n", logdet);
-    message("Quadratic term     = %lf\n", quad);
-    message("Log-likelihood     = %lf\n", loglike);
-  }
-
-  // Cleaning phase
-  return loglike;
+  return spde.loglikelihood(Z, verbose);
 }
 
 const MatrixSparse* SPDE::getQ() const
@@ -1160,6 +1130,79 @@ const PrecisionOpMulti* SPDE::getPrecisionKrig() const
     return nullptr;
   }
   return _flagCholesky ? _Qom : _QopK;
+}
+
+VectorDouble SPDE::getData(bool flagCenter, bool verbose)
+{
+  VectorDouble Z;
+  if (!_isReady)
+  {
+    messerr("You must call SPDE::makeReady() beforehand");
+    return Z;
+  }
+  Z = _dbin->getColumnsActiveAndDefined(ELoc::Z);
+
+  if (flagCenter)
+  {
+    if (centerDataByDriftInPlace(Z, verbose)) return 1;
+  }
+  return Z;
+}
+
+VectorDouble SPDE::kriging(const VectorDouble& Z) const
+{
+  if (!_isReady)
+  {
+    messerr("You must call SPDE::makeReady() beforehand");
+    return VectorDouble();
+  }
+  VectorDouble result = getSPDEOp()->kriging(Z, _AoutK);
+  uncenterResultByDriftInPlace(result);
+  return result;
+}
+
+VectorDouble SPDE::stdev(const VectorDouble& Z) const
+{
+  if (!_isReady)
+  {
+    messerr("You must call SPDE::makeReady() beforehand");
+    return VectorDouble();
+  }
+  VectorDouble result = getSPDEOp()->stdev(Z, getNMC(), getSeed(),
+                                           getAoutK(), getAoutS());
+  return result;
+}
+
+VectorDouble SPDE::simulate(const VectorDouble& Z) const
+{
+  VectorDouble result = (getFlagKrig())
+                        ? getSPDEOp()->simCond(Z, getAoutK(), getAoutS())
+                        : getSPDEOp()->simNonCond(getAoutS());
+  addNuggetToResult(result);
+  uncenterResultByDriftInPlace(result);
+  return result;
+}
+
+double SPDE::loglikelihood(const VectorDouble& Z, bool verbose) const
+{
+  Id size        = static_cast<Id>(Z.size());
+  double logdet  = getSPDEOp()->computeTotalLogDet(getNMC(), getSeed());
+  double quad    = getSPDEOp()->computeQuadratic(Z);
+  double loglike = TEST;
+  if (!FFFF(logdet) && !FFFF(quad))
+    loglike = -0.5 * (logdet + quad + size * log(2. * GV_PI));
+
+  if (verbose)
+  {
+    message("Likelihood calculation:\n");
+    message("Nb. active samples = %d\n", size);
+    message("Nb. Monte-Carlo    = %d\n", getNMC());
+    message("Cholesky           = %d\n", getFlagCholesky());
+    message("Log-Determinant    = %lf\n", logdet);
+    message("Quadratic term     = %lf\n", quad);
+    message("Log-likelihood     = %lf\n", loglike);
+  }
+  return loglike;
 }
 
 } // namespace gstlrn

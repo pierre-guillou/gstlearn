@@ -5,18 +5,18 @@ Data.2       2.35
 SPDE Simulation using gstlearn (with Matrix) -> GM
 --------------------------------------------------
                   Mean
-GM.Data.1.1       1.63
-GM.Data.1.2       1.48
-GM.Data.2.1      -0.63
-GM.Data.2.2      -0.03
+GM.Data.1.1      -1.17
+GM.Data.1.2       1.63
+GM.Data.2.1       1.59
+GM.Data.2.2      -0.84
 
 SPDE Simulation using gstlearn (Matrix-Free) -> GF
 --------------------------------------------------
                   Mean
-GF.Data.1.1       2.18
-GF.Data.1.2       0.87
-GF.Data.2.1      -0.98
-GF.Data.2.2       0.02
+GF.Data.1.1      -0.31
+GF.Data.1.2       1.57
+GF.Data.2.1       1.04
+GF.Data.2.2      -0.96
 
 SPDE Simulation performed by Hand -> HF
 ---------------------------------------

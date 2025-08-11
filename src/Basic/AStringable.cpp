@@ -1271,8 +1271,8 @@ void print_matrix(const char* title,
                   const double* tab)
 {
   if (tab == nullptr || nx <= 0 || ny <= 0) return;
-  Id nx_util   = (flag_limit && (Id)OptCst::query(ECst::NTCOL) > 0) ? MIN((Id)OptCst::query(ECst::NTCOL), nx) : nx;
-  Id ny_util   = (flag_limit && (Id)OptCst::query(ECst::NTROW) > 0) ? MIN((Id)OptCst::query(ECst::NTROW), ny) : ny;
+  Id nx_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTCOL)) > 0) ? MIN((Id)OptCst::query(ECst::NTCOL), nx) : nx;
+  Id ny_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTROW)) > 0) ? MIN((Id)OptCst::query(ECst::NTROW), ny) : ny;
   Id multi_row = (ny > 1 || title == NULL);
 
   /* Print the title (optional) */

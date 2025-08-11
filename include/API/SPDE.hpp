@@ -74,8 +74,8 @@ public:
 
   Id defineSpdeOperator(bool verbose = false);
   Id centerDataByDriftInPlace(VectorDouble& Z, bool verbose = false);
-  void uncenterResultByDriftInPlace(VectorDouble& result);
-  void addNuggetToResult(VectorDouble& result);
+  void uncenterResultByDriftInPlace(VectorDouble& result) const;
+  void addNuggetToResult(VectorDouble& result) const;
 
   Id setMeshes(bool flagForKrig, const VectorMeshes* meshes);
   Id setProjIn(bool flagForKrig, const ProjMultiMatrix* proj);
@@ -86,6 +86,11 @@ public:
                      bool flagApply               = true,
                      bool verbose                 = false);
   Id makeReady(bool verbose = false);
+  VectorDouble getData(bool flagCenter, bool verbose = false);
+  VectorDouble kriging(const VectorDouble& Z) const;
+  VectorDouble stdev(const VectorDouble& Z) const;
+  VectorDouble simulate(const VectorDouble& Z) const;
+  double loglikelihood(const VectorDouble& Z, bool verbose = false) const;
 
 private:
   void _defineFlagCholesky(Id useCholesky, const Model* model, bool verbose = false);

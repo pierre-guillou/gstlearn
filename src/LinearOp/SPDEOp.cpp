@@ -51,6 +51,11 @@ Id ASPDEOp::getSize() const
   return _QKriging->getSize();
 }
 
+Id ASPDEOp::getSizeSimu() const
+{
+  return _QSimu->getSize();
+}
+
 void ASPDEOp::_prepare(bool w1, bool w2) const
 {
   if (w1) _workdat1.resize(_getNDat());
@@ -94,11 +99,6 @@ Id ASPDEOp::_addToDest(const constvect inv, vect outv) const
   return status;
 }
 
-Id ASPDEOp::getSizeSimu() const
-{
-  return _QSimu->getSize();
-}
-
 void ASPDEOp::_simCond(const constvect data, vect outvK, vect outvS) const
 {
   // Resize if necessary
@@ -139,7 +139,7 @@ void ASPDEOp::_simNonCond(vect outv) const
 VectorDouble ASPDEOp::kriging(const VectorDouble& dat, const ProjMulti* proj) const
 {
   constvect datm(dat.data(), dat.size());
-  VectorDouble outMeshK(_QKriging->getSize());
+  VectorDouble outMeshK(getSize());
   vect outvs(outMeshK);
   Id err = _kriging(datm, outvs);
   if (err) return VectorDouble();
@@ -201,7 +201,7 @@ Id ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
 
 VectorDouble ASPDEOp::simNonCond(const ProjMulti* proj) const
 {
-  VectorDouble outMeshS(_QSimu->getSize());
+  VectorDouble outMeshS(getSizeSimu());
   vect outMeshSv(outMeshS);
   _simNonCond(outMeshSv);
 
@@ -217,9 +217,9 @@ VectorDouble ASPDEOp::simCond(const VectorDouble& dat,
                               const ProjMulti* projS) const
 {
   constvect datv(dat.data(), dat.size());
-  VectorDouble outMeshK(_QKriging->getSize());
+  VectorDouble outMeshK(getSize());
   vect outMeshKv(outMeshK);
-  VectorDouble outMeshS(_QSimu->getSize());
+  VectorDouble outMeshS(getSizeSimu());
   vect outMeshSv(outMeshS);
 
   // Perform the conditional simulation
@@ -281,7 +281,7 @@ VectorDouble ASPDEOp::krigingWithGuess(const VectorDouble& dat,
   constvect datv(dat.data(), dat.size());
   constvect guessv(guess.data(), guess.size());
 
-  VectorDouble outv(_QKriging->getSize());
+  VectorDouble outv(getSize());
   vect outvs(outv);
   Id err = krigingWithGuess(datv, guessv, outvs);
   if (err) return VectorDouble();
@@ -319,7 +319,7 @@ Id ASPDEOp::_solveWithGuess(const constvect in,
 
 Id ASPDEOp::_buildRhs(const constvect inv) const
 {
-  _rhs.resize(_QKriging->getSize());
+  _rhs.resize(getSize());
   vect w1(_workdat1);
   _invNoise->evalDirect(inv, w1);
   _projInKriging->point2mesh(_workdat1, _rhs);

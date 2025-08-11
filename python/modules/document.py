@@ -20,8 +20,10 @@ import base64
 import gstlearn as gl
 from IPython.display import HTML
 
+
 try:
-    from IPython.display import display, Javascript, Markdown
+#   from IPython.display import display, Javascript, Markdown
+    from IPython import get_ipython
     import requests
 except ModuleNotFoundError as ex:
     msg = ("Python dependencies 'IPython' and 'requests' not found.\n"
@@ -133,8 +135,10 @@ def setNoScroll():
       window.__no_scroll_observer = mo;
     })();
     """
-    display(HTML(css))
-    display(Javascript(js))
+    if get_ipython() and get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
+        from IPython.display import Javascript, display
+        display(HTML(css))
+        display(Javascript(js))
 
 def locateFile(filename, where='references', directory=None, verbose=False, version=package_version):
     '''
