@@ -33,7 +33,7 @@ class GSTLEARN_EXPORT CovGradient: public ACov
 public:
   CovGradient(const CovAniso& cova);
   CovGradient(const CovGradient& r);
-  CovGradient& operator=(const CovGradient& r) = delete;
+  CovGradient& operator=(const CovGradient& r);
   virtual ~CovGradient();
   IMPLEMENT_CLONING(CovGradient)
 

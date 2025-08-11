@@ -43,6 +43,17 @@ CovGradient::CovGradient(const CovGradient& r)
 {
 }
 
+CovGradient& CovGradient::operator=(const CovGradient& r)
+{
+  if (this != &r)
+  {
+    ACov::operator=(r);
+    _nVar = r._nVar;
+    // The member _covRef cannot be updated by this method
+  }
+  return *this;
+}
+
 CovGradient::~CovGradient()
 {
 }
