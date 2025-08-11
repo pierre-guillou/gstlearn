@@ -131,8 +131,8 @@ String AStringable::toString(const AStringFormat* /*strfmt*/) const
 std::stringstream _formatColumn(const EJustify& justify, Id localSize = 0)
 {
   std::stringstream sstr;
-  auto size = static_cast<int>((localSize > 0) ? localSize : _getColumnSize());
-  auto prec = static_cast<int>(_getDecimalNumber());
+  auto size = static_cast<I32>((localSize > 0) ? localSize : _getColumnSize());
+  auto prec = static_cast<I32>(_getDecimalNumber());
   sstr << std::fixed << std::setw(size) << std::setprecision(prec);
   if (justify == EJustify::LEFT)
     sstr << std::left;
@@ -193,8 +193,8 @@ String _tabPrintInt(Id value, const EJustify& justify, Id localSize = 0)
 String _tabPrintRowColumn(Id icase, Id value, Id flagAdd)
 {
   std::stringstream sstr;
-  int rank  = static_cast<int>(_getColumnRank());
-  int width = static_cast<int>(_getColumnSize() - _getColumnRank() - 1);
+  I32 rank  = static_cast<I32>(_getColumnRank());
+  I32 width = static_cast<I32>(_getColumnSize() - _getColumnRank() - 1);
   sstr << std::setw(width) << std::right;
   if (icase == CASE_ROW)
   {

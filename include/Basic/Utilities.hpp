@@ -166,5 +166,5 @@ GSTLEARN_EXPORT double truncateDigits(double value, Id ndigits);
 
 GSTLEARN_EXPORT void print_range(const char* title, Id ntab, const double* tab, const double* sel);
 
-GSTLEARN_EXPORT void convertIndptrToIndices(Id ncumul, const int* cumul, int* tab);
+GSTLEARN_EXPORT void convertIndptrToIndices(Id ncumul, const I32* cumul, I32* tab);
 } // namespace gstlrn

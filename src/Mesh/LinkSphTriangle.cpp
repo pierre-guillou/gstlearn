@@ -128,7 +128,7 @@ Id meshes_2D_sph_from_db(Db* db, SphTriangle* t)
     t->sph_z[ecr] = zz;
     ecr++;
   }
-  t->n_nodes = static_cast<int>(nold + neff);
+  t->n_nodes = static_cast<I32>(nold + neff);
 
   /* Set the error return code */
 
@@ -177,7 +177,7 @@ Id meshes_2D_sph_from_points(Id nech, double* x, double* y, SphTriangle* t)
     t->sph_z[ecr] = zz;
     ecr++;
   }
-  t->n_nodes = static_cast<int>(nold + nech);
+  t->n_nodes = static_cast<I32>(nold + nech);
 
   /* Set the error return code */
 
@@ -293,7 +293,7 @@ Id meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
   t->sph_x.resize(nech);
   t->sph_y.resize(nech);
   t->sph_z.resize(nech);
-  t->n_nodes = static_cast<int>(nech);
+  t->n_nodes = static_cast<I32>(nech);
 
   /* Set the error return code */
 
@@ -344,15 +344,15 @@ void meshes_2D_sph_print(SphTriangle* t, Id brief)
  *****************************************************************************/
 Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
 {
-  std::vector<int> loc_near, loc_next, loc_lnew;
+  std::vector<I32> loc_near, loc_next, loc_lnew;
   VectorDouble loc_dist;
-  int error, skip_rnd, seed_memo;
+  I32 error, skip_rnd, seed_memo;
   double memo[3][3], ampli, value, cste;
 
   /* Initializations */
 
   error    = 1;
-  skip_rnd = (int)get_keypone("Skip_Random", 0);
+  skip_rnd = (I32)get_keypone("Skip_Random", 0);
   if (t == (SphTriangle*)NULL || t->n_nodes < 3) return (1);
 
   /* Re-allocate the arrays within the SphTriangle structure */
@@ -374,10 +374,10 @@ Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
 
   if (!skip_rnd)
   {
-    seed_memo = static_cast<int>(law_get_random_seed());
+    seed_memo = static_cast<I32>(law_get_random_seed());
     law_set_random_seed(132231);
     ampli = 1.e-2;
-    for (int i = 0; i < 3; i++)
+    for (I32 i = 0; i < 3; i++)
     {
       memo[i][0] = t->sph_x[i];
       memo[i][1] = t->sph_y[i];
@@ -399,7 +399,7 @@ Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
 
   /* Restore the initial coordinates */
 
-  for (int i = 0; i < 3; i++)
+  for (I32 i = 0; i < 3; i++)
   {
     t->sph_x[i] = memo[i][0];
     t->sph_y[i] = memo[i][1];

@@ -2504,7 +2504,7 @@ double ut_legendre(Id n, double v, bool flagNorm)
 {
   if (!flagNorm)
   {
-    return boost::math::legendre_p<double>(static_cast<int>(n), v);
+    return boost::math::legendre_p<double>(static_cast<I32>(n), v);
   }
   double P0, P1, Pn, value;
 
@@ -2740,7 +2740,7 @@ double ut_flegendre(Id n, Id k0, double theta, bool flagNorm)
   Id m                        = ABS(k0);
   double phi                  = 0.;
   std::complex<double> resbis = boost::math::spherical_harmonic<double, double>(
-    static_cast<unsigned int>(n), static_cast<int>(m), theta, phi);
+    static_cast<unsigned int>(n), static_cast<I32>(m), theta, phi);
   double result = resbis.real();
 
   if (flagNorm)
@@ -2764,7 +2764,7 @@ double ut_flegendre(Id n, Id k0, double theta, bool flagNorm)
 double ut_sphericalHarmonic(Id n, Id k, double theta, double phi)
 {
   return boost::math::spherical_harmonic<double, double>(
-           static_cast<unsigned int>(n), static_cast<int>(k), theta, phi)
+           static_cast<unsigned int>(n), static_cast<I32>(k), theta, phi)
     .real();
 }
 

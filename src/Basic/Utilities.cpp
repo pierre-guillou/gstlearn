@@ -1184,9 +1184,9 @@ void print_range(const char* title,
 }
 
 /// TODO: transfer this in swig_inc.i
-void convertIndptrToIndices(Id ncumul, const int* cumul, int* tab)
+void convertIndptrToIndices(Id ncumul, const I32* cumul, I32* tab)
 {
-  for (int i = 0; i < ncumul; i++)
+  for (I32 i = 0; i < ncumul; i++)
   {
     auto start = cumul[i];
     auto end   = cumul[i + 1];

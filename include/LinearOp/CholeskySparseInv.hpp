@@ -44,7 +44,7 @@ public:
     m_val.resize(m_nnz);
 
     T* valptr = m_val.data();
-    for (int j = 0; j < m_cols; ++j)
+    for (I32 j = 0; j < m_cols; ++j)
     {
       typename SpMat::InnerIterator Acol(A, j);
       for (typename SpMat::InnerIterator pattern_col(pattern, j);
@@ -75,7 +75,7 @@ public:
     m_val.resize(m_nnz);
 
     T* valptr = m_val.data();
-    for (int j = 0; j < m_cols; ++j)
+    for (I32 j = 0; j < m_cols; ++j)
     {
       for (typename SpMat::InnerIterator pattern_col(pattern, j);
            pattern_col; ++pattern_col)

@@ -81,7 +81,7 @@ Db* FileLAS::readFromFile()
   Db* db = nullptr;
   char string[1000], *lcur, sep_blank[2], sep_point[2], *token;
   double value;
-  static int s_length = 1000;
+  static I32 s_length = 1000;
   VectorString names = { "X", "Y", "CODE" };
 
   /* Open the file */
@@ -198,7 +198,7 @@ Db* FileLAS::readFromFile()
  ** \param[out]     string     New line
  **
  *****************************************************************************/
-Id FileLAS::_readFind(int s_length,
+Id FileLAS::_readFind(I32 s_length,
                       const char* target,
                       Id* numline,
                       char* string)
@@ -228,7 +228,7 @@ Id FileLAS::_readFind(int s_length,
  ** TODO : Replace char* by String
  **
  *****************************************************************************/
-Id FileLAS::_readNext(int s_length, Id flag_up, Id* numline, char* string)
+Id FileLAS::_readNext(I32 s_length, Id flag_up, Id* numline, char* string)
 {
   Id size;
 

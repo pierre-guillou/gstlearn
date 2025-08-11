@@ -247,8 +247,8 @@ double TurboOptimizer::_getCoorByMesh(Id imesh, Id rank, Id idim0) const
 
 void TurboOptimizer::_printVector(const std::string& title,
                                   VectorDouble& uu,
-                                  int width,
-                                  int ndec)
+                                  I32 width,
+                                  I32 ndec)
 {
   Id nval = static_cast<Id>(uu.size());
   std::cout << title << std::endl;
@@ -268,8 +268,8 @@ void TurboOptimizer::_printMatrix(const std::string& title,
                                   Id nper_batch,
                                   Id row_shift,
                                   Id col_shift,
-                                  int width,
-                                  int ndec)
+                                  I32 width,
+                                  I32 ndec)
 {
   // Initializations
   Id nbatch = 1 + (ncol - 1) / nper_batch;
