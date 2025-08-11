@@ -27,7 +27,6 @@
 %begin %{
 // For isnan
 #include <cmath>
-
 // For isinf
 #include <math.h>
 // For cout
