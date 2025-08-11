@@ -24,16 +24,12 @@ ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
                  const ProjMulti* const projInKriging,
                  const ASimulable* invNoise,
                  const PrecisionOpMulti* const popSimu,
-                 const ProjMulti* const projInSimu,
-                 const ProjMulti* const projOutKriging,
-                 const ProjMulti* const projOutSimu)
+                 const ProjMulti* const projInSimu)
   : _QKriging(popKriging)
   , _projInKriging(projInKriging)
   , _invNoise(invNoise)
   , _QSimu(popSimu == nullptr ? popKriging : popSimu)
   , _projInSimu(projInSimu == nullptr ? projInKriging : projInSimu)
-  , _projOutKriging(projOutKriging)
-  , _projOutSimu(projOutSimu == nullptr ? projOutKriging : projOutSimu)
   , _solver(nullptr)
   , _verbose(false)
   , _ndat(0)
@@ -53,6 +49,11 @@ ASPDEOp::~ASPDEOp()
 Id ASPDEOp::getSize() const
 {
   return _QKriging->getSize();
+}
+
+Id ASPDEOp::getSizeSimu() const
+{
+  return _QSimu->getSize();
 }
 
 void ASPDEOp::_prepare(bool w1, bool w2) const
@@ -98,11 +99,6 @@ Id ASPDEOp::_addToDest(const constvect inv, vect outv) const
   return status;
 }
 
-Id ASPDEOp::getSizeSimu() const
-{
-  return _QSimu->getSize();
-}
-
 void ASPDEOp::_simCond(const constvect data, vect outvK, vect outvS) const
 {
   // Resize if necessary
@@ -140,25 +136,24 @@ void ASPDEOp::_simNonCond(vect outv) const
   _QSimu->evalSimulate(_workNoiseMesh, outv);
 }
 
-VectorDouble ASPDEOp::kriging(const VectorDouble& dat) const
+VectorDouble ASPDEOp::kriging(const VectorDouble& dat, const ProjMulti* proj) const
 {
   constvect datm(dat.data(), dat.size());
-  VectorDouble outMeshK(_QKriging->getSize());
+  VectorDouble outMeshK(getSize());
   vect outvs(outMeshK);
   Id err = _kriging(datm, outvs);
   if (err) return VectorDouble();
 
   // Project the result on the output mesh (optional)
-  if (_projOutKriging == nullptr)
-    return outMeshK;
-  VectorDouble result(_projOutKriging->getNPoint());
-  _projOutKriging->mesh2point(outvs, result);
+  if (proj == nullptr) return outMeshK;
+  VectorDouble result(proj->getNPoint());
+  proj->mesh2point(outvs, result);
   return result;
 }
 
 Id ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
-                                  const MatrixDense& driftMat,
-                                  const VectorDouble& driftCoeffs)
+                                 const MatrixDense& driftMat,
+                                 const VectorDouble& driftCoeffs)
 {
   auto nrows = driftMat.getNRows();
   auto ncols = driftMat.getNCols();
@@ -189,7 +184,7 @@ Id ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
 }
 
 Id ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
-                                 const VectorDouble& meanVec)
+                                const VectorDouble& meanVec)
 {
   if ((Id)Z.size() != (Id)meanVec.size())
   {
@@ -204,26 +199,41 @@ Id ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
   return 0;
 }
 
-VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
+VectorDouble ASPDEOp::simNonCond(const ProjMulti* proj) const
+{
+  VectorDouble outMeshS(getSizeSimu());
+  vect outMeshSv(outMeshS);
+  _simNonCond(outMeshSv);
+
+  // Project the result on the output mesh (optional)
+  if (proj == nullptr) return outMeshS;
+  VectorDouble result(proj->getNPoint());
+  proj->mesh2point(outMeshSv, result);
+  return result;
+}
+
+VectorDouble ASPDEOp::simCond(const VectorDouble& dat,
+                              const ProjMulti* projK,
+                              const ProjMulti* projS) const
 {
   constvect datv(dat.data(), dat.size());
-  VectorDouble outMeshK(_QKriging->getSize());
+  VectorDouble outMeshK(getSize());
   vect outMeshKv(outMeshK);
-  VectorDouble outMeshS(_QSimu->getSize());
+  VectorDouble outMeshS(getSizeSimu());
   vect outMeshSv(outMeshS);
 
   // Perform the conditional simulation
   _simCond(datv, outMeshKv, outMeshSv);
 
   // Project the result on the output mesh (optional)
-  if (_projOutKriging == nullptr && _projOutSimu == nullptr)
+  if (projK == nullptr || projS == nullptr)
   {
     VH::addInPlace(outMeshSv, outMeshKv);
     return outMeshK;
   }
-  VectorDouble result(_projOutSimu->getNPoint());
-  _projOutKriging->mesh2point(outMeshKv, result);
-  _projOutSimu->addMesh2point(outMeshSv, result);
+  VectorDouble result(projS->getNPoint());
+  projK->mesh2point(outMeshKv, result);
+  projS->addMesh2point(outMeshSv, result);
   return result;
 }
 
@@ -234,21 +244,27 @@ VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
  * @param dat Vector of Data
  * @param nMC  Number of Monte-Carlo simulations
  * @param seed Random seed for the Monte-Carlo simulations
+ * @param projK Projection Matrix used for Kriging
+ * @param projS Projection matrix used for Simulations
  * @return VectorDouble
  */
-VectorDouble ASPDEOp::stdev(const VectorDouble& dat, Id nMC, Id seed) const
+VectorDouble ASPDEOp::stdev(const VectorDouble& dat,
+                            Id nMC,
+                            Id seed,
+                            const ProjMulti* projK,
+                            const ProjMulti* projS) const
 {
   auto memo = law_get_random_seed();
   law_set_random_seed(seed);
 
   // Standard Deviation using Monte-Carlo simulations
-  Id nout = _projOutSimu->getNPoint();
+  Id nout = projS->getNPoint();
   VectorDouble temp_mean(nout, 0.);
   VectorDouble temp_mean2(nout, 0.);
 
   for (Id iMC = 0; iMC < nMC; iMC++)
   {
-    VectorDouble temp = simCond(dat);
+    VectorDouble temp = simCond(dat, projK, projS);
     VH::addInPlace(temp_mean, temp);
     VH::addSquareInPlace(temp_mean2, temp);
   }
@@ -259,27 +275,13 @@ VectorDouble ASPDEOp::stdev(const VectorDouble& dat, Id nMC, Id seed) const
   return temp_mean;
 }
 
-VectorDouble ASPDEOp::simNonCond() const
-{
-  VectorDouble outMeshS(_QSimu->getSize());
-  vect outMeshSv(outMeshS);
-  _simNonCond(outMeshSv);
-
-  // Project the result on the output mesh (optional)
-  if (_projOutSimu == nullptr)
-    return outMeshS;
-  VectorDouble result(_projOutSimu->getNPoint());
-  _projOutSimu->mesh2point(outMeshSv, result);
-  return result;
-}
-
 VectorDouble ASPDEOp::krigingWithGuess(const VectorDouble& dat,
                                        const VectorDouble& guess) const
 {
   constvect datv(dat.data(), dat.size());
   constvect guessv(guess.data(), guess.size());
 
-  VectorDouble outv(_QKriging->getSize());
+  VectorDouble outv(getSize());
   vect outvs(outv);
   Id err = krigingWithGuess(datv, guessv, outvs);
   if (err) return VectorDouble();
@@ -294,8 +296,8 @@ Id ASPDEOp::_kriging(const constvect inv, vect out) const
 }
 
 Id ASPDEOp::krigingWithGuess(const constvect inv,
-                              const constvect guess,
-                              vect out) const
+                             const constvect guess,
+                             vect out) const
 {
   _buildRhs(inv);
   return _solveWithGuess(_rhs, guess, out);
@@ -308,8 +310,8 @@ Id ASPDEOp::_solve(const constvect in, vect out) const
 }
 
 Id ASPDEOp::_solveWithGuess(const constvect in,
-                             const constvect guess,
-                             vect out) const
+                            const constvect guess,
+                            vect out) const
 {
   _solver->solveWithGuess(in, guess, out);
   return 0;
@@ -317,7 +319,7 @@ Id ASPDEOp::_solveWithGuess(const constvect in,
 
 Id ASPDEOp::_buildRhs(const constvect inv) const
 {
-  _rhs.resize(_QKriging->getSize());
+  _rhs.resize(getSize());
   vect w1(_workdat1);
   _invNoise->evalDirect(inv, w1);
   _projInKriging->point2mesh(_workdat1, _rhs);

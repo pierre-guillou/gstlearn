@@ -23,11 +23,11 @@
 
 #include "Enum/ECov.hpp"
 
+#include "Arrays/Array.hpp"
 #include "Basic/ICloneable.hpp"
 #include "Basic/Tensor.hpp"
 #include "Covariances/ACovFunc.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Arrays/Array.hpp"
 #include "Space/SpacePoint.hpp"
 #include <array>
 #include <vector>
@@ -80,12 +80,12 @@ public:
   double evalCor(const SpacePoint& p1,
                  const SpacePoint& p2,
                  const CovCalcMode* mode = nullptr,
-                 Id ivar                = 0,
-                 Id jvar                = 0) const; // let ivar and jvar for the future where the
-                                      // correlation will be different for multivariate
+                 Id ivar                 = 0,
+                 Id jvar                 = 0) const; // let ivar and jvar for the future where the
+                                     // correlation will be different for multivariate
 
   virtual double evalCovOnSphere(double alpha,
-                                 Id degree              = 50,
+                                 Id degree               = 50,
                                  bool flagScaleDistance  = true,
                                  const CovCalcMode* mode = nullptr) const override;
   virtual VectorDouble evalSpectrumOnSphere(Id n,
@@ -217,7 +217,7 @@ public:
   void makeTensorStationary(Id idim, Id jdim);
   void makeParamStationary();
 
-  TabNoStatCovAniso* getTabNoStatCovAniso() const { return (TabNoStatCovAniso*)_tabNoStat; }
+  TabNoStatCovAniso* getTabNoStatCovAniso() const { return static_cast<TabNoStatCovAniso*>(_tabNoStat); }
 
   Id getNAngles() const { return getTabNoStatCovAniso()->getNAngles(); }
   Id getNRanges() const { return getTabNoStatCovAniso()->getNRanges(); }
@@ -228,7 +228,7 @@ public:
   bool isNoStatForRotation() const { return getTabNoStatCovAniso()->isDefinedForRotation(); }
 
   VectorDouble evalCovOnSphereVec(const VectorDouble& alpha,
-                                  Id degree              = 50,
+                                  Id degree               = 50,
                                   bool flagScaleDistance  = false,
                                   const CovCalcMode* mode = nullptr) const;
   Array evalCovFFT(const VectorDouble& hmax, Id N = 128, Id ivar = 0, Id jvar = 0) const;
@@ -268,7 +268,7 @@ public:
                              const CovCalcMode* mode) const;
   void updateCov() override;
   void initParams(const MatrixSymmetric& vars,
-                  double href                 = 1.) override;
+                  double href = 1.) override;
   ParamInfo& getParamInfoScale(Id idim) { return _scales[idim]; }
   ParamInfo& getParamInfoAngle(Id idim) { return _angles[idim]; }
   std::vector<ParamInfo>& getParamInfoScales() { return _scales; }
@@ -281,14 +281,14 @@ public:
 
 #ifndef SWIG
   Id addEvalCovVecRHSInPlace(vect vect,
-                              const VectorInt& index1,
-                              Id iech2,
-                              const KrigOpt& krigopt,
-                              SpacePoint& pin,
-                              SpacePoint& pout,
-                              VectorDouble& tabwork,
-                              double lambda                 = 1.,
-                              const ECalcMember& calcMember = ECalcMember::RHS) const override;
+                             const VectorInt& index1,
+                             Id iech2,
+                             const KrigOpt& krigopt,
+                             SpacePoint& pin,
+                             SpacePoint& pout,
+                             VectorDouble& tabwork,
+                             double lambda                 = 1.,
+                             const ECalcMember& calcMember = ECalcMember::RHS) const override;
 #endif
 
 protected:
@@ -320,8 +320,8 @@ private:
 
   virtual double _eval(const SpacePoint& p1,
                        const SpacePoint& p2,
-                       Id ivar                = 0,
-                       Id jvar                = 0,
+                       Id ivar                 = 0,
+                       Id jvar                 = 0,
                        const CovCalcMode* mode = nullptr) const override;
 
 private:
@@ -342,4 +342,4 @@ private:
   // They are in a protected section as they may be modified by class hierarchy
 };
 
-}
+} // namespace gstlrn

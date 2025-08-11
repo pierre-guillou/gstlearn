@@ -79,7 +79,7 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
   , _work2()
   , _work3()
 {
-  const MeshETurbo* meshTurbo = dynamic_cast<const MeshETurbo*>(mesh);
+  const auto* meshTurbo = dynamic_cast<const MeshETurbo*>(mesh);
 
   if (stencil && meshTurbo == nullptr)
   {

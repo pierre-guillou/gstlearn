@@ -12,15 +12,15 @@
 
 #include "Basic/ICloneable.hpp"
 #include "Space/ASpace.hpp"
-#include "gstlearn_export.hpp"
 #include "geoslib_define.h"
+#include "gstlearn_export.hpp"
 
 #include "Enum/ENeigh.hpp"
 
+#include "Basic/Utilities.hpp"
 #include "Geometry/ABiTargetCheck.hpp"
 #include "Geometry/BiTargetCheckDistance.hpp"
 #include "Neigh/ANeigh.hpp"
-#include "Basic/Utilities.hpp"
 #include "Space/SpaceTarget.hpp"
 
 namespace gstlrn
@@ -48,45 +48,45 @@ class Db;
 class GSTLEARN_EXPORT NeighMoving: public ANeigh
 {
 public:
-  NeighMoving(bool flag_xvalid = false,
-              Id nmaxi = 1000,
-              double radius = TEST,
-              Id nmini = 1,
-              Id nsect = 1,
-              Id nsmax = ITEST,
-              const VectorDouble& coeffs = VectorDouble(),
-              const VectorDouble& angles = VectorDouble(),
-              bool useBallTree = false,
-              Id leaf_size = 10,
+  NeighMoving(bool flag_xvalid             = false,
+              Id nmaxi                     = 1000,
+              double radius                = TEST,
+              Id nmini                     = 1,
+              Id nsect                     = 1,
+              Id nsmax                     = ITEST,
+              const VectorDouble& coeffs   = VectorDouble(),
+              const VectorDouble& angles   = VectorDouble(),
+              bool useBallTree             = false,
+              Id leaf_size                 = 10,
               const ASpaceSharedPtr& space = ASpaceSharedPtr());
   NeighMoving(const NeighMoving& r);
   NeighMoving& operator=(const NeighMoving& r);
   virtual ~NeighMoving();
 
   IMPLEMENT_CLONING(NeighMoving)
-  
+
   /// Interface for ANeigh
-  Id attach(const Db *dbin, const Db *dbout = nullptr) override;
+  Id attach(const Db* dbin, const Db* dbout = nullptr) override;
   void getNeigh(Id iech_out, VectorInt& ranks) override;
   bool hasChanged(Id iech_out) const override;
   VectorDouble summary(Id iech_out) override;
   Id getNSampleMax(const Db* db) const override;
   ENeigh getType() const override { return ENeigh::fromKey("MOVING"); }
-  bool getFlagContinuous() const override { return (! FFFF(_distCont) && _distCont < 1.); }
+  bool getFlagContinuous() const override { return (!FFFF(_distCont) && _distCont < 1.); }
 
   /// Interface for AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static NeighMoving* create(bool flag_xvalid = false,
-                             Id nmaxi = 1000,
-                             double radius = TEST,
-                             Id nmini = 1,
-                             Id nsect = 1,
-                             Id nsmax = ITEST,
-                             const VectorDouble& coeffs = VectorDouble(),
-                             const VectorDouble& angles = VectorDouble(),
-                             bool useBallTree = false,
-                             Id leaf_size = 10,
+  static NeighMoving* create(bool flag_xvalid             = false,
+                             Id nmaxi                     = 1000,
+                             double radius                = TEST,
+                             Id nmini                     = 1,
+                             Id nsect                     = 1,
+                             Id nsmax                     = ITEST,
+                             const VectorDouble& coeffs   = VectorDouble(),
+                             const VectorDouble& angles   = VectorDouble(),
+                             bool useBallTree             = false,
+                             Id leaf_size                 = 10,
                              const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighMoving* createFromNF(const String& NFFilename, bool verbose = true);
 
@@ -116,7 +116,7 @@ public:
 
   VectorVectorDouble getEllipsoid(const VectorDouble& target, Id count = 360) const;
   VectorVectorDouble getSectors(const VectorDouble& target) const;
-  VectorVectorDouble getZoomLimits(const VectorDouble& target, double percent=20) const;
+  VectorVectorDouble getZoomLimits(const VectorDouble& target, double percent = 20) const;
 
 protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;
@@ -128,35 +128,35 @@ protected:
   String _getNFName() const override { return "NeighMoving"; }
 
 private:
-  Id  _getNBiPts() const { return (Id) _bipts.size(); }
-  Id  _moving(Id iech_out, VectorInt& ranks, double eps = EPSILON9);
-  Id  _movingSectorDefine(double dx, double dy) const;
+  Id _getNBiPts() const { return static_cast<Id>(_bipts.size()); }
+  Id _moving(Id iech_out, VectorInt& ranks, double eps = EPSILON9);
+  Id _movingSectorDefine(double dx, double dy) const;
   void _movingSectorNsmax(Id nsel, VectorInt& ranks);
   void _movingSelect(Id nsel, VectorInt& ranks);
   double _getRadius() const { return _biPtDist->getRadius(); }
-  bool _getAnisotropyElements(double *rx,
-                              double *ry,
-                              double *theta,
-                              double *cosp,
-                              double *sinp) const;
+  bool _getAnisotropyElements(double* rx,
+                              double* ry,
+                              double* theta,
+                              double* cosp,
+                              double* sinp) const;
 
 private:
-  Id _nMini;                    /* Minimum number of points in neigh. */
-  Id _nMaxi;                    /* Maximum number of points in neigh. */
-  Id _nSect;                    /* Number of 2-D angular sectors */
-  Id _nSMax;                    /* Maximum number of points per 2-D sector */
-  double _distCont;              /* Distance for continuous neighborhood */
+  Id _nMini;        /* Minimum number of points in neigh. */
+  Id _nMaxi;        /* Maximum number of points in neigh. */
+  Id _nSect;        /* Number of 2-D angular sectors */
+  Id _nSMax;        /* Maximum number of points per 2-D sector */
+  double _distCont; /* Distance for continuous neighborhood */
 
   BiTargetCheckDistance* _biPtDist;
   std::vector<ABiTargetCheck*> _bipts;
 
-  mutable VectorInt    _movingInd;
-  mutable VectorInt    _movingIsect;
-  mutable VectorInt    _movingNsect;
+  mutable VectorInt _movingInd;
+  mutable VectorInt _movingIsect;
+  mutable VectorInt _movingNsect;
   mutable VectorDouble _movingDst;
 
   mutable const DbGrid* _dbgrid; // Pointer not to be deleted
-  mutable SpaceTarget  _T1;
-  mutable SpaceTarget  _T2;
+  mutable SpaceTarget _T1;
+  mutable SpaceTarget _T2;
 };
-}
+} // namespace gstlrn

@@ -52,7 +52,7 @@ void NoStatArray::_informField(const VectorVectorDouble& coords,
 
   if (_dbNoStat->isGrid())
   {
-    const DbGrid* dbgrid = dynamic_cast<const DbGrid*>(_dbNoStat.get());
+    const auto* dbgrid = dynamic_cast<const DbGrid*>(_dbNoStat.get());
     if (migrateGridToCoor(dbgrid, iatt, coords, tab)) return;
   }
   else

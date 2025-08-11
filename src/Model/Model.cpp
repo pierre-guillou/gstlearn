@@ -1015,7 +1015,7 @@ bool Model::isFlagGradientNumerical() const
   // Check is performed on the first covariance
   const CovAnisoList* covalist = castInCovAnisoListConst(0);
   if (covalist == nullptr) return false;
-  const CovGradientNumerical* cova = dynamic_cast<const CovGradientNumerical*>(covalist->getCovAniso(0));
+  const auto* cova = dynamic_cast<const CovGradientNumerical*>(covalist->getCovAniso(0));
   return (cova != nullptr);
 }
 
@@ -1026,7 +1026,7 @@ bool Model::isFlagGradientFunctional() const
   // Check is performed on the first covariance
   const CovAnisoList* covalist = castInCovAnisoListConst(0);
   if (covalist == nullptr) return false;
-  const CovGradientFunctional* cova = dynamic_cast<const CovGradientFunctional*>(covalist->getCovAniso(0));
+  const auto* cova = dynamic_cast<const CovGradientFunctional*>(covalist->getCovAniso(0));
   return (cova != nullptr);
 }
 
@@ -1096,7 +1096,7 @@ CovAnisoList* Model::getCovAnisoListModify()
 const CovAnisoList* Model::castInCovAnisoListConst(Id icov) const
 {
   // Check the cast procedure
-  const CovAnisoList* covalist = dynamic_cast<const CovAnisoList*>(_cova.get());
+  const auto* covalist = dynamic_cast<const CovAnisoList*>(_cova.get());
   if (covalist == nullptr)
   {
     messerr("The member '_cova' in this model cannot be converted into a pointer to CovAnisoList");
@@ -1138,7 +1138,7 @@ CovLMGradient* Model::_castInCovLMGradient()
 
 const CovLMGradient* Model::castInCovLMGradientConst() const
 {
-  const CovLMGradient* covg = dynamic_cast<const CovLMGradient*>(_cova.get());
+  const auto* covg = dynamic_cast<const CovLMGradient*>(_cova.get());
   if (covg == nullptr)
   {
     messerr("The member '_cova' in this model cannot be converted into a pointer to CovLMGradient");
@@ -1149,7 +1149,7 @@ const CovLMGradient* Model::castInCovLMGradientConst() const
 
 const CovLMCTapering* Model::castInCovLMCTaperingConst() const
 {
-  const CovLMCTapering* covtape = dynamic_cast<const CovLMCTapering*>(_cova.get());
+  const auto* covtape = dynamic_cast<const CovLMCTapering*>(_cova.get());
   if (covtape == nullptr)
   {
     messerr("The member '_cova' in this model cannot be converted into a pointer to CovLMCTapering");
@@ -1159,7 +1159,7 @@ const CovLMCTapering* Model::castInCovLMCTaperingConst() const
 }
 const CovLMCAnamorphosis* Model::castInCovLMCAnamorphosisConst() const
 {
-  const CovLMCAnamorphosis* covtape = dynamic_cast<const CovLMCAnamorphosis*>(_cova.get());
+  const auto* covtape = dynamic_cast<const CovLMCAnamorphosis*>(_cova.get());
   if (covtape == nullptr)
   {
     messerr("The member '_cova' in this model cannot be converted into a pointer to CovLMCAnamorphosis");

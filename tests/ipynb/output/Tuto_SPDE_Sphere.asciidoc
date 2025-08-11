@@ -116,6 +116,18 @@ Column = 4 - Name = simu - Locator = z1----
 
 
 #NO_DIFF#XXX
+----np.int64(0)----
+
+
+#NO_DIFF#XXX
+----np.int64(9)----
+
+
+#NO_DIFF#XXX
+--------
+
+
+#NO_DIFF#XXX
 --------
 
 

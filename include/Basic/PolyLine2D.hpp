@@ -45,7 +45,7 @@ public:
   static PolyLine2D* create(const VectorDouble& x = VectorDouble(),
                             const VectorDouble& y = VectorDouble());
 
-  Id getNPoints() const { return (Id) _x.size(); }
+  Id getNPoints() const { return static_cast<Id>(_x.size()); }
   void init(const VectorDouble& x, const VectorDouble& y);
   const VectorDouble& getX() const { return _x; }
   const VectorDouble& getY() const { return _y; }

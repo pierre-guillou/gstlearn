@@ -118,14 +118,14 @@ void AnamDiscreteIR::calculateMeanAndVariance()
 }
 
 Id AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
-                                 const VectorDouble& /*wt*/)
+                                const VectorDouble& /*wt*/)
 {
   double mean, dt, dq, tnext, qnext, tcur, tprev;
   Id nsorted;
 
   /* Initializations */
 
-  Id nech   = static_cast<Id>(tab.size());
+  Id nech     = static_cast<Id>(tab.size());
   auto nclass = getNClass();
   auto ncut   = getNCut();
 
@@ -181,13 +181,13 @@ Id AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
 }
 
 Id AnamDiscreteIR::_stats_residuals(Id verbose,
-                                     Id nech,
-                                     const VectorDouble& tab,
-                                     Id* nsorted,
-                                     double* mean,
-                                     double* residuals,
-                                     double* T,
-                                     double* Q)
+                                    Id nech,
+                                    const VectorDouble& tab,
+                                    Id* nsorted,
+                                    double* mean,
+                                    double* residuals,
+                                    double* T,
+                                    double* Q)
 {
   double value, moyenne;
   Id iech, icut, jcut, nactive;
@@ -231,11 +231,11 @@ Id AnamDiscreteIR::_stats_residuals(Id verbose,
 
   /* Calculate the tonnage and meal quantity per class */
 
-  moyenne /= (double)nactive;
+  moyenne /= static_cast<double>(nactive);
   for (icut = 0; icut < ncut; icut++)
   {
-    T[icut] /= (double)nactive;
-    Q[icut] /= (double)nactive;
+    T[icut] /= static_cast<double>(nactive);
+    Q[icut] /= static_cast<double>(nactive);
   }
 
   /* Calculate the residuals */
@@ -282,12 +282,12 @@ Id AnamDiscreteIR::_stats_residuals(Id verbose,
 VectorDouble AnamDiscreteIR::z2factor(double z, const VectorInt& ifacs) const
 {
   VectorDouble factors;
-  Id nfact = (Id)ifacs.size();
+  Id nfact = static_cast<Id>(ifacs.size());
   factors.resize(nfact, 0);
 
   for (Id ifac = 0; ifac < nfact; ifac++)
   {
-    Id iclass    = ifacs[ifac] - 1;
+    Id iclass     = ifacs[ifac] - 1;
     double v1     = _getResidual(iclass, z);
     double v2     = _getResidual(iclass - 1, z);
     factors[ifac] = v1 - v2;
@@ -352,10 +352,10 @@ Id AnamDiscreteIR::updatePointToBlock(double r_coef)
   setRCoef(r_coef);
 
   auto nclass = getNClass();
-  double zie = 0.;
-  double zik = 0.;
-  double zje = 0.;
-  double zjk = 0.;
+  double zie  = 0.;
+  double zik  = 0.;
+  double zje  = 0.;
+  double zjk  = 0.;
 
   /* Loop on the classes */
 
@@ -459,15 +459,15 @@ void AnamDiscreteIR::_globalSelectivity(Selectivity* selectivity)
  **
  *****************************************************************************/
 Id AnamDiscreteIR::factor2Selectivity(Db* db,
-                                       Selectivity* selectivity,
-                                       const VectorInt& cols_est,
-                                       const VectorInt& cols_std,
-                                       Id iptr0)
+                                      Selectivity* selectivity,
+                                      const VectorInt& cols_est,
+                                      const VectorInt& cols_std,
+                                      Id iptr0)
 {
-  Id nech        = db->getNSample();
-  Id nb_est      = (Id)cols_est.size();
-  Id nb_std      = (Id)cols_std.size();
-  Id ncleff      = MAX(nb_est, nb_std);
+  Id nech         = db->getNSample();
+  Id nb_est       = static_cast<Id>(cols_est.size());
+  Id nb_std       = static_cast<Id>(cols_std.size());
+  Id ncleff       = MAX(nb_est, nb_std);
   bool cutDefined = (selectivity->getNCuts() > 0);
 
   if (db == nullptr)

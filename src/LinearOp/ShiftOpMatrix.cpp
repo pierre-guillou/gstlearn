@@ -1171,7 +1171,7 @@ void ShiftOpMatrix::_buildLambda(const AMesh* amesh)
   if (flagSphere)
   {
     const ASpace* space    = getDefaultSpaceSh().get();
-    const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
+    const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
     double r               = 1.;
     if (spaceSn != nullptr) r = spaceSn->getRadius();
     double normalizing = cova->normalizeOnSphere(50); // useful only for Markov

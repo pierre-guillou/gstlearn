@@ -41,7 +41,7 @@ Id t_btree::init_node(Id i_node, Id idx_start, Id idx_end)
 {
   Id n_features = this->n_features;
   Id n_points   = idx_end - idx_start;
-  auto centroid  = this->node_bounds.getRow(i_node);
+  auto centroid = this->node_bounds.getRow(i_node);
 
   for (Id j = 0; j < n_features; j++)
     centroid[j] = 0.0;
@@ -53,7 +53,7 @@ Id t_btree::init_node(Id i_node, Id idx_start, Id idx_end)
   for (Id j = 0; j < n_features; j++)
     centroid[j] /= n_points;
 
-  double radius = 0.0;
+  double radius        = 0.0;
   const auto dist_func = this->default_distance_function == 1 ? euclidean_distance : manhattan_distance;
   for (Id i = idx_start; i < idx_end; i++)
     radius = fmax(radius, dist_func(centroid.data(), this->data.getRow(this->idx_array[i]).data(), n_features));
@@ -68,7 +68,7 @@ Id find_node_split_dim(const MatrixT<double>& data, const VectorInt& node_indice
 {
   double min_val, max_val, val, spread;
 
-  Id j_max         = 0;
+  Id j_max          = 0;
   double max_spread = 0;
   for (Id j = 0; j < n_features; j++)
   {
@@ -194,7 +194,6 @@ t_btree::t_btree(MatrixT<double>&& data,
  * @brief Calculate the distance between the current 'pt' and the centroid of node 'i_node'
  * Returns 0 if 'pt' belongs to the node
  *
- * @param tree t_btree structure
  * @param i_node Rank of the target node
  * @param pt     Characteristics of the target SpacePoint
  * @return double Minimum distance or 0

@@ -27,13 +27,16 @@ class GSTLEARN_EXPORT SPDEOpMatrix: public SPDEOp
 public:
   SPDEOpMatrix(const PrecisionOpMultiMatrix* pop = nullptr,
                const ProjMultiMatrix* A          = nullptr,
-               const InvNuggetOp* invNoise       = nullptr,
-               const ProjMultiMatrix* projOut    = nullptr);
+               const InvNuggetOp* invNoise       = nullptr);
   virtual ~SPDEOpMatrix();
 
   double computeLogDetOp(Id nbsimu) const override;
 
-  VectorDouble stdev(const VectorDouble& dat, Id nMC, Id seed) const override;
+  VectorDouble stdev(const VectorDouble& dat,
+                     Id nMC                 = 1,
+                     Id seed                = 134343,
+                     const ProjMulti* projK = nullptr,
+                     const ProjMulti* projS = nullptr) const override;
 
 #ifndef SWIG
 

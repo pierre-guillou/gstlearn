@@ -33,7 +33,7 @@ public:
   VectorInt rankToIndice(Id rank) const;
   void rankToIndice(Id rank, VectorInt& indices) const;
 
-  Id getNDim() const { return (Id)_ndims.size(); }
+  Id getNDim() const { return static_cast<Id>(_ndims.size()); }
   Id getNPixels() const { return VH::product(_ndims); }
   const VectorInt& getNDims() const { return _ndims; }
   VectorInt getNDimsExt(Id ndimMax) const;

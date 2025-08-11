@@ -220,7 +220,7 @@ std::ostream& operator<<(std::ostream& os,
                          const VectorT<VectorNumT<T>>& vec)
 {
   os << "[";
-  for (Id i = 0, n = (Id)vec.size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(vec.size()); i < n; i++)
   {
     os << vec.at(i).toString();
     if (i != n - 1) os << " ";

@@ -44,7 +44,7 @@ public:
   void informMeshByApex(const AMesh* amesh, const EConsElem& econs) const;
   void informDbIn(const Db* dbin, const EConsElem& econs) const;
   void informDbOut(const Db* dbout, const EConsElem& econs) const;
-  Id size() const { return (Id) _items.size(); }
+  Id size() const { return static_cast<Id>(_items.size()); }
   bool empty() const { return _items.empty(); }
   void updateDescription();
   const mapNoStat& getTable() const { return _items; }

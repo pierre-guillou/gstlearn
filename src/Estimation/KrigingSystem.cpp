@@ -256,7 +256,7 @@ double KrigingSystem::_continuousMultiplier(Id rank1, Id rank2, double eps)
 {
   if (_neigh == nullptr) return (0.);
   if (_neigh->getType() != ENeigh::MOVING) return (0.);
-  const NeighMoving* neighM = dynamic_cast<const NeighMoving*>(_neigh);
+  const auto* neighM = dynamic_cast<const NeighMoving*>(_neigh);
   VectorDouble dd(_ndim);
 
   /* Calculate the distance increment */
@@ -1659,7 +1659,7 @@ void KrigingSystem::_bayesPreSimulate()
 void KrigingSystem::_transformGaussianToRaw()
 {
   if (_anam == nullptr) return;
-  const AnamHermite* anam_hermite = dynamic_cast<const AnamHermite*>(_anam);
+  const auto* anam_hermite = dynamic_cast<const AnamHermite*>(_anam);
 
   /* Get the estimation */
 

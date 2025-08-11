@@ -100,12 +100,12 @@ PPMT::~PPMT()
   delete _dirmat;
   if (!_anams.empty())
   {
-    for (Id i = 0; i < (Id)_anams.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(_anams.size()); i++)
       delete _anams[i];
   }
   if (!_initAnams.empty())
   {
-    for (Id i = 0; i < (Id)_initAnams.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(_initAnams.size()); i++)
       delete _initAnams[i];
   }
   delete _initSphering;
@@ -212,7 +212,7 @@ double PPMT::_getGaussianDistance(const VectorDouble& Yi,
                                   const VectorInt& Ri,
                                   const VectorDouble& N0) const
 {
-  Id np = (Id)Yi.size();
+  Id np = static_cast<Id>(Yi.size());
 
   double di = 0.;
   for (Id ip = 0; ip < np; ip++)
@@ -220,7 +220,7 @@ double PPMT::_getGaussianDistance(const VectorDouble& Yi,
     double value = _gaussianizeForward(Yi[ip], Ri[ip], nullptr, N0);
     di += pow(ABS(value), getAlpha());
   }
-  di /= (double)np;
+  di /= static_cast<double>(np);
   return di;
 }
 

@@ -139,7 +139,7 @@ void AnamEmpirical::setNDisc(Id ndisc)
 void AnamEmpirical::setDisc(const VectorDouble& zdisc,
                             const VectorDouble& ydisc)
 {
-  if ((Id)zdisc.size() != (Id)ydisc.size())
+  if (zdisc.size() != ydisc.size())
   {
     messerr("Argumznts 'zdisc' and 'ydisc' should have the same dimension");
     return;
@@ -226,15 +226,15 @@ void AnamEmpirical::calculateMeanAndVariance()
 }
 
 Id AnamEmpirical::_getStatistics(const VectorDouble& tab,
-                                  Id* count,
-                                  double* mean,
-                                  double* mean2,
-                                  double* mini,
-                                  double* maxi,
-                                  double* var)
+                                 Id* count,
+                                 double* mean,
+                                 double* mean2,
+                                 double* mini,
+                                 double* maxi,
+                                 double* var)
 {
-  Id nech      = static_cast<Id>(tab.size());
-  Id number    = 0;
+  Id nech       = static_cast<Id>(tab.size());
+  Id number     = 0;
   double dmean  = 0.;
   double dmean2 = 0.;
   double dmaxi  = MINIMUM_BIG;
@@ -388,7 +388,7 @@ Id AnamEmpirical::_fitNormalScore(const VectorDouble& tab)
   _ZDisc.clear();
   _YDisc.clear();
 
-  for (Id iech = 0, nech = (Id)tab.size(); iech < nech; iech++)
+  for (Id iech = 0, nech = static_cast<Id>(tab.size()); iech < nech; iech++)
   {
     if (FFFF(tab[iech])) continue;
     _ZDisc.push_back(tab[iech]);
@@ -397,13 +397,13 @@ Id AnamEmpirical::_fitNormalScore(const VectorDouble& tab)
   // Sort the Z-values by ascending order
   VH::sortInPlace(_ZDisc);
   _YDisc = VH::normalScore(_ZDisc);
-  _nDisc = (Id)_ZDisc.size();
+  _nDisc = static_cast<Id>(_ZDisc.size());
 
   return 0;
 }
 
 Id AnamEmpirical::fitFromArray(const VectorDouble& tab,
-                                const VectorDouble& wt)
+                               const VectorDouble& wt)
 {
   DECLARE_UNUSED(wt);
 
@@ -464,7 +464,7 @@ bool AnamEmpirical::_serializeAscii(std::ostream& os, bool verbose) const
 
 bool AnamEmpirical::_deserializeAscii(std::istream& is, bool verbose)
 {
-  Id ndisc      = 0;
+  Id ndisc       = 0;
   double sigma2e = TEST;
   VectorDouble zdisc, ydisc;
 
@@ -500,7 +500,7 @@ bool AnamEmpirical::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose
 
   /* Read the grid characteristics */
   bool ret       = true;
-  Id ndisc      = 0;
+  Id ndisc       = 0;
   double sigma2e = 0.;
   VectorDouble zdisc;
   VectorDouble ydisc;

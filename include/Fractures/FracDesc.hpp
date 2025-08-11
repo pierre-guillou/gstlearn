@@ -27,7 +27,7 @@ public:
   /// Interface for AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  Id getNPoint() const { return (Id) _x.size(); }
+  Id getNPoint() const { return static_cast<Id>(_x.size()); }
 
   Id getFamily() const { return _family; }
   void setFamily(Id family) { _family = family; }
@@ -47,4 +47,4 @@ private:
   VectorDouble _x;
   VectorDouble _y;
 };
-}
+} // namespace gstlrn

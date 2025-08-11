@@ -32,7 +32,7 @@ namespace gstlrn
 static void _modifyMopForAnam(ModelGeneric* model,
                               ModelOptimParam& mop)
 {
-  const CovLMCAnamorphosis* covanam = dynamic_cast<const CovLMCAnamorphosis*>(model->_getCovModify());
+  const auto* covanam = dynamic_cast<const CovLMCAnamorphosis*>(model->_getCovModify());
   if (covanam != nullptr)
   {
     EAnam anamtype = covanam->getAnamType();

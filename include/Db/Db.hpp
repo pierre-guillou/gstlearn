@@ -266,7 +266,7 @@ public:
   VectorString identifyNames(const VectorString& names) const;
   /**@}*/
 
-  inline Id getNUIDMax() const { return (Id)_uidcol.size(); }
+  inline Id getNUIDMax() const { return static_cast<Id>(_uidcol.size()); }
   inline Id getNColumn() const { return _ncol; }
 
   static Id getNEloc();

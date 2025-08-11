@@ -19,15 +19,8 @@ namespace gstlrn
 {
 SPDEOpMatrix::SPDEOpMatrix(const PrecisionOpMultiMatrix* pop,
                            const ProjMultiMatrix* A,
-                           const InvNuggetOp* invNoise,
-                           const ProjMultiMatrix* projOut)
-  : SPDEOp(pop,
-           A,
-           invNoise,
-           nullptr,
-           nullptr,
-           projOut,
-           projOut)
+                           const InvNuggetOp* invNoise)
+  : SPDEOp(pop, A, invNoise, nullptr, nullptr)
   , _QpAinvNoiseAt(std::make_shared<MatrixSparse>(0, 0))
   , _chol(nullptr)
 {
@@ -81,18 +74,25 @@ double SPDEOpMatrix::computeLogDetOp(Id nbsimu) const
  * @param dat Vector of Data
  * @param nMC  Number of Monte-Carlo simulations (unused)
  * @param seed Random seed for the Monte-Carlo simulations (unused)
+ * @param projK Projection Matrix used for Kriging
+ * @param projS Projection matrix used for Simulations (unused)
  * @return VectorDouble
  */
-VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat, Id nMC, Id seed) const
+VectorDouble SPDEOpMatrix::stdev(const VectorDouble& dat,
+                                 Id nMC,
+                                 Id seed,
+                                 const ProjMulti* projK,
+                                 const ProjMulti* projS) const
 {
   DECLARE_UNUSED(dat);
   DECLARE_UNUSED(nMC);
   DECLARE_UNUSED(seed);
+  DECLARE_UNUSED(projS);
 
   if (_chol == nullptr)
     _chol = new CholeskySparse(*_QpAinvNoiseAt); // TODO avoid to do it twice
 
-  const ProjMultiMatrix* proj = dynamic_cast<const ProjMultiMatrix*>(_projOutKriging);
+  const auto* proj            = dynamic_cast<const ProjMultiMatrix*>(projK);
   const MatrixSparse* projmat = proj->getProj();
 
   VectorDouble result(projmat->getNRows());

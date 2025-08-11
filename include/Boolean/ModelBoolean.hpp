@@ -30,7 +30,7 @@ public:
   /// Interface to AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  Id getNbTokens() const { return (Id) _shapes.size(); }
+  Id getNbTokens() const { return static_cast<Id>(_shapes.size()); }
   void addToken(const AShape& token);
   void normalizeProportions();
   BooleanObject* generateObject(Id ndim) const;

@@ -28,35 +28,35 @@ class TurningBandOperate;
 class GSTLEARN_EXPORT CalcSimuTurningBands: public ACalcSimulation
 {
 public:
-  CalcSimuTurningBands(Id nbsimu      = 0,
-                       Id nbtuba      = 0,
+  CalcSimuTurningBands(Id nbsimu       = 0,
+                       Id nbtuba       = 0,
                        bool flag_check = false,
-                       Id seed        = 4324324);
+                       Id seed         = 4324324);
   CalcSimuTurningBands(const CalcSimuTurningBands& r)            = delete;
   CalcSimuTurningBands& operator=(const CalcSimuTurningBands& r) = delete;
   virtual ~CalcSimuTurningBands();
 
   Id getNBtuba() const { return _nbtuba; }
   void setNBtuba(Id nbtuba) { _nbtuba = nbtuba; }
-  Id getNDirs() const { return (Id)_codirs.size(); }
+  Id getNDirs() const { return static_cast<Id>(_codirs.size()); }
 
   Id simulate(Db* dbin,
-               Db* dbout,
-               Model* model,
-               ANeigh* neigh,
-               Id icase,
-               Id flag_bayes              = false,
-               const VectorDouble& dmean   = VectorDouble(),
-               const MatrixSymmetric& dcov = MatrixSymmetric(),
-               bool flag_pgs               = false,
-               bool flag_gibbs             = false,
-               bool flag_dgm               = false);
+              Db* dbout,
+              Model* model,
+              ANeigh* neigh,
+              Id icase,
+              Id flag_bayes               = false,
+              const VectorDouble& dmean   = VectorDouble(),
+              const MatrixSymmetric& dcov = MatrixSymmetric(),
+              bool flag_pgs               = false,
+              bool flag_gibbs             = false,
+              bool flag_dgm               = false);
   Id simulatePotential(Db* dbiso,
-                        Db* dbgrd,
-                        Db* dbtgt,
-                        Db* dbout,
-                        Model* model,
-                        double delta);
+                       Db* dbgrd,
+                       Db* dbtgt,
+                       Db* dbout,
+                       Model* model,
+                       double delta);
 
   static bool isValidForTurningBands(const Model* model);
 
@@ -217,24 +217,24 @@ private:
 };
 
 GSTLEARN_EXPORT Id simtub(Db* dbin                        = nullptr,
-                           Db* dbout                       = nullptr,
-                           Model* model                    = nullptr,
-                           ANeigh* neigh                   = nullptr,
-                           Id nbsimu                      = 1,
-                           Id seed                        = 43431,
-                           Id nbtuba                      = 100,
-                           bool flag_dgm                   = false,
-                           bool flag_check                 = false,
-                           const NamingConvention& namconv = NamingConvention("Simu"));
+                          Db* dbout                       = nullptr,
+                          Model* model                    = nullptr,
+                          ANeigh* neigh                   = nullptr,
+                          Id nbsimu                       = 1,
+                          Id seed                         = 43431,
+                          Id nbtuba                       = 100,
+                          bool flag_dgm                   = false,
+                          bool flag_check                 = false,
+                          const NamingConvention& namconv = NamingConvention("Simu"));
 GSTLEARN_EXPORT Id simbayes(Db* dbin,
-                             Db* dbout,
-                             Model* model,
-                             ANeigh* neigh,
-                             Id nbsimu                      = 1,
-                             Id seed                        = 132141,
-                             const VectorDouble& dmean       = VectorDouble(),
-                             const MatrixSymmetric& dcov     = MatrixSymmetric(),
-                             Id nbtuba                      = 100,
-                             bool flag_check                 = false,
-                             const NamingConvention& namconv = NamingConvention("SimBayes"));
+                            Db* dbout,
+                            Model* model,
+                            ANeigh* neigh,
+                            Id nbsimu                       = 1,
+                            Id seed                         = 132141,
+                            const VectorDouble& dmean       = VectorDouble(),
+                            const MatrixSymmetric& dcov     = MatrixSymmetric(),
+                            Id nbtuba                       = 100,
+                            bool flag_check                 = false,
+                            const NamingConvention& namconv = NamingConvention("SimBayes"));
 } // namespace gstlrn

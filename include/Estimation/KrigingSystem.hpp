@@ -12,21 +12,20 @@
 
 #include "gstlearn_export.hpp"
 
-#include "Estimation/KrigingAlgebra.hpp"
+#include "Enum/EKrigOpt.hpp"
 #include "Estimation/KrigOpt.hpp"
-#include "Model/ModelGeneric.hpp"
-#include "Space/SpaceRN.hpp"
-#include "Space/SpacePoint.hpp"
-#include "Neigh/ANeigh.hpp"
+#include "Estimation/KrigingAlgebra.hpp"
+#include "LinearOp/CholeskyDense.hpp"
+#include "Matrix/MatrixDense.hpp"
 #include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "LinearOp/CholeskyDense.hpp"
-#include "Enum/EKrigOpt.hpp"
-
+#include "Model/ModelGeneric.hpp"
+#include "Neigh/ANeigh.hpp"
+#include "Space/SpacePoint.hpp"
+#include "Space/SpaceRN.hpp"
 
 namespace gstlrn
-{ 
+{
 
 class Db;
 class DbGrid;
@@ -56,16 +55,16 @@ public:
   Id resetData();
   Id setKrigOpt(const KrigOpt& krigopt);
   Id setKrigOptCalcul(const EKrigOpt& calcul,
-                       const VectorInt& ndiscs = VectorInt(),
-                       bool flag_per_cell      = false);
+                      const VectorInt& ndiscs = VectorInt(),
+                      bool flag_per_cell      = false);
   Id setKrigOptXValid(bool flag_xvalid,
-                       bool flag_kfold,
-                       bool optionXValidEstim = false,
-                       bool optionXValidStdev = false,
-                       bool optionXValidVarZ  = false);
+                      bool flag_kfold,
+                      bool optionXValidEstim = false,
+                      bool optionXValidStdev = false,
+                      bool optionXValidVarZ  = false);
   Id setKrigOptBayes(bool flag_bayes,
-                      const VectorDouble& prior_mean,
-                      const MatrixSymmetric& prior_cov);
+                     const VectorDouble& prior_mean,
+                     const MatrixSymmetric& prior_cov);
   Id setKrigOptDataWeights(Id iptrWeights, bool flagSet = true);
   Id setKrigOptFlagSimu(bool flagSimu, Id nbsimu = 0, Id rankPGS = -1);
   Id setKrigOptFlagGlobal(bool flag_global);
@@ -74,39 +73,39 @@ public:
   Id setKrigOptFactorKriging(bool flag_factor_kriging);
 
   // The subsequent methods do not require isReady() validation
-  Id  updKrigOptEstim(Id iptrEst, Id iptrStd, Id iptrVarZ, bool forceNoDual = false);
-  Id  updKrigOptIclass(Id index_class, Id nclasses);
-  Id  updKrigOptNeighOnly(Id iptrNeigh);
+  Id updKrigOptEstim(Id iptrEst, Id iptrStd, Id iptrVarZ, bool forceNoDual = false);
+  Id updKrigOptIclass(Id index_class, Id nclasses);
+  Id updKrigOptNeighOnly(Id iptrNeigh);
   bool isReady();
-  Id  estimate(Id iech_out);
+  Id estimate(Id iech_out);
   void conclusion();
 
   // Methods used to return algebraic internal information
   Id getNDim() const { return (_model != nullptr) ? _model->getNDim() : 0; }
   Id getNVar() const { return (_model != nullptr) ? _model->getNVar() : 0; }
-  Id getNech() const { return (Id)_nbgh.size(); }
+  Id getNech() const { return static_cast<Id>(_nbgh.size()); }
   Id getCovSize() const { return (!_Sigma.empty()) ? _Sigma.getNRows() : 0; }
   Id getDriftSize() const { return (!_X.empty()) ? _X.getNCols() : 0; }
   Id getNrhs() const { return (!_Sigma0.empty()) ? _Sigma0.getNCols() : 0; }
 
-  VectorInt             getSampleNbgh() const { return _nbgh; }
-  VectorVectorDouble    getSampleCoordinates() const;
-  VectorDouble          getSampleData() const { return _Z; };
+  VectorInt getSampleNbgh() const { return _nbgh; }
+  VectorVectorDouble getSampleCoordinates() const;
+  VectorDouble getSampleData() const { return _Z; };
   MatrixSymmetric getLHS() const { return _Sigma; }
-  MatrixDense     getLHSF() const { return _Sigma0; }
-  MatrixDense     getRHS() const { return _Sigma0; }
-  MatrixDense     getRHSF() const { return _X0; }
-  MatrixSquare   getVariance() const { return _Sigma00; }
-  MatrixDense     getWeights() const;
-  MatrixDense     getMu() const;
-  double                getLTerm() const { return _algebra.getLTerm(); }
+  MatrixDense getLHSF() const { return _Sigma0; }
+  MatrixDense getRHS() const { return _Sigma0; }
+  MatrixDense getRHSF() const { return _X0; }
+  MatrixSquare getVariance() const { return _Sigma00; }
+  MatrixDense getWeights() const;
+  MatrixDense getMu() const;
+  double getLTerm() const { return _algebra.getLTerm(); }
 
 private:
-  Id    _getNVar() const;
-  Id    _getNVarCL() const;
-  Id    _getNbfl() const;
-  Id    _getNeq() const;
-  Id    _getNFeq() const;
+  Id _getNVar() const;
+  Id _getNVarCL() const;
+  Id _getNbfl() const;
+  Id _getNeq() const;
+  Id _getNFeq() const;
 
   void _resetMemoryGeneral();
   bool _isAuthorized() const;
@@ -124,17 +123,17 @@ private:
   bool _isCorrect();
   bool _preparNoStat();
 
-  Id    _bayesPreCalculations();
-  void   _bayesPreSimulate();
-  void   _transformGaussianToRaw();
+  Id _bayesPreCalculations();
+  void _bayesPreSimulate();
+  void _transformGaussianToRaw();
 
-  void   _setInternalShortCutVariablesGeneral();
-  void   _setInternalShortCutVariablesModel();
-  Id    _setInternalShortCutVariablesNeigh();
+  void _setInternalShortCutVariablesGeneral();
+  void _setInternalShortCutVariablesModel();
+  Id _setInternalShortCutVariablesNeigh();
 
   Model* _castInOldModel();
   VectorInt _xvalidUniqueIndices() const;
-  Id  _updateForColCokMoving();
+  Id _updateForColCokMoving();
 
   // Deprecated function
   double _continuousMultiplier(Id rank1, Id rank2, double eps = EPSILON4);
@@ -143,42 +142,42 @@ private:
   Db* _dbin;
   Db* _dbout;
   ModelGeneric* _model;
-  ANeigh*       _neigh;
-  const AAnam*  _anam;
-  bool          _isReady;
+  ANeigh* _neigh;
+  const AAnam* _anam;
+  bool _isReady;
 
   // Pointers used when plugging KrigingAlgebra (not to be deleted)
   // Note that 'algebra' is mutable not to destroy constness when calling getLambda.
   mutable KrigingAlgebra _algebra;
-  mutable KrigOpt        _krigopt;
-  VectorVectorInt        _sampleRanks; // Vector of vector of sample indices
-  MatrixSymmetric        _Sigma00;     // Covariance part for variance
-  MatrixSymmetric        _Sigma;       // Covariance part for LHS
-  MatrixDense            _X;           // Drift part for LHS
-  MatrixDense            _Sigma0;      // Covariance part for RHS
-  MatrixDense            _X0;          // Drift par for RHS
-  VectorDouble           _Z;           // Vector of Data
-  VectorDouble           _means;       // Means of the variables (used to center variables)
-  VectorDouble           _meansTarget; // Means for target (possible using matLC)
+  mutable KrigOpt _krigopt;
+  VectorVectorInt _sampleRanks; // Vector of vector of sample indices
+  MatrixSymmetric _Sigma00;     // Covariance part for variance
+  MatrixSymmetric _Sigma;       // Covariance part for LHS
+  MatrixDense _X;               // Drift part for LHS
+  MatrixDense _Sigma0;          // Covariance part for RHS
+  MatrixDense _X0;              // Drift par for RHS
+  VectorDouble _Z;              // Vector of Data
+  VectorDouble _means;          // Means of the variables (used to center variables)
+  VectorDouble _meansTarget;    // Means for target (possible using matLC)
 
   /// UID for storage
-  Id  _iptrEst;
-  Id  _iptrStd;
-  Id  _iptrVarZ;
+  Id _iptrEst;
+  Id _iptrStd;
+  Id _iptrVarZ;
   bool _flagEst;
   bool _flagStd;
   bool _flagVarZ;
   bool _flagDataChanged;
 
   /// Option for Weights at Data locations
-  Id  _iptrWeights;
+  Id _iptrWeights;
   bool _flagWeights;
   bool _flagSet;
 
   /// Option for Simulation
   bool _flagSimu;
-  Id  _nbsimu;
-  Id  _rankPGS;
+  Id _nbsimu;
+  Id _rankPGS;
 
   /// Option for Cross_validation
   bool _xvalidEstim;
@@ -190,17 +189,17 @@ private:
 
   /// Option for Bayesian
   bool _flagBayes;
-  VectorDouble          _priorMean; 
-  MatrixSymmetric _priorCov;  
-  VectorDouble          _postMean;
+  VectorDouble _priorMean;
+  MatrixSymmetric _priorCov;
+  VectorDouble _postMean;
   MatrixSymmetric _postCov;
-  MatrixDense     _postSimu; 
+  MatrixDense _postSimu;
   MatrixSymmetric _varCorrec;
 
   /// Option for (Disjunctive) Kriging of Factor
   bool _flagFactorKriging;
-  Id  _nclasses;
-  Id  _factorClass;
+  Id _nclasses;
+  Id _factorClass;
 
   /// Option for asking for Z * A-1 * Z
   bool _flagLTerm;
@@ -222,9 +221,9 @@ private:
   Id _neq;
 
   /// Working arrays
-  mutable VectorInt    _nbgh;
-  mutable VectorInt    _dbinUidToBeDeleted;
-  mutable VectorInt    _dboutUidToBeDeleted;
+  mutable VectorInt _nbgh;
+  mutable VectorInt _dbinUidToBeDeleted;
+  mutable VectorInt _dboutUidToBeDeleted;
 
   /// Some Space Point allocated once for all
   mutable ASpaceSharedPtr _space;
@@ -241,4 +240,4 @@ private:
   mutable VectorInt _rankXvalidEqs;
   mutable VectorInt _rankXvalidVars;
 };
-}
+} // namespace gstlrn

@@ -98,7 +98,7 @@ String BImage::toString(const AStringFormat* strfmt) const
 
   sstr << AArray::toString(strfmt);
 
-  const BImageStringFormat* bstrfmt = dynamic_cast<const BImageStringFormat*>(strfmt);
+  const auto* bstrfmt = dynamic_cast<const BImageStringFormat*>(strfmt);
   if (getNDim() <= 3)
   {
     // Default values

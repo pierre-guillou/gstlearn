@@ -61,12 +61,12 @@ Id Convolution::ConvolveSparse(Id iatt,
   if (! _isDbGridDefined()) return 1;
   Id ndim    = _dbgrid->getNDim();
   Id nvar    = _dbgrid->getNLoc(ELoc::Z);
-  Id nbneigh = (Id)ranks.size();
+  Id nbneigh = static_cast<Id>(ranks.size());
 
   // Preliminary checks
-  if (ndim != (Id)ranks[0].size())
+  if (ndim != static_cast<Id>(ranks[0].size()))
   {
-    messerr("The second dimension of 'ranks' (%d)", (Id)ranks[0].size());
+    messerr("The second dimension of 'ranks' (%d)", static_cast<Id>(ranks[0].size()));
     messerr("must be equal to the space dimension (%d)", ndim);
     return 1;
     }
@@ -192,7 +192,7 @@ Id Convolution::ConvolveFFT(Id iatt,
   Id nv2        = nvar * nvar;
   VectorInt dims = _dbgrid->getNXs();
   Id sImage     = VH::product(dims);
-  double rImage  = (double) sImage;
+  auto rImage  = static_cast<double>(sImage);
 
   // Find the center of kernel
   VectorInt cKernel = marpat->getCenterIndices(false);

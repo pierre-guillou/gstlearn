@@ -114,7 +114,7 @@ static char string[STRING_LENGTH];
 static char cov_name[STRING_LENGTH];
 
 static Id CONGRUENCY = 50;
-static double EpsFit  = 1.e-12;
+static double EpsFit = 1.e-12;
 
 static Regularize REGULARIZE;
 static std::vector<StrExp> STREXPS;
@@ -130,7 +130,7 @@ static Recint RECINT;
 
 static void st_modify_optvar_for_anam(Model* model, Option_VarioFit& optvar)
 {
-  const CovLMCAnamorphosis* covanam = dynamic_cast<const CovLMCAnamorphosis*>(model->getCovAnisoList());
+  const auto* covanam = dynamic_cast<const CovLMCAnamorphosis*>(model->getCovAnisoList());
   if (covanam != nullptr)
   {
     EAnam anamtype = covanam->getAnamType();
@@ -219,21 +219,21 @@ static void st_parid_decode(Id parid,
   Id divide, iic;
 
   Id value = parid;
-  divide    = value / CONGRUENCY;
-  *jvar     = value - divide * CONGRUENCY;
-  value     = divide;
-  divide    = value / CONGRUENCY;
-  *ivar     = value - divide * CONGRUENCY;
-  value     = divide;
-  divide    = value / CONGRUENCY;
-  iic       = value - divide * CONGRUENCY;
-  value     = divide;
-  divide    = value / CONGRUENCY;
-  *icov     = value - divide * CONGRUENCY;
-  value     = divide;
-  divide    = value / CONGRUENCY;
-  *imod     = value - divide * CONGRUENCY;
-  *icons    = EConsElem::fromValue(iic);
+  divide   = value / CONGRUENCY;
+  *jvar    = value - divide * CONGRUENCY;
+  value    = divide;
+  divide   = value / CONGRUENCY;
+  *ivar    = value - divide * CONGRUENCY;
+  value    = divide;
+  divide   = value / CONGRUENCY;
+  iic      = value - divide * CONGRUENCY;
+  value    = divide;
+  divide   = value / CONGRUENCY;
+  *icov    = value - divide * CONGRUENCY;
+  value    = divide;
+  divide   = value / CONGRUENCY;
+  *imod    = value - divide * CONGRUENCY;
+  *icons   = EConsElem::fromValue(iic);
 }
 
 /****************************************************************************/
@@ -250,16 +250,16 @@ static void st_parid_decode(Id parid,
  **
  *****************************************************************************/
 static Id st_parid_encode(Id imod,
-                           Id icov,
-                           const EConsElem& icons,
-                           Id ivar,
-                           Id jvar)
+                          Id icov,
+                          const EConsElem& icons,
+                          Id ivar,
+                          Id jvar)
 {
   Id value = imod;
-  value     = value * CONGRUENCY + icov;
-  value     = value * CONGRUENCY + icons.getValue();
-  value     = value * CONGRUENCY + ivar;
-  value     = value * CONGRUENCY + jvar;
+  value    = value * CONGRUENCY + icov;
+  value    = value * CONGRUENCY + icons.getValue();
+  value    = value * CONGRUENCY + ivar;
+  value    = value * CONGRUENCY + jvar;
 
   return (value);
 }
@@ -283,9 +283,9 @@ static Id st_parid_alloc(StrMod* strmod, Id npar0)
   /* Initializations */
 
   Option_VarioFit optvar = strmod->optvar;
-  Id ndim               = strmod->models[0]->getNDim();
-  Id nvar               = strmod->models[0]->getNVar();
-  Id first_covrot       = -1;
+  Id ndim                = strmod->models[0]->getNDim();
+  Id nvar                = strmod->models[0]->getNVar();
+  Id first_covrot        = -1;
 
   /* Core allocation */
 
@@ -528,8 +528,8 @@ label_end:
  **
  *****************************************************************************/
 static Id st_get_vario_dimension(Vario* vario,
-                                  Id* nbexp_ret,
-                                  Id* npadir_ret)
+                                 Id* nbexp_ret,
+                                 Id* npadir_ret)
 
 {
   Id nbexp  = 0;
@@ -544,7 +544,7 @@ static Id st_get_vario_dimension(Vario* vario,
     for (Id ivar = 0; ivar < nvar; ivar++)
       for (Id jvar = 0; jvar <= ivar; jvar++)
       {
-        Id iad0   = vario->getCenter(ivar, jvar, idir);
+        Id iad0    = vario->getCenter(ivar, jvar, idir);
         double sw0 = vario->getSwByIndex(idir, iad0);
         double hh0 = vario->getHhByIndex(idir, iad0);
         // The test on the number of pairs avoids hacking in the case
@@ -552,7 +552,7 @@ static Id st_get_vario_dimension(Vario* vario,
         // for the first lag is arbitrarily set to 1.
         if (isZero(hh0) && sw0 > 1.)
         {
-          Id iad    = vario->getNext(ivar, jvar, idir);
+          Id iad     = vario->getNext(ivar, jvar, idir);
           double sw1 = vario->getSwByIndex(idir, iad);
           double hh1 = vario->getHhByIndex(idir, iad);
 
@@ -607,9 +607,9 @@ static Id st_get_vario_dimension(Vario* vario,
  **
  *****************************************************************************/
 static Id st_get_vmap_dimension(const Db* dbmap,
-                                 Id nvar,
-                                 Id* nbexp_ret,
-                                 Id* npadir_ret)
+                                Id nvar,
+                                Id* nbexp_ret,
+                                Id* npadir_ret)
 {
   Id nbexp  = 0;
   Id npadir = 0;
@@ -837,8 +837,8 @@ static void st_load_gg(const Vario* vario,
           GG(ijvar, ipadir) = TEST;
           if (vario->getFlagAsym())
           {
-            Id iad    = vario->getDirAddress(idir, ivar, jvar, ilag, false, 1);
-            Id jad    = vario->getDirAddress(idir, ivar, jvar, ilag, false, -1);
+            Id iad     = vario->getDirAddress(idir, ivar, jvar, ilag, false, 1);
+            Id jad     = vario->getDirAddress(idir, ivar, jvar, ilag, false, -1);
             double c00 = st_get_c00(vario, idir, ivar, jvar);
             double n1  = vario->getSwByIndex(idir, iad);
             double n2  = vario->getSwByIndex(idir, jad);
@@ -896,10 +896,10 @@ static void st_prepar_goulard_vario(Id imod)
 
 {
   Model* model                 = STRMOD->models[imod];
-  Id npadir                   = RECINT.npadir;
-  Id ndim                     = model->getNDim();
-  Id nvar                     = model->getNVar();
-  Id nvs2                     = nvar * (nvar + 1) / 2;
+  Id npadir                    = RECINT.npadir;
+  Id ndim                      = model->getNDim();
+  Id nvar                      = model->getNVar();
+  Id nvs2                      = nvar * (nvar + 1) / 2;
   VectorDouble& dd             = RECINT.dd;
   std::vector<MatrixDense>& ge = RECINT.ge;
   VectorDouble d0(ndim);
@@ -1064,8 +1064,8 @@ static void st_load_wt(const Vario* vario,
         Id shift = ijvar * vario->getNLagTotal(idir);
         if (vario->getFlagAsym())
         {
-          Id iad   = shift + vario->getNLag(idir) + ilag + 1;
-          Id jad   = shift + vario->getNLag(idir) - ilag - 1;
+          Id iad    = shift + vario->getNLag(idir) + ilag + 1;
+          Id jad    = shift + vario->getNLag(idir) - ilag - 1;
           double n1 = vario->getSwByIndex(idir, iad);
           double n2 = vario->getSwByIndex(idir, jad);
           if (CORRECT(idir, iad)) flag[idir] += n1;
@@ -1073,7 +1073,7 @@ static void st_load_wt(const Vario* vario,
         }
         else
         {
-          Id iad   = shift + ilag;
+          Id iad    = shift + ilag;
           double nn = vario->getSwByIndex(idir, iad);
           if (CORRECT(idir, iad)) flag[idir] += nn;
         }
@@ -1374,14 +1374,14 @@ static void st_sill_reset(Id nvar,
  **
  *****************************************************************************/
 static Id st_goulard_without_constraint(const Option_AutoFit& mauto,
-                                         Id nvar,
-                                         Id ncova,
-                                         Id npadir,
-                                         VectorDouble& wt,
-                                         VectorDouble& gg,
-                                         std::vector<MatrixDense>& ge,
-                                         std::vector<MatrixSymmetric>& sill,
-                                         double* crit_arg)
+                                        Id nvar,
+                                        Id ncova,
+                                        Id npadir,
+                                        VectorDouble& wt,
+                                        VectorDouble& gg,
+                                        std::vector<MatrixDense>& ge,
+                                        std::vector<MatrixSymmetric>& sill,
+                                        double* crit_arg)
 {
   Id allpos;
   double temp, crit, crit_mem, value;
@@ -1395,7 +1395,7 @@ static Id st_goulard_without_constraint(const Option_AutoFit& mauto,
   double sum  = 0.;
   double sum1 = 0.;
   double sum2 = 0.;
-  Id nvs2    = nvar * (nvar + 1) / 2;
+  Id nvs2     = nvar * (nvar + 1) / 2;
 
   /* Core allocation */
 
@@ -1502,7 +1502,7 @@ static Id st_goulard_without_constraint(const Option_AutoFit& mauto,
       vecpro = cc.getEigenVectors();
 
       Id kvar = 0;
-      allpos   = 1;
+      allpos  = 1;
       while ((kvar < nvar) && allpos)
       {
         if (valpro[kvar++] < 0) allpos = 0;
@@ -1638,10 +1638,10 @@ static void st_affect(Id rank,
  **
  ****************************************************************************/
 static Id st_compress_parid(Id n_init,
-                             VectorInt& parid,
-                             VectorDouble& param,
-                             VectorDouble& lower,
-                             VectorDouble& upper)
+                            VectorInt& parid,
+                            VectorDouble& param,
+                            VectorDouble& lower,
+                            VectorDouble& upper)
 {
   Id ntot = 0;
   for (Id i = 0; i < n_init; i++)
@@ -1742,10 +1742,10 @@ static void st_model_auto_strmod_print(Id flag_title,
   if (skip) return;
 
   Option_VarioFit optvar = strmod->optvar;
-  Id ndim               = strmod->models[0]->getNDim();
-  Id nvar               = strmod->models[0]->getNVar();
-  Id imod_mem           = -1;
-  Id icov_mem           = -1;
+  Id ndim                = strmod->models[0]->getNDim();
+  Id nvar                = strmod->models[0]->getNVar();
+  Id imod_mem            = -1;
+  Id icov_mem            = -1;
 
   /* Title */
 
@@ -1860,7 +1860,7 @@ static void st_model_auto_scldef(StrMod* strmod,
     {
       case EConsElem::E_SILL:
       {
-        Id lec     = ivar * (ivar + 1) / 2 + jvar;
+        Id lec      = ivar * (ivar + 1) / 2 + jvar;
         scale[ntot] = ABS(varchol[lec]) / sqrt(model->getNCov());
         break;
       }
@@ -1985,7 +1985,7 @@ static void st_model_auto_pardef(StrMod* strmod,
     {
       case EConsElem::E_SILL:
       {
-        Id lec     = ivar * (ivar + 1) / 2 + jvar;
+        Id lec      = ivar * (ivar + 1) / 2 + jvar;
         double dvar = varchol[lec] / sqrt(model->getNCov());
         st_affect(ntot, dvar, TEST, TEST, param, lower, upper);
         break;
@@ -2050,10 +2050,10 @@ static void st_model_auto_strmod_define(StrMod* strmod,
 
   /* Initializations */
 
-  Id nvar               = strmod->models[0]->getNVar();
-  Id ndim               = strmod->models[0]->getNDim();
+  Id nvar                = strmod->models[0]->getNVar();
+  Id ndim                = strmod->models[0]->getNDim();
   Option_VarioFit optvar = strmod->optvar;
-  Id size               = nvar * (nvar + 1) / 2;
+  Id size                = nvar * (nvar + 1) / 2;
   VectorDouble ranges(ndim, 0.);
   VectorDouble angles(ndim, 0.);
   VectorDouble tritab(size);
@@ -2104,7 +2104,7 @@ static void st_model_auto_strmod_define(StrMod* strmod,
     {
       case EConsElem::E_SILL:
       {
-        Id ipos     = ivar * (ivar + 1) / 2 + jvar;
+        Id ipos      = ivar * (ivar + 1) / 2 + jvar;
         tritab[ipos] = param[ntot];
         flag_aic     = 1;
         break;
@@ -2204,15 +2204,15 @@ static void st_model_auto_strmod_define(StrMod* strmod,
  **
  *****************************************************************************/
 static Id st_structure_reduce(StrMod* strmod,
-                               Id imod,
-                               Id icov,
-                               double hmax,
-                               double gmax,
-                               double tolsigma)
+                              Id imod,
+                              Id icov,
+                              double hmax,
+                              double gmax,
+                              double tolsigma)
 {
   Model* model = strmod->models[imod];
-  Id nvar     = model->getNVar();
-  Id ndim     = model->getNDim();
+  Id nvar      = model->getNVar();
+  Id ndim      = model->getNDim();
   VectorDouble d1(ndim, hmax);
   MatrixSquare tab(nvar);
   CovCalcMode mode(ECalcMember::RHS);
@@ -2257,8 +2257,8 @@ static void st_evaluate_vario(Id imod,
 
   for (Id i = 0; i < nbexp; i++)
   {
-    Id ivar        = strexps[i].ivar;
-    Id jvar        = strexps[i].jvar;
+    Id ivar         = strexps[i].ivar;
+    Id jvar         = strexps[i].jvar;
     VectorDouble d0 = strexps[i].dd;
     tabge[i]        = model->evalIvarIpas(1., d0, ivar, jvar, &mode);
   }
@@ -2278,9 +2278,9 @@ static void st_evaluate_vario(Id imod,
 static void st_evaluate_vmap(Id imod, StrMod* strmod, VectorDouble& tabge)
 {
   Model* model = strmod->models[imod];
-  Id ndim     = model->getNDim();
-  Id nvar     = model->getNVar();
-  Id nech     = DBMAP->getNSample();
+  Id ndim      = model->getNDim();
+  Id nvar      = model->getNVar();
+  Id nech      = DBMAP->getNSample();
   VectorDouble d0(ndim);
   VectorDouble tab(nvar * nvar);
   DBMAP->rankToIndice(nech / 2, INDG1);
@@ -2324,12 +2324,12 @@ static void st_evaluate_vmap(Id imod, StrMod* strmod, VectorDouble& tabge)
  **
  *****************************************************************************/
 static Id st_parid_match(StrMod* strmod,
-                          Id npar,
-                          Id imod0,
-                          Id icov0,
-                          const EConsElem& icons0,
-                          Id ivar0,
-                          Id jvar0)
+                         Id npar,
+                         Id imod0,
+                         Id icov0,
+                         const EConsElem& icons0,
+                         Id ivar0,
+                         Id jvar0)
 {
   Id imod, icov, ivar, jvar;
   EConsElem icons;
@@ -2397,9 +2397,9 @@ static Id st_check_definite_positive(Model* model)
  **
  *****************************************************************************/
 static Id st_truncate_negative_eigen(Id nvar,
-                                      Id icov0,
-                                      std::vector<MatrixSymmetric>& matcor,
-                                      std::vector<MatrixSymmetric>& matcoru)
+                                     Id icov0,
+                                     std::vector<MatrixSymmetric>& matcor,
+                                     std::vector<MatrixSymmetric>& matcoru)
 
 {
   MatrixSymmetric cc(nvar);
@@ -2489,7 +2489,7 @@ static double st_score(Id nvar,
                        std::vector<MatrixSymmetric>& matcor)
 {
   double score = 0.;
-  Id ijvar    = 0;
+  Id ijvar     = 0;
   for (Id ivar = 0; ivar < nvar; ivar++)
     for (Id jvar = 0; jvar <= ivar; jvar++, ijvar++)
     {
@@ -2571,7 +2571,7 @@ static double st_minimize_P4(Id icov0,
 
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
-    Id irl     = st_combineVariables(ivar0, ivar);
+    Id irl      = st_combineVariables(ivar0, ivar);
     Nir_v[ivar] = 0.;
     for (Id k = 0; k < npadir; k++)
       Nir_v[ivar] += WT(irl, k) * ge[icov0].getValue(0, k) * ge[icov0].getValue(0, k);
@@ -2590,7 +2590,7 @@ static double st_minimize_P4(Id icov0,
   for (Id k = 0; k < npadir; k++)
     for (Id ivar = 0; ivar < nvar; ivar++)
     {
-      Id irl      = st_combineVariables(ivar0, ivar);
+      Id irl       = st_combineVariables(ivar0, ivar);
       double value = 0.;
       for (Id l = 0; l < npadir; l++)
         value += WT(irl, l) * GG(irl, l) * ge[icov0].getValue(0, l);
@@ -2630,7 +2630,7 @@ static double st_minimize_P4(Id icov0,
       if (ivar != ivar0)
       {
         Id irl = st_combineVariables(ivar0, ivar);
-        s       = xr[ivar] * Birk_v.getValue(k, ivar);
+        s      = xr[ivar] * Birk_v.getValue(k, ivar);
         c += WT(irl, k) * s * s;
       }
       else
@@ -2662,8 +2662,8 @@ static double st_minimize_P4(Id icov0,
     case 3:
     {
       Id nin = 0;
-      xx[0]   = x[0];
-      xx[1]   = x[2];
+      xx[0]  = x[0];
+      xx[1]  = x[2];
       for (Id k = 0; k < 2; k++)
       {
         xt[k]   = MAX(0., MIN(xrmax, xx[k]));
@@ -2797,7 +2797,7 @@ static void st_updateCurrentSillGoulard(Id icov0,
 
     double tot1 = 0.;
     double tot2 = 0.;
-    Id ivs2    = st_combineVariables(ivar0, ivar);
+    Id ivs2     = st_combineVariables(ivar0, ivar);
 
     for (Id ilagdir = 0; ilagdir < npadir; ilagdir++)
     {
@@ -2881,9 +2881,9 @@ static void st_updateCurrentSillDiag(Id icov0,
  **
  *****************************************************************************/
 static Id st_makeDefinitePositive(Id icov0,
-                                   Id nvar,
-                                   const VectorDouble& consSill,
-                                   std::vector<MatrixSymmetric>& matcor)
+                                  Id nvar,
+                                  const VectorDouble& consSill,
+                                  std::vector<MatrixSymmetric>& matcor)
 {
   VectorDouble muold(nvar);
   VectorDouble norme1(nvar);
@@ -2936,15 +2936,15 @@ static Id st_makeDefinitePositive(Id icov0,
  **
  *****************************************************************************/
 static Id st_optimize_under_constraints(Id nvar,
-                                         Id ncova,
-                                         Id npadir,
-                                         const VectorDouble& consSill,
-                                         const Option_AutoFit& mauto,
-                                         VectorDouble& wt,
-                                         VectorDouble& gg,
-                                         std::vector<MatrixDense>& ge,
-                                         std::vector<MatrixSymmetric>& matcor,
-                                         double* score)
+                                        Id ncova,
+                                        Id npadir,
+                                        const VectorDouble& consSill,
+                                        const Option_AutoFit& mauto,
+                                        VectorDouble& wt,
+                                        VectorDouble& gg,
+                                        std::vector<MatrixDense>& ge,
+                                        std::vector<MatrixSymmetric>& matcor,
+                                        double* score)
 {
   double score_old, xrmax;
 
@@ -3069,13 +3069,13 @@ static Id st_optimize_under_constraints(Id nvar,
  **
  *****************************************************************************/
 static Id st_initialize_goulard(Id nvar,
-                                 Id ncova,
-                                 Id npadir,
-                                 VectorDouble& wt,
-                                 VectorDouble& gg,
-                                 std::vector<MatrixDense>& ge,
-                                 const VectorDouble& consSill,
-                                 std::vector<MatrixSymmetric>& matcor)
+                                Id ncova,
+                                Id npadir,
+                                VectorDouble& wt,
+                                VectorDouble& gg,
+                                std::vector<MatrixDense>& ge,
+                                const VectorDouble& consSill,
+                                std::vector<MatrixSymmetric>& matcor)
 {
   MatrixSymmetric aa(ncova);
   VectorDouble bb(ncova);
@@ -3205,14 +3205,14 @@ static void st_goulard_sill_to_model(Id nvar,
  **
  *****************************************************************************/
 static Id st_goulard_with_constraints(const VectorDouble& consSill,
-                                       const Option_AutoFit& mauto,
-                                       Id nvar,
-                                       Id ncova,
-                                       Id npadir,
-                                       VectorDouble& wt,
-                                       VectorDouble& gg,
-                                       std::vector<MatrixDense>& ge,
-                                       std::vector<MatrixSymmetric>& sill)
+                                      const Option_AutoFit& mauto,
+                                      Id nvar,
+                                      Id ncova,
+                                      Id npadir,
+                                      VectorDouble& wt,
+                                      VectorDouble& gg,
+                                      std::vector<MatrixDense>& ge,
+                                      std::vector<MatrixSymmetric>& sill)
 {
   double crit;
 
@@ -3283,29 +3283,29 @@ static Id st_goulard_with_constraints(const VectorDouble& consSill,
  **
  *****************************************************************************/
 static Id st_sill_fitting_intrinsic(Model* model,
-                                     const Option_AutoFit& mauto,
-                                     Id npadir,
-                                     VectorDouble& wt,
-                                     VectorDouble& gg,
-                                     std::vector<MatrixDense>& ge,
-                                     VectorDouble& wt2,
-                                     std::vector<MatrixDense>& ge1,
-                                     std::vector<MatrixDense>& ge2,
-                                     VectorDouble& gg2,
-                                     std::vector<MatrixSymmetric>& alphau,
-                                     std::vector<MatrixSymmetric>& sill1)
+                                    const Option_AutoFit& mauto,
+                                    Id npadir,
+                                    VectorDouble& wt,
+                                    VectorDouble& gg,
+                                    std::vector<MatrixDense>& ge,
+                                    VectorDouble& wt2,
+                                    std::vector<MatrixDense>& ge1,
+                                    std::vector<MatrixDense>& ge2,
+                                    VectorDouble& gg2,
+                                    std::vector<MatrixSymmetric>& alphau,
+                                    std::vector<MatrixSymmetric>& sill1)
 {
   double newval, crit;
 
   /* Initializations */
 
-  Id error       = 1;
-  Id nvar        = model->getNVar();
-  Id ncova       = model->getNCov();
-  Id nvs2        = nvar * (nvar + 1) / 2;
+  Id error        = 1;
+  Id nvar         = model->getNVar();
+  Id ncova        = model->getNCov();
+  Id nvs2         = nvar * (nvar + 1) / 2;
   double crit_mem = MAXIMUM_BIG;
   for (Id icov = 0; icov < ncova; icov++)
-    alphau[icov] = 1. / (double)ncova;
+    alphau[icov] = 1. / static_cast<double>(ncova);
 
   /* Iterative procedure */
 
@@ -3402,10 +3402,10 @@ label_end:
  **
  *****************************************************************************/
 static Id st_goulard_fitting(Id flag_title,
-                              Model* model,
-                              const Constraints& constraints,
-                              const Option_VarioFit& optvar,
-                              const Option_AutoFit& mauto)
+                             Model* model,
+                             const Constraints& constraints,
+                             const Option_VarioFit& optvar,
+                             const Option_AutoFit& mauto)
 {
   double crit;
 
@@ -3512,14 +3512,14 @@ static Id st_model_has_intrinsic(Model* model, const Id* filter)
  **
  *****************************************************************************/
 static Id st_model_auto_strmod_reduce(StrMod* strmod,
-                                       Id* npar,
-                                       double hmax,
-                                       double gmax,
-                                       VectorDouble& param,
-                                       VectorDouble& lower,
-                                       VectorDouble& upper,
-                                       Constraints& constraints,
-                                       Option_AutoFit& mauto)
+                                      Id* npar,
+                                      double hmax,
+                                      double gmax,
+                                      VectorDouble& param,
+                                      VectorDouble& lower,
+                                      VectorDouble& upper,
+                                      Constraints& constraints,
+                                      Option_AutoFit& mauto)
 {
   Id icov, ncova, ivar, jvar, jmod, kcov, imod, nmodel, ncovleft, rank;
   Id flag_modified, flag_range, flag_param, min_order, max_ndim, flag_int_1d;
@@ -3532,8 +3532,8 @@ static Id st_model_auto_strmod_reduce(StrMod* strmod,
 
   /* Initializations */
 
-  Id nparloc            = *npar;
-  Id ntot               = 0;
+  Id nparloc             = *npar;
+  Id ntot                = 0;
   Option_VarioFit optvar = strmod->optvar;
 
   /* Load the parameters in the Model */
@@ -3786,9 +3786,9 @@ static Id st_model_define(Model* model, const Option_VarioFit& optvar)
  **
  *****************************************************************************/
 static Id st_alter_model_optvar(const Vario* vario,
-                                 Model* model,
-                                 Constraints& constraints,
-                                 Option_VarioFit& optvar)
+                                Model* model,
+                                Constraints& constraints,
+                                Option_VarioFit& optvar)
 {
   Id ndim = model->getNDim();
   Id ndir = vario->getNDir();
@@ -3873,9 +3873,9 @@ static Id st_alter_model_optvar(const Vario* vario,
  **
  *****************************************************************************/
 static Id st_alter_vmap_optvar(const Db* dbmap,
-                                Model* model,
-                                Constraints& constraints,
-                                Option_VarioFit& optvar)
+                               Model* model,
+                               Constraints& constraints,
+                               Option_VarioFit& optvar)
 {
   /* Clever setting of options */
 
@@ -3931,13 +3931,13 @@ static Id st_alter_vmap_optvar(const Db* dbmap,
  **
  *****************************************************************************/
 static Id st_model_auto_count(const Vario* vario,
-                               Model* model1,
-                               Model* model2,
-                               Constraints& constraints,
-                               Option_VarioFit& optvar,
-                               VectorDouble& param,
-                               VectorDouble& lower,
-                               VectorDouble& upper)
+                              Model* model1,
+                              Model* model2,
+                              Constraints& constraints,
+                              Option_VarioFit& optvar,
+                              VectorDouble& param,
+                              VectorDouble& lower,
+                              VectorDouble& upper)
 {
   Id flag_range, flag_param, flag_aniso, flag_rotation;
   Id min_order, max_ndim, flag_int_1d, flag_int_2d;
@@ -4093,10 +4093,10 @@ static void st_prepar_goulard_vmap(Id imod)
 {
   Model* model                 = STRMOD->models[imod];
   std::vector<MatrixDense>& ge = RECINT.ge;
-  Id ndim                     = model->getNDim();
-  Id nvar                     = model->getNVar();
-  Id ncova                    = model->getNCov();
-  Id nech                     = DBMAP->getNSample();
+  Id ndim                      = model->getNDim();
+  Id nvar                      = model->getNVar();
+  Id ncova                     = model->getNCov();
+  Id nech                      = DBMAP->getNSample();
   VectorDouble d0(ndim);
   MatrixSquare tab(nvar);
   DBMAP->rankToIndice(nech / 2, INDG1);
@@ -4305,12 +4305,12 @@ static void st_model_post_update(StrMod* strmod, const Option_VarioFit& optvar)
  **
  *****************************************************************************/
 static Id st_manage_recint(const Option_VarioFit& optvar,
-                            Id flag_exp,
-                            Id ndim,
-                            Id nvar,
-                            Id nbexp,
-                            Id ncova,
-                            Id npadir)
+                           Id flag_exp,
+                           Id ndim,
+                           Id nvar,
+                           Id nbexp,
+                           Id ncova,
+                           Id npadir)
 {
   Id nvs2 = nvar * (nvar + 1) / 2;
 
@@ -4381,11 +4381,11 @@ static void st_regularize_init()
  **
  *****************************************************************************/
 Id model_auto_fit(Vario* vario,
-                   Model* model,
-                   bool verbose,
-                   const Option_AutoFit& mauto_arg,
-                   const Constraints& cons_arg,
-                   const Option_VarioFit& optvar_arg)
+                  Model* model,
+                  bool verbose,
+                  const Option_AutoFit& mauto_arg,
+                  const Constraints& cons_arg,
+                  const Option_VarioFit& optvar_arg)
 {
   Id npar, npar0, flag_hneg, flag_gneg, flag_reduce, flag_regular;
   double c0, hmin, hmax, gmin, gmax;
@@ -4590,10 +4590,10 @@ label_end:
  **
  *****************************************************************************/
 Id model_fitting_sills(Vario* vario,
-                        Model* model,
-                        const Constraints& constraints,
-                        const Option_VarioFit& optvar,
-                        const Option_AutoFit& mauto)
+                       Model* model,
+                       const Constraints& constraints,
+                       const Option_VarioFit& optvar,
+                       const Option_AutoFit& mauto)
 {
   Id nbexp, npadir;
   std::vector<StrExp> strexps;
@@ -4666,12 +4666,12 @@ Id model_fitting_sills(Vario* vario,
  **
  *****************************************************************************/
 static Id st_vmap_auto_count(const Db* dbmap,
-                              Model* model,
-                              Constraints& constraints,
-                              Option_VarioFit& optvar,
-                              VectorDouble& param,
-                              VectorDouble& lower,
-                              VectorDouble& upper)
+                             Model* model,
+                             Constraints& constraints,
+                             Option_VarioFit& optvar,
+                             VectorDouble& param,
+                             VectorDouble& lower,
+                             VectorDouble& upper)
 {
   Id flag_range, flag_param, flag_aniso, flag_rotation;
   Id min_order, max_ndim, flag_int_1d, flag_int_2d;
@@ -4839,11 +4839,11 @@ static void st_load_vmap(Id npadir, VectorDouble& gg, VectorDouble& wt)
  **
  *****************************************************************************/
 Id vmap_auto_fit(const DbGrid* dbmap,
-                  Model* model,
-                  bool verbose,
-                  const Option_AutoFit& mauto_arg,
-                  const Constraints& cons_arg,
-                  const Option_VarioFit& optvar_arg)
+                 Model* model,
+                 bool verbose,
+                 const Option_AutoFit& mauto_arg,
+                 const Constraints& cons_arg,
+                 const Option_VarioFit& optvar_arg)
 {
   Id npar0, npar, flag_reduce;
   VectorDouble varchol, scale, param, lower, upper;
@@ -4856,14 +4856,14 @@ Id vmap_auto_fit(const DbGrid* dbmap,
 
   /* Initializations */
 
-  Id error      = 1;
-  Id nbexp      = 0;
-  Id status     = 0;
-  Id norder     = 0;
-  Id npadir     = 0;
-  Id ncova      = model->getNCov();
-  Id nvar       = model->getNVar();
-  Id ndim       = model->getNDim();
+  Id error       = 1;
+  Id nbexp       = 0;
+  Id status      = 0;
+  Id norder      = 0;
+  Id npadir      = 0;
+  Id ncova       = model->getNCov();
+  Id nvar        = model->getNVar();
+  Id ndim        = model->getNDim();
   double hmax    = 0.;
   double gmax    = 0.;
   StrMod* strmod = nullptr;

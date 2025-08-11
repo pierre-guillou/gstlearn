@@ -62,7 +62,7 @@ private:
   Id _getNiter() const { return _niter; }
 
   Id _getNVarout() const { return _nvarOut; }
-  Id _getNStats() const { return (Id)_stats.size(); }
+  Id _getNStats() const { return static_cast<Id>(_stats.size()); }
   Id _getNEff() const;
 
   VectorVectorInt _getIndices() const;

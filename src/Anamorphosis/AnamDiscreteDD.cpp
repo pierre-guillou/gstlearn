@@ -139,7 +139,7 @@ void AnamDiscreteDD::calculateMeanAndVariance()
 }
 
 Id AnamDiscreteDD::fitFromArray(const VectorDouble& tab,
-                                 const VectorDouble& /*wt*/)
+                                const VectorDouble& /*wt*/)
 {
   VectorDouble chi;
 
@@ -429,7 +429,7 @@ void AnamDiscreteDD::_lambdaToMul()
 VectorDouble AnamDiscreteDD::z2factor(double z, const VectorInt& ifacs) const
 {
   VectorDouble factors;
-  Id nfact = (Id)ifacs.size();
+  Id nfact = static_cast<Id>(ifacs.size());
   factors.resize(nfact, 0);
 
   auto nclass = getNClass();
@@ -453,7 +453,7 @@ VectorDouble AnamDiscreteDD::factors_mod()
   /* Initializations */
 
   auto nclass = getNClass();
-  Id ntri   = nclass * (nclass + 1) / 2;
+  Id ntri     = nclass * (nclass + 1) / 2;
 
   /* Core allocation */
 
@@ -807,16 +807,16 @@ void AnamDiscreteDD::_globalSelectivity(Selectivity* selectivity)
  **
  *****************************************************************************/
 Id AnamDiscreteDD::factor2Selectivity(Db* db,
-                                       Selectivity* selectivity,
-                                       const VectorInt& cols_est,
-                                       const VectorInt& cols_std,
-                                       Id iptr0)
+                                      Selectivity* selectivity,
+                                      const VectorInt& cols_est,
+                                      const VectorInt& cols_std,
+                                      Id iptr0)
 {
   auto nclass     = getNClass();
-  Id nech        = db->getNSample();
-  Id nb_est      = (Id)cols_est.size();
-  Id nb_std      = (Id)cols_std.size();
-  Id ncleff      = MAX(nb_est, nb_std);
+  Id nech         = db->getNSample();
+  Id nb_est       = static_cast<Id>(cols_est.size());
+  Id nb_std       = static_cast<Id>(cols_std.size());
+  Id ncleff       = MAX(nb_est, nb_std);
   bool cutDefined = (selectivity->getNCuts() > 0);
 
   /* Preliminary checks */

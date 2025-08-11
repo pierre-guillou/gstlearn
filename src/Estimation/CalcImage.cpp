@@ -66,7 +66,7 @@ bool CalcImage::_check()
 
   if (_flagFilter)
   {
-    const ModelCovList* model = dynamic_cast<const ModelCovList*>(getModel());
+    const auto* model = dynamic_cast<const ModelCovList*>(getModel());
     if (model == nullptr)
     {
       messerr("Model should be a ModelCovList");
@@ -185,7 +185,7 @@ bool CalcImage::_filterImage(DbGrid* dbgrid, const ModelCovList* model)
   Id ndim = dbgrid->getNDim();
   auto nvar = _getNVar();
 
-  const NeighImage* neighI = dynamic_cast<const NeighImage*>(getNeigh());
+  const auto* neighI = dynamic_cast<const NeighImage*>(getNeigh());
   DbGrid* dblocal          = neighI->buildImageGrid(dbgrid, _seed);
   VectorVectorInt ranks    = _getActiveRanks(dblocal);
 
@@ -302,7 +302,7 @@ bool CalcImage::_run()
 
   if (_flagFilter)
   {
-    const ModelCovList* model = dynamic_cast<const ModelCovList*>(getModel());
+    const auto* model = dynamic_cast<const ModelCovList*>(getModel());
     if (!_filterImage(dbgrid, model)) return false;
   }
 
@@ -314,7 +314,7 @@ bool CalcImage::_run()
 
   if (_flagSmooth)
   {
-    const NeighImage* neighI = dynamic_cast<const NeighImage*>(getNeigh());
+    const auto* neighI = dynamic_cast<const NeighImage*>(getNeigh());
     _image_smoother(dbgrid, neighI, _smoothType, _smoothRange, _iattOut);
   }
 

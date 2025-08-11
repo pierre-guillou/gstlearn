@@ -28,7 +28,7 @@ static double _getRadius(double radius_arg)
   if (!FFFF(radius)) return radius;
   {
     const ASpace* space    = getDefaultSpace();
-    const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
+    const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
     if (spaceSn != nullptr) radius = spaceSn->getRadius();
   }
   return radius;

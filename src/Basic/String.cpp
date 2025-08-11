@@ -561,7 +561,7 @@ Id askInt(const String& text, Id defval, bool authTest)
 }
 
 /**
- * Ask interactively for the value of one Real (Double)
+ * Ask interactively for the value of one Real (Double value)
  * @param text Text of the question
  * @param defval Default value (or IFFFF)
  * @param authTest True if a TEST answer is authorized (TEST)

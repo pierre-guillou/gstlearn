@@ -103,7 +103,7 @@ void CovLMGradient::evalZAndGradients(const VectorDouble& vec,
 void CovLMGradient::addCov(const CovBase& cov)
 {
   // TODO This should be checked for some cases of Gradient (probably non numerical)
-  const ACovGradient* covgrad = dynamic_cast<const ACovGradient*>(&cov);
+  const auto* covgrad = dynamic_cast<const ACovGradient*>(&cov);
   if (covgrad == nullptr)
   {
     messerr("This covariance cannot be added");

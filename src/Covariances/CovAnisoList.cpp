@@ -79,7 +79,7 @@ void CovAnisoList::addCov(const CovBase& cov)
 const CovAniso* CovAnisoList::_getCovAniso(Id icov) const
 {
   if (!_isCovarianceIndexValid(icov)) return nullptr;
-  const CovAniso* covaniso = dynamic_cast<const CovAniso*>(_covs[icov].get());
+  const auto* covaniso = dynamic_cast<const CovAniso*>(_covs[icov].get());
   if (covaniso == nullptr)
   {
     messerr("The element 'icov' is not a CovAniso");
@@ -458,7 +458,7 @@ const gstlrn::AnamHermite* CovAnisoList::getAnamHermite() const
 {
   const gstlrn::AAnam* anam = getAnam();
   if (anam == nullptr) return nullptr;
-  const gstlrn::AnamHermite* anamH = dynamic_cast<const gstlrn::AnamHermite*>(anam);
+  const auto* anamH = dynamic_cast<const gstlrn::AnamHermite*>(anam);
   return anamH;
 }
 

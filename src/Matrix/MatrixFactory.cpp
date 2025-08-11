@@ -48,8 +48,8 @@ AMatrix* MatrixFactory::prodMatMat(const AMatrix* x,
     return nullptr;
   }
 
-  const MatrixSparse* mxsparse = dynamic_cast<const MatrixSparse*>(x);
-  const MatrixSparse* mysparse = dynamic_cast<const MatrixSparse*>(y);
+  const auto* mxsparse = dynamic_cast<const MatrixSparse*>(x);
+  const auto* mysparse = dynamic_cast<const MatrixSparse*>(y);
 
   AMatrix* res = nullptr;
   if (mxsparse != nullptr && mysparse != nullptr)
@@ -63,8 +63,8 @@ AMatrix* MatrixFactory::prodMatMat(const AMatrix* x,
 
     // Case of a resulting Dense matrix
 
-    const MatrixSymmetric* mxsym = dynamic_cast<const MatrixSymmetric*>(x);
-    const MatrixSymmetric* mysym = dynamic_cast<const MatrixSymmetric*>(y);
+    const auto* mxsym = dynamic_cast<const MatrixSymmetric*>(x);
+    const auto* mysym = dynamic_cast<const MatrixSymmetric*>(y);
 
     if (nrow1 == ncol2)
     {
@@ -115,8 +115,8 @@ MatrixSquare* MatrixFactory::createMatrixSquare(const MatrixSquare* x,
                                                 Id nrow)
 {
   /// TODO : use typeinfo
-  const MatrixSquare* mxsg     = dynamic_cast<const MatrixSquare*>(x);
-  const MatrixSymmetric* mxsym = dynamic_cast<const MatrixSymmetric*>(x);
+  const auto* mxsg     = dynamic_cast<const MatrixSquare*>(x);
+  const auto* mxsym = dynamic_cast<const MatrixSymmetric*>(x);
 
   MatrixSquare* res = nullptr;
   if (mxsg != nullptr)
@@ -184,9 +184,9 @@ AMatrix* MatrixFactory::createReduce(const AMatrix* x,
 
   /// TODO : use typeinfo
   AMatrix* res                 = nullptr;
-  const MatrixDense* mxrg      = dynamic_cast<const MatrixDense*>(x);
-  const MatrixSquare* mxsg     = dynamic_cast<const MatrixSquare*>(x);
-  const MatrixSymmetric* mxsym = dynamic_cast<const MatrixSymmetric*>(x);
+  const auto* mxrg      = dynamic_cast<const MatrixDense*>(x);
+  const auto* mxsg     = dynamic_cast<const MatrixSquare*>(x);
+  const auto* mxsym = dynamic_cast<const MatrixSymmetric*>(x);
 
   if (mxsym != nullptr)
   {
@@ -303,9 +303,9 @@ AMatrix* MatrixFactory::createGlue(const AMatrix* a1,
 
   if (isSparse)
   {
-    const MatrixSparse* aloc1 = dynamic_cast<const MatrixSparse*>(a1);
-    const MatrixSparse* aloc2 = dynamic_cast<const MatrixSparse*>(a2);
-    a                         = MatrixSparse::glue(aloc1, aloc2, flagShiftRow, flagShiftCol);
+    const auto* aloc1 = dynamic_cast<const MatrixSparse*>(a1);
+    const auto* aloc2 = dynamic_cast<const MatrixSparse*>(a2);
+    a                 = MatrixSparse::glue(aloc1, aloc2, flagShiftRow, flagShiftCol);
   }
   else
   {

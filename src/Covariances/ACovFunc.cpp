@@ -248,13 +248,13 @@ VectorDouble ACovFunc::_evaluateSpectrumOnSphere(Id n, double scale) const
 Array ACovFunc::_evalCovFFT(const VectorDouble& hmax, Id N) const
 {
   N *= 2;
-  Id ndim = (Id)hmax.size();
+  Id ndim = static_cast<Id>(hmax.size());
   VectorInt nxs(ndim);
   for (Id idim = 0; idim < ndim; idim++)
     nxs[idim] = N;
   Array array(nxs);
 
-  Id ntotal = (Id)pow(N, ndim);
+  Id ntotal = static_cast<Id>(pow(N, ndim));
   VectorDouble a(ndim);
   double coeff = 0;
   double prod  = 1.;
@@ -277,7 +277,7 @@ Array ACovFunc::_evalCovFFT(const VectorDouble& hmax, Id N) const
     double s = 0.;
     for (Id idim = 0; idim < ndim; idim++)
     {
-      double temp = a[idim] * ((double)indices[idim] / (N - 1) - 0.5);
+      double temp = a[idim] * (static_cast<double>(indices[idim]) / (N - 1) - 0.5);
       s += temp * temp;
     }
     Re[iad] = prod * evaluateSpectrum(s);
@@ -299,8 +299,8 @@ Array ACovFunc::_evalCovFFT(const VectorDouble& hmax, Id N) const
     array.rankToIndice(iad, indices);
     for (Id idim = 0; idim < ndim; idim++)
     {
-      Id odd          = indices[idim] % 2;
-      Id s            = 1 - 2 * odd;
+      Id odd           = indices[idim] % 2;
+      Id s             = 1 - 2 * odd;
       newIndices[idim] = nxs[idim] / 2 + s * (indices[idim] / 2 + odd);
       Re[iad] *= s;
     }

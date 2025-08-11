@@ -44,7 +44,7 @@ public:
   DECLARE_TOTL;
 
   void add(Id irow, Id icol, double value);
-  Id getNElements() const { return (Id)_eigenT.size(); }
+  Id getNElements() const { return static_cast<Id>(_eigenT.size()); }
   Id getNRows() const { return _nrowmax; }
   Id getNCols() const { return _ncolmax; }
   void force(Id nrow, Id ncol);

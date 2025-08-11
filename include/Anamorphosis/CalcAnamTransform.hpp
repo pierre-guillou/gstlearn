@@ -60,7 +60,7 @@ private:
   bool _ZToFactors();
   bool _FactorsToSelectivity();
 
-  Id _getNfact() const { return (Id)_ifacs.size(); }
+  Id _getNfact() const { return static_cast<Id>(_ifacs.size()); }
   Id _getNSel() const { return _selectivity->getNVar(); }
 
   bool _hasAnam(const EAnam& anamType = EAnam::fromKey("UNKNOWN")) const;

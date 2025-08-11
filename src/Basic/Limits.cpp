@@ -47,12 +47,12 @@ Limits::Limits(const VectorDouble& mini,
     messerr("You must define at least one item in 'mini' and 'maxi'. Limits empty");
     return;
   }
-  if (incmini.size() != 0 && (Id) incmini.size() != nclass)
+  if (incmini.size() != 0 && static_cast<Id>(incmini.size()) != nclass)
   {
     messerr("Arguments 'incmini' and 'mini' should have the same dimension. Limits empty");
     return;
   }
-  if (incmaxi.size() != 0 && (Id) incmaxi.size() != nclass)
+  if (incmaxi.size() != 0 && static_cast<Id>(incmaxi.size()) != nclass)
   {
     messerr("Arguments 'incmaxi' and 'maxi' should have the same dimension. Limits empty");
     return;
@@ -167,7 +167,7 @@ String Limits::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
 
-  for (Id i = 0; i < (Id) _bounds.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(_bounds.size()); i++)
     sstr << "Bound( " << i+1 << " ) : " << _bounds[i].toString() << std::endl;
 
   return sstr.str();
@@ -377,13 +377,13 @@ Id Limits::_computeCategory(Db *db,
       double maxival = (maxi.empty()) ? iclass + 1.5 : maxi[iclass];
       if (!FFFF(minival))
       {
-        Id flag = (incmini.empty()) ? 1 : (Id) incmini[iclass];
+        Id flag = (incmini.empty()) ? 1 : static_cast<Id>(incmini[iclass]);
         if ((flag == 0 && value <= minival) || (flag == 1 && value < minival))
           continue;
       }
       if (!FFFF(maxival))
       {
-        Id flag = (incmaxi.empty()) ? 0 : (Id) incmaxi[iclass];
+        Id flag = (incmaxi.empty()) ? 0 : static_cast<Id>(incmaxi[iclass]);
         if ((flag == 0 && value >= maxival) || (flag == 1 && value > maxival))
           continue;
       }
@@ -455,8 +455,8 @@ Id Limits::_computeIndicator(Db *db,
     mean[iclass] = 0.;
     minival[iclass] = (mini.empty()) ? iclass + 0.5 : mini[iclass];
     maxival[iclass] = (maxi.empty()) ? iclass + 1.5 : maxi[iclass];
-    flagmin[iclass] = (incmini.empty()) ? 1 : (Id) incmini[iclass];
-    flagmax[iclass] = (incmaxi.empty()) ? 0 : (Id) incmaxi[iclass];
+    flagmin[iclass] = (incmini.empty()) ? 1 : static_cast<Id>(incmini[iclass]);
+    flagmax[iclass] = (incmaxi.empty()) ? 0 : static_cast<Id>(incmaxi[iclass]);
   }
   Id nbelow = 0;
   Id nabove = 0;
@@ -602,7 +602,7 @@ Id Limits::_computeIndicator(Db *db,
       if (! db->isActive(iech)) continue;
       double value = db->getArray(iech, iptr_mean);
       if (FFFF(value)) continue;
-      Id iclass = (Id) value;
+      Id iclass = static_cast<Id>(value);
       if (iclass < 0)
         db->setArray(iech, iptr_mean, mbelow);
       else if (iclass < nclass)
@@ -674,8 +674,8 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
     mean[iclass] = 0.;
     minival[iclass] = (mini.empty()) ? iclass + 0.5 : mini[iclass];
     maxival[iclass] = (maxi.empty()) ? iclass + 1.5 : maxi[iclass];
-    flagmin[iclass] = (incmini.empty()) ? 1 : (Id) incmini[iclass];
-    flagmax[iclass] = (incmaxi.empty()) ? 0 : (Id) incmaxi[iclass];
+    flagmin[iclass] = (incmini.empty()) ? 1 : static_cast<Id>(incmini[iclass]);
+    flagmax[iclass] = (incmaxi.empty()) ? 0 : static_cast<Id>(incmaxi[iclass]);
   }
   Id nbelow = 0;
   Id nabove = 0;

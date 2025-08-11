@@ -299,7 +299,7 @@ String Rule::toString(const AStringFormat* strfmt) const
   Id node_tot,nfac_tot,nmax_tot,ny1_tot,ny2_tot;
   double prop_tot;
 
-  const RuleStringFormat* rulefmt = dynamic_cast<const RuleStringFormat*>(strfmt);
+  const auto* rulefmt = dynamic_cast<const RuleStringFormat*>(strfmt);
   RuleStringFormat dsf;
   if (rulefmt != nullptr) dsf = *rulefmt;
 
