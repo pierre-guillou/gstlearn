@@ -40,7 +40,6 @@ Ball::Ball(const Db* dbin,
  * @brief Construct a new Ball object based on the barycenters of the meshes
  *
  * @param mesh  AMesh description
- * @param dist_function template distance function
  * @param leaf_size Number of elements in the leafs of the Ball tree
  * @param has_constraints True if constraints are applied on the Ball Tree
  * @param default_distance_function 1 for Euclidean distance, 2 for Manhattan
