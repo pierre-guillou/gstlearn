@@ -798,13 +798,16 @@ Id krigingSPDE(Db* dbin,
   // Set the SPDE class ready
   if (spde.makeReady(verbose)) return 1;
 
+  // Local variables
+  Id nvar = model->getNVar();
+
   // Read information from the input Db and center it
   VectorDouble Z = spde.getData(true, verbose);
   if (Z.empty()) return 1;
 
   // Performing the task and storing results in 'dbout'
   // This is performed in ONE step to avoid additional core allocation
-  Id nvar = model->getNVar();
+
   if (flag_est)
   {
     VectorDouble result = spde.kriging(Z);
@@ -890,6 +893,10 @@ Id simulateSPDE(Db* dbin,
   // Set the SPDE class ready
   if (spde.makeReady(verbose)) return 1;
 
+  // Local variables
+  Id nvar    = model->getNVar();
+  Id nechred = dbout->getNSample(true);
+
   VectorDouble Z;
   VectorDouble driftCoeffs;
   if (spde.getFlagKrig())
@@ -901,9 +908,8 @@ Id simulateSPDE(Db* dbin,
 
   // Perform the Simulation and storage.
   // All is done in ONE step to avoid additional storage
-  Id nvar    = model->getNVar();
-  Id iuid    = dbout->addColumnsByConstant(nvar * nbsimu);
-  Id nechred = dbout->getNSample(true);
+
+  Id iuid = dbout->addColumnsByConstant(nvar * nbsimu);
   VectorDouble local(nechred);
   VectorDouble result;
 
@@ -995,6 +1001,10 @@ Id simPGSSPDE(Db* dbin,
   // Set the SPDE class ready
   if (spde.makeReady(verbose)) return 1;
 
+  // Local variables
+  Id nvar    = model->getNVar();
+  Id nechred = dbout->getNSample(true);
+
   VectorDouble Z;
   if (spde.getFlagKrig())
   {
@@ -1005,9 +1015,7 @@ Id simPGSSPDE(Db* dbin,
 
   // Perform the Simulation and storage.
   // All is done in ONE step to avoid additional storage
-  Id nvar    = model->getNVar();
-  Id nechred = dbout->getNSample(true);
-  Id iuid    = dbout->addColumnsByConstant(nvar * nbsimu);
+  Id iuid = dbout->addColumnsByConstant(nvar * nbsimu);
   VectorDouble local(nechred);
   VectorDouble result;
 
