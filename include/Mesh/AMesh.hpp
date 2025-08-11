@@ -145,7 +145,6 @@ private:
 };
 
 typedef std::vector<const AMesh*> VectorMeshes;
-}
 
 GSTLEARN_EXPORT void dumpMeshes(const VectorMeshes& meshes);
 

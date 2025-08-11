@@ -398,7 +398,7 @@ bool CalcAnamTransform::_ZToYByNormalScore()
 
 bool CalcAnamTransform::_ZToYByHermite()
 {
-  int nvar          = _getNVar();
+  Id nvar           = _getNVar();
   const auto* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
 
   for (Id ivar = 0; ivar < nvar; ivar++)
@@ -413,7 +413,7 @@ bool CalcAnamTransform::_ZToYByHermite()
 
 bool CalcAnamTransform::_YToZByHermite()
 {
-  int nvar          = _getNVar();
+  Id nvar           = _getNVar();
   const auto* anamC = dynamic_cast<const AnamContinuous*>(getAnam());
 
   for (Id ivar = 0; ivar < nvar; ivar++)
