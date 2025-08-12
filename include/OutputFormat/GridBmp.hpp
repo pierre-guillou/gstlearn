@@ -48,7 +48,7 @@ public:
   void setValmin(double valmin) { _valmin = valmin; }
 
 private:
-  void _writeOut(Id mode, int ival);
+  void _writeOut(Id mode, I32 ival);
   Id  _colorRank(Id iech, Id ncolor, double vmin, double vmax);
   void _colorInRGB(Id rank,
                    bool flag_color_scale,

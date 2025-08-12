@@ -26,7 +26,13 @@ namespace gstlrn
 typedef std::string String;
 typedef unsigned char UChar;
 
+/// Main type for gstlearn 64-bits integers, to be used in priority
+/// when an integer is needed.
 using Id = long;
+
+/// Secondary integer type. To be used instead of "int". No "int"
+/// should be voluntarily introduced in gstlearn.
+using I32 = int;
 
 #define EPSILON1  1.e-1
 #define EPSILON2  1.e-2

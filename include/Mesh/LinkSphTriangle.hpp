@@ -21,14 +21,14 @@ class Db;
 class SphTriangle
 {
 public:
-  int n_nodes; /* Number of nodes */
-  int sph_size; /* Size of arrays sph_list and sph_lptr */
+  I32 n_nodes; /* Number of nodes */
+  I32 sph_size; /* Size of arrays sph_list and sph_lptr */
   VectorDouble sph_x; /* Array of X-coordinates for nodes */
   VectorDouble sph_y; /* Array of Y-coordinates for nodes */
   VectorDouble sph_z; /* Array of Z-coordinates for nodes */
-  std::vector<int> sph_list; /* Set of nodal indexes */
-  std::vector<int> sph_lptr; /* Set of pointers (sph_list indexes) */
-  std::vector<int> sph_lend; /* Set of pointers to adjacency lists */
+  std::vector<I32> sph_list; /* Set of nodal indexes */
+  std::vector<I32> sph_lptr; /* Set of pointers (sph_list indexes) */
+  std::vector<I32> sph_lend; /* Set of pointers to adjacency lists */
 };
 
 

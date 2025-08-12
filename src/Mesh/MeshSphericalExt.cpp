@@ -110,7 +110,7 @@ Id MeshSphericalExt::resetFromDb(Db* dbin,
  *****************************************************************************/
 void MeshSphericalExt::_meshesSphLoadVertices(SphTriangle* t)
 {
-  int ecr, lec, nt, error;
+  I32 ecr, lec, nt, error;
   double rlong, rlat;
 
   Id natt = 2;
@@ -127,8 +127,8 @@ void MeshSphericalExt::_meshesSphLoadVertices(SphTriangle* t)
 
   ecr      = 0;
   lec      = 0;
-  int nrow = 6;
-  std::vector<int> ltri(2 * nrow * t->n_nodes, 0);
+  I32 nrow = 6;
+  std::vector<I32> ltri(2 * nrow * t->n_nodes, 0);
   (void)trlist_(&t->n_nodes, t->sph_list.data(), t->sph_lptr.data(), t->sph_lend.data(), &nrow,
                 &nt, ltri.data(), &error);
   if (error) return;

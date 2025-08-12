@@ -36,8 +36,8 @@ public:
   void setYwell(double ywell) { _ywell = ywell; }
 
 private:
-  Id _readFind(int s_length, const char* target, Id* numline, char* string);
-  Id _readNext(int s_length, Id flag_up, Id* numline, char* string);
+  Id _readFind(I32 s_length, const char* target, Id* numline, char* string);
+  Id _readNext(I32 s_length, Id flag_up, Id* numline, char* string);
   static void _stringToUppercase(char *string);
 
 private:

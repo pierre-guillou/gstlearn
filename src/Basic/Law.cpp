@@ -865,7 +865,7 @@ Id law_poisson(double parameter)
     }
     return (k - 1);
   }
-  std::poisson_distribution<int> d(parameter);
+  std::poisson_distribution<I32> d(parameter);
   return d(Random_gen);
 }
 
