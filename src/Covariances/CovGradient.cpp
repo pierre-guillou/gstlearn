@@ -9,14 +9,9 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGradient.hpp"
-#include "Basic/AStringable.hpp"
-#include "Basic/MathFunc.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Covariances/CorAniso.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
 #include "Space/ASpace.hpp"
 #include "Space/SpaceComposite.hpp"
 #include "Space/SpacePoint.hpp"

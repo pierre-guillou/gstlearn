@@ -11,9 +11,7 @@
 #pragma once
 
 #include "Basic/ICloneable.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Covariances/CorAniso.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
+#include "Covariances/ACov.hpp"
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
