@@ -52,6 +52,11 @@ execute_process(
 # Convert project name to uppercase
 string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UP)
 
+# Define a numerical version number (usable in e.g. #if ( VERSION >= ...))
+# This doesn't handle pre-release numbers (PROJECT_VERSION_SUFFIX) but this
+# should only be used to keep code compatible with several releases.
+MATH( EXPR gstlearn_VERSION_NUMBER "${gstlearn_VERSION_MAJOR} * 10000 + ${gstlearn_VERSION_MINOR} * 100 + ${gstlearn_VERSION_PATCH}" )
+
 # Fix version.h automatically
 configure_file(version.h.in version.h)
 
