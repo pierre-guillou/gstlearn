@@ -584,8 +584,8 @@ static double st_get_verr(Id rank, Id ivar)
  **
  *****************************************************************************/
 static Id st_check_environment(Id flag_in,
-                                Id flag_out,
-                                Model* model)
+                               Id flag_out,
+                               Model* model)
 {
   Id error, ndim, nvar, nfex;
 
@@ -743,7 +743,7 @@ static Id st_model_manage(Id mode, Model* model)
   {
     if (!MODEL_INIT) return (1);
     covaux_global.clear();
-    MODEL_INIT    = 0;
+    MODEL_INIT = 0;
   }
   return (0);
 }
@@ -763,10 +763,10 @@ static Id st_model_manage(Id mode, Model* model)
  **
  *****************************************************************************/
 static Id st_krige_manage_basic(Id mode,
-                                 Id nech,
-                                 Id nmax,
-                                 Id nvar,
-                                 Id nfeq)
+                                Id nech,
+                                Id nmax,
+                                Id nvar,
+                                Id nfeq)
 {
   DECLARE_UNUSED(nech);
   Id neqmax, ncmax;
@@ -850,9 +850,9 @@ static Id st_get_nmax(ANeigh* neigh)
  **
  *****************************************************************************/
 static Id st_krige_manage(Id mode,
-                           Id nvar,
-                           Model* model,
-                           ANeigh* neigh)
+                          Id nvar,
+                          Model* model,
+                          ANeigh* neigh)
 {
   Id nech, nfeq, nmax;
 
@@ -1004,10 +1004,10 @@ static void st_block_discretize(Id mode, Id flag_rand, Id iech)
  **
  *****************************************************************************/
 Id krige_koption_manage(Id mode,
-                         Id flag_check,
-                         const EKrigOpt& calcul,
-                         Id flag_rand,
-                         const VectorInt& ndiscs)
+                        Id flag_check,
+                        const EKrigOpt& calcul,
+                        Id flag_rand,
+                        const VectorInt& ndiscs)
 {
   Id ndim, error;
 
@@ -1474,15 +1474,15 @@ static void st_result_kriging_print(Id flag_xvalid, Id nvar, Id status)
  **
  *****************************************************************************/
 Id _krigsim(Db* dbin,
-             Db* dbout,
-             const Model* model,
-             ANeigh* neigh,
-             bool flag_bayes,
-             const VectorDouble& dmean,
-             const MatrixSymmetric& dcov,
-             Id icase,
-             Id nbsimu,
-             bool flag_dgm)
+            Db* dbout,
+            const Model* model,
+            ANeigh* neigh,
+            bool flag_bayes,
+            const VectorDouble& dmean,
+            const MatrixSymmetric& dcov,
+            Id icase,
+            Id nbsimu,
+            bool flag_dgm)
 {
   // Preliminary checks
 
@@ -1539,13 +1539,13 @@ Id _krigsim(Db* dbin,
  **
  *****************************************************************************/
 Id global_transitive(DbGrid* dbgrid,
-                      Model* model,
-                      Id flag_verbose,
-                      Id flag_regular,
-                      Id ndisc,
-                      double* abundance,
-                      double* sse,
-                      double* cvtrans)
+                     Model* model,
+                     Id flag_verbose,
+                     Id flag_regular,
+                     Id ndisc,
+                     double* abundance,
+                     double* sse,
+                     double* cvtrans)
 {
   Id i, ix, iy, ix1, ix2, iy1, iy2, nx, ny, flag_value;
   double c00, cvv, dx, dy, dsum, gint, dsse, wtot, value;
@@ -1791,11 +1791,11 @@ static Id st_get_limits(DbGrid* db, double top, double bot, Id* ideb, Id* ifin)
  **
  *****************************************************************************/
 static Id st_get_neigh(Id ideb,
-                        Id ifin,
-                        Id neigh_radius,
-                        Id* status,
-                        Id* nbefore,
-                        Id* nafter)
+                       Id ifin,
+                       Id neigh_radius,
+                       Id* status,
+                       Id* nbefore,
+                       Id* nafter)
 {
   Id iad;
 
@@ -1964,14 +1964,14 @@ static double st_estim_exp(Db* db, const double* wgt, Id nbefore, Id nafter)
  **
  *****************************************************************************/
 Id anakexp_f(DbGrid* db,
-              double* covdd,
-              double* covd0,
-              double top,
-              double bot,
-              Id cov_radius,
-              Id neigh_radius,
-              Id flag_sym,
-              Id nfeq)
+             double* covdd,
+             double* covd0,
+             double top,
+             double bot,
+             Id cov_radius,
+             Id neigh_radius,
+             Id flag_sym,
+             Id nfeq)
 {
   Id i, ndim, nvarin, nech, size, error, ideb, ifin, neq, status;
   Id nbefore, nafter, nbefore_mem, nafter_mem;
@@ -1982,9 +1982,9 @@ Id anakexp_f(DbGrid* db,
 
   error = 1;
   st_global_init(db, db);
-  FLAG_EST                             = true;
-  ndim                                 = db->getNDim();
-  nvarin                               = db->getNLoc(ELoc::Z);
+  FLAG_EST    = true;
+  ndim        = db->getNDim();
+  nvarin      = db->getNLoc(ELoc::Z);
   nbefore_mem = nafter_mem = -1;
   size                     = 0;
 
@@ -2384,9 +2384,9 @@ static VectorInt st_neigh_find(DbGrid* db,
  **
  *****************************************************************************/
 static Id st_neigh_diff(const Id nei_ss[3],
-                         const Id nei_nn[3],
-                         Id* nei_ref,
-                         const Id* nei_cur)
+                        const Id nei_nn[3],
+                        Id* nei_ref,
+                        const Id* nei_cur)
 {
   Id ix, iy, iz, flag1, flag2, flag_diff;
 
@@ -2630,16 +2630,16 @@ static void st_vario_dump(FILE* file,
  **
  *****************************************************************************/
 Id anakexp_3D(DbGrid* db,
-               double* cov_ref,
-               Id cov_radius,
-               Id neigh_ver,
-               Id neigh_hor,
-               Id flag_sym,
-               Model* model,
-               double nugget,
-               Id nfeq,
-               Id dbg_ix,
-               Id dbg_iy)
+              double* cov_ref,
+              Id cov_radius,
+              Id neigh_ver,
+              Id neigh_hor,
+              Id flag_sym,
+              Model* model,
+              double nugget,
+              Id nfeq,
+              Id dbg_ix,
+              Id dbg_iy)
 {
   Id i, ix, iy, iz, ndim, nvarin, nech, error, neq, status, ecr;
   Id size_cov, size_nei, flag_new, flag_col;
@@ -2655,10 +2655,10 @@ Id anakexp_3D(DbGrid* db,
   error = 1;
   st_global_init(db, db);
   FLAG_EST = true;
-  fildmp                               = nullptr;
-  ndim                                 = db->getNDim();
-  nvarin                               = db->getNLoc(ELoc::Z);
-  size_nei                             = 0;
+  fildmp   = nullptr;
+  ndim     = db->getNDim();
+  nvarin   = db->getNLoc(ELoc::Z);
+  size_nei = 0;
   VectorInt indg(ndim, 0);
 
   /* Prepare the Koption structure */
@@ -2862,11 +2862,11 @@ label_end:
  **
  *****************************************************************************/
 Id krigsum(Db* dbin,
-            Db* dbout,
-            Model* model,
-            ANeigh* neigh,
-            bool flag_positive,
-            const NamingConvention& namconv)
+           Db* dbout,
+           Model* model,
+           ANeigh* neigh,
+           bool flag_positive,
+           const NamingConvention& namconv)
 {
   Id nvar = dbin->getNLoc(ELoc::Z);
   if (model->getNVar() != 1)
@@ -3031,16 +3031,16 @@ static VectorInt st_ranks_other(Id nech,
  **
  *****************************************************************************/
 static Id st_sampling_krige_data(Db* db,
-                                  Model* model,
-                                  double beta,
-                                  VectorInt& ranks1,
-                                  VectorInt& ranks2,
-                                  VectorInt& rother,
-                                  Id* ntot_arg,
-                                  Id* nutil_arg,
-                                  VectorInt& rutil,
-                                  double** tutil_arg,
-                                  double** invsig_arg)
+                                 Model* model,
+                                 double beta,
+                                 VectorInt& ranks1,
+                                 VectorInt& ranks2,
+                                 VectorInt& rother,
+                                 Id* ntot_arg,
+                                 Id* nutil_arg,
+                                 VectorInt& rutil,
+                                 double** tutil_arg,
+                                 double** invsig_arg)
 {
   Id i, j, ecr, nmax;
   VectorDouble utab;
@@ -3218,14 +3218,14 @@ label_end:
  **
  *****************************************************************************/
 Id st_krige_data(Db* db,
-                  Model* model,
-                  double beta,
-                  VectorInt& ranks1,
-                  VectorInt& ranks2,
-                  VectorInt& rother,
-                  Id flag_abs,
-                  double* data_est,
-                  double* data_var)
+                 Model* model,
+                 double beta,
+                 VectorInt& ranks1,
+                 VectorInt& ranks2,
+                 VectorInt& rother,
+                 Id flag_abs,
+                 double* data_est,
+                 double* data_var)
 {
   Id ntot, nutil, i, iech, nech;
   double *tutil, *invsig, *s, *c00;
@@ -3317,10 +3317,10 @@ Id st_krige_data(Db* db,
  **
  *****************************************************************************/
 Id st_crit_global(Db* db,
-                   Model* model,
-                   VectorInt& ranks1,
-                   VectorInt& rother,
-                   double* crit)
+                  Model* model,
+                  VectorInt& ranks1,
+                  VectorInt& rother,
+                  double* crit)
 {
   Id ecr;
   double *c00, *invc, *cs, *cs1;
@@ -3440,15 +3440,15 @@ Id st_crit_global(Db* db,
  **
  *****************************************************************************/
 Id sampling_f(Db* db,
-               Model* model,
-               double beta,
-               Id method1,
-               Id nsize1_max,
-               VectorInt& ranks1,
-               Id method2,
-               Id nsize2_max,
-               VectorInt& ranks2,
-               Id verbose)
+              Model* model,
+              double beta,
+              Id method1,
+              Id nsize1_max,
+              VectorInt& ranks1,
+              Id method2,
+              Id nsize2_max,
+              VectorInt& ranks2,
+              Id verbose)
 {
   Id best_rank;
   double best_ecart;
@@ -3556,13 +3556,13 @@ Id sampling_f(Db* db,
  **
  *****************************************************************************/
 Id krigsampling_f(Db* dbin,
-                   Db* dbout,
-                   Model* model,
-                   double beta,
-                   VectorInt& ranks1,
-                   VectorInt& ranks2,
-                   bool flag_std,
-                   Id verbose)
+                  Db* dbout,
+                  Model* model,
+                  double beta,
+                  VectorInt& ranks1,
+                  VectorInt& ranks2,
+                  bool flag_std,
+                  Id verbose)
 {
   Id ntot, nutil, i;
   double *tutil, *invsig, *s, *c00;
@@ -3571,8 +3571,8 @@ Id krigsampling_f(Db* dbin,
 
   /* Preliminary checks */
 
-  Id nsize1   = (Id)ranks1.size();
-  Id nsize2   = (Id)ranks2.size();
+  Id nsize1    = (Id)ranks1.size();
+  Id nsize2    = (Id)ranks2.size();
   double sigma = 0.;
   tutil = invsig = s = c00 = nullptr;
   st_global_init(dbin, dbout);
@@ -3886,9 +3886,9 @@ static Id st_declustering_1(Db* db, Id iptr, const VectorDouble& radius)
  **
  *****************************************************************************/
 static Id st_declustering_2(Db* db,
-                             Model* model,
-                             ANeigh* neigh,
-                             Id iptr)
+                            Model* model,
+                            ANeigh* neigh,
+                            Id iptr)
 {
   KrigOpt krigopt;
   krigopt.setOptionCalcul(EKrigOpt::DRIFT);
@@ -3921,11 +3921,11 @@ static Id st_declustering_2(Db* db,
  **
  *****************************************************************************/
 static Id st_declustering_3(Db* db,
-                             Db* dbgrid,
-                             Model* model,
-                             ANeigh* neigh,
-                             const VectorInt& ndiscs,
-                             Id iptr)
+                            Db* dbgrid,
+                            Model* model,
+                            ANeigh* neigh,
+                            const VectorInt& ndiscs,
+                            Id iptr)
 {
   // Preliminary checks
 
@@ -3988,14 +3988,14 @@ static Id st_declustering_3(Db* db,
  **
  *****************************************************************************/
 Id declustering(Db* dbin,
-                 Model* model,
-                 Id method,
-                 ANeigh* neigh,
-                 DbGrid* dbgrid,
-                 const VectorDouble& radius,
-                 const VectorInt& ndiscs,
-                 Id flag_sel,
-                 bool verbose)
+                Model* model,
+                Id method,
+                ANeigh* neigh,
+                DbGrid* dbgrid,
+                const VectorDouble& radius,
+                const VectorInt& ndiscs,
+                Id flag_sel,
+                bool verbose)
 {
   if (!dbin->isNVarComparedTo(1)) return 1;
 
@@ -4487,8 +4487,8 @@ static VectorDouble st_inhomogeneous_covgg(Db* dbsrc,
  ** \param[in]  covpp       Inverse Covariance between Data-Data
  ** \param[in]  drftab      Drift matrix at Data
  **
- ** \param[out] yloc        Array: t(F) %*% C^-1
- ** \param[out] zloc        Array: (t(F) %*% C^-1 %*% F)^-1
+ ** \param[out] ymat        Array: t(F) %*% C^-1
+ ** \param[out] zmat        Array: (t(F) %*% C^-1 %*% F)^-1
  **
  ** \remarks The returned arrays 'yloc' and 'zloc' must be freed by the
  ** \remarks calling function
@@ -4615,12 +4615,12 @@ static void st_drift_update(Id np,
  **
  *****************************************************************************/
 Id inhomogeneous_kriging(Db* dbdat,
-                          Db* dbsrc,
-                          Db* dbout,
-                          double power,
-                          Id flag_source,
-                          Model* model_dat,
-                          Model* model_src)
+                         Db* dbsrc,
+                         Db* dbout,
+                         double power,
+                         Id flag_source,
+                         Model* model_dat,
+                         Model* model_src)
 {
   Id error, np, ip, ns, ng, nvar, neq, nred, nfeq, nbfl;
   VectorDouble covss, distps, distgs, covpp, covgp, prodps, prodgs;
