@@ -715,7 +715,7 @@ Id meshes_2D_write(const char* file_name,
  ** \param[in]  points    Array of 'ndim' coordinates for mesh vertex
  **
  *****************************************************************************/
-void mesh_stats(Id ndim, Id ncorner, Id nmesh, const Id* meshes, const double* points)
+void mesh_stats(Id ndim, Id ncorner, Id nmesh, const I32* meshes, const double* points)
 {
   VectorDouble mini(ndim, 0.);
   VectorDouble maxi(ndim, 0.);

@@ -39,7 +39,7 @@ GSTLEARN_EXPORT AMesh* meshes_turbo_3D_grid_build(DbGrid* dbgrid);
 GSTLEARN_EXPORT void mesh_stats(Id ndim,
                                 Id ncorner,
                                 Id nmesh,
-                                const Id* meshes,
+                                const I32* meshes,
                                 const double* points);
                                 
 }

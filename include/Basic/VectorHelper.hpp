@@ -26,6 +26,7 @@ public:
   static VectorVectorInt    initVVInt(Id nval1, Id nval2, Id value = 0);
 
   static VectorInt          initVInt(const Id* values, Id number);
+  static VectorInt          initVInt(const I32* values, Id number);
   static VectorDouble       initVDouble(const double* values, Id number);
   static VectorVectorDouble initVVDouble(const double* value, Id n1, Id n2);
 
