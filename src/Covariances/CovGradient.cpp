@@ -22,18 +22,22 @@
 
 namespace gstlrn
 {
-CovGradient::CovGradient(const CovAniso& cova)
+CovGradient::CovGradient(const CovAniso& cova, double ballradius)
   : ACov()
-  , _nVar(0) // to be fixed
+  , _nVar(0)
+  , _ballRadius(ballradius)
   , _covRef(cova)
 {
-  setContext(_covRef.getContext());
+  setContext(cova.getContext());
+  if (!_isValidForGradient()) return;
+  _nVar = _ctxt.getNVar() + _ctxt.getNDim(); // Consider the variable and its gradient(s)
   _ctxt.setNVar(_nVar);
 }
 
 CovGradient::CovGradient(const CovGradient& r)
   : ACov(r)
   , _nVar(r._nVar)
+  , _ballRadius(r._ballRadius)
   , _covRef(r._covRef)
 {
 }
@@ -42,28 +46,70 @@ CovGradient::~CovGradient()
 {
 }
 
+bool CovGradient::_isValidForGradient() const
+{
+  auto ndim = _covRef.getNDim();
+  auto nvar = _covRef.getNVar();
+  if (ndim > 2)
+  {
+    messerr("This class is limited to 1-D or 2-D");
+    return false;
+  }
+  if (nvar != 1)
+  {
+    messerr("This class is limited to Monovariate case");
+    return false;
+  }
+  return true;
+}
+
 void CovGradient::_optimizationSetTarget(SpacePoint& pt) const
 {
   DECLARE_UNUSED(pt)
 }
 
-void CovGradient::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
-{
-  DECLARE_UNUSED(mode)
-  DECLARE_UNUSED(ps)
-}
+// void CovGradient::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
+// {
+//   DECLARE_UNUSED(mode)
+//   DECLARE_UNUSED(ps)
+// }
 
-void CovGradient::_optimizationPostProcess() const
-{
-}
+// void CovGradient::_optimizationPostProcess() const
+// {
+// }
 
+/**
+ * @brief According to the variable rank, call covariance between the variable and its derivatives
+ *
+ * @param p1 First point for covariance calculation
+ * @param p2 Second point for covariance calculation
+ * @param ivar Rank of the first variable (see remarks)
+ * @param jvar Rank for the second variable (see remarks)
+ * @param mode CovCalcMode structure
+ * @return double
+ *
+ * @remark This use of this function is limited to the Monovariate case.
+ * @remark The argument 'ivar' (resp. 'jvar') gives the variable rank (if equal to 0)
+ * Otherwise it gives the space index derivative (=idim-1)
+ */
 double CovGradient::_eval(const SpacePoint& p1,
                           const SpacePoint& p2,
                           Id ivar,
                           Id jvar,
                           const CovCalcMode* mode) const
 {
-  return _covRef._eval(p1, p2, ivar, jvar, mode);
+  if (ivar == 0 && jvar == 0)
+    return _covRef._eval(p1, p2, ivar, jvar, mode);
+
+  Id idim = ivar - 1;
+  Id jdim = jvar - 1;
+  if (ivar == 0)
+    return -_covRef.evalZGNumeric(p1, p2, 0, 0, jdim, _ballRadius, mode);
+  if (jvar == 0)
+    return +_covRef.evalZGNumeric(p1, p2, 0, 0, idim, _ballRadius, mode);
+  if (jdim == idim)
+    return _covRef.evalGGNumeric(p1, p2, 0, 0, idim, jdim, _ballRadius, mode);
+  return -_covRef.evalGGNumeric(p1, p2, 0, 0, idim, jdim, _ballRadius, mode);
 }
 
 } // namespace gstlrn

@@ -28,10 +28,13 @@ class CovAniso;
 class GSTLEARN_EXPORT CovGradient: public ACov
 {
 public:
-  CovGradient(const CovAniso& cova);
+  CovGradient(const CovAniso& cova, double ballradius = 1);
   CovGradient(const CovGradient& r);
   CovGradient& operator=(const CovGradient& r) = delete;
   virtual ~CovGradient();
+
+  /// ICloneable Interface
+  IMPLEMENT_CLONING(CovGradient)
 
   bool isConsistent(const ASpace* space) const override
   {
@@ -51,11 +54,13 @@ protected:
   void _optimizationSetTarget(SpacePoint& pt) const override;
 
 private:
-  void _optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const override;
-  void _optimizationPostProcess() const override;
+  // void _optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const override;
+  // void _optimizationPostProcess() const override;
+  bool _isValidForGradient() const;
 
 private:
-  Id _nVar; // TODO should be number of variables and gradients
+  Id _nVar;
+  double _ballRadius;
   const CovAniso& _covRef;
 };
 } // namespace gstlrn

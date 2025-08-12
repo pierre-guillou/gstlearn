@@ -67,20 +67,20 @@ public:
   /// ASpaceObject Interface
 
   /// ACov Interface
-  virtual double eval0(Id ivar                = 0,
-                       Id jvar                = 0,
-                       const CovCalcMode* mode = nullptr) const override;
+  double eval0(Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 
-  virtual double evalCovOnSphere(double alpha,
-                                 Id degree              = 50,
-                                 bool flagScaleDistance  = true,
-                                 const CovCalcMode* mode = nullptr) const override;
-  virtual VectorDouble evalSpectrumOnSphere(Id n,
-                                            bool flagNormDistance = false,
-                                            bool flagCumul        = false) const override;
-  virtual double evalSpectrum(const VectorDouble& freq,
-                              Id ivar = 0,
-                              Id jvar = 0) const override;
+  double evalCovOnSphere(double alpha,
+                         Id degree               = 50,
+                         bool flagScaleDistance  = true,
+                         const CovCalcMode* mode = nullptr) const override;
+  VectorDouble evalSpectrumOnSphere(Id n,
+                                    bool flagNormDistance = false,
+                                    bool flagCumul        = false) const override;
+  double evalSpectrum(const VectorDouble& freq,
+                      Id ivar = 0,
+                      Id jvar = 0) const override;
 
   virtual double getIntegralRange(Id ndisc, double hmax) const;
   virtual String getFormula() const { return getCorAniso()->getFormula(); }

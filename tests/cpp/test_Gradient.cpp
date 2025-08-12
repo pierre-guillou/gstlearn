@@ -8,25 +8,25 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Estimation/CalcKriging.hpp"
-#include "Neigh/NeighUnique.hpp"
-#include "geoslib_old_f.h"
-
-#include "Enum/ECst.hpp"
-#include "Enum/ESpaceType.hpp"
-
 #include "API/SPDE.hpp"
-
 #include "Basic/File.hpp"
 #include "Basic/OptCst.hpp"
+#include "Basic/OptCustom.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Covariances/CovGradient.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
+#include "Drifts/DriftFactory.hpp"
+#include "Enum/ECst.hpp"
+#include "Enum/ESpaceType.hpp"
+#include "Estimation/CalcKriging.hpp"
 #include "LinearOp/PrecisionOpMatrix.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Model/Model.hpp"
+#include "Neigh/NeighUnique.hpp"
 #include "Space/ASpaceObject.hpp"
+#include "geoslib_old_f.h"
 
 using namespace gstlrn;
 
@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
   Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   ASerializable::setPrefixName("test_Gradient-");
+  int mode = 2;
 
   // Setup constants
-
   OptDbg::reset();
   OptCst::define(ECst::NTCAR, 10.);
   OptCst::define(ECst::NTDEC, 6.);
@@ -78,23 +78,49 @@ int main(int argc, char* argv[])
   NeighUnique* neigh = NeighUnique::create();
   neigh->display();
 
-  // Update the Model for Gradients
-  double ball_radius = 0.01;
-  (void)db_gradient_update(data);
-  Model* new_model = model_duplicate_for_gradient(model, ball_radius);
-  new_model->display();
-
-  // Perform Kriging
+  // Options
   OptDbg::setReference(3);
-  if (kriging(data, grid, new_model, neigh,
-              1, 1, 0)) messageAbort("kriging");
-  OptDbg::setReference(0);
+  double ballradius = 0.01;
+
+  // Using the old-style Depth and Gradient fake LMC Model
+  if (mode <= 0 || mode == 1)
+  {
+    // Update the Model for Gradients
+    (void)db_gradient_update(data);
+    Model* new_model = model_duplicate_for_gradient(model, ballradius);
+
+    // Perform Kriging
+    (void)kriging(data, grid, new_model, neigh, 1, 1, 0);
+
+    delete new_model;
+  }
+
+  // Use the new CovGradient
+  if (mode <= 0 || mode == 2)
+  {
+    (void)db_gradient_update(data); // Transform ELoc::G into ELoc::Z
+    CovContext ctxt(data->getNLoc(ELoc::Z), model->getNDim());
+    auto* new_model = new ModelGeneric(ctxt);
+    auto covg       = CovGradient(*model->getCovAniso(0), ballradius);
+    new_model->setCov(&covg);
+
+    DriftList* drifts = DriftFactory::createDriftListForGradients(model->getDriftList(), ctxt);
+    new_model->setDriftList(drifts);
+
+    new_model->setContext(ctxt);
+
+    // Perform Kriging
+    OptCustom::define("NotOptimSimpleCase", 1.);
+    (void)kriging(data, grid, new_model, neigh, 1, 1, 0);
+
+    delete drifts;
+    delete new_model;
+  }
 
   // Free memory
   delete data;
   delete grid;
   delete model;
-  delete new_model;
   delete neigh;
 
   return (0);

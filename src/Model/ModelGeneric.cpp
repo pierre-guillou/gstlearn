@@ -11,17 +11,17 @@
 #include "Model/ModelGeneric.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/ListParams.hpp"
+#include "Db/Db.hpp"
+#include "Drifts/DriftFactory.hpp"
 #include "Estimation/AModelOptim.hpp"
+#include "Estimation/AModelOptimFactory.hpp"
+#include "Estimation/Likelihood.hpp"
+#include "LinearOp/CholeskyDense.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
 #include "Model/AModelFitSills.hpp"
 #include "Model/Model.hpp"
-#include "Model/ModelOptimVario.hpp"
 #include "Model/ModelOptimVMap.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
-#include "LinearOp/CholeskyDense.hpp"
-#include "Db/Db.hpp"
-#include "Estimation/AModelOptimFactory.hpp"
-#include "Drifts/DriftFactory.hpp"
-#include "Estimation/Likelihood.hpp"
+#include "Model/ModelOptimVario.hpp"
 #include <memory>
 
 namespace gstlrn
@@ -195,10 +195,10 @@ static MatrixDense _transformF(const MatrixDense& F1, Id type, Id idx)
 }
 
 Id computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
-                               const MatrixSymmetric& Sigma,
-                               const MatrixDense& F1,
-                               Id type,
-                               Id idx)
+                              const MatrixSymmetric& Sigma,
+                              const MatrixDense& F1,
+                              Id type,
+                              Id idx)
 {
   MatrixDense F1loc = _transformF(F1, type, idx);
   auto nech         = F1.getNRows();
@@ -229,13 +229,13 @@ Id computeCovMatSVCLHSInPlace(MatrixSymmetric& cov,
 }
 
 Id computeCovMatSVCRHSInPlace(MatrixDense& cov,
-                               const MatrixSymmetric& Sigma,
-                               const MatrixDense& F1,
-                               const MatrixDense& F2,
-                               Id type1,
-                               Id idx1,
-                               Id type2,
-                               Id idx2)
+                              const MatrixSymmetric& Sigma,
+                              const MatrixDense& F1,
+                              const MatrixDense& F2,
+                              Id type1,
+                              Id idx1,
+                              Id type2,
+                              Id idx2)
 {
   MatrixDense F1loc = _transformF(F1, type1, idx1);
   MatrixDense F2loc = _transformF(F2, type2, idx2);
@@ -267,10 +267,10 @@ Id computeCovMatSVCRHSInPlace(MatrixDense& cov,
 }
 
 Id computeDriftMatSVCRHSInPlace(MatrixDense& mat,
-                                 const MatrixDense& F,
-                                 Id type,
-                                 Id idx,
-                                 bool flagCenteredFactors)
+                                const MatrixDense& F,
+                                Id type,
+                                Id idx,
+                                bool flagCenteredFactors)
 {
   if (flagCenteredFactors)
   {
@@ -320,7 +320,7 @@ std::shared_ptr<ListParams> ModelGeneric::generateListParams() const
   // Add Covariance parameters
   if (_cova != nullptr)
   {
-    _cova->appendParams(*listParams,&_gradFuncs);
+    _cova->appendParams(*listParams, &_gradFuncs);
   }
 
   // Add Drift parameters
@@ -364,7 +364,7 @@ void ModelGeneric::initParams(const MatrixSymmetric& vars, double href)
   // Initialize the parameters in the DriftList
   if (_driftList != nullptr)
   {
-    _driftList->initParams(vars, href);
+    gstlrn::DriftList::initParams(vars, href);
   }
 }
 
@@ -392,4 +392,4 @@ void ModelGeneric::fitNew(const Db* db,
   if (mcv != nullptr)
     mcv->deleteFitSills();
 }
-}
+} // namespace gstlrn
