@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   /***********************/
   /* 1 - Initializations */
   /***********************/
-  int ndim = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   ASerializable::setPrefixName("test_Gradient-");
 

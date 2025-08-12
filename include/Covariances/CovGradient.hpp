@@ -10,7 +10,6 @@
 /******************************************************************************/
 #pragma once
 
-#include "Basic/ICloneable.hpp"
 #include "Covariances/ACov.hpp"
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
@@ -31,9 +30,8 @@ class GSTLEARN_EXPORT CovGradient: public ACov
 public:
   CovGradient(const CovAniso& cova);
   CovGradient(const CovGradient& r);
-  CovGradient& operator=(const CovGradient& r);
+  CovGradient& operator=(const CovGradient& r) = delete;
   virtual ~CovGradient();
-  IMPLEMENT_CLONING(CovGradient)
 
   bool isConsistent(const ASpace* space) const override
   {
@@ -42,22 +40,22 @@ public:
   }
 
   /// ACov Interface
-  int getNVar() const override { return _nVar; }
+  Id getNVar() const override { return _nVar; }
 
 protected:
   double _eval(const SpacePoint& p1,
                const SpacePoint& p2,
-               int ivar                = 0,
-               int jvar                = 0,
+               Id ivar                 = 0,
+               Id jvar                 = 0,
                const CovCalcMode* mode = nullptr) const override;
   void _optimizationSetTarget(SpacePoint& pt) const override;
 
 private:
-  void _optimizationPreProcess(int mode, const std::vector<SpacePoint>& ps) const override;
+  void _optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const override;
   void _optimizationPostProcess() const override;
 
 private:
-  int _nVar; // TODO should be number of variables and gradients
+  Id _nVar; // TODO should be number of variables and gradients
   const CovAniso& _covRef;
 };
 } // namespace gstlrn

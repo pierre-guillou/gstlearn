@@ -38,17 +38,6 @@ CovGradient::CovGradient(const CovGradient& r)
 {
 }
 
-CovGradient& CovGradient::operator=(const CovGradient& r)
-{
-  if (this != &r)
-  {
-    ACov::operator=(r);
-    _nVar = r._nVar;
-    // The member _covRef cannot be updated by this method
-  }
-  return *this;
-}
-
 CovGradient::~CovGradient()
 {
 }
@@ -58,7 +47,7 @@ void CovGradient::_optimizationSetTarget(SpacePoint& pt) const
   DECLARE_UNUSED(pt)
 }
 
-void CovGradient::_optimizationPreProcess(int mode, const std::vector<SpacePoint>& ps) const
+void CovGradient::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
 {
   DECLARE_UNUSED(mode)
   DECLARE_UNUSED(ps)
@@ -70,8 +59,8 @@ void CovGradient::_optimizationPostProcess() const
 
 double CovGradient::_eval(const SpacePoint& p1,
                           const SpacePoint& p2,
-                          int ivar,
-                          int jvar,
+                          Id ivar,
+                          Id jvar,
                           const CovCalcMode* mode) const
 {
   return _covRef._eval(p1, p2, ivar, jvar, mode);
