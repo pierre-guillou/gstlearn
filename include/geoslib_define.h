@@ -65,7 +65,7 @@ using Id = long;
   };
 
 // No need to this stuff through SWIG (using target language NAs)
-// => Not really : Using customized SWIG 4.2.0b, TEST is often a default argument value!
+// => Not really : Using customized SWIG 4.3.0, TEST is often a default argument value!
 // #ifndef SWIG
 #define TEST      1.234e30
 #define TEST_COMP 1.000e30
