@@ -72,10 +72,10 @@ GSTLEARN_EXPORT Id foxleg_f(Id ndat,
 /* Prototyping the functions in util.c */
 /***************************************/
 
-GSTLEARN_EXPORT Id* ut_split_into_two(Id ncolor,
-                                       Id flag_half,
-                                       Id verbose,
-                                       Id* nposs);
+GSTLEARN_EXPORT VectorInt ut_split_into_two(Id ncolor,
+                                            Id flag_half,
+                                            Id verbose,
+                                            Id* nposs);
 GSTLEARN_EXPORT void projec_query(Id* actif);
 GSTLEARN_EXPORT void projec_print(void);
 GSTLEARN_EXPORT void projec_toggle(Id mode);

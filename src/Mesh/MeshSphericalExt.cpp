@@ -129,7 +129,7 @@ void MeshSphericalExt::_meshesSphLoadVertices(SphTriangle* t)
   lec      = 0;
   int nrow = 6;
   std::vector<int> ltri(2 * nrow * t->n_nodes, 0);
-  (void)trlist_(&t->n_nodes, t->sph_list, t->sph_lptr, t->sph_lend, &nrow,
+  (void)trlist_(&t->n_nodes, t->sph_list.data(), t->sph_lptr.data(), t->sph_lend.data(), &nrow,
                 &nt, ltri.data(), &error);
   if (error) return;
 

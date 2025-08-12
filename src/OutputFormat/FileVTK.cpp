@@ -85,13 +85,13 @@ Id FileVTK::writeInFile()
     center[icol] = 1;
   }
 
-  float** tab = (float**)malloc(sizeof(float*) * ncol);
+  VectorVectorFloat tab(ncol);
   for (Id icol = 0; icol < ncol; icol++)
   {
     if (flag_grid)
-      tab[icol] = (float*)malloc(sizeof(float) * nech);
+      tab[icol].resize(nech);
     else
-      tab[icol] = (float*)malloc(sizeof(float) * nactive);
+      tab[icol].resize(nactive);
   }
 
   VectorFloat xcoor;
@@ -197,10 +197,6 @@ Id FileVTK::writeInFile()
   else
     write_point_mesh(getFilename().c_str(), _flagBinary, nactive, points.data(),
                      ncol, vardim.data(), vc.data(), tab);
-
-  for (Id icol = 0; icol < ncol; icol++) 
-    free((char*)tab[icol]);
-  free((char*)tab);
 
   _fileClose();
   return 0;

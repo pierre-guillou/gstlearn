@@ -51,7 +51,7 @@ struct CSV_Encoding
   String na_string; // Substitute for NA
 };
 
-static CSV_Encoding* CSV_ENCODE = NULL;
+static CSV_Encoding CSV_ENCODE;
 
 /*! \endcond */
 
@@ -228,20 +228,17 @@ DbGrid* db_grid_read_f2g(const char* filename, Id /* verbose*/)
  *****************************************************************************/
 static void st_csv_print_string(const char* string)
 {
-  if (CSV_ENCODE == NULL)
-    my_throw_impossible("You must initiate CSV_ENCODING first");
-
-  (void)fprintf(CSV_ENCODE->file, "%s", string);
-  if (CSV_ENCODE->current < CSV_ENCODE->nitem - 1)
+  (void)fprintf(CSV_ENCODE.file, "%s", string);
+  if (CSV_ENCODE.current < CSV_ENCODE.nitem - 1)
   {
-    (void)fprintf(CSV_ENCODE->file, "%c", CSV_ENCODE->char_sep);
-    CSV_ENCODE->current++;
+    (void)fprintf(CSV_ENCODE.file, "%c", CSV_ENCODE.char_sep);
+    CSV_ENCODE.current++;
   }
   else
   {
-    (void)fprintf(CSV_ENCODE->file, "\n");
-    CSV_ENCODE->nlines++;
-    CSV_ENCODE->current = 0;
+    (void)fprintf(CSV_ENCODE.file, "\n");
+    CSV_ENCODE.nlines++;
+    CSV_ENCODE.current = 0;
   }
 }
 
@@ -255,11 +252,11 @@ static void st_csv_print_string(const char* string)
  *****************************************************************************/
 static void st_csv_print_eol(void)
 {
-  if (CSV_ENCODE->current <= 0) return;
+  if (CSV_ENCODE.current <= 0) return;
 
-  (void)fprintf(CSV_ENCODE->file, "\n");
-  CSV_ENCODE->current = 0;
-  CSV_ENCODE->nlines++;
+  (void)fprintf(CSV_ENCODE.file, "\n");
+  CSV_ENCODE.current = 0;
+  CSV_ENCODE.nlines++;
 }
 
 /****************************************************************************/
@@ -274,28 +271,25 @@ static void st_csv_print_eol(void)
  *****************************************************************************/
 void csv_print_double(double value)
 {
-  if (CSV_ENCODE == NULL)
-    my_throw_impossible("You must initiate CSV_ENCODING first");
-
   if (FFFF(value))
-    (void)fprintf(CSV_ENCODE->file, "%s", CSV_ENCODE->na_string.c_str());
+    (void)fprintf(CSV_ENCODE.file, "%s", CSV_ENCODE.na_string.c_str());
   else
   {
-    if (CSV_ENCODE->flagInteger)
-      (void)fprintf(CSV_ENCODE->file, "%ld", (Id)value);
+    if (CSV_ENCODE.flagInteger)
+      (void)fprintf(CSV_ENCODE.file, "%ld", (Id)value);
     else
-      (void)fprintf(CSV_ENCODE->file, "%lf", value);
+      (void)fprintf(CSV_ENCODE.file, "%lf", value);
   }
-  if (CSV_ENCODE->current < CSV_ENCODE->nitem - 1)
+  if (CSV_ENCODE.current < CSV_ENCODE.nitem - 1)
   {
-    (void)fprintf(CSV_ENCODE->file, "%c", CSV_ENCODE->char_sep);
-    CSV_ENCODE->current++;
+    (void)fprintf(CSV_ENCODE.file, "%c", CSV_ENCODE.char_sep);
+    CSV_ENCODE.current++;
   }
   else
   {
-    (void)fprintf(CSV_ENCODE->file, "\n");
-    CSV_ENCODE->nlines++;
-    CSV_ENCODE->current = 0;
+    (void)fprintf(CSV_ENCODE.file, "\n");
+    CSV_ENCODE.nlines++;
+    CSV_ENCODE.current = 0;
   }
 }
 
@@ -334,35 +328,32 @@ Id csv_manage(const char* filename,
   {
     // Initiate the CSV_ENCODE structure
 
-    if (CSV_ENCODE != NULL)
-      CSV_ENCODE = (CSV_Encoding*)mem_free((char*)CSV_ENCODE);
-    CSV_ENCODE       = (CSV_Encoding*)mem_alloc(sizeof(CSV_Encoding), 1);
-    CSV_ENCODE->file = gslFopen(filename, "w");
-    if (CSV_ENCODE->file == nullptr)
+    CSV_ENCODE.file = gslFopen(filename, "w");
+    if (CSV_ENCODE.file == nullptr)
     {
       messerr("Error when opening the CSV file %s for writing", filename);
       (void)csv_manage(filename, csv, -1, nitem, flagInteger);
       return 1;
     }
-    CSV_ENCODE->nitem       = nitem;
-    CSV_ENCODE->current     = 0;
-    CSV_ENCODE->nlines      = 0;
-    CSV_ENCODE->flagInteger = flagInteger;
-    CSV_ENCODE->char_sep    = char_sep;
-    CSV_ENCODE->na_string   = na_string;
+    CSV_ENCODE.nitem       = nitem;
+    CSV_ENCODE.current     = 0;
+    CSV_ENCODE.nlines      = 0;
+    CSV_ENCODE.flagInteger = flagInteger;
+    CSV_ENCODE.char_sep    = char_sep;
+    CSV_ENCODE.na_string   = na_string;
 
     // Optional printout
 
     if (verbose)
     {
-      if (CSV_ENCODE->flagInteger)
+      if (CSV_ENCODE.flagInteger)
         mestitle(1, "CSV Integer Encoding");
       else
         mestitle(1, "CSV Float Encoding\n");
       message("File Name                      = %s\n", filename);
-      message("Number of items per line       = %d\n", CSV_ENCODE->nitem);
-      message("Separator between items        = %s\n", CSV_ENCODE->char_sep);
-      message("String for missing information = %s\n", CSV_ENCODE->na_string.c_str());
+      message("Number of items per line       = %d\n", CSV_ENCODE.nitem);
+      message("Separator between items        = %s\n", CSV_ENCODE.char_sep);
+      message("String for missing information = %s\n", CSV_ENCODE.na_string.c_str());
     }
   }
   else
@@ -370,21 +361,18 @@ Id csv_manage(const char* filename,
     // Write the last record (if necessary)
     st_csv_print_eol();
 
-    if (CSV_ENCODE->file != NULL) fclose(CSV_ENCODE->file);
+    if (CSV_ENCODE.file != NULL) fclose(CSV_ENCODE.file);
 
     // Option printout
     if (verbose)
     {
-      if (CSV_ENCODE->flagInteger)
+      if (CSV_ENCODE.flagInteger)
         message("CSV Integer Encoding : Summary\n");
       else
         message("CSV Float Encoding : Summary\n");
       message("Number of lines successfully written = %d\n",
-              CSV_ENCODE->nlines);
+              CSV_ENCODE.nlines);
     }
-
-    if (CSV_ENCODE != NULL)
-      CSV_ENCODE = (CSV_Encoding*)mem_free((char*)CSV_ENCODE);
   }
   return 0;
 }

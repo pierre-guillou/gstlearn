@@ -19,10 +19,10 @@
 
 namespace gstlrn
 {
-typedef struct
+struct SPIMG
 {
-  double* bitmap; /* pointer to pixels */
-} SPIMG;
+  VectorDouble bitmap; /* pointer to pixels */
+};
 
 /*! \cond */
 
@@ -35,8 +35,8 @@ typedef struct
 #define INQUEUE         -1
 
 #define IAD(ix, iy)          ((ix) + (iy) * TX)
-#define BITMAP(im, ix, iy)   *(im->bitmap + (ix) + BORD + ((iy) + BORD) * TX)
-#define BITALL(im, ix, iy)   *(im->bitmap + IAD(ix, iy))
+#define BITMAP(im, ix, iy)   im->bitmap[(ix) + BORD + ((iy) + BORD) * TX]
+#define BITALL(im, ix, iy)   im->bitmap[IAD(ix, iy)]
 #define MARK(ix, iy)         *(pt_mark + IAD(ix, iy))
 #define NBGH(ix, iy)         *(pt_out + IAD(ix, iy))
 #define OUT_TO_IN(pt_out)    *(pt_out + Offset_out_in)
@@ -101,7 +101,7 @@ static void st_get_coordinates(const double* pt_out,
                                SPIMG* image     = SPIMG_OUT,
                                bool flag_center = false)
 {
-  Id shift = static_cast<Id>(pt_out - image->bitmap);
+  Id shift = static_cast<Id>(pt_out - image->bitmap.data());
   *iy       = shift / TX;
   *ix       = shift % TX;
 
@@ -326,8 +326,6 @@ static SPIMG* st_image_free(SPIMG* image)
 {
   if (image == (SPIMG*)NULL) return (image);
 
-  if (image->bitmap != nullptr)
-    mem_free((char*)image->bitmap);
   image = (SPIMG*)mem_free((char*)image);
 
   return (image);
@@ -346,8 +344,7 @@ static SPIMG* st_image_free(SPIMG* image)
 static SPIMG* st_image_alloc(double value)
 {
   SPIMG* image;
-  double* pt;
-  Id i, error;
+  Id error;
 
   /* Initializations */
 
@@ -360,17 +357,12 @@ static SPIMG* st_image_alloc(double value)
 
   /* Create the pixel array */
 
-  image->bitmap = (double*)mem_alloc(sizeof(double) * TXY, 0);
-  if (image->bitmap == nullptr) goto label_end;
+  image->bitmap.resize(TXY, value);
 
   /* Set the array to zero */
 
-  pt = image->bitmap;
-  for (i = 0; i < TXY; i++)
-    *pt++ = value;
   error = 0;
 
-label_end:
   if (error)
   {
     delete image;
@@ -696,8 +688,8 @@ Id spill_point(DbGrid* dbgrid,
   if (SPIMG_MARK == (SPIMG*)NULL) goto label_end;
   SPIMG_OUT = st_image_alloc(SURFACE_OUTSIDE);
   if (SPIMG_OUT == (SPIMG*)NULL) goto label_end;
-  Offset_out_in   = static_cast<Id>(SPIMG_IN->bitmap - SPIMG_OUT->bitmap);
-  Offset_mark_out = static_cast<Id>(SPIMG_OUT->bitmap - SPIMG_MARK->bitmap);
+  Offset_out_in   = static_cast<Id>(SPIMG_IN->bitmap.data() - SPIMG_OUT->bitmap.data());
+  Offset_mark_out = static_cast<Id>(SPIMG_OUT->bitmap.data() - SPIMG_MARK->bitmap.data());
 
   /* Copying the input arrays into the corresponding images */
 

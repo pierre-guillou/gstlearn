@@ -12,7 +12,7 @@
 
 #include "Basic/Law.hpp"
 #include "Basic/MathFunc.hpp"
-#include "Basic/Memory.hpp"
+#include "Basic/VectorNumT.hpp"
 #include "Core/Keypair.hpp"
 #include "Db/Db.hpp"
 #include "Geometry/GeometryHelper.hpp"
@@ -40,12 +40,12 @@ void meshes_2D_sph_init(SphTriangle* t)
 {
   t->n_nodes  = 0;
   t->sph_size = 0;
-  t->sph_x    = nullptr;
-  t->sph_y    = nullptr;
-  t->sph_z    = nullptr;
-  t->sph_list = nullptr;
-  t->sph_lptr = nullptr;
-  t->sph_lend = nullptr;
+  t->sph_x.clear();
+  t->sph_y.clear();
+  t->sph_z.clear();
+  t->sph_list.clear();
+  t->sph_lptr.clear();
+  t->sph_lend.clear();
 }
 
 /*****************************************************************************/
@@ -62,14 +62,14 @@ void meshes_2D_sph_free(SphTriangle* t, Id mode)
   if (t == (SphTriangle*)NULL) return;
   if (mode == 0)
   {
-    t->sph_x   = (double*)mem_free((char*)t->sph_x);
-    t->sph_y   = (double*)mem_free((char*)t->sph_y);
-    t->sph_z   = (double*)mem_free((char*)t->sph_z);
+    t->sph_x.clear();
+    t->sph_y.clear();
+    t->sph_z.clear();
     t->n_nodes = 0;
   }
-  t->sph_list = (int*)mem_free((char*)t->sph_list);
-  t->sph_lptr = (int*)mem_free((char*)t->sph_lptr);
-  t->sph_lend = (int*)mem_free((char*)t->sph_lend);
+  t->sph_list.clear();
+  t->sph_lptr.clear();
+  t->sph_lend.clear();
   t->sph_size = 0;
 }
 
@@ -110,17 +110,11 @@ Id meshes_2D_sph_from_db(Db* db, SphTriangle* t)
 
   /* Core allocation */
 
-  nold     = t->n_nodes;
-  ecr      = nold;
-  t->sph_x = (double*)mem_realloc((char*)t->sph_x,
-                                  sizeof(double) * (nold + neff), 0);
-  if (t->sph_x == nullptr) goto label_end;
-  t->sph_y = (double*)mem_realloc((char*)t->sph_y,
-                                  sizeof(double) * (nold + neff), 0);
-  if (t->sph_y == nullptr) goto label_end;
-  t->sph_z = (double*)mem_realloc((char*)t->sph_z,
-                                  sizeof(double) * (nold + neff), 0);
-  if (t->sph_z == nullptr) goto label_end;
+  nold = t->n_nodes;
+  ecr  = nold;
+  t->sph_x.resize(nold + neff);
+  t->sph_y.resize(nold + neff);
+  t->sph_z.resize(nold + neff);
 
   /* Load the points */
 
@@ -140,7 +134,6 @@ Id meshes_2D_sph_from_db(Db* db, SphTriangle* t)
 
   error = 0;
 
-label_end:
   if (error) meshes_2D_sph_free(t, 0);
   return (error);
 }
@@ -168,17 +161,11 @@ Id meshes_2D_sph_from_points(Id nech, double* x, double* y, SphTriangle* t)
 
   /* List of points */
 
-  nold     = t->n_nodes;
-  ecr      = nold;
-  t->sph_x = (double*)mem_realloc((char*)t->sph_x,
-                                  sizeof(double) * (nold + nech), 0);
-  if (t->sph_x == nullptr) goto label_end;
-  t->sph_y = (double*)mem_realloc((char*)t->sph_y,
-                                  sizeof(double) * (nold + nech), 0);
-  if (t->sph_y == nullptr) goto label_end;
-  t->sph_z = (double*)mem_realloc((char*)t->sph_z,
-                                  sizeof(double) * (nold + nech), 0);
-  if (t->sph_z == nullptr) goto label_end;
+  nold = t->n_nodes;
+  ecr  = nold;
+  t->sph_x.resize(nold + nech);
+  t->sph_y.resize(nold + nech);
+  t->sph_z.resize(nold + nech);
 
   /* Load the information */
 
@@ -196,7 +183,6 @@ Id meshes_2D_sph_from_points(Id nech, double* x, double* y, SphTriangle* t)
 
   error = 0;
 
-label_end:
   if (error) meshes_2D_sph_free(t, 0);
   return (error);
 }
@@ -264,15 +250,9 @@ Id meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
 
   /* Reallocate to maximum size */
 
-  t->sph_x = (double*)mem_realloc((char*)t->sph_x,
-                                  sizeof(double) * (nold + npoint), 0);
-  if (t->sph_x == nullptr) goto label_end;
-  t->sph_y = (double*)mem_realloc((char*)t->sph_y,
-                                  sizeof(double) * (nold + npoint), 0);
-  if (t->sph_y == nullptr) goto label_end;
-  t->sph_z = (double*)mem_realloc((char*)t->sph_z,
-                                  sizeof(double) * (nold + npoint), 0);
-  if (t->sph_z == nullptr) goto label_end;
+  t->sph_x.resize(nold + npoint);
+  t->sph_y.resize(nold + npoint);
+  t->sph_z.resize(nold + npoint);
 
   /* Check that random points are not too close from hard nodes */
 
@@ -309,13 +289,10 @@ Id meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
 
   /* Final resize */
 
-  nech     = ecr;
-  t->sph_x = (double*)mem_realloc((char*)t->sph_x, sizeof(double) * nech, 0);
-  if (t->sph_x == nullptr) goto label_end;
-  t->sph_y = (double*)mem_realloc((char*)t->sph_y, sizeof(double) * nech, 0);
-  if (t->sph_y == nullptr) goto label_end;
-  t->sph_z = (double*)mem_realloc((char*)t->sph_z, sizeof(double) * nech, 0);
-  if (t->sph_z == nullptr) goto label_end;
+  nech = ecr;
+  t->sph_x.resize(nech);
+  t->sph_y.resize(nech);
+  t->sph_z.resize(nech);
   t->n_nodes = static_cast<int>(nech);
 
   /* Set the error return code */
@@ -341,7 +318,7 @@ void meshes_2D_sph_print(SphTriangle* t, Id brief)
 
   message("- Number of nodes   = %d\n", t->n_nodes);
 
-  if (!brief && t->n_nodes > 0 && t->sph_x != nullptr && t->sph_y != nullptr && t->sph_z != nullptr)
+  if (!brief && t->n_nodes > 0 && !t->sph_x.empty() && !t->sph_y.empty() && !t->sph_z.empty())
   {
     message("\nCoordinates in Cartesian (R=1); then in Longitude - Latitude\n");
     for (Id i = 0; i < t->n_nodes; i++)
@@ -367,44 +344,31 @@ void meshes_2D_sph_print(SphTriangle* t, Id brief)
  *****************************************************************************/
 Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
 {
-  int *loc_near, *loc_next, *loc_lnew, error, skip_rnd, seed_memo;
-  double *loc_dist, memo[3][3], ampli, value, cste;
+  std::vector<int> loc_near, loc_next, loc_lnew;
+  VectorDouble loc_dist;
+  int error, skip_rnd, seed_memo;
+  double memo[3][3], ampli, value, cste;
 
   /* Initializations */
 
   error    = 1;
   skip_rnd = (int)get_keypone("Skip_Random", 0);
-  loc_near = loc_next = loc_lnew = nullptr;
-  loc_dist                       = nullptr;
   if (t == (SphTriangle*)NULL || t->n_nodes < 3) return (1);
 
   /* Re-allocate the arrays within the SphTriangle structure */
 
   meshes_2D_sph_free(t, 1);
   t->sph_size = 6 * t->n_nodes - 12;
-  t->sph_list = (int*)mem_alloc(sizeof(Id) * t->sph_size, 0);
-  if (t->sph_list == nullptr) goto label_end;
-  for (Id i = 0; i < t->sph_size; i++)
-    t->sph_list[i] = ITEST;
-  t->sph_lptr = (int*)mem_alloc(sizeof(int) * t->sph_size, 0);
-  if (t->sph_lptr == nullptr) goto label_end;
-  for (int i = 0; i < t->sph_size; i++)
-    t->sph_lptr[i] = ITEST;
-  t->sph_lend = (int*)mem_alloc(sizeof(int) * t->n_nodes, 0);
-  if (t->sph_lend == nullptr) goto label_end;
-  for (int i = 0; i < t->n_nodes; i++)
-    t->sph_lend[i] = ITEST;
+  t->sph_list.resize(t->sph_size, ITEST);
+  t->sph_lptr.resize(t->sph_size, ITEST);
+  t->sph_lend.resize(t->sph_size, ITEST);
 
   /* Allocate local arrays */
 
-  loc_lnew = (int*)mem_alloc(sizeof(int) * t->sph_size, 0);
-  if (loc_lnew == nullptr) goto label_end;
-  loc_near = (int*)mem_alloc(sizeof(int) * t->n_nodes, 0);
-  if (loc_near == nullptr) goto label_end;
-  loc_next = (int*)mem_alloc(sizeof(int) * t->n_nodes, 0);
-  if (loc_next == nullptr) goto label_end;
-  loc_dist = (double*)mem_alloc(sizeof(double) * t->n_nodes, 0);
-  if (loc_dist == nullptr) goto label_end;
+  loc_lnew.resize(t->sph_size);
+  loc_near.resize(t->n_nodes);
+  loc_next.resize(t->n_nodes);
+  loc_dist.resize(t->n_nodes);
 
   /* Avoid having three first points colinear */
 
@@ -428,9 +392,10 @@ Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
     law_set_random_seed(seed_memo);
   }
 
-  (void)trmesh_(&t->n_nodes, t->sph_x, t->sph_y, t->sph_z, t->sph_list,
-                t->sph_lptr, t->sph_lend, loc_lnew, loc_near, loc_next,
-                loc_dist, &error);
+  (void)trmesh_(&t->n_nodes, t->sph_x.data(), t->sph_y.data(), t->sph_z.data(), t->sph_list.data(),
+                t->sph_lptr.data(), t->sph_lend.data(),
+                loc_lnew.data(), loc_near.data(), loc_next.data(),
+                loc_dist.data(), &error);
 
   /* Restore the initial coordinates */
 
@@ -470,10 +435,6 @@ Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
   meshes_2D_sph_free(t, 1);
 
 label_end:
-  mem_free((char*)loc_near);
-  mem_free((char*)loc_next);
-  mem_free((char*)loc_lnew);
-  mem_free((char*)loc_dist);
   return (error);
 }
 

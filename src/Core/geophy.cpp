@@ -230,7 +230,7 @@ static Id pre_init(void), init_point(void), /* routine modified in Dec 2005 */
 
 static void error(Id), init_nearest(void),         /* routine modified in Dec 2005 */
   init_cell(double, double, double, Id, Id, Id), /* routine modified in Dec 2005 */
-  free_ptrs(Id);
+  free_ptrs();
 
 static double
 /* new function init_cellh(): see patches 271205[1] and 271205[2] */
@@ -253,13 +253,19 @@ static Id t_1d(Id, Id, Id, double, double, double, double, double),
 /* MODEL */
 
 static Id nmesh_x, nmesh_y, nmesh_z;            /* Model dimensions (cells) */
-static double ***hs, *hs_buf,                    /* 1D and 3D arrays */
-                       *hs_keep = (double*)NULL; /* to save boundary values */
+/// 1D and 3D arrays
+std::vector<std::vector<double *>> hs;
+static double *hs_buf;                    /* 1D and 3D arrays */
+
+/// to save boundary values
+VectorDouble hs_keep;
 
 /* TIMEFIELD */
 
 static Id nx, ny, nz;      /* Timefield dimensions (nodes) */
-static double ***t, *t_buf; /* 1D and 3D arrays */
+/// 1D and 3D arrays
+std::vector<std::vector<double *>> t;
+static double *t_buf;
 static double timeshift;    /* required by "fuzzy tests" */
 /* for more comments, see init_point() */
 
@@ -304,11 +310,13 @@ static Id messages,      /* message flag (0:silent)              */
   current_side_limit,     /* actual boundary of computations      */
   X0, X1, Y0, Y1, Z0, Z1, /* inclusive boundaries of timed region */
   reverse_order,          /* level of recursivity in FD scheme    */
-  *longflags,             /* local headwave flags.                */
   flag_fb, x_start_fb, y_start_fb, z_start_fb, flag_bf, x_start_bf, y_start_bf,
   z_start_bf, flag_ff, x_start_ff, y_start_ff, z_start_ff, flag_bb,
   x_start_bb, y_start_bb, z_start_bb;
 /* control current side scanning.       */
+
+/// local headwave flags.
+static VectorInt longflags;
 
 static double hs_eps_init; /* tolerance on homogeneity
  (fraction of slowness at source point) */
@@ -426,7 +434,7 @@ T[0][0][0]=%g",
   if ((signal = pre_init()) == ERROR_FREE)
   {
     signal = propagate_point(init_point());
-    free_ptrs(nx);
+    free_ptrs();
   }
   if (init_stage == 0 || signal != ERROR_FREE) error(signal);
   return signal;
@@ -457,31 +465,15 @@ static Id pre_init(void)
   n1 *= n0;
 
   /* allocate pointers */
-  hs = (double***)malloc((unsigned)nx * sizeof(double**));
-  if (hs == nullptr) return ERR_MALLOC;
-  t = (double***)malloc((unsigned)nx * sizeof(double**));
-  if (t == nullptr)
-  {
-    free((char*)hs);
-    return ERR_MALLOC;
-  }
-  longflags = (Id*)malloc((unsigned)n1 * sizeof(Id));
-  if (longflags == nullptr)
-  {
-    free((char*)t);
-    free((char*)hs);
-    return ERR_MALLOC;
-  } /* size of the largest side of the model */
+  hs.resize(nx);
+  t.resize(nx);
+  longflags.resize(n1);
+
+  /* size of the largest side of the model */
   for (x = 0; x < nx; x++)
   {
-    hs[x] = (double**)malloc((unsigned)ny * sizeof(double*));
-    t[x]  = (double**)malloc((unsigned)ny * sizeof(double*));
-    if (hs[x] == nullptr || t[x] == nullptr)
-    {
-      timeshift = 0.0; /* possibly uninitialized */
-      free_ptrs(x);
-      return ERR_MALLOC;
-    }
+    hs[x].resize(ny);
+    t[x].resize(ny);
   }
   for (x = 0; x < nx; x++)
     for (y = 0; y < ny; y++)
@@ -501,14 +493,9 @@ static Id pre_init(void)
   /* assign T3D_INF to hs in dummy meshes (x=nmesh_x|y=nmesh_y|z=nmesh_z) */
   /* and keep masked values in hs_keep[] (will be restored in free_ptrs()) */
   x       = ((nx + 1) * (ny + 1) + (nx + 1) * nz + nz * ny) * sizeof(double);
-  hs_keep = (double*)malloc((unsigned)x);
-  if (hs_keep == nullptr)
-  {
-    timeshift = 0.0; /* possibly uninitialized */
-    free_ptrs(nx);
-    return ERR_MALLOC;
-  }
-  pf = hs_keep;
+  hs_keep.resize(x);
+
+  pf = hs_keep.data();
   for (x = 0; x < nx; x++)
   {
     for (y = 0; y < ny; y++)
@@ -541,7 +528,7 @@ static Id pre_init(void)
   if (errtest != ERROR_FREE)
   {
     timeshift = 0.0; /* possibly uninitialized */
-    free_ptrs(nx);
+    free_ptrs();
   }
 
   return errtest;
@@ -1215,7 +1202,7 @@ static Id recursive_init(void)
   if (SMALLTALK) message("\nRecursive initialization: level %d", init_stage);
 
   /* free locally allocated pointers (double ***) */
-  free_ptrs(nx);
+  free_ptrs();
 
   /* save static parameters at this stage */
   nx_     = nx;
@@ -1432,16 +1419,15 @@ static Id propagate_point(Id start)
 
 /*---------------------------------------------- Free_ptrs()------------------*/
 
-static void free_ptrs(Id max_x)
-
+static void free_ptrs()
 {
   Id x, y, z;
   double* pf;
 
   /* if relevant, retrieve T3D_INF-masked hs values at model boundaries */
-  if (init_stage == 0 && hs_keep)
+  if (init_stage == 0 && !hs_keep.empty())
   {
-    pf = hs_keep;
+    pf = hs_keep.data();
     for (x = 0; x < nx; x++)
     {
       for (y = 0; y < ny; y++)
@@ -1452,7 +1438,7 @@ static void free_ptrs(Id max_x)
     for (y = 0; y < nmesh_y; y++)
       for (z = 0; z < nmesh_z; z++)
         hs[nmesh_x][y][z] = *pf++;
-    free((char*)hs_keep);
+    hs_keep.clear();
   }
 
   /* if relevant, undo timeshift (see init_point() for more comments) */
@@ -1463,16 +1449,9 @@ static void free_ptrs(Id max_x)
         for (z = 0; z < nz; z++)
           t[x][y][z] -= timeshift;
   }
-
-  /* free pointers */
-  for (x = 0; x < max_x; x++)
-  {
-    free((char*)hs[x]);
-    free((char*)t[x]);
-  }
-  free((char*)hs);
-  free((char*)t);
-  free((char*)longflags);
+  hs.clear();
+  t.clear();
+  longflags.clear();
 }
 /****end mail1/3****/
 /*--------------------LOCAL 3-D STENCILS (FUNCTIONS AND MACROS)---------------*/

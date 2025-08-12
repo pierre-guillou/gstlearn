@@ -162,7 +162,7 @@ static void force_big_endian(unsigned char *bytes)
   if (!doneTest)
   {
     Id tmp1 = 1;
-    unsigned char *tmp2 = (unsigned char *) &tmp1;
+    auto *tmp2 = (unsigned char *) &tmp1;
     if (*tmp2 != 0)
       shouldSwap = 1;
     doneTest = 1;
@@ -343,7 +343,7 @@ void write_variables(Id nvars,
                      const Id* vardim,
                      const Id* centering,
                      const char* const* varname,
-                     float** vars,
+                     VectorVectorFloat& vars,
                      Id npts,
                      Id ncells)
 {
@@ -659,7 +659,7 @@ void write_point_mesh(const char* filename,
                       Id nvars,
                       Id* vardim,
                       const char* const* varnames,
-                      float** vars)
+                      VectorVectorFloat& vars)
 {
   Id   i;
   char  str[128];
@@ -790,7 +790,7 @@ void write_unstructured_mesh(const char* filename,
                              Id* vardim,
                              Id* centering,
                              const char* const* varnames,
-                             float** vars)
+                             VectorVectorFloat& vars)
 {
   Id   i, j;
   char  str[128];
@@ -888,7 +888,7 @@ void write_rectilinear_mesh(const char* filename,
                             Id* vardim,
                             Id* centering,
                             const char* const* varnames,
-                            float** vars)
+                            VectorVectorFloat& vars)
 {
   Id   i;
   char  str[128];
@@ -965,7 +965,7 @@ void write_regular_mesh(const char* filename,
                         Id* vardim,
                         Id* centering,
                         const char* const* varnames,
-                        float** vars)
+                        VectorVectorFloat& vars)
 {
   Id  i;
  
@@ -1030,7 +1030,7 @@ void write_curvilinear_mesh(const char* filename,
                             Id* vardim,
                             Id* centering,
                             const char* const* varnames,
-                            float** vars)
+                            VectorVectorFloat& vars)
 {
   Id   i;
   char  str[128];
