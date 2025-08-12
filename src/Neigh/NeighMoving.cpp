@@ -75,8 +75,7 @@ NeighMoving::NeighMoving(const NeighMoving& r)
   , _T2(r._T2)
 {
   for (Id ipt = 0, npt = (Id)r._bipts.size(); ipt < npt; ipt++)
-    _bipts.push_back(dynamic_cast<ABiTargetCheck*>(r._bipts[ipt]->clone()));
-  //_bipts.push_back(r._bipts[ipt]);
+    _bipts.push_back(r._bipts[ipt]);
 
   // _biPtDist = r._biPtDist;
   _biPtDist = new BiTargetCheckDistance(*r._biPtDist);
@@ -111,9 +110,6 @@ NeighMoving& NeighMoving::operator=(const NeighMoving& r)
 
 NeighMoving::~NeighMoving()
 {
-  auto number = _getNBiPts();
-  for (Id ipt = 0; ipt < number; ipt++)
-    delete _bipts[ipt];
   _bipts.clear();
   delete _biPtDist;
   _biPtDist = nullptr;
@@ -168,7 +164,7 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
   Id flag_aniso    = 0;
   Id flag_rotation = 0;
   Id flag_sector   = 0;
-  double dmax       = 0.;
+  double dmax      = 0.;
 
   ret = true;
   ret = ret && _recordRead<Id>(is, "NeighMovingborhood sector search", flag_sector);
@@ -228,7 +224,7 @@ bool NeighMoving::_serializeAscii(std::ostream& os, bool verbose) const
       ret = ret && _recordWrite<double>(os, "", _biPtDist->getAnisoCoeff(idim));
     ret = ret && _commentWrite(os, "Anisotropy Coefficients");
     ret = ret && _recordWrite<Id>(os, "Anisotropy Rotation Flag",
-                                   _biPtDist->getFlagRotation());
+                                  _biPtDist->getFlagRotation());
     if (_biPtDist->getFlagRotation())
     {
       Id ecr = 0;
@@ -283,7 +279,6 @@ Id NeighMoving::getNSampleMax(const Db* /*db*/) const
 
 void NeighMoving::addBiTargetCheck(ABiTargetCheck* abpc)
 {
-  //_bipts.push_back(dynamic_cast<ABiTargetCheck*>(abpc->clone()));
   _bipts.push_back(abpc);
 }
 
@@ -297,7 +292,7 @@ bool NeighMoving::_getAnisotropyElements(double* rx, double* ry, double* theta, 
   double radius = _getRadius();
   if (FFFF(radius)) return false;
   VectorDouble anisoRatio = getAnisoCoeffs();
-  Id ndim                = (Id)anisoRatio.size();
+  Id ndim                 = (Id)anisoRatio.size();
   if (ndim != 2) return false;
   *rx = radius * anisoRatio[0];
   *ry = radius * anisoRatio[1];
@@ -379,7 +374,7 @@ Id NeighMoving::attach(const Db* dbin, const Db* dbout)
     if (!_bipts[ipt]->isValid(dbin, dbout)) return 1;
   }
 
-  Id nech     = _dbin->getNSample();
+  Id nech      = _dbin->getNSample();
   auto nsect   = getNSect();
   _movingInd   = VectorInt(nech);
   _movingDst   = VectorDouble(nech);
@@ -410,7 +405,7 @@ VectorDouble NeighMoving::summary(Id iech_out)
   VectorInt nbgh_ranks;
   select(iech_out, nbgh_ranks);
   Id nsel = (Id)nbgh_ranks.size();
-  tab[0]   = (double)nsel;
+  tab[0]  = (double)nsel;
 
   /* Maximum distance */
 
@@ -443,7 +438,7 @@ VectorDouble NeighMoving::summary(Id iech_out)
 
   /* Number of consecutive empty sectors */
 
-  number      = 0;
+  number     = 0;
   Id n_empty = 0;
   for (Id isect = 0; isect < getNSect(); isect++)
   {
@@ -528,7 +523,7 @@ Id NeighMoving::_moving(Id iech_out, VectorInt& ranks, double eps)
   /* Loop on the data points */
 
   double distmax = 0.;
-  Id nsel       = 0;
+  Id nsel        = 0;
 
   // Load the target sample as a Space Point
   if (_dbgrid != nullptr)
@@ -782,7 +777,7 @@ bool NeighMoving::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   Id flag_aniso    = 0;
   Id flag_rotation = 0;
   Id flag_sector   = 0;
-  double dmax       = 0.;
+  double dmax      = 0.;
   VectorDouble nbgh_coeffs;
   VectorDouble nbgh_rotmat;
 
