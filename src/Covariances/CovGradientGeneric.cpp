@@ -66,16 +66,6 @@ void CovGradientGeneric::_optimizationSetTarget(SpacePoint& pt) const
   DECLARE_UNUSED(pt)
 }
 
-// void CovGradientGeneric::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
-// {
-//   DECLARE_UNUSED(mode)
-//   DECLARE_UNUSED(ps)
-// }
-
-// void CovGradientGeneric::_optimizationPostProcess() const
-// {
-// }
-
 /**
  * @brief According to the variable rank, call covariance between the variable and its derivatives
  *

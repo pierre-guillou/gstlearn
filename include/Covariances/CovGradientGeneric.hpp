@@ -57,8 +57,6 @@ protected:
   void _optimizationSetTarget(SpacePoint& pt) const override;
 
 private:
-  // void _optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const override;
-  // void _optimizationPostProcess() const override;
   bool _isValidForGradient() const;
 
 private:

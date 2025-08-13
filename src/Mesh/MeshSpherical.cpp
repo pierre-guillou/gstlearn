@@ -9,36 +9,36 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Mesh/MeshSpherical.hpp"
-#include "Mesh/AMesh.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "Matrix/MatrixInt.hpp"
-#include "LinearOp/ProjMatrix.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Geometry/GeometryHelper.hpp"
-#include "Tree/Ball.hpp"
+#include "LinearOp/ProjMatrix.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Matrix/MatrixInt.hpp"
+#include "Mesh/AMesh.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpaceSN.hpp"
-#include "Basic/SerializeHDF5.hpp"
+#include "Tree/Ball.hpp"
 
 namespace gstlrn
 {
-MeshSpherical::MeshSpherical(const MatrixDense &apices,
-                             const MatrixInt &meshes)
-    : AMesh(),
-      _apices(apices),
-      _meshes(meshes)
+MeshSpherical::MeshSpherical(const MatrixDense& apices,
+                             const MatrixInt& meshes)
+  : AMesh()
+  , _apices(apices)
+  , _meshes(meshes)
 {
   auto ndim = apices.getNCols();
   _setNDim(ndim);
 }
 
-MeshSpherical::MeshSpherical(const MeshSpherical &m) 
+MeshSpherical::MeshSpherical(const MeshSpherical& m)
   : AMesh(m)
 {
   _recopy(m);
 }
 
-MeshSpherical& MeshSpherical::operator= (const MeshSpherical &m)
+MeshSpherical& MeshSpherical::operator=(const MeshSpherical& m)
 {
   _recopy(m);
   return *this;
@@ -69,7 +69,7 @@ Id MeshSpherical::getNApices() const
 *****************************************************************************/
 Id MeshSpherical::getNMeshes() const
 {
-  return static_cast<Id> (_meshes.size()) / getNApexPerMesh();
+  return static_cast<Id>(_meshes.size()) / getNApexPerMesh();
 }
 
 /****************************************************************************/
@@ -98,7 +98,7 @@ double MeshSpherical::getMeshSize(Id imesh) const
 String MeshSpherical::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
-  sstr << toTitle(0,"Spherical Meshing characteristics");
+  sstr << toTitle(0, "Spherical Meshing characteristics");
   sstr << AMesh::toString(strfmt);
   return sstr.str();
 }
@@ -117,8 +117,8 @@ MeshSpherical* MeshSpherical::createFromNF(const String& NFFilename, bool verbos
   return nullptr;
 }
 
-MeshSpherical* MeshSpherical::create(const MatrixDense &apices,
-                                     const MatrixInt &meshes)
+MeshSpherical* MeshSpherical::create(const MatrixDense& apices,
+                                     const MatrixInt& meshes)
 {
   return new MeshSpherical(apices, meshes);
 }
@@ -138,21 +138,21 @@ MeshSpherical* MeshSpherical::create(const MatrixDense &apices,
 **
 *****************************************************************************/
 Id MeshSpherical::reset(Id ndim,
-                         Id napexpermesh,
-                         const VectorDouble &apices,
-                         const VectorInt &meshes,
-                         bool byCol,
-                         bool verbose)
+                        Id napexpermesh,
+                        const VectorDouble& apices,
+                        const VectorInt& meshes,
+                        bool byCol,
+                        bool verbose)
 {
   _setNDim(ndim);
-  Id npoints = static_cast<Id> (apices.size()) / ndim;
-  Id nmeshes = static_cast<Id> (meshes.size()) / napexpermesh;
+  Id npoints = static_cast<Id>(apices.size()) / ndim;
+  Id nmeshes = static_cast<Id>(meshes.size()) / napexpermesh;
 
   // Core allocation
 
-  _apices.reset(npoints,ndim);
+  _apices.reset(npoints, ndim);
   _apices.setValues(apices, byCol);
-  _meshes.reset(nmeshes,napexpermesh);
+  _meshes.reset(nmeshes, napexpermesh);
   _meshes.setValues(meshes, byCol);
 
   // Check consistency
@@ -167,7 +167,7 @@ Id MeshSpherical::reset(Id ndim,
 
   if (verbose) messageFlush(toString());
 
-  return(0);
+  return (0);
 }
 
 /****************************************************************************/
@@ -212,7 +212,7 @@ bool MeshSpherical::_weightsInMesh(const VectorDouble& coor,
 *****************************************************************************/
 Id MeshSpherical::getApex(Id imesh, Id rank) const
 {
-  return _meshes.getValue(imesh,rank);
+  return _meshes.getValue(imesh, rank);
 }
 
 /****************************************************************************/
@@ -228,12 +228,12 @@ Id MeshSpherical::getApex(Id imesh, Id rank) const
 *****************************************************************************/
 double MeshSpherical::getCoor(Id imesh, Id rank, Id idim) const
 {
-  return _apices(getApex(imesh,rank),idim);
+  return _apices(getApex(imesh, rank), idim);
 }
 
 double MeshSpherical::getApexCoor(Id i, Id idim) const
 {
-  return _apices(i,idim);
+  return _apices(i, idim);
 }
 
 void MeshSpherical::_getCoordOnSphere(double longitude,
@@ -243,7 +243,7 @@ void MeshSpherical::_getCoordOnSphere(double longitude,
   double radius = EARTH_RADIUS;
   if (isDefaultSpaceSphere())
   {
-    const ASpace* space    = getDefaultSpaceSh().get();
+    const ASpace* space = getDefaultSpaceSh().get();
     const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
     if (spaceSn != nullptr) radius = spaceSn->getRadius();
   }
@@ -269,10 +269,10 @@ VectorDouble MeshSpherical::_defineUnits(void) const
 {
   auto nmeshes = getNMeshes();
   VectorDouble units(nmeshes);
-  for (Id imesh=0; imesh<nmeshes; imesh++)
+  for (Id imesh = 0; imesh < nmeshes; imesh++)
   {
     VectorVectorDouble corners = getCoordinatesPerMesh(imesh);
-    units[imesh] = _getMeshUnit(corners);
+    units[imesh]               = _getMeshUnit(corners);
   }
   return units;
 }
@@ -281,7 +281,7 @@ void MeshSpherical::_defineBoundingBox(void)
 {
   VectorDouble extendmin;
   VectorDouble extendmax;
-  double coor,mini,maxi;
+  double coor, mini, maxi;
   auto ndim = getNDim();
 
   // Initializations
@@ -289,15 +289,15 @@ void MeshSpherical::_defineBoundingBox(void)
   extendmax.resize(ndim);
 
   // Loop on the Space dimensions
-  for (Id idim=0; idim<ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     mini = MAXIMUM_BIG;
     maxi = MINIMUM_BIG;
 
     // Loop on the apices
-    for (Id i=0; i<getNApices(); i++)
+    for (Id i = 0; i < getNApices(); i++)
     {
-      coor = getApexCoor(i,idim);
+      coor = getApexCoor(i, idim);
       if (coor < mini) mini = coor;
       if (coor > maxi) maxi = coor;
     }
@@ -306,7 +306,7 @@ void MeshSpherical::_defineBoundingBox(void)
   }
 
   // Store the Bounding Box extension
-  (void) _setExtend(extendmin,extendmax);
+  (void)_setExtend(extendmin, extendmax);
 }
 
 double MeshSpherical::_closestValue(double ref, double coor, double period)
@@ -317,31 +317,31 @@ double MeshSpherical::_closestValue(double ref, double coor, double period)
   return coor;
 }
 
-Id MeshSpherical::_recopy(const MeshSpherical &m)
+Id MeshSpherical::_recopy(const MeshSpherical& m)
 {
   _apices = m._apices;
   _meshes = m._meshes;
   AMesh::_recopy(m);
-  return(0);
+  return (0);
 }
 
 bool MeshSpherical::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
-  Id ndim = 0;
-  Id napices = 0;
-  Id nmeshes = 0;
+  Id ndim         = 0;
+  Id napices      = 0;
+  Id nmeshes      = 0;
   Id napexpermesh = 0;
 
   bool ret = true;
-  ret = ret && _recordRead<Id>(is, "Space Dimension", ndim);
-  ret = ret && _recordRead<Id>(is, "Napices", napices);
-  ret = ret && _recordRead<Id>(is, "Number of Apices per Mesh", napexpermesh);
-  ret = ret && _recordRead<Id>(is, "Number of Meshes", nmeshes);
+  ret      = ret && _recordRead<Id>(is, "Space Dimension", ndim);
+  ret      = ret && _recordRead<Id>(is, "Napices", napices);
+  ret      = ret && _recordRead<Id>(is, "Number of Apices per Mesh", napexpermesh);
+  ret      = ret && _recordRead<Id>(is, "Number of Meshes", nmeshes);
 
   if (ret)
   {
     VectorDouble apices_local;
-    ret = ret && _recordReadVec<double>(is, "Apices", apices_local, ndim * napices);
+    ret     = ret && _recordReadVec<double>(is, "Apices", apices_local, ndim * napices);
     _apices = MatrixDense(napices, ndim);
     _apices.setValues(apices_local);
   }
@@ -349,7 +349,7 @@ bool MeshSpherical::_deserializeAscii(std::istream& is, bool /*verbose*/)
   if (ret)
   {
     VectorInt meshes_local;
-    ret = ret && _recordReadVec<Id>(is, "Meshes", meshes_local, nmeshes * napexpermesh);
+    ret     = ret && _recordReadVec<Id>(is, "Meshes", meshes_local, nmeshes * napexpermesh);
     _meshes = MatrixInt(nmeshes, napexpermesh);
     _meshes.setValues(meshes_local);
   }
@@ -359,12 +359,12 @@ bool MeshSpherical::_deserializeAscii(std::istream& is, bool /*verbose*/)
 bool MeshSpherical::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
-  ret = ret && _recordWrite<Id>(os, "Space Dimension", getNDim());
-  ret = ret && _recordWrite<Id>(os, "Napices", getNApices());
-  ret = ret && _recordWrite<Id>(os, "Number of Apices per Mesh", getNApexPerMesh());
-  ret = ret && _recordWrite<Id>(os, "Number of Meshes", getNMeshes());
-  ret = ret && _recordWriteVec<double>(os, "Apices", _apices.getValues());
-  ret = ret && _recordWriteVec<Id>(os, "Meshes", _meshes.getValues());
+  ret      = ret && _recordWrite<Id>(os, "Space Dimension", getNDim());
+  ret      = ret && _recordWrite<Id>(os, "Napices", getNApices());
+  ret      = ret && _recordWrite<Id>(os, "Number of Apices per Mesh", getNApexPerMesh());
+  ret      = ret && _recordWrite<Id>(os, "Number of Meshes", getNMeshes());
+  ret      = ret && _recordWriteVec<double>(os, "Apices", _apices.getValues());
+  ret      = ret && _recordWriteVec<Id>(os, "Meshes", _meshes.getValues());
   return ret;
 }
 
@@ -393,6 +393,8 @@ void MeshSpherical::getBarycenterInPlace(Id imesh, vect coord) const
   // Calculate the center of gravity (in the Embedded space)
   VectorVectorDouble coordE = getEmbeddedCoordinatesPerMesh(imesh);
   VectorDouble centerE(ndimE);
+  double rlong;
+  double rlat;
 
   for (Id idimE = 0; idimE < ndimE; idimE++)
   {
@@ -404,7 +406,9 @@ void MeshSpherical::getBarycenterInPlace(Id imesh, vect coord) const
 
   // Turn the gravity center from embedded to long/lat coordinates
   GH::convertCart2Sph(centerE[0], centerE[1], centerE[2],
-                      &coord[0], &coord[1], TEST);
+                      &rlong, &rlat, TEST);
+  coord[0] = rlong;
+  coord[1] = rlat;
 }
 
 #ifdef HDF5
@@ -417,7 +421,7 @@ bool MeshSpherical::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose
   }
 
   /* Read the grid characteristics */
-  bool ret     = true;
+  bool ret    = true;
   Id ndim     = 0;
   Id napices  = 0;
   Id npermesh = 0;
@@ -458,4 +462,4 @@ bool MeshSpherical::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) 
   return ret;
 }
 #endif
-}
+} // namespace gstlrn

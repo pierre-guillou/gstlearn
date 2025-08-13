@@ -38,8 +38,8 @@ namespace gstlrn
 
 static Id ASCII_BUFFER_LENGTH = 0;
 static Id ASCII_BUFFER_QUANT  = 1000;
-static char* ASCII_BUFFER      = NULL;
-static FILE* FILE_MEM          = NULL;
+static char* ASCII_BUFFER     = NULL;
+static FILE* FILE_MEM         = NULL;
 static char FILE_NAME_MEM[BUFFER_LENGTH];
 
 /*! \endcond */
@@ -453,10 +453,10 @@ void ascii_simu_read(char* file_name,
  **
  *****************************************************************************/
 Id ascii_option_defined(const char* file_name,
-                         bool verbose,
-                         const char* option_name,
-                         Id type,
-                         void* answer)
+                        bool verbose,
+                        const char* option_name,
+                        Id type,
+                        void* answer)
 {
   FILE* file;
   char keyword[100], keyval[100];
@@ -490,7 +490,7 @@ Id ascii_option_defined(const char* file_name,
         break;
 
       case 1:
-        ival            = atoi(keyval);
+        ival           = atoi(keyval);
         *((Id*)answer) = ival;
         break;
 
