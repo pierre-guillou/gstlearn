@@ -12,7 +12,6 @@
 #include "Anamorphosis/AnamDiscreteIR.hpp"
 #include "Anamorphosis/AnamHermite.hpp"
 #include "Basic/AException.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/String.hpp"
 #include "Basic/Utilities.hpp"
 #include "Covariances/CovAniso.hpp"
@@ -73,9 +72,9 @@ Model* model_duplicate_for_gradient(const Model* model, double ball_radius)
   // Preliminary checks
 
   new_model = nullptr;
-  Id nvar  = model->getNVar();
-  Id ndim  = model->getNDim();
-  Id ncova = model->getNCov();
+  Id nvar   = model->getNVar();
+  Id ndim   = model->getNDim();
+  Id ncova  = model->getNCov();
 
   // Create the new model (linked drift functions)
 
@@ -345,9 +344,9 @@ void model_cova_characteristics(const ECov& type,
                                 double* scale,
                                 double* parmax)
 {
-  auto space      = SpaceRN::create(1); // Use 1-D in order to retrieve all covariances
+  auto space = SpaceRN::create(1); // Use 1-D in order to retrieve all covariances
   CovContext ctxt(1, 1);
-  ACovFunc* cov   = CovFactory::createCovFunc(type, ctxt);
+  ACovFunc* cov = CovFactory::createCovFunc(type, ctxt);
   (void)gslStrcpy((char*)cov_name, cov->getCovName().c_str());
   *flag_range    = cov->hasRange();
   *flag_param    = cov->hasParam();
@@ -499,41 +498,37 @@ Model* model_combine(const Model* model1, const Model* model2, double r)
  **
  *****************************************************************************/
 Id model_covmat_inchol(Id verbose,
-                        Db* db,
-                        Model* model,
-                        double eta,
-                        Id npivot_max,
-                        Id nsize1,
-                        const Id* ranks1,
-                        const double* center,
-                        Id flag_sort,
-                        Id* npivot_arg,
-                        Id** Pret,
-                        double** Gret,
-                        const CovCalcMode* mode)
+                       Db* db,
+                       Model* model,
+                       double eta,
+                       Id npivot_max,
+                       Id nsize1,
+                       const Id* ranks1,
+                       const double* center,
+                       Id flag_sort,
+                       Id* npivot_arg,
+                       VectorInt& pvec,
+                       VectorDouble& Gmatrix,
+                       const CovCalcMode* mode)
 {
-  Id *pvec, i, j, npivot, jstar, nech, error, flag_incr;
-  double *G, *Gmatrix, g, residual, maxdiag, tol, b, c00;
+  Id i, j, npivot, jstar, nech, flag_incr;
+  double g, residual, maxdiag, tol, b, c00;
   VectorDouble d1;
   VectorDouble diag;
   VectorDouble crit;
+  VectorDouble G;
 
-  error = 1;
-  nech  = db->getNSample();
-  pvec  = nullptr;
-  G = Gmatrix = nullptr;
-  flag_incr   = (center != nullptr);
+  nech      = db->getNSample();
+  flag_incr = (center != nullptr);
 
   if (npivot_max <= 0) npivot_max = nech;
   npivot_max = MIN(npivot_max, nech);
   d1.resize(db->getNDim());
   diag.resize(nech);
   crit.resize(1 + nech);
-  pvec = (Id*)mem_alloc(sizeof(Id) * nech, 0);
-  if (pvec == nullptr) goto label_end;
+  pvec.resize(nech);
+  for (i = 0; i < nech; i++) pvec[i] = i;
   c00 = model->evaluateOneGeneric(nullptr, VectorDouble(), 1., mode);
-  for (i = 0; i < nech; i++)
-    pvec[i] = i;
 
   residual = 0.;
   for (i = 0; i < nech; i++)
@@ -561,8 +556,7 @@ Id model_covmat_inchol(Id verbose,
   while ((residual > tol) && (npivot < npivot_max))
   {
     // Initialize and add a new zeros column to matrix G[]
-    G = (double*)mem_realloc((char*)G, (npivot + 1) * nech * sizeof(double), 0);
-    if (G == nullptr) goto label_end;
+    G.resize((npivot + 1) * nech);
     for (i = 0; i < nech; i++)
       G(npivot, i) = 0.;
 
@@ -676,8 +670,7 @@ Id model_covmat_inchol(Id verbose,
   // Last column
   if (npivot == nech - 1)
   {
-    G = (double*)mem_realloc((char*)G, (npivot + 1) * nech * sizeof(double), 0);
-    if (G == nullptr) goto label_end;
+    G.resize((npivot + 1) * nech);
     for (i = 0; i < nech; i++)
       G(npivot, i) = 0.;
     G(npivot, npivot) = sqrt(diag[npivot]);
@@ -693,8 +686,7 @@ Id model_covmat_inchol(Id verbose,
     crit[i] /= (double)nech;
 
   // Reorder the output G matrix
-  Gmatrix = (double*)mem_alloc(npivot * nech * sizeof(double), 0);
-  if (Gmatrix == nullptr) goto label_end;
+  Gmatrix.resize(npivot * nech);
   for (j = 0; j < npivot; j++)
     for (i = 0; i < nech; i++)
     {
@@ -703,29 +695,19 @@ Id model_covmat_inchol(Id verbose,
       else
         Gmatrix(i, j) = G(j, i);
     }
-  *Gret = Gmatrix;
 
   // Renumber starting from 1
   for (i = 0; i < nech; i++)
     pvec[i]++;
-  *Pret = pvec;
 
   // Printout of the order of the retained samples
   if (verbose)
   {
     message("Number of pivots = %d\n", npivot);
-    print_imatrix("Order", 0, 1, 1, npivot, NULL, pvec);
+    print_imatrix("Order", 0, 1, 1, npivot, NULL, pvec.data());
     print_matrix("Criterion", 0, 1, 1, npivot, NULL, crit.data());
   }
 
-  /* Set the error return code */
-
-  error = 0;
-
-  /* Core deallocation */
-
-label_end:
-  mem_free((char*)G);
-  return (error);
+  return 0;
 }
 } // namespace gstlrn

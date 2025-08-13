@@ -91,9 +91,9 @@ namespace gstlrn
 typedef struct
 {
   std::vector<SPDE_Matelem> Matelems;
-  Id ndata;               /* Number of active data */
-  Id* ndata1;             /* Number of data per variable (icov=0) */
-  Id* ntarget1;           /* Number of target per variable (icov=0) */
+  Id ndata;                /* Number of active data */
+  Id* ndata1;              /* Number of data per variable (icov=0) */
+  Id* ntarget1;            /* Number of target per variable (icov=0) */
   Model* model;            /* Pointer to the Model */
   double* Csill;           /* Array of LU of sill matrices */
   MatrixSparse** Bnugget;  /* Sparse matrices for nugget effect (nvs2) */
@@ -117,7 +117,7 @@ typedef struct
   bool flag_mesh_dbout; /* Output points participate to meshing */
   bool flag_est;        /* Perform Estimation */
   bool flag_std;        /* Perform Standard deviation */
-  Id flag_case;        /* Perform: matrices(0), est(1) or simu(2) */
+  Id flag_case;         /* Perform: matrices(0), est(1) or simu(2) */
   bool flag_gibbs;      /* Perform Gibbs sampling */
   bool flag_modif;      /* Post-processing simulations */
   bool flag_onechol;    /* Perform Simu & Kriging with same Chol */
@@ -164,15 +164,15 @@ struct QChol
 };
 
 static void (*SIMU_FUNC_UPDATE)(Db*, Id, Id, Id) = NULL;
-static void (*SIMU_FUNC_SCALE)(Db*, Id, Id)       = NULL;
+static void (*SIMU_FUNC_SCALE)(Db*, Id, Id)      = NULL;
 
 /*! \endcond */
-static Id DEBUG                     = 0;
-static Id VERBOSE                   = 0;
-static Id FLAG_KEYPAIR              = 0;
+static Id DEBUG                      = 0;
+static Id VERBOSE                    = 0;
+static Id FLAG_KEYPAIR               = 0;
 static double FACDIM[]               = {0., 1., 2., 6.};
-static Id SPDE_CURRENT_IGRF         = 0;
-static Id SPDE_CURRENT_ICOV         = 0;
+static Id SPDE_CURRENT_IGRF          = 0;
+static Id SPDE_CURRENT_ICOV          = 0;
 static AMesh* S_EXTERNAL_MESH[3]     = {NULL, NULL, NULL};
 static MatrixSparse* S_EXTERNAL_Q[3] = {NULL, NULL, NULL};
 static MatrixSparse* S_EXTERNAL_A[3] = {NULL, NULL, NULL};
@@ -601,7 +601,7 @@ static void st_set_filnug(Id flag_filnug)
  *****************************************************************************/
 static double st_get_isill(Id icov, Id ivar, Id jvar)
 {
-  Id nvar                    = S_ENV.nvar;
+  Id nvar                     = S_ENV.nvar;
   const SPDE_Matelem& Maticov = spde_get_current_matelem(icov);
   double value                = Maticov.Isill[(jvar) + nvar * (ivar)];
   return (value);
@@ -1008,7 +1008,7 @@ static void st_print_all(const char* title)
 
   /* Initializations */
 
-  Id ndim       = S_ENV.ndim;
+  Id ndim        = S_ENV.ndim;
   CovAniso* cova = st_get_cova();
 
   /* Print the title */
@@ -1064,7 +1064,7 @@ static double st_spde_compute_correc(Id ndim, double param)
 static void st_compute_correc(void)
 
 {
-  Id ndim      = S_ENV.ndim;
+  Id ndim       = S_ENV.ndim;
   double param  = st_get_cova_param();
   double value  = st_spde_compute_correc(ndim, param);
   Calcul.correc = value;
@@ -1084,7 +1084,7 @@ static void st_compute_blin(void)
 
   /* Initializations */
 
-  Id ndim     = S_ENV.ndim;
+  Id ndim      = S_ENV.ndim;
   double param = st_get_cova_param();
   ndims2       = ((double)ndim) / 2.;
   alpha        = param + ndims2;
@@ -1136,7 +1136,7 @@ static void st_compute_hh()
 
   /* Initializations */
 
-  Id ndim       = S_ENV.ndim;
+  Id ndim        = S_ENV.ndim;
   CovAniso* cova = st_get_cova();
   VectorDouble temp(ndim * ndim, 0.);
 
@@ -1386,9 +1386,9 @@ static Id st_check_model(const Db* dbin, const Db* dbout, Model* model)
  **
  *****************************************************************************/
 static Id st_identify_nostat_param(const EConsElem& type0,
-                                    Id icov0 = -1,
-                                    Id ivar0 = -1,
-                                    Id jvar0 = -1)
+                                   Id icov0 = -1,
+                                   Id ivar0 = -1,
+                                   Id jvar0 = -1)
 {
   DECLARE_UNUSED(type0);
   return icov0 + ivar0 + jvar0;
@@ -1413,9 +1413,9 @@ static Id st_identify_nostat_param(const EConsElem& type0,
  **
  *****************************************************************************/
 static Id st_kriging_cholesky(QChol* QC,
-                               double* rhs,
-                               VectorDouble& work,
-                               double* z)
+                              double* rhs,
+                              VectorDouble& work,
+                              double* z)
 {
   Id ntarget;
 
@@ -1466,9 +1466,9 @@ static double* st_spde_get_mesh_dimension(AMesh* amesh)
   /* Initializations */
 
   units            = nullptr;
-  Id ndim         = amesh->getNDim();
-  Id nmesh        = amesh->getNMeshes();
-  Id ncorner      = amesh->getNApexPerMesh();
+  Id ndim          = amesh->getNDim();
+  Id nmesh         = amesh->getNMeshes();
+  Id ncorner       = amesh->getNApexPerMesh();
   bool flag_sphere = isDefaultSpaceSphere();
 
   /* Core allocation */
@@ -2385,7 +2385,7 @@ static VectorDouble st_spde_fill_Lambda(Model* model,
 {
   DECLARE_UNUSED(model);
   VectorDouble Lambda;
-  Id nvertex = amesh->getNApices();
+  Id nvertex  = amesh->getNApices();
   double sill = st_get_cova_sill(0, 0);
 
   /* Fill the array */
@@ -2698,7 +2698,7 @@ static Id st_build_Q(SPDE_Matelem& Matelem)
 
   Matelem.QC = st_qchol_manage(1, NULL);
 
-  Id nblin     = static_cast<Id>(Calcul.blin.size());
+  Id nblin      = static_cast<Id>(Calcul.blin.size());
   Matelem.QC->Q = st_spde_build_Q(Matelem.S, Matelem.Lambda, nblin,
                                   Calcul.blin.data());
   if (Matelem.QC->Q == nullptr) goto label_end;
@@ -2820,8 +2820,8 @@ static double st_chebychev_function(double x,
  **
  *****************************************************************************/
 static Id st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
-                                         Id verbose,
-                                         const VectorDouble& blin)
+                                        Id verbose,
+                                        const VectorDouble& blin)
 
 {
   double value, a, b;
@@ -3244,9 +3244,9 @@ AMesh* spde_mesh_load(Db* dbin,
  **
  *****************************************************************************/
 static Id st_spde_prepar(Db* dbin,
-                          Db* dbout,
-                          const VectorDouble& gext,
-                          SPDE_Option& s_option)
+                         Db* dbout,
+                         const VectorDouble& gext,
+                         SPDE_Option& s_option)
 {
   st_calcul_init(S_ENV.ndim);
 
@@ -3462,18 +3462,18 @@ static void st_environ_print(const Db* dbout, const VectorDouble& gext)
  **
  *****************************************************************************/
 static Id st_spde_check(const Db* dbin,
-                         const Db* dbout,
-                         Model* model1,
-                         Model* model2,
-                         bool verbose,
-                         const VectorDouble& gext,
-                         bool mesh_dbin,
-                         bool mesh_dbout,
-                         bool flag_advanced,
-                         bool flag_est,
-                         bool flag_std,
-                         bool flag_gibbs,
-                         bool flag_modif)
+                        const Db* dbout,
+                        Model* model1,
+                        Model* model2,
+                        bool verbose,
+                        const VectorDouble& gext,
+                        bool mesh_dbin,
+                        bool mesh_dbout,
+                        bool flag_advanced,
+                        bool flag_est,
+                        bool flag_std,
+                        bool flag_gibbs,
+                        bool flag_modif)
 {
   Model* models[2];
   Id ncova;
@@ -3513,7 +3513,7 @@ static Id st_spde_check(const Db* dbin,
   S_DECIDE.flag_modif   = (S_DECIDE.flag_case == CASE_SIMULATE && flag_modif);
   S_DECIDE.flag_onechol = (S_DECIDE.simu_chol);
   S_DECIDE.flag_onechol = (Id)get_keypone("Flag_OneChol",
-                                           S_DECIDE.flag_onechol);
+                                          S_DECIDE.flag_onechol);
   if (!S_DECIDE.flag_dbin) S_DECIDE.flag_onechol = 0;
   if (S_DECIDE.flag_est) S_DECIDE.flag_onechol = 1;
   if (S_DECIDE.flag_onechol) S_DECIDE.flag_Qchol = 0;
@@ -3616,7 +3616,7 @@ static Id st_m2d_check_pinchout(Db* dbgrid, Id icol_pinch)
 
   // Initializations
 
-  Id nech         = dbgrid->getNSample();
+  Id nech          = dbgrid->getNSample();
   VectorDouble tab = dbgrid->getColumnByUID(icol_pinch);
 
   // Check that values are within [0,1] interval
@@ -3763,12 +3763,12 @@ static void st_print_constraints_per_point(Id ilayer,
  **
  *****************************************************************************/
 static Id st_check_validity_MS(Db* db,
-                                Id ilayer,
-                                Id iech,
-                                Id flag_positive,
-                                Id flag_verbose,
-                                double M,
-                                double S)
+                               Id ilayer,
+                               Id iech,
+                               Id flag_positive,
+                               Id flag_verbose,
+                               double M,
+                               double S)
 {
   Id error;
   static double eps = 1.e-3;
@@ -4016,11 +4016,11 @@ static Id st_m2d_migrate_pinch_to_point(Db* dbout, Db* dbc, Id icol_pinch)
  **
  *****************************************************************************/
 static Id st_m2d_drift_inc_manage(M2D_Environ* m2denv,
-                                   Id mode,
-                                   Id nlayer,
-                                   Id icol_pinch,
-                                   Db* dbc,
-                                   Db* dbout)
+                                  Id mode,
+                                  Id nlayer,
+                                  Id icol_pinch,
+                                  Db* dbc,
+                                  Db* dbout)
 {
   double M, S;
   Id iptr;
@@ -4283,9 +4283,9 @@ static void st_m2d_stats_updt(M2D_Environ* m2denv,
  **
  *****************************************************************************/
 static Id st_m2d_initial_elevations(M2D_Environ* m2denv,
-                                     Db* dbc,
-                                     Id nlayer,
-                                     VectorDouble& work)
+                                    Db* dbc,
+                                    Id nlayer,
+                                    VectorDouble& work)
 {
   Id nech;
   double zmin, zmax, zval, eps;
@@ -4293,8 +4293,8 @@ static Id st_m2d_initial_elevations(M2D_Environ* m2denv,
 
   /* Initializations */
 
-  nech          = dbc->getNSample();
-  eps           = m2denv->zeps;
+  nech         = dbc->getNSample();
+  eps          = m2denv->zeps;
   Id flag_jter = 0;
 
   /* Loop on the samples */
@@ -4428,11 +4428,11 @@ static Id st_m2d_initial_elevations(M2D_Environ* m2denv,
  **
  *****************************************************************************/
 static Id st_m2d_drift_manage(M2D_Environ* m2denv,
-                               Db* dbin,
-                               Db* dbout,
-                               Id nlayer,
-                               Id verbose,
-                               Id* iatt_f)
+                              Db* dbin,
+                              Db* dbout,
+                              Id nlayer,
+                              Id verbose,
+                              Id* iatt_f)
 {
   Id nechin, error, nb;
   double *dval, value, delta;
@@ -4592,10 +4592,10 @@ static void st_print_details(Db* dbc, Id nech, Id ilayer)
  **
  *****************************************************************************/
 static Id st_m2d_drift_fitting(M2D_Environ* m2denv,
-                                Db* dbc,
-                                Id nlayer,
-                                Id number_hard,
-                                Id verbose)
+                               Db* dbc,
+                               Id nlayer,
+                               Id number_hard,
+                               Id verbose)
 {
   Id nech, error, numb, nbfl;
   double ff, *a, *b, mean, ffmean, stdv, epais, mini, maxi, ffmini, ffmaxi;
@@ -4823,14 +4823,14 @@ static Id st_active_sample(Db* db, Id ndim, Id nlayer, Id iech, Id bypass)
  **
  *****************************************************************************/
 static Id st_record_sample(M2D_Environ* m2denv,
-                            Db* db,
-                            Id iech,
-                            Id ndim,
-                            Id natt,
-                            Id nlayer,
-                            Id bypass,
-                            Id* number_arg,
-                            double* tab)
+                           Db* db,
+                           Id iech,
+                           Id ndim,
+                           Id natt,
+                           Id nlayer,
+                           Id bypass,
+                           Id* number_arg,
+                           double* tab)
 {
   double lower, upper;
   Id ecr, number;
@@ -5399,14 +5399,14 @@ static void st_print_sample(const char* title,
  **
  *****************************************************************************/
 static Id st_global_gibbs(M2D_Environ* m2denv,
-                           Db* dbc,
-                           Id verbose,
-                           Id iter,
-                           Id nlayer,
-                           double sigma,
-                           VectorDouble& ymean,
-                           VectorDouble& ydat,
-                           VectorDouble& work)
+                          Db* dbc,
+                          Id verbose,
+                          Id iter,
+                          Id nlayer,
+                          double sigma,
+                          VectorDouble& ymean,
+                          VectorDouble& ydat,
+                          VectorDouble& work)
 {
   Id nech;
   double zval, zmin, zmax, zcum;
@@ -5517,12 +5517,12 @@ static Id st_global_gibbs(M2D_Environ* m2denv,
  **
  *****************************************************************************/
 static Id st_check_gibbs_data(const char* title,
-                               M2D_Environ* m2denv,
-                               Db* dbc,
-                               Id nlayer,
-                               Id verbose,
-                               VectorDouble& ydat,
-                               VectorDouble& work)
+                              M2D_Environ* m2denv,
+                              Db* dbc,
+                              Id nlayer,
+                              Id verbose,
+                              VectorDouble& ydat,
+                              VectorDouble& work)
 {
   Id error, nech;
   double zmin, zmax, depth, eps;
@@ -5798,18 +5798,18 @@ static void st_m2d_stats_gaus(const char* title,
  **
  *****************************************************************************/
 Id m2d_gibbs_spde(Db* dbin,
-                   Db* dbout,
-                   Model* model,
-                   Id flag_ed,
-                   Id nlayer,
-                   Id niter,
-                   Id seed,
-                   Id nbsimu,
-                   Id icol_pinch,
-                   Id flag_drift,
-                   Id flag_ce,
-                   Id flag_cstd,
-                   Id verbose)
+                  Db* dbout,
+                  Model* model,
+                  Id flag_ed,
+                  Id nlayer,
+                  Id niter,
+                  Id seed,
+                  Id nbsimu,
+                  Id icol_pinch,
+                  Id flag_drift,
+                  Id flag_ce,
+                  Id flag_cstd,
+                  Id verbose)
 {
   Id error, iatt_f, iatt_out, nvertex, nech, ngrid, ndim, number_hard, nfois;
   Id iptr_ce, iptr_cstd, ecr;
