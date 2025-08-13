@@ -52,21 +52,21 @@ class SpaceTarget;
 /***************************************/
 
 GSTLEARN_EXPORT Id foxleg_f(Id ndat,
-                             Id npar,
-                             Id ncont,
-                             const MatrixDense& acont,
-                             VectorDouble& param,
-                             VectorDouble& lower,
-                             VectorDouble& upper,
-                             VectorDouble& scale,
-                             const Option_AutoFit& mauto,
-                             Id flag_title,
-                             void (*func_evaluate)(Id ndat,
-                                                   Id npar,
-                                                   VectorDouble& param,
-                                                   VectorDouble& work),
-                             VectorDouble& tabexp,
-                             VectorDouble& tabwgt);
+                            Id npar,
+                            Id ncont,
+                            const MatrixDense& acont,
+                            VectorDouble& param,
+                            VectorDouble& lower,
+                            VectorDouble& upper,
+                            VectorDouble& scale,
+                            const Option_AutoFit& mauto,
+                            Id flag_title,
+                            void (*func_evaluate)(Id ndat,
+                                                  Id npar,
+                                                  VectorDouble& param,
+                                                  VectorDouble& work),
+                            VectorDouble& tabexp,
+                            VectorDouble& tabwgt);
 
 /***************************************/
 /* Prototyping the functions in util.c */
@@ -76,11 +76,6 @@ GSTLEARN_EXPORT VectorInt ut_split_into_two(Id ncolor,
                                             Id flag_half,
                                             Id verbose,
                                             Id* nposs);
-GSTLEARN_EXPORT void projec_query(Id* actif);
-GSTLEARN_EXPORT void projec_print(void);
-GSTLEARN_EXPORT void projec_toggle(Id mode);
-GSTLEARN_EXPORT void set_last_message(Id mode, const char* string);
-GSTLEARN_EXPORT void print_last_message(void);
 
 GSTLEARN_EXPORT void ut_trace_discretize(Id nseg,
                                          const double* trace,
@@ -115,10 +110,6 @@ GSTLEARN_EXPORT void ut_distance_allocated(Id ndim,
 
 GSTLEARN_EXPORT Id matrix_invert(double* a, Id neq, Id rank);
 GSTLEARN_EXPORT double matrix_determinant(Id neq, const VectorDouble& b);
-GSTLEARN_EXPORT Id matrix_eigen(const double* a,
-                                 Id neq,
-                                 double* value,
-                                 double* vector);
 GSTLEARN_EXPORT void matrix_product_safe(Id n1,
                                          Id n2,
                                          Id n3,
@@ -126,81 +117,60 @@ GSTLEARN_EXPORT void matrix_product_safe(Id n1,
                                          const double* v2,
                                          double* v3);
 GSTLEARN_EXPORT Id matrix_prod_norme(Id transpose,
-                                      Id n1,
-                                      Id n2,
-                                      const double* v1,
-                                      const double* a,
-                                      double* w);
+                                     Id n1,
+                                     Id n2,
+                                     const double* v1,
+                                     const double* a,
+                                     double* w);
 GSTLEARN_EXPORT void matrix_transpose(Id n1, Id n2, VectorDouble& v1, VectorDouble& w1);
 GSTLEARN_EXPORT Id matrix_cholesky_decompose(const double* a,
-                                              double* tl,
-                                              Id neq);
-GSTLEARN_EXPORT void matrix_cholesky_product(Id mode,
-                                             Id neq,
-                                             Id nrhs,
-                                             const double* tl,
-                                             const double* a,
-                                             double* x);
+                                             double* tl,
+                                             Id neq);
 GSTLEARN_EXPORT void matrix_combine(Id nval,
                                     double coeffa,
                                     const double* a,
                                     double coeffb,
                                     const double* b,
                                     double* c);
-GSTLEARN_EXPORT void matrix_product_by_diag(Id mode,
-                                            Id neq,
-                                            double* a,
-                                            double* c,
-                                            double* b);
-GSTLEARN_EXPORT void matrix_triangle_to_square(Id mode,
-                                               Id neq,
-                                               const double* tl,
-                                               double* a);
-GSTLEARN_EXPORT Id matrix_eigen_tridiagonal(const double* vecdiag,
-                                             const double* vecinf,
-                                             const double* vecsup,
-                                             Id neq,
-                                             double* eigvec,
-                                             double* eigval);
 
 /*****************************************/
 /* Prototyping the functions in morpho.c */
 /*****************************************/
 
 GSTLEARN_EXPORT Id spill_point(DbGrid* dbgrid,
-                                Id ind_depth,
-                                Id ind_data,
-                                Id option,
-                                bool flag_up,
-                                Id verbose_step,
-                                double hmax,
-                                double* h,
-                                const double* th,
-                                Id* ix0,
-                                Id* iy0);
+                               Id ind_depth,
+                               Id ind_data,
+                               Id option,
+                               bool flag_up,
+                               Id verbose_step,
+                               double hmax,
+                               double* h,
+                               const double* th,
+                               Id* ix0,
+                               Id* iy0);
 
 /****************************************/
 /* Prototyping the functions in model.c */
 /****************************************/
 
 GSTLEARN_EXPORT Id model_fitting_sills(Vario* vario,
-                                        Model* model,
-                                        const Constraints& constraints = Constraints(),
-                                        const Option_VarioFit& optvar  = Option_VarioFit(),
-                                        const Option_AutoFit& mauto    = Option_AutoFit());
+                                       Model* model,
+                                       const Constraints& constraints = Constraints(),
+                                       const Option_VarioFit& optvar  = Option_VarioFit(),
+                                       const Option_AutoFit& mauto    = Option_AutoFit());
 GSTLEARN_EXPORT Id model_covmat_inchol(Id verbose,
-                                        Db* db,
-                                        Model* model,
-                                        double eta,
-                                        Id npivot_max,
-                                        Id nsize1,
-                                        const Id* ranks1,
-                                        const double* center,
-                                        Id flag_sort,
-                                        Id* npivot_arg,
-                                        Id** Pret,
-                                        double** Gret,
-                                        const CovCalcMode* mode = nullptr);
+                                       Db* db,
+                                       Model* model,
+                                       double eta,
+                                       Id npivot_max,
+                                       Id nsize1,
+                                       const Id* ranks1,
+                                       const double* center,
+                                       Id flag_sort,
+                                       Id* npivot_arg,
+                                       Id** Pret,
+                                       double** Gret,
+                                       const CovCalcMode* mode = nullptr);
 GSTLEARN_EXPORT Model* model_duplicate_for_gradient(const Model* model,
                                                     double ball_radius);
 GSTLEARN_EXPORT void model_covupdt(Model* model,
@@ -234,11 +204,11 @@ GSTLEARN_EXPORT VectorInt grid_iterator_next(Grid* grid);
 
 GSTLEARN_EXPORT Id db_name_identify(Db* db, const String& string);
 GSTLEARN_EXPORT Id db_locator_attribute_add(Db* db,
-                                             const ELoc& locatorType,
-                                             Id number,
-                                             Id r_tem,
-                                             double valinit,
-                                             Id* iptr);
+                                            const ELoc& locatorType,
+                                            Id number,
+                                            Id r_tem,
+                                            double valinit,
+                                            Id* iptr);
 GSTLEARN_EXPORT void db_locators_correct(VectorString& strings,
                                          const VectorInt& current,
                                          Id flag_locnew);
@@ -253,10 +223,10 @@ GSTLEARN_EXPORT void db_sample_print(Db* db,
                                      Id flag_blk  = 0);
 GSTLEARN_EXPORT Id db_center(Db* db, double* center);
 GSTLEARN_EXPORT Id db_selref(Id ndim,
-                              const Id* nx,
-                              const Id* ref,
-                              const double* tabin,
-                              double* tabout);
+                             const Id* nx,
+                             const Id* ref,
+                             const double* tabin,
+                             double* tabout);
 GSTLEARN_EXPORT Db* db_regularize(Db* db, DbGrid* dbgrid, Id flag_center);
 GSTLEARN_EXPORT Id compat_NDIM(Db* db1, Db* db2);
 GSTLEARN_EXPORT double get_grid_value(DbGrid* dbgrid,
@@ -307,31 +277,31 @@ GSTLEARN_EXPORT VectorDouble db_distances_general(Db* db1,
                                                   double* dmin,
                                                   double* dmax);
 GSTLEARN_EXPORT Id point_to_grid(const DbGrid* db,
-                                  const double* coor,
-                                  Id flag_outside,
-                                  Id* indg);
+                                 const double* coor,
+                                 Id flag_outside,
+                                 Id* indg);
 GSTLEARN_EXPORT Id point_to_bench(const DbGrid* db,
-                                   double* coor,
-                                   Id flag_outside,
-                                   Id* indb);
+                                  double* coor,
+                                  Id flag_outside,
+                                  Id* indb);
 GSTLEARN_EXPORT Id index_point_to_grid(const Db* db,
-                                        Id iech,
-                                        Id flag_outside,
-                                        const DbGrid* dbout,
-                                        double* coor);
+                                       Id iech,
+                                       Id flag_outside,
+                                       const DbGrid* dbout,
+                                       double* coor);
 GSTLEARN_EXPORT Id point_to_point(Db* db, const double* coor);
 GSTLEARN_EXPORT Id point_inside_grid(Db* db, Id iech, const DbGrid* dbgrid);
 GSTLEARN_EXPORT Id db_gradient_components(DbGrid* dbgrid);
 GSTLEARN_EXPORT Id db_streamline(DbGrid* dbgrid,
-                                  Db* dbpoint,
-                                  Id niter,
-                                  double step,
-                                  Id flag_norm,
-                                  Id use_grad,
-                                  Id save_grad,
-                                  Id* nbline_loc,
-                                  Id* npline_loc,
-                                  VectorDouble& line);
+                                 Db* dbpoint,
+                                 Id niter,
+                                 double step,
+                                 Id flag_norm,
+                                 Id use_grad,
+                                 Id save_grad,
+                                 Id* nbline_loc,
+                                 Id* npline_loc,
+                                 VectorDouble& line);
 GSTLEARN_EXPORT void db_monostat(Db* db,
                                  Id iatt,
                                  double* wtot,
@@ -341,29 +311,29 @@ GSTLEARN_EXPORT void db_monostat(Db* db,
                                  double* maxi);
 GSTLEARN_EXPORT Id db_gradient_update(Db* db);
 GSTLEARN_EXPORT Id surface(Db* db_point,
-                            DbGrid* db_grid,
-                            Id icol,
-                            double dlim,
-                            double* dtab,
-                            double* gtab);
+                           DbGrid* db_grid,
+                           Id icol,
+                           double dlim,
+                           double* dtab,
+                           double* gtab);
 GSTLEARN_EXPORT Id db_edit(Db* db, Id* flag_valid);
 GSTLEARN_EXPORT Id db_grid_copy(DbGrid* db1,
-                                 DbGrid* db2,
-                                 const Id* ind1,
-                                 const Id* ind2,
-                                 Id ncol,
-                                 Id* cols);
+                                DbGrid* db2,
+                                const Id* ind1,
+                                const Id* ind2,
+                                Id ncol,
+                                Id* cols);
 GSTLEARN_EXPORT Id db_grid_copy_dilate(DbGrid* db1,
-                                        Id iatt1,
-                                        DbGrid* db2,
-                                        Id iatt2,
-                                        Id mode,
-                                        const Id* nshift);
+                                       Id iatt1,
+                                       DbGrid* db2,
+                                       Id iatt2,
+                                       Id mode,
+                                       const Id* nshift);
 GSTLEARN_EXPORT Id db_proportion(Db* db,
-                                  DbGrid* dbgrid,
-                                  Id nfac1max,
-                                  Id nfac2max,
-                                  Id* nclout);
+                                 DbGrid* dbgrid,
+                                 Id nfac1max,
+                                 Id nfac2max,
+                                 Id* nclout);
 GSTLEARN_EXPORT Id db_merge(Db* db, Id ncol, Id* cols);
 GSTLEARN_EXPORT Id db_count_defined(Db* db, Id icol);
 
@@ -371,19 +341,19 @@ GSTLEARN_EXPORT Id db_prop_read(DbGrid* db, Id ix, Id iy, double* props);
 GSTLEARN_EXPORT Id db_prop_write(DbGrid* db, Id ix, Id iy, double* props);
 GSTLEARN_EXPORT Id db_resind(Db* db, Id ivar, const VectorDouble& zcut);
 GSTLEARN_EXPORT Id db_gradient_modang_to_component(Db* db,
-                                                    Id ang_conv,
-                                                    Id iad_mod,
-                                                    Id iad_ang,
-                                                    Id iad_gx,
-                                                    Id iad_gy);
+                                                   Id ang_conv,
+                                                   Id iad_mod,
+                                                   Id iad_ang,
+                                                   Id iad_gx,
+                                                   Id iad_gy);
 GSTLEARN_EXPORT Id db_gradient_component_to_modang(Db* db,
-                                                    Id verbose,
-                                                    Id iad_gx,
-                                                    Id iad_gy,
-                                                    Id iad_mod,
-                                                    Id iad_ang,
-                                                    double scale,
-                                                    double ve);
+                                                   Id verbose,
+                                                   Id iad_gx,
+                                                   Id iad_gy,
+                                                   Id iad_mod,
+                                                   Id iad_ang,
+                                                   double scale,
+                                                   double ve);
 GSTLEARN_EXPORT Db* db_point_init(Id nech,
                                   const VectorDouble& coormin = VectorDouble(),
                                   const VectorDouble& coormax = VectorDouble(),
@@ -393,52 +363,52 @@ GSTLEARN_EXPORT Db* db_point_init(Id nech,
                                   double range                = 0.,
                                   double beta                 = 0.,
                                   double extend               = 0.,
-                                  Id seed                    = 43241,
+                                  Id seed                     = 43241,
                                   bool flagAddSampleRank      = true);
 GSTLEARN_EXPORT Id db_smooth_vpc(DbGrid* db, Id width, double range);
 GSTLEARN_EXPORT Id db_grid2point_sampling(DbGrid* dbgrid,
-                                           Id nvar,
-                                           Id* vars,
-                                           const Id* npacks,
-                                           Id npcell,
-                                           Id nmini,
-                                           Id* nech,
-                                           VectorDouble& coor,
-                                           VectorDouble& data);
+                                          Id nvar,
+                                          Id* vars,
+                                          const Id* npacks,
+                                          Id npcell,
+                                          Id nmini,
+                                          Id* nech,
+                                          VectorDouble& coor,
+                                          VectorDouble& data);
 GSTLEARN_EXPORT Id db_grid_patch(DbGrid* ss_grid,
-                                  DbGrid* db_grid,
-                                  Id iptr_ss,
-                                  Id iptr_db,
-                                  Id iptr_rank,
-                                  Id new_rank,
-                                  Id oper,
-                                  Id verbose);
+                                 DbGrid* db_grid,
+                                 Id iptr_ss,
+                                 Id iptr_db,
+                                 Id iptr_rank,
+                                 Id new_rank,
+                                 Id oper,
+                                 Id verbose);
 
 /****************************************/
 /* Prototyping the functions in stats.c */
 /****************************************/
 
 GSTLEARN_EXPORT Id stats_residuals(Id verbose,
-                                    Id nech,
-                                    double* tab,
-                                    Id ncut,
-                                    double* zcut,
-                                    Id* nsorted,
-                                    double* mean,
-                                    double* residuals,
-                                    double* T,
-                                    double* Q);
+                                   Id nech,
+                                   double* tab,
+                                   Id ncut,
+                                   double* zcut,
+                                   Id* nsorted,
+                                   double* mean,
+                                   double* residuals,
+                                   double* T,
+                                   double* Q);
 GSTLEARN_EXPORT Id db_upscale(DbGrid* dbgrid1,
-                               DbGrid* dbgrid2,
-                               Id orient,
-                               Id verbose);
+                              DbGrid* dbgrid2,
+                              Id orient,
+                              Id verbose);
 GSTLEARN_EXPORT Id db_diffusion(DbGrid* dbgrid1,
-                                 DbGrid* dbgrid2,
-                                 Id orient,
-                                 Id niter,
-                                 Id nseed,
-                                 Id seed,
-                                 Id verbose);
+                                DbGrid* dbgrid2,
+                                Id orient,
+                                Id niter,
+                                Id nseed,
+                                Id seed,
+                                Id verbose);
 
 /****************************************/
 /* Prototyping the functions in krige.c */
@@ -447,10 +417,10 @@ GSTLEARN_EXPORT Id db_diffusion(DbGrid* dbgrid1,
 GSTLEARN_EXPORT void set_DBIN(Db* dbin);
 GSTLEARN_EXPORT void set_DBOUT(Db* dbout);
 GSTLEARN_EXPORT Id krige_koption_manage(Id mode,
-                                         Id flag_check,
-                                         const EKrigOpt& calcul,
-                                         Id flag_rand,
-                                         const VectorInt& ndiscs = VectorInt());
+                                        Id flag_check,
+                                        const EKrigOpt& calcul,
+                                        Id flag_rand,
+                                        const VectorInt& ndiscs = VectorInt());
 GSTLEARN_EXPORT void krige_lhs_print(Id nech,
                                      Id neq,
                                      Id nred,
@@ -463,58 +433,58 @@ GSTLEARN_EXPORT void krige_rhs_print(Id nvar,
                                      const Id* flag,
                                      double* rhs);
 GSTLEARN_EXPORT Id krigsampling_f(Db* dbin,
-                                   Db* dbout,
-                                   Model* model,
-                                   double beta,
-                                   VectorInt& ranks1,
-                                   VectorInt& ranks2,
-                                   bool flag_std,
-                                   Id verbose);
+                                  Db* dbout,
+                                  Model* model,
+                                  double beta,
+                                  VectorInt& ranks1,
+                                  VectorInt& ranks2,
+                                  bool flag_std,
+                                  Id verbose);
 GSTLEARN_EXPORT Id global_transitive(DbGrid* dbgrid,
-                                      Model* model,
-                                      Id flag_verbose,
-                                      Id flag_regular,
-                                      Id ndisc,
-                                      double* abundance,
-                                      double* sse,
-                                      double* cvtrans);
+                                     Model* model,
+                                     Id flag_verbose,
+                                     Id flag_regular,
+                                     Id ndisc,
+                                     double* abundance,
+                                     double* sse,
+                                     double* cvtrans);
 GSTLEARN_EXPORT Id anakexp_f(DbGrid* db,
-                              double* covdd,
-                              double* covd0,
-                              double top,
-                              double bot,
-                              Id ncov_radius,
-                              Id neigh_radius,
-                              Id flag_sym,
-                              Id nfeq);
+                             double* covdd,
+                             double* covd0,
+                             double top,
+                             double bot,
+                             Id ncov_radius,
+                             Id neigh_radius,
+                             Id flag_sym,
+                             Id nfeq);
 GSTLEARN_EXPORT Id anakexp_3D(DbGrid* db,
-                               double* cov_ref,
-                               Id cov_radius,
-                               Id neigh_ver,
-                               Id neigh_hor,
-                               Id flag_sym,
-                               Model* model,
-                               double nugget,
-                               Id nfeq,
-                               Id dbg_ix,
-                               Id dbg_iy);
+                              double* cov_ref,
+                              Id cov_radius,
+                              Id neigh_ver,
+                              Id neigh_hor,
+                              Id flag_sym,
+                              Model* model,
+                              double nugget,
+                              Id nfeq,
+                              Id dbg_ix,
+                              Id dbg_iy);
 GSTLEARN_EXPORT Id sampling_f(Db* db,
-                               Model* model,
-                               double beta,
-                               Id method1,
-                               Id nsize1_max,
-                               VectorInt& ranks1,
-                               Id method2,
-                               Id nsize2_max,
-                               VectorInt& ranks2,
-                               Id verbose);
+                              Model* model,
+                              double beta,
+                              Id method1,
+                              Id nsize1_max,
+                              VectorInt& ranks1,
+                              Id method2,
+                              Id nsize2_max,
+                              VectorInt& ranks2,
+                              Id verbose);
 GSTLEARN_EXPORT Id inhomogeneous_kriging(Db* dbdat,
-                                          Db* dbsrc,
-                                          Db* dbout,
-                                          double power,
-                                          Id flag_source,
-                                          Model* model_dat,
-                                          Model* model_src);
+                                         Db* dbsrc,
+                                         Db* dbout,
+                                         double power,
+                                         Id flag_source,
+                                         Model* model_dat,
+                                         Model* model_src);
 
 /*****************************************/
 /* Prototyping the functions in simtub.c */
@@ -550,172 +520,172 @@ GSTLEARN_EXPORT void check_mandatory_attribute(const char* method,
                                                Db* db,
                                                const ELoc& locatorType);
 GSTLEARN_EXPORT Id simcond(Db* dbin,
-                            Db* dbout,
-                            Model* model,
-                            Id seed,
-                            Id nbsimu,
-                            Id nbtuba,
-                            Id gibbs_nburn,
-                            Id gibbs_niter,
-                            Id flag_check,
-                            Id flag_ce,
-                            Id flag_cstd,
-                            Id verbose);
+                           Db* dbout,
+                           Model* model,
+                           Id seed,
+                           Id nbsimu,
+                           Id nbtuba,
+                           Id gibbs_nburn,
+                           Id gibbs_niter,
+                           Id flag_check,
+                           Id flag_ce,
+                           Id flag_cstd,
+                           Id verbose);
 GSTLEARN_EXPORT Id simmaxstable(Db* dbout,
-                                 Model* model,
-                                 double ratio,
-                                 Id seed,
-                                 Id nbtuba,
-                                 Id flag_simu,
-                                 Id flag_rank,
-                                 Id verbose);
+                                Model* model,
+                                double ratio,
+                                Id seed,
+                                Id nbtuba,
+                                Id flag_simu,
+                                Id flag_rank,
+                                Id verbose);
 GSTLEARN_EXPORT Id simRI(Db* dbout,
-                          Model* model,
-                          Id ncut,
-                          double* zcut,
-                          double* wcut,
-                          Id seed,
-                          Id nbtuba,
-                          Id verbose);
+                         Model* model,
+                         Id ncut,
+                         double* zcut,
+                         double* wcut,
+                         Id seed,
+                         Id nbtuba,
+                         Id verbose);
 GSTLEARN_EXPORT Id simtub_constraints(Db* dbin,
-                                       Db* dbout,
-                                       Model* model,
-                                       ANeigh* neigh,
-                                       Id seed,
-                                       Id nbtuba,
-                                       Id nbsimu_min,
-                                       Id nbsimu_quant,
-                                       Id niter_max,
-                                       VectorInt& cols,
-                                       Id (*func_valid)(Id flag_grid,
-                                                         Id nDim,
-                                                         Id nech,
-                                                         Id* nx,
-                                                         double* dx,
-                                                         double* x0,
-                                                         double nonval,
-                                                         double percent,
-                                                         VectorDouble& tab));
+                                      Db* dbout,
+                                      Model* model,
+                                      ANeigh* neigh,
+                                      Id seed,
+                                      Id nbtuba,
+                                      Id nbsimu_min,
+                                      Id nbsimu_quant,
+                                      Id niter_max,
+                                      VectorInt& cols,
+                                      Id (*func_valid)(Id flag_grid,
+                                                       Id nDim,
+                                                       Id nech,
+                                                       Id* nx,
+                                                       double* dx,
+                                                       double* x0,
+                                                       double nonval,
+                                                       double percent,
+                                                       VectorDouble& tab));
 GSTLEARN_EXPORT Id db_simulations_to_ce(Db* db,
-                                         const ELoc& locatorType,
-                                         Id nbsimu,
-                                         Id nvar,
-                                         Id* iptr_ce_arg,
-                                         Id* iptr_cstd_arg);
+                                        const ELoc& locatorType,
+                                        Id nbsimu,
+                                        Id nvar,
+                                        Id* iptr_ce_arg,
+                                        Id* iptr_cstd_arg);
 
 /*****************************************/
 /* Prototyping the functions in simreg.c */
 /*****************************************/
 
 GSTLEARN_EXPORT Id simfine_dim(DbGrid* dbin,
-                                Id nmult,
-                                Id* ndim,
-                                Id* ntot,
-                                Id* nx,
-                                double* x0,
-                                double* dx);
+                               Id nmult,
+                               Id* ndim,
+                               Id* ntot,
+                               Id* nx,
+                               double* x0,
+                               double* dx);
 GSTLEARN_EXPORT Id simfine_f(DbGrid* dbin,
-                              Model* model,
-                              const SimuRefineParam& param,
-                              Id seed,
-                              VectorDouble& tab);
+                             Model* model,
+                             const SimuRefineParam& param,
+                             Id seed,
+                             VectorDouble& tab);
 
 /*****************************************/
 /* Prototyping the functions in thresh.c */
 /*****************************************/
 
 GSTLEARN_EXPORT Id db_bounds_shadow(Db* db,
-                                     Db* dbprop,
-                                     RuleShadow* rule,
-                                     Model* model,
-                                     const VectorDouble& props,
-                                     Id flag_stat,
-                                     Id nfacies);
+                                    Db* dbprop,
+                                    RuleShadow* rule,
+                                    Model* model,
+                                    const VectorDouble& props,
+                                    Id flag_stat,
+                                    Id nfacies);
 
 /*****************************************/
 /* Prototyping the functions in geophy.c */
 /*****************************************/
 
 GSTLEARN_EXPORT Id time_3db(double* HS,
-                             double* T,
-                             Id NX,
-                             Id NY,
-                             Id NZ,
-                             Id BX,
-                             Id BY,
-                             Id BZ,
-                             double XS,
-                             double YS,
-                             double ZS,
-                             double HS_EPS_INIT,
-                             Id MSG);
+                            double* T,
+                            Id NX,
+                            Id NY,
+                            Id NZ,
+                            Id BX,
+                            Id BY,
+                            Id BZ,
+                            double XS,
+                            double YS,
+                            double ZS,
+                            double HS_EPS_INIT,
+                            Id MSG);
 
 /******************************************/
 /* Prototyping the functions in mlayers.c */
 /******************************************/
 GSTLEARN_EXPORT Id multilayers_vario(Db* dbin,
-                                      DbGrid* dbout,
-                                      Vario* vario,
-                                      Id nlayers,
-                                      Id flag_vel,
-                                      Id flag_ext,
-                                      Id irf_rank,
-                                      Id match_time,
-                                      Id colrefd,
-                                      Id colreft,
-                                      Id verbose);
+                                     DbGrid* dbout,
+                                     Vario* vario,
+                                     Id nlayers,
+                                     Id flag_vel,
+                                     Id flag_ext,
+                                     Id irf_rank,
+                                     Id match_time,
+                                     Id colrefd,
+                                     Id colreft,
+                                     Id verbose);
 GSTLEARN_EXPORT Id multilayers_kriging(Db* dbin,
-                                        DbGrid* dbout,
-                                        Model* model,
-                                        ANeigh* neigh,
-                                        Id flag_same,
-                                        Id flag_z,
-                                        Id flag_vel,
-                                        Id flag_cumul,
-                                        Id flag_ext,
-                                        Id flag_std,
-                                        Id flag_bayes,
-                                        Id irf_rank,
-                                        Id match_time,
-                                        Id dim_prior,
-                                        double* prior_mean,
-                                        double* prior_vars,
-                                        Id colrefd,
-                                        Id colreft,
-                                        Id colrefb,
-                                        Id verbose);
+                                       DbGrid* dbout,
+                                       Model* model,
+                                       ANeigh* neigh,
+                                       Id flag_same,
+                                       Id flag_z,
+                                       Id flag_vel,
+                                       Id flag_cumul,
+                                       Id flag_ext,
+                                       Id flag_std,
+                                       Id flag_bayes,
+                                       Id irf_rank,
+                                       Id match_time,
+                                       Id dim_prior,
+                                       double* prior_mean,
+                                       double* prior_vars,
+                                       Id colrefd,
+                                       Id colreft,
+                                       Id colrefb,
+                                       Id verbose);
 GSTLEARN_EXPORT Id multilayers_get_prior(Db* dbin,
-                                          DbGrid* dbout,
-                                          Model* model,
-                                          Id flag_same,
-                                          Id flag_vel,
-                                          Id flag_ext,
-                                          Id irf_rank,
-                                          Id match_time,
-                                          Id colrefd,
-                                          Id colreft,
-                                          Id colrefb,
-                                          Id verbose,
-                                          Id* npar_arg,
-                                          VectorDouble& mean,
-                                          VectorDouble& vars);
+                                         DbGrid* dbout,
+                                         Model* model,
+                                         Id flag_same,
+                                         Id flag_vel,
+                                         Id flag_ext,
+                                         Id irf_rank,
+                                         Id match_time,
+                                         Id colrefd,
+                                         Id colreft,
+                                         Id colrefb,
+                                         Id verbose,
+                                         Id* npar_arg,
+                                         VectorDouble& mean,
+                                         VectorDouble& vars);
 
 /***************************************/
 /* Prototyping the functions in spde.c */
 /***************************************/
 GSTLEARN_EXPORT Id m2d_gibbs_spde(Db* dbin,
-                                   Db* dbout,
-                                   Model* model,
-                                   Id flag_ed,
-                                   Id nlayer,
-                                   Id niter,
-                                   Id seed,
-                                   Id nbsimu,
-                                   Id icol_pinch,
-                                   Id flag_drift,
-                                   Id flag_ce,
-                                   Id flag_cstd,
-                                   Id verbose);
+                                  Db* dbout,
+                                  Model* model,
+                                  Id flag_ed,
+                                  Id nlayer,
+                                  Id niter,
+                                  Id seed,
+                                  Id nbsimu,
+                                  Id icol_pinch,
+                                  Id flag_drift,
+                                  Id flag_ce,
+                                  Id flag_cstd,
+                                  Id verbose);
 
 #ifndef SWIG
 GSTLEARN_EXPORT SPDE_Matelem& spde_get_current_matelem(Id icov);

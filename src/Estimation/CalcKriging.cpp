@@ -586,4 +586,4 @@ Id test_neigh(Db* dbin,
   return error;
 }
 
-}
+} // namespace gstlrn

@@ -96,7 +96,7 @@ double CovGradientNumerical::_evalGradGrad(Id ivar,
   if (idim != jdim)
   {
     vec[idim] = -_ballRadius / 2.;
-    vec[jdim] = _ballRadius / 2.;
+    vec[jdim] = +_ballRadius / 2.;
     paux      = p2;
     paux.move(vec);
     double covmp = ACovGradient::evalCov(p1, paux, ivar, jvar, mode);
@@ -105,13 +105,13 @@ double CovGradientNumerical::_evalGradGrad(Id ivar,
     paux         = p2;
     paux.move(vec);
     double covmm = ACovGradient::_eval(p1, paux, ivar, jvar, mode);
-    vec[idim]    = _ballRadius / 2.;
+    vec[idim]    = +_ballRadius / 2.;
     vec[jdim]    = -_ballRadius / 2.;
     paux         = p2;
     paux.move(vec);
     double covpm = ACovGradient::_eval(p1, paux, ivar, jvar, mode);
-    vec[idim]    = _ballRadius / 2.;
-    vec[jdim]    = _ballRadius / 2.;
+    vec[idim]    = +_ballRadius / 2.;
+    vec[jdim]    = +_ballRadius / 2.;
     paux         = p2;
     paux.move(vec);
     double covpp = ACovGradient::_eval(p1, paux, ivar, jvar, mode);
@@ -120,7 +120,7 @@ double CovGradientNumerical::_evalGradGrad(Id ivar,
   }
   else
   {
-    vec[idim] = _ballRadius;
+    vec[idim] = +_ballRadius;
     paux      = p2;
     paux.move(vec);
     double cov2m = ACovGradient::evalCov(p1, paux, ivar, jvar, mode);

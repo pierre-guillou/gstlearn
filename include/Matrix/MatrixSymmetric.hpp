@@ -67,15 +67,15 @@ public:
   Id computeEigen(bool optionPositive = true);
   Id computeGeneralizedEigen(const MatrixSymmetric& b, bool optionPositive = true);
   Id computeGeneralizedInverse(MatrixSymmetric& tabout,
-                                double maxicond = 1.e20,
-                                double eps      = EPSILON20);
+                               double maxicond = 1.e20,
+                               double eps      = EPSILON20);
   bool isDefinitePositive();
   Id minimizeWithConstraintsInPlace(const VectorDouble& gmat,
-                                     const MatrixDense& aemat,
-                                     const VectorDouble& bemat,
-                                     const MatrixDense& aimat,
-                                     const VectorDouble& bimat,
-                                     VectorDouble& xmat);
+                                    const MatrixDense& aemat,
+                                    const VectorDouble& bemat,
+                                    const MatrixDense& aimat,
+                                    const VectorDouble& bimat,
+                                    VectorDouble& xmat);
 
   bool _isPhysicallyPresent(Id irow, Id icol) const override;
   void _setValues(const double* values, bool byCol = true) override;
@@ -84,36 +84,36 @@ public:
   // Local functions (old style algebra)
   Id _matrix_qo(const VectorDouble& gmat, VectorDouble& xmat);
   Id _matrix_qoc(bool flag_invert,
-                  const VectorDouble& gmat,
-                  Id na,
-                  const MatrixDense& amat,
-                  const VectorDouble& bmat,
-                  VectorDouble& xmat,
-                  VectorDouble& lambda);
+                 const VectorDouble& gmat,
+                 Id na,
+                 const MatrixDense& amat,
+                 const VectorDouble& bmat,
+                 VectorDouble& xmat,
+                 VectorDouble& lambda);
   Id _constraintsError(const VectorInt& active,
-                        const MatrixDense& aimat,
-                        const VectorDouble& bimat,
-                        const VectorDouble& xmat,
-                        VectorDouble& vmat,
-                        VectorInt& flag);
+                       const MatrixDense& aimat,
+                       const VectorDouble& bimat,
+                       const VectorDouble& xmat,
+                       VectorDouble& vmat,
+                       VectorInt& flag);
   static Id _constraintsConcatenateMat(Id nae,
-                                        Id nai,
-                                        Id neq,
-                                        const VectorInt& active,
-                                        const MatrixDense& tabemat,
-                                        const MatrixDense& tabimat,
-                                        MatrixDense& tabout);
-  static Id _constraintsConcatenateVD(Id nae,
                                        Id nai,
+                                       Id neq,
                                        const VectorInt& active,
-                                       const VectorDouble& tabemat,
-                                       const VectorDouble& tabimat,
-                                       VectorDouble& tabout);
+                                       const MatrixDense& tabemat,
+                                       const MatrixDense& tabimat,
+                                       MatrixDense& tabout);
+  static Id _constraintsConcatenateVD(Id nae,
+                                      Id nai,
+                                      const VectorInt& active,
+                                      const VectorDouble& tabemat,
+                                      const VectorDouble& tabimat,
+                                      VectorDouble& tabout);
   static Id _constraintsCount(Id nai, VectorInt& active);
   Id _terminateEigen(const VectorDouble& eigenValues,
-                      const VectorDouble& eigenVectors,
-                      bool optionPositive = true,
-                      bool changeOrder    = false);
+                     const VectorDouble& eigenVectors,
+                     bool optionPositive = true,
+                     bool changeOrder    = false);
   MatrixSymmetric compress0MatLC(const MatrixDense& matLC);
 
 private:

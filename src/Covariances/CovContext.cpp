@@ -202,7 +202,7 @@ void CovContext::copyCovContext(const CovContext& ctxt, bool severe)
 const CovContext* CovContext::createReduce(const VectorInt& validVars) const
 {
   Id ecr, lec;
-  Id nvar = (Id)validVars.size();
+  Id nvar   = (Id)validVars.size();
   auto ndim = getNDim();
   VectorBool valids(_nVar, false);
   for (Id ivar = 0; ivar < nvar; ivar++) valids[validVars[ivar]] = true;
@@ -223,4 +223,4 @@ const CovContext* CovContext::createReduce(const VectorInt& validVars) const
   auto* newctxt = new CovContext(nvar, ndim, covar0);
   return newctxt;
 }
-}
+} // namespace gstlrn

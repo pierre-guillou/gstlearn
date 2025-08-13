@@ -20,7 +20,7 @@ class CovContext;
 class GSTLEARN_EXPORT CovPoisson : public ACovFunc
 {
 public:
-  CovPoisson(const CovContext& ctx);
+  CovPoisson(const CovContext& ctxt);
   CovPoisson(const CovPoisson &r);
   CovPoisson& operator= (const CovPoisson &r);
   virtual ~CovPoisson();

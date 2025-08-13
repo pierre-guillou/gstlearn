@@ -35,10 +35,9 @@ public:
   /// ICloneable interface
   IMPLEMENT_CLONING(CovGradientNumerical)
 
-  virtual double eval0(Id ivar = 0,
-                       Id jvar = 0,
-                       const CovCalcMode* mode = nullptr) const override;
-
+  double eval0(Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 
   double getBallRadius() const override { return _ballRadius; }
 
@@ -51,12 +50,12 @@ public:
                          bool flagGrad = false) const override;
 
 protected:
+  double _eval(const SpacePoint& p1,
+               const SpacePoint& p2,
+               Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 
-virtual double _eval(const SpacePoint& p1,
-                     const SpacePoint& p2,
-                     Id ivar = 0,
-                     Id jvar = 0,
-                     const CovCalcMode* mode = nullptr) const override;
 private:
   double _evalZZ(Id ivar,
                  Id jvar,

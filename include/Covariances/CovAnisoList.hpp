@@ -13,19 +13,18 @@
 #include "Anamorphosis/AAnam.hpp"
 #include "Anamorphosis/AnamHermite.hpp"
 #include "Enum/EModelProperty.hpp"
-#include "gstlearn_export.hpp"
 #include "geoslib_define.h"
+#include "gstlearn_export.hpp"
 
 #include "Enum/ECov.hpp"
 
 #include "Basic/ICloneable.hpp"
-#include "Covariances/CovList.hpp"
 #include "Covariances/CovCalcMode.hpp"
+#include "Covariances/CovList.hpp"
 
-
-
-namespace gstlrn {
-class AAnam;  // Forward declaration
+namespace gstlrn
+{
+class AAnam; // Forward declaration
 class CovAniso;
 class CovContext;
 class AnamHermite;
@@ -60,9 +59,9 @@ public:
   /// Interface for ACov
   Id getNVar() const override;
   bool isIndexable() const override { return true; }
-  double eval0(Id ivar                = 0,
-                       Id jvar                = 0,
-                       const CovCalcMode* mode = nullptr) const override;
+  double eval0(Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 
   /// Interface for AStringable Interface
   String toString(const AStringFormat* strfmt = nullptr) const override;
@@ -146,4 +145,4 @@ protected:
 private:
   bool _sameRotation;
 };
-}
+} // namespace gstlrn

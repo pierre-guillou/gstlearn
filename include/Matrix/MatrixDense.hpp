@@ -197,9 +197,9 @@ protected:
 private:
   void _recopy(const MatrixDense& r);
   Id _terminateEigen(const Eigen::VectorXd& eigenValues,
-                      const Eigen::MatrixXd& eigenVectors,
-                      bool optionPositive = true,
-                      bool changeOrder    = false);
+                     const Eigen::MatrixXd& eigenVectors,
+                     bool optionPositive = true,
+                     bool changeOrder    = false);
   bool _needToReset(Id nrows, Id ncols) override;
 
 #ifndef SWIG

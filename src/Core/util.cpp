@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/Memory.hpp"
 #include "Basic/String.hpp"
 #include "Basic/Utilities.hpp"
 #include "Geometry/GeometryHelper.hpp"
@@ -38,96 +37,11 @@ typedef struct
   VectorDouble values;
 } Keypair;
 
-typedef struct
-{
-  Id actif;
-} Projec_Environ;
-
-typedef struct
-{
-  Id curech;
-  Id ndim;
-  Id* nx;
-  Id* order;
-  Id* indg;
-  double* tab;
-} Dim_Loop;
-
-static Projec_Environ PROJEC = {0};
-static Id KEYPAIR_NTAB      = 0;
+static Id KEYPAIR_NTAB = 0;
 static std::vector<Keypair> KEYPAIR_TABS;
-static Id DISTANCE_NDIM     = 0;
+static Id DISTANCE_NDIM = 0;
 static VectorDouble DISTANCE_TAB1;
 static VectorDouble DISTANCE_TAB2;
-static std::vector<std::vector<char>> LAST_MESSAGE;
-static Id NB_LAST_MESSAGE   = 0;
-
-/****************************************************************************/
-/*!
- **  Toggle the status of the Projection flag
- **
- ** \param[in]  mode Toggle of the projection flag
- ** \li               0   : Switch the flag OFF
- ** \li               1   : Switch the flag ON
- ** \li              -1   : Toggle the flag
- ** \li              else : Do not modify the flag
- **
- *****************************************************************************/
-void projec_toggle(Id mode)
-{
-  Id projec_actif;
-
-  /* Process the toggling */
-
-  projec_actif = PROJEC.actif;
-  if (mode == 1)
-    projec_actif = 1;
-  else if (mode == 0)
-    projec_actif = 0;
-  else if (mode == -1)
-    projec_actif = 1 - projec_actif;
-
-  /* Check that the current space is RN */
-
-  bool flag_sphere = (getDefaultSpaceType() == ESpaceType::SN);
-  if (flag_sphere && projec_actif)
-  {
-    messerr("Error when toggling a Projection ON");
-    messerr(
-      "Definition of a Projection is incompatible with working on a Sphere");
-  }
-  else
-    PROJEC.actif = projec_actif;
-}
-
-/****************************************************************************/
-/*!
- **  Returns the projection characteristics
- **
- ** \param[out]  actif activity flag
- **
- *****************************************************************************/
-void projec_query(Id* actif)
-
-{
-  *actif = PROJEC.actif;
-}
-
-/****************************************************************************/
-/*!
- **  Print the characteristics of the projection
- **
- *****************************************************************************/
-void projec_print(void)
-
-{
-  mestitle(1, "Parameters for Projection");
-  if (PROJEC.actif)
-    message("Projection is switched ON\n");
-  else
-    message("Projection is switched OFF\n");
-  message("Use 'projec.define' to modify previous values\n");
-}
 
 /****************************************************************************/
 /*!
@@ -611,8 +525,8 @@ double get_keypone(const char* keyword, double valdef)
   found  = st_match_keypair(keyword, 1);
   if (found >= 0)
   {
-    keypair = &KEYPAIR_TABS[found];
-    const auto &rtab    = keypair->values;
+    keypair          = &KEYPAIR_TABS[found];
+    const auto& rtab = keypair->values;
     if (keypair->nrow * keypair->ncol == 1) retval = rtab[0];
   }
 
@@ -806,87 +720,6 @@ void ut_distance_allocated(Id ndim, double** tab1, double** tab2)
 
 /****************************************************************************/
 /*!
- **  Deposit a last message
- **
- ** \param[in]  mode           Type of operation
- **                            0 to empty the array of messages
- **                            1 to add the string to the array of messages
- **                           -1 to concatenate the string to the last message
- ** \param[in]  string         Current string
- **
- **
- *****************************************************************************/
-void set_last_message(Id mode, const char* string)
-{
-  char* address;
-  Id size, sizaux;
-
-  /* Dispatch */
-
-  switch (mode)
-  {
-    case 0:
-      if (NB_LAST_MESSAGE <= 0) return;
-      LAST_MESSAGE.clear();
-      NB_LAST_MESSAGE = 0;
-      break;
-
-    case 1: // Add string to array of messages
-      size = static_cast<Id>(strlen(string));
-      if (size <= 0) return;
-
-      if (NB_LAST_MESSAGE <= 0)
-        LAST_MESSAGE.resize(1);
-      else
-      {
-        LAST_MESSAGE.resize(NB_LAST_MESSAGE + 1);
-      }
-      LAST_MESSAGE[NB_LAST_MESSAGE].resize(size + 1);
-      address = LAST_MESSAGE[NB_LAST_MESSAGE].data();
-      (void)gslStrcpy(address, string);
-      address[size] = '\0';
-      NB_LAST_MESSAGE++;
-      break;
-
-    case -1: // Concatenate
-      size = static_cast<Id>(strlen(string));
-      if (size <= 0) return;
-
-      if (NB_LAST_MESSAGE <= 0)
-      {
-        set_last_message(1, string);
-        return;
-      }
-
-      sizaux                            = static_cast<Id>(strlen(LAST_MESSAGE[NB_LAST_MESSAGE - 1].data()));
-      LAST_MESSAGE[NB_LAST_MESSAGE - 1].resize(size + sizaux + 2);
-      address = LAST_MESSAGE[NB_LAST_MESSAGE - 1].data();
-      address[sizaux] = ' ';
-      (void)gslStrcpy(&address[sizaux + 1], string);
-      address[size + sizaux + 1] = '\0';
-      break;
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Print the array of last messages
- **
- *****************************************************************************/
-void print_last_message(void)
-{
-  if (NB_LAST_MESSAGE <= 0) return;
-
-  mestitle(0, "Last Message");
-  for (Id i = 0; i < NB_LAST_MESSAGE; i++)
-  {
-    message(">>> %s\n", LAST_MESSAGE[i].data());
-  }
-  message("\n");
-}
-
-/****************************************************************************/
-/*!
  **  Return all the ways to split ncolor into two non-empty subsets
  **
  ** \return Return an array of possibilities
@@ -909,9 +742,9 @@ VectorInt ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
 
   /* Initializations */
 
-  p      = (flag_half) ? static_cast<Id>(floor((double)ncolor / 2.)) : ncolor - 1;
-  nmax   = static_cast<Id>(pow(2, ncolor));
-  np     = 0;
+  p    = (flag_half) ? static_cast<Id>(floor((double)ncolor / 2.)) : ncolor - 1;
+  nmax = static_cast<Id>(pow(2, ncolor));
+  np   = 0;
 
   /* Core allocation */
 
@@ -948,22 +781,6 @@ VectorInt ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
     }
   }
   return (mattab);
-}
-
-/****************************************************************************/
-/*!
- **   Convert std::string into a char *
- **
- ** \return  Pointer to the returned array of characters
- **
- ** \param[in]  s        Input VectorString
- **
- *****************************************************************************/
-char* convert(const std::string& s)
-{
-  char* pc = new char[s.size() + 1];
-  (void)gslStrcpy(pc, s.c_str());
-  return pc;
 }
 
 } // namespace gstlrn

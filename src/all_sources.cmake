@@ -77,7 +77,9 @@ set(SRC
   Covariances/CovWendland0.cpp
   Covariances/CovWendland1.cpp
   Covariances/CovWendland2.cpp
+  Covariances/CovGradientGeneric.cpp
   Covariances/CovGradientFunctional.cpp
+  Covariances/CovGradientNumerical.cpp
   Covariances/CovMatern.cpp
   Covariances/CovLMGradient.cpp
   Covariances/CovPower.cpp
@@ -109,7 +111,6 @@ set(SRC
   Covariances/ACovFunc.cpp
   Covariances/CorAniso.cpp
   Covariances/CovAniso.cpp
-  Covariances/CovGradientNumerical.cpp
   Covariances/CovCubic.cpp
   Covariances/CovNugget.cpp
   Covariances/CovBesselJ.cpp

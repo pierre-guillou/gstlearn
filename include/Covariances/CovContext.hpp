@@ -10,16 +10,15 @@
 /******************************************************************************/
 #pragma once
 
-#include "Space/ASpaceObject.hpp"
 #include "Space/ASpace.hpp"
-
+#include "Space/ASpaceObject.hpp"
 
 namespace gstlrn
 {
 class Db;
 class Vario;
 
-class GSTLEARN_EXPORT CovContext : public ASpaceObject
+class GSTLEARN_EXPORT CovContext: public ASpaceObject
 {
 public:
   CovContext(Id nvar = 1, const ASpaceSharedPtr& space = ASpaceSharedPtr());
@@ -40,31 +39,35 @@ public:
 
   static CovContext* create(Id nvar, Id ndim);
 
-  bool isEqual(const CovContext &r) const;
+  bool isEqual(const CovContext& r) const;
 
-  Id                             getNVar()      const { return _nVar; }
-  double                          getField()     const { return _field; }
-  const VectorDouble&             getCovar0()    const { return _covar0; }
+  Id getNVar() const { return _nVar; }
+  double getField() const { return _field; }
+  const VectorDouble& getCovar0() const { return _covar0; }
 
   double getCovar0(Id ivar, Id jvar) const;
 
-  void setNVar(Id nvar)                 { _nVar = nvar; _update(); }
-  void setField(double field)            { _field = field; }
+  void setNVar(Id nvar)
+  {
+    _nVar = nvar;
+    _update();
+  }
+  void setField(double field) { _field = field; }
 
   void setCovar0s(const VectorDouble& covar0);
   void setCovar0(Id ivar, Id jvar, double covar0);
 
   void copyCovContext(const CovContext& ctxt, bool severe = false);
 
-  const CovContext* createReduce(const VectorInt &validVars) const;
+  const CovContext* createReduce(const VectorInt& validVars) const;
 
 private:
-  Id           _nVar;         /*! Number of variables */
-  double        _field;        /*! Field maximum size */
-  VectorDouble  _covar0;       /*! Variance-Covariance matrix (used for covariances) */
+  Id _nVar;             /*! Number of variables */
+  double _field;        /*! Field maximum size */
+  VectorDouble _covar0; /*! Variance-Covariance matrix (used for covariances) */
 
 private:
-  Id  _getIndex(Id ivar, Id jvar) const;
+  Id _getIndex(Id ivar, Id jvar) const;
   void _update();
 };
-}
+} // namespace gstlrn
