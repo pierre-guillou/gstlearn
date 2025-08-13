@@ -60,6 +60,7 @@ jobs:
         python-version: ${{env.PYTHON_VERSION}}
         activate-environment: true
 
+    # Downgrade notebook and plotly (for 3D render) using nbconvert generation
     - name: Install Python dependencies
       run: |
         uv pip install numpy
