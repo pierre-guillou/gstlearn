@@ -705,7 +705,7 @@ double GeometryHelper::geodeticAngularDistance(double long1,
   double slat2 = sin(rlat2);
   double clat2 = cos(rlat2);
   double dlong = rlon2 - rlon1;
-  if (ABS(dlong) < EPSILON3)
+  if (ABS(dlong) < EPSILON6)
   {
     double dlat = ABS(rlat2 - rlat1);
     return (radius * dlat);
