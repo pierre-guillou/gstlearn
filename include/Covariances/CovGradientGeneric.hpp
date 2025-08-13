@@ -21,8 +21,12 @@ class ACov;
 class CovAniso;
 /**
  * \brief
- * This class describes the Gneiting correlation function.
- *
+ * This class describes the Covariance to be used when processing Data
+ * and its gradient components.
+ * This covariance is based on the initial covariance of the Data and derives
+ * the simple and cross covariances of its gradient components.
+ * It uses Numerical Derivation and therefore is suitable whatever the type
+ * of covariance used for the Data variable.
  */
 class GSTLEARN_EXPORT CovGradientGeneric: public ACov
 {
