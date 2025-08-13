@@ -8,8 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Covariances/CovGradient.hpp"
-#include "Covariances/CovAniso.hpp"
+#include "Covariances/CovGradientGeneric.hpp"
 #include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Space/ASpace.hpp"
@@ -18,11 +17,10 @@
 #include "geoslib_define.h"
 
 #include <cmath>
-#include <vector>
 
 namespace gstlrn
 {
-CovGradient::CovGradient(const CovAniso& cova, double ballradius)
+CovGradientGeneric::CovGradientGeneric(const ACov& cova, double ballradius)
   : ACov()
   , _nVar(0)
   , _ballRadius(ballradius)
@@ -34,7 +32,7 @@ CovGradient::CovGradient(const CovAniso& cova, double ballradius)
   _ctxt.setNVar(_nVar);
 }
 
-CovGradient::CovGradient(const CovGradient& r)
+CovGradientGeneric::CovGradientGeneric(const CovGradientGeneric& r)
   : ACov(r)
   , _nVar(r._nVar)
   , _ballRadius(r._ballRadius)
@@ -42,11 +40,11 @@ CovGradient::CovGradient(const CovGradient& r)
 {
 }
 
-CovGradient::~CovGradient()
+CovGradientGeneric::~CovGradientGeneric()
 {
 }
 
-bool CovGradient::_isValidForGradient() const
+bool CovGradientGeneric::_isValidForGradient() const
 {
   auto ndim = _covRef.getNDim();
   auto nvar = _covRef.getNVar();
@@ -63,18 +61,18 @@ bool CovGradient::_isValidForGradient() const
   return true;
 }
 
-void CovGradient::_optimizationSetTarget(SpacePoint& pt) const
+void CovGradientGeneric::_optimizationSetTarget(SpacePoint& pt) const
 {
   DECLARE_UNUSED(pt)
 }
 
-// void CovGradient::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
+// void CovGradientGeneric::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
 // {
 //   DECLARE_UNUSED(mode)
 //   DECLARE_UNUSED(ps)
 // }
 
-// void CovGradient::_optimizationPostProcess() const
+// void CovGradientGeneric::_optimizationPostProcess() const
 // {
 // }
 
@@ -92,14 +90,14 @@ void CovGradient::_optimizationSetTarget(SpacePoint& pt) const
  * @remark The argument 'ivar' (resp. 'jvar') gives the variable rank (if equal to 0)
  * Otherwise it gives the space index derivative (=idim-1)
  */
-double CovGradient::_eval(const SpacePoint& p1,
-                          const SpacePoint& p2,
-                          Id ivar,
-                          Id jvar,
-                          const CovCalcMode* mode) const
+double CovGradientGeneric::_eval(const SpacePoint& p1,
+                                 const SpacePoint& p2,
+                                 Id ivar,
+                                 Id jvar,
+                                 const CovCalcMode* mode) const
 {
   if (ivar == 0 && jvar == 0)
-    return _covRef._eval(p1, p2, ivar, jvar, mode);
+    return _covRef.evalCov(p1, p2, ivar, jvar, mode);
 
   Id idim = ivar - 1;
   Id jdim = jvar - 1;

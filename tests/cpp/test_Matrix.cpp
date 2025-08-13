@@ -101,7 +101,6 @@ int main(int argc, char* argv[])
   double proba = 0.4; // Probability to set values to 0 (making matrix sparse)
 
   // We create a square symmetrical matrix (not necessarily sparse)
-
   MatrixDense MR(nrow, ncol);
   for (Id icol = 0; icol < ncol; icol++)
     for (Id irow = 0; irow < nrow; irow++)
@@ -115,7 +114,6 @@ int main(int argc, char* argv[])
   MR.display();
 
   // Checking using the operator to modify and correct the initial matrix MR()
-
   double memo = MR(1, 2);
   message("Initial value of M(1,2) = %lf\n", memo);
 
@@ -129,7 +127,6 @@ int main(int argc, char* argv[])
   MR.display();
 
   // The symmetric matrix is obtained as M = t(MR) %*% MR
-
   AMatrix* MRt = MR.transpose();
   MRt->display();
   //  AMatrix* M = prodMatMatInPlace(MRt, &MR);
@@ -138,11 +135,12 @@ int main(int argc, char* argv[])
   M->display();
 
   // Creating two vectors for future use
-
   V1.resize(ncol, 0.);
   V2.resize(ncol, 0.);
 
+  ////////////////////////////////////////////////////////////////////
   // Create the different matrix formats (by conversion or extraction)
+  ////////////////////////////////////////////////////////////////////
 
   // To a rectangular matrix
   MatrixDense MRR(nrow, ncol);
@@ -165,9 +163,10 @@ int main(int argc, char* argv[])
   message("Matrix MSP\n");
   MSP->display();
 
-  /**
-   * Adding a constant value to the diagonal of a matrix
-   */
+  //////////////////////////////////////////////////////
+  // Adding a constant value to the diagonal of a matrix
+  //////////////////////////////////////////////////////
+
   double addendum = 1.432;
 
   mestitle(0, "Adding a constant value to the diagonal of a matrix");
@@ -185,9 +184,10 @@ int main(int argc, char* argv[])
   MSP->addScalarDiag(addendum);
   message("Are results for MRR and MSP similar: %d\n", (Id)MRR.isSame(*MSP));
 
-  /**
-   * Multiplying the matrix by a constant
-   */
+  ///////////////////////////////////////
+  // Multiplying the matrix by a constant
+  ///////////////////////////////////////
+
   double multiply = 3.2;
 
   mestitle(0, "Multiplying a Matrix by a constant");
@@ -205,10 +205,10 @@ int main(int argc, char* argv[])
   MSP->prodScalar(multiply);
   message("Are results for MRR and MSP similar: %d\n", (Id)MRR.isSame(*MSP));
 
-  /**
-   * Adding a constant to a matrix
-   * Note: This does not make sense for sparse or diagonal matrices
-   */
+  /////////////////////////////////////////////////////////////////
+  // Adding a constant to a matrix
+  // Note: This does not make sense for sparse or diagonal matrices
+  /////////////////////////////////////////////////////////////////
 
   mestitle(0, "Adding a constant value to the whole matrix");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
@@ -223,9 +223,10 @@ int main(int argc, char* argv[])
   MSS.addScalar(addendum);
   message("Are results for MRR and MSS similar: %d\n", (Id)MRR.isSame(MSS));
 
-  /**
-   * Linear combination
-   */
+  /////////////////////
+  // Linear combination
+  /////////////////////
+
   double cx = 1.3;
   double cy = -0.5;
 
@@ -244,10 +245,11 @@ int main(int argc, char* argv[])
   MSP->addMat(*MSP, cx, cy);
   message("Are results for MRR and MSP similar: %d\n", (Id)MRR.isSame(*MSP));
 
-  /**
-   * Extraction of a Vector
-   * All the tests are not performed on all the matrix types
-   */
+  //////////////////////////////////////////////////////////
+  // Extraction of a Vector
+  // All the tests are not performed on all the matrix types
+  //////////////////////////////////////////////////////////
+
   mestitle(0, "Extracting Vectors from Matrix");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
 
@@ -276,9 +278,10 @@ int main(int argc, char* argv[])
   print_vector("Fourth Column", 0, (Id)Vref.size(), Vref.data());
   message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V1));
 
-  /**
-   * Product of the matrix by a vector
-   */
+  ////////////////////////////////////
+  // Product of the matrix by a vector
+  ////////////////////////////////////
+
   Vref.resize(nrow, 0.);
 
   mestitle(0, "Product of the matrix by a vector");
@@ -296,9 +299,9 @@ int main(int argc, char* argv[])
   MSP->prodMatVecInPlace(V1, V2);
   message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V2));
 
-  /**
-   * Linear solver
-   */
+  ////////////////
+  // Linear solver
+  ////////////////
 
   V3.resize(nrow, 0.);
 
@@ -318,9 +321,9 @@ int main(int argc, char* argv[])
   MSP->prodMatVecInPlace(V2, V3);
   message("Are results correct for MSP: %d\n", (Id)VH::isEqual(V1, V3));
 
-  /**
-   * Inversion
-   */
+  ////////////
+  // Inversion
+  ////////////
 
   mestitle(0, "Matrix Inversion");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
@@ -348,9 +351,9 @@ int main(int argc, char* argv[])
   message("Are results correct for MSP: %d\n", (Id)Res->isIdentity());
   delete Res;
 
-  /*
-   * Auxiliary functions (virtual in AMatrix)
-   */
+  ///////////////////////////////////////////
+  // Auxiliary functions (virtual in AMatrix)
+  ///////////////////////////////////////////
 
   mestitle(0, "Setting various Elements to known values");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
@@ -546,9 +549,9 @@ int main(int argc, char* argv[])
   MSP->setDiagonalToConstant(vdiag0);
   MSP->display();
 
-  /*
-   * Testing LU
-   */
+  /////////////
+  // Testing LU
+  /////////////
 
   Id neq  = 3;
   Id neq2 = neq * neq;
@@ -593,9 +596,9 @@ int main(int argc, char* argv[])
   (void)a.invert();
   a.display();
 
-  // ************
+  ///////////////
   // Eigen values
-  // ************
+  ///////////////
 
   mestitle(0, "Eigen values calculation for Dense matrices");
   reset_to_initial_contents(M, MRR, MSG, MSS, MSP);
@@ -621,9 +624,9 @@ int main(int argc, char* argv[])
   const MatrixSquare* eigNoVec = MNoEig->getEigenVectors();
   eigNoVec->display();
 
-  // *********************
+  ////////////////////////
   // Cholesky calculations
-  // *********************
+  ////////////////////////
 
   // Compute Cholesky factorization (only for comparison)
   CholeskyDense MEigChol(*MEig);
@@ -696,12 +699,11 @@ int main(int argc, char* argv[])
   message("Result Matrix X =\n");
   Bres.display();
 
-  MatrixDense* Bcheck = MatrixFactory::prodMatMat<MatrixDense>(MEig, &Bres);
+  auto* Bcheck = MatrixFactory::prodMatMat<MatrixDense>(MEig, &Bres);
   message("Is M * X = B: %d\n", (Id)Bmat.isSame(*Bcheck));
   delete Bcheck;
 
   // Product by Diagonal built from a vector
-
   MatrixSparse* MSNDEig = prodNormDiagVec(MSEig, B, 1);
   message("Product by Diagonal from Vector (Eigen)\n");
   MSNDEig->display();
@@ -719,23 +721,21 @@ int main(int argc, char* argv[])
   MSNoEig->display();
 
   // Gluing two sparse matrices
-
-  MatrixSparse* MSGlueEig = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(MSEig, MSEig, true, true));
+  auto* MSGlueEig = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(MSEig, MSEig, true, true));
   MSGlueEig->display();
-  MatrixSparse* MSGlueNoEig = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(MSNoEig, MSNoEig, true, true));
+  auto* MSGlueNoEig = dynamic_cast<MatrixSparse*>(MatrixFactory::createGlue(MSNoEig, MSNoEig, true, true));
   MSGlueNoEig->display();
 
   // Compare Generalized Eigen values calculated using Eigen Library or not (dense matrix only)
-
   mestitle(0, "Generalized Eigen values calculation for Dense matrices");
 
   // We use the Square symmetric matrices created in previous paragraph
   // We must construct another square symmetric matrix (B)
   VectorDouble vbh = VH::simulateGaussian(nrow * ncol);
 
-  MatrixDense* MREig    = MatrixDense::createFromVD(vbh, nrow, ncol, false);
-  AMatrix* MREigt       = MREig->transpose();
-  MatrixSymmetric* BEig = MatrixFactory::prodMatMat<MatrixSymmetric>(MREig, MREigt);
+  MatrixDense* MREig = MatrixDense::createFromVD(vbh, nrow, ncol, false);
+  AMatrix* MREigt    = MREig->transpose();
+  auto* BEig         = MatrixFactory::prodMatMat<MatrixSymmetric>(MREig, MREigt);
   delete MREig;
   delete MREigt;
 
@@ -751,9 +751,9 @@ int main(int argc, char* argv[])
   genEigVec->display();
   delete BEig;
 
-  MatrixDense* MRNoEig    = MatrixDense::createFromVD(vbh, nrow, ncol, false);
-  AMatrix* MRNoEigt       = MRNoEig->transpose();
-  MatrixSymmetric* BNoEig = MatrixFactory::prodMatMat<MatrixSymmetric>(MRNoEig, MRNoEigt);
+  MatrixDense* MRNoEig = MatrixDense::createFromVD(vbh, nrow, ncol, false);
+  AMatrix* MRNoEigt    = MRNoEig->transpose();
+  auto* BNoEig         = MatrixFactory::prodMatMat<MatrixSymmetric>(MRNoEig, MRNoEigt);
   delete MRNoEig;
   delete MRNoEigt;
 
@@ -764,8 +764,21 @@ int main(int argc, char* argv[])
   genEigNoVec->display();
   delete BNoEig;
 
-  // Free the pointers
+  ////////////////////////////////////////////////
+  // Get Eigen values from of a tridiagonal matrix
+  ////////////////////////////////////////////////
+  mestitle(0, "Constructing Square tridiagonal matrix and performing Eigen decomposition");
+  Id neqDiag           = 7;
+  VectorDouble vecdiag = VH::simulateGaussian(neqDiag);
+  VectorDouble vecinf  = VH::simulateUniform(neqDiag);
+  VectorDouble vecsup  = VH::simulateUniform(neqDiag);
+  auto* matsqr         = MatrixSquare::createFromTridiagonal(vecdiag, vecinf, vecsup);
+  matsqr->computeEigen();
+  VH::dump("Eigen Values", matsqr->getEigenValues());
+  message("Eigen Vectors\n");
+  matsqr->getEigenVectors()->display();
 
+  // Free the pointers
   delete M;
   return (0);
 }

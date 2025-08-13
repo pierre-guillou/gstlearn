@@ -381,8 +381,11 @@ VectorDouble AnamDiscreteDD::_generator(const VectorDouble& vecc,
 
   /* Diagonalize the infinitesimal generator */
 
-  matrix_eigen_tridiagonal(vecc.data(), vecb.data(), veca.data(),
-                           nclass, eigvec.data(), eigval.data());
+  auto* matTri = MatrixSquare::createFromTridiagonal(vecc, veca, vecb);
+  matTri->computeEigen();
+  eigval = matTri->getEigenValues();
+  eigvec = matTri->getEigenVectors()->getValues();
+  delete matTri;
 
   /* Choose to set the Hn(0) = 1 */
 

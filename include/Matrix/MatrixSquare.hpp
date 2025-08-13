@@ -54,6 +54,10 @@ public:
                                     Id nrow,
                                     bool byCol             = false,
                                     bool invertColumnOrder = false);
+  static MatrixSquare* createFromTridiagonal(const VectorDouble& vecdiag,
+                                             const VectorDouble& vecinf,
+                                             const VectorDouble& vecsup);
+
   double trace() const;
 
   /*! Perform inner product */
@@ -69,8 +73,10 @@ public:
 
   double normVec(const VectorDouble& vec);
   Id decomposeLU(MatrixSquare& tls,
-                  MatrixSquare& tus,
-                  double eps = EPSILON20);
+                 MatrixSquare& tus,
+                 double eps = EPSILON20);
+
+  Id computeEigen(bool optionPositive = true);
 
 protected:
   bool _isNumbersValid(Id nrows, Id ncols) const override;
@@ -79,9 +85,9 @@ protected:
 private:
   Id _invertLU();
   Id _solveLU(const MatrixSquare& tus,
-               const MatrixSquare& tls,
-               const double* b,
-               double* x);
+              const MatrixSquare& tls,
+              const double* b,
+              double* x);
   Id _forwardLU(const MatrixSquare& tls, const double* b, double* x, double eps = EPSILON20);
   Id _backwardLU(const MatrixSquare& tus, const double* b, double* x, double eps = EPSILON20);
 };

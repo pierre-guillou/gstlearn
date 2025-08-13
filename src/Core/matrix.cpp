@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/Memory.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "geoslib_define.h"
@@ -18,35 +17,18 @@
 /*! \cond */
 #define TRI(i)        (((i) * ((i) + 1)) / 2)
 #define SQ(i, j, neq) ((j) * neq + (i))
-#define VECTOR(i, j)  vector[SQ(i, j, neq)]
 #define A(i, j)       a[SQ(i, j, neq)]
-#define ILS(i, j)     ils[SQ(i, j, neq)]
 #define B(i, j)       b[SQ(i, j, neq)]
 #define C(i, j)       c[SQ(i, j, neqm1)]
 #define X(i, j)       x[SQ(i, j, neq)]
-#define AMT(i, j)     amat[SQ(i, j, neq)]
-#define HMT(i, j)     hmat[SQ(i, j, neq)]
-#define AIMT(i, j)    aimat[SQ(i, j, neq)]
-#define HA(i, j)      ha[SQ(i, j, neq)]
-#define AI(i, j)      ai[SQ(i, j, neq)]
-#define TEMP(i, j)    temp[SQ(i, j, na)]
 #define AS(i, j)      a[SQ(i, j, neq)]
-#define AT(i, j)      at[TRI(j) + (i)] /* for j >= i */
 #define BS(i, j)      b[SQ(i, j, neq)] // Proposition a valider: c'etait j,i
 #define XS(i, j)      x[SQ(i, j, neq)] // Proposition a valider: c'etait j,i
 #define V1(i, j)      v1[SQ(i, j, n1)]
 #define V2(i, j)      v2[SQ(i, j, n2)]
-#define V3(i, j)      v3[SQ(i, j, n1)] /* Warning not to change the last argument: major bug */
-#define V4(i, j)      v4[SQ(i, j, n1)]
+#define V3(i, j)      v3[SQ(i, j, n1)]           /* Warning not to change the last argument: major bug */
 #define TU(i, j)      tu[TRI(i) + (j)]           /* for i >= j */
 #define TL(i, j)      tl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
-#define XL(i, j)      xl[SQ(i, j, neq) - TRI(j)] /* for i >= j */
-#define AL(i, j)      al[SQ(i, j, neq) - TRI(j)] /* for i >= j */
-#define TABEMT(i, j)  tabemat[SQ(i, j, neq)]
-#define TABIMT(i, j)  tabimat[SQ(i, j, neq)]
-#define TABOUT(i, j)  tabout[SQ(i, j, neq)]
-#define EIGVEC(i, j)  eigvec[SQ(j, i, neq)]
-#define A2(i, j)      a2[SQ(i, j, 2 * neq)]
 #define U(i, j)       u[SQ(j, i, neq)]
 #define V(i, j)       v[SQ(j, i, neq)]
 /*! \endcond */
@@ -56,290 +38,6 @@ namespace gstlrn
 static double _getTolInvert()
 {
   return EPSILON25;
-}
-static double _getEpsMatrix()
-{
-  return 2.3e-16;
-}
-
-/*****************************************************************************/
-/*!
- **  Calculates the eigen values and eigen vectors of a symmetric square matrix
- **             A X = X l
- **
- ** \return  Return code:
- ** \return   0 no error
- ** \return   1 convergence problem
- **
- ** \param[in]  a_in  square symmetric matrix (dimension = neq*neq)
- ** \param[in]  neq   matrix dimension
- **
- ** \param[out] value  matrix of the eigen values (dimension: neq)
- ** \param[out] vector matrix of the eigen vectors (dimension: neq*neq)
- **
- ** \remark  a_in is protected
- **
- *****************************************************************************/
-Id matrix_eigen(const double* a_in, Id neq, double* value, double* vector)
-
-{
-  double a11, a12, a13, a21, a22, a23, a33, a34;
-  double bb, cc, co, hold, s, si, v1, v2, bigk, qj, pp, temp;
-  std::array<VectorDouble, 4> work;
-  VectorDouble a, tmp;
-  VectorInt ind;
-  Id i, j, k, ji, ki, kj, n1, n2, i1, i2, iter, error;
-
-  /* Initializations */
-
-  error = 1;
-
-  a34 = 0.0;
-  if (neq == 1)
-  {
-    value[0]     = a_in[0];
-    VECTOR(0, 0) = 1;
-    return (0);
-  }
-
-  a.resize(neq * neq);
-  for (i = 0; i < neq * neq; i++) a[i] = a_in[i];
-
-  for (i = 0; i < 4; i++)
-  {
-    work[i].resize(neq);
-  }
-
-  work[0][0] = AS(0, 0);
-  if (neq <= 2)
-  {
-    work[0][1] = AS(1, 1);
-    work[1][1] = AS(1, 0);
-  }
-  else
-  {
-    for (j = 1; j < neq; j++)
-    {
-      work[0][j] = AS(j, j);
-      for (i = 0; i < j; i++) AS(i, j) = AS(j, i);
-    }
-
-    for (i = 0; i < neq - 2; i++)
-    {
-      pp = 0.;
-      i1 = i + 1;
-      for (j = i1; j < neq; j++) pp += AS(i, j) * AS(i, j);
-      work[1][i1] = SIGN(AS(i, i1), -sqrt(pp));
-      if (pp <= 0) continue;
-      hold = pp - work[1][i1] * AS(i, i1);
-      AS(i, i1) -= work[1][i1];
-      for (ki = i1; ki < neq; ki++)
-      {
-        qj = 0.;
-        for (kj = i1; kj <= ki; kj++) qj += AS(kj, ki) * AS(i, kj);
-        for (kj = ki + 1; kj < neq; kj++) qj += AS(ki, kj) * AS(i, kj);
-        work[2][ki] = qj / hold;
-      }
-      bigk = 0.;
-      for (kj = i1; kj < neq; kj++) bigk += AS(i, kj) * work[2][kj];
-      bigk /= 2.0 * hold;
-      for (kj = i1; kj < neq; kj++) work[2][kj] -= bigk * AS(i, kj);
-      for (ki = i1; ki < neq; ki++)
-        for (kj = ki; kj < neq; kj++)
-          AS(ki, kj) -= work[2][ki] * AS(i, kj) + work[2][kj] * AS(i, ki);
-    }
-
-    for (i = 1; i < neq; i++)
-    {
-      hold       = work[0][i];
-      work[0][i] = AS(i, i);
-      AS(i, i)   = hold;
-    }
-    work[1][neq - 1] = AS(neq - 2, neq - 1);
-  }
-
-  work[3][0] = work[0][0];
-  for (i = 1; i < neq; i++)
-    for (j = 0; j < 2; j++) work[3 - j][i] = work[j][i];
-
-  iter = 0;
-  do
-  {
-    n1 = n2 = 0;
-    for (i2 = neq - 1; i2 > 0 && n2 == 0; i2--)
-    {
-      n1 = 0;
-      for (i1 = i2; i1 > 0 && n1 == 0; i1--)
-        if (ABS(work[2][i1]) <=
-            _getEpsMatrix() * neq * (ABS(work[3][i1 - 1]) + ABS(work[3][i1])))
-          n1 = i1;
-      if (n1 != i2) n2 = i2;
-    }
-    if (n2 < 1) break;
-
-    bb  = (work[3][n2] - work[3][n2 - 1]) / 2.;
-    cc  = work[2][n2] * work[2][n2];
-    a22 = work[3][n1];
-    a12 = a22 - work[3][n2];
-    if (!isZero(bb) || !isZero(cc))
-      a12 -= cc / (bb + SIGN(bb, sqrt(bb * bb + cc)));
-    a23 = work[2][n1 + 1];
-    a13 = a23;
-    for (i = n1; i < n2; i++)
-    {
-      a33 = work[3][i + 1];
-      if (i != n2 - 1) a34 = work[2][i + 2];
-      s  = sqrt(a12 * a12 + a13 * a13);
-      si = a13 / s;
-      co = a12 / s;
-      if (i != n1) work[2][i] = s;
-      a11            = co * a22 + si * a23;
-      a12            = co * a23 + si * a33;
-      a13            = si * a34;
-      a21            = co * a23 - si * a22;
-      a22            = co * a33 - si * a23;
-      a23            = co * a34;
-      work[3][i]     = a11 * co + a12 * si;
-      a12            = -a11 * si + a12 * co;
-      work[2][i + 1] = a12;
-      a22            = a22 * co - a21 * si;
-    }
-    work[3][n2] = a22;
-    iter++;
-  } while (iter < 10 * neq && n2 != -1);
-
-  for (i = 0; i < neq; i++)
-  {
-    value[i]   = work[0][i];
-    work[2][i] = work[1][i];
-    for (j = 0; j < neq; j++) VECTOR(j, i) = 0.;
-    VECTOR(i, i) = 1.;
-  }
-
-  k = 0;
-  for (n2 = neq - 1; n2 >= 1; n2--)
-  {
-    hold = work[3][n2];
-    iter = 0;
-    do
-    {
-      bb  = (value[n2] - value[n2 - 1]) / 2.;
-      cc  = work[2][n2] * work[2][n2];
-      a22 = value[n2];
-      if (!isZero(bb) || !isZero(cc))
-        a22 += cc / (bb + SIGN(bb, sqrt(bb * bb + cc)));
-      for (i = 0; i < n2; i++)
-        if (ABS(hold - a22) > ABS(work[3][i] - a22))
-        {
-          hold        = work[3][i];
-          work[3][i]  = work[3][n2];
-          work[3][n2] = hold;
-        }
-
-      n1 = 0;
-      for (i1 = n2; i1 > 0 && n1 == 0; i1--)
-        if (ABS(work[2][i1]) <=
-            _getEpsMatrix() * neq * (ABS(value[i1 - 1]) + ABS(value[i1])))
-          n1 = i1;
-      if (n2 == n1) break;
-
-      if (iter >= 3) hold = a22;
-      k++;
-      a22 = value[n1];
-      a12 = a22 - hold;
-      a23 = work[2][n1 + 1];
-      a13 = a23;
-      for (i = n1; i < n2; i++)
-      {
-        a33 = value[i + 1];
-        if (i != n2 - 1) a34 = work[2][i + 2];
-        s  = SIGN(a12, sqrt(a12 * a12 + a13 * a13));
-        si = a13 / s;
-        co = a12 / s;
-        for (ji = 0; ji <= MIN(neq - 1, i + k); ji++)
-        {
-          v1                = VECTOR(ji, i);
-          v2                = VECTOR(ji, i + 1);
-          VECTOR(ji, i)     = v1 * co + v2 * si;
-          VECTOR(ji, i + 1) = v2 * co - v1 * si;
-        }
-        if (i != n1) work[2][i] = s;
-        a11            = co * a22 + si * a23;
-        a12            = co * a23 + si * a33;
-        a13            = si * a34;
-        a21            = co * a23 - si * a22;
-        a22            = co * a33 - si * a23;
-        a23            = co * a34;
-        value[i]       = a11 * co + a12 * si;
-        a12            = -a11 * si + a12 * co;
-        work[2][i + 1] = a12;
-        a22            = a22 * co - a21 * si;
-      }
-      value[n2] = a22;
-      iter++;
-    } while (iter < 20 && n2 != n1);
-    if (iter == 20) goto label_end;
-  }
-
-  for (j = 0; j < neq; j++)
-  {
-    v2 = VECTOR(0, j) * VECTOR(0, j);
-    v1 = v2 * work[0][0];
-    for (i = 1; i < neq; i++)
-    {
-      v2 += VECTOR(i, j) * VECTOR(i, j);
-      v1 += VECTOR(i, j) *
-            (2. * work[1][i] * VECTOR(i - 1, j) + work[0][i] * VECTOR(i, j));
-    }
-    value[j] = v1 / v2;
-  }
-
-  if (neq > 2)
-    for (j = 0; j < neq; j++)
-      for (i = neq - 2; i > 0; i--)
-        if (!isZero(work[1][i]))
-        {
-          pp = 0.;
-          for (ki = i; ki < neq; ki++) pp += AS(i - 1, ki) * VECTOR(ki, j);
-          pp /= (AS(i - 1, i) * work[1][i]);
-          for (ki = i; ki < neq; ki++) VECTOR(ki, j) += pp * AS(i - 1, ki);
-        }
-
-  /* Sort the eigen values and the corresponding vectors */
-
-  ind.resize(neq);
-  tmp.resize(neq * neq);
-  for (i = 0; i < neq; i++) ind[i] = i;
-  ut_sort_double(0, neq, ind.data(), value);
-  for (i = 0; i < neq; i++)
-    for (j = 0; j < neq; j++) tmp[i + neq * j] = VECTOR(i, ind[j]);
-  for (i = 0; i < neq * neq; i++) vector[i] = tmp[i];
-
-  /* Sorting in decreasing order */
-
-  for (i = 0; i < neq / 2; i++)
-  {
-    k        = neq - i - 1;
-    temp     = value[i];
-    value[i] = value[k];
-    value[k] = temp;
-    for (j = 0; j < neq; j++)
-    {
-      temp         = VECTOR(j, i);
-      VECTOR(j, i) = VECTOR(j, k);
-      VECTOR(j, k) = temp;
-    }
-  }
-
-  /* Set the error returned code */
-
-  error = 0;
-
-label_end:
-
-  if (error) print_matrix("Eigen matrix", 0, 1, neq, neq, NULL, a_in);
-
-  return (error);
 }
 
 /*****************************************************************************/
@@ -556,7 +254,7 @@ double matrix_determinant(Id neq, const VectorDouble& b)
     default:
       /* Core allocation */
       double deter = 0.;
-      Id neqm1    = neq - 1;
+      Id neqm1     = neq - 1;
       VectorDouble c(neqm1 * neqm1, 0.);
 
       for (Id j1 = 0; j1 < neq; j1++)
@@ -624,111 +322,6 @@ Id matrix_cholesky_decompose(const double* a, double* tl, Id neq)
 
 /*****************************************************************************/
 /*!
- **  Performs the product between a triangular and a square matrix
- **  TL is the lower triangular matrix and X is a square matrix
- **
- ** \param[in]  mode Type of calculations:
- **             0 : X=TU%*%A
- **             1 : X=TL%*%A
- **             2 : X=A%*%TU
- **             3 : X=A%*%TL
- **             4 : X=t(A)%*%TU
- **             5 : X=t(A)%*%TL
- ** \param[in]  neq  number of equations in the system
- ** \param[in]  nrhs number of columns in x
- ** \param[in]  tl   Triangular matrix defined by column (dimension: neq * neq)
- ** \param[in]  a    matrix (dimension neq * nrhs)
- **
- ** \param[out] x    resulting matrix (dimension neq * nrhs)
- **
- *****************************************************************************/
-void matrix_cholesky_product(Id mode,
-                             Id neq,
-                             Id nrhs,
-                             const double* tl,
-                             const double* a,
-                             double* x)
-{
-  Id irhs, i, j, n1, n2;
-  double val, *v2;
-  const double* v1;
-
-  if (mode == 0)
-  {
-    for (irhs = 0; irhs < nrhs; irhs++)
-      for (i = 0; i < neq; i++)
-      {
-        val = 0.;
-        for (j = i; j < neq; j++) val += TL(j, i) * AS(j, irhs);
-        XS(i, irhs) = val;
-      }
-  }
-  else if (mode == 1)
-  {
-    for (irhs = 0; irhs < nrhs; irhs++)
-      for (i = 0; i < neq; i++)
-      {
-        val = 0.;
-        for (j = 0; j <= i; j++) val += TL(i, j) * AS(j, irhs);
-        XS(i, irhs) = val;
-      }
-  }
-  else if (mode == 2)
-  {
-    v2 = x;
-    n2 = nrhs;
-    for (irhs = 0; irhs < nrhs; irhs++)
-      for (i = 0; i < neq; i++)
-      {
-        val = 0.;
-        for (j = 0; j <= i; j++) val += AS(irhs, j) * TL(i, j);
-        V2(irhs, i) = val;
-      }
-  }
-  else if (mode == 3)
-  {
-    v2 = x;
-    n2 = nrhs;
-    for (irhs = 0; irhs < nrhs; irhs++)
-      for (i = 0; i < neq; i++)
-      {
-        val = 0.;
-        for (j = i; j < neq; j++) val += AS(irhs, j) * TL(j, i);
-        V2(irhs, i) = val;
-      }
-  }
-  else if (mode == 4)
-  {
-    v1 = a;
-    n1 = nrhs;
-    v2 = x;
-    n2 = nrhs;
-    for (irhs = 0; irhs < nrhs; irhs++)
-      for (i = 0; i < neq; i++)
-      {
-        val = 0.;
-        for (j = 0; j <= i; j++) val += V1(irhs, j) * TL(i, j);
-        V2(irhs, i) = val;
-      }
-  }
-  else if (mode == 5)
-  {
-    v1 = a;
-    n1 = nrhs;
-    v2 = x;
-    n2 = nrhs;
-    for (irhs = 0; irhs < nrhs; irhs++)
-      for (i = 0; i < neq; i++)
-      {
-        val = 0.;
-        for (j = i; j < neq; j++) val += V1(irhs, j) * TL(j, i);
-        V2(irhs, i) = val;
-      }
-  }
-}
-
-/*****************************************************************************/
-/*!
  **  Perform a linear combination of matrices or vectors
  **            [C] = 'coeffa' * [A] + 'coeffb' * [B]
  **
@@ -762,85 +355,6 @@ void matrix_combine(Id nval,
     if (b != nullptr) value += coeffb * b[i];
     c[i] = value;
   }
-}
-
-/*****************************************************************************/
-/*!
- **  Transform a tridiagonal non-symmetric matrix into a symmetric one
- **
- ** \return  Error return code (see remarks)
- **
- ** \param[in]  vecdiag Vector for the main diagonal
- ** \param[in]  vecinf  Vector for the subdiagonal (in the last neq-1 positions)
- ** \param[in]  vecsup  Vector for the superdiagonal (in the first neq positions)
- ** \param[in]  neq    matrix dimension
- **
- ** \param[out] eigvec square symmetric matrix (dimension: neq * neq)
- ** \param[out] eigval vector (dimensionL neq)
- **
- ** \remark Given the nonsymmetric tridiagonal matrix, we must have the products
- ** \remark of corresponding pairs of off-diagonal elements are all non-negative,
- ** \remark and zero only when both factors are zero
- **
- *****************************************************************************/
-Id matrix_eigen_tridiagonal(const double* vecdiag,
-                             const double* vecinf,
-                             const double* vecsup,
-                             Id neq,
-                             double* eigvec,
-                             double* eigval)
-{
-  VectorDouble b, e;
-  double h;
-  Id i, j;
-
-  /* Initializations */
-
-  e.resize(neq);
-  b.resize(neq * neq);
-
-  for (i = 1; i < neq; i++)
-  {
-    h = vecinf[i] * vecsup[i - 1];
-    if (h < 0) return (1);
-    if (isZero(h))
-    {
-      if (!isZero(vecinf[i]) || !isZero(vecsup[i - 1])) return (2);
-      e[i] = 0.;
-    }
-    else
-    {
-      e[i] = sqrt(h);
-    }
-  }
-
-  for (i = 0; i < neq * neq; i++)
-    b[i] = 0.;
-  for (i = 0; i < neq; i++)
-  {
-    B(i, i) = vecdiag[i];
-    if (i > 0) B(i, i - 1) = B(i - 1, i) = e[i];
-  }
-
-  /* Compute the eigen eigval and eigen eigvec */
-
-  matrix_eigen(b.data(), neq, eigval, eigvec);
-
-  e[0] = 1.;
-  for (i = 1; i < neq; i++)
-  {
-    if (!isZero(e[i]))
-      e[i] *= e[i - 1] / vecsup[i - 1];
-    else
-      e[i] = 1.;
-  }
-  for (i = 0; i < neq; i++)
-    for (j = 1; j < neq; j++)
-      EIGVEC(i, j) *= e[j];
-
-  /* Core deallocation */
-
-  return (0);
 }
 
 } // namespace gstlrn

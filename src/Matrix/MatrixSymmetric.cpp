@@ -173,7 +173,7 @@ void MatrixSymmetric::resetFromVVD(const VectorVectorDouble& tab, bool byCol)
 void MatrixSymmetric::normMatrix(const AMatrix& y, const MatrixSquare& x, bool transpose)
 {
   bool xEmpty = x.empty();
-  Id n       = 0;
+  Id n        = 0;
 
   if (xEmpty)
   {
@@ -256,9 +256,9 @@ Id MatrixSymmetric::computeGeneralizedEigen(const MatrixSymmetric& b, bool optio
 }
 
 Id MatrixSymmetric::_terminateEigen(const VectorDouble& eigenValues,
-                                     const VectorDouble& eigenVectors,
-                                     bool optionPositive,
-                                     bool changeOrder)
+                                    const VectorDouble& eigenVectors,
+                                    bool optionPositive,
+                                    bool changeOrder)
 {
   auto nrows = getNRows();
 
@@ -369,7 +369,7 @@ MatrixSymmetric* MatrixSymmetric::createFromTriangle(Id mode,
 Id MatrixSymmetric::_getTriangleSize() const
 {
   auto neq = getNRows();
-  Id size = neq * (neq + 1) / 2;
+  Id size  = neq * (neq + 1) / 2;
   return size;
 }
 
@@ -419,12 +419,12 @@ Id MatrixSymmetric::_matrix_qo(const VectorDouble& gmat, VectorDouble& xmat)
  **
  *****************************************************************************/
 Id MatrixSymmetric::_matrix_qoc(bool flag_invert,
-                                 const VectorDouble& gmat,
-                                 Id na,
-                                 const MatrixDense& amat,
-                                 const VectorDouble& bmat,
-                                 VectorDouble& xmat,
-                                 VectorDouble& lambda)
+                                const VectorDouble& gmat,
+                                Id na,
+                                const MatrixDense& amat,
+                                const VectorDouble& bmat,
+                                VectorDouble& xmat,
+                                VectorDouble& lambda)
 {
   double value;
 
@@ -524,20 +524,20 @@ Id MatrixSymmetric::_matrix_qoc(bool flag_invert,
  **
  *****************************************************************************/
 Id MatrixSymmetric::minimizeWithConstraintsInPlace(const VectorDouble& gmat,
-                                                    const MatrixDense& aemat,
-                                                    const VectorDouble& bemat,
-                                                    const MatrixDense& aimat,
-                                                    const VectorDouble& bimat,
-                                                    VectorDouble& xmat)
+                                                   const MatrixDense& aemat,
+                                                   const VectorDouble& bemat,
+                                                   const MatrixDense& aimat,
+                                                   const VectorDouble& bimat,
+                                                   VectorDouble& xmat)
 {
   Id ncur, first, lec;
   double omega, omin, value;
 
   /* Initializations */
 
-  auto neq  = getNRows();
-  auto nae  = aemat.getNCols();
-  auto nai  = aimat.getNCols();
+  auto neq = getNRows();
+  auto nae = aemat.getNCols();
+  auto nai = aimat.getNCols();
   Id namax = nae + nai;
 
   /* Case when there is no equality nor inequality constraints */
@@ -661,16 +661,16 @@ Id MatrixSymmetric::minimizeWithConstraintsInPlace(const VectorDouble& gmat,
  **
  *****************************************************************************/
 Id MatrixSymmetric::_constraintsError(const VectorInt& active,
-                                       const MatrixDense& aimat,
-                                       const VectorDouble& bimat,
-                                       const VectorDouble& xmat,
-                                       VectorDouble& vmat,
-                                       VectorInt& flag)
+                                      const MatrixDense& aimat,
+                                      const VectorDouble& bimat,
+                                      const VectorDouble& xmat,
+                                      VectorDouble& vmat,
+                                      VectorInt& flag)
 {
   double eps = EPSILON10;
 
-  auto neq   = getNRows();
-  auto nai   = aimat.getNCols();
+  auto neq  = getNRows();
+  auto nai  = aimat.getNCols();
   Id number = 0;
   Id ecr    = 0;
   for (Id i = 0; i < nai; i++)
@@ -715,12 +715,12 @@ Id MatrixSymmetric::_constraintsError(const VectorInt& active,
  **
  *****************************************************************************/
 Id MatrixSymmetric::_constraintsConcatenateMat(Id nae,
-                                                Id nai,
-                                                Id neq,
-                                                const VectorInt& active,
-                                                const MatrixDense& tabemat,
-                                                const MatrixDense& tabimat,
-                                                MatrixDense& tabout)
+                                               Id nai,
+                                               Id neq,
+                                               const VectorInt& active,
+                                               const MatrixDense& tabemat,
+                                               const MatrixDense& tabimat,
+                                               MatrixDense& tabout)
 {
   /* Copy the equalities */
 
@@ -764,11 +764,11 @@ Id MatrixSymmetric::_constraintsConcatenateMat(Id nae,
  **
  *****************************************************************************/
 Id MatrixSymmetric::_constraintsConcatenateVD(Id nae,
-                                               Id nai,
-                                               const VectorInt& active,
-                                               const VectorDouble& tabemat,
-                                               const VectorDouble& tabimat,
-                                               VectorDouble& tabout)
+                                              Id nai,
+                                              const VectorInt& active,
+                                              const VectorDouble& tabemat,
+                                              const VectorDouble& tabimat,
+                                              VectorDouble& tabout)
 {
   /* Copy the equalities */
 
@@ -823,8 +823,8 @@ Id MatrixSymmetric::_constraintsCount(Id nai, VectorInt& active)
  **
  *****************************************************************************/
 Id MatrixSymmetric::computeGeneralizedInverse(MatrixSymmetric& tabout,
-                                               double maxicond,
-                                               double eps)
+                                              double maxicond,
+                                              double eps)
 {
   if (!isSameSize(tabout)) return 1;
 
@@ -902,8 +902,8 @@ MatrixSymmetric* MatrixSymmetric::createRandomDefinitePositive(Id neq, Id seed)
 
 MatrixSymmetric MatrixSymmetric::compress0MatLC(const MatrixDense& matLC)
 {
-  auto nvar           = getNCols();
-  auto nvarCL         = matLC.getNRows();
+  auto nvar   = getNCols();
+  auto nvarCL = matLC.getNRows();
   MatrixSymmetric mat(nvarCL);
   for (Id jvarCL = 0; jvarCL < nvarCL; jvarCL++)
     for (Id ivarCL = 0; ivarCL <= jvarCL; ivarCL++)
@@ -917,4 +917,5 @@ MatrixSymmetric MatrixSymmetric::compress0MatLC(const MatrixDense& matLC)
     }
   return mat;
 }
+
 } // namespace gstlrn

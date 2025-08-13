@@ -308,8 +308,8 @@ MatrixSquare* MatrixSquare::createFromVD(const VectorDouble& X,
  * @remarks The output matrices 'tus'  and 'tls' must be dimensioned beforehand
  */
 Id MatrixSquare::decomposeLU(MatrixSquare& tls,
-                              MatrixSquare& tus,
-                              double eps)
+                             MatrixSquare& tus,
+                             double eps)
 {
   auto neq = getNRows();
   tls.fill(0.);
@@ -388,9 +388,9 @@ Id MatrixSquare::_invertLU()
 }
 
 Id MatrixSquare::_solveLU(const MatrixSquare& tus,
-                           const MatrixSquare& tls,
-                           const double* b,
-                           double* x)
+                          const MatrixSquare& tls,
+                          const double* b,
+                          double* x)
 {
   auto neq = getNRows();
   VectorDouble y(neq);
@@ -467,7 +467,7 @@ MatrixSquare* prodNormMatMat(const MatrixDense* a,
                              const MatrixDense* m,
                              bool transpose)
 {
-  Id nrow  = (transpose) ? a->getNCols() : a->getNRows();
+  Id nrow   = (transpose) ? a->getNCols() : a->getNRows();
   auto* mat = new MatrixSquare(nrow);
   mat->prodNormMatMatInPlace(a, m, transpose);
   return mat;
@@ -475,7 +475,7 @@ MatrixSquare* prodNormMatMat(const MatrixDense* a,
 
 MatrixSquare* prodNormMat(const MatrixDense& a, bool transpose)
 {
-  Id nsym  = (transpose) ? a.getNCols() : a.getNRows();
+  Id nsym   = (transpose) ? a.getNCols() : a.getNRows();
   auto* mat = new MatrixSquare(nsym);
   mat->prodNormMatInPlace(&a, transpose);
   return mat;
@@ -483,9 +483,51 @@ MatrixSquare* prodNormMat(const MatrixDense& a, bool transpose)
 
 MatrixSquare* prodNormMatVec(const MatrixDense& a, const VectorDouble& vec, bool transpose)
 {
-  Id nsym  = (transpose) ? a.getNCols() : a.getNRows();
+  Id nsym   = (transpose) ? a.getNCols() : a.getNRows();
   auto* mat = new MatrixSquare(nsym);
   mat->prodNormMatVecInPlace(&a, vec, transpose);
   return mat;
 }
+
+/**
+ * @brief Create a square matrix from three diagonals
+ *
+ * @param vecdiag Vector of information along the diagonal
+ * @param vecinf  Vector of information along the line below the diagonal
+ * @param vecsup  Vector of information along the line above the diagonal
+ * @return Returned matrix
+ */
+MatrixSquare* MatrixSquare::createFromTridiagonal(const VectorDouble& vecdiag,
+                                                  const VectorDouble& vecinf,
+                                                  const VectorDouble& vecsup)
+{
+  // Preliminary checks
+  if (vecdiag.size() != vecinf.size() || vecdiag.size() != vecsup.size())
+  {
+    messerr("Arguments 'vecdiag'(%d), 'vecinf'(%d) and 'vecsup'(%d) should have same dimension",
+            vecdiag.size(), vecinf.size(), vecsup.size());
+    return nullptr;
+  }
+
+  /* Initializations */
+  Id neq    = static_cast<Id>(vecdiag.size());
+  auto* res = new MatrixSquare(neq);
+  res->fill(0.);
+
+  for (Id i = 0; i < neq; i++)
+  {
+    res->setValue(i, i, vecdiag[i]);
+    if (i > 0)
+      res->setValue(i, i - 1, vecinf[i]); // sous-diagonale
+    if (i < neq - 1)
+      res->setValue(i, i + 1, vecsup[i]); // sur-diagonale
+  }
+  return res;
+}
+
+Id MatrixSquare::computeEigen(bool optionPositive)
+{
+  return MatrixDense::_computeEigen(optionPositive);
+}
+
 } // namespace gstlrn

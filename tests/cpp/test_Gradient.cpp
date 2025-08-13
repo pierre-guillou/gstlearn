@@ -14,7 +14,7 @@
 #include "Basic/OptCustom.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Covariances/CovGradient.hpp"
+#include "Covariances/CovGradientGeneric.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Drifts/DriftFactory.hpp"
@@ -32,7 +32,7 @@ using namespace gstlrn;
 
 /****************************************************************************/
 /*!
-** This test is meant to check the elaboration of the CovGradient class
+** This test is meant to check the elaboration of the CovGradientGenric class
 ** and its use in Kriging (or Depth adn Gradient)
 **
 *****************************************************************************/
@@ -95,13 +95,13 @@ int main(int argc, char* argv[])
     delete new_model;
   }
 
-  // Use the new CovGradient
+  // Use the new CovGradientGeneric
   if (mode <= 0 || mode == 2)
   {
     (void)db_gradient_update(data); // Transform ELoc::G into ELoc::Z
     CovContext ctxt(data->getNLoc(ELoc::Z), model->getNDim());
     auto* new_model = new ModelGeneric(ctxt);
-    auto covg       = CovGradient(*model->getCovAniso(0), ballradius);
+    auto covg       = CovGradientGeneric(*model->getCovAniso(0), ballradius);
     new_model->setCov(&covg);
 
     DriftList* drifts = DriftFactory::createDriftListForGradients(model->getDriftList(), ctxt);

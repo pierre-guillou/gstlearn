@@ -14,7 +14,6 @@
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
-#include <vector>
 
 namespace gstlrn
 {
@@ -25,16 +24,16 @@ class CovAniso;
  * This class describes the Gneiting correlation function.
  *
  */
-class GSTLEARN_EXPORT CovGradient: public ACov
+class GSTLEARN_EXPORT CovGradientGeneric: public ACov
 {
 public:
-  CovGradient(const CovAniso& cova, double ballradius = 1);
-  CovGradient(const CovGradient& r);
-  CovGradient& operator=(const CovGradient& r) = delete;
-  virtual ~CovGradient();
+  CovGradientGeneric(const ACov& cova, double ballradius = 1);
+  CovGradientGeneric(const CovGradientGeneric& r);
+  CovGradientGeneric& operator=(const CovGradientGeneric& r) = delete;
+  virtual ~CovGradientGeneric();
 
   /// ICloneable Interface
-  IMPLEMENT_CLONING(CovGradient)
+  IMPLEMENT_CLONING(CovGradientGeneric)
 
   bool isConsistent(const ASpace* space) const override
   {
@@ -61,6 +60,7 @@ private:
 private:
   Id _nVar;
   double _ballRadius;
-  const CovAniso& _covRef;
+  const ACov& _covRef;
 };
+
 } // namespace gstlrn
