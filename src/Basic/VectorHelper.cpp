@@ -55,6 +55,14 @@ VectorInt VectorHelper::initVInt(const Id* values, Id number)
   return vec;
 }
 
+VectorInt VectorHelper::initVInt(const I32* values, Id number)
+{
+  if (values == nullptr) return VectorInt();
+  VectorInt vec(number);
+  for (Id i = 0; i < number; i++) vec[i] = values[i];
+  return vec;
+}
+
 VectorDouble VectorHelper::initVDouble(const double* values, Id number)
 {
   if (values == nullptr) return VectorDouble();
