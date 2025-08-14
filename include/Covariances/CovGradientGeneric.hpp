@@ -39,6 +39,9 @@ public:
   /// ICloneable Interface
   IMPLEMENT_CLONING(CovGradientGeneric)
 
+  /// AStringable Interface
+  String toString(const AStringFormat* strfmt = nullptr) const override;
+
   bool isConsistent(const ASpace* space) const override
   {
     DECLARE_UNUSED(space)

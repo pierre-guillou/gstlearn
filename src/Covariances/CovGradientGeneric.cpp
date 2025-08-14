@@ -100,4 +100,14 @@ double CovGradientGeneric::_eval(const SpacePoint& p1,
   return -_covRef.evalGGNumeric(p1, p2, 0, 0, idim, jdim, _ballRadius, mode);
 }
 
+String CovGradientGeneric::toString(const AStringFormat* strfmt) const
+{
+  DECLARE_UNUSED(strfmt);
+  std::stringstream sstr;
+
+  sstr << "Covariance for Variable and its Gradients" << std::endl;
+  sstr << "Derivation distance" << _ballRadius << std::endl;
+  return sstr.str();
+}
+
 } // namespace gstlrn

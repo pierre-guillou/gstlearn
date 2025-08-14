@@ -475,9 +475,9 @@ Model* model_combine(const Model* model1, const Model* model2, double r)
  ** \param[in]  mode       CovCalcMode structure
  **
  ** \param[out] npivot_arg Number of pivots
- ** \param[out] Pret       Array of indices of the retained samples (from 1)
+ ** \param[out] pvec       Array of indices of the retained samples (from 1)
  **                        Dimension: nech
- ** \param[out] Gret       Rectangular matrix
+ ** \param[out] Gmatrix    Rectangular matrix
  **                        Dimension: nech * npivot_arg
  **
  ** \remark The output arrays Pret and Gret should be freed by calling function

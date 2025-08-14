@@ -60,8 +60,8 @@ int main(int argc, char* argv[])
 
   auto Aproj = ProjMatrix(&dbdat, &mesh);
 
-  int ndef = VH::countUndefined(Aproj.getValues());
-  message("Number of undef = %d\n", ndef);
+  Id ndef = VH::countUndefined(Aproj.getValues());
+  message("Number of undef = %ld\n", ndef);
 
   exit(0);
 }

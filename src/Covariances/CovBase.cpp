@@ -9,13 +9,12 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovBase.hpp"
-#include "Basic/ListParams.hpp"
 #include "Basic/Iterators.hpp"
+#include "Basic/ListParams.hpp"
 #include "Basic/ParamInfo.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Covariances/NoStatArray.hpp"
 #include "Covariances/TabNoStatSills.hpp"
 #include "Db/Db.hpp"
 #include "LinearOp/CholeskyDense.hpp"
@@ -26,7 +25,7 @@
 #include <cstddef>
 #include <memory>
 
-namespace gstlrn 
+namespace gstlrn
 {
 
 ParamInfo CovBase::createParamInfoForCholSill()
@@ -42,7 +41,7 @@ CovBase::CovBase(ACov* cor,
   , _cholSillsInfo(MatrixT<ParamInfo>(sill.getNRows(), sill.getNCols(), createParamInfoForCholSill()))
   , _cholSills(MatrixSymmetric(sill.getNRows()))
   , _sillCur(sill)
-  , _cor(std::dynamic_pointer_cast<ACov>(cor==nullptr? nullptr :cor->cloneShared()))
+  , _cor(std::dynamic_pointer_cast<ACov>(cor == nullptr ? nullptr : cor->cloneShared()))
   , _itRange(sill.getNRows())
 {
 
@@ -68,7 +67,6 @@ CovBase::CovBase(const CovBase& r)
   _sillCur       = r._sillCur;
   _workMat       = r._workMat;
   _cor           = std::dynamic_pointer_cast<ACov>(r._cor->cloneShared());
-
 }
 
 CovBase& CovBase::operator=(const CovBase& r)
@@ -91,7 +89,7 @@ CovBase::~CovBase()
 
 void CovBase::setCor(ACov* cor)
 {
-  _cor     = std::dynamic_pointer_cast<ACov>(cor->cloneShared());
+  _cor      = std::dynamic_pointer_cast<ACov>(cor->cloneShared());
   auto nvar = getNVar();
   if (cor != nullptr)
   {
@@ -129,7 +127,7 @@ void CovBase::setSill(const MatrixSymmetric& sill) const
 
 void CovBase::setSill(const VectorDouble& sill) const
 {
-  Id size = static_cast<Id>(sill.size());
+  Id size   = static_cast<Id>(sill.size());
   auto nvar = getNVar();
   if (size != nvar * nvar)
   {
@@ -183,14 +181,14 @@ bool CovBase::isConsistent(const ASpace* space) const
 }
 
 Id CovBase::addEvalCovVecRHSInPlace(vect vect,
-                                     const VectorInt& index1,
-                                     Id iech2,
-                                     const KrigOpt& krigopt,
-                                     SpacePoint& pin,
-                                     SpacePoint& pout,
-                                     VectorDouble& tabwork,
-                                     double lambda,
-                                     const ECalcMember& calcMember) const
+                                    const VectorInt& index1,
+                                    Id iech2,
+                                    const KrigOpt& krigopt,
+                                    SpacePoint& pin,
+                                    SpacePoint& pout,
+                                    VectorDouble& tabwork,
+                                    double lambda,
+                                    const ECalcMember& calcMember) const
 {
   DECLARE_UNUSED(lambda)
   return _cor->addEvalCovVecRHSInPlace(vect, index1, iech2, krigopt, pin, pout, tabwork, getSill(0, 0), calcMember);
@@ -462,8 +460,8 @@ void CovBase::updateCovByMesh(Id imesh, bool aniso) const
       if (type == EConsElem::SILL)
       {
         double sill = e.second->getValueOnMeshByApex(imesh);
-        Id iv1     = e.first.getIV1();
-        Id iv2     = e.first.getIV2();
+        Id iv1      = e.first.getIV1();
+        Id iv2      = e.first.getIV2();
         setSill(iv1, iv2, sill);
       }
     }
@@ -552,14 +550,13 @@ static double softplus(double x)
   // Softplus function to ensure positive values
   return std::log1p(std::exp(x));
   // stable version of softplus:  log(1 + exp(x))
-
 }
 
 static double softplusinv(double x)
 {
   // Inverse of the softplus function
   if (x <= 0) return -std::numeric_limits<double>::infinity();
-  return x + std::log1p(- std::exp(-x));
+  return x + std::log1p(-std::exp(-x));
   // stable version of softplus inverse: log(exp(x) - 1)
 }
 static double softplusDerivative(double x)
@@ -591,7 +588,7 @@ void CovBase::appendParams(ListParams& listParams,
           if (i == (Id)jvard)
           {
             double grad_softplus = softplusDerivative(val);
-            val = grad_softplus * softplus(val); // Apply softplus to ensure positive values
+            val                  = grad_softplus * softplus(val); // Apply softplus to ensure positive values
           }
           if (i == (Id)ivard)
           {
@@ -613,7 +610,7 @@ void CovBase::initParams(const MatrixSymmetric& vars, double href)
   {
     double value = chol.getLowerTriangle(ivar, jvar);
     if (ivar == jvar)
-       value = softplusinv(abs(value)); 
+      value = softplusinv(abs(value));
     _cholSillsInfo(ivar, jvar).setValue(value);
   }
 
@@ -628,14 +625,14 @@ void CovBase::updateCov()
   {
     if (_cholSillsInfo(ivar, jvar).isFixed()) continue;
     nvaroptim++;
-    double val =  _cholSillsInfo(ivar, jvar).getValue();
+    double val = _cholSillsInfo(ivar, jvar).getValue();
     if (ivar == jvar)
-       val = softplus(val); // Apply softplus to ensure positive values
-    
+      val = softplus(val); // Apply softplus to ensure positive values
+
     _cholSills.setValue(ivar, jvar, val);
   }
 
   if (nvaroptim > 0)
     _sillCur.prodMatMatInPlace(&_cholSills, &_cholSills, false, true);
 }
-}
+} // namespace gstlrn
