@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
   VectorDouble X = mesh0.getCoordinatesPerApex(0);
   VectorDouble Y = mesh0.getCoordinatesPerApex(1);
 
-  Db dbdat         = Db();
+  Db dbdat;
   VectorDouble dbX = VH::sample(X, ind);
   VectorDouble dbY = VH::sample(Y, ind);
   dbdat.addColumns(dbX, "x1", ELoc::X, 0);
