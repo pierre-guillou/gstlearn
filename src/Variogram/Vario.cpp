@@ -5109,17 +5109,18 @@ bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   Id nvar        = 0;
   Id ndir        = 0;
   Id flag_calcul = 1;
+  Id type        = 1;
   VectorString varnames;
-  ECalcVario calcul;
 
   // Read the Global structure
   ret = ret && SerializeHDF5::readValue(*varioG, "NVar", nvar);
   ret = ret && SerializeHDF5::readValue(*varioG, "NDir", ndir);
   ret = ret && SerializeHDF5::readVec(*varioG, "Names", varnames);
   ret = ret && SerializeHDF5::readValue(*varioG, "Calcul", flag_calcul);
-  // ret = ret && SerializeHDF5::readValue(*varioG, "Type", calcul);
-  setCalcul(calcul);
+  ret = ret && SerializeHDF5::readValue(*varioG, "CalcType", type);
 
+  setCalcul(ECalcVario::fromValue(type));
+  _setFlagAsym();
   setNVar(nvar);
   internalDirectionResize(ndir, false);
   internalVariableResize();
@@ -5132,7 +5133,6 @@ bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   if (!varioparamG) return false;
   ret = ret && SerializeHDF5::readValue(*varioparamG, "NDim", ndim);
   ret = ret && SerializeHDF5::readValue(*varioparamG, "Scale", scale);
-  setCalculByName("vg"); // TODO: read this information from NF file and treat accordingly
   setScale(scale);
 
   if (flag_calcul)
@@ -5214,8 +5214,7 @@ bool Vario::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   ret = ret && SerializeHDF5::writeValue(varioG, "NDir", getNDir());
   ret = ret && SerializeHDF5::writeVec(varioG, "Names", _variableNames);
   ret = ret && SerializeHDF5::writeValue(varioG, "Calcul", flag_calcul);
-  // ret = ret && SerializeHDF5::writeValue(varioG, "Type", getCalcul());
-  const auto calcul_name = getCalcul().getDescr();
+  ret = ret && SerializeHDF5::writeValue(varioG, "CalcType", getCalcul().getValue());
 
   // Writing Direction global description
   auto varioparamG = grp.createGroup("VarioParam");
