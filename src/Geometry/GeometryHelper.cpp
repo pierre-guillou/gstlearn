@@ -27,7 +27,7 @@ static double _getRadius(double radius_arg)
   double radius = radius_arg;
   if (!FFFF(radius)) return radius;
   {
-    const ASpace* space    = getDefaultSpace();
+    const ASpace* space = getDefaultSpace();
     const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
     if (spaceSn != nullptr) radius = spaceSn->getRadius();
   }
@@ -696,13 +696,22 @@ double GeometryHelper::geodeticAngularDistance(double long1,
                                                double lat2,
                                                double radius)
 {
-  double rlon1  = ut_deg2rad(long1);
-  double rlat1  = ut_deg2rad(lat1);
-  double rlon2  = ut_deg2rad(long2);
-  double rlat2  = ut_deg2rad(lat2);
-  double dlong  = rlon2 - rlon1;
-  double angdst = acos(
-    sin(rlat1) * sin(rlat2) + cos(rlat1) * cos(rlat2) * cos(dlong));
+  double rlon1 = ut_deg2rad(long1);
+  double rlat1 = ut_deg2rad(lat1);
+  double rlon2 = ut_deg2rad(long2);
+  double rlat2 = ut_deg2rad(lat2);
+  double slat1 = sin(rlat1);
+  double clat1 = cos(rlat1);
+  double slat2 = sin(rlat2);
+  double clat2 = cos(rlat2);
+  double dlong = rlon2 - rlon1;
+  if (ABS(dlong) < EPSILON6)
+  {
+    double dlat = ABS(rlat2 - rlat1);
+    return (radius * dlat);
+  }
+  double clong  = cos(dlong);
+  double angdst = acos(slat1 * slat2 + clat1 * clat2 * clong);
   return (radius * angdst);
 }
 
@@ -717,12 +726,12 @@ double GeometryHelper::geodeticAngularDistance(double long1,
  ** \param[in]  cosc   Cosine of third angle
  **
  *****************************************************************************/
-static double st_convert_geodetic_angle(double /*sina*/,
-                                        double cosa,
-                                        double sinb,
-                                        double cosb,
-                                        double sinc,
-                                        double cosc)
+static double st_convertGeodeticAngle(double /*sina*/,
+                                      double cosa,
+                                      double sinb,
+                                      double cosb,
+                                      double sinc,
+                                      double cosc)
 {
   double prod = sinb * sinc;
   double cosA = (prod == 0.) ? 0. : (cosa - cosb * cosc) / prod;
@@ -774,9 +783,9 @@ void GeometryHelper::geodeticAngles(double long1,
   double sinb = sin(*b);
   double sinc = sin(*c);
 
-  *A = st_convert_geodetic_angle(sina, cosa, sinb, cosb, sinc, cosc);
-  *B = st_convert_geodetic_angle(sinb, cosb, sinc, cosc, sina, cosa);
-  *C = st_convert_geodetic_angle(sinc, cosc, sina, cosa, sinb, cosb);
+  *A = st_convertGeodeticAngle(sina, cosa, sinb, cosb, sinc, cosc);
+  *B = st_convertGeodeticAngle(sinb, cosb, sinc, cosc, sina, cosa);
+  *C = st_convertGeodeticAngle(sinc, cosc, sina, cosa, sinb, cosb);
 }
 
 /****************************************************************************/
@@ -859,60 +868,47 @@ bool GeometryHelper::isInSphericalTriangleOptimized(const double* coor,
   double s[3];
   double total = 0.;
 
-  double dab = GH::geodeticAngularDistance(ptsa[0], ptsa[1], ptsb[0], ptsb[1]);
-  double dbc = GH::geodeticAngularDistance(ptsb[0], ptsb[1], ptsc[0], ptsc[1]);
-  double dac = GH::geodeticAngularDistance(ptsa[0], ptsa[1], ptsc[0], ptsc[1]);
-  double d0a = GH::geodeticAngularDistance(coor[0], coor[1], ptsa[0], ptsa[1]);
-  double d0b = GH::geodeticAngularDistance(coor[0], coor[1], ptsb[0], ptsb[1]);
-  double d0c = GH::geodeticAngularDistance(coor[0], coor[1], ptsc[0], ptsc[1]);
-
+  double dab   = GH::geodeticAngularDistance(ptsa[0], ptsa[1], ptsb[0], ptsb[1]);
   double sinab = sin(dab);
   double cosab = cos(dab);
+  double dbc   = GH::geodeticAngularDistance(ptsb[0], ptsb[1], ptsc[0], ptsc[1]);
   double sinbc = sin(dbc);
   double cosbc = cos(dbc);
+  double dac   = GH::geodeticAngularDistance(ptsa[0], ptsa[1], ptsc[0], ptsc[1]);
   double sinac = sin(dac);
   double cosac = cos(dac);
-  double sin0a = sin(d0a);
-  double cos0a = cos(d0a);
-  double sin0b = sin(d0b);
-  double cos0b = cos(d0b);
-  double sin0c = sin(d0c);
-  double cos0c = cos(d0c);
 
-  double A    = st_convert_geodetic_angle(sinbc, cosbc, sinac, cosac, sinab,
-                                          cosab);
-  double B    = st_convert_geodetic_angle(sinac, cosac, sinab, cosab, sinbc,
-                                          cosbc);
-  double C    = st_convert_geodetic_angle(sinab, cosab, sinbc, cosbc, sinac,
-                                          cosac);
+  double A    = st_convertGeodeticAngle(sinbc, cosbc, sinac, cosac, sinab, cosab);
+  double B    = st_convertGeodeticAngle(sinac, cosac, sinab, cosab, sinbc, cosbc);
+  double C    = st_convertGeodeticAngle(sinab, cosab, sinbc, cosbc, sinac, cosac);
   double stot = (A + B + C - GV_PI);
 
-  double OA = st_convert_geodetic_angle(sinbc, cosbc, sin0c, cos0c, sin0b,
-                                        cos0b);
-  double BA = st_convert_geodetic_angle(sin0c, cos0c, sin0b, cos0b, sinbc,
-                                        cosbc);
-  double CA = st_convert_geodetic_angle(sin0b, cos0b, sinbc, cosbc, sin0c,
-                                        cos0c);
-  s[0]      = (OA + BA + CA - GV_PI);
+  double d0b   = GH::geodeticAngularDistance(coor[0], coor[1], ptsb[0], ptsb[1]);
+  double sin0b = sin(d0b);
+  double cos0b = cos(d0b);
+  double d0c   = GH::geodeticAngularDistance(coor[0], coor[1], ptsc[0], ptsc[1]);
+  double sin0c = sin(d0c);
+  double cos0c = cos(d0c);
+  double OA    = st_convertGeodeticAngle(sinbc, cosbc, sin0c, cos0c, sin0b, cos0b);
+  double BA    = st_convertGeodeticAngle(sin0c, cos0c, sin0b, cos0b, sinbc, cosbc);
+  double CA    = st_convertGeodeticAngle(sin0b, cos0b, sinbc, cosbc, sin0c, cos0c);
+  s[0]         = (OA + BA + CA - GV_PI);
   total += s[0];
   if (total > stot + eps) return false;
 
-  double AB = st_convert_geodetic_angle(sin0c, cos0c, sinac, cosac, sin0a,
-                                        cos0a);
-  double OB = st_convert_geodetic_angle(sinac, cosac, sin0a, cos0a, sin0c,
-                                        cos0c);
-  double CB = st_convert_geodetic_angle(sin0a, cos0a, sin0c, cos0c, sinac,
-                                        cosac);
-  s[1]      = (AB + OB + CB - GV_PI);
+  double d0a   = GH::geodeticAngularDistance(coor[0], coor[1], ptsa[0], ptsa[1]);
+  double sin0a = sin(d0a);
+  double cos0a = cos(d0a);
+  double AB    = st_convertGeodeticAngle(sin0c, cos0c, sinac, cosac, sin0a, cos0a);
+  double OB    = st_convertGeodeticAngle(sinac, cosac, sin0a, cos0a, sin0c, cos0c);
+  double CB    = st_convertGeodeticAngle(sin0a, cos0a, sin0c, cos0c, sinac, cosac);
+  s[1]         = (AB + OB + CB - GV_PI);
   total += s[1];
   if (total > stot + eps) return false;
 
-  double AC = st_convert_geodetic_angle(sin0b, cos0b, sin0a, cos0a, sinab,
-                                        cosab);
-  double BC = st_convert_geodetic_angle(sin0a, cos0a, sinab, cosab, sin0b,
-                                        cos0b);
-  double OC = st_convert_geodetic_angle(sinab, cosab, sin0b, cos0b, sin0a,
-                                        cos0a);
+  double AC = st_convertGeodeticAngle(sin0b, cos0b, sin0a, cos0a, sinab, cosab);
+  double BC = st_convertGeodeticAngle(sin0a, cos0a, sinab, cosab, sin0b, cos0b);
+  double OC = st_convertGeodeticAngle(sinab, cosab, sin0b, cos0b, sin0a, cos0a);
   s[2]      = (AC + BC + OC - GV_PI);
   total += s[2];
   if (ABS(total - stot) > eps) return false;
@@ -1265,14 +1261,14 @@ double util_rotation_gradXYToAngle(double dzoverdx, double dzoverdy)
 
   // Vector orthogonal to the horizontal plane/ i.e. the vertical axis
   VectorDouble vert(3, 0.);
-  vert[ndim - 1]    = -1.;
+  vert[ndim - 1] = -1.;
 
   // Vector orthogonal to the tilted plane
   VectorDouble vort(ndim);
-  vort[0]           = dzoverdx;
-  vort[1]           = dzoverdy;
-  vort[2]           = -1.;
-  double norme      = VH::norm(vort);
+  vort[0]      = dzoverdx;
+  vort[1]      = dzoverdy;
+  vort[2]      = -1.;
+  double norme = VH::norm(vort);
   for (Id idim = 0; idim < ndim; idim++)
     vort[idim] /= norme;
 
@@ -1305,14 +1301,14 @@ MatrixSquare GeometryHelper::gradXYToRotmat(double dzoverdx,
 
   // Vector orthogonal to the horizontal plane/ i.e. the vertical axis
   VectorDouble vert(3, 0.);
-  vert[ndim - 1]    = -1.;
+  vert[ndim - 1] = -1.;
 
   // Vector orthogonal to the tilted plane
   VectorDouble vort(ndim);
-  vort[0]           = dzoverdx;
-  vort[1]           = dzoverdy;
-  vort[2]           = -1.;
-  double norme      = VH::norm(vort);
+  vort[0]      = dzoverdx;
+  vort[1]      = dzoverdy;
+  vort[2]      = -1.;
+  double norme = VH::norm(vort);
   for (Id idim = 0; idim < ndim; idim++)
     vort[idim] /= norme;
 
@@ -1365,9 +1361,9 @@ VectorDouble GeometryHelper::rotationToEuler(const MatrixSquare& M,
   _decodeConvRot(convrot, &firstaxis, &parity, &repetition, &frame);
 
   VectorInt next_axis = {1, 2, 0, 1};
-  Id i               = firstaxis;
-  Id j               = next_axis[i + parity];
-  Id k               = next_axis[i - parity + 1];
+  Id i                = firstaxis;
+  Id j                = next_axis[i + parity];
+  Id k                = next_axis[i - parity + 1];
 
   double ax, ay, az;
 
@@ -1439,9 +1435,9 @@ MatrixSquare GeometryHelper::EulerToRotation(const VectorDouble& angles,
   _decodeConvRot(convrot, &firstaxis, &parity, &repetition, &frame);
 
   VectorInt next_axis = {1, 2, 0, 1};
-  Id i               = firstaxis;
-  Id j               = next_axis[i + parity];
-  Id k               = next_axis[i - parity + 1];
+  Id i                = firstaxis;
+  Id j                = next_axis[i + parity];
+  Id k                = next_axis[i - parity + 1];
 
   Id ndim = 3;
   MatrixSquare M(ndim);
@@ -1543,9 +1539,9 @@ void GeometryHelper::EulerToRotationDerivativesInPlace(std::vector<MatrixSquare>
   _decodeConvRot(convrot, &firstaxis, &parity, &repetition, &frame);
 
   VectorInt next_axis = {1, 2, 0, 1};
-  Id i               = firstaxis;
-  Id j               = next_axis[i + parity];
-  Id k               = next_axis[i - parity + 1];
+  Id i                = firstaxis;
+  Id j                = next_axis[i + parity];
+  Id k                = next_axis[i - parity + 1];
 
   Id ndim = 3;
 
@@ -1824,7 +1820,7 @@ VectorVectorDouble GeometryHelper::sphBarCoord(const VectorVectorDouble& sphPts,
                                                const MatrixDense& apices,
                                                const MatrixInt& meshes)
 {
-  Id np      = (Id)sphPts.size();
+  Id np        = (Id)sphPts.size();
   auto nmeshes = meshes.getNRows();
 
   // Dimension the output storage
@@ -1838,7 +1834,7 @@ VectorVectorDouble GeometryHelper::sphBarCoord(const VectorVectorDouble& sphPts,
   for (Id k = 0; k < np; k++)
   {
     bool notFound = true;
-    Id i         = 0;
+    Id i          = 0;
 
     while (i < nmeshes && notFound)
     {

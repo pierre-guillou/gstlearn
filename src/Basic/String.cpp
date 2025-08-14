@@ -752,15 +752,6 @@ Id gslSScanf(const char* str, const char* format, ...)
   return n;
 }
 
-Id gslFScanf(FILE* stream, const char* format, ...)
-{
-  va_list ap;
-  va_start(ap, format);
-  Id n = vfscanf(stream, format, ap);
-  va_end(ap);
-  return n;
-}
-
 char* gslStrtok(char* str, const char* delim)
 {
   return strtok(str, delim);

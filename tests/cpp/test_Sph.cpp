@@ -147,7 +147,7 @@ static void st_test_3(void)
     }
   }
   total /= (2. * GV_PI);
-  message("Surface totale = %lf\n", total);
+  message("Surface totale = %5.3lf\n", total);
 }
 
 /****************************************************************************/

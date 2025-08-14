@@ -168,8 +168,8 @@ GSTLEARN_EXPORT Id model_covmat_inchol(Id verbose,
                                        const double* center,
                                        Id flag_sort,
                                        Id* npivot_arg,
-                                       Id** Pret,
-                                       double** Gret,
+                                       VectorInt& pvec,
+                                       VectorDouble& Gmatrix,
                                        const CovCalcMode* mode = nullptr);
 GSTLEARN_EXPORT Model* model_duplicate_for_gradient(const Model* model,
                                                     double ball_radius);

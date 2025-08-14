@@ -66,16 +66,6 @@ void CovGradientGeneric::_optimizationSetTarget(SpacePoint& pt) const
   DECLARE_UNUSED(pt)
 }
 
-// void CovGradientGeneric::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
-// {
-//   DECLARE_UNUSED(mode)
-//   DECLARE_UNUSED(ps)
-// }
-
-// void CovGradientGeneric::_optimizationPostProcess() const
-// {
-// }
-
 /**
  * @brief According to the variable rank, call covariance between the variable and its derivatives
  *
@@ -108,6 +98,16 @@ double CovGradientGeneric::_eval(const SpacePoint& p1,
   if (jdim == idim)
     return _covRef.evalGGNumeric(p1, p2, 0, 0, idim, jdim, _ballRadius, mode);
   return -_covRef.evalGGNumeric(p1, p2, 0, 0, idim, jdim, _ballRadius, mode);
+}
+
+String CovGradientGeneric::toString(const AStringFormat* strfmt) const
+{
+  DECLARE_UNUSED(strfmt);
+  std::stringstream sstr;
+
+  sstr << "Covariance for Variable and its Gradients" << std::endl;
+  sstr << "Derivation distance" << _ballRadius << std::endl;
+  return sstr.str();
 }
 
 } // namespace gstlrn
