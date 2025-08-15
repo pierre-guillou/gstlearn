@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Enum/ECalcVario.hpp"
 #include "geoslib_define.h"
 #include "geoslib_f.h"
 
@@ -162,7 +163,7 @@ Vario* Vario::create(const VarioParam& varioparam)
 Vario* Vario::createFromNF(const String& NFFilename, bool verbose)
 {
   VarioParam varioparam;
-  auto* vario          = new Vario(varioparam);
+  auto* vario = new Vario(varioparam);
   if (vario->_fileOpenAndDeserialize(NFFilename, verbose)) return vario;
   delete vario;
   return nullptr;
@@ -334,12 +335,12 @@ Id Vario::prepare(const ECalcVario& calcul, bool defineList)
 }
 
 Id Vario::compute(Db* db,
-                   const ECalcVario& calcul,
-                   bool flag_sample,
-                   bool verr_mode,
-                   const Model* model,
-                   Id niter_UK,
-                   bool verbose)
+                  const ECalcVario& calcul,
+                  bool flag_sample,
+                  bool verr_mode,
+                  const Model* model,
+                  Id niter_UK,
+                  bool verbose)
 {
   _db   = db;
   _nVar = _db->getNLoc(ELoc::Z);
@@ -361,15 +362,15 @@ Id Vario::compute(Db* db,
 }
 
 Id Vario::computeIndic(Db* db,
-                        const ECalcVario& calcul,
-                        bool flag_sample,
-                        bool verr_mode,
-                        const Model* model,
-                        Id niter_UK,
-                        bool verbose,
-                        Id nfacmax)
+                       const ECalcVario& calcul,
+                       bool flag_sample,
+                       bool verr_mode,
+                       const Model* model,
+                       Id niter_UK,
+                       bool verbose,
+                       Id nfacmax)
 {
-  _db      = db;
+  _db     = db;
   Id nvar = _db->getNLoc(ELoc::Z);
   if (nvar != 1)
   {
@@ -379,7 +380,7 @@ Id Vario::computeIndic(Db* db,
 
   // Calculate the number of Facies in 'Db'
   VectorDouble props = dbStatisticsFacies(_db);
-  Id nclass         = static_cast<Id>(props.size());
+  Id nclass          = static_cast<Id>(props.size());
   if (nclass <= 0 || (nfacmax > 0 && nclass > nfacmax))
   {
     messerr("The input variable should exhibit Facies");
@@ -393,7 +394,7 @@ Id Vario::computeIndic(Db* db,
 
   // Translate the 'Facies' into 'categories'   VectorDouble props =
   Limits limits(nclass);
-  Id iatt      = _db->getUIDByLocator(ELoc::Z, 0);
+  Id iatt = _db->getUIDByLocator(ELoc::Z, 0);
   if (limits.toIndicatorByAttribute(_db, iatt))
   {
     messerr("Problem when translating Facies into Categories");
@@ -535,7 +536,7 @@ void Vario::resetReduce(const VectorInt& varcols,
 
           if (!flagMakeSym)
           {
-            Id iadfrom           = vario_in.getDirAddress(idir, ivar, jvar, ilag, false, 0);
+            Id iadfrom            = vario_in.getDirAddress(idir, ivar, jvar, ilag, false, 0);
             _sw[idir][iadto]      = vario_in.getSwByIndex(idir0, iadfrom);
             _gg[idir][iadto]      = vario_in.getGgByIndex(idir0, iadfrom);
             _hh[idir][iadto]      = vario_in.getHhByIndex(idir0, iadfrom);
@@ -543,8 +544,8 @@ void Vario::resetReduce(const VectorInt& varcols,
           }
           else
           {
-            Id iadf1             = vario_in.getDirAddress(idir, ivar, jvar, ilag, false, -1);
-            Id iadf2             = vario_in.getDirAddress(idir, ivar, jvar, ilag, false, 1);
+            Id iadf1              = vario_in.getDirAddress(idir, ivar, jvar, ilag, false, -1);
+            Id iadf2              = vario_in.getDirAddress(idir, ivar, jvar, ilag, false, 1);
             _sw[idir][iadto]      = (vario_in.getSwByIndex(idir0, iadf1) + vario_in.getSwByIndex(idir0, iadf2)) / 2.;
             _gg[idir][iadto]      = (vario_in.getGgByIndex(idir0, iadf1) + vario_in.getGgByIndex(idir0, iadf2)) / 2.;
             _hh[idir][iadto]      = (ABS(vario_in.getHhByIndex(idir0, iadf1)) + ABS(vario_in.getHhByIndex(idir0, iadf2))) / 2.;
@@ -679,11 +680,11 @@ Id Vario::transformYToZ(const AAnam* anam)
  **
  *****************************************************************************/
 Id Vario::regularizeFromModel(const Model& model,
-                               const VectorDouble& ext,
-                               const VectorInt& ndisc,
-                               const VectorDouble& angles,
-                               const CovCalcMode* mode,
-                               bool asCov)
+                              const VectorDouble& ext,
+                              const VectorInt& ndisc,
+                              const VectorDouble& angles,
+                              const CovCalcMode* mode,
+                              bool asCov)
 {
   auto ndim = model.getNDim();
   auto nvar = model.getNVar();
@@ -747,7 +748,7 @@ MatrixSquare Vario::_evalAverageDbIncr(Model* model,
   auto nvar = getNVar();
   auto nech = db.getNSample(true);
   auto ndim = getNDim();
-  Id norme = nech * nech;
+  Id norme  = nech * nech;
 
   MatrixSquare mat(nvar);
   VectorDouble dd(ndim);
@@ -787,8 +788,8 @@ MatrixSquare Vario::_evalAverageDbIncr(Model* model,
  **
  *****************************************************************************/
 Id Vario::regularizeFromDbGrid(Model* model,
-                                const Db& db,
-                                const CovCalcMode* mode)
+                               const Db& db,
+                               const CovCalcMode* mode)
 {
   Id nvar = model->getNVar();
   setNVar(nvar);
@@ -1703,7 +1704,7 @@ Id Vario::getNext(Id ivar, Id jvar, Id idir, Id shift) const
   Id count;
   if (_flagAsym) return ITEST;
   auto iad = getDirSize(idir) - 1;
-  count   = 0;
+  count    = 0;
   for (Id ilag = 0; ilag < nlag && count < shift; ilag++)
   {
     iad = getDirAddress(idir, ivar, jvar, ilag, true, 0);
@@ -1721,12 +1722,12 @@ Id Vario::getVarAddress(Id ivar, Id jvar) const
 }
 
 Id Vario::getDirAddress(Id idir,
-                         Id ivar,
-                         Id jvar,
-                         Id ilag,
-                         bool flag_abs,
-                         Id sens,
-                         bool flagCheck) const
+                        Id ivar,
+                        Id jvar,
+                        Id ilag,
+                        bool flag_abs,
+                        Id sens,
+                        bool flagCheck) const
 {
   if (!_isDirectionValid(idir, flagCheck)) return ITEST;
   if (!_isVariableValid(ivar, flagCheck)) return ITEST;
@@ -2039,9 +2040,9 @@ void Vario::patchCenter(Id idir, Id nech, double rho)
 }
 
 Id Vario::fill(Id idir,
-                const VectorDouble& sw,
-                const VectorDouble& gg,
-                const VectorDouble& hh)
+               const VectorDouble& sw,
+               const VectorDouble& gg,
+               const VectorDouble& hh)
 {
   if (!_isDirectionValid(idir)) return 1;
   auto size = getDirSize(idir);
@@ -2049,7 +2050,8 @@ Id Vario::fill(Id idir,
       size != static_cast<Id>(hh.size()) ||
       size != static_cast<Id>(gg.size()))
   {
-    messerr("The argument do not have correct dimension");
+    messerr("The arguments (%ld) do not have correct dimension (%ld)",
+            static_cast<Id>(gg.size()), size);
     return 1;
   }
   for (Id i = 0; i < size; i++)
@@ -2209,9 +2211,9 @@ VectorDouble Vario::_varsFromProportions(VectorDouble props)
 {
   if (props.empty()) return VectorDouble();
 
-  Id nvar          = static_cast<Id>(props.size());
+  Id nvar = static_cast<Id>(props.size());
   VectorDouble vars(nvar * nvar);
-  Id ecr           = 0;
+  Id ecr = 0;
   for (Id ivar = 0; ivar < nvar; ivar++)
     for (Id jvar = 0; jvar < nvar; jvar++)
     {
@@ -2289,14 +2291,14 @@ double Vario::getCodir(Id idir, Id idim) const
  **
  *****************************************************************************/
 Id Vario::_compute(Db* db,
-                    Id flag_sample,
-                    Id verr_mode,
-                    const Model* model,
-                    Id niter_UK,
-                    bool verbose)
+                   Id flag_sample,
+                   Id verr_mode,
+                   const Model* model,
+                   Id niter_UK,
+                   bool verbose)
 {
   if (model != nullptr) _model = model->clone();
-  _verbose   = verbose;
+  _verbose    = verbose;
   auto norder = _get_generalized_variogram_order();
 
   // Preliminary checks
@@ -2368,8 +2370,8 @@ Id Vario::_compute(Db* db,
  **
  *****************************************************************************/
 Id Vario::_calculateGeneral(Db* db,
-                             Id flag_sample,
-                             Id verr_mode)
+                            Id flag_sample,
+                            Id verr_mode)
 {
   bool flag_verr      = false;
   Vario_Order* vorder = nullptr;
@@ -2633,7 +2635,7 @@ void Vario::_calculateBiasGlobal(Db* db)
     if (!db->isActiveAndDefined(iech, 0)) continue;
     for (Id il = 0; il < nbfl; il++)
     {
-      value     = 0;
+      value    = 0;
       Id jjech = 0;
       for (Id jech = 0; jech < db->getNSample(); jech++)
       {
@@ -2729,7 +2731,7 @@ void Vario::_calculateOnLineSolution(Db* db, Id idir, Id norder)
   Id jech, keep;
   double value, zz;
 
-  Id nech     = db->getNSample();
+  Id nech      = db->getNSample();
   auto nlag    = getNLag(idir);
   auto nvar    = getNVar();
   double dist0 = 0.;
@@ -2905,8 +2907,8 @@ Id Vario::_calculateGenOnGrid(DbGrid* db, Id norder)
  *****************************************************************************/
 Id Vario::_calculateOnGrid(DbGrid* db)
 {
-  Id iadd_new  = -1;
-  Id iatt_old  = -1;
+  Id iadd_new   = -1;
+  Id iatt_old   = -1;
   double maille = 0.;
 
   /* In the case of Covariogram, add the weight set to the scale */
@@ -3094,7 +3096,7 @@ Id Vario::_updateVerr(Db* db, Id idir, Vario_Order* vorder, Id verr_mode)
 {
   Id ifirst, ilast, iech, jech, number, nfois;
   double dist, value, g_old, diff, sumt, sumb, wgt, sval, gval;
-  static double tol  = EPSILON5;
+  static double tol = EPSILON5;
   static Id maxiter = 100;
 
   /* Initializations */
@@ -3309,16 +3311,16 @@ void Vario::_calculateFromGeometry(Db* db, Id idir, Vario_Order* vorder)
  **
  *****************************************************************************/
 Id Vario::_calculateGeneralSolution1(Db* db,
-                                      Id idir,
-                                      const Id* rindex,
-                                      Vario_Order* vorder)
+                                     Id idir,
+                                     const Id* rindex,
+                                     Vario_Order* vorder)
 {
   SpaceTarget T1(getSpace(), false);
   SpaceTarget T2(getSpace(), false);
   Id iech, jech, ilag, npair, ideb;
 
   DirParam dirparam            = getDirParam(idir);
-  Id nech                     = db->getNSample();
+  Id nech                      = db->getNSample();
   auto nvar                    = getNVar();
   double maxdist               = getMaximumDistance(idir);
   const VarioParam& varioparam = getVarioParam();
@@ -3419,7 +3421,7 @@ Id Vario::_calculateGeneralSolution2(Db* db, Id idir, const Id* rindex)
 
   const VarioParam& varioparam = getVarioParam();
   const DirParam& dirparam     = getDirParam(idir);
-  Id nech                     = db->getNSample();
+  Id nech                      = db->getNSample();
   auto size                    = getDirSize(idir);
   auto nvar                    = getNVar();
   double maxdist               = getMaximumDistance(idir);
@@ -3528,7 +3530,7 @@ Id Vario::_calculateOnGridSolution(DbGrid* db, Id idir)
 
   /* Initializations */
 
-  Id nech                 = db->getNSample();
+  Id nech                  = db->getNSample();
   auto nlag                = getNLag(idir);
   const DirParam& dirparam = getDirParam(idir);
 
@@ -3537,7 +3539,7 @@ Id Vario::_calculateOnGridSolution(DbGrid* db, Id idir)
   bool hasWeight = db->hasLocVariable(ELoc::W);
   double dist    = 0.;
   auto nvar      = getNVar();
-  Id ndim       = db->getNDim();
+  Id ndim        = db->getNDim();
 
   /* Core allocation */
 
@@ -3612,9 +3614,9 @@ Id Vario::_calculateGenOnGridSolution(DbGrid* db, Id idir, Id norder)
 
   /* Initializations */
 
-  Id nech                 = db->getNSample();
+  Id nech                  = db->getNSample();
   auto nlag                = getNLag(idir);
-  Id ndim                 = db->getNDim();
+  Id ndim                  = db->getNDim();
   auto nvar                = getNVar();
   const DirParam& dirparam = getDirParam(idir);
 
@@ -3856,7 +3858,7 @@ Id Vario::computeGeometry(Db* db, Vario_Order* vorder, Id* npair)
   bool hasSel    = db->hasLocVariable(ELoc::SEL);
   bool hasWeight = db->hasLocVariable(ELoc::W);
   bool hasDate   = varioparam.isDateUsed(db);
-  Id nech       = db->getNSample();
+  Id nech        = db->getNSample();
   auto ndir      = getNDir();
   double dist    = 0.;
 
@@ -4057,7 +4059,7 @@ Id Vario::_calculateVarioVectSolution(Db* db, Id idir, Id ncomp, const Id* rinde
   double w1, w2, zi1, zi2, zj1, zj2, v12, v21, di1, di2, dj1, dj2;
 
   const DirParam& dirparam = getDirParam(idir);
-  Id nech                 = db->getNSample();
+  Id nech                  = db->getNSample();
   auto nvar                = getNVar();
   double maxdist           = getMaximumDistance(idir);
 
@@ -4302,7 +4304,7 @@ void Vario::_rescale(Id idir)
       {
         for (Id i = 0; i < getNLagTotal(idir); i++, ecr++)
         {
-          auto j = getDirAddress(idir, ivar, jvar, i, true, 0);
+          auto j  = getDirAddress(idir, ivar, jvar, i, true, 0);
           auto j0 = getDirAddress(idir, jvar, jvar, i, true, 0);
           setGgByIndex(idir, j, -getGgByIndex(idir, j) / getGgByIndex(idir, j0));
         }
@@ -4315,7 +4317,7 @@ void Vario::_rescale(Id idir)
       {
         for (Id i = 0; i < getNLagTotal(idir); i++, ecr++)
         {
-          auto j = getDirAddress(idir, ivar, jvar, i, true, 0);
+          auto j  = getDirAddress(idir, ivar, jvar, i, true, 0);
           auto j0 = getDirAddress(idir, ivar, ivar, i, true, 0);
           setGgByIndex(idir, j, -getGgByIndex(idir, j) / getGgByIndex(idir, j0));
         }
@@ -4328,7 +4330,7 @@ void Vario::_rescale(Id idir)
       {
         for (Id i = 0; i < getNLagTotal(idir); i++, ecr++)
         {
-          auto j = getDirAddress(idir, ivar, jvar, i, true, 0);
+          auto j  = getDirAddress(idir, ivar, jvar, i, true, 0);
           auto j1 = getDirAddress(idir, ivar, ivar, i, true, 0);
           auto j2 = getDirAddress(idir, jvar, jvar, i, true, 0);
           setGgByIndex(idir, j,
@@ -4392,7 +4394,7 @@ bool Vario::keepPair(Id idir, SpaceTarget& T1, SpaceTarget& T2, double* dist) co
  *****************************************************************************/
 Id Vario::getRankFromDirAndDate(Id idir, Id idate) const
 {
-  Id rank  = idir;
+  Id rank    = idir;
   auto ndir  = getNDir();
   auto ndate = getNDate();
   if (idir < 0 || idir >= ndir) return (-1);
@@ -4628,8 +4630,8 @@ Id Vario::transformCut(Id nh, double ycut)
  **
  *****************************************************************************/
 Id Vario::computeGeometryMLayers(Db* db,
-                                  VectorInt& seltab,
-                                  Vario_Order* vorder) const
+                                 VectorInt& seltab,
+                                 Vario_Order* vorder) const
 {
   SpaceTarget T1(getSpace(), false);
   SpaceTarget T2(getSpace(), false);
@@ -4641,7 +4643,7 @@ Id Vario::computeGeometryMLayers(Db* db,
 
   // Local variables to speed up calculations
   bool hasSel = db->hasLocVariable(ELoc::SEL);
-  Id nech    = db->getNSample();
+  Id nech     = db->getNSample();
   auto ndir   = getNDir();
   double dist = 0.;
 
@@ -4705,7 +4707,7 @@ Id Vario::sampleModel(Model* model, const CovCalcMode* mode)
 {
   auto ndim = getNDim();
   auto ndir = getNDir();
-  Id nvar = model->getNVar();
+  Id nvar   = model->getNVar();
 
   /* Core allocation */
 
@@ -4787,7 +4789,7 @@ bool Vario::isLagCorrect(Id idir, Id k) const
 double Vario::getC00(Id idir, Id ivar, Id jvar) const
 {
   auto iad0  = getDirAddress(idir, ivar, jvar, 0, false, 0);
-  Id iad    = iad0;
+  Id iad     = iad0;
   double c00 = getSwByIndex(idir, iad);
   if (!isZero(c00) || getSwByIndex(idir, iad) > 0) return c00;
 
@@ -4808,7 +4810,7 @@ VectorDouble Vario::computeWeightPerDirection() const
 {
   auto ndir = getNDir();
   auto nvar = getNVar();
-  Id nvs2 = nvar * (nvar + 1) / 2;
+  Id nvs2   = nvar * (nvar + 1) / 2;
   VectorDouble count(ndir);
 
   /* Determine the count of significant directions */
@@ -4822,8 +4824,8 @@ VectorDouble Vario::computeWeightPerDirection() const
         Id shift = ijvar * getNLagTotal(idir);
         if (getFlagAsym())
         {
-          Id iad   = shift + getNLag(idir) + ilag + 1;
-          Id jad   = shift + getNLag(idir) - ilag - 1;
+          Id iad    = shift + getNLag(idir) + ilag + 1;
+          Id jad    = shift + getNLag(idir) - ilag - 1;
           double n1 = getSwByIndex(idir, iad);
           double n2 = getSwByIndex(idir, jad);
           if (isLagCorrect(idir, iad)) count[idir] += n1;
@@ -4831,7 +4833,7 @@ VectorDouble Vario::computeWeightPerDirection() const
         }
         else
         {
-          Id iad   = shift + ilag;
+          Id iad    = shift + ilag;
           double nn = getSwByIndex(idir, iad);
           if (isLagCorrect(idir, iad)) count[idir] += nn;
         }
@@ -4843,7 +4845,7 @@ VectorDouble Vario::computeWeightPerDirection() const
 Id Vario::getTotalLagsPerDirection() const
 {
   Id npatot = 0;
-  auto ndir  = getNDir();
+  auto ndir = getNDir();
   for (Id idir = 0; idir < ndir; idir++)
     npatot += getNLagTotal(idir);
   return npatot;
@@ -4855,7 +4857,7 @@ VectorDouble Vario::computeWeightsFromVario(Id wmode) const
   auto nvar          = getNVar();
   auto npadir        = getTotalLagsPerDirection();
   VectorDouble count = computeWeightPerDirection();
-  Id nvs2           = nvar * (nvar + 1) / 2;
+  Id nvs2            = nvar * (nvar + 1) / 2;
   VectorDouble wt(npadir * nvs2, 0.);
 
   /* Determine the count of significant directions */
@@ -4870,8 +4872,8 @@ VectorDouble Vario::computeWeightsFromVario(Id wmode) const
         Id shift = ijvar * getNLagTotal(idir);
         if (getFlagAsym())
         {
-          Id iad   = shift + getNLag(idir) + ilag + 1;
-          Id jad   = shift + getNLag(idir) - ilag - 1;
+          Id iad    = shift + getNLag(idir) + ilag + 1;
+          Id jad    = shift + getNLag(idir) - ilag - 1;
           double n1 = getSwByIndex(idir, iad);
           double n2 = getSwByIndex(idir, jad);
           if (isLagCorrect(idir, iad)) count[idir] += n1;
@@ -4879,7 +4881,7 @@ VectorDouble Vario::computeWeightsFromVario(Id wmode) const
         }
         else
         {
-          Id iad   = shift + ilag;
+          Id iad    = shift + ilag;
           double nn = getSwByIndex(idir, iad);
           if (isLagCorrect(idir, iad)) count[idir] += nn;
         }
@@ -4967,7 +4969,7 @@ VectorDouble Vario::computeWeightsFromVario(Id wmode) const
                   // for the first lag is arbitrarily set to 1.
                   if (sw0 > 1.)
                   {
-                    Id iad1     = iad + 1;
+                    Id iad1      = iad + 1;
                     double sw1   = getSwByIndex(idir, iad1);
                     double hh1   = getHhByIndex(idir, iad1);
                     double ddmod = hh1 * sw0 / sw1;
@@ -5103,10 +5105,11 @@ bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   auto varioG = SerializeHDF5::getGroup(grp, "Vario");
   if (!varioG) return false;
 
-  bool ret        = true;
+  bool ret       = true;
   Id nvar        = 0;
   Id ndir        = 0;
   Id flag_calcul = 1;
+  Id type        = 1;
   VectorString varnames;
 
   // Read the Global structure
@@ -5114,20 +5117,22 @@ bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   ret = ret && SerializeHDF5::readValue(*varioG, "NDir", ndir);
   ret = ret && SerializeHDF5::readVec(*varioG, "Names", varnames);
   ret = ret && SerializeHDF5::readValue(*varioG, "Calcul", flag_calcul);
+  ret = ret && SerializeHDF5::readValue(*varioG, "CalcType", type);
 
+  setCalcul(ECalcVario::fromValue(type));
+  _setFlagAsym();
   setNVar(nvar);
   internalDirectionResize(ndir, false);
   internalVariableResize();
   setVariableNames(varnames);
 
   // Reading Direction global description
-  Id ndim         = 0;
+  Id ndim          = 0;
   double scale     = 0.;
   auto varioparamG = SerializeHDF5::getGroup(grp, "VarioParam");
   if (!varioparamG) return false;
   ret = ret && SerializeHDF5::readValue(*varioparamG, "NDim", ndim);
   ret = ret && SerializeHDF5::readValue(*varioparamG, "Scale", scale);
-  setCalculByName("vg"); // TODO: read this information from NF file and treat accordingly
   setScale(scale);
 
   if (flag_calcul)
@@ -5148,8 +5153,8 @@ bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
     auto dirG      = SerializeHDF5::getGroup(*dirsG, locName);
     if (!dirG) return false;
 
-    Id nlag       = 0;
-    Id optionCode = 0;
+    Id nlag        = 0;
+    Id optionCode  = 0;
     double tolcode = 0.;
     double dlag    = 0.;
     double toldist = 0.;
@@ -5209,6 +5214,7 @@ bool Vario::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   ret = ret && SerializeHDF5::writeValue(varioG, "NDir", getNDir());
   ret = ret && SerializeHDF5::writeVec(varioG, "Names", _variableNames);
   ret = ret && SerializeHDF5::writeValue(varioG, "Calcul", flag_calcul);
+  ret = ret && SerializeHDF5::writeValue(varioG, "CalcType", getCalcul().getValue());
 
   // Writing Direction global description
   auto varioparamG = grp.createGroup("VarioParam");

@@ -1115,7 +1115,11 @@ bool Rule::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   ret = ret && SerializeHDF5::readValue(*ruleG, "Rho", rho);
   ret = ret && SerializeHDF5::readVec(*ruleG, "Nodes", nodes);
 
-  if (ret) setMainNodeFromNodNames(nodes);
+  if (ret)
+  {
+    setModeRule(ERule::fromValue(type));
+    setMainNodeFromNodNames(nodes);
+  }
 
   return ret;
 }
