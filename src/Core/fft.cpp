@@ -80,7 +80,7 @@ static void* Tmp0 = NULL; /* temp space for real part */
 static void* Tmp1 = NULL; /* temp space for imaginary part */
 static void* Tmp2 = NULL; /* temp space for Cosine values */
 static void* Tmp3 = NULL; /* temp space for Sine values */
-static Id* Perm  = NULL; /* Permutation vector */
+static Id* Perm   = NULL; /* Permutation vector */
 
 static Id factor[NFACTOR];
 
@@ -187,13 +187,13 @@ static Id factorize(Id nPass, Id* kt)
  * possible to make this a standalone function
  */
 static Id fftradix(double Re[],
-                    double Im[],
-                    size_t nTotal,
-                    size_t nPass,
-                    size_t nSpan,
-                    Id iSign,
-                    Id maxFactors,
-                    Id maxPerm)
+                   double Im[],
+                   size_t nTotal,
+                   size_t nPass,
+                   size_t nSpan,
+                   Id iSign,
+                   Id maxFactors,
+                   Id maxPerm)
 {
   Id ii, nFactor, kspan, ispan, inc;
   Id j, jc, jf, jj, k, k1, k3, kk, kt, nn, ns, nt;
@@ -235,9 +235,9 @@ static Id fftradix(double Re[],
     /* allow full use of alloc'd space */
     maxFactors = static_cast<Id>(SpaceAlloced / sizeof(double));
   }
-  if (MaxPermAlloced < (size_t)maxPerm)
+  if (MaxPermAlloced < static_cast<size_t>(maxPerm))
   {
-    Perm           = (Id*)realloc((char*)Perm, maxPerm * sizeof(Id));
+    Perm           = static_cast<Id*>(realloc((char*)Perm, maxPerm * sizeof(Id)));
     MaxPermAlloced = maxPerm;
   }
   else
@@ -248,10 +248,10 @@ static Id fftradix(double Re[],
   if (!Tmp0 || !Tmp1 || !Tmp2 || !Tmp3 || !Perm) goto Memory_Error;
 
   /* assign pointers */
-  Rtmp = (double*)Tmp0;
-  Itmp = (double*)Tmp1;
-  Cos  = (double*)Tmp2;
-  Sin  = (double*)Tmp3;
+  Rtmp = static_cast<double*>(Tmp0);
+  Itmp = static_cast<double*>(Tmp1);
+  Cos  = static_cast<double*>(Tmp2);
+  Sin  = static_cast<double*>(Tmp3);
 
   /*
    * Function Body
@@ -272,7 +272,7 @@ static Id fftradix(double Re[],
 
   nn   = nt - inc;
   jc   = static_cast<Id>(ns / nPass);
-  radf = pi2 * (double)jc;
+  radf = pi2 * static_cast<double>(jc);
   pi2 *= 2.0; /* use 2 PI from here on */
 
   ii = 0;
@@ -290,7 +290,7 @@ static Id fftradix(double Re[],
   /* compute fourier transform */
   for (;;)
   {
-    sd = radf / (double)kspan;
+    sd = radf / static_cast<double>(kspan);
     cd = sin(sd);
     cd = 2.0 * cd * cd;
     sd = sin(sd + sd);
@@ -546,7 +546,7 @@ static Id fftradix(double Re[],
             if (jf != k)
             {
               jf = k;
-              s1 = pi2 / (double)jf;
+              s1 = pi2 / static_cast<double>(jf);
               c1 = cos(s1);
               s1 = sin(s1);
               if (jf > maxFactors) goto Memory_Error;
@@ -930,11 +930,11 @@ Memory_Error:
  **
  *****************************************************************************/
 Id fftn(Id ndim,
-         const Id dims[],
-         double Re[],
-         double Im[],
-         Id iSign,
-         double scaling)
+        const Id dims[],
+        double Re[],
+        double Im[],
+        Id iSign,
+        double scaling)
 {
   size_t nTotal;
   Id maxFactors, maxPerm;
@@ -970,7 +970,7 @@ Id fftn(Id ndim,
 
   /* Loop over the dimensions: */
 
-  if (dims != NULL)
+  if (dims != nullptr)
   {
     size_t nSpan = 1;
     Id i;
@@ -1000,7 +1000,7 @@ Id fftn(Id ndim,
     if (iSign < 0) iSign = -iSign;
     if (scaling < 0.0) scaling = (scaling < -1.0) ? sqrt(nTotal) : nTotal;
     scaling = 1.0 / scaling; /* multiply is often faster */
-    for (i = 0; i < (Id)nTotal; i += iSign)
+    for (i = 0; i < static_cast<Id>(nTotal); i += iSign)
     {
       Re_Data(i) *= scaling;
       Im_Data(i) *= scaling;

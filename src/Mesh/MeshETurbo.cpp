@@ -843,7 +843,7 @@ Id MeshETurbo::initFromCova(const CovAniso& cova,
 {
   // Initializations
   auto ndim = cova.getNDim();
-  Id nval = (Id)pow(2., ndim);
+  Id nval = static_cast<Id>(pow(2., ndim));
 
   // Get the rotation linked to the covariance
   const Rotation& rot = cova.getAnisoRotation();
@@ -912,7 +912,7 @@ Id MeshETurbo::initFromCova(const CovAniso& cova,
   {
     double delta = extendMaxRot[idim] - extendMinRot[idim];
     dx[idim]     = cova.getRange(idim) / ratio;
-    nx[idim]     = (Id)ceil(delta / dx[idim]) + 2 * nbExt + 1;
+    nx[idim]     = static_cast<Id>(ceil(delta / dx[idim])) + 2 * nbExt + 1;
     // Adapt the number of nodes if too large (compared to 'nxmax' if defined)
     if (nxmax > 0 && nx[idim] > nxmax)
     {
@@ -932,7 +932,7 @@ Id MeshETurbo::initFromCova(const CovAniso& cova,
     for (Id idim = 0; idim < ndim; idim++)
     {
       double delta = extendMaxRot[idim] - extendMinRot[idim];
-      nx[idim]     = (Id)ceil(delta / dx[idim]) + 2 * nbExt + 1;
+      nx[idim]     = static_cast<Id>(ceil(delta / dx[idim])) + 2 * nbExt + 1;
     }
   }
 
@@ -981,7 +981,7 @@ bool MeshETurbo::_deserializeAscii(std::istream& is, bool /*verbose*/)
   }
 
   if (ret)
-    (void)initFromGridByMatrix(nx, dx, x0, rotmat, VectorDouble(), (bool)flag_polarized, 0);
+    (void)initFromGridByMatrix(nx, dx, x0, rotmat, VectorDouble(), static_cast<bool>(flag_polarized), 0);
 
   ret = ret && _recordRead<Id>(is, "Mesh Active Count", nmesh_active);
   ret = ret && _recordRead<Id>(is, "Mesh Masking Count", nmesh_mask);
@@ -1013,14 +1013,14 @@ bool MeshETurbo::_serializeAscii(std::ostream& os, bool /*verbose*/) const
   ret      = ret && _recordWrite<Id>(os, "Storing Mode", _meshIndirect.getMode());
 
   // Dumping the Mesh Masking map
-  Id nmesh_mask = (Id)_meshIndirect.getRelRanks().size();
+  Id nmesh_mask = static_cast<Id>(_meshIndirect.getRelRanks().size());
   ret            = ret && _recordWrite<Id>(os, "Mesh Active Count", getNMeshes());
   ret            = ret && _recordWrite<Id>(os, "Mesh Masking Count", nmesh_mask);
   if (nmesh_mask > 0)
     ret = ret && _recordWriteVec<Id>(os, "Mesh Masking", _meshIndirect.getRelRanks());
 
   // Dumping the Grid Masking map
-  Id ngrid_mask = (Id)_gridIndirect.getRelRanks().size();
+  Id ngrid_mask = static_cast<Id>(_gridIndirect.getRelRanks().size());
   ret            = ret && _recordWrite<Id>(os, "Grid Active Count", getNApices());
   ret            = ret && _recordWrite<Id>(os, "Grid Masking Count", ngrid_mask);
   if (ngrid_mask > 0)
@@ -1038,7 +1038,7 @@ bool MeshETurbo::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 bool isTurbo(const VectorMeshes& meshes)
 {
   if (meshes.empty()) return false;
-  for (Id imesh = 0, nmesh = (Id)meshes.size(); imesh < nmesh; imesh++)
+  for (Id imesh = 0, nmesh = static_cast<Id>(meshes.size()); imesh < nmesh; imesh++)
   {
     const auto* mTurbo = dynamic_cast<const MeshETurbo*>(meshes[imesh]);
     if (mTurbo == nullptr) return false;
@@ -1076,7 +1076,7 @@ bool MeshETurbo::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   {
     _meshIndirect.setMode(mode);
     _gridIndirect.setMode(mode);
-    (void)initFromGridByMatrix(nx, dx, x0, rotmat, VectorDouble(), (bool)flag_polarized, 0);
+    (void)initFromGridByMatrix(nx, dx, x0, rotmat, VectorDouble(), static_cast<bool>(flag_polarized), 0);
   }
 
   Id nmesh_active = 0;
@@ -1120,7 +1120,7 @@ bool MeshETurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   ret = ret && SerializeHDF5::writeValue(meshG, "Mode", _meshIndirect.getMode());
 
   // Dumping the Mesh Masking map
-  Id nmesh_mask = (Id)_meshIndirect.getRelRanks().size();
+  Id nmesh_mask = static_cast<Id>(_meshIndirect.getRelRanks().size());
 
   ret = ret && SerializeHDF5::writeValue(meshG, "MeshCountActive", getNMeshes());
   ret = ret && SerializeHDF5::writeValue(meshG, "MeshCountMask", nmesh_mask);
@@ -1128,7 +1128,7 @@ bool MeshETurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
     ret = ret && SerializeHDF5::writeVec(meshG, "MeshMask", _meshIndirect.getRelRanks());
 
   // Dumping the Grid Masking map
-  Id ngrid_mask = (Id)_gridIndirect.getRelRanks().size();
+  Id ngrid_mask = static_cast<Id>(_gridIndirect.getRelRanks().size());
 
   ret = ret && SerializeHDF5::writeValue(meshG, "GridCountActive", getNApices());
   ret = ret && SerializeHDF5::writeValue(meshG, "GridCountMask", ngrid_mask);

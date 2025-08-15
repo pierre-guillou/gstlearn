@@ -219,7 +219,7 @@ double CovBase::getSill(Id ivar, Id jvar) const
  *****************************************************************************/
 void CovBase::nostatUpdate(CovInternal* covint) const
 {
-  if (covint == NULL) return;
+  if (covint == nullptr) return;
   updateCovByPoints(covint->getIcas1(), covint->getIech1(),
                     covint->getIcas2(), covint->getIech2());
 }
@@ -259,7 +259,7 @@ bool CovBase::isOptimizationInitialized(const Db* db) const
 {
   if (_p1As.empty()) return false;
   if (db == nullptr) return true;
-  Id n = (Id)_p1As.size();
+  Id n = static_cast<Id>(_p1As.size());
   return n == db->getNSample();
 }
 
@@ -585,12 +585,12 @@ void CovBase::appendParams(ListParams& listParams,
         for (Id i = jvard; i < this->getNVar(); i++)
         {
           double val = this->_cholSillsInfo.getValue(i, jvard).getValue();
-          if (i == (Id)jvard)
+          if (i == static_cast<Id>(jvard))
           {
             double grad_softplus = softplusDerivative(val);
             val                  = grad_softplus * softplus(val); // Apply softplus to ensure positive values
           }
-          if (i == (Id)ivard)
+          if (i == static_cast<Id>(ivard))
           {
             val *= 2; // Derivative of the diagonal element is 2
           }

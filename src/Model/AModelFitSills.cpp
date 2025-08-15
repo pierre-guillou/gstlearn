@@ -144,7 +144,7 @@ void AModelFitSills::_storeSillsInModel() const
 
 void AModelFitSills::_resetInitialSill(std::vector<MatrixSymmetric>& sill) const
 {
-  Id ncova = (Id) sill.size();
+  Id ncova = static_cast<Id>(sill.size());
   for (Id icova = 0; icova < ncova; icova++)
   {
     for (Id ivar = 0; ivar < _nvar; ivar++)
@@ -848,7 +848,7 @@ Id AModelFitSills::_sillFittingIntrinsic()
 {
   score           = 0.;
   double crit_mem = MAXIMUM_BIG;
-  for (Id icov = 0; icov < _ncova; icov++) _alphau[icov] = 1. / (double)_ncova;
+  for (Id icov = 0; icov < _ncova; icov++) _alphau[icov] = 1. / static_cast<double>(_ncova);
 
   /* Iterative procedure */
 

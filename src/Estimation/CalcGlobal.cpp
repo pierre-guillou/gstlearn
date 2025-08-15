@@ -158,7 +158,7 @@ Id CalcGlobal::_globalKriging()
   }
 
   // Normalize the cumulative R.H.S.
-  double oneOverNG = 1. / (double)ng;
+  double oneOverNG = 1. / static_cast<double>(ng);
   Sigma0Cum.prodScalar(oneOverNG);
   X0Cum.prodScalar(oneOverNG);
   algebra.setRHS(&Sigma0Cum, &X0Cum);

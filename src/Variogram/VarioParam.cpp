@@ -44,7 +44,7 @@ VarioParam::VarioParam(const VarioParam& VarioParam,
     _scale = VarioParam.getScale();
     _dates = VarioParam.getDates();
 
-    for (Id idir = 0; idir < (Id) dircols.size(); idir++)
+    for (Id idir = 0; idir < static_cast<Id>(dircols.size()); idir++)
     {
       _dirparams.push_back(VarioParam.getDirParam(dircols[idir]));
     }
@@ -266,7 +266,7 @@ void VarioParam::addDir(const DirParam& dirparam)
 
 void VarioParam::addMultiDirs(const std::vector<DirParam>& dirparams)
 {
-  for (Id i = 0; i < (Id) dirparams.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(dirparams.size()); i++)
   {
     if (! _validDefinedFromGrid(dirparams[i])) return;
     _dirparams.push_back(dirparams[i]);
@@ -503,14 +503,14 @@ Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam)
 
         // The pair is kept
 
-        ranks[0].push_back((double) iech);
-        ranks[1].push_back((double) jech);
-        ranks[0].push_back((double) jech);
-        ranks[1].push_back((double) iech);
-        dirs.push_back((double) idir);
-        dirs.push_back((double) idir);
-        lags.push_back((double) ilag);
-        lags.push_back((double) ilag);
+        ranks[0].push_back(static_cast<double>(iech));
+        ranks[1].push_back(static_cast<double>(jech));
+        ranks[0].push_back(static_cast<double>(jech));
+        ranks[1].push_back(static_cast<double>(iech));
+        dirs.push_back(static_cast<double>(idir));
+        dirs.push_back(static_cast<double>(idir));
+        lags.push_back(static_cast<double>(ilag));
+        lags.push_back(static_cast<double>(ilag));
         dists.push_back(dist);
         dists.push_back(dist);
       }

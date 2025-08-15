@@ -164,7 +164,7 @@ void ModelGeneric::setDrifts(const VectorString& driftSymbols)
   else
     delAllDrifts();
 
-  for (Id i = 0; i < (Id)driftSymbols.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(driftSymbols.size()); i++)
   {
     ADrift* drift = DriftFactory::createDriftBySymbol(driftSymbols[i]);
     addDrift(drift);

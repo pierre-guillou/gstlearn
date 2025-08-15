@@ -285,7 +285,7 @@ void MatrixSparse::fill(double value)
 /*! Multiply a Matrix row-wise */
 void MatrixSparse::multiplyRow(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNRows() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNRows() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of rows. Nothing is done");
     return;
@@ -298,7 +298,7 @@ void MatrixSparse::multiplyRow(const VectorDouble& vec)
 /*! Multiply a Matrix column-wise */
 void MatrixSparse::multiplyColumn(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNCols() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNCols() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of columns. Nothing is done");
     return;
@@ -311,7 +311,7 @@ void MatrixSparse::multiplyColumn(const VectorDouble& vec)
 /*! Divide a Matrix row-wise */
 void MatrixSparse::divideRow(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNRows() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNRows() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of rows. Nothing is done");
     return;
@@ -324,7 +324,7 @@ void MatrixSparse::divideRow(const VectorDouble& vec)
 /*! Divide a Matrix column-wise */
 void MatrixSparse::divideColumn(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNCols() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNCols() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of columns. Nothing is done");
     return;
@@ -408,7 +408,7 @@ MatrixSparse* MatrixSparse::addMatMat(const MatrixSparse* x,
 
 MatrixSparse* MatrixSparse::diagVec(const VectorDouble& vec)
 {
-  Id size  = (Id)vec.size();
+  Id size  = static_cast<Id>(vec.size());
   auto* mat = new MatrixSparse(size, size);
 
   mat->setDiagonal(vec);
@@ -474,7 +474,7 @@ void MatrixSparse::getStats(Id* nrows, Id* ncols, Id* count, double* percent) co
   *count   = eigenMat().nonZeros();
   *percent = 0.;
   if ((*nrows) > 0 && (*ncols) > 0)
-    (*percent) = ((100. * (double)(*count)) / ((double)(*nrows) * (double)(*ncols)));
+    (*percent) = ((100. * static_cast<double>(*count)) / (static_cast<double>(*nrows) * static_cast<double>(*ncols)));
 }
 
 VectorDouble MatrixSparse::extractDiag(Id oper_choice) const
@@ -695,10 +695,10 @@ void MatrixSparse::prodNormDiagVecInPlace(const VectorDouble& vec, Id oper_choic
     messerr("This method is limited to square matrices");
     return;
   }
-  if (getNRows() != (Id)vec.size())
+  if (getNRows() != static_cast<Id>(vec.size()))
   {
     messerr("Matrix dimension (%d) does not match vector dimension (%d)",
-            getNRows(), (Id)vec.size());
+            getNRows(), static_cast<Id>(vec.size()));
     return;
   }
 
@@ -866,7 +866,7 @@ Id MatrixSparse::_solve(const VectorDouble& b, VectorDouble& x) const
 {
   if (!isSquare())
     my_throw("Invert method is limited to Square Matrices");
-  if ((Id)b.size() != getNRows() || (Id)x.size() != getNRows())
+  if (static_cast<Id>(b.size()) != getNRows() || static_cast<Id>(x.size()) != getNRows())
     my_throw("b' and 'x' should have the same dimension as the Matrix");
 
   Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver;

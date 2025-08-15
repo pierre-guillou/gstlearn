@@ -361,7 +361,7 @@ void PCA::_calculateNormalization(const Db* db,
     {
       _mean[ivar] /= niso;
       _sigma[ivar] = (_sigma[ivar] / niso - _mean[ivar] * _mean[ivar]);
-      if (flag_nm1) _sigma[ivar] *= (double)(niso / (niso - 1.));
+      if (flag_nm1) _sigma[ivar] *= (niso / (niso - 1.));
       _sigma[ivar] = (_sigma[ivar] > 0) ? sqrt(_sigma[ivar]) : 0.;
     }
   }
@@ -447,7 +447,7 @@ void PCA::_center(VectorDouble& data,
                   bool flag_center,
                   bool flag_scale)
 {
-  Id nvar = (Id)mean.size();
+  Id nvar = static_cast<Id>(mean.size());
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
     if (flag_center)
@@ -474,10 +474,9 @@ void PCA::_uncenter(VectorDouble& data,
                     bool flag_center,
                     bool flag_scale)
 {
-  Id ivar;
-  Id nvar = (Id)mean.size();
+  Id nvar = static_cast<Id>(mean.size());
 
-  for (ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     if (sigma[ivar] <= 0.) continue;
     if (flag_scale)
@@ -838,7 +837,7 @@ VectorBool PCA::_getVectorIsotopic(const Db* db)
 
 void PCA::_loadData(const Db* db, Id iech, VectorDouble& data)
 {
-  Id nvar = (Id)db->getNLoc(ELoc::Z);
+  Id nvar = db->getNLoc(ELoc::Z);
   for (Id ivar = 0; ivar < nvar; ivar++)
     data[ivar] = db->getZVariable(iech, ivar);
 }
@@ -847,9 +846,9 @@ VectorDouble PCA::mafOfIndex() const
 {
   // Calculate the probability of each interval
   VectorDouble w = _mean;
-  Id ncut       = (Id)_mean.size();
+  Id ncut       = static_cast<Id>(_mean.size());
   w.push_back(1 - VH::cumul(_mean));
-  Id nclass = (Id)w.size();
+  Id nclass = static_cast<Id>(w.size());
 
   // Normalize the indicator of intervals
   MatrixDense i_norm_val(nclass, ncut);

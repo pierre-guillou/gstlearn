@@ -78,12 +78,12 @@ void AShiftOp::prodLambda(const VectorDouble& x,
 }
 
 double AShiftOp::logDetLambda() const
-  {
-    double res = 0.;
-    for (const auto& e : _Lambda)
-      res += log(e);
-    return 2. * res;
-  }
+{
+  double res = 0.;
+  for (const auto& e: _Lambda)
+    res += log(e);
+  return 2. * res;
+}
 
 double AShiftOp::getMaxEigenValue() const
 {
@@ -122,12 +122,12 @@ void AShiftOp::addProdLambda(const constvect x,
 
 std::shared_ptr<CovAniso> AShiftOp::cloneAndCast(const std::shared_ptr<CovAniso>& cova)
 {
-  return std::shared_ptr<CovAniso>((CovAniso*)cova->clone());
+  return std::shared_ptr<CovAniso>(cova->clone());
 }
 
 std::shared_ptr<CovAniso> AShiftOp::cloneAndCast(const CovAniso* cova)
 {
-  return std::shared_ptr<CovAniso>((CovAniso*)cova->clone());
+  return std::shared_ptr<CovAniso>(cova->clone());
 }
 
 void AShiftOp::normalizeLambdaBySills(const AMesh* mesh)
@@ -137,7 +137,7 @@ void AShiftOp::normalizeLambdaBySills(const AMesh* mesh)
   if (_cova->isNoStatForVariance())
   {
     _cova->informMeshByApexForSills(mesh);
-    Id number = (Id)_Lambda.size();
+    Id number = static_cast<Id>(_Lambda.size());
 
     for (Id imesh = 0; imesh < number; imesh++)
     {

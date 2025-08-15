@@ -11,7 +11,6 @@
 #include "Enum/EDbg.hpp"
 
 #include "Basic/Law.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "geoslib_define.h"
@@ -30,12 +29,12 @@ static EDbg _debugOptions = EDbg::DB;
 bool isInteger(double value, double eps)
 {
   auto iclose = getClosestInteger(value);
-  return (ABS((double)iclose - value) <= eps);
+  return (ABS(static_cast<double>(iclose) - value) <= eps);
 }
 
 Id getClosestInteger(double value)
 {
-  Id iclose = (Id)round(value);
+  Id iclose = static_cast<Id>(round(value));
   return iclose;
 }
 
@@ -43,7 +42,7 @@ bool isMultiple(Id nbig, Id nsmall)
 {
   double ratio;
 
-  ratio = (double)nbig / (double)nsmall;
+  ratio = static_cast<double>(nbig) / static_cast<double>(nsmall);
   return (isInteger(ratio));
 }
 
@@ -214,7 +213,7 @@ void ut_sort_double(Id safe, Id nech, Id* ind, double* value)
         {
           i = l;
           j = r + 1;
-          p = (Id)((double)(l + r) / 2.);
+          p = static_cast<Id>(static_cast<double>(l + r) / 2.);
 
           if (tab[p] < tab[l])
           {
@@ -313,7 +312,7 @@ void ut_sort_double(Id safe, Id nech, Id* ind, double* value)
         {
           i = l;
           j = r + 1;
-          p = (Id)((double)(l + r) / 2.);
+          p = static_cast<Id>(static_cast<double>(l + r) / 2.);
 
           if (tab[p] < tab[l])
           {
@@ -428,7 +427,7 @@ StatResults ut_statistics(Id nech, const double* tab, const double* sel, const d
   double num  = 0.;
   double mm   = 0.;
   double vv   = 0.;
-  Id nval    = 0;
+  Id nval     = 0;
 
   for (Id i = 0; i < nech; i++)
   {
@@ -524,7 +523,7 @@ void ut_facies_statistics(Id nech,
   {
     if (sel != nullptr && isZero(sel[i])) continue;
     if (FFFF(tab[i])) continue;
-    facies = (Id)tab[i];
+    facies = static_cast<Id>(tab[i]);
     if (facies < 0) continue;
     if (facies < facmin) facmin = facies;
     if (facies > facmax) facmax = facies;
@@ -599,7 +598,7 @@ void ut_classify(Id nech,
       (*ntest)++;
       continue;
     }
-    rank = (Id)((value - start) / pas);
+    rank = static_cast<Id>((value - start) / pas);
     if (rank < 0 || rank >= nclass)
     {
       (*nout)++;
@@ -851,7 +850,7 @@ VectorInt ut_combinations(Id n, Id maxk, Id* ncomb)
   for (Id i = 0; i < n; i++)
     v[i] = i;
 
-  (*ncomb)  = 0;
+  (*ncomb) = 0;
   VectorInt comb;
   st_combinations(v.data(), 1, n, 1, maxk, ncomb, comb);
   return comb;
@@ -908,7 +907,7 @@ void ut_shuffle_array(Id nrow, Id ncol, VectorDouble& tab)
  */
 VectorInt getListActiveToAbsolute(const VectorDouble& sel)
 {
-  Id nech = (Id)sel.size();
+  Id nech = static_cast<Id>(sel.size());
   VectorInt ranks;
   for (Id iabs = 0; iabs < nech; iabs++)
   {
@@ -927,7 +926,7 @@ VectorInt getListActiveToAbsolute(const VectorDouble& sel)
 std::map<Id, Id> getMapAbsoluteToRelative(const VectorDouble& sel, bool verbose)
 {
   std::map<Id, Id> map;
-  Id nabs   = (Id)sel.size();
+  Id nabs   = static_cast<Id>(sel.size());
   Id ifirst = ITEST;
   Id ilast  = ITEST;
   Id irel   = 0;
@@ -1139,9 +1138,9 @@ double truncateDigits(double value, Id ndigits)
   if (ndigits <= 0) return TEST;
   Id iSigned = value > 0 ? 1 : -1;
   value *= iSigned;
-  Id order = (Id)log10(value);
+  Id order = static_cast<Id>(log10(value));
   Id ndec  = (value > 1) ? ndigits - order - 1 : ndigits - order;
-  value     = truncateDecimals(value, ndec) * iSigned;
+  value    = truncateDecimals(value, ndec) * iSigned;
   return value;
 }
 
@@ -1165,7 +1164,7 @@ void print_range(const char* title,
 
   /* Encode the title (if defined) */
 
-  if (title != NULL)
+  if (title != nullptr)
     message("%s : ", title);
   else
     message("Range : ");

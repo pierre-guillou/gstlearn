@@ -53,7 +53,7 @@ Constraints& Constraints::operator=(const Constraints& m)
 
 Constraints::~Constraints()
 {
-  for (Id i = 0, n = (Id)_consItems.size(); i < n; i++) delete _consItems[i];
+  for (Id i = 0, n = static_cast<Id>(_consItems.size()); i < n; i++) delete _consItems[i];
   _consItems.clear();
 }
 
@@ -96,7 +96,7 @@ String Constraints::toString(const AStringFormat* strfmt) const
 Id Constraints::isDefinedForSill() const
 {
   if (_consItems.size() <= 0) return (0);
-  for (Id i = 0; i < (Id)_consItems.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(_consItems.size()); i++)
   {
     if (_consItems[i]->getType() == EConsElem::SILL) return (1);
   }
@@ -105,7 +105,7 @@ Id Constraints::isDefinedForSill() const
 
 void Constraints::modifyConstraintsForSill()
 {
-  for (Id i = 0; i < (Id)getNConsItem(); i++)
+  for (Id i = 0; i < getNConsItem(); i++)
   {
     const ConsItem* consitem = getConsItems(i);
     if (consitem->getType() != EConsElem::SILL) continue;
@@ -158,7 +158,7 @@ void constraints_print(const Constraints& constraints)
 Id modify_constraints_on_sill(Constraints& constraints)
 
 {
-  Id ncons = (Id)constraints.getNConsItem();
+  Id ncons = constraints.getNConsItem();
   for (Id i = 0; i < ncons; i++)
   {
     const ConsItem* consitem = constraints.getConsItems(i);
@@ -205,7 +205,7 @@ double constraints_get(const Constraints& constraints,
 {
   if (!constraints.isDefined()) return (TEST);
 
-  for (Id i = 0; i < (Id)constraints.getNConsItem(); i++)
+  for (Id i = 0; i < constraints.getNConsItem(); i++)
   {
     const ConsItem* item = constraints.getConsItems(i);
     if (item->getIGrf() != igrf || item->getICov() != icov ||

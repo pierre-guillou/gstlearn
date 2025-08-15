@@ -28,8 +28,8 @@ void NoStatFunctional::_informField(const VectorVectorDouble& coords,
                                     bool verbose)
 {
   DECLARE_UNUSED(verbose)
-  Id size = (Id)coords[0].size();
-  Id ndim = (Id)coords.size();
+  Id size = static_cast<Id>(coords[0].size());
+  Id ndim = static_cast<Id>(coords.size());
   VectorDouble vec(ndim);
   for (Id icoords = 0; icoords < size; icoords++)
   {
@@ -53,4 +53,4 @@ String NoStatFunctional::toString(const AStringFormat* strfmt) const
     sstr << "Functional" << std::endl;
   return sstr.str();
 }
-}
+} // namespace gstlrn

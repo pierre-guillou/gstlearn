@@ -21,14 +21,14 @@
 
 #define EVALOP(IN, OUT, TAB, getmat, OP, IY, COMPUTEOP, XORY, START, END, IVAR, JVAR)                    \
   {                                                                                                      \
-    auto nvar      = _getNVar();                                                                         \
-    auto ncov      = _getNCov();                                                                         \
-    Id iad_x      = 0;                                                                                  \
-    Id iad_struct = 0;                                                                                  \
+    auto nvar     = _getNVar();                                                                          \
+    auto ncov     = _getNCov();                                                                          \
+    Id iad_x      = 0;                                                                                   \
+    Id iad_struct = 0;                                                                                   \
     vect y;                                                                                              \
-    for (Id icov = 0; icov < ncov; icov++)                                                              \
+    for (Id icov = 0; icov < ncov; icov++)                                                               \
     {                                                                                                    \
-      Id napices = size(icov);                                                                          \
+      Id napices = size(icov);                                                                           \
       if ((nvar == 1) && (ncov == 1))                                                                    \
       {                                                                                                  \
         y = vect(OUT);                                                                                   \
@@ -41,9 +41,9 @@
           y = vect(_works[icov]);                                                                        \
         }                                                                                                \
       }                                                                                                  \
-      for (Id jvar = 0; jvar < nvar; jvar++)                                                            \
+      for (Id jvar = 0; jvar < nvar; jvar++)                                                             \
       {                                                                                                  \
-        Id iad_y = IY;                                                                                  \
+        Id iad_y = IY;                                                                                   \
         constvect x(IN.data() + iad_x, napices);                                                         \
         if (nvar == 1)                                                                                   \
           y = vect(OUT.data() + iad_y, napices);                                                         \
@@ -59,7 +59,7 @@
           iad_x += napices;                                                                              \
           continue;                                                                                      \
         }                                                                                                \
-        for (Id ivar = START; ivar < END; ivar++)                                                       \
+        for (Id ivar = START; ivar < END; ivar++)                                                        \
         {                                                                                                \
           if (_isNoStatForVariance[icov])                                                                \
           {                                                                                              \
@@ -114,7 +114,7 @@ PrecisionOpMulti::PrecisionOpMulti(Model* model,
 
   _isValid = true;
   _computeSize();
-  Id ncov = (Id)meshes.size();
+  Id ncov = static_cast<Id>(meshes.size());
   _isNoStatForVariance.resize(ncov, false);
 
   _works.resize(ncov);
@@ -214,7 +214,7 @@ bool PrecisionOpMulti::_isValidMeshes(const std::vector<const AMesh*>& meshes)
 
 void PrecisionOpMulti::_popsClear()
 {
-  for (Id i = 0, n = (Id)_pops.size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(_pops.size()); i < n; i++)
     delete _pops[i];
 }
 
@@ -238,13 +238,13 @@ Id PrecisionOpMulti::_getNVar() const
 Id PrecisionOpMulti::_getNCov() const
 {
   if (_covList.empty()) return 0;
-  return (Id)_covList.size();
+  return static_cast<Id>(_covList.size());
 }
 
 Id PrecisionOpMulti::_getNMesh() const
 {
   if (_meshes.empty()) return 0;
-  return (Id)_meshes.size();
+  return static_cast<Id>(_meshes.size());
 }
 
 Id PrecisionOpMulti::getSize() const
@@ -255,7 +255,7 @@ void PrecisionOpMulti::_computeSize()
 {
   auto nvar = _getNVar();
   auto ncov = _getNCov();
-  _size    = 0;
+  _size     = 0;
   for (Id i = 0; i < ncov; i++)
   {
     _size += nvar * _meshes[i]->getNApices();
@@ -318,7 +318,7 @@ Id PrecisionOpMulti::_buildMatrices()
   auto ncov = _getNCov();
 
   // Do nothing if the array has already been calculated (correct dimension)
-  if (ncov == (Id)_cholSillsStat.size()) return 0;
+  if (ncov == static_cast<Id>(_cholSillsStat.size())) return 0;
 
   _localSills.resize(ncov);
   _cholSillsNoStat.resize(ncov);
@@ -408,7 +408,7 @@ std::pair<double, double> PrecisionOpMulti::rangeEigenValQ() const
 {
   std::pair<double, double> result = _pops[0]->getRangeEigenVal();
 
-  for (Id i = 1; i < (Id)_pops.size(); i++)
+  for (Id i = 1; i < static_cast<Id>(_pops.size()); i++)
   {
     std::pair<double, double> vals = _pops[i]->getRangeEigenVal();
     result.first                   = MIN(result.first, vals.first);

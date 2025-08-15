@@ -81,13 +81,13 @@ namespace gstlrn
   Id DbLine::getNLine() const
   {
     if (_lineAdds.empty()) return 0;
-    return (Id)_lineAdds.size();
+    return static_cast<Id>(_lineAdds.size());
   }
 
   Id DbLine::getNSamplePerLine(Id iline) const
   {
     if (!_isLineNumberValid(iline)) return -1;
-    return (Id)_lineAdds[iline].size();
+    return static_cast<Id>(_lineAdds[iline].size());
   }
 
   Id DbLine::getNTotal() const
@@ -200,7 +200,7 @@ namespace gstlrn
     }
 
     // Count the number of lines
-    Id nbline = (Id)lineCounts.size();
+    Id nbline = static_cast<Id>(lineCounts.size());
 
     // Create the Linkage
     _lineAdds.resize(nbline, 0);
@@ -221,22 +221,22 @@ namespace gstlrn
     auto nech = getNSample();
 
     // Preliminary checks by dimensions
-    if ((Id)linesId.size() != nech)
+    if (static_cast<Id>(linesId.size()) != nech)
     {
       messerr("Dimension of 'linesId' (%d) should match Number of samples (%d)",
-              (Id)linesId.size(), nech);
+              static_cast<Id>(linesId.size()), nech);
       return 1;
     }
-    if ((Id)ranksPerId.size() != nech)
+    if (static_cast<Id>(ranksPerId.size()) != nech)
     {
       messerr("Dimension of 'ranksPerId' (%d) should match Number of samples (%d)",
-              (Id)ranksPerId.size(), nech);
+              static_cast<Id>(ranksPerId.size()), nech);
       return 1;
     }
 
     // Find the number of lines
     VectorInt allLines = VH::unique(linesId);
-    Id nbline         = (Id)allLines.size();
+    Id nbline         = static_cast<Id>(allLines.size());
 
     // Create the Linkage
     _lineAdds.resize(nbline, 0);
@@ -257,7 +257,7 @@ namespace gstlrn
       VectorInt sortedRanks = VH::orderRanks(ranks);
       _lineAdds[iline]      = VH::reorder(iadds, sortedRanks);
     }
-    return (Id)!isConsistent();
+    return static_cast<Id>(!isConsistent());
   }
 
   /**
@@ -632,13 +632,13 @@ namespace gstlrn
       messerr("This method is coded to extract wells from a 3-D Grid only");
       return nullptr;
     }
-    if ((Id)xranks.size() != (Id)yranks.size())
+    if (static_cast<Id>(xranks.size()) != static_cast<Id>(yranks.size()))
     {
       messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
       return nullptr;
     }
-    Id nvar    = (Id)names.size();
-    Id nwells  = (Id)xranks.size();
+    Id nvar    = static_cast<Id>(names.size());
+    Id nwells  = static_cast<Id>(xranks.size());
     auto nz     = grid.getNX(2);
     Id nbywell = nz / byZ;
     Id nsample = nwells * nbywell;
@@ -699,13 +699,13 @@ namespace gstlrn
       messerr("This method is coded to extract wells from a 3-D Grid only");
       return nullptr;
     }
-    if ((Id)xranks.size() != (Id)yranks.size())
+    if (static_cast<Id>(xranks.size()) != static_cast<Id>(yranks.size()))
     {
       messerr("Arguments 'xranks' and 'yranks' should have same dimensions");
       return nullptr;
     }
-    Id ncuts  = (Id)cuts.size();
-    Id nwells = (Id)xranks.size();
+    Id ncuts  = static_cast<Id>(cuts.size());
+    Id nwells = static_cast<Id>(xranks.size());
     auto nz    = grid.getNX(2);
     VectorDouble tab;
     VectorInt lineCounts(nwells);

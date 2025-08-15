@@ -24,7 +24,7 @@ AModelOptim::AModelOptim(ModelGeneric* model, bool verbose)
   if (_model == nullptr)
     throw std::invalid_argument("Model cannot be null");
 
-  bool useGradient = (bool)OptCustom::query("UseGradient", 1);
+  bool useGradient = static_cast<bool>(OptCustom::query("UseGradient", 1));
   _params          = _model->generateListParams();
 
   // Id nvar                 = _model->getNVar();
@@ -33,9 +33,9 @@ AModelOptim::AModelOptim(ModelGeneric* model, bool verbose)
   // _model->initParams(varsUnit, 1.);
   _x    = _params->getOptimizableValues();
   if (useGradient)
-    _opt = new Optim(LBFGS, (Id)_x.size());
+    _opt = new Optim(LBFGS, static_cast<Id>(_x.size()));
   else
-    _opt = new Optim(NELDERMEAD, (Id)_x.size());
+    _opt = new Optim(NELDERMEAD, static_cast<Id>(_x.size()));
 
   _opt->setXtolRel(EPSILON6);
   _opt->setObjective([this](const std::vector<double>& x)

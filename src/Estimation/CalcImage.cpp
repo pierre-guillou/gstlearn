@@ -211,11 +211,11 @@ bool CalcImage::_filterImage(DbGrid* dbgrid, const ModelCovList* model)
   Id retcode = 0;
   if (!_flagFFT)
   {
-    retcode = conv.ConvolveSparse(_iattOut, ranks, wgt, means, (Id)_verbose);
+    retcode = conv.ConvolveSparse(_iattOut, ranks, wgt, means, static_cast<Id>(_verbose));
   }
   else
   {
-    DbGrid* marpat = _buildMarpat(neighI, ranks, wgt, (Id)_verbose);
+    DbGrid* marpat = _buildMarpat(neighI, ranks, wgt, static_cast<Id>(_verbose));
     retcode        = conv.ConvolveFFT(_iattOut, nvar, marpat, means);
     delete marpat;
   }
@@ -237,8 +237,8 @@ DbGrid* CalcImage::_buildMarpat(const NeighImage* neigh,
                                 const MatrixDense& wgt,
                                 Id optionVerbose)
 {
-  Id nbneigh = (Id)ranks.size();
-  Id ndim    = (Id)ranks[0].size();
+  Id nbneigh = static_cast<Id>(ranks.size());
+  Id ndim    = static_cast<Id>(ranks[0].size());
   auto nvar   = wgt.getNCols();
   VectorInt nx(ndim);
   for (Id i = 0; i < ndim; i++)

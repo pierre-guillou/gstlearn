@@ -126,14 +126,14 @@ int main(int argc, char* argv[])
     mestitle(0, "Demonstrating the findNN algorithm");
     bool flagShuffle = true;
 
-    nech             = 20;
-    Db* aux          = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
-                                            VectorDouble(), VectorDouble(),
-                                            VectorDouble(), 24813);
+    nech    = 20;
+    Db* aux = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
+                                   VectorDouble(), VectorDouble(),
+                                   VectorDouble(), 24813);
 
-    auto mat         = findNN(data, aux, nb_neigh, flagShuffle);
-    auto nrows       = (Id)mat.getNRows();
-    auto ncols       = (Id)mat.getNCols();
+    auto mat   = findNN(data, aux, nb_neigh, flagShuffle);
+    auto nrows = static_cast<Id>(mat.getNRows());
+    auto ncols = static_cast<Id>(mat.getNCols());
     for (Id irow = 0; irow < nrows; irow++)
     {
       for (Id icol = 0; icol < ncols; icol++)

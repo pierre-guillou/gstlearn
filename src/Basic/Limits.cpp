@@ -8,26 +8,25 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/Db.hpp"
 #include "Basic/Limits.hpp"
 #include "Basic/Interval.hpp"
-#include "Basic/Utilities.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "Basic/Utilities.hpp"
+#include "Db/Db.hpp"
 #include "geoslib_define.h"
 
 namespace gstlrn
 {
 Limits::Limits()
-    : AStringable(),
-      _bounds()
+  : AStringable()
+  , _bounds()
 {
 }
 
-Limits::Limits(const Limits &m)
-    : AStringable(m),
-      _bounds(m._bounds)
+Limits::Limits(const Limits& m)
+  : AStringable(m)
+  , _bounds(m._bounds)
 {
-
 }
 
 Limits::Limits(const VectorDouble& mini,
@@ -41,7 +40,7 @@ Limits::Limits(const VectorDouble& mini,
     messerr("Arguments 'mini' and 'maxi' should have the same dimension. Limits empty");
     return;
   }
-  Id nclass = static_cast<Id> (mini.size());
+  Id nclass = static_cast<Id>(mini.size());
   if (nclass <= 0)
   {
     messerr("You must define at least one item in 'mini' and 'maxi'. Limits empty");
@@ -62,7 +61,7 @@ Limits::Limits(const VectorDouble& mini,
   {
     bool incmini_loc = (incmini.empty()) ? true : incmini[i];
     bool incmaxi_loc = (incmaxi.empty()) ? false : incmaxi[i];
-    Interval bd(mini[i],maxi[i],incmini_loc,incmaxi_loc);
+    Interval bd(mini[i], maxi[i], incmini_loc, incmaxi_loc);
     _bounds.push_back(bd);
   }
 }
@@ -77,7 +76,7 @@ Limits::Limits(const VectorDouble& bounds, bool addFromZero)
   if (bounds.size() == 1)
   {
     // Same as next constructor
-    Id nclass = static_cast<Id> (bounds[0]);
+    Id nclass = static_cast<Id>(bounds[0]);
     _bounds.clear();
     for (Id i = 0; i < nclass; i++)
     {
@@ -87,7 +86,7 @@ Limits::Limits(const VectorDouble& bounds, bool addFromZero)
   }
   else
   {
-    Id nclass = static_cast<Id> (bounds.size()) - 1;
+    Id nclass = static_cast<Id>(bounds.size()) - 1;
     if (nclass <= 0)
       my_throw("The argument 'bounds' should have at least 2 items");
 
@@ -127,7 +126,7 @@ Limits::Limits(Id nclass)
   }
 }
 
-Limits& Limits::operator=(const Limits &m)
+Limits& Limits::operator=(const Limits& m)
 {
   if (this != &m)
   {
@@ -139,7 +138,6 @@ Limits& Limits::operator=(const Limits &m)
 
 Limits::~Limits()
 {
-
 }
 
 Limits* Limits::create(const VectorDouble& mini,
@@ -168,7 +166,7 @@ String Limits::toString(const AStringFormat* /*strfmt*/) const
   std::stringstream sstr;
 
   for (Id i = 0; i < static_cast<Id>(_bounds.size()); i++)
-    sstr << "Bound( " << i+1 << " ) : " << _bounds[i].toString() << std::endl;
+    sstr << "Bound( " << i + 1 << " ) : " << _bounds[i].toString() << std::endl;
 
   return sstr.str();
 }
@@ -231,22 +229,22 @@ bool Limits::isInside(double value) const
 {
   for (Id i = 0; i < getNLimit(); i++)
   {
-    if (! _bounds[i].isInside(value)) return false;
+    if (!_bounds[i].isInside(value)) return false;
   }
   return true;
 }
 
 Id Limits::toCategoryByAttribute(Db* db,
-                                  Id iatt,
-                                  const NamingConvention& namconv) const
+                                 Id iatt,
+                                 const NamingConvention& namconv) const
 {
   return _computeCategory(db, iatt, getLowerBounds(), getUpperBounds(),
                           getLowerIncluded(), getUpperIncluded(), namconv);
 }
 
 Id Limits::toCategory(Db* db,
-                       const String& name,
-                       const NamingConvention& namconv) const
+                      const String& name,
+                      const NamingConvention& namconv) const
 {
   Id iatt = db->getUID(name);
   if (iatt < 0) return 1;
@@ -254,7 +252,7 @@ Id Limits::toCategory(Db* db,
 }
 
 /**
- * Create indicators variables on the intervals defined by the limits for a given variable in a Db.  
+ * Create indicators variables on the intervals defined by the limits for a given variable in a Db.
  * Note:
  *
  * - If OptionIndicator is 1, the Db-class will contain the new indicator variables.
@@ -276,23 +274,23 @@ Id Limits::toCategory(Db* db,
  * @return
  */
 Id Limits::toIndicator(Db* db,
-                        const String& name,
-                        Id OptionIndicator,
-                        bool flagBelow,
-                        bool flagAbove,
-                        const NamingConvention& namconv) const
+                       const String& name,
+                       Id OptionIndicator,
+                       bool flagBelow,
+                       bool flagAbove,
+                       const NamingConvention& namconv) const
 {
   Id iatt = db->getUID(name);
   if (iatt < 0) return 1;
   return toIndicatorByAttribute(db, iatt, OptionIndicator, flagBelow, flagAbove, namconv);
 }
 
-Id Limits::toIndicatorByAttribute(Db *db,
-                                   Id iatt,
-                                   Id OptionIndicator,
-                                   bool flagBelow,
-                                   bool flagAbove,
-                                   const NamingConvention &namconv) const
+Id Limits::toIndicatorByAttribute(Db* db,
+                                  Id iatt,
+                                  Id OptionIndicator,
+                                  bool flagBelow,
+                                  bool flagAbove,
+                                  const NamingConvention& namconv) const
 {
   return _computeIndicator(db, iatt, OptionIndicator, getLowerBounds(),
                            getUpperBounds(), getLowerIncluded(),
@@ -341,13 +339,13 @@ VectorDouble Limits::statistics(Db* db,
  ** \remark maxi[iclass[ = Id(iclass)
  **
  *****************************************************************************/
-Id Limits::_computeCategory(Db *db,
-                             Id iatt,
-                             const VectorDouble &mini,
-                             const VectorDouble &maxi,
-                             const VectorBool &incmini,
-                             const VectorBool &incmaxi,
-                             const NamingConvention &namconv)
+Id Limits::_computeCategory(Db* db,
+                            Id iatt,
+                            const VectorDouble& mini,
+                            const VectorDouble& maxi,
+                            const VectorBool& incmini,
+                            const VectorBool& incmaxi,
+                            const NamingConvention& namconv)
 {
   // Determination of the number of classes
 
@@ -392,7 +390,7 @@ Id Limits::_computeCategory(Db *db,
 
     /* Set the returning value */
 
-    db->setArray(iech, iptr, (double) ival);
+    db->setArray(iech, iptr, static_cast<double>(ival));
   }
 
   namconv.setNamesAndLocators(db, iatt, db, iptr);
@@ -424,16 +422,16 @@ Id Limits::_computeCategory(Db *db,
  ** \remark maxi[iclass[ = iclass
  **
  *****************************************************************************/
-Id Limits::_computeIndicator(Db *db,
-                              Id iatt,
-                              Id flag_indic,
-                              const VectorDouble &mini,
-                              const VectorDouble &maxi,
-                              const VectorBool &incmini,
-                              const VectorBool &incmaxi,
-                              bool flagBelow,
-                              bool flagAbove,
-                              const NamingConvention &namconv)
+Id Limits::_computeIndicator(Db* db,
+                             Id iatt,
+                             Id flag_indic,
+                             const VectorDouble& mini,
+                             const VectorDouble& maxi,
+                             const VectorBool& incmini,
+                             const VectorBool& incmaxi,
+                             bool flagBelow,
+                             bool flagAbove,
+                             const NamingConvention& namconv)
 {
   // Determination of the number of classes
 
@@ -451,15 +449,15 @@ Id Limits::_computeIndicator(Db *db,
   VectorDouble maxival(nclass);
   for (Id iclass = 0; iclass < nclass; iclass++)
   {
-    count[iclass] = 0;
-    mean[iclass] = 0.;
+    count[iclass]   = 0;
+    mean[iclass]    = 0.;
     minival[iclass] = (mini.empty()) ? iclass + 0.5 : mini[iclass];
     maxival[iclass] = (maxi.empty()) ? iclass + 1.5 : maxi[iclass];
     flagmin[iclass] = (incmini.empty()) ? 1 : static_cast<Id>(incmini[iclass]);
     flagmax[iclass] = (incmaxi.empty()) ? 0 : static_cast<Id>(incmaxi[iclass]);
   }
-  Id nbelow = 0;
-  Id nabove = 0;
+  Id nbelow     = 0;
+  Id nabove     = 0;
   double mbelow = 0.;
   double mabove = 0.;
 
@@ -485,14 +483,14 @@ Id Limits::_computeIndicator(Db *db,
   {
     if (flagBelow)
     {
-      iptr_below =  db->addColumnsByConstant(1, 0.);
+      iptr_below = db->addColumnsByConstant(1, 0.);
       if (iptr_below < 0) return 1;
     }
     iptr_indic = db->addColumnsByConstant(nclass, 0.);
     if (iptr_indic < 0) return 1;
     if (flagAbove)
     {
-      iptr_above =  db->addColumnsByConstant(1, 0.);
+      iptr_above = db->addColumnsByConstant(1, 0.);
       if (iptr_above < 0) return 1;
     }
   }
@@ -519,13 +517,13 @@ Id Limits::_computeIndicator(Db *db,
       if (!FFFF(minival[iclass]))
       {
         if ((flagmin[iclass] == 0 && value <= minival[iclass]) ||
-            (flagmin[iclass] == 1 && value <  minival[iclass]))
+            (flagmin[iclass] == 1 && value < minival[iclass]))
           belong = 0;
       }
       if (!FFFF(maxival[iclass]))
       {
         if ((flagmax[iclass] == 0 && value >= maxival[iclass]) ||
-            (flagmax[iclass] == 1 && value >  maxival[iclass]))
+            (flagmax[iclass] == 1 && value > maxival[iclass]))
           belong = 0;
       }
 
@@ -576,7 +574,7 @@ Id Limits::_computeIndicator(Db *db,
       iclass = found;
     }
     if (!flag_indic)
-      db->setArray(iech, iptr_mean, (double) iclass);
+      db->setArray(iech, iptr_mean, static_cast<double>(iclass));
   }
 
   /* Calculate the statistics */
@@ -586,12 +584,12 @@ Id Limits::_computeIndicator(Db *db,
     if (count[iclass] <= 0)
       mean[iclass] = TEST;
     else
-      mean[iclass] /= (double) count[iclass];
+      mean[iclass] /= static_cast<double>(count[iclass]);
   }
-  if (nbelow > 0) mbelow /= (double) nbelow;
-  if (nabove > 0) mabove /= (double) nabove;
-  if (! flagBelow) mbelow = TEST;
-  if (! flagAbove) mabove = TEST;
+  if (nbelow > 0) mbelow /= static_cast<double>(nbelow);
+  if (nabove > 0) mabove /= static_cast<double>(nabove);
+  if (!flagBelow) mbelow = TEST;
+  if (!flagAbove) mabove = TEST;
 
   /* Assign the mean variable per class */
 
@@ -599,7 +597,7 @@ Id Limits::_computeIndicator(Db *db,
   {
     for (Id iech = 0; iech < db->getNSample(); iech++)
     {
-      if (! db->isActive(iech)) continue;
+      if (!db->isActive(iech)) continue;
       double value = db->getArray(iech, iptr_mean);
       if (FFFF(value)) continue;
       Id iclass = static_cast<Id>(value);
@@ -644,12 +642,12 @@ Id Limits::_computeIndicator(Db *db,
  ** \param[in]  flagAbove If True, consider the values above the upper bound
  **
  *****************************************************************************/
-VectorDouble Limits::_computeLimitStatistics(Db *db,
+VectorDouble Limits::_computeLimitStatistics(Db* db,
                                              Id iatt,
-                                             const VectorDouble &mini,
-                                             const VectorDouble &maxi,
-                                             const VectorBool &incmini,
-                                             const VectorBool &incmaxi,
+                                             const VectorDouble& mini,
+                                             const VectorDouble& maxi,
+                                             const VectorBool& incmini,
+                                             const VectorBool& incmaxi,
                                              Id optionStat,
                                              bool flagBelow,
                                              bool flagAbove)
@@ -670,15 +668,15 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
   VectorDouble maxival(nclass);
   for (Id iclass = 0; iclass < nclass; iclass++)
   {
-    count[iclass] = 0;
-    mean[iclass] = 0.;
+    count[iclass]   = 0;
+    mean[iclass]    = 0.;
     minival[iclass] = (mini.empty()) ? iclass + 0.5 : mini[iclass];
     maxival[iclass] = (maxi.empty()) ? iclass + 1.5 : maxi[iclass];
     flagmin[iclass] = (incmini.empty()) ? 1 : static_cast<Id>(incmini[iclass]);
     flagmax[iclass] = (incmaxi.empty()) ? 0 : static_cast<Id>(incmaxi[iclass]);
   }
-  Id nbelow = 0;
-  Id nabove = 0;
+  Id nbelow     = 0;
+  Id nabove     = 0;
   double mbelow = 0.;
   double mabove = 0.;
 
@@ -712,13 +710,13 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
       if (!FFFF(minival[iclass]))
       {
         if ((flagmin[iclass] == 0 && value <= minival[iclass]) ||
-            (flagmin[iclass] == 1 && value <  minival[iclass]))
+            (flagmin[iclass] == 1 && value < minival[iclass]))
           belong = 0;
       }
       if (!FFFF(maxival[iclass]))
       {
         if ((flagmax[iclass] == 0 && value >= maxival[iclass]) ||
-            (flagmax[iclass] == 1 && value >  maxival[iclass]))
+            (flagmax[iclass] == 1 && value > maxival[iclass]))
           belong = 0;
       }
 
@@ -755,10 +753,10 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
     if (count[iclass] <= 0)
       mean[iclass] = TEST;
     else
-      mean[iclass] /= (double) count[iclass];
+      mean[iclass] /= static_cast<double>(count[iclass]);
   }
-  if (nbelow > 0) mbelow /= (double) nbelow;
-  if (nabove > 0) mabove /= (double) nabove;
+  if (nbelow > 0) mbelow /= static_cast<double>(nbelow);
+  if (nabove > 0) mabove /= static_cast<double>(nabove);
 
   /* Returning the results */
 
@@ -766,10 +764,10 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
 
   if (optionStat == 1)
   {
-    if (flagBelow) stats.push_back((double) nbelow / (double) nactive);
+    if (flagBelow) stats.push_back(static_cast<double>(nbelow) / static_cast<double>(nactive));
     for (Id iclass = 0; iclass < nclass; iclass++)
-      stats.push_back((double) count[iclass] / (double) nactive);
-    if (flagAbove) stats.push_back((double) nabove / (double) nactive);
+      stats.push_back(static_cast<double>(count[iclass]) / static_cast<double>(nactive));
+    if (flagAbove) stats.push_back(static_cast<double>(nabove) / static_cast<double>(nactive));
   }
   else
   {
@@ -796,11 +794,11 @@ VectorDouble Limits::_computeLimitStatistics(Db *db,
  ** \param[out] nclass_arg Number of classes
  **
  *****************************************************************************/
-Id Limits::_check_bound_consistency(const VectorDouble &mini,
-                                     const VectorDouble &maxi,
-                                     const VectorBool &incmini,
-                                     const VectorBool &incmaxi,
-                                     Id *nclass_arg)
+Id Limits::_check_bound_consistency(const VectorDouble& mini,
+                                    const VectorDouble& maxi,
+                                    const VectorBool& incmini,
+                                    const VectorBool& incmaxi,
+                                    Id* nclass_arg)
 {
   Id nclass = 0;
   if (!mini.empty())
@@ -852,4 +850,4 @@ Id Limits::_check_bound_consistency(const VectorDouble &mini,
   return 0;
 }
 
-}
+} // namespace gstlrn

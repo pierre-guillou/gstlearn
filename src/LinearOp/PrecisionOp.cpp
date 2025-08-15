@@ -14,6 +14,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "LinearOp/AShiftOp.hpp"
+#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
 #include "LinearOp/ShiftOpStencil.hpp"
 #include "Mesh/AMesh.hpp"
@@ -104,7 +105,8 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
 }
 
 PrecisionOp::PrecisionOp(const PrecisionOp& pmat)
-  : _shiftOp(nullptr)
+  : ASimulable(pmat)
+  , _shiftOp(nullptr)
   , _cova(pmat._cova->clone())
   , _verbose(pmat._verbose)
   , _training(false)
@@ -272,8 +274,8 @@ Id PrecisionOp::_prepareChebychev(const EPowerPT& power) const
 }
 
 Id PrecisionOp::reset(const AShiftOp* shiftop,
-                       const CovAniso* cova,
-                       bool verbose)
+                      const CovAniso* cova,
+                      bool verbose)
 {
   // Initializations
 
@@ -336,7 +338,7 @@ void PrecisionOp::_addEvalPower(const constvect inv,
   if (power == EPowerPT::ONE || power == EPowerPT::MINUSONE)
   {
     _shiftOp->prodLambda(inv, worksp, power);
-    inPtr = (constvect*)&worksp;
+    inPtr = reinterpret_cast<constvect*>(&worksp);
   }
 
   // Polynomial evaluation
@@ -362,8 +364,8 @@ void PrecisionOp::_addEvalPower(const constvect inv,
 }
 
 Id PrecisionOp::_evalPoly(const EPowerPT& power,
-                           const constvect inv,
-                           vect outv) const
+                          const constvect inv,
+                          vect outv) const
 {
   std::fill(outv.begin(), outv.end(), 0.);
   _addEvalPoly(power, inv, outv);
@@ -371,8 +373,8 @@ Id PrecisionOp::_evalPoly(const EPowerPT& power,
 }
 
 Id PrecisionOp::_addEvalPoly(const EPowerPT& power,
-                              const constvect inv,
-                              vect outv) const
+                             const constvect inv,
+                             vect outv) const
 {
   constvect invs(inv);
 
@@ -402,7 +404,7 @@ Id PrecisionOp::_addEvalPoly(const EPowerPT& power,
     }
     ((ClassicalPolynomial*)_polynomials[power].get())->evalOpTraining(a->getS(), invs, _workPoly, _work5);
 
-    for (Id i = 0; i < (Id)inv.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(inv.size()); i++)
     {
       outv[i] += _workPoly[0][i];
     }
@@ -552,7 +554,7 @@ VectorDouble PrecisionOp::extractDiag() const
  * Compute the Logarithm of the Determinant
  * @param nMC Number of Monte-Carlo simulations
  * @return The computed value or TEST if problem
- * 
+ *
  */
 double PrecisionOp::computeLogDet(Id nMC) const
 {
@@ -566,7 +568,7 @@ double PrecisionOp::computeLogDet(Id nMC) const
     VH::simulateGaussianInPlace(gauss);
     vect results(result);
     if (_evalPoly(EPowerPT::LOG, gauss, results) != 0) return TEST;
-    val1 += VH::innerProduct(gauss, result);   
+    val1 += VH::innerProduct(gauss, result);
   }
 
   val1 /= nMC;

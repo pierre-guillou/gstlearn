@@ -66,7 +66,7 @@ bool AOF::isValidForGrid() const
 
 bool AOF::isValidForVariable() const
 {
-  Id ncol = (Id)_cols.size();
+  Id ncol = static_cast<Id>(_cols.size());
   if (mustBeOneVariable() && ncol > 1)
   {
     messerr("This function requires a single Variable but ncol = %d", ncol);

@@ -153,7 +153,7 @@ String CovAnisoList::toString(const AStringFormat* /*strfmt*/) const
 
 Id CovAnisoList::getNCov(bool skipNugget) const
 {
-  Id ncov = (Id)_covs.size();
+  Id ncov = static_cast<Id>(_covs.size());
   if (!skipNugget) return ncov;
 
   Id nstruc = 0;
@@ -419,7 +419,7 @@ const CovAnisoList* CovAnisoList::createReduce(const VectorInt& validVars) const
     CovAniso* covs = newcovlist->getCovAniso(is);
     newcovlist->setCov(is, covs->createReduce(validVars));
   }
-  newcovlist->setNVar((Id)validVars.size());
+  newcovlist->setNVar(static_cast<Id>(validVars.size()));
   return newcovlist;
 }
 
@@ -438,7 +438,7 @@ double CovAnisoList::getBallRadius() const
 
 Id CovAnisoList::hasExternalCov() const
 {
-  for (Id icov = 0; icov < (Id)getNCov(); icov++)
+  for (Id icov = 0; icov < static_cast<Id>(getNCov()); icov++)
   {
     if (getCovType(icov) == ECov::FUNCTION) return 1;
   }

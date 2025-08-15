@@ -232,7 +232,7 @@ static Id st_gibbs(Id niter,
       st_vector_compress(nvertex, colref[icol], z, colors, ind, zred);
       Qcols[icol]->prodVecMatInPlace(zred, krig, false);
 
-      for (Id ic = 0, nc = (Id)ind.size(); ic < nc; ic++)
+      for (Id ic = 0, nc = static_cast<Id>(ind.size()); ic < nc; ic++)
       {
         auto i        = ind[ic];
         double valmin = (!consmin.empty()) ? consmin[i] : -10.;
@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
 
   VectorInt colors = Q->colorCoding();
   VectorInt colref = VH::unique(colors);
-  Id ncolor        = (Id)colref.size();
+  Id ncolor        = static_cast<Id>(colref.size());
 
   // Core allocation
 

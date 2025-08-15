@@ -13,8 +13,8 @@
 namespace gstlrn
 {
 CalcSimuPostPropByLayer::CalcSimuPostPropByLayer()
-    : CalcSimuPost(),
-      _dbgrid(nullptr)
+  : CalcSimuPost()
+  , _dbgrid(nullptr)
 {
 }
 
@@ -24,10 +24,10 @@ CalcSimuPostPropByLayer::~CalcSimuPostPropByLayer()
 
 bool CalcSimuPostPropByLayer::_check()
 {
-  if (! CalcSimuPost::_check()) return false;
+  if (!CalcSimuPost::_check()) return false;
 
   // The upscaling is compulsory here
-  if (! _getFlagUpscale())
+  if (!_getFlagUpscale())
   {
     messerr("The output 'Db' (organized as a Grid is compulsory");
     return false;
@@ -72,11 +72,11 @@ Id CalcSimuPostPropByLayer::_getTransfoNvar() const
  */
 void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, VectorDouble& Y_p_k_s) const
 {
-  Id nlayer = (Id) Z_n_k_s.size();
-  Id ndim_out = getDbout()->getNDim();
+  Id nlayer    = static_cast<Id>(Z_n_k_s.size());
+  Id ndim_out  = getDbout()->getNDim();
   auto iechout = _getIechout();
 
-  double z_ref  = _dbgrid->getCoordinate(iechout, ndim_out-1);
+  double z_ref  = _dbgrid->getCoordinate(iechout, ndim_out - 1);
   double h_max  = _dbgrid->getDX(ndim_out - 1);
   double z_base = z_ref - h_max / 2.;
   double z_top  = z_ref + h_max / 2.;
@@ -95,37 +95,42 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
    */
 
   /* second implementation */
-    double cote = 0.;
+  double cote = 0.;
 
-    // compute the top of the layers and limit to the cell extension [0, h_max]
-    cote += Z_n_k_s[0];
-    if(_flagTopToBase){
-        Y_p_k_s[0] = MIN(MAX(z_top - cote, 0.), h_max);
-    } else {
-        Y_p_k_s[0] = MIN(MAX(cote - z_base, 0.), h_max);
-    }
-    for (Id ilayer = 1; ilayer < nlayer; ilayer++)
+  // compute the top of the layers and limit to the cell extension [0, h_max]
+  cote += Z_n_k_s[0];
+  if (_flagTopToBase)
+  {
+    Y_p_k_s[0] = MIN(MAX(z_top - cote, 0.), h_max);
+  }
+  else
+  {
+    Y_p_k_s[0] = MIN(MAX(cote - z_base, 0.), h_max);
+  }
+  for (Id ilayer = 1; ilayer < nlayer; ilayer++)
+  {
+    if (_flagTopToBase)
     {
-    	if(_flagTopToBase){
-    	      cote -= Z_n_k_s[ilayer];
-    	      Y_p_k_s[ilayer] = MIN(MAX(z_top - cote, 0.), h_max);
-    	} else {
-    	      cote += Z_n_k_s[ilayer];
-    	      Y_p_k_s[ilayer] = MIN(MAX(cote - z_base, 0.), h_max);
-    	}
+      cote -= Z_n_k_s[ilayer];
+      Y_p_k_s[ilayer] = MIN(MAX(z_top - cote, 0.), h_max);
     }
-     Y_p_k_s[nlayer] = h_max;
+    else
+    {
+      cote += Z_n_k_s[ilayer];
+      Y_p_k_s[ilayer] = MIN(MAX(cote - z_base, 0.), h_max);
+    }
+  }
+  Y_p_k_s[nlayer] = h_max;
 
-    // compute the layer thickness
-     for (Id ilayer = nlayer; ilayer > 0; ilayer--)
-    {
-      Y_p_k_s[ilayer] -= Y_p_k_s[ilayer-1];
-    }
+  // compute the layer thickness
+  for (Id ilayer = nlayer; ilayer > 0; ilayer--)
+  {
+    Y_p_k_s[ilayer] -= Y_p_k_s[ilayer - 1];
+  }
 
   // Normalize by the extension of the cell
   for (Id ilayer = 0; ilayer <= nlayer; ilayer++)
     Y_p_k_s[ilayer] /= h_max;
-
 
   /* taking into account the direction of calculation
   for (i in 1:(P-1)) {
@@ -149,14 +154,14 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
   double cote = Z_n_k_s[0];
   for (Id ilayer = 1; ilayer < nlayer; ilayer++)
   {
-	  if(_flagTopToBase) { // from Top to Base
-		    cote -= Z_n_k_s[ilayer];
-		    Y_p_k_s[ilayer] = MIN(MAX(z_top - cote, 0.), h_max);
+          if(_flagTopToBase) { // from Top to Base
+                    cote -= Z_n_k_s[ilayer];
+                    Y_p_k_s[ilayer] = MIN(MAX(z_top - cote, 0.), h_max);
 
-	  } else { // from Base to Top
-		    cote += Z_n_k_s[ilayer];
-		    Y_p_k_s[ilayer] = MIN(MAX(cote - z_base, 0.), h_max);
-	  }
+          } else { // from Base to Top
+                    cote += Z_n_k_s[ilayer];
+                    Y_p_k_s[ilayer] = MIN(MAX(cote - z_base, 0.), h_max);
+          }
   }
   Y_p_k_s[nlayer] = h_max;
 
@@ -192,16 +197,16 @@ void CalcSimuPostPropByLayer::_transformFunction(const VectorDouble& Z_n_k_s, Ve
  */
 
 Id simuPostPropByLayer(Db* dbin,
-                        DbGrid* dbout,
-                        const VectorString& names,
-                        bool flag_match,
-                        bool flag_topToBase,
-                        const EPostUpscale& upscale,
-                        const std::vector<EPostStat>& stats,
-                        bool verbose,
-                        const VectorInt& check_targets,
-                        Id check_level,
-                        const NamingConvention& namconv)
+                       DbGrid* dbout,
+                       const VectorString& names,
+                       bool flag_match,
+                       bool flag_topToBase,
+                       const EPostUpscale& upscale,
+                       const std::vector<EPostStat>& stats,
+                       bool verbose,
+                       const VectorInt& check_targets,
+                       Id check_level,
+                       const NamingConvention& namconv)
 {
   CalcSimuPostPropByLayer calcul;
   calcul.setDbin(dbin);
@@ -224,4 +229,4 @@ Id simuPostPropByLayer(Db* dbin,
   Id error = (calcul.run()) ? 0 : 1;
   return error;
 }
-}
+} // namespace gstlrn

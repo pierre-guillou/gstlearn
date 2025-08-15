@@ -151,10 +151,10 @@ void AGibbs::init(Id npgs,
 **
 *****************************************************************************/
 Id AGibbs::_boundsCheck(Id ipgs,
-                         Id ivar,
-                         Id iact,
-                         double* vmin_arg,
-                         double* vmax_arg) const
+                        Id ivar,
+                        Id iact,
+                        double* vmin_arg,
+                        double* vmax_arg) const
 {
   const Db* db = getDb();
   auto icase   = getRank(ipgs, ivar);
@@ -300,7 +300,7 @@ VectorVectorDouble AGibbs::allocY() const
 {
   auto nact = _getSampleRankNumber();
   VectorVectorDouble y(_getDimension());
-  for (Id i = 0, nsize = (Id)y.size(); i < nsize; i++)
+  for (Id i = 0, nsize = static_cast<Id>(y.size()); i < nsize; i++)
     y[i].resize(nact);
   return y;
 }
@@ -319,14 +319,14 @@ void AGibbs::storeResult(const VectorVectorDouble& y,
 {
   auto nsize = _getDimension();
   auto nact  = _getSampleRankNumber();
-  auto nvar = getNvar();
+  auto nvar  = getNvar();
 
   /* Loop on the variables */
 
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
     auto icase = getRank(ipgs, ivar);
-    Id rank  = icase + nsize * isimu;
+    Id rank    = icase + nsize * isimu;
 
     /* Loop on the samples */
 
@@ -401,8 +401,8 @@ void AGibbs::_updateStats(const VectorVectorDouble& y,
     double result;
     auto icol     = getRank(ipgs, ivar);
     double residu = 1. - amort;
-    double oldw   = (1. - pow(amort, (double)iter)) / residu;
-    double neww   = (1. - pow(amort, (double)iter + 1)) / residu;
+    double oldw   = (1. - pow(amort, static_cast<double>(iter))) / residu;
+    double neww   = (1. - pow(amort, static_cast<double>(iter) + 1)) / residu;
 
     // The mean
     jcol           = _getColRankStats(ipgs, ivar, 0);
@@ -504,7 +504,7 @@ void AGibbs::_getBoundsDecay(Id iter, double* vmin, double* vmax) const
   // Do not modify the bounds after the burning stage
   if (iter > _nburn) return;
 
-  double ratio = (double)iter / (double)_nburn;
+  double ratio = static_cast<double>(iter) / static_cast<double>(_nburn);
   if (!FFFF(*vmin))
     *vmin = THRESH_INF + ((*vmin) - THRESH_INF) * ratio;
   if (!FFFF(*vmax))
@@ -590,4 +590,4 @@ String AGibbs::toString(const AStringFormat* /*strfmt*/) const
 
   return sstr.str();
 }
-}
+} // namespace gstlrn

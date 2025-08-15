@@ -565,7 +565,7 @@ void CalcSimuTurningBands::_migrationInit(Id ibs,
   double delta = tmax - tmin;
   if (scale < delta * eps)
   {
-    Id count = (Id)ceil(delta / eps);
+    Id count = static_cast<Id>(ceil(delta / eps));
     for (Id i = 0; i < count; i++)
       operTB.pushT(law_gaussian());
   }

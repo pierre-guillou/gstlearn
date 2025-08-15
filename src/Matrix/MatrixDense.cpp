@@ -490,7 +490,7 @@ void MatrixDense::fill(double value)
 /*! Multiply a Matrix row-wise */
 void MatrixDense::multiplyRow(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNRows() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNRows() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of rows. Nothing is done");
     return;
@@ -502,7 +502,7 @@ void MatrixDense::multiplyRow(const VectorDouble& vec)
 /*! Multiply a Matrix column-wise */
 void MatrixDense::multiplyColumn(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNCols() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNCols() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of columns. Nothing is done");
     return;
@@ -514,7 +514,7 @@ void MatrixDense::multiplyColumn(const VectorDouble& vec)
 /*! Divide a Matrix row-wise */
 void MatrixDense::divideRow(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNRows() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNRows() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of rows. Nothing is done");
     return;
@@ -527,7 +527,7 @@ void MatrixDense::divideRow(const VectorDouble& vec)
 /*! Divide a Matrix column-wise */
 void MatrixDense::divideColumn(const VectorDouble& vec)
 {
-  if (getFlagMatrixCheck() && getNCols() != (Id)vec.size())
+  if (getFlagMatrixCheck() && getNCols() != static_cast<Id>(vec.size()))
   {
     messerr("The size of 'vec' must match the number of columns. Nothing is done");
     return;
@@ -658,8 +658,8 @@ MatrixDense* MatrixDense::create(Id nrow, Id ncol)
  */
 MatrixDense* MatrixDense::createFromVVD(const VectorVectorDouble& X)
 {
-  Id nrow = (Id)X.size();
-  Id ncol = (Id)X[0].size();
+  Id nrow = static_cast<Id>(X.size());
+  Id ncol = static_cast<Id>(X[0].size());
 
   auto* mat = new MatrixDense(nrow, ncol);
   mat->_fillFromVVD(X);
@@ -672,10 +672,10 @@ MatrixDense* MatrixDense::createFromVD(const VectorDouble& X,
                                        bool byCol,
                                        bool invertColumnOrder)
 {
-  if (nrow * ncol != (Id)X.size())
+  if (nrow * ncol != static_cast<Id>(X.size()))
   {
     messerr("Inconsistency between arguments 'nrow'(%d) and 'ncol'(%d)", nrow, ncol);
-    messerr("and the dimension of the input Vector (%d)", (Id)X.size());
+    messerr("and the dimension of the input Vector (%d)", static_cast<Id>(X.size()));
   }
   auto* mat = new MatrixDense(nrow, ncol);
 
@@ -784,8 +784,8 @@ bool MatrixDense::sample(MatrixDense& res,
   if (cols.empty()) cols = VH::sequence(ncoltotal);
   if (flagInvertCol) cols = VH::complement(VH::sequence(ncoltotal), cols);
 
-  Id nrows = (Id)rows.size();
-  Id ncols = (Id)cols.size();
+  Id nrows = static_cast<Id>(rows.size());
+  Id ncols = static_cast<Id>(cols.size());
   if (nrows <= 0 || ncols <= 0) return false;
 
   for (Id irow = 0; irow < nrows; irow++)
@@ -828,8 +828,8 @@ void MatrixDense::unsample(const AMatrix* A,
   if (cols.empty()) cols = VH::sequence(ncoltotal);
   if (flagInvertCol) cols = VH::complement(VH::sequence(ncoltotal), cols);
 
-  Id nrows = (Id)rows.size();
-  Id ncols = (Id)cols.size();
+  Id nrows = static_cast<Id>(rows.size());
+  Id ncols = static_cast<Id>(cols.size());
   if (nrows <= 0 || ncols <= 0) return;
 
   for (Id irow = 0; irow < nrows; irow++)

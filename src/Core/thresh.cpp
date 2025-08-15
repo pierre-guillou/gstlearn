@@ -304,7 +304,7 @@ static Id st_proportion_define(PropDef* propdef,
   ifac_ref = -1;
   if (propdef->mode == EProcessOper::CONDITIONAL)
   {
-    ifac_ref = (Id)db->getSimvar(ELoc::FACIES, iech, isimu, 0, 0, nbsimu, 1);
+    ifac_ref = static_cast<Id>(db->getSimvar(ELoc::FACIES, iech, isimu, 0, 0, nbsimu, 1));
     if (ifac_ref < 1 || ifac_ref > propdef->nfac[0]) return (1);
   }
   st_proportion_locate(propdef, ifac_ref);
@@ -914,7 +914,7 @@ void propdef_reset(PropDef* propdef)
   if (propdef == nullptr) return;
   if (propdef->propmem.empty()) return;
 
-  for (Id ifac = 0; ifac < (Id)propdef->propmem.size(); ifac++)
+  for (Id ifac = 0; ifac < static_cast<Id>(propdef->propmem.size()); ifac++)
     propdef->propmem[ifac] = -1;
 }
 

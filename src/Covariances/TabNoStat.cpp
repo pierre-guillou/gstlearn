@@ -17,7 +17,7 @@
 #include "geoslib_define.h"
 #include <memory>
 
-namespace gstlrn 
+namespace gstlrn
 {
 
 TabNoStat::TabNoStat()
@@ -46,7 +46,7 @@ TabNoStat& TabNoStat::operator=(const TabNoStat& m)
 Id TabNoStat::removeElem(const EConsElem& econs, Id iv1, Id iv2)
 {
   ParamId param(econs, iv1, iv2);
-  Id res = (Id)_items.erase(param);
+  Id res = static_cast<Id>(_items.erase(param));
   updateDescription();
   return res;
 }
@@ -119,7 +119,7 @@ Id TabNoStat::addElem(std::shared_ptr<ANoStat>& nostat, const EConsElem& econs, 
   if (!isValid(econs))
     return 0;
   ParamId param(econs, iv1, iv2);
-  Id res       = (Id)_items.count(param);
+  Id res        = static_cast<Id>(_items.count(param));
   _items[param] = nostat;
   if (res == 1)
   {
@@ -223,4 +223,4 @@ void TabNoStat::informDbOut(const Db* dbout, const EConsElem& econs) const
 TabNoStat::~TabNoStat()
 {
 }
-}
+} // namespace gstlrn

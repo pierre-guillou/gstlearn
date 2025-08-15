@@ -17,7 +17,7 @@
 
 /*! \cond */
 #define STORE_NAME_LENGTH 10
-#define SHIFT()           ((MEMORY_DEBUG) ? (Id)sizeof(Id) : 0)
+#define SHIFT()           ((MEMORY_DEBUG) ? static_cast<Id>(sizeof(Id)) : 0)
 
 namespace gstlrn
 {
@@ -38,12 +38,12 @@ typedef struct
 
 /*! \endcond */
 
-static Id MEMORY_LEAK    = 0;
-static Id MEMORY_DEBUG   = 0;
-static Id MEMORY_TOTAL   = 0;
-static Id MEMORY_MAX     = 0;
-static Id MEMORY_MIN_PT  = 1000000;
-static Id NB_MEM_CHUNK   = 0;
+static Id MEMORY_LEAK     = 0;
+static Id MEMORY_DEBUG    = 0;
+static Id MEMORY_TOTAL    = 0;
+static Id MEMORY_MAX      = 0;
+static Id MEMORY_MIN_PT   = 1000000;
+static Id NB_MEM_CHUNK    = 0;
 static MemChunk** MemLeak = NULL;
 
 /****************************************************************************/
@@ -97,7 +97,7 @@ static void st_memory_leak_add(const char* call_file,
   // Allocate the new Chunk
 
   chunk = (MemChunk*)malloc(sizeof(MemChunk));
-  if (chunk == NULL)
+  if (chunk == nullptr)
   {
     messerr("Memory problem: Memory Leak procedure is interrupted");
     st_memory_leak_reset();
@@ -114,7 +114,7 @@ static void st_memory_leak_add(const char* call_file,
   auto* placeholder =
     realloc((char*)MemLeak, (NB_MEM_CHUNK + 1) * sizeof(MemChunk*));
   MemLeak = (MemChunk**)placeholder;
-  if (MemLeak == NULL)
+  if (MemLeak == nullptr)
   {
     messerr("Memory problem: Memory Leak procedure is interrupted");
     st_memory_leak_reset();
@@ -196,7 +196,7 @@ static void st_mem_message(const char* call_file,
 {
   Id minsize;
 
-  minsize = (Id)get_keypone("Minimum_Debug_Size", MEMORY_MIN_PT);
+  minsize = static_cast<Id>(get_keypone("Minimum_Debug_Size", MEMORY_MIN_PT));
 
   if (MEMORY_DEBUG > 1 && size > minsize)
   {
@@ -270,7 +270,7 @@ char* mem_alloc_(const char* call_file,
   size     = size_eff + SHIFT();
 
   tab_aux = (char*)malloc(size);
-  if (tab_aux == NULL)
+  if (tab_aux == nullptr)
   {
     mem_error(size_eff);
     if (flag_fatal) messageAbort("Fatal error");
@@ -320,7 +320,7 @@ char* mem_copy_(const char* call_file,
   size     = size_eff + SHIFT();
 
   tab_aux = (char*)malloc(size);
-  if (tab_aux == NULL)
+  if (tab_aux == nullptr)
   {
     mem_error(size_eff);
     if (flag_fatal) messageAbort("Fatal error");
@@ -375,7 +375,7 @@ char* mem_calloc_(const char* call_file,
   size     = size_eff + SHIFT();
 
   tab_aux = (char*)calloc(size_elem, size);
-  if (tab_aux == NULL)
+  if (tab_aux == nullptr)
   {
     mem_error(size_eff);
     if (flag_fatal) messageAbort("Fatal error");
@@ -426,7 +426,7 @@ char* mem_realloc_(const char* call_file,
   {
     // The new dimension is positive
 
-    if (tab == NULL)
+    if (tab == nullptr)
     {
 
       // The memory chunk does not already exist
@@ -473,7 +473,7 @@ char* mem_realloc_(const char* call_file,
       }
     }
 
-    if (tab_aux == NULL)
+    if (tab_aux == nullptr)
     {
       mem_error(size_eff);
       if (flag_fatal) messageAbort("Fatal error");
@@ -563,4 +563,4 @@ double** mem_tab_alloc(Id nvar, Id size, Id flag_fatal)
   }
   return (tab);
 }
-}
+} // namespace gstlrn

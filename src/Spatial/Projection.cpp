@@ -115,8 +115,8 @@ VectorDouble Projection::operateInvert(const VectorDouble& coor) const
 
 Id Projection::operateVecInPlace(VectorDouble& x, VectorDouble& y) const
 {
-  Id nech = (Id) x.size();
-  if (nech != (Id) y.size())
+  Id nech = static_cast<Id>(x.size());
+  if (nech != static_cast<Id>(y.size()))
   {
     messerr("Arguments 'x' and 'y' should have same dimension");
     return 1;

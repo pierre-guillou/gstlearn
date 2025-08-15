@@ -130,7 +130,7 @@ void _updateProportions(DbGrid* dbin,
                         VectorDouble& prop)
 {
   Id rank = dbin->getGrid().indiceToRank(indg);
-  Id ifac = (Id)dbin->getZVariable(rank, 0);
+  Id ifac = static_cast<Id>(dbin->getZVariable(rank, 0));
   if (ifac < 1 || ifac > nfacies) return;
   prop[ifac - 1] += 1.;
 }
@@ -157,9 +157,9 @@ void _updateTransition(DbGrid* dbin,
 {
   Id jpos = indg[pos] + orient;
   if (jpos <= 0 || jpos >= dbin->getNX(pos)) return;
-  Id ifac1 = (Id)dbin->getZVariable(dbin->getGrid().indiceToRank(indg), 0);
+  Id ifac1 = static_cast<Id>(dbin->getZVariable(dbin->getGrid().indiceToRank(indg), 0));
   indg[pos] += orient;
-  Id ifac2 = (Id)dbin->getZVariable(dbin->getGrid().indiceToRank(indg), 0);
+  Id ifac2 = static_cast<Id>(dbin->getZVariable(dbin->getGrid().indiceToRank(indg), 0));
   indg[pos] -= orient;
 
   if (ifac1 < 1 || ifac1 > nfacies || ifac2 < 1 || ifac2 > nfacies) return;
@@ -286,7 +286,7 @@ void _neighboringCell(Id ndim,
   /* Initializations */
 
   nei1d = 2 * radius + 1;
-  count = (Id)pow(nei1d, (double)ndim);
+  count = static_cast<Id>(pow(nei1d, static_cast<double>(ndim)));
   value = rank0;
 
   /* Loop on the space dimensions */
@@ -322,14 +322,14 @@ double _getQuantile(VectorDouble& tab, Id ntab, double proba)
   if (FFFF(proba)) return (TEST);
 
   VH::sortInPlace(tab, true, ntab);
-  rank = (Id)(proba * (double)ntab);
+  rank = static_cast<Id>(proba * static_cast<double>(ntab));
   v1   = tab[rank];
 
   if (rank < ntab - 1)
   {
     v2    = tab[rank + 1];
-    p1    = (double)rank / (double)ntab;
-    p2    = (double)(1 + rank) / (double)ntab;
+    p1    = static_cast<double>(rank) / static_cast<double>(ntab);
+    p2    = static_cast<double>(1 + rank) / static_cast<double>(ntab);
     value = v1 + (proba - p1) * (v2 - v1) / (p2 - p1);
   }
   else
@@ -342,7 +342,7 @@ double _getQuantile(VectorDouble& tab, Id ntab, double proba)
 VectorString statOptionToName(const std::vector<EStatOption>& opers)
 {
   VectorString names;
-  for (Id i = 0; i < (Id)opers.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(opers.size()); i++)
   {
     const EStatOption& oper = opers[i];
     names.push_back(String {oper.getKey()});
@@ -354,7 +354,7 @@ std::vector<EStatOption> KeysToStatOptions(const VectorString& opers)
 {
   std::vector<EStatOption> options;
 
-  for (Id i = 0; i < (Id)opers.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(opers.size()); i++)
   {
     EStatOption opt = EStatOption::fromKey(opers[i]);
     if (opt != EStatOption::UNKNOWN) options.push_back(opt);
@@ -437,7 +437,7 @@ void dbStatisticsVariables(Db* db,
       if (neff > 0)
       {
         if (opers[i] == EStatOption::NUM)
-          tab = (double)neff;
+          tab = static_cast<double>(neff);
         else if (opers[i] == EStatOption::MEAN)
           tab = mean;
         else if (opers[i] == EStatOption::VAR)
@@ -451,15 +451,15 @@ void dbStatisticsVariables(Db* db,
         else if (opers[i] == EStatOption::SUM)
           tab = sum;
         else if (opers[i] == EStatOption::PROP || opers[i] == EStatOption::T)
-          tab = (double)nperc / (double)neff;
+          tab = static_cast<double>(nperc) / static_cast<double>(neff);
         else if (opers[i] == EStatOption::QUANT)
           tab = _getQuantile(local, neff, proba);
         else if (opers[i] == EStatOption::Q)
-          tab = metal / (double)neff;
+          tab = metal / static_cast<double>(neff);
         else if (opers[i] == EStatOption::M)
-          tab = (nperc > 0) ? metal / (double)nperc : TEST;
+          tab = (nperc > 0) ? metal / static_cast<double>(nperc) : TEST;
         else if (opers[i] == EStatOption::B)
-          tab = (!FFFF(vmin)) ? (metal - vmin) / (double)neff : TEST;
+          tab = (!FFFF(vmin)) ? (metal - vmin) / static_cast<double>(neff) : TEST;
         else
           return;
       }
@@ -575,7 +575,7 @@ Table dbStatisticsMono(Db* db,
       if (neff > 0)
       {
         if (opers[i] == EStatOption::NUM)
-          tab.push_back((double)neff);
+          tab.push_back(static_cast<double>(neff));
         else if (opers[i] == EStatOption::MEAN)
           tab.push_back(mean);
         else if (opers[i] == EStatOption::VAR)
@@ -589,15 +589,15 @@ Table dbStatisticsMono(Db* db,
         else if (opers[i] == EStatOption::SUM)
           tab.push_back(sum);
         else if (opers[i] == EStatOption::PROP || opers[i] == EStatOption::T)
-          tab.push_back((double)nperc / (double)neff);
+          tab.push_back(static_cast<double>(nperc) / static_cast<double>(neff));
         else if (opers[i] == EStatOption::QUANT)
           tab.push_back(_getQuantile(local, neff, proba));
         else if (opers[i] == EStatOption::Q)
-          tab.push_back(metal / (double)neff);
+          tab.push_back(metal / static_cast<double>(neff));
         else if (opers[i] == EStatOption::M)
-          tab.push_back((nperc > 0) ? metal / (double)nperc : TEST);
+          tab.push_back((nperc > 0) ? metal / static_cast<double>(nperc) : TEST);
         else if (opers[i] == EStatOption::B)
-          tab.push_back((!FFFF(vmin)) ? (metal - vmin) / (double)neff : TEST);
+          tab.push_back((!FFFF(vmin)) ? (metal - vmin) / static_cast<double>(neff) : TEST);
         else if (opers[i] == EStatOption::MEDIAN)
           tab.push_back(median);
         else
@@ -609,7 +609,7 @@ Table dbStatisticsMono(Db* db,
       else
       {
         if (opers[i] == EStatOption::NUM)
-          tab.push_back((double)neff);
+          tab.push_back(static_cast<double>(neff));
         else if (opers[i] == EStatOption::MEAN ||
                  opers[i] == EStatOption::VAR ||
                  opers[i] == EStatOption::STDV ||
@@ -679,7 +679,7 @@ VectorDouble dbStatisticsFacies(Db* db)
   for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActiveAndDefined(iech, 0)) continue;
-    Id ifac = (Id)db->getZVariable(iech, 0);
+    Id ifac = static_cast<Id>(db->getZVariable(iech, 0));
     if (ifac <= 0) continue;
     props[ifac - 1] += 1.;
     neff++;
@@ -690,7 +690,7 @@ VectorDouble dbStatisticsFacies(Db* db)
   if (neff > 0)
   {
     for (Id ifac = 0; ifac < nfac; ifac++)
-      props[ifac] /= (double)neff;
+      props[ifac] /= static_cast<double>(neff);
   }
   return props;
 }
@@ -722,7 +722,7 @@ double dbStatisticsIndicator(Db* db)
   for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActiveAndDefined(iech, 0)) continue;
-    Id ifac = (Id)db->getZVariable(iech, 0);
+    Id ifac = static_cast<Id>(db->getZVariable(iech, 0));
     if (ifac == 1) prop += 1.;
     neff++;
   }
@@ -818,7 +818,7 @@ Table dbStatisticsCorrel(Db* db, const VectorString& names, bool flagIso, const 
 
   // Store the results in the symmetric square matrix
   VectorString namloc = db->getNames(names);
-  Id nvar            = (Id)namloc.size();
+  Id nvar            = static_cast<Id>(namloc.size());
 
   Table table;
   if (title.empty())
@@ -1236,7 +1236,7 @@ void dbStatisticsPrint(const Db* db,
   for (Id icol = 0; icol < ncol; icol++)
   {
     _getRowname(radix, ncol, icol, db->getNameByUID(iuids[icol]), string);
-    taille = MAX(taille, (Id)strlen(string));
+    taille = MAX(taille, static_cast<Id>(strlen(string)));
   }
 
   /* Print the header of the monovariate statistics */
@@ -1264,7 +1264,7 @@ void dbStatisticsPrint(const Db* db,
     tab_print_rowname(string, taille);
 
     if (_operExists(opers, EStatOption::NUM))
-      tab_printi(NULL, (Id)num[icol]);
+      tab_printi(NULL, static_cast<Id>(num[icol]));
     if (num[icol] > 0)
     {
       if (_operExists(opers, EStatOption::MINI))
@@ -1324,7 +1324,7 @@ MatrixSquare* sphering(const AMatrix* X)
   MatrixSymmetric* prodsym = dynamic_cast<MatrixSymmetric*>(prod);
   if (prodsym == nullptr) return nullptr;
 
-  prodsym->prodScalar(1. / (double)nech);
+  prodsym->prodScalar(1. / static_cast<double>(nech));
   if (prodsym->computeEigen()) return nullptr;
   VectorDouble eigen_values = prodsym->getEigenValues();
   MatrixSquare* S           = prodsym->getEigenVectors()->clone();
@@ -1364,7 +1364,7 @@ VectorDouble dbStatisticsPerCell(Db* db,
   double z1 = 0.;
   double z2 = 0.;
   Id nxyz  = dbgrid->getNSample();
-  Id ncut  = (Id)cuts.size();
+  Id ncut  = static_cast<Id>(cuts.size());
   Id ndim  = dbgrid->getNDim();
   if (juid < 0) juid = iuid;
 
@@ -1613,7 +1613,7 @@ Table dbStatisticsMulti(Db* db,
   /* Initializations */
 
   VectorInt cols = db->getUIDs(names);
-  Id ncol       = (Id)cols.size();
+  Id ncol       = static_cast<Id>(cols.size());
   Id nech       = db->getNSample();
   Id ncol2      = ncol * ncol;
 
@@ -1839,8 +1839,8 @@ Id dbStatisticsInGridTool(Db* db,
   Id nxyz        = dbgrid->getNSample();
   Id ndim        = dbgrid->getNDim();
   VectorInt iuids = db->getUIDs(names);
-  Id nuid        = (Id)iuids.size();
-  Id count       = (Id)pow(2. * radius + 1., (double)ndim);
+  Id nuid        = static_cast<Id>(iuids.size());
+  Id count       = static_cast<Id>(pow(2. * radius + 1., static_cast<double>(ndim)));
 
   /* Check the validity of the requested function */
 
@@ -2085,7 +2085,7 @@ VectorVectorInt correlationPairs(Db* db1,
   if (verbose)
   {
     message("Total number of samples = %d\n", nech);
-    message("Number of samples defined = %d\n", (Id)nb);
+    message("Number of samples defined = %d\n", nb);
   }
   return indices;
 }
@@ -2190,7 +2190,7 @@ VectorVectorInt hscatterPairs(Db* db,
     if (verbose)
     {
       message("Total number of samples = %d\n", nech);
-      message("Number of pairs used for translated correlation = %d\n", (Id)nb);
+      message("Number of pairs used for translated correlation = %d\n", nb);
     }
   }
   return indices;
@@ -2289,7 +2289,7 @@ VectorVectorDouble condexp(Db* db1,
     if (FFFF(val2)) continue;
     if (val2 < mini || val2 > maxi) continue;
 
-    Id rank = Id((nclass - 1.) * (val2 - mini) / (maxi - mini));
+    Id rank = static_cast<Id>((nclass - 1.) * (val2 - mini) / (maxi - mini));
 
     xycond[0][rank] += val1;
     xycond[1][rank] += val2;
@@ -2330,7 +2330,7 @@ VectorVectorDouble condexp(Db* db1,
 std::map<Id, Id> contingencyTable(const VectorInt& values)
 {
   std::map<Id, Id> table;
-  for (Id i = 0, size = (Id)values.size(); i < size; i++)
+  for (Id i = 0, size = static_cast<Id>(values.size()); i < size; i++)
     table[values[i]]++;
   return table;
 }
@@ -2339,12 +2339,12 @@ std::map<Id, std::map<Id, Id>> contingencyTable2(const VectorInt& values,
                                                     const VectorInt& bins)
 {
   std::map<Id, std::map<Id, Id>> table;
-  if ((Id)values.size() != (Id)bins.size())
+  if (static_cast<Id>(values.size()) != static_cast<Id>(bins.size()))
   {
     messerr("Arguments 'values' and 'bins' should have the same dimension");
     return table;
   }
-  for (Id i = 0, size = (Id)values.size(); i < size; i++)
+  for (Id i = 0, size = static_cast<Id>(values.size()); i < size; i++)
     table[values[i]][bins[i]]++;
   return table;
 }

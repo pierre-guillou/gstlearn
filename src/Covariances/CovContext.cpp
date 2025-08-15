@@ -140,7 +140,7 @@ bool CovContext::isEqual(const CovContext& r) const
 double CovContext::getCovar0(Id ivar, Id jvar) const
 {
   auto rank = _getIndex(ivar, jvar);
-  if (rank < 0 || rank >= (Id)_covar0.size())
+  if (rank < 0 || rank >= static_cast<Id>(_covar0.size()))
     my_throw("Invalid argument in _setCovar0");
   return _covar0[rank];
 }
@@ -158,7 +158,7 @@ void CovContext::setCovar0s(const VectorDouble& covar0)
 void CovContext::setCovar0(Id ivar, Id jvar, double covar0)
 {
   auto rank = _getIndex(ivar, jvar);
-  if (rank < 0 || rank >= (Id)_covar0.size())
+  if (rank < 0 || rank >= static_cast<Id>(_covar0.size()))
     my_throw("Invalid argument in _setCovar0");
   _covar0[rank] = covar0;
 }
@@ -170,7 +170,7 @@ Id CovContext::_getIndex(Id ivar, Id jvar) const
 
 void CovContext::_update()
 {
-  if (_nVar * _nVar != (Id)_covar0.size())
+  if (_nVar * _nVar != static_cast<Id>(_covar0.size()))
   {
     MatrixSymmetric Id(_nVar);
     Id.setIdentity();
@@ -202,7 +202,7 @@ void CovContext::copyCovContext(const CovContext& ctxt, bool severe)
 const CovContext* CovContext::createReduce(const VectorInt& validVars) const
 {
   Id ecr, lec;
-  Id nvar   = (Id)validVars.size();
+  Id nvar   = static_cast<Id>(validVars.size());
   auto ndim = getNDim();
   VectorBool valids(_nVar, false);
   for (Id ivar = 0; ivar < nvar; ivar++) valids[validVars[ivar]] = true;

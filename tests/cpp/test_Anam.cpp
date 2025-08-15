@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   double s_Z     = 0.5;
   VectorDouble Y = grid->getColumn("Y");
   VectorDouble Z(Y.size());
-  for (Id i = 0; i < (Id)Y.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(Y.size()); i++)
     Z[i] = m_Z * exp(s_Z * Y[i] - 0.5 * s_Z * s_Z);
   grid->addColumns(Z, "Z");
 

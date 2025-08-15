@@ -205,10 +205,10 @@ void correctNewNameForDuplicates(VectorString& list, Id rank)
  * @return The index of the matching item or -1
  */
 Id getRankInList(const VectorString& list,
-                  const String& match,
-                  bool caseSensitive)
+                 const String& match,
+                 bool caseSensitive)
 {
-  for (Id i = 0; i < (Id)list.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(list.size()); i++)
   {
     if (matchRegexp(list[i], match, caseSensitive)) return i;
   }
@@ -226,9 +226,9 @@ Id getRankInList(const VectorString& list,
  * @return Error returned code
  */
 Id decodeInString(const String& symbol,
-                   const String& node,
-                   Id* facies,
-                   bool caseSensitive)
+                  const String& node,
+                  Id* facies,
+                  bool caseSensitive)
 {
   String locnode = node;
   String locsymb = symbol;
@@ -265,12 +265,12 @@ Id decodeInString(const String& symbol,
  * @return Error returned code
  */
 Id decodeInList(const VectorString& symbols,
-                 const String& node,
-                 Id* rank,
-                 Id* facies,
-                 bool caseSensitive)
+                const String& node,
+                Id* rank,
+                Id* facies,
+                bool caseSensitive)
 {
-  for (Id i = 0; i < (Id)symbols.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(symbols.size()); i++)
   {
     if (decodeInString(symbols[i], node, facies, caseSensitive)) continue;
     *rank = i;
@@ -341,7 +341,7 @@ VectorString expandList(const VectorString& list,
   std::regex regexpr = _protectRegexp(match);
 
   VectorString sublist;
-  for (Id i = 0; i < (Id)list.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(list.size()); i++)
   {
     const String& toto = list[i];
     if (std::regex_match(toto, regexpr)) sublist.push_back(toto);
@@ -355,7 +355,7 @@ VectorString expandList(const VectorString& list,
       messerr(
         "The name (%s) has been expanded to several matching possibilities",
         match.c_str());
-      for (Id i = 0; i < (Id)sublist.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(sublist.size()); i++)
         messerr("- %s", sublist[i].c_str());
     }
     else
@@ -372,10 +372,10 @@ VectorString expandList(const VectorString& list, const VectorString& matches)
   VectorString sublist;
 
   // Loop on the patterns to be matched
-  for (Id i = 0; i < (Id)matches.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(matches.size()); i++)
   {
     // Loop for eligible names
-    for (Id j = 0; j < (Id)list.size(); j++)
+    for (Id j = 0; j < static_cast<Id>(list.size()); j++)
     {
       std::regex regexpr = _protectRegexp(matches[i]);
       if (std::regex_match(list[j], regexpr))
@@ -406,7 +406,7 @@ Id getMaxStringSize(const VectorString& list)
 {
   Id size = 0;
   if (list.empty()) return size;
-  for (Id i = 0; i < (Id)list.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(list.size()); i++)
   {
     Id local = static_cast<Id>(list[i].length());
     if (local > size) size = local;
@@ -509,7 +509,7 @@ String toString(double value)
 Id askInt(const String& text, Id defval, bool authTest)
 {
   bool hasDefault = !IFFFF(defval) || authTest;
-  Id answer      = defval;
+  Id answer       = defval;
   std::cin.exceptions(std::istream::failbit | std::istream::badbit);
 
   try
@@ -783,7 +783,7 @@ VectorInt decodeGridSorting(const String& string,
                             const VectorInt& nx,
                             bool verbose)
 {
-  Id ndim = (Id)nx.size();
+  Id ndim = static_cast<Id>(nx.size());
   VectorInt order(ndim, 0);
   VectorInt ranks(ndim, 0);
 
@@ -791,7 +791,7 @@ VectorInt decodeGridSorting(const String& string,
 
   Id idim   = 0;
   Id ind    = 0;
-  Id length = (Id)string.size();
+  Id length = static_cast<Id>(string.size());
 
   while (ind < length)
   {

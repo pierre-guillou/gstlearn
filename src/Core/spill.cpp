@@ -102,8 +102,8 @@ static void st_get_coordinates(const double* pt_out,
                                bool flag_center = false)
 {
   Id shift = static_cast<Id>(pt_out - image->bitmap.data());
-  *iy       = shift / TX;
-  *ix       = shift % TX;
+  *iy      = shift / TX;
+  *ix      = shift % TX;
 
   if (flag_center)
   {
@@ -380,8 +380,8 @@ static SPIMG* st_image_alloc(double value)
  *****************************************************************************/
 static void st_heap_add(double* p)
 {
-  Id i   = Hsize++;
-  Id n   = (i - 1) / 2;
+  Id i    = Hsize++;
+  Id n    = (i - 1) / 2;
   Heap[i] = p;
   while ((i > 0) && SIGNE * (OUT_TO_IN(p) - OUT_TO_IN(Heap[n])) > 0.)
   {
@@ -515,20 +515,20 @@ static void st_print()
 
 static void st_final_stats(double hspill, Id ix0, Id iy0)
 {
-  Id num_inside     = 0;
+  Id num_inside      = 0;
   double min_inside  = MAXIMUM_BIG;
   double max_inside  = MINIMUM_BIG;
-  Id num_outside    = 0;
+  Id num_outside     = 0;
   double min_outside = MAXIMUM_BIG;
   double max_outside = MINIMUM_BIG;
-  Id num_else       = 0;
+  Id num_else        = 0;
   double min_else    = MAXIMUM_BIG;
   double max_else    = MINIMUM_BIG;
 
   for (Id iy = 0; iy < SY; iy++)
     for (Id ix = 0; ix < SX; ix++)
     {
-      Id value   = BITMAP(SPIMG_OUT, ix, iy);
+      Id value    = BITMAP(SPIMG_OUT, ix, iy);
       double topo = BITMAP(SPIMG_IN, ix, iy);
 
       if (value == SURFACE_INSIDE)
@@ -594,16 +594,16 @@ static void st_final_stats(double hspill, Id ix0, Id iy0)
  **
  *****************************************************************************/
 Id spill_point(DbGrid* dbgrid,
-                Id ind_depth,
-                Id ind_data,
-                Id option,
-                bool flag_up,
-                Id verbose_step,
-                double hmax,
-                double* h,
-                const double* th,
-                Id* ix0,
-                Id* iy0)
+               Id ind_depth,
+               Id ind_data,
+               Id option,
+               bool flag_up,
+               Id verbose_step,
+               double hmax,
+               double* h,
+               const double* th,
+               Id* ix0,
+               Id* iy0)
 {
   DECLARE_UNUSED(th);
   double *pt_mark, *pt_out, hspill;
@@ -717,16 +717,16 @@ Id spill_point(DbGrid* dbgrid,
     {
       pt_mark = &BITMAP(SPIMG_MARK, ix, iy);
       pt_out  = &MARK_TO_OUT(pt_mark);
-      if ((Id)MARK(0, 0) == SURFACE_UNKNOWN)
+      if (static_cast<Id>(MARK(0, 0)) == SURFACE_UNKNOWN)
       {
         for (k = found = 0; k < n && found == 0; k++)
-          if ((Id)MARK(x[k], y[k]) == SURFACE_INSIDE) found = 1;
+          if (static_cast<Id>(MARK(x[k], y[k])) == SURFACE_INSIDE) found = 1;
         if (found)
           st_heap_add(pt_out);
         else
           st_change(pt_out, SURFACE_UNKNOWN);
       }
-      else if ((Id)MARK(0, 0) == SURFACE_INSIDE)
+      else if (static_cast<Id>(MARK(0, 0)) == SURFACE_INSIDE)
         st_change(pt_out, SURFACE_INSIDE);
       else
         st_heap_add(pt_out);

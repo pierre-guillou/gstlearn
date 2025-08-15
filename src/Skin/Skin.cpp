@@ -280,7 +280,7 @@ Id Skin::init(bool verbose)
       Id ecr = _gridShift(indg, dir);
       if (IFFFF(ecr)) continue;
       if (!_skf->isAlreadyFilled(ecr)) continue;
-      local += (Id)_skf->getWeight(ecr, invdir[dir]);
+      local += static_cast<Id>(_skf->getWeight(ecr, invdir[dir]));
     }
     if (local > 0.)
     {
@@ -324,7 +324,7 @@ Id Skin::remains(bool verbose)
   if (verbose)
     message("Skin iteration:%5d - Length:%4d - Energy:%lf\n",
             _date, _nval, _total);
-  return ((Id)_total);
+  return (static_cast<Id>(_total));
 }
 
 /*****************************************************************************/
@@ -393,7 +393,7 @@ Id Skin::unstack(Id rank0, Id ipos0)
     /* Discard the neighboring cell if it cannot filled */
 
     if (!_skf->isToBeFilled(ecr)) continue;
-    local    = (Id)_skf->getWeight(ipos0, dir);
+    local    = static_cast<Id>(_skf->getWeight(ipos0, dir));
     Id rank = _cellAlreadyFilled(ecr);
     if (rank < 0)
     {

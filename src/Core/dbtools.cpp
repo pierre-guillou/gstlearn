@@ -173,7 +173,7 @@ Id surface(Db* db_point,
 
   for (Id igrid = 0; igrid < db_grid->getNSample(); igrid++)
   {
-    Id jech = (Id)gtab[igrid];
+    Id jech = static_cast<Id>(gtab[igrid]);
     if (jech >= 0) dtab[jech]++;
   }
   for (Id iech = 0; iech < db_point->getNSample(); iech++)
@@ -184,7 +184,7 @@ Id surface(Db* db_point,
 
   for (Id igrid = 0; igrid < db_grid->getNSample(); igrid++)
   {
-    Id jech = (Id)gtab[igrid];
+    Id jech = static_cast<Id>(gtab[igrid]);
     if (jech >= 0)
       gtab[igrid] = dtab[jech];
     else
@@ -410,7 +410,7 @@ label_loop:
       if (mem_long > 0)
       {
         *rank = strtol(decode, &decode, 0);
-        if (mem_long == (Id)strlen(decode))
+        if (mem_long == static_cast<Id>(strlen(decode)))
         {
           messerr("Cannot convert '%s' into a valid Rank", decode);
           goto label_loop;
@@ -429,7 +429,7 @@ label_loop:
       if (mem_long > 0)
       {
         *vmin = strtod(decode, &decode);
-        if (mem_long == (Id)strlen(decode))
+        if (mem_long == static_cast<Id>(strlen(decode)))
         {
           messerr("Cannot convert '%s' into a valid Minimum Bound", decode);
           goto label_loop;
@@ -443,7 +443,7 @@ label_loop:
       if (mem_long > 0)
       {
         *vmax = strtod(decode, &decode);
-        if (mem_long == (Id)strlen(decode))
+        if (mem_long == static_cast<Id>(strlen(decode)))
         {
           messerr("Cannot convert '%s' into a valid Maximum Bound", decode);
           goto label_loop;
@@ -620,7 +620,7 @@ void ut_trace_discretize(Id nseg,
 
     /* Discretize the trace segment */
 
-    nloc = (Id)floor(dist / disc);
+    nloc = static_cast<Id>(floor(dist / disc));
     if (ABS(nloc * disc - dist) < dist / 1000) nloc--;
     np += nloc;
     xp.resize(np);
@@ -740,7 +740,7 @@ void ut_trace_sample(Db* db,
       rks.resize(ns + 1);
       xs[ns]  = dd[ipmin];
       ys[ns]  = cote;
-      lys[ns] = (FFFF(layer)) ? 1 : (Id)layer + 1;
+      lys[ns] = (FFFF(layer)) ? 1 : static_cast<Id>(layer) + 1;
       typ[ns] = 1;
       rks[ns] = iech + 1;
       ns++;
@@ -804,7 +804,7 @@ static VectorDouble st_point_init_homogeneous(Id number,
     return tab;
   }
   VectorDouble extend = VH::subtract(coormin, coormax);
-  Id ndim             = (Id)coormin.size();
+  Id ndim             = static_cast<Id>(coormin.size());
   VectorDouble coor(ndim);
   VectorDouble delta(ndim);
 
@@ -951,7 +951,7 @@ static VectorDouble st_point_init_inhomogeneous(Id number,
     }
     else
     {
-      indip = (Id)proba;
+      indip = static_cast<Id>(proba);
     }
 
     // Draw the point within the elected cell
@@ -1032,7 +1032,7 @@ static VectorDouble st_point_init_inhomogeneous(Id number,
 Id db_resind(Db* db, Id ivar, const VectorDouble& zcut)
 {
   Id nech = db->getNSample();
-  Id ncut = (Id)zcut.size();
+  Id ncut = static_cast<Id>(zcut.size());
   if (!VH::isSorted(zcut, true))
   {
     messerr("The cutoffs must be provided in increasing order");
@@ -1367,7 +1367,7 @@ Id db_streamline(DbGrid* dbgrid,
   nbline = nquant = 0;
   iptr_grad       = -1;
   if (dbpoint == nullptr) dbpoint = dbgrid;
-  nbyech = (Id)get_keypone("Streamline_Skip", 1.);
+  nbyech = static_cast<Id>(get_keypone("Streamline_Skip", 1.));
 
   /* Preliminary checks */
 
@@ -1656,7 +1656,7 @@ Db* db_regularize(Db* db, DbGrid* dbgrid, Id flag_center)
   Id size = ndim + nvar + 1;
 
   VectorDouble codes = db->getCodeList();
-  Id ncode           = (Id)codes.size();
+  Id ncode           = static_cast<Id>(codes.size());
   VectorDouble coor(ndim, 0);
   VectorDouble wcnt(ncode * nz, 0);
   VectorDouble wcor(ncode * nz * ndim, 0);
@@ -1665,8 +1665,6 @@ Db* db_regularize(Db* db, DbGrid* dbgrid, Id flag_center)
   // Loop on the different samples
 
   Id ntot = db->getNSample();
-
-  // message("Before regularization: ncode = %d, nz = %d, ntot = %d\n", (Id)ncode, (Id)nz, (Id)ntot);
 
   for (Id iech = 0; iech < ntot; iech++)
   {
@@ -1977,7 +1975,7 @@ Db* db_point_init(Id nech,
   Db* db  = nullptr;
   Id ndim = 0;
   if (dbgrid == nullptr)
-    ndim = (Id)coormin.size();
+    ndim = static_cast<Id>(coormin.size());
   else
     ndim = dbgrid->getNDim();
   if (ndim <= 0) return db;
@@ -2022,7 +2020,7 @@ Db* db_point_init(Id nech,
 
   /* Allocate the main structure */
 
-  number = (Id)tab.size() / ndim;
+  number = static_cast<Id>(tab.size()) / ndim;
   db     = Db::createFromSamples(number, ELoadBy::SAMPLE, tab, VectorString(),
                                  VectorString(), flagAddSampleRank);
 

@@ -77,13 +77,13 @@ void ProjMatrix::resetFromMeshAndDb(const Db* db, const AMesh* a_mesh, Id rankZ,
 
 Id ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
 {
-  if ((Id)inv.size() != getNApex())
+  if (static_cast<Id>(inv.size()) != getNApex())
   {
     messerr("_addMesh2point: Error in the dimension of argument 'inv'(%d). It should be (%d)",
             inv.size(), getNApex());
     return 1;
   }
-  if ((Id)outv.size() != getNPoint())
+  if (static_cast<Id>(outv.size()) != getNPoint())
   {
     messerr("_addMesh2point: Error in the dimension of argument 'outv'(%d). It should be (%d)",
             outv.size(), getNPoint());
@@ -96,13 +96,13 @@ Id ProjMatrix::_addMesh2point(const constvect inv, vect outv) const
 
 Id ProjMatrix::_addPoint2mesh(const constvect inv, vect outv) const
 {
-  if ((Id)inv.size() != getNPoint())
+  if (static_cast<Id>(inv.size()) != getNPoint())
   {
     messerr("_addPoint2mesh: Error in the dimension of argument 'inv'(%d). It should be (%d)",
             inv.size(), getNPoint());
     return 1;
   }
-  if ((Id)outv.size() != getNApex())
+  if (static_cast<Id>(outv.size()) != getNApex())
   {
     messerr("_addPoint2mesh: Error in the dimension of argument 'outv'(%d). It should be (%d)",
             outv.size(), getNApex());

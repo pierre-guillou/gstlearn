@@ -114,8 +114,8 @@ void CalcSimuFFT::_alloc()
     if (i < _getNDim())
     {
       auto nval = _getNOptimalEven(_shift[i] + dbgrid->getNX(i));
-      _dims[i] = nval;
-      _dim2[i] = nval / 2;
+      _dims[i]  = nval;
+      _dim2[i]  = nval / 2;
     }
     else
     {
@@ -166,7 +166,7 @@ Id CalcSimuFFT::_getNOptimalEven(Id number, Id largeFactor)
   while (answer)
   {
     VectorInt factors = _getFactors(local);
-    Id nfact         = (Id)factors.size();
+    Id nfact          = static_cast<Id>(factors.size());
     answer            = false;
     for (Id i = 0; i < nfact; i++)
       if (factors[i] > largeFactor) answer = 1;
@@ -262,9 +262,9 @@ void CalcSimuFFT::_gridDilate()
   /* Evaluate the count of elementary grid mesh (in each direction) */
   /* for the covariance to become negligeable (<percent)*/
 
-  Id ndx     = 1;
-  Id ndy     = 1;
-  Id ndz     = 1;
+  Id ndx      = 1;
+  Id ndy      = 1;
+  Id ndz      = 1;
   bool not_ok = true;
 
   while (not_ok)
@@ -532,7 +532,7 @@ void CalcSimuFFT::_prepar(bool flag_amplitude, double eps)
     double total_moins = 0.;
     for (Id i = 0; i < _sizes_alloc; i++)
     {
-      cplx[i] /= (double)_sizes_alloc;
+      cplx[i] /= static_cast<double>(_sizes_alloc);
       if (cplx[i] < 0)
         total_moins -= cplx[i];
       else
@@ -859,7 +859,7 @@ void CalcSimuFFT::_defineSym3()
  *****************************************************************************/
 void CalcSimuFFT::_setZero(Id ix, Id iy, Id iz)
 {
-  Id ind = IND(ix, iy, iz);
+  Id ind  = IND(ix, iy, iz);
   _v[ind] = 0.;
 }
 
@@ -877,8 +877,8 @@ void CalcSimuFFT::_setZero(Id ix, Id iy, Id iz)
  *****************************************************************************/
 void CalcSimuFFT::_setConjugate(Id ix, Id iy, Id iz, Id jx, Id jy, Id jz)
 {
-  Id ind1 = IND(ix, iy, iz);
-  Id ind2 = IND(jx, jy, jz);
+  Id ind1  = IND(ix, iy, iz);
+  Id ind2  = IND(jx, jy, jz);
   _u[ind2] = _u[ind1];
   _v[ind2] = -_v[ind1];
 }
@@ -972,7 +972,7 @@ double CalcSimuFFT::_support1(double sigma)
   double value = 0.;
   for (Id ix = -_nx[0]; ix <= _nx[0]; ix++)
   {
-    Id iix    = (ix < 0) ? _dims[0] + ix : ix;
+    Id iix     = (ix < 0) ? _dims[0] + ix : ix;
     double rho = _rhoSigma(sigma, iix, 0, 0);
     value += (_nx[0] - ABS(ix)) * rho;
   }
@@ -994,8 +994,8 @@ double CalcSimuFFT::_support2(double sigma)
   for (Id ix = -_nx[0]; ix <= _nx[0]; ix++)
     for (Id iy = -_nx[1]; iy <= _nx[1]; iy++)
     {
-      Id iix    = (ix < 0) ? _dims[0] + ix : ix;
-      Id iiy    = (iy < 0) ? _dims[1] + iy : iy;
+      Id iix     = (ix < 0) ? _dims[0] + ix : ix;
+      Id iiy     = (iy < 0) ? _dims[1] + iy : iy;
       double rho = _rhoSigma(sigma, iix, iiy, 0);
       value += ((_nx[0] - ABS(ix)) * (_nx[1] - ABS(iy)) * rho);
     }
@@ -1018,9 +1018,9 @@ double CalcSimuFFT::_support3(double sigma)
     for (Id iy = -_nx[1]; iy <= _nx[1]; iy++)
       for (Id iz = -_nx[2]; iz <= _nx[2]; iz++)
       {
-        Id iix    = (ix < 0) ? _dims[0] + ix : ix;
-        Id iiy    = (iy < 0) ? _dims[1] + iy : iy;
-        Id iiz    = (iz < 0) ? _dims[2] + iz : iz;
+        Id iix     = (ix < 0) ? _dims[0] + ix : ix;
+        Id iiy     = (iy < 0) ? _dims[1] + iy : iy;
+        Id iiz     = (iz < 0) ? _dims[2] + iz : iz;
         double rho = _rhoSigma(sigma, iix, iiy, iiz);
         value += ((_nx[0] - ABS(ix)) * (_nx[1] - ABS(iy)) * (_nx[2] - ABS(iz)) * rho);
       }
@@ -1120,7 +1120,7 @@ VectorDouble CalcSimuFFT::changeSupport(const VectorDouble& sigma)
 
   /* Loop on the different lognormal variances */
 
-  Id nval = (Id)sigma.size();
+  Id nval = static_cast<Id>(sigma.size());
   VectorDouble r2val;
   if (nval > 0)
   {
@@ -1152,12 +1152,12 @@ VectorDouble CalcSimuFFT::changeSupport(const VectorDouble& sigma)
  **
  *****************************************************************************/
 Id simfft(DbGrid* db,
-           ModelGeneric* model,
-           SimuFFTParam& param,
-           Id nbsimu,
-           Id seed,
-           Id verbose,
-           const NamingConvention& namconv)
+          ModelGeneric* model,
+          SimuFFTParam& param,
+          Id nbsimu,
+          Id seed,
+          Id verbose,
+          const NamingConvention& namconv)
 {
   CalcSimuFFT simfft(nbsimu, verbose, seed);
   simfft.setDbout(db);

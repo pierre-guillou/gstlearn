@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   double m_Z        = 1.5;
   double s_Z        = 0.5;
   VectorDouble Zval = grid->getColumn("Y");
-  for (Id i = 0; i < (Id)Zval.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(Zval.size()); i++)
     Zval[i] = m_Z * exp(s_Z * Zval[i] - 0.5 * s_Z * s_Z);
   grid->addColumns(Zval, "Z");
   grid->display(&dbfmt);
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
   vario->display();
 
   // Fitting the Model on the Gaussian transformed variable
-  auto* model            = new Model(1, ndim);
+  auto* model = new Model(1, ndim);
   Constraints constraints(1.);
   (void)model->fit(vario, {ECov::EXPONENTIAL, ECov::EXPONENTIAL}, constraints);
   model->display();

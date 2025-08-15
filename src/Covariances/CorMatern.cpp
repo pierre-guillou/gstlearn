@@ -26,21 +26,21 @@
 
 namespace gstlrn
 {
-CorMatern::CorMatern(const VectorDouble &ranges,
-                     const VectorDouble &angles,
-                     const VectorDouble& coeffScales, 
-                     const VectorDouble& params ,
+CorMatern::CorMatern(const VectorDouble& ranges,
+                     const VectorDouble& angles,
+                     const VectorDouble& coeffScales,
+                     const VectorDouble& params,
                      bool flagRange)
   : ACov()
-  , _nVar((Id)params.size())
-  , _corRef(CorAniso::createAnisotropic(CovContext(1, (Id)ranges.size()), ECov::MATERN, ranges, params[0], angles, flagRange))
+  , _nVar(static_cast<Id>(params.size()))
+  , _corRef(CorAniso::createAnisotropic(CovContext(1, static_cast<Id>(ranges.size())), ECov::MATERN, ranges, params[0], angles, flagRange))
   , _corMatern(*_corRef)
   , _coeffScales(coeffScales)
   , _params(params)
   , _corMax(_nVar)
   , _angles(angles)
 {
-  if ((Id)_coeffScales.size() != _nVar - 1)
+  if (static_cast<Id>(_coeffScales.size()) != _nVar - 1)
   {
     messerr("CorMatern: inconsistent size between coeffScales and params");
     messerr("CorMatern: coeffScales size = %d, params size = %d", _coeffScales.size(), _nVar);
@@ -157,15 +157,15 @@ double CorMatern::_eval(const SpacePoint& p1,
 {
   _corMatern.setParam(computeParam(ivar, jvar));
 
-    VectorDouble scales = _corRef->getScales();
-  
-    double correcScale = computeScale(ivar, jvar);
-    for (Id idim = 0; idim < (Id)getSpace()->getNDim(); idim++)
-    {
-        scales[idim] *= correcScale;
-    }
-    _corMatern.setRotationAnglesAndRadius(_angles,VectorDouble(),scales);
-    return _corMax.getValue(ivar, jvar) * _corMatern.evalCov(p1, p2, 0 , 0 , mode);
+  VectorDouble scales = _corRef->getScales();
+
+  double correcScale = computeScale(ivar, jvar);
+  for (Id idim = 0; idim < static_cast<Id>(getSpace()->getNDim()); idim++)
+  {
+    scales[idim] *= correcScale;
+  }
+  _corMatern.setRotationAnglesAndRadius(_angles, VectorDouble(), scales);
+  return _corMax.getValue(ivar, jvar) * _corMatern.evalCov(p1, p2, 0, 0, mode);
 }
 
-}
+} // namespace gstlrn

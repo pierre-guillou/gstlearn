@@ -160,7 +160,7 @@ void CalcKrigingFactors::_rollback()
 
 Id CalcKrigingFactors::_getNFactors() const
 {
-  return (Id)_iuidFactors.size();
+  return static_cast<Id>(_iuidFactors.size());
 }
 
 /****************************************************************************/

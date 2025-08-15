@@ -70,7 +70,7 @@ static Id st_match_keypair(const char* keyword, Id flag_exact)
     }
     else
     {
-      if (strstr(keypair->keyword, keyloc) != NULL) return (i);
+      if (strstr(keypair->keyword, keyloc) != nullptr) return (i);
     }
   }
   return (-1);
@@ -230,13 +230,13 @@ static void st_keypair_copy(Keypair* keypair, Id type, Id start, void* values)
   size = keypair->nrow * keypair->ncol;
   if (type == 1)
   {
-    icopy = (Id*)values;
+    icopy = static_cast<Id*>(values);
     for (Id i = 0; i < size; i++)
       keypair->values[i + start] = icopy[i];
   }
   else
   {
-    rcopy = (double*)values;
+    rcopy = static_cast<double*>(values);
     for (Id i = 0; i < size; i++)
       keypair->values[i + start] = rcopy[i];
   }
@@ -609,7 +609,7 @@ Id get_keypair_int(const char* keyword, Id* nrow, Id* ncol, VectorInt& values)
 
   values.resize(size);
   for (Id i = 0; i < size; i++)
-    values[i] = (Id)keypair->values[i];
+    values[i] = static_cast<Id>(keypair->values[i]);
 
   return (0);
 }
@@ -742,7 +742,7 @@ VectorInt ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
 
   /* Initializations */
 
-  p    = (flag_half) ? static_cast<Id>(floor((double)ncolor / 2.)) : ncolor - 1;
+  p    = (flag_half) ? static_cast<Id>(floor(static_cast<double>(ncolor) / 2.)) : ncolor - 1;
   nmax = static_cast<Id>(pow(2, ncolor));
   np   = 0;
 

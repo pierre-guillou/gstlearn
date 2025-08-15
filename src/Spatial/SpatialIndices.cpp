@@ -474,7 +474,7 @@ VectorVectorDouble SpatialIndices::getQT(const String &name) const
   double Q = VH::cumul(wzs);
   double SA = 0.;
   VectorDouble QT = VH::cumsum(wzs, true);
-  for (Id ib = 0, nb = (Id)ww.size(); ib < nb; ib++)
+  for (Id ib = 0, nb = static_cast<Id>(ww.size()); ib < nb; ib++)
     SA += (QT[ib] + QT[ib + 1]) * wws[ib];
   SA /= Q;
   message("Spreading Area  = %lf\n", SA);
@@ -484,7 +484,7 @@ VectorVectorDouble SpatialIndices::getQT(const String &name) const
   vec[1] = VH::cumsum(wzs, true, true);
 
   // Upgrade Q(T) into (Q-Q(T))/Q
-  for (Id i = 0, n = (Id)vec[1].size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(vec[1].size()); i < n; i++)
     vec[1][i] = (Q - vec[1][i]) / Q;
   
   return vec;
@@ -533,8 +533,8 @@ double SpatialIndices::getMicroStructure(const String& name,
   xmax += dx * extend;
   ymin -= dy * extend;
   ymax += dy * extend;
-  dx = (xmax - xmin) / (double) ndisc;
-  dy = (ymax - ymin) / (double) ndisc;
+  dx = (xmax - xmin) / static_cast<double>(ndisc);
+  dy = (ymax - ymin) / static_cast<double>(ndisc);
   double maille = dx * dy;
 
   // Create the internal Grid
@@ -597,7 +597,7 @@ static void _updateGravityCenter(const VectorDouble& xxs,
   double yb = 0.;
   double paval = 0.;
   double pbval = 0.;
-  for (Id iech = 0, nech = (Id)ig.size(); iech < nech; iech++)
+  for (Id iech = 0, nech = static_cast<Id>(ig.size()); iech < nech; iech++)
   {
     if (ig[iech] != found)
       continue;
@@ -629,7 +629,7 @@ static SpacePoint _calculateGlobalGravityCenter(const VectorDouble& xxs,
   double yb = 0.;
   (*patot) = 0.;
   (*pbtot) = 0.;
-  for (Id iech = 0, nech = (Id)xxs.size(); iech < nech; iech++) {
+  for (Id iech = 0, nech = static_cast<Id>(xxs.size()); iech < nech; iech++) {
     xt += wws[iech] * zzs[iech] * xxs[iech];
     xb += wws[iech] * zzs[iech];
     yt += wws[iech] * zzs[iech] * yys[iech];
@@ -702,7 +702,7 @@ std::vector<SpacePoint> SpatialIndices::getPatches(const String &name,
     origRank.push_back(iech);
   }
 
-  Id nech = (Id)origRank.size();
+  Id nech = static_cast<Id>(origRank.size());
   if (nech <= 0)
     return centers;
   VH::normalize(ww, 1); // Normalize the weights
@@ -718,7 +718,7 @@ std::vector<SpacePoint> SpatialIndices::getPatches(const String &name,
 
    // The first point is automatically assigned to the first center of gravity
   Id iech = 0;
-  ig[iech] = (Id)centers.size();
+  ig[iech] = static_cast<Id>(centers.size());
   _createNewPatch(0, xxs, yys, zzs, wws, centers, pa, pb);
 
   // Loop on the samples
@@ -731,7 +731,7 @@ std::vector<SpacePoint> SpatialIndices::getPatches(const String &name,
     // Find which gravity center the current point aggregates to
     Id found = -1;
     double dmin = MAXIMUM_BIG;
-    for (Id ic = 0, ncenter = (Id)centers.size(); ic < ncenter; ic++)
+    for (Id ic = 0, ncenter = static_cast<Id>(centers.size()); ic < ncenter; ic++)
     {
       double dist = current.getDistance(centers[ic]);
       if (dist > dmin)
@@ -748,14 +748,14 @@ std::vector<SpacePoint> SpatialIndices::getPatches(const String &name,
     else
     {
       // Create a new center of gravity
-      ig[jech] = (Id)centers.size();
+      ig[jech] = static_cast<Id>(centers.size());
       _createNewPatch(jech, xxs, yys, zzs, wws, centers, pa, pb);
     }
   }
 
   // Store the patch rank in the Data Base
   Id iuid = _db->addColumnsByConstant(1, ITEST, "Patch");
-  for (Id i = 0, n = (Id)origRank.size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(origRank.size()); i < n; i++)
     _db->setArray(origs[i], iuid, ig[i]);
 
   // Calculate the global center of gravity
@@ -767,7 +767,7 @@ std::vector<SpacePoint> SpatialIndices::getPatches(const String &name,
   VH::divideConstant(pb, pbtot);
 
   // Printout
-  Id ncenter = (Id) centers.size();
+  Id ncenter = static_cast<Id>(centers.size());
   message("Regrouping the information of %s by patches\n", name.c_str());
   message("- Distance to Center of Gravity = %lf\n", Dmin);
   message("- Total Number of patches = %d\n", ncenter);

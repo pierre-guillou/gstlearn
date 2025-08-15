@@ -62,8 +62,8 @@ void MatrixSquare::_setNSize(Id nval)
 void MatrixSquare::resetFromVVD(const VectorVectorDouble& tab, bool byCol)
 {
   if (tab.empty()) return;
-  Id n1 = (Id)tab.size();
-  Id n2 = (Id)tab[0].size();
+  Id n1 = static_cast<Id>(tab.size());
+  Id n2 = static_cast<Id>(tab[0].size());
   if (n1 != n2)
   {
     messerr("The Matrix should be square");
@@ -123,7 +123,7 @@ void MatrixSquare::innerMatrix(const MatrixSquare& x,
 /*! Multiply the diagonal by a vector */
 void MatrixSquare::prodDiagByVector(const VectorDouble& diag)
 {
-  if ((Id)diag.size() != getNRows())
+  if (static_cast<Id>(diag.size()) != getNRows())
     my_throw("Argument 'Diag' must match Matrix dimension");
 
   for (Id i = 0; i < getNRows(); i++)
@@ -135,7 +135,7 @@ void MatrixSquare::prodDiagByVector(const VectorDouble& diag)
 /*! Divide the diagonal by a vector */
 void MatrixSquare::divideDiagByVector(const VectorDouble& diag)
 {
-  if ((Id)diag.size() != getNRows())
+  if (static_cast<Id>(diag.size()) != getNRows())
     my_throw("Argument 'Diag' must match Matrix dimension");
 
   for (Id i = 0; i < getNRows(); i++)
@@ -193,7 +193,7 @@ double MatrixSquare::determinant(void) const
 
 double MatrixSquare::normVec(const VectorDouble& vec)
 {
-  if (getNRows() != (Id)vec.size())
+  if (getNRows() != static_cast<Id>(vec.size()))
   {
     messerr("Wrong dimension of 'vec' argument");
     return TEST;
@@ -251,8 +251,8 @@ bool MatrixSquare::_isNumbersValid(Id nrows, Id ncols) const
  */
 MatrixSquare* MatrixSquare::createFromVVD(const VectorVectorDouble& X)
 {
-  Id nrow = (Id)X.size();
-  Id ncol = (Id)X[0].size();
+  Id nrow = static_cast<Id>(X.size());
+  Id ncol = static_cast<Id>(X[0].size());
   if (nrow != ncol)
   {
     messerr("The matrix does not seem to be square");
@@ -270,10 +270,10 @@ MatrixSquare* MatrixSquare::createFromVD(const VectorDouble& X,
                                          bool invertColumnOrder)
 {
   Id ncol = nrow;
-  if (nrow * ncol != (Id)X.size())
+  if (nrow * ncol != static_cast<Id>(X.size()))
   {
     messerr("Inconsistency between arguments 'nrow'(%d) and 'ncol'(%d)", nrow, ncol);
-    messerr("and the dimension of the input Vector (%d)", (Id)X.size());
+    messerr("and the dimension of the input Vector (%d)", static_cast<Id>(X.size()));
   }
   auto* mat = new MatrixSquare(nrow);
 

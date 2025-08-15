@@ -708,8 +708,8 @@ double ACov::evalAverageIncrToIncr(const VectorVectorDouble& d1,
                                    Id jvar,
                                    const CovCalcMode* mode) const
 {
-  Id nincr1 = (Id)d1.size();
-  Id nincr2 = (Id)d2.size();
+  Id nincr1 = static_cast<Id>(d1.size());
+  Id nincr2 = static_cast<Id>(d2.size());
 
   /* Loop on the first sample */
 
@@ -728,7 +728,7 @@ double ACov::evalAverageIncrToIncr(const VectorVectorDouble& d1,
   }
 
   // Scaling
-  total /= (double)(nincr1 * nincr2);
+  total /= static_cast<double>(nincr1 * nincr2);
 
   return total;
 }
@@ -782,8 +782,8 @@ void ACov::evalPointToDbAsSP(VectorDouble& values,
                              Id jvar,
                              const CovCalcMode* mode) const
 {
-  Id nech1 = (Id)p1s.size();
-  if (nech1 != (Id)values.size()) values.resize(nech1);
+  Id nech1 = static_cast<Id>(p1s.size());
+  if (nech1 != static_cast<Id>(values.size())) values.resize(nech1);
 
   /* Loop on the second sample */
 
@@ -821,8 +821,8 @@ void ACov::evalPointToDb(VectorDouble& values,
 
   VectorInt index2;
   db2->getSampleRanksPerVariable(index2, nbgh2, jvar, useSel);
-  Id nech2 = (Id)index2.size();
-  if (nech2 != (Id)values.size()) values.resize(nech2);
+  Id nech2 = static_cast<Id>(index2.size());
+  if (nech2 != static_cast<Id>(values.size())) values.resize(nech2);
 
   Id irow = 0;
   for (const auto i: index2.getVector())
@@ -851,16 +851,16 @@ double ACov::evalCvv(const VectorDouble& ext,
                      const CovCalcMode* mode) const
 {
   auto ndim = getNDim();
-  if (ndim != (Id)ext.size())
+  if (ndim != static_cast<Id>(ext.size()))
   {
     messerr("Block Extension (%d) should have same dimension as the Model %d)",
-            (Id)ext.size(), ndim);
+            static_cast<Id>(ext.size()), ndim);
     return TEST;
   }
-  if (ndim != (Id)ndisc.size())
+  if (ndim != static_cast<Id>(ndisc.size()))
   {
     messerr("Discretization (%d) should have same dimension as the Model (%d)",
-            (Id)ndisc.size(), ndim);
+            static_cast<Id>(ndisc.size()), ndim);
     return TEST;
   }
 
@@ -894,22 +894,22 @@ double ACov::evalCvvShift(const VectorDouble& ext,
                           const CovCalcMode* mode) const
 {
   auto ndim = getNDim();
-  if (ndim != (Id)ext.size())
+  if (ndim != static_cast<Id>(ext.size()))
   {
     messerr("Block Extension (%d) should have same dimension as the Model %d)",
-            (Id)ext.size(), ndim);
+            static_cast<Id>(ext.size()), ndim);
     return TEST;
   }
-  if (ndim != (Id)ndisc.size())
+  if (ndim != static_cast<Id>(ndisc.size()))
   {
     messerr("Discretization (%d) should have same dimension as the Model (%d)",
-            (Id)ndisc.size(), ndim);
+            static_cast<Id>(ndisc.size()), ndim);
     return TEST;
   }
-  if (ndim != (Id)shift.size())
+  if (ndim != static_cast<Id>(shift.size()))
   {
     messerr("Shift (%d) should have the same dimension as the Model (%d)",
-            (Id)shift.size(), ndim);
+            static_cast<Id>(shift.size()), ndim);
     return TEST;
   }
 
@@ -959,16 +959,16 @@ double ACov::evalCxv(const SpacePoint& p1,
                      const CovCalcMode* mode) const
 {
   auto ndim = getNDim();
-  if (ndim != (Id)ext.size())
+  if (ndim != static_cast<Id>(ext.size()))
   {
     messerr("Block Extension (%d) should have same dimension as the Model %d)",
-            (Id)ext.size(), ndim);
+            static_cast<Id>(ext.size()), ndim);
     return TEST;
   }
-  if (ndim != (Id)ndisc.size())
+  if (ndim != static_cast<Id>(ndisc.size()))
   {
     messerr("Discretization (%d) should have same dimension as the Model (%d)",
-            (Id)ndisc.size(), ndim);
+            static_cast<Id>(ndisc.size()), ndim);
     return TEST;
   }
 
@@ -1002,16 +1002,16 @@ double ACov::evalCxv(const Db* db,
             db->getNDim(), ndim);
     return TEST;
   }
-  if (ndim != (Id)ext.size())
+  if (ndim != static_cast<Id>(ext.size()))
   {
     messerr("Block Extension (%d) should have same dimension as the Model %d)",
-            (Id)ext.size(), ndim);
+            static_cast<Id>(ext.size()), ndim);
     return TEST;
   }
-  if (ndim != (Id)ndisc.size())
+  if (ndim != static_cast<Id>(ndisc.size()))
   {
     messerr("Discretization (%d) should have same dimension as the Model (%d)",
-            (Id)ndisc.size(), ndim);
+            static_cast<Id>(ndisc.size()), ndim);
     return TEST;
   }
 
@@ -1057,7 +1057,7 @@ DbGrid* ACov::_discretizeBlock(const VectorDouble& ext,
 {
   auto ndim          = getNDim();
   VectorDouble x0loc = x0;
-  if (x0loc.empty() || ndim != (Id)x0loc.size())
+  if (x0loc.empty() || ndim != static_cast<Id>(x0loc.size()))
     x0loc.resize(ndim, 0.);
   for (Id idim = 0; idim < ndim; idim++)
     x0loc[idim] -= ext[idim] / 2.;
@@ -1080,7 +1080,7 @@ Db* ACov::_discretizeBlockRandom(const DbGrid* dbgrid, Id seed) const
   {
     double taille    = dbgrid->getDX(idim);
     VectorDouble vec = dbgrid->getOneCoordinate(idim, false);
-    for (Id i = 0; i < (Id)vec.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(vec.size()); i++)
       vec[i] += taille * law_uniform(-0.5, 0.5);
     db->addColumns(vec, names[idim], ELoc::X, idim);
   }
@@ -1187,8 +1187,8 @@ Id ACov::evalCovMatInPlaceFromIdx(MatrixDense& mat,
   _optimizationPreProcessForTarget(db2, nbgh2);
 
   // Creating the matrix
-  Id nvar1 = (Id)index1.size();
-  Id nvar2 = (Id)index2.size();
+  Id nvar1 = static_cast<Id>(index1.size());
+  Id nvar2 = static_cast<Id>(index2.size());
   Id neq1  = VH::count(index1);
   Id neq2  = VH::count(index2);
   if (neq1 <= 0 || neq2 <= 0)
@@ -1207,7 +1207,7 @@ Id ACov::evalCovMatInPlaceFromIdx(MatrixDense& mat,
   {
     const VectorInt& index2i = index2[ivar2];
     const Id* ptr2           = index2i.data();
-    for (Id irel2 = 0, n2 = (Id)index2i.size(); irel2 < n2; irel2++)
+    for (Id irel2 = 0, n2 = static_cast<Id>(index2i.size()); irel2 < n2; irel2++)
     {
       Id iabs2       = *ptr2++;
       SpacePoint& p2 = optimizationLoadInPlace(irel2, 2, 2);
@@ -1414,7 +1414,7 @@ Id ACov::evalCovVecRHSInPlace(vect vect,
                               double lambda,
                               const ECalcMember& calcMember) const
 {
-  for (Id i = 0; i < (Id)vect.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(vect.size()); i++)
     vect[i] = 0.;
 
   // db2->getSampleAsSPInPlace(pin, iech2);
@@ -1438,7 +1438,7 @@ Id ACov::addEvalCovVecRHSInPlace(vect vect,
   const CovCalcMode& mode = krigopt.getMode();
   const Id* inds          = index1.data();
   Id icas                 = (calcMember == ECalcMember::LHS) ? 1 : 2;
-  for (Id i = 0; i < (Id)vect.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(vect.size()); i++)
   {
     if (flagNoStat)
       updateCovByPoints(1, *inds, icas, iech2);
@@ -1470,11 +1470,11 @@ Id ACov::_evalCovMatRHSInPlaceBlock(MatrixDense& mat,
   // Loop on Data
 
   Id icol = 0;
-  for (Id ivar2 = 0, nvar2 = (Id)index2.size(); ivar2 < nvar2; ivar2++)
+  for (Id ivar2 = 0, nvar2 = static_cast<Id>(index2.size()); ivar2 < nvar2; ivar2++)
   {
     const VectorInt& index2i = index2[ivar2];
     const Id* ptr2           = index2i.data();
-    for (Id irel2 = 0, n2 = (Id)index2i.size(); irel2 < n2; irel2++)
+    for (Id irel2 = 0, n2 = static_cast<Id>(index2i.size()); irel2 < n2; irel2++)
     {
       Id iabs2 = *ptr2++;
 
@@ -1517,11 +1517,11 @@ Id ACov::_evalCovMatRHSInPlacePoint(MatrixDense& mat,
 
   // Loop on Target
   Id icol = 0;
-  for (Id ivar2 = 0, nvar2 = (Id)index2.size(); ivar2 < nvar2; ivar2++)
+  for (Id ivar2 = 0, nvar2 = static_cast<Id>(index2.size()); ivar2 < nvar2; ivar2++)
   {
     const VectorInt& index2i = index2[ivar2];
     const Id* ptr2           = index2i.data();
-    for (Id irel2 = 0, n2 = (Id)index2i.size(); irel2 < n2; irel2++)
+    for (Id irel2 = 0, n2 = static_cast<Id>(index2i.size()); irel2 < n2; irel2++)
     {
       Id iabs2 = *ptr2++;
 
@@ -1548,7 +1548,7 @@ void ACov::_loopOnData(MatrixDense& mat,
   double value;
 
   Id irow = 0;
-  for (Id ivar1 = 0, nvar1 = (Id)index1.size(); ivar1 < nvar1; ivar1++)
+  for (Id ivar1 = 0, nvar1 = static_cast<Id>(index1.size()); ivar1 < nvar1; ivar1++)
   {
     const VectorInt& index1i = index1[ivar1];
     for (const auto iabs1: index1i.getVector())
@@ -1591,7 +1591,7 @@ void ACov::_updateCovMatrixSymmetricForVerr(const Db* db1,
 
   // Loop on Data
   Id irow = 0;
-  for (Id ivar1 = 0, nvar1 = (Id)index1.size(); ivar1 < nvar1; ivar1++)
+  for (Id ivar1 = 0, nvar1 = static_cast<Id>(index1.size()); ivar1 < nvar1; ivar1++)
   {
     Id icolVerr              = db1->getColIdxByLocator(ELoc::V, ivar1);
     const VectorInt& index1i = index1[ivar1];
@@ -1701,7 +1701,7 @@ Id ACov::evalCovMatSymInPlaceFromIdx(MatrixSymmetric& mat,
   // Loop on Data
   double value;
   Id icol = 0;
-  for (Id ivar2 = 0, nvar2 = (Id)index1.size(); ivar2 < nvar2; ivar2++)
+  for (Id ivar2 = 0, nvar2 = static_cast<Id>(index1.size()); ivar2 < nvar2; ivar2++)
   {
     const VectorInt& index2i = index1[ivar2];
     for (const auto iabs2: index2i.getVector())
@@ -1709,7 +1709,7 @@ Id ACov::evalCovMatSymInPlaceFromIdx(MatrixSymmetric& mat,
       SpacePoint& p2 = optimizationLoadInPlace(iabs2, 1, 2);
 
       Id irow = 0;
-      for (Id ivar1 = 0, nvar1 = (Id)index1.size(); ivar1 < nvar1; ivar1++)
+      for (Id ivar1 = 0, nvar1 = static_cast<Id>(index1.size()); ivar1 < nvar1; ivar1++)
       {
         const VectorInt& index1i = index1[ivar1];
         for (const auto iabs1: index1i.getVector())
@@ -1799,8 +1799,8 @@ MatrixSparse* ACov::evalCovMatSparse(const Db* db1,
   VectorVectorInt index2 = db2->getSampleRanks(jvars, nbgh2, true, true, flagSameDb);
 
   // Evaluate the matrix of sills
-  Id nvar1 = (Id)ivars.size();
-  Id nvar2 = (Id)jvars.size();
+  Id nvar1 = static_cast<Id>(ivars.size());
+  Id nvar2 = static_cast<Id>(jvars.size());
   MatrixDense mat0(nvar1, nvar2);
   for (Id ivar = 0; ivar < nvar1; ivar++)
   {
@@ -1822,7 +1822,7 @@ MatrixSparse* ACov::evalCovMatSparse(const Db* db1,
   {
     const VectorInt& index2i = index2[ivar2];
     const Id* ptr2           = index2i.data();
-    for (Id irel2 = 0, n2 = (Id)index2i.size(); irel2 < n2; irel2++)
+    for (Id irel2 = 0, n2 = static_cast<Id>(index2i.size()); irel2 < n2; irel2++)
     {
       Id iabs2       = *ptr2++;
       SpacePoint& p2 = optimizationLoadInPlace(irel2, 2, 2);
@@ -2168,7 +2168,7 @@ VectorDouble ACov::evaluateFromDb(Db* db,
                                   Id jvar,
                                   const CovCalcMode* mode) const
 {
-  if ((Id)getNDim() != db->getNDim())
+  if (static_cast<Id>(getNDim()) != db->getNDim())
   {
     messerr("Dimension of the Db (%d) does not match dimension of the Model (%d)",
             db->getNDim(), getNDim());
@@ -2363,7 +2363,7 @@ VectorDouble ACov::sample(const VectorDouble& h,
                           const CovCalcMode* mode,
                           const CovInternal* covint) const
 {
-  Id nh     = (Id)h.size();
+  Id nh     = static_cast<Id>(h.size());
   auto ndim = getNDim();
   auto nvar = getNVar();
 
@@ -2422,7 +2422,7 @@ VectorDouble ACov::sampleUnitary(const VectorDouble& hh,
   {
     (void)GH::rotationGetDirectionDefault(ndim, codir);
   }
-  Id nh = (Id)hh.size();
+  Id nh = static_cast<Id>(hh.size());
 
   double c00      = eval0(ivar, ivar, mode);
   double c11      = eval0(jvar, jvar, mode);
@@ -2451,7 +2451,7 @@ VectorDouble ACov::envelop(const VectorDouble& hh,
   {
     (void)GH::rotationGetDirectionDefault(ndim, codir);
   }
-  Id nh = (Id)hh.size();
+  Id nh = static_cast<Id>(hh.size());
   VectorDouble gg(nh);
   VectorDouble g1 = sample(hh, codir, ivar, ivar, mode);
   VectorDouble g2 = sample(hh, codir, jvar, jvar, mode);
@@ -2512,7 +2512,7 @@ double ACov::gofToVario(const Vario* vario, bool verbose) const
 
         // Evaluate the Model
 
-        Id nlag           = (Id)gexp.size();
+        Id nlag           = static_cast<Id>(gexp.size());
         VectorDouble gmod = sample(hh, codir, ivar, jvar, &mode);
 
         // Evaluate the score
@@ -2529,11 +2529,11 @@ double ACov::gofToVario(const Vario* vario, bool verbose) const
         totpas = totpas / scale;
         totdir += totpas;
       }
-      totdir /= (double)ndir;
+      totdir /= static_cast<double>(ndir);
       totdir /= varij;
       total += ABS(totdir);
     }
-  total = 100. * total / (double)(nvar * nvar);
+  total = 100. * total / static_cast<double>(nvar * nvar);
   return total;
 }
 
@@ -2551,7 +2551,7 @@ void ACov::gofDisplay(double gof, bool byValue, const VectorDouble& thresholds)
     message(" = %5.2lf\n", gof);
     return;
   }
-  Id nclass = (Id)thresholds.size();
+  Id nclass = static_cast<Id>(thresholds.size());
   for (Id iclass = 0; iclass < nclass; iclass++)
   {
     if (gof < thresholds[iclass])

@@ -16,7 +16,7 @@
 
 namespace gstlrn
 {
-bool _isSelected(ACovFunc *cov,
+bool _isSelected(ACovFunc* cov,
                  Id ndim,
                  Id minorder,
                  bool hasrange,
@@ -24,7 +24,7 @@ bool _isSelected(ACovFunc *cov,
                  bool flagSimuSpectral)
 {
   if (cov == nullptr) return false;
-  if (ndim > (Id)cov->getMaxNDim()) return false;
+  if (ndim > static_cast<Id>(cov->getMaxNDim())) return false;
   if (minorder < cov->getMinOrder()) return false;
   if (hasrange && !cov->hasRange()) return false;
   if (flagSimtub && !cov->isValidForTurningBand()) return false;
@@ -69,4 +69,4 @@ VectorString CovHelper::getAllCovariances(Id ndim,
   return vs;
 }
 
-}
+} // namespace gstlrn

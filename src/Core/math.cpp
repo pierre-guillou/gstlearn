@@ -77,7 +77,7 @@ static void st_tableone_manage(CTables* ctables,
       for (Id i = 0; i < size; i++)
         if (FFFF(INTRESX(rank, i))) number++;
       ctables->res[rank].clear();
-      *nb_used          = number;
+      *nb_used = number;
       return;
     }
   }
@@ -98,8 +98,8 @@ static void st_tableone_manage(CTables* ctables,
  **
  *****************************************************************************/
 Id ct_tableone_covrank(const CTables* ctables,
-                        double cova,
-                        double* cround)
+                       double cova,
+                       double* cround)
 {
   double dc, ecart;
   Id iconf, nconf;
@@ -108,7 +108,7 @@ Id ct_tableone_covrank(const CTables* ctables,
   ecart            = (cova - ctables->cmin);
   dc               = ctables->dc;
   auto placeholder = (0.5 + ecart / dc);
-  iconf            = (Id)placeholder;
+  iconf            = static_cast<Id>(placeholder);
 
   if (iconf < 0) iconf = 0;
   if (iconf >= nconf) iconf = nconf - 1;
@@ -141,7 +141,7 @@ double ct_INTRES2(CTables* ctables,
   Id infin[2], inform, nelem, iad, nb_used, nb_max;
   static double abseps = 1.e-8;
   static double releps = 0.;
-  static Id maxpts    = 25000;
+  static Id maxpts     = 25000;
 
   // Check if integral has already been defined
 
@@ -234,7 +234,7 @@ double ct_INTRES3(CTables* ctables,
   Id infin[3], inform, nelem, iad, nb_used, nb_max;
   static double abseps = 1.e-8;
   static double releps = 0.;
-  static Id maxpts    = 25000;
+  static Id maxpts     = 25000;
 
   // Check if integral has already been defined
 
@@ -409,8 +409,8 @@ CTables* ct_tables_manage(Id mode,
     ctables->ndisc      = ndisc;
     ctables->cmin       = cmin;
     ctables->cmax       = cmax;
-    ctables->dc         = (ctables->cmax - ctables->cmin) / (double)(nconf - 1);
-    ctables->dp         = 1. / (double)ndisc;
+    ctables->dc         = (ctables->cmax - ctables->cmin) / static_cast<double>(nconf - 1);
+    ctables->dp         = 1. / static_cast<double>(ndisc);
 
     ctables->res.resize(ctables->nconf);
     for (Id iconf = 0; iconf < ctables->nconf; iconf++)
@@ -422,7 +422,7 @@ CTables* ct_tables_manage(Id mode,
     ctables->v[0]     = THRESH_INF;
     ctables->v[ndisc] = THRESH_SUP;
     for (Id idisc = 0; idisc < ndisc; idisc++)
-      ctables->v[idisc] = law_invcdf_gaussian((double)idisc * ctables->dp);
+      ctables->v[idisc] = law_invcdf_gaussian(static_cast<double>(idisc) * ctables->dp);
   }
   else
   {
@@ -618,8 +618,8 @@ double ct_tableone_calculate_by_rank(CTables* ctables,
 
     // Pixelated case
 
-    for (Id idisc = (Id)rklows[0]; idisc < (Id)rkups[0]; idisc++)
-      for (Id jdisc = (Id)rklows[1]; jdisc < (Id)rkups[1]; jdisc++)
+    for (Id idisc = static_cast<Id>(rklows[0]); idisc < static_cast<Id>(rkups[0]); idisc++)
+      for (Id jdisc = static_cast<Id>(rklows[1]); jdisc < static_cast<Id>(rkups[1]); jdisc++)
         result += ct_INTRES2(ctables, iconf0, idisc, jdisc);
   }
   else
@@ -627,7 +627,10 @@ double ct_tableone_calculate_by_rank(CTables* ctables,
 
     // Cumulative case
 
-    result = (ct_INTRES2(ctables, iconf0, (Id)rkups[0], (Id)rkups[1]) - ct_INTRES2(ctables, iconf0, (Id)rklows[0], (Id)rkups[1]) - ct_INTRES2(ctables, iconf0, (Id)rkups[0], (Id)rklows[1]) + ct_INTRES2(ctables, iconf0, (Id)rklows[0], (Id)rklows[1]));
+    result = (ct_INTRES2(ctables, iconf0, static_cast<Id>(rkups[0]), static_cast<Id>(rkups[1])) -
+              ct_INTRES2(ctables, iconf0, static_cast<Id>(rklows[0]), static_cast<Id>(rkups[1])) -
+              ct_INTRES2(ctables, iconf0, static_cast<Id>(rkups[0]), static_cast<Id>(rklows[1])) +
+              ct_INTRES2(ctables, iconf0, static_cast<Id>(rklows[0]), static_cast<Id>(rklows[1])));
   }
   return (result);
 }
@@ -646,7 +649,7 @@ double ct_tableone_calculate_by_rank(CTables* ctables,
  **
  *****************************************************************************/
 Id ct_tableone_getrank_from_proba(CTables* ctables,
-                                   double gaussian)
+                                  double gaussian)
 {
   double dp, proba, vmin, vmax;
   Id iad, nelem;

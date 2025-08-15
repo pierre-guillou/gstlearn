@@ -215,7 +215,7 @@ static Id st_grid_fill_calculate(Id ipos,
     case 0:
     {
       for (Id iech = 0; iech < nech; iech++) top += tabval[iech];
-      result = top / (double)nech;
+      result = top / static_cast<double>(nech);
       break;
     }
 
@@ -635,7 +635,7 @@ Id DbHelper::findDuplicates(Db* db1,
         double v2 = db2->getCoordinate(iech2, idim);
         if (flag_code)
         {
-          if (st_code_comparable(db1, db2, iech1, iech2, opt_code, (Id)tolcode))
+          if (st_code_comparable(db1, db2, iech1, iech2, opt_code, static_cast<Id>(tolcode)))
             continue;
         }
         double dval = (!dist.empty()) ? dist[idim] : 0.;
@@ -702,7 +702,7 @@ Id DbHelper::normalizeVariables(Db* db,
   /* Initializations */
 
   Id nech = db->getNSample();
-  Id ncol = (Id)cols.size();
+  Id ncol = static_cast<Id>(cols.size());
 
   /* Check that all variables are defined */
 
@@ -921,7 +921,7 @@ Id DbHelper::dbgrid_filling(DbGrid* dbgrid,
 
   DB_GRID_FILL = dbgrid;
   skin         = nullptr;
-  count        = (Id)pow(2. * radius + 1., (double)ndim) - 1;
+  count        = static_cast<Id>(pow(2. * radius + 1., static_cast<double>(ndim))) - 1;
 
   /* Core allocation */
 

@@ -79,7 +79,7 @@ Id Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
 {
   if (!rotmat.empty())
   {
-    if ((Id)rotmat.size() != _rotMat.size())
+    if (static_cast<Id>(rotmat.size()) != _rotMat.size())
       my_throw("The argument 'rotmat' does not have same dimension as 'this'");
     MatrixSquare local(_nDim);
     local.setValues(rotmat);
@@ -143,7 +143,7 @@ std::vector<MatrixSquare> Rotation::getDerivatives() const
 
 void Rotation::setIdentity()
 {
-  for (Id idim = 0; idim < (Id)_nDim; idim++)
+  for (Id idim = 0; idim < static_cast<Id>(_nDim); idim++)
     VH::fill(_angles, 0.);
   _rotMat.setIdentity();
   _rotInv.setIdentity();

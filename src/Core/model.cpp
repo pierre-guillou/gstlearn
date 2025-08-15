@@ -683,7 +683,7 @@ Id model_covmat_inchol(Id verbose,
 
   // Normalize the criterion
   for (i = 0; i < npivot; i++)
-    crit[i] /= (double)nech;
+    crit[i] /= static_cast<double>(nech);
 
   // Reorder the output G matrix
   Gmatrix.resize(npivot * nech);

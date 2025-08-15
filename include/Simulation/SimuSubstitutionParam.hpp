@@ -15,18 +15,18 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorNumT.hpp"
 
-namespace gstlrn  
+namespace gstlrn
 {
 class GSTLEARN_EXPORT SimuSubstitutionParam: public AStringable
 {
 public:
-  SimuSubstitutionParam(Id nfacies = 2,
+  SimuSubstitutionParam(Id nfacies       = 2,
                         double intensity = 0.1,
                         bool flag_direct = true,
                         bool flag_coding = true,
                         bool flag_orient = false);
-  SimuSubstitutionParam(const SimuSubstitutionParam &r);
-  SimuSubstitutionParam& operator=(const SimuSubstitutionParam &r);
+  SimuSubstitutionParam(const SimuSubstitutionParam& r);
+  SimuSubstitutionParam& operator=(const SimuSubstitutionParam& r);
   virtual ~SimuSubstitutionParam();
 
   /// Interface to AStringable
@@ -60,8 +60,8 @@ public:
   double getVector(Id idim) const { return _vector[idim]; }
 
   bool isValid(bool verbose = false);
-  void isValidOrientation(VectorDouble& vector, bool verbose = false);
-  void isValidFactor(double* factor, bool verbose = false) const;
+  static void isValidOrientation(VectorDouble& vector, bool verbose = false);
+  static void isValidFactor(double* factor, bool verbose = false);
 
   bool isAngleLocal() const;
   bool isLocal() const;
@@ -84,4 +84,4 @@ private:
   VectorDouble _vector;
   VectorDouble _trans;
 };
-}
+} // namespace gstlrn

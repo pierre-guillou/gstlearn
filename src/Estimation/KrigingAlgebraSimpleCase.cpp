@@ -450,8 +450,8 @@ void KrigingAlgebraSimpleCase::setZ(std::shared_ptr<VectorDouble>& Z)
  * @note kept unchanged (even if its contents may have been updated)
  */
 Id KrigingAlgebraSimpleCase::setData(const VectorDouble* Z,
-                                      const RankHandler* rankhandler,
-                                      const VectorDouble& Means)
+                                     const RankHandler* rankhandler,
+                                     const VectorDouble& Means)
 {
   _resetLinkedToZ();
 
@@ -498,7 +498,7 @@ void KrigingAlgebraSimpleCase::setMeans(const VectorDouble& Means)
  * @note kept unchanged (even if its contents may have been updated)
  */
 Id KrigingAlgebraSimpleCase::setLHS(const MatrixSymmetric* Sigma,
-                                     const MatrixDense* X)
+                                    const MatrixDense* X)
 {
   _resetLinkedToLHS();
 
@@ -536,7 +536,7 @@ Id KrigingAlgebraSimpleCase::setVariance(const MatrixSymmetric* Sigma00)
 }
 
 Id KrigingAlgebraSimpleCase::setRHS(MatrixDense* Sigma0,
-                                     MatrixDense* X0)
+                                    MatrixDense* X0)
 {
   _resetLinkedToRHS();
 
@@ -564,7 +564,7 @@ bool KrigingAlgebraSimpleCase::_checkDimensionVD(const String& name,
                                                  const VectorDouble* vec,
                                                  Id* sizeRef)
 {
-  Id size = (Id)vec->size();
+  Id size = static_cast<Id>(vec->size());
   if (*sizeRef > 0 && size > 0 && size != *sizeRef)
   {
     messerr("Dimension of %s (%d) incorrect: it should be (%d)",
@@ -579,7 +579,7 @@ bool KrigingAlgebraSimpleCase::_checkDimensionVI(const String& name,
                                                  const VectorInt* vec,
                                                  Id* sizeRef)
 {
-  Id size = (Id)vec->size();
+  Id size = static_cast<Id>(vec->size());
   if (*sizeRef > 0 && size != *sizeRef)
   {
     messerr("Dimension of %s (%d) incorrect: it should be (%d)", name.c_str(), size,
@@ -595,7 +595,7 @@ bool KrigingAlgebraSimpleCase::_checkDimensionVVI(const String& name,
                                                   Id* size1Ref,
                                                   Id* size2Ref)
 {
-  Id count = (Id)vec->size();
+  Id count = static_cast<Id>(vec->size());
   if (*size1Ref > 0 && count != *size1Ref)
   {
     messerr("First dimension of %s (%d) incorrect: it should be (%d)", name.c_str(),
@@ -987,9 +987,9 @@ Id KrigingAlgebraSimpleCase::_needMuUK()
 
 void KrigingAlgebraSimpleCase::updateSampleRanks()
 {
-  _neq  = (Id)(*getSampleRanksByVariable(0)).size();
-  _nrhs = (Id)getSampleRanks()->size();
-  _nvar = (Id)getSampleRanks()->size();
+  _neq  = static_cast<Id>((*getSampleRanksByVariable(0)).size());
+  _nrhs = static_cast<Id>(getSampleRanks()->size());
+  _nvar = static_cast<Id>(getSampleRanks()->size());
   _Sigma0->resize(_neq, _nrhs);
   _resetLinkedToLHS();
   _nbfl = _X->getNCols();
@@ -997,16 +997,16 @@ void KrigingAlgebraSimpleCase::updateSampleRanks()
   _flagSK = (_nbfl <= 0);
   if (_flagSK && !_Means.empty())
   {
-    for (Id i = 0; i < (Id)_Z->size(); i++)
+    for (Id i = 0; i < static_cast<Id>(_Z->size()); i++)
       (*_Z)[i] -= _Means[0];
   }
 }
 
 void KrigingAlgebraSimpleCase::updateRankHandler()
 {
-  _neq  = (Id)getSampleRanksByVariable(0)->size();
-  _nrhs = (Id)getSampleRanks()->size();
-  _nvar = (Id)getSampleRanks()->size();
+  _neq  = static_cast<Id>(getSampleRanksByVariable(0)->size());
+  _nrhs = static_cast<Id>(getSampleRanks()->size());
+  _nvar = static_cast<Id>(getSampleRanks()->size());
   _Sigma0->resize(_neq, _nrhs);
   _resetLinkedToLHS();
   _nbfl = _X->getNCols();
@@ -1102,7 +1102,7 @@ void KrigingAlgebraSimpleCase::_printVector(const String& name, const VectorDoub
 {
   if (vec == nullptr) return;
   if (vec->size() <= 0) return;
-  message(" - %s (%d)\n", name.c_str(), (Id)vec->size());
+  message(" - %s (%d)\n", name.c_str(), static_cast<Id>(vec->size()));
 }
 
 void KrigingAlgebraSimpleCase::printStatus() const
@@ -1299,7 +1299,7 @@ void KrigingAlgebraSimpleCase::dumpWGT()
   for (Id ivar = 0; ivar < _nvar; ivar++)
   {
     if (_nvar > 1) message("Using variable Z%-2d\n", ivar + 1);
-    Id nbyvar = (Id)getSampleRanksByVariable(0)->size();
+    Id nbyvar = static_cast<Id>(getSampleRanksByVariable(0)->size());
     sum.fill(0.);
 
     for (Id j = 0; j < nbyvar; j++)

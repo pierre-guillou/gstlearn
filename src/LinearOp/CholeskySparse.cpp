@@ -67,13 +67,13 @@ void CholeskySparse::_clean()
  **
  *****************************************************************************/
 Id CholeskySparse::stdev(VectorDouble& vcur,
-                          const MatrixSparse* proj,
-                          bool flagStDev) const
+                         const MatrixSparse* proj,
+                         bool flagStDev) const
 {
   if (_stdev(vcur, proj)) return 1;
 
   if (flagStDev)
-    for (Id iech = 0, ntarget = (Id)vcur.size(); iech < ntarget; iech++)
+    for (Id iech = 0, ntarget = static_cast<Id>(vcur.size()); iech < ntarget; iech++)
       vcur[iech] = sqrt(vcur[iech]);
   return 0;
 }
@@ -197,7 +197,7 @@ Id CholeskySparse::addInvLX(const constvect vecin, vect vecout) const
  * the original Takahashi algorithm (see sparseinv in old code)
  */
 Id CholeskySparse::_stdev(VectorDouble& vcur,
-                           const MatrixSparse* proj) const
+                          const MatrixSparse* proj) const
 {
   Eigen::Map<Eigen::VectorXd> vcurm(vcur.data(), vcur.size());
   vcurm.setZero();

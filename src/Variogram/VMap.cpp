@@ -198,12 +198,12 @@ DbGrid* db_vmap(Db *db,
   Id ndim = db->getNDim();
   VectorInt nxloc = nxx;
   if (nxloc.empty()) nxloc.resize(ndim, 20);
-  if (ndim != (Id) nxloc.size())
+  if (ndim != static_cast<Id>(nxloc.size()))
   {
     messerr("Argument 'nxx' should have same Space Dimension as 'db'");
     return nullptr;
   }
-  if (! dxx.empty() && ndim != (Id) dxx.size())
+  if (! dxx.empty() && ndim != static_cast<Id>(dxx.size()))
   {
     messerr("Argument 'dxx'  should have same Space Dimension as 'db'");
     return nullptr;
@@ -224,7 +224,7 @@ DbGrid* db_vmap(Db *db,
   {
     for (Id idim = 0; idim < ndim; idim++)
       dx_map[idim] = (! dxx.empty() && !FFFF(dxx[idim])) ?
-          dxx[idim] : db->getExtension(idim) / (double) nxloc[idim];
+          dxx[idim] : db->getExtension(idim) / static_cast<double>(nxloc[idim]);
   }
   for (Id idim = 0; idim < ndim; idim++)
     x0_map[idim] = -nxloc[idim] * dx_map[idim];
@@ -338,7 +338,7 @@ Id VMap::_grid_fft(DbGrid *dbgrid, const NamingConvention &namconv)
      }
      else
      {
-       dims[i] = (Id) ceil((double) (nxgrid[i] + nxmap[i] - 1) / 8.) * 8;
+       dims[i] = static_cast<Id>(ceil(static_cast<double>(nxgrid[i] + nxmap[i] - 1) / 8.)) * 8;
        sizegrid *= nxgrid[i];
        sizemap *= nxmap[i];
        sizetot *= dims[i];
@@ -646,7 +646,7 @@ Id VMap::_vmap_general(Db *db, Id radius, const NamingConvention &namconv)
   /* Calculate a neighborhood (if radius > 0) */
 
   VectorInt neigh = gridcell_neigh(ndim, 1, radius, false, false);
-  Id nbmax = (Id) neigh.size() / ndim;
+  Id nbmax = static_cast<Id>(neigh.size()) / ndim;
 
   /* Calculate the VMAP half-extension */
 
@@ -1017,7 +1017,7 @@ Id VMap::_vmap_load_cross(DbGrid *dbgrid,
 void VMap::_vmap_blank(VectorVectorDouble& tab)
 {
   for (Id ic = 0; ic < 2; ic++)
-    for (Id i = 0, size = (Id) tab[ic].size(); i < size; i++)
+    for (Id i = 0, size = static_cast<Id>(tab[ic].size()); i < size; i++)
       tab[ic][i] = 0.;
 }
 
@@ -1037,7 +1037,7 @@ void VMap::_product_conjugate(double coef,
                               VectorVectorDouble& tab2,
                               VectorVectorDouble& tab)
 {
-  for (Id i = 0, size=(Id) tab1[0].size(); i < size; i++)
+  for (Id i = 0, size=static_cast<Id>(tab1[0].size()); i < size; i++)
   {
     tab[0][i] += coef * (tab1[0][i] * tab2[0][i] + tab1[1][i] * tab2[1][i]);
     tab[1][i] += coef * (tab1[0][i] * tab2[1][i] - tab1[1][i] * tab2[0][i]);
@@ -1057,7 +1057,7 @@ void VMap::_vmap_rescale(double scale,
                          VectorDouble &tab1,
                          VectorDouble &tab2)
 {
-  for (Id i = 0, size = (Id) tab1.size(); i < size; i++)
+  for (Id i = 0, size = static_cast<Id>(tab1.size()); i < size; i++)
   {
     double value = tab2[i];
     if (value > EPSILON8) tab1[i] /= (scale * value);
@@ -1077,7 +1077,7 @@ void VMap::_vmap_shift(VectorDouble &tab,
                        VectorDouble &tabm1,
                        VectorDouble &tabm2)
 {
-  for (Id i = 0, size = (Id) tab.size(); i < size; i++)
+  for (Id i = 0, size = static_cast<Id>(tab.size()); i < size; i++)
     tab[i] -= tabm1[i] * tabm2[i];
 }
 

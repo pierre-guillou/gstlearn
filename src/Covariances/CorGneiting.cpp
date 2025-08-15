@@ -12,11 +12,11 @@
 #include "Covariances/CorGneiting.hpp"
 #include "Basic/AStringable.hpp"
 #include "Covariances/CorAniso.hpp"
+#include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
 #include "Space/ASpace.hpp"
 #include "Space/SpaceComposite.hpp"
 #include "Space/SpacePoint.hpp"
-#include "Covariances/CovCalcMode.hpp"
 #include <memory>
 
 namespace gstlrn
@@ -44,7 +44,7 @@ CorGneiting::CorGneiting(const CorAniso* covS, const CorAniso* covTemp, double s
   space->addSpaceComponent(covTemp->getSpace());
   _ctxt.setSpace(space);
 
-  Id nvar        = covS->getNVar();
+  Id nvar = covS->getNVar();
   CovContext ctxt(nvar, space);
   setContext(ctxt);
 }
@@ -111,10 +111,10 @@ double CorGneiting::_eval(const SpacePoint& p1,
   double ct = _covTemp->evalCov(p1_T, p2_T, ivar, jvar, mode);
 
   double scale = pow(ct, _separability / _covSCopy.getNDim(0));
-  for (Id i = 0; i < (Id)_covSCopy.getNDim(); i++)
+  for (Id i = 0; i < static_cast<Id>(_covSCopy.getNDim()); i++)
     _covSCopy.setScaleDim(i, _covS->getScale(i) / scale);
   double cs = _covSCopy.evalCov(p1_S, p2_S, ivar, jvar, mode);
 
   return cs * ct;
 }
-}
+} // namespace gstlrn

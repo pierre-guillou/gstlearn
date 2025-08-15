@@ -80,8 +80,8 @@ Table* Table::create(Id nrow, Id ncol)
 Table* Table::createFromNames(const VectorString& rownames,
                               const VectorString& colnames)
 {
-  Id nrow    = (Id)rownames.size();
-  Id ncol    = (Id)colnames.size();
+  Id nrow    = static_cast<Id>(rownames.size());
+  Id ncol    = static_cast<Id>(colnames.size());
   auto* table = new Table(nrow, ncol);
   table->setRowNames(rownames);
   table->setColumnNames(colnames);
@@ -202,7 +202,7 @@ String Table::toString(const AStringFormat* /*strfmt*/) const
   {
     for (Id irow = 0; irow < nrows; irow++)
     {
-      Id rowLength = (Id)_rowNames[irow].size();
+      Id rowLength = static_cast<Id>(_rowNames[irow].size());
       if (rowLength > rowLengthMax) rowLengthMax = rowLength;
     }
   }
@@ -241,10 +241,10 @@ void Table::plot(Id isimu) const
 
 void Table::setColumnNames(const VectorString& colNames)
 {
-  if (getNCols() != (Id)colNames.size())
+  if (getNCols() != static_cast<Id>(colNames.size()))
   {
     messerr("The size of 'colNames' (%d) does not match the number of columns (%d)",
-            (Id)colNames.size(), getNCols());
+            static_cast<Id>(colNames.size()), getNCols());
     return;
   }
   _colNames = colNames;
@@ -270,10 +270,10 @@ void Table::setRowName(Id irow, const String& name)
 
 void Table::setRowNames(const VectorString& rowNames)
 {
-  if (getNRows() != (Id)rowNames.size())
+  if (getNRows() != static_cast<Id>(rowNames.size()))
   {
     messerr("The size of 'rowNames' (%d) does not match the number of rows (%d)",
-            (Id)rowNames.size(), getNRows());
+            static_cast<Id>(rowNames.size()), getNRows());
     return;
   }
   _rowNames = rowNames;

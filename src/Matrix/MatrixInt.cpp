@@ -300,8 +300,8 @@ String MatrixInt::toString(const AStringFormat* /* strfmt*/) const
  */
 MatrixInt* MatrixInt::createFromVVI(const VectorVectorInt& X)
 {
-  Id nrow = (Id)X.size();
-  Id ncol = (Id)X[0].size();
+  Id nrow = static_cast<Id>(X.size());
+  Id ncol = static_cast<Id>(X[0].size());
 
   auto* mat = new MatrixInt(nrow, ncol);
   for (Id irow = 0; irow < nrow; irow++)
@@ -316,10 +316,10 @@ MatrixInt* MatrixInt::createFromVI(const VectorInt& X,
                                    Id ncol,
                                    bool byCol)
 {
-  if (nrow * ncol != (Id)X.size())
+  if (nrow * ncol != static_cast<Id>(X.size()))
   {
     messerr("Inconsistency between arguments 'nrow'(%d) and 'ncol'(%d)", nrow, ncol);
-    messerr("and the dimension of the input Vector (%d)", (Id)X.size());
+    messerr("and the dimension of the input Vector (%d)", static_cast<Id>(X.size()));
   }
   auto* mat = new MatrixInt(nrow, ncol);
 

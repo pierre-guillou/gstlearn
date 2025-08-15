@@ -122,7 +122,7 @@ Id CholeskyDense::addInvLX(const constvect vecin, vect vecout) const
 Id CholeskyDense::addSolveX(const constvect vecin, vect vecout) const
 {
   if (!isReady()) return 1;
-  Id size = (Id)vecin.size();
+  Id size = static_cast<Id>(vecin.size());
   Eigen::Map<const Eigen::VectorXd> bm(vecin.data(), size);
   Eigen::Map<Eigen::VectorXd> xm(vecout.data(), size);
   xm += _factor.solve(bm);
@@ -367,7 +367,7 @@ void CholeskyDense::normMatInPlace(Id mode,
             if (!a.empty())
               vala = a.getValue(k, l);
             else
-              vala = (double)(k == l);
+              vala = static_cast<double>(k == l);
             val += _TL(i, k) * vala * _TL(j, l);
           }
       }
@@ -379,7 +379,7 @@ void CholeskyDense::normMatInPlace(Id mode,
             if (!a.empty())
               vala = a.getValue(k, l);
             else
-              vala = (double)(k == l);
+              vala = static_cast<double>(k == l);
             val += _TL(k, i) * vala * _TL(l, j);
           }
       }
