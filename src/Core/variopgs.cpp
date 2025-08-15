@@ -5235,10 +5235,10 @@ Rule* _rule_auto(Db* db,
 
   /* Initializations */
 
-  Id error         = 1;
-  Rule* rule       = nullptr;
-  auto* Pile_Relem = nullptr;
-  PropDef* propdef = nullptr;
+  Id error          = 1;
+  Rule* rule        = nullptr;
+  Relem* Pile_Relem = nullptr;
+  PropDef* propdef  = nullptr;
 
   NCOLOR      = db->getNFacies();
   NGRF        = ngrfmax;
