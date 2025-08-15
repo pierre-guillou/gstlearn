@@ -8,3 +8,6 @@ Testing gslStrcat:
 Testing gslSPrintf:
 - Expected result: A+fgh
 - Result(char) = A+fgh
+Testing gslSPrintf2:
+- Expected result: BC+fgh
+- Result(char) = BC+fgh

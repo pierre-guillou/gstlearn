@@ -1100,16 +1100,16 @@ void _getRowname(const String& radix,
                  Id ncol,
                  Id icol,
                  const String& name,
-                 char* string)
+                 VectorUChar& string)
 {
   if (!radix.empty())
-    (void)gslSPrintf(string, "%s-%d", radix.c_str(), icol + 1);
+    (void)gslSPrintf2(string, "%s-%d", radix.c_str(), icol + 1);
   else if (!name.empty())
-    (void)gslSPrintf(string, "%s", name.c_str());
+    (void)gslSPrintf2(string, "%s", name.c_str());
   else if (ncol > 1)
-    (void)gslSPrintf(string, "Variable-%d", icol + 1);
+    (void)gslSPrintf2(string, "Variable-%d", icol + 1);
   else
-    (void)gslSPrintf(string, "Variable");
+    (void)gslSPrintf2(string, "Variable");
 }
 
 /**
@@ -1131,7 +1131,7 @@ void dbStatisticsPrint(const Db* db,
   VectorInt iuids = db->getUIDs(names);
   if (iuids.empty()) return;
 
-  char string[50];
+  VectorUChar string(50);
   Id ncol = static_cast<Id>(iuids.size());
 
   /* Preliminary checks */
@@ -1236,7 +1236,7 @@ void dbStatisticsPrint(const Db* db,
   for (Id icol = 0; icol < ncol; icol++)
   {
     _getRowname(radix, ncol, icol, db->getNameByUID(iuids[icol]), string);
-    taille = MAX(taille, (Id)strlen(string));
+    taille = MAX(taille, static_cast<Id>(string.size()));
   }
 
   /* Print the header of the monovariate statistics */
@@ -1261,7 +1261,7 @@ void dbStatisticsPrint(const Db* db,
   for (Id icol = 0; icol < ncol; icol++)
   {
     _getRowname(radix, ncol, icol, db->getNameByUID(iuids[icol]), string);
-    tab_print_rowname(string, taille);
+    tab_print_rowname(reinterpret_cast<char*>(string.data()), taille);
 
     if (_operExists(opers, EStatOption::NUM))
       tab_printi(NULL, (Id)num[icol]);

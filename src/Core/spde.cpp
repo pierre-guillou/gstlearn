@@ -178,7 +178,7 @@ static MatrixSparse* S_EXTERNAL_Q[3] = {NULL, NULL, NULL};
 static MatrixSparse* S_EXTERNAL_A[3] = {NULL, NULL, NULL};
 static SPDE_Environ S_ENV;
 static SPDE_Decision S_DECIDE;
-static char string_encode[100];
+static VectorUChar string_encode(100);
 static SPDE_Calcul Calcul;
 
 static bool is_chol_ready(QChol* QC)
@@ -388,32 +388,36 @@ static void st_title(Id flag_igrf, Id flag_icov, Id rank, const char* title)
 {
   Id flag_decor;
 
-  (void)gslStrcpy(string_encode, " ");
+  (void)gslStrcpy2(string_encode, " ");
 
   flag_decor = (flag_igrf || flag_icov);
 
   if (flag_decor)
   {
-    (void)gslStrcpy(string_encode, "(");
+    (void)gslStrcpy2(string_encode, "(");
     if (flag_igrf)
-      (void)gslSPrintf(string_encode, "%s GRF:%d", string_encode,
-                       SPDE_CURRENT_IGRF + 1);
+      (void)gslSPrintf2(string_encode, "%s GRF:%d",
+                        reinterpret_cast<char*>(string_encode.data()),
+                        SPDE_CURRENT_IGRF + 1);
     if (flag_icov)
-      (void)gslSPrintf(string_encode, "%s - COV:%d", string_encode,
-                       SPDE_CURRENT_ICOV + 1);
-    (void)gslSPrintf(string_encode, "%s ) %s", string_encode, title);
+      (void)gslSPrintf2(string_encode, "%s - COV:%d",
+                        reinterpret_cast<char*>(string_encode.data()),
+                        SPDE_CURRENT_ICOV + 1);
+    (void)gslSPrintf2(string_encode, "%s ) %s",
+                      reinterpret_cast<char*>(string_encode.data()), title);
   }
   else
   {
-    (void)gslSPrintf(string_encode, "%s", title);
+    (void)gslSPrintf2(string_encode, "%s", title);
   }
 
   if (rank >= 0)
-    mestitle(rank, string_encode);
+    mestitle(rank, reinterpret_cast<char*>(string_encode.data()));
   else
   {
-    (void)gslSPrintf(string_encode, "%s\n", string_encode);
-    message(string_encode);
+    (void)gslSPrintf2(string_encode, "%s\n",
+                      reinterpret_cast<char*>(string_encode.data()));
+    message(reinterpret_cast<char*>(string_encode.data()));
   }
 }
 
@@ -5032,24 +5036,24 @@ static Db* st_m2d_create_constraints(M2D_Environ* m2denv,
   db->setNameByUID(ecr++, "rank");
   for (Id idim = 0; idim < ndim; idim++)
   {
-    (void)gslSPrintf(string_encode, "X%d", idim + 1);
-    db->setNameByUID(ecr++, string_encode);
+    (void)gslSPrintf2(string_encode, "X%d", idim + 1);
+    db->setNameByUID(ecr++, reinterpret_cast<char*>(string_encode.data()));
   }
   for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
-    (void)gslSPrintf(string_encode, "Lower%d", ilayer + 1);
-    db->setNameByUID(ecr++, string_encode);
-    (void)gslSPrintf(string_encode, "Upper%d", ilayer + 1);
-    db->setNameByUID(ecr++, string_encode);
-    (void)gslSPrintf(string_encode, "Value%d", ilayer + 1);
-    db->setNameByUID(ecr++, string_encode);
+    (void)gslSPrintf2(string_encode, "Lower%d", ilayer + 1);
+    db->setNameByUID(ecr++, reinterpret_cast<char*>(string_encode.data()));
+    (void)gslSPrintf2(string_encode, "Upper%d", ilayer + 1);
+    db->setNameByUID(ecr++, reinterpret_cast<char*>(string_encode.data()));
+    (void)gslSPrintf2(string_encode, "Value%d", ilayer + 1);
+    db->setNameByUID(ecr++, reinterpret_cast<char*>(string_encode.data()));
   }
   if (m2denv->flag_ed)
   {
     for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
-      (void)gslSPrintf(string_encode, "Drift%d", ilayer + 1);
-      db->setNameByUID(ecr++, string_encode);
+      (void)gslSPrintf2(string_encode, "Drift%d", ilayer + 1);
+      db->setNameByUID(ecr++, reinterpret_cast<char*>(string_encode.data()));
     }
   }
 
@@ -5758,8 +5762,9 @@ static void st_m2d_stats_gaus(const char* title,
   if (!DEBUG) return;
   for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
-    (void)gslSPrintf(string_encode, "%s (Layer #%d)", title, ilayer + 1);
-    ut_stats_mima_print(string_encode, nech, &YDAT(ilayer, 0), NULL);
+    (void)gslSPrintf2(string_encode, "%s (Layer #%d)", title, ilayer + 1);
+    ut_stats_mima_print(reinterpret_cast<char*>(string_encode.data()),
+                        nech, &YDAT(ilayer, 0), NULL);
   }
 }
 
@@ -5980,8 +5985,8 @@ Id m2d_gibbs_spde(Db* dbin,
     for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
       dbout->setColumnByUIDOldStyle(&GWORK(ilayer, 0), iatt_out + ilayer);
-      (void)gslSPrintf(string_encode, "Drift%d", ilayer + 1);
-      dbout->setNameByUID(iatt_out + ilayer, string_encode);
+      (void)gslSPrintf2(string_encode, "Drift%d", ilayer + 1);
+      dbout->setNameByUID(iatt_out + ilayer, reinterpret_cast<char*>(string_encode.data()));
     }
     error = 0;
     goto label_end;
@@ -6144,9 +6149,9 @@ Id m2d_gibbs_spde(Db* dbin,
     {
       for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       {
-        (void)gslSPrintf(string_encode, "Layer-%d_Simu-%d", ilayer + 1,
+        (void)gslAddSPrintf2(string_encode, "Layer-%d_Simu-%d", ilayer + 1,
                          isimu + 1);
-        dbout->setNameByUID(iatt_out + ecr, string_encode);
+        dbout->setNameByUID(iatt_out + ecr, reinterpret_cast<char*>(string_encode.data()));
         ecr++;
       }
     }
@@ -6181,14 +6186,14 @@ Id m2d_gibbs_spde(Db* dbin,
       if (iptr_ce >= 0)
         for (Id ilayer = 0; ilayer < nlayer; ilayer++)
         {
-          (void)gslSPrintf(string_encode, "Layer-%d_CE", ilayer + 1);
-          dbout->setNameByUID(iptr_ce + ilayer, string_encode);
+          (void)gslSPrintf2(string_encode, "Layer-%d_CE", ilayer + 1);
+          dbout->setNameByUID(iptr_ce + ilayer, reinterpret_cast<char*>(string_encode.data()));
         }
       if (iptr_cstd >= 0)
         for (Id ilayer = 0; ilayer < nlayer; ilayer++)
         {
-          (void)gslSPrintf(string_encode, "Layer-%d_CStd", ilayer + 1);
-          dbout->setNameByUID(iptr_cstd + ilayer, string_encode);
+          (void)gslSPrintf2(string_encode, "Layer-%d_CStd", ilayer + 1);
+          dbout->setNameByUID(iptr_cstd + ilayer, reinterpret_cast<char*>(string_encode.data()));
         }
     }
   }

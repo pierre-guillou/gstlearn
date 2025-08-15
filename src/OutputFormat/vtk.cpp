@@ -57,21 +57,21 @@ License: BSD 3-clause
 #include "OutputFormat/vtk.h"
 
 #include "Basic/AStringable.hpp"
-#include "Basic/String.hpp"
 #include "Basic/File.hpp"
+#include "Basic/String.hpp"
 
 #include <cstring>
 
 /*
  * Globals.
  */
- 
- namespace gstlrn
+
+namespace gstlrn
 {
-static FILE *fp = NULL;
-static Id useBinary = 0;
+static FILE* fp       = NULL;
+static Id useBinary   = 0;
 static Id numInColumn = 0;
- 
+
 /* ****************************************************************************
  *  Function: end_line
  *
@@ -84,7 +84,7 @@ static Id numInColumn = 0;
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
+
 static void end_line(void)
 {
   if (!useBinary)
@@ -106,7 +106,7 @@ static void end_line(void)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
-static void open_file(const char *filename)
+static void open_file(const char* filename)
 {
   char full_filename[1024];
   if (strstr(filename, ".vtk") != NULL)
@@ -117,11 +117,10 @@ static void open_file(const char *filename)
   {
     gslSPrintf(full_filename, "%s.vtk", filename);
   }
- 
+
   fp = gslFopen(full_filename, "w+");
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: close_file
  *
@@ -132,15 +131,14 @@ static void open_file(const char *filename)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
+
 static void close_file(void)
 {
   end_line();
   fclose(fp);
   fp = NULL;
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: force_big_endian
  *
@@ -154,32 +152,31 @@ static void close_file(void)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
-static void force_big_endian(unsigned char *bytes)
+
+static void force_big_endian(unsigned char* bytes)
 {
-  static Id doneTest = 0;
+  static Id doneTest   = 0;
   static Id shouldSwap = 0;
   if (!doneTest)
   {
-    Id tmp1 = 1;
-    auto *tmp2 = (unsigned char *) &tmp1;
+    Id tmp1    = 1;
+    auto* tmp2 = (unsigned char*)&tmp1;
     if (*tmp2 != 0)
       shouldSwap = 1;
     doneTest = 1;
   }
- 
+
   if (shouldSwap & useBinary)
   {
     unsigned char tmp = bytes[0];
-    bytes[0] = bytes[3];
-    bytes[3] = tmp;
-    tmp = bytes[1];
-    bytes[1] = bytes[2];
-    bytes[2] = tmp;
+    bytes[0]          = bytes[3];
+    bytes[3]          = tmp;
+    tmp               = bytes[1];
+    bytes[1]          = bytes[2];
+    bytes[2]          = tmp;
   }
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: write_string
  *
@@ -190,13 +187,12 @@ static void force_big_endian(unsigned char *bytes)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
-static void write_string(const char *str)
+
+static void write_string(const char* str)
 {
   fprintf(fp, "%s", str);
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: new_section
  *
@@ -208,7 +204,7 @@ static void write_string(const char *str)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
+
 static void new_section(void)
 {
   // This code was previously refering to end_line() function only if the
@@ -224,8 +220,7 @@ static void new_section(void)
   fprintf(fp, "%s", str2);
   numInColumn = 0;
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: write_int
  *
@@ -237,19 +232,19 @@ static void new_section(void)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
+
 static void write_int(Id val)
 {
   if (useBinary)
   {
-    force_big_endian((unsigned char *) &val);
+    force_big_endian((unsigned char*)&val);
     fwrite(&val, sizeof(Id), 1, fp);
   }
   else
   {
-    char str[128];
-    gslSPrintf(str, "%d ", val);
-    fprintf(fp, "%s", str);
+    VectorUChar str(128);
+    gslSPrintf2(str, "%d ", val);
+    fprintf(fp, "%s", reinterpret_cast<char*>(str.data()));
     if (((numInColumn++) % 9) == 8)
     {
       char str2[8] = "\n";
@@ -258,8 +253,7 @@ static void write_int(Id val)
     }
   }
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: write_float
  *
@@ -276,27 +270,25 @@ static void write_int(Id val)
  *    Make precision changes suggested by Jeff McAninch
  *
  * ************************************************************************* */
- 
 static void write_float(float val)
 {
   if (useBinary)
   {
-    force_big_endian((unsigned char *) &val);
+    force_big_endian((unsigned char*)&val);
     fwrite(&val, sizeof(float), 1, fp);
   }
   else
   {
-    char str[128];
-    gslSPrintf(str, "%20.12e ", val);
-    fprintf(fp, "%s", str);
+    VectorUChar str(128);
+    gslSPrintf2(str, "%20.12e ", val);
+    fprintf(fp, "%s", reinterpret_cast<char*>(str.data()));
     if (((numInColumn++) % 9) == 8)
     {
       end_line();
     }
   }
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: write_header
  *
@@ -308,7 +300,7 @@ static void write_float(float val)
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
+
 static void write_header(void)
 {
   fprintf(fp, "# vtk DataFile Version 2.0\n");
@@ -318,8 +310,7 @@ static void write_header(void)
   else
     fprintf(fp, "ASCII\n");
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: write_variables
  *
@@ -347,36 +338,36 @@ void write_variables(Id nvars,
                      Id npts,
                      Id ncells)
 {
-  char str[1024];
+  VectorUChar str(1024);
   Id i, j, first_scalar, first_vector;
   Id num_scalars, num_vectors;
- 
+
   new_section();
-  gslSPrintf(str, "CELL_DATA %d\n", ncells);
-  write_string(str);
- 
+  gslSPrintf2(str, "CELL_DATA %d\n", ncells);
+  write_string(reinterpret_cast<char*>(str.data()));
+
   first_scalar = 0;
   first_vector = 0;
-  num_scalars = 0;
-  num_vectors = 0;
+  num_scalars  = 0;
+  num_vectors  = 0;
   /* The field data is where the non-primary scalars and vectors are
    * stored.  They must all be grouped together at the end of the point
    * data.  So write out the primary scalars and vectors first.
    */
-  for (i = 0 ; i < nvars ; i++)
+  for (i = 0; i < nvars; i++)
   {
     if (centering[i] == 0)
     {
       Id num_to_write = 0;
       Id should_write = 0;
- 
+
       if (vardim[i] == 1)
       {
         if (first_scalar == 0)
         {
           should_write = 1;
-          gslSPrintf(str, "SCALARS %s float\n", varname[i]);
-          write_string(str);
+          gslSPrintf2(str, "SCALARS %s float\n", varname[i]);
+          write_string(reinterpret_cast<char*>(str.data()));
           write_string("LOOKUP_TABLE default\n");
           first_scalar = 1;
         }
@@ -388,8 +379,8 @@ void write_variables(Id nvars,
         if (first_vector == 0)
         {
           should_write = 1;
-          gslSPrintf(str, "VECTORS %s float\n", varname[i]);
-          write_string(str);
+          gslSPrintf2(str, "VECTORS %s float\n", varname[i]);
+          write_string(reinterpret_cast<char*>(str.data()));
           first_vector = 1;
         }
         else
@@ -401,11 +392,11 @@ void write_variables(Id nvars,
         messerr("Ignoring variable %s.", varname[i]);
         continue;
       }
- 
+
       if (should_write)
       {
-        num_to_write = ncells*vardim[i];
-        for (j = 0 ; j < num_to_write ; j++)
+        num_to_write = ncells * vardim[i];
+        for (j = 0; j < num_to_write; j++)
         {
           write_float(vars[i][j]);
         }
@@ -413,13 +404,13 @@ void write_variables(Id nvars,
       }
     }
   }
- 
+
   first_scalar = 0;
   if (num_scalars > 0)
   {
-    gslSPrintf(str, "FIELD FieldData %d\n", num_scalars);
-    write_string(str);
-    for (i = 0 ; i < nvars ; i++)
+    gslSPrintf2(str, "FIELD FieldData %d\n", num_scalars);
+    write_string(reinterpret_cast<char*>(str.data()));
+    for (i = 0; i < nvars; i++)
     {
       Id should_write = 0;
       if (centering[i] == 0)
@@ -433,16 +424,16 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf(str, "%s 1 %d float\n", varname[i], ncells);
-            write_string(str);
+            gslSPrintf2(str, "%s 1 %d float\n", varname[i], ncells);
+            write_string(reinterpret_cast<char*>(str.data()));
           }
         }
       }
- 
+
       if (should_write)
       {
-        Id num_to_write = ncells*vardim[i];
-        for (j = 0 ; j < num_to_write ; j++)
+        Id num_to_write = ncells * vardim[i];
+        for (j = 0; j < num_to_write; j++)
         {
           write_float(vars[i][j]);
         }
@@ -450,13 +441,13 @@ void write_variables(Id nvars,
       }
     }
   }
- 
+
   first_vector = 0;
   if (num_vectors > 0)
   {
-    gslSPrintf(str, "FIELD FieldData %d\n", num_vectors);
-    write_string(str);
-    for (i = 0 ; i < nvars ; i++)
+    gslSPrintf2(str, "FIELD FieldData %d\n", num_vectors);
+    write_string(reinterpret_cast<char*>(str.data()));
+    for (i = 0; i < nvars; i++)
     {
       Id should_write = 0;
       if (centering[i] == 0)
@@ -470,16 +461,16 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf(str, "%s 3 %d float\n", varname[i], ncells);
-            write_string(str);
+            gslSPrintf2(str, "%s 3 %d float\n", varname[i], ncells);
+            write_string(reinterpret_cast<char*>(str.data()));
           }
         }
       }
- 
+
       if (should_write)
       {
-        Id num_to_write = ncells*vardim[i];
-        for (j = 0 ; j < num_to_write ; j++)
+        Id num_to_write = ncells * vardim[i];
+        for (j = 0; j < num_to_write; j++)
         {
           write_float(vars[i][j]);
         }
@@ -487,33 +478,33 @@ void write_variables(Id nvars,
       }
     }
   }
- 
+
   new_section();
-  gslSPrintf(str, "POINT_DATA %d\n", npts);
-  write_string(str);
- 
+  gslSPrintf2(str, "POINT_DATA %d\n", npts);
+  write_string(reinterpret_cast<char*>(str.data()));
+
   first_scalar = 0;
   first_vector = 0;
-  num_scalars = 0;
-  num_vectors = 0;
+  num_scalars  = 0;
+  num_vectors  = 0;
   /* The field data is where the non-primary scalars and vectors are
    * stored.  They must all be grouped together at the end of the point
    * data.  So write out the primary scalars and vectors first.
    */
-  for (i = 0 ; i < nvars ; i++)
+  for (i = 0; i < nvars; i++)
   {
     if (centering[i] != 0)
     {
       Id num_to_write = 0;
       Id should_write = 0;
- 
+
       if (vardim[i] == 1)
       {
         if (first_scalar == 0)
         {
           should_write = 1;
-          gslSPrintf(str, "SCALARS %s float\n", varname[i]);
-          write_string(str);
+          gslSPrintf2(str, "SCALARS %s float\n", varname[i]);
+          write_string(reinterpret_cast<char*>(str.data()));
           write_string("LOOKUP_TABLE default\n");
           first_scalar = 1;
         }
@@ -525,8 +516,8 @@ void write_variables(Id nvars,
         if (first_vector == 0)
         {
           should_write = 1;
-          gslSPrintf(str, "VECTORS %s float\n", varname[i]);
-          write_string(str);
+          gslSPrintf2(str, "VECTORS %s float\n", varname[i]);
+          write_string(reinterpret_cast<char*>(str.data()));
           first_vector = 1;
         }
         else
@@ -538,11 +529,11 @@ void write_variables(Id nvars,
         messerr("Ignoring variable %s.", varname[i]);
         continue;
       }
- 
+
       if (should_write)
       {
-        num_to_write = npts*vardim[i];
-        for (j = 0 ; j < num_to_write ; j++)
+        num_to_write = npts * vardim[i];
+        for (j = 0; j < num_to_write; j++)
         {
           write_float(vars[i][j]);
         }
@@ -550,13 +541,13 @@ void write_variables(Id nvars,
       }
     }
   }
- 
+
   first_scalar = 0;
   if (num_scalars > 0)
   {
-    gslSPrintf(str, "FIELD FieldData %d\n", num_scalars);
-    write_string(str);
-    for (i = 0 ; i < nvars ; i++)
+    gslSPrintf2(str, "FIELD FieldData %d\n", num_scalars);
+    write_string(reinterpret_cast<char*>(str.data()));
+    for (i = 0; i < nvars; i++)
     {
       Id should_write = 0;
       if (centering[i] != 0)
@@ -570,16 +561,16 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf(str, "%s 1 %d float\n", varname[i], npts);
-            write_string(str);
+            gslSPrintf2(str, "%s 1 %d float\n", varname[i], npts);
+            write_string(reinterpret_cast<char*>(str.data()));
           }
         }
       }
- 
+
       if (should_write)
       {
-        Id num_to_write = npts*vardim[i];
-        for (j = 0 ; j < num_to_write ; j++)
+        Id num_to_write = npts * vardim[i];
+        for (j = 0; j < num_to_write; j++)
         {
           write_float(vars[i][j]);
         }
@@ -587,13 +578,13 @@ void write_variables(Id nvars,
       }
     }
   }
- 
+
   first_vector = 0;
   if (num_vectors > 0)
   {
-    gslSPrintf(str, "FIELD FieldData %d\n", num_vectors);
-    write_string(str);
-    for (i = 0 ; i < nvars ; i++)
+    gslSPrintf2(str, "FIELD FieldData %d\n", num_vectors);
+    write_string(reinterpret_cast<char*>(str.data()));
+    for (i = 0; i < nvars; i++)
     {
       Id should_write = 0;
       if (centering[i] != 0)
@@ -607,16 +598,16 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf(str, "%s 3 %d float\n", varname[i], npts);
-            write_string(str);
+            gslSPrintf2(str, "%s 3 %d float\n", varname[i], npts);
+            write_string(reinterpret_cast<char*>(str.data()));
           }
         }
       }
- 
+
       if (should_write)
       {
-        Id num_to_write = npts*vardim[i];
-        for (j = 0 ; j < num_to_write ; j++)
+        Id num_to_write = npts * vardim[i];
+        for (j = 0; j < num_to_write; j++)
         {
           write_float(vars[i][j]);
         }
@@ -625,8 +616,7 @@ void write_variables(Id nvars,
     }
   }
 }
- 
- 
+
 /* ****************************************************************************
 //  Function: write_point_mesh
 //
@@ -661,48 +651,47 @@ void write_point_mesh(const char* filename,
                       const char* const* varnames,
                       VectorVectorFloat& vars)
 {
-  Id   i;
-  char  str[128];
+  Id i;
+  VectorUChar str(128);
   VectorInt centering;
- 
+
   useBinary = ub;
   open_file(filename);
   write_header();
- 
+
   write_string("DATASET UNSTRUCTURED_GRID\n");
-  gslSPrintf(str, "POINTS %d float\n", npts);
-  write_string(str);
-  for (i = 0 ; i < 3*npts ; i++)
+  gslSPrintf2(str, "POINTS %d float\n", npts);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < 3 * npts; i++)
   {
     write_float(pts[i]);
   }
- 
+
   new_section();
-  gslSPrintf(str, "CELLS %d %d\n", npts, 2*npts);
-  write_string(str);
-  for (i = 0 ; i < npts ; i++)
+  gslSPrintf2(str, "CELLS %d %d\n", npts, 2 * npts);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < npts; i++)
   {
     write_int(1);
     write_int(i);
     end_line();
   }
- 
+
   new_section();
-  gslSPrintf(str, "CELL_TYPES %d\n", npts);
-  write_string(str);
-  for (i = 0 ; i < npts ; i++)
+  gslSPrintf2(str, "CELL_TYPES %d\n", npts);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < npts; i++)
   {
     write_int(VISIT_VERTEX);
     end_line();
   }
- 
+
   centering.resize(nvars, 1);
   write_variables(nvars, vardim, centering.data(), varnames, vars, npts, npts);
- 
+
   close_file();
 }
- 
- 
+
 /* ****************************************************************************
  *  Function: num_points_for_cell
  *
@@ -713,7 +702,7 @@ void write_point_mesh(const char* filename,
  *  Creation:   September 3, 2004
  *
  * ************************************************************************* */
- 
+
 static Id num_points_for_cell(Id celltype)
 {
   Id npts = 0;
@@ -744,8 +733,7 @@ static Id num_points_for_cell(Id celltype)
   }
   return npts;
 }
- 
- 
+
 /* ****************************************************************************
 //  Function: write_unstructured_mesh
 //
@@ -792,55 +780,54 @@ void write_unstructured_mesh(const char* filename,
                              const char* const* varnames,
                              VectorVectorFloat& vars)
 {
-  Id   i, j;
-  char  str[128];
-  Id   conn_size = 0;
-  Id  *curr_conn = conn;
- 
+  Id i, j;
+  VectorUChar str(128);
+  Id conn_size  = 0;
+  Id* curr_conn = conn;
+
   useBinary = ub;
   open_file(filename);
   write_header();
- 
+
   write_string("DATASET UNSTRUCTURED_GRID\n");
-  gslSPrintf(str, "POINTS %d float\n", npts);
-  write_string(str);
-  for (i = 0 ; i < 3*npts ; i++)
+  gslSPrintf2(str, "POINTS %d float\n", npts);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < 3 * npts; i++)
   {
     write_float(pts[i]);
   }
- 
+
   new_section();
-  for (i = 0 ; i < ncells ; i++)
+  for (i = 0; i < ncells; i++)
   {
     Id npts_loc = num_points_for_cell(celltypes[i]);
     conn_size += npts_loc + 1;
   }
-  gslSPrintf(str, "CELLS %d %d\n", ncells, conn_size);
-  write_string(str);
-  for (i = 0 ; i < ncells ; i++)
+  gslSPrintf2(str, "CELLS %d %d\n", ncells, conn_size);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < ncells; i++)
   {
     Id npts_per_cell = num_points_for_cell(celltypes[i]);
     write_int(npts_per_cell);
-    for (j = 0 ; j < npts_per_cell ; j++)
+    for (j = 0; j < npts_per_cell; j++)
       write_int(*curr_conn++);
     end_line();
   }
- 
+
   new_section();
-  gslSPrintf(str, "CELL_TYPES %d\n", ncells);
-  write_string(str);
-  for (i = 0 ; i < ncells ; i++)
+  gslSPrintf2(str, "CELL_TYPES %d\n", ncells);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < ncells; i++)
   {
     write_int(celltypes[i]);
     end_line();
   }
- 
+
   write_variables(nvars, vardim, centering, varnames, vars, npts, ncells);
- 
+
   close_file();
 }
- 
- 
+
 /* ****************************************************************************
 //  Function: write_rectilinear_mesh
 //
@@ -890,42 +877,41 @@ void write_rectilinear_mesh(const char* filename,
                             const char* const* varnames,
                             VectorVectorFloat& vars)
 {
-  Id   i;
-  char  str[128];
-  Id npts = dims[0]*dims[1]*dims[2];
-  Id ncX = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
-  Id ncY = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
-  Id ncZ = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
-  Id ncells = ncX*ncY*ncZ;
- 
+  Id i;
+  VectorUChar str(128);
+  Id npts   = dims[0] * dims[1] * dims[2];
+  Id ncX    = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
+  Id ncY    = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
+  Id ncZ    = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
+  Id ncells = ncX * ncY * ncZ;
+
   useBinary = ub;
   open_file(filename);
   write_header();
- 
+
   write_string("DATASET RECTILINEAR_GRID\n");
-  gslSPrintf(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
-  write_string(str);
-  gslSPrintf(str, "X_COORDINATES %d float\n", dims[0]);
-  write_string(str);
-  for (i = 0 ; i < dims[0] ; i++)
+  gslSPrintf2(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
+  write_string(reinterpret_cast<char*>(str.data()));
+  gslSPrintf2(str, "X_COORDINATES %d float\n", dims[0]);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < dims[0]; i++)
     write_float(x[i]);
   new_section();
-  gslSPrintf(str, "Y_COORDINATES %d float\n", dims[1]);
-  write_string(str);
-  for (i = 0 ; i < dims[1] ; i++)
+  gslSPrintf2(str, "Y_COORDINATES %d float\n", dims[1]);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < dims[1]; i++)
     write_float(y[i]);
   new_section();
-  gslSPrintf(str, "Z_COORDINATES %d float\n", dims[2]);
-  write_string(str);
-  for (i = 0 ; i < dims[2] ; i++)
+  gslSPrintf2(str, "Z_COORDINATES %d float\n", dims[2]);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < dims[2]; i++)
     write_float(z[i]);
- 
+
   write_variables(nvars, vardim, centering, varnames, vars, npts, ncells);
- 
+
   close_file();
 }
- 
- 
+
 /* ****************************************************************************
 //  Function: write_regular_mesh
 //
@@ -967,24 +953,23 @@ void write_regular_mesh(const char* filename,
                         const char* const* varnames,
                         VectorVectorFloat& vars)
 {
-  Id  i;
- 
+  Id i;
+
   VectorFloat x(dims[0]);
   VectorFloat y(dims[1]);
   VectorFloat z(dims[2]);
- 
-  for (i = 0 ; i < dims[0] ; i++)
-    x[i] = (float) i;
-  for (i = 0 ; i < dims[1] ; i++)
-    y[i] = (float) i;
-  for (i = 0 ; i < dims[2] ; i++)
-    z[i] = (float) i;
+
+  for (i = 0; i < dims[0]; i++)
+    x[i] = (float)i;
+  for (i = 0; i < dims[1]; i++)
+    y[i] = (float)i;
+  for (i = 0; i < dims[2]; i++)
+    z[i] = (float)i;
 
   write_rectilinear_mesh(filename, ub, dims, x.data(), y.data(), z.data(),
                          nvars, vardim, centering, varnames, vars);
-
 }
- 
+
 /* ****************************************************************************
 //  Function: write_curvilinear_mesh
 //
@@ -1032,30 +1017,30 @@ void write_curvilinear_mesh(const char* filename,
                             const char* const* varnames,
                             VectorVectorFloat& vars)
 {
-  Id   i;
-  char  str[128];
-  Id npts = dims[0]*dims[1]*dims[2];
-  Id ncX = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
-  Id ncY = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
-  Id ncZ = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
-  Id ncells = ncX*ncY*ncZ;
- 
+  Id i;
+  VectorUChar str(128);
+  Id npts   = dims[0] * dims[1] * dims[2];
+  Id ncX    = (dims[0] - 1 < 1 ? 1 : dims[0] - 1);
+  Id ncY    = (dims[1] - 1 < 1 ? 1 : dims[1] - 1);
+  Id ncZ    = (dims[2] - 1 < 1 ? 1 : dims[2] - 1);
+  Id ncells = ncX * ncY * ncZ;
+
   useBinary = ub;
   open_file(filename);
   write_header();
- 
+
   write_string("DATASET STRUCTURED_GRID\n");
-  gslSPrintf(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
-  write_string(str);
-  gslSPrintf(str, "POINTS %d float\n", npts);
-  write_string(str);
-  for (i = 0 ; i < 3*npts ; i++)
+  gslSPrintf2(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
+  write_string(reinterpret_cast<char*>(str.data()));
+  gslSPrintf2(str, "POINTS %d float\n", npts);
+  write_string(reinterpret_cast<char*>(str.data()));
+  for (i = 0; i < 3 * npts; i++)
   {
     write_float(pts[i]);
   }
- 
+
   write_variables(nvars, vardim, centering, varnames, vars, npts, ncells);
- 
+
   close_file();
 }
-}
+} // namespace gstlrn

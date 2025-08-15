@@ -16,21 +16,13 @@
 #include <cstring>
 
 /*! \cond */
-#define STORE_NAME_LENGTH 10
-#define SHIFT()           ((MEMORY_DEBUG) ? (Id)sizeof(Id) : 0)
+#define SHIFT() ((MEMORY_DEBUG) ? (Id)sizeof(Id) : 0)
 
 namespace gstlrn
 {
 typedef struct
 {
-  char call_name[STORE_NAME_LENGTH];
-  Id ncalls;
-  Id msec;
-} TimeChunk;
-
-typedef struct
-{
-  char call_file[STORE_NAME_LENGTH];
+  VectorUChar call_file;
   Id call_line;
   size_t size;
   void* ptr;
@@ -38,12 +30,12 @@ typedef struct
 
 /*! \endcond */
 
-static Id MEMORY_LEAK    = 0;
-static Id MEMORY_DEBUG   = 0;
-static Id MEMORY_TOTAL   = 0;
-static Id MEMORY_MAX     = 0;
-static Id MEMORY_MIN_PT  = 1000000;
-static Id NB_MEM_CHUNK   = 0;
+static Id MEMORY_LEAK     = 0;
+static Id MEMORY_DEBUG    = 0;
+static Id MEMORY_TOTAL    = 0;
+static Id MEMORY_MAX      = 0;
+static Id MEMORY_MIN_PT   = 1000000;
+static Id NB_MEM_CHUNK    = 0;
 static MemChunk** MemLeak = NULL;
 
 /****************************************************************************/
@@ -103,11 +95,11 @@ static void st_memory_leak_add(const char* call_file,
     st_memory_leak_reset();
     return;
   }
-  (void)gslStrncpy(chunk->call_file, call_file, STORE_NAME_LENGTH);
-  chunk->call_file[STORE_NAME_LENGTH - 1] = '\0';
-  chunk->call_line                        = call_line;
-  chunk->size                             = size;
-  chunk->ptr                              = ptr;
+  chunk->call_file.resize(10);
+  gslStrcpy2(chunk->call_file, call_file);
+  chunk->call_line = call_line;
+  chunk->size      = size;
+  chunk->ptr       = ptr;
 
   // Glue the new chunk to the Global array
 
@@ -220,7 +212,9 @@ static void st_mem_message(const char* call_file,
  ** \param[in]  tab       Array to be freed
  **
  *****************************************************************************/
-char* mem_free_(const char* call_file, size_t call_line, char* tab)
+char* mem_free_(const char* call_file,
+                size_t call_line,
+                char* tab)
 {
   Id size_eff;
   char* tab_aux;
@@ -563,4 +557,4 @@ double** mem_tab_alloc(Id nvar, Id size, Id flag_fatal)
   }
   return (tab);
 }
-}
+} // namespace gstlrn

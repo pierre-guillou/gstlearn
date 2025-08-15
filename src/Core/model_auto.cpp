@@ -110,7 +110,7 @@ typedef struct
 /*! \endcond */
 
 // TODO : rename this (and remove static string below)
-static char string[STRING_LENGTH];
+static VectorUChar string(STRING_LENGTH);
 static char cov_name[STRING_LENGTH];
 
 static Id CONGRUENCY = 50;
@@ -149,13 +149,13 @@ static void st_modify_optvar_for_anam(Model* model, Option_VarioFit& optvar)
 static void st_name_range(Id ivar)
 {
   if (ivar == 0)
-    (void)gslStrcpy(string, "Range U");
+    (void)gslStrcpy2(string, "Range U");
   else if (ivar == 1)
-    (void)gslStrcpy(string, "Range V");
+    (void)gslStrcpy2(string, "Range V");
   else if (ivar == 2)
-    (void)gslStrcpy(string, "Range W");
+    (void)gslStrcpy2(string, "Range W");
   else
-    (void)gslSPrintf(string, "Range in direction %d", ivar);
+    (void)gslSPrintf2(string, "Range in direction %d", ivar);
 }
 
 /****************************************************************************/
@@ -168,13 +168,13 @@ static void st_name_range(Id ivar)
 static void st_name_scale(Id ivar)
 {
   if (ivar == 0)
-    (void)gslStrcpy(string, "Scale U");
+    (void)gslStrcpy2(string, "Scale U");
   else if (ivar == 1)
-    (void)gslStrcpy(string, "Scale V");
+    (void)gslStrcpy2(string, "Scale V");
   else if (ivar == 2)
-    (void)gslStrcpy(string, "Scale W");
+    (void)gslStrcpy2(string, "Scale W");
   else
-    (void)gslSPrintf(string, "Scale in direction %d", ivar);
+    (void)gslSPrintf2(string, "Scale in direction %d", ivar);
 }
 
 /****************************************************************************/
@@ -187,13 +187,13 @@ static void st_name_scale(Id ivar)
 static void st_name_rotation(Id rank)
 {
   if (rank == 0)
-    (void)gslStrcpy(string, "Anisotropy Rotation Angle around Oz");
+    (void)gslStrcpy2(string, "Anisotropy Rotation Angle around Oz");
   else if (rank == 1)
-    (void)gslStrcpy(string, "Anisotropy Rotation Angle around Oy");
+    (void)gslStrcpy2(string, "Anisotropy Rotation Angle around Oy");
   else if (rank == 2)
-    (void)gslStrcpy(string, "Anisotropy Rotation Angle around Ox");
+    (void)gslStrcpy2(string, "Anisotropy Rotation Angle around Ox");
   else
-    (void)gslSPrintf(string, "Anisotropy Rotation Angle %d", rank);
+    (void)gslSPrintf2(string, "Anisotropy Rotation Angle %d", rank);
 }
 
 /****************************************************************************/
@@ -1254,7 +1254,7 @@ static void st_load_wt(const Vario* vario,
  *****************************************************************************/
 static void st_goulard_debug_title(Id nvar, Id ncova)
 {
-  static char loc_string[20];
+  VectorUChar loc_string(20);
 
   if (!OptDbg::query(EDbg::CONVERGE)) return;
   mestitle(1, "Trajectory of parameters in Goulard Algorithm");
@@ -1265,8 +1265,8 @@ static void st_goulard_debug_title(Id nvar, Id ncova)
     for (Id ivar = 0; ivar < nvar; ivar++)
       for (Id jvar = 0; jvar <= ivar; jvar++)
       {
-        (void)gslSPrintf(loc_string, "St%d(%d-%d)", icov + 1, ivar + 1, jvar + 1);
-        tab_prints(NULL, loc_string);
+        (void)gslSPrintf2(loc_string, "St%d(%d-%d)", icov + 1, ivar + 1, jvar + 1);
+        tab_prints(NULL, reinterpret_cast<char*>(loc_string.data()));
       }
   message("\n");
 }
@@ -1281,7 +1281,7 @@ static void st_goulard_debug_title(Id nvar, Id ncova)
  *****************************************************************************/
 static void st_keypair_sill(Id mode, Model* model)
 {
-  char loc_string[100];
+  VectorUChar loc_string(100);
 
   if (model == nullptr) return;
   Id ncova = model->getNCov();
@@ -1295,8 +1295,8 @@ static void st_keypair_sill(Id mode, Model* model)
   {
     for (Id icova = 0; icova < ncova; icova++)
     {
-      (void)gslSPrintf(loc_string, "Fitted_Sill_%d", icova + 1);
-      set_keypair(loc_string, 1, nvar, nvar,
+      (void)gslSPrintf2(loc_string, "Fitted_Sill_%d", icova + 1);
+      set_keypair(reinterpret_cast<char*>(loc_string.data()), 1, nvar, nvar,
                   model->getSills(icova).getValues().data());
     }
   }
@@ -1319,7 +1319,7 @@ static void st_keypair_results(Id mode,
                                double* valpro,
                                double* vecpro)
 {
-  char loc_string[50];
+  VectorUChar loc_string(50);
 
   if (mode < 0)
   {
@@ -1328,10 +1328,10 @@ static void st_keypair_results(Id mode,
   }
   else
   {
-    (void)gslSPrintf(loc_string, "Model_Auto_Eigen_Values_%d", icov + 1);
-    set_keypair(loc_string, 1, 1, nvar, valpro);
-    (void)gslSPrintf(loc_string, "Model_Auto_Eigen_Vector_%d", icov + 1);
-    set_keypair(loc_string, 1, nvar, nvar, vecpro);
+    (void)gslSPrintf2(loc_string, "Model_Auto_Eigen_Values_%d", icov + 1);
+    set_keypair(reinterpret_cast<char*>(loc_string.data()), 1, 1, nvar, valpro);
+    (void)gslSPrintf2(loc_string, "Model_Auto_Eigen_Vector_%d", icov + 1);
+    set_keypair(reinterpret_cast<char*>(loc_string.data()), 1, nvar, nvar, vecpro);
   }
 }
 
@@ -1793,17 +1793,17 @@ static void st_model_auto_strmod_print(Id flag_title,
 
       case EConsElem::E_RANGE:
         st_name_range(ivar);
-        st_print(string, 1, ntot, param, lower, upper);
+        st_print(reinterpret_cast<char*>(string.data()), 1, ntot, param, lower, upper);
         break;
 
       case EConsElem::E_SCALE:
         st_name_scale(ivar);
-        st_print(string, 1, ntot, param, lower, upper);
+        st_print(reinterpret_cast<char*>(string.data()), 1, ntot, param, lower, upper);
         break;
 
       case EConsElem::E_ANGLE:
         st_name_rotation(ivar);
-        st_print(string, 1, ntot, param, lower, upper);
+        st_print(reinterpret_cast<char*>(string.data()), 1, ntot, param, lower, upper);
         break;
 
       case EConsElem::E_T_RANGE:

@@ -96,7 +96,7 @@ static Db *DBIN, *DBOUT;
 static Koption KOPTION;
 static Id INH_FLAG_VERBOSE = 0;
 static Id INH_FLAG_LIMIT   = 1;
-static char string[100];
+static VectorUChar string(100);
 
 static CovInternal COVINT;
 
@@ -1240,14 +1240,14 @@ static void st_krige_wgt_print(Id status,
   if (KOPTION.flag_data_disc)
     for (idim = 0; idim < ndim; idim++)
     {
-      (void)gslSPrintf(string, "Size%d", idim + 1);
-      tab_prints(NULL, string);
+      (void)gslSPrintf2(string, "Size%d", idim + 1);
+      tab_prints(NULL, reinterpret_cast<char*>(string.data()));
     }
   tab_prints(NULL, "Data");
   for (ivar = 0; ivar < nvar; ivar++)
   {
-    (void)gslSPrintf(string, "Z%d*", ivar + 1);
-    tab_prints(NULL, string);
+    (void)gslSPrintf2(string, "Z%d*", ivar + 1);
+    tab_prints(NULL, reinterpret_cast<char*>(string.data()));
   }
   message("\n");
 
@@ -2853,13 +2853,13 @@ Id krigsum(Db* dbin,
     dbin->setLocatorByUID(iuids[ivar], ELoc::Z, 0);
     if (ksys.resetData()) return 1;
     if (ksys.updKrigOptEstim(iptr_est + ivar, -1, -1)) return 1;
-    (void)gslSPrintf(string, "Kriging of variable #%d at sample", ivar + 1);
+    (void)gslSPrintf2(string, "Kriging of variable #%d at sample", ivar + 1);
 
     /* Loop on the targets to be processed */
 
     for (Id iech_out = 0; iech_out < dbout->getNSample(); iech_out++)
     {
-      mes_process(string, dbout->getNSample(), iech_out);
+      mes_process(reinterpret_cast<char*>(string.data()), dbout->getNSample(), iech_out);
       if (ksys.estimate(iech_out)) return 1;
     }
 

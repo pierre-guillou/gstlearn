@@ -11,6 +11,7 @@
 #include "Basic/String.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/VectorNumT.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -205,8 +206,8 @@ void correctNewNameForDuplicates(VectorString& list, Id rank)
  * @return The index of the matching item or -1
  */
 Id getRankInList(const VectorString& list,
-                  const String& match,
-                  bool caseSensitive)
+                 const String& match,
+                 bool caseSensitive)
 {
   for (Id i = 0; i < (Id)list.size(); i++)
   {
@@ -226,9 +227,9 @@ Id getRankInList(const VectorString& list,
  * @return Error returned code
  */
 Id decodeInString(const String& symbol,
-                   const String& node,
-                   Id* facies,
-                   bool caseSensitive)
+                  const String& node,
+                  Id* facies,
+                  bool caseSensitive)
 {
   String locnode = node;
   String locsymb = symbol;
@@ -265,10 +266,10 @@ Id decodeInString(const String& symbol,
  * @return Error returned code
  */
 Id decodeInList(const VectorString& symbols,
-                 const String& node,
-                 Id* rank,
-                 Id* facies,
-                 bool caseSensitive)
+                const String& node,
+                Id* rank,
+                Id* facies,
+                bool caseSensitive)
 {
   for (Id i = 0; i < (Id)symbols.size(); i++)
   {
@@ -509,7 +510,7 @@ String toString(double value)
 Id askInt(const String& text, Id defval, bool authTest)
 {
   bool hasDefault = !IFFFF(defval) || authTest;
-  Id answer      = defval;
+  Id answer       = defval;
   std::cin.exceptions(std::istream::failbit | std::istream::badbit);
 
   try
@@ -713,16 +714,34 @@ String erase(const String& s, const String& t)
 char* gslStrcpy(char* dst, const char* src)
 {
   return strcpy(dst, src);
-  //(void)gslSPrintf(dst, "%s", src);
-  // return dst;
 }
+
+void gslStrcpy2(VectorUChar& dst, const VectorUChar& src)
+{
+  (void)strcpy(reinterpret_cast<char*>(dst.data()),
+               reinterpret_cast<const char*>(src.data()));
+}
+
+void gslStrcpy2(VectorUChar& dst, const char* src)
+{
+  (void)strcpy(reinterpret_cast<char*>(dst.data()), src);
+}
+
 
 char* gslStrcat(char* dst, const char* src)
 {
   return strcat(dst, src);
-  //  size_t size = String(dst).size();
-  //  (void)gslSPrintf(&dst[size], "%s%s", dst, src);
-  //  return dst;
+}
+
+void gslStrcat2(VectorUChar& dst, const char* src)
+{
+  (void)strcat(reinterpret_cast<char*>(dst.data()), src);
+}
+
+void gslStrcat2(VectorUChar& dst, const VectorUChar& src)
+{
+  (void)strcat(reinterpret_cast<char*>(dst.data()),
+               reinterpret_cast<const char*>(src.data()));
 }
 
 Id gslSPrintf(char* dst, const char* fmt, ...)
@@ -732,6 +751,62 @@ Id gslSPrintf(char* dst, const char* fmt, ...)
   Id n = vsprintf(dst, fmt, ap);
   va_end(ap);
   return n;
+}
+
+Id gslAddSPrintf2(VectorUChar& dst, const char* fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+
+  // Calculer la longueur de la chaîne formatée
+  va_list ap_copy;
+  va_copy(ap_copy, ap);
+  int new_size = std::vsnprintf(nullptr, 0, fmt, ap_copy);
+  va_end(ap_copy);
+
+  if (new_size < 0)
+  {
+    va_end(ap);
+    return -1; // erreur
+  }
+
+  // Position de concaténation : avant le '\0' actuel si dst n'est pas vide
+  size_t old_size = dst.empty() ? 0 : dst.size() - 1;
+
+  // Redimensionner dst pour contenir l'ancien + le nouveau + '\0'
+  dst.resize(old_size + new_size + 1);
+
+  // Écrire à la fin de l'ancien contenu
+  std::vsnprintf(reinterpret_cast<char*>(dst.data() + old_size), new_size + 1, fmt, ap);
+
+  va_end(ap);
+  return new_size;
+}
+
+Id gslSPrintf2(VectorUChar& dst, const char* fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+
+  va_list ap_copy;
+  va_copy(ap_copy, ap);
+  int size = std::vsnprintf(nullptr, 0, fmt, ap_copy);
+  va_end(ap_copy);
+
+  if (size < 0)
+  {
+    va_end(ap);
+    return -1; // erreur
+  }
+
+  // Redimensionner le vecteur pour contenir la chaîne et le '\0'
+  dst.resize(size + 1);
+
+  // Écrire dans le vecteur
+  std::vsnprintf(reinterpret_cast<char*>(dst.data()), dst.size(), fmt, ap);
+
+  va_end(ap);
+  return size;
 }
 
 Id gslScanf(const char* format, ...)
@@ -755,11 +830,6 @@ Id gslSScanf(const char* str, const char* format, ...)
 char* gslStrtok(char* str, const char* delim)
 {
   return strtok(str, delim);
-}
-
-char* gslStrncpy(char* dest, const char* src, size_t n)
-{
-  return strncpy(dest, src, n);
 }
 
 /****************************************************************************/

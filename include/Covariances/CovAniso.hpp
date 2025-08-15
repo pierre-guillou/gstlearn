@@ -10,19 +10,19 @@
 /******************************************************************************/
 #pragma once
 
+#include "Arrays/Array.hpp"
+#include "Basic/ICloneable.hpp"
+#include "Basic/Tensor.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Covariances/ACovFunc.hpp"
+#include "Covariances/CorAniso.hpp"
+#include "Covariances/CovContext.hpp"
 #include "Covariances/CovProportional.hpp"
+#include "Enum/ECov.hpp"
+#include "Matrix/MatrixSymmetric.hpp"
+#include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
-#include "Enum/ECov.hpp"
-#include "Covariances/CorAniso.hpp"
-#include "Basic/ICloneable.hpp"
-#include "Matrix/MatrixSymmetric.hpp"
-#include "Basic/Tensor.hpp"
-#include "Covariances/ACovFunc.hpp"
-#include "Covariances/CovContext.hpp"
-#include "Arrays/Array.hpp"
-#include "Space/SpacePoint.hpp"
 
 namespace gstlrn
 {
@@ -230,12 +230,12 @@ public:
   const ACovFunc* getCorFunc() const { return getCorAniso()->getCorFunc(); }
 
   VectorDouble evalCovOnSphereVec(const VectorDouble& alpha,
-                                  Id degree              = 50,
+                                  Id degree               = 50,
                                   bool flagScaleDistance  = false,
                                   const CovCalcMode* mode = nullptr) const;
   Array evalCovFFT(const VectorDouble& hmax, Id N = 128, Id ivar = 0, Id jvar = 0) const;
 
-  Id getNDim() const { return _ctxt.getNDim(); }
+  Id getNDim() const { return static_cast<Id>(_ctxt.getNDim()); }
   CorAniso* getCorAniso();
   CovAniso* createReduce(const VectorInt& validVars) const;
 
@@ -248,12 +248,11 @@ public:
 
   virtual double _eval(const SpacePoint& p1,
                        const SpacePoint& p2,
-                       Id ivar                = 0,
-                       Id jvar                = 0,
+                       Id ivar                 = 0,
+                       Id jvar                 = 0,
                        const CovCalcMode* mode = nullptr) const override;
-
 };
 
 GSTLEARN_EXPORT double scale2range(const ECov& type, double scale, double param = 1.);
 GSTLEARN_EXPORT double range2scale(const ECov& type, double range, double param = 1.);
-}
+} // namespace gstlrn

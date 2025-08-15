@@ -102,8 +102,8 @@ static void st_get_coordinates(const double* pt_out,
                                bool flag_center = false)
 {
   Id shift = static_cast<Id>(pt_out - image->bitmap.data());
-  *iy       = shift / TX;
-  *ix       = shift % TX;
+  *iy      = shift / TX;
+  *ix      = shift % TX;
 
   if (flag_center)
   {
@@ -124,19 +124,19 @@ static void st_get_coordinates(const double* pt_out,
  *****************************************************************************/
 static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* image)
 {
-  char STRING[BUFFER_LENGTH];
+  VectorUChar STRING(BUFFER_LENGTH);
 
   if (VERBOSE_STEP < 0) return;
   if (!flagMain && STEP <= VERBOSE_STEP) return;
 
   /* Process the title */
 
-  (void)gslStrcpy(STRING, "\n");
+  (void)gslStrcpy2(STRING, "\n");
   if (flagMain)
   {
-    (void)gslSPrintf(&STRING[strlen(STRING)], "End of Step %d === ", STEP);
-    (void)gslStrcat(STRING, title.c_str());
-    (void)gslStrcat(STRING, "\n");
+    (void)gslSPrintf2(STRING, "\nEnd of Step %d === ", STEP);
+    (void)gslStrcat2(STRING, title.c_str());
+    (void)gslStrcat2(STRING, "\n");
   }
 
   /* Current address */
@@ -146,9 +146,9 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   if (pt_out != nullptr)
   {
     st_get_coordinates(pt_out, &ix0, &iy0);
-    (void)gslSPrintf(&STRING[strlen(STRING)], "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
+    (void)gslAddSPrintf2(STRING, "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
   }
-  message(STRING);
+  message(reinterpret_cast<char*>(STRING.data()));
 
   // Current Spill position
 
@@ -170,50 +170,50 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   for (Id jy = 0; jy < TY; jy++)
   {
     Id iy = TY - jy - 1;
-    (void)gslStrcpy(STRING, "");
+    (void)gslStrcpy2(STRING, "");
     for (Id ix = 0; ix < TX; ix++)
     {
       Id value = BITALL(image, ix, iy);
       if (ix == ix0 && iy == iy0)
       {
-        (void)gslStrcat(STRING, "X");
+        (void)gslStrcat2(STRING, "X");
       }
       else if (ix == ix_spill && iy == iy_spill)
       {
-        (void)gslStrcat(STRING, "#");
+        (void)gslStrcat2(STRING, "#");
       }
       else if (value == INQUEUE)
       {
         numm1++;
-        (void)gslStrcat(STRING, "?");
+        (void)gslStrcat2(STRING, "?");
       }
       else if (value == SURFACE_UNKNOWN)
       {
         nump0++;
-        (void)gslStrcat(STRING, " ");
+        (void)gslStrcat2(STRING, " ");
       }
       else if (value == SURFACE_OUTSIDE)
       {
-        (void)gslStrcat(STRING, ".");
+        (void)gslStrcat2(STRING, ".");
         nump1++;
       }
       else if (value == SURFACE_INSIDE)
       {
-        (void)gslStrcat(STRING, "*");
+        (void)gslStrcat2(STRING, "*");
         nump2++;
       }
       else if (value == SURFACE_BELOW)
       {
-        (void)gslStrcat(STRING, "-");
+        (void)gslStrcat2(STRING, "-");
         numpb++;
       }
       else
       {
-        (void)gslStrcat(STRING, "U");
+        (void)gslStrcat2(STRING, "U");
       }
     }
-    (void)gslStrcat(STRING, "\n");
-    message(STRING);
+    (void)gslStrcat2(STRING, "\n");
+    message(reinterpret_cast<char*>(STRING.data()));
   }
   message("Spill'#' Queue'?'(%d) Unknown' '(%d) Out'.'(%d) In'*'(%d) Below'-'(%d) Heap(%d)\n",
           numm1, nump0, nump1, nump2, numpb, Hsize);
@@ -380,8 +380,8 @@ static SPIMG* st_image_alloc(double value)
  *****************************************************************************/
 static void st_heap_add(double* p)
 {
-  Id i   = Hsize++;
-  Id n   = (i - 1) / 2;
+  Id i    = Hsize++;
+  Id n    = (i - 1) / 2;
   Heap[i] = p;
   while ((i > 0) && SIGNE * (OUT_TO_IN(p) - OUT_TO_IN(Heap[n])) > 0.)
   {
@@ -515,20 +515,20 @@ static void st_print()
 
 static void st_final_stats(double hspill, Id ix0, Id iy0)
 {
-  Id num_inside     = 0;
+  Id num_inside      = 0;
   double min_inside  = MAXIMUM_BIG;
   double max_inside  = MINIMUM_BIG;
-  Id num_outside    = 0;
+  Id num_outside     = 0;
   double min_outside = MAXIMUM_BIG;
   double max_outside = MINIMUM_BIG;
-  Id num_else       = 0;
+  Id num_else        = 0;
   double min_else    = MAXIMUM_BIG;
   double max_else    = MINIMUM_BIG;
 
   for (Id iy = 0; iy < SY; iy++)
     for (Id ix = 0; ix < SX; ix++)
     {
-      Id value   = BITMAP(SPIMG_OUT, ix, iy);
+      Id value    = BITMAP(SPIMG_OUT, ix, iy);
       double topo = BITMAP(SPIMG_IN, ix, iy);
 
       if (value == SURFACE_INSIDE)
@@ -594,16 +594,16 @@ static void st_final_stats(double hspill, Id ix0, Id iy0)
  **
  *****************************************************************************/
 Id spill_point(DbGrid* dbgrid,
-                Id ind_depth,
-                Id ind_data,
-                Id option,
-                bool flag_up,
-                Id verbose_step,
-                double hmax,
-                double* h,
-                const double* th,
-                Id* ix0,
-                Id* iy0)
+               Id ind_depth,
+               Id ind_data,
+               Id option,
+               bool flag_up,
+               Id verbose_step,
+               double hmax,
+               double* h,
+               const double* th,
+               Id* ix0,
+               Id* iy0)
 {
   DECLARE_UNUSED(th);
   double *pt_mark, *pt_out, hspill;

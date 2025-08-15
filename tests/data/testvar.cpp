@@ -30,7 +30,7 @@ using namespace gstlrn;
 
 int main(int argc, char* argv[])
 {
-  std::vector<char> filename(BUFFER_LENGTH);
+  VectorUChar filename(BUFFER_LENGTH);
   DbGrid* dbout;
   Vario* vario;
   Model* model;
@@ -71,29 +71,29 @@ int main(int argc, char* argv[])
 
   /* Define the environment */
 
-  ascii_filename("Environ", 0, 0, filename.data());
-  ascii_environ_read(filename.data(), verbose);
+  ascii_filename("Environ", 0, 0, filename);
+  ascii_environ_read(filename, verbose);
 
   /* Define the options */
 
-  ascii_filename("Option", 0, 0, filename.data());
-  ascii_option_defined(filename.data(), 0, "Norm_sill", 0, &flag_norm_sill);
-  ascii_option_defined(filename.data(), 0, "Goulard_used", 0, &flag_goulard_used);
+  ascii_filename("Option", 0, 0, filename);
+  ascii_option_defined(filename, 0, "Norm_sill", 0, &flag_norm_sill);
+  ascii_option_defined(filename, 0, "Goulard_used", 0, &flag_goulard_used);
 
   /* Define the output grid file */
 
-  ascii_filename("Grid", 0, 0, filename.data());
-  dbout = DbGrid::createFromNF(filename.data(), verbose);
+  ascii_filename("Grid", 0, 0, filename);
+  dbout = DbGrid::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
 
   /* Look for simulations */
 
-  ascii_filename("Simu", 0, 0, filename.data());
-  ascii_simu_read(filename.data(), verbose, &nbsimu, &nbtuba, &seed);
+  ascii_filename("Simu", 0, 0, filename);
+  ascii_simu_read(filename, verbose, &nbsimu, &nbtuba, &seed);
 
   /* Define the model */
 
-  ascii_filename("Model", 0, 0, filename.data());
-  model = Model::createFromNF(filename.data(), verbose);
+  ascii_filename("Model", 0, 0, filename);
+  model = Model::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
   if (model == (Model*)NULL) goto label_end;
 
   // Define and store the Space
@@ -113,13 +113,13 @@ int main(int argc, char* argv[])
 
   /* Define the variogram */
 
-  ascii_filename("Vario", 0, 0, filename.data());
-  vario = Vario::createFromNF(filename.data(), verbose);
+  ascii_filename("Vario", 0, 0, filename);
+  vario = Vario::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
   if (vario == (Vario*)NULL) goto label_end;
   if (dbout != (Db*)NULL)
   {
     vario->compute(dbout, ECalcVario::VARIOGRAM);
-    ascii_filename("Vario", 0, 1, filename.data());
+    ascii_filename("Vario", 0, 1, filename);
   }
   vario->display();
   if (!vario->dumpToNF("Vario.dat", EFormatNF::DEFAULT, verbose))
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
   if (model_auto_fit(vario, model, verbose, mauto, constraints, options))
     messageAbort("model_auto_fit");
   model->display();
-  ascii_filename("Model", 0, 1, filename.data());
+  ascii_filename("Model", 0, 1, filename);
   if (!model->dumpToNF("Model.out", EFormatNF::DEFAULT, verbose))
     messageAbort("ascii_model_write");
 

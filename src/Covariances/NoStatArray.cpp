@@ -89,10 +89,10 @@ void NoStatArray::_informField(const VectorVectorDouble& coords,
 
   if (verbose)
   {
-    char str[LONG_SIZE];
-    (void)gslSPrintf(str,
-                     "Statistics for Non-Stationary Parameter on Mesh");
-    VH::dumpStats(str, tab);
+    VectorUChar str(LONG_SIZE);
+    (void)gslSPrintf2(str,
+                      "Statistics for Non-Stationary Parameter on Mesh");
+    VH::dumpStats(reinterpret_cast<char*>(str.data()), tab);
   }
 }
-}
+} // namespace gstlrn

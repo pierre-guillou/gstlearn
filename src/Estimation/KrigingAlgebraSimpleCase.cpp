@@ -450,8 +450,8 @@ void KrigingAlgebraSimpleCase::setZ(std::shared_ptr<VectorDouble>& Z)
  * @note kept unchanged (even if its contents may have been updated)
  */
 Id KrigingAlgebraSimpleCase::setData(const VectorDouble* Z,
-                                      const RankHandler* rankhandler,
-                                      const VectorDouble& Means)
+                                     const RankHandler* rankhandler,
+                                     const VectorDouble& Means)
 {
   _resetLinkedToZ();
 
@@ -498,7 +498,7 @@ void KrigingAlgebraSimpleCase::setMeans(const VectorDouble& Means)
  * @note kept unchanged (even if its contents may have been updated)
  */
 Id KrigingAlgebraSimpleCase::setLHS(const MatrixSymmetric* Sigma,
-                                     const MatrixDense* X)
+                                    const MatrixDense* X)
 {
   _resetLinkedToLHS();
 
@@ -536,7 +536,7 @@ Id KrigingAlgebraSimpleCase::setVariance(const MatrixSymmetric* Sigma00)
 }
 
 Id KrigingAlgebraSimpleCase::setRHS(MatrixDense* Sigma0,
-                                     MatrixDense* X0)
+                                    MatrixDense* X0)
 {
   _resetLinkedToRHS();
 
@@ -1280,7 +1280,7 @@ void KrigingAlgebraSimpleCase::dumpWGT()
     lambda = &_LambdaUK;
   }
   if (_notFindSampleRanks()) return;
-  char string[20];
+  VectorUChar string(20);
 
   /* Header Line */
 
@@ -1288,8 +1288,8 @@ void KrigingAlgebraSimpleCase::dumpWGT()
   tab_prints(NULL, "Data");
   for (Id irhs = 0; irhs < _nrhs; irhs++)
   {
-    (void)gslSPrintf(string, "Z%d*", irhs + 1);
-    tab_prints(NULL, string);
+    (void)gslSPrintf2(string, "Z%d*", irhs + 1);
+    tab_prints(NULL, reinterpret_cast<char*>(string.data()));
   }
   message("\n");
 
@@ -1329,7 +1329,7 @@ void KrigingAlgebraSimpleCase::dumpWGT()
 void KrigingAlgebraSimpleCase::dumpAux()
 {
   if (_notFindSampleRanks()) return;
-  char string[20];
+  VectorUChar string(20);
 
   // For Simple Kriging, dump the information on Means
   if (_nbfl <= 0)
@@ -1349,8 +1349,8 @@ void KrigingAlgebraSimpleCase::dumpAux()
   tab_prints(NULL, "Rank");
   for (Id irhs = 0; irhs < _nrhs; irhs++)
   {
-    (void)gslSPrintf(string, "Mu%d*", irhs + 1);
-    tab_prints(NULL, string);
+    (void)gslSPrintf2(string, "Mu%d*", irhs + 1);
+    tab_prints(NULL, reinterpret_cast<char*>(string.data()));
   }
   tab_prints(NULL, "Coeff");
   message("\n");

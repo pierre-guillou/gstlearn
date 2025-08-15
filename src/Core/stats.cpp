@@ -348,11 +348,11 @@ static void st_mean_harmo(Id idim,
  **
  *****************************************************************************/
 static Id st_recopy(const Id* nxyz1,
-                     const double* numtab1,
-                     const double* valtab1,
-                     Id* nxyz2,
-                     double* numtab2,
-                     double* valtab2)
+                    const double* numtab1,
+                    const double* valtab1,
+                    Id* nxyz2,
+                    double* numtab2,
+                    double* valtab2)
 {
   Id i, ncell;
 
@@ -392,7 +392,7 @@ static void st_print_grid(const char* subtitle,
                           double* numtab,
                           double* valtab)
 {
-  char string[100];
+  VectorUChar string(100);
   Id iz, shift;
 
   /* Initializations */
@@ -403,11 +403,11 @@ static void st_print_grid(const char* subtitle,
 
   for (iz = 0; iz < nxyz[2]; iz++)
   {
-    (void)gslSPrintf(string, "%s Values (iz=%d)\n", subtitle, iz + 1);
-    message(string);
+    (void)gslSPrintf2(string, "%s Values (iz=%d)\n", subtitle, iz + 1);
+    message(reinterpret_cast<char*>(string.data()));
     print_matrix(NULL, 0, 0, nxyz[0], nxyz[1], NULL, &valtab[iz * shift]);
-    (void)gslSPrintf(string, "%s Counts (iz=%d)\n", subtitle, iz + 1);
-    message(string);
+    (void)gslSPrintf2(string, "%s Counts (iz=%d)\n", subtitle, iz + 1);
+    message(reinterpret_cast<char*>(string.data()));
     print_matrix(NULL, 0, 0, nxyz[0], nxyz[1], NULL, &numtab[iz * shift]);
   }
   message("\n");
@@ -584,12 +584,12 @@ static void st_upscale(Id orient,
  **
  *****************************************************************************/
 static Id st_is_subgrid(Id verbose,
-                         const char* title,
-                         DbGrid* dbgrid1,
-                         DbGrid* dbgrid2,
-                         Id* ind0,
-                         Id* nxyz,
-                         Id* ntot)
+                        const char* title,
+                        DbGrid* dbgrid1,
+                        DbGrid* dbgrid2,
+                        Id* ind0,
+                        Id* nxyz,
+                        Id* ntot)
 {
   double d;
   Id ndim;
@@ -673,7 +673,7 @@ Id db_upscale(DbGrid* dbgrid1, DbGrid* dbgrid2, Id orient, Id verbose)
 
   error     = 1;
   iech_save = (Id)get_keypone("Upscale.Converge.Block", 0);
-  Id ndim2 = dbgrid2->getNDim();
+  Id ndim2  = dbgrid2->getNDim();
   VectorInt ixyz(ndim2);
 
   /* Preliminary checks */
@@ -1239,17 +1239,17 @@ static double st_get_diff_coeff(Id niter,
  **
  *****************************************************************************/
 Id db_diffusion(DbGrid* dbgrid1,
-                 DbGrid* dbgrid2,
-                 Id orient,
-                 Id niter,
-                 Id nseed,
-                 Id seed,
-                 Id verbose)
+                DbGrid* dbgrid2,
+                Id orient,
+                Id niter,
+                Id nseed,
+                Id seed,
+                Id verbose)
 {
   double diff_coeff, pmid, probtot;
   Id error, ndim, ind0[3], nxyz[3], iech, nech, iptr, opt_center;
   Id ntot, iech_save, flag_save, opt_morpho, flag_traj, n_nbgh;
-  char name[40];
+  VectorUChar name(40);
   VectorInt nbgh;
   VectorInt tabini;
   VectorInt tabcur;
@@ -1273,8 +1273,8 @@ Id db_diffusion(DbGrid* dbgrid1,
 
   /* Preliminary checks */
 
-  ndim      = dbgrid1->getNDim();
-  nech      = dbgrid2->getNSample();
+  ndim     = dbgrid1->getNDim();
+  nech     = dbgrid2->getNSample();
   Id ndim2 = dbgrid2->getNDim();
   VectorInt ixyz(ndim2, 0);
   if (ndim < 1 || ndim > 3)
@@ -1361,12 +1361,13 @@ Id db_diffusion(DbGrid* dbgrid1,
         {
           for (Id iseed = 0; iseed < nseed; iseed++)
           {
-            (void)gslSPrintf(name, "Diffusion.Trajectory.%d", iseed + 1);
+            (void)gslSPrintf2(name, "Diffusion.Trajectory.%d", iseed + 1);
             for (Id iter = 0; iter < niter; iter++)
               for (Id idim = 0; idim < ndim; idim++)
                 TRAJEC(iseed, iter, idim) = dbgrid2->getCoordinate(iech, idim) +
                                             TRAJEC(iseed, iter, idim) * dbgrid1->getDX(idim);
-            set_keypair(name, 1, niter, ndim, &TRAJEC(iseed, 0, 0));
+            set_keypair(reinterpret_cast<char*>(name.data()),
+                        1, niter, ndim, &TRAJEC(iseed, 0, 0));
           }
         }
       }
@@ -1406,15 +1407,15 @@ label_end:
  **
  *****************************************************************************/
 Id stats_residuals(Id verbose,
-                    Id nech,
-                    const double* tab,
-                    Id ncut,
-                    double* zcut,
-                    Id* nsorted,
-                    double* mean,
-                    double* residuals,
-                    double* T,
-                    double* Q)
+                   Id nech,
+                   const double* tab,
+                   Id ncut,
+                   double* zcut,
+                   Id* nsorted,
+                   double* mean,
+                   double* residuals,
+                   double* T,
+                   double* Q)
 {
   double value, moyenne;
   Id iech, icut, jcut, nactive;
