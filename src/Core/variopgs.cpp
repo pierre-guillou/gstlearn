@@ -1765,7 +1765,7 @@ Vario_Order* vario_order_manage(Id mode,
 
   /* Dispatch */
 
-  vorder_loc = (Vario_Order*)NULL;
+  vorder_loc = nullptr;
   switch (mode)
   {
     case 1:
@@ -3636,7 +3636,7 @@ static void st_manage_pgs(Id mode,
       local_pgs->model       = nullptr;
       local_pgs->vario       = nullptr;
       local_pgs->varioind    = nullptr;
-      local_pgs->vorder      = (Vario_Order*)NULL;
+      local_pgs->vorder      = nullptr;
       break;
 
     case 1:
@@ -3820,7 +3820,7 @@ static Id st_variopgs_calcul_rho(Vario* vario,
 
   st_make_some_lags_inactive(vario);
   st_set_rho(
-    golden_search(st_rho_search, (void*)local_pgs, GS_TOLSTOP_RHO, -1., 1.,
+    golden_search(st_rho_search, static_cast<void*>(local_pgs), GS_TOLSTOP_RHO, -1., 1.,
                   &testval, &niter),
     local_pgs);
   st_make_all_lags_active(vario);
@@ -5237,7 +5237,7 @@ Rule* _rule_auto(Db* db,
 
   Id error         = 1;
   Rule* rule       = nullptr;
-  auto* Pile_Relem = (Relem*)NULL;
+  auto* Pile_Relem = nullptr;
   PropDef* propdef = nullptr;
 
   NCOLOR      = db->getNFacies();
