@@ -275,7 +275,7 @@ void set_keypair(const char* keyword,
 
   /* Copy the values */
 
-  st_keypair_copy(keypair, 2, 0, (void*)values);
+  st_keypair_copy(keypair, 2, 0, static_cast<void*>(const_cast<double*>(values)));
 }
 
 /****************************************************************************/
@@ -325,7 +325,7 @@ void app_keypair(const char* keyword,
 
   /* Copy the values */
 
-  st_keypair_copy(keypair, 2, start, (void*)values);
+  st_keypair_copy(keypair, 2, start, static_cast<void*>(values));
 }
 
 /****************************************************************************/
@@ -361,7 +361,7 @@ void set_keypair_int(const char* keyword,
 
   /* Copy the values */
 
-  st_keypair_copy(keypair, 1, 0, (void*)values);
+  st_keypair_copy(keypair, 1, 0, static_cast<void*>(values));
 }
 
 /****************************************************************************/
@@ -411,7 +411,7 @@ void app_keypair_int(const char* keyword,
 
   /* Copy the values */
 
-  st_keypair_copy(keypair, 1, start, (void*)values);
+  st_keypair_copy(keypair, 1, start, static_cast<void*>(values));
 }
 
 /****************************************************************************/

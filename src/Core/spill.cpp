@@ -324,7 +324,7 @@ static void st_convert(double hspill)
  *****************************************************************************/
 static SPIMG* st_image_free(SPIMG* image)
 {
-  if (image == (SPIMG*)NULL) return (image);
+  if (image == nullptr) return (image);
 
   image = (SPIMG*)mem_free((char*)image);
 
@@ -683,11 +683,11 @@ Id spill_point(DbGrid* dbgrid,
   /* Core allocation */
 
   SPIMG_IN = st_image_alloc(BIGVAL);
-  if (SPIMG_IN == (SPIMG*)NULL) goto label_end;
+  if (SPIMG_IN == nullptr) goto label_end;
   SPIMG_MARK = st_image_alloc(SURFACE_OUTSIDE);
-  if (SPIMG_MARK == (SPIMG*)NULL) goto label_end;
+  if (SPIMG_MARK == nullptr) goto label_end;
   SPIMG_OUT = st_image_alloc(SURFACE_OUTSIDE);
-  if (SPIMG_OUT == (SPIMG*)NULL) goto label_end;
+  if (SPIMG_OUT == nullptr) goto label_end;
   Offset_out_in   = static_cast<Id>(SPIMG_IN->bitmap.data() - SPIMG_OUT->bitmap.data());
   Offset_mark_out = static_cast<Id>(SPIMG_OUT->bitmap.data() - SPIMG_MARK->bitmap.data());
 

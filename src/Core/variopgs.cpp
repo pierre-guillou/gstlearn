@@ -1148,7 +1148,7 @@ static Id st_varcalc_from_vario_stat(Vario* vario,
       for (Id igrf = 0; igrf < ngrf; igrf++)
       {
         local_pgs->igrfcur = igrf;
-        result             = golden_search(st_func_search_stat, (void*)local_pgs,
+        result             = golden_search(st_func_search_stat, static_cast<void*>(local_pgs),
                                            GS_TOLSTOP, -1., 1., &testval, &niter);
         trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf, 1, &testval);
         trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf + 1, 1, &niter);
@@ -1249,7 +1249,7 @@ static void st_varcalc_uncorrelated_grf(Local_Pgs* local_pgs, Id idir)
     for (igrf = 0; igrf < ngrf; igrf++)
     {
       local_pgs->igrfcur = igrf;
-      result             = golden_search(st_func_search_nostat, (void*)local_pgs,
+      result             = golden_search(st_func_search_nostat, static_cast<void*>(local_pgs),
                                          GS_TOLSTOP, -1., 1., &testval, &niter);
       trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf, 1, &testval);
       trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf + 1, 1, &niter);
@@ -1579,7 +1579,7 @@ static void st_rule_glue(Relem* relem,
                          const VectorInt& rules1,
                          const VectorInt& fipos1)
 {
-  if (relem == (Relem*)NULL) return;
+  if (relem == nullptr) return;
   if (nrule1 <= 0) return;
   Id nnew = relem->nrule + nrule1;
   Id ir   = relem->nrule;
@@ -1674,7 +1674,7 @@ static void st_split_collapse(Split* split, Id verbose)
   Id num[2], nby[2], nprod;
   VectorInt* ptr[2];
 
-  if (split == (Split*)NULL) return;
+  if (split == nullptr) return;
 
   // Explore the two Relems
 
@@ -1727,7 +1727,7 @@ static void st_relem_explore(Relem* relem, Id verbose)
 {
   Split* split;
 
-  if (relem == (Relem*)NULL) return;
+  if (relem == nullptr) return;
 
   for (Id is = 0; is < relem->nsplit; is++)
   {
@@ -1833,7 +1833,7 @@ Id vario_order_add(Vario_Order* vorder,
   Id iad;
   static Id VARIO_ORDER_QUANT = 1000;
 
-  if (vorder == (Vario_Order*)NULL) return (0);
+  if (vorder == nullptr) return (0);
 
   /* Resize the array */
 
@@ -1888,7 +1888,7 @@ void vario_order_print(Vario_Order* vorder,
 {
   Id i, j, ilag, idir, flag_first;
 
-  if (vorder == (Vario_Order*)NULL) return;
+  if (vorder == nullptr) return;
 
   mestitle(0, "Variogram Order structure");
   message("Allocated size    = %d\n", vorder->nalloc);
@@ -1939,7 +1939,7 @@ Vario_Order* vario_order_final(Vario_Order* vorder, Id* npair)
   Id i, error;
 
   *npair = 0;
-  if (vorder == (Vario_Order*)NULL) return (vorder);
+  if (vorder == nullptr) return (vorder);
 
   error = 0;
   if (vorder->npair > 0)
@@ -3314,7 +3314,7 @@ static Id st_variogram_geometry_pgs_final(Local_Pgs* local_pgs)
   Id npair;
 
   local_pgs->vorder = vario_order_final(local_pgs->vorder, &npair);
-  if (local_pgs->vorder == (Vario_Order*)NULL) return (1);
+  if (local_pgs->vorder == nullptr) return (1);
   if (npair > 0 && !local_pgs->flag_stat)
   {
     local_pgs->memint.resize(npair);

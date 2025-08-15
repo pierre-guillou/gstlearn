@@ -284,7 +284,7 @@ Id PrecisionOp::reset(const AShiftOp* shiftop,
   try
   {
     // Store the pointer to the ShiftOp
-    if (shiftop == (ShiftOpMatrix*)NULL)
+    if (shiftop == nullptr)
       my_throw("The argument 'shiftop'must be provided");
 
     // Store the members

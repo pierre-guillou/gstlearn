@@ -5612,7 +5612,7 @@ static M2D_Environ* st_m2denv_manage(Id mode,
     // Allocation
 
     m2denv = (M2D_Environ*)mem_alloc(sizeof(M2D_Environ), 0);
-    if (m2denv == (M2D_Environ*)NULL) return (m2denv);
+    if (m2denv == nullptr) return (m2denv);
     m2denv->flag_ed = flag_ed;
     m2denv->iatt_fd = -1;
     m2denv->iatt_fg = -1;
@@ -5629,7 +5629,7 @@ static M2D_Environ* st_m2denv_manage(Id mode,
   else
   {
     m2denv = m2denv_old;
-    if (m2denv != (M2D_Environ*)NULL)
+    if (m2denv != nullptr)
 
     {
       m2denv->dcoef = (double*)mem_free((char*)m2denv->dcoef);
