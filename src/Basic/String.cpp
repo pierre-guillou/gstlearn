@@ -727,7 +727,6 @@ void gslStrcpy2(VectorUChar& dst, const char* src)
   (void)strcpy(reinterpret_cast<char*>(dst.data()), src);
 }
 
-
 char* gslStrcat(char* dst, const char* src)
 {
   return strcat(dst, src);
@@ -809,20 +808,20 @@ Id gslSPrintf2(VectorUChar& dst, const char* fmt, ...)
   return size;
 }
 
-Id gslScanf(const char* format, ...)
+Id gslScanf(const char* fmt, ...)
 {
   va_list ap;
-  va_start(ap, format);
-  Id n = vscanf(format, ap);
+  va_start(ap, fmt);
+  Id n = vscanf(fmt, ap);
   va_end(ap);
   return n;
 }
 
-Id gslSScanf(const char* str, const char* format, ...)
+Id gslSScanf(const char* str, const char* fmt, ...)
 {
   va_list ap;
-  va_start(ap, format);
-  Id n = vsscanf(str, format, ap);
+  va_start(ap, fmt);
+  Id n = vsscanf(str, fmt, ap);
   va_end(ap);
   return n;
 }
