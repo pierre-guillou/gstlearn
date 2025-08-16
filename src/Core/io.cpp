@@ -436,7 +436,7 @@ Id _file_read(FILE* file, const char* format, va_list ap)
       ret_i = va_arg(ap, Id*);
       if (gslSScanf(LCUR, "%d", ret_i) <= 0) return (1);
       ideb += 2;
-      if (*ret_i == (Id)ASCII_TEST) *ret_i = ITEST;
+      if (*ret_i == static_cast<Id>(ASCII_TEST)) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
     }
     else if (!strcmp(fmt, "%f"))
@@ -444,7 +444,7 @@ Id _file_read(FILE* file, const char* format, va_list ap)
       ret_f = va_arg(ap, float*);
       if (gslSScanf(LCUR, "%f", ret_f) <= 0) return (1);
       ideb += 2;
-      if (*ret_f == ASCII_TEST) *ret_f = (float)TEST;
+      if (*ret_f == ASCII_TEST) *ret_f = static_cast<float>(TEST);
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Float = %s\n", *ret_f);
     }
     else if (!strcmp(fmt, "%lf"))
@@ -502,7 +502,7 @@ Id _file_get_ncol(FILE* file)
   /* Eliminate the comments */
 
   flag_com = 0;
-  for (i = 0; i < (Id)strlen(LINE); i++)
+  for (i = 0; i < static_cast<Id>(strlen(LINE)); i++)
   {
     if (LINE[i] == DEL_COM)
     {
@@ -633,7 +633,7 @@ Id _buffer_read(char** buffer, const char* format, va_list ap)
       ret_i = va_arg(ap, Id*);
       if (gslSScanf(LCUR, "%d", ret_i) <= 0) return (1);
       ideb += 2;
-      if (*ret_i == (Id)ASCII_TEST) *ret_i = ITEST;
+      if (*ret_i == static_cast<Id>(ASCII_TEST)) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
     }
     else if (!strcmp(fmt, "%f"))
@@ -641,7 +641,7 @@ Id _buffer_read(char** buffer, const char* format, va_list ap)
       ret_f = va_arg(ap, float*);
       if (gslSScanf(LCUR, "%f", ret_f) <= 0) return (1);
       ideb += 2;
-      if (*ret_f == ASCII_TEST) *ret_f = (float)TEST;
+      if (*ret_f == ASCII_TEST) *ret_f = static_cast<float>(TEST);
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Float = %s\n", *ret_f);
     }
     else if (!strcmp(fmt, "%lf"))
