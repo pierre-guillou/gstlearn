@@ -53,7 +53,7 @@ Id GridZycor::writeInFile()
   double rbid, x0[2], xf[2], dx[2];
   double buff[5]; /* Size = nbyline */
   char card[100]; /* Size = nbyline * 20 */
-  static Id nbyline    = 5;
+  static Id nbyline     = 5;
   static double testval = MAXIMUM_BIG;
 
   /* Open the file */

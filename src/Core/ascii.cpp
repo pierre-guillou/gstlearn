@@ -108,7 +108,7 @@ static Id st_record_read(const char* title, const char* format, ...)
 static void st_record_write(const char* format, ...)
 {
   va_list ap;
-  char buf[1000];
+  VectorUChar buf(1000);
   Id long1, long2;
 
   va_start(ap, format);
@@ -119,14 +119,14 @@ static void st_record_write(const char* format, ...)
   else
   {
     _buffer_write(buf, format, ap);
-    long1 = static_cast<Id>(strlen(buf));
+    long1 = buf.size();
     long2 = (ASCII_BUFFER != NULL) ? static_cast<Id>(strlen(ASCII_BUFFER)) : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
       ASCII_BUFFER = mem_realloc(ASCII_BUFFER, ASCII_BUFFER_LENGTH, 1);
     }
-    (void)gslStrcat(ASCII_BUFFER, buf);
+    (void)gslStrcat(ASCII_BUFFER, reinterpret_cast<char*>(buf.data()));
   }
 
   va_end(ap);

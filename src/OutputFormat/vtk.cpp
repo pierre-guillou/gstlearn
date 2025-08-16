@@ -108,17 +108,17 @@ static void end_line(void)
  * ************************************************************************* */
 static void open_file(const char* filename)
 {
-  char full_filename[1024];
+  VectorUChar full_filename(1024);
   if (strstr(filename, ".vtk") != NULL)
   {
-    gslStrcpy(full_filename, filename);
+    gslStrcpy2(full_filename, filename);
   }
   else
   {
-    gslSPrintf(full_filename, "%s.vtk", filename);
+    gslSPrintf2(full_filename, "%s.vtk", filename);
   }
 
-  fp = gslFopen(full_filename, "w+");
+  fp = gslFopen(reinterpret_cast<char*>(full_filename.data()), "w+");
 }
 
 /* ****************************************************************************

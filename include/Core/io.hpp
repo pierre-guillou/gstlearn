@@ -16,6 +16,8 @@
 #include <cstdarg>
 #include <cstdio>
 
+class VectorUChar;
+
 namespace gstlrn
 {
 GSTLEARN_EXPORT Id _file_read(FILE* file, const char* format, va_list ap);
@@ -25,7 +27,7 @@ GSTLEARN_EXPORT FILE* _file_open(const char* filename, Id mode);
 GSTLEARN_EXPORT Id _record_read(FILE* file, const char* format, ...);
 GSTLEARN_EXPORT Id _buffer_read(char** buffer, const char* format, va_list ap);
 GSTLEARN_EXPORT void _file_write(FILE* file, const char* format, va_list ap);
-GSTLEARN_EXPORT void _buffer_write(char* buffer, const char* format, va_list ap);
+GSTLEARN_EXPORT void _buffer_write(VectorUChar& buffer, const char* format, va_list ap);
 GSTLEARN_EXPORT void _lire_string(const char* question,
                                   Id flag_def,
                                   const char* valdef,

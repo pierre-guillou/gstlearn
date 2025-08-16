@@ -13,6 +13,7 @@
 #include "Basic/OptDbg.hpp"
 #include "Basic/String.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/VectorNumT.hpp"
 #include "geoslib_io.h"
 #include <cmath>
 #include <cstdarg>
@@ -766,7 +767,7 @@ void _file_write(FILE* file, const char* format, va_list ap)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-void _buffer_write(char* buffer, const char* format, va_list ap)
+void _buffer_write(VectorUChar& buffer, const char* format, va_list ap)
 {
   Id ret_i, no_blank;
   double ret_d;
@@ -781,54 +782,54 @@ void _buffer_write(char* buffer, const char* format, va_list ap)
   if (!strcmp(format, "%s"))
   {
     ret_s = va_arg(ap, char*);
-    (void)gslSPrintf(buffer, "%s", ret_s);
+    (void)gslSPrintf2(buffer, "%s", ret_s);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded String = %s\n", ret_s);
   }
   else if (!strcmp(format, "%d"))
   {
     ret_i = va_arg(ap, Id);
     if (ret_i == TEST)
-      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf(buffer, "%d", ret_i);
+      (void)gslSPrintf2(buffer, "%d", ret_i);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Integer = %i\n", ret_i);
   }
   else if (!strcmp(format, "%f"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf(buffer, "%f", ret_d);
+      (void)gslSPrintf2(buffer, "%f", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Float = %s\n", ret_d);
   }
   else if (!strcmp(format, "%lf"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf(buffer, "%lf", ret_d);
+      (void)gslSPrintf2(buffer, "%lf", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Double = %lf\n", ret_d);
   }
   else if (!strcmp(format, "%lg"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf(buffer, "%lg", ret_d);
+      (void)gslSPrintf2(buffer, "%lg", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Double = %lg\n", ret_d);
   }
   else if (!strcmp(format, "\n"))
   {
-    (void)gslSPrintf(buffer, "\n");
+    (void)gslSPrintf2(buffer, "\n");
     no_blank = 1;
   }
   else if (!strcmp(format, "#"))
   {
     ret_s = va_arg(ap, char*);
-    (void)gslSPrintf(buffer, "# %s\n", ret_s);
+    (void)gslSPrintf2(buffer, "# %s\n", ret_s);
     no_blank = 1;
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Comment = %s\n", ret_s);
   }
@@ -837,7 +838,7 @@ void _buffer_write(char* buffer, const char* format, va_list ap)
     messerr("Wrong format %s", format);
     return;
   }
-  if (!no_blank) (void)gslStrcat(buffer, " ");
+  if (!no_blank) (void)gslStrcat2(buffer, " ");
 }
 
 /****************************************************************************/
@@ -907,10 +908,10 @@ loop:
  **
  *****************************************************************************/
 Id _lire_int(const char* question,
-              Id flag_def,
-              Id valdef,
-              Id valmin,
-              Id valmax)
+             Id flag_def,
+             Id valdef,
+             Id valmin,
+             Id valmax)
 {
   Id rep;
 

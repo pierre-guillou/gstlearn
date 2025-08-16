@@ -134,7 +134,7 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   (void)gslStrcpy2(STRING, "\n");
   if (flagMain)
   {
-    (void)gslSPrintf2(STRING, "\nEnd of Step %d === ", STEP);
+    (void)gslAddSPrintf2(STRING, "\nEnd of Step %d === ", STEP);
     (void)gslStrcat2(STRING, title.c_str());
     (void)gslStrcat2(STRING, "\n");
   }
