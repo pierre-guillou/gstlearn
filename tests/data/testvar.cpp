@@ -30,7 +30,7 @@ using namespace gstlrn;
 
 int main(int argc, char* argv[])
 {
-  VectorUChar filename(BUFFER_LENGTH);
+  String filename;
   DbGrid* dbout;
   Vario* vario;
   Model* model;
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
   /* Define the output grid file */
 
   ascii_filename("Grid", 0, 0, filename);
-  dbout = DbGrid::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  dbout = DbGrid::createFromNF(filename, verbose);
 
   /* Look for simulations */
 
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
   /* Define the model */
 
   ascii_filename("Model", 0, 0, filename);
-  model = Model::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  model = Model::createFromNF(filename, verbose);
   if (model == (Model*)NULL) goto label_end;
 
   // Define and store the Space
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
   /* Define the variogram */
 
   ascii_filename("Vario", 0, 0, filename);
-  vario = Vario::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  vario = Vario::createFromNF(filename, verbose);
   if (vario == (Vario*)NULL) goto label_end;
   if (dbout != (Db*)NULL)
   {

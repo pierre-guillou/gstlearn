@@ -124,7 +124,7 @@ static void st_get_coordinates(const double* pt_out,
  *****************************************************************************/
 static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* image)
 {
-  VectorUChar STRING(BUFFER_LENGTH);
+  String STRING;
 
   if (VERBOSE_STEP < 0) return;
   if (!flagMain && STEP <= VERBOSE_STEP) return;
@@ -134,7 +134,7 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   (void)gslStrcpy2(STRING, "\n");
   if (flagMain)
   {
-    (void)gslAddSPrintf2(STRING, "\nEnd of Step %d === ", STEP);
+    (void)gslSPrintfCat2(STRING, "\nEnd of Step %d === ", STEP);
     (void)gslStrcat2(STRING, title.c_str());
     (void)gslStrcat2(STRING, "\n");
   }
@@ -146,9 +146,9 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   if (pt_out != nullptr)
   {
     st_get_coordinates(pt_out, &ix0, &iy0);
-    (void)gslAddSPrintf2(STRING, "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
+    (void)gslSPrintfCat2(STRING, "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
   }
-  message(reinterpret_cast<char*>(STRING.data()));
+  message(STRING.data());
 
   // Current Spill position
 
@@ -213,7 +213,7 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
       }
     }
     (void)gslStrcat2(STRING, "\n");
-    message(reinterpret_cast<char*>(STRING.data()));
+    message(STRING.data());
   }
   message("Spill'#' Queue'?'(%d) Unknown' '(%d) Out'.'(%d) In'*'(%d) Below'-'(%d) Heap(%d)\n",
           numm1, nump0, nump1, nump2, numpb, Hsize);

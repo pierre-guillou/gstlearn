@@ -1100,7 +1100,7 @@ void _getRowname(const String& radix,
                  Id ncol,
                  Id icol,
                  const String& name,
-                 VectorUChar& string)
+                 String& string)
 {
   if (!radix.empty())
     (void)gslSPrintf2(string, "%s-%d", radix.c_str(), icol + 1);
@@ -1131,7 +1131,7 @@ void dbStatisticsPrint(const Db* db,
   VectorInt iuids = db->getUIDs(names);
   if (iuids.empty()) return;
 
-  VectorUChar string(50);
+  String string;
   Id ncol = static_cast<Id>(iuids.size());
 
   /* Preliminary checks */
@@ -1261,7 +1261,7 @@ void dbStatisticsPrint(const Db* db,
   for (Id icol = 0; icol < ncol; icol++)
   {
     _getRowname(radix, ncol, icol, db->getNameByUID(iuids[icol]), string);
-    tab_print_rowname(reinterpret_cast<char*>(string.data()), taille);
+    tab_print_rowname(string.data(), taille);
 
     if (_operExists(opers, EStatOption::NUM))
       tab_printi(NULL, (Id)num[icol]);

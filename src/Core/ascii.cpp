@@ -40,24 +40,24 @@ static Id ASCII_BUFFER_LENGTH = 0;
 static Id ASCII_BUFFER_QUANT  = 1000;
 static char* ASCII_BUFFER     = NULL;
 static FILE* FILE_MEM         = NULL;
-static VectorUChar FILE_NAME_MEM(BUFFER_LENGTH);
+static String FILE_NAME_MEM;
 
 /*! \endcond */
 
-static char STUDY[BUFFER_LENGTH] = "./";
-static char EXT_DAT[]            = "dat";
-static char EXT_OUT[]            = "out";
-static char Fichier_environ[]    = "Environ";
-static char Fichier_donnees[]    = "Data";
-static char Fichier_grid[]       = "Grid";
-static char Fichier_vario[]      = "Vario";
-static char Fichier_model[]      = "Model";
-static char Fichier_neigh[]      = "Neigh";
-static char Fichier_polygon[]    = "Polygon";
-static char Fichier_option[]     = "Option";
-static char Fichier_rule[]       = "Rule";
-static char Fichier_simu[]       = "Simu";
-static char Fichier_frac[]       = "Frac";
+static String STUDY;
+static char EXT_DAT[]         = "dat";
+static char EXT_OUT[]         = "out";
+static char Fichier_environ[] = "Environ";
+static char Fichier_donnees[] = "Data";
+static char Fichier_grid[]    = "Grid";
+static char Fichier_vario[]   = "Vario";
+static char Fichier_model[]   = "Model";
+static char Fichier_neigh[]   = "Neigh";
+static char Fichier_polygon[] = "Polygon";
+static char Fichier_option[]  = "Option";
+static char Fichier_rule[]    = "Rule";
+static char Fichier_simu[]    = "Simu";
+static char Fichier_frac[]    = "Frac";
 
 /****************************************************************************/
 /*!
@@ -88,8 +88,7 @@ static Id st_record_read(const char* title, const char* format, ...)
 
   if (error > 0)
   {
-    messerr("Error when reading '%s' from %s", title,
-            reinterpret_cast<char*>(FILE_NAME_MEM.data()));
+    messerr("Error when reading '%s' from %s", title, FILE_NAME_MEM.data());
     print_current_line();
   }
 
@@ -108,7 +107,7 @@ static Id st_record_read(const char* title, const char* format, ...)
 static void st_record_write(const char* format, ...)
 {
   va_list ap;
-  VectorUChar buf(1000);
+  String buf;
   Id long1, long2;
 
   va_start(ap, format);
@@ -126,7 +125,7 @@ static void st_record_write(const char* format, ...)
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
       ASCII_BUFFER = mem_realloc(ASCII_BUFFER, ASCII_BUFFER_LENGTH, 1);
     }
-    (void)gslStrcat(ASCII_BUFFER, reinterpret_cast<char*>(buf.data()));
+    (void)gslStrcat(ASCII_BUFFER, buf.data());
   }
 
   va_end(ap);
@@ -152,14 +151,15 @@ static void st_record_write(const char* format, ...)
 static void st_filename_patch(const char* ref_name,
                               Id rank,
                               Id mode,
-                              VectorUChar& filename)
+                              String& filename)
 {
   if (rank == 0)
   {
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf2(filename, "%s/%s.%s", STUDY, ref_name, EXT_DAT);
+        (void)gslSPrintf2(filename, "%s/%s.%s",
+                          STUDY.data(), ref_name, EXT_DAT);
         break;
 
       case 1:
@@ -176,7 +176,8 @@ static void st_filename_patch(const char* ref_name,
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf2(filename, "%s/%s%1d.%s", STUDY, ref_name, rank,
+        (void)gslSPrintf2(filename, "%s/%s%1d.%s",
+                          STUDY.data(), ref_name, rank,
                           EXT_DAT);
         break;
 
@@ -203,7 +204,7 @@ static void st_filename_patch(const char* ref_name,
  ** \param[out] filename  Output filename
  **
  *****************************************************************************/
-void ascii_filename(const char* type, Id rank, Id mode, VectorUChar& filename)
+void ascii_filename(const char* type, Id rank, Id mode, String& filename)
 {
   if (!strcmp(type, "Environ"))
     st_filename_patch(Fichier_environ, rank, mode, filename);
@@ -243,7 +244,7 @@ void ascii_filename(const char* type, Id rank, Id mode, VectorUChar& filename)
 void ascii_study_define(const char* study)
 
 {
-  (void)gslStrcpy(STUDY, study);
+  (void)gslStrcpy2(STUDY, study);
 }
 
 /****************************************************************************/
@@ -271,7 +272,7 @@ static void st_file_close(FILE* file)
  ** \param[in]  verbose  Verbose option if the file cannot be opened
  **
  *****************************************************************************/
-static FILE* st_file_open(const VectorUChar& filename,
+static FILE* st_file_open(const String& filename,
                           const char* filetype,
                           Id mode,
                           bool verbose)
@@ -281,20 +282,18 @@ static FILE* st_file_open(const VectorUChar& filename,
 
   /* Open the file */
 
-  file = FILE_MEM = _file_open(reinterpret_cast<const char*>(filename.data()), mode);
+  file = FILE_MEM = _file_open(filename.data(), mode);
   FILE_NAME_MEM   = filename;
 
   if (file == nullptr)
   {
-    if (verbose) messerr("Error when opening the file %s",
-                         reinterpret_cast<const char*>(filename.data()));
+    if (verbose) messerr("Error when opening the file %s", filename.data());
     FILE_MEM = NULL;
     return (file);
   }
 
   if (OptDbg::query(EDbg::INTERFACE))
-    message("Opening the File = %s\n",
-            reinterpret_cast<const char*>(filename.data()));
+    message("Opening the File = %s\n", filename.data());
 
   /* Check against the file type */
 
@@ -308,7 +307,7 @@ static FILE* st_file_open(const VectorUChar& filename,
     if (strcmp(idtype, filetype) != 0)
     {
       messerr("Error: in the File (%s), its Type (%s) does not match the requested one (%s)",
-              reinterpret_cast<const char*>(filename.data()), idtype, filetype);
+              filename.data(), idtype, filetype);
       FILE_MEM = NULL;
       return (NULL);
     }
@@ -333,7 +332,7 @@ static FILE* st_file_open(const VectorUChar& filename,
  ** \param[in] verbose    Verbose option if the file cannot be opened
  **
  *****************************************************************************/
-void ascii_environ_read(VectorUChar& filename, bool verbose)
+void ascii_environ_read(String& filename, bool verbose)
 
 {
   FILE* file;
@@ -374,7 +373,7 @@ label_end:
  ** \param[out]  seed      Seed for the random number generator
  **
  *****************************************************************************/
-void ascii_simu_read(VectorUChar& filename,
+void ascii_simu_read(String& filename,
                      bool verbose,
                      Id* nbsimu,
                      Id* nbtuba,
@@ -419,7 +418,7 @@ void ascii_simu_read(VectorUChar& filename,
  ** \param[out]  answer      Answer
  **
  *****************************************************************************/
-Id ascii_option_defined(const VectorUChar& filename,
+Id ascii_option_defined(const String& filename,
                         bool verbose,
                         const char* option_name,
                         Id type,
@@ -489,7 +488,7 @@ label_end:
  ** \param[in]  flagAddSampleRank True To add the rank number
  **
  *****************************************************************************/
-Db* db_read_csv(const VectorUChar& filename,
+Db* db_read_csv(const String& filename,
                 const CSVformat& csvfmt,
                 bool verbose,
                 Id ncol_max,
@@ -507,7 +506,7 @@ Db* db_read_csv(const VectorUChar& filename,
 
   /* Reading the CSV file */
 
-  if (csv_table_read(reinterpret_cast<const char*>(filename.data()),
+  if (csv_table_read(filename,
                      csvfmt, verbose, ncol_max, nrow_max, &ncol, &nrow, names, tab))
     goto label_end;
 

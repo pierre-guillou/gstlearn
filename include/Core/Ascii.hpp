@@ -10,17 +10,16 @@
 /******************************************************************************/
 #pragma once
 
-#include "Basic/VectorNumT.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
 namespace gstlrn
 {
 GSTLEARN_EXPORT void ascii_study_define(const char* study);
-GSTLEARN_EXPORT void ascii_environ_read(VectorUChar& filename, bool verbose);
-GSTLEARN_EXPORT void ascii_filename(const char* type, Id rank, Id mode, VectorUChar& filename);
-GSTLEARN_EXPORT void ascii_simu_read(VectorUChar& filename, bool verbose, Id* nbsimu, Id* nbtuba, Id* seed);
-GSTLEARN_EXPORT Id ascii_option_defined(const VectorUChar& filename,
+GSTLEARN_EXPORT void ascii_environ_read(String& filename, bool verbose);
+GSTLEARN_EXPORT void ascii_filename(const char* type, Id rank, Id mode, String& filename);
+GSTLEARN_EXPORT void ascii_simu_read(String& filename, bool verbose, Id* nbsimu, Id* nbtuba, Id* seed);
+GSTLEARN_EXPORT Id ascii_option_defined(const String& filename,
                                         bool verbose,
                                         const char* option_name,
                                         Id type,

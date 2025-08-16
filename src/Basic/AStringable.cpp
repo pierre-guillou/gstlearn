@@ -33,9 +33,9 @@ namespace gstlrn
 {
 class EJustify;
 
-static VectorUChar FORMAT(100);
-static VectorUChar DECODE(100);
-static VectorUChar TABSTR(100);
+static String FORMAT;
+static String DECODE;
+static String TABSTR;
 
 static Id _getColumnRank()
 {
@@ -81,12 +81,12 @@ static void _buildFormat(Id mode)
 
     case CASE_REAL:
       (void)gslSPrintf2(FORMAT, "%%%d.%dlf", static_cast<Id>(OptCst::query(ECst::NTCAR)),
-                       static_cast<Id>(OptCst::query(ECst::NTDEC)));
+                        static_cast<Id>(OptCst::query(ECst::NTDEC)));
       break;
 
     case CASE_DOUBLE:
       (void)gslSPrintf2(FORMAT, "%%%d.%dlg", static_cast<Id>(OptCst::query(ECst::NTCAR)),
-                       static_cast<Id>(OptCst::query(ECst::NTDEC)));
+                        static_cast<Id>(OptCst::query(ECst::NTDEC)));
       break;
 
     case CASE_COL:
@@ -1111,7 +1111,7 @@ void tab_prints(const char* title,
       (void)gslStrcat2(TABSTR, string);
       break;
   }
-  message(reinterpret_cast<const char*>(TABSTR.data()));
+  message(TABSTR.data());
 }
 
 /****************************************************************************/
@@ -1138,9 +1138,9 @@ void tab_printg(const char* title,
   {
     // Prevent -0.00 : https://stackoverflow.com/a/12536500/3952924
     value = (ABS(value) < _getThresh()) ? 0. : value;
-    (void)gslSPrintf2(DECODE, reinterpret_cast<char*>(FORMAT.data()), value);
+    (void)gslSPrintf2(DECODE, FORMAT.data(), value);
   }
-  tab_prints(title, reinterpret_cast<char*>(DECODE.data()), ncol, justify);
+  tab_prints(title, DECODE.data(), ncol, justify);
 }
 
 /****************************************************************************/
@@ -1164,9 +1164,9 @@ void tab_printd(const char* title,
   if (FFFF(value))
     (void)gslStrcpy2(DECODE, "N/A");
   else
-    (void)gslSPrintf2(DECODE, reinterpret_cast<char*>(FORMAT.data()), value);
+    (void)gslSPrintf2(DECODE, FORMAT.data(), value);
 
-  tab_prints(title, reinterpret_cast<char*>(DECODE.data()), ncol, justify);
+  tab_prints(title, DECODE.data(), ncol, justify);
 }
 
 /****************************************************************************/
@@ -1187,9 +1187,9 @@ void tab_printi(const char* title, Id value, Id ncol, const EJustify& justify)
   if (IFFFF(value))
     (void)gslStrcpy2(DECODE, "N/A");
   else
-    (void)gslSPrintf2(DECODE, reinterpret_cast<char*>(FORMAT.data()), value);
+    (void)gslSPrintf2(DECODE, FORMAT.data(), value);
 
-  tab_prints(title, reinterpret_cast<char*>(DECODE.data()), ncol, justify);
+  tab_prints(title, DECODE.data(), ncol, justify);
 }
 
 /****************************************************************************/
@@ -1212,9 +1212,9 @@ void tab_print_rc(const char* title,
 {
   _buildFormat(mode);
 
-  (void)gslSPrintf2(DECODE, reinterpret_cast<char*>(FORMAT.data()), value);
-  string_strip_blanks(reinterpret_cast<char*>(DECODE.data()), 0);
-  tab_prints(title, reinterpret_cast<char*>(DECODE.data()), ncol, justify);
+  (void)gslSPrintf2(DECODE, FORMAT.data(), value);
+  string_strip_blanks(DECODE.data(), 0);
+  tab_prints(title, DECODE.data(), ncol, justify);
 }
 
 /****************************************************************************/
@@ -1240,7 +1240,7 @@ void tab_print_rowname(const char* string, Id taille)
   TABSTR[neff] = '\0';
   for (Id i = 0; i < nrst; i++)
     (void)gslStrcat2(TABSTR, " ");
-  message(reinterpret_cast<const char*>(TABSTR.data()));
+  message(TABSTR.data());
 }
 
 /****************************************************************************/

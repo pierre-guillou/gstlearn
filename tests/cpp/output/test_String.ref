@@ -17,3 +17,4 @@ Testing gslStrcat2:
 - Result(char) = BC+fgh added 1 times (Tested successfully)
 Testing gslStrcpy2:
 - Result(char) = After a copy
+String length = 12

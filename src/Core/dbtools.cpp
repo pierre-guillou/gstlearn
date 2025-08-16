@@ -208,7 +208,7 @@ static void st_edit_display(Db* db, Id nrdv, Id nrds, Id ivar, Id iech)
 {
   Id item, nvar, nech, ivar_deb, ivar_fin, iech_deb, iech_fin, jvar, jech;
   ELoc locatorType;
-  VectorUChar string(5);
+  String string;
 
   /* Initializations */
 
@@ -255,7 +255,7 @@ static void st_edit_display(Db* db, Id nrdv, Id nrds, Id ivar, Id iech)
     else
       (void)gslStrcpy2(string, "NA");
     if (jvar == ivar) (void)gslStrcat2(string, "*");
-    tab_prints(NULL, reinterpret_cast<char*>(string.data()));
+    tab_prints(NULL, string.data());
   }
   message("\n");
 

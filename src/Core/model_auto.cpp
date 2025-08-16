@@ -110,7 +110,7 @@ typedef struct
 /*! \endcond */
 
 // TODO : rename this (and remove static string below)
-static VectorUChar string(STRING_LENGTH);
+static String string;
 static char cov_name[STRING_LENGTH];
 
 static Id CONGRUENCY = 50;
@@ -1254,7 +1254,7 @@ static void st_load_wt(const Vario* vario,
  *****************************************************************************/
 static void st_goulard_debug_title(Id nvar, Id ncova)
 {
-  VectorUChar loc_string(20);
+  String loc_string;
 
   if (!OptDbg::query(EDbg::CONVERGE)) return;
   mestitle(1, "Trajectory of parameters in Goulard Algorithm");
@@ -1266,7 +1266,7 @@ static void st_goulard_debug_title(Id nvar, Id ncova)
       for (Id jvar = 0; jvar <= ivar; jvar++)
       {
         (void)gslSPrintf2(loc_string, "St%d(%d-%d)", icov + 1, ivar + 1, jvar + 1);
-        tab_prints(NULL, reinterpret_cast<char*>(loc_string.data()));
+        tab_prints(NULL, loc_string.data());
       }
   message("\n");
 }
@@ -1281,7 +1281,7 @@ static void st_goulard_debug_title(Id nvar, Id ncova)
  *****************************************************************************/
 static void st_keypair_sill(Id mode, Model* model)
 {
-  VectorUChar loc_string(100);
+  String loc_string;
 
   if (model == nullptr) return;
   Id ncova = model->getNCov();
@@ -1296,7 +1296,7 @@ static void st_keypair_sill(Id mode, Model* model)
     for (Id icova = 0; icova < ncova; icova++)
     {
       (void)gslSPrintf2(loc_string, "Fitted_Sill_%d", icova + 1);
-      set_keypair(reinterpret_cast<char*>(loc_string.data()), 1, nvar, nvar,
+      set_keypair(loc_string.data(), 1, nvar, nvar,
                   model->getSills(icova).getValues().data());
     }
   }
@@ -1319,7 +1319,7 @@ static void st_keypair_results(Id mode,
                                double* valpro,
                                double* vecpro)
 {
-  VectorUChar loc_string(50);
+  String loc_string;
 
   if (mode < 0)
   {
@@ -1329,9 +1329,9 @@ static void st_keypair_results(Id mode,
   else
   {
     (void)gslSPrintf2(loc_string, "Model_Auto_Eigen_Values_%d", icov + 1);
-    set_keypair(reinterpret_cast<char*>(loc_string.data()), 1, 1, nvar, valpro);
+    set_keypair(loc_string.data(), 1, 1, nvar, valpro);
     (void)gslSPrintf2(loc_string, "Model_Auto_Eigen_Vector_%d", icov + 1);
-    set_keypair(reinterpret_cast<char*>(loc_string.data()), 1, nvar, nvar, vecpro);
+    set_keypair(loc_string.data(), 1, nvar, nvar, vecpro);
   }
 }
 
@@ -1793,17 +1793,17 @@ static void st_model_auto_strmod_print(Id flag_title,
 
       case EConsElem::E_RANGE:
         st_name_range(ivar);
-        st_print(reinterpret_cast<char*>(string.data()), 1, ntot, param, lower, upper);
+        st_print(string.data(), 1, ntot, param, lower, upper);
         break;
 
       case EConsElem::E_SCALE:
         st_name_scale(ivar);
-        st_print(reinterpret_cast<char*>(string.data()), 1, ntot, param, lower, upper);
+        st_print(string.data(), 1, ntot, param, lower, upper);
         break;
 
       case EConsElem::E_ANGLE:
         st_name_rotation(ivar);
-        st_print(reinterpret_cast<char*>(string.data()), 1, ntot, param, lower, upper);
+        st_print(string.data(), 1, ntot, param, lower, upper);
         break;
 
       case EConsElem::E_T_RANGE:

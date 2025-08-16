@@ -13,7 +13,6 @@
 #include "Basic/OptDbg.hpp"
 #include "Basic/String.hpp"
 #include "Basic/Utilities.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "geoslib_io.h"
 #include <cmath>
 #include <cstdarg>
@@ -767,7 +766,7 @@ void _file_write(FILE* file, const char* format, va_list ap)
  ** This method is not documented on purpose. It should remain private
  **
  *****************************************************************************/
-void _buffer_write(VectorUChar& buffer, const char* format, va_list ap)
+void _buffer_write(String& buffer, const char* format, va_list ap)
 {
   Id ret_i, no_blank;
   double ret_d;

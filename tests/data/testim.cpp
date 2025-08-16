@@ -67,7 +67,7 @@ static Model* st_modify(Model* model,
 
 int main(int argc, char* argv[])
 {
-  VectorUChar filename(BUFFER_LENGTH);
+  String filename;
   Db* dbin;
   DbGrid* dbout;
   Vario* vario;
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
   /* Define the data */
 
   ascii_filename("Data", 0, 0, filename);
-  dbin = Db::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  dbin = Db::createFromNF(filename, verbose);
   if (dbin == nullptr) goto label_end;
   dbfmt.setFlags(true, false, true, true, true);
   dbin->display(&dbfmt);
@@ -125,32 +125,32 @@ int main(int argc, char* argv[])
   /* Define the output grid file */
 
   ascii_filename("Grid", 0, 0, filename);
-  dbout = DbGrid::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  dbout = DbGrid::createFromNF(filename, verbose);
   //  if (dbout != nullptr) dbout->display(&dbfmt);
 
   /* Define the variogram */
 
   ascii_filename("Vario", 0, 0, filename);
-  vario = Vario::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  vario = Vario::createFromNF(filename, verbose);
   if (vario != nullptr)
   {
     vario->compute(dbin, ECalcVario::VARIOGRAM);
     vario->display();
     ascii_filename("Vario", 0, 1, filename);
-    if (!vario->dumpToNF(reinterpret_cast<const char*>(filename.data()), EFormatNF::DEFAULT, verbose))
+    if (!vario->dumpToNF(filename, EFormatNF::DEFAULT, verbose))
       messageAbort("ascii_vario_write");
   }
 
   /* Define the model */
 
   ascii_filename("Model", 0, 0, filename);
-  model = Model::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  model = Model::createFromNF(filename, verbose);
   if (model == nullptr) goto label_end;
   if (vario != nullptr)
   {
     if (model_fitting_sills(vario, model, constraints)) goto label_end;
     ascii_filename("Model", 0, 1, filename);
-    if (!model->dumpToNF(reinterpret_cast<const char*>(filename.data()), EFormatNF::DEFAULT, verbose))
+    if (!model->dumpToNF(filename, EFormatNF::DEFAULT, verbose))
       messageAbort("ascii_model_write");
   }
   new_model = st_modify(model, dbin);
@@ -159,13 +159,13 @@ int main(int argc, char* argv[])
   /* Define the neighborhood */
 
   ascii_filename("Neigh", 0, 0, filename);
-  neigh = NeighUnique::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  neigh = NeighUnique::createFromNF(filename, verbose);
   if (neigh == nullptr)
-    neigh = NeighImage::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+    neigh = NeighImage::createFromNF(filename, verbose);
   if (neigh == nullptr)
-    neigh = NeighBench::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+    neigh = NeighBench::createFromNF(filename, verbose);
   if (neigh == nullptr)
-    neigh = NeighMoving::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+    neigh = NeighMoving::createFromNF(filename, verbose);
 
   /* Look for simulations */
 

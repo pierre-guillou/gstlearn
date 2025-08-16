@@ -1280,7 +1280,7 @@ void KrigingAlgebraSimpleCase::dumpWGT()
     lambda = &_LambdaUK;
   }
   if (_notFindSampleRanks()) return;
-  VectorUChar string(20);
+  String string;
 
   /* Header Line */
 
@@ -1289,7 +1289,7 @@ void KrigingAlgebraSimpleCase::dumpWGT()
   for (Id irhs = 0; irhs < _nrhs; irhs++)
   {
     (void)gslSPrintf2(string, "Z%d*", irhs + 1);
-    tab_prints(NULL, reinterpret_cast<char*>(string.data()));
+    tab_prints(NULL, string.data());
   }
   message("\n");
 
@@ -1329,7 +1329,7 @@ void KrigingAlgebraSimpleCase::dumpWGT()
 void KrigingAlgebraSimpleCase::dumpAux()
 {
   if (_notFindSampleRanks()) return;
-  VectorUChar string(20);
+  String string;
 
   // For Simple Kriging, dump the information on Means
   if (_nbfl <= 0)
@@ -1350,7 +1350,7 @@ void KrigingAlgebraSimpleCase::dumpAux()
   for (Id irhs = 0; irhs < _nrhs; irhs++)
   {
     (void)gslSPrintf2(string, "Mu%d*", irhs + 1);
-    tab_prints(NULL, reinterpret_cast<char*>(string.data()));
+    tab_prints(NULL, string.data());
   }
   tab_prints(NULL, "Coeff");
   message("\n");

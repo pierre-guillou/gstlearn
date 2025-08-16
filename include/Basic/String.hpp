@@ -103,12 +103,12 @@ GSTLEARN_EXPORT char* gslStrtok(char* str, const char* delim);
 GSTLEARN_EXPORT Id gslScanf(const char* fmt, ...);
 GSTLEARN_EXPORT Id gslSScanf(const char* str, const char* fmt, ...);
 
-GSTLEARN_EXPORT void gslStrcpy2(VectorUChar& dst, const VectorUChar& src);
-GSTLEARN_EXPORT void gslStrcpy2(VectorUChar& dst, const char* src);
-GSTLEARN_EXPORT void gslStrcat2(VectorUChar& dst, const char* src);
-GSTLEARN_EXPORT void gslStrcat2(VectorUChar& dst, const VectorUChar& src);
-GSTLEARN_EXPORT Id gslSPrintf2(VectorUChar& dst, const char* fmt, ...);
-GSTLEARN_EXPORT Id gslAddSPrintf2(VectorUChar& dst, const char* fmt, ...);
+GSTLEARN_EXPORT void gslStrcpy2(String& dst, const String& src);
+GSTLEARN_EXPORT void gslStrcpy2(String& dst, const char* src);
+GSTLEARN_EXPORT void gslStrcat2(String& dst, const char* src);
+GSTLEARN_EXPORT void gslStrcat2(String& dst, const String& src);
+GSTLEARN_EXPORT Id gslSPrintf2(String& dst, const char* fmt, ...);
+GSTLEARN_EXPORT Id gslSPrintfCat2(String& dst, const char* fmt, ...);
 
 // Adapted from:
 // - https://stackoverflow.com/a/26310318

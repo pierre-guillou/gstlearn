@@ -33,7 +33,7 @@
 using namespace gstlrn;
 int main(int argc, char* argv[])
 {
-  VectorUChar filename(BUFFER_LENGTH);
+  String filename;
   Db* dbin;
   DbGrid* dbout;
   Vario* vario;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
   /* Define the data */
 
   ascii_filename("Data", 0, 0, filename);
-  dbin = Db::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  dbin = Db::createFromNF(filename, verbose);
   if (dbin == nullptr) goto label_end;
   iatt_z = dbin->getUIDByLocator(ELoc::Z, 0);
   dbfmt.setFlags(true, false, true, true, true);
@@ -105,13 +105,13 @@ int main(int argc, char* argv[])
   /* Define the variogram (optional) */
 
   ascii_filename("Vario", 0, 0, filename);
-  vario      = Vario::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  vario      = Vario::createFromNF(filename, verbose);
   flag_vario = (vario != nullptr);
 
   /* Define the output grid file */
 
   ascii_filename("Grid", 0, 0, filename);
-  dbout     = DbGrid::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+  dbout     = DbGrid::createFromNF(filename, verbose);
   flag_grid = (dbout != nullptr);
 
   /* Define the rules */
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
     /* Read the rule */
 
     ascii_filename("Rule", i, 0, filename);
-    rule[i] = Rule::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+    rule[i] = Rule::createFromNF(filename, verbose);
     if (rule[i] == nullptr) continue;
     npgs++;
     rule[i]->display();
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
     {
       if (!rule[i]->isYUsed(j)) continue;
       ascii_filename("Model", lec, 0, filename);
-      model[i][j] = Model::createFromNF(reinterpret_cast<const char*>(filename.data()), verbose);
+      model[i][j] = Model::createFromNF(filename, verbose);
       if (model[i][j] == nullptr) goto label_end;
     }
 
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
       vario->compute(dbin, ECalcVario::VARIOGRAM);
       vario->display();
       ascii_filename("Vario", 0, 1, filename);
-      if (!vario->dumpToNF(reinterpret_cast<const char*>(filename.data()), EFormatNF::DEFAULT, verbose))
+      if (!vario->dumpToNF(filename, EFormatNF::DEFAULT, verbose))
         messageAbort("ascii_vario_write");
 
       /* Delete the indicator variables */

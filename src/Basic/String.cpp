@@ -716,18 +716,32 @@ char* gslStrcpy(char* dst, const char* src)
   return strcpy(dst, src);
 }
 
-void gslStrcpy2(VectorUChar& dst, const char* src)
+void gslStrcpy2(String& dst, const char* src)
 {
+  if (!src)
+  {
+    dst.clear();
+    return;
+  }
+
   size_t len = std::strlen(src);
-  dst.resize(len + 1); // ajuster la taille à la chaîne copiée
-  std::strcpy(reinterpret_cast<char*>(dst.data()), src);
+
+  // ajuster la taille du string
+  dst.resize(len);
+
+  // copier le contenu
+  std::memcpy(dst.data(), src, len);
 }
 
-void gslStrcpy2(VectorUChar& dst, const VectorUChar& src)
+void gslStrcpy2(String& dst, const String& src)
 {
-  size_t len = std::strlen(reinterpret_cast<const char*>(src.data()));
-  dst.resize(len + 1);
-  std::strcpy(reinterpret_cast<char*>(dst.data()), reinterpret_cast<const char*>(src.data()));
+  size_t len = src.size();
+
+  // redimensionner dst pour accueillir exactement src
+  dst.resize(len);
+
+  // copier le contenu
+  std::memcpy(dst.data(), src.data(), len);
 }
 
 char* gslStrcat(char* dst, const char* src)
@@ -735,21 +749,30 @@ char* gslStrcat(char* dst, const char* src)
   return strcat(dst, src);
 }
 
-void gslStrcat2(VectorUChar& dst, const char* src)
+void gslStrcat2(String& dst, const char* src)
 {
-  size_t old_len = std::strlen(reinterpret_cast<const char*>(dst.data()));
+  if (!src) return; // sécurité
+
+  size_t old_len = dst.size();
   size_t add_len = std::strlen(src);
-  dst.resize(old_len + add_len + 1); // +1 pour le '\0'
-  std::strcat(reinterpret_cast<char*>(dst.data()), src);
+
+  // on redimensionne pour accueillir l'ajout
+  dst.resize(old_len + add_len);
+
+  // on copie le nouveau contenu à la fin
+  std::memcpy(&dst[old_len], src, add_len);
 }
 
-void gslStrcat2(VectorUChar& dst, const VectorUChar& src)
+void gslStrcat2(String& dst, const String& src)
 {
-  size_t old_len = std::strlen(reinterpret_cast<const char*>(dst.data()));
-  size_t add_len = std::strlen(reinterpret_cast<const char*>(src.data()));
-  dst.resize(old_len + add_len + 1);
-  std::strcat(reinterpret_cast<char*>(dst.data()),
-              reinterpret_cast<const char*>(src.data()));
+  size_t old_len = dst.size();
+  size_t add_len = src.size();
+
+  // redimensionner dst pour accueillir l'ajout
+  dst.resize(old_len + add_len);
+
+  // copier directement les caractères de src
+  std::memcpy(&dst[old_len], src.data(), add_len);
 }
 
 Id gslSPrintf(char* dst, const char* fmt, ...)
@@ -761,41 +784,12 @@ Id gslSPrintf(char* dst, const char* fmt, ...)
   return n;
 }
 
-Id gslAddSPrintf2(VectorUChar& dst, const char* fmt, ...)
+Id gslSPrintfCat2(String& dst, const char* fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
 
-  // Calculer la longueur de la chaîne formatée
-  va_list ap_copy;
-  va_copy(ap_copy, ap);
-  int new_size = std::vsnprintf(nullptr, 0, fmt, ap_copy);
-  va_end(ap_copy);
-
-  if (new_size < 0)
-  {
-    va_end(ap);
-    return -1; // erreur
-  }
-
-  // Position de concaténation : avant le '\0' actuel si dst n'est pas vide
-  size_t old_size = dst.empty() ? 0 : dst.size() - 1;
-
-  // Redimensionner dst pour contenir l'ancien + le nouveau + '\0'
-  dst.resize(old_size + new_size + 1);
-
-  // Écrire à la fin de l'ancien contenu
-  std::vsnprintf(reinterpret_cast<char*>(dst.data() + old_size), new_size + 1, fmt, ap);
-
-  va_end(ap);
-  return new_size;
-}
-
-Id gslSPrintf2(VectorUChar& dst, const char* fmt, ...)
-{
-  va_list ap;
-  va_start(ap, fmt);
-
+  // calculer la taille du texte formaté
   va_list ap_copy;
   va_copy(ap_copy, ap);
   int size = std::vsnprintf(nullptr, 0, fmt, ap_copy);
@@ -807,13 +801,49 @@ Id gslSPrintf2(VectorUChar& dst, const char* fmt, ...)
     return -1; // erreur
   }
 
-  // Redimensionner le vecteur pour contenir la chaîne et le '\0'
+  // mémoriser l'ancienne longueur
+  size_t old_len = dst.size();
+
+  // redimensionner dst pour contenir l'ancien contenu + nouveau texte + '\0'
+  dst.resize(old_len + size + 1);
+
+  // écrire le texte formaté à la fin
+  std::vsnprintf(&dst[old_len], size + 1, fmt, ap);
+  va_end(ap);
+
+  // redimensionner pour enlever le '\0' final
+  dst.resize(old_len + size);
+
+  return size;
+}
+
+Id gslSPrintf2(String& dst, const char* fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+
+  // On calcule la taille nécessaire
+  va_list ap_copy;
+  va_copy(ap_copy, ap);
+  int size = std::vsnprintf(nullptr, 0, fmt, ap_copy);
+  va_end(ap_copy);
+
+  if (size < 0)
+  {
+    va_end(ap);
+    return -1; // erreur
+  }
+
+  // Redimensionner pour contenir le texte + '\0'
   dst.resize(size + 1);
 
-  // Écrire dans le vecteur
-  std::vsnprintf(reinterpret_cast<char*>(dst.data()), dst.size(), fmt, ap);
-
+  // Ecrire la chaîne formatée
+  std::vsnprintf(dst.data(), dst.size(), fmt, ap);
   va_end(ap);
+
+  // Enlever le '\0' final pour que dst.size() == longueur réelle
+  dst.resize(size);
+
   return size;
 }
 

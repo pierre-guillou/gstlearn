@@ -982,7 +982,7 @@ static void st_define_bounds(VectorDouble& param,
 static void st_foxleg_debug_title(void)
 
 {
-  VectorUChar string(10);
+  String string;
 
   if (!OptDbg::query(EDbg::CONVERGE)) return;
   mestitle(1, "Trajectory of parameters in Foxleg Algorithm");
@@ -992,7 +992,7 @@ static void st_foxleg_debug_title(void)
   for (Id ipar = 0; ipar < NPAR; ipar++)
   {
     (void)gslSPrintf2(string, "Par-%d", ipar + 1);
-    tab_prints(NULL, reinterpret_cast<const char*>(string.data()));
+    tab_prints(NULL, string.data());
   }
   message("\n");
 }

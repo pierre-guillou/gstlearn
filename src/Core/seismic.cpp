@@ -49,7 +49,7 @@ static MatrixSquare covtab;
 static double DX, DZ;
 static Id NX, NY, NZ, NVAR, NTRACE;
 static double VFACT = 1000.;
-static Id IECH_OUT = -1;
+static Id IECH_OUT  = -1;
 typedef struct
 {
   Id nvois;
@@ -78,11 +78,11 @@ typedef struct
  **
  *****************************************************************************/
 static Id st_velocity_minmax(Id nech,
-                              double* vv,
-                              double* v0,
-                              double* v1,
-                              double* vmin,
-                              double* vmax)
+                             double* vv,
+                             double* v0,
+                             double* v1,
+                             double* vmin,
+                             double* vmax)
 {
   Id i, number;
   double vvdef, delta;
@@ -538,11 +538,11 @@ static void st_seismic_debug(Id rankz,
  **
  *****************************************************************************/
 Id seismic_z2t_grid(Id verbose,
-                     DbGrid* db_z,
-                     Id iatt_v,
-                     Id* nx,
-                     double* x0,
-                     double* dx)
+                    DbGrid* db_z,
+                    Id iatt_v,
+                    Id* nx,
+                    double* x0,
+                    double* dx)
 {
   double z0, t0, v0, v1, dz, dt, vmin, vmax;
   Id ndim, nech, nt, nz, i;
@@ -608,11 +608,11 @@ Id seismic_z2t_grid(Id verbose,
  **
  *****************************************************************************/
 Id seismic_t2z_grid(Id verbose,
-                     DbGrid* db_t,
-                     Id iatt_v,
-                     Id* nx,
-                     double* x0,
-                     double* dx)
+                    DbGrid* db_t,
+                    Id iatt_v,
+                    Id* nx,
+                    double* x0,
+                    double* dx)
 {
   double z0, t0, v0, v1, dz, dt, vmin, vmax;
   Id ndim, nech, nt, nz, i;
@@ -997,12 +997,12 @@ static void TR_OUT(Db* db,
  **
  *****************************************************************************/
 static Id st_seismic_operate(Db* db,
-                              Id oper,
-                              Id natt,
-                              Id nt,
-                              Id iatt_in,
-                              Id iatt_out,
-                              double dt)
+                             Id oper,
+                             Id natt,
+                             Id nt,
+                             Id iatt_in,
+                             Id iatt_out,
+                             double dt)
 {
   Id it, iatt, itrace, count;
   double x, y, max, denom, sum;
@@ -1784,20 +1784,20 @@ static void st_seismic_contrast(Id nz, double* tab)
  **
  *****************************************************************************/
 Id seismic_convolve(DbGrid* db,
-                     Id flag_operate,
-                     Id flag_contrast,
-                     Id type,
-                     Id ntw,
-                     Id option,
-                     Id tindex,
-                     double fpeak,
-                     double period,
-                     double amplitude,
-                     double distort,
-                     double val_before,
-                     double val_middle,
-                     double val_after,
-                     VectorDouble& wavelet)
+                    Id flag_operate,
+                    Id flag_contrast,
+                    Id type,
+                    Id ntw,
+                    Id option,
+                    Id tindex,
+                    double fpeak,
+                    double period,
+                    double amplitude,
+                    double distort,
+                    double val_before,
+                    double val_middle,
+                    double val_after,
+                    VectorDouble& wavelet)
 {
   Id ndim, iatt, natt, itrace, iz, nz, iatt_in, iatt_out, error, size, shift;
   double dz;
@@ -2126,7 +2126,7 @@ static ST_Seismic_Neigh* st_estimate_neigh_management(Id mode,
  **
  *****************************************************************************/
 static Id st_estimate_neigh_unchanged(ST_Seismic_Neigh* ngh_old,
-                                       ST_Seismic_Neigh* ngh_cur)
+                                      ST_Seismic_Neigh* ngh_cur)
 {
   Id i, flag_unchanged;
 
@@ -2245,16 +2245,16 @@ static void st_estimate_neigh_print(ST_Seismic_Neigh* ngh, Id ix0, Id iz0)
  **
  *****************************************************************************/
 static Id st_estimate_neigh_create(DbGrid* db,
-                                    Id flag_exc,
-                                    Id iatt_z1,
-                                    Id iatt_z2,
-                                    Id ix0,
-                                    Id iz0,
-                                    Id nbench,
-                                    Id nv2max,
-                                    Id /*npres*/[2],
-                                    VectorVectorInt& presence,
-                                    ST_Seismic_Neigh* ngh)
+                                   Id flag_exc,
+                                   Id iatt_z1,
+                                   Id iatt_z2,
+                                   Id ix0,
+                                   Id iz0,
+                                   Id nbench,
+                                   Id nv2max,
+                                   Id /*npres*/[2],
+                                   VectorVectorInt& presence,
+                                   ST_Seismic_Neigh* ngh)
 {
   Id i, idx, ix, iz, jz, count, flag_valid;
 
@@ -2612,7 +2612,7 @@ static void st_wgt_print(ST_Seismic_Neigh* ngh,
 {
   double sum[2], value;
   Id iwgt, ivar, jvar, iech, lec, cumflag;
-  VectorUChar string(10);
+  String string;
 
   /* Header */
 
@@ -2627,7 +2627,7 @@ static void st_wgt_print(ST_Seismic_Neigh* ngh,
   for (ivar = 0; ivar < nvar; ivar++)
   {
     (void)gslSPrintf2(string, "Z%d*", ivar + 1);
-    tab_prints(NULL, reinterpret_cast<char*>(string.data()));
+    tab_prints(NULL, string.data());
   }
   message("\n");
 
@@ -2685,12 +2685,12 @@ static void st_wgt_print(ST_Seismic_Neigh* ngh,
 **
 *****************************************************************************/
 static Id st_estimate_wgt(ST_Seismic_Neigh* ngh,
-                           Model* /*model*/,
-                           Id nred,
-                           Id* flag,
-                           double* lhs,
-                           double* rhs,
-                           double* wgt)
+                          Model* /*model*/,
+                          Id nred,
+                          Id* flag,
+                          double* lhs,
+                          double* rhs,
+                          double* wgt)
 {
   Id nech;
 
@@ -2948,13 +2948,13 @@ static Id st_estimate_sort(const Id* presence, Id* rank)
  **
  *****************************************************************************/
 Id seismic_estimate_XZ(DbGrid* db,
-                        Model* model,
-                        Id nbench,
-                        Id nv2max,
-                        Id flag_ks,
-                        Id flag_std,
-                        Id flag_sort,
-                        Id flag_stat)
+                       Model* model,
+                       Id nbench,
+                       Id nv2max,
+                       Id flag_ks,
+                       Id flag_std,
+                       Id flag_sort,
+                       Id flag_stat)
 {
   Id npres[2], iatt_est[2], iatt_std[2];
   Id i, ix0, jx0, iz0, nvois, size, error, nred, nfeq, iatt_z1, iatt_z2;
@@ -3202,14 +3202,14 @@ static void st_copy_attribute(Db* db, Id nbsimu, Id* iatt)
  **
  *****************************************************************************/
 Id seismic_simulate_XZ(DbGrid* db,
-                        Model* model,
-                        Id nbench,
-                        Id nv2max,
-                        Id nbsimu,
-                        Id seed,
-                        Id flag_ks,
-                        Id flag_sort,
-                        Id flag_stat)
+                       Model* model,
+                       Id nbench,
+                       Id nv2max,
+                       Id nbsimu,
+                       Id seed,
+                       Id flag_ks,
+                       Id flag_sort,
+                       Id flag_stat)
 {
   Id npres[2], iatt_sim[2];
   Id i, isimu, ix0, iz0, nvois, size, error, nred, nfeq, jx0;

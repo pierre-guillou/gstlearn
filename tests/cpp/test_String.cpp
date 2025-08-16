@@ -15,7 +15,6 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/File.hpp"
 #include "Basic/String.hpp"
-#include "Basic/VectorNumT.hpp"
 
 using namespace gstlrn;
 
@@ -29,7 +28,7 @@ int main(int argc, char* argv[])
   char buf_char[] = "abcde";
   message("Buffer (char) = %s\n", buf_char);
   char dst_char[10];
-  VectorUChar dst_vec(100);
+  String dst_vec;
 
   // Testing gslStrcpy
   message("Testing gslStrcpy:\n");
@@ -62,7 +61,7 @@ int main(int argc, char* argv[])
   // Testing gslAddSPrintf2
   message("Testing gslAddSPrintf2:\n");
   Id one = 1;
-  gslAddSPrintf2(dst_vec, " added %d times", one);
+  gslSPrintfCat2(dst_vec, " added %d times", one);
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing gslStrcat2
@@ -74,5 +73,8 @@ int main(int argc, char* argv[])
   message("Testing gslStrcpy2:\n");
   gslStrcpy2(dst_vec, "After a copy");
   message("- Result(char) = %s\n", dst_vec.data());
+
+  // Testing the string lengt
+  message("String length = %d\n", dst_vec.size());
   return 0;
 }
