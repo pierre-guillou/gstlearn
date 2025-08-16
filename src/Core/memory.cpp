@@ -30,13 +30,12 @@ typedef struct
 
 /*! \endcond */
 
-static Id MEMORY_LEAK     = 0;
-static Id MEMORY_DEBUG    = 0;
-static Id MEMORY_TOTAL    = 0;
-static Id MEMORY_MAX      = 0;
-static Id MEMORY_MIN_PT   = 1000000;
-static Id NB_MEM_CHUNK    = 0;
-static MemChunk** MemLeak = NULL;
+static Id MEMORY_LEAK   = 0;
+static Id MEMORY_DEBUG  = 0;
+static Id MEMORY_TOTAL  = 0;
+static Id MEMORY_MAX    = 0;
+static Id MEMORY_MIN_PT = 1000000;
+static std::vector<MemChunk> MemLeak;
 
 /****************************************************************************/
 /*!
@@ -49,22 +48,6 @@ static void st_mem_update(Id size)
 {
   MEMORY_TOTAL += size;
   if (MEMORY_TOTAL > MEMORY_MAX) MEMORY_MAX = MEMORY_TOTAL;
-}
-
-/****************************************************************************/
-/*!
- ** Reset the Memory Leak processing structure
- **
- *****************************************************************************/
-static void st_memory_leak_reset(void)
-{
-  if (!MEMORY_LEAK) return;
-
-  for (Id i = 0; i < NB_MEM_CHUNK; i++)
-    free((char*)MemLeak[i]);
-  free((char*)MemLeak);
-  MemLeak      = NULL;
-  NB_MEM_CHUNK = 0;
 }
 
 /****************************************************************************/
@@ -82,38 +65,16 @@ static void st_memory_leak_add(const char* call_file,
                                size_t size,
                                void* ptr)
 {
-  MemChunk* chunk;
-
   if (!MEMORY_LEAK) return;
 
-  // Allocate the new Chunk
-
-  chunk = (MemChunk*)malloc(sizeof(MemChunk));
-  if (chunk == NULL)
-  {
-    messerr("Memory problem: Memory Leak procedure is interrupted");
-    st_memory_leak_reset();
-    return;
-  }
-  chunk->call_file.resize(10);
-  gslStrcpy2(chunk->call_file, call_file);
-  chunk->call_line = call_line;
-  chunk->size      = size;
-  chunk->ptr       = ptr;
-
-  // Glue the new chunk to the Global array
-
-  auto* placeholder =
-    realloc((char*)MemLeak, (NB_MEM_CHUNK + 1) * sizeof(MemChunk*));
-  MemLeak = (MemChunk**)placeholder;
-  if (MemLeak == NULL)
-  {
-    messerr("Memory problem: Memory Leak procedure is interrupted");
-    st_memory_leak_reset();
-    return;
-  }
-  MemLeak[NB_MEM_CHUNK] = chunk;
-  NB_MEM_CHUNK++;
+  Id nb_mem_chunk = MemLeak.size();
+  MemLeak.resize(nb_mem_chunk + 1);
+  MemChunk& chunk = MemLeak[nb_mem_chunk];
+  chunk.call_file.resize(100);
+  gslStrcpy2(chunk.call_file, call_file);
+  chunk.call_line = call_line;
+  chunk.size      = size;
+  chunk.ptr       = ptr;
 }
 
 /****************************************************************************/
@@ -129,40 +90,31 @@ static void st_memory_leak_delete(const char* call_file,
                                   size_t call_line,
                                   void* ptr)
 {
-  MemChunk* chunk;
-  Id found;
-
   if (!MEMORY_LEAK) return;
 
   // Look for the chunk to be freed
 
-  found = -1;
-  for (Id i = 0; i < NB_MEM_CHUNK && found < 0; i++)
+  Id found = -1;
+  for (Id i = 0, n = MemLeak.size(); i < n && found < 0; i++)
   {
-    chunk = MemLeak[i];
-    if (chunk->ptr == ptr) found = i;
+    MemChunk& chunk = MemLeak[i];
+    if (chunk.ptr == ptr) found = i;
   }
 
   // The Chunk to be freed does not seem to be allocated
 
   if (found < 0)
   {
-    messerr("A Chunk seems not to be allocated (called from %s : %d)",
+    messerr("Attempt to free a Chunk which seems not to be allocated (called from %s : %d)",
             call_file, call_line);
     return;
   }
 
-  // Free the Chunk
-
-  free((char*)MemLeak[found]);
-
   // Compress the array of Memory chunks
 
-  MemLeak[found] = MemLeak[NB_MEM_CHUNK - 1];
-  auto* placeholder =
-    realloc((char*)MemLeak, (NB_MEM_CHUNK - 1) * sizeof(MemChunk*));
-  MemLeak = (MemChunk**)placeholder;
-  NB_MEM_CHUNK--;
+  Id nb_mem_chunk = MemLeak.size();
+  MemLeak[found]  = MemLeak[nb_mem_chunk - 1];
+  MemLeak.resize(nb_mem_chunk - 1);
 }
 
 /****************************************************************************/

@@ -716,15 +716,18 @@ char* gslStrcpy(char* dst, const char* src)
   return strcpy(dst, src);
 }
 
-void gslStrcpy2(VectorUChar& dst, const VectorUChar& src)
-{
-  (void)strcpy(reinterpret_cast<char*>(dst.data()),
-               reinterpret_cast<const char*>(src.data()));
-}
-
 void gslStrcpy2(VectorUChar& dst, const char* src)
 {
-  (void)strcpy(reinterpret_cast<char*>(dst.data()), src);
+  size_t len = std::strlen(src);
+  dst.resize(len + 1); // ajuster la taille à la chaîne copiée
+  std::strcpy(reinterpret_cast<char*>(dst.data()), src);
+}
+
+void gslStrcpy2(VectorUChar& dst, const VectorUChar& src)
+{
+  size_t len = std::strlen(reinterpret_cast<const char*>(src.data()));
+  dst.resize(len + 1);
+  std::strcpy(reinterpret_cast<char*>(dst.data()), reinterpret_cast<const char*>(src.data()));
 }
 
 char* gslStrcat(char* dst, const char* src)
@@ -734,13 +737,19 @@ char* gslStrcat(char* dst, const char* src)
 
 void gslStrcat2(VectorUChar& dst, const char* src)
 {
-  (void)strcat(reinterpret_cast<char*>(dst.data()), src);
+  size_t old_len = std::strlen(reinterpret_cast<const char*>(dst.data()));
+  size_t add_len = std::strlen(src);
+  dst.resize(old_len + add_len + 1); // +1 pour le '\0'
+  std::strcat(reinterpret_cast<char*>(dst.data()), src);
 }
 
 void gslStrcat2(VectorUChar& dst, const VectorUChar& src)
 {
-  (void)strcat(reinterpret_cast<char*>(dst.data()),
-               reinterpret_cast<const char*>(src.data()));
+  size_t old_len = std::strlen(reinterpret_cast<const char*>(dst.data()));
+  size_t add_len = std::strlen(reinterpret_cast<const char*>(src.data()));
+  dst.resize(old_len + add_len + 1);
+  std::strcat(reinterpret_cast<char*>(dst.data()),
+              reinterpret_cast<const char*>(src.data()));
 }
 
 Id gslSPrintf(char* dst, const char* fmt, ...)

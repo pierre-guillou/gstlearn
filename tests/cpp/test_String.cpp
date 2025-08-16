@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
   char buf_char[] = "abcde";
   message("Buffer (char) = %s\n", buf_char);
   char dst_char[10];
-  VectorUChar dst_vec(10);
+  VectorUChar dst_vec(100);
 
   // Testing gslStrcpy
   message("Testing gslStrcpy:\n");
@@ -59,5 +59,20 @@ int main(int argc, char* argv[])
   gslSPrintf2(dst_vec, "BC+%s", newbuf_char);
   message("- Result(char) = %s\n", dst_vec.data());
 
+  // Testing gslAddSPrintf2
+  message("Testing gslAddSPrintf2:\n");
+  Id one = 1;
+  gslAddSPrintf2(dst_vec, " added %d times", one);
+  message("- Result(char) = %s\n", dst_vec.data());
+
+  // Testing gslStrcat2
+  message("Testing gslStrcat2:\n");
+  gslStrcat2(dst_vec, " (Tested successfully)");
+  message("- Result(char) = %s\n", dst_vec.data());
+
+  // Testing gslStrcpy2
+  message("Testing gslStrcpy2:\n");
+  gslStrcpy2(dst_vec, "After a copy");
+  message("- Result(char) = %s\n", dst_vec.data());
   return 0;
 }
