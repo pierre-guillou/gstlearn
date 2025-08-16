@@ -627,7 +627,7 @@ Id Vario::transformYToZ(const AAnam* anam)
 
   /* Preliminary checks */
 
-  if (anam == (AAnam*)NULL) return 1;
+  if (anam == nullptr) return 1;
   if (anam->getType() != EAnam::HERMITIAN)
   {
     messerr("The function 'transformYToZ' is restricted to Gaussian Anamorphosis");
@@ -2394,7 +2394,7 @@ Id Vario::_calculateGeneral(Db* db,
 
   if (_flag_UK)
   {
-    if (vorder == (Vario_Order*)NULL)
+    if (vorder == nullptr)
       vorder = vario_order_manage(1, 1, 0, vorder);
   }
 

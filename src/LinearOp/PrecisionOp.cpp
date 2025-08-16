@@ -14,6 +14,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "LinearOp/AShiftOp.hpp"
+#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
 #include "LinearOp/ShiftOpStencil.hpp"
 #include "Mesh/AMesh.hpp"
@@ -29,7 +30,8 @@
 namespace gstlrn
 {
 PrecisionOp::PrecisionOp()
-  : _shiftOp(nullptr)
+  : ASimulable()
+  , _shiftOp(nullptr)
   , _cova(nullptr)
   , _polynomials()
   , _verbose(false)
@@ -45,7 +47,8 @@ PrecisionOp::PrecisionOp()
 PrecisionOp::PrecisionOp(AShiftOp* shiftop,
                          const CovAniso* cova,
                          bool verbose)
-  : _shiftOp(shiftop)
+  : ASimulable()
+  , _shiftOp(shiftop)
   , _cova(cova->clone())
   , _polynomials()
   , _verbose(verbose)
@@ -68,7 +71,8 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
                          CovAniso* cova,
                          bool stencil,
                          bool verbose)
-  : _shiftOp(nullptr)
+  : ASimulable()
+  , _shiftOp(nullptr)
   , _cova(cova->clone())
   , _polynomials()
   , _verbose(verbose)
@@ -104,7 +108,8 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
 }
 
 PrecisionOp::PrecisionOp(const PrecisionOp& pmat)
-  : _shiftOp(nullptr)
+  : ASimulable(pmat) // Explicitly call the base class copy constructor
+  , _shiftOp(nullptr)
   , _cova(pmat._cova->clone())
   , _verbose(pmat._verbose)
   , _training(false)
@@ -272,8 +277,8 @@ Id PrecisionOp::_prepareChebychev(const EPowerPT& power) const
 }
 
 Id PrecisionOp::reset(const AShiftOp* shiftop,
-                       const CovAniso* cova,
-                       bool verbose)
+                      const CovAniso* cova,
+                      bool verbose)
 {
   // Initializations
 
@@ -282,7 +287,7 @@ Id PrecisionOp::reset(const AShiftOp* shiftop,
   try
   {
     // Store the pointer to the ShiftOp
-    if (shiftop == (ShiftOpMatrix*)NULL)
+    if (shiftop == nullptr)
       my_throw("The argument 'shiftop'must be provided");
 
     // Store the members
@@ -362,8 +367,8 @@ void PrecisionOp::_addEvalPower(const constvect inv,
 }
 
 Id PrecisionOp::_evalPoly(const EPowerPT& power,
-                           const constvect inv,
-                           vect outv) const
+                          const constvect inv,
+                          vect outv) const
 {
   std::fill(outv.begin(), outv.end(), 0.);
   _addEvalPoly(power, inv, outv);
@@ -371,8 +376,8 @@ Id PrecisionOp::_evalPoly(const EPowerPT& power,
 }
 
 Id PrecisionOp::_addEvalPoly(const EPowerPT& power,
-                              const constvect inv,
-                              vect outv) const
+                             const constvect inv,
+                             vect outv) const
 {
   constvect invs(inv);
 
@@ -552,7 +557,7 @@ VectorDouble PrecisionOp::extractDiag() const
  * Compute the Logarithm of the Determinant
  * @param nMC Number of Monte-Carlo simulations
  * @return The computed value or TEST if problem
- * 
+ *
  */
 double PrecisionOp::computeLogDet(Id nMC) const
 {
@@ -566,7 +571,7 @@ double PrecisionOp::computeLogDet(Id nMC) const
     VH::simulateGaussianInPlace(gauss);
     vect results(result);
     if (_evalPoly(EPowerPT::LOG, gauss, results) != 0) return TEST;
-    val1 += VH::innerProduct(gauss, result);   
+    val1 += VH::innerProduct(gauss, result);
   }
 
   val1 /= nMC;

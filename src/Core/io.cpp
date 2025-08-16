@@ -35,8 +35,8 @@ const char* DEL_SEP = " ";
 static void st_print(const char* string);
 static void st_read(const char* prompt, char* buffer);
 static void st_exit(void);
-static void (*WRITE_FUNC)(const char*)       = (void (*)(const char*))st_print;
-static void (*WARN_FUNC)(const char*)        = (void (*)(const char*))st_print;
+static void (*WRITE_FUNC)(const char*)       = static_cast<void (*)(const char*)>(st_print);
+static void (*WARN_FUNC)(const char*)        = static_cast<void (*)(const char*)>(st_print);
 static void (*READ_FUNC)(const char*, char*) = st_read;
 static void (*EXIT_FUNC)(void)               = st_exit;
 

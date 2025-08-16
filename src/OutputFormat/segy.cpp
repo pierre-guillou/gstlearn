@@ -104,12 +104,12 @@ static Id st_to_i(Id a)
 {
   unsigned short tmp1 = (a >> 16);
   unsigned short tmp2 = (a * 0x0000FFFF);
-  tmp2                    = st_to_u(tmp2);
-  tmp1                    = st_to_u(tmp1);
+  tmp2                = st_to_u(tmp2);
+  tmp1                = st_to_u(tmp1);
 
-  Id b = (Id)tmp2;
-  b     = b << 16;
-  b     = b | (Id)tmp1;
+  Id b = static_cast<Id>(tmp2);
+  b    = b << 16;
+  b    = b | static_cast<Id>(tmp1);
 
   return b;
 }
@@ -129,10 +129,10 @@ static float st_ibm2ieee(const float ibm)
   src.f = ibm;
 
   // CONVERT TO FLOAT
-  long IntMantissa = ((long)src.c[1] << 16) + ((long)src.c[2] << 8) + src.c[3];
+  long IntMantissa = (static_cast<long>(src.c[1]) << 16) + (static_cast<long>(src.c[2]) << 8) + src.c[3];
 
-  float Mantissa  = float(IntMantissa) / float(0x1000000);
-  float PosResult = Mantissa * (float)pow(16.0, double((src.c[0] & 0x7F) - 64));
+  float Mantissa  = static_cast<float>(IntMantissa) / static_cast<float>(0x1000000);
+  float PosResult = Mantissa * static_cast<float>(pow(16.0, static_cast<double>((src.c[0] & 0x7F) - 64)));
 
   if (src.c[0] & 0x80)
     return -PosResult;
@@ -349,9 +349,9 @@ static binaryFileHeader st_binaryFileHeader_init()
  **
  *****************************************************************************/
 static Id st_readFileHeader(FILE* file,
-                             Id verbOption,
-                             Id* NPerTrace,
-                             double* delta)
+                            Id verbOption,
+                            Id* NPerTrace,
+                            double* delta)
 {
   unsigned char TFileHead_[3200];
   binaryFileHeader BFileHead_ = st_binaryFileHeader_init();
@@ -365,13 +365,13 @@ static Id st_readFileHeader(FILE* file,
 }
 
 static Id st_read_trace(FILE* file,
-                         Id codefmt,
-                         Id numtrace,
-                         Id nPerTrace,
-                         double delta,
-                         Id verbOption,
-                         VectorDouble& values,
-                         VectorDouble& cotes)
+                        Id codefmt,
+                        Id numtrace,
+                        Id nPerTrace,
+                        double delta,
+                        Id verbOption,
+                        VectorDouble& values,
+                        VectorDouble& cotes)
 {
   short svalue;
   Id minsamp, maxsamp, ivalue, imaxvalue, iminvalue;
@@ -476,17 +476,17 @@ static Id st_read_trace(FILE* file,
  **
  *****************************************************************************/
 static Id st_surface_identify(Id verbOption,
-                               Db* surfaces,
-                               const String& name_bot,
-                               bool flag_bot,
-                               Id* iatt_bot,
-                               const String& name_top,
-                               bool flag_top,
-                               Id* iatt_top,
-                               const String& aux_top,
-                               Id* iaux_top,
-                               const String& aux_bot,
-                               Id* iaux_bot)
+                              Db* surfaces,
+                              const String& name_bot,
+                              bool flag_bot,
+                              Id* iatt_bot,
+                              const String& name_top,
+                              bool flag_top,
+                              Id* iatt_top,
+                              const String& aux_top,
+                              Id* iaux_top,
+                              const String& aux_bot,
+                              Id* iaux_bot)
 {
   *iatt_bot = -1;
   if (surfaces == nullptr) return 1;
@@ -557,14 +557,14 @@ static Id st_surface_identify(Id verbOption,
  **
  *****************************************************************************/
 static Id st_get_cuts(Db* surfaces,
-                       Id rank,
-                       Id iatt_top,
-                       Id iatt_bot,
-                       double /*xtrace*/,
-                       double /*ytrace*/,
-                       double thickmin,
-                       double* cztop,
-                       double* czbot)
+                      Id rank,
+                      Id iatt_top,
+                      Id iatt_bot,
+                      double /*xtrace*/,
+                      double /*ytrace*/,
+                      double thickmin,
+                      double* cztop,
+                      double* czbot)
 {
 
   // Initializations
@@ -830,11 +830,11 @@ static void st_grid_from_2refpt(RefPt refpt[3],
  **
  *****************************************************************************/
 static Id st_store_refpt(Id nbrefpt,
-                          RefPt refpt[3],
-                          Id iline,
-                          Id xline,
-                          double xtrace,
-                          double ytrace)
+                         RefPt refpt[3],
+                         Id iline,
+                         Id xline,
+                         double xtrace,
+                         double ytrace)
 {
   RefPt *ref0, *ref1, *ref2;
 
@@ -988,7 +988,7 @@ static bool st_within_layer(double z0,
       if (FFFF(czbot)) return false;
       if (FFFF(cztop)) return false;
       if (cztop < czbot) return false;
-      double dz = (cztop - czbot) / (double)(nz - 1);
+      double dz = (cztop - czbot) / static_cast<double>(nz - 1);
       iz1       = static_cast<Id>(floor((cote - czbot) / dz));
       iz2       = static_cast<Id>(ceil((cote - czbot + delta) / dz));
       *cote_ret = czbot + dz * iz1;
@@ -1015,14 +1015,14 @@ static bool st_within_layer(double z0,
 static double st_get_average(Id nz, const VectorDouble& writes)
 {
   double dmean = 0.;
-  Id nmean    = 0;
+  Id nmean     = 0;
   for (Id iz = 0; iz < nz; iz++)
   {
     if (FFFF(writes[iz])) continue;
     dmean += writes[iz];
     nmean++;
   }
-  dmean = (nmean > 0) ? dmean / (double)nmean : TEST;
+  dmean = (nmean > 0) ? dmean / static_cast<double>(nmean) : TEST;
   return dmean;
 }
 
@@ -1036,8 +1036,8 @@ static double st_get_average(Id nz, const VectorDouble& writes)
  * @remarks The rank is returned as -1 if not defined
  */
 static Id st_identify_trace_rank(DbGrid* surfaces,
-                                  double xtrace,
-                                  double ytrace)
+                                 double xtrace,
+                                 double ytrace)
 {
   // Check if the surface file has been defined
 
@@ -1112,17 +1112,17 @@ static void st_auxiliary(Db* surfaces,
  **
  *****************************************************************************/
 static Id st_load_trace(Id nPerTrace,
-                         Id nz,
-                         Id option,
-                         double z0,
-                         double delta,
-                         double czbot,
-                         double cztop,
-                         const VectorDouble& cotes,
-                         const VectorDouble& values,
-                         VectorDouble& writes,
-                         Id* nbvalues,
-                         RefStats& refstats)
+                        Id nz,
+                        Id option,
+                        double z0,
+                        double delta,
+                        double czbot,
+                        double cztop,
+                        const VectorDouble& cotes,
+                        const VectorDouble& values,
+                        VectorDouble& writes,
+                        Id* nbvalues,
+                        RefStats& refstats)
 {
   Id iz1, iz2;
   double cote_ret;
@@ -1249,11 +1249,11 @@ void st_get_trace_params(traceHead* Theader,
                          double* ytrace)
 {
   Id scacsv = st_to_s(Theader->SCALE_COOR);
-  *delta     = (double)st_to_s(Theader->SAMPLE_INTRVL) / 1000;
-  *xtrace    = st_scaling(st_to_f(Theader->ENS_COOR_X), scacsv);
-  *ytrace    = st_scaling(st_to_f(Theader->ENS_COOR_Y), scacsv);
-  *iline     = st_to_i(Theader->INLINE);
-  *xline     = st_to_i(Theader->CROSS);
+  *delta    = (double)st_to_s(Theader->SAMPLE_INTRVL) / 1000;
+  *xtrace   = st_scaling(st_to_f(Theader->ENS_COOR_X), scacsv);
+  *ytrace   = st_scaling(st_to_f(Theader->ENS_COOR_Y), scacsv);
+  *iline    = st_to_i(Theader->INLINE);
+  *xline    = st_to_i(Theader->CROSS);
 }
 
 /****************************************************************************/
@@ -1262,11 +1262,11 @@ void st_get_trace_params(traceHead* Theader,
  **
  *****************************************************************************/
 static Id st_reject_trace(Id iline,
-                           Id xline,
-                           Id iline_min,
-                           Id iline_max,
-                           Id xline_min,
-                           Id xline_max)
+                          Id xline,
+                          Id iline_min,
+                          Id iline_max,
+                          Id xline_min,
+                          Id xline_max)
 {
   if (!IFFFF(iline_min) && iline < iline_min) return (1);
   if (!IFFFF(iline_max) && iline > iline_max) return (1);
@@ -1522,8 +1522,8 @@ SegYArg segy_array(const char* filesegy,
   // Initializations
 
   FILE* file           = nullptr;
-  Id nbrefpt          = 0;
-  Id nz               = 0;
+  Id nbrefpt           = 0;
+  Id nz                = 0;
   double delta         = 0.;
   double z0            = 0.;
   double cztop         = 0.;
@@ -1722,8 +1722,8 @@ Grid segy_summary(const char* filesegy,
   // Initializations
 
   FILE* file   = nullptr;
-  Id nbrefpt  = 0;
-  Id nz       = 0;
+  Id nbrefpt   = 0;
+  Id nz        = 0;
   double delta = 0.;
   double z0    = 0.;
   double czbot = 0.;
@@ -1875,23 +1875,23 @@ Grid segy_summary(const char* filesegy,
  **
  *****************************************************************************/
 Id db_segy(const char* filesegy,
-            DbGrid* grid3D,
-            DbGrid* surf2D,
-            const String& name_top,
-            const String& name_bot,
-            double thickmin,
-            Id option,
-            Id nz_ss,
-            Id verbOption,
-            Id iline_min,
-            Id iline_max,
-            Id xline_min,
-            Id xline_max,
-            double modif_high,
-            double modif_low,
-            double modif_scale,
-            Id codefmt,
-            const NamingConvention& namconv)
+           DbGrid* grid3D,
+           DbGrid* surf2D,
+           const String& name_top,
+           const String& name_bot,
+           double thickmin,
+           Id option,
+           Id nz_ss,
+           Id verbOption,
+           Id iline_min,
+           Id iline_max,
+           Id xline_min,
+           Id xline_max,
+           double modif_high,
+           double modif_low,
+           double modif_scale,
+           Id codefmt,
+           const NamingConvention& namconv)
 {
   DECLARE_UNUSED(nz_ss);
   double xtrace, ytrace, coor[3];
@@ -1905,13 +1905,13 @@ Id db_segy(const char* filesegy,
 
   Id nPerTrace;
   FILE* file   = nullptr;
-  Id nbrefpt  = 0;
-  Id nz       = 0;
+  Id nbrefpt   = 0;
+  Id nz        = 0;
   double delta = 0.;
   double z0    = 0.;
   double czbot = 0.;
   double cztop = 0.;
-  Id ndim     = grid3D->getNDim();
+  Id ndim      = grid3D->getNDim();
   VectorInt indg(ndim, 0);
   st_refstats_init(refstats, modif_high, modif_low, modif_scale);
   traceHead traceHead_ = st_traceHead_init();

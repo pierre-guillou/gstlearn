@@ -59,7 +59,7 @@ void meshes_2D_sph_init(SphTriangle* t)
  *****************************************************************************/
 void meshes_2D_sph_free(SphTriangle* t, Id mode)
 {
-  if (t == (SphTriangle*)NULL) return;
+  if (t == nullptr) return;
   if (mode == 0)
   {
     t->sph_x.clear();

@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
   ascii_filename("Model", 0, 0, filename);
   model = Model::createFromNF(filename, verbose);
-  if (model == (Model*)NULL) goto label_end;
+  if (model == nullptr) goto label_end;
 
   // Define and store the Space
 
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
   ascii_filename("Vario", 0, 0, filename);
   vario = Vario::createFromNF(filename, verbose);
-  if (vario == (Vario*)NULL) goto label_end;
+  if (vario == nullptr) goto label_end;
   if (dbout != (Db*)NULL)
   {
     vario->compute(dbout, ECalcVario::VARIOGRAM);

@@ -274,7 +274,7 @@ static void write_float(float val)
 {
   if (useBinary)
   {
-    force_big_endian((unsigned char*)&val);
+    force_big_endian(reinterpret_cast<unsigned char*>(&val));
     fwrite(&val, sizeof(float), 1, fp);
   }
   else

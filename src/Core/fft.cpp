@@ -80,7 +80,7 @@ static void* Tmp0 = NULL; /* temp space for real part */
 static void* Tmp1 = NULL; /* temp space for imaginary part */
 static void* Tmp2 = NULL; /* temp space for Cosine values */
 static void* Tmp3 = NULL; /* temp space for Sine values */
-static Id* Perm  = NULL; /* Permutation vector */
+static Id* Perm   = NULL; /* Permutation vector */
 
 static Id factor[NFACTOR];
 
@@ -187,13 +187,13 @@ static Id factorize(Id nPass, Id* kt)
  * possible to make this a standalone function
  */
 static Id fftradix(double Re[],
-                    double Im[],
-                    size_t nTotal,
-                    size_t nPass,
-                    size_t nSpan,
-                    Id iSign,
-                    Id maxFactors,
-                    Id maxPerm)
+                   double Im[],
+                   size_t nTotal,
+                   size_t nPass,
+                   size_t nSpan,
+                   Id iSign,
+                   Id maxFactors,
+                   Id maxPerm)
 {
   Id ii, nFactor, kspan, ispan, inc;
   Id j, jc, jf, jj, k, k1, k3, kk, kt, nn, ns, nt;
@@ -248,10 +248,10 @@ static Id fftradix(double Re[],
   if (!Tmp0 || !Tmp1 || !Tmp2 || !Tmp3 || !Perm) goto Memory_Error;
 
   /* assign pointers */
-  Rtmp = (double*)Tmp0;
-  Itmp = (double*)Tmp1;
-  Cos  = (double*)Tmp2;
-  Sin  = (double*)Tmp3;
+  Rtmp = static_cast<double*>(Tmp0);
+  Itmp = static_cast<double*>(Tmp1);
+  Cos  = static_cast<double*>(Tmp2);
+  Sin  = static_cast<double*>(Tmp3);
 
   /*
    * Function Body
@@ -930,11 +930,11 @@ Memory_Error:
  **
  *****************************************************************************/
 Id fftn(Id ndim,
-         const Id dims[],
-         double Re[],
-         double Im[],
-         Id iSign,
-         double scaling)
+        const Id dims[],
+        double Re[],
+        double Im[],
+        Id iSign,
+        double scaling)
 {
   size_t nTotal;
   Id maxFactors, maxPerm;

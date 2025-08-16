@@ -230,13 +230,13 @@ static void st_keypair_copy(Keypair* keypair, Id type, Id start, void* values)
   size = keypair->nrow * keypair->ncol;
   if (type == 1)
   {
-    icopy = (Id*)values;
+    icopy = static_cast<Id*>(values);
     for (Id i = 0; i < size; i++)
       keypair->values[i + start] = icopy[i];
   }
   else
   {
-    rcopy = (double*)values;
+    rcopy = static_cast<double*>(values);
     for (Id i = 0; i < size; i++)
       keypair->values[i + start] = rcopy[i];
   }

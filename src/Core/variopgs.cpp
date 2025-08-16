@@ -113,10 +113,10 @@ static double GS_TOLSTOP     = 5.e-02;
 static double GS_TOLSTOP_RHO = 1.e-01;
 static CTables* CTABLES      = NULL;
 static bool TEST_DISCRET     = false;
-static Id NCOLOR            = 0;
-static Id NGRF              = 0;
-static Id NRULE             = 0;
-static Id BASE              = 0;
+static Id NCOLOR             = 0;
+static Id NGRF               = 0;
+static Id NRULE              = 0;
+static Id BASE               = 0;
 
 // Needed declarations due to intricated recursions
 static Relem* st_relem_free(Relem* relem);
@@ -229,7 +229,7 @@ static void st_relem_define(Relem* relem,
 {
   Id ecr, number;
 
-  if (relem == (Relem*)NULL) return;
+  if (relem == nullptr) return;
 
   if (poss == nullptr)
     number = nfacies;
@@ -362,8 +362,8 @@ static void st_relem_subdivide(Relem* relem0, Id half, Id noper)
   previous_oper = 1;
   if (relem0->old_split != NULL) previous_oper = relem0->old_split->oper;
 
-  auto divs   = ut_split_into_two(ncur, half, verbose, &ndiv);
-  number = ndiv * noper;
+  auto divs = ut_split_into_two(ncur, half, verbose, &ndiv);
+  number    = ndiv * noper;
   divs.clear();
 
   relem0->splits.resize(number);
@@ -403,7 +403,7 @@ static void st_relem_subdivide(Relem* relem0, Id half, Id noper)
  *****************************************************************************/
 static Split* st_split_free(Split* split)
 {
-  if (split == (Split*)NULL) return (split);
+  if (split == nullptr) return (split);
 
   /* Free the descending substructures (relem) */
 
@@ -536,7 +536,7 @@ static void st_set_rho(double rho, Local_Pgs* local_pgs)
   Db* db           = local_pgs->db;
   PropDef* propdef = local_pgs->propdef;
   const Rule* rule = local_pgs->rule;
-  Id flag_stat    = local_pgs->flag_stat;
+  Id flag_stat     = local_pgs->flag_stat;
   double t1min, t1max, t2min, t2max;
 
   local_pgs->corpgs.rho = rho;
@@ -599,7 +599,7 @@ static double st_get_proba_ind(double correl,
 
   double releps = 0.;
   double abseps = EPS;
-  Id maxpts    = 8000;
+  Id maxpts     = 8000;
 
   proba = TEST;
 
@@ -724,13 +724,13 @@ static Id st_calculate_thresh_stat(Local_Pgs* local_pgs)
  **
  *****************************************************************************/
 static Id st_vario_pgs_variable(Id mode,
-                                 Id ngrf,
-                                 Id nfacies,
-                                 Id flag_one,
-                                 Id flag_prop,
-                                 Db* db,
-                                 PropDef* propdef,
-                                 const Rule* rule)
+                                Id ngrf,
+                                Id nfacies,
+                                Id flag_one,
+                                Id flag_prop,
+                                Db* db,
+                                PropDef* propdef,
+                                const Rule* rule)
 {
   Id number, ifac, jfac, nloop, iptr;
   double t1min, t1max, t2min, t2max;
@@ -875,8 +875,8 @@ static double st_extract_trace(Local_Pgs* local_pgs)
 
 {
   Local_TracePgs* tracepgs = &local_pgs->tracepgs;
-  Id nrow                 = tracepgs->nrow;
-  Id ncol                 = tracepgs->ncol;
+  Id nrow                  = tracepgs->nrow;
+  Id ncol                  = tracepgs->ncol;
   if (nrow <= 0 || ncol <= 0) return TEST;
 
   /* Evaluate the sum of the score */
@@ -910,7 +910,7 @@ static void st_variogram_patch_C00(Local_Pgs* local_pgs,
                                    Id idir,
                                    double rho)
 {
-  Db* db   = local_pgs->db;
+  Db* db  = local_pgs->db;
   Id nech = (db == nullptr) ? 0 : db->getNSample(true);
   vario->patchCenter(idir, nech, rho);
 }
@@ -959,13 +959,13 @@ static double st_func_search_stat(double correl, void* user_data)
 
   /* Initializations */
 
-  local_pgs  = (Local_Pgs*)user_data;
+  local_pgs = static_cast<Local_Pgs*>(user_data);
   Id iconf0 = 0;
 
-  Id nfacies  = local_pgs->nfacies;
-  Id ilag     = local_pgs->ipascur;
-  Id idir     = local_pgs->idircur;
-  Id igrf     = local_pgs->igrfcur;
+  Id nfacies   = local_pgs->nfacies;
+  Id ilag      = local_pgs->ipascur;
+  Id idir      = local_pgs->idircur;
+  Id igrf      = local_pgs->igrfcur;
   Vario* vario = local_pgs->varioind;
 
   if (TEST_DISCRET) iconf0 = ct_tableone_covrank(CTABLES, correl, &cround);
@@ -981,7 +981,7 @@ static double st_func_search_stat(double correl, void* user_data)
       double proba = st_get_proba_ind(correl, low, up, iconf0);
 
       double logp = (proba <= 0.) ? MINIMUM_BIG : log(proba);
-      Id iad     = vario->getDirAddress(idir, ifac1, ifac2, ilag, false, 1);
+      Id iad      = vario->getDirAddress(idir, ifac1, ifac2, ilag, false, 1);
       double sw   = vario->getSwByIndex(idir, iad);
       double gg   = vario->getGgByIndex(idir, iad);
       iad         = vario->getDirAddress(idir, ifac1, ifac2, ilag, false, -1);
@@ -1010,7 +1010,7 @@ static double st_func_search_nostat(double correl, void* user_data)
 
   /* Initializations */
 
-  local_pgs = (Local_Pgs*)user_data;
+  local_pgs = static_cast<Local_Pgs*>(user_data);
   iconf0    = 0;
 
   if (TEST_DISCRET) iconf0 = ct_tableone_covrank(CTABLES, correl, &cround);
@@ -1115,8 +1115,8 @@ static void trace_define(Local_Pgs* local_pgs,
  **
  *****************************************************************************/
 static Id st_varcalc_from_vario_stat(Vario* vario,
-                                      Local_Pgs* local_pgs,
-                                      Id ngrf)
+                                     Local_Pgs* local_pgs,
+                                     Id ngrf)
 {
   Id iad;
   double result, testval, varloc, niter;
@@ -1449,10 +1449,10 @@ static Id st_update_orientation(Id fac0, Id igrf_cas, VectorInt& fgrf)
  **
  *****************************************************************************/
 static Id st_same_score(Relem* relem,
-                         Id ir0,
-                         Id igrf_cas,
-                         VectorInt& fgrf,
-                         VectorInt& fcmp)
+                        Id ir0,
+                        Id igrf_cas,
+                        VectorInt& fgrf,
+                        VectorInt& fcmp)
 {
   VectorInt& fipos = relem->Rfipos;
   if (ir0 <= 0) return (-1);
@@ -1579,7 +1579,7 @@ static void st_rule_glue(Relem* relem,
                          const VectorInt& rules1,
                          const VectorInt& fipos1)
 {
-  if (relem == (Relem*)NULL) return;
+  if (relem == nullptr) return;
   if (nrule1 <= 0) return;
   Id nnew = relem->nrule + nrule1;
   Id ir   = relem->nrule;
@@ -1628,8 +1628,8 @@ static void st_rule_product(Split* split,
   for (Id i1 = 0; i1 < nrule1; i1++)
     for (Id i2 = 0; i2 < nrule2; i2++, ir++)
     {
-      Id ic          = 0;
-      Id oper        = split->oper;
+      Id ic           = 0;
+      Id oper         = split->oper;
       RULES(ir, ic++) = 1000 + oper;
 
       if (flag_debug)
@@ -1672,9 +1672,9 @@ static void st_split_collapse(Split* split, Id verbose)
 {
   Relem* relem;
   Id num[2], nby[2], nprod;
-  VectorInt *ptr[2];
+  VectorInt* ptr[2];
 
-  if (split == (Split*)NULL) return;
+  if (split == nullptr) return;
 
   // Explore the two Relems
 
@@ -1727,7 +1727,7 @@ static void st_relem_explore(Relem* relem, Id verbose)
 {
   Split* split;
 
-  if (relem == (Relem*)NULL) return;
+  if (relem == nullptr) return;
 
   for (Id is = 0; is < relem->nsplit; is++)
   {
@@ -1777,8 +1777,8 @@ Vario_Order* vario_order_manage(Id mode,
       vorder_loc->tab_ipas.resize(0);
       vorder_loc->tab_sort.resize(0);
       vorder_loc->tab_dist.resize(0);
-      vorder_loc->size_aux     = size_aux;
-      vorder_loc->flag_dist    = flag_dist;
+      vorder_loc->size_aux  = size_aux;
+      vorder_loc->flag_dist = flag_dist;
       vorder_loc->tab_aux_iech.clear();
       vorder_loc->tab_aux_jech.clear();
       break;
@@ -1822,18 +1822,18 @@ Vario_Order* vario_order_manage(Id mode,
  **
  *****************************************************************************/
 Id vario_order_add(Vario_Order* vorder,
-                    Id iech,
-                    Id jech,
-                    void* aux_iech,
-                    void* aux_jech,
-                    Id ilag,
-                    Id idir,
-                    double dist)
+                   Id iech,
+                   Id jech,
+                   void* aux_iech,
+                   void* aux_jech,
+                   Id ilag,
+                   Id idir,
+                   double dist)
 {
   Id iad;
   static Id VARIO_ORDER_QUANT = 1000;
 
-  if (vorder == (Vario_Order*)NULL) return (0);
+  if (vorder == nullptr) return (0);
 
   /* Resize the array */
 
@@ -1888,7 +1888,7 @@ void vario_order_print(Vario_Order* vorder,
 {
   Id i, j, ilag, idir, flag_first;
 
-  if (vorder == (Vario_Order*)NULL) return;
+  if (vorder == nullptr) return;
 
   mestitle(0, "Variogram Order structure");
   message("Allocated size    = %d\n", vorder->nalloc);
@@ -1939,7 +1939,7 @@ Vario_Order* vario_order_final(Vario_Order* vorder, Id* npair)
   Id i, error;
 
   *npair = 0;
-  if (vorder == (Vario_Order*)NULL) return (vorder);
+  if (vorder == nullptr) return (vorder);
 
   error = 0;
   if (vorder->npair > 0)
@@ -2741,8 +2741,8 @@ static double st_d2_dkldkj(Id index1,
 
   VectorDouble lowi = VH::reduceOne(lower, index2);
   VectorDouble uppi = VH::reduceOne(upper, index2);
-  Id lowj          = lower[index2];
-  Id uppj          = upper[index2];
+  Id lowj           = lower[index2];
+  Id uppj           = upper[index2];
 
   double S = 0.;
   VectorDouble u(3);
@@ -2799,8 +2799,8 @@ static double st_calcul_stat(Local_Pgs* local_pgs,
   Id inform;
   static double abseps = 1.e-6;
   static double releps = 0.;
-  static Id maxpts4   = 10000;
-  static Id maxpts2   = 4000;
+  static Id maxpts4    = 10000;
+  static Id maxpts2    = 4000;
   MatrixSymmetric hess(4);
   MatrixSymmetric gradgrad(4);
   VectorDouble grad(4);
@@ -2908,8 +2908,8 @@ static double st_calcul_nostat(Local_Pgs* local_pgs,
   Id i1, i2, inform;
   static double abseps = 1.e-6;
   static double releps = 0.;
-  static Id maxpts4   = 10000;
-  static Id maxpts2   = 4000;
+  static Id maxpts4    = 10000;
+  static Id maxpts2    = 4000;
   VectorDouble grad(4);
   VectorDouble lower(4);
   VectorDouble upper(4);
@@ -2923,8 +2923,8 @@ static double st_calcul_nostat(Local_Pgs* local_pgs,
   for (Id ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
   {
     vario_order_get_indices(local_pgs->vorder, ipair, &i1, &i2, &dist);
-    Id ifac1 = (Id)local_pgs->db->getZVariable(i1, 0);
-    Id ifac2 = (Id)local_pgs->db->getZVariable(i2, 0);
+    Id ifac1  = (Id)local_pgs->db->getZVariable(i1, 0);
+    Id ifac2  = (Id)local_pgs->db->getZVariable(i2, 0);
     double w1 = local_pgs->db->getWeight(i1);
     double w2 = local_pgs->db->getWeight(i2);
 
@@ -3099,12 +3099,12 @@ static double st_optim_onelag_pgs(Local_Pgs* local_pgs,
   double Spen     = 0.;
   double Srpen    = 0.;
   double penalize = 1000;
-  Id barrier     = 0;
+  Id barrier      = 0;
 
   /* Initializations */
 
   Local_CorPgs* corpgs = &local_pgs->corpgs;
-  Id npar             = corpgs->npar;
+  Id npar              = corpgs->npar;
   double delta         = delta0;
   double mdiminution   = 0.;
 
@@ -3367,8 +3367,8 @@ static void st_variogram_geometry_pgs_correct(Local_Pgs* local_pgs,
  **
  *****************************************************************************/
 static Id st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
-                                            Vario* vario,
-                                            Id idir)
+                                           Vario* vario,
+                                           Id idir)
 {
   Id iad;
   SpaceTarget T1(vario->getSpace());
@@ -3377,8 +3377,8 @@ static Id st_variogram_geometry_pgs_calcul(Local_Pgs* local_pgs,
   /* Retrieve information from Local_pgs structure */
 
   Db* db                   = local_pgs->db;
-  Id nech                 = db->getNSample();
-  Id nvar                 = vario->getNVar();
+  Id nech                  = db->getNSample();
+  Id nvar                  = vario->getNVar();
   double maxdist           = vario->getMaximumDistance(idir);
   const DirParam& dirparam = vario->getDirParam(idir);
 
@@ -3507,7 +3507,7 @@ static double st_varcalc_correlated_grf(Local_Pgs* local_pgs, Id idir)
 {
   Id iad;
 
-  Id opt_temp = local_pgs->corpgs.opt_correl;
+  Id opt_temp  = local_pgs->corpgs.opt_correl;
   double value = 0.;
   Vario* vario = local_pgs->vario;
 
@@ -3602,11 +3602,11 @@ static void st_manage_pgs(Id mode,
                           Vario* varioind               = nullptr,
                           Model* model                  = nullptr,
                           PropDef* propdef              = nullptr,
-                          Id flag_stat                 = 0,
-                          Id flag_facies               = 0,
-                          Id flag_dist                 = 0,
-                          Id ngrf                      = 0,
-                          Id nfacies                   = 0,
+                          Id flag_stat                  = 0,
+                          Id flag_facies                = 0,
+                          Id flag_dist                  = 0,
+                          Id ngrf                       = 0,
+                          Id nfacies                    = 0,
                           const ECalcVario& calcul_type = ECalcVario::UNDEFINED)
 {
   /* Dispatch */
@@ -3693,11 +3693,11 @@ static void st_manage_pgs(Id mode,
  **
  *****************************************************************************/
 static Id st_variopgs_calcul_norho(Vario* vario,
-                                    const Rule* rule,
-                                    Local_Pgs* local_pgs,
-                                    Id ngrf,
-                                    Id opt_correl,
-                                    Id flag_geometry)
+                                   const Rule* rule,
+                                   Local_Pgs* local_pgs,
+                                   Id ngrf,
+                                   Id opt_correl,
+                                   Id flag_geometry)
 {
   st_set_rho(rule->getRho(), local_pgs);
 
@@ -3773,9 +3773,9 @@ static void st_make_all_lags_active(Vario* vario)
  *****************************************************************************/
 static double st_rho_search(double rho, void* user_data)
 {
-  double sum           = 0;
-  Local_Pgs* local_pgs = (Local_Pgs*)user_data;
-  Id ndir             = local_pgs->vario->getNDir();
+  double sum      = 0;
+  auto* local_pgs = static_cast<Local_Pgs*>(user_data);
+  Id ndir         = local_pgs->vario->getNDir();
   st_set_rho(rho, local_pgs);
 
   /* Evaluation of the global cost-function */
@@ -3802,10 +3802,10 @@ static double st_rho_search(double rho, void* user_data)
  **
  *****************************************************************************/
 static Id st_variopgs_calcul_rho(Vario* vario,
-                                  const Rule* rule,
-                                  Local_Pgs* local_pgs,
-                                  Id ngrf,
-                                  Id opt_correl)
+                                 const Rule* rule,
+                                 Local_Pgs* local_pgs,
+                                 Id ngrf,
+                                 Id opt_correl)
 {
   double testval, niter;
 
@@ -3891,13 +3891,13 @@ static Id st_check_test_discret(const ERule& mode, Id flag_rho)
  **
  *****************************************************************************/
 static Id st_vario_pgs_check(Id flag_db,
-                              Id flag_rule,
-                              Id flag_varioind,
-                              Db* db,
-                              const Db* dbprop,
-                              const Vario* vario,
-                              Vario* varioind,
-                              const Rule* rule)
+                             Id flag_rule,
+                             Id flag_varioind,
+                             Db* db,
+                             const Db* dbprop,
+                             const Vario* vario,
+                             Vario* varioind,
+                             const Rule* rule)
 {
   /* Experimental variogram (compulsory) */
 
@@ -3987,12 +3987,12 @@ static Id st_vario_pgs_check(Id flag_db,
  **
  *****************************************************************************/
 static Id st_variogram_pgs_nostat(Db* db,
-                                   const Db* dbprop,
-                                   Vario* vario,
-                                   const Rule* rule,
-                                   const VectorDouble& propcst,
-                                   Id flag_rho,
-                                   Id opt_correl)
+                                  const Db* dbprop,
+                                  Vario* vario,
+                                  const Rule* rule,
+                                  const VectorDouble& propcst,
+                                  Id flag_rho,
+                                  Id opt_correl)
 {
   Local_Pgs local_pgs;
   Id flag_correl, flag_stat;
@@ -4092,8 +4092,8 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
   double cround;
 
   const Rule* rule = local_pgs->rule;
-  Id nvar         = local_pgs->model->getNVar();
-  Id ngrf         = local_pgs->rule->getNGRF();
+  Id nvar          = local_pgs->model->getNVar();
+  Id ngrf          = local_pgs->rule->getNGRF();
   MatrixSquare cov0(nvar);
   MatrixSquare covh(nvar);
 
@@ -4184,7 +4184,7 @@ static double st_get_proba(Local_Pgs* local_pgs,
                            double* cov)
 {
   double proba = TEST;
-  Id ngrf     = local_pgs->ngrf;
+  Id ngrf      = local_pgs->ngrf;
 
   if (ngrf == 1)
   {
@@ -4206,7 +4206,7 @@ static double st_get_proba(Local_Pgs* local_pgs,
         double err;
         double releps = 0.;
         double abseps = EPS;
-        Id maxpts    = 8000;
+        Id maxpts     = 8000;
 
         Id infin[4];
         infin[0] = mvndst_infin(low[0], up[0]);
@@ -4464,7 +4464,7 @@ static Id st_vario_indic_model_nostat(Local_Pgs* local_pgs)
 
   /* Initializations */
 
-  Id nfacies  = local_pgs->nfacies;
+  Id nfacies   = local_pgs->nfacies;
   Vario* vario = local_pgs->vario;
 
   /* Loop on the directions */
@@ -4554,10 +4554,10 @@ static Id st_vario_indic_model_nostat(Local_Pgs* local_pgs)
  **
  *****************************************************************************/
 static Id st_copy_swhh(const Vario* vario1,
-                        Vario* vario2,
-                        bool flagSw,
-                        bool flagHh,
-                        bool flagGg)
+                       Vario* vario2,
+                       bool flagSw,
+                       bool flagHh,
+                       bool flagGg)
 {
   if (vario1->getNDir() != vario2->getNDir())
   {
@@ -4611,7 +4611,7 @@ static Id st_vario_indic_model_stat(Local_Pgs* local_pgs)
 
   /* Initializations */
 
-  Id nfacies  = local_pgs->nfacies;
+  Id nfacies   = local_pgs->nfacies;
   Vario* vario = local_pgs->vario;
   for (Id i = 0; i < 6; i++)
     cov[i] = 0.;
@@ -4635,7 +4635,7 @@ static Id st_vario_indic_model_stat(Local_Pgs* local_pgs)
 
       for (Id i = 0; i < vario->getNDim(); i++)
       {
-        Id jpas         = vario->getDirAddress(idir, 0, 0, ilag, false, 1);
+        Id jpas          = vario->getDirAddress(idir, 0, 0, ilag, false, 1);
         local_pgs->d1[i] = vario->getHhByIndex(idir, jpas) * vario->getCodir(idir, i);
       }
       st_calcul_covmatrix(local_pgs, &flag_ind, iconf, cov);
@@ -4679,7 +4679,7 @@ static void st_update_variance_stat(Local_Pgs* local_pgs)
 {
   Id iad;
   Vario* vario = local_pgs->vario;
-  Id nfacies  = local_pgs->nfacies;
+  Id nfacies   = local_pgs->nfacies;
 
   /* Evaluate the theoretical variances */
 
@@ -4730,10 +4730,10 @@ static void st_update_variance_stat(Local_Pgs* local_pgs)
 static void st_update_variance_nostat(Local_Pgs* local_pgs)
 
 {
-  Id number   = 0;
+  Id number    = 0;
   Db* dbin     = local_pgs->db;
   Vario* vario = local_pgs->vario;
-  Id nfacies  = local_pgs->nfacies;
+  Id nfacies   = local_pgs->nfacies;
 
   /* Core allocation */
 
@@ -4837,7 +4837,7 @@ Vario* model_pgs(Db* db,
     messerr("RuleProp must be defined");
     return nullptr;
   }
-  Id flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat                = ruleprop->isFlagStat();
   const Rule* rule            = ruleprop->getRule();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
@@ -4996,10 +4996,10 @@ label_end:
  **
  *****************************************************************************/
 static Id st_variogram_pgs_stat(Db* db,
-                                 Vario* vario,
-                                 Vario* varioind,
-                                 const Rule* rule,
-                                 const VectorDouble& propcst)
+                                Vario* vario,
+                                Vario* varioind,
+                                const Rule* rule,
+                                const VectorDouble& propcst)
 {
   Local_Pgs local_pgs;
   Id node_tot, nmax_tot, ny1, ny2, error, nfacies, ngrf, flag_stat;
@@ -5107,7 +5107,7 @@ Vario* variogram_pgs(Db* db,
     messerr("RuleProp must be defined");
     return nullptr;
   }
-  Id flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat                = ruleprop->isFlagStat();
   const Rule* rule            = ruleprop->getRule();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
@@ -5219,7 +5219,7 @@ Rule* _rule_auto(Db* db,
     messerr("RuleProp must be defined");
     return nullptr;
   }
-  Id flag_stat               = ruleprop->isFlagStat();
+  Id flag_stat                = ruleprop->isFlagStat();
   const VectorDouble& propcst = ruleprop->getPropCst();
   const Db* dbprop            = ruleprop->getDbprop();
 
@@ -5235,7 +5235,7 @@ Rule* _rule_auto(Db* db,
 
   /* Initializations */
 
-  Id error        = 1;
+  Id error         = 1;
   Rule* rule       = nullptr;
   auto* Pile_Relem = (Relem*)NULL;
   PropDef* propdef = nullptr;

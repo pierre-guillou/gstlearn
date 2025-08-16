@@ -4031,7 +4031,7 @@ static Id st_m2d_drift_inc_manage(M2D_Environ* m2denv,
 
   /* Initializations */
 
-  if (m2denv == (M2D_Environ*)NULL) return (1);
+  if (m2denv == nullptr) return (1);
   iptr = -1;
 
   /* Dispatch */
@@ -5617,7 +5617,7 @@ static M2D_Environ* st_m2denv_manage(Id mode,
     // Allocation
 
     m2denv = (M2D_Environ*)mem_alloc(sizeof(M2D_Environ), 0);
-    if (m2denv == (M2D_Environ*)NULL) return (m2denv);
+    if (m2denv == nullptr) return (m2denv);
     m2denv->flag_ed = flag_ed;
     m2denv->iatt_fd = -1;
     m2denv->iatt_fg = -1;
@@ -5914,7 +5914,7 @@ Id m2d_gibbs_spde(Db* dbin,
   vartot = model->getTotalSill(0, 0);
 
   m2denv = st_m2denv_manage(1, flag_ed, sqrt(vartot), NULL);
-  if (m2denv == (M2D_Environ*)NULL) goto label_end;
+  if (m2denv == nullptr) goto label_end;
 
   /* Preparing the variables in 'dbout' */
 
