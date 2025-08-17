@@ -958,7 +958,7 @@ Id law_binomial(Id n, double p)
         }
         else
         {
-          y = (Id)(xl + log(v) / lambdal);
+          y = static_cast<Id>(xl + log(v) / lambdal);
           if (y < 0) continue;
           /* Go to step 5 */
           v = v * (u - p2) * lambdal;
@@ -1104,8 +1104,8 @@ VectorDouble law_exp_sample(const double* tabin,
 
   for (Id ivar = 0; ivar < nvarin; ivar++)
   {
-    mean[ivar] /= (double)nechin;
-    stdv[ivar] = stdv[ivar] / (double)nechin - mean[ivar] * mean[ivar];
+    mean[ivar] /= static_cast<double>(nechin);
+    stdv[ivar] = stdv[ivar] / static_cast<double>(nechin) - mean[ivar] * mean[ivar];
     stdv[ivar] = (stdv[ivar] > 0) ? sqrt(stdv[ivar]) : 0.;
     stdv[ivar] *= percent / 100.;
   }
@@ -1127,9 +1127,9 @@ VectorDouble law_exp_sample(const double* tabin,
 
       /* Get the closest experimental sample (the reference) */
 
-      selec            = (Id)law_uniform(1., (double)nechin);
+      selec            = static_cast<Id>(law_uniform(1., static_cast<double>(nechin)));
       auto placeholder = (selec + 0.5);
-      iechin           = (Id)placeholder;
+      iechin           = static_cast<Id>(placeholder);
       if (iechin < 0) iechin = 0;
       if (iechin >= nechin) iechin = nechin - 1;
 
@@ -1202,7 +1202,7 @@ Id sampleInteger(Id mini, Id maxi)
   double rmini = mini - 0.5;
   double rmaxi = maxi + 0.5;
   double rand  = law_uniform(rmini, rmaxi);
-  Id retval    = (rand > 0) ? (Id)trunc(rand + 0.5) : (Id)-trunc(-rand + 0.5);
+  Id retval    = (rand > 0) ? static_cast<Id>(trunc(rand + 0.5)) : static_cast<Id>(-trunc(-rand + 0.5));
   return retval;
 }
 

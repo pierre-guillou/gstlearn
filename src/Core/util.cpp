@@ -609,7 +609,7 @@ Id get_keypair_int(const char* keyword, Id* nrow, Id* ncol, VectorInt& values)
 
   values.resize(size);
   for (Id i = 0; i < size; i++)
-    values[i] = (Id)keypair->values[i];
+    values[i] = static_cast<Id>(keypair->values[i]);
 
   return (0);
 }
@@ -742,7 +742,7 @@ VectorInt ut_split_into_two(Id ncolor, Id flag_half, Id verbose, Id* nposs)
 
   /* Initializations */
 
-  p    = (flag_half) ? static_cast<Id>(floor((double)ncolor / 2.)) : ncolor - 1;
+  p    = (flag_half) ? static_cast<Id>(floor(static_cast<double>(ncolor) / 2.)) : ncolor - 1;
   nmax = static_cast<Id>(pow(2, ncolor));
   np   = 0;
 
