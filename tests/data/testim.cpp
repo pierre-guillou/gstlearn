@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 
   int nargs      = static_cast<int>(subparts.size());
   String outname = concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
-  if (outname == "Jeu3-") verbose = true; // Pour voir
+  if (outname == "Jeu3-") verbose = true; // Pour voir le resultat
   ASerializable::setPrefixName(outname);
 
   /* Getting the Study name */
