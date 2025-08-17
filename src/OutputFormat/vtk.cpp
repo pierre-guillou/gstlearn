@@ -960,11 +960,11 @@ void write_regular_mesh(const char* filename,
   VectorFloat z(dims[2]);
 
   for (i = 0; i < dims[0]; i++)
-    x[i] = (float)i;
+    x[i] = static_cast<float>(i);
   for (i = 0; i < dims[1]; i++)
-    y[i] = (float)i;
+    y[i] = static_cast<float>(i);
   for (i = 0; i < dims[2]; i++)
-    z[i] = (float)i;
+    z[i] = static_cast<float>(i);
 
   write_rectilinear_mesh(filename, ub, dims, x.data(), y.data(), z.data(),
                          nvars, vardim, centering, varnames, vars);

@@ -153,9 +153,9 @@ static double st_scaling(Id coor, Id scale)
 {
   double value = coor;
   if (scale < 0)
-    value /= (double)ABS(scale);
+    value /= static_cast<double>(ABS(scale));
   else
-    value *= (double)ABS(scale);
+    value *= static_cast<double>(ABS(scale));
   return value;
 }
 
@@ -360,7 +360,7 @@ static Id st_readFileHeader(FILE* file,
   if (fread(&BFileHead_, 1, sizeof(BFileHead_), file) == 0) return (1);
   if (verbOption >= 1) st_print_BFileHead(&BFileHead_);
   *NPerTrace = st_to_s(BFileHead_.NUM_OF_SAMPLES);
-  *delta     = (double)st_to_s(BFileHead_.INTERVAL_MS) / 1000;
+  *delta     = static_cast<double>(st_to_s(BFileHead_.INTERVAL_MS)) / 1000;
   return (0);
 }
 
@@ -405,10 +405,10 @@ static Id st_read_trace(FILE* file,
         fminvalue = fvalue;
         minsamp   = i + 1;
       }
-      values[i] = (double)fvalue;
+      values[i] = static_cast<double>(fvalue);
       if (ABS(values[i]) < 0.01) values[i] = TEST;
-      cotes[i] = (double)cote;
-      cote -= (float)delta;
+      cotes[i] = static_cast<double>(cote);
+      cote -= static_cast<float>(delta);
     }
     if (verbOption >= 2)
       message("Min(%6d) = %11.0f - Max(%6d) = %11.0f\n", minsamp, fminvalue,
@@ -427,7 +427,7 @@ static Id st_read_trace(FILE* file,
       if (codefmt == 3)
       {
         if (fread(&svalue, 2, 1, file) == 0) return (1);
-        ivalue = (Id)svalue;
+        ivalue = static_cast<Id>(svalue);
       }
 
       if (ivalue > imaxvalue)
@@ -440,10 +440,10 @@ static Id st_read_trace(FILE* file,
         iminvalue = ivalue;
         minsamp   = i + 1;
       }
-      values[i] = (double)ivalue;
+      values[i] = static_cast<double>(ivalue);
       if (ABS(values[i]) < 0.01) values[i] = TEST;
-      cotes[i] = (double)cote;
-      cote -= (float)delta;
+      cotes[i] = static_cast<double>(cote);
+      cote -= static_cast<float>(delta);
     }
     if (verbOption >= 2)
       message("Min(%6d) = %11d - Max(%6d) = %11d\n", minsamp, iminvalue,
@@ -1249,7 +1249,7 @@ void st_get_trace_params(traceHead* Theader,
                          double* ytrace)
 {
   Id scacsv = st_to_s(Theader->SCALE_COOR);
-  *delta    = (double)st_to_s(Theader->SAMPLE_INTRVL) / 1000;
+  *delta    = static_cast<double>(st_to_s(Theader->SAMPLE_INTRVL)) / 1000;
   *xtrace   = st_scaling(st_to_f(Theader->ENS_COOR_X), scacsv);
   *ytrace   = st_scaling(st_to_f(Theader->ENS_COOR_Y), scacsv);
   *iline    = st_to_i(Theader->INLINE);

@@ -289,7 +289,7 @@ static void st_rule_print(Id rank,
 
   if (!FFFF(score))
   {
-    iscore = (Id)score;
+    iscore = static_cast<Id>(score);
     message(" -> %d", iscore);
   }
 
@@ -508,14 +508,14 @@ static void st_set_bounds(Db* db,
   {
     jfac = (flag_one) ? 0 : ifac;
     db->setInterval(iech, jfac,
-                    (double)ct_tableone_getrank_from_proba(CTABLES, t1min),
-                    (double)ct_tableone_getrank_from_proba(CTABLES, t1max));
+                    static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t1min)),
+                    static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t1max)));
     if (ngrf > 1)
     {
       jfac = (flag_one) ? 1 : nfacies + ifac;
       db->setInterval(iech, jfac,
-                      (double)ct_tableone_getrank_from_proba(CTABLES, t2min),
-                      (double)ct_tableone_getrank_from_proba(CTABLES, t2max));
+                      static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t2min)),
+                      static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t2max)));
     }
   }
 }
@@ -556,7 +556,7 @@ static void st_set_rho(double rho, Local_Pgs* local_pgs)
     for (iech = 0; iech < db->getNSample(); iech++)
     {
       if (!db->isActive(iech)) continue;
-      ifac = (Id)db->getZVariable(iech, 0);
+      ifac = static_cast<Id>(db->getZVariable(iech, 0));
       if (rule_thresh_define(propdef, db, rule, ifac, iech, 0, 0, 0, &t1min,
                              &t1max, &t2min, &t2max)) return;
       st_set_bounds(db, 1, ngrf, local_pgs->nfacies, ifac, iech, t1min, t1max,
@@ -659,23 +659,23 @@ static Id st_calculate_thresh_stat(Local_Pgs* local_pgs)
     }
     else
     {
-      STAT_THRESH(ifac, 0, 0) = (double)ct_tableone_getrank_from_proba(CTABLES,
-                                                                       t1min);
-      STAT_THRESH(ifac, 0, 1) = (double)ct_tableone_getrank_from_proba(CTABLES,
-                                                                       t1max);
+      STAT_THRESH(ifac, 0, 0) =
+        static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t1min));
+      STAT_THRESH(ifac, 0, 1) =
+        static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t1max));
       if (ngrf > 1)
       {
-        STAT_THRESH(ifac, 1, 0) = (double)ct_tableone_getrank_from_proba(CTABLES,
-                                                                         t2min);
-        STAT_THRESH(ifac, 1, 1) = (double)ct_tableone_getrank_from_proba(CTABLES,
-                                                                         t2max);
+        STAT_THRESH(ifac, 1, 0) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t2min));
+        STAT_THRESH(ifac, 1, 1) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t2max));
       }
       else
       {
-        STAT_THRESH(ifac, 1, 0) = (double)ct_tableone_getrank_from_proba(CTABLES,
-                                                                         -10.);
-        STAT_THRESH(ifac, 1, 1) = (double)ct_tableone_getrank_from_proba(CTABLES,
-                                                                         +10.);
+        STAT_THRESH(ifac, 1, 0) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, -10.));
+        STAT_THRESH(ifac, 1, 1) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, +10.));
       }
     }
   }
@@ -786,7 +786,7 @@ static Id st_vario_pgs_variable(Id mode,
 
         for (Id i = 0; i < nloop; i++)
         {
-          ifac = (flag_one) ? (Id)db->getZVariable(iech, 0) : i;
+          ifac = (flag_one) ? static_cast<Id>(db->getZVariable(iech, 0)) : i;
           jfac = (flag_one) ? ifac : ifac + 1;
           if (rule_thresh_define(propdef, db, rule, jfac, iech, 0, 0, 0, &t1min,
                                  &t1max, &t2min, &t2max)) return (1);
@@ -1017,7 +1017,7 @@ static double st_func_search_nostat(double correl, void* user_data)
 
   /* Reset the pre-calculation array (only if flag_stat) */
   if (local_pgs->flag_stat)
-    for (i = 0; i < (Id)local_pgs->stat_proba.size(); i++)
+    for (i = 0; i < static_cast<Id>(local_pgs->stat_proba.size()); i++)
       local_pgs->stat_proba[i] = TEST;
 
   sum = 0.;
@@ -1033,9 +1033,9 @@ static double st_func_search_nostat(double correl, void* user_data)
 
       /* In the stationary case, search in the lookup table first */
 
-      ifac1 = (Id)local_pgs->db->getZVariable(i1, 0) - 1;
+      ifac1 = static_cast<Id>(local_pgs->db->getZVariable(i1, 0)) - 1;
       if (ifac1 < 0 || ifac1 >= local_pgs->nfacies) continue;
-      ifac2 = (Id)local_pgs->db->getZVariable(i2, 0) - 1;
+      ifac2 = static_cast<Id>(local_pgs->db->getZVariable(i2, 0)) - 1;
       if (ifac2 < 0 || ifac2 >= local_pgs->nfacies) continue;
       proba = STAT_PROBA(ifac1, ifac2);
     }
@@ -1496,8 +1496,8 @@ static VectorDouble st_relem_evaluate(Relem* relem,
 
   /* Initializations */
 
-  flag_check       = (Id)get_keypone("Multi_Score_Check", 0.);
-  nmax             = (Id)pow(2., (double)NGRF);
+  flag_check       = static_cast<Id>(get_keypone("Multi_Score_Check", 0.));
+  nmax             = static_cast<Id>(pow(2., static_cast<double>(NGRF)));
   nrule            = relem->nrule;
   VectorInt& rules = relem->Rrules;
   VectorInt& fipos = relem->Rfipos;
@@ -1765,7 +1765,7 @@ Vario_Order* vario_order_manage(Id mode,
 
   /* Dispatch */
 
-  vorder_loc = (Vario_Order*)NULL;
+  vorder_loc = nullptr;
   switch (mode)
   {
     case 1:
@@ -2492,7 +2492,7 @@ static Id st_get_count(Local_Pgs* local_pgs, Id ifac1, Id ifac2)
     if (ifac2 != local_pgs->db->getZVariable(i2, 0)) continue;
     double w1 = local_pgs->db->getWeight(i1);
     double w2 = local_pgs->db->getWeight(i2);
-    number += (Id)(w1 * w2);
+    number += static_cast<Id>(w1 * w2);
   }
   return (number);
 }
@@ -2840,7 +2840,7 @@ static double st_calcul_stat(Local_Pgs* local_pgs,
         s = STAT_PROBA(ifac1, ifac2);
 
       rj2 = -2. * log(s);
-      S += (double)nfifj * rj2;
+      S += static_cast<double>(nfifj) * rj2;
 
       /* Calculate the derivative */
 
@@ -2923,8 +2923,8 @@ static double st_calcul_nostat(Local_Pgs* local_pgs,
   for (Id ipair = local_pgs->ifirst; ipair < local_pgs->ilast; ipair++)
   {
     vario_order_get_indices(local_pgs->vorder, ipair, &i1, &i2, &dist);
-    Id ifac1  = (Id)local_pgs->db->getZVariable(i1, 0);
-    Id ifac2  = (Id)local_pgs->db->getZVariable(i2, 0);
+    Id ifac1  = static_cast<Id>(local_pgs->db->getZVariable(i1, 0));
+    Id ifac2  = static_cast<Id>(local_pgs->db->getZVariable(i2, 0));
     double w1 = local_pgs->db->getWeight(i1);
     double w2 = local_pgs->db->getWeight(i2);
 
@@ -3277,7 +3277,7 @@ static Id st_discard_point(Local_Pgs* local_pgs, Id iech)
 
   /* Check on the facies */
 
-  Id ifac = (Id)local_pgs->db->getZVariable(iech, 0);
+  Id ifac = static_cast<Id>(local_pgs->db->getZVariable(iech, 0));
   if (ifac < 1 || ifac > local_pgs->nfacies) return (1);
 
   /* Check on the thresholds */
@@ -3314,7 +3314,7 @@ static Id st_variogram_geometry_pgs_final(Local_Pgs* local_pgs)
   Id npair;
 
   local_pgs->vorder = vario_order_final(local_pgs->vorder, &npair);
-  if (local_pgs->vorder == (Vario_Order*)NULL) return (1);
+  if (local_pgs->vorder == nullptr) return (1);
   if (npair > 0 && !local_pgs->flag_stat)
   {
     local_pgs->memint.resize(npair);
@@ -3636,7 +3636,7 @@ static void st_manage_pgs(Id mode,
       local_pgs->model       = nullptr;
       local_pgs->vario       = nullptr;
       local_pgs->varioind    = nullptr;
-      local_pgs->vorder      = (Vario_Order*)NULL;
+      local_pgs->vorder      = nullptr;
       break;
 
     case 1:
@@ -4119,7 +4119,7 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
   }
   else if (rule->getModeRule() == ERule::SHIFT)
   {
-    RuleShift* ruleshift = (RuleShift*)rule;
+    auto* ruleshift = (RuleShift*)rule;
     cov[0]               = covh.getValue(0, 0);                                     /* C11(h)  */
     cov[5]               = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 1); /* C22(h)  */
 
@@ -4765,10 +4765,10 @@ static void st_update_variance_nostat(Local_Pgs* local_pgs)
   /* Normalization */
 
   for (Id ivar = 0; ivar < nfacies; ivar++)
-    mean[ivar] /= (double)number;
+    mean[ivar] /= static_cast<double>(number);
   for (Id ivar = 0; ivar < nfacies; ivar++)
     for (Id jvar = 0; jvar < nfacies; jvar++)
-      COVS(ivar, jvar) = COVS(ivar, jvar) / (double)number - mean[ivar] * mean[jvar];
+      COVS(ivar, jvar) = COVS(ivar, jvar) / static_cast<double>(number) - mean[ivar] * mean[jvar];
 
   /* Store the results */
 
@@ -4894,7 +4894,7 @@ Vario* model_pgs(Db* db,
       messerr("Space Dimension inconsistency between Dbprop and Vario");
       return nullptr;
     }
-    if ((Id)new_model->getNDim() != db->getNDim())
+    if (static_cast<Id>(new_model->getNDim()) != db->getNDim())
     {
       messerr("The Space Dimension of the Db structure (%d)", db->getNDim());
       messerr("Does not correspond to the Space Dimension of the model (%d)",
@@ -5142,10 +5142,10 @@ Vario* variogram_pgs(Db* db,
   {
     if (!propcst.empty())
     {
-      if ((Id)propcst.size() != nclass)
+      if (static_cast<Id>(propcst.size()) != nclass)
       {
         messerr("Number of proportions in 'propcst' (%d) should match Number of Facies in 'rule' (%d)",
-                (Id)propcst.size(), rule->getNFacies());
+                static_cast<Id>(propcst.size()), rule->getNFacies());
         return nullptr;
       }
       props = propcst;
@@ -5154,10 +5154,10 @@ Vario* variogram_pgs(Db* db,
     {
       // Calculate the number of Facies in 'Db'
       props = dbStatisticsFacies(db);
-      if ((Id)props.size() != nclass)
+      if (static_cast<Id>(props.size()) != nclass)
       {
         messerr("Number of Facies in 'db' (%d) should match Number of facies in 'rule' (%d)",
-                (Id)props.size(), rule->getNFacies());
+                static_cast<Id>(props.size()), rule->getNFacies());
         return nullptr;
       }
     }
@@ -5235,10 +5235,10 @@ Rule* _rule_auto(Db* db,
 
   /* Initializations */
 
-  Id error         = 1;
-  Rule* rule       = nullptr;
-  auto* Pile_Relem = (Relem*)NULL;
-  PropDef* propdef = nullptr;
+  Id error          = 1;
+  Rule* rule        = nullptr;
+  Relem* Pile_Relem = nullptr;
+  PropDef* propdef  = nullptr;
 
   NCOLOR      = db->getNFacies();
   NGRF        = ngrfmax;
