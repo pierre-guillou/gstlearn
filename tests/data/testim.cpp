@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   Id nbsimu, seed, nbtuba;
   static int nboot    = 10;
   static int niter    = 10;
-  static bool verbose = false;
+  static bool verbose = true;
 
   /* Initializations */
 
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
   /* Create the output name (for storage of dump files) */
 
   VectorString subparts = separateKeywords(argv[1]);
-  int nargs             = (int)subparts.size();
+  int nargs             = static_cast<int>(subparts.size());
   String outname        = concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
   ASerializable::setPrefixName(outname);
 
