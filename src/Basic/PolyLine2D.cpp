@@ -108,10 +108,10 @@ bool PolyLine2D::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   if (getNPoints() <= 0) return false;
   bool ret = true;
-  ret      = ret && _recordWrite<Id>(os, "Number of Points", (Id)_x.size());
+  ret      = ret && _recordWrite<Id>(os, "Number of Points", static_cast<Id>(_x.size()));
 
   VectorDouble buffer(2);
-  for (Id i = 0; i < (Id)_x.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(_x.size()); i++)
   {
     buffer[0] = _x[i];
     buffer[1] = _y[i];
@@ -540,7 +540,7 @@ Id dbFoldPolyline(DbGrid* dbin,
 
   /* Add the variables */
 
-  Id ncol = (Id)cols.size();
+  Id ncol = static_cast<Id>(cols.size());
   Id iptr = dbout->addColumnsByConstant(ncol, TEST);
   if (iptr < 0) return 1;
 

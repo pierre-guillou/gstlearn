@@ -340,7 +340,7 @@ Id GibbsMMulti::_storeAllWeights(bool verbose)
   if (verbose)
   {
     message("- Number of zero weights = %d\n", nzero);
-    double reduc = 100. * (double)(ntotal - nzero) / (double)ntotal;
+    double reduc = 100. * static_cast<double>(ntotal - nzero) / static_cast<double>(ntotal);
     message("- Percentage             = %6.2lf\n", reduc);
   }
   return 0;

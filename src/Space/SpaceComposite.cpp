@@ -77,28 +77,28 @@ void SpaceComposite::setOrigin(const VectorDouble& origin)
 
 size_t SpaceComposite::getNDim(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
     return ASpace::getNDim();
   return _comps[ispace]->getNDim();
 }
 
 size_t SpaceComposite::getOffset(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
     return ASpace::getOffset();
   return _comps[ispace]->getOffset();
 }
 
 const VectorDouble& SpaceComposite::getOrigin(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
     return ASpace::getOrigin();
   return _comps[ispace]->getOrigin();
 }
 
 size_t SpaceComposite::getNComponents() const
 {
-  return (Id)_comps.size();
+  return static_cast<Id>(_comps.size());
 }
 
 std::shared_ptr<SpaceComposite> SpaceComposite::create(const std::vector<ASpaceSharedPtr>& vectspace)
@@ -108,7 +108,7 @@ std::shared_ptr<SpaceComposite> SpaceComposite::create(const std::vector<ASpaceS
 
 ASpaceSharedPtr SpaceComposite::getComponent(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
     return ASpace::getComponent(); // Return this if wrong ispace
   return _comps[ispace];
 }
@@ -189,7 +189,7 @@ double SpaceComposite::_getDistance(const SpacePoint& p1,
                                     const SpacePoint& p2,
                                     Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
     return getDistances(p1, p2).norm(); // Return the norm of sub-distances vector
   return _comps[ispace]->getDistance(p1, p2);
 }
@@ -200,7 +200,7 @@ double SpaceComposite::_getDistance(const SpacePoint& p1,
                                     const Tensor& tensor,
                                     Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
   {
     std::cout << "Error: Inconsistent space dimension. Return TEST."
               << std::endl;
@@ -216,7 +216,7 @@ double SpaceComposite::_getFrequentialDistance(const SpacePoint& p1,
                                               const Tensor& tensor,
                                               Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
   {
     std::cout << "Error: Inconsistent space dimension. Return TEST."
               << std::endl;
@@ -242,7 +242,7 @@ void SpaceComposite::_getIncrementInPlace(const SpacePoint& p1,
 {
   ptemp.clear();
   VectorDouble inc;
-  if (ispace < 0 || ispace >= (Id)getNComponents())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents()))
   {
     for (const auto& sp: _comps)
     {

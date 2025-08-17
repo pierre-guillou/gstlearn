@@ -131,7 +131,7 @@ static VectorDouble st_core(Id nli, Id nco)
 
   /* Initialization */
 
-  rsize = (double)nli * (double)nco;
+  rsize = static_cast<double>(nli) * static_cast<double>(nco);
   if (rsize < 0 || rsize > INT_MAX)
   {
     messerr("Core allocation problem: Size (%d x %d) too big", nli, nco);
@@ -591,7 +591,7 @@ static Id st_check_environment(Id flag_in,
               model->getNDim());
       goto label_end;
     }
-    if ((Id)model->getNDim() != ndim)
+    if (static_cast<Id>(model->getNDim()) != ndim)
     {
       messerr("The Space Dimension of the Db structure (%d)", ndim);
       messerr("Does not correspond to the Space Dimension of the model (%d)",
@@ -936,7 +936,7 @@ static void st_block_discretize(Id mode, Id flag_rand, Id iech)
       DISC1(i, idim) = taille * ((j + 0.5) / nd - 0.5);
       DISC2(i, idim) = DISC1(i, idim);
       if (flag_rand)
-        DISC2(i, idim) += taille * law_uniform(-0.5, 0.5) / (double)nd;
+        DISC2(i, idim) += taille * law_uniform(-0.5, 0.5) / static_cast<double>(nd);
     }
   }
   law_set_random_seed(memo);
@@ -1082,7 +1082,7 @@ void krige_lhs_print(Id nech,
 
     /* Flag line */
 
-    if (flag != NULL)
+    if (flag != nullptr)
     {
       tab_prints(NULL, "    ");
       tab_prints(NULL, "Flag");
@@ -1217,7 +1217,7 @@ static void st_krige_wgt_print(Id status,
 
   /* Initializations */
 
-  nech     = (Id)nbgh_ranks.size();
+  nech     = static_cast<Id>(nbgh_ranks.size());
   ndim     = DBIN->getNDim();
   auto sum = st_core(nvar_m, 1);
   if (sum.empty()) return;
@@ -1707,14 +1707,14 @@ static Id st_get_limits(DbGrid* db, double top, double bot, Id* ideb, Id* ifin)
   if (FFFF(bot))
     iad = 0;
   else
-    iad = (Id)((bot - z0) / dz);
+    iad = static_cast<Id>((bot - z0) / dz);
   if (bot > z0 + iad * dz) iad++;
   *ideb = MAX(0, MIN(iad, nz - 1));
 
   if (FFFF(top))
     iad = nz - 1;
   else
-    iad = (Id)((top - z0) / dz);
+    iad = static_cast<Id>((top - z0) / dz);
   *ifin = MAX(0, MIN(iad, nz - 1));
   return (0);
 }
@@ -2727,7 +2727,7 @@ Id anakexp_3D(DbGrid* db,
         /* Look for the neighborhood */
 
         nbgh_ranks = st_neigh_find(db, ix, iy, iz, nei_ss, nei_nn, nei_cur.data());
-        nech       = (Id)nbgh_ranks.size();
+        nech       = static_cast<Id>(nbgh_ranks.size());
         if (nech <= 0) continue;
         neq = (nfeq == 0) ? nech : nech + 1;
 
@@ -2948,9 +2948,9 @@ static VectorInt st_ranks_other(Id nech,
   VectorInt rother(nech, 0);
   for (Id i = 0; i < nech; i++)
     rother[i] = i;
-  for (Id i = 0, nsize1 = (Id)ranks1.size(); i < nsize1; i++)
+  for (Id i = 0, nsize1 = static_cast<Id>(ranks1.size()); i < nsize1; i++)
     rother[ranks1[i]] = -1;
-  for (Id i = 0, nsize2 = (Id)ranks2.size(); i < nsize2; i++)
+  for (Id i = 0, nsize2 = static_cast<Id>(ranks2.size()); i < nsize2; i++)
     rother[ranks2[i]] = -1;
   return rother;
 }
@@ -2998,8 +2998,8 @@ static Id st_sampling_krige_data(Db* db,
 
   Id error  = 1;
   Id ndat   = db->getNSample(true);
-  Id nsize1 = (Id)ranks1.size();
-  Id nsize2 = (Id)ranks2.size();
+  Id nsize1 = static_cast<Id>(ranks1.size());
+  Id nsize2 = static_cast<Id>(ranks2.size());
   Id ntot   = nsize1 + nsize2;
   Id npart  = ndat - nsize1;
   Id nutil  = 0;
@@ -3268,7 +3268,7 @@ Id st_crit_global(Db* db,
 
   /* Initializations */
 
-  Id nsize1 = (Id)ranks1.size();
+  Id nsize1 = static_cast<Id>(ranks1.size());
   Id ndat   = db->getNSample(true);
   Id nutil  = ndat - nsize1;
   c00 = invc = cs = cs1 = nullptr;
@@ -3395,8 +3395,8 @@ Id sampling_f(Db* db,
 
   /* Initializations */
 
-  Id nsize1 = (Id)ranks1.size();
-  Id nsize2 = (Id)ranks2.size();
+  Id nsize1 = static_cast<Id>(ranks1.size());
+  Id nsize2 = static_cast<Id>(ranks2.size());
   Id nech   = db->getNSample();
 
   /* Preliminary checks */
@@ -3513,8 +3513,8 @@ Id krigsampling_f(Db* dbin,
 
   /* Preliminary checks */
 
-  Id nsize1    = (Id)ranks1.size();
-  Id nsize2    = (Id)ranks2.size();
+  Id nsize1    = static_cast<Id>(ranks1.size());
+  Id nsize2    = static_cast<Id>(ranks2.size());
   double sigma = 0.;
   s = c00 = nullptr;
   st_global_init(dbin, dbout);

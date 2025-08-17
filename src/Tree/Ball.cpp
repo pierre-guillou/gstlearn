@@ -75,8 +75,8 @@ KNN Ball::queryAsVVD(const VectorVectorDouble& test, Id n_neighbors)
 {
   KNN knn;
   if (test.empty()) return knn;
-  Id n_samples  = (Id)test[0].size();
-  Id n_features = (Id)test.size();
+  Id n_samples  = static_cast<Id>(test[0].size());
+  Id n_features = static_cast<Id>(test.size());
   MatrixT<double> internal(n_samples, n_features);
   // transpose
   for (Id i = 0; i < n_samples; ++i)
@@ -105,7 +105,7 @@ KNN Ball::queryOne(const double* test, Id n_features, Id n_neighbors)
 KNN Ball::queryOneAsVD(const VectorDouble& test, Id n_neighbors)
 {
   KNN knn;
-  Id n_features = (Id)test.size();
+  Id n_features = static_cast<Id>(test.size());
   MatrixT<double> internal(1, n_features);
   for (Id i = 0; i < n_features; ++i)
   {
@@ -137,7 +137,7 @@ VectorInt Ball::getIndices(const SpacePoint& Pt, Id n_neighbors)
 Id Ball::queryClosest(const VectorDouble& test)
 {
   KNN knn;
-  Id n_features = (Id)test.size();
+  Id n_features = static_cast<Id>(test.size());
   MatrixT<double> internal(1, n_features);
   for (Id i = 0; i < n_features; ++i)
   {
@@ -154,7 +154,7 @@ Id Ball::queryOneInPlace(const VectorDouble& test,
                           Id rank)
 {
   KNN knn;
-  Id n_features = (Id)test.size();
+  Id n_features = static_cast<Id>(test.size());
   MatrixT<double> internal(1, n_features);
   for (Id i = 0; i < n_features; ++i)
   {

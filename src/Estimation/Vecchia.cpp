@@ -294,7 +294,7 @@ Id Vecchia::computeLower(const MatrixT<Id>& Ranks, bool verbose)
   // Preliminary check
   Id ndim;
   if (!haveSameNDim(_db1, _db2, &ndim)) return 1;
-  if (ndim != (Id)_model->getNDim())
+  if (ndim != static_cast<Id>(_model->getNDim()))
   {
     messerr("Db(%d) and Model(%d) should share the same Space Dimension",
             ndim, _model->getNDim());
@@ -303,15 +303,15 @@ Id Vecchia::computeLower(const MatrixT<Id>& Ranks, bool verbose)
 
   Id nvar;
   if (!haveCompatibleNVar(_db1, _db2, &nvar)) return 1;
-  if (nvar != (Id)_model->getNVar())
+  if (nvar != static_cast<Id>(_model->getNVar()))
   {
     messerr("Db(%d) and Model(%d) should share the same Number of Variables",
             nvar, _model->getNVar());
     return 1;
   }
 
-  Id nsample  = (Id)Ranks.getNRows();
-  Id nb_neigh = (Id)Ranks.getNCols() - 1;
+  Id nsample  = static_cast<Id>(Ranks.getNRows());
+  Id nb_neigh = static_cast<Id>(Ranks.getNCols()) - 1;
 
   _Ntot1 = 0;
   if (_db1 != nullptr)

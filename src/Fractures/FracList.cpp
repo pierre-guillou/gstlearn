@@ -119,17 +119,17 @@ String FracList::toString(const AStringFormat* strfmt) const
  **
  *****************************************************************************/
 Id FracList::simulate(const FracEnviron& envir,
-                       bool flag_sim_layer,
-                       bool flag_sim_fract,
-                       Id seed,
-                       bool verbose,
-                       const VectorDouble& elevations)
+                      bool flag_sim_layer,
+                      bool flag_sim_fract,
+                      Id seed,
+                      bool verbose,
+                      const VectorDouble& elevations)
 {
   _step    = envir.getXextend() / _ndisc;
   _xorigin = -envir.getDeltax();
   _verbose = verbose;
 
-  double y0  = 0.;
+  double y0 = 0.;
   Id ninfos = 1 + envir.getNFamilies() * NPART;
   law_set_random_seed(seed);
 
@@ -148,7 +148,7 @@ Id FracList::simulate(const FracEnviron& envir,
     thicks = _layersManage(envir, &y0);
   else
     thicks = _layersRead(elevations, &y0);
-  _nlayers = (Id)thicks.size();
+  _nlayers = static_cast<Id>(thicks.size());
 
   /* Core allocation */
 
@@ -175,7 +175,7 @@ Id FracList::simulate(const FracEnviron& envir,
 
     /* Loop on the layers */
 
-    Id ifrac = -1;
+    Id ifrac  = -1;
     cote      = y0;
     double xx = envir.getFault(ifault).faultAbscissae(cote);
     for (Id ilayer = 0; ilayer < _nlayers; ilayer++)
@@ -244,8 +244,8 @@ Id FracList::simulate(const FracEnviron& envir,
       _setMemTheta1(ilayer, ifam, theta1);
       _setMemTheta2(ilayer, ifam, theta2);
       _setMemPropsur(ilayer, ifam, propsur);
-      _setMemFrac(ilayer, ifam, (double)nfracs);
-      _setMemTotal(ilayer, ifam, (double)getNFracs());
+      _setMemFrac(ilayer, ifam, static_cast<double>(nfracs));
+      _setMemTotal(ilayer, ifam, static_cast<double>(getNFracs()));
     }
   }
 
@@ -305,7 +305,7 @@ VectorDouble FracList::_layersManage(const FracEnviron& envir, double* y0) const
 
   if (_verbose)
   {
-    Id number = (Id)thicks.size();
+    Id number = static_cast<Id>(thicks.size());
     mestitle(0, "Layer generation");
     message("Thickness law - Mean               = %lf\n", mean);
     message("Thickness law - St. Dev.           = %lf\n", stdev);
@@ -332,7 +332,7 @@ VectorDouble FracList::_layersRead(const VectorDouble& elevations, double* y0) c
 
   /* Initializations */
 
-  Id nlayers = (Id)elevations.size();
+  Id nlayers = static_cast<Id>(elevations.size());
   thicks.resize(nlayers - 1);
 
   double cote = elevations[0];
@@ -374,12 +374,12 @@ VectorDouble FracList::_layersRead(const VectorDouble& elevations, double* y0) c
  **
  *****************************************************************************/
 Id FracList::_fracAdd(Id ifrac,
-                       Id ifam,
-                       double xx,
-                       double cote,
-                       double thick,
-                       double orient,
-                       double* xp)
+                      Id ifam,
+                      double xx,
+                      double cote,
+                      double thick,
+                      double orient,
+                      double* xp)
 {
   if (ifrac < 0)
   {
@@ -677,7 +677,7 @@ double FracList::_extendFractures(const FracFamily& family,
     _updateRepulsion(xx, family.getRange(), denstab);
   }
 
-  double propsur = (ntotal > 0) ? (double)next / (double)ntotal : 0.;
+  double propsur = (ntotal > 0) ? static_cast<double>(next) / static_cast<double>(ntotal) : 0.;
   if (_verbose && ntotal > 0)
   {
     message("Survival proportion               = %lf (%d from %d)\n", propsur,
@@ -821,7 +821,7 @@ void FracList::_updateRepulsion(double x0,
                                 double range,
                                 VectorDouble& denstab)
 {
-  Id idisc0 = (Id)((x0 - _xorigin) / _step);
+  Id idisc0 = static_cast<Id>((x0 - _xorigin) / _step);
   Id nrange = MAX(1, (Id)(range / _step));
 
   /* Central cell */
@@ -957,19 +957,19 @@ double FracList::_fractureExtension(const FracDesc& desc,
  **
  *******************************************************************F**********/
 Id FracList::_simulateFractures(const FracEnviron& envir,
-                                 const FracFamily& family,
-                                 Id ifam,
-                                 double cote,
-                                 double thick,
-                                 double theta,
-                                 VectorDouble& denstab)
+                                const FracFamily& family,
+                                Id ifam,
+                                double cote,
+                                double thick,
+                                double theta,
+                                VectorDouble& denstab)
 {
   double total;
   double xp;
 
   double orient  = family.getOrient();
   double dorient = family.getDorient();
-  Id nfracs     = law_poisson(theta * envir.getXextend());
+  Id nfracs      = law_poisson(theta * envir.getXextend());
 
   /* Loop on the fractures to be simulated */
 
@@ -1050,13 +1050,13 @@ MatrixDense FracList::fractureExport() const
     Id npoint = _descs[ifrac].getNPoint();
     for (Id ip = 0; ip < npoint; ip++)
     {
-      segs.setValue(ifrac, 0, (double)ifrac + 1);
-      segs.setValue(ifrac, 1, (double)ip + 1);
-      segs.setValue(ifrac, 2, (double)_descs[ifrac].getFamily());
+      segs.setValue(ifrac, 0, static_cast<double>(ifrac) + 1);
+      segs.setValue(ifrac, 1, static_cast<double>(ip) + 1);
+      segs.setValue(ifrac, 2, static_cast<double>(_descs[ifrac].getFamily()));
       segs.setValue(ifrac, 3, _descs[ifrac].getXXF(ip));
       segs.setValue(ifrac, 4, _descs[ifrac].getYYF(ip));
       segs.setValue(ifrac, 5, _descs[ifrac].getOrient());
-      segs.setValue(ifrac, 6, (double)(ip == 0));
+      segs.setValue(ifrac, 6, static_cast<double>(ip == 0));
     }
   }
 
@@ -1091,7 +1091,7 @@ FracList* FracList::fractureImport(const VectorDouble& frac_segs,
                                    const VectorDouble& layinfo,
                                    Id nfamilies)
 {
-  Id nvalf = (Id)frac_segs.size();
+  Id nvalf = static_cast<Id>(frac_segs.size());
   if (!isMultiple(nvalf, NBYFRAC))
   {
     messerr("The number of values in 'frac_segs' (%d) should be a multiple of %d",
@@ -1105,7 +1105,7 @@ FracList* FracList::fractureImport(const VectorDouble& frac_segs,
   Id nlayer = 0;
   if (!layinfo.empty())
   {
-    nvall  = (Id)layinfo.size();
+    nvall  = static_cast<Id>(layinfo.size());
     number = 1 + nfamilies * NPART;
     if (!isMultiple(nvall, number))
     {
@@ -1125,11 +1125,11 @@ FracList* FracList::fractureImport(const VectorDouble& frac_segs,
   Id icur = -1;
   for (Id i = 0; i < nseg; i++)
   {
-    Id ifam      = (Id)FRACSEG(i, 2);
+    Id ifam       = static_cast<Id>(FRACSEG(i, 2));
     double xx     = FRACSEG(i, 3);
     double yy     = FRACSEG(i, 4);
     double orient = FRACSEG(i, 5);
-    bool flag_new = (Id)FRACSEG(i, 6);
+    bool flag_new = static_cast<bool>(FRACSEG(i, 6));
 
     if (flag_new || icur < 0)
     {
@@ -1176,13 +1176,13 @@ void FracList::addDescription(const FracDesc& description)
  **
  *****************************************************************************/
 Id FracList::fractureToBlock(DbGrid* dbgrid,
-                              double xmax,
-                              VectorDouble& permtab,
-                              double perm_mat,
-                              double perm_bench,
-                              Id ndisc,
-                              bool verbose,
-                              const NamingConvention& namconv)
+                             double xmax,
+                             VectorDouble& permtab,
+                             double perm_mat,
+                             double perm_bench,
+                             Id ndisc,
+                             bool verbose,
+                             const NamingConvention& namconv)
 {
   if (dbgrid->getNDim() != 2)
   {
@@ -1194,7 +1194,7 @@ Id FracList::fractureToBlock(DbGrid* dbgrid,
   {
     if (dbgrid->getDX(idim) < dmin) dmin = dbgrid->getDX(idim);
   }
-  double delta = dmin / (double)ndisc;
+  double delta = dmin / static_cast<double>(ndisc);
 
   // Allocate the new variable
 
@@ -1218,7 +1218,7 @@ Id FracList::fractureToBlock(DbGrid* dbgrid,
     FracDesc& desc = _descs[ifrac];
     auto ifam      = desc.getFamily();
     double perm    = 0.;
-    if (ifam < (Id)permtab.size()) perm = permtab[ifam];
+    if (ifam < static_cast<Id>(permtab.size())) perm = permtab[ifam];
     if (perm <= 0.) continue;
 
     /* Loop on the segments */
@@ -1269,7 +1269,7 @@ void FracList::_plungeSegment(DbGrid* dbgrid,
   double deltax = x2 - x1;
   double deltay = y2 - y1;
   double dist   = sqrt(deltax * deltax + deltay * deltay);
-  Id number    = (Id)floor(dist / delta);
+  Id number     = static_cast<Id>(floor(dist / delta));
 
   // Loop on the discretization lags
 
@@ -1368,7 +1368,7 @@ VectorDouble FracList::fractureToWell(Id nval,
     _welloutAdd(wellout, x2, y2, -1, -1, 0, 0.);
   }
 
-  (*nint) = (Id)wellout.size() / NBYWOUT;
+  (*nint) = static_cast<Id>(wellout.size()) / NBYWOUT;
   (*ncol) = NBYWOUT;
   return wellout;
 }
@@ -1396,17 +1396,17 @@ void FracList::_welloutAdd(VectorDouble& wellout,
 {
   Id nloc;
 
-  nloc = (Id)wellout.size() / NBYWOUT;
+  nloc = static_cast<Id>(wellout.size()) / NBYWOUT;
   wellout.resize(NBYWOUT * (nloc + 1));
 
-  WELLOUT(nloc, 0) = x;                 /* First coordinate */
-  WELLOUT(nloc, 1) = y;                 /* Second coordinate */
-  WELLOUT(nloc, 2) = (double)ifrac + 1; /* Rank of the fracture */
-  WELLOUT(nloc, 3) = (double)ip + 1;    /* Rank of segment in frature */
-  WELLOUT(nloc, 4) = (double)family;    /* Rank of family */
-  WELLOUT(nloc, 5) = perm;              /* Starting permeability */
-  WELLOUT(nloc, 6) = perm;              /* Ending permeability */
-  WELLOUT(nloc, 7) = TEST;              /* Range of permeability change */
+  WELLOUT(nloc, 0) = x;                              /* First coordinate */
+  WELLOUT(nloc, 1) = y;                              /* Second coordinate */
+  WELLOUT(nloc, 2) = static_cast<double>(ifrac) + 1; /* Rank of the fracture */
+  WELLOUT(nloc, 3) = static_cast<double>(ip) + 1;    /* Rank of segment in frature */
+  WELLOUT(nloc, 4) = static_cast<double>(family);    /* Rank of family */
+  WELLOUT(nloc, 5) = perm;                           /* Starting permeability */
+  WELLOUT(nloc, 6) = perm;                           /* Ending permeability */
+  WELLOUT(nloc, 7) = TEST;                           /* Range of permeability change */
 }
 
 /****************************************************************************/
@@ -1536,14 +1536,14 @@ VectorDouble FracList::fractureExtractDist(Id ifam, double cote, double dcote)
  **
  *****************************************************************************/
 Id FracList::fractureWellToBlock(DbGrid* dbgrid,
-                                  Id col_perm,
-                                  Id col_fluid,
-                                  Id flag_fluid,
-                                  double val_fluid,
-                                  const VectorDouble& wellout,
-                                  Id nval,
-                                  Id ndisc,
-                                  bool verbose)
+                                 Id col_perm,
+                                 Id col_fluid,
+                                 Id flag_fluid,
+                                 double val_fluid,
+                                 const VectorDouble& wellout,
+                                 Id nval,
+                                 Id ndisc,
+                                 bool verbose)
 {
   VectorDouble traj;
   Id iptr_perm  = -1;
@@ -1568,7 +1568,7 @@ Id FracList::fractureWellToBlock(DbGrid* dbgrid,
   {
     if (dbgrid->getDX(idim) < dmin) dmin = dbgrid->getDX(idim);
   }
-  double delta = dmin / (double)ndisc;
+  double delta = dmin / static_cast<double>(ndisc);
 
   /* Allocate the new variable */
 
@@ -1606,8 +1606,8 @@ Id FracList::fractureWellToBlock(DbGrid* dbgrid,
   {
     double xx    = WELLOUT(iw, 0);
     double yy    = WELLOUT(iw, 1);
-    Id ifrac    = (Id)WELLOUT(iw, 2) - 1;
-    Id ip       = (Id)WELLOUT(iw, 3) - 1;
+    Id ifrac     = static_cast<Id>(WELLOUT(iw, 2)) - 1;
+    Id ip        = static_cast<Id>(WELLOUT(iw, 3)) - 1;
     double perm1 = WELLOUT(iw, 5);
     double perm2 = WELLOUT(iw, 6);
     double range = WELLOUT(iw, 7);
@@ -1670,7 +1670,7 @@ Id FracList::fractureWellToBlock(DbGrid* dbgrid,
  *****************************************************************************/
 void FracList::_trajAdd(VectorDouble& traj, double x, double y)
 {
-  Id nloc = (Id)traj.size();
+  Id nloc = static_cast<Id>(traj.size());
   traj.resize(2 * (nloc + 1));
   TRAJ(nloc, 0) = x;
   TRAJ(nloc, 1) = y;
@@ -1699,7 +1699,7 @@ void FracList::_plungeSegmentGradual(DbGrid* dbgrid,
 {
   VectorDouble coor(2);
 
-  Id ntraj    = (Id)traj.size();
+  Id ntraj     = static_cast<Id>(traj.size());
   double total = 0.;
   for (Id ip = 0; ip < ntraj - 1; ip++)
   {
@@ -1710,7 +1710,7 @@ void FracList::_plungeSegmentGradual(DbGrid* dbgrid,
     double deltax = x2 - x1;
     double deltay = y2 - y1;
     double dist   = sqrt(deltax * deltax + deltay * deltay);
-    Id number    = (Id)floor(dist / delta);
+    Id number     = static_cast<Id>(floor(dist / delta));
     double incx   = deltax / number;
     double incy   = deltay / number;
     double incr   = dist / number;
@@ -1739,5 +1739,4 @@ void FracList::_plungeSegmentGradual(DbGrid* dbgrid,
     }
   }
 }
-}
-
+} // namespace gstlrn

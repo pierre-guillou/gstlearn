@@ -417,7 +417,7 @@ Id CalcSimpleInterpolation::_movave(Db* dbin, Db* dbout, ANeigh* neigh)
     neigh->select(iech, nbgh);
 
     // Perform the estimation
-    for (Id i = 0; i < (Id)nbgh.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(nbgh.size()); i++)
     {
       double value = dbin->getZVariable(nbgh[i], 0);
       if (FFFF(value))
@@ -471,7 +471,7 @@ Id CalcSimpleInterpolation::_movmed(Db* dbin, Db* dbout, ANeigh* neigh)
     // Perform the estimation
     if (nbgh.size() > 0)
     {
-      Id rank = (Id)nbgh.size() / 2;
+      Id rank = static_cast<Id>(nbgh.size()) / 2;
       nbghmed.push_back(nbgh[rank]);
       weights.push_back(1.);
     }
@@ -519,7 +519,7 @@ Id CalcSimpleInterpolation::_lstsqr(Db* dbin, Db* dbout, ANeigh* neigh) const
 
     // Find the neighborhood
     neigh->select(iech, nbgh);
-    Id nSize = (Id)nbgh.size();
+    Id nSize = static_cast<Id>(nbgh.size());
     if (nSize < ndrift)
     {
       dbout->setArray(iech, _iattEst, TEST);
@@ -659,7 +659,7 @@ void CalcSimpleInterpolation::_pointInvdist(Db* dbin, Db* dbout)
 void CalcSimpleInterpolation::_gridInvdist(DbGrid* dbin, Db* dbout)
 {
   Id ndim     = dbin->getNDim();
-  Id maxneigh = (Id)pow(2., (double)ndim);
+  Id maxneigh = static_cast<Id>(pow(2., static_cast<double>(ndim)));
   double dmin  = dbout->getExtensionDiagonal() / 1.e5;
 
   VectorDouble coor(ndim);
@@ -774,7 +774,7 @@ double CalcSimpleInterpolation::_estimCalc(const Db* dbin,
 {
 
   double result = 0.;
-  for (Id i = 0, n = (Id)nbgh.size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(nbgh.size()); i < n; i++)
   {
     Id iech     = nbgh[i];
     double value = dbin->getZVariable(iech, 0);

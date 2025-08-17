@@ -186,7 +186,7 @@ void KrigingSystemSimpleCase::_setInternalShortCutVariablesGeneral()
 }
 void KrigingSystemSimpleCase::_rhsDump(KrigingAlgebraSimpleCase& algebra) const
 {
-  Id nech = (Id)algebra.getSampleRanksByVariable(0)->size();
+  Id nech = static_cast<Id>(algebra.getSampleRanksByVariable(0)->size());
   mestitle(0, "RHS of Kriging matrix");
   if (nech > 0) message("Number of active samples    = %d\n", nech);
   message("Total number of equations   = %d\n", _getNeq(nech));
@@ -219,7 +219,7 @@ void KrigingSystemSimpleCase::_estimateCalcul(Id status,
                                               Id iechout,
                                               KrigingAlgebraSimpleCase& algebra) const
 {
-  Id nech = (Id)algebra.getSampleRanksByVariable(0)->size();
+  Id nech = static_cast<Id>(algebra.getSampleRanksByVariable(0)->size());
   if (_flagEst)
     _estimateEstim(status, algebra, iechout);
 
@@ -255,7 +255,7 @@ void KrigingSystemSimpleCase::_estimateCalcul(Id status,
 
 void KrigingSystemSimpleCase::_neighCalcul(Id status, const VectorDouble& tab, Id iechout)
 {
-  Id ntab = (Id)tab.size();
+  Id ntab = static_cast<Id>(tab.size());
   for (Id i = 0; i < ntab; i++)
   {
 
@@ -269,11 +269,11 @@ void KrigingSystemSimpleCase::_neighCalcul(Id status, const VectorDouble& tab, I
   {
     mestitle(0, "Neighborhood Parameters");
 
-    message("Number of selected samples          = %d\n", (Id)tab[0]);
+    message("Number of selected samples          = %d\n", static_cast<Id>(tab[0]));
     message("Maximum neighborhood distance       = %lf\n", tab[1]);
     message("Minimum neighborhood distance       = %lf\n", tab[2]);
-    message("Number of non-empty sectors         = %d\n", (Id)tab[3]);
-    message("Number of consecutive empty sectors = %d\n", (Id)tab[4]);
+    message("Number of non-empty sectors         = %d\n", static_cast<Id>(tab[3]));
+    message("Number of consecutive empty sectors = %d\n", static_cast<Id>(tab[4]));
   }
 }
 
@@ -660,7 +660,7 @@ bool KrigingSystemSimpleCase::_isCorrect()
   }
   if (_model != nullptr)
   {
-    if (ndim > 0 && ndim != (Id)_model->getNDim())
+    if (ndim > 0 && ndim != static_cast<Id>(_model->getNDim()))
     {
       messerr("Incompatible Space Dimension of '_ model'");
       return false;
@@ -669,12 +669,12 @@ bool KrigingSystemSimpleCase::_isCorrect()
   }
   if (_neigh != nullptr)
   {
-    if (ndim > 0 && ndim != (Id)_neigh->getNDim())
+    if (ndim > 0 && ndim != static_cast<Id>(_neigh->getNDim()))
     {
       messerr("Incompatible Space Dimension of '_neigh'");
       return false;
     }
-    ndim = (Id)_neigh->getNDim();
+    ndim = static_cast<Id>(_neigh->getNDim());
   }
 
   /****************************/
@@ -844,7 +844,7 @@ bool KrigingSystemSimpleCase::_preparNoStat()
  */
 VectorVectorDouble KrigingSystemSimpleCase::getSampleCoordinates(KrigingAlgebraSimpleCase& algebra, Id iechout) const
 {
-  Id nech = (Id)algebra.getSampleRanksByVariable(0)->size();
+  Id nech = static_cast<Id>(algebra.getSampleRanksByVariable(0)->size());
   VectorVectorDouble xyz(_ndim);
   for (Id idim = 0; idim < _ndim; idim++)
   {

@@ -86,7 +86,7 @@ bool _regressionCheck(Db *db1,
                       Db *db2,
                       const Model *model)
 {
-  Id ncol = (Id) icols.size();
+  Id ncol = static_cast<Id>(icols.size());
   Id nfex = db2->getNLoc(ELoc::F);
 
   switch (mode)
@@ -153,7 +153,7 @@ bool _regressionLoad(Db *db1,
     case 0:
       *value = db1->getArray(iech, icol0);
       if (flagCst) x[ecr++] = 1.;
-      for (Id icol = 0; icol < (Id) icols.size(); icol++)
+      for (Id icol = 0; icol < static_cast<Id>(icols.size()); icol++)
         x[ecr++] = db2->getArray(iech, icols[icol]);
       break;
 
@@ -174,7 +174,7 @@ bool _regressionLoad(Db *db1,
   }
 
   bool flagTest = false;
-  for (Id i = 0; i < (Id) x.size() && !flagTest; i++)
+  for (Id i = 0; i < static_cast<Id>(x.size()) && !flagTest; i++)
     flagTest = FFFF(x[i]);
   return (FFFF(*value) || flagTest);
 }
@@ -195,7 +195,7 @@ VectorDouble regressionDeming(const VectorDouble &x,
                               double delta)
 {
   VectorDouble beta(2,TEST);
-  Id nech = (Id) x.size();
+  Id nech = static_cast<Id>(x.size());
   if (nech <= 1) return beta;
 
   double xmean = 0.;
@@ -205,8 +205,8 @@ VectorDouble regressionDeming(const VectorDouble &x,
     xmean += x[iech];
     ymean += y[iech];
   }
-  xmean /= (double) nech;
-  ymean /= (double) nech;
+  xmean /= static_cast<double>(nech);
+  ymean /= static_cast<double>(nech);
 
   double sxx = 0.;
   double sxy = 0.;
@@ -219,9 +219,9 @@ VectorDouble regressionDeming(const VectorDouble &x,
     sxy += deltax * deltay;
     syy += deltay * deltay;
   }
-  sxx /= (double) nech;
-  sxy /= (double) nech;
-  syy /= (double) nech;
+  sxx /= static_cast<double>(nech);
+  sxy /= static_cast<double>(nech);
+  syy /= static_cast<double>(nech);
 
   double T = syy - delta * sxx;
   beta[1] = (T + sqrt(T * T + 4. * delta * sxy * sxy)) / (2. * sxy);
@@ -269,7 +269,7 @@ Regression regression(Db *db1,
 
   Id nfex = db2->getNLoc(ELoc::F);
   Id nech = db1->getNSample();
-  Id ncol = (Id) icols.size();
+  Id ncol = static_cast<Id>(icols.size());
   Id size = 0;
   switch (mode)
   {
@@ -406,7 +406,7 @@ Id Regression::apply(Db *db1,
 
   /* Store the regression error at sample points */
 
-  Id size = (Id) getCoeffs().size();
+  Id size = static_cast<Id>(getCoeffs().size());
   double value = 0;
   VectorDouble x(size);
 

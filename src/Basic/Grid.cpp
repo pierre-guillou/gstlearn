@@ -140,9 +140,9 @@ void Grid::resetFromSpaceDimension(Id ndim)
 }
 
 Id Grid::resetFromVector(const VectorInt& nx,
-                          const VectorDouble& dx,
-                          const VectorDouble& x0,
-                          const VectorDouble& angles)
+                         const VectorDouble& dx,
+                         const VectorDouble& x0,
+                         const VectorDouble& angles)
 {
   _nDim = static_cast<Id>(nx.size());
   _allocate();
@@ -505,7 +505,7 @@ double Grid::indiceToCoordinate(Id idim0,
 
   for (Id idim = 0; idim < _nDim; idim++)
   {
-    _work1[idim] = (double)indice[idim];
+    _work1[idim] = static_cast<double>(indice[idim]);
     if (!percent.empty()) _work1[idim] += percent[idim];
     _work1[idim] *= _dx[idim];
   }
@@ -661,9 +661,9 @@ void Grid::coordinateToIndicesInPlace(VectorInt& indices,
  * @return Error return code
  */
 Id Grid::coordinateToIndicesInPlace(const VectorDouble& coor,
-                                     VectorInt& indice,
-                                     bool centered,
-                                     double eps) const
+                                    VectorInt& indice,
+                                    bool centered,
+                                    double eps) const
 {
   if (static_cast<Id>(indice.size()) != _nDim)
   {
@@ -692,9 +692,9 @@ Id Grid::coordinateToIndicesInPlace(const VectorDouble& coor,
   {
     Id ix;
     if (centered)
-      ix = (Id)floor(_work2[idim] / _dx[idim] + 0.5 + eps);
+      ix = static_cast<Id>(floor(_work2[idim] / _dx[idim] + 0.5 + eps));
     else
-      ix = (Id)floor(_work2[idim] / _dx[idim] + eps);
+      ix = static_cast<Id>(floor(_work2[idim] / _dx[idim] + eps));
     indice[idim] = ix;
     if (ix < 0 || ix >= _nx[idim]) outside = true;
   }
@@ -930,9 +930,9 @@ void Grid::iteratorNext(std::vector<Id>& indices)
   for (Id jdim = _nDim - 1; jdim >= 0; jdim--)
   {
     Id order = _order[jdim];
-    idim      = ABS(order);
+    idim     = ABS(order);
     nval /= _counts[idim];
-    Id divid     = iech / nval;
+    Id divid      = iech / nval;
     indices[idim] = divid;
     iech -= divid * nval;
   }
@@ -1014,11 +1014,11 @@ void Grid::multiple(const VectorInt& nmult,
 
   for (Id idim = 0; idim < _nDim; idim++)
   {
-    double value = (double)getNX(idim);
+    double value = static_cast<double>(getNX(idim));
     if (flagCell)
-      nx[idim] = (Id)floor(value / (double)nmult[idim]);
+      nx[idim] = static_cast<Id>(floor(value / static_cast<double>(nmult[idim])));
     else
-      nx[idim] = 1 + (Id)floor((value - 1.) / (double)nmult[idim]);
+      nx[idim] = 1 + static_cast<Id>(floor((value - 1.) / static_cast<double>(nmult[idim])));
   }
 
   /* Get the new grid meshes */
@@ -1040,7 +1040,7 @@ void Grid::multiple(const VectorInt& nmult,
   {
     double delta = (coor2[idim] - coor1[idim]) / 2.;
     if (flagCell)
-      x0[idim] = coor1[idim] + delta * (double)nmult[idim];
+      x0[idim] = coor1[idim] + delta * static_cast<double>(nmult[idim]);
     else
       x0[idim] = getX0(idim);
   }
@@ -1081,7 +1081,7 @@ void Grid::divider(const VectorInt& nmult,
   /* Get the new grid meshes */
 
   for (Id idim = 0; idim < _nDim; idim++)
-    dx[idim] = getDX(idim) / ((double)nmult[idim]);
+    dx[idim] = getDX(idim) / (static_cast<double>(nmult[idim]));
 
   /* Get the lower left corner of the small grid */
 
@@ -1097,7 +1097,7 @@ void Grid::divider(const VectorInt& nmult,
   {
     double delta = (coor2[idim] - coor1[idim]) / 2.;
     if (flagCell)
-      x0[idim] = coor1[idim] + delta / (double)nmult[idim];
+      x0[idim] = coor1[idim] + delta / static_cast<double>(nmult[idim]);
     else
       x0[idim] = getX0(idim);
   }

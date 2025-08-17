@@ -235,7 +235,7 @@ bool RuleProp::_checkConsistency()
   }
   _flagStat = true;
   _dbprop = nullptr;
-  _propcst.resize(nfacies, 1./(double) nfacies);
+  _propcst.resize(nfacies, 1./static_cast<double>(nfacies));
   return true;
 }
 

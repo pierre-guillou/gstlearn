@@ -119,7 +119,7 @@ static void st_record_write(const char* format, ...)
   {
     _buffer_write(buf, format, ap);
     long1 = static_cast<Id>(strlen(buf));
-    long2 = (ASCII_BUFFER != NULL) ? static_cast<Id>(strlen(ASCII_BUFFER)) : 0;
+    long2 = (ASCII_BUFFER != nullptr) ? static_cast<Id>(strlen(ASCII_BUFFER)) : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
@@ -348,7 +348,7 @@ static FILE* st_file_open(const char* filename,
   }
   else
   {
-    if (filetype != NULL)
+    if (filetype != nullptr)
     {
       st_record_write("%s", filetype);
       st_record_write("\n");
@@ -486,17 +486,17 @@ Id ascii_option_defined(const char* file_name,
       case 0:
         ival = 0;
         if (!strcmp(keyval, "Y") || !strcmp(keyval, "YES") || !strcmp(keyval, "y") || !strcmp(keyval, "yes") || atoi(keyval) == 1) ival = 1;
-        *((Id*)answer) = ival;
+        *(static_cast<Id*>(answer)) = ival;
         break;
 
       case 1:
         ival           = atoi(keyval);
-        *((Id*)answer) = ival;
+        *(static_cast<Id*>(answer)) = ival;
         break;
 
       case 2:
         rval               = atof(keyval);
-        *((double*)answer) = rval;
+        *(static_cast<double*>(answer)) = rval;
         break;
     }
     lrep = 1;

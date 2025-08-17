@@ -627,13 +627,13 @@ Id Vario::transformYToZ(const AAnam* anam)
 
   /* Preliminary checks */
 
-  if (anam == (AAnam*)NULL) return 1;
+  if (anam == nullptr) return 1;
   if (anam->getType() != EAnam::HERMITIAN)
   {
     messerr("The function 'transformYToZ' is restricted to Gaussian Anamorphosis");
     return 1;
   }
-  AnamHermite* anam_hermite = dynamic_cast<AnamHermite*>(anam->clone());
+  auto* anam_hermite = dynamic_cast<AnamHermite*>(anam->clone());
   if (anam_hermite == nullptr)
   {
     messerr("The function 'transformYToZ' needs a Hermite Anamorphosis");
@@ -1427,7 +1427,7 @@ void Vario::setGgVec(Id idir, Id ivar, Id jvar, const VectorDouble& gg)
   if (!_isVariableValid(jvar)) return;
   if (!_isDirectionValid(idir)) return;
   auto nlag = getNLag(idir);
-  if (nlag != (Id)gg.size()) return;
+  if (nlag != static_cast<Id>(gg.size())) return;
 
   Id iad;
   if (_flagAsym)
@@ -1509,7 +1509,7 @@ void Vario::setHhVec(Id idir, Id ivar, Id jvar, const VectorDouble& hh)
   if (!_isDirectionValid(idir)) return;
 
   auto nlag = getNLag(idir);
-  if (nlag != (Id)hh.size()) return;
+  if (nlag != static_cast<Id>(hh.size())) return;
 
   Id iad;
   if (_flagAsym)
@@ -1590,7 +1590,7 @@ void Vario::setSwVec(Id idir, Id ivar, Id jvar, const VectorDouble& sw)
   if (!_isVariableValid(jvar)) return;
   if (!_isDirectionValid(idir)) return;
   auto nlag = getNLag(idir);
-  if (nlag != (Id)sw.size()) return;
+  if (nlag != static_cast<Id>(sw.size())) return;
 
   Id iad;
   if (_flagAsym)
@@ -1953,7 +1953,7 @@ bool Vario::_serializeAscii(std::ostream& os, bool /*verbose*/) const
   ret = ret && _commentWrite(os, "Variable Names");
   for (Id ivar = 0; ivar < getNVar(); ivar++)
   {
-    if (ivar < (Id)_variableNames.size())
+    if (ivar < static_cast<Id>(_variableNames.size()))
       ret = ret && _recordWrite<String>(os, "", _variableNames[ivar]);
     else
       ret = ret && _recordWrite<String>(os, "", "Unknown");
@@ -1990,17 +1990,17 @@ bool Vario::_serializeAscii(std::ostream& os, bool /*verbose*/) const
     if (!dirparam.isDefinedForGrid())
     {
       ret = ret && _recordWrite<double>(os, "Tolerance on angle", dirparam.getTolAngle());
-      for (Id idim = 0; idim < (Id)dirparam.getNDim() && ret; idim++)
+      for (Id idim = 0; idim < static_cast<Id>(dirparam.getNDim()) && ret; idim++)
         ret = ret && _recordWrite<double>(os, "", dirparam.getCodir(idim));
       ret = ret && _commentWrite(os, "Direction coefficients");
     }
 
     if (dirparam.isDefinedForGrid())
     {
-      for (Id idim = 0; ret && idim < (Id)dirparam.getNDim() && ret; idim++)
-        ret = ret && _recordWrite(os, "", (double)dirparam.getGrincr(idim));
+      for (Id idim = 0; ret && idim < static_cast<Id>(dirparam.getNDim()) && ret; idim++)
+        ret = ret && _recordWrite(os, "", static_cast<double>(dirparam.getGrincr(idim)));
       ret = ret && _commentWrite(os, "Direction increments on grid");
-      for (Id idim = 0; idim < (Id)dirparam.getNDim() && ret; idim++)
+      for (Id idim = 0; idim < static_cast<Id>(dirparam.getNDim()) && ret; idim++)
         ret = ret && _recordWrite<double>(os, "", dirparam.getCodir(idim));
       ret = ret && _commentWrite(os, "Direction coefficients");
     }
@@ -2030,7 +2030,7 @@ void Vario::patchCenter(Id idir, Id nech, double rho)
       // Get the central address
       auto iad = getDirAddress(idir, ivar, jvar, 0, false, 0);
       if (IFFFF(iad)) continue;
-      setSwByIndex(idir, iad, (double)nech);
+      setSwByIndex(idir, iad, static_cast<double>(nech));
       setHhByIndex(idir, iad, 0.);
       if (ivar == jvar)
         setGgByIndex(idir, iad, 1.);
@@ -2239,7 +2239,7 @@ VectorDouble Vario::getGgs(Id idir, Id ivar, Id jvar, const VectorInt& ilag) con
   if (!_isDirectionValid(idir)) return values;
   const DirParam dirparam = _varioparam.getDirParam(idir);
 
-  for (Id i = 0; i < (Id)ilag.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(ilag.size()); i++)
   {
     if (ilag[i] >= 0 && ilag[i] < getDirSize(idir)) values.push_back(getGg(idir, ivar, jvar, ilag[i]));
   }
@@ -2253,9 +2253,9 @@ VectorDouble Vario::setGgs(Id idir, Id ivar, Id jvar, const VectorInt& ilag, con
   if (!_isDirectionValid(idir)) return values;
   const DirParam dirparam = _varioparam.getDirParam(idir);
 
-  for (Id i = 0; i < (Id)ilag.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(ilag.size()); i++)
   {
-    if (ilag[i] >= 0 && ilag[i] < getDirSize(idir) && i < (Id)values.size())
+    if (ilag[i] >= 0 && ilag[i] < getDirSize(idir) && i < static_cast<Id>(values.size()))
       setGg(idir, ivar, jvar, ilag[i], values[i]);
   }
   return values;
@@ -2374,7 +2374,7 @@ Id Vario::_calculateGeneral(Db* db,
                             Id verr_mode)
 {
   bool flag_verr      = false;
-  Vario_Order* vorder = (Vario_Order*)NULL;
+  Vario_Order* vorder = nullptr;
 
   /* Particular case of Transitive Covariogram */
   /* It is only coded in the by_sample case and uses the regression technique */
@@ -2394,7 +2394,7 @@ Id Vario::_calculateGeneral(Db* db,
 
   if (_flag_UK)
   {
-    if (vorder == (Vario_Order*)NULL)
+    if (vorder == nullptr)
       vorder = vario_order_manage(1, 1, 0, vorder);
   }
 
@@ -2442,7 +2442,7 @@ Id Vario::_calculateGeneral(Db* db,
       if (_calculateGeneralSolution2(db, idir, rindex.data())) return 1;
     }
 
-    if (vorder != (Vario_Order*)NULL)
+    if (vorder != nullptr)
       _calculateFromGeometry(db, idir, vorder);
   }
 
@@ -3359,7 +3359,7 @@ Id Vario::_calculateGeneralSolution1(Db* db,
 
       /* Case of internal storage */
 
-      if (vorder != (Vario_Order*)NULL)
+      if (vorder != nullptr)
       {
         vario_order_add(vorder, iech, jech, NULL, NULL, ilag, idir, dist);
       }
@@ -3378,7 +3378,7 @@ Id Vario::_calculateGeneralSolution1(Db* db,
 
   /* Internal storage */
 
-  if (vorder != (Vario_Order*)NULL)
+  if (vorder != nullptr)
   {
     vario_order_final(vorder, &npair);
   }
@@ -3558,7 +3558,7 @@ Id Vario::_calculateOnGridSolution(DbGrid* db, Id idir)
     for (Id ilag = 1; ilag < nlag; ilag++)
     {
       for (Id idim = 0; idim < db->getNDim(); idim++)
-        indg2[idim] = indg1[idim] + (Id)(ilag * getGrincr(idir, idim));
+        indg2[idim] = indg1[idim] + static_cast<Id>(ilag * getGrincr(idir, idim));
       Id jech = db->indiceToRank(indg2);
       if (jech < 0) continue;
 
@@ -3648,7 +3648,7 @@ Id Vario::_calculateGenOnGridSolution(DbGrid* db, Id idir, Id norder)
       {
         keep = 0;
         for (Id idim = 0; idim < db->getNDim(); idim++)
-          indg2[idim] = indg1[idim] + (Id)(ilag * iwgt * dirparam.getGrincr(idim));
+          indg2[idim] = indg1[idim] + (ilag * iwgt * dirparam.getGrincr(idim));
 
         Id jech = db->indiceToRank(indg2);
         if (jech < 0) continue;
@@ -4568,7 +4568,7 @@ Id Vario::transformCut(Id nh, double ycut)
     return 1;
   }
   static double disc = 0.01;
-  Id ndisc           = (Id)(2. / disc + 1.);
+  Id ndisc          = static_cast<Id>(2. / disc + 1.);
 
   /* Core allocation */
 
@@ -5139,7 +5139,7 @@ bool Vario::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   {
     VectorDouble vars;
     ret = ret && SerializeHDF5::readVec(*varioG, "Variances", vars);
-    if ((Id)vars.size() != nvar * nvar) return false;
+    if (static_cast<Id>(vars.size()) != nvar * nvar) return false;
     setVars(vars);
   }
 

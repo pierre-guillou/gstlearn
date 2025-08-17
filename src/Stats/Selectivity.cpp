@@ -136,7 +136,7 @@ Selectivity* Selectivity::createByKeys(const VectorString& keys,
 {
   std::vector<ESelectivity> codes;
 
-  for (Id i = 0; i < (Id)keys.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(keys.size()); i++)
   {
     ESelectivity code = ESelectivity::fromKey(keys[i]);
     if (code == ESelectivity::UNKNOWN) continue;
@@ -198,7 +198,7 @@ Id Selectivity::calculateFromArray(const VectorDouble& tab,
     return 1;
   }
 
-  Id nech          = (Id)tab.size();
+  Id nech          = static_cast<Id>(tab.size());
   VectorDouble wtab = weights;
   if (wtab.empty())
   {
@@ -206,7 +206,7 @@ Id Selectivity::calculateFromArray(const VectorDouble& tab,
   }
   else
   {
-    if (nech != (Id)wtab.size())
+    if (nech != static_cast<Id>(wtab.size()))
     {
       messerr("Arguments 'tab' and 'weights' should have same dimension");
       return 1;
@@ -345,7 +345,7 @@ Selectivity* Selectivity::createInterpolation(const VectorDouble& zcuts,
   double tval, qval;
 
   auto nclass = selecin.getNCuts();
-  Id ncuts  = (Id)zcuts.size();
+  Id ncuts  = static_cast<Id>(zcuts.size());
 
   auto* selectivity = new Selectivity(ncuts);
   for (Id icut = 0; icut < ncuts; icut++)
@@ -486,7 +486,7 @@ void Selectivity::defineRecoveries(const std::vector<ESelectivity>& codes,
                                    double proba,
                                    bool verbose)
 {
-  Id ncode = (Id)codes.size();
+  Id ncode = static_cast<Id>(codes.size());
   _proba    = proba;
   _numberQT.reset(getNQT(), 2);
   _numberQT.fill(0);
@@ -1158,7 +1158,7 @@ void Selectivity::_defineAutomaticCutoffs(const VectorDouble& tab, double eps)
     return;
   }
   for (Id icut = 0; icut < ncuts; icut++)
-    _Zcut[icut] = zmin + (zmax - zmin) * (double)icut / ((double)(ncuts - 1));
+    _Zcut[icut] = zmin + (zmax - zmin) * static_cast<double>(icut) / (static_cast<double>(ncuts - 1));
 }
 
 Id dbSelectivity(Db* db,
@@ -1171,7 +1171,7 @@ Id dbSelectivity(Db* db,
     messerr("You need a 'Db' already defined");
     return 1;
   }
-  Id ncuts = (Id)zcuts.size();
+  Id ncuts = static_cast<Id>(zcuts.size());
   if (ncuts <= 0)
   {
     messerr("argument 'zcuts' must have some cutoffs defined");

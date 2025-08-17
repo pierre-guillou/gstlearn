@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
   MRt->display();
   //  AMatrix* M = prodMatMatInPlace(MRt, &MR);
   AMatrix* M = MatrixFactory::prodMatMat(MRt, &MR);
-  message("Matrix M (should be symmetric). Checking = %d\n", (Id)M->isSymmetric());
+  message("Matrix M (should be symmetric). Checking = %d\n", static_cast<Id>(M->isSymmetric()));
   M->display();
 
   // Creating two vectors for future use
@@ -178,11 +178,11 @@ int main(int argc, char* argv[])
   MRR.display();
 
   MSG.addScalarDiag(addendum);
-  message("Are results for MRR and MSG similar: %d\n", (Id)MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", static_cast<Id>(MRR.isSame(MSG)));
   MSS.addScalarDiag(addendum);
-  message("Are results for MRR and MSS similar: %d\n", (Id)MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", static_cast<Id>(MRR.isSame(MSS)));
   MSP->addScalarDiag(addendum);
-  message("Are results for MRR and MSP similar: %d\n", (Id)MRR.isSame(*MSP));
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(MRR.isSame(*MSP)));
 
   ///////////////////////////////////////
   // Multiplying the matrix by a constant
@@ -199,11 +199,11 @@ int main(int argc, char* argv[])
   MRR.display();
 
   MSG.prodScalar(multiply);
-  message("Are results for MRR and MSG similar: %d\n", (Id)MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", static_cast<Id>(MRR.isSame(MSG)));
   MSS.prodScalar(multiply);
-  message("Are results for MRR and MSS similar: %d\n", (Id)MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", static_cast<Id>(MRR.isSame(MSS)));
   MSP->prodScalar(multiply);
-  message("Are results for MRR and MSP similar: %d\n", (Id)MRR.isSame(*MSP));
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(MRR.isSame(*MSP)));
 
   /////////////////////////////////////////////////////////////////
   // Adding a constant to a matrix
@@ -219,9 +219,9 @@ int main(int argc, char* argv[])
   MRR.display();
 
   MSG.addScalar(addendum);
-  message("Are results for MRR and MSG similar: %d\n", (Id)MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", static_cast<Id>(MRR.isSame(MSG)));
   MSS.addScalar(addendum);
-  message("Are results for MRR and MSS similar: %d\n", (Id)MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", static_cast<Id>(MRR.isSame(MSS)));
 
   /////////////////////
   // Linear combination
@@ -239,11 +239,11 @@ int main(int argc, char* argv[])
   MRR.display();
 
   MSG.addMat(MSG, cx, cy);
-  message("Are results for MRR and MSG similar: %d\n", (Id)MRR.isSame(MSG));
+  message("Are results for MRR and MSG similar: %d\n", static_cast<Id>(MRR.isSame(MSG)));
   MSS.addMat(MSS, cx, cy);
-  message("Are results for MRR and MSS similar: %d\n", (Id)MRR.isSame(MSS));
+  message("Are results for MRR and MSS similar: %d\n", static_cast<Id>(MRR.isSame(MSS)));
   MSP->addMat(*MSP, cx, cy);
-  message("Are results for MRR and MSP similar: %d\n", (Id)MRR.isSame(*MSP));
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(MRR.isSame(*MSP)));
 
   //////////////////////////////////////////////////////////
   // Extraction of a Vector
@@ -259,24 +259,24 @@ int main(int argc, char* argv[])
   VH::dump("Reference Vector", Vref);
 
   V1 = MSP->getDiagonal();
-  print_vector("Main Diagonal", 0, (Id)Vref.size(), Vref.data());
-  message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V1));
+  print_vector("Main Diagonal", 0, static_cast<Id>(Vref.size()), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V1)));
   Vref = MRR.getDiagonal(1);
   V1   = MSP->getDiagonal(1);
-  print_vector("Second Diagonal Below", 0, (Id)Vref.size(), Vref.data());
-  message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V1));
+  print_vector("Second Diagonal Below", 0, static_cast<Id>(Vref.size()), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V1)));
   Vref = MRR.getDiagonal(-2);
   V1   = MSP->getDiagonal(-2);
-  print_vector("Third Diagonal Above", 0, (Id)Vref.size(), Vref.data());
-  message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V1));
+  print_vector("Third Diagonal Above", 0, static_cast<Id>(Vref.size()), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V1)));
   Vref = MRR.getRow(2);
   V1   = MSP->getRow(2);
-  print_vector("Third Row", 0, (Id)Vref.size(), Vref.data());
-  message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V1));
+  print_vector("Third Row", 0, static_cast<Id>(Vref.size()), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V1)));
   Vref = MRR.getColumn(3);
   V1   = MSP->getColumn(3);
-  print_vector("Fourth Column", 0, (Id)Vref.size(), Vref.data());
-  message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V1));
+  print_vector("Fourth Column", 0, static_cast<Id>(Vref.size()), Vref.data());
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V1)));
 
   ////////////////////////////////////
   // Product of the matrix by a vector
@@ -293,11 +293,11 @@ int main(int argc, char* argv[])
   VH::dump("Reference Output Vector", Vref);
 
   MSG.prodMatVecInPlace(V1, V2);
-  message("Are results for MRR and MSG similar: %d\n", (Id)VH::isEqual(Vref, V2));
+  message("Are results for MRR and MSG similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V2)));
   MSS.prodMatVecInPlace(V1, V2);
-  message("Are results for MRR and MSS similar: %d\n", (Id)VH::isEqual(Vref, V2));
+  message("Are results for MRR and MSS similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V2)));
   MSP->prodMatVecInPlace(V1, V2);
-  message("Are results for MRR and MSP similar: %d\n", (Id)VH::isEqual(Vref, V2));
+  message("Are results for MRR and MSP similar: %d\n", static_cast<Id>(VH::isEqual(Vref, V2)));
 
   ////////////////
   // Linear solver
@@ -316,10 +316,10 @@ int main(int argc, char* argv[])
   VH::dump("Reference Output Vector", V2);
 
   MSS.prodMatVecInPlace(V2, V3);
-  message("Are results correct for MSS: %d\n", (Id)VH::isEqual(V1, V3));
+  message("Are results correct for MSS: %d\n", static_cast<Id>(VH::isEqual(V1, V3)));
   MSP->solve(V1, V2);
   MSP->prodMatVecInPlace(V2, V3);
-  message("Are results correct for MSP: %d\n", (Id)VH::isEqual(V1, V3));
+  message("Are results correct for MSP: %d\n", static_cast<Id>(VH::isEqual(V1, V3)));
 
   ////////////
   // Inversion
@@ -338,17 +338,17 @@ int main(int argc, char* argv[])
   MSG.display();
 
   Res = MatrixFactory::prodMatMat(&MSG, &MSGref);
-  message("Are results correct for MSG: %d\n", (Id)Res->isIdentity());
+  message("Are results correct for MSG: %d\n", static_cast<Id>(Res->isIdentity()));
   delete Res;
 
   MSS.invert();
   Res = MatrixFactory::prodMatMat(&MSS, &MSGref);
-  message("Are results correct for MSS: %d\n", (Id)Res->isIdentity());
+  message("Are results correct for MSS: %d\n", static_cast<Id>(Res->isIdentity()));
   delete Res;
 
   MSP->invert();
   Res = MatrixFactory::prodMatMat(MSP, &MSGref);
-  message("Are results correct for MSP: %d\n", (Id)Res->isIdentity());
+  message("Are results correct for MSP: %d\n", static_cast<Id>(Res->isIdentity()));
   delete Res;
 
   ///////////////////////////////////////////
@@ -366,13 +366,13 @@ int main(int argc, char* argv[])
 
   Id icol0 = 1;
   message("Setting Column (%d) to a vector (sequence from 1 to %d)\n", icol0, nrow);
-  VectorDouble myCol = VH::sequence(1., (double)nrow);
+  VectorDouble myCol = VH::sequence(1., static_cast<double>(nrow));
   MSG.setColumn(icol0, myCol);
   MSG.display();
 
   Id irow0 = 2;
   message("Setting Row (%d) to a vector (sequence from 1 to %d)\n", irow0, ncol);
-  VectorDouble myRow = VH::sequence(1., (double)ncol);
+  VectorDouble myRow = VH::sequence(1., static_cast<double>(ncol));
   MSG.setRow(irow0, myRow);
   MSG.display();
 
@@ -403,22 +403,22 @@ int main(int argc, char* argv[])
   MSG.display();
 
   message("Multiplying current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double)nrow);
+  myCol = VH::sequence(1., static_cast<double>(nrow));
   MSG.multiplyColumn(myCol);
   MSG.display();
 
   message("Dividing current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double)nrow);
+  myCol = VH::sequence(1., static_cast<double>(nrow));
   MSG.divideColumn(myCol);
   MSG.display();
 
   message("Multiplying current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double)ncol);
+  myRow = VH::sequence(1., static_cast<double>(ncol));
   MSG.multiplyRow(myRow);
   MSG.display();
 
   message("Dividing current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double)ncol);
+  myRow = VH::sequence(1., static_cast<double>(ncol));
   MSG.divideRow(myRow);
   MSG.display();
 
@@ -426,22 +426,22 @@ int main(int argc, char* argv[])
   VectorDouble myColRes;
 
   message("Multiplying sequence vector by matrix\n");
-  myCol    = VH::sequence(1., (double)nrow);
+  myCol    = VH::sequence(1., static_cast<double>(nrow));
   myRowRes = MSG.prodVecMat(myCol, false);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix (transposed) by sequence vector\n");
-  myCol    = VH::sequence(1., (double)nrow);
+  myCol    = VH::sequence(1., static_cast<double>(nrow));
   myRowRes = MSG.prodMatVec(myCol, true);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix by sequence vector\n");
-  myRow    = VH::sequence(1., (double)ncol);
+  myRow    = VH::sequence(1., static_cast<double>(ncol));
   myColRes = MSG.prodMatVec(myRow, false);
   VH::dump("Resulting Vector", myColRes);
 
   message("Multiplying sequence vector by matrix (transposed)\n");
-  myRow    = VH::sequence(1., (double)ncol);
+  myRow    = VH::sequence(1., static_cast<double>(ncol));
   myColRes = MSG.prodVecMat(myRow, true);
   VH::dump("Resulting Vector", myColRes);
 
@@ -451,7 +451,7 @@ int main(int argc, char* argv[])
   MSG.display();
 
   message("Clearing matrix and Setting Diagonal to a vector (sequence from 1 to %d)\n", ncol);
-  VectorDouble myDiag = VH::sequence(1., (double)ncol);
+  VectorDouble myDiag = VH::sequence(1., static_cast<double>(ncol));
   MSG.setDiagonal(myDiag);
   MSG.display();
 
@@ -465,12 +465,12 @@ int main(int argc, char* argv[])
   MSP->display();
 
   message("Setting terms of Column (%d) to a vector (sequence from 1 to %d)\n", icol0, nrow);
-  myCol = VH::sequence(1., (double)nrow);
+  myCol = VH::sequence(1., static_cast<double>(nrow));
   MSP->setColumn(icol0, myCol);
   MSP->display();
 
   message("Setting terms of Row (%d) to a vector (sequence from 1 to %d)\n", irow0, ncol);
-  myRow = VH::sequence(1., (double)ncol);
+  myRow = VH::sequence(1., static_cast<double>(ncol));
   MSP->setRow(irow0, myRow);
   MSP->display();
 
@@ -496,42 +496,42 @@ int main(int argc, char* argv[])
   MSP->display();
 
   message("Multiplying current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double)nrow);
+  myCol = VH::sequence(1., static_cast<double>(nrow));
   MSP->multiplyColumn(myCol);
   MSP->display();
 
   message("Dividing current matrix column-wise by a vector (sequence)\n");
-  myCol = VH::sequence(1., (double)nrow);
+  myCol = VH::sequence(1., static_cast<double>(nrow));
   MSP->divideColumn(myCol);
   MSP->display();
 
   message("Multiplying current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double)ncol);
+  myRow = VH::sequence(1., static_cast<double>(ncol));
   MSP->multiplyRow(myRow);
   MSP->display();
 
   message("Dividing current matrix row-wise by a vector (sequence)\n");
-  myRow = VH::sequence(1., (double)ncol);
+  myRow = VH::sequence(1., static_cast<double>(ncol));
   MSP->divideRow(myRow);
   MSP->display();
 
   message("Multiplying sequence vector by matrix\n");
-  myCol    = VH::sequence(1., (double)nrow);
+  myCol    = VH::sequence(1., static_cast<double>(nrow));
   myRowRes = MSP->prodVecMat(myCol, false);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix (transposed) by sequence vector\n");
-  myCol    = VH::sequence(1., (double)nrow);
+  myCol    = VH::sequence(1., static_cast<double>(nrow));
   myRowRes = MSP->prodMatVec(myCol, true);
   VH::dump("Resulting Vector", myRowRes);
 
   message("Multiplying matrix by sequence vector\n");
-  myRow    = VH::sequence(1., (double)ncol);
+  myRow    = VH::sequence(1., static_cast<double>(ncol));
   myColRes = MSP->prodMatVec(myRow, false);
   VH::dump("Resulting Vector", myColRes);
 
   message("Multiplying sequence vector by matrix (transposed)\n");
-  myRow    = VH::sequence(1., (double)ncol);
+  myRow    = VH::sequence(1., static_cast<double>(ncol));
   myColRes = MSP->prodVecMat(myRow, true);
   VH::dump("Resulting Vector", myColRes);
 
@@ -541,7 +541,7 @@ int main(int argc, char* argv[])
   MSP->display();
 
   message("Clearing matrix and Setting Diagonal to a vector (sequence from 1 to %d)\n", ncol);
-  myDiag = VH::sequence(1., (double)ncol);
+  myDiag = VH::sequence(1., static_cast<double>(ncol));
   MSP->setDiagonal(myDiag);
   MSP->display();
 
@@ -683,7 +683,7 @@ int main(int argc, char* argv[])
   VH::dump("Input Vector B =", B);
   MEigChol.solve(B, XEig);
   VH::dump("Result Vector X =", XEig);
-  message("Is M * X = B: %d\n", (Id)VH::isEqual(B, MEig->prodMatVec(XEig)));
+  message("Is M * X = B: %d\n", static_cast<Id>(VH::isEqual(B, MEig->prodMatVec(XEig))));
 
   // Solving a linear system after Cholesky decomposition (matrix RHS)
   mestitle(0, "Solving a Linear system after Cholesky decomposition (matrix RHS)");
@@ -700,7 +700,7 @@ int main(int argc, char* argv[])
   Bres.display();
 
   auto* Bcheck = MatrixFactory::prodMatMat<MatrixDense>(MEig, &Bres);
-  message("Is M * X = B: %d\n", (Id)Bmat.isSame(*Bcheck));
+  message("Is M * X = B: %d\n", static_cast<Id>(Bmat.isSame(*Bcheck)));
   delete Bcheck;
 
   // Product by Diagonal built from a vector

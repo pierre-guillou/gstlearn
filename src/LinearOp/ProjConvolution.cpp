@@ -123,7 +123,7 @@ void ProjConvolution::_buildShiftVector()
   for (Id i = -_getHalfSize(); i <= _getHalfSize(); i++)
   {
     indm[ndim - 1]                   = indp[ndim - 1] + i;
-    Id id                           = grid.indiceToRank(indm);
+    Id id                            = grid.indiceToRank(indm);
     _shiftVector[i + _getHalfSize()] = id - center;
   }
 }
@@ -131,16 +131,16 @@ void ProjConvolution::_buildShiftVector()
 bool ProjConvolution::_isVecDimCorrect(const constvect valonseismic,
                                        const constvect valonvertex) const
 {
-  if ((Id)valonvertex.size() != getNApex())
+  if (static_cast<Id>(valonvertex.size()) != getNApex())
   {
     messerr("Dimension of 'valonvertex'(%d) incorrect. If should be %d",
-            (Id)valonvertex.size(), getNApex());
+            static_cast<Id>(valonvertex.size()), getNApex());
     return false;
   }
-  if ((Id)valonseismic.size() != getNPoint())
+  if (static_cast<Id>(valonseismic.size()) != getNPoint())
   {
     messerr("Dimension of 'valonseismic'(%d) incorrect. If should be %d",
-            (Id)valonseismic.size(), getNPoint());
+            static_cast<Id>(valonseismic.size()), getNPoint());
     return false;
   }
   if (_shiftVector.size() == 0)
@@ -159,7 +159,7 @@ bool ProjConvolution::_isVecDimCorrect(const constvect valonseismic,
  * @return
  */
 Id ProjConvolution::_addPoint2mesh(const constvect valonseismic,
-                                    vect valonvertex) const
+                                   vect valonvertex) const
 {
   if (!_isVecDimCorrect(valonseismic, valonvertex)) return 1;
 
@@ -190,7 +190,7 @@ Id ProjConvolution::_addPoint2mesh(const constvect valonseismic,
  * @return
  */
 Id ProjConvolution::_addMesh2point(const constvect valonvertex,
-                                    vect valonseismic) const
+                                   vect valonseismic) const
 {
   if (!_isVecDimCorrect(valonseismic, valonvertex)) return 1;
 
@@ -220,11 +220,11 @@ Id ProjConvolution::_addMesh2point(const constvect valonvertex,
 void ProjConvolution::_convolve(const constvect valonvertex,
                                 vect valonseismic) const
 {
-  Id count   = (Id)valonseismic.size();
+  Id count    = static_cast<Id>(valonseismic.size());
   auto size   = _getConvSize();
   double valp = 0.;
   double valm = 0.;
-  Id id      = 0;
+  Id id       = 0;
   for (Id is = 0; is < count; is++)
   {
     valp = 0;
@@ -247,10 +247,10 @@ void ProjConvolution::_convolveT(const constvect valonseismic,
                                  vect valonvertex) const
 {
   std::fill(valonvertex.begin(), valonvertex.end(), 0.);
-  Id count   = (Id)valonseismic.size();
+  Id count    = static_cast<Id>(valonseismic.size());
   auto size   = _getConvSize();
   double valm = 0.;
-  Id id      = 0;
+  Id id       = 0;
   for (Id is = 0; is < count; is++)
   {
     for (Id j = 0; j < size; j++)

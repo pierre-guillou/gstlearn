@@ -498,7 +498,7 @@ bool KrigingAlgebra::_checkDimensionVD(const String& name,
                                        const VectorDouble* vec,
                                        Id* sizeRef)
 {
-  Id size = (Id)vec->size();
+  Id size = static_cast<Id>(vec->size());
   if (*sizeRef > 0 && size > 0 && size != *sizeRef)
   {
     messerr("Dimension of %s (%d) incorrect: it should be (%d)",
@@ -513,7 +513,7 @@ bool KrigingAlgebra::_checkDimensionVI(const String& name,
                                        const VectorInt* vec,
                                        Id* sizeRef)
 {
-  Id size = (Id)vec->size();
+  Id size = static_cast<Id>(vec->size());
   if (*sizeRef > 0 && size != *sizeRef)
   {
     messerr("Dimension of %s (%d) incorrect: it should be (%d)", name.c_str(), size,
@@ -529,7 +529,7 @@ bool KrigingAlgebra::_checkDimensionVVI(const String& name,
                                         Id* size1Ref,
                                         Id* size2Ref)
 {
-  Id count = (Id)vec->size();
+  Id count = static_cast<Id>(vec->size());
   if (*size1Ref > 0 && count != *size1Ref)
   {
     messerr("First dimension of %s (%d) incorrect: it should be (%d)", name.c_str(),
@@ -639,7 +639,7 @@ Id KrigingAlgebra::setXvalidUnique(const VectorInt* rankXvalidEqs,
   _nrhs           = 0;
   _rankXvalidEqs  = rankXvalidEqs;
   _rankXvalidVars = rankXvalidVars;
-  _nxvalid        = (Id)rankXvalidEqs->size();
+  _nxvalid        = static_cast<Id>(rankXvalidEqs->size());
   return _patchRHSForXvalidUnique();
 }
 
@@ -1343,7 +1343,7 @@ void KrigingAlgebra::_printVector(const String& name, const VectorDouble* vec)
 {
   if (vec == nullptr) return;
   if (vec->size() <= 0) return;
-  message(" - %s (%d)\n", name.c_str(), (Id)vec->size());
+  message(" - %s (%d)\n", name.c_str(), static_cast<Id>(vec->size()));
 }
 
 void KrigingAlgebra::printStatus() const
@@ -1623,7 +1623,7 @@ void KrigingAlgebra::dumpWGT()
   for (Id ivar = 0; ivar < _nvar; ivar++)
   {
     if (_nvar > 1) message("Using variable Z%-2d\n", ivar + 1);
-    Id nbyvar = (Id)(*_sampleRanks)[ivar].size();
+    Id nbyvar = static_cast<Id>((*_sampleRanks)[ivar].size());
     sum.fill(0.);
 
     for (Id j = 0; j < nbyvar; j++)

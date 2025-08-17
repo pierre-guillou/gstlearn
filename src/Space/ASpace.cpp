@@ -266,7 +266,7 @@ void ASpace::getIncrementInPlace(const SpacePoint& p1,
 
 VectorDouble ASpace::projCoord(const VectorDouble& coord, Id ispace) const
 {
-  if (ispace < 0 || ispace >= (Id)getNComponents()) return coord;
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents())) return coord;
   auto sp = getComponent(ispace);
   auto first       = coord.cbegin() + sp->getOffset();
   auto last        = first          + sp->getNDim();

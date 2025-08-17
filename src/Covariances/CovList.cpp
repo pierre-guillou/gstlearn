@@ -31,7 +31,7 @@
 #include <memory>
 #include <vector>
 
-namespace gstlrn 
+namespace gstlrn
 {
 
 CovList::CovList(const CovContext& ctxt)
@@ -50,7 +50,7 @@ CovList::CovList(const CovContext& ctxt)
 CovList::CovList(const CovList& r)
   : ACov(r)
 {
-  for (const auto &e: r._covs)
+  for (const auto& e: r._covs)
   {
     _covs.push_back(std::dynamic_pointer_cast<CovBase>(e->cloneShared()));
   }
@@ -172,11 +172,11 @@ void CovList::_attachNoStatDb(const Db* db)
     e->setNoStatDbIfNecessary(dbptr);
 }
 Id CovList::makeElemNoStat(const EConsElem& econs,
-                            Id iv1,
-                            Id iv2,
-                            const AFunctional* func,
-                            const Db* db,
-                            const String& namecol)
+                           Id iv1,
+                           Id iv2,
+                           const AFunctional* func,
+                           const Db* db,
+                           const String& namecol)
 {
   DECLARE_UNUSED(econs, iv1, iv2, func, db, namecol)
   messerr("Error: CovList::_makeElemNoStat is not impemented for this classe");
@@ -228,14 +228,14 @@ const VectorInt& CovList::_getListActiveCovariances(const CovCalcMode* mode) con
 }
 
 Id CovList::addEvalCovVecRHSInPlace(vect vect,
-                                     const VectorInt& index1,
-                                     Id iech2,
-                                     const KrigOpt& krigopt,
-                                     SpacePoint& pin,
-                                     SpacePoint& pout,
-                                     VectorDouble& tabwork,
-                                     double lambda,
-                                     const ECalcMember& calcMember) const
+                                    const VectorInt& index1,
+                                    Id iech2,
+                                    const KrigOpt& krigopt,
+                                    SpacePoint& pin,
+                                    SpacePoint& pout,
+                                    VectorDouble& tabwork,
+                                    double lambda,
+                                    const ECalcMember& calcMember) const
 {
   CovCalcMode mode(ECalcMember::RHS);
   const VectorInt& list = _getListActiveCovariances(&mode);
@@ -315,7 +315,7 @@ String CovList::toString(const AStringFormat* /*strfmt*/) const
 
 Id CovList::getNCov() const
 {
-  Id ncov = (Id)_covs.size();
+  Id ncov = static_cast<Id>(_covs.size());
   return ncov;
 }
 
@@ -503,7 +503,7 @@ void CovList::_setContext(const CovContext& ctxt)
 
 void CovList::copyCovContext(const CovContext& ctxt)
 {
-  Id number = (Id)_covs.size();
+  Id number = static_cast<Id>(_covs.size());
   for (Id i = 0; i < number; i++) _covs[i]->copyCovContext(ctxt);
 }
 
@@ -543,7 +543,7 @@ void CovList::initParams(const MatrixSymmetric& vars, double href)
   for (const auto& [ivar, jvar]: itRange)
     varsPerStructure.setValue(ivar, jvar, vars.getValue(ivar, jvar) / ncov);
 
-  Id jcov      = 0;
+  Id jcov       = 0;
   auto ntotal   = getNCovNuggetExcluded();
   double hlocal = href / ntotal / 2;
   for (Id icov = 0, ncov = getNCov(); icov < ncov; icov++)
@@ -588,4 +588,4 @@ AModelFitSills* CovList::getFitSills() const
 {
   return _modelFitSills;
 }
-}
+} // namespace gstlrn

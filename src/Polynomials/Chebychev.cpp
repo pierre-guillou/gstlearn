@@ -52,9 +52,9 @@ void Chebychev::init(Id ncMax, Id nDisc, double a, double b, bool verbose)
 }
 
 Id Chebychev::fit2(AFunction* f,
-                    double a,
-                    double b,
-                    double tol)
+                   double a,
+                   double b,
+                   double tol)
 {
   std::function<double(double)> func = [f](double val)
   { return f->eval(val); };
@@ -72,13 +72,13 @@ Id Chebychev::fit(const std::function<double(double)>& f, double a, double b, do
 
   /* Loop on some discretized samples of the interval */
 
-  Id number   = 0;
+  Id number    = 0;
   double incr  = (b - a) / (_nDisc + 1);
   double value = a;
   while (value <= b)
   {
     Id numloc = _countCoeffs(f, value, a, b);
-    number     = MAX(number, numloc);
+    number    = MAX(number, numloc);
     value += incr;
   }
 
@@ -99,7 +99,7 @@ Id Chebychev::fit(const std::function<double(double)>& f, double a, double b, do
   // Optional printout
 
   if (_verbose)
-    for (Id i = 0; i < (Id)_coeffs.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(_coeffs.size()); i++)
       message("Chebychev coefficient[%d] = %lf\n", i + 1, _coeffs[i]);
 
   return 0;
@@ -169,7 +169,7 @@ void Chebychev::_fillCoeffs(const std::function<double(double)>& f, double a, do
   if (minsubdiv >= (_ncMax + 1.) / 2.)
     n = static_cast<Id>(minsubdiv);
   else
-    n = static_cast<Id>(ceil((double)(_ncMax + 1) / 2));
+    n = static_cast<Id>(ceil(static_cast<double>(_ncMax + 1) / 2));
 
   /* Core allocation */
 
@@ -182,7 +182,7 @@ void Chebychev::_fillCoeffs(const std::function<double(double)>& f, double a, do
 
   for (Id i = 0; i < n; i++)
   {
-    double theta = 2. * GV_PI * ((double)i) / ((double)n);
+    double theta = 2. * GV_PI * (static_cast<double>(i)) / (static_cast<double>(n));
     double ct    = cos(theta / 2.);
     double val1  = f(((b + a) + (b - a) * ct) / 2.);
     double val2  = f(((b + a) - (b - a) * ct) / 2.);
@@ -201,7 +201,7 @@ void Chebychev::_fillCoeffs(const std::function<double(double)>& f, double a, do
 
   /* Store the coefficients */
 
-  double value = 2. / (double)n;
+  double value = 2. / static_cast<double>(n);
   for (Id i = 0; i < n; i++)
   {
     if (2 * i >= _ncMax) break;
@@ -300,7 +300,7 @@ void Chebychev::evalOp(MatrixSparse* S, const constvect x, vect y) const
 
   /* Loop on the AChebychev polynomials */
 
-  for (Id ib = 2; ib < (Id)_coeffs.size(); ib++)
+  for (Id ib = 2; ib < static_cast<Id>(_coeffs.size()); ib++)
   {
     T1->prodVecMatInPlace(tm1, tx, false);
     for (Id i = 0; i < nvertex; i++)
@@ -361,7 +361,7 @@ void Chebychev::_addEvalOp(const ALinearOp* Op, const constvect inv, vect outv) 
 
   /* Loop on the AChebychev polynomials */
 
-  for (Id ib = 2; ib < (Id)_coeffs.size(); ib++)
+  for (Id ib = 2; ib < static_cast<Id>(_coeffs.size()); ib++)
   {
     Op->addToDest(tm1, tx);
     for (Id i = 0; i < nvertex; i++)

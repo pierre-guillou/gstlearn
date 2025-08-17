@@ -59,7 +59,7 @@ void meshes_2D_sph_init(SphTriangle* t)
  *****************************************************************************/
 void meshes_2D_sph_free(SphTriangle* t, Id mode)
 {
-  if (t == (SphTriangle*)NULL) return;
+  if (t == nullptr) return;
   if (mode == 0)
   {
     t->sph_x.clear();
@@ -219,13 +219,13 @@ Id meshes_2D_sph_from_auxiliary(const String& triswitch, SphTriangle* t)
   if (triswitch[0] == '-' && triswitch[1] == 'n')
   {
     flag_vdc = 1;
-    ndecode  = (Id)strtod(&triswitch[2], nullptr);
+    ndecode  = static_cast<Id>(strtod(&triswitch[2], nullptr));
     if (ndecode <= 0) return (0);
   }
   if (triswitch[0] == '-' && triswitch[1] == 'r')
   {
     flag_reg = 1;
-    ndecode  = (Id)strtod(&triswitch[2], nullptr);
+    ndecode  = static_cast<Id>(strtod(&triswitch[2], nullptr));
     if (ndecode <= 0) return (0);
   }
   if (triswitch[0] == '-' && triswitch[1] == 'h')
@@ -352,8 +352,8 @@ Id meshes_2D_sph_create(Id verbose, SphTriangle* t)
   /* Initializations */
 
   error    = 1;
-  skip_rnd = (I32)get_keypone("Skip_Random", 0);
-  if (t == (SphTriangle*)NULL || t->n_nodes < 3) return (1);
+  skip_rnd = static_cast<I32>(get_keypone("Skip_Random", 0));
+  if (t == nullptr || t->n_nodes < 3) return (1);
 
   /* Re-allocate the arrays within the SphTriangle structure */
 

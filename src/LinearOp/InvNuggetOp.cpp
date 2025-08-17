@@ -49,7 +49,7 @@ Id InvNuggetOp::_addSimulateToDest(const constvect whitenoise, vect outv) const
 
 static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef)
 {
-  Id nverr = (Id)verrDef.size();
+  Id nverr = static_cast<Id>(verrDef.size());
   if (nverr > 0)
   {
     for (Id iverr = 0; iverr < nverr; iverr++)
@@ -59,7 +59,7 @@ static void _addVerrConstant(MatrixSymmetric& sills, const VectorDouble& verrDef
 
 static void _checkMinNugget(MatrixSymmetric& sills, const VectorDouble& minNug)
 {
-  Id nvar = (Id)minNug.size();
+  Id nvar = static_cast<Id>(minNug.size());
 
   // Check that the diagonal of the Sill matrix is large enough
   for (Id ivar = 0; ivar < nvar; ivar++)
@@ -85,18 +85,18 @@ static MatrixSymmetric _buildSillPartialMatrix(const MatrixSymmetric& sillsRef,
 }
 
 static Id _loadPositions(Id iech,
-                          const VectorVectorInt& index1,
-                          const VectorInt& cumul,
-                          VectorInt& positions,
-                          VectorInt& identity,
-                          Id* rank_arg)
+                         const VectorVectorInt& index1,
+                         const VectorInt& cumul,
+                         VectorInt& positions,
+                         VectorInt& identity,
+                         Id* rank_arg)
 {
-  Id nvar = (Id)cumul.size();
+  Id nvar = static_cast<Id>(cumul.size());
   Id ndef = 0;
   Id rank = 0;
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
-    rank     = 2 * rank;
+    rank    = 2 * rank;
     Id ipos = VH::whereElement(index1[ivar], iech);
     if (ipos < 0)
       positions[ivar] = -1;
@@ -201,7 +201,7 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
   // - flag_isotropic: True in Isotopic case
   // - flag_uniqueVerr: True if the Variance of Measurement Error is constant per variable
   // - flag_nostat: True is some non-stationarity is defined
-  Id nverr          = db->getNLoc(ELoc::V);
+  Id nverr           = db->getNLoc(ELoc::V);
   bool flag_verr     = (nverr > 0);
   bool flag_isotopic = true;
   for (Id ivar = 1; ivar < nvar && flag_isotopic; ivar++)
@@ -213,7 +213,7 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
     for (Id iverr = 0; iverr < nverr && flag_uniqueVerr; iverr++)
     {
       VectorDouble verr = db->getColumnByLocator(ELoc::V, iverr);
-      if ((Id)VH::unique(verr).size() > 1) flag_uniqueVerr = false;
+      if (static_cast<Id>(VH::unique(verr).size()) > 1) flag_uniqueVerr = false;
       verrDef[iverr] = verr[0];
     }
   }
@@ -221,7 +221,7 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
 
   // Elaborate the Sill matrix for the Nugget Effect component
   MatrixSymmetric sillsRef = cova->getSill();
-  Id count                = (Id)pow(2, nvar);
+  Id count                 = static_cast<Id>(pow(2, nvar));
   std::vector<MatrixSymmetric> sillsInv(count);
 
   // Pre-calculate the inverse of the sill matrix (if constant)

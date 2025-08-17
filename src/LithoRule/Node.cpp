@@ -212,12 +212,12 @@ Node& Node::operator=(const Node& m)
 
 Node::~Node()
 {
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
   {
     delete _r1;
     _r1 = nullptr;
   }
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
   {
     delete _r2;
     _r2 = nullptr;
@@ -236,9 +236,9 @@ String Node::nodePrint(bool flagProp, bool flagThresh) const
 
 {
   std::stringstream sstr;
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
     sstr << _r1->nodePrint(flagProp, flagThresh);
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
     sstr << _r2->nodePrint(flagProp, flagThresh);
 
   switch (_orient)
@@ -275,9 +275,9 @@ String Node::nodePrint(bool flagProp, bool flagThresh) const
 String Node::nodePrintShadow(bool flagProp, bool flagThresh) const
 {
   std::stringstream sstr;
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
     sstr << _r1->nodePrintShadow(flagProp, flagThresh);
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
     sstr << _r2->nodePrintShadow(flagProp, flagThresh);
 
   switch (_orient)
@@ -345,11 +345,11 @@ void Node::_getStatistics(Id *node_tot,
   double p1_loc,p2_loc;
 
   p1_loc = 0.;
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
     _r1->_getStatistics(node_tot,nfac_tot,ny1_tot,ny2_tot,&p1_loc);
 
   p2_loc = 0.;
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
     _r2->_getStatistics(node_tot,nfac_tot,ny1_tot,ny2_tot,&p2_loc);
 
   _p1 = p1_loc;
@@ -385,11 +385,11 @@ void Node::_getStatistics(Id *node_tot,
 *****************************************************************************/
 Id Node::isValid(VectorInt& facies)
 {
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
   {
     if (_r1->isValid(facies)) return(1);
   }
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
   {
     if (_r2->isValid(facies)) return(1);
   }
@@ -421,8 +421,8 @@ Id Node::isValid(VectorInt& facies)
 *****************************************************************************/
 void Node::scaleProp(double scale)
 {
-  if (_r1 != (Node *) NULL) _r1->scaleProp(scale);
-  if (_r2 != (Node *) NULL) _r2->scaleProp(scale);
+  if (_r1 != nullptr) _r1->scaleProp(scale);
+  if (_r2 != nullptr) _r2->scaleProp(scale);
 
   if (_orient == THRESH_IDLE) _prop /= scale;
 }
@@ -438,11 +438,11 @@ Id Node::proportionDefine(const VectorDouble& props)
 {
   static double eps = 1.e-3;
 
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
   {
     if (_r1->proportionDefine(props)) return(1);
   }
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
   {
     if (_r2->proportionDefine(props)) return(1);
   }
@@ -479,11 +479,11 @@ Id Node::proportionDefine(const VectorDouble& props)
  */
 Id Node::getProportion(Id facies, double *prop)
 {
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
   {
     if (_r1->getProportion(facies,prop)) return(1);
   }
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
   {
     if (_r2->getProportion(facies,prop)) return(1);
   }
@@ -522,12 +522,12 @@ Id Node::getThresh(Id  mode,
                     double *t2min,
                     double *t2max)
 {
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
   {
     if (_r1->getThresh(mode, istop, rank, facies, t1min, t1max, t2min, t2max))
       return (1);
   }
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
   {
     if (_r2->getThresh(mode, istop, rank, facies, t1min, t1max, t2min, t2max))
       return (1);
@@ -583,16 +583,16 @@ void Node::proportionToThresh(double rho,
 
   if (_orient == THRESH_Y1)
   {
-    if (_r1 != (Node *) NULL)
+    if (_r1 != nullptr)
       _r1->proportionToThresh(rho, t1min, _thresh, t2min, t2max);
-    if (_r2 != (Node *) NULL)
+    if (_r2 != nullptr)
       _r2->proportionToThresh(rho, _thresh, t1max, t2min, t2max);
   }
   else
   {
-    if (_r1 != (Node *) NULL)
+    if (_r1 != nullptr)
       _r1->proportionToThresh(rho, t1min, t1max, t2min, _thresh);
-    if (_r2 != (Node *) NULL)
+    if (_r2 != nullptr)
       _r2->proportionToThresh(rho, t1min, t1max, _thresh, t2max);
   }
 }
@@ -730,11 +730,11 @@ double Node::_threshDichotomy(double rho) const
 *****************************************************************************/
 Id Node::gaussianToFacies(double y1, double y2, double *facies)
 {
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
   {
     if (_r1->gaussianToFacies(y1,y2,facies)) return(1);
   }
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
   {
     if (_r2->gaussianToFacies(y1,y2,facies)) return(1);
   }
@@ -744,7 +744,7 @@ Id Node::gaussianToFacies(double y1, double y2, double *facies)
   if (_t1max < get_rule_extreme(+1) && y1 > _t1max) return(0);
   if (_t2min > get_rule_extreme(-1) && y2 < _t2min) return(0);
   if (_t2max < get_rule_extreme(+1) && y2 > _t2max) return(0);
-  *facies = (double) _facies;
+  *facies = static_cast<double>(_facies);
   return(1);
 }
 
@@ -804,12 +804,12 @@ void Node::_getInfo(Id *nodes,
 
   /* Process the subsequent tree */
 
-  if (_r1 != (Node *) NULL)
+  if (_r1 != nullptr)
   {
     (*rank)++;
     _r1->_getInfo(nodes,type,number,1,rank,n_fac,n_y1,n_y2);
   }
-  if (_r2 != (Node *) NULL)
+  if (_r2 != nullptr)
   {
     (*rank)++;
     _r2->_getInfo(nodes,type,number,2,rank,n_fac,n_y1,n_y2);

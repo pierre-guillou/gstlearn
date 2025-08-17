@@ -132,8 +132,8 @@ void AMatrix::resetFromVVD(const VectorVectorDouble& tab, bool byCol)
 {
   if (!byCol)
   {
-    Id nrows = (Id)tab.size();
-    Id ncols = (Id)tab[0].size();
+    Id nrows = static_cast<Id>(tab.size());
+    Id ncols = static_cast<Id>(tab[0].size());
     reset(nrows, ncols);
     for (Id icol = 0; icol < ncols; icol++)
       for (Id irow = 0; irow < nrows; irow++)
@@ -141,8 +141,8 @@ void AMatrix::resetFromVVD(const VectorVectorDouble& tab, bool byCol)
   }
   else
   {
-    Id ncols = (Id)tab.size();
-    Id nrows = (Id)tab[0].size();
+    Id ncols = static_cast<Id>(tab.size());
+    Id nrows = static_cast<Id>(tab[0].size());
     reset(nrows, ncols);
     for (Id icol = 0; icol < ncols; icol++)
       for (Id irow = 0; irow < nrows; irow++)
@@ -367,7 +367,7 @@ void AMatrix::fillRandom(Id seed, double zeroPercent)
  */
 void AMatrix::setValues(const VectorDouble& values, bool byCol)
 {
-  if ((Id)values.size() != size())
+  if (static_cast<Id>(values.size()) != size())
   {
     messerr("Inconsistency between 'values' and Matrix Dimension");
     messerr("Operation cancelled");
@@ -687,7 +687,7 @@ Id AMatrix::solve(const VectorDouble& b, VectorDouble& x) const
     messerr("'solve' method is limited to Square Matrices");
     return 1;
   }
-  if ((Id)b.size() != _nRows || (Id)x.size() != _nRows)
+  if (static_cast<Id>(b.size()) != _nRows || static_cast<Id>(x.size()) != _nRows)
   {
     messerr("b' and 'x' should have the same dimension as the Matrix");
     return 1;
@@ -764,7 +764,7 @@ bool AMatrix::_isIndexValid(Id irow, Id icol) const
 
 bool AMatrix::_isRowVectorConsistent(const VectorDouble& tab) const
 {
-  if ((Id)tab.size() != getNRows())
+  if (static_cast<Id>(tab.size()) != getNRows())
   {
     messerr("Argument vector size should match the number of rows");
     return false;
@@ -774,7 +774,7 @@ bool AMatrix::_isRowVectorConsistent(const VectorDouble& tab) const
 
 bool AMatrix::_isColVectorConsistent(const VectorDouble& tab) const
 {
-  if ((Id)tab.size() != getNCols())
+  if (static_cast<Id>(tab.size()) != getNCols())
   {
     messerr("Argument vector size should match the number of columns");
     return false;
@@ -786,10 +786,10 @@ bool AMatrix::_isVectorSizeConsistent(const VectorDouble& tab) const
 {
   auto nrows = getNRows();
   auto ncols = getNCols();
-  if ((Id)tab.size() != nrows * ncols)
+  if (static_cast<Id>(tab.size()) != nrows * ncols)
   {
     messerr("The argument 'tab'(%d) does not have correct dimension (%d)",
-            (Id)tab.size(), nrows * ncols);
+            static_cast<Id>(tab.size()), nrows * ncols);
     return false;
   }
   return true;
@@ -798,10 +798,10 @@ bool AMatrix::_isVectorSizeConsistent(const VectorDouble& tab) const
 bool AMatrix::_isColumnSizeConsistent(const VectorDouble& tab) const
 {
   auto nrows = getNRows();
-  if ((Id)tab.size() != nrows)
+  if (static_cast<Id>(tab.size()) != nrows)
   {
     messerr("The argument 'tab'(%d) does not have correct dimension (%d)",
-            (Id)tab.size(), nrows);
+            static_cast<Id>(tab.size()), nrows);
     return false;
   }
   return true;
@@ -810,10 +810,10 @@ bool AMatrix::_isColumnSizeConsistent(const VectorDouble& tab) const
 bool AMatrix::_isRowSizeConsistent(const VectorDouble& tab) const
 {
   auto ncols = getNCols();
-  if ((Id)tab.size() != ncols)
+  if (static_cast<Id>(tab.size()) != ncols)
   {
     messerr("The argument 'tab'(%d) does not have correct dimension (%d)",
-            (Id)tab.size(), ncols);
+            static_cast<Id>(tab.size()), ncols);
     return false;
   }
   return true;
@@ -1187,8 +1187,8 @@ void AMatrix::copyReduce(const AMatrix* x,
                          const VectorInt& validRows,
                          const VectorInt& validCols)
 {
-  for (Id irow = 0; irow < (Id)validRows.size(); irow++)
-    for (Id icol = 0; icol < (Id)validCols.size(); icol++)
+  for (Id irow = 0; irow < static_cast<Id>(validRows.size()); irow++)
+    for (Id icol = 0; icol < static_cast<Id>(validCols.size()); icol++)
       setValue(irow, icol, x->getValue(validRows[irow], validCols[icol]));
 }
 
@@ -1212,8 +1212,8 @@ void AMatrix::copyElements(const AMatrix& m, double factor)
  */
 void AMatrix::_fillFromVVD(const VectorVectorDouble& X)
 {
-  Id nrow = (Id)X.size();
-  Id ncol = (Id)X[0].size();
+  Id nrow = static_cast<Id>(X.size());
+  Id ncol = static_cast<Id>(X[0].size());
 
   for (Id irow = 0; irow < nrow; irow++)
     for (Id icol = 0; icol < ncol; icol++)
@@ -1342,7 +1342,7 @@ void AMatrix::dumpRange(const char* title)
 
   /* Printout */
 
-  if (title != NULL)
+  if (title != nullptr)
     message("%s\n", title);
   else
     message("Sparse matrix\n");

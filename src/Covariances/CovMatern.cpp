@@ -20,7 +20,7 @@
 
 #define MAXTAB 100
 namespace gstlrn
-{ 
+{
 static bool bessel_Old_Style = false;
 
 CovMatern::CovMatern(const CovContext& ctxt)
@@ -88,7 +88,7 @@ double CovMatern::_besselK(double nu, double h)
 {
 #if !defined(__cpp_lib_math_special_functions)
   double TAB[MAXTAB];
-  Id nb = (Id)floor(nu);
+  Id nb = static_cast<Id>(floor(nu));
   if (nu <= 0 || nb >= MAXTAB) return (0.);
   double alpha = nu - nb;
   if (besselk(h, alpha, nb + 1, TAB) < nb + 1) return 0.;
@@ -103,7 +103,7 @@ double CovMatern::_oldMatern(double h) const
   double TAB[MAXTAB];
   double cov   = 0.;
   double third = getParam();
-  Id nb       = (Id)floor(third);
+  Id nb        = static_cast<Id>(floor(third));
   double alpha = third - nb;
   if (third <= 0 || nb >= MAXTAB) return (0.);
   double coeff = (h > 0) ? pow(h / 2., third) : 1.;
@@ -124,21 +124,21 @@ String CovMatern::getFormula() const
 double CovMatern::evaluateSpectrum(double freq) const
 {
   auto ndim    = getContext().getNDim();
-  double alpha = (double)ndim / 2. + getParam();
+  double alpha = static_cast<double>(ndim) / 2. + getParam();
   return 1. / pow(1. + freq, alpha);
 }
 
 void CovMatern::computeMarkovCoeffs(Id ndim)
 {
   double param  = getParam();
-  double ndims2 = ((double)ndim) / 2.;
+  double ndims2 = (static_cast<double>(ndim)) / 2.;
   double alpha  = param + ndims2;
   auto p        = getClosestInteger(alpha);
-  Id ndimp     = p + 1;
+  Id ndimp      = p + 1;
   _markovCoeffs.resize(ndimp);
   for (Id i = 0; i < ndimp; i++)
   {
-    _markovCoeffs[i] = (double)ut_cnp(p, i);
+    _markovCoeffs[i] = ut_cnp(p, i);
   }
   computeCorrec(ndim);
 }
@@ -146,7 +146,7 @@ void CovMatern::computeMarkovCoeffs(Id ndim)
 void CovMatern::computeCorrec(Id ndim)
 {
   double g0, ndims2, gammap, gammaa;
-  ndims2  = ((double)ndim) / 2.;
+  ndims2  = (static_cast<double>(ndim)) / 2.;
   gammap  = exp(loggamma(getParam()));
   gammaa  = exp(loggamma(getParam() + ndims2));
   g0      = pow(4. * GV_PI, ndims2);

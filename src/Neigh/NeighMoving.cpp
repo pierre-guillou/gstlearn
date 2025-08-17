@@ -74,7 +74,7 @@ NeighMoving::NeighMoving(const NeighMoving& r)
   , _T1(r._T1)
   , _T2(r._T2)
 {
-  for (Id ipt = 0, npt = (Id)r._bipts.size(); ipt < npt; ipt++)
+  for (Id ipt = 0, npt = static_cast<Id>(r._bipts.size()); ipt < npt; ipt++)
     _bipts.push_back(r._bipts[ipt]);
 
   // _biPtDist = r._biPtDist;
@@ -98,7 +98,7 @@ NeighMoving& NeighMoving::operator=(const NeighMoving& r)
     _T1          = r._T1;
     _T2          = r._T2;
 
-    for (Id ipt = 0, npt = (Id)r._bipts.size(); ipt < npt; ipt++)
+    for (Id ipt = 0, npt = static_cast<Id>(r._bipts.size()); ipt < npt; ipt++)
       //_bipts.push_back(dynamic_cast<ABiTargetCheck*>(r._bipts[ipt]->clone()));
       _bipts.push_back(r._bipts[ipt]);
     delete _biPtDist;
@@ -292,7 +292,7 @@ bool NeighMoving::_getAnisotropyElements(double* rx, double* ry, double* theta, 
   double radius = _getRadius();
   if (FFFF(radius)) return false;
   VectorDouble anisoRatio = getAnisoCoeffs();
-  Id ndim                 = (Id)anisoRatio.size();
+  Id ndim                 = static_cast<Id>(anisoRatio.size());
   if (ndim != 2) return false;
   *rx = radius * anisoRatio[0];
   *ry = radius * anisoRatio[1];
@@ -404,8 +404,8 @@ VectorDouble NeighMoving::summary(Id iech_out)
 
   VectorInt nbgh_ranks;
   select(iech_out, nbgh_ranks);
-  Id nsel = (Id)nbgh_ranks.size();
-  tab[0]  = (double)nsel;
+  Id nsel = static_cast<Id>(nbgh_ranks.size());
+  tab[0]  = static_cast<double>(nsel);
 
   /* Maximum distance */
 
@@ -434,7 +434,7 @@ VectorDouble NeighMoving::summary(Id iech_out)
   {
     if (_movingNsect[isect] > 0) number++;
   }
-  tab[3] = (double)number;
+  tab[3] = static_cast<double>(number);
 
   /* Number of consecutive empty sectors */
 
@@ -460,7 +460,7 @@ VectorDouble NeighMoving::summary(Id iech_out)
       if (n_empty > number) number = n_empty;
     }
   }
-  tab[4] = (double)number;
+  tab[4] = static_cast<double>(number);
 
   return tab;
 }
@@ -536,7 +536,7 @@ Id NeighMoving::_moving(Id iech_out, VectorInt& ranks, double eps)
   if (_useBallSearch)
   {
     elligibles = getBall().getIndices(_T1, _nMaxi);
-    nech       = (Id)elligibles.size();
+    nech       = static_cast<Id>(elligibles.size());
   }
 
   for (Id jech = 0; jech < nech; jech++)
@@ -663,7 +663,7 @@ Id NeighMoving::_movingSectorDefine(double dx, double dy) const
       else
         angle = GV_PI + atan(dy / dx);
     }
-    isect = (Id)(getNSect() * angle / (2. * GV_PI));
+    isect = static_cast<Id>(getNSect() * angle / (2. * GV_PI));
   }
   return (isect);
 }
@@ -818,7 +818,7 @@ bool NeighMoving::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) co
 
   ret = ret && ANeigh::_serializeH5(neighG, verbose);
 
-  ret = ret && SerializeHDF5::writeValue(neighG, "UseSectors", (Id)getFlagSector());
+  ret = ret && SerializeHDF5::writeValue(neighG, "UseSectors", static_cast<Id>(getFlagSector()));
   ret = ret && SerializeHDF5::writeValue(neighG, "NMini", getNMini());
   ret = ret && SerializeHDF5::writeValue(neighG, "NMaxi", getNMaxi());
   ret = ret && SerializeHDF5::writeValue(neighG, "NSect", getNSect());

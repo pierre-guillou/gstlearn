@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
   bool flagStationary = false;
 
   // Creating a Point Data base in the 1x1 square with 'nech' samples
-  Id nech  = 1000;
-  Db* db   = Db::createFromBox(nech, {0., 0.}, {1., 1.}, 432432);
+  Id nech = 1000;
+  Db* db  = Db::createFromBox(nech, {0., 0.}, {1., 1.}, 432432);
   DbStringFormat dbfmt(FLAG_STATS);
   db->display(&dbfmt);
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 
   // Setting constant global proportions
   VectorDouble props({0.2, 0.5, 0.3});
-  Id nfac            = (Id)props.size();
+  Id nfac            = static_cast<Id>(props.size());
   VectorString names = generateMultipleNames("Props", nfac);
   for (Id ifac = 0; ifac < nfac; ifac++)
     dbprop->addColumnsByConstant(1, props[ifac], names[ifac], ELoc::P, ifac);

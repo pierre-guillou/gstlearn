@@ -43,9 +43,9 @@ namespace gstlrn
 struct CSV_Encoding
 {
   FILE* file;       // Stream used for writing into CSV file
-  Id nitem;        // Number of items per line
-  Id current;      // Rank of the current item
-  Id nlines;       // Number of lines printed
+  Id nitem;         // Number of items per line
+  Id current;       // Rank of the current item
+  Id nlines;        // Number of lines printed
   bool flagInteger; // true for Integer encoding
   char char_sep;    // Separator between consecutive fields
   String na_string; // Substitute for NA
@@ -93,31 +93,31 @@ Id db_grid_write_arcgis(const char* filename, DbGrid* db, Id icol)
   return 0;
 }
 Id db_grid_write_bmp(const char* filename,
-                      DbGrid* db,
-                      Id icol,
-                      Id nsamplex,
-                      Id nsampley,
-                      Id nmult,
-                      Id ncolor,
-                      Id flag_low,
-                      Id flag_high,
-                      double valmin,
-                      double valmax,
-                      Id* red,
-                      Id* green,
-                      Id* blue,
-                      Id mask_red,
-                      Id mask_green,
-                      Id mask_blue,
-                      Id ffff_red,
-                      Id ffff_green,
-                      Id ffff_blue,
-                      Id low_red,
-                      Id low_green,
-                      Id low_blue,
-                      Id high_red,
-                      Id high_green,
-                      Id high_blue)
+                     DbGrid* db,
+                     Id icol,
+                     Id nsamplex,
+                     Id nsampley,
+                     Id nmult,
+                     Id ncolor,
+                     Id flag_low,
+                     Id flag_high,
+                     double valmin,
+                     double valmax,
+                     Id* red,
+                     Id* green,
+                     Id* blue,
+                     Id mask_red,
+                     Id mask_green,
+                     Id mask_blue,
+                     Id ffff_red,
+                     Id ffff_green,
+                     Id ffff_blue,
+                     Id low_red,
+                     Id low_green,
+                     Id low_blue,
+                     Id high_red,
+                     Id high_green,
+                     Id high_blue)
 {
   VectorInt reds   = VH::initVInt(red, ncolor);
   VectorInt greens = VH::initVInt(green, ncolor);
@@ -151,10 +151,10 @@ DbGrid* db_grid_read_bmp(const char* filename, Id /*verbose*/)
 }
 
 Id db_grid_write_irap(const char* filename,
-                       DbGrid* db,
-                       Id icol,
-                       Id nsamplex,
-                       Id nsampley)
+                      DbGrid* db,
+                      Id icol,
+                      Id nsamplex,
+                      Id nsampley)
 {
   GridIrap aof(filename, db);
   aof.setCol(icol);
@@ -187,8 +187,8 @@ Id db_grid_write_eclipse(const char* filename, DbGrid* db, Id icol)
   return 0;
 }
 Id db_write_vtk(const char* filename,
-                 DbGrid* db,
-                 const VectorInt& cols)
+                DbGrid* db,
+                const VectorInt& cols)
 {
   FileVTK aof(filename, db);
   aof.setCols(cols);
@@ -276,7 +276,7 @@ void csv_print_double(double value)
   else
   {
     if (CSV_ENCODE.flagInteger)
-      (void)fprintf(CSV_ENCODE.file, "%ld", (Id)value);
+      (void)fprintf(CSV_ENCODE.file, "%ld", static_cast<Id>(value));
     else
       (void)fprintf(CSV_ENCODE.file, "%lf", value);
   }
@@ -313,11 +313,11 @@ void csv_print_double(double value)
  **
  *****************************************************************************/
 Id csv_manage(const char* filename,
-               const CSVformat& csv,
-               Id mode,
-               Id nitem,
-               bool flagInteger,
-               bool verbose)
+              const CSVformat& csv,
+              Id mode,
+              Id nitem,
+              bool flagInteger,
+              bool verbose)
 {
   char char_sep    = csv.getCharSep();
   String na_string = csv.getNaString();
@@ -361,7 +361,7 @@ Id csv_manage(const char* filename,
     // Write the last record (if necessary)
     st_csv_print_eol();
 
-    if (CSV_ENCODE.file != NULL) fclose(CSV_ENCODE.file);
+    if (CSV_ENCODE.file != nullptr) fclose(CSV_ENCODE.file);
 
     // Option printout
     if (verbose)
@@ -394,17 +394,17 @@ Id csv_manage(const char* filename,
  **
  *****************************************************************************/
 Id db_write_csv(Db* db,
-                 const char* filename,
-                 const CSVformat& csvfmt,
-                 Id flag_allcol,
-                 Id flag_coor,
-                 bool flagInteger)
+                const char* filename,
+                const CSVformat& csvfmt,
+                Id flag_allcol,
+                Id flag_coor,
+                bool flagInteger)
 {
   if (db == nullptr) return 1;
-  Id ncol         = db->getNColumn();
-  Id ndim         = db->getNDim();
-  Id nech         = db->getNSample();
-  Id nvar         = db->getNLoc(ELoc::Z);
+  Id ncol          = db->getNColumn();
+  Id ndim          = db->getNDim();
+  Id nech          = db->getNSample();
+  Id nvar          = db->getNLoc(ELoc::Z);
   bool flag_header = csvfmt.getFlagHeader();
 
   // Count the number of items per line
@@ -506,14 +506,14 @@ Id db_write_csv(Db* db,
  **
  *****************************************************************************/
 Id csv_table_read(const String& filename,
-                   const CSVformat& csvfmt,
-                   bool verbose,
-                   Id ncol_max,
-                   Id nrow_max,
-                   Id* ncol_arg,
-                   Id* nrow_arg,
-                   VectorString& names,
-                   VectorDouble& tab)
+                  const CSVformat& csvfmt,
+                  bool verbose,
+                  Id ncol_max,
+                  Id nrow_max,
+                  Id* ncol_arg,
+                  Id* nrow_arg,
+                  VectorString& names,
+                  VectorDouble& tab)
 {
   bool flag_header = csvfmt.getFlagHeader();
   auto nskip       = csvfmt.getNSkip();

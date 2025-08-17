@@ -39,24 +39,24 @@ namespace gstlrn
 {
 typedef struct
 {
-  Id ndim;                /* Space dimension */
-  Id niso;                /* Number of Iso-potential information */
-  Id nlayers;             /* Number of Iso-potential values */
-  Id ngrd;                /* Number of gradient information */
-  Id ntgt;                /* Number of tangent information */
-  Id next;                /* Number of external drifts */
-  Id nequa;               /* Number of equations in the System */
-  Id order;               /* Order of the drift */
-  Id size_iso;            /* Matrix size linked to iso-potential */
-  Id size_grd;            /* Matrix size linked to gradient */
-  Id size_tgt;            /* Matrix size linked to tangent */
-  Id size_drf;            /* Matrix size linked to Drift functions */
-  Id size_ext;            /* Matrix size linked to External Drifts */
-  Id start_iso;           /* Address of the first iso-potential */
-  Id start_grd;           /* Address of the first gradient */
-  Id start_tgt;           /* Address of the first tangent */
-  Id start_drf;           /* Address of the first drift */
-  Id start_ext;           /* Address of the first external drift */
+  Id ndim;                 /* Space dimension */
+  Id niso;                 /* Number of Iso-potential information */
+  Id nlayers;              /* Number of Iso-potential values */
+  Id ngrd;                 /* Number of gradient information */
+  Id ntgt;                 /* Number of tangent information */
+  Id next;                 /* Number of external drifts */
+  Id nequa;                /* Number of equations in the System */
+  Id order;                /* Order of the drift */
+  Id size_iso;             /* Matrix size linked to iso-potential */
+  Id size_grd;             /* Matrix size linked to gradient */
+  Id size_tgt;             /* Matrix size linked to tangent */
+  Id size_drf;             /* Matrix size linked to Drift functions */
+  Id size_ext;             /* Matrix size linked to External Drifts */
+  Id start_iso;            /* Address of the first iso-potential */
+  Id start_grd;            /* Address of the first gradient */
+  Id start_tgt;            /* Address of the first tangent */
+  Id start_drf;            /* Address of the first drift */
+  Id start_ext;            /* Address of the first external drift */
   VectorInt nb_per_layer;  /* Array of counts of samples per layer */
   VectorInt ptr_per_layer; /* Array of ptr per layer */
   VectorInt rank_iso;      /* Array of ranks for Iso-potential */
@@ -318,7 +318,7 @@ static Id st_extdrift_create_model(Pot_Ext* pot_ext)
   /* Creating the model */
 
   CovContext ctxt(1, pot_ext->ndim, 1.);
-  pot_ext->model  = new Model(ctxt);
+  pot_ext->model = new Model(ctxt);
   if (pot_ext->model == nullptr) return 1;
 
   // Covariance part
@@ -421,10 +421,10 @@ static Id st_extdrift_calc_init(DbGrid* dbout, Pot_Ext* pot_ext)
  **
  *****************************************************************************/
 static Id st_potext_manage(Id mode,
-                            Pot_Ext* pot_ext,
-                            Id nring,
-                            double range,
-                            DbGrid* dbout)
+                           Pot_Ext* pot_ext,
+                           Id nring,
+                           double range,
+                           DbGrid* dbout)
 {
   /* Dispatch */
 
@@ -485,7 +485,7 @@ bool st_potenv_valid(Pot_Env* pot_env,
     messerr("The Tangent and Data Db must share the same space dimension");
     return false;
   }
-  if ((Id)model->getNDim() != pot_env->ndim)
+  if (static_cast<Id>(model->getNDim()) != pot_env->ndim)
   {
     messerr("The Model and Data Db must have the same space dimension");
     return false;
@@ -628,7 +628,7 @@ static Id st_update_isopot(Db* dbiso, Pot_Env* pot_env)
     if (!dbiso->isActive(iech)) continue;
     double value = dbiso->getFromLocator(ELoc::LAYER, iech);
     if (FFFF(value)) continue;
-    Id ival = (Id)value;
+    Id ival = static_cast<Id>(value);
 
     // Look for an already registered layer value
 
@@ -650,7 +650,7 @@ static Id st_update_isopot(Db* dbiso, Pot_Env* pot_env)
 
   // Eliminate layers with not enough samples
 
-  niso  = 0;
+  niso = 0;
   Id j = 0;
   for (Id i = 0; i < nlayers; i++)
   {
@@ -691,7 +691,7 @@ static Id st_update_isopot(Db* dbiso, Pot_Env* pot_env)
       if (!dbiso->isActive(iech)) continue;
       double value = dbiso->getFromLocator(ELoc::LAYER, iech);
       if (FFFF(value)) continue;
-      Id ival = (Id)value;
+      Id ival = static_cast<Id>(value);
       if (ival != layval[i]) continue;
       pot_env->rank_iso[ecr++] = iech;
     }
@@ -827,7 +827,7 @@ static Id st_update_final(Model* model, Pot_Env* pot_env)
 {
   // Compute the starting addresses
 
-  Id pos            = 0;
+  Id pos             = 0;
   pot_env->start_grd = pos;
   pos += pot_env->size_grd;
   pot_env->start_tgt = pos;
@@ -1052,13 +1052,13 @@ static Id st_extdrift_neigh(DbGrid* dbgrid, Pot_Ext* pot_ext)
  **
  *****************************************************************************/
 static Id st_extdrift_eval(const char* target,
-                            double x0,
-                            double y0,
-                            double z0,
-                            DbGrid* dbgrid,
-                            Pot_Ext* pot_ext,
-                            double* extval,
-                            VectorDouble& extgrd)
+                           double x0,
+                           double y0,
+                           double z0,
+                           DbGrid* dbgrid,
+                           Pot_Ext* pot_ext,
+                           double* extval,
+                           VectorDouble& extgrd)
 {
   DECLARE_UNUSED(target);
   if (dbgrid == nullptr) return 1;
@@ -1129,12 +1129,12 @@ static Id st_extdrift_eval(const char* target,
  **
  *****************************************************************************/
 static Id st_build_lhs(Pot_Env* pot_env,
-                        Pot_Ext* pot_ext,
-                        DbGrid* dbout,
-                        Model* model,
-                        double nugget_grd,
-                        double nugget_tgt,
-                        MatrixSymmetric& lhs)
+                       Pot_Ext* pot_ext,
+                       DbGrid* dbout,
+                       Model* model,
+                       double nugget_grd,
+                       double nugget_tgt,
+                       MatrixSymmetric& lhs)
 {
   double extval, extval1, extval2;
 
@@ -1669,9 +1669,9 @@ static void st_build_rhs(Pot_Env* pot_env,
   double extval = 0.;
   double covar  = 0.;
   double covar1 = 0.;
-  Id ndim      = pot_env->ndim;
-  Id nequa     = pot_env->nequa;
-  Id nsol      = (flag_grad) ? 1 + pot_env->ndim : 1;
+  Id ndim       = pot_env->ndim;
+  Id nequa      = pot_env->nequa;
+  Id nsol       = (flag_grad) ? 1 + pot_env->ndim : 1;
 
   VectorDouble covGp(3, 0);
   VectorDouble covGG(9, 0.);
@@ -2091,7 +2091,7 @@ static void st_dist_convert(Pot_Env* pot_env,
   DECLARE_UNUSED(dbiso, dbgrd, dbtgt);
   VectorDouble result(4);
   static Id niter_max = 50;
-  static double eps    = 1.e-3;
+  static double eps   = 1.e-3;
 
   VectorDouble coor(3, 0.);
   VectorDouble coor0(3, 0.);
@@ -2254,7 +2254,7 @@ static void st_xvalid_potential(Pot_Env* pot_env,
 
       // Get the variance and the weights from the inverted L.H.S.
 
-      Id icol0       = ISC(ic, j);
+      Id icol0        = ISC(ic, j);
       double variance = 1. / getLhs(lhs, icol0, icol0);
       double stdev    = sqrt(variance);
       double dist_geo = 0.;
@@ -2806,13 +2806,13 @@ static void st_save_result_on_data(Pot_Env* pot_env,
   if (pot_env->flag_pot)
   {
     Id uid = db->addColumnsByConstant(nvar, value,
-                                       "Potential", loctype_pot);
+                                      "Potential", loctype_pot);
     uid_pot.push_back(uid);
   }
   if (pot_env->flag_grad)
   {
     Id uid = db->addColumnsByConstant(nvar * pot_env->ndim, value,
-                                       "Gradients", loctype_grad);
+                                      "Gradients", loctype_grad);
     for (Id idim = 0; idim < pot_env->ndim; idim++)
       uid_grad.push_back(uid + idim);
   }
@@ -2853,19 +2853,19 @@ static void st_save_result_on_data(Pot_Env* pot_env,
  **
  *****************************************************************************/
 Id potential_kriging(Db* dbiso,
-                      Db* dbgrd,
-                      Db* dbtgt,
-                      DbGrid* dbout,
-                      Model* model,
-                      ANeigh* neigh,
-                      double nugget_grd,
-                      double nugget_tgt,
-                      bool flag_pot,
-                      bool flag_grad,
-                      bool flag_trans,
-                      bool flag_save_data,
-                      Id opt_part,
-                      bool verbose)
+                     Db* dbgrd,
+                     Db* dbtgt,
+                     DbGrid* dbout,
+                     Model* model,
+                     ANeigh* neigh,
+                     double nugget_grd,
+                     double nugget_tgt,
+                     bool flag_pot,
+                     bool flag_grad,
+                     bool flag_trans,
+                     bool flag_save_data,
+                     Id opt_part,
+                     bool verbose)
 {
   Id error, nequa;
   VectorInt uid_iso_pot, uid_iso_grad;
@@ -3002,8 +3002,8 @@ label_end:
 static Id st_distance_to_isoline(DbGrid* dbout)
 
 {
-  Id radius = 1;
-  Id seed   = 3432521;
+  Id radius  = 1;
+  Id seed    = 3432521;
   auto memo  = law_get_random_seed();
   double eps = 1.e-3;
 
@@ -3047,19 +3047,19 @@ static Id st_distance_to_isoline(DbGrid* dbout)
  **
  *****************************************************************************/
 Id potential_simulate(Db* dbiso,
-                       Db* dbgrd,
-                       Db* dbtgt,
-                       DbGrid* dbout,
-                       Model* model,
-                       ANeigh* neigh,
-                       double nugget_grd,
-                       double nugget_tgt,
-                       double dist_tempere,
-                       bool flag_trans,
-                       Id seed,
-                       Id nbsimu,
-                       Id nbtuba,
-                       bool verbose)
+                      Db* dbgrd,
+                      Db* dbtgt,
+                      DbGrid* dbout,
+                      Model* model,
+                      ANeigh* neigh,
+                      double nugget_grd,
+                      double nugget_tgt,
+                      double dist_tempere,
+                      bool flag_trans,
+                      Id seed,
+                      Id nbsimu,
+                      Id nbtuba,
+                      bool verbose)
 {
   Id nequa, nlayers;
   double delta;
@@ -3246,14 +3246,14 @@ label_end:
  **
  *****************************************************************************/
 Id potential_xvalid(Db* dbiso,
-                     Db* dbgrd,
-                     Db* dbtgt,
-                     Model* model,
-                     ANeigh* neigh,
-                     double nugget_grd,
-                     double nugget_tgt,
-                     bool flag_dist_conv,
-                     bool verbose)
+                    Db* dbgrd,
+                    Db* dbtgt,
+                    Model* model,
+                    ANeigh* neigh,
+                    double nugget_grd,
+                    double nugget_tgt,
+                    bool flag_dist_conv,
+                    bool verbose)
 {
   Id nequa, nvar;
   Pot_Env pot_env;
@@ -3402,16 +3402,16 @@ static void st_print_type(Id rank, Id type)
  **
  *****************************************************************************/
 Id potential_cov(Model* model,
-                  bool verbose,
-                  Id type1,
-                  const VectorDouble& x10,
-                  const VectorDouble& x1p,
-                  const VectorDouble& tx1,
-                  Id type2,
-                  const VectorDouble& x20,
-                  const VectorDouble& x2p,
-                  const VectorDouble& tx2,
-                  VectorDouble& covtab)
+                 bool verbose,
+                 Id type1,
+                 const VectorDouble& x10,
+                 const VectorDouble& x1p,
+                 const VectorDouble& tx1,
+                 Id type2,
+                 const VectorDouble& x20,
+                 const VectorDouble& x2p,
+                 const VectorDouble& tx2,
+                 VectorDouble& covtab)
 {
   VectorDouble covGp(3, 0.);
   VectorDouble cov2Gp(3, 0.);
@@ -3425,7 +3425,7 @@ Id potential_cov(Model* model,
 
   // Preliminary checks
 
-  VERBOSE  = verbose;
+  VERBOSE = verbose;
   Id ndim = model->getNDim();
   covtab.resize(ndim * ndim, TEST);
 
@@ -3490,7 +3490,7 @@ Id potential_cov(Model* model,
           st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
           for (Id idim = 0; idim < ndim; idim++)
           {
-            Id i        = 3 * idim;
+            Id i         = 3 * idim;
             covtab[idim] = setMatUV(ndim, tx2[0], tx2[1], tx2[2], covGG[i + 0],
                                     covGG[i + 1], covGG[i + 2]);
           }
@@ -3539,7 +3539,7 @@ Id potential_cov(Model* model,
           st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
           for (Id idim = 0; idim < ndim; idim++)
           {
-            Id i        = 3 * idim;
+            Id i         = 3 * idim;
             covtab[idim] = setMatUV(ndim,
                                     tx1[0], tx1[1], tx1[2], covGG[i + 0],
                                     covGG[i + 1], covGG[i + 2]);

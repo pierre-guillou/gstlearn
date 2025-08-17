@@ -164,7 +164,7 @@ Model* Model::createFromParam(const ECov& type,
   if (!ranges.empty())
   {
     Id ndim       = spaceloc->getNDim();
-    Id ndimRanges = (Id)ranges.size();
+    Id ndimRanges = static_cast<Id>(ranges.size());
     if (ndimRanges != 1 && ndimRanges != ndim)
     {
       messerr("Incompatibility between:");
@@ -194,14 +194,14 @@ Model* Model::createFromParamOldStyle(const ECov& type,
 {
   Id nvar = 1;
   if (!sills.empty())
-    nvar = (Id)sqrt(sills.size());
+    nvar = static_cast<Id>(sqrt(sills.size()));
 
   auto spaceloc = ASpace::getDefaultSpaceIfNull(space);
 
   if (!ranges.empty())
   {
     Id ndim       = spaceloc->getNDim();
-    Id ndimRanges = (Id)ranges.size();
+    Id ndimRanges = static_cast<Id>(ranges.size());
     if (ndimRanges != 1 && ndimRanges != ndim)
     {
       messerr("Incompatibility between:");
@@ -323,7 +323,7 @@ void Model::addCovFromParamOldStyle(const ECov& type,
   {
     if (ndim > 0 && ranges.size() != ndim)
     {
-      messerr("Mismatch between the dimension of 'ranges' (%d)", (Id)ranges.size());
+      messerr("Mismatch between the dimension of 'ranges' (%d)", static_cast<Id>(ranges.size()));
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return;
@@ -334,7 +334,7 @@ void Model::addCovFromParamOldStyle(const ECov& type,
   {
     if (ndim > 0 && angles.size() != ndim)
     {
-      messerr("Mismatch between the dimension of 'angles' (%d)", (Id)angles.size());
+      messerr("Mismatch between the dimension of 'angles' (%d)", static_cast<Id>(angles.size()));
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return;
@@ -344,14 +344,14 @@ void Model::addCovFromParamOldStyle(const ECov& type,
   auto nvar = getNVar();
   if (!sills.empty())
   {
-    if (nvar > 0 && (Id)sills.size() != nvar * nvar)
+    if (nvar > 0 && static_cast<Id>(sills.size()) != nvar * nvar)
     {
-      messerr("Mismatch between the size of 'sills' (%d)", (Id)sills.size());
+      messerr("Mismatch between the size of 'sills' (%d)", static_cast<Id>(sills.size()));
       messerr("and the Number of variables stored in the Model (%d)", nvar);
       messerr("Operation is cancelled");
       return;
     }
-    nvar = (Id)sqrt((double)sills.size());
+    nvar = static_cast<Id>(sqrt(static_cast<double>(sills.size())));
   }
 
   // Define the covariance
@@ -418,7 +418,7 @@ void Model::addCovFromParam(const ECov& type,
     if (ndim > 0 && ranges.size() != ndim)
     {
       messerr("Mismatch between the dimension of 'ranges' (%d)",
-              (Id)ranges.size());
+              static_cast<Id>(ranges.size()));
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return;
@@ -430,7 +430,7 @@ void Model::addCovFromParam(const ECov& type,
     if (ndim > 0 && angles.size() != ndim)
     {
       messerr("Mismatch between the dimension of 'angles' (%d)",
-              (Id)angles.size());
+              static_cast<Id>(angles.size()));
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return;
@@ -447,7 +447,7 @@ void Model::addCovFromParam(const ECov& type,
       messerr("Operation is cancelled");
       return;
     }
-    nvar = (Id)sqrt((double)sills.size());
+    nvar = static_cast<Id>(sqrt(static_cast<double>(sills.size())));
   }
 
   // Define the covariance
@@ -643,7 +643,7 @@ Id Model::fitFromCovIndices(Vario* vario,
   // Add the relevant covariances
 
   _ctxt = CovContext(vario); /// TODO : What to do with that ?
-  for (Id is = 0; is < (Id)types.size(); is++)
+  for (Id is = 0; is < static_cast<Id>(types.size()); is++)
   {
     CovAniso cov(types[is], _ctxt);
     addCov(cov);
@@ -685,7 +685,7 @@ Id Model::fit(Vario* vario,
   _ctxt = CovContext(vario); /// TODO : What to do with that ?
   _driftList->copyCovContext(_ctxt);
 
-  for (Id is = 0; is < (Id)types.size(); is++)
+  for (Id is = 0; is < static_cast<Id>(types.size()); is++)
   {
     CovAniso cov(types[is], _ctxt);
     addCov(cov);
@@ -720,7 +720,7 @@ Id Model::fitFromVMap(DbGrid* dbmap,
 
   // Add the relevant covariances
 
-  for (Id is = 0; is < (Id)types.size(); is++)
+  for (Id is = 0; is < static_cast<Id>(types.size()); is++)
   {
     CovAniso cov(types[is], _ctxt);
     addCov(cov);
@@ -886,14 +886,14 @@ bool Model::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 
     // Writing the Anisotropy information
 
-    ret = ret && _recordWrite<Id>(os, "Anisotropy Flag", (Id)cova->getFlagAniso());
+    ret = ret && _recordWrite<Id>(os, "Anisotropy Flag", static_cast<Id>(cova->getFlagAniso()));
 
     if (!cova->getFlagAniso()) continue;
 
     for (size_t idim = 0; ret && idim < getNDim(); idim++)
       ret = ret && _recordWrite<double>(os, "", cova->getAnisoCoeff(idim));
     ret = ret && _commentWrite(os, "Anisotropy Coefficients");
-    ret = ret && _recordWrite<Id>(os, "Anisotropy Rotation Flag", (Id)cova->getFlagRotation());
+    ret = ret && _recordWrite<Id>(os, "Anisotropy Rotation Flag", static_cast<Id>(cova->getFlagRotation()));
 
     if (!cova->getFlagRotation()) continue;
 
@@ -982,7 +982,7 @@ Model* Model::duplicate() const
 Model* Model::createReduce(const VectorInt& validVars) const
 {
   VectorInt localValidVars = VH::filter(validVars, 0, getNVar());
-  Id nvar                 = (Id)localValidVars.size();
+  Id nvar                 = static_cast<Id>(localValidVars.size());
   if (nvar <= 0)
   {
     messerr("Your new Model has no variable left");
@@ -1034,7 +1034,7 @@ VectorECov Model::initCovList(const VectorInt& covranks)
 {
   VectorECov list;
 
-  for (Id i = 0; i < (Id)covranks.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(covranks.size()); i++)
   {
     ECov ec = ECov::fromValue(covranks[i]);
     if (ec == ECov::UNKNOWN)
@@ -1331,7 +1331,7 @@ Model* Model::createFillRandom(Id ndim,
 {
   // Create the Covariance Part
   Model* model   = Model::create(CovContext(nvar, ndim));
-  Id ncov       = (Id)types.size();
+  Id ncov       = static_cast<Id>(types.size());
   Id seed_local = seed;
   for (Id icov = 0; icov < ncov; icov++)
   {
@@ -1479,7 +1479,7 @@ bool Model::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
   auto modelG = grp.createGroup("Model");
 
   bool ret = true;
-  ret      = ret && SerializeHDF5::writeValue(modelG, "NDim", (Id)getNDim());
+  ret      = ret && SerializeHDF5::writeValue(modelG, "NDim", static_cast<Id>(getNDim()));
   ret      = ret && SerializeHDF5::writeValue(modelG, "NVar", getNVar());
   ret      = ret && SerializeHDF5::writeValue(modelG, "Field", getField());
   ret      = ret && SerializeHDF5::writeValue(modelG, "NCov", getNCov());
@@ -1499,12 +1499,12 @@ bool Model::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
     ret = ret && SerializeHDF5::writeValue(covG, "Param", cova->getParam());
 
     // Anisotropy
-    ret = ret && SerializeHDF5::writeValue(covG, "FlagAniso", (Id)cova->getFlagAniso());
+    ret = ret && SerializeHDF5::writeValue(covG, "FlagAniso", static_cast<Id>(cova->getFlagAniso()));
     if (cova->getFlagAniso())
     {
       ret = ret && SerializeHDF5::writeVec(covG, "Aniso", cova->getAnisoCoeffs());
 
-      ret = ret && SerializeHDF5::writeValue(covG, "FlagRotation", (Id)cova->getFlagRotation());
+      ret = ret && SerializeHDF5::writeValue(covG, "FlagRotation", static_cast<Id>(cova->getFlagRotation()));
       if (cova->getFlagRotation())
         ret = ret && SerializeHDF5::writeVec(covG, "Rotation", cova->getAnisoRotMat().getValues());
     }

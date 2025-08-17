@@ -69,11 +69,11 @@ VectorDouble CovMarkov::_evaluateSpectrumOnSphereWithoutNormalization(Id n, doub
 {
   VectorDouble sp(1 + n, 0.);
 
-  for (Id j = 0; j < (Id)sp.size(); j++)
+  for (Id j = 0; j < static_cast<Id>(sp.size()); j++)
   {
-    double nnp1 = scale * scale * (double)j * ((double)j + 1.);
+    double nnp1 = scale * scale * static_cast<double>(j) * (static_cast<double>(j) + 1.);
     double s    = 0.;
-    for (Id i = 0; i < (Id)_markovCoeffs.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(_markovCoeffs.size()); i++)
     {
       s += _markovCoeffs[i] * pow(nnp1, i);
     }
@@ -96,7 +96,7 @@ double CovMarkov::normalizeOnSphere(Id n, double scale) const
 double CovMarkov::evaluateSpectrum(double freq) const
 {
   double s = 0.;
-  Id n    = (Id)_markovCoeffs.size();
+  Id n     = static_cast<Id>(_markovCoeffs.size());
   if (n == 0)
   {
     return TEST;

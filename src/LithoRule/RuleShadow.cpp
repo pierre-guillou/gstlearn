@@ -438,7 +438,7 @@ Id RuleShadow::gaus2facResult(PropDef* propdef,
 
   VectorDouble del(nech);
   dinc  = getIncr();
-  nstep = (Id)floor(getDMax() / dinc);
+  nstep = static_cast<Id>(floor(getDMax() / dinc));
   dy    = dinc * getTgte();
   for (idim = 0; idim < ndim; idim++)
     del[idim] = dinc * _shift[idim];
@@ -538,7 +538,7 @@ Id RuleShadow::evaluateBounds(PropDef* propdef,
   nech        = dbin->getNSample();
   dist        = 0.;
   dinc        = getIncr();
-  nstep       = (Id)floor(getDMax() / dinc);
+  nstep       = static_cast<Id>(floor(getDMax() / dinc));
   seuil = s1min = s1max = s2min = s2max = TEST;
   dbgrid                                = dynamic_cast<const DbGrid*>(dbout);
 
@@ -552,7 +552,7 @@ Id RuleShadow::evaluateBounds(PropDef* propdef,
     /* Convert the proportions into thresholds for data point */
     if (!dbin->isActive(iech)) continue;
     if (!point_inside_grid(dbin, iech, dbgrid)) continue;
-    facies = (Id)dbin->getZVariable(iech, 0);
+    facies = static_cast<Id>(dbin->getZVariable(iech, 0));
     if (rule_thresh_define_shadow(propdef, dbin, this, facies, iech, isimu,
                                   nbsimu, &t1min, &t1max, &t2min, &t2max,
                                   &sh_dsup, &sh_down)) return (1);
