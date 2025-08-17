@@ -96,9 +96,10 @@ int main(int argc, char* argv[])
   /* Create the output name (for storage of dump files) */
 
   VectorString subparts = separateKeywords(argv[1]);
-  VH::dump("Les mots cles separes", subparts);
+
   int nargs      = static_cast<int>(subparts.size());
   String outname = concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
+  if (outname == "Jeu3-") verbose = true;
   ASerializable::setPrefixName(outname);
 
   /* Getting the Study name */
