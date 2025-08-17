@@ -101,7 +101,7 @@ Id CovLMCAnamorphosis::init(const VectorInt& anam_strcnt)
   if (type == EAnam::DISCRETE_IR)
   {
     Id nfact = _anam->getNFactor();
-    if ((Id)anam_strcnt.size() != nfact)
+    if (static_cast<Id>(anam_strcnt.size()) != nfact)
     {
       messerr("Argument 'anam_strcnt' must be dimensioned to the number of factors (%d)", nfact);
       return 1;
@@ -282,8 +282,8 @@ double CovLMCAnamorphosis::_evalHermite(Id ivar,
 
     // For the factor 'iclass'
 
-    double rhon = pow(rho, (double)iclass);
-    double rn   = pow(r, (double)iclass);
+    double rhon = pow(rho, static_cast<double>(iclass));
+    double rn   = pow(r, static_cast<double>(iclass));
     switch (mode->getMember().getValue())
     {
       case ECalcMember::E_LHS:

@@ -164,7 +164,7 @@ static Id st_divide_by_2(Id* nxyz, Id orient)
   ival = nxyz[orient];
   if (ival <= 1) return (0);
 
-  ival         = (Id)floor((double)(ival + 1.) / 2);
+  ival         = static_cast<Id>(floor((ival + 1.) / 2));
   nxyz[orient] = ival;
   return (1);
 }
@@ -615,7 +615,7 @@ static Id st_is_subgrid(Id verbose,
         "The origin of the Output Grid does not coincide with a node of the Input Grid");
       return (0);
     }
-    ind0[idim] = (Id)floor(d + 0.5);
+    ind0[idim] = static_cast<Id>(floor(d + 0.5));
 
     /* Are grid meshes multiple */
 
@@ -626,7 +626,7 @@ static Id st_is_subgrid(Id verbose,
         "The grid cell of the Output Grid is not a multiple of the grid cell of the Input Grid");
       return (0);
     }
-    nxyz[idim] = (Id)floor(d + 0.5);
+    nxyz[idim] = static_cast<Id>(floor(d + 0.5));
     (*ntot) *= nxyz[idim];
   }
 
@@ -672,7 +672,7 @@ Id db_upscale(DbGrid* dbgrid1, DbGrid* dbgrid2, Id orient, Id verbose)
   /* Initializations */
 
   error     = 1;
-  iech_save = (Id)get_keypone("Upscale.Converge.Block", 0);
+  iech_save = static_cast<Id>(get_keypone("Upscale.Converge.Block", 0));
   Id ndim2  = dbgrid2->getNDim();
   VectorInt ixyz(ndim2);
 
@@ -1025,7 +1025,7 @@ static void st_updiff(Id orient,
 
   /* Check if a fixed starting position has been defined */
 
-  fixed_position = (Id)get_keypone("Fixed_Position", -1);
+  fixed_position = static_cast<Id>(get_keypone("Fixed_Position", -1));
   flag_fixed     = fixed_position >= 0;
 
   /* Draw initial seed locations */
@@ -1084,7 +1084,7 @@ static void st_updiff(Id orient,
 
       dmoy += d2;
     }
-    cvdist2[iter] = dmoy / (double)nseed;
+    cvdist2[iter] = dmoy / static_cast<double>(nseed);
   }
 }
 
@@ -1147,7 +1147,7 @@ static double st_get_diff_coeff(Id niter,
   Id iter, rank_mid;
 
   slope_ref = origin_ref = TEST;
-  rank_mid               = (Id)(pmid * niter / 100.);
+  rank_mid               = static_cast<Id>(pmid * niter / 100.);
   count = sum_x = sum_y = sum_xx = sum_xy = origin = slope = 0.;
 
   for (Id jter = 0; jter < niter; jter++)
@@ -1156,7 +1156,7 @@ static double st_get_diff_coeff(Id niter,
 
     /* Calculate the average slope */
 
-    st_update_regression((double)(iter + 1), cvdist2[iter], &count, &sum_x,
+    st_update_regression(static_cast<double>(iter + 1), cvdist2[iter], &count, &sum_x,
                          &sum_y, &sum_xx, &sum_xy);
     if (count > 1)
     {
@@ -1178,7 +1178,7 @@ static double st_get_diff_coeff(Id niter,
     if (verbose && !FFFF(slope) && !FFFF(origin))
     {
       message("  Rank=%5d Slope=%lf Origin=%lf (Count=%d)", iter + 1, slope,
-              origin, (Id)count);
+              origin, static_cast<Id>(count));
       if (iter == rank_mid) message(" - Stored");
       message("\n");
     }
@@ -1264,10 +1264,10 @@ Id db_diffusion(DbGrid* dbgrid1,
   /* Initializations */
 
   error      = 1;
-  iech_save  = (Id)get_keypone("Diffusion.Converge.Block", 0);
-  opt_morpho = (Id)get_keypone("Diffusion.Converge.Morpho", 1);
-  opt_center = (Id)get_keypone("Diffusion.Converge.Center", 1);
-  flag_traj  = (Id)get_keypone("Diffusion.Flag.Trajectory", 0);
+  iech_save  = static_cast<Id>(get_keypone("Diffusion.Converge.Block", 0));
+  opt_morpho = static_cast<Id>(get_keypone("Diffusion.Converge.Morpho", 1));
+  opt_center = static_cast<Id>(get_keypone("Diffusion.Converge.Center", 1));
+  flag_traj  = static_cast<Id>(get_keypone("Diffusion.Flag.Trajectory", 0));
   pmid       = get_keypone("Diffusion.Converge.PMid", 70.);
   if (seed != 0) law_set_random_seed(seed);
 
@@ -1315,7 +1315,7 @@ Id db_diffusion(DbGrid* dbgrid1,
   /* Allocate the neighboring displacement array */
 
   nbgh   = gridcell_neigh(ndim, opt_morpho, 1, opt_center, verbose);
-  n_nbgh = (Id)nbgh.size() / ndim;
+  n_nbgh = static_cast<Id>(nbgh.size()) / ndim;
   valwrk.resize(n_nbgh);
 
   /* Create the new variable in the output file */
@@ -1457,11 +1457,11 @@ Id stats_residuals(Id verbose,
 
   /* Calculate the tonnage and meal quantity per class */
 
-  moyenne /= (double)nactive;
+  moyenne /= static_cast<double>(nactive);
   for (icut = 0; icut < ncut; icut++)
   {
-    T[icut] /= (double)nactive;
-    Q[icut] /= (double)nactive;
+    T[icut] /= static_cast<double>(nactive);
+    Q[icut] /= static_cast<double>(nactive);
   }
 
   /* Calculate the residuals */

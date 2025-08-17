@@ -18,7 +18,7 @@ ShapeEllipsoid::ShapeEllipsoid(double proportion,
                                double yext,
                                double zext,
                                double theta)
-    : AShape()
+  : AShape()
 {
   initParams(getNParams());
   setParamDefault(0, "X-Extension", xext);
@@ -28,16 +28,16 @@ ShapeEllipsoid::ShapeEllipsoid(double proportion,
   setProportion(proportion);
 }
 
-ShapeEllipsoid::ShapeEllipsoid(const ShapeEllipsoid &r)
-    : AShape(r)
+ShapeEllipsoid::ShapeEllipsoid(const ShapeEllipsoid& r)
+  : AShape(r)
 {
 }
 
-ShapeEllipsoid& ShapeEllipsoid::operator=(const ShapeEllipsoid &r)
+ShapeEllipsoid& ShapeEllipsoid::operator=(const ShapeEllipsoid& r)
 {
   if (this != &r)
   {
-    AShape::operator =(r);
+    AShape::operator=(r);
   }
   return *this;
 }
@@ -74,10 +74,10 @@ BooleanObject* ShapeEllipsoid::generateObject(Id ndim)
 bool ShapeEllipsoid::belongObject(const VectorDouble& coor,
                                   const BooleanObject* object) const
 {
-  Id ndim = (Id) coor.size();
+  Id ndim   = static_cast<Id>(coor.size());
   double dx = (ndim >= 1) ? coor[0] / (object->getExtension(0) / 2.) : 0.;
   double dy = (ndim >= 2) ? coor[1] / (object->getExtension(1) / 2.) : 0.;
   double dz = (ndim >= 3) ? coor[2] / (object->getExtension(2) / 2.) : 0.;
   return (dx * dx + dy * dy + dz * dz <= 1);
 }
-}
+} // namespace gstlrn

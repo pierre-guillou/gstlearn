@@ -121,8 +121,8 @@ VectorDouble extend_grid(DbGrid* db, const VectorDouble& gext, Id* nout)
   /* Initializations */
 
   ndim   = db->getNDim();
-  number = (Id)pow(2., ndim);
-  ndiv0  = (Id)pow(2., ndim - 1);
+  number = static_cast<Id>(pow(2., ndim));
+  ndiv0  = static_cast<Id>(pow(2., ndim - 1));
   *nout  = 0;
 
   /* Core allocation */
@@ -172,8 +172,8 @@ VectorDouble extend_grid(DbGrid* db, const VectorDouble& gext, Id* nout)
 VectorDouble extend_point(Db* db, const VectorDouble& gext, Id* nout)
 {
   Id ndim   = db->getNDim();
-  Id number = (Id)pow(2., ndim);
-  Id ndiv0  = (Id)pow(2., ndim - 1);
+  Id number = static_cast<Id>(pow(2., ndim));
+  Id ndiv0  = static_cast<Id>(pow(2., ndim - 1));
 
   /* Core allocation */
 
@@ -229,8 +229,8 @@ VectorDouble get_db_extension(Db* dbin, Db* dbout, Id* nout)
   Id ndim = 0;
   if (dbin != nullptr) ndim = dbin->getNDim();
   if (dbout != nullptr) ndim = dbout->getNDim();
-  Id number = (Id)pow(2., ndim);
-  Id ndiv0  = (Id)pow(2., ndim - 1);
+  Id number = static_cast<Id>(pow(2., ndim));
+  Id ndiv0  = static_cast<Id>(pow(2., ndim - 1));
 
   /* Core allocation */
 

@@ -112,7 +112,7 @@ KrigingSystem::KrigingSystem(Db* dbin,
   , _flagNoStat(false)
 {
   // _model is a copy of input model to allow modification (still used???)
-  if (model != nullptr) _model = (ModelGeneric*)model->clone();
+  if (model != nullptr) _model = model->clone();
 
   if (model != nullptr)
     _flagNoStat = _model->isNoStat();
@@ -425,7 +425,7 @@ void KrigingSystem::_estimateCalcul(Id status)
 
 void KrigingSystem::_neighCalcul(Id status, const VectorDouble& tab)
 {
-  Id ntab = (Id)tab.size();
+  Id ntab = static_cast<Id>(tab.size());
   for (Id i = 0; i < ntab; i++)
   {
 
@@ -439,11 +439,11 @@ void KrigingSystem::_neighCalcul(Id status, const VectorDouble& tab)
   {
     mestitle(0, "Neighborhood Parameters");
 
-    message("Number of selected samples          = %d\n", (Id)tab[0]);
+    message("Number of selected samples          = %d\n", static_cast<Id>(tab[0]));
     message("Maximum neighborhood distance       = %lf\n", tab[1]);
     message("Minimum neighborhood distance       = %lf\n", tab[2]);
-    message("Number of non-empty sectors         = %d\n", (Id)tab[3]);
-    message("Number of consecutive empty sectors = %d\n", (Id)tab[4]);
+    message("Number of non-empty sectors         = %d\n", static_cast<Id>(tab[3]));
+    message("Number of consecutive empty sectors = %d\n", static_cast<Id>(tab[4]));
   }
 }
 
@@ -460,7 +460,7 @@ void KrigingSystem::_estimateEstim(Id status)
   if (!status)
   {
     local = _algebra.getEstimation();
-    if ((Id)local.size() < _nvarCL) return;
+    if (static_cast<Id>(local.size()) < _nvarCL) return;
   }
   for (Id ivarCL = 0; ivarCL < _nvarCL; ivarCL++)
     _dbout->setArray(_iechOut, _iptrEst + ivarCL, local[ivarCL]);
@@ -479,7 +479,7 @@ void KrigingSystem::_estimateStdv(Id status)
   if (!status)
   {
     local = _algebra.getStdv();
-    if ((Id)local.size() < _nvarCL) return;
+    if (static_cast<Id>(local.size()) < _nvarCL) return;
   }
   for (Id ivarCL = 0; ivarCL < _nvarCL; ivarCL++)
     _dbout->setArray(_iechOut, _iptrStd + ivarCL, local[ivarCL]);
@@ -498,7 +498,7 @@ void KrigingSystem::_estimateVarZ(Id status)
   if (!status)
   {
     local = _algebra.getVarianceZstar();
-    if ((Id)local.size() < _nvarCL) return;
+    if (static_cast<Id>(local.size()) < _nvarCL) return;
   }
   for (Id ivarCL = 0; ivarCL < _nvarCL; ivarCL++)
     _dbout->setArray(_iechOut, _iptrVarZ + ivarCL, local[ivarCL]);
@@ -743,7 +743,7 @@ label_store:
 
 Id KrigingSystem::_updateForColCokMoving()
 {
-  Id nvar = (Id)_sampleRanks.size();
+  Id nvar = static_cast<Id>(_sampleRanks.size());
   Id nbfl = _X.getNCols();
   Id nrhs = _Sigma0.getNCols();
   Id ndim = _dbin->getNDim();
@@ -751,7 +751,7 @@ Id KrigingSystem::_updateForColCokMoving()
   // If the target coincides with a data point, do not do anything
   // (otherwise the new CoKriging system will be regular)
   VectorDouble coor = _dbout->getSampleCoordinates(_iechOut);
-  for (Id jech = 0, nech = (Id)_nbgh.size(); jech < nech; jech++)
+  for (Id jech = 0, nech = static_cast<Id>(_nbgh.size()); jech < nech; jech++)
   {
     Id iech          = _nbgh[jech];
     bool flagCoincide = true;
@@ -776,7 +776,7 @@ Id KrigingSystem::_updateForColCokMoving()
   }
   if (nAdd <= 0) return 0;
 
-  Id oldSize = (Id)_Z.size();
+  Id oldSize = static_cast<Id>(_Z.size());
   Id newSize = oldSize + nAdd;
 
   // Create the indexing vector (>0 for actual samples, <0 for additional sample)
@@ -785,7 +785,7 @@ Id KrigingSystem::_updateForColCokMoving()
   Id ecr = 0;
   for (Id ivar = 0, lec = 0; ivar < nvar; ivar++)
   {
-    for (Id i = 0, n = (Id)_sampleRanks[ivar].size(); i < n; i++, lec++)
+    for (Id i = 0, n = static_cast<Id>(_sampleRanks[ivar].size()); i < n; i++, lec++)
       adds[ecr++] = 1 + lec;
     if (!FFFF(newValues[ivar])) adds[ecr++] = -1 - ivar;
   }
@@ -877,9 +877,9 @@ VectorInt KrigingSystem::_xvalidUniqueIndices() const
 {
   VectorInt ranks;
   Id lec = 0;
-  for (Id ivar = 0, nvar = (Id)_sampleRanks.size(); ivar < nvar; ivar++)
+  for (Id ivar = 0, nvar = static_cast<Id>(_sampleRanks.size()); ivar < nvar; ivar++)
   {
-    for (Id i = 0, n = (Id)_sampleRanks[ivar].size(); i < n; i++, lec++)
+    for (Id i = 0, n = static_cast<Id>(_sampleRanks[ivar].size()); i < n; i++, lec++)
       if (_sampleRanks[ivar][i] == _iechOut) ranks.push_back(lec);
   }
   return ranks;
@@ -1162,15 +1162,15 @@ Id KrigingSystem::setKrigOptBayes(bool flag_bayes,
       for (Id i = 0; i < nfeq; i++)
         local_cov.setValue(i, i, 1.);
     }
-    if ((Id)local_mean.size() != nfeq)
+    if (static_cast<Id>(local_mean.size()) != nfeq)
     {
-      messerr("Size of argument 'prior_mean'(%d)", (Id)local_mean.size());
+      messerr("Size of argument 'prior_mean'(%d)", static_cast<Id>(local_mean.size()));
       messerr("should be equal to the Number of Drift Equations(%d)", nfeq);
       return 1;
     }
-    if ((Id)local_cov.size() != nfeq * nfeq)
+    if (local_cov.size() != nfeq * nfeq)
     {
-      messerr("Size of argument 'prior_cov'(%d)", (Id)local_cov.size());
+      messerr("Size of argument 'prior_cov'(%d)", local_cov.size());
       messerr("should be equal to the Number of Drift Equations (squared) (%d)",
               nfeq * nfeq);
       return 1;
@@ -1350,7 +1350,7 @@ bool KrigingSystem::_isCorrect()
   }
   if (_model != nullptr)
   {
-    if (ndim > 0 && ndim != (Id)_model->getNDim())
+    if (ndim > 0 && ndim != static_cast<Id>(_model->getNDim()))
     {
       messerr("Incompatible Space Dimension of '_ model'");
       return false;
@@ -1359,12 +1359,12 @@ bool KrigingSystem::_isCorrect()
   }
   if (_neigh != nullptr)
   {
-    if (ndim > 0 && ndim != (Id)_neigh->getNDim())
+    if (ndim > 0 && ndim != static_cast<Id>(_neigh->getNDim()))
     {
       messerr("Incompatible Space Dimension of '_neigh'");
       return false;
     }
-    ndim = (Id)_neigh->getNDim();
+    ndim = static_cast<Id>(_neigh->getNDim());
   }
 
   /****************************/

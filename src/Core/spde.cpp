@@ -1051,7 +1051,7 @@ static double st_spde_compute_correc(Id ndim, double param)
 {
   double g0, ndims2, gammap, gammaa, value;
 
-  ndims2 = ((double)ndim) / 2.;
+  ndims2 = (static_cast<double>(ndim)) / 2.;
   gammap = exp(loggamma(param));
   gammaa = exp(loggamma(param + ndims2));
   g0     = pow(4. * GV_PI, ndims2);
@@ -1090,9 +1090,9 @@ static void st_compute_blin(void)
 
   Id ndim      = S_ENV.ndim;
   double param = st_get_cova_param();
-  ndims2       = ((double)ndim) / 2.;
+  ndims2       = (static_cast<double>(ndim)) / 2.;
   alpha        = param + ndims2;
-  p            = (Id)ceil(alpha);
+  p            = static_cast<Id>(ceil(alpha));
   ndimp        = p + 1;
   lambda       = alpha - floor(alpha);
   delta        = lambda - alpha;
@@ -1269,7 +1269,7 @@ static Id st_check_model(const Db* dbin, const Db* dbout, Model* model)
               ndim, dbin->getNDim());
       return (1);
     }
-    flag_mult_data = (Id)get_keypone("Flag_Mult_Data", 0);
+    flag_mult_data = static_cast<Id>(get_keypone("Flag_Mult_Data", 0));
     if (flag_mult_data)
     {
       if (nvar != 1)
@@ -2359,7 +2359,7 @@ static VectorDouble st_spde_fill_TildeC(AMesh* amesh, const double* units)
 
   /* Scale */
 
-  double factor = (double)ncorner;
+  auto factor = static_cast<double>(ncorner);
   for (Id ip = 0; ip < nvertex; ip++)
   {
     double value = cumunit[ip] / factor;
@@ -2552,7 +2552,7 @@ static Id st_build_QCov(SPDE_Matelem& Matelem)
     /* Case when a nugget effect is present */
     /****************************************/
 
-    if (Matelem.Aproj == NULL || SS->Bnugget == NULL) return (1);
+    if (Matelem.Aproj == NULL || SS->Bnugget == nullptr) return (1);
 
     for (Id ivar = 0; ivar < nvar; ivar++)
     {
@@ -2574,7 +2574,7 @@ static Id st_build_QCov(SPDE_Matelem& Matelem)
     /* Case when there is no nugget effect */
     /***************************************/
 
-    if (Matelem.Aproj == NULL || SS->BheteroD == NULL || SS->BheteroT == NULL)
+    if (Matelem.Aproj == NULL || SS->BheteroD == NULL || SS->BheteroT == nullptr)
       return (1);
 
     for (Id ivar = 0; ivar < nvar; ivar++)
@@ -2614,7 +2614,7 @@ label_end:
   delete Bi;
   if (error)
   {
-    if (QCov != NULL)
+    if (QCov != nullptr)
     {
       for (Id ivar = 0; ivar < nvar; ivar++)
         QCov[ivar] = st_qchol_manage(-1, QCov[ivar]);
@@ -2802,7 +2802,7 @@ static double st_chebychev_function(double x,
 
   value = 1.;
   total = blin[0];
-  for (Id i = 1, nblin = (Id)blin.size(); i < nblin; i++)
+  for (Id i = 1, nblin = static_cast<Id>(blin.size()); i < nblin; i++)
   {
     value *= x;
     total += blin[i] * value;
@@ -2967,8 +2967,8 @@ static Cheb_Elem* st_spde_cheb_manage(Id mode,
     if (cheb_elem == nullptr) goto label_end;
     cheb_elem->coeffs.clear();
 
-    ncmax = (Id)get_keypone("Number_Polynomials_Chebychev", 10001.);
-    ndisc = (Id)get_keypone("Number_Discretization_Chebychev", 100.);
+    ncmax = static_cast<Id>(get_keypone("Number_Polynomials_Chebychev", 10001.));
+    ndisc = static_cast<Id>(get_keypone("Number_Discretization_Chebychev", 100.));
     tol   = get_keypone("Chebychev_Tolerance", 5.e-3);
 
     /* Calculate key values */
@@ -3063,7 +3063,7 @@ static void st_matelem_manage(Id mode)
         delete Matelem.S;
         delete Matelem.Aproj;
         Matelem.QC = st_qchol_manage(-1, Matelem.QC);
-        if (Matelem.QCov != NULL)
+        if (Matelem.QCov != nullptr)
         {
           for (Id ivar = 0; ivar < S_ENV.nvar; ivar++)
             Matelem.QCov[ivar] = st_qchol_manage(-1, Matelem.QCov[ivar]);
@@ -3101,7 +3101,7 @@ static AMesh* st_create_meshes(Db* dbin,
 {
   DECLARE_UNUSED(s_option);
   DECLARE_UNUSED(gext);
-  bool flag_force = (Id)get_keypone("Force_Regular_Meshing", 0);
+  bool flag_force = static_cast<Id>(get_keypone("Force_Regular_Meshing", 0));
   if (VERBOSE)
   {
     message("Generating the meshes\n");
@@ -3145,7 +3145,7 @@ static AMesh* st_create_meshes(Db* dbin,
   }
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(dbloc);
 
-  if (dbloc != NULL)
+  if (dbloc != nullptr)
   {
     if (VERBOSE) message("Using Turbo Meshing\n");
 
@@ -3488,9 +3488,9 @@ static Id st_spde_check(const Db* dbin,
   models[0] = model1;
   models[1] = model2;
 
-  FLAG_KEYPAIR       = (Id)get_keypone("SPDE_FLAG_KEYPAIR", 0);
-  DEBUG              = (Id)get_keypone("SPDE_DEBUG", DEBUG);
-  S_DECIDE.simu_chol = (Id)get_keypone("Flag_Simu_Chol", 0);
+  FLAG_KEYPAIR       = static_cast<Id>(get_keypone("SPDE_FLAG_KEYPAIR", 0));
+  DEBUG              = static_cast<Id>(get_keypone("SPDE_DEBUG", DEBUG));
+  S_DECIDE.simu_chol = static_cast<Id>(get_keypone("Flag_Simu_Chol", 0));
   S_DECIDE.simu_cheb = !S_DECIDE.simu_chol;
 
   S_DECIDE.flag_dbin       = (dbin != nullptr);
@@ -3512,12 +3512,11 @@ static Id st_spde_check(const Db* dbin,
   S_DECIDE.flag_Q = 1;
   if (!S_DECIDE.flag_dbin && S_DECIDE.simu_cheb) S_DECIDE.flag_Q = 0;
   if (!flag_advanced) S_DECIDE.flag_Q = 1;
-  S_DECIDE.flag_Q       = (Id)get_keypone("Flag_Q", S_DECIDE.flag_Q);
+  S_DECIDE.flag_Q       = static_cast<Id>(get_keypone("Flag_Q", S_DECIDE.flag_Q));
   S_DECIDE.flag_Qchol   = (S_DECIDE.flag_case == CASE_SIMULATE && S_DECIDE.flag_Q && S_DECIDE.simu_chol);
   S_DECIDE.flag_modif   = (S_DECIDE.flag_case == CASE_SIMULATE && flag_modif);
   S_DECIDE.flag_onechol = (S_DECIDE.simu_chol);
-  S_DECIDE.flag_onechol = (Id)get_keypone("Flag_OneChol",
-                                          S_DECIDE.flag_onechol);
+  S_DECIDE.flag_onechol = static_cast<Id>(get_keypone("Flag_OneChol", S_DECIDE.flag_onechol));
   if (!S_DECIDE.flag_dbin) S_DECIDE.flag_onechol = 0;
   if (S_DECIDE.flag_est) S_DECIDE.flag_onechol = 1;
   if (S_DECIDE.flag_onechol) S_DECIDE.flag_Qchol = 0;
@@ -3696,7 +3695,7 @@ static void st_print_concatenate_interval(const char* title,
                                           double upper,
                                           Id tail)
 {
-  if (title != NULL) message("%s", title);
+  if (title != nullptr) message("%s", title);
   message(" [");
   if (FFFF(lower))
     message("    NA");
@@ -4177,7 +4176,7 @@ static void st_m2d_stats_init(M2D_Environ* m2denv,
     mestitle(2, "Global Statistics on Raw Elevations (extended by %4.2lf)",
              percent);
     message("Statistics are derived from compiling bounds (when defined)\n");
-    message("Number of valid bounds = %d\n", (Id)nb);
+    message("Number of valid bounds = %d\n", static_cast<Id>(nb));
     message("Mean                   = %lf\n", m2denv->zmean);
     message("St. Deviation          = %lf\n", m2denv->zstdv);
     message("Tolerance              = %lf\n", m2denv->zeps);
@@ -4260,7 +4259,7 @@ static void st_m2d_stats_updt(M2D_Environ* m2denv,
   {
     mestitle(2, "Global Statistics on Centered Elevations");
     message("Statistics are compiled from initial values within bounds\n");
-    message("Number of values = %d\n", (Id)nb);
+    message("Number of values = %d\n", static_cast<Id>(nb));
     message("Mean             = %lf\n", m2denv->zmean);
     message("St. Deviation    = %lf\n", m2denv->zstdv);
     message("Tolerance        = %lf\n", m2denv->zeps);
@@ -4528,7 +4527,7 @@ static Id st_m2d_drift_manage(M2D_Environ* m2denv,
   {
     mestitle(2, "Global Statistics on Trends (extended by %4.2lf)", percent);
     message("Statistics are derived from compiling drift at grid nodes\n");
-    message("Number of valid nodes  = %d\n", (Id)nb);
+    message("Number of valid nodes  = %d\n", static_cast<Id>(nb));
     message("Minimum Drift          = %lf\n", m2denv->dmini);
     message("Maximum Drift          = %lf\n", m2denv->dmaxi);
     message("Range of Drift         = %lf\n", m2denv->dmaxi - m2denv->dmini);
@@ -4851,7 +4850,7 @@ static Id st_record_sample(M2D_Environ* m2denv,
 
   // Set the rank
 
-  tab[ecr++] = (double)number + 1;
+  tab[ecr++] = static_cast<double>(number) + 1;
 
   // Set the coordinates
 
@@ -5634,7 +5633,7 @@ static M2D_Environ* st_m2denv_manage(Id mode,
   else
   {
     m2denv = m2denv_old;
-    if (m2denv != (M2D_Environ*)NULL)
+    if (m2denv != nullptr)
 
     {
       m2denv->dcoef = (double*)mem_free((char*)m2denv->dcoef);
@@ -5719,7 +5718,7 @@ static void st_print_db_constraints(const char* title,
 
   // Initializations
 
-  nprint = (Id)get_keypone("Print_Data", 10.);
+  nprint = static_cast<Id>(get_keypone("Print_Data", 10.));
   if (!verbose || nprint == 0) return;
 
   // Printout
@@ -5843,7 +5842,7 @@ Id m2d_gibbs_spde(Db* dbin,
   gwork             = nullptr;
   dbc               = nullptr;
   Qc                = nullptr;
-  m2denv            = (M2D_Environ*)NULL;
+  m2denv            = nullptr;
   ysigma            = 0.;
   number_hard       = 0;
 

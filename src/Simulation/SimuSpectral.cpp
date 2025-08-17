@@ -144,8 +144,8 @@ void SimuSpectral::_simulateOnSphere(Id nd, bool verbose)
   VectorDouble spectrum = _model->getCovAniso(0)->evalSpectrumOnSphere(nd);
 
   // Simulate vector N
-  Id n       = 0;
-  double p    = 0.;
+  Id n     = 0;
+  double p = 0.;
   VectorInt N(_ns, 0);
   while (p < maxU && n < _ns)
   {
@@ -165,7 +165,7 @@ void SimuSpectral::_simulateOnSphere(Id nd, bool verbose)
   VectorInt Kabs = K;
   for (Id is = 0; is < _ns; is++) Kabs[is] = ABS(Kabs[is]);
   VectorInt orders = VH::unique(Kabs);
-  Id order_size   = (Id)orders.size();
+  Id order_size    = static_cast<Id>(orders.size());
 
   // Loop on the orders
   _spSims.resize(order_size);
@@ -255,12 +255,12 @@ void SimuSpectral::_computeOnRn(Db* dbout, Id iuid, bool verbose)
  * @param namconv Naming convention (only used when 'iuid' == 0)
  */
 Id SimuSpectral::compute(Db* dbout,
-                          Id iuid,
-                          bool verbose,
-                          const NamingConvention& namconv)
+                         Id iuid,
+                         bool verbose,
+                         const NamingConvention& namconv)
 {
-  Id nech             = dbout->getNSample(true);
-  Id ndim             = dbout->getNDim();
+  Id nech              = dbout->getNSample(true);
+  Id ndim              = dbout->getNDim();
   bool flagNewVariable = (iuid <= 0);
 
   if (ndim != _ndim)
@@ -378,7 +378,7 @@ void SimuSpectral::_printSpSims(Id status)
 {
   Id totalP = 0;
   Id totalM = 0;
-  Id ns     = (Id)_spSims.size();
+  Id ns     = static_cast<Id>(_spSims.size());
   mestitle(1, "List of Orders");
   for (Id is = 0; is < ns; is++)
   {
@@ -401,7 +401,7 @@ void SimuSpectral::_computeOnSphere(Db* dbout, Id iuid, bool verbose)
   Id nb    = 0;
   Id N_max = -9999;
   VectorInt K_list;
-  for (Id is = 0, size = (Id)_spSims.size(); is < size; is++)
+  for (Id is = 0, size = static_cast<Id>(_spSims.size()); is < size; is++)
   {
     nb += _spSims[is]._countP + _spSims[is]._countM;
     K_list.push_back(_spSims[is]._k);
@@ -497,7 +497,7 @@ void SimuSpectral::_computeOnSphere(Db* dbout, Id iuid, bool verbose)
                     cumComp, jk);
           }
 
-          for (Id ii = 0, ncomp = (Id)valComp.size(); ii < ncomp; ii++)
+          for (Id ii = 0, ncomp = static_cast<Id>(valComp.size()); ii < ncomp; ii++)
           {
             if (nbrComp[ii] > 0)
             {
@@ -572,14 +572,14 @@ bool SimuSpectral::isValidForSpectral(const Model* model)
  * @note The conditional version is not yet available
  */
 Id simuSpectral(Db* dbin,
-                 Db* dbout,
-                 Model* model,
-                 Id nbsimu,
-                 Id seed,
-                 Id ns,
-                 Id nd,
-                 bool verbose,
-                 const NamingConvention& namconv)
+                Db* dbout,
+                Model* model,
+                Id nbsimu,
+                Id seed,
+                Id ns,
+                Id nd,
+                bool verbose,
+                const NamingConvention& namconv)
 {
   if (dbin != nullptr)
   {
@@ -591,7 +591,7 @@ Id simuSpectral(Db* dbin,
     messerr("You must provide a positive number of simulations");
     return 1;
   }
-  if (dbout->getNDim() != (Id)model->getNDim())
+  if (dbout->getNDim() != static_cast<Id>(model->getNDim()))
   {
     messerr("The Space dimension of 'dbout'(%d) should match the one of Model(%d)",
             dbout->getNDim(), model->getNDim());

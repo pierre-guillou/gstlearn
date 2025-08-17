@@ -69,7 +69,7 @@ bool NeighImage::_deserializeAscii(std::istream& is, bool verbose)
 
   ret = ret && ANeigh::_deserializeAscii(is, verbose);
   ret = ret && _recordRead<Id>(is, "Skipping factor", _skip);
-  for (Id idim = 0; ret && idim < (Id) getNDim(); idim++)
+  for (Id idim = 0; ret && idim < static_cast<Id>(getNDim()); idim++)
   {
     double loc_radius = 0.;
     ret = ret && _recordRead<double>(is, "Image NeighImageborhood Radius",
@@ -85,8 +85,8 @@ bool NeighImage::_serializeAscii(std::ostream& os, bool verbose) const
   bool ret = true;
   ret = ret && ANeigh::_serializeAscii(os, verbose);
   ret = ret && _recordWrite<Id>(os, "", getSkip());
-  for (Id idim = 0; ret && idim < (Id) getNDim(); idim++)
-    ret = ret && _recordWrite<double>(os, "", (double) getImageRadius(idim));
+  for (Id idim = 0; ret && idim < static_cast<Id>(getNDim()); idim++)
+    ret = ret && _recordWrite<double>(os, "", static_cast<double>(getImageRadius(idim)));
   ret = ret && _commentWrite(os, "Image NeighImageborhood parameters");
   return ret;
 }
@@ -118,7 +118,7 @@ NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
 Id NeighImage::getNSampleMax(const Db* /*db*/) const
 {
   Id nmax = 1;
-  for (Id idim = 0; idim < (Id) getNDim(); idim++)
+  for (Id idim = 0; idim < static_cast<Id>(getNDim()); idim++)
     nmax *= (2 * _imageRadius[idim] + 1);
   return nmax;
 }

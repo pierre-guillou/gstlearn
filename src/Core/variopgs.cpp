@@ -360,7 +360,7 @@ static void st_relem_subdivide(Relem* relem0, Id half, Id noper)
   if (ncur <= 1) return;
 
   previous_oper = 1;
-  if (relem0->old_split != NULL) previous_oper = relem0->old_split->oper;
+  if (relem0->old_split != nullptr) previous_oper = relem0->old_split->oper;
 
   auto divs = ut_split_into_two(ncur, half, verbose, &ndiv);
   number    = ndiv * noper;
@@ -434,7 +434,7 @@ static Split* st_split_free(Split* split)
  *****************************************************************************/
 static Relem* st_relem_free(Relem* relem)
 {
-  if (relem == NULL) return (relem);
+  if (relem == nullptr) return (relem);
 
   /* Free the descending substructures (Split) */
 
@@ -1148,7 +1148,7 @@ static Id st_varcalc_from_vario_stat(Vario* vario,
       for (Id igrf = 0; igrf < ngrf; igrf++)
       {
         local_pgs->igrfcur = igrf;
-        result             = golden_search(st_func_search_stat, (void*)local_pgs,
+        result             = golden_search(st_func_search_stat, static_cast<void*>(local_pgs),
                                            GS_TOLSTOP, -1., 1., &testval, &niter);
         trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf, 1, &testval);
         trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf + 1, 1, &niter);
@@ -1249,7 +1249,7 @@ static void st_varcalc_uncorrelated_grf(Local_Pgs* local_pgs, Id idir)
     for (igrf = 0; igrf < ngrf; igrf++)
     {
       local_pgs->igrfcur = igrf;
-      result             = golden_search(st_func_search_nostat, (void*)local_pgs,
+      result             = golden_search(st_func_search_nostat, static_cast<void*>(local_pgs),
                                          GS_TOLSTOP, -1., 1., &testval, &niter);
       trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf, 1, &testval);
       trace_define(local_pgs, idir + 1, ilag + 1, 2 * igrf + 1, 1, &niter);
@@ -1862,9 +1862,9 @@ Id vario_order_add(Vario_Order* vorder,
   if (vorder->size_aux > 0)
   {
     iad = vorder->npair * vorder->size_aux;
-    if (aux_iech != NULL)
+    if (aux_iech != nullptr)
       (void)memcpy(&vorder->tab_aux_iech[iad], aux_iech, vorder->size_aux);
-    if (aux_jech != NULL)
+    if (aux_jech != nullptr)
       (void)memcpy(&vorder->tab_aux_jech[iad], aux_jech, vorder->size_aux);
   }
   vorder->npair++;
@@ -3820,7 +3820,7 @@ static Id st_variopgs_calcul_rho(Vario* vario,
 
   st_make_some_lags_inactive(vario);
   st_set_rho(
-    golden_search(st_rho_search, (void*)local_pgs, GS_TOLSTOP_RHO, -1., 1.,
+    golden_search(st_rho_search, static_cast<void*>(local_pgs), GS_TOLSTOP_RHO, -1., 1.,
                   &testval, &niter),
     local_pgs);
   st_make_all_lags_active(vario);
@@ -5092,7 +5092,7 @@ Vario* variogram_pgs(Db* db,
   Vario* vario    = nullptr;
   Vario* varioind = nullptr;
 
-  if (db == NULL)
+  if (db == nullptr)
   {
     messerr("The Db must be provided");
     return nullptr;

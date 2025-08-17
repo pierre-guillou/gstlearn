@@ -132,7 +132,7 @@ Id KrigOpt::setOptionCalcul(const EKrigOpt& calcul,
     _flagPerCell = flag_per_cell;
 
     // Prepare auxiliary storage
-    _nDiscDim    = (Id)ndiscs.size();
+    _nDiscDim    = static_cast<Id>(ndiscs.size());
     _nDiscNumber = VH::product(_ndiscs);
     _disc1.resize(_nDiscNumber);
     _disc2.resize(_nDiscNumber);
@@ -276,18 +276,18 @@ bool KrigOpt::_isValidMatLC(const ModelGeneric* model) const
   if (_matLC == nullptr) return true;
   if (_matLC->empty()) return true;
   Id nvar  = model->getNVar();
-  Id nrows = (Id)_matLC->getNRows();
-  Id ncols = (Id)_matLC->getNCols();
+  Id nrows = _matLC->getNRows();
+  Id ncols = _matLC->getNCols();
 
   if (nrows > nvar)
   {
-    messerr("First dimension of 'matLC' (%d)", (Id)nrows);
+    messerr("First dimension of 'matLC' (%ld)", nrows);
     messerr("should be smaller than the number of variables in the model (%d)", nvar);
     return false;
   }
   if (ncols != nvar)
   {
-    messerr("Second dimension of 'matLC' (%d)", (Id)ncols);
+    messerr("Second dimension of 'matLC' (%ld)", ncols);
     messerr("should be equal to the number of variables in the model (%d)", nvar);
     return false;
   }

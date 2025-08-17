@@ -43,7 +43,7 @@ DriftM::~DriftM()
 double DriftM::eval(const Db* db, Id iech) const
 {
   double value = 1.;
-  for (Id idim = 0, ndim = (Id)_monomialPower.size(); idim < ndim; idim++)
+  for (Id idim = 0, ndim = static_cast<Id>(_monomialPower.size()); idim < ndim; idim++)
   {
     double locoor = db->getCoordinate(iech, idim);
     double locpow = _monomialPower[idim];
@@ -55,7 +55,7 @@ double DriftM::eval(const Db* db, Id iech) const
 Id DriftM::getOrderIRF() const
 {
   Id irf = -1;
-  for (Id idim = 0, ndim = (Id)_monomialPower.size(); idim < ndim; idim++)
+  for (Id idim = 0, ndim = static_cast<Id>(_monomialPower.size()); idim < ndim; idim++)
   {
     double locpow = _monomialPower[idim];
     if (locpow > irf) irf = locpow;
@@ -71,7 +71,7 @@ Id DriftM::getOrderIRFIdim(Id idim) const
 
 Id DriftM::getDriftNDimMax() const
 {
-  return (Id)_monomialPower.size();
+  return static_cast<Id>(_monomialPower.size());
 }
 
 String DriftM::getDriftName() const
@@ -83,7 +83,7 @@ String DriftM::getDriftName() const
   {
     sstr << "Drift:";
     bool flag_first = true;
-    for (Id idim = 0, ndim = (Id)_monomialPower.size(); idim < ndim; idim++)
+    for (Id idim = 0, ndim = static_cast<Id>(_monomialPower.size()); idim < ndim; idim++)
     {
       double locpow = _monomialPower[idim];
       if (locpow > 0)

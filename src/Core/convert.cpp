@@ -273,7 +273,7 @@ void csv_print_double(double value)
   else
   {
     if (CSV_ENCODE.flagInteger)
-      (void)fprintf(CSV_ENCODE.file, "%ld", (Id)value);
+      (void)fprintf(CSV_ENCODE.file, "%ld", static_cast<Id>(value));
     else
       (void)fprintf(CSV_ENCODE.file, "%lf", value);
   }
@@ -358,7 +358,7 @@ Id csv_manage(const char* filename,
     // Write the last record (if necessary)
     st_csv_print_eol();
 
-    if (CSV_ENCODE.file != NULL) fclose(CSV_ENCODE.file);
+    if (CSV_ENCODE.file != nullptr) fclose(CSV_ENCODE.file);
 
     // Option printout
     if (verbose)

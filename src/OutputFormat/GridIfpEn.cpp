@@ -52,7 +52,7 @@ Id GridIfpEn::writeInFile()
   if (_fileWriteOpen()) return 1;
 
   // Preliminary calculations
-  Id ncol             = (Id)_cols.size();
+  Id ncol             = static_cast<Id>(_cols.size());
   VectorInt nx        = _dbgrid->getNXsExt(3);
   VectorDouble angles = _dbgrid->getAngles();
   Id ntot             = 1;
@@ -258,13 +258,13 @@ Id GridIfpEn::_readLine(Id mode,
 
   /* Reading the line */
 
-  if (fgets(line, 100, _file) == NULL) return (1);
+  if (fgets(line, 100, _file) == nullptr) return (1);
   line[strlen(line) - 1] = '\0';
 
   /* Check the comment */
 
   start = 0;
-  if (comment != NULL)
+  if (comment != nullptr)
   {
     if (strcmp(line, comment) < 0) return (1);
     start = static_cast<Id>(strlen(comment));

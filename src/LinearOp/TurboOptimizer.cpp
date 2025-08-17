@@ -203,7 +203,7 @@ Id TurboOptimizer::_MSS(Id icas, Id icorn, Id idim0)
 
 void TurboOptimizer::_rankToIndice(Id rank, VectorInt& indice, bool minusOne) const
 {
-  if ((Id)indice.size() < 2)
+  if (static_cast<Id>(indice.size()) < 2)
     my_throw("Argument indice should have the correct size");
   Id nval   = minusOne ? (_ny - 1) : _ny;
   indice[1] = rank / nval;
@@ -532,11 +532,11 @@ VectorDouble TurboOptimizer::_buildBlin() const
 
   double gammap = 0.;
   for (Id i = 1; i < _param; i++)
-    gammap += log((double)i);
+    gammap += log(static_cast<double>(i));
   gammap        = exp(gammap);
   double gammaa = 0.;
   for (Id i = 1; i < _param + ndims2; i++)
-    gammaa += log((double)i);
+    gammaa += log(static_cast<double>(i));
   gammaa = exp(gammaa);
 
   double g0     = pow(4. * PI, ndims2);
@@ -828,12 +828,12 @@ Id TurboOptimizer::_coordinateToIndice(double x,
                                        double y,
                                        VectorInt& indice) const
 {
-  if ((Id)indice.size() < 2)
+  if (static_cast<Id>(indice.size()) < 2)
     my_throw("Argument indice should have the correct size");
-  Id ix = (Id)floor((x - _x0) / _dx);
+  Id ix = static_cast<Id>(floor((x - _x0) / _dx));
   if (ix < 0 || ix >= _nx) return 1;
   indice[0] = ix;
-  Id iy     = (Id)floor((y - _y0) / _dy);
+  Id iy     = static_cast<Id>(floor((y - _y0) / _dy));
   if (iy < 0 || iy >= _ny) return 1;
   indice[1] = iy;
   return 0;

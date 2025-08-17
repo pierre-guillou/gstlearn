@@ -65,14 +65,14 @@ void ClassicalPolynomial::evalOpCumul(MatrixSparse* Op,
 
   Op->prodMatVecInPlaceC(inv, *swap1);
 
-  for (Id j = 1; j < (Id)_coeffs.size(); j++)
+  for (Id j = 1; j < static_cast<Id>(_coeffs.size()); j++)
   {
     for (Id i = 0; i < n; i++)
     {
       outv[i] += _coeffs[j] * (*swap1)[i];
     }
 
-    if (j < (Id)_coeffs.size() - 1)
+    if (j < static_cast<Id>(_coeffs.size()) - 1)
     {
       Op->prodMatVecInPlaceC(*swap1, *swap2);
       swap3 = swap1;
@@ -90,11 +90,11 @@ void ClassicalPolynomial::_addEvalOp(const ALinearOp* Op,
 
   vect swap1, swap2, swap3;
 
-  if ((Id)_work.size() != n)
+  if (static_cast<Id>(_work.size()) != n)
   {
     _work.resize(n);
   }
-  if ((Id)_work2.size() != n)
+  if (static_cast<Id>(_work2.size()) != n)
   {
     _work2.resize(n);
   }
@@ -109,14 +109,14 @@ void ClassicalPolynomial::_addEvalOp(const ALinearOp* Op,
 
   Op->evalDirect(inv, swap1);
 
-  for (Id j = 1; j < (Id)_coeffs.size(); j++)
+  for (Id j = 1; j < static_cast<Id>(_coeffs.size()); j++)
   {
     for (Id i = 0; i < n; i++)
     {
       outv[i] += _coeffs[j] * (swap1)[i];
     }
 
-    if (j < (Id)_coeffs.size() - 1)
+    if (j < static_cast<Id>(_coeffs.size()) - 1)
     {
       Op->evalDirect(swap1, swap2);
       swap3 = swap1;
@@ -137,7 +137,7 @@ void ClassicalPolynomial::evalOp(MatrixSparse* Op,
   for (Id i = 0; i < n; i++)
     outv[i] = _coeffs.back() * inv[i];
 
-  Id degree = (Id)_coeffs.size();
+  Id degree = static_cast<Id>(_coeffs.size());
   for (Id j = degree - 2; j >= 0; j--)
   {
     Op->prodMatVecInPlaceC(outv, ws);
@@ -159,7 +159,7 @@ void ClassicalPolynomial::evalOp(MatrixSparse* Op,
  */
 double ClassicalPolynomial::evalOpByRank(MatrixSparse* S, Id rank) const
 {
-  Id degree = (Id)_coeffs.size();
+  Id degree = static_cast<Id>(_coeffs.size());
 
   MatrixSparse* work = S->getColumnAsMatrixSparse(rank, _coeffs.back());
   MatrixSparse* outv = nullptr;
@@ -197,7 +197,7 @@ void ClassicalPolynomial::evalOpTraining(
     store[_coeffs.size() - 1][i] = _coeffs.back() * inv[i];
   }
 
-  for (Id j = (Id)_coeffs.size() - 2; j >= 0; j--)
+  for (Id j = static_cast<Id>(_coeffs.size()) - 2; j >= 0; j--)
   {
     constvect stores(store[j + 1]);
     vect ws(work);

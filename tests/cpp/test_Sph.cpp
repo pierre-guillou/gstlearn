@@ -128,18 +128,18 @@ static void st_test_3(void)
     message("ny = ");
     if (gslScanf("%ld", &ny) == EOF) return;
   }
-  dy = 90. / (double)ny;
-  dx = 360. / (double)nx;
+  dy = 90. / static_cast<double>(ny);
+  dx = 360. / static_cast<double>(nx);
 
   total = 0.;
   for (Id iy = 0; iy < ny; iy++)
   {
-    y1 = dy * (double)(iy);
-    y2 = dy * (double)(iy + 1.);
+    y1 = dy * static_cast<double>(iy);
+    y2 = dy * (iy + 1.);
     for (Id ix = 0; ix < nx; ix++)
     {
-      x1 = dx * (double)(ix);
-      x2 = dx * (double)(ix + 1.);
+      x1 = dx * static_cast<double>(ix);
+      x2 = dx * (ix + 1.);
 
       s1 = GH::geodeticTriangleSurface(x1, y1, x2, y1, x1, y2);
       s2 = GH::geodeticTriangleSurface(x2, y1, x1, y2, x2, y2);

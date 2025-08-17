@@ -180,7 +180,7 @@ bool SimuSubstitutionParam::_isIrreductibility(bool verbose)
   /* Check the irreductibility */
 
   VectorInt flag(_nfacies);
-  flag[0]  = 0;
+  flag[0] = 0;
   Id nend = 0;
   Id ndeb = 0;
   for (Id i = 1; i < _nfacies; i++)
@@ -223,7 +223,7 @@ bool SimuSubstitutionParam::_isIrreductibility(bool verbose)
 void SimuSubstitutionParam::isValidOrientation(VectorDouble& vector,
                                                bool verbose)
 {
-  Id ndim     = (Id)vector.size();
+  Id ndim      = static_cast<Id>(vector.size());
   double total = 0.;
   for (Id i = 0; i < ndim; i++)
     total += vector[i] * vector[i];
@@ -249,7 +249,7 @@ void SimuSubstitutionParam::isValidOrientation(VectorDouble& vector,
  ** \param[in]  verbose     Verbose option
  **
  *****************************************************************************/
-void SimuSubstitutionParam::isValidFactor(double* factor, bool verbose) const
+void SimuSubstitutionParam::isValidFactor(double* factor, bool verbose)
 {
   if (*factor < 0.)
   {
@@ -274,7 +274,7 @@ void SimuSubstitutionParam::isValidFactor(double* factor, bool verbose) const
 bool SimuSubstitutionParam::isAngleLocal() const
 {
   if (_colang.empty()) return false;
-  for (Id i = 0; i < (Id)_colang.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(_colang.size()); i++)
     if (_colang[i] >= 0) return true;
   return false;
 }
@@ -286,7 +286,7 @@ bool SimuSubstitutionParam::isLocal() const
 
 bool SimuSubstitutionParam::_isValidTransition(bool verbose, double eps)
 {
-  if ((Id)_trans.size() != _nfacies * _nfacies) return false;
+  if (static_cast<Id>(_trans.size()) != _nfacies * _nfacies) return false;
 
   for (Id irow = 0; irow < _nfacies; irow++)
   {
@@ -308,7 +308,7 @@ bool SimuSubstitutionParam::_isValidTransition(bool verbose, double eps)
 
 Id SimuSubstitutionParam::getColang(Id idim) const
 {
-  if (idim < (Id)_colang.size())
+  if (idim < static_cast<Id>(_colang.size()))
     return _colang[idim];
   return 0.;
 }

@@ -160,7 +160,7 @@ String gslGetEnv(const String& name)
     text = String(buffer);
 #elif defined(__linux__) || defined(__APPLE__)
   char* value = std::getenv(name.c_str());
-  if (value != NULL)
+  if (value != nullptr)
     text = String(value);
 #endif
   return text;

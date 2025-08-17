@@ -49,8 +49,8 @@ namespace gstlrn
 {
 bool _isValid(ACovFunc* cova, const CovContext& ctxt)
 {
-  return (Id)cova->getMaxNDim() <= 0 ||
-         (Id)ctxt.getNDim() <= (Id)cova->getMaxNDim();
+  return static_cast<Id>(cova->getMaxNDim()) <= 0 ||
+         static_cast<Id>(ctxt.getNDim()) <= static_cast<Id>(cova->getMaxNDim());
 }
 
 ACovFunc* CovFactory::createCovFunc(const ECov& type, const CovContext& ctxt)
@@ -219,10 +219,10 @@ ECov CovFactory::identifyCovariance(const String& cov_name,
 double CovFactory::getScaleFactor(const ECov& type, double param)
 {
   CovContext ctxt(1, 1);
-  ACovFunc* cova  = CovFactory::createCovFunc(type, ctxt);
+  ACovFunc* cova = CovFactory::createCovFunc(type, ctxt);
   cova->setParam(param);
   double scadef = cova->getScadef();
   delete cova;
   return scadef;
 }
-}
+} // namespace gstlrn

@@ -423,7 +423,7 @@ void mes_process(const char* string, Id ntot, Id iech)
   /* Calculate the current quantile */
 
   double ratio = nproc * static_cast<double>(jech) / static_cast<double>(ntot);
-  Id quant     = (Id)(ratio);
+  Id quant     = static_cast<Id>(ratio);
 
   /* Conditional printout */
 
@@ -596,7 +596,7 @@ String toMatrix(const String& title,
   Id nrutil = nrows;
   if (_getMaxNCols() > 0 && ncutil > _getMaxNCols() && !flagOverride) ncutil = _getMaxNCols();
   if (_getMaxNRows() > 0 && nrutil > _getMaxNRows() && !flagOverride) nrutil = _getMaxNRows();
-  Id npass       = (Id)ceil((double)ncutil / (double)_getNBatch());
+  Id npass       = static_cast<Id>(ceil(static_cast<double>(ncutil) / static_cast<double>(_getNBatch())));
   bool multi_row = nrutil > 1 || npass > 1;
 
   Id colSize = 0;
@@ -691,7 +691,7 @@ String toMatrix(const String& title,
   Id nrutil = nrows;
   if (_getMaxNCols() > 0 && ncutil > _getMaxNCols() && !flagOverride) ncutil = _getMaxNCols();
   if (_getMaxNRows() > 0 && nrutil > _getMaxNRows() && !flagOverride) nrutil = _getMaxNRows();
-  Id npass       = (Id)ceil((double)ncutil / (double)_getNBatch());
+  Id npass       = static_cast<Id>(ceil(static_cast<double>(ncutil) / static_cast<double>(_getNBatch())));
   bool multi_row = nrutil > 1 || npass > 1;
 
   Id colSize = 0;
@@ -866,7 +866,7 @@ String toVector(const String& title, const VectorVectorDouble& tab, bool flagOve
   if (!title.empty())
     sstr << title << std::endl;
 
-  Id nrows  = (Id)tab.size();
+  Id nrows  = static_cast<Id>(tab.size());
   Id nrutil = nrows;
   if (_getMaxNRows() > 0 && nrutil > _getMaxNRows() && !flagOverride) nrutil = _getMaxNRows();
 
@@ -895,7 +895,7 @@ String toVector(const String& title, const VectorVectorInt& tab, bool flagOverri
 
   if (!title.empty()) sstr << title << std::endl;
 
-  Id nrows  = (Id)tab.size();
+  Id nrows  = static_cast<Id>(tab.size());
   Id nrutil = nrows;
   if (_getMaxNRows() > 0 && nrutil > _getMaxNRows() && !flagOverride)
     nrutil = _getMaxNRows();
@@ -1023,7 +1023,7 @@ String toDouble(double value, const EJustify& justify)
 VectorString toVectorDouble(const VectorDouble& values, const EJustify& justify)
 {
   VectorString strings;
-  for (Id i = 0; i < (Id)values.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(values.size()); i++)
     strings.push_back(toDouble(values[i], justify));
   return strings;
 }
@@ -1070,7 +1070,7 @@ void tab_prints(const char* title,
                 Id ncol,
                 const EJustify& justify)
 {
-  Id taille = (1 + (Id)OptCst::query(ECst::NTCAR)) * ncol;
+  Id taille = (1 + static_cast<Id>(OptCst::query(ECst::NTCAR))) * ncol;
   Id size   = static_cast<Id>(strlen(string));
   Id neff   = MIN(taille, size);
   Id nrst   = taille - neff;
@@ -1079,7 +1079,7 @@ void tab_prints(const char* title,
 
   /* Encode the title (if defined) */
 
-  if (title != NULL) message("%s", title);
+  if (title != nullptr) message("%s", title);
 
   /* Blank the string out */
 
@@ -1270,13 +1270,13 @@ void print_matrix(const char* title,
                   const double* tab)
 {
   if (tab == nullptr || nx <= 0 || ny <= 0) return;
-  Id nx_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTCOL)) > 0) ? MIN((Id)OptCst::query(ECst::NTCOL), nx) : nx;
-  Id ny_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTROW)) > 0) ? MIN((Id)OptCst::query(ECst::NTROW), ny) : ny;
-  Id multi_row = (ny > 1 || title == NULL);
+  Id nx_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTCOL)) > 0) ? MIN(static_cast<Id>(OptCst::query(ECst::NTCOL)), nx) : nx;
+  Id ny_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTROW)) > 0) ? MIN(static_cast<Id>(OptCst::query(ECst::NTROW)), ny) : ny;
+  Id multi_row = (ny > 1 || title == nullptr);
 
   /* Print the title (optional) */
 
-  if (title != NULL)
+  if (title != nullptr)
   {
     if (multi_row)
       message("%s\n", title);
@@ -1360,7 +1360,7 @@ void print_trimat(const char* title, Id mode, Id neq, const double* tl)
 
   /* Print the title (optional) */
 
-  if (title != NULL) message("%s\n", title);
+  if (title != nullptr) message("%s\n", title);
 
   /* Print the header */
 
@@ -1417,13 +1417,13 @@ void print_imatrix(const char* title,
                    const Id* tab)
 {
   if (tab == nullptr || nx <= 0 || ny <= 0) return;
-  Id nx_util   = (flag_limit && (Id)OptCst::query(ECst::NTCOL) > 0) ? MIN((Id)OptCst::query(ECst::NTCOL), nx) : nx;
-  Id ny_util   = (flag_limit && (Id)OptCst::query(ECst::NTROW) > 0) ? MIN((Id)OptCst::query(ECst::NTROW), ny) : ny;
-  Id multi_row = (ny > 1 || title == NULL);
+  Id nx_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTCOL)) > 0) ? MIN(static_cast<Id>(OptCst::query(ECst::NTCOL)), nx) : nx;
+  Id ny_util   = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTROW)) > 0) ? MIN(static_cast<Id>(OptCst::query(ECst::NTROW)), ny) : ny;
+  Id multi_row = (ny > 1 || title == nullptr);
 
   /* Print the title (optional) */
 
-  if (title != NULL)
+  if (title != nullptr)
   {
     if (multi_row)
       message("%s\n", title);
@@ -1495,10 +1495,10 @@ void print_vector(const char* title,
   /* Initializations */
 
   if (ntab <= 0) return;
-  Id nby         = (flag_limit && (Id)OptCst::query(ECst::NTCOL) >= 0) ? (Id)OptCst::query(ECst::NTCOL) : nby_def;
+  Id nby         = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTCOL)) >= 0) ? static_cast<Id>(OptCst::query(ECst::NTCOL)) : nby_def;
   bool flag_many = (ntab > nby);
 
-  if (title != NULL)
+  if (title != nullptr)
   {
     message("%s", title);
     if (flag_many) message("\n");
@@ -1542,10 +1542,10 @@ void print_ivector(const char* title, Id flag_limit, Id ntab, const Id* itab)
   /* Initializations */
 
   if (ntab <= 0) return;
-  Id nby         = (flag_limit && (Id)OptCst::query(ECst::NTCOL) >= 0) ? (Id)OptCst::query(ECst::NTCOL) : nby_def;
+  Id nby         = (flag_limit && static_cast<Id>(OptCst::query(ECst::NTCOL)) >= 0) ? static_cast<Id>(OptCst::query(ECst::NTCOL)) : nby_def;
   bool flag_many = (ntab > nby);
 
-  if (title != NULL)
+  if (title != nullptr)
   {
     message("%s", title);
     if (flag_many) message("\n");

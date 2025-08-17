@@ -76,8 +76,8 @@ MatrixSymmetric::~MatrixSymmetric()
  */
 MatrixSymmetric* MatrixSymmetric::createFromVVD(const VectorVectorDouble& X)
 {
-  Id nrow = (Id)X.size();
-  Id ncol = (Id)X[0].size();
+  Id nrow = static_cast<Id>(X.size());
+  Id ncol = static_cast<Id>(X[0].size());
   if (nrow != ncol)
   {
     messerr("The matrix does not seem to be square");
@@ -90,7 +90,7 @@ MatrixSymmetric* MatrixSymmetric::createFromVVD(const VectorVectorDouble& X)
 
 MatrixSymmetric* MatrixSymmetric::createFromVD(const VectorDouble& X)
 {
-  Id ncol = sqrt((Id)X.size());
+  Id ncol = sqrt(static_cast<Id>(X.size()));
   Id nrow = ncol;
 
   // Check symmetry
@@ -295,7 +295,7 @@ bool MatrixSymmetric::isDefinitePositive()
 
   /* Check if the eigen values are all positive */
 
-  for (Id i = 0, n = (Id)valpro.size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(valpro.size()); i < n; i++)
   {
     if (valpro[i] < -1.0e-10)
     {
@@ -601,7 +601,7 @@ Id MatrixSymmetric::minimizeWithConstraintsInPlace(const VectorDouble& gmat,
       for (Id i = 0; i < nai; i++)
       {
         if (active[i] == 0) continue;
-        active[i] = (Id)(lambda[lec] >= 0);
+        active[i] = static_cast<Id>(lambda[lec] >= 0);
         if (active[i] != 0) first = i;
         lec++;
       }
@@ -691,7 +691,7 @@ Id MatrixSymmetric::_constraintsError(const VectorInt& active,
 
     if (!vmat.empty()) vmat[ecr] = ecart;
     bool flag_active = (ecart < -eps);
-    if (!flag.empty()) flag[ecr] = (Id)flag_active;
+    if (!flag.empty()) flag[ecr] = static_cast<Id>(flag_active);
     if (flag_active) number++;
     ecr++;
   }
@@ -876,7 +876,7 @@ bool MatrixSymmetric::sample(MatrixSymmetric& res,
   if (rows.empty()) rows = VH::sequence(ntotal);
   if (flagInvert) rows = VH::complement(VH::sequence(ntotal), rows);
 
-  Id nrows = (Id)rows.size();
+  Id nrows = static_cast<Id>(rows.size());
   if (nrows <= 0) return false;
 
   for (Id irow = 0; irow < nrows; irow++)

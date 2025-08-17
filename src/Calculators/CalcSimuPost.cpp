@@ -183,7 +183,7 @@ Id CalcSimuPost::_defineVaroutNumber()
   // Loop on the statistic options
 
   auto nvarin = _getNEff();
-  _nvarOut   = 0;
+  _nvarOut    = 0;
   for (Id ioption = 0, noption = _getNStats(); ioption < noption; ioption++)
   {
     if (_stats[ioption] != EPostStat::UNKNOWN)
@@ -234,8 +234,8 @@ void CalcSimuPost::_writeOut(Id iech, const VectorDouble& tabout) const
  */
 void CalcSimuPost::_upscaleFunction(const VectorVectorDouble& Y_p_k_s, VectorDouble& tabout) const
 {
-  Id nsample = (Id)Y_p_k_s.size();
-  Id nvar    = (Id)Y_p_k_s[0].size();
+  Id nsample = static_cast<Id>(Y_p_k_s.size());
+  Id nvar    = static_cast<Id>(Y_p_k_s[0].size());
 
   // Initialization values
   double valinit;
@@ -248,7 +248,7 @@ void CalcSimuPost::_upscaleFunction(const VectorVectorDouble& Y_p_k_s, VectorDou
 
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
-    Id ndef      = 0;
+    Id ndef       = 0;
     double result = valinit;
     for (Id ip = 0; ip < nsample; ip++)
     {
@@ -400,8 +400,8 @@ VectorVectorInt CalcSimuPost::_getIndices() const
       Id local = jter;
       for (Id ivar = 0; ivar < nvar; ivar++)
       {
-        Id jvar            = nvar - ivar - 1;
-        Id divid           = local / _nfact[jvar];
+        Id jvar             = nvar - ivar - 1;
+        Id divid            = local / _nfact[jvar];
         indices[jter][jvar] = local - divid * _nfact[jvar];
         local               = divid;
       }
@@ -431,7 +431,7 @@ Id CalcSimuPost::_defineNames()
     messerr("The input Db must be defined beforehand");
     return 1;
   }
-  Id nvar = (Id)_names.size();
+  Id nvar = static_cast<Id>(_names.size());
   if (nvar <= 0)
   {
     messerr("Some variables must be defined in the input Db");
@@ -451,7 +451,7 @@ Id CalcSimuPost::_defineNames()
     VectorString subnames = getDbin()->expandNameList(_names[ivar]);
 
     // Get the multiplicity factor
-    Id nfois = (Id)subnames.size();
+    Id nfois = static_cast<Id>(subnames.size());
     if (nfois <= 0)
     {
       messerr("The variable (%s) does not seem to exist in the input Db", _names[ivar].c_str());
@@ -578,7 +578,7 @@ Id CalcSimuPost::_process()
     if (_mustBeChecked(0))
     {
       if (_flagUpscale)
-        message("\n== Cell #%d/%d (regrouping %d samples)\n", _iechout + 1, nechout, (Id)local.size());
+        message("\n== Cell #%d/%d (regrouping %d samples)\n", _iechout + 1, nechout, static_cast<Id>(local.size()));
       else
         message("\n== Cell #%d/%d\n", _iechout + 1, nechout);
     }
@@ -591,7 +591,7 @@ Id CalcSimuPost::_process()
 
       // Loop on the samples contained in the target cell
       VectorVectorDouble Z_n_k_s;
-      for (Id is = 0, nlocal = (Id)local.size(); is < nlocal; is++)
+      for (Id is = 0, nlocal = static_cast<Id>(local.size()); is < nlocal; is++)
       {
         Id iechin = local[is];
 
@@ -663,15 +663,15 @@ Id CalcSimuPost::_process()
  * -# Compute statistics according to stat rule '_stats'
  */
 Id simuPost(Db* dbin,
-             DbGrid* dbout,
-             const VectorString& names,
-             bool flag_match,
-             const EPostUpscale& upscale,
-             const std::vector<EPostStat>& stats,
-             bool verbose,
-             const VectorInt& check_targets,
-             Id check_level,
-             const NamingConvention& namconv)
+            DbGrid* dbout,
+            const VectorString& names,
+            bool flag_match,
+            const EPostUpscale& upscale,
+            const std::vector<EPostStat>& stats,
+            bool verbose,
+            const VectorInt& check_targets,
+            Id check_level,
+            const NamingConvention& namconv)
 {
   CalcSimuPost calcul;
   calcul.setDbin(dbin);

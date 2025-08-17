@@ -8,14 +8,14 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Basic/VectorHelper.hpp"
 #include "Calculators/ACalculator.hpp"
 #include "Calculators/CalcMigrate.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
-#include "Basic/VectorHelper.hpp"
 
 namespace gstlrn
-{ 
+{
 
 ACalcDbToDb::ACalcDbToDb(bool mustShareSameSpaceDimension)
   : ACalculator()
@@ -38,46 +38,46 @@ ACalcDbToDb::~ACalcDbToDb()
 
 bool ACalcDbToDb::_checkSpaceDimension()
 {
-   Id ndim = 0;
-   if (_dbin != nullptr)
-   {
-     if (ndim > 0)
-     {
-       if (ndim != _dbin->getNDim())
-       {
-         messerr("Inconsistent Space dimension:");
-         messerr("- Current dimension = %d", ndim);
-         messerr("- Space Dimension of 'dbin' = %d", _dbin->getNDim());
-         return false;
-       }
-     }
-     else
-     {
-       ndim = _dbin->getNDim();
-     }
-   }
-   _setNdim(ndim);
+  Id ndim = 0;
+  if (_dbin != nullptr)
+  {
+    if (ndim > 0)
+    {
+      if (ndim != _dbin->getNDim())
+      {
+        messerr("Inconsistent Space dimension:");
+        messerr("- Current dimension = %d", ndim);
+        messerr("- Space Dimension of 'dbin' = %d", _dbin->getNDim());
+        return false;
+      }
+    }
+    else
+    {
+      ndim = _dbin->getNDim();
+    }
+  }
+  _setNdim(ndim);
 
-   if (!_mustShareSpaceDimension) return true;
+  if (!_mustShareSpaceDimension) return true;
 
-   if (_dbout != nullptr)
-   {
-     if (ndim > 0)
-     {
-       if (ndim != _dbout->getNDim())
-       {
-         messerr("Inconsistent Space dimension:");
-         messerr("- Current dimension = %d", ndim);
-         messerr("- Space Dimension of 'dbout' = %d", _dbout->getNDim());
-         return false;
-       }
-     }
-     else
-     {
-       ndim = _dbout->getNDim();
-     }
-   }
-   return true;
+  if (_dbout != nullptr)
+  {
+    if (ndim > 0)
+    {
+      if (ndim != _dbout->getNDim())
+      {
+        messerr("Inconsistent Space dimension:");
+        messerr("- Current dimension = %d", ndim);
+        messerr("- Space Dimension of 'dbout' = %d", _dbout->getNDim());
+        return false;
+      }
+    }
+    else
+    {
+      ndim = _dbout->getNDim();
+    }
+  }
+  return true;
 }
 
 bool ACalcDbToDb::_setNvar(Id nvar, bool flagForce)
@@ -146,18 +146,18 @@ bool ACalcDbToDb::_checkVariableNumber()
 bool ACalcDbToDb::_check()
 {
   if (!ACalculator::_check()) return false;
-  
+
   /**************************************************/
   /* Cross-checking the Space Dimension consistency */
   /**************************************************/
 
-  if (! _checkSpaceDimension()) return false;
+  if (!_checkSpaceDimension()) return false;
 
   /**************************************************/
   /* Cross-Checking the Variable Number consistency */
   /**************************************************/
 
-  if (! _checkVariableNumber()) return false;
+  if (!_checkVariableNumber()) return false;
 
   return true;
 }
@@ -174,7 +174,7 @@ bool ACalcDbToDb::_preprocess()
  */
 Db* ACalcDbToDb::_whichDb(Id whichDb)
 {
-  Db *db;
+  Db* db;
   if (whichDb == 1)
     db = _dbin;
   else
@@ -199,9 +199,9 @@ String ACalcDbToDb::_identifyVariable(Id iuid) const
  */
 void ACalcDbToDb::_storeInVariableList(Id whichDb,
                                        Id status,
-                                       const VectorInt &iuids)
+                                       const VectorInt& iuids)
 {
-  Id number = (Id) iuids.size();
+  Id number = static_cast<Id>(iuids.size());
   if (number <= 0) return;
 
   if (whichDb == 1)
@@ -232,16 +232,16 @@ void ACalcDbToDb::_storeInVariableList(Id whichDb,
   }
 }
 Id ACalcDbToDb::_addVariableDb(Id whichDb,
-                                Id status,
-                                const ELoc& locatorType,
-                                Id locatorIndex,
-                                Id number,
-                                double valinit)
+                               Id status,
+                               const ELoc& locatorType,
+                               Id locatorIndex,
+                               Id number,
+                               double valinit)
 {
-  Db *db = _whichDb(whichDb);
+  Db* db = _whichDb(whichDb);
   if (db == nullptr) return -1;
   Id iuid = db->addColumnsByConstant(number, valinit, String(), locatorType,
-                                      locatorIndex);
+                                     locatorIndex);
   if (iuid < 0) return -1;
   VectorInt iuids = VH::sequence(number, iuid);
   _storeInVariableList(whichDb, status, iuids);
@@ -289,7 +289,7 @@ void ACalcDbToDb::_cleanVariableDb(Id status)
     // In 'dbin'
     if (!_listVariablePermDbIn.empty())
     {
-      for (Id i = 0; i < (Id) _listVariablePermDbIn.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(_listVariablePermDbIn.size()); i++)
         _dbin->deleteColumnByUID(_listVariablePermDbIn[i]);
     }
     _listVariablePermDbIn.clear();
@@ -297,7 +297,7 @@ void ACalcDbToDb::_cleanVariableDb(Id status)
     // In 'dbout'
     if (!_listVariablePermDbOut.empty())
     {
-      for (Id i = 0; i < (Id) _listVariablePermDbOut.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(_listVariablePermDbOut.size()); i++)
       {
         _dbout->deleteColumnByUID(_listVariablePermDbOut[i]);
       }
@@ -309,7 +309,7 @@ void ACalcDbToDb::_cleanVariableDb(Id status)
     // In 'dbin'
     if (!_listVariableTempDbIn.empty())
     {
-      for (Id i = 0; i < (Id) _listVariableTempDbIn.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(_listVariableTempDbIn.size()); i++)
         _dbin->deleteColumnByUID(_listVariableTempDbIn[i]);
     }
     _listVariableTempDbIn.clear();
@@ -317,7 +317,7 @@ void ACalcDbToDb::_cleanVariableDb(Id status)
     // In 'dbout'
     if (!_listVariableTempDbOut.empty())
     {
-      for (Id i = 0; i < (Id) _listVariableTempDbOut.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(_listVariableTempDbOut.size()); i++)
         _dbout->deleteColumnByUID(_listVariableTempDbOut[i]);
     }
     _listVariableTempDbOut.clear();
@@ -368,14 +368,14 @@ bool ACalcDbToDb::isGridOut(bool verbose) const
 DbGrid* ACalcDbToDb::getGridin() const
 {
   if (!hasDbin(false)) return nullptr;
-  DbGrid *dbgrid = dynamic_cast<DbGrid*>(_dbin);
+  DbGrid* dbgrid = dynamic_cast<DbGrid*>(_dbin);
   return dbgrid;
 }
 
 DbGrid* ACalcDbToDb::getGridout() const
 {
   if (!hasDbout(false)) return nullptr;
-  DbGrid *dbgrid = dynamic_cast<DbGrid*>(_dbout);
+  DbGrid* dbgrid = dynamic_cast<DbGrid*>(_dbout);
   return dbgrid;
 }
 
@@ -424,7 +424,7 @@ Id ACalcDbToDb::_expandInformation(Id mode, const ELoc& locatorType) const
     messerr("The Input Db does not contain the correct number of External Drifts");
     return 1;
   }
-  DbGrid *dbgrid = dynamic_cast<DbGrid*>(getDbout());
+  DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
 
   /* Dispatch */
 
@@ -435,7 +435,7 @@ Id ACalcDbToDb::_expandInformation(Id mode, const ELoc& locatorType) const
     NamingConvention* namconv = NamingConvention::create("Migrate");
     namconv->setLocatorOutType(locatorType);
     Id error = migrateByLocator(dbgrid, getDbin(), locatorType, 1,
-                                 VectorDouble(), false, false, false, *namconv);
+                                VectorDouble(), false, false, false, *namconv);
     delete namconv;
     if (error != 0) return 1;
   }
@@ -445,5 +445,4 @@ Id ACalcDbToDb::_expandInformation(Id mode, const ELoc& locatorType) const
   }
   return 0;
 }
-}
-
+} // namespace gstlrn

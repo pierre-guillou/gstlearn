@@ -1546,7 +1546,7 @@ SegYArg segy_array(const char* filesegy,
   // Open Input SEGY file
 
   file = gslFopen(filesegy, "rb");
-  if (file == NULL)
+  if (file == nullptr)
   {
     messerr("ERROR: Cannot find input file %s", filesegy);
     return segyarg;
@@ -1656,7 +1656,7 @@ SegYArg segy_array(const char* filesegy,
     st_print_results(nPerTrace, flag_surf, delta, refstats);
   }
 
-  if (file != NULL) fclose(file);
+  if (file != nullptr) fclose(file);
 
   return segyarg;
 }
@@ -1745,7 +1745,7 @@ Grid segy_summary(const char* filesegy,
   // Open Input SEGY file
 
   file = gslFopen(filesegy, "rb");
-  if (file == NULL)
+  if (file == nullptr)
   {
     messerr("ERROR:  cannot find input file %s", filesegy);
     return def_grid;
@@ -1830,7 +1830,7 @@ Grid segy_summary(const char* filesegy,
     st_print_grid(def_grid);
   }
 
-  if (file != NULL) fclose(file);
+  if (file != nullptr) fclose(file);
   return def_grid;
 }
 
@@ -1932,7 +1932,7 @@ Id db_segy(const char* filesegy,
   // Open Input SEGY file
 
   file = gslFopen(filesegy, "rb");
-  if (file == NULL)
+  if (file == nullptr)
   {
     messerr("ERROR:  cannot find input file %s", filesegy);
     return 1;
@@ -2045,7 +2045,7 @@ Id db_segy(const char* filesegy,
 
   namconv.setNamesAndLocators(grid3D, iatt, String());
 
-  if (file != NULL) fclose(file);
+  if (file != nullptr) fclose(file);
   return 0;
 }
 

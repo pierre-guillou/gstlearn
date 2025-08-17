@@ -115,7 +115,7 @@ void OptimCostBinary::reset(PrecisionOp* pmat,
 
   // Particular case of the Seismic
 
-  _flagSeismic = (projseis != (ProjMatrix*)NULL && projseis->getNPoint() > 0);
+  _flagSeismic = (projseis != nullptr && projseis->getNPoint() > 0);
   if (_flagSeismic)
   {
     Id nseis = _projSeis->getNPoint();
@@ -306,7 +306,7 @@ Id OptimCostBinary::getNVertex() const
 void OptimCostBinary::toggleSeismic(bool status)
 {
   // When Seismic is not defined, this precedure is useless
-  if (_projSeis == (ProjMatrix*)NULL || _projSeis->getNPoint() <= 0)
+  if (_projSeis == nullptr || _projSeis->getNPoint() <= 0)
     return;
 
   _flagSeismic = status;

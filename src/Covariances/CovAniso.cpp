@@ -158,7 +158,7 @@ VectorDouble CovAniso::evalCovOnSphereVec(const VectorDouble& alpha,
                                           bool flagScaleDistance,
                                           const CovCalcMode* mode) const
 {
-  Id n = (Id)alpha.size();
+  Id n = static_cast<Id>(alpha.size());
   VectorDouble vec(n);
   for (Id i = 0; i < n; i++)
     vec[i] = evalCovOnSphere(alpha[i], degree, flagScaleDistance, mode);
@@ -271,8 +271,8 @@ CovAniso* CovAniso::createAnisotropic(const CovContext& ctxt,
     messerr("This function is dedicated to the Monovariate case");
     return nullptr;
   }
-  Id ndim = (Id)ranges.size();
-  if ((Id)ctxt.getNDim() != ndim)
+  Id ndim = static_cast<Id>(ranges.size());
+  if (static_cast<Id>(ctxt.getNDim()) != ndim)
   {
     messerr("Mismatch in Space Dimension between 'ranges'(%d) and 'ctxt'(%d)",
             ndim, ctxt.getNDim());
@@ -332,8 +332,8 @@ CovAniso* CovAniso::createAnisotropicMulti(const CovContext& ctxt,
       nvar, ctxt.getNVar());
     return nullptr;
   }
-  Id ndim = (Id)ranges.size();
-  if ((Id)ctxt.getNDim() != ndim)
+  Id ndim = static_cast<Id>(ranges.size());
+  if (static_cast<Id>(ctxt.getNDim()) != ndim)
   {
     messerr("Mismatch in Space Dimension between 'ranges'(%d) and 'ctxt'(%d)",
             ndim, ctxt.getNDim());
@@ -366,39 +366,39 @@ CovAniso* CovAniso::createFromParam(const ECov& type,
   Id ndim = 0;
   if (!ranges.empty())
   {
-    if (ndim > 0 && (Id)ranges.size() != ndim)
+    if (ndim > 0 && static_cast<Id>(ranges.size()) != ndim)
     {
       messerr("Mismatch between the dimension of 'ranges' (%d)",
-              (Id)ranges.size());
+              static_cast<Id>(ranges.size()));
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return nullptr;
     }
-    ndim = (Id)ranges.size();
+    ndim = static_cast<Id>(ranges.size());
   }
   if (!angles.empty())
   {
-    if (ndim > 0 && (Id)angles.size() != ndim)
+    if (ndim > 0 && static_cast<Id>(angles.size()) != ndim)
     {
       messerr("Mismatch between the dimension of 'angles' (%d)",
-              (Id)angles.size());
+              static_cast<Id>(angles.size()));
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return nullptr;
     }
-    ndim = (Id)angles.size();
+    ndim = static_cast<Id>(angles.size());
   }
   if (space != nullptr)
   {
-    if (ndim > 0 && (Id)space->getNDim() != ndim)
+    if (ndim > 0 && static_cast<Id>(space->getNDim()) != ndim)
     {
       messerr("Mismatch between the space dimension in 'space' (%d)",
-              (Id)space->getNDim());
+              static_cast<Id>(space->getNDim()));
       messerr("and the Space dimension stored in the Model (%d)", ndim);
       messerr("Operation is cancelled");
       return nullptr;
     }
-    ndim = (Id)space->getNDim();
+    ndim = static_cast<Id>(space->getNDim());
   }
   if (ndim <= 0)
   {
@@ -416,14 +416,14 @@ CovAniso* CovAniso::createFromParam(const ECov& type,
       messerr("Operation is cancelled");
       return nullptr;
     }
-    nvar = (Id)sqrt((double)sills.size());
+    nvar = static_cast<Id>(sqrt(static_cast<double>(sills.size())));
   }
   if (nvar <= 0) nvar = 1;
 
   // Define the covariance
 
   const CovContext& ctxt = CovContext(nvar, space);
-  auto* cov          = new CovAniso(type, ctxt);
+  auto* cov              = new CovAniso(type, ctxt);
 
   // Define the Third parameter
   double parmax = cov->getParMax();
@@ -490,7 +490,7 @@ CovAniso* CovAniso::createReduce(const VectorInt& validVars) const
   CovAniso* newCovAniso = this->clone();
 
   // Modify the CovContext
-  Id nvar        = (Id)validVars.size();
+  Id nvar = static_cast<Id>(validVars.size());
   CovContext ctxt(nvar);
 
   // Modify the Matrix of sills
@@ -503,7 +503,7 @@ CovAniso* CovAniso::createReduce(const VectorInt& validVars) const
 double scale2range(const ECov& type, double scale, double param)
 {
   CovContext ctxt(1, 1);
-  ACovFunc* cova  = CovFactory::createCovFunc(type, ctxt);
+  ACovFunc* cova = CovFactory::createCovFunc(type, ctxt);
   cova->setParam(param);
   double scadef = cova->getScadef();
   return scale * scadef;
@@ -512,7 +512,7 @@ double scale2range(const ECov& type, double scale, double param)
 double range2scale(const ECov& type, double range, double param)
 {
   CovContext ctxt(1, 1);
-  ACovFunc* cova  = CovFactory::createCovFunc(type, ctxt);
+  ACovFunc* cova = CovFactory::createCovFunc(type, ctxt);
   cova->setParam(param);
   double scadef = cova->getScadef();
   return range / scadef;

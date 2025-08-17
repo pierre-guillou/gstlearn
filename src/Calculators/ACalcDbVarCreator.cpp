@@ -9,19 +9,19 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Calculators/ACalcDbVarCreator.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Calculators/ACalculator.hpp"
 #include "Db/Db.hpp"
 #include "Model/Model.hpp"
-#include "Basic/VectorHelper.hpp"
 
 namespace gstlrn
 {
 ACalcDbVarCreator::ACalcDbVarCreator()
-    : ACalculator(),
-      _db(nullptr),
-      _namconv(),
-      _listVariablePermDb(),
-      _listVariableTempDb()
+  : ACalculator()
+  , _db(nullptr)
+  , _namconv()
+  , _listVariablePermDb()
+  , _listVariableTempDb()
 {
 }
 
@@ -32,13 +32,13 @@ ACalcDbVarCreator::~ACalcDbVarCreator()
 Id ACalcDbVarCreator::_getNDim() const
 {
   if (_db == nullptr) return -1;
-  return  _db->getNDim();
+  return _db->getNDim();
 }
 
 Id ACalcDbVarCreator::_getNVar() const
 {
   if (_db == nullptr) return -1;
-  return  _db->getNLoc(ELoc::Z);
+  return _db->getNLoc(ELoc::Z);
 }
 
 /**
@@ -48,7 +48,7 @@ Id ACalcDbVarCreator::_getNVar() const
  */
 void ACalcDbVarCreator::_storeInVariableList(Id status, const VectorInt& iuids)
 {
-  Id number = (Id) iuids.size();
+  Id number = static_cast<Id>(iuids.size());
   if (number <= 0) return;
 
   if (status == 1)
@@ -64,10 +64,10 @@ void ACalcDbVarCreator::_storeInVariableList(Id status, const VectorInt& iuids)
 }
 
 Id ACalcDbVarCreator::_addVariableDb(Id status,
-                                      const ELoc& locatorType,
-                                      Id locatorIndex,
-                                      Id number,
-                                      double valinit)
+                                     const ELoc& locatorType,
+                                     Id locatorIndex,
+                                     Id number,
+                                     double valinit)
 {
   if (_db == nullptr) return -1;
   Id iuid = _db->addColumnsByConstant(number, valinit, String(), locatorType, locatorIndex);
@@ -80,7 +80,7 @@ Id ACalcDbVarCreator::_addVariableDb(Id status,
 void ACalcDbVarCreator::_renameVariable(Id nvar,
                                         Id iptr,
                                         const ELoc& locatorInType,
-                                        const String &qualifier,
+                                        const String& qualifier,
                                         Id count)
 {
   _namconv.setNamesAndLocators(_db, VectorString(), locatorInType, nvar, _db, iptr, qualifier, count);
@@ -94,7 +94,7 @@ void ACalcDbVarCreator::_cleanVariableDb(Id status)
   {
     if (!_listVariablePermDb.empty())
     {
-      for (Id i = 0; i < (Id) _listVariablePermDb.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(_listVariablePermDb.size()); i++)
         _db->deleteColumnByUID(_listVariablePermDb[i]);
     }
     _listVariablePermDb.clear();
@@ -103,7 +103,7 @@ void ACalcDbVarCreator::_cleanVariableDb(Id status)
   {
     if (!_listVariableTempDb.empty())
     {
-      for (Id i = 0; i < (Id) _listVariableTempDb.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(_listVariableTempDb.size()); i++)
         _db->deleteColumnByUID(_listVariableTempDb[i]);
     }
     _listVariableTempDb.clear();
@@ -120,4 +120,4 @@ bool ACalcDbVarCreator::hasDb(bool verbose) const
   }
   return true;
 }
-}
+} // namespace gstlrn

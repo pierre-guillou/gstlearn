@@ -85,7 +85,7 @@ static void st_read(const char* prompt, char* buffer)
 {
   message("%s :", prompt);
 
-  while (fgets(LINE, LONG_SIZE, stdin) == NULL);
+  while (fgets(LINE, LONG_SIZE, stdin) == nullptr);
 
   (void)gslStrcpy(buffer, LINE);
   buffer[strlen(buffer) - 1] = '\0';
@@ -100,7 +100,7 @@ static void st_read(const char* prompt, char* buffer)
  *****************************************************************************/
 void redefine_message(void (*write_func)(const char*))
 {
-  if (write_func != NULL) WRITE_FUNC = write_func;
+  if (write_func != nullptr) WRITE_FUNC = write_func;
 }
 
 /****************************************************************************/
@@ -112,7 +112,7 @@ void redefine_message(void (*write_func)(const char*))
  *****************************************************************************/
 void redefine_error(void (*warn_func)(const char*))
 {
-  if (warn_func != NULL) WARN_FUNC = warn_func;
+  if (warn_func != nullptr) WARN_FUNC = warn_func;
 }
 
 /****************************************************************************/
@@ -124,7 +124,7 @@ void redefine_error(void (*warn_func)(const char*))
  *****************************************************************************/
 void redefine_read(void (*read_func)(const char*, char*))
 {
-  if (read_func != NULL) READ_FUNC = read_func;
+  if (read_func != nullptr) READ_FUNC = read_func;
 }
 
 /****************************************************************************/
@@ -136,7 +136,7 @@ void redefine_read(void (*read_func)(const char*, char*))
  *****************************************************************************/
 void redefine_exit(void (*exit_func)(void))
 {
-  if (exit_func != NULL) EXIT_FUNC = exit_func;
+  if (exit_func != nullptr) EXIT_FUNC = exit_func;
 }
 
 /*****************************************************************************/
@@ -213,9 +213,9 @@ char* strsep(char** stringp, const char* delim)
   char* start = *stringp;
   char* p;
 
-  p = (start != NULL) ? strpbrk(start, delim) : NULL;
+  p = (start != nullptr) ? strpbrk(start, delim) : NULL;
 
-  if (p == NULL)
+  if (p == nullptr)
   {
     *stringp = NULL;
   }
@@ -384,12 +384,12 @@ Id _file_read(FILE* file, const char* format, va_list ap)
 
   label_start:
     fmt = &format[ideb];
-    if (LCUR == NULL)
+    if (LCUR == nullptr)
     {
 
       /* Read the next line */
 
-      if (fgets(LINE, LONG_SIZE, file) == NULL) return (-1);
+      if (fgets(LINE, LONG_SIZE, file) == nullptr) return (-1);
       LINE[strlen(LINE) - 1] = '\0';
       (void)gslStrcpy(LINE_MEM, LINE);
       if (OptDbg::query(EDbg::INTERFACE)) message("Lecture ASCII = %s\n", LINE);
@@ -416,7 +416,7 @@ Id _file_read(FILE* file, const char* format, va_list ap)
 
     LCUR = gslStrtok(cur, DEL_SEP);
     cur  = NULL;
-    if (LCUR == NULL) goto label_start;
+    if (LCUR == nullptr) goto label_start;
     if (OptDbg::query(EDbg::INTERFACE)) message("String to be decoded = '%s'\n", LCUR);
 
     /* Reading */
@@ -495,7 +495,7 @@ Id _file_get_ncol(FILE* file)
 
   /* Read the next line */
 
-  if (fgets(LINE, LONG_SIZE, file) == NULL) return (ncol);
+  if (fgets(LINE, LONG_SIZE, file) == nullptr) return (ncol);
   LINE[strlen(LINE) - 1] = '\0';
   if (OptDbg::query(EDbg::INTERFACE)) message("Lecture ASCII = %s\n", LINE);
 
@@ -517,10 +517,10 @@ Id _file_get_ncol(FILE* file)
 
   /* Get the number of tokens */
 
-  if (gslStrtok(LINE, DEL_SEP) != NULL)
+  if (gslStrtok(LINE, DEL_SEP) != nullptr)
   {
     ncol++;
-    while (gslStrtok(NULL, DEL_SEP) != NULL)
+    while (gslStrtok(NULL, DEL_SEP) != nullptr)
       ncol++;
   }
 
@@ -583,13 +583,13 @@ Id _buffer_read(char** buffer, const char* format, va_list ap)
 
   label_start:
     fmt = &format[ideb];
-    if (LCUR == NULL)
+    if (LCUR == nullptr)
     {
 
       /* Read the next line */
 
       LINEB = strsep(buffer, "\n");
-      if (LINEB == NULL) return (-1);
+      if (LINEB == nullptr) return (-1);
       (void)gslStrcpy(LINE_MEM, LINEB);
       if (OptDbg::query(EDbg::INTERFACE)) message("Lecture ASCII = %s\n", LINEB);
 
@@ -615,7 +615,7 @@ Id _buffer_read(char** buffer, const char* format, va_list ap)
 
     LCUR = gslStrtok(cur, DEL_SEP);
     cur  = NULL;
-    if (LCUR == NULL) goto label_start;
+    if (LCUR == nullptr) goto label_start;
     if (OptDbg::query(EDbg::INTERFACE))
       message("String to be decoded = '%s'\n", LCUR);
 

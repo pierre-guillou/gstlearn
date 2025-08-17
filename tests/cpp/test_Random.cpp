@@ -102,14 +102,14 @@ int main(int argc, char *argv[])
   double lambda = 4.6;
   number = 100000; // Use larger sample for convergence
   tab.resize(number,0.);
-  Id ndec = (Id)OptCst::query(ECst::NTDEC);
+  Id ndec = static_cast<Id>(OptCst::query(ECst::NTDEC));
   OptCst::define(ECst::NTDEC, 4);
   message("\nPoisson Distribution: lambda=%lf\n",lambda);
   law_set_old_style(true);
-  for (Id i = 0; i < number; i++) tab[i] = (double)law_poisson(lambda);
+  for (Id i = 0; i < number; i++) tab[i] = static_cast<double>(law_poisson(lambda));
   VH::dumpStats("Old Style", tab);
   law_set_old_style(false);
-  for (Id i = 0; i < number; i++) tab[i] = (double)law_poisson(lambda);
+  for (Id i = 0; i < number; i++) tab[i] = static_cast<double>(law_poisson(lambda));
   VH::dumpStats("New Style", tab);
   OptCst::define(ECst::NTDEC, ndec);
 

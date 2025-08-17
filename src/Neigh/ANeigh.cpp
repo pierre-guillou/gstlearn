@@ -176,7 +176,7 @@ void ANeigh::select(Id iech_out, VectorInt& ranks)
   }
 
   // Stop the neighborhood search if not enough point is available
-  if ((Id)ranks.size() <= 0) return;
+  if (static_cast<Id>(ranks.size()) <= 0) return;
 }
 
 /**
@@ -407,7 +407,7 @@ Id ANeigh::_xvalid(Id iech_in, Id iech_out, double eps)
 
 bool ANeigh::_isDimensionValid(Id idim) const
 {
-  if (idim < 0 || idim >= (Id)getNDim())
+  if (idim < 0 || idim >= static_cast<Id>(getNDim()))
   {
     messerr("Error in 'idim'(%d). It should lie within [0,%d[", idim, getNDim());
     return false;
@@ -443,7 +443,7 @@ void ANeigh::setBallSearch(bool status, Id leaf_size)
 void ANeigh::_neighCompress(VectorInt& ranks)
 {
   Id necr   = 0;
-  Id number = (Id)ranks.size();
+  Id number = static_cast<Id>(ranks.size());
   for (Id i = 0; i < number; i++)
     if (ranks[i] >= 0) ranks[necr++] = i;
   ranks.resize(necr);
@@ -474,7 +474,7 @@ bool ANeigh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 
   bool ret = true;
 
-  ret = ret && SerializeHDF5::writeValue(aneighG, "NDim", (Id)getNDim());
+  ret = ret && SerializeHDF5::writeValue(aneighG, "NDim", static_cast<Id>(getNDim()));
 
   return ret;
 }

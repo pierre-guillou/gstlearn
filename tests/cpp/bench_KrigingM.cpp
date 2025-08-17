@@ -75,16 +75,16 @@ int main(int argc, char* argv[])
   NeighMoving* neighM;
   Db* data;
   Timer timer;
-  for (Id icas = 0; icas < (Id)nechs.size(); icas++)
+  for (Id icas = 0; icas < static_cast<Id>(nechs.size()); icas++)
   {
     Id nloop = (icas < 2) ? 2 : 1;
     Id nech  = nechs[icas];
     for (Id iloop = 0; iloop < nloop; iloop++)
     {
-      Id ileaf  = (iloop == 0) ? leaf_size : 0;
-      data      = Db::createFillRandom(nech, 2, 1);
-      neighM    = NeighMoving::create(false, nmaxi, radius, nmini, nsect, nsmax,
-                                      VectorDouble(), VectorDouble(), ileaf > 0, ileaf);
+      Id ileaf = (iloop == 0) ? leaf_size : 0;
+      data     = Db::createFillRandom(nech, 2, 1);
+      neighM   = NeighMoving::create(false, nmaxi, radius, nmini, nsect, nsmax,
+                                     VectorDouble(), VectorDouble(), ileaf > 0, ileaf);
 
       timer.reset();
       message("Nsample = %7d - Leaf = %3d\n", nech, ileaf);

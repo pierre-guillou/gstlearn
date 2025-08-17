@@ -45,7 +45,7 @@ static void _firstTest()
 {
   mestitle(0, "Minimization of a Function");
   std::vector<double> x = {1.};
-  auto* opt             = new Optim(NELDERMEAD, (Id)x.size());
+  auto* opt             = new Optim(NELDERMEAD, static_cast<Id>(x.size()));
 
   // Bounds for each parameter
   VectorDouble lb = {1., 10.};

@@ -165,13 +165,13 @@ DirParam* DirParam::createFromGrid(const DbGrid* dbgrid,
 
 double DirParam::getBreak(Id i) const
 {
-  if (!checkArg("Break Index", i, (Id)_breaks.size())) return TEST;
+  if (!checkArg("Break Index", i, static_cast<Id>(_breaks.size()))) return TEST;
   return _breaks[i];
 }
 
 double DirParam::getCodir(Id i) const
 {
-  if (!checkArg("Codir Index", i, (Id)_codir.size())) return TEST;
+  if (!checkArg("Codir Index", i, static_cast<Id>(_codir.size()))) return TEST;
   return _codir[i];
 }
 
@@ -228,7 +228,7 @@ void DirParam::setDPas(const DbGrid* db)
 {
   if (_grincr.empty()) return;
   double dlag = 0;
-  for (Id idim = 0; idim < (Id)getNDim(); idim++)
+  for (Id idim = 0; idim < static_cast<Id>(getNDim()); idim++)
   {
     double delta = _grincr[idim] * db->getDX(idim);
     dlag += delta * delta;
@@ -340,9 +340,9 @@ std::vector<DirParam> DirParam::createMultiple(Id ndir,
   std::vector<DirParam> dirs;
   for (Id idir = 0; idir < ndir; idir++)
   {
-    angles[0] = 180. * (double)idir / (double)ndir + angref;
+    angles[0] = 180. * static_cast<double>(idir) / static_cast<double>(ndir) + angref;
     (void)GH::rotationGetDirection2D(angles, codir);
-    double tolang     = 90. / (double)ndir;
+    double tolang     = 90. / static_cast<double>(ndir);
     DirParam dirparam = DirParam(nlag, dlag, toldis, tolang, 0, 0, TEST, TEST, 0.,
                                  VectorDouble(), codir, TEST, space);
     dirs.push_back(dirparam);
@@ -368,7 +368,7 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
 
   VectorDouble anglesloc(1);
   VectorDouble codir(ndim);
-  Id ndir               = (Id)angles.size();
+  Id ndir               = static_cast<Id>(angles.size());
   if (FFFF(tolang)) tolang = 90. / ndir;
   for (Id idir = 0; idir < ndir; idir++)
   {
@@ -428,7 +428,7 @@ Id DirParam::getLagRank(double dist) const
   Id ilag = -1;
   if (getFlagRegular())
   {
-    ilag = (Id)floor(distloc / getDPas() + 0.5);
+    ilag = static_cast<Id>(floor(distloc / getDPas() + 0.5));
     if (ABS(distloc - ilag * getDPas()) > getTolDist() * getDPas()) return (ITEST);
   }
   else

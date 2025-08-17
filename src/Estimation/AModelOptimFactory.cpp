@@ -282,7 +282,7 @@ static void _fixAllAnglesFromIndex(CorAniso* coraniso,
                                    bool resetToZero = false)
 {
   std::vector<ParamInfo>& params = coraniso->getParamInfoAngles();
-  for (Id ipar = start, npar = (Id)params.size(); ipar < npar; ipar++)
+  for (Id ipar = start, npar = static_cast<Id>(params.size()); ipar < npar; ipar++)
   {
     if (resetToZero) params[ipar].setValue(0.);
     params[ipar].setFixed(true);
@@ -292,7 +292,7 @@ static void _fixAllAnglesFromIndex(CorAniso* coraniso,
 static void _fixAllScalesFromIndex(CorAniso* coraniso, Id start = 0)
 {
   std::vector<ParamInfo>& params = coraniso->getParamInfoScales();
-  for (Id ipar = start, npar = (Id)params.size(); ipar < npar; ipar++)
+  for (Id ipar = start, npar = static_cast<Id>(params.size()); ipar < npar; ipar++)
   {
     params[ipar].setValue(0.);
     params[ipar].setFixed(true);
@@ -385,7 +385,7 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
   // Fitting from LogLikelihood
   if (db != nullptr)
   {
-    if ((Id)model->getNDim() != db->getNDim()) return nullptr;
+    if (static_cast<Id>(model->getNDim()) != db->getNDim()) return nullptr;
     if (nb_neighVecchia != ITEST) return Vecchia::createForOptim(model, db, nb_neighVecchia, reml);
     return Likelihood::createForOptim(model, db, reml);
   }
@@ -393,7 +393,7 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
   // Fitting from a Variogram Map
   if (dbmap != nullptr)
   {
-    if ((Id)model->getNDim() != dbmap->getNDim()) return nullptr;
+    if (static_cast<Id>(model->getNDim()) != dbmap->getNDim()) return nullptr;
     if (_modifyMopForVMap(dbmap, model, constraints, mopLocal)) return nullptr;
     if (_modifyModelForConstraints(constraints, model)) return nullptr;
     if (_modifyModelForMop(mopLocal, model)) return nullptr;
@@ -403,7 +403,7 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
   // Fitting from an experimental Variogram
   if (vario != nullptr)
   {
-    if ((Id)model->getNDim() != vario->getNDim()) return nullptr;
+    if (static_cast<Id>(model->getNDim()) != vario->getNDim()) return nullptr;
     if (_modifyMopForVario(vario, model, constraints, mopLocal)) return nullptr;
     if (_modifyModelForConstraints(constraints, model)) return nullptr;
     if (_modifyModelForMop(mopLocal, model)) return nullptr;

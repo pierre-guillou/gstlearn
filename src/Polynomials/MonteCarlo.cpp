@@ -33,12 +33,12 @@ double integralGaussHermite(double yc, double r, const VectorDouble& psi)
 }
 void normalizeResults(Id nbsimu, double& valest)
 {
-  valest /= (double)nbsimu;
+  valest /= static_cast<double>(nbsimu);
 }
 
 void normalizeResults(Id nbsimu, double& valest, double& valstd)
 {
-  valest /= (double)nbsimu;
+  valest /= static_cast<double>(nbsimu);
   valstd = valstd / nbsimu - valest * valest;
   valstd = (valstd > 0.) ? sqrt(valstd) : 0.;
 }

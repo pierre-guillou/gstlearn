@@ -68,7 +68,7 @@ String FracFault::toString(const AStringFormat* /*strfmt*/) const
   sstr << "Location of the Fault           = " << _coord << std::endl;
   sstr << "Fault orientation               = " << _orient << " (degree)" << std::endl;
 
-  Id number = (Id)_thetal.size();
+  Id number = static_cast<Id>(_thetal.size());
   for (Id j = 0; j < number; j++)
   {
     sstr << toTitle(2, "Family #%d/%d", j + 1, number);
@@ -113,15 +113,15 @@ void FracFault::addFaultPerFamily(double thetal,
 
 bool FracFault::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
-  bool ret = true;
+  bool ret  = true;
   auto nfam = getNFamilies();
-  ret      = ret && _recordRead<double>(is, "Abscissa of the first Fault point", _coord);
-  ret      = ret && _recordRead<double>(is, "Fault orientation", _orient);
-  ret      = ret && _recordRead<Id>(is, "Number of Families", nfam);
-  ret      = ret && _recordReadVec<double>(is, "Maximum Density on the left", _thetal, nfam);
-  ret      = ret && _recordReadVec<double>(is, "Maximum Density on the right", _thetar, nfam);
-  ret      = ret && _recordReadVec<double>(is, "Decrease Range on the left", _rangel, nfam);
-  ret      = ret && _recordReadVec<double>(is, "Decrease Range on the right", _ranger, nfam);
+  ret       = ret && _recordRead<double>(is, "Abscissa of the first Fault point", _coord);
+  ret       = ret && _recordRead<double>(is, "Fault orientation", _orient);
+  ret       = ret && _recordRead<Id>(is, "Number of Families", nfam);
+  ret       = ret && _recordReadVec<double>(is, "Maximum Density on the left", _thetal, nfam);
+  ret       = ret && _recordReadVec<double>(is, "Maximum Density on the right", _thetar, nfam);
+  ret       = ret && _recordReadVec<double>(is, "Decrease Range on the left", _rangel, nfam);
+  ret       = ret && _recordReadVec<double>(is, "Decrease Range on the right", _ranger, nfam);
   return ret;
 }
 
@@ -179,4 +179,4 @@ bool FracFault::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) cons
   return ret;
 }
 #endif
-}
+} // namespace gstlrn

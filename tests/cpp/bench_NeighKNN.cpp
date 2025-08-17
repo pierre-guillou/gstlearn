@@ -23,7 +23,7 @@ using namespace gstlrn;
 
 VectorDouble getSortedDistance(Db* data, const VectorInt& ranks, const SpaceTarget& Pt)
 {
-  Id size = (Id)ranks.size();
+  Id size = static_cast<Id>(ranks.size());
   SpaceTarget Dt;
   VectorDouble dist(size, TEST);
   for (Id iech = 0; iech < size; iech++)
@@ -54,12 +54,12 @@ int main(int argc, char* argv[])
   Timer timer;
 
   // Main parameters
-  Id ndat       = 100000;
-  Id ntarget    = 1000;
-  Id nmaxi      = 20;
-  Id leaf_size  = 20;
-  Id mode       = 0;
-  bool verbose  = false;
+  Id ndat      = 100000;
+  Id ntarget   = 1000;
+  Id nmaxi     = 20;
+  Id leaf_size = 20;
+  Id mode      = 0;
+  bool verbose = false;
 
   // Generate the input data base
   Id ndim  = 2;

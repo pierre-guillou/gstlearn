@@ -89,7 +89,7 @@ double TurningBandOperate::shotNoiseAffineOne(double t0)
   if (! isFlagScaled()) t0 /= scale;
 
   double dt = t0 - getTdeb() / scale;
-  Id nt0 = (Id) (dt);
+  Id nt0 = static_cast<Id>(dt);
   double dt0 = dt - nt0;
   return _t[nt0] * (2. * dt0 - 1.);
 }
@@ -100,7 +100,7 @@ double TurningBandOperate::shotNoiseCubicOne(double t0)
   if (! isFlagScaled()) t0 /= scale;
 
   double dt = t0 - getTdeb() / scale;
-  Id nt0 = (Id) (dt);
+  Id nt0 = static_cast<Id>(dt);
   double dt0 = dt - nt0;
   return _t[nt0] * dt0 * (dt0 - 0.5) * (dt0 - 1.);
 }
@@ -182,7 +182,7 @@ Id TurningBandOperate::_rankInPoisson(Id def_rank,
   /* First, try with the default interval then the next one and finally
    the previous one */
 
-  Id nt = (Id) t.size();
+  Id nt = static_cast<Id>(t.size());
   if (t0 >= t[def_rank] && t0 < t[def_rank + 1])
     return (def_rank);
   if (def_rank < (nt - 2) && t0 >= t[def_rank + 1] && t0 < t[def_rank + 2])

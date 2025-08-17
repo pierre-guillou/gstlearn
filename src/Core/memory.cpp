@@ -139,7 +139,7 @@ static void st_mem_message(const char* call_file,
 {
   Id minsize;
 
-  minsize = (Id)get_keypone("Minimum_Debug_Size", MEMORY_MIN_PT);
+  minsize = static_cast<Id>(get_keypone("Minimum_Debug_Size", MEMORY_MIN_PT));
 
   if (MEMORY_DEBUG > 1 && size > minsize)
   {
@@ -215,7 +215,7 @@ char* mem_alloc_(const char* call_file,
   size     = size_eff + SHIFT();
 
   tab_aux = (char*)malloc(size);
-  if (tab_aux == NULL)
+  if (tab_aux == nullptr)
   {
     mem_error(size_eff);
     if (flag_fatal) messageAbort("Fatal error");
@@ -265,7 +265,7 @@ char* mem_copy_(const char* call_file,
   size     = size_eff + SHIFT();
 
   tab_aux = (char*)malloc(size);
-  if (tab_aux == NULL)
+  if (tab_aux == nullptr)
   {
     mem_error(size_eff);
     if (flag_fatal) messageAbort("Fatal error");
@@ -320,7 +320,7 @@ char* mem_calloc_(const char* call_file,
   size     = size_eff + SHIFT();
 
   tab_aux = (char*)calloc(size_elem, size);
-  if (tab_aux == NULL)
+  if (tab_aux == nullptr)
   {
     mem_error(size_eff);
     if (flag_fatal) messageAbort("Fatal error");
@@ -371,7 +371,7 @@ char* mem_realloc_(const char* call_file,
   {
     // The new dimension is positive
 
-    if (tab == NULL)
+    if (tab == nullptr)
     {
 
       // The memory chunk does not already exist
@@ -418,7 +418,7 @@ char* mem_realloc_(const char* call_file,
       }
     }
 
-    if (tab_aux == NULL)
+    if (tab_aux == nullptr)
     {
       mem_error(size_eff);
       if (flag_fatal) messageAbort("Fatal error");

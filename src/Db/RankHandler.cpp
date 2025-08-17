@@ -82,24 +82,24 @@ void RankHandler::_initElligible()
   Id nech = _db->getNSample();
   _elligible.resize(_nvar, nech);
 
-  for (size_t ivar = 0; ivar < (size_t)_nvar; ivar++)
+  for (size_t ivar = 0; ivar < static_cast<size_t>(_nvar); ivar++)
   {
     double value;
     // Loop on the elligible sample ranks
-    for (size_t iabs = 0; iabs < (size_t)nech; iabs++)
+    for (size_t iabs = 0; iabs < static_cast<size_t>(nech); iabs++)
     {
 
       // Check against a possible selection
       if (_iptrSel >= 0)
       {
-        value = _db->getValueByColIdx((Id)iabs, _iptrSel);
+        value = _db->getValueByColIdx(static_cast<Id>(iabs), _iptrSel);
         _elligible.setValue(ivar, iabs, value > 0);
       }
 
       // Check against validity of the Variance of Measurement Error variable
       if (!_iptrVerr.empty())
       {
-        value = _db->getValueByColIdx((Id)iabs, _iptrVerr[ivar]);
+        value = _db->getValueByColIdx(static_cast<Id>(iabs), _iptrVerr[ivar]);
         _elligible.setValue(ivar, iabs, !FFFF(value) && (value > 0));
       }
 
@@ -109,7 +109,7 @@ void RankHandler::_initElligible()
         bool valid = true;
         for (Id iext = 0; iext < _nExtD && valid; iext++)
         {
-          value = _db->getValueByColIdx((Id)iabs, _iptrExtD[iext]);
+          value = _db->getValueByColIdx(static_cast<Id>(iabs), _iptrExtD[iext]);
           if (FFFF(value)) valid = false;
         }
         _elligible.setValue(ivar, iabs, valid);
@@ -118,7 +118,7 @@ void RankHandler::_initElligible()
       // Check against the existence of a target variable
       if (!_iptrZ.empty())
       {
-        value = _db->getValueByColIdx((Id)iabs, _iptrZ[ivar]);
+        value = _db->getValueByColIdx(static_cast<Id>(iabs), _iptrZ[ivar]);
         _elligible.setValue(ivar, iabs, !FFFF(value));
       }
     }
@@ -191,7 +191,7 @@ void RankHandler::defineSampleRanks(const VectorInt& nbgh)
   {
     _nbgh = nbgh;
   }
-  Id nech = (Id)_nbgh.size();
+  Id nech = static_cast<Id>(_nbgh.size());
 
   double value;
   _Zflatten->clear();
@@ -232,7 +232,7 @@ Id RankHandler::getCount(Id ivar) const
     messerr("RankHandler::getCount: invalid variable index %d", ivar);
     return -1;
   }
-  return (Id)_index[ivar].size();
+  return static_cast<Id>(_index[ivar].size());
 }
 
 /**
@@ -255,7 +255,7 @@ Id RankHandler::getTotalCount() const
  */
 Id RankHandler::getNumber() const
 {
-  return (Id)_nbgh.size();
+  return static_cast<Id>(_nbgh.size());
 }
 
 Id RankHandler::identifyVariableRank(Id ipos) const
@@ -290,10 +290,10 @@ Id RankHandler::identifySampleRank(Id ipos) const
 void RankHandler::dump(bool flagFull) const
 {
   mestitle(0, "Rank Handler");
-  message("Use Selection: %d\n", (Id)_useSel);
-  message("Use Z-variable: %d\n", (Id)_useZ);
-  message("Use Variance of Measurement Error: %d\n", (Id)_useVerr);
-  message("Use External Drift: %d\n", (Id)_useExtD);
+  message("Use Selection: %d\n", static_cast<Id>(_useSel));
+  message("Use Z-variable: %d\n", static_cast<Id>(_useZ));
+  message("Use Variance of Measurement Error: %d\n", static_cast<Id>(_useVerr));
+  message("Use External Drift: %d\n", static_cast<Id>(_useExtD));
   message("\n");
   message("Number of Variables: %d\n", _nvar);
   message("Number of External Drifts: %d\n", _nExtD);

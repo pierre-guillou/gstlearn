@@ -214,8 +214,8 @@ Id Rule::setMainNodeFromNodNames(const VectorInt& nodes)
               inode + 1, NODE_RANK(inode), nb_node);
       return 1;
     }
-    if ((NODE_TYPE(inode) == THRESH_Y1 && n1tab[NODE_RANK(inode) - 1] != (Node*)NULL) ||
-        (NODE_TYPE(inode) == THRESH_Y2 && n2tab[NODE_RANK(inode) - 1] != (Node*)NULL))
+    if ((NODE_TYPE(inode) == THRESH_Y1 && n1tab[NODE_RANK(inode) - 1] != nullptr) ||
+        (NODE_TYPE(inode) == THRESH_Y2 && n2tab[NODE_RANK(inode) - 1] != nullptr))
     {
       messerr("Error: Node #%d (%s%d) has already been created", inode + 1,
               symbol[NODE_TYPE(inode)].c_str(), NODE_RANK(inode));
@@ -607,7 +607,7 @@ Id Rule::getFaciesFromGaussian(double y1, double y2) const
 
   if (FFFF(y1) || FFFF(y2)) return (0);
   if (!_mainNode->gaussianToFacies(y1, y2, &facies)) return (0);
-  return ((Id)facies);
+  return (static_cast<Id>(facies));
 }
 
 VectorInt Rule::getNodes() const
@@ -648,7 +648,7 @@ Id Rule::setProportions(const VectorDouble& proportions) const
   {
     auto nfacies = getNFacies();
     _props.clear();
-    _props.resize(nfacies, 1. / (double)nfacies);
+    _props.resize(nfacies, 1. / static_cast<double>(nfacies));
   }
   else
   {
@@ -1009,7 +1009,7 @@ Id Rule::evaluateBounds(PropDef* propdef,
   for (iech = 0; iech < nech; iech++)
   {
     if (!dbin->isActive(iech)) continue;
-    facies = (Id)dbin->getZVariable(iech, 0);
+    facies = static_cast<Id>(dbin->getZVariable(iech, 0));
     if (rule_thresh_define(propdef, dbin, this, facies, iech, isimu, nbsimu, 1,
                            &t1min, &t1max, &t2min, &t2max)) return (1);
     if (igrf == 0)

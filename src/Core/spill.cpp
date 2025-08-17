@@ -716,16 +716,16 @@ Id spill_point(DbGrid* dbgrid,
     {
       pt_mark = &BITMAP(SPIMG_MARK, ix, iy);
       pt_out  = &MARK_TO_OUT(pt_mark);
-      if ((Id)MARK(0, 0) == SURFACE_UNKNOWN)
+      if (static_cast<Id>(MARK(0, 0)) == SURFACE_UNKNOWN)
       {
         for (k = found = 0; k < n && found == 0; k++)
-          if ((Id)MARK(x[k], y[k]) == SURFACE_INSIDE) found = 1;
+          if (static_cast<Id>(MARK(x[k], y[k])) == SURFACE_INSIDE) found = 1;
         if (found)
           st_heap_add(pt_out);
         else
           st_change(pt_out, SURFACE_UNKNOWN);
       }
-      else if ((Id)MARK(0, 0) == SURFACE_INSIDE)
+      else if (static_cast<Id>(MARK(0, 0)) == SURFACE_INSIDE)
         st_change(pt_out, SURFACE_INSIDE);
       else
         st_heap_add(pt_out);

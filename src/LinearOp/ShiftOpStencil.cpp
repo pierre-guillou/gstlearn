@@ -11,13 +11,13 @@
 #include "LinearOp/ShiftOpStencil.hpp"
 
 #include "Basic/AStringable.hpp"
+#include "Basic/Grid.hpp"
 #include "Basic/Indirection.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Covariances/CovAniso.hpp"
 #include "LinearOp/AShiftOp.hpp"
 #include "LinearOp/ShiftOpMatrix.hpp"
 #include "Mesh/MeshETurbo.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Basic/Grid.hpp"
 
 #include "geoslib_define.h"
 
@@ -58,15 +58,15 @@ ShiftOpStencil& ShiftOpStencil::operator=(const ShiftOpStencil& shift)
   AShiftOp::operator=(shift);
   if (this != &shift)
   {
-    _relativeShifts = shift._relativeShifts;
-    _absoluteShifts = shift._absoluteShifts;
-    _weights        = shift._weights;
-    _weightsSimu    = shift._weightsSimu;
-    _isInside       = shift._isInside;
-    _lambdaVal      = shift._lambdaVal;
+    _relativeShifts     = shift._relativeShifts;
+    _absoluteShifts     = shift._absoluteShifts;
+    _weights            = shift._weights;
+    _weightsSimu        = shift._weightsSimu;
+    _isInside           = shift._isInside;
+    _lambdaVal          = shift._lambdaVal;
     _useLambdaSingleVal = shift._useLambdaSingleVal;
     _useModifiedShift   = shift._useModifiedShift;
-    _mesh           = shift._mesh;
+    _mesh               = shift._mesh;
   }
   return *this;
 }
@@ -80,13 +80,13 @@ Id ShiftOpStencil::_addToDest(const constvect inv, vect outv) const
   {
     currentWeights = &_weightsSimu;
   }
-  else 
+  else
   {
     currentWeights = &_weights;
   }
 
   auto nw                     = _getNWeights();
-  Id size = (Id) inv.size();
+  Id size                     = static_cast<Id>(inv.size());
   const Indirection& indirect = _mesh->getGridIndirect();
 
   double total;
@@ -100,7 +100,7 @@ Id ShiftOpStencil::_addToDest(const constvect inv, vect outv) const
       {
         for (Id iw = 0; iw < nw; iw++)
         {
-          Id iabs = ic + _absoluteShifts[iw];
+          Id iabs      = ic + _absoluteShifts[iw];
           double value = _isInside[iabs] ? inv[iabs] : 0.;
           total += (*currentWeights)[iw] * value;
         }
@@ -111,7 +111,7 @@ Id ShiftOpStencil::_addToDest(const constvect inv, vect outv) const
   else
   {
     const Grid& grid = _mesh->getGrid();
-    Id ndim         = _mesh->getNDim();
+    Id ndim          = _mesh->getNDim();
 
     VectorInt center(ndim);
     VectorInt local(ndim);
@@ -147,23 +147,23 @@ void ShiftOpStencil::normalizeLambdaBySills(const AMesh* mesh)
   if (_cova->isNoStatForVariance())
   {
     _Lambda.resize(_napices);
-    for (auto &e : _Lambda)
+    for (auto& e: _Lambda)
     {
       e = _lambdaVal;
     }
     AShiftOp::normalizeLambdaBySills(mesh);
     _useLambdaSingleVal = false;
   }
-  else 
+  else
   {
-    _lambdaVal /= sqrt(_cova->getSill(0,0));
+    _lambdaVal /= sqrt(_cova->getSill(0, 0));
   }
 }
 
 double ShiftOpStencil::_getMaxEigenValue() const
 {
   double s = 0.;
-  for (const auto &e : _weights)
+  for (const auto& e: _weights)
   {
     s += ABS(e);
   }
@@ -185,16 +185,16 @@ double ShiftOpStencil::logDetLambda() const
 void ShiftOpStencil::multiplyByValueAndAddDiagonal(double v1, double v2) const
 {
   _weightsSimu = VectorDouble(_weights.size());
-  for (Id i = 0; i < (Id)_weights.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(_weights.size()); i++)
     _weightsSimu[i] = v1 * _weights[i];
-  Id center = (Id) _relativeShifts.size() / 2;
+  Id center = static_cast<Id>(_relativeShifts.size()) / 2;
   _weightsSimu[center] += v2;
   _useModifiedShift = true;
 }
 
 Id ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
-                                   const CovAniso* cova,
-                                   bool verbose)
+                                  const CovAniso* cova,
+                                  bool verbose)
 {
   // Preliminary checks
 
@@ -209,9 +209,9 @@ Id ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
     return 1;
   }
 
-  _mesh = mesh;
+  _mesh    = mesh;
   _napices = mesh->getNApices();
-  Id ndim        = _mesh->getNDim();
+  Id ndim  = _mesh->getNDim();
 
   _setCovAniso(cova);
 
@@ -245,7 +245,7 @@ Id ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
   // Get the non-zero elements of the center column
   _relativeShifts.clear();
   _weights.clear();
-  for (Id i = 0, n = (Id)centerColumn.size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(centerColumn.size()); i < n; i++)
   {
     double weight = centerColumn[i];
     if (ABS(weight) < EPSILON6) continue;
@@ -266,7 +266,7 @@ Id ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
   {
     VectorInt local = center;
     VH::addInPlace(local, _relativeShifts[iw]);
-    Id iabs = grid.indiceToRank(local);
+    Id iabs             = grid.indiceToRank(local);
     _absoluteShifts[iw] = iabs - iorigin;
   }
 
@@ -295,8 +295,8 @@ Id ShiftOpStencil::_buildInternal(const MeshETurbo* mesh,
 void ShiftOpStencil::_printStencil() const
 {
   auto nweight = _getNWeights();
-  Id ndim    = _mesh->getNDim();
-  Id size    = _mesh->getNApices();
+  Id ndim      = _mesh->getNDim();
+  Id size      = _mesh->getNApices();
   mestitle(0, "Stencil contents");
   for (Id i = 0; i < nweight; i++)
   {
@@ -312,4 +312,4 @@ void ShiftOpStencil::_printStencil() const
     if (_isInside[i]) ntreated++;
   message("Number of pixels inside the grid (no edge effect) = %d/%d\n", ntreated, size);
 }
-}
+} // namespace gstlrn

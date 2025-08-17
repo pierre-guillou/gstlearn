@@ -136,7 +136,7 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
   double h        = getSpace()->getDistance(p1, p2, getAniso());
   VectorDouble d1 = VH::subtract(p1.getCoords(), p2.getCoords());
   for (Id i = 0; i < 3; i++)
-    d[i] = (i < (Id)d1.size()) ? d1[i] : 0.;
+    d[i] = (i < static_cast<Id>(d1.size())) ? d1[i] : 0.;
 
   //  Calculate the covariance
 
@@ -179,7 +179,7 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
         //  Isotropic case
 
         double b = dcovsr * trttr[0];
-        Id ecr  = 0;
+        Id ecr   = 0;
         for (Id i = 0; i < 3; i++)
           for (Id j = 0; j < 3; j++)
           {

@@ -18,7 +18,7 @@ ShapeParaboloid::ShapeParaboloid(double proportion,
                                  double yext,
                                  double zext,
                                  double theta)
-    : AShape()
+  : AShape()
 {
   initParams(getNParams());
   setParamDefault(0, "X-Extension", xext);
@@ -28,16 +28,16 @@ ShapeParaboloid::ShapeParaboloid(double proportion,
   setProportion(proportion);
 }
 
-ShapeParaboloid::ShapeParaboloid(const ShapeParaboloid &r)
-    : AShape(r)
+ShapeParaboloid::ShapeParaboloid(const ShapeParaboloid& r)
+  : AShape(r)
 {
 }
 
-ShapeParaboloid& ShapeParaboloid::operator=(const ShapeParaboloid &r)
+ShapeParaboloid& ShapeParaboloid::operator=(const ShapeParaboloid& r)
 {
   if (this != &r)
   {
-    AShape::operator =(r);
+    AShape::operator=(r);
   }
   return *this;
 }
@@ -74,12 +74,12 @@ BooleanObject* ShapeParaboloid::generateObject(Id ndim)
 bool ShapeParaboloid::belongObject(const VectorDouble& coor,
                                    const BooleanObject* object) const
 {
-  Id ndim = (Id) coor.size();
+  Id ndim   = static_cast<Id>(coor.size());
   double dx = (ndim >= 1) ? coor[0] / (object->getExtension(0) / 2.) : 0.;
   double dy = (ndim >= 2) ? coor[1] / (object->getExtension(1) / 2.) : 0.;
-  double dz = (ndim >= 3) ? coor[2] / (object->getExtension(2))      : 0.;
+  double dz = (ndim >= 3) ? coor[2] / (object->getExtension(2)) : 0.;
   if (dx * dx + dy * dy - dz > 1) return false;
   if (dx * dx + dy * dy + dz > 1) return false;
   return true;
 }
-}
+} // namespace gstlrn
