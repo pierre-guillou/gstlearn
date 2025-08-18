@@ -9,6 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Neigh/NeighMoving.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/OptCustom.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/SerializeHDF5.hpp"
@@ -198,6 +199,7 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
     }
   }
   if (!ret) return ret;
+  message("ret avant d'appeler le bipts = %d\n", ret);
 
   setNSect((getFlagSector()) ? MAX(_nSect, 1) : 1);
 
@@ -274,6 +276,7 @@ NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
   if (neigh->_fileOpenAndDeserialize(NFFilename, verbose))
   {
     message("on sort de desrialize avec ret = true\n");
+    if (neigh == nullptr) messageAbort("ca ne peut pas arriver");
     return neigh;
   }
   message("on n'a pas deserialize: on detruit le voisinage\n");

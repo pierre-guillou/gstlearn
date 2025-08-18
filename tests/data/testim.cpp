@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Basic/AStringable.hpp"
 #include "Enum/EFormatNF.hpp"
 #include "geoslib_f.h"
 #include "geoslib_old_f.h"
@@ -168,6 +169,7 @@ int main(int argc, char* argv[])
     neigh = NeighBench::createFromNF(filename, verbose);
   if (neigh == nullptr)
     neigh = NeighMoving::createFromNF(filename, verbose);
+  if (neigh == nullptr) messageAbort("on doit avoir neigh defini");
 
   /* Look for simulations */
 
