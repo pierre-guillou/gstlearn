@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 
   int nargs      = static_cast<int>(subparts.size());
   String outname = concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
-  if (outname == "Jeu3-") verbose = true; // Pour voir le resultat
+  // if (outname == "Jeu3-") verbose = true; // Pour voir le resultat de Jeu3 en particulier
   ASerializable::setPrefixName(outname);
 
   /* Getting the Study name */
@@ -169,7 +169,6 @@ int main(int argc, char* argv[])
     neigh = NeighBench::createFromNF(filename, verbose);
   if (neigh == nullptr)
     neigh = NeighMoving::createFromNF(filename, verbose);
-  if (neigh == nullptr) messageAbort("on doit avoir neigh defini");
 
   /* Look for simulations */
 
@@ -229,13 +228,6 @@ int main(int argc, char* argv[])
         dbout->dumpToNF("Krige.out", EFormatNF::DEFAULT, verbose);
       }
     }
-  }
-  else
-  {
-    messerr("No action is performed as:");
-    if (dbin == nullptr) messerr("- The Input Db file is not defined");
-    if (new_model == nullptr) messerr("- The Model is not defined");
-    if (neigh == nullptr) messerr("- The Neighborhood is not defined");
   }
 
   /* Core deallocation */

@@ -153,7 +153,6 @@ String NeighMoving::toString(const AStringFormat* strfmt) const
 
 bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
 {
-  message("on passe dans deserialise de NeighMoving\n");
   bool ret = true;
   ret      = ret && ANeigh::_deserializeAscii(is, verbose);
   if (!ret) return ret;
@@ -169,19 +168,12 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
   double dmax      = 0.;
 
   ret = true;
-  message("flag_sector\n");
   ret = ret && _recordRead<Id>(is, "NeighMovingborhood sector search", flag_sector);
-  message("nmini\n");
   ret = ret && _recordRead<Id>(is, "Minimum Number of samples", _nMini);
-  message("nmaxi\n");
   ret = ret && _recordRead<Id>(is, "Maximum Number of samples", _nMaxi);
-  message("nsect\n");
   ret = ret && _recordRead<Id>(is, "Optimum Number of samples per sector", _nSect);
-  message("nsmax\n");
   ret = ret && _recordRead<Id>(is, "Maximum Number of samples per sector", _nSMax);
-  message("dmax\n");
   ret = ret && _recordRead<double>(is, "Maximum Isotropic Radius", dmax);
-  message("flag_aniso\n");
   ret = ret && _recordRead<Id>(is, "Flag for Anisotropy", flag_aniso);
   if (flag_aniso)
   {
@@ -199,7 +191,6 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
     }
   }
   if (!ret) return ret;
-  message("ret avant d'appeler le bipts = %d\n", ret);
 
   setNSect((getFlagSector()) ? MAX(_nSect, 1) : 1);
 
@@ -209,7 +200,6 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
   if (!nbgh_rotmat.empty())
     _biPtDist->setAnisoRotMat(nbgh_rotmat);
 
-  message("fin de neigh deserialize avec ret=%d\n", ret);
   return ret;
 }
 
@@ -273,13 +263,7 @@ NeighMoving* NeighMoving::create(bool flag_xvalid,
 NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
 {
   auto* neigh = new NeighMoving();
-  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose))
-  {
-    message("on sort de desrialize avec ret = true\n");
-    if (neigh == nullptr) messageAbort("ca ne peut pas arriver");
-    return neigh;
-  }
-  message("on n'a pas deserialize: on detruit le voisinage\n");
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
   delete neigh;
   return nullptr;
 }

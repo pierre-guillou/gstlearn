@@ -100,7 +100,6 @@ bool ASerializable::_fileOpenAndDeserialize(const String& filename, bool verbose
 {
   // Check that the file exists
   String filepath = ASerializable::buildFileName(1, filename, true);
-  message("neigh on cherche %s\n", filepath.c_str());
   std::ifstream file(filepath);
   if (!file.good())
   {
@@ -117,14 +116,11 @@ bool ASerializable::_fileOpenAndDeserialize(const String& filename, bool verbose
     return _deserializeH5(file, verbose);
   }
 #endif
-  message("c est un fichier ASCII \n");
 
   // Try to open it according to ASCII format
   std::ifstream is;
-  message("juste avant fileOpenRead dans aserializable\n");
   if (SerializeNeutralFile::fileOpenRead(*this, filename, is, verbose))
   {
-    message("juste apres fileOpenRead dans aserializable, avant deserialize\n");
     return _deserializeAscii(is, verbose);
   }
 
