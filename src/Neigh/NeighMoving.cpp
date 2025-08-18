@@ -207,7 +207,7 @@ bool NeighMoving::_deserializeAscii(std::istream& is, bool verbose)
   if (!nbgh_rotmat.empty())
     _biPtDist->setAnisoRotMat(nbgh_rotmat);
 
-  message("fin de neigh deserialize\n");
+  message("fin de neigh deserialize avec ret=%d\n", ret);
   return ret;
 }
 
@@ -271,7 +271,12 @@ NeighMoving* NeighMoving::create(bool flag_xvalid,
 NeighMoving* NeighMoving::createFromNF(const String& NFFilename, bool verbose)
 {
   auto* neigh = new NeighMoving();
-  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose))
+  {
+    message("on sort de desrialize avec ret = true\n");
+    return neigh;
+  }
+  message("on n'a pas deserialize: on detruit le voisinage\n");
   delete neigh;
   return nullptr;
 }
