@@ -48,9 +48,9 @@ namespace gstlrn
 static Id NWGT[4]      = {2, 3, 4, 5};
 static Id NORWGT[4]    = {2, 6, 20, 70};
 static Id COVWGT[4][5] = {{2, -2, 0, 0, 0},
-                           {6, -8, 2, 0, 0},
-                           {20, -30, 12, -2, 0},
-                           {70, -112, 56, -16, 2}};
+                          {6, -8, 2, 0, 0},
+                          {20, -30, 12, -2, 0},
+                          {70, -112, 56, -16, 2}};
 
 struct DerivCache
 {
@@ -473,14 +473,14 @@ double CorAniso::evalCor(const SpacePoint& p1,
 }
 
 Id CorAniso::addEvalCovVecRHSInPlace(vect vect,
-                                      const VectorInt& index1,
-                                      Id iech2,
-                                      const KrigOpt& krigopt,
-                                      SpacePoint& pin,
-                                      SpacePoint& pout,
-                                      VectorDouble& tabwork,
-                                      double lambda,
-                                      const ECalcMember& calcMember) const
+                                     const VectorInt& index1,
+                                     Id iech2,
+                                     const KrigOpt& krigopt,
+                                     SpacePoint& pin,
+                                     SpacePoint& pout,
+                                     VectorDouble& tabwork,
+                                     double lambda,
+                                     const ECalcMember& calcMember) const
 {
   if (!isOptimEnabled())
     return ACov::addEvalCovVecRHSInPlace(vect, index1, iech2, krigopt, pin, pout, tabwork, lambda, calcMember);
@@ -531,7 +531,7 @@ double CorAniso::evalDerivativeBasis(const SpacePoint& p1,
     return _corfunc->evalDerivative(h) / h;
 
   double cov = 0.;
-  Id norder = mode->getOrderVario();
+  Id norder  = mode->getOrderVario();
   if (norder == 0)
   {
 
@@ -551,7 +551,7 @@ double CorAniso::evalCovOnSphere(double alpha,
                                  const CovCalcMode* mode) const
 {
   if (!_corfunc->hasCovOnSphere()) return TEST;
-  const ASpace* space    = getDefaultSpaceSh().get();
+  const ASpace* space = getDefaultSpaceSh().get();
   const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
   if (spaceSn == nullptr) return TEST;
 
@@ -574,7 +574,7 @@ double CorAniso::evalCovOnSphere(double alpha,
 VectorDouble CorAniso::evalSpectrumOnSphere(Id n, bool flagNormDistance, bool flagCumul) const
 {
   if (!_corfunc->hasSpectrumOnSphere()) return VectorDouble();
-  const ASpace* space    = getDefaultSpaceSh().get();
+  const ASpace* space = getDefaultSpaceSh().get();
   const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
   if (spaceSn == nullptr) return VectorDouble();
 
@@ -661,11 +661,11 @@ double CorAniso::evalSpectrum(const VectorDouble& freq, Id ivar, Id jvar) const
 
 double CorAniso::normalizeOnSphere(Id n) const
 {
-  const ASpace* space    = getDefaultSpaceSh().get();
+  const ASpace* space = getDefaultSpaceSh().get();
   const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
-  double scale           = getScaleIso();
-  double radius          = spaceSn->getRadius();
-  scale                  = scale / radius;
+  double scale        = getScaleIso();
+  double radius       = spaceSn->getRadius();
+  scale               = scale / radius;
   return _corfunc->normalizeOnSphere(n, scale);
 }
 
@@ -759,7 +759,7 @@ String CorAniso::toString(const AStringFormat* strfmt) const
  *****************************************************************************/
 void CorAniso::nostatUpdate(CovInternal* covint)
 {
-  if (covint == NULL) return;
+  if (covint == nullptr) return;
   updateCovByPoints(covint->getIcas1(), covint->getIech1(),
                     covint->getIcas2(), covint->getIech2());
 }
@@ -934,7 +934,7 @@ bool CorAniso::_isVariableValid(Id ivar) const
 
 Id CorAniso::getNGradParam() const
 {
-  auto ndim  = getNDim();
+  auto ndim = getNDim();
   Id number = 0;
 
   // Anisotropy ranges

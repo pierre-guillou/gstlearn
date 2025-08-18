@@ -249,7 +249,7 @@ double AMesh::getCenterCoordinate(Id imesh, Id idim) const
   auto ncorner = getNApexPerMesh();
   for (Id icorner = 0; icorner < ncorner; icorner++)
     coor += getCoor(imesh, icorner, idim);
-  return (coor / (double)ncorner);
+  return (coor / static_cast<double>(ncorner));
 }
 
 VectorVectorDouble AMesh::getAllCenterCoordinates() const
@@ -492,7 +492,7 @@ VectorDouble AMesh::getDistances(Id iapex0, const VectorInt& japices) const
 {
   VectorInt jlocal = japices;
   if (jlocal.empty()) jlocal = VH::sequence(getNApices());
-  Id number = (Id)jlocal.size();
+  Id number = static_cast<Id>(jlocal.size());
   VectorDouble vec(number, 0.);
 
   SpacePoint P1(getApexCoordinates(iapex0), -1);
@@ -559,7 +559,7 @@ VectorVectorInt AMesh::getNeighborhoodPerApex() const
     VectorInt vec;
 
     // Loop on the meshes neighboring the target apex 'ip'
-    Id nmesh = (Id)Vmesh[ip].size();
+    Id nmesh = static_cast<Id>(Vmesh[ip].size());
     for (Id i = 0; i < nmesh; i++)
     {
       // Index of the neighboring mesh
@@ -591,7 +591,7 @@ VectorVectorInt AMesh::getNeighborhoodPerApex() const
 void AMesh::dumpNeighborhood(std::vector<VectorInt>& Vmesh, Id nline_max)
 {
   mestitle(1, "List of Meshing Neighborhood");
-  Id nmax = (Id)Vmesh.size();
+  Id nmax = static_cast<Id>(Vmesh.size());
   if (nline_max > 0) nmax = MIN(nmax, nline_max);
   for (Id irow = 0; irow < nmax; irow++)
   {

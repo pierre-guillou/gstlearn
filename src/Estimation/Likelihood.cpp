@@ -145,7 +145,7 @@ void Likelihood::_fillGradCovMat(RankHandler& rkh, covmaptype& gradcov)
   SpacePoint p1, p2;
   rkh.defineSampleRanks();
 
-  for (size_t jvar = 0; (Id)jvar < _model->getNVar(); jvar++)
+  for (size_t jvar = 0; static_cast<Id>(jvar) < _model->getNVar(); jvar++)
   {
     auto indsj = rkh.getSampleRanksByVariable(jvar);
 
@@ -154,7 +154,7 @@ void Likelihood::_fillGradCovMat(RankHandler& rkh, covmaptype& gradcov)
       icur = 0;
       _db->getSampleAsSPInPlace(p1, j);
 
-      for (size_t ivar = 0; (Id)ivar < _model->getNVar(); ivar++)
+      for (size_t ivar = 0; static_cast<Id>(ivar) < _model->getNVar(); ivar++)
       {
         auto indsi = rkh.getSampleRanksByVariable(ivar);
         for (auto& i: indsi)

@@ -12,13 +12,13 @@
 #include "Simulation/BooleanObject.hpp"
 
 namespace gstlrn
-{ 
+{
 ShapeHalfEllipsoid::ShapeHalfEllipsoid(double proportion,
                                        double xext,
                                        double yext,
                                        double zext,
                                        double theta)
-    : AShape()
+  : AShape()
 {
   initParams(getNParams());
   setParamDefault(0, "X-Extension", xext);
@@ -28,16 +28,16 @@ ShapeHalfEllipsoid::ShapeHalfEllipsoid(double proportion,
   setProportion(proportion);
 }
 
-ShapeHalfEllipsoid::ShapeHalfEllipsoid(const ShapeHalfEllipsoid &r)
-    : AShape(r)
+ShapeHalfEllipsoid::ShapeHalfEllipsoid(const ShapeHalfEllipsoid& r)
+  : AShape(r)
 {
 }
 
-ShapeHalfEllipsoid& ShapeHalfEllipsoid::operator=(const ShapeHalfEllipsoid &r)
+ShapeHalfEllipsoid& ShapeHalfEllipsoid::operator=(const ShapeHalfEllipsoid& r)
 {
   if (this != &r)
   {
-    AShape::operator =(r);
+    AShape::operator=(r);
   }
   return *this;
 }
@@ -74,11 +74,11 @@ BooleanObject* ShapeHalfEllipsoid::generateObject(Id ndim)
 bool ShapeHalfEllipsoid::belongObject(const VectorDouble& coor,
                                       const BooleanObject* object) const
 {
-  Id ndim = (Id) coor.size();
+  Id ndim   = static_cast<Id>(coor.size());
   double dx = (ndim >= 1) ? coor[0] / (object->getExtension(0) / 2.) : 0.;
   double dy = (ndim >= 2) ? coor[1] / (object->getExtension(1) / 2.) : 0.;
-  double dz = (ndim >= 3) ? coor[2] / (object->getExtension(2))      : 0.;
+  double dz = (ndim >= 3) ? coor[2] / (object->getExtension(2)) : 0.;
   return (dx * dx + dy * dy + dz * dz <= 1);
 }
 
-}
+} // namespace gstlrn

@@ -67,7 +67,7 @@ ProjMultiMatrix* ProjMultiMatrix::createFromDbAndMeshes(const Db* db,
     messerr("nvar should be > 0");
     return nullptr;
   }
-  Id nmeshes = (Id)meshes.size();
+  Id nmeshes = static_cast<Id>(meshes.size());
   if (nmeshes == 0)
   {
     messerr("You have to provide at least one mesh");
@@ -91,7 +91,7 @@ ProjMultiMatrix* ProjMultiMatrix::createFromDbAndMeshes(const Db* db,
 
   std::vector<std::vector<const ProjMatrix*>> stocker;
 
-  Id nmesh      = (Id)meshes.size();
+  Id nmesh       = static_cast<Id>(meshes.size());
   bool flagIsVar = checkOnZVariable && db->hasLocator(ELoc::Z);
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
@@ -131,7 +131,7 @@ ProjMultiMatrix::~ProjMultiMatrix()
 std::vector<std::vector<const ProjMatrix*>> ProjMultiMatrix::create(std::vector<const ProjMatrix*>& vectproj,
                                                                     Id nvariable)
 {
-  Id nlatent = (Id)vectproj.size();
+  Id nlatent = static_cast<Id>(vectproj.size());
   std::vector<std::vector<const ProjMatrix*>> result;
 
   for (Id i = 0; i < nlatent; i++)

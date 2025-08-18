@@ -319,7 +319,7 @@ static void st_mksinc(double d, Id lsinc, double* sinc)
   double s[20], a[20], c[20], work[20], fmax;
 
   /* compute auto-correlation and cross-correlation arrays */
-  fmax = 0.066 + 0.265 * log((double)lsinc);
+  fmax = 0.066 + 0.265 * log(static_cast<double>(lsinc));
   fmax = (fmax < 1.0) ? fmax : 1.0;
   for (j = 0; j < lsinc; j++)
   {
@@ -390,7 +390,7 @@ static void st_intt8r(Id ntable,
   ioutb     = -3 - 8;
   xoutf     = fxin;
   xoutb     = 8.0 - xoutf / dxin;
-  fntablem1 = (double)(ntable - 1);
+  fntablem1 = static_cast<double>(ntable - 1);
   nxinm8    = nxin - 8;
 
   /* loop over output samples */
@@ -400,10 +400,10 @@ static void st_intt8r(Id ntable,
     /* determine pointers into table and yin */
     sum    = 0.;
     xoutn  = xoutb + xout[ixout] / dxin;
-    ixoutn = (Id)xoutn;
+    ixoutn = static_cast<Id>(xoutn);
     kyin   = ioutb + ixoutn;
-    frac   = xoutn - (double)ixoutn;
-    ktable = (Id)((frac >= 0.0) ? frac * fntablem1 + 0.5 : (frac + 1.0) * fntablem1 - 0.5);
+    frac   = xoutn - static_cast<double>(ixoutn);
+    ktable = static_cast<Id>((frac >= 0.0) ? frac * fntablem1 + 0.5 : (frac + 1.0) * fntablem1 - 0.5);
 
     /* if totally within input array, use fast method */
     if (kyin >= 0 && kyin <= nxinm8)
@@ -449,7 +449,7 @@ static void st_weights(double table[][LTABLE])
 
   for (jtable = 1; jtable < NTABLE - 1; jtable++)
   {
-    frac = (double)jtable / (double)(NTABLE - 1);
+    frac = static_cast<double>(jtable) / static_cast<double>(NTABLE - 1);
     st_mksinc(frac, LTABLE, &table[jtable][0]);
   }
   for (jtable = 0; jtable < LTABLE; jtable++)
@@ -578,7 +578,7 @@ Id seismic_z2t_grid(Id verbose,
   dz = db_z->getDX(ndim - 1);
   dt = 2. * dz / vmin;
   t0 = 2. * z0 / v0;
-  nt = (Id)(1 + (nz - 1) * (2. * dz) / (dt * vmax));
+  nt = static_cast<Id>(1 + (nz - 1) * (2. * dz) / (dt * vmax));
   dt *= VFACT;
   t0 *= VFACT;
   dx[ndim - 1] = dt;
@@ -648,7 +648,7 @@ Id seismic_t2z_grid(Id verbose,
   dt = db_t->getDX(ndim - 1);
   dz = vmin * dt / 2.;
   z0 = v0 * t0 / 2.;
-  nz = (Id)(1 + (nt - 1) * (dt * vmax) / (2. * dz));
+  nz = static_cast<Id>(1 + (nt - 1) * (dt * vmax) / (2. * dz));
   dz /= VFACT;
   z0 /= VFACT;
   dx[ndim - 1] = dz;

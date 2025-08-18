@@ -51,7 +51,7 @@ static Db* _dataTargetDeplement(Db* data, const VectorInt& varXvalid, Id iech0)
     DbStringFormat::createFromFlags(false, false, false, false, true);
 
   // Delete the cross-validation information
-  for (Id i = 0, nval = (Id)varXvalid.size(); i < nval; i++)
+  for (Id i = 0, nval = static_cast<Id>(varXvalid.size()); i < nval; i++)
     datap->setLocVariable(ELoc::Z, iech0, varXvalid[i], TEST);
   datap->display(dbfmt);
 

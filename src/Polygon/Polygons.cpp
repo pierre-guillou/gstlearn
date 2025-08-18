@@ -82,10 +82,10 @@ Id Polygons::resetFromDb(const Db* db, double dilate, bool verbose)
  * @return
  */
 Id Polygons::resetFromCSV(const String& filename,
-                           const CSVformat& csv,
-                           bool verbose,
-                           Id ncol_max,
-                           Id nrow_max)
+                          const CSVformat& csv,
+                          bool verbose,
+                          Id ncol_max,
+                          Id nrow_max)
 {
   VectorString names;
   VectorDouble tab;
@@ -138,10 +138,10 @@ Id Polygons::resetFromCSV(const String& filename,
  * @return
  */
 Id Polygons::resetFromWKT(const String& filename,
-                           const CSVformat& csv,
-                           bool verbose,
-                           Id ncol_max,
-                           Id nrow_max)
+                          const CSVformat& csv,
+                          bool verbose,
+                          Id ncol_max,
+                          Id nrow_max)
 {
   DECLARE_UNUSED(nrow_max);
   DECLARE_UNUSED(ncol_max);
@@ -283,8 +283,8 @@ PolyElem Polygons::_extractFromTab(Id ideb,
   for (Id j = ideb; j < ifin; j++)
   {
     Id i = j - ideb;
-    x[i]  = tab[ncol * j + 0];
-    y[i]  = tab[ncol * j + 1];
+    x[i] = tab[ncol * j + 0];
+    y[i] = tab[ncol * j + 1];
   }
   PolyElem polyelem(x, y);
   return polyelem;
@@ -510,11 +510,11 @@ bool Polygons::_isValidPolyElemIndex(Id ipol) const
  **
  *****************************************************************************/
 Id dbPolygonDistance(Db* db,
-                      Polygons* polygon,
-                      double dmax,
-                      Id scale,
-                      Id polin,
-                      const NamingConvention& namconv)
+                     Polygons* polygon,
+                     double dmax,
+                     Id scale,
+                     Id polin,
+                     const NamingConvention& namconv)
 {
   PolyPoint2D pldist;
   VectorDouble target(2);
@@ -571,7 +571,7 @@ Id dbPolygonDistance(Db* db,
       if (polin != 0)
       {
         Id inside = polygon->inside(db->getCoordinate(iech, 0),
-                                     db->getCoordinate(iech, 1));
+                                    db->getCoordinate(iech, 1));
         if (polin > 0)
         {
           if (!inside) continue;
@@ -626,7 +626,7 @@ Id dbPolygonDistance(Db* db,
     for (Id iech = 0; iech < nech; iech++)
     {
       Id inside = polygon->inside(db->getCoordinate(iech, 0),
-                                   db->getCoordinate(iech, 1));
+                                  db->getCoordinate(iech, 1));
       if (polin > 0 && !inside) db->setArray(iech, iptr, valtest);
       if (polin < 0 && inside) db->setArray(iech, iptr, valtest);
     }
@@ -657,7 +657,7 @@ Id dbPolygonDistance(Db* db,
  *****************************************************************************/
 bool Polygons::inside(const VectorDouble& coor, bool flag_nested) const
 {
-  bool flag3d = (Id)coor.size() > 2;
+  bool flag3d = static_cast<Id>(coor.size()) > 2;
   if (flag_nested)
   {
     Id number = 0;
@@ -700,13 +700,13 @@ bool Polygons::inside(const VectorDouble& coor, bool flag_nested) const
 VectorInt Polygons::_getHullIndices(const VectorDouble& x,
                                     const VectorDouble& y)
 {
-  Id number = (Id)x.size();
+  Id number = static_cast<Id>(x.size());
   VectorInt index(number + 1);
 
   /* Calculate the center of gravity and the leftmost point */
 
-  Id rank  = 0;
-  Id np    = 0;
+  Id rank   = 0;
+  Id np     = 0;
   double xg = 0.;
   double yg = 0.;
   for (Id i = 0; i < number; i++)
@@ -769,7 +769,7 @@ void Polygons::_polygonHullPrint(const VectorInt& index,
 {
   mestitle(1, "Polygon Hull");
   message("Ranks (1-based) and coordinates of the Active Samples included in the Convex Hull\n");
-  for (Id i = 0; i < (Id)index.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(index.size()); i++)
   {
     Id j = index[i];
     message("%3d : %lf %lf\n", j + 1, x[j], y[j]);
@@ -788,21 +788,21 @@ void Polygons::_getExtend(double ext,
                           VectorDouble& y,
                           Id nsect)
 {
-  Id ninit = (Id)x.size();
+  Id ninit = static_cast<Id>(x.size());
 
   x.resize(nsect * ninit);
   y.resize(nsect * ninit);
 
   for (Id j = 0; j < ninit; j++)
   {
-    Id i     = ninit - j - 1;
+    Id i      = ninit - j - 1;
     double x0 = x[i];
     double y0 = y[i];
 
     Id iad = i * nsect;
     for (Id k = 0; k < nsect; k++)
     {
-      double angle = 2. * GV_PI * k / (double)nsect;
+      double angle = 2. * GV_PI * k / static_cast<double>(nsect);
       x[iad + k]   = x0 + ext * cos(angle);
       y[iad + k]   = y0 + ext * sin(angle);
     }
@@ -852,7 +852,7 @@ Id Polygons::_buildHull(const Db* db, double dilate, bool verbose)
 
   /* Create the polygons */
 
-  Id np = (Id)index.size();
+  Id np = static_cast<Id>(index.size());
   VectorDouble xret(np);
   VectorDouble yret(np);
   for (Id i = 0; i < np; i++)
@@ -869,7 +869,7 @@ Id Polygons::_buildHull(const Db* db, double dilate, bool verbose)
     _getExtend(dilate, xinit, yinit);
     index = _getHullIndices(xinit, yinit);
 
-    np = (Id)index.size();
+    np = static_cast<Id>(index.size());
     xret.resize(np);
     yret.resize(np);
     for (Id i = 0; i < np; i++)
@@ -951,7 +951,7 @@ void db_polygon(Db* db,
         selval    = selval || polygon->inside(coor, flag_nested);
       }
     }
-    db->setArray(iech, iatt, (double)selval);
+    db->setArray(iech, iatt, static_cast<double>(selval));
   }
 
   // Setting the output variable
@@ -975,10 +975,10 @@ void db_polygon(Db* db,
  **
  *****************************************************************************/
 Id db_selhull(Db* db1,
-               Db* db2,
-               double dilate,
-               bool verbose,
-               const NamingConvention& namconv)
+              Db* db2,
+              double dilate,
+              bool verbose,
+              const NamingConvention& namconv)
 {
   /* Create the polygon as the convex hull of first Db */
 

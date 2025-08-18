@@ -71,9 +71,9 @@ void Timer::displaySeconds(const String& title, double sec, Id expected_time)
 {
   String loc_title = title.empty() ? "Timer" : title;
   if (expected_time > 0)
-    messageNoDiff("%s: %d s. (Ref = %d s.)\n", title.c_str(), (Id)sec, expected_time);
+    messageNoDiff("%s: %d s. (Ref = %d s.)\n", title.c_str(), static_cast<Id>(sec), expected_time);
   else
-    messageNoDiff("%s: %d s.\n", title.c_str(), (Id)sec);
+    messageNoDiff("%s: %d s.\n", title.c_str(), static_cast<Id>(sec));
 }
 
 /**
@@ -103,8 +103,8 @@ void Timer::displayMilliseconds(const String& title, double msec, Id expected_ti
 {
   String loc_title = title.empty() ? "Timer" : title;
   if (expected_time > 0)
-    messageNoDiff("%s: %d ms. (Ref = %d ms.)\n", title.c_str(), (Id)msec, expected_time);
+    messageNoDiff("%s: %d ms. (Ref = %d ms.)\n", title.c_str(), static_cast<Id>(msec), expected_time);
   else
-    messageNoDiff("%s: %d ms.\n", title.c_str(), (Id)msec);
+    messageNoDiff("%s: %d ms.\n", title.c_str(), static_cast<Id>(msec));
 }
 } // namespace gstlrn

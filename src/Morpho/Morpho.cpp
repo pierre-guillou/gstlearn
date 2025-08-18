@@ -67,9 +67,9 @@ Id _st_morpho_label_size(const VectorDouble& compnum,
                           VectorInt& sizes)
 {
   Id total = 0;
-  for (Id i = 0; i < (Id)compnum.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(compnum.size()); i++)
   {
-    Id val = (Id)compnum[i];
+    Id val = static_cast<Id>(compnum[i]);
     if (val > 0 && val <= nbcomp)
     {
       sizes[val - 1]++;
@@ -92,9 +92,9 @@ void _st_morpho_label_order(VectorDouble& compnum,
                             const VectorInt& order,
                             Id nbcomp)
 {
-  for (Id i = 0; i < (Id)compnum.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(compnum.size()); i++)
   {
-    Id val = (Id)compnum[i];
+    Id val = static_cast<Id>(compnum[i]);
     if (val <= 0) continue;
     Id found = -1;
     for (Id j = nbcomp - 1; j >= 0 && found < 0; j--)
@@ -190,7 +190,7 @@ VectorDouble morpho_labelling(Id option,
             jz           = iz + id[itest][2];
             if (imagin.isInside(jx, jy, jz))
             {
-              ival = (Id)COMPNUM(jx, jy, jz);
+              ival = static_cast<Id>(COMPNUM(jx, jy, jz));
               if (ival > 0)
               {
                 jcomp[itest] = list_array[ival - 1];
@@ -222,7 +222,7 @@ VectorDouble morpho_labelling(Id option,
         {
           icomp = 0;
         }
-        COMPNUM(ix, iy, iz) = (double)icomp;
+        COMPNUM(ix, iy, iz) = static_cast<double>(icomp);
       }
 
   /* Compressing the list */
@@ -240,7 +240,7 @@ VectorDouble morpho_labelling(Id option,
     for (iy = 0; iy < imagin.getNDims(1); iy++)
       for (ix = 0; ix < imagin.getNDims(0); ix++)
       {
-        iad = (Id)COMPNUM(ix, iy, iz);
+        iad = static_cast<Id>(COMPNUM(ix, iy, iz));
         if (iad != 0)
           COMPNUM(ix, iy, iz) = list_array[iad - 1];
         else
@@ -263,7 +263,7 @@ VectorDouble morpho_labelling(Id option,
       for (i = 0; i < nxyz; i++)
       {
         if (FFFF(compnum[i])) continue;
-        ival       = (Id)compnum[i];
+        ival       = static_cast<Id>(compnum[i]);
         compnum[i] = sizes[ival - 1];
       }
 
@@ -317,7 +317,7 @@ VectorInt morpho_labelsize(Id option, const BImage& imagin)
 {
   VectorInt sizes;
   VectorDouble compnum = morpho_labelling(option, 0, imagin, TEST);
-  Id nbcomp           = (Id)compnum.size();
+  Id nbcomp           = static_cast<Id>(compnum.size());
   if (nbcomp > 0)
   {
     sizes.resize(nbcomp, 0);
@@ -651,7 +651,7 @@ void morpho_double2imageInPlace(const VectorInt& nx,
         if (FFFF(val)) result = 0.;
         if (!FFFF(vmin) && val < vmin) result = 0.;
         if (!FFFF(vmax) && val >= vmax) result = 0.;
-        mot = (mot << 1) + (unsigned char)result;
+        mot = (mot << 1) + static_cast<unsigned char>(result);
         if (ind == 8)
         {
           imagout.setValue(ecr, mot);

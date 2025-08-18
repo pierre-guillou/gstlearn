@@ -71,7 +71,7 @@ bool CalcSimuPartition::_voronoi()
 
   /* Derive the number of points */
 
-  Id nbpoints = (Id)(volume * _parparam.getIntensity());
+  Id nbpoints = static_cast<Id>(volume * _parparam.getIntensity());
   if (_verbose)
     message("Boolean simulation. Intensity = %lf - Nb. seeds = %d\n",
             _parparam.getIntensity(), nbpoints);
@@ -177,7 +177,7 @@ bool CalcSimuPartition::_poisson()
     for (Id ip = 0; ip < np; ip++)
     {
       double prod = 0.;
-      for (Id i = 0; i < (Id)cen.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(cen.size()); i++)
         prod += planes[ip].getCoor(i) * cen[i];
       valtot += (prod + planes[ip].getIntercept() > 0) ? planes[ip].getRndval() : -planes[ip].getRndval();
     }
@@ -232,7 +232,7 @@ bool CalcSimuPartition::_poisson()
 double CalcSimuPartition::_stackSearch(const std::vector<Stack>& stacks,
                                        double valref)
 {
-  for (Id i = 0; i < (Id)stacks.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(stacks.size()); i++)
   {
     if (isEqual(stacks[i].valref, valref)) return stacks[i].valsim;
   }
@@ -323,11 +323,11 @@ void CalcSimuPartition::_rollback()
  **
  *****************************************************************************/
 Id tessellation_poisson(DbGrid* dbgrid,
-                         Model* model,
-                         const SimuPartitionParam& parparam,
-                         Id seed,
-                         Id verbose,
-                         const NamingConvention& namconv)
+                        Model* model,
+                        const SimuPartitionParam& parparam,
+                        Id seed,
+                        Id verbose,
+                        const NamingConvention& namconv)
 {
   CalcSimuPartition simpart(2, 1, seed, verbose);
   simpart.setDbout(dbgrid);
@@ -354,11 +354,11 @@ Id tessellation_poisson(DbGrid* dbgrid,
  **
  *****************************************************************************/
 Id tessellation_voronoi(DbGrid* dbgrid,
-                         Model* model,
-                         const SimuPartitionParam& parparam,
-                         Id seed,
-                         Id verbose,
-                         const NamingConvention& namconv)
+                        Model* model,
+                        const SimuPartitionParam& parparam,
+                        Id seed,
+                        Id verbose,
+                        const NamingConvention& namconv)
 {
   CalcSimuPartition simpart(1, 1, seed, verbose);
   simpart.setDbout(dbgrid);

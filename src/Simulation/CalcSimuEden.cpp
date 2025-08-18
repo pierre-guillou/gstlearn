@@ -379,7 +379,7 @@ Id CalcSimuEden::isToBeFilled(Id ipos) const
 Id CalcSimuEden::_getFACIES(Id iech) const
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  Id ifacies    = (Id)dbgrid->getArray(iech, _indFacies);
+  Id ifacies     = static_cast<Id>(dbgrid->getArray(iech, _indFacies));
   if (ifacies < 0 || ifacies > _nfacies || IFFFF(ifacies)) ifacies = SHALE;
   return (ifacies);
 }
@@ -399,7 +399,7 @@ Id CalcSimuEden::_getPERM(Id iech) const
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   double perm    = dbgrid->getArray(iech, _indPerm);
   if (FFFF(perm) || perm < 0.) perm = 0.;
-  return ((Id)perm);
+  return (static_cast<Id>(perm));
 }
 
 /****************************************************************************/
@@ -435,7 +435,7 @@ double CalcSimuEden::_getDATE(Id iech)
 Id CalcSimuEden::_getFLUID(Id iech) const
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  Id ifluid     = (Id)dbgrid->getArray(iech, _indFluid);
+  Id ifluid      = static_cast<Id>(dbgrid->getArray(iech, _indFluid));
   if (ifluid < 0 || ifluid > _nfluids || IFFFF(ifluid)) ifluid = UNDEF_FLUID;
   return (ifluid);
 }
@@ -455,7 +455,7 @@ Id CalcSimuEden::_getFLUID_OLD(Id iech) const
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
   double ifluid  = dbgrid->getArray(iech, _indFluid);
   if (ifluid < 0 || ifluid > _nfluids) ifluid = UNDEF_FLUID;
-  return ((Id)ifluid);
+  return (static_cast<Id>(ifluid));
 }
 
 /****************************************************************************/
@@ -497,8 +497,8 @@ double CalcSimuEden::getWeight(Id ipos, Id idir) const
     auto ifacies = _getFACIES(ipos);
     auto ifluid  = _getFLUID(ipos);
     auto perm    = _getPERM(ipos);
-    Id ind     = (idir) + 6 * ((ifacies - 1) * _nfluids + (ifluid - 1));
-    value       = perm * _speeds[ind];
+    Id ind       = (idir) + 6 * ((ifacies - 1) * _nfluids + (ifluid - 1));
+    value        = perm * _speeds[ind];
   }
   return (value);
 }
@@ -560,7 +560,7 @@ void CalcSimuEden::_checkInconsistency(bool verbose)
   {
     auto ifluid  = _getFLUID_OLD(iech);
     auto ifacies = _getFACIES(iech);
-    double perm = _getPERM(iech);
+    double perm  = _getPERM(iech);
 
     if (ifacies == SHALE || perm <= 0)
     {
@@ -629,7 +629,7 @@ void CalcSimuEden::_setFACIES(Id iech, Id ifacies)
 void CalcSimuEden::_setFACIES_CORK(Id iech)
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  Id ifacies    = (Id)dbgrid->getArray(iech, _indFacies);
+  Id ifacies     = static_cast<Id>(dbgrid->getArray(iech, _indFacies));
   dbgrid->setArray(iech, _indFacies, -ifacies);
 }
 
@@ -815,7 +815,7 @@ void CalcSimuEden::_statsEmpty(const char* title)
 {
   /* Print the statistics */
 
-  double total   = 0;
+  double total  = 0;
   Id flag_title = 1;
   for (Id ifacies = 0; ifacies < _nfacies; ifacies++)
   {
@@ -859,7 +859,7 @@ void CalcSimuEden::_calculateCumul(void)
 
     /* Update the Cork statistics */
 
-    Id ifacies = (Id)dbgrid->getArray(iech, _indFacies);
+    Id ifacies = static_cast<Id>(dbgrid->getArray(iech, _indFacies));
     if (ifacies < 0) dbgrid->updArray(iech, _iptrStatCork, EOperator::ADD, 1);
   }
 }
@@ -886,7 +886,7 @@ void CalcSimuEden::_updateResults(Id reset_facies, Id show_fluid)
   for (Id iech = 0; iech < _nxyz; iech++)
   {
     auto ifluid = _getFLUID_OLD(iech);
-    Id ifacies = (Id)dbgrid->getArray(iech, _indFacies);
+    Id ifacies  = static_cast<Id>(dbgrid->getArray(iech, _indFacies));
 
     /* Update the Facies information */
 
@@ -933,11 +933,11 @@ void CalcSimuEden::_normalizeCumul(Id niter)
     /* Normalize the Fluid statistics */
 
     for (Id ifluid = 0; ifluid < _nfluids; ifluid++)
-      dbgrid->updArray(iech, _iptrStatFluid + ifluid, EOperator::DIVIDE, (double)niter);
+      dbgrid->updArray(iech, _iptrStatFluid + ifluid, EOperator::DIVIDE, static_cast<double>(niter));
 
     /* Update the Cork statistics */
 
-    dbgrid->updArray(iech, _iptrStatCork, EOperator::DIVIDE, (double)niter);
+    dbgrid->updArray(iech, _iptrStatCork, EOperator::DIVIDE, static_cast<double>(niter));
   }
 }
 
@@ -1082,20 +1082,20 @@ void CalcSimuEden::_rollback()
 **
 *****************************************************************************/
 Id fluid_propagation(DbGrid* dbgrid,
-                      const String& name_facies,
-                      const String& name_fluid,
-                      const String& name_perm,
-                      const String& name_poro,
-                      Id nfacies,
-                      Id nfluids,
-                      Id niter,
-                      const VectorInt& speeds,
-                      bool show_fluid,
-                      double number_max,
-                      double volume_max,
-                      Id seed,
-                      bool verbose,
-                      const NamingConvention& namconv)
+                     const String& name_facies,
+                     const String& name_fluid,
+                     const String& name_perm,
+                     const String& name_poro,
+                     Id nfacies,
+                     Id nfluids,
+                     Id niter,
+                     const VectorInt& speeds,
+                     bool show_fluid,
+                     double number_max,
+                     double volume_max,
+                     Id seed,
+                     bool verbose,
+                     const NamingConvention& namconv)
 {
   CalcSimuEden seden(nfacies, nfluids, niter, 1, seed, verbose);
 

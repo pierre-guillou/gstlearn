@@ -81,7 +81,7 @@ void DriftList::copyCovContext(const CovContext& ctxt)
 
 void DriftList::_update()
 {
-  if ((Id)_mean.size() != _ctxt.getNVar())
+  if (static_cast<Id>(_mean.size()) != _ctxt.getNVar())
     _mean = VectorDouble(_ctxt.getNVar(), 0.);
 }
 
@@ -248,7 +248,7 @@ void DriftList::resetDriftList()
 
   // Resize the 'filtered' array (if necessary)
 
-  if (nbfl != (Id)_filtered.size())
+  if (nbfl != static_cast<Id>(_filtered.size()))
     _filtered.resize(nbfl, false);
 }
 
@@ -264,10 +264,10 @@ void DriftList::resetDriftList()
 void DriftList::setDriftCLByPart(Id ivar, Id ib, const VectorDouble& coef)
 {
   auto nbfl = getNDrift();
-  if (nbfl != (Id)coef.size())
+  if (nbfl != static_cast<Id>(coef.size()))
   {
     messerr("The dimension of 'vec' (%d) is not equal to the number of drift functions (%d)",
-            (Id)coef.size(), nbfl);
+            static_cast<Id>(coef.size()), nbfl);
     return;
   }
   for (Id il = 0; il < nbfl; il++)
@@ -342,7 +342,7 @@ VectorVectorDouble DriftList::getDrifts(const Db* db, bool useSel) const
 double DriftList::evalDriftCoef(const Db* db, Id iech, const VectorDouble& coeffs) const
 {
   auto nbfl  = getNDrift();
-  Id ncoeff = (Id)coeffs.size();
+  Id ncoeff = static_cast<Id>(coeffs.size());
   if (nbfl != ncoeff)
   {
     messerr("Dimension of 'coeffs' (%d) should match number of drift functions (%d)", ncoeff, nbfl);
@@ -372,7 +372,7 @@ VectorDouble DriftList::evalDriftCoefs(const Db* db,
 {
   VectorDouble vec;
   auto nbfl  = getNDrift();
-  Id ncoeff = (Id)coeffs.size();
+  Id ncoeff = static_cast<Id>(coeffs.size());
   if (ncoeff != nbfl)
   {
     messerr("'coeffs' dimension (%d) should match number of drift functions (%d)",
@@ -565,7 +565,7 @@ Id DriftList::evalDriftMatByRanksInPlace(MatrixDense& mat,
 
     /* Loop on the samples */
 
-    Id nechs = (Id)sampleRanksLoc[ivar].size();
+    Id nechs = static_cast<Id>(sampleRanksLoc[ivar].size());
     for (Id jech = 0; jech < nechs; jech++, irow++)
     {
       Id iech = sampleRanksLoc[ivar][jech];
@@ -622,7 +622,7 @@ VectorDouble DriftList::evalMeanVecByRanks(const Db* db,
 
   for (Id ivar = 0, ecr = 0, irow = 0; ivar < nvar; ivar++)
   {
-    Id nechs = (Id)sampleRanksLoc[ivar].size();
+    Id nechs = static_cast<Id>(sampleRanksLoc[ivar].size());
     for (Id jech = 0; jech < nechs; jech++, irow++, ecr++)
     {
       vec[ecr] = getMean(ivar);
@@ -705,7 +705,7 @@ void DriftList::evalDriftBySampleInPlace(const Db* db,
                                          VectorDouble& drftab) const
 {
   auto nbfl = getNDrift();
-  if (nbfl != (Id)drftab.size()) drftab.resize(nbfl);
+  if (nbfl != static_cast<Id>(drftab.size())) drftab.resize(nbfl);
   for (Id il = 0; il < nbfl; il++)
   {
     if (member != ECalcMember::LHS && isDriftFiltered(il))
@@ -772,7 +772,7 @@ const DriftList* DriftList::createReduce(const VectorInt& validVars) const
   Id ecr = 0;
   Id lec = 0;
   VectorBool valids(getNVar(), false);
-  Id nvar = (Id)validVars.size();
+  Id nvar = static_cast<Id>(validVars.size());
   VectorDouble mean(nvar, 0);
 
   for (Id ivar = 0; ivar < nvar; ivar++) valids[validVars[ivar]] = true;
@@ -796,7 +796,7 @@ void DriftList::setMeans(const VectorDouble& mean)
 
 double DriftList::getMean(Id ivar) const
 {
-  if (ivar < 0 || ivar >= (Id)_mean.size())
+  if (ivar < 0 || ivar >= static_cast<Id>(_mean.size()))
   {
     messerr("Invalid argument in DriftList::getMean");
     return TEST;
@@ -811,7 +811,7 @@ double DriftList::getMean(Id ivar) const
  */
 void DriftList::setMean(const double mean, Id ivar)
 {
-  if (ivar < 0 || ivar >= (Id)_mean.size())
+  if (ivar < 0 || ivar >= static_cast<Id>(_mean.size()))
   {
     messerr("Invalid argument in DriftList::setMean - nothing changed");
     return;

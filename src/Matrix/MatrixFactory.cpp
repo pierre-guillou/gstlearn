@@ -158,7 +158,7 @@ AMatrix* MatrixFactory::createReduce(const AMatrix* x,
     localSelRows = VH::filter(selRows, 0, x->getNRows());
     if (!flagKeepRows) localSelRows = VH::complement(VH::sequence(nrows), localSelRows);
   }
-  Id newNRows = (Id)localSelRows.size();
+  Id newNRows = static_cast<Id>(localSelRows.size());
   if (newNRows <= 0)
   {
     messerr("The new Matrix has no Row left");
@@ -174,7 +174,7 @@ AMatrix* MatrixFactory::createReduce(const AMatrix* x,
     localSelCols = VH::filter(selCols, 0, x->getNCols());
     if (!flagKeepCols) localSelCols = VH::complement(VH::sequence(ncols), localSelCols);
   }
-  Id newNCols = (Id)localSelCols.size();
+  Id newNCols = static_cast<Id>(localSelCols.size());
   if (newNCols <= 0)
   {
     messerr("The new Matrix has no Column left");

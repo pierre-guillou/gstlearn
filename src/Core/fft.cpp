@@ -237,7 +237,7 @@ static Id fftradix(double Re[],
   }
   if (MaxPermAlloced < static_cast<size_t>(maxPerm))
   {
-    Perm           = (Id*)realloc((char*)Perm, maxPerm * sizeof(Id));
+    Perm           = static_cast<Id*>(realloc((char*)Perm, maxPerm * sizeof(Id)));
     MaxPermAlloced = maxPerm;
   }
   else
@@ -970,7 +970,7 @@ Id fftn(Id ndim,
 
   /* Loop over the dimensions: */
 
-  if (dims != NULL)
+  if (dims != nullptr)
   {
     size_t nSpan = 1;
     Id i;

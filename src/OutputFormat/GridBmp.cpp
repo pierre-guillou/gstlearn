@@ -220,7 +220,7 @@ Id GridBmp::writeInFile()
   indg[0]  = 0;
   indg[1]  = 0;
   Id ipad = nx * _nmult;
-  ipad     = ipad - 4 * ((Id)(ipad / 4));
+  ipad     = ipad - 4 * ((ipad / 4));
   for (Id iy = 0; iy < ny; iy++)
   {
     if (iy % _nsampley != 0) continue;
@@ -320,7 +320,7 @@ Id GridBmp::_colorRank(Id iech, Id ncolor, double vmin, double vmax)
   if (FFFF(value)) return COLOR_FFFF;
 
   /* Find the color */
-  Id ival = (Id)(ncolor * (value - vmin) / (vmax - vmin));
+  Id ival = static_cast<Id>(ncolor * (value - vmin) / (vmax - vmin));
 
   /* Value lower than vmin */
   if (ival < 0)
@@ -364,41 +364,41 @@ void GridBmp::_colorInRGB(Id rank,
   switch (rank)
   {
     case COLOR_MASK:
-      *ired   = (unsigned char)_mask_red;
-      *igreen = (unsigned char)_mask_green;
-      *iblue  = (unsigned char)_mask_blue;
+      *ired   = static_cast<unsigned char>(_mask_red);
+      *igreen = static_cast<unsigned char>(_mask_green);
+      *iblue  = static_cast<unsigned char>(_mask_blue);
       break;
 
     case COLOR_FFFF:
-      *ired   = (unsigned char)_ffff_red;
-      *igreen = (unsigned char)_ffff_green;
-      *iblue  = (unsigned char)_ffff_blue;
+      *ired   = static_cast<unsigned char>(_ffff_red);
+      *igreen = static_cast<unsigned char>(_ffff_green);
+      *iblue  = static_cast<unsigned char>(_ffff_blue);
       break;
 
     case COLOR_LOWER:
-      *ired   = (unsigned char)_low_red;
-      *igreen = (unsigned char)_low_green;
-      *iblue  = (unsigned char)_low_blue;
+      *ired   = static_cast<unsigned char>(_low_red);
+      *igreen = static_cast<unsigned char>(_low_green);
+      *iblue  = static_cast<unsigned char>(_low_blue);
       break;
 
     case COLOR_UPPER:
-      *ired   = (unsigned char)_high_red;
-      *igreen = (unsigned char)_high_green;
-      *iblue  = (unsigned char)_high_blue;
+      *ired   = static_cast<unsigned char>(_high_red);
+      *igreen = static_cast<unsigned char>(_high_green);
+      *iblue  = static_cast<unsigned char>(_high_blue);
       break;
 
     default:
       if (flag_color_scale)
       {
-        *ired   = (unsigned char)_reds[rank];
-        *igreen = (unsigned char)_greens[rank];
-        *iblue  = (unsigned char)_blues[rank];
+        *ired   = static_cast<unsigned char>(_reds[rank]);
+        *igreen = static_cast<unsigned char>(_greens[rank]);
+        *iblue  = static_cast<unsigned char>(_blues[rank]);
       }
       else
       {
-        *ired   = (unsigned char)rank;
-        *igreen = (unsigned char)rank;
-        *iblue  = (unsigned char)rank;
+        *ired   = static_cast<unsigned char>(rank);
+        *igreen = static_cast<unsigned char>(rank);
+        *iblue  = static_cast<unsigned char>(rank);
       }
   }
 }
@@ -469,8 +469,8 @@ DbGrid* GridBmp::readGridFromFile()
 
   /* Final results */
 
-  if (ndx > 0) dx[0] = 100. / (double)ndx;
-  if (ndy > 0) dx[1] = 100. / (double)ndy;
+  if (ndx > 0) dx[0] = 100. / static_cast<double>(ndx);
+  if (ndy > 0) dx[1] = 100. / static_cast<double>(ndy);
 
   /* Reading the image (from bottom to up) */
 
@@ -556,7 +556,7 @@ unsigned char GridBmp::_readIn()
 
 {
   unsigned char c;
-  c = (unsigned char)fgetc(_file);
+  c = static_cast<unsigned char>(fgetc(_file));
   if (!feof(_file)) return c;
   return (c);
 }
@@ -603,11 +603,11 @@ void GridBmp::_rgb2num(Id red,
   DECLARE_UNUSED(a);
   double value;
 
-  value = (double)(red + green + blue) / 3.;
+  value = static_cast<double>(red + green + blue) / 3.;
 
   if (value < 0.) value = 0.;
   if (value > 255.) value = 255.;
-  *c = (unsigned char)value;
+  *c = static_cast<unsigned char>(value);
 }
 
 } // namespace gstlrn

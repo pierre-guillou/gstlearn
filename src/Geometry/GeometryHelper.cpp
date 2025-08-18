@@ -343,7 +343,7 @@ void GeometryHelper::rotationCopy(Id ndim, const double* rotin, double* rotout)
 void GeometryHelper::rotationGetAnglesInPlace(const VectorDouble& rot,
                                               VectorDouble& angles)
 {
-  Id ndim = sqrt((Id)rot.size());
+  Id ndim = sqrt(static_cast<Id>(rot.size()));
   GH::rotationGetAnglesInPlace(ndim, rot.data(), angles.data());
 }
 
@@ -439,7 +439,7 @@ void GeometryHelper::rotationGetAnglesFromCodirInPlace(const VectorDouble& codir
                                                        VectorDouble& angles)
 {
   Id nval;
-  Id ndim = (Id)codir.size();
+  Id ndim = static_cast<Id>(codir.size());
   angles.resize(ndim);
 
   /* Initializations */
@@ -495,7 +495,7 @@ void GeometryHelper::rotationGetAnglesFromCodirInPlace(const VectorDouble& codir
 VectorDouble GeometryHelper::rotationGetAngles(const VectorDouble& codir,
                                                bool flagResize)
 {
-  Id ndim = (Id)codir.size();
+  Id ndim = static_cast<Id>(codir.size());
   VectorDouble angles(ndim);
   GH::rotationGetAnglesFromCodirInPlace(codir, angles);
   if (ndim == 2 && flagResize) angles.resize(1);
@@ -512,7 +512,7 @@ VectorDouble GeometryHelper::rotationGetAngles(const VectorDouble& codir,
 VectorDouble GeometryHelper::rotationFromIncrements(const VectorDouble& incr, bool flagDegree)
 {
   VectorDouble angles;
-  Id ndim = (Id)incr.size();
+  Id ndim = static_cast<Id>(incr.size());
   if (ndim == 1 || ndim > 3)
   {
     messerr("This function only makes sense when NDIM (%d) = 2 or 3", ndim);
@@ -561,9 +561,9 @@ VectorDouble GeometryHelper::rotationFromIncrements(const VectorDouble& incr, bo
 void GeometryHelper::rotationGetDirection2D(const VectorDouble& angles,
                                             VectorDouble& codir)
 {
-  Id ndir = (Id)angles.size();
+  Id ndir = static_cast<Id>(angles.size());
   Id ndim = 2;
-  if (codir.size() > 0) ndim = (Id)codir.size() / ndir;
+  if (codir.size() > 0) ndim = static_cast<Id>(codir.size()) / ndir;
   codir.resize(ndim * ndir);
   for (Id i = 0; i < ndim * ndir; i++)
     codir[i] = 0.;
@@ -1114,7 +1114,7 @@ VectorVectorDouble GeometryHelper::convert3DToLongLat(const VectorDouble& x,
   double radius = _getRadius(radius_arg);
 
   VectorVectorDouble tab;
-  Id number = (Id)x.size();
+  Id number = static_cast<Id>(x.size());
 
   // Dimension the returned argument
   tab.resize(2);
@@ -1151,8 +1151,8 @@ VectorVectorDouble GeometryHelper::convertLongLatTo3D(const VectorDouble& longit
   radius *= dilate;
 
   VectorVectorDouble tab;
-  Id number = (Id)longitude.size();
-  if (number != (Id)latitude.size()) return tab;
+  Id number = static_cast<Id>(longitude.size());
+  if (number != static_cast<Id>(latitude.size())) return tab;
 
   // Dimension the returned argument
   tab.resize(3);
@@ -1770,7 +1770,7 @@ double GeometryHelper::formatAngle(double anglein, double basis)
 VectorDouble GeometryHelper::formatAngles(const VectorDouble& anglesin, double basis)
 {
   VectorDouble angles = anglesin;
-  for (Id idim = 0; idim < (Id)angles.size(); idim++)
+  for (Id idim = 0; idim < static_cast<Id>(angles.size()); idim++)
     angles[idim] = formatAngle(angles[idim], basis);
   return angles;
 }
@@ -1820,7 +1820,7 @@ VectorVectorDouble GeometryHelper::sphBarCoord(const VectorVectorDouble& sphPts,
                                                const MatrixDense& apices,
                                                const MatrixInt& meshes)
 {
-  Id np        = (Id)sphPts.size();
+  Id np        = static_cast<Id>(sphPts.size());
   auto nmeshes = meshes.getNRows();
 
   // Dimension the output storage

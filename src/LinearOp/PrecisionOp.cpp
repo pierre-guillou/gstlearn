@@ -341,7 +341,7 @@ void PrecisionOp::_addEvalPower(const constvect inv,
   if (power == EPowerPT::ONE || power == EPowerPT::MINUSONE)
   {
     _shiftOp->prodLambda(inv, worksp, power);
-    inPtr = (constvect*)&worksp;
+    inPtr = reinterpret_cast<constvect*>(&worksp);
   }
 
   // Polynomial evaluation
@@ -407,7 +407,7 @@ Id PrecisionOp::_addEvalPoly(const EPowerPT& power,
     }
     ((ClassicalPolynomial*)_polynomials[power].get())->evalOpTraining(a->getS(), invs, _workPoly, _work5);
 
-    for (Id i = 0; i < (Id)inv.size(); i++)
+    for (Id i = 0; i < static_cast<Id>(inv.size()); i++)
     {
       outv[i] += _workPoly[0][i];
     }

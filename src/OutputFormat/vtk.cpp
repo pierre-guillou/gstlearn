@@ -237,7 +237,7 @@ static void write_int(Id val)
 {
   if (useBinary)
   {
-    force_big_endian((unsigned char*)&val);
+    force_big_endian(reinterpret_cast<unsigned char*>(&val));
     fwrite(&val, sizeof(Id), 1, fp);
   }
   else

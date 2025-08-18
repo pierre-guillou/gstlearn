@@ -216,7 +216,7 @@ bool DbGraphO::_deserializeAscii(std::istream& is, bool verbose)
   for (Id i = 0; i < narcs; i++)
   {
     ret = ret && _recordReadVec<double>(is, "", tab, 3);
-    nft.add((Id)tab[0], (Id)tab[1], tab[2]);
+    nft.add(static_cast<Id>(tab[0]), static_cast<Id>(tab[1]), tab[2]);
   }
   _downArcs.resetFromTriplet(nft);
 
@@ -374,7 +374,7 @@ double DbGraphO::getArcValue(Id iarc) const
 
 void DbGraphO::_updateOrder(Id rank, const VectorDouble& v, VectorInt& order)
 {
-  Id nech = (Id)v.size();
+  Id nech = static_cast<Id>(v.size());
 
   for (Id iech = 0; iech < nech; iech++)
   {
@@ -384,7 +384,7 @@ void DbGraphO::_updateOrder(Id rank, const VectorDouble& v, VectorInt& order)
 
 void DbGraphO::_updateCumul(Id rank, const VectorDouble& v, VectorDouble& cumul)
 {
-  Id nech = (Id)v.size();
+  Id nech = static_cast<Id>(v.size());
 
   for (Id iech = 0; iech < nech; iech++)
   {
@@ -396,7 +396,7 @@ void DbGraphO::_updateCumul(Id rank, const VectorDouble& v, VectorDouble& cumul)
 VectorInt DbGraphO::_getRanks(const VectorDouble& v)
 {
   VectorInt retvec;
-  for (Id iech = 0, nech = (Id)v.size(); iech < nech; iech++)
+  for (Id iech = 0, nech = static_cast<Id>(v.size()); iech < nech; iech++)
   {
     if (v[iech] > 0.) retvec.push_back(iech);
   }
@@ -513,7 +513,7 @@ VectorInt DbGraphO::getOrderDown(Id node) const
 
 VectorInt DbGraphO::_getNoneZeroIndices(const VectorDouble& v)
 {
-  Id nech = (Id)v.size();
+  Id nech = static_cast<Id>(v.size());
 
   VectorInt vall;
   for (Id iech = 0; iech < nech; iech++)
@@ -537,7 +537,7 @@ void DbGraphO::_iterateCumul(const VectorInt& inds,
                              VectorDouble& v1,
                              VectorDouble& v2) const
 {
-  for (Id ind = 0, nind = (Id)inds.size(); ind < nind; ind++)
+  for (Id ind = 0, nind = static_cast<Id>(inds.size()); ind < nind; ind++)
   {
     Id rank = inds[ind];
     v1.fill(0.);
@@ -564,7 +564,7 @@ VectorDouble DbGraphO::getCumulDown(Id node) const
 
 void DbGraphO::setArcLine(const VectorInt& nodes, double value)
 {
-  Id number = (Id)nodes.size();
+  Id number = static_cast<Id>(nodes.size());
   for (Id i = 1; i < number; i++)
   {
     Id i1 = nodes[i - 1];
@@ -599,7 +599,7 @@ bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
     if (!arcg) return false;
 
     ret = ret && SerializeHDF5::readVec(*arcg, "Arc", tab);
-    nft.add((Id)tab[0], (Id)tab[1], tab[2]);
+    nft.add(static_cast<Id>(tab[0]), static_cast<Id>(tab[1]), tab[2]);
   }
   _downArcs.resetFromTriplet(nft);
 

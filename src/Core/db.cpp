@@ -268,7 +268,7 @@ void db_sample_print(Db* db,
     if (FFFF(value))
       message("Code          = NA\n");
     else
-      message("Code          = %d\n", (Id)value);
+      message("Code          = %d\n", static_cast<Id>(value));
   }
   if (flag_blk != 0)
   {
@@ -278,7 +278,7 @@ void db_sample_print(Db* db,
       if (FFFF(value))
         message("Code          = NA\n");
       else
-        message("Code          = %d\n", (Id)value);
+        message("Code          = %d\n", static_cast<Id>(value));
     }
   }
 }
@@ -440,10 +440,10 @@ Id db_gradient_update(Db* db)
  **
  *****************************************************************************/
 Id db_selref(Id ndim,
-              const Id* nx,
-              const Id* ref,
-              const double* tabin,
-              double* tabout)
+             const Id* nx,
+             const Id* ref,
+             const double* tabin,
+             double* tabout)
 {
   Id idim, jdim, ntotal, nval, lec, ecr, iech, ival, neff_ndim;
 
@@ -523,11 +523,11 @@ Id db_selref(Id ndim,
  **
  *****************************************************************************/
 Id db_locator_attribute_add(Db* db,
-                             const ELoc& locatorType,
-                             Id number,
-                             Id r_tem,
-                             double valinit,
-                             Id* iptr)
+                            const ELoc& locatorType,
+                            Id number,
+                            Id r_tem,
+                            double valinit,
+                            Id* iptr)
 {
   (*iptr) = db->addColumnsByConstant(number, valinit);
   if ((*iptr) < 0) return (1);
@@ -558,11 +558,11 @@ Id db_locator_attribute_add(Db* db,
  **
  *****************************************************************************/
 Id db_grid_copy(DbGrid* db1,
-                 DbGrid* db2,
-                 const Id* ind1,
-                 const Id* ind2,
-                 Id ncol,
-                 Id* cols)
+                DbGrid* db2,
+                const Id* ind1,
+                const Id* ind2,
+                Id ncol,
+                Id* cols)
 {
   /* Set the constant indices in the input Grid Db */
 
@@ -756,9 +756,9 @@ static VectorDouble work2;
  **
  *****************************************************************************/
 Id point_to_grid(const DbGrid* db,
-                  const double* coor,
-                  Id flag_outside,
-                  Id* indg)
+                 const double* coor,
+                 Id flag_outside,
+                 Id* indg)
 {
   Id ndim = db->getNDim();
   work1.resize(ndim);
@@ -836,7 +836,7 @@ Id point_to_bench(const DbGrid* db, double* coor, Id flag_outside, Id* indb)
   work1.resize(ndim);
   work2.resize(ndim);
   Id idim0 = 2;
-  (*indb)   = -1;
+  (*indb)  = -1;
 
   /* Check that the grid is defined in 3-D (or more) space */
 
@@ -860,7 +860,7 @@ Id point_to_bench(const DbGrid* db, double* coor, Id flag_outside, Id* indb)
 
   double z  = work2[idim0];
   double dz = db->getDX(idim0);
-  Id nz    = db->getNX(idim0);
+  Id nz     = db->getNX(idim0);
 
   Id iz;
   if (dz <= 0.)
@@ -1118,7 +1118,7 @@ Id db_proportion(
 
     for (Id ivar = invalid = 0; ivar < nvar && invalid == 0; ivar++)
     {
-      ifac[ivar] = (Id)db->getZVariable(iech, ivar);
+      ifac[ivar] = static_cast<Id>(db->getZVariable(iech, ivar));
       if (ifac[ivar] > nmax[ivar]) invalid = 1;
     }
     if (invalid) continue;
@@ -1409,7 +1409,7 @@ Id db_prop_read(DbGrid* db, Id ix, Id iy, double* props)
   for (Id iz = ecr = 0; iz < nz; iz++)
   {
     indices[2] = iz;
-    Id iech   = db->indiceToRank(indices);
+    Id iech    = db->indiceToRank(indices);
 
     /* Check if the proportions are ALL defined */
 
@@ -1469,7 +1469,7 @@ Id db_prop_write(DbGrid* db, Id ix, Id iy, double* props)
   for (Id iz = ecr = 0; iz < nz; iz++)
   {
     indices[2] = iz;
-    Id iech   = db->indiceToRank(indices);
+    Id iech    = db->indiceToRank(indices);
     for (Id iprop = 0; iprop < nprop; iprop++, ecr++)
       db->setLocVariable(ELoc::P, iech, iprop, props[ecr]);
   }
@@ -1755,13 +1755,13 @@ Id db_gradient_modang_to_component(
  **
  *****************************************************************************/
 Id db_gradient_component_to_modang(Db* db,
-                                    Id verbose,
-                                    Id iad_gx,
-                                    Id iad_gy,
-                                    Id iad_mod,
-                                    Id iad_ang,
-                                    double scale,
-                                    double ve)
+                                   Id verbose,
+                                   Id iad_gx,
+                                   Id iad_gy,
+                                   Id iad_mod,
+                                   Id iad_ang,
+                                   double scale,
+                                   double ve)
 {
   double norme, angle, vmax, surr, alpha, mini, maxi;
 
@@ -2084,13 +2084,13 @@ label_end:
  **
  *****************************************************************************/
 Id db_grid_patch(DbGrid* ss_grid,
-                  DbGrid* db_grid,
-                  Id iptr_ss,
-                  Id iptr_db,
-                  Id iptr_rank,
-                  Id new_rank,
-                  Id oper,
-                  Id verbose)
+                 DbGrid* db_grid,
+                 Id iptr_ss,
+                 Id iptr_db,
+                 Id iptr_rank,
+                 Id new_rank,
+                 Id oper,
+                 Id verbose)
 {
   Id error, ndim, jech, nused, noused, nout, nundef, nmask, ndef, nbnomask,
     flag_save;

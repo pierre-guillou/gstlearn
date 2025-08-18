@@ -9,13 +9,13 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Calculators/ACalcInterpolator.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Calculators/ACalcDbToDb.hpp"
 #include "Calculators/CalcMigrate.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbHelper.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/ANeigh.hpp"
-#include "Basic/VectorHelper.hpp"
 
 namespace gstlrn
 {
@@ -52,7 +52,7 @@ bool ACalcInterpolator::_setNCov(Id ncova)
 
 bool ACalcInterpolator::_check()
 {
-  if (! ACalcDbToDb::_check()) return false;
+  if (!ACalcDbToDb::_check()) return false;
 
   /**************************************************/
   /* Cross-checking the Space Dimension consistency */
@@ -66,8 +66,8 @@ bool ACalcInterpolator::_check()
       if (ndim != _model->getNDim())
       {
         messerr("Inconsistent Space dimension:");
-        messerr("- Current dimension = %d",ndim);
-        messerr("- Space Dimension of 'model' = %d",_model->getNDim());
+        messerr("- Current dimension = %d", ndim);
+        messerr("- Space Dimension of 'model' = %d", _model->getNDim());
         return false;
       }
     }
@@ -84,14 +84,14 @@ bool ACalcInterpolator::_check()
       if (ndim != _neigh->getNDim())
       {
         messerr("Inconsistent Space dimension:");
-        messerr("- Current dimension = %d",ndim);
-        messerr("- Space Dimension of '_neigh' = %d",_neigh->getNDim());
+        messerr("- Current dimension = %d", ndim);
+        messerr("- Space Dimension of '_neigh' = %d", _neigh->getNDim());
         return false;
       }
     }
     else
     {
-      ndim = (Id) _neigh->getNDim();
+      ndim = static_cast<Id>(_neigh->getNDim());
     }
     // Attach the input and output files
     _neigh->attach(getDbin(), getDbout());
@@ -109,14 +109,14 @@ bool ACalcInterpolator::_check()
       if (nvar != _model->getNVar())
       {
         messerr("Inconsistent Variable Number:");
-        messerr("- Current number = %d",nvar);
-        messerr("- Number of variables in 'model' = %d",_model->getNVar());
+        messerr("- Current number = %d", nvar);
+        messerr("- Number of variables in 'model' = %d", _model->getNVar());
         return false;
       }
     }
     else
     {
-//      nvar = _model->getNVar(); // Never reached
+      //      nvar = _model->getNVar(); // Never reached
     }
   }
 
@@ -174,7 +174,7 @@ bool ACalcInterpolator::_check()
   {
     VectorDouble db_mini(ndim, TEST);
     VectorDouble db_maxi(ndim, TEST);
-    if (hasDbin(false))  getDbin()->getExtensionInPlace(db_mini, db_maxi, true);
+    if (hasDbin(false)) getDbin()->getExtensionInPlace(db_mini, db_maxi, true);
     if (hasDbout(false)) getDbout()->getExtensionInPlace(db_mini, db_maxi, true);
     _model->setField(VH::extensionDiagonal(db_mini, db_maxi));
   }
@@ -193,7 +193,7 @@ bool ACalcInterpolator::_preprocess()
   }
   if (_neigh != nullptr)
   {
-    if (!_setNdim((Id)_neigh->getNDim())) return false;
+    if (!_setNdim(static_cast<Id>(_neigh->getNDim()))) return false;
   }
 
   // Number of variables
@@ -255,4 +255,4 @@ Id ACalcInterpolator::_centerDataToGrid(DbGrid* dbgrid)
   }
   return DbH::centerPointToGrid(getDbin(), dbgrid, 0.);
 }
-}
+} // namespace gstlrn

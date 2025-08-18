@@ -33,7 +33,7 @@ ModelOptimVario::ModelOptimVario(ModelGeneric* model,
   , _vario()
   , _lags()
 {
-  bool useGradientsAnalytical = (bool) OptCustom::query("AnalyticalGradients",1);
+  bool useGradientsAnalytical = static_cast<bool>(OptCustom::query("AnalyticalGradients",1));
   setAuthorizedAnalyticalGradients(useGradientsAnalytical);
 }
 
@@ -70,7 +70,7 @@ ModelOptimVario::~ModelOptimVario()
 
 bool ModelOptimVario::_checkConsistency()
 {
-  if (_vario->getNDim() != (Id)_model->getNDim())
+  if (_vario->getNDim() != static_cast<Id>(_model->getNDim()))
   {
     messerr("'_vario'(%d) and '_model'(%d) should have same Space Dimension",
             _vario->getNDim(), _model->getNDim());
@@ -242,7 +242,7 @@ double ModelOptimVario::computeCost(bool verbose)
   DECLARE_UNUSED(verbose);
 
   // Evaluate the Cost function
-  Id nlags    = (Id)_lags.size();
+  Id nlags    = static_cast<Id>(_lags.size());
   double score = 0.;
   SpacePoint origin;
   _resid.resize(nlags);
@@ -262,7 +262,7 @@ void ModelOptimVario::evalGrad(vect res)
 {
 
   auto gradcov = _model->getGradients();
-  Id nlags    = (Id)_lags.size();
+  Id nlags    = static_cast<Id>(_lags.size());
   SpacePoint origin;
 
   for (size_t i = 0; i < gradcov.size(); i++)

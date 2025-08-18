@@ -402,7 +402,7 @@ static StrMod* st_model_auto_strmod_free(StrMod* strmod)
   if (strmod == nullptr) return (strmod);
 
   /* Check that the user_data area has been freed */
-  if (strmod->user_data != NULL)
+  if (strmod->user_data != nullptr)
   {
     messerr("The User_Data area of the StrMod structure has not been freed");
     messerr("Before the StrMod structure is released");
@@ -735,8 +735,8 @@ static void st_compress_array(const Vario* vario,
 
   Id ecr     = 0;
   Id ipadir  = 0;
-  Id sizein  = (Id)tabin.size();
-  Id sizeout = (Id)tabout.size();
+  Id sizein  = static_cast<Id>(tabin.size());
+  Id sizeout = static_cast<Id>(tabout.size());
   for (Id idir = 0, ndir = vario->getNDir(); idir < ndir; idir++)
     for (Id ilag = 0, nlag = vario->getNLag(idir); ilag < nlag; ilag++, ipadir++)
     {
@@ -4442,14 +4442,14 @@ Id model_auto_fit(Vario* vario,
 
   // Define regularizing constraints (temporarily) using "keypair" mechanism
 
-  flag_regular = (Id)get_keypone("Data_Discretization", 0.);
+  flag_regular = static_cast<Id>(get_keypone("Data_Discretization", 0.));
   if (flag_regular)
   {
     REGULARIZE.flag_regularize = 1;
     REGULARIZE.ndim            = ndim;
-    REGULARIZE.ndisc[0]        = (Id)get_keypone("Data_Discretization_NX", 1.);
-    REGULARIZE.ndisc[1]        = (Id)get_keypone("Data_Discretization_NY", 1.);
-    REGULARIZE.ndisc[2]        = (Id)get_keypone("Data_Discretization_NZ", 1.);
+    REGULARIZE.ndisc[0]        = static_cast<Id>(get_keypone("Data_Discretization_NX", 1.));
+    REGULARIZE.ndisc[1]        = static_cast<Id>(get_keypone("Data_Discretization_NY", 1.));
+    REGULARIZE.ndisc[2]        = static_cast<Id>(get_keypone("Data_Discretization_NZ", 1.));
     REGULARIZE.support[0]      = get_keypone("Data_Discretization_DX", 0.);
     REGULARIZE.support[1]      = get_keypone("Data_Discretization_DY", 0.);
     REGULARIZE.support[2]      = get_keypone("Data_Discretization_DZ", 0.);

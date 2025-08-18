@@ -157,13 +157,13 @@ Id ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
 {
   auto nrows = driftMat.getNRows();
   auto ncols = driftMat.getNCols();
-  if (nrows != (Id)Z.size())
+  if (nrows != static_cast<Id>(Z.size()))
   {
     messerr("Error in number of Rows of drift matrix (%d) and size of data vector (%d)",
             nrows, Z.size());
     return 1;
   }
-  if (ncols != (Id)driftCoeffs.size())
+  if (ncols != static_cast<Id>(driftCoeffs.size()))
   {
     messerr("Error in number of Columns of drift matrix (%d) and size of drift coefficients (%d)",
             ncols, driftCoeffs.size());
@@ -186,7 +186,7 @@ Id ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
 Id ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
                                 const VectorDouble& meanVec)
 {
-  if ((Id)Z.size() != (Id)meanVec.size())
+  if (static_cast<Id>(Z.size()) != static_cast<Id>(meanVec.size()))
   {
     messerr("Error in size of data vector (%d) and size of mean vector (%d)",
             Z.size(), meanVec.size());
@@ -194,7 +194,7 @@ Id ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
   }
 
   // Center the data set
-  for (Id i = 0, nrows = (Id)Z.size(); i < nrows; i++)
+  for (Id i = 0, nrows = static_cast<Id>(Z.size()); i < nrows; i++)
     Z[i] -= meanVec[i];
   return 0;
 }
@@ -347,7 +347,7 @@ VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
                                          const MatrixDense& driftMat,
                                          bool verbose) const
 {
-  Id xsize = (Id)(driftMat.getNCols());
+  Id xsize = (driftMat.getNCols());
   VectorDouble XtInvSigmaZ(xsize);
   MatrixSymmetric XtInvSigmaX(xsize);
   VectorDouble result(xsize);

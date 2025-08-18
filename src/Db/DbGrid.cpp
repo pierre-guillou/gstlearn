@@ -116,7 +116,7 @@ Id DbGrid::reset(const VectorInt& nx,
   Id nech = 1;
   for (Id idim = 0; idim < ndim; idim++)
     nech *= nx[idim];
-  Id ntab   = (tab.empty()) ? 0 : (Id)(tab.size() / nech);
+  Id ntab   = (tab.empty()) ? 0 : static_cast<Id>(tab.size() / nech);
   Id number = 0;
   if (flagAddSampleRank) number += 1;
   if (flagAddCoordinates) number += ndim;
@@ -185,22 +185,22 @@ Id DbGrid::resetCoveringDb(const Db* db,
     VectorDouble coor = db->getExtrema(idim, true);
 
     double marge = 0.;
-    if (ndim == (Id)margin.size()) marge = margin[idim];
+    if (ndim == static_cast<Id>(margin.size())) marge = margin[idim];
 
     double x0loc = coor[0];
-    if (ndim == (Id)x0.size()) x0loc = x0[idim];
+    if (ndim == static_cast<Id>(x0.size())) x0loc = x0[idim];
     x0loc -= marge;
 
     double ext = coor[1] - x0loc + marge;
 
     // Constraints specified by the number of nodes
     Id nxloc = 10;
-    if (ndim == (Id)nx.size())
+    if (ndim == static_cast<Id>(nx.size()))
       nxloc = nx[idim];
-    double dxloc = ext / ((double)nxloc - 1.);
+    double dxloc = ext / (static_cast<double>(nxloc) - 1.);
 
     // Constraints specified by the cell sizes
-    if (ndim == (Id)dx.size())
+    if (ndim == static_cast<Id>(dx.size()))
     {
       dxloc = dx[idim];
       nxloc = ceil((ext - dxloc / 2.) / dxloc) + 1;
@@ -260,13 +260,13 @@ Id DbGrid::resetFromPolygon(Polygons* polygon,
     double ext = (idim == 0) ? xmax - xmin : ymax - ymin;
 
     Id nx    = 10;
-    double dx = ext / (double)nx;
-    if (ndim == (Id)nodes.size())
+    double dx = ext / static_cast<double>(nx);
+    if (ndim == static_cast<Id>(nodes.size()))
     {
       nx = nodes[idim];
-      dx = ext / (double)nx;
+      dx = ext / static_cast<double>(nx);
     }
-    if (ndim == (Id)dcell.size())
+    if (ndim == static_cast<Id>(dcell.size()))
     {
       dx = dcell[idim];
       nx = static_cast<Id>(ext / dx);
@@ -402,18 +402,18 @@ DbGrid* DbGrid::createFromGridExtend(const DbGrid& gridIn,
 {
   DbGrid* gridnew = new DbGrid;
 
-  Id ncoor = (Id)nxnew.size();
+  Id ncoor = static_cast<Id>(nxnew.size());
   if (ncoor <= 0)
   {
     messerr("You must provide a non-empty vector of meshing dimensions");
     return gridnew;
   }
-  if (ncoor != (Id)tops.size())
+  if (ncoor != static_cast<Id>(tops.size()))
   {
     messerr("Arguments 'tops' and 'nxnew' should have the same dimension");
     return gridnew;
   }
-  if (ncoor != (Id)bots.size())
+  if (ncoor != static_cast<Id>(bots.size()))
   {
     messerr("Arguments 'bots' and 'nxnew' should have the same dimension");
     return gridnew;
@@ -504,7 +504,7 @@ DbGrid* DbGrid::createFromGridShrink(const DbGrid& gridIn,
   auto* gridnew = new DbGrid();
   auto ndim     = gridIn.getNDim();
 
-  for (Id i = 0; i < (Id)deletedRanks.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(deletedRanks.size()); i++)
   {
     if (i < 0 || i >= ndim)
     {
@@ -526,7 +526,7 @@ DbGrid* DbGrid::createFromGridShrink(const DbGrid& gridIn,
   VectorDouble angles = gridIn.getAngles();
 
   // Suppress the dimensions of the grid
-  for (Id i = 0; i < (Id)ranks.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(ranks.size()); i++)
   {
     nx.erase(nx.begin() + ranks[i]);
     dx.erase(dx.begin() + ranks[i]);
@@ -607,7 +607,7 @@ bool DbGrid::migrateAllVariables(Db* dbin, bool flag_fill, bool flag_inter, bool
     }
     icols.push_back(icol);
   }
-  Id ncol = (Id)icols.size();
+  Id ncol = static_cast<Id>(icols.size());
   if (ncol <= 0) return true;
 
   // Migrate the variables
@@ -874,7 +874,7 @@ void DbGrid::getGridPileInPlace(Id iuid,
                                 VectorDouble& vec) const
 {
   auto nz = getNX(idim0);
-  if (nz != (Id)vec.size()) vec.resize(nz);
+  if (nz != static_cast<Id>(vec.size())) vec.resize(nz);
 
   // Loop on the samples
 
@@ -894,7 +894,7 @@ void DbGrid::setGridPileInPlace(Id iuid,
                                 const VectorDouble& vec)
 {
   auto nz = getNX(idim0);
-  if ((Id)vec.size() != nz) return;
+  if (static_cast<Id>(vec.size()) != nz) return;
 
   // Loop on the samples
 
@@ -969,7 +969,7 @@ VectorDouble DbGrid::getOneSlice(const String& name,
   VectorInt cornloc = corner;
   if (cornloc.empty())
     cornloc.resize(ndim, 0);
-  if (ndim != (Id)cornloc.size())
+  if (ndim != static_cast<Id>(cornloc.size()))
   {
     messerr("The dimension of 'corner' should be equal to 'ndim'");
     return tab;
@@ -1050,7 +1050,7 @@ VectorDouble DbGrid::getOneSliceForCoordinate(Id idim,
   VectorInt cornloc = corner;
   if (cornloc.empty())
     cornloc.resize(ndim, 0);
-  if (ndim != (Id)cornloc.size())
+  if (ndim != static_cast<Id>(cornloc.size()))
   {
     messerr("The dimension of 'corner' should be equal to 'ndim'");
     return tab;
@@ -1154,7 +1154,7 @@ Id DbGrid::coordinateToIndicesInPlace(const VectorDouble& coor,
 
 Id DbGrid::centerCoordinateInPlace(VectorDouble& coor, bool centered, bool stopIfOut, double eps) const
 {
-  Id ndim = (Id)coor.size();
+  Id ndim = static_cast<Id>(coor.size());
   VectorInt indice(ndim);
   Id err = coordinateToIndicesInPlace(coor, indice, centered, eps);
   if (stopIfOut && err > 0) return -1;
@@ -1559,7 +1559,7 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
   law_set_random_seed(seed);
 
   // Create the Db
-  Id ndim = (Id)nx.size();
+  Id ndim = static_cast<Id>(nx.size());
   VectorDouble dx(ndim);
   for (Id idim = 0; idim < ndim; idim++) dx[idim] = 1. / nx[idim];
   DbGrid* dbgrid = DbGrid::create(nx, dx, x0);
@@ -1592,7 +1592,7 @@ DbGrid* DbGrid::createFillRandom(const VectorInt& nx,
   }
 
   // Generate the variables
-  bool flag_hetero = ((Id)heteroRatio.size() == nvar);
+  bool flag_hetero = (static_cast<Id>(heteroRatio.size()) == nvar);
   VectorVectorDouble vars(nvar);
   for (Id ivar = 0; ivar < nvar; ivar++)
   {
@@ -1643,7 +1643,7 @@ void DbGrid::_interpolate(const DbGrid* grid3D,
     double zz = z0out + iz * dzout;
 
     // Find the index in the input vector
-    Id izin = (Id)(double(nzin) * (zz - bot) / (top - bot));
+    Id izin = static_cast<Id>(static_cast<double>(nzin) * (zz - bot) / (top - bot));
     if (izin < 0 || izin <= nzin) continue;
 
     // Assign the value
@@ -1665,7 +1665,7 @@ DbGrid* DbGrid::createSubGrid(const DbGrid* gridIn, VectorVectorInt limits, bool
   Id ndim = gridIn->getNDim();
 
   // Preliminary checks
-  if (ndim != (Id)limits.size())
+  if (ndim != static_cast<Id>(limits.size()))
   {
     messerr("The argument 'limits' should have dimension ndim x 2");
     return gridOut;
@@ -1674,7 +1674,7 @@ DbGrid* DbGrid::createSubGrid(const DbGrid* gridIn, VectorVectorInt limits, bool
   // Get the list of variables to be copied (rank and coordinates excluded)
   VectorString names = gridIn->getAllNames(true);
   VectorInt iuidIn   = gridIn->getUIDs(names);
-  Id nvar           = (Id)names.size();
+  Id nvar           = static_cast<Id>(names.size());
 
   // Create the characteristics of the new grid
   VectorInt NXs       = gridIn->getNXs();
@@ -1784,7 +1784,7 @@ DbGrid* DbGrid::createSqueezeAndStretchForward(const DbGrid* grid3Din,
   }
   Id ndim  = 3;
   Id idim0 = ndim - 1;
-  Id nvar  = (Id)names.size();
+  Id nvar  = static_cast<Id>(names.size());
 
   // Getting relevant information from the top and bottom surfaces (using the selection)
   VectorDouble botArray = surf2D->getColumn(nameBot, true);
@@ -1810,7 +1810,7 @@ DbGrid* DbGrid::createSqueezeAndStretchForward(const DbGrid* grid3Din,
   double dz = DXs[idim0];
 
   NXs[idim0] = nzout;
-  DXs[idim0] = (topmax - botmin) / (double)nzout;
+  DXs[idim0] = (topmax - botmin) / static_cast<double>(nzout);
   X0s[idim0] = 0.;
 
   // Create the output 3D grid (with no coordinate)
@@ -1922,7 +1922,7 @@ DbGrid* DbGrid::createSqueezeAndStretchBackward(const DbGrid* grid3Din,
   }
   Id ndim  = 3;
   Id idim0 = ndim - 1;
-  Id nvar  = (Id)names.size();
+  Id nvar  = static_cast<Id>(names.size());
 
   // Getting relevant information from the top and bottom surfaces (using the selection)
   VectorDouble botArray = surf2D->getColumn(nameBot, true);
@@ -2068,7 +2068,7 @@ VectorVectorInt DbGrid::getLimitsFromVariableExtend(const String& nameTop,
     vec[idim][1] = indmax[idim];
   }
 
-  for (Id iexc = 0, nexc = (Id)dimExclude.size(); iexc < nexc; iexc++)
+  for (Id iexc = 0, nexc = static_cast<Id>(dimExclude.size()); iexc < nexc; iexc++)
   {
     vec[iexc][0] = 0;
     vec[iexc][1] = getNX(iexc);
@@ -2154,7 +2154,7 @@ void DbGrid::clean3DFromSurfaces(const VectorString& names,
   }
 
   bool limitsDefined = !nameTop.empty() && !nameBot.empty();
-  Id nvar           = (Id)names.size();
+  Id nvar           = static_cast<Id>(names.size());
 
   // Loop on the vertical columns of the 3-D grid
 
@@ -2278,7 +2278,7 @@ VectorInt DbGrid::locateDataInGrid(const Db* data,
 
     // Locate the samples defined by their ranks stored in 'rankIn'
 
-    for (Id ip = 0; ip < (Id)rankIn.size(); ip++)
+    for (Id ip = 0; ip < static_cast<Id>(rankIn.size()); ip++)
     {
       VectorDouble coor = data->getSampleCoordinates(rankIn[ip]);
       rankOut.push_back(coordinateToRank(coor, centered));
@@ -2403,7 +2403,7 @@ VectorVectorDouble DbGrid::getDiscretizedBlock(const VectorInt& ndiscs,
       if (!flagRandom)
         discs[i][idim] = local;
       else
-        discs[i][idim] = local + taille * law_uniform(-0.5, 0.5) / (double)nd;
+        discs[i][idim] = local + taille * law_uniform(-0.5, 0.5) / static_cast<double>(nd);
     }
   }
   law_set_random_seed(memo);
@@ -2492,7 +2492,7 @@ VectorDouble DbGrid::getDistanceToOrigin(const VectorInt& origin,
   auto nech           = getNSample();
   VectorDouble coor0  = getCoordinatesByIndice(origin);
   VectorDouble radloc = radius;
-  if (ndim != (Id)radloc.size()) radloc = VectorDouble(ndim, 1.);
+  if (ndim != static_cast<Id>(radloc.size())) radloc = VectorDouble(ndim, 1.);
 
   VectorDouble coor(ndim);
   VectorDouble distvec(nech, 0.);

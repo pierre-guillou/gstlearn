@@ -9,9 +9,9 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/HessianOp.hpp"
-#include "Basic/Utilities.hpp"
 #include "Basic/AException.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/Utilities.hpp"
 #include "LinearOp/PrecisionOp.hpp"
 
 #include <cmath>
@@ -34,14 +34,14 @@ HessianOp::HessianOp()
 {
 }
 
-HessianOp::~HessianOp() 
+HessianOp::~HessianOp()
 {
 }
 
 /**
  * @brief Return the size of the operator
- * 
- * @return Id 
+ *
+ * @return Id
  */
 Id HessianOp::getSize() const
 {
@@ -60,12 +60,12 @@ Id HessianOp::getSize() const
 ** \param[in]  varseis  Array of variance attached to the seismic
 **
 *****************************************************************************/
-Id HessianOp::init(PrecisionOp*  pmat,
-                    const ProjMatrix*   projdata,
-                    const ProjMatrix*   projseis,
-                    const VectorDouble& indic,
-                    const VectorDouble& propseis,
-                    const VectorDouble& varseis)
+Id HessianOp::init(PrecisionOp* pmat,
+                   const ProjMatrix* projdata,
+                   const ProjMatrix* projseis,
+                   const VectorDouble& indic,
+                   const VectorDouble& propseis,
+                   const VectorDouble& varseis)
 {
   // Initialization
 
@@ -79,19 +79,19 @@ Id HessianOp::init(PrecisionOp*  pmat,
     _indic    = indic;
     _propSeis = propseis;
     _varSeis  = varseis;
-    
+
     Id nvertex = _projData->getNApex();
     Id npoint  = _projData->getNPoint();
-    
+
     // Particular case of the Seismic
-    _flagSeismic = (projseis != (ProjMatrix *) NULL && 
+    _flagSeismic = (projseis != nullptr &&
                     projseis->getNPoint() > 0);
     if (_flagSeismic)
     {
       Id nseis = _projSeis->getNPoint();
       _works.resize(nseis);
     }
-    
+
     // Auxiliary working arrays
     _workp.resize(npoint);
     _workx.resize(npoint);
@@ -100,7 +100,7 @@ Id HessianOp::init(PrecisionOp*  pmat,
     // Set the initialization flag
     _isInitialized = true;
   }
-  catch(const std::string& str)
+  catch (const std::string& str)
   {
     // TODO : Check if std::exception can be used
     error = 1;
@@ -121,71 +121,71 @@ Id HessianOp::init(PrecisionOp*  pmat,
 Id HessianOp::_addToDest(const constvect inv, vect outv) const
 {
   if (!_isInitialized) my_throw("'HessianOp' must be initialized beforehand");
-  
+
   // Map Eigen Vector to VectorDouble arguments
   // TODO : VectorXd => VectorDouble = Memory copy !!
- // VectorDouble einv(inv.data(), inv.data() + inv.size());
- // VectorDouble eoutv(outv.size());
+  // VectorDouble einv(inv.data(), inv.data() + inv.size());
+  // VectorDouble eoutv(outv.size());
 
   // Contribution of the spatial structure
 
-  _pMat->addToDest(inv,outv);
+  _pMat->addToDest(inv, outv);
 
   // Contribution of the Data
   constvect lambdas(_lambda);
   vect wps(_workp);
   vect wxs(_workx);
-  _projData->mesh2point(lambdas,wps);
-  _projData->mesh2point(inv,wxs);
+  _projData->mesh2point(lambdas, wps);
+  _projData->mesh2point(inv, wxs);
 
-  double denom,dl;
-  for (Id i=0; i<_projData->getNPoint(); i++)
+  double denom, dl;
+  for (Id i = 0; i < _projData->getNPoint(); i++)
   {
     double ratio = 0.;
-    if (! FFFF(_indic[i]))
+    if (!FFFF(_indic[i]))
     {
       denom = _indic[i] - law_cdf_gaussian(_workp[i]);
       dl    = law_df_gaussian(_workp[i]);
       ratio = dl / denom;
     }
-    _workp[i] = _workx[i] * (- _workp[i] * ratio + pow(ratio,2) ) ;
+    _workp[i] = _workx[i] * (-_workp[i] * ratio + pow(ratio, 2));
   }
   vect wvs(_workv);
   _projData->point2mesh(wps, wvs);
-  for (Id i=0; i<_projData->getNApex(); i++) 
+  for (Id i = 0; i < _projData->getNApex(); i++)
   {
-    outv[i]+= _workv[i];
+    outv[i] += _workv[i];
   }
   // Contribution of Seismic (optional)
 
   if (_flagSeismic)
   {
-    for (Id i=0; i<_projSeis->getNApex(); i++) 
+    for (Id i = 0; i < _projSeis->getNApex(); i++)
       _workv[i] = law_cdf_gaussian(_lambda[i]);
     vect wss(_works);
     _projSeis->mesh2point(wvs, wss);
-    for (Id i=0; i<_projSeis->getNPoint(); i++) 
+    for (Id i = 0; i < _projSeis->getNPoint(); i++)
     {
-      _works[i]-= _propSeis[i];
-      _works[i]*= _varSeis[i];
+      _works[i] -= _propSeis[i];
+      _works[i] *= _varSeis[i];
     }
     _projSeis->point2mesh(wss, wvs);
 
-    for (Id i=0; i<_projData->getNApex(); i++) 
-    { 
+    for (Id i = 0; i < _projData->getNApex(); i++)
+    {
       double val = _lambda[i];
       outv[i] -= val * law_df_gaussian(val) * _workv[i] * inv[i];
     }
-    for (Id i=0; i<_projSeis->getNApex(); i++)
+    for (Id i = 0; i < _projSeis->getNApex(); i++)
       _workv[i] = inv[i] * law_df_gaussian(_lambda[i]);
     _projSeis->mesh2point(wvs, wss);
-    for (Id i=0; i<_projSeis->getNPoint(); i++)
+    for (Id i = 0; i < _projSeis->getNPoint(); i++)
       _works[i] *= _varSeis[i];
     _projSeis->point2mesh(wss, wvs);
-    for (Id i=0; i<_projSeis->getNApex(); i++)
+    for (Id i = 0; i < _projSeis->getNApex(); i++)
       _workv[i] *= law_df_gaussian(_lambda[i]);
 
-    for (Id i=0; i<_projData->getNApex(); i++) 
+    for (Id i = 0; i < _projData->getNApex(); i++)
       outv[i] += _workv[i];
   }
   return 0;

@@ -255,8 +255,8 @@ Id VCloud::_update_discretization_grid(double x, double y)
   Id ndim = _dbcloud->getNDim();
   VectorInt indg(ndim,0);
 
-  Id ix = (Id) floor((x - _dbcloud->getX0(0)) / _dbcloud->getDX(0) + 0.5);
-  Id iy = (Id) floor((y - _dbcloud->getX0(1)) / _dbcloud->getDX(1) + 0.5);
+  Id ix = static_cast<Id>(floor((x - _dbcloud->getX0(0)) / _dbcloud->getDX(0) + 0.5));
+  Id iy = static_cast<Id>(floor((y - _dbcloud->getX0(1)) / _dbcloud->getDX(1) + 0.5));
   if (ix < 0 || ix >= _dbcloud->getNX(0)) return (-1);
   if (iy < 0 || iy >= _dbcloud->getNX(1)) return (-1);
   indg[0] = ix;
@@ -301,8 +301,8 @@ DbGrid* db_vcloud(Db *db,
   nx[0] = lagnb;
   nx[1] = varnb;
   VectorDouble dx(2);
-  dx[0] = lagmax / (double) lagnb;
-  dx[1] = varmax / (double) varnb;
+  dx[0] = lagmax / static_cast<double>(lagnb);
+  dx[1] = varmax / static_cast<double>(varnb);
   VectorDouble x0(2);
   x0[0] = 0.;
   x0[1] = 0.;
@@ -351,7 +351,7 @@ Id VCloud::selectFromPolygon(Db *db, Polygons *polygon, Id idir)
   {
     Id jech = nech - iech - 1;
     if (IDS[jech] <= 0.) break;
-    message("Sample #%3d: %d occurence(s)\n", rank[jech] + 1, (Id) IDS[jech]);
+    message("Sample #%3d: %d occurence(s)\n", rank[jech] + 1, static_cast<Id>(IDS[jech]));
   }
 
   POLYGON = nullptr;

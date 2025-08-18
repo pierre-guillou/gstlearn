@@ -32,7 +32,7 @@ BiTargetCheckDistance::BiTargetCheckDistance(double radius,
 {
   if (!coeffs.empty())
   {
-    _ndim = (Id)coeffs.size();
+    _ndim = static_cast<Id>(coeffs.size());
 
     //    _flagAniso = (ut_vector_constant(coeffs)) ? 0 : 1;
     _flagAniso = true;
@@ -184,4 +184,4 @@ bool BiTargetCheckDistance::isOK(const SpaceTarget& T1,
 
   return _dist <= _radius;
 }
-}
+} // namespace gstlrn

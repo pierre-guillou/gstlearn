@@ -50,7 +50,7 @@ static VectorDouble _corputVector(Id n, Id b)
 {
   VectorDouble retval(n, 0.);
 
-  Id L = (Id)ceil(log(n - 1) / log(b));
+  Id L = static_cast<Id>(ceil(log(n - 1) / log(b)));
   VectorDouble un(L, 0.);
   un[0] = 1.;
 
@@ -59,7 +59,7 @@ static VectorDouble _corputVector(Id n, Id b)
   if (L == 1)
   {
     for (Id l = 0; l < n; l++)
-      retval[l] = (double)(l + 1.) / (double)b;
+      retval[l] = (l + 1.) / static_cast<double>(b);
   }
   else
   {
@@ -83,7 +83,7 @@ static VectorDouble _corputVector(Id n, Id b)
     {
       double total = 0.;
       for (Id p = 0; p < L; p++)
-        total += d.getValue(l, p) * pow(1. / b, (double)p + 1.);
+        total += d.getValue(l, p) * pow(1. / b, static_cast<double>(p) + 1.);
       retval[l] = total;
     }
   }
@@ -1127,7 +1127,7 @@ static void st_dkrcht(const Id* s,
     i__1  = *s;
     for (i = 1; i <= i__1; ++i)
     {
-      rn          = (double)prime[i - 1];
+      rn          = static_cast<double>(prime[i - 1]);
       psqt[i - 1] = sqrt(rn);
     }
   }
@@ -1192,7 +1192,7 @@ static void st_dksmrc(Id* ndim,
   i__1    = nk - 1;
   for (j = 1; j <= i__1; ++j)
   {
-    jp     = (Id)(j + law_uniform(0., 1.) * (nk + 1 - j));
+    jp     = static_cast<Id>(j + law_uniform(0., 1.) * (nk + 1 - j));
     xt     = vk[j];
     vk[j]  = vk[jp];
     vk[jp] = xt;
@@ -1349,7 +1349,7 @@ static void st_dkbvrc(Id* ndim,
   static Id np = 0;
   static double vk[20], difint, finval;
   static double varprd;
-  static Id sampls    = 0;
+  static Id sampls     = 0;
   static double varest = 0, varsqr;
   static Id intvls;
 
@@ -1516,7 +1516,7 @@ void mvndst(Id n,
   }
   else
   {
-    *inform = (Id)st_mvndnt(&n, &correl[1], &lower[1], &upper[1], &infin[1], &infis, &d, &e);
+    *inform = static_cast<Id>(st_mvndnt(&n, &correl[1], &lower[1], &upper[1], &infin[1], &infis, &d, &e));
     if (n - infis == 0)
     {
       *value = 1.;
@@ -1525,7 +1525,7 @@ void mvndst(Id n,
     else if (n - infis == 1)
     {
       *value = e - d;
-      *error = (float)2e-16;
+      *error = static_cast<float>(2e-16);
     }
     else
     {
@@ -1717,7 +1717,7 @@ Id besselj_table(double x, double alpha, Id nb, double* b)
   /* Start */
 
   --b;
-  magx = (Id)(x);
+  magx = static_cast<Id>(x);
   if (nb > 0 && x >= 0. && x <= xlarge && alpha >= 0. && alpha < 1.)
   {
 
@@ -1779,7 +1779,7 @@ Id besselj_table(double x, double alpha, Id nb, double* b)
       m   = 11;
       if (x >= 35.) m = 8;
       if (x >= 130.) m = 4;
-      xm = 4. * (double)m;
+      xm = 4. * static_cast<double>(m);
 
       /* Argument reduction for SIN and COS routines. */
 
@@ -2287,7 +2287,7 @@ Id besselk(double x, double alpha, Id nb, double* bk)
         /*  Calculation of K(ALPHA+1,X)/K(ALPHA,X),  1.0 <= X <= 4.0 */
 
         d2 = floor(estm[0] / ex + estm[1]);
-        m  = (Id)d2;
+        m  = static_cast<Id>(d2);
         d1 = d2 + d2;
         d2 -= 0.5;
         d2 *= d2;
@@ -2302,7 +2302,7 @@ Id besselk(double x, double alpha, Id nb, double* bk)
         /*    recurrence and K(ALPHA,X) from the wronskian */
 
         d2 = floor(estm[2] * ex + estm[3]);
-        m  = (Id)d2;
+        m  = static_cast<Id>(d2);
         c  = ABS(enu);
         d3 = c + c;
         d1 = d3 - 1.;
@@ -2338,7 +2338,7 @@ Id besselk(double x, double alpha, Id nb, double* bk)
         /*  by backward recurrence, for  X > 4.0 */
 
         dm = floor(estm[4] / ex + estm[5]);
-        m  = (Id)dm;
+        m  = static_cast<Id>(dm);
         d2 = dm - 0.5;
         d2 *= d2;
         d1 = dm + dm;
@@ -2456,7 +2456,7 @@ double loggamma(double parameter)
   x  = parameter;
   xe = floor(x);
   if (x - xe > 0.5) xe += 1.;
-  m = (Id)(ceil(xe) - 1);
+  m = static_cast<Id>(ceil(xe) - 1);
 
   xe = x;
   if (m == -1) xe = x + 1.;
@@ -2518,7 +2518,7 @@ double ut_legendre(Id n, double v, bool flagNorm)
     P1 = v * sqrt(2. * 1. + 1.);
     for (Id ii = 1; ii < n; ii++)
     {
-      double i = (double)ii;
+      auto i   = static_cast<double>(ii);
       double a = sqrt((2. * i + 1.) * (2. * i + 3.)) / (i + 1.);
       double b = i / (i + 1.) * sqrt((2. * i + 3.) / (2. * i - 1.));
       Pn       = a * v * P1 - b * P0;
@@ -2532,7 +2532,7 @@ double ut_legendre(Id n, double v, bool flagNorm)
 
 VectorDouble ut_legendreVec(Id n, const VectorDouble& vecin, bool flagNorm)
 {
-  Id size = (Id)vecin.size();
+  Id size = static_cast<Id>(vecin.size());
   VectorDouble vecout(size);
   for (Id i = 0; i < size; i++)
     vecout[i] = ut_legendre(n, vecin[i], flagNorm);
@@ -2541,7 +2541,7 @@ VectorDouble ut_legendreVec(Id n, const VectorDouble& vecin, bool flagNorm)
 
 MatrixDense ut_legendreMatNorm(Id n, const VectorDouble& v)
 {
-  Id nrow = (Id)v.size();
+  Id nrow = static_cast<Id>(v.size());
   Id ncol = n + 1;
   MatrixDense res(nrow, ncol);
 
@@ -2551,7 +2551,7 @@ MatrixDense ut_legendreMatNorm(Id n, const VectorDouble& v)
   double l;
   for (Id ll = 0; ll <= n; ll++)
   {
-    l = (double)ll;
+    l = static_cast<double>(ll);
     if (ll == 0)
     {
       val.fill(1.);
@@ -2613,7 +2613,7 @@ MatrixDense ut_legendreMatNorm(Id n, const VectorDouble& v)
  *****************************************************************************/
 MatrixDense ut_legendreAssociatedMat(Id l, const VectorDouble& v, bool flagNorm)
 {
-  Id nrow = (Id)v.size();
+  Id nrow = static_cast<Id>(v.size());
   Id ncol = l + 1;
   MatrixDense res(nrow, ncol);
 
@@ -2632,7 +2632,7 @@ MatrixDense ut_legendreAssociatedMat(Id l, const VectorDouble& v, bool flagNorm)
 
     for (Id mm = 0; mm <= l; mm++)
     {
-      m = (double)mm;
+      m = static_cast<double>(mm);
 
       // From m-1 to m
       if (mm == 0)
@@ -2648,7 +2648,7 @@ MatrixDense ut_legendreAssociatedMat(Id l, const VectorDouble& v, bool flagNorm)
       // From n-1 to n
       for (Id nn = mm; nn <= l; nn++)
       {
-        n = (double)nn;
+        n = static_cast<double>(nn);
         if (nn == mm)
         {
           Plm = Pmm;
@@ -2684,7 +2684,7 @@ MatrixDense ut_legendreAssociatedMat(Id l, const VectorDouble& v, bool flagNorm)
       // evaluation of P_l^m (m > 0)
       for (Id mm = 1; mm <= l; mm++)
       {
-        m = (double)mm;
+        m = static_cast<double>(mm);
         // computing P_{m}^{m} from P_{m-1}^{m-1}
         double a0 = (2. * m - 1.);
         for (Id k = 0; k < nrow; k++)
@@ -2696,7 +2696,7 @@ MatrixDense ut_legendreAssociatedMat(Id l, const VectorDouble& v, bool flagNorm)
           Pn1m = Pmm;
           for (Id nn = mm + 1; nn <= l; nn++)
           {
-            n        = (double)nn;
+            n        = static_cast<double>(nn);
             double a = (2. * n - 1.) / (n - m);
             double b = (n + m - 1.) / (n - m);
             for (Id k = 0; k < nrow; k++)
@@ -2773,7 +2773,7 @@ VectorDouble ut_sphericalHarmonicVec(Id n,
                                      VectorDouble theta,
                                      VectorDouble phi)
 {
-  Id size = (Id)theta.size();
+  Id size = static_cast<Id>(theta.size());
   VectorDouble res(size);
   for (Id i = 0; i < size; i++)
     res[i] = ut_sphericalHarmonic(n, k, theta[i], phi[i]);
@@ -2857,7 +2857,7 @@ double golden_search(double (*func_evaluate)(double test, void* user_data),
   /* Returning value */
 
   result = (a + c) / 2.;
-  if (test_loc != NULL) *test_loc = fb;
+  if (test_loc != nullptr) *test_loc = fb;
 
   return (result);
 }
@@ -2876,9 +2876,9 @@ double golden_search(double (*func_evaluate)(double test, void* user_data),
  **
  *****************************************************************************/
 Id ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
-                       Cheb_Elem* cheb_elem,
-                       double x,
-                       const VectorDouble& blin)
+                      Cheb_Elem* cheb_elem,
+                      double x,
+                      const VectorDouble& blin)
 {
   double y, y0, T1, Tx, Tm1, Tm2, power, a, b, tol;
   Id ncmax;
@@ -2927,8 +2927,8 @@ Id ut_chebychev_count(double (*func)(double, double, const VectorDouble&),
  **
  *****************************************************************************/
 Id ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
-                        Cheb_Elem* cheb_elem,
-                        const VectorDouble& blin)
+                       Cheb_Elem* cheb_elem,
+                       const VectorDouble& blin)
 {
   double minsubdiv, theta, ct, val1, val2, coeff, power, a, b;
   Id n, ncmax;
@@ -2945,7 +2945,7 @@ Id ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
   if (minsubdiv >= (ncmax + 1.) / 2.)
     n = static_cast<Id>(minsubdiv);
   else
-    n = static_cast<Id>(ceil((double)(ncmax + 1) / 2));
+    n = static_cast<Id>(ceil(static_cast<double>(ncmax + 1) / 2));
 
   /* Core allocation */
 
@@ -2958,7 +2958,7 @@ Id ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
 
   for (Id i = 0; i < n; i++)
   {
-    theta = 2. * GV_PI * ((double)i) / ((double)n);
+    theta = 2. * GV_PI * (static_cast<double>(i)) / (static_cast<double>(n));
     ct    = cos(theta / 2.);
     val1  = func(((b + a) + (b - a) * ct) / 2., power, blin);
     val2  = func(((b + a) - (b - a) * ct) / 2., power, blin);
@@ -2975,7 +2975,7 @@ Id ut_chebychev_coeffs(double (*func)(double, double, const VectorDouble&),
 
   /* Store the coefficients */
 
-  coeff = 2. / (double)n;
+  coeff = 2. / static_cast<double>(n);
   for (Id i = 0; i < ncmax; i++)
     coeffs[i] = 0.;
   for (Id i = 0; i < n; i++)
@@ -3170,10 +3170,10 @@ void st_subdivide(double v1[3],
 }
 
 static Id st_already_present(Reg_Coor* R_coor,
-                              Id i0,
-                              Id ntri,
-                              const VectorDouble& coord,
-                              double eps = EPSILON3)
+                             Id i0,
+                             Id ntri,
+                             const VectorDouble& coord,
+                             double eps = EPSILON3)
 {
   if (ntri <= 0) return (0);
 
@@ -3232,7 +3232,7 @@ Id ut_icosphere(Id n, Id flag_rot, Id* ntri_arg, VectorDouble& coord)
     messerr("The Regular Sphere discretization is limited to degree 10");
     return (1);
   }
-  R_coor.ntri   = 0;
+  R_coor.ntri = 0;
   R_coor.coor.clear();
   Id seed_memo = law_get_random_seed();
   law_set_random_seed(43241);
@@ -3304,7 +3304,7 @@ void ut_log_factorial(Id nbpoly, double* factor)
 
   factor[0] = 0;
   for (i = 1; i < nbpoly; i++)
-    factor[i] = factor[i - 1] + log((double)(i + 1));
+    factor[i] = factor[i - 1] + log(static_cast<double>(i + 1));
 }
 
 /*****************************************************************************/
@@ -3322,7 +3322,7 @@ double ut_factorial(Id k)
 
   val = 1;
   for (Id i = 1; i <= k; i++)
-    val *= (double)i;
+    val *= static_cast<double>(i);
   return (val);
 }
 
@@ -3341,7 +3341,7 @@ MatrixDense* vanDerCorput(Id n, Id nd)
                          73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149,
                          151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229};
 
-  if (nd > (Id)primes.size())
+  if (nd > static_cast<Id>(primes.size()))
   {
     messerr("Argument 'nd' should be smaller than 50.");
     return nullptr;
@@ -3358,7 +3358,7 @@ MatrixDense* vanDerCorput(Id n, Id nd)
 
 MatrixDense fillLegendreMatrix(const VectorDouble& r, Id legendreOrder)
 {
-  Id nrow = (Id)r.size();
+  Id nrow = static_cast<Id>(r.size());
   Id ncol = legendreOrder + 1;
   MatrixDense lp(nrow, ncol);
 

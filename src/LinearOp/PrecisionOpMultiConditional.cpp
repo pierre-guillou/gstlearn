@@ -71,7 +71,7 @@ void PrecisionOpMultiConditional::computeRhsInPlace(const std::vector<double>& d
 }
 
 Id PrecisionOpMultiConditional::push_back(PrecisionOp* pmatElem,
-                                           IProj* projDataElem)
+                                          IProj* projDataElem)
 {
   if (sizes() == 0 && projDataElem != nullptr)
   {
@@ -105,7 +105,7 @@ std::pair<double, double> PrecisionOpMultiConditional::rangeEigenValQ() const
 {
   std::pair<double, double> result = _multiPrecisionOp[0]->getRangeEigenVal();
 
-  for (Id i = 1; i < (Id)_multiPrecisionOp.size(); i++)
+  for (Id i = 1; i < static_cast<Id>(_multiPrecisionOp.size()); i++)
   {
     std::pair<double, double> vals = _multiPrecisionOp[i]->getRangeEigenVal();
     result.first                   = MIN(result.first, vals.first);
@@ -269,7 +269,7 @@ void PrecisionOpMultiConditional::_evalDirect(const std::vector<std::vector<doub
 
 void PrecisionOpMultiConditional::simulateOnMeshings(std::vector<std::vector<double>>& result) const
 {
-  for (Id icov = 0, ncov = (Id)_multiPrecisionOp.size(); icov < ncov; icov++)
+  for (Id icov = 0, ncov = static_cast<Id>(_multiPrecisionOp.size()); icov < ncov; icov++)
     simulateOnMeshing(result[icov], icov);
 }
 

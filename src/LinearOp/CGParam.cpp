@@ -67,7 +67,7 @@ void CGParam::setPrecond(const ALinearOp* precond, Id status)
 {
   _precond       = precond;
   _precondStatus = status;
-  if (precond == NULL) _precondStatus = 0;
+  if (precond == nullptr) _precondStatus = 0;
 }
 
 String CGParam::toString(const AStringFormat* strfmt) const
@@ -81,4 +81,4 @@ String CGParam::toString(const AStringFormat* strfmt) const
   sstr << "Using a Pre-conditioner = " << _precondStatus << std::endl;
   return sstr.str();
 }
-}
+} // namespace gstlrn
