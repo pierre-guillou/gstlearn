@@ -145,17 +145,26 @@ int main(int argc, char* argv[])
 
   /* Define the model */
 
+  if (verbose) message("on cherche a ouvrir le model.dat\n");
   ascii_filename("Model", 0, 0, filename);
+  if (verbose) message("apres ascii de model\n");
   model = Model::createFromNF(filename, verbose);
+  message("on a tente d'ouvrir model par create\n");
   if (model == nullptr) goto label_end;
+  message("on continue apres avoir bien lu le Model\n");
   if (vario != nullptr)
   {
+    if (verbose) message("on tente avant model fitting\n");
     if (model_fitting_sills(vario, model, constraints)) goto label_end;
+    if (verbose) message("avant d'ecrire dans filename\n");
     ascii_filename("Model", 0, 1, filename);
+    if (verbose) message("avant le dump de model\n");
     if (!model->dumpToNF(filename, EFormatNF::DEFAULT, verbose))
       messageAbort("ascii_model_write");
   }
+  if (verbose) message("avant model modify\n");
   new_model = st_modify(model, dbin);
+  if (verbose) message("apres model modify\n");
   if (new_model == nullptr) goto label_end;
 
   /* Define the neighborhood */
