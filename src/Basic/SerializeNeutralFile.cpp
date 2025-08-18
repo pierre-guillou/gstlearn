@@ -64,8 +64,7 @@ bool SerializeNeutralFile::fileOpenRead(const ASerializable& parent,
     is.close();
     return false;
   }
-  return is.good(); // Cannot be "end of file" already
-  if (is.good())
+  if (is.good()) // Cannot be "end of file" already
   {
     if (verbose)
       message("File %s opened successfully\n", filepath.c_str());
