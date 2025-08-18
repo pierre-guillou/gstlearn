@@ -64,13 +64,7 @@ bool SerializeNeutralFile::fileOpenRead(const ASerializable& parent,
     is.close();
     return false;
   }
-  if (is.good()) // Cannot be "end of file" already
-  {
-    if (verbose)
-      message("File %s opened successfully\n", filepath.c_str());
-    return true;
-  }
-  return false;
+  return is.good(); // Cannot be "end of file" already
 }
 
 bool SerializeNeutralFile::commentWrite(std::ostream& os, const String& comment)

@@ -228,6 +228,13 @@ int main(int argc, char* argv[])
       }
     }
   }
+  else
+  {
+    messerr("No action is performed as:");
+    if (dbin == nullptr) messerr("- The Input Db file is not defined");
+    if (new_model == nullptr) messerr("- The Model is not defined");
+    if (neigh == nullptr) messerr("- The Neighborhood is not defined");
+  }
 
   /* Core deallocation */
 
