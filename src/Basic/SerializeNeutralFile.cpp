@@ -40,10 +40,12 @@ bool SerializeNeutralFile::fileOpenRead(const ASerializable& parent,
                                         std::ifstream& is,
                                         bool verbose)
 {
+  message("dans serializableNeutralFile:: fileopen read\n");
   // Close the stream if opened
   if (is.is_open()) is.close();
 
   // Build the multi-platform filename
+  message("avant buildfilename verbose=%d\n", verbose);
   String filepath = ASerializable::buildFileName(1, filename, true);
 
   // Open new stream
@@ -54,6 +56,7 @@ bool SerializeNeutralFile::fileOpenRead(const ASerializable& parent,
     return false;
   }
   // Read and check the file type (class name)
+  message("avant check file type. On recherche %s\n", parent._getNFName().c_str());
   String type;
   is >> type;
   if (type != parent._getNFName())
@@ -64,6 +67,8 @@ bool SerializeNeutralFile::fileOpenRead(const ASerializable& parent,
     is.close();
     return false;
   }
+  message("a priori tout se passe bien\n");
+  message("on va tester is.good=%d\n", is.good());
   return is.good(); // Cannot be "end of file" already
 }
 

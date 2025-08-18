@@ -121,8 +121,10 @@ bool ASerializable::_fileOpenAndDeserialize(const String& filename, bool verbose
 
   // Try to open it according to ASCII format
   std::ifstream is;
+  message("juste avant fileOpenRead dans aserializable\n");
   if (SerializeNeutralFile::fileOpenRead(*this, filename, is, verbose))
   {
+    message("juste apres fileOpenRead dans aserializable, avant deserialize\n");
     return _deserializeAscii(is, verbose);
   }
 
