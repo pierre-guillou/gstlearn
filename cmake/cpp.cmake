@@ -211,7 +211,17 @@ foreach(FLAVOR ${FLAVORS})
   endif()
 
   # Link to NLopt
-  target_link_libraries(${FLAVOR} PRIVATE NLopt::nlopt)
+  # NLopt is only used internally so a PUBLIC dependency for e.g., headers is
+  # not needed. Moreover, if using a static library for NLopt, the shared
+  # library will bundle it, thus the dependency can be made PRIVATE. In all
+  # other cases, the dependency must be PUBLIC as users of gstlearn will have
+  # to provide their own NLopt.
+  set(nlopt_link PUBLIC)
+  get_target_property(nlopt_lib_type NLopt::nlopt TYPE)
+  if (${FLAVOR} MATCHES shared AND ${nlopt_lib_type} MATCHES STATIC_LIBRARY)
+    set(nlopt_link PRIVATE)
+  endif()
+  target_link_libraries(${FLAVOR} ${nlopt_link} NLopt::nlopt)
 
   # Link to HDF5
   if(USE_HDF5)
