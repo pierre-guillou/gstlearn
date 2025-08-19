@@ -1,6 +1,6 @@
 # List special non-regression test sources
 set(TEST_SOURCES 
-  testim.cpp)
+  testim.cpp
   testpgs.cpp
   testvar.cpp)
 

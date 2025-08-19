@@ -27,7 +27,6 @@
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Variogram/Vario.hpp"
-#include "Basic/OptDbg.hpp"
 
 using namespace gstlrn;
 
