@@ -75,7 +75,7 @@ jobs:
 
     - name: Install packages and execute non-regression tests
       run: |
-        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target check_data # TODO restore check
+        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target check
 
     - name: Compress output logs and neutral files
       if: success() || failure()
