@@ -177,7 +177,7 @@ public:
   double getParam() const;
   double getScadef() const { return _corfunc->getScadef(); }
   double getParMax() const { return _corfunc->getParMax(); }
-  Id getMaxNDim() const { return _corfunc->getMaxNDim(); }
+  Id getMaxNDim() const { return static_cast<Id>(_corfunc->getMaxNDim()); }
   Id getMinOrder() const { return _corfunc->getMinOrder(); }
   bool hasInt1D() const { return _corfunc->hasInt1D(); }
   bool hasInt2D() const { return _corfunc->hasInt2D(); }

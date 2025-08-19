@@ -212,10 +212,10 @@ static double st_essai(VectorDouble& hgnadm,
  **
  *****************************************************************************/
 static Id st_solve_hgnc(Id npar,
-                         const VectorDouble& grad,
-                         const MatrixSquare& gauss,
-                         VectorDouble& hgnc,
-                         Id flaginvsign)
+                        const VectorDouble& grad,
+                        const MatrixSquare& gauss,
+                        VectorDouble& hgnc,
+                        Id flaginvsign)
 {
   VectorDouble tempMatVD(npar * npar, 0.);
   VectorDouble tempVec(npar, 0.);
@@ -307,20 +307,20 @@ static void st_fill_constraints(const MatrixDense& acont,
  **
  *****************************************************************************/
 static Id st_calcul0(VectorDouble& param,
-                      VectorDouble& lower,
-                      VectorDouble& upper,
-                      VectorDouble& scale,
-                      const MatrixDense& acont,
-                      VectorDouble& tabwgt,
-                      VectorDouble& residuals,
-                      MatrixDense& Jr,
-                      VectorDouble& grad,
-                      MatrixSquare& gauss,
-                      VectorDouble& hgnc,
-                      VectorDouble& param1,
-                      VectorDouble& param2,
-                      VectorDouble& tabmod1,
-                      VectorDouble& tabmod2)
+                     VectorDouble& lower,
+                     VectorDouble& upper,
+                     VectorDouble& scale,
+                     const MatrixDense& acont,
+                     VectorDouble& tabwgt,
+                     VectorDouble& residuals,
+                     MatrixDense& Jr,
+                     VectorDouble& grad,
+                     MatrixSquare& gauss,
+                     VectorDouble& hgnc,
+                     VectorDouble& param1,
+                     VectorDouble& param2,
+                     VectorDouble& tabmod1,
+                     VectorDouble& tabmod2)
 {
   st_gradient(param, lower, upper, scale, tabwgt, Jr, param1, param2, tabmod1, tabmod2);
   matrix_product_safe(1, NDAT, NPAR, residuals.data(), Jr.getValues().data(), grad.data());
@@ -345,11 +345,11 @@ static Id st_calcul0(VectorDouble& param,
  **
  *****************************************************************************/
 static Id st_possibilities(Id npar,
-                            MatrixDense& bords,
-                            VectorDouble& ai,
-                            VectorDouble& hgnc,
-                            VectorInt& flag,
-                            VectorDouble& temp)
+                           MatrixDense& bords,
+                           VectorDouble& ai,
+                           VectorDouble& hgnc,
+                           VectorInt& flag,
+                           VectorDouble& temp)
 {
   Id flag_imposs;
 
@@ -385,12 +385,12 @@ static Id st_possibilities(Id npar,
  **
  *****************************************************************************/
 static Id st_define_constraints(Id mode,
-                                 MatrixDense& bords_red,
-                                 VectorDouble& ai_red,
-                                 VectorDouble& hgnc,
-                                 MatrixDense& consts,
-                                 VectorInt& flag,
-                                 VectorDouble& temp)
+                                MatrixDense& bords_red,
+                                VectorDouble& ai_red,
+                                VectorDouble& hgnc,
+                                MatrixDense& consts,
+                                VectorInt& flag,
+                                VectorDouble& temp)
 {
   Id iparac2;
 
@@ -410,7 +410,7 @@ static Id st_define_constraints(Id mode,
 
   Id number   = 0;
   Id flag_loc = 0;
-  iparac2      = 0;
+  iparac2     = 0;
   for (Id ic = 0; ic < 2; ic++)
     for (Id iparac = 0; iparac < NPARAC; iparac++, iparac2++)
     {
@@ -463,7 +463,7 @@ static void st_minimum(VectorInt& /*ind_util*/,
                        VectorDouble& hgnc,
                        VectorDouble& hgnadm)
 {
-  Id jparac       = -1;
+  Id jparac        = -1;
   double bordval   = MINIMUM_BIG;
   double alpha_inf = MAXIMUM_BIG;
 
@@ -542,18 +542,18 @@ static void st_update_bords(MatrixDense& bords,
  **
  *****************************************************************************/
 static Id st_suppress_unused_constraints(MatrixDense& bords,
-                                          VectorDouble& ai,
-                                          VectorDouble& grad,
-                                          MatrixSquare& gauss,
-                                          VectorDouble& hgnc,
-                                          VectorInt& ind_util,
-                                          MatrixDense& bords_red,
-                                          VectorDouble& ai_red,
-                                          VectorDouble& grad_red,
-                                          MatrixSquare& gauss_red,
-                                          VectorInt& flag1,
-                                          VectorInt& flag2,
-                                          VectorDouble& temp)
+                                         VectorDouble& ai,
+                                         VectorDouble& grad,
+                                         MatrixSquare& gauss,
+                                         VectorDouble& hgnc,
+                                         VectorInt& ind_util,
+                                         MatrixDense& bords_red,
+                                         VectorDouble& ai_red,
+                                         VectorDouble& grad_red,
+                                         MatrixSquare& gauss_red,
+                                         VectorInt& flag1,
+                                         VectorInt& flag2,
+                                         VectorDouble& temp)
 {
   Id n_imposs, ic, ipar, jpar, iparac, jparac, ipar2, iparac2;
 
@@ -666,17 +666,17 @@ static Id st_suppress_unused_constraints(MatrixDense& bords,
 **
 *****************************************************************************/
 static Id st_establish_minimization(Id nactive,
-                                     VectorInt& ind_util,
-                                     VectorInt& flag_active,
-                                     MatrixDense& bords_red,
-                                     VectorDouble& ai_red,
-                                     VectorDouble& grad_red,
-                                     MatrixSquare& gauss_red,
-                                     Id* lambda_neg,
-                                     VectorDouble& hgnc,
-                                     MatrixSquare& a,
-                                     VectorDouble& b,
-                                     VectorDouble& temp)
+                                    VectorInt& ind_util,
+                                    VectorInt& flag_active,
+                                    MatrixDense& bords_red,
+                                    VectorDouble& ai_red,
+                                    VectorDouble& grad_red,
+                                    MatrixSquare& gauss_red,
+                                    Id* lambda_neg,
+                                    VectorDouble& hgnc,
+                                    MatrixSquare& a,
+                                    VectorDouble& b,
+                                    VectorDouble& temp)
 {
   Id size, ic, iparac, jparac, iparac2, iecr;
   DECLARE_UNUSED(ind_util);
@@ -794,21 +794,21 @@ static void st_check(VectorInt& ind_util,
  **
  *****************************************************************************/
 static Id st_minimization_under_constraints(VectorInt& ind_util,
-                                             MatrixDense& bords_red,
-                                             VectorDouble& ai_red,
-                                             VectorDouble& grad_red,
-                                             MatrixSquare& gauss_red,
-                                             MatrixDense& consts,
-                                             VectorDouble& hgnc,
-                                             VectorDouble& hgnadm,
-                                             VectorInt& flag_active,
-                                             VectorInt& flag_actaux,
-                                             MatrixSquare& a,
-                                             VectorDouble& b1,
-                                             VectorDouble& b2,
-                                             VectorDouble& b3,
-                                             VectorDouble& temp,
-                                             const MatrixDense& acont)
+                                            MatrixDense& bords_red,
+                                            VectorDouble& ai_red,
+                                            VectorDouble& grad_red,
+                                            MatrixSquare& gauss_red,
+                                            MatrixDense& consts,
+                                            VectorDouble& hgnc,
+                                            VectorDouble& hgnadm,
+                                            VectorInt& flag_active,
+                                            VectorInt& flag_actaux,
+                                            MatrixSquare& a,
+                                            VectorDouble& b1,
+                                            VectorDouble& b2,
+                                            VectorDouble& b3,
+                                            VectorDouble& temp,
+                                            const MatrixDense& acont)
 {
   Id iparac, nactaux, sortie, nactive, lambda_neg;
   double min_adm_cur, min_adm_best;
@@ -982,18 +982,17 @@ static void st_define_bounds(VectorDouble& param,
 static void st_foxleg_debug_title(void)
 
 {
-  Id ipar;
-  static char string[10];
+  String string;
 
   if (!OptDbg::query(EDbg::CONVERGE)) return;
   mestitle(1, "Trajectory of parameters in Foxleg Algorithm");
   tab_prints(NULL, "Iteration");
   tab_prints(NULL, "Score");
   tab_prints(NULL, "Delta");
-  for (ipar = 0; ipar < NPAR; ipar++)
+  for (Id ipar = 0; ipar < NPAR; ipar++)
   {
-    (void)gslSPrintf(string, "Par-%d", ipar + 1);
-    tab_prints(NULL, string);
+    (void)gslSPrintf2(string, "Par-%d", ipar + 1);
+    tab_prints(NULL, string.data());
   }
   message("\n");
 }
@@ -1096,8 +1095,8 @@ static void st_linear_interpolate(double mscur,
  **
  *****************************************************************************/
 static Id st_check_param(VectorDouble& param,
-                          VectorDouble& lower,
-                          VectorDouble& upper)
+                         VectorDouble& lower,
+                         VectorDouble& upper)
 {
   Id ipar;
 
@@ -1170,21 +1169,21 @@ static Id st_check_param(VectorDouble& param,
  **
  *****************************************************************************/
 Id foxleg_f(Id ndat,
-             Id npar,
-             Id ncont,
-             const MatrixDense& acont,
-             VectorDouble& param,
-             VectorDouble& lower,
-             VectorDouble& upper,
-             VectorDouble& scale,
-             const Option_AutoFit& mauto,
-             Id flag_title,
-             void (*func_evaluate)(Id ndat,
-                                   Id npar,
-                                   VectorDouble& param,
-                                   VectorDouble& work),
-             VectorDouble& tabexp,
-             VectorDouble& tabwgt)
+            Id npar,
+            Id ncont,
+            const MatrixDense& acont,
+            VectorDouble& param,
+            VectorDouble& lower,
+            VectorDouble& upper,
+            VectorDouble& scale,
+            const Option_AutoFit& mauto,
+            Id flag_title,
+            void (*func_evaluate)(Id ndat,
+                                  Id npar,
+                                  VectorDouble& param,
+                                  VectorDouble& work),
+            VectorDouble& tabexp,
+            VectorDouble& tabwgt)
 {
   Id iparac;
   double msaux;

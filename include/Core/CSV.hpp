@@ -28,7 +28,7 @@ GSTLEARN_EXPORT Id csv_manage(const char* filename,
                                bool verbose     = false);
 GSTLEARN_EXPORT void csv_print_double(double value);
 
-GSTLEARN_EXPORT Db* db_read_csv(const char* file_name,
+GSTLEARN_EXPORT Db* db_read_csv(const String& filename,
                                 const CSVformat& csvfmt,
                                 bool verbose           = false,
                                 Id ncol_max           = -1,

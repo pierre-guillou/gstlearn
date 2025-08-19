@@ -9,8 +9,8 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Neigh/NeighImage.hpp"
-#include "Basic/OptDbg.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/OptDbg.hpp"
 #include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
@@ -21,16 +21,16 @@
 namespace gstlrn
 {
 NeighImage::NeighImage(const VectorInt& radius, Id skip, const ASpaceSharedPtr& space)
-    : ANeigh(space),
-      _skip(skip),
-      _imageRadius(radius)
+  : ANeigh(space)
+  , _skip(skip)
+  , _imageRadius(radius)
 {
 }
 
 NeighImage::NeighImage(const NeighImage& r)
-    : ANeigh(r),
-      _skip(r._skip),
-      _imageRadius(r._imageRadius)
+  : ANeigh(r)
+  , _skip(r._skip)
+  , _imageRadius(r._imageRadius)
 {
 }
 
@@ -39,9 +39,9 @@ NeighImage& NeighImage::operator=(const NeighImage& r)
   if (this != &r)
   {
     ANeigh::operator=(r);
-    _skip = r._skip;
+    _skip        = r._skip;
     _imageRadius = r._imageRadius;
-   }
+  }
   return *this;
 }
 
@@ -54,7 +54,7 @@ String NeighImage::toString(const AStringFormat* strfmt) const
   DECLARE_UNUSED(strfmt);
   std::stringstream sstr;
 
-  sstr << toTitle(0,"Image Neighborhood");
+  sstr << toTitle(0, "Image Neighborhood");
 
   sstr << "Skipping factor = " << _skip << std::endl;
   sstr << toMatrix("Image radius :", VectorString(), VectorString(), true,
@@ -71,10 +71,10 @@ bool NeighImage::_deserializeAscii(std::istream& is, bool verbose)
   ret = ret && _recordRead<Id>(is, "Skipping factor", _skip);
   for (Id idim = 0; ret && idim < static_cast<Id>(getNDim()); idim++)
   {
-    double loc_radius = 0.;
-    ret = ret && _recordRead<double>(is, "Image NeighImageborhood Radius",
-                                     loc_radius);
-    _imageRadius[idim] = static_cast<Id> (loc_radius);
+    double loc_radius  = 0.;
+    ret                = ret && _recordRead<double>(is, "Image NeighImageborhood Radius",
+                                                    loc_radius);
+    _imageRadius[idim] = static_cast<Id>(loc_radius);
   }
 
   return ret;
@@ -83,8 +83,8 @@ bool NeighImage::_deserializeAscii(std::istream& is, bool verbose)
 bool NeighImage::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serializeAscii(os, verbose);
-  ret = ret && _recordWrite<Id>(os, "", getSkip());
+  ret      = ret && ANeigh::_serializeAscii(os, verbose);
+  ret      = ret && _recordWrite<Id>(os, "", getSkip());
   for (Id idim = 0; ret && idim < static_cast<Id>(getNDim()); idim++)
     ret = ret && _recordWrite<double>(os, "", static_cast<double>(getImageRadius(idim)));
   ret = ret && _commentWrite(os, "Image NeighImageborhood parameters");
@@ -169,7 +169,7 @@ void NeighImage::_uimage(Id iech_out, VectorInt& ranks)
   {
     /* Discard the masked input sample */
 
-    if (! _dbin->isActive(iech)) continue;
+    if (!_dbin->isActive(iech)) continue;
 
     /* Discard samples where all variables are undefined */
 
@@ -202,8 +202,8 @@ DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, Id seed) const
   DbGrid* dbsub = nullptr;
 
   double seuil = 1. / (1. + _skip);
-  Id ndim     = dbgrid->getNDim();
-  Id nvar     = dbgrid->getNLoc(ELoc::Z);
+  Id ndim      = dbgrid->getNDim();
+  Id nvar      = dbgrid->getNLoc(ELoc::Z);
 
   /* Core allocation */
 
@@ -250,7 +250,7 @@ bool NeighImage::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   /* Read the grid characteristics */
   bool ret = true;
-  Id skip = 0;
+  Id skip  = 0;
 
   ret = ret && SerializeHDF5::readValue(*neighG, "Skip", skip);
 
@@ -275,4 +275,4 @@ bool NeighImage::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) con
   return ret;
 }
 #endif
-}
+} // namespace gstlrn

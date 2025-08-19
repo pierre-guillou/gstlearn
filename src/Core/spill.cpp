@@ -124,19 +124,19 @@ static void st_get_coordinates(const double* pt_out,
  *****************************************************************************/
 static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* image)
 {
-  char STRING[BUFFER_LENGTH];
+  String STRING;
 
   if (VERBOSE_STEP < 0) return;
   if (!flagMain && STEP <= VERBOSE_STEP) return;
 
   /* Process the title */
 
-  (void)gslStrcpy(STRING, "\n");
+  (void)gslStrcpy2(STRING, "\n");
   if (flagMain)
   {
-    (void)gslSPrintf(&STRING[strlen(STRING)], "End of Step %d === ", STEP);
-    (void)gslStrcat(STRING, title.c_str());
-    (void)gslStrcat(STRING, "\n");
+    (void)gslSPrintfCat2(STRING, "\nEnd of Step %d === ", STEP);
+    (void)gslStrcat2(STRING, title.c_str());
+    (void)gslStrcat2(STRING, "\n");
   }
 
   /* Current address */
@@ -146,9 +146,9 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   if (pt_out != nullptr)
   {
     st_get_coordinates(pt_out, &ix0, &iy0);
-    (void)gslSPrintf(&STRING[strlen(STRING)], "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
+    (void)gslSPrintfCat2(STRING, "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
   }
-  message(STRING);
+  message(STRING.data());
 
   // Current Spill position
 
@@ -170,50 +170,50 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   for (Id jy = 0; jy < TY; jy++)
   {
     Id iy = TY - jy - 1;
-    (void)gslStrcpy(STRING, "");
+    (void)gslStrcpy2(STRING, "");
     for (Id ix = 0; ix < TX; ix++)
     {
       Id value = BITALL(image, ix, iy);
       if (ix == ix0 && iy == iy0)
       {
-        (void)gslStrcat(STRING, "X");
+        (void)gslStrcat2(STRING, "X");
       }
       else if (ix == ix_spill && iy == iy_spill)
       {
-        (void)gslStrcat(STRING, "#");
+        (void)gslStrcat2(STRING, "#");
       }
       else if (value == INQUEUE)
       {
         numm1++;
-        (void)gslStrcat(STRING, "?");
+        (void)gslStrcat2(STRING, "?");
       }
       else if (value == SURFACE_UNKNOWN)
       {
         nump0++;
-        (void)gslStrcat(STRING, " ");
+        (void)gslStrcat2(STRING, " ");
       }
       else if (value == SURFACE_OUTSIDE)
       {
-        (void)gslStrcat(STRING, ".");
+        (void)gslStrcat2(STRING, ".");
         nump1++;
       }
       else if (value == SURFACE_INSIDE)
       {
-        (void)gslStrcat(STRING, "*");
+        (void)gslStrcat2(STRING, "*");
         nump2++;
       }
       else if (value == SURFACE_BELOW)
       {
-        (void)gslStrcat(STRING, "-");
+        (void)gslStrcat2(STRING, "-");
         numpb++;
       }
       else
       {
-        (void)gslStrcat(STRING, "U");
+        (void)gslStrcat2(STRING, "U");
       }
     }
-    (void)gslStrcat(STRING, "\n");
-    message(STRING);
+    (void)gslStrcat2(STRING, "\n");
+    message(STRING.data());
   }
   message("Spill'#' Queue'?'(%d) Unknown' '(%d) Out'.'(%d) In'*'(%d) Below'-'(%d) Heap(%d)\n",
           numm1, nump0, nump1, nump2, numpb, Hsize);
@@ -325,9 +325,8 @@ static void st_convert(double hspill)
 static SPIMG* st_image_free(SPIMG* image)
 {
   if (image == nullptr) return (image);
-
-  image = (SPIMG*)mem_free((char*)image);
-
+  delete image;
+  image = nullptr;
   return (image);
 }
 

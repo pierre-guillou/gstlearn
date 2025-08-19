@@ -8,9 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/AException.hpp"
 #include "Basic/File.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/String.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
@@ -28,7 +26,6 @@
 #include "OutputFormat/GridIrap.hpp"
 #include "OutputFormat/GridXYZ.hpp"
 #include "OutputFormat/GridZycor.hpp"
-#include "OutputFormat/vtk.h"
 #include "geoslib_define.h"
 
 #include <cstdio>

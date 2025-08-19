@@ -392,7 +392,7 @@ static void st_print_grid(const char* subtitle,
                           double* numtab,
                           double* valtab)
 {
-  char string[100];
+  String string;
   Id iz, shift;
 
   /* Initializations */
@@ -403,11 +403,11 @@ static void st_print_grid(const char* subtitle,
 
   for (iz = 0; iz < nxyz[2]; iz++)
   {
-    (void)gslSPrintf(string, "%s Values (iz=%d)\n", subtitle, iz + 1);
-    message(string);
+    (void)gslSPrintf2(string, "%s Values (iz=%d)\n", subtitle, iz + 1);
+    message(string.data());
     print_matrix(NULL, 0, 0, nxyz[0], nxyz[1], NULL, &valtab[iz * shift]);
-    (void)gslSPrintf(string, "%s Counts (iz=%d)\n", subtitle, iz + 1);
-    message(string);
+    (void)gslSPrintf2(string, "%s Counts (iz=%d)\n", subtitle, iz + 1);
+    message(string.data());
     print_matrix(NULL, 0, 0, nxyz[0], nxyz[1], NULL, &numtab[iz * shift]);
   }
   message("\n");
@@ -1249,7 +1249,7 @@ Id db_diffusion(DbGrid* dbgrid1,
   double diff_coeff, pmid, probtot;
   Id error, ndim, ind0[3], nxyz[3], iech, nech, iptr, opt_center;
   Id ntot, iech_save, flag_save, opt_morpho, flag_traj, n_nbgh;
-  char name[40];
+  String name;
   VectorInt nbgh;
   VectorInt tabini;
   VectorInt tabcur;
@@ -1361,12 +1361,12 @@ Id db_diffusion(DbGrid* dbgrid1,
         {
           for (Id iseed = 0; iseed < nseed; iseed++)
           {
-            (void)gslSPrintf(name, "Diffusion.Trajectory.%d", iseed + 1);
+            (void)gslSPrintf2(name, "Diffusion.Trajectory.%d", iseed + 1);
             for (Id iter = 0; iter < niter; iter++)
               for (Id idim = 0; idim < ndim; idim++)
                 TRAJEC(iseed, iter, idim) = dbgrid2->getCoordinate(iech, idim) +
                                             TRAJEC(iseed, iter, idim) * dbgrid1->getDX(idim);
-            set_keypair(name, 1, niter, ndim, &TRAJEC(iseed, 0, 0));
+            set_keypair(name.data(), 1, niter, ndim, &TRAJEC(iseed, 0, 0));
           }
         }
       }

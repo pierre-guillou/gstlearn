@@ -11,6 +11,7 @@
 #include "Basic/String.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/VectorNumT.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -713,16 +714,65 @@ String erase(const String& s, const String& t)
 char* gslStrcpy(char* dst, const char* src)
 {
   return strcpy(dst, src);
-  //(void)gslSPrintf(dst, "%s", src);
-  // return dst;
+}
+
+void gslStrcpy2(String& dst, const char* src)
+{
+  if (!src)
+  {
+    dst.clear();
+    return;
+  }
+
+  size_t len = std::strlen(src);
+
+  // ajuster la taille du string
+  dst.resize(len);
+
+  // copier le contenu
+  std::memcpy(dst.data(), src, len);
+}
+
+void gslStrcpy2(String& dst, const String& src)
+{
+  size_t len = src.size();
+
+  // redimensionner dst pour accueillir exactement src
+  dst.resize(len);
+
+  // copier le contenu
+  std::memcpy(dst.data(), src.data(), len);
 }
 
 char* gslStrcat(char* dst, const char* src)
 {
   return strcat(dst, src);
-  //  size_t size = String(dst).size();
-  //  (void)gslSPrintf(&dst[size], "%s%s", dst, src);
-  //  return dst;
+}
+
+void gslStrcat2(String& dst, const char* src)
+{
+  if (!src) return; // sécurité
+
+  size_t old_len = dst.size();
+  size_t add_len = std::strlen(src);
+
+  // on redimensionne pour accueillir l'ajout
+  dst.resize(old_len + add_len);
+
+  // on copie le nouveau contenu à la fin
+  std::memcpy(&dst[old_len], src, add_len);
+}
+
+void gslStrcat2(String& dst, const String& src)
+{
+  size_t old_len = dst.size();
+  size_t add_len = src.size();
+
+  // redimensionner dst pour accueillir l'ajout
+  dst.resize(old_len + add_len);
+
+  // copier directement les caractères de src
+  std::memcpy(&dst[old_len], src.data(), add_len);
 }
 
 Id gslSPrintf(char* dst, const char* fmt, ...)
@@ -734,20 +784,83 @@ Id gslSPrintf(char* dst, const char* fmt, ...)
   return n;
 }
 
-Id gslScanf(const char* format, ...)
+Id gslSPrintfCat2(String& dst, const char* fmt, ...)
 {
   va_list ap;
-  va_start(ap, format);
-  Id n = vscanf(format, ap);
+  va_start(ap, fmt);
+
+  // calculer la taille du texte formaté
+  va_list ap_copy;
+  va_copy(ap_copy, ap);
+  int size = std::vsnprintf(nullptr, 0, fmt, ap_copy);
+  va_end(ap_copy);
+
+  if (size < 0)
+  {
+    va_end(ap);
+    return -1; // erreur
+  }
+
+  // mémoriser l'ancienne longueur
+  size_t old_len = dst.size();
+
+  // redimensionner dst pour contenir l'ancien contenu + nouveau texte + '\0'
+  dst.resize(old_len + size + 1);
+
+  // écrire le texte formaté à la fin
+  std::vsnprintf(&dst[old_len], size + 1, fmt, ap);
+  va_end(ap);
+
+  // redimensionner pour enlever le '\0' final
+  dst.resize(old_len + size);
+
+  return size;
+}
+
+Id gslSPrintf2(String& dst, const char* fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+
+  // On calcule la taille nécessaire
+  va_list ap_copy;
+  va_copy(ap_copy, ap);
+  int size = std::vsnprintf(nullptr, 0, fmt, ap_copy);
+  va_end(ap_copy);
+
+  if (size < 0)
+  {
+    va_end(ap);
+    return -1; // erreur
+  }
+
+  // Redimensionner pour contenir le texte + '\0'
+  dst.resize(size + 1);
+
+  // Ecrire la chaîne formatée
+  std::vsnprintf(dst.data(), dst.size(), fmt, ap);
+  va_end(ap);
+
+  // Enlever le '\0' final pour que dst.size() == longueur réelle
+  dst.resize(size);
+
+  return size;
+}
+
+Id gslScanf(const char* fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+  Id n = vscanf(fmt, ap);
   va_end(ap);
   return n;
 }
 
-Id gslSScanf(const char* str, const char* format, ...)
+Id gslSScanf(const char* str, const char* fmt, ...)
 {
   va_list ap;
-  va_start(ap, format);
-  Id n = vsscanf(str, format, ap);
+  va_start(ap, fmt);
+  Id n = vsscanf(str, fmt, ap);
   va_end(ap);
   return n;
 }
@@ -755,11 +868,6 @@ Id gslSScanf(const char* str, const char* format, ...)
 char* gslStrtok(char* str, const char* delim)
 {
   return strtok(str, delim);
-}
-
-char* gslStrncpy(char* dest, const char* src, size_t n)
-{
-  return strncpy(dest, src, n);
 }
 
 /****************************************************************************/

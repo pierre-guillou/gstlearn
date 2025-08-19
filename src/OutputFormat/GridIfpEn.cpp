@@ -122,35 +122,25 @@ void GridIfpEn::_writeLine(Id mode,
 {
   std::stringstream sstr;
 
-  // char line[1000];
-
-  /* Initialize the string */
-
-  //(void) gslStrcpy(line, "");
-
   /* Comment */
 
   if (comment != NULL)
-    //(void) gslSPrintf(&line[strlen(line)], "%s", comment);
     sstr << comment;
 
   /* Encoding the value */
 
   if (mode == 1)
   {
-    // (void) gslSPrintf(&line[strlen(line)], " %d", valint);
     sstr << " " << valint;
   }
   else if (mode == 2)
   {
-    // (void) gslSPrintf(&line[strlen(line)], " %lf", valrel);
     sstr << " " << valrel;
   }
 
   /* Secondary comment */
 
-  if (combis != nullptr)
-    //(void) gslSPrintf(&line[strlen(line)], " %s", combis);
+  if (combis != NULL)
     sstr << " " << combis;
 
   /* Print the line */

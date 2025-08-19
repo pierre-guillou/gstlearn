@@ -2612,7 +2612,7 @@ static void st_wgt_print(ST_Seismic_Neigh* ngh,
 {
   double sum[2], value;
   Id iwgt, ivar, jvar, iech, lec, cumflag;
-  char string[10];
+  String string;
 
   /* Header */
 
@@ -2626,8 +2626,8 @@ static void st_wgt_print(ST_Seismic_Neigh* ngh,
   tab_prints(NULL, "Data");
   for (ivar = 0; ivar < nvar; ivar++)
   {
-    (void)gslSPrintf(string, "Z%d*", ivar + 1);
-    tab_prints(NULL, string);
+    (void)gslSPrintf2(string, "Z%d*", ivar + 1);
+    tab_prints(NULL, string.data());
   }
   message("\n");
 

@@ -659,23 +659,23 @@ static Id st_calculate_thresh_stat(Local_Pgs* local_pgs)
     }
     else
     {
-      STAT_THRESH(ifac, 0, 0) = static_cast<double>(ct_tableone_getrank_from_proba(CTABLES,
-                                                                                   t1min));
-      STAT_THRESH(ifac, 0, 1) = static_cast<double>(ct_tableone_getrank_from_proba(CTABLES,
-                                                                                   t1max));
+      STAT_THRESH(ifac, 0, 0) =
+        static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t1min));
+      STAT_THRESH(ifac, 0, 1) =
+        static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t1max));
       if (ngrf > 1)
       {
-        STAT_THRESH(ifac, 1, 0) = static_cast<double>(ct_tableone_getrank_from_proba(CTABLES,
-                                                                                     t2min));
-        STAT_THRESH(ifac, 1, 1) = static_cast<double>(ct_tableone_getrank_from_proba(CTABLES,
-                                                                                     t2max));
+        STAT_THRESH(ifac, 1, 0) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t2min));
+        STAT_THRESH(ifac, 1, 1) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, t2max));
       }
       else
       {
-        STAT_THRESH(ifac, 1, 0) = static_cast<double>(ct_tableone_getrank_from_proba(CTABLES,
-                                                                                     -10.));
-        STAT_THRESH(ifac, 1, 1) = static_cast<double>(ct_tableone_getrank_from_proba(CTABLES,
-                                                                                     +10.));
+        STAT_THRESH(ifac, 1, 0) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, -10.));
+        STAT_THRESH(ifac, 1, 1) =
+          static_cast<double>(ct_tableone_getrank_from_proba(CTABLES, +10.));
       }
     }
   }
@@ -4119,7 +4119,7 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
   }
   else if (rule->getModeRule() == ERule::SHIFT)
   {
-    RuleShift* ruleshift = (RuleShift*)rule;
+    auto* ruleshift = (RuleShift*)rule;
     cov[0]               = covh.getValue(0, 0);                                     /* C11(h)  */
     cov[5]               = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 1); /* C22(h)  */
 

@@ -33,7 +33,7 @@
 using namespace gstlrn;
 int main(int argc, char* argv[])
 {
-  char filename[BUFFER_LENGTH];
+  String filename;
   Db* dbin;
   DbGrid* dbout;
   Vario* vario;
@@ -145,8 +145,8 @@ int main(int argc, char* argv[])
 
       /* Define the indicators */
 
-      nclass        = nfac[i];
-      iatt_ind      = dbin->getNColumn();
+      nclass   = nfac[i];
+      iatt_ind = dbin->getNColumn();
       Limits limits(nclass);
       limits.toIndicator(dbin);
       dbin->setLocatorsByUID(nclass, iatt_ind, ELoc::Z, 0);

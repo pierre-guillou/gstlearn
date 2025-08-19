@@ -1879,7 +1879,7 @@ static void st_calc_point(Pot_Env* pot_env,
 
   if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH))
   {
-    mestitle(1, "Target location");
+    mestitle(1, "Target location6");
     db_sample_print(db_target, iech0, 1, 0, 0, 0);
   }
 

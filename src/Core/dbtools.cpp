@@ -208,11 +208,11 @@ static void st_edit_display(Db* db, Id nrdv, Id nrds, Id ivar, Id iech)
 {
   Id item, nvar, nech, ivar_deb, ivar_fin, iech_deb, iech_fin, jvar, jech;
   ELoc locatorType;
-  char string[5];
+  String string;
 
   /* Initializations */
 
-  (void)gslStrcpy(string, "NA");
+  (void)gslStrcpy2(string, "NA");
   nech = db->getNSample();
   nvar = db->getNColumn();
 
@@ -250,12 +250,12 @@ static void st_edit_display(Db* db, Id nrdv, Id nrds, Id ivar, Id iech)
     if (db->getLocatorByColIdx(jvar, &locatorType, &item))
     {
       String strloc = getLocatorName(locatorType, item);
-      (void)gslStrcpy(string, strloc.c_str());
+      (void)gslStrcpy2(string, strloc.c_str());
     }
     else
-      (void)gslStrcpy(string, "NA");
-    if (jvar == ivar) (void)gslStrcat(string, "*");
-    tab_prints(NULL, string);
+      (void)gslStrcpy2(string, "NA");
+    if (jvar == ivar) (void)gslStrcat2(string, "*");
+    tab_prints(NULL, string.data());
   }
   message("\n");
 

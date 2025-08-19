@@ -40,24 +40,24 @@ static Id ASCII_BUFFER_LENGTH = 0;
 static Id ASCII_BUFFER_QUANT  = 1000;
 static char* ASCII_BUFFER     = NULL;
 static FILE* FILE_MEM         = NULL;
-static char FILE_NAME_MEM[BUFFER_LENGTH];
+static String FILE_NAME_MEM;
 
 /*! \endcond */
 
-static char STUDY[BUFFER_LENGTH] = "./";
-static char EXT_DAT[]            = "dat";
-static char EXT_OUT[]            = "out";
-static char Fichier_environ[]    = "Environ";
-static char Fichier_donnees[]    = "Data";
-static char Fichier_grid[]       = "Grid";
-static char Fichier_vario[]      = "Vario";
-static char Fichier_model[]      = "Model";
-static char Fichier_neigh[]      = "Neigh";
-static char Fichier_polygon[]    = "Polygon";
-static char Fichier_option[]     = "Option";
-static char Fichier_rule[]       = "Rule";
-static char Fichier_simu[]       = "Simu";
-static char Fichier_frac[]       = "Frac";
+static String STUDY;
+static char EXT_DAT[]         = "dat";
+static char EXT_OUT[]         = "out";
+static char Fichier_environ[] = "Environ";
+static char Fichier_donnees[] = "Data";
+static char Fichier_grid[]    = "Grid";
+static char Fichier_vario[]   = "Vario";
+static char Fichier_model[]   = "Model";
+static char Fichier_neigh[]   = "Neigh";
+static char Fichier_polygon[] = "Polygon";
+static char Fichier_option[]  = "Option";
+static char Fichier_rule[]    = "Rule";
+static char Fichier_simu[]    = "Simu";
+static char Fichier_frac[]    = "Frac";
 
 /****************************************************************************/
 /*!
@@ -88,7 +88,7 @@ static Id st_record_read(const char* title, const char* format, ...)
 
   if (error > 0)
   {
-    messerr("Error when reading '%s' from %s", title, FILE_NAME_MEM);
+    messerr("Error when reading '%s' from %s", title, FILE_NAME_MEM.data());
     print_current_line();
   }
 
@@ -107,7 +107,7 @@ static Id st_record_read(const char* title, const char* format, ...)
 static void st_record_write(const char* format, ...)
 {
   va_list ap;
-  char buf[1000];
+  String buf;
   Id long1, long2;
 
   va_start(ap, format);
@@ -118,14 +118,14 @@ static void st_record_write(const char* format, ...)
   else
   {
     _buffer_write(buf, format, ap);
-    long1 = static_cast<Id>(strlen(buf));
-    long2 = (ASCII_BUFFER != nullptr) ? static_cast<Id>(strlen(ASCII_BUFFER)) : 0;
+    long1 = buf.size();
+    long2 = (ASCII_BUFFER != NULL) ? static_cast<Id>(strlen(ASCII_BUFFER)) : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
       ASCII_BUFFER = mem_realloc(ASCII_BUFFER, ASCII_BUFFER_LENGTH, 1);
     }
-    (void)gslStrcat(ASCII_BUFFER, buf);
+    (void)gslStrcat(ASCII_BUFFER, buf.data());
   }
 
   va_end(ap);
@@ -142,7 +142,7 @@ static void st_record_write(const char* format, ...)
  ** \li                  1 for writing - extension ".out"
  ** \li                 -1 no extension
  **
- ** \param[out] file_name Output filename
+ ** \param[out] filename Output filename
  **
  ** \remark  When the rank is 0, the generic name is returned
  ** \remark  Otherwise the rank is combined in the name
@@ -151,22 +151,23 @@ static void st_record_write(const char* format, ...)
 static void st_filename_patch(const char* ref_name,
                               Id rank,
                               Id mode,
-                              char* file_name)
+                              String& filename)
 {
   if (rank == 0)
   {
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_DAT);
+        (void)gslSPrintf2(filename, "%s/%s.%s",
+                          STUDY.data(), ref_name, EXT_DAT);
         break;
 
       case 1:
-        (void)gslSPrintf(file_name, "%s.%s", ref_name, EXT_OUT);
+        (void)gslSPrintf2(filename, "%s.%s", ref_name, EXT_OUT);
         break;
 
       case -1:
-        (void)gslSPrintf(file_name, "%s", ref_name);
+        (void)gslSPrintf2(filename, "%s", ref_name);
         break;
     }
   }
@@ -175,57 +176,21 @@ static void st_filename_patch(const char* ref_name,
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
-                         EXT_DAT);
+        (void)gslSPrintf2(filename, "%s/%s%1d.%s",
+                          STUDY.data(), ref_name, rank,
+                          EXT_DAT);
         break;
 
       case 1:
-        (void)gslSPrintf(file_name, "%s%1d.%s", ref_name, rank,
-                         EXT_OUT);
+        (void)gslSPrintf2(filename, "%s%1d.%s", ref_name, rank,
+                          EXT_OUT);
         break;
 
       case -1:
-        (void)gslSPrintf(file_name, "%s%1d", ref_name, rank);
+        (void)gslSPrintf2(filename, "%s%1d", ref_name, rank);
         break;
     }
   }
-  //  if (rank == 0)
-  //  {
-  //    switch (mode)
-  //    {
-  //      case 0:
-  //        (void) gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_DAT);
-  //        break;
-  //
-  //      case 1:
-  //        (void) gslSPrintf(file_name, "%s/%s.%s", STUDY, ref_name, EXT_OUT);
-  //        break;
-  //
-  //      case -1:
-  //        (void) gslSPrintf(file_name, "%s/%s", STUDY, ref_name);
-  //        break;
-  //    }
-  //  }
-  //  else
-  //  {
-  //    switch (mode)
-  //    {
-  //      case 0:
-  //        (void) gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
-  //                          EXT_DAT);
-  //        break;
-  //
-  //      case 1:
-  //        (void) gslSPrintf(file_name, "%s/%s%1d.%s", STUDY, ref_name, rank,
-  //                          EXT_OUT);
-  //        break;
-  //
-  //      case -1:
-  //        (void) gslSPrintf(file_name, "%s/%s%1d", STUDY, ref_name, rank);
-  //        break;
-  //    }
-  //  }
-  //
 }
 
 /****************************************************************************/
@@ -239,7 +204,7 @@ static void st_filename_patch(const char* ref_name,
  ** \param[out] filename  Output filename
  **
  *****************************************************************************/
-void ascii_filename(const char* type, Id rank, Id mode, char* filename)
+void ascii_filename(const char* type, Id rank, Id mode, String& filename)
 {
   if (!strcmp(type, "Environ"))
     st_filename_patch(Fichier_environ, rank, mode, filename);
@@ -279,7 +244,7 @@ void ascii_filename(const char* type, Id rank, Id mode, char* filename)
 void ascii_study_define(const char* study)
 
 {
-  (void)gslStrcpy(STUDY, study);
+  (void)gslStrcpy2(STUDY, study);
 }
 
 /****************************************************************************/
@@ -307,7 +272,7 @@ static void st_file_close(FILE* file)
  ** \param[in]  verbose  Verbose option if the file cannot be opened
  **
  *****************************************************************************/
-static FILE* st_file_open(const char* filename,
+static FILE* st_file_open(const String& filename,
                           const char* filetype,
                           Id mode,
                           bool verbose)
@@ -317,17 +282,18 @@ static FILE* st_file_open(const char* filename,
 
   /* Open the file */
 
-  file = FILE_MEM = _file_open(filename, mode);
-  (void)gslStrcpy(FILE_NAME_MEM, filename);
+  file = FILE_MEM = _file_open(filename.data(), mode);
+  FILE_NAME_MEM   = filename;
 
   if (file == nullptr)
   {
-    if (verbose) messerr("Error when opening the file %s", filename);
+    if (verbose) messerr("Error when opening the file %s", filename.data());
     FILE_MEM = NULL;
     return (file);
   }
 
-  if (OptDbg::query(EDbg::INTERFACE)) message("Opening the File = %s\n", filename);
+  if (OptDbg::query(EDbg::INTERFACE))
+    message("Opening the File = %s\n", filename.data());
 
   /* Check against the file type */
 
@@ -341,7 +307,7 @@ static FILE* st_file_open(const char* filename,
     if (strcmp(idtype, filetype) != 0)
     {
       messerr("Error: in the File (%s), its Type (%s) does not match the requested one (%s)",
-              filename, idtype, filetype);
+              filename.data(), idtype, filetype);
       FILE_MEM = NULL;
       return (NULL);
     }
@@ -362,11 +328,11 @@ static FILE* st_file_open(const char* filename,
 /*!
  **   Read the Environment definition file
  **
- ** \param[in] file_name  Name of the ASCII file
+ ** \param[in] filename  Name of the ASCII file
  ** \param[in] verbose    Verbose option if the file cannot be opened
  **
  *****************************************************************************/
-void ascii_environ_read(char* file_name, bool verbose)
+void ascii_environ_read(String& filename, bool verbose)
 
 {
   FILE* file;
@@ -375,7 +341,7 @@ void ascii_environ_read(char* file_name, bool verbose)
 
   /* Opening the Data file */
 
-  file = st_file_open(file_name, "Environ", OLD, verbose);
+  file = st_file_open(filename, "Environ", OLD, verbose);
   if (file == nullptr) return;
 
   /* Reading the environment */
@@ -383,7 +349,7 @@ void ascii_environ_read(char* file_name, bool verbose)
   while (1)
   {
     if (st_record_read("Debug Keyword", "%s", name)) goto label_end;
-    if (st_record_read("Debug Value", "%d", &debug)) goto label_end;
+    if (st_record_read("Debug Value", "%ld", &debug)) goto label_end;
     String s = toUpper(String(name));
     if (debug == 1)
       OptDbg::defineByKey(s);
@@ -399,7 +365,7 @@ label_end:
 /*!
  **   Read the Simulation Characteristics
  **
- ** \param[in]  file_name  Name of the ASCII file
+ ** \param[in]  filename  Name of the ASCII file
  ** \param[in]  verbose    Verbose option if the file cannot be opened
  **
  ** \param[out]  nbsimu    Number of simulations
@@ -407,7 +373,7 @@ label_end:
  ** \param[out]  seed      Seed for the random number generator
  **
  *****************************************************************************/
-void ascii_simu_read(char* file_name,
+void ascii_simu_read(String& filename,
                      bool verbose,
                      Id* nbsimu,
                      Id* nbtuba,
@@ -423,14 +389,14 @@ void ascii_simu_read(char* file_name,
 
   /* Opening the Simulation Definition file */
 
-  file = st_file_open(file_name, "Simu", OLD, verbose);
+  file = st_file_open(filename, "Simu", OLD, verbose);
   if (file == nullptr) return;
 
   /* Read the parameters */
 
   if (st_record_read("Number of simulations", "%d", nbsimu)) return;
   if (st_record_read("Number of Turning Bands", "%d", nbtuba)) return;
-  if (st_record_read("Random Seed", "%d", seed)) return;
+  if (st_record_read("Random Seed", "%ld", seed)) return;
 
   st_file_close(file);
 }
@@ -441,7 +407,7 @@ void ascii_simu_read(char* file_name,
  **
  ** \return  1 if the option is defined and 0 otherwise
  **
- ** \param[in]  file_name    Name of the ASCII file
+ ** \param[in]  filename    Name of the ASCII file
  ** \param[in]  verbose      Verbose option if the file cannot be opened
  ** \param[in]  option_name  Keyword for the requested option
  ** \param[in]  type         Answer type
@@ -452,7 +418,7 @@ void ascii_simu_read(char* file_name,
  ** \param[out]  answer      Answer
  **
  *****************************************************************************/
-Id ascii_option_defined(const char* file_name,
+Id ascii_option_defined(const String& filename,
                         bool verbose,
                         const char* option_name,
                         Id type,
@@ -469,7 +435,7 @@ Id ascii_option_defined(const char* file_name,
 
   /* Opening the Data file */
 
-  file = st_file_open(file_name, "Option", OLD, verbose);
+  file = st_file_open(filename, "Option", OLD, verbose);
   if (file == nullptr) return (lrep);
 
   /* Implicit loop on the lines of the file */
@@ -514,7 +480,7 @@ label_end:
  **
  ** \return  Pointer to the Db descriptor
  **
- ** \param[in]  file_name     Name of the ASCII file
+ ** \param[in]  filename     Name of the ASCII file
  ** \param[in]  verbose       Verbose option if the file cannot be opened
  ** \param[in]  csvfmt        CSVformat structure
  ** \param[in]  ncol_max      Maximum number of columns (or -1)
@@ -522,7 +488,7 @@ label_end:
  ** \param[in]  flagAddSampleRank True To add the rank number
  **
  *****************************************************************************/
-Db* db_read_csv(const char* file_name,
+Db* db_read_csv(const String& filename,
                 const CSVformat& csvfmt,
                 bool verbose,
                 Id ncol_max,
@@ -540,7 +506,8 @@ Db* db_read_csv(const char* file_name,
 
   /* Reading the CSV file */
 
-  if (csv_table_read(file_name, csvfmt, verbose, ncol_max, nrow_max, &ncol, &nrow, names, tab))
+  if (csv_table_read(filename,
+                     csvfmt, verbose, ncol_max, nrow_max, &ncol, &nrow, names, tab))
     goto label_end;
 
   /* Creating the Db */

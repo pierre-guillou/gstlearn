@@ -30,7 +30,8 @@
 namespace gstlrn
 {
 PrecisionOp::PrecisionOp()
-  : _shiftOp(nullptr)
+  : ASimulable()
+  , _shiftOp(nullptr)
   , _cova(nullptr)
   , _polynomials()
   , _verbose(false)
@@ -46,7 +47,8 @@ PrecisionOp::PrecisionOp()
 PrecisionOp::PrecisionOp(AShiftOp* shiftop,
                          const CovAniso* cova,
                          bool verbose)
-  : _shiftOp(shiftop)
+  : ASimulable()
+  , _shiftOp(shiftop)
   , _cova(cova->clone())
   , _polynomials()
   , _verbose(verbose)
@@ -69,7 +71,8 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
                          CovAniso* cova,
                          bool stencil,
                          bool verbose)
-  : _shiftOp(nullptr)
+  : ASimulable()
+  , _shiftOp(nullptr)
   , _cova(cova->clone())
   , _polynomials()
   , _verbose(verbose)
@@ -105,7 +108,7 @@ PrecisionOp::PrecisionOp(const AMesh* mesh,
 }
 
 PrecisionOp::PrecisionOp(const PrecisionOp& pmat)
-  : ASimulable(pmat)
+  : ASimulable(pmat) // Explicitly call the base class copy constructor
   , _shiftOp(nullptr)
   , _cova(pmat._cova->clone())
   , _verbose(pmat._verbose)

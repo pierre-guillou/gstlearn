@@ -96,8 +96,7 @@ bool ASerializable::dumpToNF(const String& NFFilename,
   return false;
 }
 
-bool ASerializable::_fileOpenAndDeserialize(const String& filename,
-                                            bool verbose)
+bool ASerializable::_fileOpenAndDeserialize(const String& filename, bool verbose)
 {
   // Check that the file exists
   String filepath = ASerializable::buildFileName(1, filename, true);
@@ -185,7 +184,6 @@ String ASerializable::buildFileName(Id status, const String& filename, bool ensu
   {
     return fileLocal.string();
   }
-
   fileLocal.clear();
 
   // container name: first search for the GSTLEARN_OUTPUT_DIR

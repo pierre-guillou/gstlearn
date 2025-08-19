@@ -42,7 +42,9 @@ GSTLEARN_EXPORT char* mem_copy_(const char* call_file,
                                 char* tabin,
                                 Id size,
                                 Id flag_fatal);
-GSTLEARN_EXPORT char* mem_free_(const char* call_file, size_t call_line, char* tab);
+GSTLEARN_EXPORT char* mem_free_(const char* call_file,
+                                size_t call_line,
+                                char* tab);
 GSTLEARN_EXPORT double** mem_tab_free(double** tab, Id nvar);
 GSTLEARN_EXPORT double** mem_tab_alloc(Id nvar, Id size, Id flag_fatal);
 GSTLEARN_EXPORT unsigned long long getTotalSystemMemory();

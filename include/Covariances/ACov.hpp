@@ -495,7 +495,7 @@ public:
     DECLARE_UNUSED(icas2);
     DECLARE_UNUSED(iech2);
   }
-  Id getNDim(Id ispace = -1) const { return _ctxt.getNDim(ispace); }
+  Id getNDim(Id ispace = -1) const { return static_cast<Id>(_ctxt.getNDim(ispace)); }
   void optimizationPreProcessForData(const Db* db1 = nullptr) const;
   virtual void setOptimEnabled(bool enabled) const { _optimEnabled = enabled; }
 

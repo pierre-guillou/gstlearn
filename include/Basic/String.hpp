@@ -100,9 +100,15 @@ GSTLEARN_EXPORT char* gslStrcpy(char* dst, const char* src);
 GSTLEARN_EXPORT char* gslStrcat(char* dst, const char* src);
 GSTLEARN_EXPORT Id gslSPrintf(char* dst, const char* fmt, ...);
 GSTLEARN_EXPORT char* gslStrtok(char* str, const char* delim);
-GSTLEARN_EXPORT char* gslStrncpy(char* dest, const char* src, size_t n);
-GSTLEARN_EXPORT Id gslScanf(const char* format, ...);
-GSTLEARN_EXPORT Id gslSScanf(const char* str, const char* format, ...);
+GSTLEARN_EXPORT Id gslScanf(const char* fmt, ...);
+GSTLEARN_EXPORT Id gslSScanf(const char* str, const char* fmt, ...);
+
+GSTLEARN_EXPORT void gslStrcpy2(String& dst, const String& src);
+GSTLEARN_EXPORT void gslStrcpy2(String& dst, const char* src);
+GSTLEARN_EXPORT void gslStrcat2(String& dst, const char* src);
+GSTLEARN_EXPORT void gslStrcat2(String& dst, const String& src);
+GSTLEARN_EXPORT Id gslSPrintf2(String& dst, const char* fmt, ...);
+GSTLEARN_EXPORT Id gslSPrintfCat2(String& dst, const char* fmt, ...);
 
 // Adapted from:
 // - https://stackoverflow.com/a/26310318

@@ -10,13 +10,11 @@
 /******************************************************************************/
 #pragma once
 
-#include "Covariances/CovAniso.hpp"
-#include "LinearOp/ASimulable.hpp"
-
-#include "Enum/EPowerPT.hpp"
-
 #include "Basic/VectorNumT.hpp"
+#include "Covariances/CovAniso.hpp"
+#include "Enum/EPowerPT.hpp"
 #include "LinearOp/AShiftOp.hpp"
+#include "LinearOp/ASimulable.hpp"
 #include <map>
 #include <memory>
 
@@ -62,8 +60,8 @@ public:
                              bool verbose = false);
 
   Id reset(const AShiftOp* shiftop,
-            const CovAniso* cova = nullptr,
-            bool verbose         = false);
+           const CovAniso* cova = nullptr,
+           bool verbose         = false);
 
 #ifndef SWIG
   virtual void gradYQX(const constvect /*X*/,
@@ -120,8 +118,8 @@ protected:
 
 #ifndef SWIG
   Id _addEvalPoly(const EPowerPT& power,
-                   const constvect inv,
-                   vect outv) const;
+                  const constvect inv,
+                  vect outv) const;
   Id _addToDest(const constvect inv, vect outv) const override;
   Id _addSimulateToDest(const constvect whitenoise, vect outv) const override;
 

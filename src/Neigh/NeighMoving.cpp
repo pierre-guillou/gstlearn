@@ -9,6 +9,7 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Neigh/NeighMoving.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/OptCustom.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/SerializeHDF5.hpp"

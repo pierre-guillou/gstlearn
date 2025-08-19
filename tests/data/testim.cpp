@@ -8,6 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Basic/AStringable.hpp"
 #include "Enum/EFormatNF.hpp"
 #include "geoslib_f.h"
 #include "geoslib_old_f.h"
@@ -67,7 +68,7 @@ static Model* st_modify(Model* model,
 
 int main(int argc, char* argv[])
 {
-  char filename[BUFFER_LENGTH];
+  String filename;
   Db* dbin;
   DbGrid* dbout;
   Vario* vario;
@@ -76,8 +77,8 @@ int main(int argc, char* argv[])
   Constraints constraints;
   DbStringFormat dbfmt;
   Id nbsimu, seed, nbtuba;
-  static int nboot   = 10;
-  static int niter   = 10;
+  static int nboot    = 10;
+  static int niter    = 10;
   static bool verbose = false;
 
   /* Initializations */
@@ -96,8 +97,10 @@ int main(int argc, char* argv[])
   /* Create the output name (for storage of dump files) */
 
   VectorString subparts = separateKeywords(argv[1]);
-  int nargs             = (int)subparts.size();
-  String outname        = concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
+
+  int nargs      = static_cast<int>(subparts.size());
+  String outname = concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
+  // if (outname == "Jeu3-") verbose = true; // Pour voir le resultat de Jeu3 en particulier
   ASerializable::setPrefixName(outname);
 
   /* Getting the Study name */
@@ -173,9 +176,9 @@ int main(int argc, char* argv[])
   ascii_simu_read(filename, verbose, &nbsimu, &nbtuba, &seed);
 
   /* Conditional expectation */
-
   if (dbin->getNInterval() > 0)
   {
+    if (verbose) message("Performing Gibbs Sampler\n");
     dbin->clearLocators(ELoc::Z);
     if (gibbs_sampler(dbin, new_model,
                       1, seed, nboot, niter, false, false, true, false, false, 0,
@@ -187,13 +190,14 @@ int main(int argc, char* argv[])
 
   /* Perform the estimation */
 
-  if (neigh != nullptr)
+  if (dbin != nullptr && new_model != nullptr && neigh != nullptr)
   {
     if (nbsimu > 0)
     {
 
       /* Simulation case */
 
+      if (verbose) message("Performing Simulations");
       if (simtub(dbin, dbout, new_model, neigh, nbsimu, seed, nbtuba, 0))
         messageAbort("Simulations");
       dbfmt.setFlags(true, false, true, true, true);
@@ -206,7 +210,7 @@ int main(int argc, char* argv[])
       {
 
         /* Cross-validation */
-
+        if (verbose) message("Performing Cross-validation\n");
         if (xvalid(dbin, new_model, neigh, false, 1, 0, 0)) messageAbort("xvalid");
         dbfmt.setFlags(true, false, true, true, true);
         dbin->display(&dbfmt);
@@ -215,7 +219,7 @@ int main(int argc, char* argv[])
       {
 
         /* Estimation case */
-
+        if (verbose) message("Performing Kriging\n");
         if (kriging(dbin, dbout, new_model, neigh,
                     1, 1, 0)) messageAbort("kriging");
         dbfmt.setFlags(true, false, true, true, true);
