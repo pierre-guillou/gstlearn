@@ -57,16 +57,14 @@ if (WIN32)
     ARCHIVE
   )
 else()
+  # gmtsph is built by gstlearn itself (and always as a static library), so it
+  # can be installed inside gstlearn itself. NLopt (if needed) is an external
+  # dependency that users of gstlearn will have to provide themselves.
   install(
-    TARGETS shared static gmtsph # NLopt::nlopt
+    TARGETS shared static gmtsph
     EXPORT ${PROJECT_NAME}_corelibs
     LIBRARY
     ARCHIVE COMPONENT static EXCLUDE_FROM_ALL
-  )
-  install(
-    DIRECTORY ${NLopt_DIR}/../../../
-    DESTINATION NLopt
-    COMPONENT static EXCLUDE_FROM_ALL
   )
 endif()
 
