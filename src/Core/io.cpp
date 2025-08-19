@@ -439,6 +439,14 @@ Id _file_read(FILE* file, const char* format, va_list ap)
       if (*ret_i == static_cast<Id>(ASCII_TEST)) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
     }
+    else if (!strcmp(fmt, "%ld"))
+    {
+      ret_i = va_arg(ap, Id*);
+      if (gslSScanf(LCUR, "%ld", ret_i) <= 0) return (1);
+      ideb += 3;
+      if (*ret_i == static_cast<Id>(ASCII_TEST)) *ret_i = ITEST;
+      if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Large Integer = %i\n", *ret_i);
+    }
     else if (!strcmp(fmt, "%f"))
     {
       ret_f = va_arg(ap, float*);
@@ -635,6 +643,14 @@ Id _buffer_read(char** buffer, const char* format, va_list ap)
       ideb += 2;
       if (*ret_i == static_cast<Id>(ASCII_TEST)) *ret_i = ITEST;
       if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Integer = %i\n", *ret_i);
+    }
+    else if (!strcmp(fmt, "%ld"))
+    {
+      ret_i = va_arg(ap, Id*);
+      if (gslSScanf(LCUR, "%ld", ret_i) <= 0) return (1);
+      ideb += 3;
+      if (*ret_i == static_cast<Id>(ASCII_TEST)) *ret_i = ITEST;
+      if (OptDbg::query(EDbg::INTERFACE)) message("Decoded Large Integer = %i\n", *ret_i);
     }
     else if (!strcmp(fmt, "%f"))
     {

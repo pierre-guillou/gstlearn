@@ -349,7 +349,7 @@ void ascii_environ_read(String& filename, bool verbose)
   while (1)
   {
     if (st_record_read("Debug Keyword", "%s", name)) goto label_end;
-    if (st_record_read("Debug Value", "%d", &debug)) goto label_end;
+    if (st_record_read("Debug Value", "%ld", &debug)) goto label_end;
     String s = toUpper(String(name));
     if (debug == 1)
       OptDbg::defineByKey(s);
@@ -396,7 +396,7 @@ void ascii_simu_read(String& filename,
 
   if (st_record_read("Number of simulations", "%d", nbsimu)) return;
   if (st_record_read("Number of Turning Bands", "%d", nbtuba)) return;
-  if (st_record_read("Random Seed", "%d", seed)) return;
+  if (st_record_read("Random Seed", "%ld", seed)) return;
 
   st_file_close(file);
 }

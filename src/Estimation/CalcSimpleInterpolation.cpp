@@ -363,7 +363,7 @@ Id CalcSimpleInterpolation::_nearest(Db* dbin,
     if (!dbout->isActive(iech)) continue;
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target location7");
+      mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
     }
     VectorDouble weights;
@@ -408,7 +408,7 @@ Id CalcSimpleInterpolation::_movave(Db* dbin, Db* dbout, ANeigh* neigh)
     OptDbg::setCurrentIndex(iech + 1);
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target location8");
+      mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
     }
     VectorDouble weights;
@@ -459,7 +459,7 @@ Id CalcSimpleInterpolation::_movmed(Db* dbin, Db* dbout, ANeigh* neigh)
     OptDbg::setCurrentIndex(iech + 1);
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target location9");
+      mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
     }
     VectorDouble weights;
@@ -513,7 +513,7 @@ Id CalcSimpleInterpolation::_lstsqr(Db* dbin, Db* dbout, ANeigh* neigh) const
     if (!dbout->isActive(iech)) continue;
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target locationA");
+      mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
     }
 
@@ -610,7 +610,7 @@ void CalcSimpleInterpolation::_pointInvdist(Db* dbin, Db* dbout)
     if (!dbout->isActive(iech)) continue;
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target locationB");
+      mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
     }
     VectorInt nbgh;
@@ -677,7 +677,7 @@ void CalcSimpleInterpolation::_gridInvdist(DbGrid* dbin, Db* dbout)
     if (!dbout->isActive(iech)) continue;
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target locationC");
+      mestitle(1, "Target location");
       db_sample_print(dbout, iech, 1, 0, 0, 0);
     }
 

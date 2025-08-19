@@ -430,7 +430,7 @@ Id KrigingSystemSimpleCase::estimate(Id iechout,
     OptDbg::setCurrentIndex(iechout + 1);
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target locationE");
+      mestitle(1, "Target location");
       db_sample_print(_dbout, iechout, 1, 0, 0, 0);
     }
   }

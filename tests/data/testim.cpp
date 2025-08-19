@@ -160,8 +160,6 @@ int main(int argc, char* argv[])
   new_model = st_modify(model, dbin);
   if (new_model == nullptr) goto label_end;
 
-  OptDbg::display(); // TODO remove this
-
   /* Define the neighborhood */
 
   ascii_filename("Neigh", 0, 0, filename);

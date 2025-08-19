@@ -622,7 +622,7 @@ Id KrigingSystem::estimate(Id iech_out)
         message("\nProcessing Factor %d / %d\n", cova->getActiveFactor(), _nclasses);
     }
 
-    mestitle(1, "Target locationD");
+    mestitle(1, "Target location");
     if (!_krigopt.hasColcok())
       db_sample_print(_dbout, _iechOut, 1, 0, 0, 0);
     else
