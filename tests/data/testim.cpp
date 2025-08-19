@@ -27,6 +27,7 @@
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "Variogram/Vario.hpp"
+#include "Basic/OptDbg.hpp"
 
 using namespace gstlrn;
 
@@ -159,6 +160,8 @@ int main(int argc, char* argv[])
   new_model = st_modify(model, dbin);
   if (new_model == nullptr) goto label_end;
 
+  OptDbg::display(); // TODO remove this
+
   /* Define the neighborhood */
 
   ascii_filename("Neigh", 0, 0, filename);
@@ -176,7 +179,6 @@ int main(int argc, char* argv[])
   ascii_simu_read(filename, verbose, &nbsimu, &nbtuba, &seed);
 
   /* Conditional expectation */
-
   if (dbin->getNInterval() > 0)
   {
     if (verbose) message("Performing Gibbs Sampler\n");

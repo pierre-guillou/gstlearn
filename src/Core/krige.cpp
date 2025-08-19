@@ -1995,7 +1995,7 @@ Id anakexp_f(DbGrid* db,
     if (!db->isActive(IECH_OUT)) continue;
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target location");
+      mestitle(1, "Target location1");
       db_sample_print(db, IECH_OUT, 1, 0, 0, 0);
     }
 
@@ -2720,7 +2720,7 @@ Id anakexp_3D(DbGrid* db,
           continue;
         if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
         {
-          mestitle(1, "Target location");
+          mestitle(1, "Target location2");
           db_sample_print(db, IECH_OUT, 1, 0, 0, 0);
         }
 
@@ -3597,7 +3597,7 @@ Id krigsampling_f(Db* dbin,
     if (!dbout->isActive(IECH_OUT)) continue;
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target location");
+      mestitle(1, "Target location3");
       db_sample_print(dbout, IECH_OUT, 1, 0, 0, 0);
     }
 
@@ -4708,7 +4708,7 @@ Id inhomogeneous_kriging(Db* dbdat,
     if (!dbout->isActive(IECH_OUT)) continue;
     if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH) || OptDbg::query(EDbg::RESULTS))
     {
-      mestitle(1, "Target location");
+      mestitle(1, "Target location4");
       db_sample_print(dbout, IECH_OUT, 1, 0, 0, 0);
     }
 
