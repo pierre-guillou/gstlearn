@@ -195,8 +195,15 @@ foreach(FLAVOR ${FLAVORS})
   target_link_libraries(${FLAVOR} PRIVATE OpenMP::OpenMP_CXX)
 
   # Link to gmtsph
-  target_link_libraries(${FLAVOR} PRIVATE gmtsph)
-    
+  # gmtsph is only used internally and always compiled as a static library so
+  # the shared target can use a PRIVATE dependency. The static target needs to
+  # link with it so it must be PUBLIC (it is packaged with gstlearn itself).
+  set(gmtsph_link PUBLIC)
+  if (${FLAVOR} MATCHES shared)
+    set(gmtsph_link PRIVATE)
+  endif()
+  target_link_libraries(${FLAVOR} ${gmtsph_link} gmtsph)
+
   # Link to Eigen
   target_link_libraries(${FLAVOR} PUBLIC Eigen3::Eigen)
 
