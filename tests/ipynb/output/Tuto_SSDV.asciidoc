@@ -1,5 +1,7 @@
 #NO_DIFF#XXX
-----<IPython.core.display.Javascript object>----
+----
+
+<IPython.core.display.Javascript object>----
 
 
 #NO_DIFF#XXX
@@ -83,5 +85,6 @@ Coefficient of Variation = 21.20
 #NO_DIFF#XXX
 ----
 Specific area (case #1) = 107891.40 m²
+
 Specific area (case #2) = 207479.07 m²
 ----
