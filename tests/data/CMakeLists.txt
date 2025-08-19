@@ -1,7 +1,7 @@
 # List special non-regression test sources
 set(TEST_SOURCES 
   testim.cpp)
-#  testpgs.cpp
+#  testpgs.cpp   # TODO restore all executables
 #  testvar.cpp)
 
 # Generation folder (all tests in one folder)
@@ -77,7 +77,7 @@ foreach(TARGET_EXE ${TARGETS_EXE})
                OUTPUT_VARIABLE TARGET_EXE)
     # Retrieve all test cases
 #    file(GLOB TEST_SRC_DIRS ${BDIR}*)
-    file(GLOB TEST_SRC_DIRS ${BDIR}8) # Only Jeu8
+    file(GLOB TEST_SRC_DIRS ${BDIR}8) # Only Jeu8 # TODO : restore all test cases
     foreach(TEST_SRC_DIR ${TEST_SRC_DIRS})
         # Drop absolute directory path
         get_filename_component(DIR_NAME "${TEST_SRC_DIR}" NAME)
