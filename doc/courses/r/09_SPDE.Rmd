@@ -114,7 +114,7 @@ plot.end(p)
 Derive the parameter of a Global Trend (composed of the Elevation as a drift function) using the SPDE formalism.
 
 ```{r Trend_coefficients}
-coeffs = trendSPDE(temperatures, grid, model)
+coeffs = trendSPDE(temperatures, model)
 cat("Trend coefficients:", coeffs)
 ```
 

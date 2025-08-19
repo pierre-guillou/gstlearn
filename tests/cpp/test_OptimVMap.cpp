@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   model->display();
 
   // Simulating the Input file
-  int nx         = 100;
+  Id nx          = 100;
   double dx      = 1. / nx;
   DbGrid* dbgrid = DbGrid::create({nx, nx}, {dx, dx});
   (void)simtub(nullptr, dbgrid, model);
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   modelfit->display();
 
   // Fit the Model
-  ModelOptimParam mop = ModelOptimParam();
+  ModelOptimParam mop;
   mop.setFlagGoulard(true);
   bool verbose = false;
   bool trace   = false;

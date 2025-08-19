@@ -28,12 +28,12 @@ class DbGrid;
 class GSTLEARN_EXPORT Krigtest_Res
 {
 public:
-  int ndim;               // Space dimension
-  int nvar;               // Number of variables
-  int nech;               // Number of Neighboring samples
-  int CSize;              // Number of drift equations in the Drift part
-  int DSize;              // Number of Equations of the Covariance part
-  int nrhs;               // Number of R.H.S. vectors
+  Id ndim;               // Space dimension
+  Id nvar;               // Number of variables
+  Id nech;               // Number of Neighboring samples
+  Id CSize;              // Number of drift equations in the Drift part
+  Id DSize;              // Number of Equations of the Covariance part
+  Id nrhs;               // Number of R.H.S. vectors
   VectorInt nbgh;         // Ranks of the neighboring samples
   VectorVectorDouble xyz; // Coordinates of the neighboring samples [ndim][nech]
   VectorDouble data;      // Usable values at neighboring samples [neq]
@@ -61,13 +61,13 @@ public:
   void setPriorCov(const MatrixSymmetric& priorCov) { _priorCov = priorCov; }
   void setPriorMean(const VectorDouble& priorMean) { _priorMean = priorMean; }
   void setFlagBayes(bool flagBayes) { _flagBayes = flagBayes; }
-  void setIechSingleTarget(int iechSingleTarget) { _iechSingleTarget = iechSingleTarget; }
+  void setIechSingleTarget(Id iechSingleTarget) { _iechSingleTarget = iechSingleTarget; }
   void setVerboseSingleTarget(bool verbose) { _verboseSingleTarget = verbose; }
   void setAnam(AAnam* anam) { _anam = anam; }
   void setFlagGam(bool flagGam) { _flagGam = flagGam; }
-  void setFlagXvalidEst(int flagXvalidEst) { _flagXvalidEst = flagXvalidEst; }
-  void setFlagXvalidStd(int flagXvalidStd) { _flagXvalidStd = flagXvalidStd; }
-  void setFlagXvalidVarZ(int flagXvalidVarZ) { _flagXvalidVarZ = flagXvalidVarZ; }
+  void setFlagXvalidEst(Id flagXvalidEst) { _flagXvalidEst = flagXvalidEst; }
+  void setFlagXvalidStd(Id flagXvalidStd) { _flagXvalidStd = flagXvalidStd; }
+  void setFlagXvalidVarZ(Id flagXvalidVarZ) { _flagXvalidVarZ = flagXvalidVarZ; }
   void setFlagXvalid(bool flagXvalid) { _flagXvalid = flagXvalid; }
   void setFlagKfold(bool flag_kfold) { _flagKfold = flag_kfold; }
   void setFlagNeighOnly(bool flagNeighOnly) { _flagNeighOnly = flagNeighOnly; }
@@ -94,7 +94,7 @@ private:
   VectorDouble _priorMean;
   MatrixSymmetric _priorCov;
 
-  int _iechSingleTarget;
+  Id _iechSingleTarget;
   bool _verboseSingleTarget;
 
   bool _flagGam;
@@ -102,22 +102,22 @@ private:
 
   bool _flagXvalid;
   bool _flagKfold;
-  int _flagXvalidEst;
-  int _flagXvalidStd;
-  int _flagXvalidVarZ;
+  Id _flagXvalidEst;
+  Id _flagXvalidStd;
+  Id _flagXvalidVarZ;
 
   bool _flagNeighOnly;
-  int _nbNeigh;
+  Id _nbNeigh;
 
-  int _iptrEst;
-  int _iptrStd;
-  int _iptrVarZ;
-  int _iptrNeigh;
+  Id _iptrEst;
+  Id _iptrStd;
+  Id _iptrVarZ;
+  Id _iptrNeigh;
 
   Krigtest_Res _ktest;
 };
 
-GSTLEARN_EXPORT int kriging(Db* dbin,
+GSTLEARN_EXPORT Id kriging(Db* dbin,
                             Db* dbout,
                             ModelGeneric* model,
                             ANeigh* neigh,
@@ -126,7 +126,7 @@ GSTLEARN_EXPORT int kriging(Db* dbin,
                             bool flag_varz                  = false,
                             const KrigOpt& krigopt          = KrigOpt(),
                             const NamingConvention& namconv = NamingConvention("Kriging"));
-GSTLEARN_EXPORT int krigcell(Db* dbin,
+GSTLEARN_EXPORT Id krigcell(Db* dbin,
                              Db* dbout,
                              ModelGeneric* model,
                              ANeigh* neigh,
@@ -134,7 +134,7 @@ GSTLEARN_EXPORT int krigcell(Db* dbin,
                              bool flag_std                   = true,
                              const KrigOpt& krigopt          = KrigOpt(),
                              const NamingConvention& namconv = NamingConvention("KrigCell"));
-GSTLEARN_EXPORT int kribayes(Db* dbin,
+GSTLEARN_EXPORT Id kribayes(Db* dbin,
                              Db* dbout,
                              ModelGeneric* model,
                              ANeigh* neigh,
@@ -143,7 +143,7 @@ GSTLEARN_EXPORT int kribayes(Db* dbin,
                              bool flag_est                    = true,
                              bool flag_std                    = true,
                              const NamingConvention& namconv  = NamingConvention("Bayes"));
-GSTLEARN_EXPORT int kriggam(Db* dbin,
+GSTLEARN_EXPORT Id kriggam(Db* dbin,
                             Db* dbout,
                             ModelGeneric* model,
                             ANeigh* neigh,
@@ -153,19 +153,19 @@ GSTLEARN_EXPORT Krigtest_Res krigtest(Db* dbin,
                                       Db* dbout,
                                       ModelGeneric* model,
                                       ANeigh* neigh,
-                                      int iech0              = 0,
+                                      Id iech0              = 0,
                                       const KrigOpt& krigopt = KrigOpt(),
                                       bool verbose           = true);
-GSTLEARN_EXPORT int xvalid(Db* db,
+GSTLEARN_EXPORT Id xvalid(Db* db,
                            ModelGeneric* model,
                            ANeigh* neigh,
                            bool flag_kfold                 = false,
-                           int flag_xvalid_est             = 1,
-                           int flag_xvalid_std             = 1,
-                           int flag_xvalid_varz            = 0,
+                           Id flag_xvalid_est             = 1,
+                           Id flag_xvalid_std             = 1,
+                           Id flag_xvalid_varz            = 0,
                            const KrigOpt& krigopt          = KrigOpt(),
                            const NamingConvention& namconv = NamingConvention("Xvalid"));
-GSTLEARN_EXPORT int test_neigh(Db* dbin,
+GSTLEARN_EXPORT Id test_neigh(Db* dbin,
                                Db* dbout,
                                ModelGeneric* model,
                                ANeigh* neigh,

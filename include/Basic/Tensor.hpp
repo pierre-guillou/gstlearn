@@ -22,7 +22,7 @@ namespace gstlrn
 class GSTLEARN_EXPORT Tensor : public AStringable /// TODO : public ASpaceObject
 {
 public:
-  Tensor(unsigned int ndim = 2);
+  Tensor(size_t ndim = 2);
   Tensor(const Tensor &r);
   Tensor& operator= (const Tensor &r);
   virtual ~Tensor();
@@ -30,16 +30,16 @@ public:
   /// Interface for AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  void init(int ndim);
+  void init(Id ndim);
   void setTensorDirect2(const MatrixSymmetric& tensor);
 
   void setRadiusIsotropic(double radius);
   void setRadiusVec(const VectorDouble& radius);
-  void setRadiusDir(unsigned int idim, double radius);
+  void setRadiusDir(size_t idim, double radius);
 
   void setRotation(const Rotation& rot);
   void setRotationAngles(const VectorDouble& angles);
-  void setRotationAngle(unsigned int idim, double angle);
+  void setRotationAngle(size_t idim, double angle);
 
   void setRotationAnglesAndRadius(const VectorDouble& angles = VectorDouble(),
                                   const VectorDouble& radius = VectorDouble());
@@ -49,15 +49,15 @@ public:
   const MatrixSquare&   getTensorInverse()  const { return  _tensorInverse; }
   const MatrixSymmetric& getTensorDirect2()  const { return  _tensorDirect2; }
   const VectorDouble&          getRadius()         const { return  _radius; }
-  double getAngle(int i)         const { return  getAngles()[i]; }
-  double getRadius(int i)         const { return  _radius[i]; }
+  double getAngle(Id i)         const { return  getAngles()[i]; }
+  double getRadius(Id i)         const { return  _radius[i]; }
   const Rotation&              getRotation()       const { return  _rotation; }
   const MatrixSquare&   getMatrixDirect()   const { return  _rotation.getMatrixDirect(); }
   const MatrixSquare&   getMatrixInverse()  const { return  _rotation.getMatrixInverse(); }
   bool                         isIsotropic()       const { return  _isotropic; }
   bool                         hasRotation()       const { return !_rotation.isIdentity(); }
 
-  double getValue(int idim, int jdim) const { return _rotation.getMatrixDirect(idim, jdim); }
+  double getValue(Id idim, Id jdim) const { return _rotation.getMatrixDirect(idim, jdim); }
 
   VectorDouble applyDirect (const VectorDouble& vec) const;
   VectorDouble applyInverse(const VectorDouble& vec) const;
@@ -76,7 +76,7 @@ private:
   void _direct2ToInverse2();
 
 private:
-  unsigned int _nDim;                      /// Number of dimensions
+  size_t _nDim;                     /// Number of dimensions
   MatrixSquare   _tensorDirect;     /// Direct Tensor matrix (definite positive)
   MatrixSquare   _tensorInverse;    /// Inverse Tensor matrix (definite positive)
   MatrixSymmetric _tensorDirect2;    /// Square of Direct tensor

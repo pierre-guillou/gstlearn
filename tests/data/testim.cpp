@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   ANeigh* neigh;
   Constraints constraints;
   DbStringFormat dbfmt;
-  int nbsimu, seed, nbtuba;
+  Id nbsimu, seed, nbtuba;
   static int nboot   = 10;
   static int niter   = 10;
   static bool verbose = false;

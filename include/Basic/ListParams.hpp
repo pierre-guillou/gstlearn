@@ -25,8 +25,8 @@ public:
   void addParam(ParamInfo& param);
   void addParams(std::vector<ParamInfo>& params);
   void clear();
-  double getValue(int index) const;
-  void setValue(int index, double value);
+  double getValue(Id index) const;
+  void setValue(Id index, double value);
   std::vector<double> getOptimizableValues() const;
   void setValues(const std::vector<double>& values);
   std::vector<double> getMinValues() const;

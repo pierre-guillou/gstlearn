@@ -19,7 +19,7 @@ namespace gstlrn
 class GSTLEARN_EXPORT BiTargetCheckBench: public ABiTargetCheck
 {
 public:
-  BiTargetCheckBench(int idim_bench, double width);
+  BiTargetCheckBench(Id idim_bench, double width);
   BiTargetCheckBench(const BiTargetCheckBench& r);
   BiTargetCheckBench& operator=(const BiTargetCheckBench& r);
   virtual ~BiTargetCheckBench();
@@ -33,12 +33,12 @@ public:
   /// Interface to AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  static BiTargetCheckBench* create(int idim_bench, double width);
+  static BiTargetCheckBench* create(Id idim_bench, double width);
 
   double getWidth() const { return _width; }
 
 private:
-  int       _idimBench;
+  Id       _idimBench;
   double    _width;
 };
 }

@@ -61,52 +61,52 @@ public:
   /// AStringable Interface
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  int getNVar() const { return _ctxt.getNVar(); }
-  int getNDrift() const { return static_cast<int>(_drifts.size()); }
+  Id getNVar() const { return _ctxt.getNVar(); }
+  Id getNDrift() const { return static_cast<Id>(_drifts.size()); }
   bool hasDrift() const { return !_drifts.empty(); }
 
   // Add one elementary drift structure
   void addDrift(const ADrift* drift);
   // Remove an elementary drift structure
-  void delDrift(unsigned int rank);
+  void delDrift(size_t rank);
   // Remove all elementary drift structures
   void delAllDrifts();
 
   const VectorBool& getFiltered() const { return _filtered; }
   void setFiltered(const VectorBool& filtered) { _filtered = filtered; }
-  bool isDriftFiltered(int i) const;
-  void setFiltered(int i, bool filter);
-  int  getNDriftEquation() const;
+  bool isDriftFiltered(Id i) const;
+  void setFiltered(Id i, bool filter);
+  Id  getNDriftEquation() const;
   bool hasExternalDrift() const;
   bool isValid() const;
-  int  getNExtDrift() const;
+  Id  getNExtDrift() const;
   const CovContext& getContext() const { return _ctxt; }
 
   /// TODO : to be removed (encapsulation)
   ////////////////////////////////////////////////
-  const ADrift* getDrift(int il) const;
-  int getRankFex(int il) const;
-  String getDriftName(int il) const;
+  const ADrift* getDrift(Id il) const;
+  Id getRankFex(Id il) const;
+  String getDriftName(Id il) const;
   ////////////////////////////////////////////////
 
   const VectorDouble& getBetaHats() const { return _betaHat; }
 
-  void setDriftCLByPart(int ivar, int ib, const VectorDouble& coef);
+  void setDriftCLByPart(Id ivar, Id ib, const VectorDouble& coef);
   void resetDriftList();
 
   bool isDriftSampleDefined(const Db *db,
-                            int ib,
-                            int nech,
+                            Id ib,
+                            Id nech,
                             const VectorInt &nbgh,
                             const ELoc &loctype) const;
-  double computeDrift(const Db* db, int ib, int iech) const;
+  double computeDrift(const Db* db, Id ib, Id iech) const;
 
   VectorVectorDouble getDrifts(const Db* db, bool useSel = true) const;
   bool isFlagLinked() const { return _flagLinked; }
   bool isFlagCombined() const { return _flagCombined; }
-  int  getDriftMaxIRFOrder() const;
-  bool isDriftDefined(const VectorInt &powers, int rank_fex = 0) const;
-  bool isDriftDifferentDefined(const VectorInt &powers, int rank_fex = -1) const;
+  Id  getDriftMaxIRFOrder() const;
+  bool isDriftDefined(const VectorInt &powers, Id rank_fex = 0) const;
+  bool isDriftDifferentDefined(const VectorInt &powers, Id rank_fex = -1) const;
 
   void copyCovContext(const CovContext& ctxt);
 
@@ -115,28 +115,28 @@ public:
   void setBetaHat(const VectorDouble &betaHat) { _betaHat = betaHat; }
 
   double evalDrift(const Db* db,
-                   int iech,
-                   int il,
+                   Id iech,
+                   Id il,
                    const ECalcMember& member = ECalcMember::fromKey("LHS")) const;
-  double evalDriftCoef(const Db *db, int iech, const VectorDouble &coeffs) const;
+  double evalDriftCoef(const Db *db, Id iech, const VectorDouble &coeffs) const;
   VectorDouble evalDriftCoefs(const Db *db,
                               const VectorDouble &coeffs,
                               bool useSel = false) const;
   VectorDouble evalDriftBySample(const Db *db,
-                                 int iech,
+                                 Id iech,
                                  const ECalcMember &member = ECalcMember::fromKey("LHS")) const;
   void evalDriftBySampleInPlace(const Db *db,
-                                int iech,
+                                Id iech,
                                 const ECalcMember &member,
                                 VectorDouble &drftab) const;
   MatrixDense evalDriftMat(const Db* db,
                            const VectorInt& nbgh     = VectorInt(),
                            const ECalcMember& member = ECalcMember::fromKey("LHS")) const;
-  int evalDriftMatInPlace(MatrixDense& mat,
+  Id evalDriftMatInPlace(MatrixDense& mat,
                           const Db* db,
                           const VectorInt& nbgh     = VectorInt(),
                           const ECalcMember& member = ECalcMember::fromKey("LHS")) const;
-  int evalDriftMatByRanksInPlace(MatrixDense& mat,
+  Id evalDriftMatByRanksInPlace(MatrixDense& mat,
                                  const Db* db,
                                  const VectorVectorInt& sampleranks = VectorVectorInt(),
                                  const ECalcMember& member          = ECalcMember::fromKey("LHS")) const;
@@ -145,25 +145,25 @@ public:
                                   const ECalcMember& member          = ECalcMember::fromKey("LHS")) const;
   VectorDouble evalMeanVecByRanks(const Db* db,
                                   const VectorVectorInt& sampleRanks = VectorVectorInt()) const;
-  int evalDriftMatByTargetInPlace(MatrixDense& mat,
+  Id evalDriftMatByTargetInPlace(MatrixDense& mat,
                                   const Db* db,
-                                  int iech2,
+                                  Id iech2,
                                   const KrigOpt& krigopt = KrigOpt()) const;
   double evalDriftValue(const Db* db,
-                        int iech,
-                        int ivar,
-                        int ib,
+                        Id iech,
+                        Id ivar,
+                        Id ib,
                         const ECalcMember& member = ECalcMember::fromKey("LHS")) const;
 
   void setMeans(const VectorDouble& mean);
-  void setMean(const double mean,int ivar=0);
-  double getMean(int ivar) const;
+  void setMean(const double mean,Id ivar=0);
+  double getMean(Id ivar) const;
   const VectorDouble& getMeans() const { return _mean; }
   const DriftList* createReduce(const VectorInt &validVars) const;
   
   double evalDriftVarCoef(const Db *db,
-                          int iech,
-                          int ivar,
+                          Id iech,
+                          Id ivar,
                           const VectorDouble &coeffs) const;
   VectorDouble evalDriftVarCoefs(const Db *db,
                                  const VectorDouble &coeffs,
@@ -184,15 +184,15 @@ public:
 
 private:
   void _update();
-  bool _isDriftIndexValid(int i) const;
-  bool _isDriftEquationValid(int ib) const;
-  int  _getAddress(int ivar, int il, int ib) const
+  bool _isDriftIndexValid(Id i) const;
+  bool _isDriftEquationValid(Id ib) const;
+  Id  _getAddress(Id ivar, Id il, Id ib) const
   {
     return (ib + getNDriftEquation() * (il + getNDrift() * ivar));
   }
-  double _getDriftCL(int ivar, int il, int ib) const { return _driftCL[_getAddress(ivar,il,ib)]; }
-  void   _setDriftCL(int ivar, int il, int ib, double value) { _driftCL[_getAddress(ivar,il,ib)] = value; }
-  VectorInt _getActiveVariables(int ivar0) const;
+  double _getDriftCL(Id ivar, Id il, Id ib) const { return _driftCL[_getAddress(ivar,il,ib)]; }
+  void   _setDriftCL(Id ivar, Id il, Id ib, double value) { _driftCL[_getAddress(ivar,il,ib)] = value; }
+  VectorInt _getActiveVariables(Id ivar0) const;
   
 #ifndef SWIG
 protected:

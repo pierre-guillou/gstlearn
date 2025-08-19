@@ -67,12 +67,12 @@ ModelFitSillsVMap* ModelFitSillsVMap::createForOptim(const DbGrid* dbmap,
     messerr("The argument 'model' should be a 'ModelCovList'");
     return nullptr;
   }
-  ModelFitSillsVMap* optim = new ModelFitSillsVMap(dbmap, modelLocal, constraints, mop);
+  auto* optim = new ModelFitSillsVMap(dbmap, modelLocal, constraints, mop);
 
   return optim;
 }
 
-int ModelFitSillsVMap::_prepare()
+Id ModelFitSillsVMap::_prepare()
 {
   // Get internal dimension
   if (_getDimensions()) return 1;
@@ -100,13 +100,13 @@ int ModelFitSillsVMap::_prepare()
  ** \return  Error return code
  **
  *****************************************************************************/
-int ModelFitSillsVMap::fitSillMatrices()
+Id ModelFitSillsVMap::fitSillMatrices()
 {
 
   // Initialize Model-dependent quantities
   _updateFromModel();
 
-  int status =  _fitSillMatrices();
+  Id status =  _fitSillMatrices();
 
   return status;
 }
@@ -123,8 +123,8 @@ void ModelFitSillsVMap::_computeVMap()
 
   /* Load the Experimental conditions structure */
 
-  int ipadir = 0;
-  for (int iech = 0; iech < _nech; iech++)
+  Id ipadir = 0;
+  for (Id iech = 0; iech < _nech; iech++)
   {
     dbmap->rankToIndice(iech, _indg2);
     double dist = distance_intra(dbmap, _nech / 2, iech, NULL);
@@ -132,12 +132,12 @@ void ModelFitSillsVMap::_computeVMap()
 
     /* Check samples containing only undefined values */
 
-    int ntest = 0;
-    for (int ijvar = 0; ijvar < _nvs2; ijvar++)
+    Id ntest = 0;
+    for (Id ijvar = 0; ijvar < _nvs2; ijvar++)
       if (!FFFF(dbmap->getZVariable(iech, ijvar))) ntest++;
     if (ntest <= 0) continue;
 
-    for (int ijvar = 0; ijvar < _nvs2; ijvar++)
+    for (Id ijvar = 0; ijvar < _nvs2; ijvar++)
     {
       _WT(ijvar, ipadir) = 0.;
       _GG(ijvar, ipadir) = 0.;
@@ -163,7 +163,7 @@ void ModelFitSillsVMap::_updateFromModel()
 
   VectorDouble d0(_ndim);
   _dbmap->rankToIndice(_nech / 2, _indg1);
-  for (int idim = 0; idim < _ndim; idim++)
+  for (Id idim = 0; idim < _ndim; idim++)
     d0[idim] = _indg1[idim] * _dbmap->getDX(idim);
   SpacePoint origin(d0);
   SpacePoint P = origin;
@@ -171,33 +171,33 @@ void ModelFitSillsVMap::_updateFromModel()
   /* Loop on the basic structures */
 
   const CovList* cova = _model->getCovList();
-  for (int icov = 0; icov < _ncova; icov++)
+  for (Id icov = 0; icov < _ncova; icov++)
   {
     cova->setActiveCovListFromOne(icov);
 
     /* Loop on the experiments */
 
-    for (int ipadir = 0; ipadir < _npadir; ipadir++)
+    for (Id ipadir = 0; ipadir < _npadir; ipadir++)
     {
       _dbmap->rankToIndice(ipadir, _indg2);
-      for (int idim = 0; idim < _ndim; idim++)
+      for (Id idim = 0; idim < _ndim; idim++)
         d0[idim] = _indg2[idim] * _dbmap->getDX(idim);
       P.setCoords(d0);
 
       /* Loop on the variables */
 
-      int ijvar = 0;
-      for (int ivar = 0; ivar < _nvar; ivar++)
-        for (int jvar = 0; jvar <= ivar; jvar++, ijvar++)
+      Id ijvar = 0;
+      for (Id ivar = 0; ivar < _nvar; ivar++)
+        for (Id jvar = 0; jvar <= ivar; jvar++, ijvar++)
           _ge[icov].setValue(ijvar, ipadir, _model->evalCov(origin, P, ivar, jvar, &_calcmode));
     }
   }
 }
 
-int ModelFitSillsVMap::_getDimensions()
+Id ModelFitSillsVMap::_getDimensions()
 {
-  int nbexp  = 0;
-  int npadir = 0;
+  Id nbexp  = 0;
+  Id npadir = 0;
   _nech      = _dbmap->getNSample();
   _nvar      = _dbmap->getNLoc(ELoc::Z);
   _ndim      = _dbmap->getNLoc(ELoc::X);
@@ -208,10 +208,10 @@ int ModelFitSillsVMap::_getDimensions()
 
   /* Calculate the total number of lags */
 
-  for (int iech = 0; iech < _nech; iech++)
+  for (Id iech = 0; iech < _nech; iech++)
   {
-    int ndef = 0;
-    for (int ijvar = 0; ijvar < _nvs2; ijvar++)
+    Id ndef = 0;
+    for (Id ijvar = 0; ijvar < _nvs2; ijvar++)
       if (!FFFF(_dbmap->getZVariable(iech, ijvar))) ndef++;
     nbexp += ndef;
     if (ndef > 0) npadir++;

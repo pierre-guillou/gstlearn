@@ -32,15 +32,15 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_RankHandler-");
-  int seed = 10355;
+  Id seed = 10355;
   law_set_random_seed(seed);
   OptCst::define(ECst::NTROW, -1);
   OptCst::define(ECst::NTCOL, -1);
 
   // Creating the Db
-  int ndat                 = 20;
-  int ndim                 = 2;
-  int nvar                 = 3;
+  Id ndat                  = 20;
+  Id ndim                  = 2;
+  Id nvar                  = 3;
   double selRatio          = 0.2;
   VectorDouble heteroRatio = {0.3, 0.2, 0.1};
   Db* db                   = Db::createFillRandom(ndat, ndim, nvar, 0, 0, 0., selRatio, heteroRatio);
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   db->display(dbfmt);
 
   // Instanciate the RankHandler
-  RankHandler* rkhd = new RankHandler(db, true, true, true, true);
+  auto* rkhd = new RankHandler(db, true, true, true, true);
 
   // Creating the vector of elligible samples
   // It is constructed so as to involve:
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   // Using some features of the RankHandler class
   message("Number of elligible samples: %d\n", rkhd->getNumber());
   message("Total count of sample references = %d\n", rkhd->getTotalCount());
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     message("Number of references for Variable %d = %d\n", ivar, rkhd->getCount(ivar));
 
   // Complete dump

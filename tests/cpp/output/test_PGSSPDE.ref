@@ -14,7 +14,7 @@ Variables
 Column = 0 - Name = rank - Locator = NA
 Column = 1 - Name = x-1 - Locator = x1
 Column = 2 - Name = x-2 - Locator = x2
-Column = 3 - Name = variable - Locator = z1
+Column = 3 - Name = Data - Locator = z1
 
 Model characteristics
 =====================
@@ -82,7 +82,7 @@ Data Base Statistics
  Mean value          =      0.500
  Standard Deviation  =      0.292
  Variance            =      0.085
-4 - Name SimPGSSPDE - Locator z1
+4 - Name SimPGSSPDE - Locator NA
  Nb of data          =      10201
  Nb of active values =      10201
  Minimum value       =      1.000
@@ -90,3 +90,19 @@ Data Base Statistics
  Mean value          =      2.192
  Standard Deviation  =      0.690
  Variance            =      0.476
+5 - Name SimPGSSPDE.1 - Locator NA
+ Nb of data          =      10201
+ Nb of active values =      10201
+ Minimum value       =      1.000
+ Maximum value       =      3.000
+ Mean value          =      2.187
+ Standard Deviation  =      0.727
+ Variance            =      0.529
+6 - Name SimPGSSPDE.1.1 - Locator z1
+ Nb of data          =      10201
+ Nb of active values =      10201
+ Minimum value       =      1.000
+ Maximum value       =      3.000
+ Mean value          =      2.188
+ Standard Deviation  =      0.735
+ Variance            =      0.540

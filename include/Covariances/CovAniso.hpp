@@ -67,22 +67,22 @@ public:
   /// ASpaceObject Interface
 
   /// ACov Interface
-  virtual double eval0(int ivar                = 0,
-                       int jvar                = 0,
-                       const CovCalcMode* mode = nullptr) const override;
+  double eval0(Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 
-  virtual double evalCovOnSphere(double alpha,
-                                 int degree              = 50,
-                                 bool flagScaleDistance  = true,
-                                 const CovCalcMode* mode = nullptr) const override;
-  virtual VectorDouble evalSpectrumOnSphere(int n,
-                                            bool flagNormDistance = false,
-                                            bool flagCumul        = false) const override;
-  virtual double evalSpectrum(const VectorDouble& freq,
-                              int ivar = 0,
-                              int jvar = 0) const override;
+  double evalCovOnSphere(double alpha,
+                         Id degree               = 50,
+                         bool flagScaleDistance  = true,
+                         const CovCalcMode* mode = nullptr) const override;
+  VectorDouble evalSpectrumOnSphere(Id n,
+                                    bool flagNormDistance = false,
+                                    bool flagCumul        = false) const override;
+  double evalSpectrum(const VectorDouble& freq,
+                      Id ivar = 0,
+                      Id jvar = 0) const override;
 
-  virtual double getIntegralRange(int ndisc, double hmax) const;
+  virtual double getIntegralRange(Id ndisc, double hmax) const;
   virtual String getFormula() const { return getCorAniso()->getFormula(); }
   virtual double getBallRadius() const { return TEST; }
 
@@ -181,7 +181,7 @@ public:
   FORWARD_METHOD(getCorAniso, getScadef, TEST)
   FORWARD_METHOD(getCorAniso, getParMax, TEST)
   FORWARD_METHOD(getCorAniso, getMaxNDim, ITEST)
-  FORWARD_METHOD(getCorAniso, getMinOrder, TEST)
+  FORWARD_METHOD(getCorAniso, getMinOrder, ITEST)
   FORWARD_METHOD(getCorAniso, hasInt1D, false)
   FORWARD_METHOD(getCorAniso, hasInt2D, false)
   FORWARD_METHOD(getCorAniso, hasRange, false)
@@ -208,7 +208,7 @@ public:
 
   FORWARD_METHOD(getCorAniso, getDetTensor, false)
 
-  double getSlope(int ivar, int jvar) const;
+  double getSlope(Id ivar, Id jvar) const;
   const Rotation& getAnisoRotation() const { return getCorAniso()->getAniso().getRotation(); }
   const CorAniso* getCorAniso() const;
   bool getFlagAniso() const { return !isIsotropic(); }
@@ -216,9 +216,9 @@ public:
   const VectorDouble& getAnisoAngles() const { return getCorAniso()->getAniso().getAngles(); }
   const MatrixSquare& getAnisoRotMat() const { return getCorAniso()->getAniso().getMatrixDirect(); }
   const MatrixSquare& getAnisoInvMat() const { return getCorAniso()->getAniso().getMatrixInverse(); }
-  double getAnisoAngle(int idim) const { return getAnisoAngles()[idim]; }
-  double getAnisoRotMatElement(int idim, int jdim) const { return getCorAniso()->getAniso().getMatrixDirect().getValue(idim, jdim); }
-  double getAnisoCoeff(int idim) const { return getAnisoCoeffs()[idim]; }
+  double getAnisoAngle(Id idim) const { return getAnisoAngles()[idim]; }
+  double getAnisoRotMatElement(Id idim, Id jdim) const { return getCorAniso()->getAniso().getMatrixDirect().getValue(idim, jdim); }
+  double getAnisoCoeff(Id idim) const { return getAnisoCoeffs()[idim]; }
   const CovContext& getContext() const { return _ctxt; }
 
   String getCovName() const { return getCorAniso()->getCovName(); }
@@ -230,12 +230,12 @@ public:
   const ACovFunc* getCorFunc() const { return getCorAniso()->getCorFunc(); }
 
   VectorDouble evalCovOnSphereVec(const VectorDouble& alpha,
-                                  int degree              = 50,
+                                  Id degree              = 50,
                                   bool flagScaleDistance  = false,
                                   const CovCalcMode* mode = nullptr) const;
-  Array evalCovFFT(const VectorDouble& hmax, int N = 128, int ivar = 0, int jvar = 0) const;
+  Array evalCovFFT(const VectorDouble& hmax, Id N = 128, Id ivar = 0, Id jvar = 0) const;
 
-  int getNDim() const { return _ctxt.getNDim(); }
+  Id getNDim() const { return _ctxt.getNDim(); }
   CorAniso* getCorAniso();
   CovAniso* createReduce(const VectorInt& validVars) const;
 
@@ -244,12 +244,12 @@ public:
   std::vector<ParamInfo>& getScalesParam() { return getCorAniso()->getParamInfoScales(); }
   std::vector<ParamInfo>& getAnglesParam() { return getCorAniso()->getParamInfoAngles(); }
 
-  double _getSillValue(int ivar, int jvar, const CovCalcMode* mode) const;
+  double _getSillValue(Id ivar, Id jvar, const CovCalcMode* mode) const;
 
   virtual double _eval(const SpacePoint& p1,
                        const SpacePoint& p2,
-                       int ivar                = 0,
-                       int jvar                = 0,
+                       Id ivar                = 0,
+                       Id jvar                = 0,
                        const CovCalcMode* mode = nullptr) const override;
 
 };

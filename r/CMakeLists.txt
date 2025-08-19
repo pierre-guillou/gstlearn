@@ -16,8 +16,8 @@ if(NOT R_FOUND)
   message(FATAL_ERROR "R not found")
 endif()
 
-# Look for SWIG 4.2.0 [customized]
-find_package(SWIG 4.2.0 REQUIRED)
+# Look for SWIG 4.3.0 [customized]
+find_package(SWIG 4.3.0 REQUIRED)
 message(STATUS "Found SWIG: " ${SWIG_EXECUTABLE} " (found version \"" ${SWIG_VERSION} "\")")
 include(${SWIG_USE_FILE})
 
@@ -176,6 +176,10 @@ target_compile_options(r_build PRIVATE
   -Wno-free-nonheap-object
   -Wno-cast-function-type
   -Wno-cast-function-type-mismatch)
+
+if (CLANG OR APPLE)
+  target_compile_options(r_build PRIVATE -Wno-shorten-64-to-32)
+endif()
 
 # Find appropriate R.h
 target_include_directories(r_build PRIVATE ${R_INCLUDE_DIRS})

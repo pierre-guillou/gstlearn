@@ -35,12 +35,12 @@ public:
   GibbsUMultiMono& operator=(const GibbsUMultiMono &r);
   virtual ~GibbsUMultiMono();
 
-  void update(VectorVectorDouble &y, int isimu, int ipgs, int iter) override;
-  int covmatAlloc(bool verbose, bool verboseTimer = false) override;
+  void update(VectorVectorDouble &y, Id isimu, Id ipgs, Id iter) override;
+  Id covmatAlloc(bool verbose, bool verboseTimer = false) override;
 
 private:
-  double _getVariance(int ivar, int iact) const;
-  double _getEstimate(int icase, int ivar, int iact, VectorVectorDouble& y) const;
+  double _getVariance(Id ivar, Id iact) const;
+  double _getEstimate(Id icase, Id ivar, Id iact, VectorVectorDouble& y) const;
 
 private:
   VectorVectorDouble _covmat; // One matrix per variable

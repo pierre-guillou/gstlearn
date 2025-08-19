@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Potential-");
 
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Iso-Potential file

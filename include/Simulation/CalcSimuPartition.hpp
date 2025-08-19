@@ -32,7 +32,7 @@ typedef struct
 class GSTLEARN_EXPORT CalcSimuPartition: public ACalcSimulation
 {
 public:
-  CalcSimuPartition(int mode, int nbsimu = 0, int seed = 4324324, bool verbose = false);
+  CalcSimuPartition(Id mode, Id nbsimu = 0, Id seed = 4324324, bool verbose = false);
   CalcSimuPartition(const CalcSimuPartition& r)            = delete;
   CalcSimuPartition& operator=(const CalcSimuPartition& r) = delete;
   virtual ~CalcSimuPartition();
@@ -40,7 +40,7 @@ public:
   const SimuPartitionParam& getParparam() const { return _parparam; }
   void setParparam(const SimuPartitionParam& parparam) { _parparam = parparam; }
 
-  void setMode(int mode) { _mode = mode; }
+  void setMode(Id mode) { _mode = mode; }
   void setVerbose(bool verbose) { _verbose = verbose; }
 
 private:
@@ -55,25 +55,25 @@ private:
   static double _stackSearch(const std::vector<Stack>& stacks, double valref);
 
 private:
-  int _mode;
+  Id _mode;
   bool _verbose;
-  int _iattOut;
+  Id _iattOut;
   SimuPartitionParam _parparam;
   Model* _modelLocal;
 };
 
-GSTLEARN_EXPORT int tessellation_voronoi(DbGrid* dbgrid,
+GSTLEARN_EXPORT Id tessellation_voronoi(DbGrid* dbgrid,
                                          Model* model,
                                          const SimuPartitionParam& parparam,
-                                         int seed                        = 43243,
-                                         int verbose                     = false,
+                                         Id seed                        = 43243,
+                                         Id verbose                     = false,
                                          const NamingConvention& namconv = NamingConvention(
                                            "Voronoi"));
-GSTLEARN_EXPORT int tessellation_poisson(DbGrid* dbgrid,
+GSTLEARN_EXPORT Id tessellation_poisson(DbGrid* dbgrid,
                                          Model* model,
                                          const SimuPartitionParam& parparam,
-                                         int seed                        = 432432,
-                                         int verbose                     = false,
+                                         Id seed                        = 432432,
+                                         Id verbose                     = false,
                                          const NamingConvention& namconv = NamingConvention(
                                            "Poisson"));
 } // namespace gstlrn

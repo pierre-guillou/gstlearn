@@ -44,7 +44,7 @@ VarioParam::VarioParam(const VarioParam& VarioParam,
     _scale = VarioParam.getScale();
     _dates = VarioParam.getDates();
 
-    for (int idir = 0; idir < (int) dircols.size(); idir++)
+    for (Id idir = 0; idir < static_cast<Id>(dircols.size()); idir++)
     {
       _dirparams.push_back(VarioParam.getDirParam(dircols[idir]));
     }
@@ -78,18 +78,18 @@ VarioParam::~VarioParam()
 
 bool VarioParam::isDefinedForGrid() const
 {
-  int ndir = getNDir();
+  auto ndir = getNDir();
   if (ndir <= 0) return false;
   return _dirparams[0].isDefinedForGrid();
 }
 
 bool VarioParam::_validDefinedFromGrid(const DirParam& dirparam) const
 {
-  int ndir = getNDir();
+  auto ndir            = getNDir();
   bool definedFromGrid = dirparam.isDefinedForGrid();
   if (ndir > 0)
   {
-    for (int idir = 0; idir < ndir; idir++)
+    for (Id idir = 0; idir < ndir; idir++)
     {
       if (_dirparams[idir].isDefinedForGrid() != definedFromGrid)
       {
@@ -127,11 +127,11 @@ bool VarioParam::_validDefinedFromGrid(const DirParam& dirparam) const
  * @param space Pointer to the space definition
  * @return
  */
-VarioParam* VarioParam::createOmniDirection(int nlag,
+VarioParam* VarioParam::createOmniDirection(Id nlag,
                                             double dlag,
                                             double toldis,
-                                            int opt_code,
-                                            int idate,
+                                            Id opt_code,
+                                            Id idate,
                                             double bench,
                                             double cylrad,
                                             double tolcode,
@@ -143,14 +143,14 @@ VarioParam* VarioParam::createOmniDirection(int nlag,
   DirParam* dir = DirParam::createOmniDirection(nlag, dlag, toldis,
                                                 opt_code, idate, bench, cylrad,
                                                 tolcode, breaks, space);
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
   varioparam->addDir(*dir);
   delete dir;
   return varioparam;
 }
 
-VarioParam* VarioParam::createMultiple(int ndir,
-                                       int nlag,
+VarioParam* VarioParam::createMultiple(Id ndir,
+                                       Id nlag,
                                        double dlag,
                                        double toldis,
                                        double angref,
@@ -161,7 +161,7 @@ VarioParam* VarioParam::createMultiple(int ndir,
   std::vector<DirParam> dirs = DirParam::createMultiple(ndir, nlag, dlag,
                                                         toldis, angref, space);
   if (dirs.empty()) return nullptr;
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
   varioparam->addMultiDirs(dirs);
   return varioparam;
 }
@@ -181,17 +181,17 @@ VarioParam* VarioParam::createMultiple(int ndir,
  * @note However, this number can be truncated to 'ndimax' (when defined)
  */
 VarioParam* VarioParam::createMultipleFromGrid(const DbGrid* dbgrid,
-                                               int nlag,
+                                               Id nlag,
                                                double scale,
                                                const VectorDouble& dates,
                                                const ASpaceSharedPtr& space,
-                                               int ndimax)
+                                               Id ndimax)
 {
-  VarioParam* varioparam = new VarioParam(scale, dates);
-  int ndim               = dbgrid->getNDim();
-  int ncalc = (ndimax <= 0) ? ndim : ndimax;
+  auto* varioparam = new VarioParam(scale, dates);
+  Id ndim               = dbgrid->getNDim();
+  Id ncalc = (ndimax <= 0) ? ndim : ndimax;
   VectorInt grincr(ndim, 0);
-  for (int idim = 0; idim < ncalc; idim++)
+  for (Id idim = 0; idim < ncalc; idim++)
   {
     VH::fill(grincr,  0.);
     grincr[idim] = 1;
@@ -215,7 +215,7 @@ VarioParam* VarioParam::createMultipleFromGrid(const DbGrid* dbgrid,
  * @param space Pointer to the Space definition
  * @return
  */
-VarioParam* VarioParam::createFromSpaceDimension(int nlag,
+VarioParam* VarioParam::createFromSpaceDimension(Id nlag,
                                                  double dlag,
                                                  double toldis,
                                                  double tolang,
@@ -223,12 +223,12 @@ VarioParam* VarioParam::createFromSpaceDimension(int nlag,
                                                  const VectorDouble &dates,
                                                  const ASpaceSharedPtr& space)
 {
-  int ndim = getDefaultSpaceDimension();
+  auto ndim = getDefaultSpaceDimension();
   if (space != nullptr) ndim = space->getNDim();
 
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
 
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     DirParam dirparam(nlag, dlag, toldis, tolang, 0, 0, TEST, TEST, 0.,
                       VectorDouble(), VectorDouble(), TEST, space);
@@ -242,7 +242,7 @@ VarioParam* VarioParam::createFromSpaceDimension(int nlag,
 }
 
 VarioParam* VarioParam::createSeveral2D(const VectorDouble &angles,
-                                        int nlag,
+                                        Id nlag,
                                         double dlag,
                                         double toldis,
                                         double tolang,
@@ -253,7 +253,7 @@ VarioParam* VarioParam::createSeveral2D(const VectorDouble &angles,
   std::vector<DirParam> dirs = DirParam::createSeveral2D(angles, nlag, dlag,
                                                          toldis, tolang, space);
   if (dirs.empty()) return nullptr;
-  VarioParam* varioparam = new VarioParam(scale, dates);
+  auto* varioparam = new VarioParam(scale, dates);
   varioparam->addMultiDirs(dirs);
   return varioparam;
 }
@@ -266,14 +266,14 @@ void VarioParam::addDir(const DirParam& dirparam)
 
 void VarioParam::addMultiDirs(const std::vector<DirParam>& dirparams)
 {
-  for (int i = 0; i < (int) dirparams.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(dirparams.size()); i++)
   {
     if (! _validDefinedFromGrid(dirparams[i])) return;
     _dirparams.push_back(dirparams[i]);
   }
 }
 
-void VarioParam::delDir(int rank)
+void VarioParam::delDir(Id rank)
 {
   if (rank < 0 || rank >= getNDir()) return;
   _dirparams.erase(_dirparams.begin() + rank);
@@ -295,7 +295,7 @@ String VarioParam::toString(const AStringFormat* strfmt) const
 
   /* Loop on the directions */
 
-  for (int idir=0; idir<getNDir(); idir++)
+  for (Id idir=0; idir<getNDir(); idir++)
   {
     sstr << toTitle(1,"Direction #%d",idir+1);
     sstr << _dirparams[idir].toString(strfmt);
@@ -307,7 +307,7 @@ String VarioParam::toString(const AStringFormat* strfmt) const
 String VarioParam::toStringMain(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
-  int ndir = getNDir();
+  auto ndir = getNDir();
 
   /* General parameters */
 
@@ -328,36 +328,36 @@ String VarioParam::toStringMain(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-double VarioParam::getDate(int idate, int icas) const
+double VarioParam::getDate(Id idate, Id icas) const
 {
   if (!_isDateValid(idate)) return 0.;
   return _dates[2 * idate + icas];
 }
 
-int VarioParam::getNLag(int idir) const
+Id VarioParam::getNLag(Id idir) const
 {
   if (! _isDirectionValid(idir)) return 0;
   return _dirparams[idir].getNLag();
 }
 
-VectorDouble VarioParam::getCodirs(int idir) const
+VectorDouble VarioParam::getCodirs(Id idir) const
 {
   if (! _isDirectionValid(idir)) return VectorDouble();
   return _dirparams[idir].getCodirs();
 }
 
-bool VarioParam::_isDirectionValid(int idir) const
+bool VarioParam::_isDirectionValid(Id idir) const
 {
   return checkArg("Direction Index", idir, getNDir());
 }
 
-bool VarioParam::_isDateValid(int idate) const
+bool VarioParam::_isDateValid(Id idate) const
 {
   if (!hasDate()) return false;
   return checkArg("Date Index", idate, getNDate());
 }
 
-VectorDouble VarioParam::_getDirectionInterval(int idir) const
+VectorDouble VarioParam::_getDirectionInterval(Id idir) const
 {
   VectorDouble bounds(2);
   if (idir < 0 || idir >= getNDim())
@@ -373,19 +373,19 @@ VectorDouble VarioParam::_getDirectionInterval(int idir) const
   return bounds;
 }
 
-void VarioParam::setDPas(int idir,const DbGrid* db)
+void VarioParam::setDPas(Id idir,const DbGrid* db)
 {
   if (! _isDirectionValid(idir)) return;
   _dirparams[idir].setDPas(db);
 }
 
-void VarioParam::setGrincr(int idir, const VectorInt& grincr)
+void VarioParam::setGrincr(Id idir, const VectorInt& grincr)
 {
   if (! _isDirectionValid(idir)) return;
   _dirparams[idir].setGrincr(grincr);
 }
 
-int VarioParam::getNDim() const
+Id VarioParam::getNDim() const
 {
   if (getNDir() <= 0) return 0;
   return _dirparams[0].getNDim();
@@ -444,13 +444,13 @@ Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam)
   }
 
   // Creating a local Vario structure (to constitute the BiTargetCheck list
-  Vario vario = Vario(varioparam);
+  Vario vario(varioparam);
   vario.setDb(db);
   if (vario.prepare()) return nullptr;
 
   // Creating the output Db
   Db* newdb = Db::create();
-  int ndim = db->getNDim();
+  Id ndim = db->getNDim();
   VectorVectorDouble ranks(2);
   VectorDouble lags;
   VectorDouble dirs;
@@ -469,25 +469,25 @@ Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam)
   bool hasDate = varioparam.isDateUsed(db);
   double dist = 0.;
 
-  for (int idir = 0; idir < varioparam.getNDir(); idir++)
+  for (Id idir = 0; idir < varioparam.getNDir(); idir++)
   {
     const DirParam& dirparam = varioparam.getDirParam(idir);
-    int nech = db->getNSample();
+    Id nech = db->getNSample();
     double maxdist = dirparam.getMaximumDistance();
 
     /* Loop on the first point */
 
-    for (int iiech = 0; iiech < nech - 1; iiech++)
+    for (Id iiech = 0; iiech < nech - 1; iiech++)
     {
-      int iech = rindex[iiech];
+      Id iech = rindex[iiech];
       if (hasSel && !db->isActive(iech)) continue;
       if (hasWeight && FFFF(db->getWeight(iech))) continue;
       db->getSampleAsSTInPlace(iech, T1);
 
-      int ideb = (hasDate) ? 0 : iiech + 1;
-      for (int jjech = ideb; jjech < nech; jjech++)
+      Id ideb = (hasDate) ? 0 : iiech + 1;
+      for (Id jjech = ideb; jjech < nech; jjech++)
       {
-        int jech = rindex[jjech];
+        Id jech = rindex[jjech];
         if (db->getDistance1D(iech, jech) > maxdist) break;
         if (hasSel && !db->isActive(jech)) continue;
         if (hasWeight && FFFF(db->getWeight(jech))) continue;
@@ -498,19 +498,19 @@ Db* buildDbFromVarioParam(Db *db, const VarioParam& varioparam)
 
         /* Get the rank of the lag */
 
-        int ilag = dirparam.getLagRank(dist);
+        auto ilag = dirparam.getLagRank(dist);
         if (IFFFF(ilag)) continue;
 
         // The pair is kept
 
-        ranks[0].push_back((double) iech);
-        ranks[1].push_back((double) jech);
-        ranks[0].push_back((double) jech);
-        ranks[1].push_back((double) iech);
-        dirs.push_back((double) idir);
-        dirs.push_back((double) idir);
-        lags.push_back((double) ilag);
-        lags.push_back((double) ilag);
+        ranks[0].push_back(static_cast<double>(iech));
+        ranks[1].push_back(static_cast<double>(jech));
+        ranks[0].push_back(static_cast<double>(jech));
+        ranks[1].push_back(static_cast<double>(iech));
+        dirs.push_back(static_cast<double>(idir));
+        dirs.push_back(static_cast<double>(idir));
+        lags.push_back(static_cast<double>(ilag));
+        lags.push_back(static_cast<double>(ilag));
         dists.push_back(dist);
         dists.push_back(dist);
       }

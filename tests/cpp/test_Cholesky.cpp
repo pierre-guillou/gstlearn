@@ -20,12 +20,12 @@
 #include "Matrix/NF_Triplet.hpp"
 
 using namespace gstlrn;
-MatrixSparse* _createSparseMatrix(int n, double proba)
+MatrixSparse* _createSparseMatrix(Id n, double proba)
 {
   // We create a square matrix
   NF_Triplet NF_T;
-  for (int icol = 0; icol < n; icol++)
-    for (int irow = 0; irow < n; irow++)
+  for (Id icol = 0; icol < n; icol++)
+    for (Id irow = 0; irow < n; irow++)
     {
       double value  = law_gaussian();
       double tirage = law_uniform(0., 1.);
@@ -44,12 +44,12 @@ MatrixSparse* _createSparseMatrix(int n, double proba)
   return Q;
 }
 
-MatrixSymmetric* _createDenseMatrix(int n, const MatrixSparse* Q)
+MatrixSymmetric* _createDenseMatrix(Id n, const MatrixSparse* Q)
 {
   // Create the corresponding Symmetric matrix
-  MatrixSymmetric* M = new MatrixSymmetric(n);
-  for (int icol = 0; icol < n; icol++)
-    for (int irow = 0; irow < n; irow++)
+  auto* M = new MatrixSymmetric(n);
+  for (Id icol = 0; icol < n; icol++)
+    for (Id irow = 0; irow < n; irow++)
     {
       double value = Q->getValue(irow, icol);
       M->setValue(irow, icol, value);
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  int size           = 10;
+  Id size            = 10;
   double proba       = 0.05;
   MatrixSparse* Q    = _createSparseMatrix(size, proba);
   MatrixSymmetric* M = _createDenseMatrix(size, Q);

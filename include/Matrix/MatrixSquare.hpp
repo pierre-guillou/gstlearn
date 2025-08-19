@@ -22,7 +22,7 @@ class GSTLEARN_EXPORT MatrixSquare: public MatrixDense
 {
 
 public:
-  MatrixSquare(int nrow = 0);
+  MatrixSquare(Id nrow = 0);
   MatrixSquare(const MatrixSquare& r);
   MatrixSquare(const AMatrix& m);
   MatrixSquare& operator=(const MatrixSquare& r);
@@ -46,14 +46,18 @@ public:
   bool mustBeSymmetric() const override { return false; }
 
   /*! Returns the size of the matrix (nrows=ncols) */
-  int getNSize() const { return getNRows(); }
+  Id getNSize() const { return getNRows(); }
   void resetFromVVD(const VectorVectorDouble& tab, bool byCol = true) override;
 
   static MatrixSquare* createFromVVD(const VectorVectorDouble& X);
   static MatrixSquare* createFromVD(const VectorDouble& X,
-                                    int nrow,
+                                    Id nrow,
                                     bool byCol             = false,
                                     bool invertColumnOrder = false);
+  static MatrixSquare* createFromTridiagonal(const VectorDouble& vecdiag,
+                                             const VectorDouble& vecinf,
+                                             const VectorDouble& vecsup);
+
   double trace() const;
 
   /*! Perform inner product */
@@ -65,25 +69,27 @@ public:
   /*! Divide the diagonal by a vector */
   void divideDiagByVector(const VectorDouble& diag);
   /*! Multiply by a Diagonal matrix provided as VectorDouble (in place) */
-  void prodByDiagInPlace(int mode, const VectorDouble& c);
+  void prodByDiagInPlace(Id mode, const VectorDouble& c);
 
   double normVec(const VectorDouble& vec);
-  int decomposeLU(MatrixSquare& tls,
-                  MatrixSquare& tus,
-                  double eps = EPSILON20);
+  Id decomposeLU(MatrixSquare& tls,
+                 MatrixSquare& tus,
+                 double eps = EPSILON20);
+
+  Id computeEigen(bool optionPositive = true);
 
 protected:
-  bool _isNumbersValid(int nrows, int ncols) const override;
-  void _setNSize(int nval);
+  bool _isNumbersValid(Id nrows, Id ncols) const override;
+  void _setNSize(Id nval);
 
 private:
-  int _invertLU();
-  int _solveLU(const MatrixSquare& tus,
-               const MatrixSquare& tls,
-               const double* b,
-               double* x);
-  int _forwardLU(const MatrixSquare& tls, const double* b, double* x, double eps = EPSILON20);
-  int _backwardLU(const MatrixSquare& tus, const double* b, double* x, double eps = EPSILON20);
+  Id _invertLU();
+  Id _solveLU(const MatrixSquare& tus,
+              const MatrixSquare& tls,
+              const double* b,
+              double* x);
+  Id _forwardLU(const MatrixSquare& tls, const double* b, double* x, double eps = EPSILON20);
+  Id _backwardLU(const MatrixSquare& tus, const double* b, double* x, double eps = EPSILON20);
 };
 
 /*! Product 't(A)' %*% 'M' %*% 'A' or 'A' %*% 'M' %*% 't(A)' */

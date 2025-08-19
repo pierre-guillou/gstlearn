@@ -32,16 +32,16 @@ public:
   MatrixSymmetricSim& operator=(const MatrixSymmetricSim &m) = delete;
   virtual ~MatrixSymmetricSim();
 
-  int  getSize() const override;
+  Id  getSize() const override;
   bool isEmpty() const { return _factor == nullptr; }
-  double computeLogDet(int nMC = 1) const override;
+  double computeLogDet(Id nMC = 1) const override;
   
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;
 
 protected:
-  int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
-  int _addToDest(const constvect inv, vect outv) const override;
+  Id _addSimulateToDest(const constvect whitenoise, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
 
 private:
   bool _inverse;

@@ -42,9 +42,9 @@ class GSTLEARN_EXPORT NeighCell: public ANeigh
 {
 public:
   NeighCell(bool flag_xvalid             = false,
-            int nmini                    = 1,
+            Id nmini                    = 1,
             bool useBallTree             = false,
-            int leaf_size                = 10,
+            Id leaf_size                = 10,
             const ASpaceSharedPtr& space = ASpaceSharedPtr());
   NeighCell(const NeighCell& r);
   NeighCell& operator=(const NeighCell& r);
@@ -52,10 +52,10 @@ public:
 
   IMPLEMENT_CLONING(NeighCell)
   /// Interface for ANeigh
-  int attach(const Db *dbin, const Db *dbout = nullptr) override;
-  void getNeigh(int iech_out, VectorInt& ranks) override;
-  bool hasChanged(int iech_out) const override;
-  int getNSampleMax(const Db* db) const override {
+  Id attach(const Db *dbin, const Db *dbout = nullptr) override;
+  void getNeigh(Id iech_out, VectorInt& ranks) override;
+  bool hasChanged(Id iech_out) const override;
+  Id getNSampleMax(const Db* db) const override {
     DECLARE_UNUSED(db);
     return 0;
   }
@@ -65,16 +65,16 @@ public:
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighCell* create(bool flag_xvalid             = false,
-                           int nmini                    = 1,
+                           Id nmini                    = 1,
                            bool useBallTree             = false,
-                           int leaf_size                = 10,
+                           Id leaf_size                = 10,
                            const ASpaceSharedPtr& space = ASpaceSharedPtr());
   static NeighCell* createFromNF(const String& NFFilename, bool verbose = true);
 
-  int getNMini() const { return _nMini; }
+  Id getNMini() const { return _nMini; }
 
 private:
-  int _cell(int iech_out, VectorInt& ranks);
+  Id _cell(Id iech_out, VectorInt& ranks);
 
 protected:
   bool _deserializeAscii(std::istream& is, bool verbose = false) override;
@@ -86,7 +86,7 @@ protected:
   String _getNFName() const override { return "NeighCell"; }
 
 private:
-  int _nMini;
+  Id _nMini;
   BiTargetCheckCell* _biPtCell;
 
   mutable SpaceTarget _T1;

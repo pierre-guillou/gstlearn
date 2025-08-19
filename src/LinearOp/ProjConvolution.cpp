@@ -31,7 +31,7 @@ ProjConvolution::ProjConvolution(const VectorDouble& convolution,
   , _AProjHoriz(nullptr)
   , _work()
 {
-  int ndim = grid_point->getNDim();
+  Id ndim = grid_point->getNDim();
   if (ndim != 2 && ndim != 3)
   {
     messerr("ProjConvolution is limited to 2-D or 3-D case");
@@ -66,7 +66,7 @@ ProjConvolution::~ProjConvolution()
 
 void ProjConvolution::_buildGridSeis2D()
 {
-  int ndim          = _getNDim();
+  auto ndim         = _getNDim();
   VectorInt nx_seis = _gridSeismic->getNXs();
   nx_seis.resize(ndim - 1);
   VectorDouble dx_seis = _gridSeismic->getDXs();
@@ -82,7 +82,7 @@ void ProjConvolution::_buildGridRes2D()
                                         VectorDouble(), _gext);
 }
 
-int ProjConvolution::_buildAprojHoriz()
+Id ProjConvolution::_buildAprojHoriz()
 {
   // Create the Turbo Meshing on the Resolution 'ndim-1' grid
   MeshETurbo* mesh = MeshETurbo::createFromGrid(_gridRes2D);
@@ -104,9 +104,9 @@ void ProjConvolution::_buildShiftVector()
 
   Grid grid = _getGridCharacteristicsRR();
 
-  int ndim   = _gridSeismic->getNDim();
-  int center = 1;
-  for (int idim = 0; idim < ndim; idim++)
+  Id ndim   = _gridSeismic->getNDim();
+  Id center = 1;
+  for (Id idim = 0; idim < ndim; idim++)
     center *= grid.getNX(idim);
   center /= 2;
 
@@ -115,15 +115,15 @@ void ProjConvolution::_buildShiftVector()
   _shiftVector.resize(_getConvSize());
 
   grid.rankToIndice(center, indp);
-  for (int idim = 0; idim < ndim; idim++) indm[idim] = indp[idim];
+  for (Id idim = 0; idim < ndim; idim++) indm[idim] = indp[idim];
 
   // Shift the index of last coordinate by the shift of the grid
   indp[ndim - 1] += _getHalfSize();
 
-  for (int i = -_getHalfSize(); i <= _getHalfSize(); i++)
+  for (Id i = -_getHalfSize(); i <= _getHalfSize(); i++)
   {
     indm[ndim - 1]                   = indp[ndim - 1] + i;
-    int id                           = grid.indiceToRank(indm);
+    Id id                            = grid.indiceToRank(indm);
     _shiftVector[i + _getHalfSize()] = id - center;
   }
 }
@@ -131,16 +131,16 @@ void ProjConvolution::_buildShiftVector()
 bool ProjConvolution::_isVecDimCorrect(const constvect valonseismic,
                                        const constvect valonvertex) const
 {
-  if ((int)valonvertex.size() != getNApex())
+  if (static_cast<Id>(valonvertex.size()) != getNApex())
   {
     messerr("Dimension of 'valonvertex'(%d) incorrect. If should be %d",
-            (int)valonvertex.size(), getNApex());
+            static_cast<Id>(valonvertex.size()), getNApex());
     return false;
   }
-  if ((int)valonseismic.size() != getNPoint())
+  if (static_cast<Id>(valonseismic.size()) != getNPoint())
   {
     messerr("Dimension of 'valonseismic'(%d) incorrect. If should be %d",
-            (int)valonseismic.size(), getNPoint());
+            static_cast<Id>(valonseismic.size()), getNPoint());
     return false;
   }
   if (_shiftVector.size() == 0)
@@ -158,21 +158,21 @@ bool ProjConvolution::_isVecDimCorrect(const constvect valonseismic,
  * @param valonvertex  Output vector defined on the Coarse Grid
  * @return
  */
-int ProjConvolution::_addPoint2mesh(const constvect valonseismic,
-                                    vect valonvertex) const
+Id ProjConvolution::_addPoint2mesh(const constvect valonseismic,
+                                   vect valonvertex) const
 {
   if (!_isVecDimCorrect(valonseismic, valonvertex)) return 1;
 
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
 
   // Get the characteristics of the R-R grid
-  int slice_R = _gridRes2D->getNSample();
+  Id slice_R = _gridRes2D->getNSample();
 
   // Get the characteristics of the S-S grid
-  int slice_S = _gridSeis2D->getNSample();
+  Id slice_S = _gridSeis2D->getNSample();
 
   // Mesh barycenter on 'ndim-1' slices
-  for (int iz = 0; iz < _gridSeismic->getNX(ndim - 1); iz++)
+  for (Id iz = 0; iz < _gridSeismic->getNX(ndim - 1); iz++)
   {
     constvect vec_S(valonseismic.data() + iz * slice_S, slice_S);
     vect vec_R(_work.data() + iz * slice_R, slice_R);
@@ -189,25 +189,25 @@ int ProjConvolution::_addPoint2mesh(const constvect valonseismic,
  * @param valonseismic  Output vector defined on the Seismic grid
  * @return
  */
-int ProjConvolution::_addMesh2point(const constvect valonvertex,
-                                    vect valonseismic) const
+Id ProjConvolution::_addMesh2point(const constvect valonvertex,
+                                   vect valonseismic) const
 {
   if (!_isVecDimCorrect(valonseismic, valonvertex)) return 1;
 
-  int ndim = _getNDim();
+  auto ndim = _getNDim();
 
   // Get the characteristics of the R-R grid
-  int slice_R = _gridRes2D->getNSample();
+  Id slice_R = _gridRes2D->getNSample();
 
   // Get the characteristics of the R-S grid
-  int slice_S = _gridSeis2D->getNSample();
+  Id slice_S = _gridSeis2D->getNSample();
 
   // Convolution
   vect ws(_work);
   _convolve(valonvertex, ws);
 
   // Mesh barycenter on 'ndim-1' slices
-  for (int iz = 0; iz < _gridSeismic->getNX(ndim - 1); iz++)
+  for (Id iz = 0; iz < _gridSeismic->getNX(ndim - 1); iz++)
   {
     constvect vec_R(_work.data() + iz * slice_R, slice_R);
     vect vec_S(valonseismic.data() + iz * slice_S, slice_S);
@@ -220,15 +220,15 @@ int ProjConvolution::_addMesh2point(const constvect valonvertex,
 void ProjConvolution::_convolve(const constvect valonvertex,
                                 vect valonseismic) const
 {
-  int count   = (int)valonseismic.size();
-  int size    = _getConvSize();
+  Id count    = static_cast<Id>(valonseismic.size());
+  auto size   = _getConvSize();
   double valp = 0.;
   double valm = 0.;
-  int id      = 0;
-  for (int is = 0; is < count; is++)
+  Id id       = 0;
+  for (Id is = 0; is < count; is++)
   {
     valp = 0;
-    for (int j = 0; j < size; j++)
+    for (Id j = 0; j < size; j++)
     {
       id   = is + _shiftVector[j];
       valm = valonvertex[id];
@@ -247,13 +247,13 @@ void ProjConvolution::_convolveT(const constvect valonseismic,
                                  vect valonvertex) const
 {
   std::fill(valonvertex.begin(), valonvertex.end(), 0.);
-  int count   = (int)valonseismic.size();
-  int size    = _getConvSize();
+  Id count    = static_cast<Id>(valonseismic.size());
+  auto size   = _getConvSize();
   double valm = 0.;
-  int id      = 0;
-  for (int is = 0; is < count; is++)
+  Id id       = 0;
+  for (Id is = 0; is < count; is++)
   {
-    for (int j = 0; j < size; j++)
+    for (Id j = 0; j < size; j++)
     {
       id   = is + _shiftVector[j];
       valm = valonseismic[is];
@@ -269,7 +269,7 @@ void ProjConvolution::_convolveT(const constvect valonseismic,
 
 Grid ProjConvolution::_getGridCharacteristicsRR(bool delLastDim) const
 {
-  int ndim = _gridSeismic->getNDim();
+  Id ndim = _gridSeismic->getNDim();
 
   VectorInt nx    = _gridRes2D->getNXs();
   VectorDouble dx = _gridRes2D->getDXs();
@@ -295,7 +295,7 @@ Grid ProjConvolution::_getGridCharacteristicsRR(bool delLastDim) const
  */
 Grid ProjConvolution::_getGridCharacteristicsRS() const
 {
-  int ndim = _gridSeismic->getNDim();
+  Id ndim = _gridSeismic->getNDim();
 
   Grid gridRR     = _getGridCharacteristicsRR();
   VectorInt nxs   = gridRR.getNXs();
@@ -322,13 +322,13 @@ DbGrid* ProjConvolution::getResolutionGrid() const
   return dbgrid;
 }
 
-int ProjConvolution::getNApex() const
+Id ProjConvolution::getNApex() const
 {
   Grid grid = _getGridCharacteristicsRR();
   return VH::product(grid.getNXs());
 }
 
-int ProjConvolution::getNPoint() const
+Id ProjConvolution::getNPoint() const
 {
   VectorInt nxs = _gridSeismic->getNXs();
   return VH::product(nxs);

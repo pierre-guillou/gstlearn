@@ -64,12 +64,12 @@ VectorDouble ASpaceObject::getUnitaryVector() const
   return _space->getUnitaryVector();
 }
 
-unsigned int ASpaceObject::getNDim(int ispace) const
+size_t ASpaceObject::getNDim(Id ispace) const
 {
   return (_space->getNDim(ispace));
 }
 
-const VectorDouble& ASpaceObject::getOrigin(int ispace) const
+const VectorDouble& ASpaceObject::getOrigin(Id ispace) const
 {
   if (_space == nullptr)
     return _dummy;
@@ -78,7 +78,7 @@ const VectorDouble& ASpaceObject::getOrigin(int ispace) const
 
 double ASpaceObject::getDistance(const SpacePoint& p1,
                                  const SpacePoint& p2,
-                                 int ispace) const
+                                 Id ispace) const
 {
   return (_space->getDistance(p1, p2, ispace));
 }
@@ -91,7 +91,7 @@ VectorDouble ASpaceObject::getDistances(const SpacePoint& p1,
 
 VectorDouble ASpaceObject::getIncrement(const SpacePoint& p1,
                                         const SpacePoint& p2,
-                                        int ispace) const
+                                        Id ispace) const
 {
   return (_space->getIncrement(p1, p2, ispace));
 }
@@ -99,7 +99,7 @@ VectorDouble ASpaceObject::getIncrement(const SpacePoint& p1,
 void ASpaceObject::getIncrementInPlace(const SpacePoint& p1,
                                        const SpacePoint& p2,
                                        VectorDouble& ptemp,
-                                       int ispace) const
+                                       Id ispace) const
 {
   _space->getIncrementInPlace(p1, p2, ptemp, ispace);
 }
@@ -109,7 +109,7 @@ void ASpaceObject::getIncrementInPlace(const SpacePoint& p1,
  * (To be used only during creation ... in particular when reading NF)
  * @param ndim
  */
-void ASpaceObject::setNDim(int ndim)
+void ASpaceObject::setNDim(Id ndim)
 {
   if (_space->getType() != ESpaceType::RN)
     my_throw("Object is not in Space RN");
@@ -125,7 +125,7 @@ void ASpaceObject::setNDim(int ndim)
  * @param ndim Number of dimensions
  * @param param Optional space parameter (ex: radius of the sphere)
  */
-void defineDefaultSpace(const ESpaceType& type, unsigned int ndim, double param)
+void defineDefaultSpace(const ESpaceType& type, size_t ndim, double param)
 {
 
   switch (type.getValue())
@@ -165,7 +165,7 @@ ESpaceType getDefaultSpaceType()
   return defaultSpace->getType();
 }
 
-int getDefaultSpaceDimension()
+Id getDefaultSpaceDimension()
 {
   if (nullptr == defaultSpace) defineDefaultSpace(ESpaceType::RN, 2);
   return defaultSpace->getNDim();

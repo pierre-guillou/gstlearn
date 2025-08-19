@@ -103,11 +103,11 @@ NamingConvention* NamingConvention::create(const String& prefix,
  * @param locatorShift Shift to be applied to the locator currently defined
  */
 void NamingConvention::setNamesAndLocators(Db* dbout,
-                                           int iattout_start,
+                                           Id iattout_start,
                                            const String& qualifier,
-                                           int nitems,
+                                           Id nitems,
                                            bool flagSetLocator,
-                                           int locatorShift) const
+                                           Id locatorShift) const
 {
   _setNames(dbout, iattout_start, VectorString(), 0, qualifier, nitems);
 
@@ -130,14 +130,14 @@ void NamingConvention::setNamesAndLocators(Db* dbout,
  */
 void NamingConvention::setNamesAndLocators(const VectorString& names,
                                            Db* dbout,
-                                           int iattout_start,
+                                           Id iattout_start,
                                            const String& qualifier,
-                                           int nitems,
+                                           Id nitems,
                                            bool flagSetLocator,
-                                           int locatorShift) const
+                                           Id locatorShift) const
 {
   if (iattout_start < 0) return;
-  int nvar = static_cast<int> (names.size());
+  Id nvar = static_cast<Id> (names.size());
   if (nvar <= 0) return;
 
   _setNames(dbout, iattout_start, names, nvar, qualifier, nitems);
@@ -158,15 +158,15 @@ void NamingConvention::setNamesAndLocators(const VectorString& names,
  * @param locatorShift Shift to be applied to the locator currently defined
  */
 void NamingConvention::setNamesAndLocators(Db* dbout,
-                                           int iattout_start,
+                                           Id iattout_start,
                                            const VectorString& names,
                                            bool flagSetLocator,
-                                           int locatorShift) const
+                                           Id locatorShift) const
 {
   if (iattout_start < 0) return;
-  int nvar = static_cast<int> (names.size());
+  Id nvar = static_cast<Id> (names.size());
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     dbout->setNameByUID(iattout_start+ivar, names[ivar]);
 
   if (flagSetLocator)
@@ -188,11 +188,11 @@ void NamingConvention::setNamesAndLocators(Db* dbout,
  */
 void NamingConvention::setNamesAndLocators(const String& namin,
                                            Db* dbout,
-                                           int iattout_start,
+                                           Id iattout_start,
                                            const String& qualifier,
-                                           int nitems,
+                                           Id nitems,
                                            bool flagSetLocator,
-                                           int locatorShift) const
+                                           Id locatorShift) const
 {
   if (iattout_start < 0) return;
   VectorString names;
@@ -227,13 +227,13 @@ void NamingConvention::setNamesAndLocators(const String& namin,
 void NamingConvention::setNamesAndLocators(const Db *dbin,
                                            const VectorString& names,
                                            const ELoc& locatorInType,
-                                           int nvar,
+                                           Id nvar,
                                            Db* dbout,
-                                           int iattout_start,
+                                           Id iattout_start,
                                            const String& qualifier,
-                                           int nitems,
+                                           Id nitems,
                                            bool flagSetLocator,
-                                           int locatorShift) const
+                                           Id locatorShift) const
 {
   // No variable is concerned: simply return
   if (iattout_start < 0) return;
@@ -250,7 +250,7 @@ void NamingConvention::setNamesAndLocators(const Db *dbin,
       // If 'nvar' is defined, it prevails.
       namloc = dbin->getNamesByLocator(locatorInType);
       if (nvar <= 0)
-        nvar = (int) namloc.size();
+        nvar = static_cast<Id>(namloc.size());
       else
         namloc.resize(nvar);
     }
@@ -264,14 +264,14 @@ void NamingConvention::setNamesAndLocators(const Db *dbin,
   else
   {
     // 'namloc' is defined as input argument
-    if ((int) namloc.size() == 1 && nvar > 1)
+    if (static_cast<Id>(namloc.size()) == 1 && nvar > 1)
     {
       // Particular case of a single string in 'namloc' but 'nvar' > 1; expand the name
       namloc = generateMultipleNames(namloc[0], nvar);
     }
 
     // The number items in 'namloc' overrides 'nvar'
-    nvar = (int) namloc.size();
+    nvar = static_cast<Id>(namloc.size());
   }
 
   _setNames(dbout, iattout_start, namloc, nvar, qualifier, nitems);
@@ -299,19 +299,19 @@ void NamingConvention::setNamesAndLocators(const Db *dbin,
 void NamingConvention::setNamesAndLocators(const Db *dbin,
                                            const VectorInt& iatts,
                                            Db* dbout,
-                                           int iattout_start,
+                                           Id iattout_start,
                                            const String& qualifier,
-                                           int nitems,
+                                           Id nitems,
                                            bool flagSetLocator,
-                                           int locatorShift) const
+                                           Id locatorShift) const
 {
   if (iattout_start < 0) return;
   if (dbin == nullptr) return;
-  int nvar = static_cast<int>(iatts.size());
+  Id nvar = static_cast<Id>(iatts.size());
   if (nvar <= 0) return;
 
   VectorString names;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     names.push_back(dbin->getNameByUID(iatts[ivar]));
 
   _setNames(dbout, iattout_start, names, nvar, qualifier, nitems);
@@ -335,13 +335,13 @@ void NamingConvention::setNamesAndLocators(const Db *dbin,
  * @param locatorShift Shift to be applied to the locator currently defined
  */
 void NamingConvention::setNamesAndLocators(const Db *dbin,
-                                           int iatt,
+                                           Id iatt,
                                            Db* dbout,
-                                           int iattout_start,
+                                           Id iattout_start,
                                            const String& qualifier,
-                                           int nitems,
+                                           Id nitems,
                                            bool flagSetLocator,
-                                           int locatorShift) const
+                                           Id locatorShift) const
 {
   if (iattout_start < 0) return;
   if (dbin == nullptr) return;
@@ -356,10 +356,10 @@ void NamingConvention::setNamesAndLocators(const Db *dbin,
  }
 
 void NamingConvention::setLocators(Db *dbout,
-                                   int iattout_start,
-                                   int nvar,
-                                   int nitems,
-                                   int locatorShift) const
+                                   Id iattout_start,
+                                   Id nvar,
+                                   Id nitems,
+                                   Id locatorShift) const
 {
   if (! _flagLocator || _locatorOutType == ELoc::UNKNOWN) return;
 
@@ -369,7 +369,7 @@ void NamingConvention::setLocators(Db *dbout,
     dbout->clearLocators(_locatorOutType);
 
   // Set the locator for all variables
-  for (int ecr = 0; ecr < nvar * nitems; ecr++)
+  for (Id ecr = 0; ecr < nvar * nitems; ecr++)
     dbout->setLocatorByUID(iattout_start + ecr, _locatorOutType, ecr + locatorShift);
 }
 
@@ -379,19 +379,19 @@ void NamingConvention::setLocators(Db *dbout,
  * @param nvar  Number of variables (may be 0)
  * @return A valid number of variables
  */
-int NamingConvention::_getNameCount(const VectorString& names, int nvar)
+Id NamingConvention::_getNameCount(const VectorString& names, Id nvar)
 {
   if (nvar <= 0)
   {
     // Argument 'nvar' is not defined yet
     if (names.empty()) return 1;
-    return (int)names.size();
+    return static_cast<Id>(names.size());
   }
   // Argument 'nvar' is provided: is it consistent with 'names'
   if (names.empty()) return nvar;
   // Both 'nvar' and 'names' are provided. For safety reasons,
   // the number of variables is the minimum between the two
-  return MIN(nvar, (int)names.size());
+  return MIN(nvar, static_cast<Id>(names.size()));
 }
 
 /**
@@ -406,19 +406,19 @@ int NamingConvention::_getNameCount(const VectorString& names, int nvar)
  * @param nitems Number of items to be renamed
  */
 void NamingConvention::_setNames(Db *dbout,
-                                 int iattout_start,
+                                 Id iattout_start,
                                  const VectorString& names,
-                                 int nvar,
+                                 Id nvar,
                                  const String& qualifier,
-                                 int nitems) const
+                                 Id nitems) const
 {
-  int nloc = _getNameCount(names, nvar);
+  auto nloc             = _getNameCount(names, nvar);
   VectorString outnames = _createNames(names, nloc, qualifier, nitems);
 
-  int ecr = 0;
-  for (int ivar = 0; ivar < nloc; ivar++)
+  Id ecr = 0;
+  for (Id ivar = 0; ivar < nloc; ivar++)
   {
-    for (int item = 0; item < nitems; item++)
+    for (Id item = 0; item < nitems; item++)
     {
       dbout->setNameByUID(iattout_start + ecr, outnames[ecr]);
       ecr++;
@@ -437,13 +437,13 @@ void NamingConvention::_setNames(Db *dbout,
  * @return outnames An array of variable names (Dimension: nvar * nitems)
  */
 VectorString NamingConvention::_createNames(const VectorString &names,
-                                            int nvar,
+                                            Id nvar,
                                             const String &qualifier,
-                                            int nitems) const
+                                            Id nitems) const
 {
   VectorString outnames;
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     // Variable 'local' defined for each variable, is:
     // - extracted from the array 'names' (if defined)
@@ -452,7 +452,7 @@ VectorString NamingConvention::_createNames(const VectorString &names,
     String loc_number;
     if (_flagVarname)
     {
-      if (static_cast<int>(names.size()) == nvar) loc_varname = names[ivar];
+      if (static_cast<Id>(names.size()) == nvar) loc_varname = names[ivar];
       if (loc_varname.empty() && nvar > 1) loc_varname = std::to_string(ivar+1);
     }
     else
@@ -461,7 +461,7 @@ VectorString NamingConvention::_createNames(const VectorString &names,
       if (nvar > 1) loc_number = std::to_string(ivar+1);
     }
 
-    for (int item = 0; item < nitems; item++)
+    for (Id item = 0; item < nitems; item++)
     {
       String loc_qualifier;
 

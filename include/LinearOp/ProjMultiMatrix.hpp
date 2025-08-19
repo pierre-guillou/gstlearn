@@ -27,11 +27,11 @@ public:
                   bool silent  = false);
   virtual ~ProjMultiMatrix();
   static std::vector<std::vector<const ProjMatrix*>> create(std::vector<const ProjMatrix*>& vectproj,
-                                                            int nvariable);
+                                                            Id nvariable);
   static ProjMultiMatrix* createFromDbAndMeshes(const Db* db,
                                                 const std::vector<const AMesh*>& meshes,
-                                                int ncov,
-                                                int nvar,
+                                                Id ncov,
+                                                Id nvar,
                                                 bool checkOnZVariable = true,
                                                 bool verbose          = false);
 
@@ -39,8 +39,8 @@ public:
 #ifndef SWIG
 
 protected:
-  int _addPoint2mesh(const constvect inv, vect outv) const override;
-  int _addMesh2point(const constvect inv, vect outv) const override;
+  Id _addPoint2mesh(const constvect inv, vect outv) const override;
+  Id _addMesh2point(const constvect inv, vect outv) const override;
 #endif
 
 private:

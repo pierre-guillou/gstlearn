@@ -33,19 +33,19 @@ using namespace gstlrn;
 *****************************************************************************/
 int main(int argc, char* argv[])
 {
-  int nx              = 10;
-  int niter           = 10000;
-  int nburn           = 100;
+  Id nx               = 10;
+  Id niter            = 10000;
+  Id nburn            = 100;
   double range        = 10.;
   double bound        = TEST;
   bool flag_sym_neigh = true;
 
-  int seed              = 5452;
-  int ndim              = 2;
-  int nvar              = 1;
-  int nbsimu            = 1;
+  Id seed               = 5452;
+  Id ndim               = 2;
+  Id nvar               = 1;
+  Id nbsimu             = 1;
   double sill           = 1.;
-  int nlag              = 20;
+  Id nlag               = 20;
   VectorDouble ranges   = {range, range};
   bool verbose          = true;
   bool flag_moving      = true;
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
   // Model
 
   CovContext ctxt(nvar, 2, 1.);
-  Model* model = new Model(ctxt);
+  auto* model = new Model(ctxt);
   CovAnisoList covs(ctxt);
   CovAniso cova(ECov::EXPONENTIAL, ctxt);
   cova.setRanges(ranges);
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
   varioparam.addMultiDirs(dirparams);
   Vario vario(varioparam);
   VectorString names = db->getName("Gibbs*");
-  for (int isimu = 0; isimu < nbsimu; isimu++)
+  for (Id isimu = 0; isimu < nbsimu; isimu++)
   {
     db->clearLocators(ELoc::Z);
     db->setLocator(names[isimu], ELoc::Z, 0);

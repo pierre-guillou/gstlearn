@@ -53,7 +53,7 @@ public:
     DECLARE_UNUSED(Op, inv, outv, work);
   };
 
-  virtual double evalOpByRank(MatrixSparse* Op, int rank) const
+  virtual double evalOpByRank(MatrixSparse* Op, Id rank) const
   {
     DECLARE_UNUSED(Op);
     DECLARE_UNUSED(rank);
@@ -70,8 +70,8 @@ public:
     VectorDouble getCoeffs() const { return _coeffs; }
     void setCoeffs(const VectorDouble& coeffs) {_coeffs = coeffs;}
 
-    int getDegree() const { return static_cast<int>(_coeffs.size());}
-    virtual int fit(const std::function<double(double)>& f,
+    Id getDegree() const { return static_cast<Id>(_coeffs.size());}
+    virtual Id fit(const std::function<double(double)>& f,
                   double from = 0.,
                   double to = 1.,
                   double tol = EPSILON5)

@@ -44,7 +44,7 @@ ProjComposition::ProjComposition(std::vector<const IProj*> projs) : IProj()
   for (auto p : projs) _projs.push_back(std::unique_ptr<const IProj>(p));
 }
 
-int ProjComposition::_addPoint2mesh(const constvect in, vect out) const
+Id ProjComposition::_addPoint2mesh(const constvect in, vect out) const
 {
   if (_projs.size() == 0) return -1;
   if (_projs.size() == 1) return _projs[0]->addPoint2mesh(in, out);
@@ -55,7 +55,7 @@ int ProjComposition::_addPoint2mesh(const constvect in, vect out) const
 
   // Unroll a bit the loop because first/last use different in/out arrays.
   // This also means size == 1 is a special case (treated above).
-  int ret = _projs[idx]->point2mesh(in, _works[idx-1]);
+  Id ret = _projs[idx]->point2mesh(in, _works[idx-1]);
   if (ret != 0) return ret;
   idx--;
 
@@ -69,13 +69,13 @@ int ProjComposition::_addPoint2mesh(const constvect in, vect out) const
   return _projs[idx]->addPoint2mesh(_works[0], out);
 }
 
-int ProjComposition::_addMesh2point(const constvect in, vect out) const {
+Id ProjComposition::_addMesh2point(const constvect in, vect out) const {
   if (_projs.size() == 0) return -1;
   if (_projs.size() == 1) return _projs[0]->addMesh2point(in, out);
 
   size_t idx = 0;
 
-  int ret = _projs[0]->mesh2point(in, _works[0]);
+  Id ret = _projs[0]->mesh2point(in, _works[0]);
   if (ret != 0) return ret;
   idx++;
 

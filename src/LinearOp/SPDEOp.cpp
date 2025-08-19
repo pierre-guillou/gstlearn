@@ -24,16 +24,12 @@ ASPDEOp::ASPDEOp(const PrecisionOpMulti* const popKriging,
                  const ProjMulti* const projInKriging,
                  const ASimulable* invNoise,
                  const PrecisionOpMulti* const popSimu,
-                 const ProjMulti* const projInSimu,
-                 const ProjMulti* const projOutKriging,
-                 const ProjMulti* const projOutSimu)
+                 const ProjMulti* const projInSimu)
   : _QKriging(popKriging)
   , _projInKriging(projInKriging)
   , _invNoise(invNoise)
   , _QSimu(popSimu == nullptr ? popKriging : popSimu)
   , _projInSimu(projInSimu == nullptr ? projInKriging : projInSimu)
-  , _projOutKriging(projOutKriging)
-  , _projOutSimu(projOutSimu == nullptr ? projOutKriging : projOutSimu)
   , _solver(nullptr)
   , _verbose(false)
   , _ndat(0)
@@ -50,9 +46,14 @@ ASPDEOp::~ASPDEOp()
   delete _solver;
 }
 
-int ASPDEOp::getSize() const
+Id ASPDEOp::getSize() const
 {
   return _QKriging->getSize();
+}
+
+Id ASPDEOp::getSizeSimu() const
+{
+  return _QSimu->getSize();
 }
 
 void ASPDEOp::_prepare(bool w1, bool w2) const
@@ -71,7 +72,7 @@ void ASPDEOp::_prepare(bool w1, bool w2) const
 ** \param[out] outv    Array of output values
 **
 *****************************************************************************/
-// int ASPDEOp::_addToDest(const constvect inv, vect outv) const
+// Id ASPDEOp::_addToDest(const constvect inv, vect outv) const
 // {
 //   _prepare();
 
@@ -83,11 +84,11 @@ void ASPDEOp::_prepare(bool w1, bool w2) const
 //   return _QKriging->addToDest(inv, outv);
 // }
 
-int ASPDEOp::_addToDest(const constvect inv, vect outv) const
+Id ASPDEOp::_addToDest(const constvect inv, vect outv) const
 {
   _prepare();
 
-  int status = _QKriging->addToDest(inv, outv); // TODO: find why outv is set to zero in multistructure case
+  Id status = _QKriging->addToDest(inv, outv); // TODO: find why outv is set to zero in multistructure case
   if (status) return status;
   vect w1s(_workdat1);
   vect w2s(_workdat2);
@@ -96,11 +97,6 @@ int ASPDEOp::_addToDest(const constvect inv, vect outv) const
   _projInKriging->addPoint2mesh(w2s, outv);
 
   return status;
-}
-
-int ASPDEOp::getSizeSimu() const
-{
-  return _QSimu->getSize();
 }
 
 void ASPDEOp::_simCond(const constvect data, vect outvK, vect outvS) const
@@ -140,35 +136,34 @@ void ASPDEOp::_simNonCond(vect outv) const
   _QSimu->evalSimulate(_workNoiseMesh, outv);
 }
 
-VectorDouble ASPDEOp::kriging(const VectorDouble& dat) const
+VectorDouble ASPDEOp::kriging(const VectorDouble& dat, const ProjMulti* proj) const
 {
   constvect datm(dat.data(), dat.size());
-  VectorDouble outMeshK(_QKriging->getSize());
+  VectorDouble outMeshK(getSize());
   vect outvs(outMeshK);
-  int err = _kriging(datm, outvs);
+  Id err = _kriging(datm, outvs);
   if (err) return VectorDouble();
 
   // Project the result on the output mesh (optional)
-  if (_projOutKriging == nullptr)
-    return outMeshK;
-  VectorDouble result(_projOutKriging->getNPoint());
-  _projOutKriging->mesh2point(outvs, result);
+  if (proj == nullptr) return outMeshK;
+  VectorDouble result(proj->getNPoint());
+  proj->mesh2point(outvs, result);
   return result;
 }
 
-int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
-                                  const MatrixDense& driftMat,
-                                  const VectorDouble& driftCoeffs)
+Id ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
+                                 const MatrixDense& driftMat,
+                                 const VectorDouble& driftCoeffs)
 {
-  int nrows = driftMat.getNRows();
-  int ncols = driftMat.getNCols();
-  if (nrows != (int)Z.size())
+  auto nrows = driftMat.getNRows();
+  auto ncols = driftMat.getNCols();
+  if (nrows != static_cast<Id>(Z.size()))
   {
     messerr("Error in number of Rows of drift matrix (%d) and size of data vector (%d)",
             nrows, Z.size());
     return 1;
   }
-  if (ncols != (int)driftCoeffs.size())
+  if (ncols != static_cast<Id>(driftCoeffs.size()))
   {
     messerr("Error in number of Columns of drift matrix (%d) and size of drift coefficients (%d)",
             ncols, driftCoeffs.size());
@@ -176,10 +171,10 @@ int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
   }
 
   // Center the data set
-  for (int i = 0; i < nrows; i++)
+  for (Id i = 0; i < nrows; i++)
   {
     double sum = 0.;
-    for (int j = 0; j < ncols; j++)
+    for (Id j = 0; j < ncols; j++)
     {
       sum += driftCoeffs[j] * driftMat.getValue(i, j);
     }
@@ -188,10 +183,10 @@ int ASPDEOp::centerDataByDriftMat(VectorDouble& Z,
   return 0;
 }
 
-int ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
-                                 const VectorDouble& meanVec)
+Id ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
+                                const VectorDouble& meanVec)
 {
-  if ((int)Z.size() != (int)meanVec.size())
+  if (static_cast<Id>(Z.size()) != static_cast<Id>(meanVec.size()))
   {
     messerr("Error in size of data vector (%d) and size of mean vector (%d)",
             Z.size(), meanVec.size());
@@ -199,31 +194,46 @@ int ASPDEOp::centerDataByMeanVec(VectorDouble& Z,
   }
 
   // Center the data set
-  for (int i = 0, nrows = (int)Z.size(); i < nrows; i++)
+  for (Id i = 0, nrows = static_cast<Id>(Z.size()); i < nrows; i++)
     Z[i] -= meanVec[i];
   return 0;
 }
 
-VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
+VectorDouble ASPDEOp::simNonCond(const ProjMulti* proj) const
+{
+  VectorDouble outMeshS(getSizeSimu());
+  vect outMeshSv(outMeshS);
+  _simNonCond(outMeshSv);
+
+  // Project the result on the output mesh (optional)
+  if (proj == nullptr) return outMeshS;
+  VectorDouble result(proj->getNPoint());
+  proj->mesh2point(outMeshSv, result);
+  return result;
+}
+
+VectorDouble ASPDEOp::simCond(const VectorDouble& dat,
+                              const ProjMulti* projK,
+                              const ProjMulti* projS) const
 {
   constvect datv(dat.data(), dat.size());
-  VectorDouble outMeshK(_QKriging->getSize());
+  VectorDouble outMeshK(getSize());
   vect outMeshKv(outMeshK);
-  VectorDouble outMeshS(_QSimu->getSize());
+  VectorDouble outMeshS(getSizeSimu());
   vect outMeshSv(outMeshS);
 
   // Perform the conditional simulation
   _simCond(datv, outMeshKv, outMeshSv);
 
   // Project the result on the output mesh (optional)
-  if (_projOutKriging == nullptr && _projOutSimu == nullptr)
+  if (projK == nullptr || projS == nullptr)
   {
     VH::addInPlace(outMeshSv, outMeshKv);
     return outMeshK;
   }
-  VectorDouble result(_projOutSimu->getNPoint());
-  _projOutKriging->mesh2point(outMeshKv, result);
-  _projOutSimu->addMesh2point(outMeshSv, result);
+  VectorDouble result(projS->getNPoint());
+  projK->mesh2point(outMeshKv, result);
+  projS->addMesh2point(outMeshSv, result);
   return result;
 }
 
@@ -234,21 +244,27 @@ VectorDouble ASPDEOp::simCond(const VectorDouble& dat) const
  * @param dat Vector of Data
  * @param nMC  Number of Monte-Carlo simulations
  * @param seed Random seed for the Monte-Carlo simulations
+ * @param projK Projection Matrix used for Kriging
+ * @param projS Projection matrix used for Simulations
  * @return VectorDouble
  */
-VectorDouble ASPDEOp::stdev(const VectorDouble& dat, int nMC, int seed) const
+VectorDouble ASPDEOp::stdev(const VectorDouble& dat,
+                            Id nMC,
+                            Id seed,
+                            const ProjMulti* projK,
+                            const ProjMulti* projS) const
 {
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
   law_set_random_seed(seed);
 
   // Standard Deviation using Monte-Carlo simulations
-  int nout = _projOutSimu->getNPoint();
+  Id nout = projS->getNPoint();
   VectorDouble temp_mean(nout, 0.);
   VectorDouble temp_mean2(nout, 0.);
 
-  for (int iMC = 0; iMC < nMC; iMC++)
+  for (Id iMC = 0; iMC < nMC; iMC++)
   {
-    VectorDouble temp = simCond(dat);
+    VectorDouble temp = simCond(dat, projK, projS);
     VH::addInPlace(temp_mean, temp);
     VH::addSquareInPlace(temp_mean2, temp);
   }
@@ -259,65 +275,51 @@ VectorDouble ASPDEOp::stdev(const VectorDouble& dat, int nMC, int seed) const
   return temp_mean;
 }
 
-VectorDouble ASPDEOp::simNonCond() const
-{
-  VectorDouble outMeshS(_QSimu->getSize());
-  vect outMeshSv(outMeshS);
-  _simNonCond(outMeshSv);
-
-  // Project the result on the output mesh (optional)
-  if (_projOutSimu == nullptr)
-    return outMeshS;
-  VectorDouble result(_projOutSimu->getNPoint());
-  _projOutSimu->mesh2point(outMeshSv, result);
-  return result;
-}
-
 VectorDouble ASPDEOp::krigingWithGuess(const VectorDouble& dat,
                                        const VectorDouble& guess) const
 {
   constvect datv(dat.data(), dat.size());
   constvect guessv(guess.data(), guess.size());
 
-  VectorDouble outv(_QKriging->getSize());
+  VectorDouble outv(getSize());
   vect outvs(outv);
-  int err = krigingWithGuess(datv, guessv, outvs);
+  Id err = krigingWithGuess(datv, guessv, outvs);
   if (err) return VectorDouble();
   return outv;
 }
 
-int ASPDEOp::_kriging(const constvect inv, vect out) const
+Id ASPDEOp::_kriging(const constvect inv, vect out) const
 {
   _buildRhs(inv);
-  int status = _solve(_rhs, out);
+  Id status = _solve(_rhs, out);
   return status;
 }
 
-int ASPDEOp::krigingWithGuess(const constvect inv,
-                              const constvect guess,
-                              vect out) const
+Id ASPDEOp::krigingWithGuess(const constvect inv,
+                             const constvect guess,
+                             vect out) const
 {
   _buildRhs(inv);
   return _solveWithGuess(_rhs, guess, out);
 }
 
-int ASPDEOp::_solve(const constvect in, vect out) const
+Id ASPDEOp::_solve(const constvect in, vect out) const
 {
   _solver->solve(in, out);
   return 0;
 }
 
-int ASPDEOp::_solveWithGuess(const constvect in,
-                             const constvect guess,
-                             vect out) const
+Id ASPDEOp::_solveWithGuess(const constvect in,
+                            const constvect guess,
+                            vect out) const
 {
   _solver->solveWithGuess(in, guess, out);
   return 0;
 }
 
-int ASPDEOp::_buildRhs(const constvect inv) const
+Id ASPDEOp::_buildRhs(const constvect inv) const
 {
-  _rhs.resize(_QKriging->getSize());
+  _rhs.resize(getSize());
   vect w1(_workdat1);
   _invNoise->evalDirect(inv, w1);
   _projInKriging->point2mesh(_workdat1, _rhs);
@@ -345,14 +347,14 @@ VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
                                          const MatrixDense& driftMat,
                                          bool verbose) const
 {
-  int xsize = (int)(driftMat.getNCols());
+  Id xsize = (driftMat.getNCols());
   VectorDouble XtInvSigmaZ(xsize);
   MatrixSymmetric XtInvSigmaX(xsize);
   VectorDouble result(xsize);
 
   _workdat1.resize(_getNDat());
   vect w1s(_workdat1);
-  for (int i = 0; i < xsize; i++)
+  for (Id i = 0; i < xsize; i++)
   {
     auto xm = driftMat.getColumnPtr(i);
     evalInvCov(xm, w1s);
@@ -361,7 +363,7 @@ VectorDouble ASPDEOp::computeDriftCoeffs(const VectorDouble& Z,
     constvect wd1(_workdat1.data(), _workdat1.size());
     XtInvSigmaZ[i] = VH::innerProduct(ym, wd1);
 
-    for (int j = i; j < xsize; j++)
+    for (Id j = i; j < xsize; j++)
     {
       constvect xmj = driftMat.getViewOnColumn(j);
       double prod   = VH::innerProduct(xmj, w1s);
@@ -397,14 +399,14 @@ void ASPDEOp::_preparePoly(Chebychev& logPoly) const
               { return log(val); }, a, b, 2 * EPSILON4 / (a + b));
 }
 
-double ASPDEOp::computeLogDetOp(int nbsimu) const
+double ASPDEOp::computeLogDetOp(Id nbsimu) const
 {
   Chebychev logPoly;
   _preparePoly(logPoly);
   _workNoiseMesh.resize(getSize());
   _workmesh.resize(getSize());
   double val = 0.;
-  for (int i = 0; i < nbsimu; i++)
+  for (Id i = 0; i < nbsimu; i++)
   {
     VH::simulateGaussianInPlace(_workNoiseMesh);
     std::fill(_workmesh.begin(), _workmesh.end(), 0.);
@@ -423,7 +425,7 @@ double ASPDEOp::computeQuadratic(const std::vector<double>& x) const
   return VH::innerProduct(w1s, xm);
 }
 
-double ASPDEOp::computeLogDetQ(int nMC) const
+double ASPDEOp::computeLogDetQ(Id nMC) const
 {
   return _QKriging->computeLogDet(nMC);
 }
@@ -434,9 +436,9 @@ double ASPDEOp::computeLogDetInvNoise() const
 }
 
 // We use the fact that log|Sigma| = log |Q + A^t diag^(-1) (sigma) A|- log|Q| + log|Noise|
-double ASPDEOp::computeTotalLogDet(int nMC, int seed) const
+double ASPDEOp::computeTotalLogDet(Id nMC, Id seed) const
 {
-  int memo = law_get_random_seed();
+  auto memo = law_get_random_seed();
 
   law_set_random_seed(seed);
   double a1 = computeLogDetOp(nMC);

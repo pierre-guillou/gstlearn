@@ -38,12 +38,12 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("bench_KrigingM-");
 
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
-  int leaf_size = 30;
+  Id leaf_size = 30;
 
   // Generate the output grid
-  int ncell       = 100;
+  Id ncell        = 100;
   VectorInt nx    = {ncell, ncell};
   VectorDouble dx = {1. / ncell, 1. / ncell};
   DbGrid* grid    = DbGrid::create(nx, dx);
@@ -54,10 +54,10 @@ int main(int argc, char* argv[])
   Model* model = Model::createFromParam(ECov::SPHERICAL, range, sill);
 
   // Create the neighborhood
-  int nmaxi     = 20;
-  int nmini     = 2;
-  int nsect     = 8;
-  int nsmax     = 3;
+  Id nmaxi      = 20;
+  Id nmini      = 2;
+  Id nsect      = 8;
+  Id nsmax      = 3;
   double radius = 1.;
 
   // Print the environment
@@ -75,21 +75,21 @@ int main(int argc, char* argv[])
   NeighMoving* neighM;
   Db* data;
   Timer timer;
-  for (int icas = 0; icas < (int)nechs.size(); icas++)
+  for (Id icas = 0; icas < static_cast<Id>(nechs.size()); icas++)
   {
-    int nloop = (icas < 2) ? 2 : 1;
-    int nech  = nechs[icas];
-    for (int iloop = 0; iloop < nloop; iloop++)
+    Id nloop = (icas < 2) ? 2 : 1;
+    Id nech  = nechs[icas];
+    for (Id iloop = 0; iloop < nloop; iloop++)
     {
-      int ileaf = (iloop == 0) ? leaf_size : 0;
-      data      = Db::createFillRandom(nech, 2, 1);
-      neighM    = NeighMoving::create(false, nmaxi, radius, nmini, nsect, nsmax,
-                                      VectorDouble(), VectorDouble(), ileaf > 0, ileaf);
+      Id ileaf = (iloop == 0) ? leaf_size : 0;
+      data     = Db::createFillRandom(nech, 2, 1);
+      neighM   = NeighMoving::create(false, nmaxi, radius, nmini, nsect, nsmax,
+                                     VectorDouble(), VectorDouble(), ileaf > 0, ileaf);
 
       timer.reset();
       message("Nsample = %7d - Leaf = %3d\n", nech, ileaf);
       kriging(data, grid, model, neighM, true, false);
-      int time = (iloop == 0) ? timeb[icas] : times[icas];
+      Id time = (iloop == 0) ? timeb[icas] : times[icas];
       timer.displayIntervalMilliseconds("Kriging in Moving Neighborhood", time);
 
       delete data;

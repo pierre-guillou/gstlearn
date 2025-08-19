@@ -84,7 +84,7 @@ static void _thirdTest(const CovAniso* cov1,
 
 static void _clearModels(std::vector<Model*>& models)
 {
-  for (int i = 0, n = models.size(); i < n; i++)
+  for (size_t i = 0, n = models.size(); i < n; i++)
   {
     delete models[i];
   }
@@ -102,8 +102,9 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_PGSSPDE-");
-  int error = 0;
-  int ndim  = 2;
+  Id error  = 0;
+  Id ndim   = 2;
+  Id nbsimu = 3;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Prepare the Discrete process with Discretized Option
@@ -111,7 +112,7 @@ int main(int argc, char* argv[])
 
   // Prepare dimension variables
   auto ndata = 100;
-  int nx     = 101;
+  Id nx      = 101;
   double dx  = 1. / (nx - 1);
 
   // Prepare the output Grid
@@ -120,16 +121,16 @@ int main(int argc, char* argv[])
   // Prepare facies proportions and corresponding Grid
   DbGrid* dbprop = DbGrid::create({nx, nx}, {dx, dx});
   VectorDouble props({0.2, 0.5, 0.3});
-  int nfac           = (int)props.size();
+  Id nfac            = static_cast<Id>(props.size());
   VectorString names = generateMultipleNames("Props", nfac);
-  for (int ifac = 0; ifac < nfac; ifac++)
+  for (Id ifac = 0; ifac < nfac; ifac++)
     dbprop->addColumnsByConstant(1, props[ifac], names[ifac]);
   dbprop->setLocators(names, ELoc::P, 0);
 
   // Prepare the input data set
   Db* dat        = Db::createFromBox(ndata, grid->getCoorMinimum(), grid->getCoorMaximum());
   VectorDouble z = VH::simulateGaussian(ndata);
-  dat->addColumns(z, "variable", ELoc::Z);
+  dat->addColumns(z, "Data", ELoc::Z);
   dat->display();
 
   // Creating the covariances involved in the Model(s) of the Underlying GRF(s)
@@ -143,7 +144,7 @@ int main(int argc, char* argv[])
   std::vector<Model*> models;
   Rule rule;
   RuleProp ruleprop;
-  int mode = 3;
+  Id mode = 3;
 
   // IMPORTANT NOTE: the two following tests have been temporarily discraded.
   // They use the old class PGSSPDE which is now deprecated.
@@ -194,7 +195,7 @@ int main(int argc, char* argv[])
     ruleprop.resetFromRule(&rule, props);
     ruleprop.display();
 
-    (void)simPGSSPDE(dat, grid, models[0], ruleprop);
+    (void)simPGSSPDE(dat, grid, models[0], ruleprop, nbsimu);
 
     _clearModels(models);
   }
@@ -207,5 +208,5 @@ int main(int argc, char* argv[])
   delete dbprop;
   delete dat;
 
-  return (error);
+  return static_cast<int>(error);
 }

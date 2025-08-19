@@ -19,10 +19,10 @@
 
 namespace gstlrn
 {
-typedef struct
+struct SPIMG
 {
-  double* bitmap; /* pointer to pixels */
-} SPIMG;
+  VectorDouble bitmap; /* pointer to pixels */
+};
 
 /*! \cond */
 
@@ -35,8 +35,8 @@ typedef struct
 #define INQUEUE         -1
 
 #define IAD(ix, iy)          ((ix) + (iy) * TX)
-#define BITMAP(im, ix, iy)   *(im->bitmap + (ix) + BORD + ((iy) + BORD) * TX)
-#define BITALL(im, ix, iy)   *(im->bitmap + IAD(ix, iy))
+#define BITMAP(im, ix, iy)   im->bitmap[(ix) + BORD + ((iy) + BORD) * TX]
+#define BITALL(im, ix, iy)   im->bitmap[IAD(ix, iy)]
 #define MARK(ix, iy)         *(pt_mark + IAD(ix, iy))
 #define NBGH(ix, iy)         *(pt_out + IAD(ix, iy))
 #define OUT_TO_IN(pt_out)    *(pt_out + Offset_out_in)
@@ -44,18 +44,18 @@ typedef struct
 #define OUT_TO_MARK(pt_out)  *(pt_out - Offset_mark_out)
 /*! \endcond */
 
-static int SX; /* Window size along X */
-static int SY; /* Window size along Y */
-static int TX; /* Allocated size of BITMAP along X */
-static int TY; /* Allocated size of BITMAP along Y */
-static int TXY;
-static int SXY;
-static int STEP  = 0;
-static int Hsize = 0;
+static Id SX; /* Window size along X */
+static Id SY; /* Window size along Y */
+static Id TX; /* Allocated size of BITMAP along X */
+static Id TY; /* Allocated size of BITMAP along Y */
+static Id TXY;
+static Id SXY;
+static Id STEP  = 0;
+static Id Hsize = 0;
 
 static double **Heap, HMAX, HINIT, HTOP, BIGVAL;
-static int Offset_mark_out, Offset_out_in, SIGNE, OPTION;
-static int VERBOSE_STEP;
+static Id Offset_mark_out, Offset_out_in, SIGNE, OPTION;
+static Id VERBOSE_STEP;
 static DbGrid* DB;
 
 static SPIMG* SPIMG_OUT  = nullptr;
@@ -72,8 +72,8 @@ static double st_htop_evaluate()
 {
   double value;
   double high = -SIGNE * MAXIMUM_BIG;
-  for (int iy = 0; iy < SY; iy++)
-    for (int ix = 0; ix < SX; ix++)
+  for (Id iy = 0; iy < SY; iy++)
+    for (Id ix = 0; ix < SX; ix++)
     {
       if (BITMAP(SPIMG_MARK, ix, iy) != SURFACE_INSIDE) continue;
       value = BITMAP(SPIMG_IN, ix, iy);
@@ -96,14 +96,14 @@ static double st_htop_evaluate()
  **
  *****************************************************************************/
 static void st_get_coordinates(const double* pt_out,
-                               int* ix,
-                               int* iy,
+                               Id* ix,
+                               Id* iy,
                                SPIMG* image     = SPIMG_OUT,
                                bool flag_center = false)
 {
-  int shift = static_cast<int>(pt_out - image->bitmap);
-  *iy       = shift / TX;
-  *ix       = shift % TX;
+  Id shift = static_cast<Id>(pt_out - image->bitmap.data());
+  *iy      = shift / TX;
+  *ix      = shift % TX;
 
   if (flag_center)
   {
@@ -141,8 +141,8 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
 
   /* Current address */
 
-  int ix0 = ITEST;
-  int iy0 = ITEST;
+  Id ix0 = ITEST;
+  Id iy0 = ITEST;
   if (pt_out != nullptr)
   {
     st_get_coordinates(pt_out, &ix0, &iy0);
@@ -152,8 +152,8 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
 
   // Current Spill position
 
-  int ix_spill = ITEST;
-  int iy_spill = ITEST;
+  Id ix_spill = ITEST;
+  Id iy_spill = ITEST;
   if (PT_SPILL != nullptr)
   {
     st_get_coordinates(PT_SPILL, &ix_spill, &iy_spill);
@@ -162,18 +162,18 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   // Loop on the rows (reversed order) followed by the loop on columns
   // for a legible printout
 
-  int numm1 = 0;
-  int nump0 = 0;
-  int nump1 = 0;
-  int nump2 = 0;
-  int numpb = 0;
-  for (int jy = 0; jy < TY; jy++)
+  Id numm1 = 0;
+  Id nump0 = 0;
+  Id nump1 = 0;
+  Id nump2 = 0;
+  Id numpb = 0;
+  for (Id jy = 0; jy < TY; jy++)
   {
-    int iy = TY - jy - 1;
+    Id iy = TY - jy - 1;
     (void)gslStrcpy(STRING, "");
-    for (int ix = 0; ix < TX; ix++)
+    for (Id ix = 0; ix < TX; ix++)
     {
-      int value = BITALL(image, ix, iy);
+      Id value = BITALL(image, ix, iy);
       if (ix == ix0 && iy == iy0)
       {
         (void)gslStrcat(STRING, "X");
@@ -228,8 +228,8 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
  *****************************************************************************/
 static void st_blank_center(SPIMG* image)
 {
-  for (int iy = 0; iy < SY; iy++)
-    for (int ix = 0; ix < SX; ix++)
+  for (Id iy = 0; iy < SY; iy++)
+    for (Id ix = 0; ix < SX; ix++)
       BITMAP(image, ix, iy) = 0.;
 }
 
@@ -245,13 +245,13 @@ static void st_blank_center(SPIMG* image)
  ** \param[in,out] image SPIMG structure to be initialized
  **
  *****************************************************************************/
-static void st_copy_center(int mode, int iatt, SPIMG* image, double defval)
+static void st_copy_center(Id mode, Id iatt, SPIMG* image, double defval)
 {
   DECLARE_UNUSED(mode);
 
   VectorInt ind(2);
-  for (int iy = 0; iy < SY; iy++)
-    for (int ix = 0; ix < SX; ix++)
+  for (Id iy = 0; iy < SY; iy++)
+    for (Id ix = 0; ix < SX; ix++)
     {
       ind[0]                = ix;
       ind[1]                = iy;
@@ -269,11 +269,11 @@ static void st_copy_center(int mode, int iatt, SPIMG* image, double defval)
  ** \param[out] iatt  Rank of the output attribute
  **
  *****************************************************************************/
-static void st_extract_center(SPIMG* image, int iatt)
+static void st_extract_center(SPIMG* image, Id iatt)
 {
   VectorInt ind(2);
-  for (int iy = 0; iy < SY; iy++)
-    for (int ix = 0; ix < SX; ix++)
+  for (Id iy = 0; iy < SY; iy++)
+    for (Id ix = 0; ix < SX; ix++)
     {
       ind[0] = ix;
       ind[1] = iy;
@@ -299,8 +299,8 @@ static void st_convert(double hspill)
 {
   double *pt_out, th;
 
-  for (int iy = 0; iy < SY; iy++)
-    for (int ix = 0; ix < SX; ix++)
+  for (Id iy = 0; iy < SY; iy++)
+    for (Id ix = 0; ix < SX; ix++)
     {
       pt_out = &BITMAP(SPIMG_OUT, ix, iy);
       if (*pt_out == SURFACE_INSIDE || *pt_out == SURFACE_OUTSIDE) continue;
@@ -324,10 +324,8 @@ static void st_convert(double hspill)
  *****************************************************************************/
 static SPIMG* st_image_free(SPIMG* image)
 {
-  if (image == (SPIMG*)NULL) return (image);
+  if (image == nullptr) return (image);
 
-  if (image->bitmap != nullptr)
-    mem_free((char*)image->bitmap);
   image = (SPIMG*)mem_free((char*)image);
 
   return (image);
@@ -346,8 +344,7 @@ static SPIMG* st_image_free(SPIMG* image)
 static SPIMG* st_image_alloc(double value)
 {
   SPIMG* image;
-  double* pt;
-  int i, error;
+  Id error;
 
   /* Initializations */
 
@@ -356,23 +353,21 @@ static SPIMG* st_image_alloc(double value)
 
   /* Create the header */
 
-  image = (SPIMG*)mem_alloc(sizeof(SPIMG), 0);
-  if (image == (SPIMG*)NULL) goto label_end;
+  image = new SPIMG;
 
   /* Create the pixel array */
 
-  image->bitmap = (double*)mem_alloc(sizeof(double) * TXY, 0);
-  if (image->bitmap == nullptr) goto label_end;
+  image->bitmap.resize(TXY, value);
 
   /* Set the array to zero */
 
-  pt = image->bitmap;
-  for (i = 0; i < TXY; i++)
-    *pt++ = value;
   error = 0;
 
-label_end:
-  if (error) image = st_image_free(image);
+  if (error)
+  {
+    delete image;
+    image = nullptr;
+  }
   return (image);
 }
 
@@ -385,8 +380,8 @@ label_end:
  *****************************************************************************/
 static void st_heap_add(double* p)
 {
-  int i   = Hsize++;
-  int n   = (i - 1) / 2;
+  Id i    = Hsize++;
+  Id n    = (i - 1) / 2;
   Heap[i] = p;
   while ((i > 0) && SIGNE * (OUT_TO_IN(p) - OUT_TO_IN(Heap[n])) > 0.)
   {
@@ -411,7 +406,7 @@ static double* st_heap_del(void)
 
 {
   double *first, *temp;
-  int i, il, ir, is;
+  Id i, il, ir, is;
 
   first = Heap[0];
   Hsize--;
@@ -450,7 +445,7 @@ static double* st_heap_del(void)
  ** \param[in]  pt_vois pointer to the neighboring element
  **
  *****************************************************************************/
-static int st_traite(double* pt_out, double* pt_vois)
+static Id st_traite(double* pt_out, double* pt_vois)
 
 {
   double th, value;
@@ -518,22 +513,22 @@ static void st_print()
   message("An edge of %d pixels is added to the original grid.\n", BORD);
 }
 
-static void st_final_stats(double hspill, int ix0, int iy0)
+static void st_final_stats(double hspill, Id ix0, Id iy0)
 {
-  int num_inside     = 0;
+  Id num_inside      = 0;
   double min_inside  = MAXIMUM_BIG;
   double max_inside  = MINIMUM_BIG;
-  int num_outside    = 0;
+  Id num_outside     = 0;
   double min_outside = MAXIMUM_BIG;
   double max_outside = MINIMUM_BIG;
-  int num_else       = 0;
+  Id num_else        = 0;
   double min_else    = MAXIMUM_BIG;
   double max_else    = MINIMUM_BIG;
 
-  for (int iy = 0; iy < SY; iy++)
-    for (int ix = 0; ix < SX; ix++)
+  for (Id iy = 0; iy < SY; iy++)
+    for (Id ix = 0; ix < SX; ix++)
     {
-      int value   = BITMAP(SPIMG_OUT, ix, iy);
+      Id value    = BITMAP(SPIMG_OUT, ix, iy);
       double topo = BITMAP(SPIMG_IN, ix, iy);
 
       if (value == SURFACE_INSIDE)
@@ -598,31 +593,31 @@ static void st_final_stats(double hspill, int ix0, int iy0)
  ** \remark  must start with 1
  **
  *****************************************************************************/
-int spill_point(DbGrid* dbgrid,
-                int ind_depth,
-                int ind_data,
-                int option,
-                bool flag_up,
-                int verbose_step,
-                double hmax,
-                double* h,
-                const double* th,
-                int* ix0,
-                int* iy0)
+Id spill_point(DbGrid* dbgrid,
+               Id ind_depth,
+               Id ind_data,
+               Id option,
+               bool flag_up,
+               Id verbose_step,
+               double hmax,
+               double* h,
+               const double* th,
+               Id* ix0,
+               Id* iy0)
 {
   DECLARE_UNUSED(th);
   double *pt_mark, *pt_out, hspill;
-  int *x, *y, k, n, iy, ix, found, local;
-  static int n4   = 4;
-  static int n8   = 8;
-  static int x4[] = {1, -1, 0, 0};
-  static int y4[] = {0, 0, 1, -1};
-  static int x8[] = {1, -1, 0, 0, 1, -1, -1, 1};
-  static int y8[] = {0, 0, 1, -1, 1, -1, 1, -1};
+  Id *x, *y, k, n, iy, ix, found, local;
+  static Id n4   = 4;
+  static Id n8   = 8;
+  static Id x4[] = {1, -1, 0, 0};
+  static Id y4[] = {0, 0, 1, -1};
+  static Id x8[] = {1, -1, 0, 0, 1, -1, -1, 1};
+  static Id y8[] = {0, 0, 1, -1, 1, -1, 1, -1};
 
   /* Preliminary tests */
 
-  int error = 1;
+  Id error = 1;
 
   /* Preliminary checks */
 
@@ -682,19 +677,19 @@ int spill_point(DbGrid* dbgrid,
 
   /* Add the attribute */
 
-  int iptr_spill = dbgrid->addColumnsByConstant(1, 0., "Spill", ELoc::Z);
+  Id iptr_spill = dbgrid->addColumnsByConstant(1, 0., "Spill", ELoc::Z);
   if (iptr_spill < 0) goto label_end;
 
   /* Core allocation */
 
   SPIMG_IN = st_image_alloc(BIGVAL);
-  if (SPIMG_IN == (SPIMG*)NULL) goto label_end;
+  if (SPIMG_IN == nullptr) goto label_end;
   SPIMG_MARK = st_image_alloc(SURFACE_OUTSIDE);
-  if (SPIMG_MARK == (SPIMG*)NULL) goto label_end;
+  if (SPIMG_MARK == nullptr) goto label_end;
   SPIMG_OUT = st_image_alloc(SURFACE_OUTSIDE);
-  if (SPIMG_OUT == (SPIMG*)NULL) goto label_end;
-  Offset_out_in   = static_cast<int>(SPIMG_IN->bitmap - SPIMG_OUT->bitmap);
-  Offset_mark_out = static_cast<int>(SPIMG_OUT->bitmap - SPIMG_MARK->bitmap);
+  if (SPIMG_OUT == nullptr) goto label_end;
+  Offset_out_in   = static_cast<Id>(SPIMG_IN->bitmap.data() - SPIMG_OUT->bitmap.data());
+  Offset_mark_out = static_cast<Id>(SPIMG_OUT->bitmap.data() - SPIMG_MARK->bitmap.data());
 
   /* Copying the input arrays into the corresponding images */
 
@@ -722,16 +717,16 @@ int spill_point(DbGrid* dbgrid,
     {
       pt_mark = &BITMAP(SPIMG_MARK, ix, iy);
       pt_out  = &MARK_TO_OUT(pt_mark);
-      if ((int)MARK(0, 0) == SURFACE_UNKNOWN)
+      if (static_cast<Id>(MARK(0, 0)) == SURFACE_UNKNOWN)
       {
         for (k = found = 0; k < n && found == 0; k++)
-          if ((int)MARK(x[k], y[k]) == SURFACE_INSIDE) found = 1;
+          if (static_cast<Id>(MARK(x[k], y[k])) == SURFACE_INSIDE) found = 1;
         if (found)
           st_heap_add(pt_out);
         else
           st_change(pt_out, SURFACE_UNKNOWN);
       }
-      else if ((int)MARK(0, 0) == SURFACE_INSIDE)
+      else if (static_cast<Id>(MARK(0, 0)) == SURFACE_INSIDE)
         st_change(pt_out, SURFACE_INSIDE);
       else
         st_heap_add(pt_out);
@@ -811,4 +806,4 @@ label_end:
 
   return (error);
 }
-}
+} // namespace gstlrn

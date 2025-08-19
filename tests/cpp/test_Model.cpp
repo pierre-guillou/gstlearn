@@ -38,16 +38,16 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_Model-");
-  int seed = 10355;
-  int ndim = 2;
-  int nvar = 1;
+  Id seed = 10355;
+  Id ndim = 2;
+  Id nvar = 1;
   law_set_random_seed(seed);
 
   ///////////////////////
   // Creating the Db
-  auto nx            = {2, 3};
-  auto x0            = {5.2, 8.3};
-  auto dx            = {1.3, 0.6};
+  VectorInt nx       = {2, 3};
+  VectorDouble x0    = {5.2, 8.3};
+  VectorDouble dx    = {1.3, 0.6};
   DbGrid* workingDbc = DbGrid::create(nx, dx, x0);
 
   // Building the Covariance Context
@@ -55,16 +55,16 @@ int main(int argc, char* argv[])
 
   ///////////////////////
   // Creating the Model
-  Model modellmc = Model(ctxt);
+  Model modellmc(ctxt);
   // Build the List of Covariances
-  CovAnisoList covlmc = CovAnisoList(ctxt);
+  CovAnisoList covlmc(ctxt);
   // Build the Elementary Covariances
-  CovAniso cov1       = CovAniso(ECov::CUBIC, ctxt);
+  CovAniso cov1(ECov::CUBIC, ctxt);
   VectorDouble ranges = {1.2, 2.1};
   cov1.setRanges(ranges);
   cov1.setSill(1.5);
   covlmc.addCov(cov1);
-  CovAniso cov2 = CovAniso(ECov::NUGGET, ctxt);
+  CovAniso cov2(ECov::NUGGET, ctxt);
   cov2.setSill(0.5);
   covlmc.addCov(cov2);
   // Assembling the Model
@@ -83,12 +83,12 @@ int main(int argc, char* argv[])
 
   /////////////////////////////
   // Creating the Tapered Model
-  CovLMCTapering covtape = CovLMCTapering(ETape::STORKEY, 4., ctxt);
+  CovLMCTapering covtape(ETape::STORKEY, 4., ctxt);
   // Build the Covariance list
   covtape.addCov(cov1);
   covtape.addCov(cov2);
   // Building the Model
-  Model modeltape = Model(ctxt);
+  Model modeltape(ctxt);
   modeltape.setCovAnisoList(&covtape);
   modeltape.display();
 
@@ -97,12 +97,12 @@ int main(int argc, char* argv[])
 
   /////////////////////////////
   // Creating the Convoluted Model
-  CovLMCConvolution covconv = CovLMCConvolution(EConvType::EXPONENTIAL, EConvDir::X, 1., 10, ctxt);
+  CovLMCConvolution covconv(EConvType::EXPONENTIAL, EConvDir::X, 1., 10, ctxt);
   // Build the Covariance list
   covconv.addCov(cov1);
   covconv.addCov(cov2);
   // Building the Model
-  Model modelconv = Model(ctxt);
+  Model modelconv(ctxt);
   modelconv.setCovAnisoList(&covconv);
   modelconv.display();
   // Sample the Tapered Model at regular steps
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
   modelM->addDrift(&FF);
   modelM->display();
 
-  int nsample = workingDbc->getNSample();
+  auto nsample = workingDbc->getNSample();
   // Adding a first variable (filled completely)
   VectorDouble rnd1 = VH::simulateGaussian(nsample);
   workingDbc->addColumns(rnd1, "Z1");
@@ -155,10 +155,10 @@ int main(int argc, char* argv[])
   VectorDouble rnd2 = VH::simulateGaussian(nsample);
   rnd2[1]           = TEST;
   workingDbc->addColumns(rnd2, "Z2");
-  VectorDouble verr1 = VectorDouble(nsample, 0.1);
+  VectorDouble verr1(nsample, 0.1);
   verr1[3]           = TEST;
   workingDbc->addColumns(verr1, "V1");
-  VectorDouble verr2 = VectorDouble(nsample, 0.25);
+  VectorDouble verr2(nsample, 0.25);
   workingDbc->addColumns(verr2, "V2");
   // Adding a Selection
   workingDbc->addColumns({1, 1, 1, 0, 1, 0}, "Sel");
@@ -230,8 +230,8 @@ int main(int argc, char* argv[])
   // Testing Models on the Sphere
 
   defineDefaultSpace(ESpaceType::SN, 2);
-  int ns            = 20;
-  int nincr         = 30;
+  Id ns             = 20;
+  Id nincr          = 30;
   VectorDouble incr = VH::sequence(0., GV_PI + EPSILON10, GV_PI / (nincr - 1.));
   double mu         = 1.0;
   double kappa      = 2.0;

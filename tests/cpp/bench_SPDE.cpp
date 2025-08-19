@@ -49,10 +49,10 @@ int main(int argc, char* argv[])
 
   // Global parameters
   defineDefaultSpace(ESpaceType::RN, 2);
-  int seed            = 123;
-  int nsim            = 10;
-  int ndat            = 50;
-  int nxref           = 101;
+  Id seed             = 123;
+  Id nsim             = 10;
+  Id ndat             = 50;
+  Id nxref            = 101;
   double matern_param = 1.0;
 
   OptCst::define(ECst::NTDEC, 2);
@@ -67,21 +67,21 @@ int main(int argc, char* argv[])
   //  1: Kriging
   //  2: non-conditional simulations
   //  3: conditional simulations
-  int mode = -1;
+  Id mode = -1;
 
-  int nfois = 2;
+  Id nfois = 2;
   // Feature to be tested:
   // -1: all cases
   //  0: not using the Cholesky option
   //  1: using the Cholesky option
-  int ifois_ref = -1;
+  Id ifois_ref = -1;
 
-  int ncov_tot = 2;
+  Id ncov_tot = 2;
   // Feature to be tested:
   // -1: all the covariances
   //  0: one covariance
   //  1: two covariances
-  int ncov_ref = -1;
+  Id ncov_ref = -1;
 
   bool showStats = false;
 
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
   // Loop for usage of Cholesky
 
-  for (int ncov = 0; ncov < ncov_tot; ncov++)
+  for (Id ncov = 0; ncov < ncov_tot; ncov++)
   {
     if (ncov_ref >= 0 && ncov_ref != ncov) continue;
 
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
     if (mode < 0 || mode == 0)
     {
       MeshETurbo mesh(grid);
-      for (int icov = 0; icov <= ncov; icov++)
+      for (Id icov = 0; icov <= ncov; icov++)
       {
         timer.reset();
         ShiftOpMatrix shiftop(&mesh, model->getCovAniso(icov), nullptr);
@@ -131,11 +131,11 @@ int main(int argc, char* argv[])
       }
     }
 
-    for (int ifois = 0; ifois < nfois; ifois++)
+    for (Id ifois = 0; ifois < nfois; ifois++)
     {
       if (ifois_ref >= 0 && ifois != ifois_ref) continue;
 
-      int useCholesky = ifois;
+      Id useCholesky  = ifois;
       String option   = (ifois == 0) ? ".NoChol" : ".Chol";
       if (showStats)
         message("- Cholesky Option        = %d\n", useCholesky);
@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
         SPDEParam params;
         params.setNMC(10);
         (void)krigingSPDE(dat, grid, model, true, true, useCholesky,
-                          VectorMeshes(), nullptr, VectorMeshes(), nullptr, params, verbose,
+                          nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, params, verbose,
                           NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 400);
       }
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
         namconv.append(sncov);
         law_set_random_seed(seed);
         (void)simulateSPDE(nullptr, grid, model, nsim, useCholesky,
-                           VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                           nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
                            SPDEParam(), verbose,
                            NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 1350);
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
         namconv.append(sncov);
         law_set_random_seed(seed);
         (void)simulateSPDE(dat, grid, model, nsim, useCholesky,
-                           VectorMeshes(), nullptr, VectorMeshes(), nullptr,
+                           nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
                            SPDEParam(), verbose,
                            NamingConvention(namconv));
         timer.displayIntervalMilliseconds(namconv, 3130);

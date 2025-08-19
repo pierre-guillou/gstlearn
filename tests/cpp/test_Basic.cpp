@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
   // This results in adding a field (commonly referred to as a variable) in mygrid which is called Data.
   // Typing the name of the grid data base is an easy way to get a summary of its contents.
 
-  int nbtuba = 1000;
-  int seed   = 14341;
+  Id nbtuba = 1000;
+  Id seed   = 14341;
   (void)simtub(nullptr, mygrid, mymodel, nullptr, 1, seed, nbtuba, false, false,
                NamingConvention("Data"));
   mygrid->display();
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
   // We calculate a variogram along the two main directions of the Model, i.e. 30 and 120 degrees.
 
-  int nlag               = 25;
+  Id nlag                = 25;
   double dlag            = 2.;
   angles                 = {30., 120.};
   VarioParam* varioparam = VarioParam::createSeveral2D(angles, nlag, dlag);

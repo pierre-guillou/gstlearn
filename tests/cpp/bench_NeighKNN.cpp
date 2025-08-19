@@ -23,10 +23,10 @@ using namespace gstlrn;
 
 VectorDouble getSortedDistance(Db* data, const VectorInt& ranks, const SpaceTarget& Pt)
 {
-  int size = (int)ranks.size();
+  Id size = static_cast<Id>(ranks.size());
   SpaceTarget Dt;
   VectorDouble dist(size, TEST);
-  for (int iech = 0; iech < size; iech++)
+  for (Id iech = 0; iech < size; iech++)
   {
     data->getSampleAsSTInPlace(ranks[iech], Dt);
     dist = Pt.getDistance(Dt);
@@ -54,16 +54,16 @@ int main(int argc, char* argv[])
   Timer timer;
 
   // Main parameters
-  int ndat      = 100000;
-  int ntarget   = 1000;
-  int nmaxi     = 20;
-  int leaf_size = 20;
-  int mode      = 0;
-  bool verbose  = false;
+  Id ndat      = 100000;
+  Id ntarget   = 1000;
+  Id nmaxi     = 20;
+  Id leaf_size = 20;
+  Id mode      = 0;
+  bool verbose = false;
 
   // Generate the input data base
-  int ndim = 2;
-  int nvar = 1;
+  Id ndim  = 2;
+  Id nvar  = 1;
   Db* data = Db::createFillRandom(ndat, ndim, nvar);
 
   // Generate the output data base
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
     timer.reset();
     if (verbose) message("Data Indices for each Target Neighborhood\n");
     VectorInt indices1;
-    for (int i = 0; i < ntarget; i++)
+    for (Id i = 0; i < ntarget; i++)
     {
       target->getSampleAsSTInPlace(i, Pt);
       neigh1->getNeigh(i, indices1);
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
     timer.reset();
     if (verbose) message("Data Indices for each Target Neighborhood\n");
     VectorInt indices2;
-    for (int i = 0; i < ntarget; i++)
+    for (Id i = 0; i < ntarget; i++)
     {
       target->getSampleAsSTInPlace(i, Pt);
       neigh2->getNeigh(i, indices2);
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
   // Compare the set of indices
   if (mode <= 0)
   {
-    for (int i = 0; i < ntarget; i++)
+    for (Id i = 0; i < ntarget; i++)
       if (!VH::isEqual(checkDistances1[i], checkDistances2[i], 0.01))
       {
         messerr("Vector of indices are different at rank %d", i);

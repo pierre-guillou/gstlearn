@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Eden-");
 
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   law_set_random_seed(32131);
 
   defineDefaultSpace(ESpaceType::RN, ndim);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   (void)simtub(nullptr, grid, model);
 
   // Operate a transformation to convert into 3 (nested) facies
-  int nfacies        = 3;
+  Id nfacies         = 3;
   double thresh      = 1.;
   VectorDouble vmini = {TEST, -thresh, thresh};
   VectorDouble vmaxi = {-thresh, thresh, TEST};
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   grid->setName("Category*", "Facies");
 
   // Add a Fluid information
-  int nfluids = 1;
+  Id nfluids = 1;
   grid->addColumnsByConstant(nfluids, TEST, "Fluid");
   (void)grid->assignGridColumn("Fluid", 0, 100, 1.);
 
@@ -74,9 +74,9 @@ int main(int argc, char* argv[])
   // Speed: (dir + 6 * (facies * nfluids + fluid))
   // Direction = 0: +X; 1: -X; 2: +Y; 3: -Y; 4: +Z(up); 5: -Z(down)
 
-  int sl           = 1;
-  int sm           = 3;
-  int sh           = 10;
+  Id sl            = 1;
+  Id sm            = 3;
+  Id sh            = 10;
   VectorInt speeds = {sm, sm, sm, sm, sl, sl,
                       sh, sh, sh, sh, sl, sl,
                       sl, sl, sl, sl, sl, sl};

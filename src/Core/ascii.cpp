@@ -33,10 +33,13 @@
 #define NODE_RANK(inode) (nodes[6 * (inode) + 4])
 #define FACIES(inode)    (nodes[6 * (inode) + 5])
 
-static int ASCII_BUFFER_LENGTH = 0;
-static int ASCII_BUFFER_QUANT  = 1000;
-static char* ASCII_BUFFER      = NULL;
-static FILE* FILE_MEM          = NULL;
+namespace gstlrn
+{
+
+static Id ASCII_BUFFER_LENGTH = 0;
+static Id ASCII_BUFFER_QUANT  = 1000;
+static char* ASCII_BUFFER     = NULL;
+static FILE* FILE_MEM         = NULL;
 static char FILE_NAME_MEM[BUFFER_LENGTH];
 
 /*! \endcond */
@@ -56,8 +59,6 @@ static char Fichier_rule[]       = "Rule";
 static char Fichier_simu[]       = "Simu";
 static char Fichier_frac[]       = "Frac";
 
-namespace gstlrn
-{
 /****************************************************************************/
 /*!
  **  Read the next record
@@ -69,11 +70,11 @@ namespace gstlrn
  ** \param[in]  ...        Value to be written
  **
  *****************************************************************************/
-static int st_record_read(const char* title, const char* format, ...)
+static Id st_record_read(const char* title, const char* format, ...)
 {
   va_list ap;
 
-  int error;
+  Id error;
   va_start(ap, format);
 
   if (FILE_MEM != nullptr)
@@ -107,7 +108,7 @@ static void st_record_write(const char* format, ...)
 {
   va_list ap;
   char buf[1000];
-  int long1, long2;
+  Id long1, long2;
 
   va_start(ap, format);
   if (FILE_MEM != nullptr)
@@ -117,8 +118,8 @@ static void st_record_write(const char* format, ...)
   else
   {
     _buffer_write(buf, format, ap);
-    long1 = static_cast<int>(strlen(buf));
-    long2 = (ASCII_BUFFER != NULL) ? static_cast<int>(strlen(ASCII_BUFFER)) : 0;
+    long1 = static_cast<Id>(strlen(buf));
+    long2 = (ASCII_BUFFER != nullptr) ? static_cast<Id>(strlen(ASCII_BUFFER)) : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
@@ -148,8 +149,8 @@ static void st_record_write(const char* format, ...)
  **
  *****************************************************************************/
 static void st_filename_patch(const char* ref_name,
-                              int rank,
-                              int mode,
+                              Id rank,
+                              Id mode,
                               char* file_name)
 {
   if (rank == 0)
@@ -238,7 +239,7 @@ static void st_filename_patch(const char* ref_name,
  ** \param[out] filename  Output filename
  **
  *****************************************************************************/
-void ascii_filename(const char* type, int rank, int mode, char* filename)
+void ascii_filename(const char* type, Id rank, Id mode, char* filename)
 {
   if (!strcmp(type, "Environ"))
     st_filename_patch(Fichier_environ, rank, mode, filename);
@@ -308,7 +309,7 @@ static void st_file_close(FILE* file)
  *****************************************************************************/
 static FILE* st_file_open(const char* filename,
                           const char* filetype,
-                          int mode,
+                          Id mode,
                           bool verbose)
 {
   FILE* file;
@@ -347,7 +348,7 @@ static FILE* st_file_open(const char* filename,
   }
   else
   {
-    if (filetype != NULL)
+    if (filetype != nullptr)
     {
       st_record_write("%s", filetype);
       st_record_write("\n");
@@ -370,7 +371,7 @@ void ascii_environ_read(char* file_name, bool verbose)
 {
   FILE* file;
   char name[10];
-  int debug;
+  Id debug;
 
   /* Opening the Data file */
 
@@ -408,9 +409,9 @@ label_end:
  *****************************************************************************/
 void ascii_simu_read(char* file_name,
                      bool verbose,
-                     int* nbsimu,
-                     int* nbtuba,
-                     int* seed)
+                     Id* nbsimu,
+                     Id* nbtuba,
+                     Id* seed)
 {
   FILE* file;
 
@@ -451,16 +452,16 @@ void ascii_simu_read(char* file_name,
  ** \param[out]  answer      Answer
  **
  *****************************************************************************/
-int ascii_option_defined(const char* file_name,
-                         bool verbose,
-                         const char* option_name,
-                         int type,
-                         void* answer)
+Id ascii_option_defined(const char* file_name,
+                        bool verbose,
+                        const char* option_name,
+                        Id type,
+                        void* answer)
 {
   FILE* file;
   char keyword[100], keyval[100];
   double rval;
-  int lrep, ival;
+  Id lrep, ival;
 
   /* Initializations */
 
@@ -485,17 +486,17 @@ int ascii_option_defined(const char* file_name,
       case 0:
         ival = 0;
         if (!strcmp(keyval, "Y") || !strcmp(keyval, "YES") || !strcmp(keyval, "y") || !strcmp(keyval, "yes") || atoi(keyval) == 1) ival = 1;
-        *((int*)answer) = ival;
+        *(static_cast<Id*>(answer)) = ival;
         break;
 
       case 1:
-        ival            = atoi(keyval);
-        *((int*)answer) = ival;
+        ival           = atoi(keyval);
+        *(static_cast<Id*>(answer)) = ival;
         break;
 
       case 2:
         rval               = atof(keyval);
-        *((double*)answer) = rval;
+        *(static_cast<double*>(answer)) = rval;
         break;
     }
     lrep = 1;
@@ -524,12 +525,12 @@ label_end:
 Db* db_read_csv(const char* file_name,
                 const CSVformat& csvfmt,
                 bool verbose,
-                int ncol_max,
-                int nrow_max,
+                Id ncol_max,
+                Id nrow_max,
                 bool flagAddSampleRank)
 {
   Db* db;
-  int ncol, nrow;
+  Id ncol, nrow;
   VectorString names;
   VectorDouble tab;
 
@@ -550,9 +551,9 @@ Db* db_read_csv(const char* file_name,
 
   /* Loading the names */
 
-  for (int i = 0; i < ncol; i++)
+  for (Id i = 0; i < ncol; i++)
   {
-    int j = (flagAddSampleRank) ? i + 1 : i;
+    Id j = (flagAddSampleRank) ? i + 1 : i;
     db->setNameByUID(j, names[i]);
   }
 

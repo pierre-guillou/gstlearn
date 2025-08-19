@@ -25,7 +25,7 @@ class Model;
 class GSTLEARN_EXPORT AnamHermite: public AnamContinuous
 {
 public:
-  AnamHermite(int nbpoly = 3, bool flagBound = true, double rCoef = 1.);
+  AnamHermite(Id nbpoly = 3, bool flagBound = true, double rCoef = 1.);
   AnamHermite(const AnamHermite& m);
   AnamHermite& operator=(const AnamHermite& m);
   virtual ~AnamHermite();
@@ -39,15 +39,15 @@ public:
   /// Interface AAnam
   const EAnam& getType() const override { return EAnam::fromKey("HERMITIAN"); }
   bool hasFactor() const override { return true; }
-  int getNFactor() const override { return getNbPoly(); }
+  Id getNFactor() const override { return getNbPoly(); }
   VectorDouble z2factor(double z, const VectorInt& ifacs) const override;
   double computeVariance(double chh) const override;
-  int updatePointToBlock(double r_coef) override;
+  Id updatePointToBlock(double r_coef) override;
   bool allowChangeSupport() const override { return true; }
   bool isChangeSupportDefined() const override { return (_rCoef < 1.); }
-  int getNClass() const override { return getNbPoly(); }
+  Id getNClass() const override { return getNbPoly(); }
 
-  int fitFromArray(const VectorDouble& tab,
+  Id fitFromArray(const VectorDouble& tab,
                    const VectorDouble& wt = VectorDouble()) override;
 
   /// ASerializable Interface
@@ -58,7 +58,7 @@ public:
   double transformToRawValue(double y) const override;
   void calculateMeanAndVariance() override;
 
-  static AnamHermite* create(int nbpoly = 0, bool flagBound = true, double rCoef = 1.);
+  static AnamHermite* create(Id nbpoly = 0, bool flagBound = true, double rCoef = 1.);
 
   void reset(double pymin,
              double pzmin,
@@ -71,24 +71,24 @@ public:
              double r,
              const VectorDouble& psi_hn);
 
-  int getNbPoly() const { return (int)_psiHn.size(); }
+  Id getNbPoly() const { return static_cast<Id>(_psiHn.size()); }
   VectorDouble getPsiHns() const;
-  double getPsiHn(int ih) const;
+  double getPsiHn(Id ih) const;
   double getRCoef() const { return _rCoef; }
   bool getFlagBound() const { return _flagBound; }
 
   void setPsiHns(const VectorDouble& psi_hn) { _psiHn = psi_hn; }
   void setFlagBound(bool flagBound) { _flagBound = flagBound; }
-  void setPsiHn(int i, double psi_hn);
+  void setPsiHn(Id i, double psi_hn);
   void setRCoef(double r_coef);
 
-  int factor2Selectivity(Db* db,
+  Id factor2Selectivity(Db* db,
                          Selectivity* selectivity,
                          const VectorInt& cols_est,
                          const VectorInt& cols_std,
-                         int iptr0);
+                         Id iptr0);
 
-  double evalSupportCoefficient(int option,
+  double evalSupportCoefficient(Id option,
                                 Model* model,
                                 const VectorDouble& dxs,
                                 const VectorInt& ndisc,
@@ -107,7 +107,7 @@ protected:
   String _getNFName() const override { return "AnamHermite"; }
 
 private:
-  bool _isIndexValid(int i) const;
+  bool _isIndexValid(Id i) const;
   void _defineBounds(double pymin,
                      double pzmin,
                      double pymax,
@@ -116,7 +116,7 @@ private:
                      double azmin,
                      double aymax,
                      double azmax);
-  static int _data_sort(int nech,
+  static Id _data_sort(Id nech,
                         const VectorDouble& z,
                         const VectorDouble& wt,
                         VectorDouble& zs,

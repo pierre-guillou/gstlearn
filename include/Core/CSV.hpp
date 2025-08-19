@@ -20,10 +20,10 @@ namespace gstlrn
 class CSVformat;
 class Db;
 
-GSTLEARN_EXPORT int csv_manage(const char* filename,
+GSTLEARN_EXPORT Id csv_manage(const char* filename,
                                const CSVformat& csv,
-                               int mode,
-                               int nitem,
+                               Id mode,
+                               Id nitem,
                                bool flagInteger = false,
                                bool verbose     = false);
 GSTLEARN_EXPORT void csv_print_double(double value);
@@ -31,22 +31,22 @@ GSTLEARN_EXPORT void csv_print_double(double value);
 GSTLEARN_EXPORT Db* db_read_csv(const char* file_name,
                                 const CSVformat& csvfmt,
                                 bool verbose           = false,
-                                int ncol_max           = -1,
-                                int nrow_max           = -1,
+                                Id ncol_max           = -1,
+                                Id nrow_max           = -1,
                                 bool flagAddSampleRank = false);
-GSTLEARN_EXPORT int db_write_csv(Db* db,
+GSTLEARN_EXPORT Id db_write_csv(Db* db,
                                  const char* filename,
                                  const CSVformat& csv,
-                                 int flag_allcol  = 1,
-                                 int flag_coor    = 1,
+                                 Id flag_allcol  = 1,
+                                 Id flag_coor    = 1,
                                  bool flagInteger = false);
-GSTLEARN_EXPORT int csv_table_read(const String& filename,
+GSTLEARN_EXPORT Id csv_table_read(const String& filename,
                                    const CSVformat& csvfmt,
                                    bool verbose,
-                                   int ncol_max,
-                                   int nrow_max,
-                                   int* ncol_arg,
-                                   int* nrow_arg,
+                                   Id ncol_max,
+                                   Id nrow_max,
+                                   Id* ncol_arg,
+                                   Id* nrow_arg,
                                    VectorString& names,
                                    VectorDouble& tab);
 } // namespace gstlrn

@@ -91,9 +91,9 @@ namespace gstlrn
 typedef struct
 {
   std::vector<SPDE_Matelem> Matelems;
-  int ndata;               /* Number of active data */
-  int* ndata1;             /* Number of data per variable (icov=0) */
-  int* ntarget1;           /* Number of target per variable (icov=0) */
+  Id ndata;                /* Number of active data */
+  Id* ndata1;              /* Number of data per variable (icov=0) */
+  Id* ntarget1;            /* Number of target per variable (icov=0) */
   Model* model;            /* Pointer to the Model */
   double* Csill;           /* Array of LU of sill matrices */
   MatrixSparse** Bnugget;  /* Sparse matrices for nugget effect (nvs2) */
@@ -103,9 +103,9 @@ typedef struct
 
 typedef struct
 {
-  int ndim;  /* Space Dimension */
-  int nvar;  /* Number of variables */
-  int ngrfs; /* Number of GRFs */
+  Id ndim;  /* Space Dimension */
+  Id nvar;  /* Number of variables */
+  Id ngrfs; /* Number of GRFs */
   SPDE_SS_Environ SS_ENV[SPDE_MAX_NGRF];
 } SPDE_Environ;
 
@@ -117,7 +117,7 @@ typedef struct
   bool flag_mesh_dbout; /* Output points participate to meshing */
   bool flag_est;        /* Perform Estimation */
   bool flag_std;        /* Perform Standard deviation */
-  int flag_case;        /* Perform: matrices(0), est(1) or simu(2) */
+  Id flag_case;         /* Perform: matrices(0), est(1) or simu(2) */
   bool flag_gibbs;      /* Perform Gibbs sampling */
   bool flag_modif;      /* Post-processing simulations */
   bool flag_onechol;    /* Perform Simu & Kriging with same Chol */
@@ -131,9 +131,9 @@ typedef struct
 
 typedef struct
 {
-  int flag_ed;
-  int iatt_fd;
-  int iatt_fg;
+  Id flag_ed;
+  Id iatt_fd;
+  Id iatt_fg;
   double zmean;
   double zstdv;
   double zeps;
@@ -147,7 +147,7 @@ typedef struct
 
 typedef struct
 {
-  int flag_sphere;
+  Id flag_sphere;
   double sqdeth;
   double correc;
   double R;
@@ -163,16 +163,16 @@ struct QChol
   CholeskySparse* chol;
 };
 
-static void (*SIMU_FUNC_UPDATE)(Db*, int, int, int) = NULL;
-static void (*SIMU_FUNC_SCALE)(Db*, int, int)       = NULL;
+static void (*SIMU_FUNC_UPDATE)(Db*, Id, Id, Id) = NULL;
+static void (*SIMU_FUNC_SCALE)(Db*, Id, Id)      = NULL;
 
 /*! \endcond */
-static int DEBUG                     = 0;
-static int VERBOSE                   = 0;
-static int FLAG_KEYPAIR              = 0;
+static Id DEBUG                      = 0;
+static Id VERBOSE                    = 0;
+static Id FLAG_KEYPAIR               = 0;
 static double FACDIM[]               = {0., 1., 2., 6.};
-static int SPDE_CURRENT_IGRF         = 0;
-static int SPDE_CURRENT_ICOV         = 0;
+static Id SPDE_CURRENT_IGRF          = 0;
+static Id SPDE_CURRENT_ICOV          = 0;
 static AMesh* S_EXTERNAL_MESH[3]     = {NULL, NULL, NULL};
 static MatrixSparse* S_EXTERNAL_Q[3] = {NULL, NULL, NULL};
 static MatrixSparse* S_EXTERNAL_A[3] = {NULL, NULL, NULL};
@@ -186,14 +186,14 @@ static bool is_chol_ready(QChol* QC)
   return QC->chol != nullptr;
 }
 
-int qchol_getNRows(QChol* QC)
+Id qchol_getNRows(QChol* QC)
 {
   if (QC == nullptr) return 0;
   if (QC->Q == nullptr) return 0;
   return QC->Q->getNRows();
 }
 
-int qchol_getNCols(QChol* QC)
+Id qchol_getNCols(QChol* QC)
 {
   if (QC == nullptr) return 0;
   if (QC->Q == nullptr) return 0;
@@ -214,7 +214,7 @@ int qchol_getNCols(QChol* QC)
  ** \remarks If the decomposition is already performed, nothing is done
  **
  *****************************************************************************/
-static int qchol_cholesky(int verbose, QChol* QC)
+static Id qchol_cholesky(Id verbose, QChol* QC)
 {
   /* Check that the Q matrix has already been defined */
 
@@ -273,12 +273,12 @@ static void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const do
   DECLARE_UNUSED(work);
   DECLARE_UNUSED(work);
   if (DEBUG) message("Cholesky Inversion\n");
-  int n = qchol_getNCols(qctt);
+  auto n = qchol_getNCols(qctt);
 
   VectorDouble rhsVD(n);
-  for (int i = 0; i < n; i++) rhsVD[i] = rhs[i];
+  for (Id i = 0; i < n; i++) rhsVD[i] = rhs[i];
   VectorDouble xcrVD = qctt->chol->solveX(rhsVD);
-  for (int i = 0; i < n; i++) xcr[i] = xcrVD[i];
+  for (Id i = 0; i < n; i++) xcr[i] = xcrVD[i];
 }
 
 /****************************************************************************/
@@ -294,13 +294,13 @@ static void cs_chol_invert(QChol* qctt, double* xcr, const double* rhs, const do
 static void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
 {
   if (DEBUG) message("Cholesky Simulation\n");
-  int n = qchol_getNCols(qctt);
+  auto n = qchol_getNCols(qctt);
 
   VectorDouble simuVD(n);
   VectorDouble workVD(n);
-  for (int i = 0; i < n; i++) workVD[i] = work[i];
+  for (Id i = 0; i < n; i++) workVD[i] = work[i];
   (void)qctt->chol->addSimulateToDest(workVD, simuVD);
-  for (int i = 0; i < n; i++) simu[i] = simuVD[i];
+  for (Id i = 0; i < n; i++) simu[i] = simuVD[i];
 }
 
 /****************************************************************************/
@@ -316,7 +316,7 @@ static void cs_chol_simulate(QChol* qctt, double* simu, const double* work)
  ** \remarks order between 'ivar' and 'jvar'
  **
  *****************************************************************************/
-static int st_get_rank(int ivar, int jvar)
+static Id st_get_rank(Id ivar, Id jvar)
 {
   if (jvar > ivar) return (jvar * (jvar + 1) / 2 + ivar);
   return (ivar * (ivar + 1) / 2 + jvar);
@@ -329,7 +329,7 @@ static int st_get_rank(int ivar, int jvar)
  ** \param[in] icov    Rank of the covariance
  **
  *****************************************************************************/
-static void st_matelem_print(int icov)
+static void st_matelem_print(Id icov)
 {
   static const char* NOK[] = {"OFF", "ON"};
 
@@ -366,7 +366,7 @@ static SPDE_Option st_spde_option_alloc(void)
  ** \param[in] icov    Rank of the target Covariance (or -1)typedef struct
  **
  *****************************************************************************/
-SPDE_Matelem& spde_get_current_matelem(int icov)
+SPDE_Matelem& spde_get_current_matelem(Id icov)
 {
   if (icov < 0)
     return (MATGRF(SPDE_CURRENT_IGRF)->Matelems[SPDE_CURRENT_ICOV]);
@@ -384,9 +384,9 @@ SPDE_Matelem& spde_get_current_matelem(int icov)
  ** \param[in]  title      Input title
  **
  *****************************************************************************/
-static void st_title(int flag_igrf, int flag_icov, int rank, const char* title)
+static void st_title(Id flag_igrf, Id flag_icov, Id rank, const char* title)
 {
-  int flag_decor;
+  Id flag_decor;
 
   (void)gslStrcpy(string_encode, " ");
 
@@ -433,9 +433,9 @@ static Model* st_get_model(void)
  **  Returns the number of GRFs of the environment
  **
  *****************************************************************************/
-static int st_get_number_grf(void)
+static Id st_get_number_grf(void)
 {
-  int ngrfs;
+  Id ngrfs;
   ngrfs = MAX(1, S_ENV.ngrfs);
   return (ngrfs);
 }
@@ -452,7 +452,7 @@ static void st_environ_init(void)
   S_ENV.ndim  = 0;
   S_ENV.nvar  = 0;
   S_ENV.ngrfs = 0;
-  for (int igrf = 0; igrf < SPDE_MAX_NGRF; igrf++)
+  for (Id igrf = 0; igrf < SPDE_MAX_NGRF; igrf++)
   {
     SS           = &S_ENV.SS_ENV[igrf];
     SS->ndata    = 0;
@@ -473,7 +473,7 @@ static void st_environ_init(void)
  ** \param[in]  st_simu_update  Pointer to the update function
  **
  *****************************************************************************/
-void simu_define_func_update(void (*st_simu_update)(Db*, int, int, int))
+void simu_define_func_update(void (*st_simu_update)(Db*, Id, Id, Id))
 {
   SIMU_FUNC_UPDATE = st_simu_update;
 }
@@ -485,7 +485,7 @@ void simu_define_func_update(void (*st_simu_update)(Db*, int, int, int))
  ** \param[in]  st_simu_scale  Pointer to the scaling function
  **
  *****************************************************************************/
-void simu_define_func_scale(void (*st_simu_scale)(Db*, int, int))
+void simu_define_func_scale(void (*st_simu_scale)(Db*, Id, Id))
 {
   SIMU_FUNC_SCALE = st_simu_scale;
 }
@@ -513,7 +513,7 @@ static CovAniso* st_get_nugget(void)
   CovAniso* cova;
 
   model = st_get_model();
-  for (int is = 0; is < model->getNCov(); is++)
+  for (Id is = 0; is < model->getNCov(); is++)
   {
     cova = model->getCovAniso(is);
     if (cova->getType() == ECov::NUGGET) return (cova);
@@ -531,12 +531,12 @@ static CovAniso* st_get_cova(void)
 {
   Model* model;
   CovAniso* cova;
-  int is0, jcov;
+  Id is0, jcov;
 
   model = st_get_model();
   is0   = SPDE_CURRENT_ICOV;
 
-  for (int icov = jcov = 0; icov < model->getNCov(); icov++)
+  for (Id icov = jcov = 0; icov < model->getNCov(); icov++)
   {
     cova = model->getCovAniso(icov);
     if (cova->getType() == ECov::NUGGET) continue;
@@ -565,7 +565,7 @@ static void st_set_model(Model* model)
  **  Return the number of variables of the environment
  **
  *****************************************************************************/
-static int st_get_nvs2(void)
+static Id st_get_nvs2(void)
 {
   return (S_ENV.nvar * (S_ENV.nvar + 1) / 2);
 }
@@ -575,7 +575,7 @@ static int st_get_nvs2(void)
  **  Return if a nugget effect component must be filtered
  **
  *****************************************************************************/
-static int st_get_filnug(void)
+static Id st_get_filnug(void)
 {
   return (S_DECIDE.flag_filnug && S_DECIDE.flag_case == CASE_KRIGING);
 }
@@ -587,7 +587,7 @@ static int st_get_filnug(void)
  ** \param[in]  flag_filnug  Flag to define if a nugget effect must be filtered
  **
  *****************************************************************************/
-static void st_set_filnug(int flag_filnug)
+static void st_set_filnug(Id flag_filnug)
 {
   if (DEBUG) st_title(0, 0, -1, "(DEBUG) Set 'filnug'");
   S_DECIDE.flag_filnug = flag_filnug;
@@ -599,9 +599,9 @@ static void st_set_filnug(int flag_filnug)
  **  a pair of variables
  **
  *****************************************************************************/
-static double st_get_isill(int icov, int ivar, int jvar)
+static double st_get_isill(Id icov, Id ivar, Id jvar)
 {
-  int nvar                    = S_ENV.nvar;
+  Id nvar                     = S_ENV.nvar;
   const SPDE_Matelem& Maticov = spde_get_current_matelem(icov);
   double value                = Maticov.Isill[(jvar) + nvar * (ivar)];
   return (value);
@@ -620,14 +620,14 @@ static void st_clean_Bhetero(void)
 
   /* Clean the vector of number of data / target per variable */
 
-  SS->ndata1   = (int*)mem_free((char*)SS->ndata1);
-  SS->ntarget1 = (int*)mem_free((char*)SS->ntarget1);
+  SS->ndata1   = (Id*)mem_free((char*)SS->ndata1);
+  SS->ntarget1 = (Id*)mem_free((char*)SS->ntarget1);
 
   /* Clean the sparse matrices for heterotopy at data points */
 
   if (SS->BheteroD != nullptr)
   {
-    for (int ivar = 0; ivar < S_ENV.nvar; ivar++)
+    for (Id ivar = 0; ivar < S_ENV.nvar; ivar++)
       delete SS->BheteroD[ivar];
     delete SS->BheteroD;
     SS->BheteroD = nullptr;
@@ -637,7 +637,7 @@ static void st_clean_Bhetero(void)
 
   if (SS->BheteroT != nullptr)
   {
-    for (int ivar = 0; ivar < S_ENV.nvar; ivar++)
+    for (Id ivar = 0; ivar < S_ENV.nvar; ivar++)
       delete SS->BheteroT[ivar];
     delete SS->BheteroT;
     SS->BheteroT = nullptr;
@@ -656,7 +656,7 @@ static void st_clean_Bnugget(void)
   SS = MATGRF(SPDE_CURRENT_IGRF);
   if (SS->Bnugget != nullptr)
   {
-    for (int i = 0; i < st_get_nvs2(); i++)
+    for (Id i = 0; i < st_get_nvs2(); i++)
       delete SS->Bnugget[i];
     delete SS->Bnugget;
     SS->Bnugget = nullptr;
@@ -670,7 +670,7 @@ static void st_clean_Bnugget(void)
  ** \param[in]  auth    Status option
  **
  *****************************************************************************/
-static void st_print_status(int auth)
+static void st_print_status(Id auth)
 
 {
   if (auth & VT_OTHER) message("OTHER ");
@@ -689,7 +689,7 @@ static void st_print_status(int auth)
  ** \param[in]  auth    Filter option
  **
  *****************************************************************************/
-static void st_qchol_filter(const char* title, int auth)
+static void st_qchol_filter(const char* title, Id auth)
 {
   message("%s = ", title);
   st_print_status(auth);
@@ -709,19 +709,19 @@ static void st_qchol_filter(const char* title, int auth)
  ** \remarks The Cholesky decomposition is performed (if possible)
  **
  *****************************************************************************/
-static MatrixSparse* st_extract_Q_from_Q(MatrixSparse* Q_in, int row_auth, int col_auth)
+static MatrixSparse* st_extract_Q_from_Q(MatrixSparse* Q_in, Id row_auth, Id col_auth)
 {
   DECLARE_UNUSED(row_auth, col_auth);
 
   /* Initializations */
 
-  int n_in = Q_in->getNCols();
+  Id n_in = Q_in->getNCols();
   VectorInt rank_rows(n_in);
   VectorInt rank_cols(n_in);
 
   /* Fill the index vectors */
 
-  for (int i = 0; i < n_in; i++)
+  for (Id i = 0; i < n_in; i++)
   {
     rank_rows[i] = i;
     rank_cols[i] = i;
@@ -744,7 +744,7 @@ static MatrixSparse* st_extract_Q_from_Q(MatrixSparse* Q_in, int row_auth, int c
  ** \param[in]  QC         Pointer to the QChol structure (when mode < 0)
  **
  *****************************************************************************/
-static QChol* st_qchol_manage(int mode, QChol* QC)
+static QChol* st_qchol_manage(Id mode, QChol* QC)
 {
 
   /* Dispatch */
@@ -781,10 +781,10 @@ static QChol* st_qchol_manage(int mode, QChol* QC)
  *****************************************************************************/
 static QChol* st_extract_QC_from_Q(const char* title,
                                    QChol* QC_in,
-                                   int row_auth,
-                                   int col_auth)
+                                   Id row_auth,
+                                   Id col_auth)
 {
-  int error;
+  Id error;
   QChol* QC;
 
   /* Initializations */
@@ -827,9 +827,9 @@ label_end:
  ** \param[in]  qsimu       QSimu structure
  **
  *****************************************************************************/
-static QSimu* st_qsimu_manage(int mode, QSimu* qsimu)
+static QSimu* st_qsimu_manage(Id mode, QSimu* qsimu)
 {
-  int error;
+  Id error;
 
   /* Initializations */
 
@@ -890,7 +890,7 @@ label_end:
  ** \remarks of the variables
  **
  *****************************************************************************/
-static double st_get_nugget_sill(int ivar, int jvar)
+static double st_get_nugget_sill(Id ivar, Id jvar)
 {
   CovAniso* cova = st_get_nugget();
   if (cova == nullptr) return (TEST);
@@ -908,7 +908,7 @@ static double st_get_nugget_sill(int ivar, int jvar)
  ** \remarks of the structure or of the variables
  **
  *****************************************************************************/
-static double st_get_cova_sill(int ivar, int jvar)
+static double st_get_cova_sill(Id ivar, Id jvar)
 {
   CovAniso* cova = st_get_cova();
   return (cova->getSill(ivar, jvar));
@@ -929,17 +929,17 @@ static double st_get_cova_param(void)
  **  Returns the number of structures in the Model (nugget excluded)
  **
  *****************************************************************************/
-static int st_get_ncova(void)
+static Id st_get_ncova(void)
 
 {
   Model* model;
   CovAniso* cova;
-  int ncova;
+  Id ncova;
 
   ncova = 0;
   model = st_get_model();
   if (model == nullptr) return (ncova);
-  for (int is = 0; is < model->getNCov(); is++)
+  for (Id is = 0; is < model->getNCov(); is++)
   {
     cova = model->getCovAniso(is);
     if (cova->getType() != ECov::NUGGET) ncova++;
@@ -954,7 +954,7 @@ static int st_get_ncova(void)
  ** \param[in] icov    Rank of the target Covariance (or -1)
  **
  *****************************************************************************/
-static int st_get_nvertex(int icov)
+static Id st_get_nvertex(Id icov)
 {
   return (spde_get_current_matelem(icov).amesh->getNApices());
 }
@@ -980,14 +980,14 @@ static double st_get_cova_range(void)
  ** \remarks of the variables
  **
  *****************************************************************************/
-static double st_get_sill_total(int ivar, int jvar)
+static double st_get_sill_total(Id ivar, Id jvar)
 {
   double total = 0.;
 
   CovAniso* cova = st_get_nugget();
   if (cova != nullptr) total += cova->getSill(ivar, jvar);
 
-  for (int icov = 0; icov < st_get_ncova(); icov++)
+  for (Id icov = 0; icov < st_get_ncova(); icov++)
   {
     SPDE_CURRENT_ICOV = icov;
     cova              = st_get_cova();
@@ -1008,7 +1008,7 @@ static void st_print_all(const char* title)
 
   /* Initializations */
 
-  int ndim       = S_ENV.ndim;
+  Id ndim        = S_ENV.ndim;
   CovAniso* cova = st_get_cova();
 
   /* Print the title */
@@ -1023,7 +1023,7 @@ static void st_print_all(const char* title)
   message("Alpha                 = %lf\n", st_get_cova_param() + ndim / 2.);
   message("Total Sill            = %lf\n", st_get_sill_total(0, 0));
   message("Ranges                = ");
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     message("%lf ", st_get_cova_range() * cova->getAnisoCoeff(idim));
   message("\n");
 
@@ -1037,17 +1037,17 @@ static void st_print_all(const char* title)
 
   /* Linear combination */
 
-  int nblin = static_cast<int>(Calcul.blin.size());
+  Id nblin = static_cast<Id>(Calcul.blin.size());
   message("Number of terms in Linear Combination         = %d\n", nblin);
   print_matrix("Coefficients of the Linear Combination", 0, 1, 1, nblin, NULL,
                Calcul.blin.data());
 }
 
-static double st_spde_compute_correc(int ndim, double param)
+static double st_spde_compute_correc(Id ndim, double param)
 {
   double g0, ndims2, gammap, gammaa, value;
 
-  ndims2 = ((double)ndim) / 2.;
+  ndims2 = (static_cast<double>(ndim)) / 2.;
   gammap = exp(loggamma(param));
   gammaa = exp(loggamma(param + ndims2));
   g0     = pow(4. * GV_PI, ndims2);
@@ -1064,7 +1064,7 @@ static double st_spde_compute_correc(int ndim, double param)
 static void st_compute_correc(void)
 
 {
-  int ndim      = S_ENV.ndim;
+  Id ndim       = S_ENV.ndim;
   double param  = st_get_cova_param();
   double value  = st_spde_compute_correc(ndim, param);
   Calcul.correc = value;
@@ -1080,15 +1080,15 @@ static void st_compute_correc(void)
 static void st_compute_blin(void)
 {
   double ndims2, alpha, lambda, delta, correc;
-  int p, ndimp;
+  Id p, ndimp;
 
   /* Initializations */
 
-  int ndim     = S_ENV.ndim;
+  Id ndim      = S_ENV.ndim;
   double param = st_get_cova_param();
-  ndims2       = ((double)ndim) / 2.;
+  ndims2       = (static_cast<double>(ndim)) / 2.;
   alpha        = param + ndims2;
-  p            = (int)ceil(alpha);
+  p            = static_cast<Id>(ceil(alpha));
   ndimp        = p + 1;
   lambda       = alpha - floor(alpha);
   delta        = lambda - alpha;
@@ -1105,10 +1105,10 @@ static void st_compute_blin(void)
     MatrixSquare m(ndimp);
     MatrixSquare tp = ut_pascal(ndimp);
 
-    for (int idim = 0; idim < ndimp; idim++)
+    for (Id idim = 0; idim < ndimp; idim++)
     {
       v1[idim] = 1. / (2. * p - idim + delta);
-      for (int jdim = 0; jdim < ndimp; jdim++)
+      for (Id jdim = 0; jdim < ndimp; jdim++)
         m.setValue(idim, jdim, 1. / (2. * p - idim - jdim + lambda));
     }
     (void)m.invert();
@@ -1117,7 +1117,7 @@ static void st_compute_blin(void)
   }
   else
   {
-    for (int i = 0; i <= p; i++)
+    for (Id i = 0; i <= p; i++)
       Calcul.blin[i] = ut_cnp(p, i) * correc;
   }
 
@@ -1136,13 +1136,13 @@ static void st_compute_hh()
 
   /* Initializations */
 
-  int ndim       = S_ENV.ndim;
+  Id ndim        = S_ENV.ndim;
   CovAniso* cova = st_get_cova();
   VectorDouble temp(ndim * ndim, 0.);
 
   /* Processing */
 
-  for (int i = 0; i < ndim; i++)
+  for (Id i = 0; i < ndim; i++)
   {
     double scale = cova->getScale(i);
     if (Calcul.flag_sphere) scale /= Calcul.R;
@@ -1157,7 +1157,7 @@ static void st_compute_hh()
  **  Initialize the contents of SPDE_Calcul structure
  **
  *****************************************************************************/
-static void st_calcul_init(int ndim)
+static void st_calcul_init(Id ndim)
 {
   Calcul.flag_sphere = isDefaultSpaceSphere();
   Calcul.sqdeth      = 0.;
@@ -1166,9 +1166,9 @@ static void st_calcul_init(int ndim)
   Calcul.hh.resize(ndim * ndim, 0.);
   if (Calcul.flag_sphere)
   {
-    const ASpace* space    = getDefaultSpaceSh().get();
-    const SpaceSN* spaceSn = dynamic_cast<const SpaceSN*>(space);
-    Calcul.R               = spaceSn->getRadius();
+    const ASpace* space = getDefaultSpaceSh().get();
+    const auto* spaceSn = dynamic_cast<const SpaceSN*>(space);
+    Calcul.R            = spaceSn->getRadius();
     Calcul.srot.resize(2, 0.);
   }
   Calcul.vv.resize(ndim, 0.);
@@ -1181,7 +1181,7 @@ static void st_calcul_init(int ndim)
  *****************************************************************************/
 static void st_calcul_update(void)
 {
-  int ndim = S_ENV.ndim;
+  Id ndim = S_ENV.ndim;
 
   // Check that the structure has already been initiated
 
@@ -1245,10 +1245,10 @@ static void st_convert_exponential2matern(CovAniso* cova)
  ** \param[in]  model        Model structure
  **
  *****************************************************************************/
-static int st_check_model(const Db* dbin, const Db* dbout, Model* model)
+static Id st_check_model(const Db* dbin, const Db* dbout, Model* model)
 {
   CovAniso* cova;
-  int ndim, nvar, flag_mult_data, flag_nugget;
+  Id ndim, nvar, flag_mult_data, flag_nugget;
   double silltot, nugval;
 
   /* Check space dimension */
@@ -1265,7 +1265,7 @@ static int st_check_model(const Db* dbin, const Db* dbout, Model* model)
               ndim, dbin->getNDim());
       return (1);
     }
-    flag_mult_data = (int)get_keypone("Flag_Mult_Data", 0);
+    flag_mult_data = static_cast<Id>(get_keypone("Flag_Mult_Data", 0));
     if (flag_mult_data)
     {
       if (nvar != 1)
@@ -1307,7 +1307,7 @@ static int st_check_model(const Db* dbin, const Db* dbout, Model* model)
 
   silltot     = 0.;
   flag_nugget = 0;
-  for (int icov = 0; icov < model->getNCov(); icov++)
+  for (Id icov = 0; icov < model->getNCov(); icov++)
   {
     cova = model->getCovAniso(icov);
     silltot += cova->getSill(0, 0);
@@ -1347,7 +1347,7 @@ static int st_check_model(const Db* dbin, const Db* dbout, Model* model)
   {
     nugval = silltot / 1000.;
     MatrixSymmetric sill(nvar);
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
       sill.setValue(ivar, ivar, nugval);
     model->addCovFromParam(ECov::NUGGET, 0., 0., 0., VectorDouble(), sill);
   }
@@ -1385,17 +1385,17 @@ static int st_check_model(const Db* dbin, const Db* dbout, Model* model)
  ** \remark The nugget effect corresponds to rank (-1)
  **
  *****************************************************************************/
-static int st_identify_nostat_param(const EConsElem& type0,
-                                    int icov0 = -1,
-                                    int ivar0 = -1,
-                                    int jvar0 = -1)
+static Id st_identify_nostat_param(const EConsElem& type0,
+                                   Id icov0 = -1,
+                                   Id ivar0 = -1,
+                                   Id jvar0 = -1)
 {
   DECLARE_UNUSED(type0);
   return icov0 + ivar0 + jvar0;
   /* const ANoStat *nostat = st_get_model()->getNoStat();
   if (nostat == nullptr) return -1;
-  int igrf0 = SPDE_CURRENT_IGRF;
-  int ipar = nostat->getRank(type0, icov0, ivar0, jvar0, igrf0);
+  Id igrf0 = SPDE_CURRENT_IGRF;
+  Id ipar = nostat->getRank(type0, icov0, ivar0, jvar0, igrf0);
   return ipar; */
 }
 
@@ -1412,17 +1412,17 @@ static int st_identify_nostat_param(const EConsElem& type0,
  ** \param[out] z           Output array  (Dimension: ntarget)
  **
  *****************************************************************************/
-static int st_kriging_cholesky(QChol* QC,
-                               double* rhs,
-                               VectorDouble& work,
-                               double* z)
+static Id st_kriging_cholesky(QChol* QC,
+                              double* rhs,
+                              VectorDouble& work,
+                              double* z)
 {
-  int ntarget;
+  Id ntarget;
 
   /* Initializations */
 
   ntarget = qchol_getNCols(QC);
-  for (int icur = 0; icur < ntarget; icur++)
+  for (Id icur = 0; icur < ntarget; icur++)
     work[icur] = 0.;
 
   /* Prepare Cholesky decomposition (if not already performed) */
@@ -1466,9 +1466,9 @@ static double* st_spde_get_mesh_dimension(AMesh* amesh)
   /* Initializations */
 
   units            = nullptr;
-  int ndim         = amesh->getNDim();
-  int nmesh        = amesh->getNMeshes();
-  int ncorner      = amesh->getNApexPerMesh();
+  Id ndim          = amesh->getNDim();
+  Id nmesh         = amesh->getNMeshes();
+  Id ncorner       = amesh->getNApexPerMesh();
   bool flag_sphere = isDefaultSpaceSphere();
 
   /* Core allocation */
@@ -1480,7 +1480,7 @@ static double* st_spde_get_mesh_dimension(AMesh* amesh)
 
   if (flag_sphere)
   {
-    for (int imesh = 0; imesh < nmesh; imesh++)
+    for (Id imesh = 0; imesh < nmesh; imesh++)
     {
       units[imesh] = GH::geodeticTriangleSurface(amesh->getCoor(imesh, 0, 0),
                                                  amesh->getCoor(imesh, 0, 1),
@@ -1492,11 +1492,11 @@ static double* st_spde_get_mesh_dimension(AMesh* amesh)
   }
   else
   {
-    for (int imesh = 0; imesh < nmesh; imesh++)
+    for (Id imesh = 0; imesh < nmesh; imesh++)
     {
-      int ecr = 0;
-      for (int icorn = 1; icorn < ncorner; icorn++)
-        for (int idim = 0; idim < ndim; idim++)
+      Id ecr = 0;
+      for (Id icorn = 1; icorn < ncorner; icorn++)
+        for (Id idim = 0; idim < ndim; idim++)
           mat[ecr++] = (amesh->getCoor(imesh, icorn, idim) - amesh->getCoor(imesh, 0, idim));
       units[imesh] = ABS(matrix_determinant(ndim, mat)) / FACDIM[ndim];
     }
@@ -1512,7 +1512,7 @@ static double* st_spde_get_mesh_dimension(AMesh* amesh)
  ** \param[in]  imesh0    Rank of the current mesh
  **
  *****************************************************************************/
-static void st_calcul_update_nostat(AMesh* amesh, int imesh0)
+static void st_calcul_update_nostat(AMesh* amesh, Id imesh0)
 {
   DECLARE_UNUSED(amesh);
   DECLARE_UNUSED(imesh0);
@@ -1521,9 +1521,9 @@ static void st_calcul_update_nostat(AMesh* amesh, int imesh0)
 
   /* Initializations */
 
-  // int ndim = S_ENV.ndim;
-  // int igrf0 = SPDE_CURRENT_IGRF;
-  // int icov0 = SPDE_CURRENT_ICOV;
+  // Id ndim = S_ENV.ndim;
+  // Id igrf0 = SPDE_CURRENT_IGRF;
+  // Id icov0 = SPDE_CURRENT_ICOV;
 
   /* Update the Tensor 'hh' */
 
@@ -1539,9 +1539,9 @@ static void st_calcul_update_nostat(AMesh* amesh, int imesh0)
   /*  if (nostat->isDefined(EConsElem::SPHEROT, icov0, -1, -1, igrf0))
    {
      VectorDouble srot(2, 0.);
-     for (int i = 0; i < 2; i++)
+     for (Id i = 0; i < 2; i++)
      {
-       int ipar = nostat->getRank(EConsElem::SPHEROT, icov0,  i, -1, igrf0);
+       Id ipar = nostat->getRank(EConsElem::SPHEROT, icov0,  i, -1, igrf0);
        if (ipar < 0) continue;
        Calcul.srot[i] = nostat->getValueByParam(ipar, 0, imesh0);
      }
@@ -1552,9 +1552,9 @@ static void st_calcul_update_nostat(AMesh* amesh, int imesh0)
   /*   if (nostat->isDefined(EConsElem::VELOCITY, icov0, -1, -1, igrf0))
     {
       VectorDouble vv(ndim, 0.);
-      for (int idim = 0; idim < ndim; idim++)
+      for (Id idim = 0; idim < ndim; idim++)
       {
-        int ipar = nostat->getRank(EConsElem::VELOCITY, icov0, idim, -1, igrf0);
+        Id ipar = nostat->getRank(EConsElem::VELOCITY, icov0, idim, -1, igrf0);
         if (ipar < 0) continue;
         Calcul.vv[idim] = nostat->getValueByParam(ipar, 0, imesh0);
       }
@@ -1570,10 +1570,10 @@ static void st_calcul_update_nostat(AMesh* amesh, int imesh0)
  ** \remark The matrix 'Isill' is dimensioned to nvar * nvar where
  **
  *****************************************************************************/
-static int st_fill_Isill(void)
+static Id st_fill_Isill(void)
 {
   double* mcova;
-  int nvar, nvar2, error, icov, ecr;
+  Id nvar, nvar2, error, icov, ecr;
 
   /* Initializations */
 
@@ -1592,8 +1592,8 @@ static int st_fill_Isill(void)
   /* Load the sill of the covariance */
 
   ecr = 0;
-  for (int ivar = 0; ivar < nvar; ivar++)
-    for (int jvar = 0; jvar < nvar; jvar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
+    for (Id jvar = 0; jvar < nvar; jvar++)
       mcova[ecr++] = st_get_cova_sill(ivar, jvar);
 
   /* Loop on the structures to invert the sill matrices */
@@ -1624,11 +1624,11 @@ label_end:
  ** \remark - ncova designates the number of continuous structures of the Model
  **
  *****************************************************************************/
-static int st_fill_Csill(void)
+static Id st_fill_Csill(void)
 {
   Model* model;
   double* mcova;
-  int nvar, nvs2, error, icov;
+  Id nvar, nvs2, error, icov;
 
   /* Initializations */
 
@@ -1676,11 +1676,11 @@ label_end:
  ** \remark where nvs2 is the product nvar * (nvar+1) / 2
  **
  *****************************************************************************/
-static int st_fill_Bnugget(Db* dbin)
+static Id st_fill_Bnugget(Db* dbin)
 {
   double *mat, *local, *local0;
-  int *ind, error, ndata, nvar, nvs2, nvar2, size, ecr, nvr, ivar, jvar, iad;
-  int flag_nostat_sillnug;
+  Id *ind, error, ndata, nvar, nvs2, nvar2, size, ecr, nvr, ivar, jvar, iad;
+  Id flag_nostat_sillnug;
   DECLARE_UNUSED(nvr, iad, flag_nostat_sillnug)
   Model* model;
   MatrixSparse** Bnugget;
@@ -1714,11 +1714,11 @@ static int st_fill_Bnugget(Db* dbin)
   if (local == nullptr) goto label_end;
   local0 = (double*)mem_alloc(sizeof(double) * nvar2, 0);
   if (local0 == nullptr) goto label_end;
-  ind = (int*)mem_alloc(sizeof(int) * ndata, 0);
+  ind = (Id*)mem_alloc(sizeof(Id) * ndata, 0);
   if (ind == nullptr) goto label_end;
   mat = (double*)mem_alloc(sizeof(double) * size, 0);
   if (mat == nullptr) goto label_end;
-  for (int i = 0; i < size; i++)
+  for (Id i = 0; i < size; i++)
     mat[i] = 0.;
 
   /* Establish the nugget sill matrix for isotopic case (only in stationary) */
@@ -1738,7 +1738,7 @@ static int st_fill_Bnugget(Db* dbin)
   /* Loop on the active samples */
 
   ecr = 0;
-  /* for (int iech = 0; iech < dbin->getNSample(); iech++)
+  /* for (Id iech = 0; iech < dbin->getNSample(); iech++)
   {
     if (!dbin->isActive(iech)) continue;
  */
@@ -1776,8 +1776,8 @@ static int st_fill_Bnugget(Db* dbin)
 
   /* Constitute the sill matrix for the nugget effect */
 
-  /*    for (int ivr = 0; ivr < nvr; ivr++)
-       for (int jvr = 0; jvr < nvr; jvr++)
+  /*    for (Id ivr = 0; ivr < nvr; ivr++)
+       for (Id jvr = 0; jvr < nvr; jvr++)
          LOCAL(ivr,jvr) = st_get_nugget_sill(ind[ivr], ind[jvr]);
 */
   /* Invert the sill partial matrix */
@@ -1791,8 +1791,8 @@ static int st_fill_Bnugget(Db* dbin)
 
   /* Store the sill partial matrix */
 
-  /*   for (int ivr = 0; ivr < nvr; ivr++)
-      for (int jvr = 0; jvr <= ivr; jvr++)
+  /*   for (Id ivr = 0; ivr < nvr; ivr++)
+      for (Id jvr = 0; jvr <= ivr; jvr++)
       {
         ivar = ind[ivr];
         jvar = ind[jvr];
@@ -1807,7 +1807,7 @@ static int st_fill_Bnugget(Db* dbin)
 
   Bnugget = (MatrixSparse**)mem_alloc(sizeof(MatrixSparse*) * nvs2, 0);
   if (Bnugget == nullptr) goto label_end;
-  for (int ivs2 = 0; ivs2 < nvs2; ivs2++)
+  for (Id ivs2 = 0; ivs2 < nvs2; ivs2++)
     Bnugget[ivs2] = nullptr;
   ecr = 0;
   for (ivar = 0; ivar < nvar; ivar++)
@@ -1857,32 +1857,32 @@ label_end:
  ** \remarks Dimension: nvertex
  **
  *****************************************************************************/
-static int* st_get_vertex_ranks(AMesh* amesh, Db* dbin, Db* dbout)
+static Id* st_get_vertex_ranks(AMesh* amesh, Db* dbin, Db* dbout)
 {
-  int nvertex = amesh->getNApices();
-  int n_in    = (dbin != nullptr) ? dbin->getNSample(true) : 0;
-  int n_out   = dbout->getNSample(true);
+  Id nvertex = amesh->getNApices();
+  Id n_in    = (dbin != nullptr) ? dbin->getNSample(true) : 0;
+  Id n_out   = dbout->getNSample(true);
   if (nvertex < (n_in + n_out))
     messageAbort("Nvertex(%d) must be larger than n_in(%d) + n_out(%d)",
                  nvertex, n_in, n_out);
 
   /* Core allocation */
 
-  int* ranks = (int*)mem_alloc(sizeof(int) * nvertex, 0);
+  Id* ranks = (Id*)mem_alloc(sizeof(Id) * nvertex, 0);
   if (ranks == nullptr) return (ranks);
-  for (int i = 0; i < nvertex; i++) ranks[i] = 0;
+  for (Id i = 0; i < nvertex; i++) ranks[i] = 0;
 
   /* Identify the vertices */
 
-  int ecr = 0;
+  Id ecr = 0;
   if (dbin != nullptr)
-    for (int i = 0; i < dbin->getNSample(); i++)
+    for (Id i = 0; i < dbin->getNSample(); i++)
     {
       if (!dbin->isActive(i)) continue;
       ranks[ecr++] = (i + 1);
     }
 
-  for (int i = 0; i < dbout->getNSampleActive(); i++)
+  for (Id i = 0; i < dbout->getNSampleActive(); i++)
   {
     if (!dbout->isActive(i)) continue;
     ranks[ecr++] = -(i + 1);
@@ -1901,11 +1901,11 @@ static int* st_get_vertex_ranks(AMesh* amesh, Db* dbin, Db* dbout)
  ** \param[in]  dbout     Output Db structure
  **
  *****************************************************************************/
-static int st_fill_Bhetero(Db* dbin, Db* dbout)
+static Id st_fill_Bhetero(Db* dbin, Db* dbout)
 
 {
-  int *ranks, *ndata1, *ntarget1;
-  int ndata, nvar, ecrT, nvertex, flag_add, iech, error;
+  Id *ranks, *ndata1, *ntarget1;
+  Id ndata, nvar, ecrT, nvertex, flag_add, iech, error;
   double value;
   Model* model;
   MatrixSparse **BheteroD, **BheteroT;
@@ -1930,21 +1930,21 @@ static int st_fill_Bhetero(Db* dbin, Db* dbout)
 
   /* Define the sparse matrices */
 
-  ndata1 = (int*)mem_alloc(sizeof(int) * nvar, 0);
+  ndata1 = (Id*)mem_alloc(sizeof(Id) * nvar, 0);
   if (ndata1 == nullptr) goto label_end;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     ndata1[ivar] = 0;
-  ntarget1 = (int*)mem_alloc(sizeof(int) * nvar, 0);
+  ntarget1 = (Id*)mem_alloc(sizeof(Id) * nvar, 0);
   if (ntarget1 == nullptr) goto label_end;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     ntarget1[ivar] = 0;
   BheteroD = (MatrixSparse**)mem_alloc(sizeof(MatrixSparse*) * nvar, 0);
   if (BheteroD == nullptr) goto label_end;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     BheteroD[ivar] = nullptr;
   BheteroT = (MatrixSparse**)mem_alloc(sizeof(MatrixSparse*) * nvar, 0);
   if (BheteroT == nullptr) goto label_end;
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     BheteroT[ivar] = nullptr;
 
   /**************************************************************/
@@ -1957,10 +1957,10 @@ static int st_fill_Bhetero(Db* dbin, Db* dbout)
   /* assigned to the vertices of the mesh to which it belongs   */
   /* (if the variable is defined for this sample); 0 otherwise  */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     NF_Triplet Btriplet;
-    for (int i = 0; i < nvertex; i++)
+    for (Id i = 0; i < nvertex; i++)
     {
       if (ranks[i] <= 0) continue; // Target or Steiner
       ndata1[ivar]++;
@@ -1985,11 +1985,11 @@ static int st_fill_Bhetero(Db* dbin, Db* dbout)
   /* correspond to a data sample which is defined for this variable but */
   /* not defined for all variables                                      */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     NF_Triplet Btriplet;
     ecrT = 0;
-    for (int i = 0; i < nvertex; i++)
+    for (Id i = 0; i < nvertex; i++)
     {
       flag_add = 0;
       if (ranks[i] <= 0)
@@ -2053,32 +2053,32 @@ label_end:
  **
  *****************************************************************************/
 static void st_triangle_center(AMesh* amesh,
-                               int ncorner,
-                               int imesh,
+                               Id ncorner,
+                               Id imesh,
                                double center[3],
                                double xyz[3][3])
 {
   double ratio;
 
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
     center[i] = 0.;
-  for (int icorn = 0; icorn < ncorner; icorn++)
+  for (Id icorn = 0; icorn < ncorner; icorn++)
   {
     GH::convertSph2Cart(amesh->getCoor(imesh, icorn, 0),
                         amesh->getCoor(imesh, icorn, 1),
                         &xyz[icorn][0], &xyz[icorn][1], &xyz[icorn][2]);
-    for (int i = 0; i < 3; i++)
+    for (Id i = 0; i < 3; i++)
       center[i] += xyz[icorn][i];
   }
 
   ratio = 0.;
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
   {
     center[i] /= 3.;
     ratio += center[i] * center[i];
   }
   ratio = 1. / sqrt(ratio);
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
     center[i] *= ratio;
 }
 
@@ -2102,19 +2102,19 @@ static void st_project_plane(double center[3],
 
   /* Projection */
 
-  for (int j = 0; j < 2; j++)
+  for (Id j = 0; j < 2; j++)
   {
     coeff[j] = 0.;
-    for (int i = 0; i < 3; i++)
+    for (Id i = 0; i < 3; i++)
       coeff[j] += (axes[j][i] - center[i]) * (xyz[i] - center[i]);
   }
 
   /* Projected vector */
 
-  for (int i = 0; i < 3; i++)
+  for (Id i = 0; i < 3; i++)
   {
     v[i] = 0.;
-    for (int j = 0; j < 2; j++)
+    for (Id j = 0; j < 2; j++)
       v[i] += coeff[j] * (axes[j][i] - center[i]);
   }
 
@@ -2177,13 +2177,13 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
   DECLARE_UNUSED(model)
   double vald, mat[16], mat1[16];
   double xyz[3][3], center[3], axes[2][3], matv[3], coeff[3][2];
-  int ecr, errcod, error, ndim, ncorner, flag_nostat;
+  Id ecr, errcod, error, ndim, ncorner, flag_nostat;
   bool flag_sphere;
   long ip1, ip2;
   MatrixSparse* G = nullptr;
-  std::map<std::pair<int, int>, double> tab;
-  std::pair<std::map<std::pair<int, int>, double>::iterator, bool> ret;
-  std::map<std::pair<int, int>, double>::iterator it;
+  std::map<std::pair<Id, Id>, double> tab;
+  std::pair<std::map<std::pair<Id, Id>, double>::iterator, bool> ret;
+  std::map<std::pair<Id, Id>, double>::iterator it;
 
   /* Initializations */
 
@@ -2202,7 +2202,7 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
 
   /* Loop on the meshes */
 
-  for (int imesh = 0; imesh < amesh->getNMeshes(); imesh++)
+  for (Id imesh = 0; imesh < amesh->getNMeshes(); imesh++)
   {
 
     /* Get parameters in the non-stationary case */
@@ -2230,12 +2230,12 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
 
       /* Project corner points on the Tangent plane */
 
-      for (int icorn = 0; icorn < ncorner; icorn++)
+      for (Id icorn = 0; icorn < ncorner; icorn++)
         st_project_plane(center, axes, xyz[icorn], coeff[icorn]);
 
-      for (int icorn = 0; icorn < ncorner; icorn++)
+      for (Id icorn = 0; icorn < ncorner; icorn++)
       {
-        for (int idim = 0; idim < ndim; idim++)
+        for (Id idim = 0; idim < ndim; idim++)
           matu.setValue(icorn, idim, coeff[icorn][idim]);
         matu.setValue(icorn, ncorner - 1, 1.);
       }
@@ -2245,9 +2245,9 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
 
       // Case of Euclidean geometry
 
-      for (int icorn = 0; icorn < ncorner; icorn++)
+      for (Id icorn = 0; icorn < ncorner; icorn++)
       {
-        for (int idim = 0; idim < ndim; idim++)
+        for (Id idim = 0; idim < ndim; idim++)
           matu.setValue(icorn, idim, amesh->getCoor(imesh, icorn, idim));
         matu.setValue(icorn, ncorner - 1, 1.);
       }
@@ -2259,10 +2259,10 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
     if (errcod)
     {
       messerr("Error in Mesh #%3d - Its volume is zero", imesh + 1);
-      for (int icorn = 0; icorn < ncorner; icorn++)
+      for (Id icorn = 0; icorn < ncorner; icorn++)
       {
         message("Sample #%4d - Coordinates (", amesh->getApex(imesh, icorn));
-        for (int idim = 0; idim < ndim; idim++)
+        for (Id idim = 0; idim < ndim; idim++)
           message(" %lf", amesh->getCoor(imesh, icorn, idim));
         message(")\n");
       }
@@ -2271,8 +2271,8 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
     else
     {
       ecr = 0;
-      for (int icorn = 0; icorn < ncorner; icorn++)
-        for (int idim = 0; idim < ndim; idim++)
+      for (Id icorn = 0; icorn < ncorner; icorn++)
+        for (Id idim = 0; idim < ndim; idim++)
           matw[ecr++] = matu.getValue(idim, icorn);
       matrix_transpose(ndim, ncorner, matw, matinvw);
 
@@ -2281,15 +2281,15 @@ static MatrixSparse* st_spde_fill_S(AMesh* amesh, Model* model, const double* un
         matrix_product_safe(ncorner, ndim, 1, matinvw.data(), Calcul.vv.data(), matv);
       matrix_product_safe(ncorner, ndim, ncorner, mat1, matw.data(), mat);
 
-      for (int j0 = 0; j0 < ncorner; j0++)
-        for (int j1 = 0; j1 < ncorner; j1++)
+      for (Id j0 = 0; j0 < ncorner; j0++)
+        for (Id j1 = 0; j1 < ncorner; j1++)
         {
           ip1 = amesh->getApex(imesh, j0);
           ip2 = amesh->getApex(imesh, j1);
-          std::pair<int, int> key(ip1, ip2);
+          std::pair<Id, Id> key(ip1, ip2);
           vald = units[imesh] * MAT(j0, j1);
           if (flag_nostat) vald += matv[j1] * units[imesh];
-          ret = tab.insert(std::pair<std::pair<int, int>, double>(key, vald));
+          ret = tab.insert(std::pair<std::pair<Id, Id>, double>(key, vald));
           if (!ret.second) ret.first->second += vald;
         }
     }
@@ -2335,28 +2335,28 @@ label_end:
 static VectorDouble st_spde_fill_TildeC(AMesh* amesh, const double* units)
 {
   VectorDouble tildec, cumunit;
-  int nvertex = amesh->getNApices();
-  int ncorner = amesh->getNApexPerMesh();
+  Id nvertex = amesh->getNApices();
+  Id ncorner = amesh->getNApexPerMesh();
   cumunit.resize(nvertex, 0);
 
   /* Loop on the meshes */
 
-  for (int imesh = 0; imesh < amesh->getNMeshes(); imesh++)
+  for (Id imesh = 0; imesh < amesh->getNMeshes(); imesh++)
   {
 
     /* Loop on the vertices */
 
-    for (int icorn = 0; icorn < ncorner; icorn++)
+    for (Id icorn = 0; icorn < ncorner; icorn++)
     {
-      int ip = amesh->getApex(imesh, icorn);
+      Id ip = amesh->getApex(imesh, icorn);
       cumunit[ip] += units[imesh];
     }
   }
 
   /* Scale */
 
-  double factor = (double)ncorner;
-  for (int ip = 0; ip < nvertex; ip++)
+  auto factor = static_cast<double>(ncorner);
+  for (Id ip = 0; ip < nvertex; ip++)
   {
     double value = cumunit[ip] / factor;
     if (ABS(value) <= 0.)
@@ -2385,13 +2385,13 @@ static VectorDouble st_spde_fill_Lambda(Model* model,
 {
   DECLARE_UNUSED(model);
   VectorDouble Lambda;
-  int nvertex = amesh->getNApices();
+  Id nvertex  = amesh->getNApices();
   double sill = st_get_cova_sill(0, 0);
 
   /* Fill the array */
 
   double sqdeth = Calcul.sqdeth;
-  for (int ip = 0; ip < nvertex; ip++)
+  for (Id ip = 0; ip < nvertex; ip++)
     Lambda.push_back(sqrt((TildeC[ip]) / (sqdeth * sill)));
 
   return (Lambda);
@@ -2414,10 +2414,10 @@ static VectorDouble st_spde_fill_Lambda(Model* model,
  ** \remarks - for Data-Data operators
  **
  *****************************************************************************/
-static MatrixSparse* st_extract_Q1_nugget(int row_var,
-                                          int col_var,
-                                          int* nrows,
-                                          int* ncols)
+static MatrixSparse* st_extract_Q1_nugget(Id row_var,
+                                          Id col_var,
+                                          Id* nrows,
+                                          Id* ncols)
 {
   SPDE_SS_Environ* SS;
   MatrixSparse* B0;
@@ -2452,14 +2452,14 @@ static MatrixSparse* st_extract_Q1_nugget(int row_var,
  ** \remarks The returned matrix is multipled by the inverse of the Sill
  **
  *****************************************************************************/
-static MatrixSparse* st_extract_Q1_hetero(int row_var,
-                                          int col_var,
-                                          int row_oper,
-                                          int col_oper,
-                                          int* nrows,
-                                          int* ncols)
+static MatrixSparse* st_extract_Q1_hetero(Id row_var,
+                                          Id col_var,
+                                          Id row_oper,
+                                          Id col_oper,
+                                          Id* nrows,
+                                          Id* ncols)
 {
-  int error;
+  Id error;
   MatrixSparse *Q, *Brow, *Bcol, *B1, *Bt, *Qn;
   SPDE_SS_Environ* SS;
 
@@ -2516,10 +2516,10 @@ label_end:
  ** \remarks Otherwise, we need 'BheteroD' and 'BheteroT'
  **
  *****************************************************************************/
-static int st_build_QCov(SPDE_Matelem& Matelem)
+static Id st_build_QCov(SPDE_Matelem& Matelem)
 
 {
-  int error, nvar, icov0, nrows, ncols;
+  Id error, nvar, icov0, nrows, ncols;
   MatrixSparse *B0, *Bi;
   QChol** QCov;
   SPDE_SS_Environ* SS;
@@ -2536,7 +2536,7 @@ static int st_build_QCov(SPDE_Matelem& Matelem)
   /* Core allocation */
 
   QCov = (QChol**)mem_alloc(sizeof(QChol*) * nvar, 1);
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
     QCov[ivar] = st_qchol_manage(1, NULL);
 
   /* Dispatch */
@@ -2548,9 +2548,9 @@ static int st_build_QCov(SPDE_Matelem& Matelem)
     /* Case when a nugget effect is present */
     /****************************************/
 
-    if (Matelem.Aproj == NULL || SS->Bnugget == NULL) return (1);
+    if (Matelem.Aproj == NULL || SS->Bnugget == nullptr) return (1);
 
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       // Sill(icov)_ii * Q(icov) + A^t(icov) * E_ii * A(icov)
       B0 = st_extract_Q1_nugget(ivar, ivar, &nrows, &ncols);
@@ -2570,10 +2570,10 @@ static int st_build_QCov(SPDE_Matelem& Matelem)
     /* Case when there is no nugget effect */
     /***************************************/
 
-    if (Matelem.Aproj == NULL || SS->BheteroD == NULL || SS->BheteroT == NULL)
+    if (Matelem.Aproj == NULL || SS->BheteroD == NULL || SS->BheteroT == nullptr)
       return (1);
 
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
       if (icov0 == 0)
       {
@@ -2610,9 +2610,9 @@ label_end:
   delete Bi;
   if (error)
   {
-    if (QCov != NULL)
+    if (QCov != nullptr)
     {
-      for (int ivar = 0; ivar < nvar; ivar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
         QCov[ivar] = st_qchol_manage(-1, QCov[ivar]);
     }
   }
@@ -2633,12 +2633,12 @@ label_end:
  *****************************************************************************/
 static MatrixSparse* st_spde_build_Q(MatrixSparse* S,
                                      const VectorDouble& Lambda,
-                                     int nblin,
+                                     Id nblin,
                                      double* blin)
 {
   // Preliminary checks
 
-  int nvertex = S->getNCols();
+  Id nvertex = S->getNCols();
   if (nvertex <= 0)
   {
     messerr("You must define a valid Meshing beforehand");
@@ -2660,7 +2660,7 @@ static MatrixSparse* st_spde_build_Q(MatrixSparse* S,
 
   /* Loop on the different terms */
 
-  for (int iterm = 1; iterm < nblin; iterm++)
+  for (Id iterm = 1; iterm < nblin; iterm++)
   {
     Q->addMat(*Bi, 1., blin[iterm]);
     if (iterm < nblin - 1)
@@ -2683,10 +2683,10 @@ static MatrixSparse* st_spde_build_Q(MatrixSparse* S,
  ** \param[in]  Matelem    SPDE_Matelem structure
  **
  *****************************************************************************/
-static int st_build_Q(SPDE_Matelem& Matelem)
+static Id st_build_Q(SPDE_Matelem& Matelem)
 
 {
-  int error;
+  Id error;
   QChol* QC;
 
   /* Initializations */
@@ -2698,7 +2698,7 @@ static int st_build_Q(SPDE_Matelem& Matelem)
 
   Matelem.QC = st_qchol_manage(1, NULL);
 
-  int nblin     = static_cast<int>(Calcul.blin.size());
+  Id nblin      = static_cast<Id>(Calcul.blin.size());
   Matelem.QC->Q = st_spde_build_Q(Matelem.S, Matelem.Lambda, nblin,
                                   Calcul.blin.data());
   if (Matelem.QC->Q == nullptr) goto label_end;
@@ -2729,9 +2729,9 @@ label_end:
  ** \remarks It must be freed by the calling functions
  **
  *****************************************************************************/
-static int st_spde_build_matrices(Model* model, int verbose)
+static Id st_spde_build_matrices(Model* model, Id verbose)
 {
-  int error = 1;
+  Id error = 1;
   VectorDouble tildec;
   double* units         = nullptr;
   VERBOSE               = verbose;
@@ -2798,7 +2798,7 @@ static double st_chebychev_function(double x,
 
   value = 1.;
   total = blin[0];
-  for (int i = 1, nblin = (int)blin.size(); i < nblin; i++)
+  for (Id i = 1, nblin = static_cast<Id>(blin.size()); i < nblin; i++)
   {
     value *= x;
     total += blin[i] * value;
@@ -2819,13 +2819,13 @@ static double st_chebychev_function(double x,
  ** \param[in]  blin       Array of coefficients for Linear combination
  **
  *****************************************************************************/
-static int st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
-                                         int verbose,
-                                         const VectorDouble& blin)
+static Id st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
+                                        Id verbose,
+                                        const VectorDouble& blin)
 
 {
   double value, a, b;
-  int error, number, numloc, ndisc;
+  Id error, number, numloc, ndisc;
 
   /* Initializations */
 
@@ -2836,8 +2836,7 @@ static int st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
 
   /* Calculate the polynomials */
 
-  cheb_elem->coeffs = (double*)mem_alloc(sizeof(double) * cheb_elem->ncmax, 0);
-  if (cheb_elem->coeffs == nullptr) goto label_end;
+  cheb_elem->coeffs.resize(cheb_elem->ncmax);
 
   /* Evaluate the coefficients of the Chebychev approximation */
 
@@ -2846,7 +2845,7 @@ static int st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
   /* Loop on some discretized samples of the interval */
 
   number = 0;
-  for (int idisc = 1; idisc < ndisc; idisc++)
+  for (Id idisc = 1; idisc < ndisc; idisc++)
   {
     value  = a + (b - a) * idisc / ndisc;
     numloc = ut_chebychev_count(st_chebychev_function, cheb_elem, value, blin);
@@ -2860,16 +2859,13 @@ static int st_chebychev_calculate_coeffs(Cheb_Elem* cheb_elem,
     message("Chebychev Polynomial Approximation:\n");
     message("- Power = %lf\n", cheb_elem->power);
     message("- Performed using %d terms\n", number);
-    message("- between %lf and %lf (Nb. discretization steps=%d)\n", a, b,
-            ndisc);
+    message("- between %lf and %lf (Nb. discretization steps=%d)\n", a, b, ndisc);
     message("- with a tolerance of %lg\n", cheb_elem->tol);
   }
 
   /* Core Reallocation */
 
-  cheb_elem->coeffs = (double*)mem_realloc((char*)cheb_elem->coeffs,
-                                           sizeof(double) * number, 0);
-  if (cheb_elem->coeffs == nullptr) goto label_end;
+  cheb_elem->coeffs.resize(number);
   cheb_elem->ncoeffs = number;
 
   /* Set the error return code */
@@ -2893,14 +2889,14 @@ label_end:
  ** \param[out] zsnc       Output array (Dimension: nvertex)
  **
  *****************************************************************************/
-static int st_simulate_cholesky(QChol* QC, VectorDouble& work, VectorDouble& zsnc)
+static Id st_simulate_cholesky(QChol* QC, VectorDouble& work, VectorDouble& zsnc)
 {
-  int nvertex;
+  Id nvertex;
 
   /* Initializations */
 
   nvertex = qchol_getNCols(QC);
-  for (int ip = 0; ip < nvertex; ip++)
+  for (Id ip = 0; ip < nvertex; ip++)
     work[ip] = law_gaussian();
 
   /* Prepare Cholesky decomposition (if not already performed) */
@@ -2941,8 +2937,8 @@ static int st_simulate_cholesky(QChol* QC, VectorDouble& work, VectorDouble& zsn
  ** \remarks Argument 'cheb_old' is used if mode=-1
  **
  *****************************************************************************/
-static Cheb_Elem* st_spde_cheb_manage(int mode,
-                                      int verbose,
+static Cheb_Elem* st_spde_cheb_manage(Id mode,
+                                      Id verbose,
                                       double power,
                                       const VectorDouble& blin,
                                       MatrixSparse* S,
@@ -2950,7 +2946,7 @@ static Cheb_Elem* st_spde_cheb_manage(int mode,
 {
   Cheb_Elem* cheb_elem;
   double a, b, v1, v2, tol;
-  int error, ncmax, ndisc;
+  Id error, ncmax, ndisc;
 
   /* Initializations */
 
@@ -2965,10 +2961,10 @@ static Cheb_Elem* st_spde_cheb_manage(int mode,
 
     cheb_elem = new Cheb_Elem();
     if (cheb_elem == nullptr) goto label_end;
-    cheb_elem->coeffs = nullptr;
+    cheb_elem->coeffs.clear();
 
-    ncmax = (int)get_keypone("Number_Polynomials_Chebychev", 10001.);
-    ndisc = (int)get_keypone("Number_Discretization_Chebychev", 100.);
+    ncmax = static_cast<Id>(get_keypone("Number_Polynomials_Chebychev", 10001.));
+    ndisc = static_cast<Id>(get_keypone("Number_Discretization_Chebychev", 100.));
     tol   = get_keypone("Chebychev_Tolerance", 5.e-3);
 
     /* Calculate key values */
@@ -2989,7 +2985,7 @@ static Cheb_Elem* st_spde_cheb_manage(int mode,
     cheb_elem->ndisc   = ndisc;
     cheb_elem->tol     = tol;
     cheb_elem->ncoeffs = 0;
-    cheb_elem->coeffs  = nullptr;
+    cheb_elem->coeffs.clear();
 
     /* Get the optimal count of Chebychev coefficients */
 
@@ -3002,8 +2998,7 @@ static Cheb_Elem* st_spde_cheb_manage(int mode,
     // Deallocation
 
     cheb_elem = cheb_old;
-    if (cheb_elem != nullptr)
-      cheb_elem->coeffs = (double*)mem_free((char*)cheb_elem->coeffs);
+    if (cheb_elem != nullptr) cheb_elem->coeffs.clear();
     delete cheb_elem;
     cheb_elem = nullptr;
   }
@@ -3029,10 +3024,10 @@ label_end:
  ** \remarks This function is called when the current IGRF has been chosen
  **
  *****************************************************************************/
-static void st_matelem_manage(int mode)
+static void st_matelem_manage(Id mode)
 
 {
-  int ncova           = st_get_ncova();
+  auto ncova          = st_get_ncova();
   SPDE_SS_Environ* SS = MATGRF(SPDE_CURRENT_IGRF);
 
   /* Dispatch */
@@ -3042,7 +3037,7 @@ static void st_matelem_manage(int mode)
     case 1: // Allocation
       SS->Matelems.resize(ncova);
 
-      for (int is = 0; is < ncova; is++)
+      for (Id is = 0; is < ncova; is++)
       {
         SPDE_Matelem& Matelem = SS->Matelems[is];
         Matelem.S             = nullptr;
@@ -3058,15 +3053,15 @@ static void st_matelem_manage(int mode)
       break;
 
     case -1: // Deallocation
-      for (int icov = 0; icov < ncova; icov++)
+      for (Id icov = 0; icov < ncova; icov++)
       {
         SPDE_Matelem& Matelem = spde_get_current_matelem(icov);
         delete Matelem.S;
         delete Matelem.Aproj;
         Matelem.QC = st_qchol_manage(-1, Matelem.QC);
-        if (Matelem.QCov != NULL)
+        if (Matelem.QCov != nullptr)
         {
-          for (int ivar = 0; ivar < S_ENV.nvar; ivar++)
+          for (Id ivar = 0; ivar < S_ENV.nvar; ivar++)
             Matelem.QCov[ivar] = st_qchol_manage(-1, Matelem.QCov[ivar]);
         }
         Matelem.Isill  = (double*)mem_free((char*)Matelem.Isill);
@@ -3102,7 +3097,7 @@ static AMesh* st_create_meshes(Db* dbin,
 {
   DECLARE_UNUSED(s_option);
   DECLARE_UNUSED(gext);
-  bool flag_force = (int)get_keypone("Force_Regular_Meshing", 0);
+  bool flag_force = static_cast<Id>(get_keypone("Force_Regular_Meshing", 0));
   if (VERBOSE)
   {
     message("Generating the meshes\n");
@@ -3112,7 +3107,7 @@ static AMesh* st_create_meshes(Db* dbin,
       message("- Output targets do not participate to the Meshing\n");
   }
 
-  int ndim_loc = 0;
+  Id ndim_loc = 0;
   if (dbin != nullptr) ndim_loc = MAX(ndim_loc, dbin->getNDim());
   if (dbout != nullptr) ndim_loc = MAX(ndim_loc, dbout->getNDim());
 
@@ -3146,7 +3141,7 @@ static AMesh* st_create_meshes(Db* dbin,
   }
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(dbloc);
 
-  if (dbloc != NULL)
+  if (dbloc != nullptr)
   {
     if (VERBOSE) message("Using Turbo Meshing\n");
 
@@ -3171,7 +3166,7 @@ static AMesh* st_create_meshes(Db* dbin,
  ** \param[in]  icov0     Rank of the (non-nugget) covariance
  **
  *****************************************************************************/
-static int st_is_external_AQ_defined(int icov0)
+static Id st_is_external_AQ_defined(Id icov0)
 {
   return (S_EXTERNAL_Q[icov0] != nullptr &&
           S_EXTERNAL_A[icov0] != nullptr);
@@ -3188,7 +3183,7 @@ static int st_is_external_AQ_defined(int icov0)
  ** \param[in]  icov0    Rank of the current Covariance
  **
  *****************************************************************************/
-static int st_spde_external_copy(SPDE_Matelem& matelem, int icov0)
+static Id st_spde_external_copy(SPDE_Matelem& matelem, Id icov0)
 {
   if (S_EXTERNAL_A[icov0] == nullptr)
   {
@@ -3248,10 +3243,10 @@ AMesh* spde_mesh_load(Db* dbin,
  ** \param[in]  s_option    SPDE_Option structure
  **
  *****************************************************************************/
-static int st_spde_prepar(Db* dbin,
-                          Db* dbout,
-                          const VectorDouble& gext,
-                          SPDE_Option& s_option)
+static Id st_spde_prepar(Db* dbin,
+                         Db* dbout,
+                         const VectorDouble& gext,
+                         SPDE_Option& s_option)
 {
   st_calcul_init(S_ENV.ndim);
 
@@ -3261,7 +3256,7 @@ static int st_spde_prepar(Db* dbin,
 
   /* Loop on the GRFs */
 
-  for (int igrf = 0; igrf < st_get_number_grf(); igrf++)
+  for (Id igrf = 0; igrf < st_get_number_grf(); igrf++)
   {
     SPDE_CURRENT_IGRF = igrf;
 
@@ -3274,7 +3269,7 @@ static int st_spde_prepar(Db* dbin,
 
     /* Loop on the covariances */
 
-    for (int icov = 0; icov < st_get_ncova(); icov++)
+    for (Id icov = 0; icov < st_get_ncova(); icov++)
     {
       SPDE_CURRENT_ICOV     = icov;
       SPDE_Matelem& Matelem = spde_get_current_matelem(icov);
@@ -3389,7 +3384,7 @@ static int st_spde_prepar(Db* dbin,
  ** \return  Error return code
  **
  *****************************************************************************/
-static int st_spde_posterior()
+static Id st_spde_posterior()
 {
   /*  if (st_get_model()->isNoStat())
    {
@@ -3436,7 +3431,7 @@ static void st_environ_print(const Db* dbout, const VectorDouble& gext)
   if (dbout != nullptr && dbout->isGrid() && !gext.empty())
   {
     message("- The resulting Grid is dilated: %lf", gext[0]);
-    for (int idim = 1; idim < dbout->getNDim(); idim++)
+    for (Id idim = 1; idim < dbout->getNDim(); idim++)
       message(" * %lf", gext[idim]);
     message("\n");
   }
@@ -3466,22 +3461,22 @@ static void st_environ_print(const Db* dbout, const VectorDouble& gext)
  ** \remarks This function initiates the Matelem structures
  **
  *****************************************************************************/
-static int st_spde_check(const Db* dbin,
-                         const Db* dbout,
-                         Model* model1,
-                         Model* model2,
-                         bool verbose,
-                         const VectorDouble& gext,
-                         bool mesh_dbin,
-                         bool mesh_dbout,
-                         bool flag_advanced,
-                         bool flag_est,
-                         bool flag_std,
-                         bool flag_gibbs,
-                         bool flag_modif)
+static Id st_spde_check(const Db* dbin,
+                        const Db* dbout,
+                        Model* model1,
+                        Model* model2,
+                        bool verbose,
+                        const VectorDouble& gext,
+                        bool mesh_dbin,
+                        bool mesh_dbout,
+                        bool flag_advanced,
+                        bool flag_est,
+                        bool flag_std,
+                        bool flag_gibbs,
+                        bool flag_modif)
 {
   Model* models[2];
-  int ncova;
+  Id ncova;
 
   st_environ_init();
 
@@ -3489,9 +3484,9 @@ static int st_spde_check(const Db* dbin,
   models[0] = model1;
   models[1] = model2;
 
-  FLAG_KEYPAIR       = (int)get_keypone("SPDE_FLAG_KEYPAIR", 0);
-  DEBUG              = (int)get_keypone("SPDE_DEBUG", DEBUG);
-  S_DECIDE.simu_chol = (int)get_keypone("Flag_Simu_Chol", 0);
+  FLAG_KEYPAIR       = static_cast<Id>(get_keypone("SPDE_FLAG_KEYPAIR", 0));
+  DEBUG              = static_cast<Id>(get_keypone("SPDE_DEBUG", DEBUG));
+  S_DECIDE.simu_chol = static_cast<Id>(get_keypone("Flag_Simu_Chol", 0));
   S_DECIDE.simu_cheb = !S_DECIDE.simu_chol;
 
   S_DECIDE.flag_dbin       = (dbin != nullptr);
@@ -3513,12 +3508,11 @@ static int st_spde_check(const Db* dbin,
   S_DECIDE.flag_Q = 1;
   if (!S_DECIDE.flag_dbin && S_DECIDE.simu_cheb) S_DECIDE.flag_Q = 0;
   if (!flag_advanced) S_DECIDE.flag_Q = 1;
-  S_DECIDE.flag_Q       = (int)get_keypone("Flag_Q", S_DECIDE.flag_Q);
+  S_DECIDE.flag_Q       = static_cast<Id>(get_keypone("Flag_Q", S_DECIDE.flag_Q));
   S_DECIDE.flag_Qchol   = (S_DECIDE.flag_case == CASE_SIMULATE && S_DECIDE.flag_Q && S_DECIDE.simu_chol);
   S_DECIDE.flag_modif   = (S_DECIDE.flag_case == CASE_SIMULATE && flag_modif);
   S_DECIDE.flag_onechol = (S_DECIDE.simu_chol);
-  S_DECIDE.flag_onechol = (int)get_keypone("Flag_OneChol",
-                                           S_DECIDE.flag_onechol);
+  S_DECIDE.flag_onechol = static_cast<Id>(get_keypone("Flag_OneChol", S_DECIDE.flag_onechol));
   if (!S_DECIDE.flag_dbin) S_DECIDE.flag_onechol = 0;
   if (S_DECIDE.flag_est) S_DECIDE.flag_onechol = 1;
   if (S_DECIDE.flag_onechol) S_DECIDE.flag_Qchol = 0;
@@ -3544,7 +3538,7 @@ static int st_spde_check(const Db* dbin,
   }
 
   S_ENV.ngrfs = 0;
-  for (int igrf = 0; igrf < SPDE_MAX_NGRF; igrf++)
+  for (Id igrf = 0; igrf < SPDE_MAX_NGRF; igrf++)
   {
     if (models[igrf] != nullptr)
     {
@@ -3554,7 +3548,7 @@ static int st_spde_check(const Db* dbin,
       st_matelem_manage(1);
       ncova = st_get_ncova();
 
-      for (int icov = 0; icov < ncova; icov++)
+      for (Id icov = 0; icov < ncova; icov++)
       {
         SPDE_CURRENT_ICOV = icov;
         st_calcul_update();
@@ -3614,19 +3608,19 @@ static int st_spde_check(const Db* dbin,
  ** \param[in]  icol_pinch  Pointer to the pinchout variabe
  **
  *****************************************************************************/
-static int st_m2d_check_pinchout(Db* dbgrid, int icol_pinch)
+static Id st_m2d_check_pinchout(Db* dbgrid, Id icol_pinch)
 {
   if (dbgrid == nullptr) return 0;
   if (icol_pinch < 0) return 0;
 
   // Initializations
 
-  int nech         = dbgrid->getNSample();
+  Id nech          = dbgrid->getNSample();
   VectorDouble tab = dbgrid->getColumnByUID(icol_pinch);
 
   // Check that values are within [0,1] interval
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!dbgrid->isActive(iech)) continue;
     if (FFFF(tab[iech])) continue;
@@ -3653,8 +3647,8 @@ static int st_m2d_check_pinchout(Db* dbgrid, int icol_pinch)
  **
  *****************************************************************************/
 static double st_m2d_draw_elevation(M2D_Environ* m2denv,
-                                    int /*nlayer*/,
-                                    int /*ilayer*/,
+                                    Id /*nlayer*/,
+                                    Id /*ilayer*/,
                                     double lower,
                                     double upper)
 {
@@ -3695,9 +3689,9 @@ static double st_m2d_draw_elevation(M2D_Environ* m2denv,
 static void st_print_concatenate_interval(const char* title,
                                           double lower,
                                           double upper,
-                                          int tail)
+                                          Id tail)
 {
-  if (title != NULL) message("%s", title);
+  if (title != nullptr) message("%s", title);
   message(" [");
   if (FFFF(lower))
     message("    NA");
@@ -3729,8 +3723,8 @@ static void st_print_concatenate_interval(const char* title,
  ** \param[in]  upper       Upper bound or FFFF
  **
  *****************************************************************************/
-static void st_print_constraints_per_point(int ilayer,
-                                           int iech,
+static void st_print_constraints_per_point(Id ilayer,
+                                           Id iech,
                                            double value,
                                            double drift,
                                            double vgaus,
@@ -3767,15 +3761,15 @@ static void st_print_constraints_per_point(int ilayer,
  ** \param[in]  S             Value for the Variance
  **
  *****************************************************************************/
-static int st_check_validity_MS(Db* db,
-                                int ilayer,
-                                int iech,
-                                int flag_positive,
-                                int flag_verbose,
-                                double M,
-                                double S)
+static Id st_check_validity_MS(Db* db,
+                               Id ilayer,
+                               Id iech,
+                               Id flag_positive,
+                               Id flag_verbose,
+                               double M,
+                               double S)
 {
-  int error;
+  Id error;
   static double eps = 1.e-3;
 
   error = 0;
@@ -3823,12 +3817,12 @@ static int st_check_validity_MS(Db* db,
  *****************************************************************************/
 static double st_m2d_get_M(M2D_Environ* m2denv,
                            Db* db,
-                           int type,
-                           int ilayer,
-                           int iech)
+                           Id type,
+                           Id ilayer,
+                           Id iech)
 {
   double value;
-  int iatt;
+  Id iatt;
 
   if (type == 1)
     iatt = m2denv->iatt_fd;
@@ -3849,9 +3843,9 @@ static double st_m2d_get_M(M2D_Environ* m2denv,
  *****************************************************************************/
 static double st_m2d_get_S(M2D_Environ* m2denv,
                            Db* /*db*/,
-                           int /*type*/,
-                           int /*ilayer*/,
-                           int /*iech*/)
+                           Id /*type*/,
+                           Id /*ilayer*/,
+                           Id /*iech*/)
 {
   double value;
 
@@ -3873,8 +3867,8 @@ static double st_m2d_get_S(M2D_Environ* m2denv,
  *****************************************************************************/
 static double st_m2d_external_drift_increment(M2D_Environ* m2denv,
                                               Db* db,
-                                              int ilayer0,
-                                              int iech0)
+                                              Id ilayer0,
+                                              Id iech0)
 {
   double value, previous;
 
@@ -3904,8 +3898,8 @@ static double st_m2d_external_drift_increment(M2D_Environ* m2denv,
  *****************************************************************************/
 static double st_m2d_get_drift(M2D_Environ* m2denv,
                                Db* db,
-                               int ilayer0,
-                               int iech0)
+                               Id ilayer0,
+                               Id iech0)
 {
   double coeff, value, drift;
 
@@ -3931,16 +3925,16 @@ static double st_m2d_get_drift(M2D_Environ* m2denv,
  **
  *****************************************************************************/
 static void st_m2d_set_M(M2D_Environ* m2denv,
-                         int nlayer,
-                         int icol_pinch,
+                         Id nlayer,
+                         Id icol_pinch,
                          Db* db,
-                         int iatt)
+                         Id iatt)
 {
   double drift;
 
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
-    for (int iech = 0; iech < db->getNSample(); iech++)
+    for (Id iech = 0; iech < db->getNSample(); iech++)
     {
       if (db->isActive(iech))
       {
@@ -3968,20 +3962,20 @@ static void st_m2d_set_M(M2D_Environ* m2denv,
  ** \param[in]  icol_pinch  Pointer to the pinchout variabe
  **
  *****************************************************************************/
-static int st_m2d_migrate_pinch_to_point(Db* dbout, Db* dbc, int icol_pinch)
+static Id st_m2d_migrate_pinch_to_point(Db* dbout, Db* dbc, Id icol_pinch)
 {
   VectorInt cols(1);
   cols[0] = icol_pinch;
 
   // Initializations
 
-  int nech = dbc->getNSample();
+  Id nech = dbc->getNSample();
   if (dbout == nullptr) return 0;
   if (icol_pinch < 0) return 0;
 
   // Add an attribute
 
-  int iptr = dbc->addColumnsByConstant(1, TEST);
+  Id iptr = dbc->addColumnsByConstant(1, TEST);
   if (iptr < 0) return 1;
 
   // Core allocation
@@ -4020,19 +4014,19 @@ static int st_m2d_migrate_pinch_to_point(Db* dbout, Db* dbc, int icol_pinch)
  ** \param[in]  dbout       Db output structure
  **
  *****************************************************************************/
-static int st_m2d_drift_inc_manage(M2D_Environ* m2denv,
-                                   int mode,
-                                   int nlayer,
-                                   int icol_pinch,
-                                   Db* dbc,
-                                   Db* dbout)
+static Id st_m2d_drift_inc_manage(M2D_Environ* m2denv,
+                                  Id mode,
+                                  Id nlayer,
+                                  Id icol_pinch,
+                                  Db* dbc,
+                                  Db* dbout)
 {
   double M, S;
-  int iptr;
+  Id iptr;
 
   /* Initializations */
 
-  if (m2denv == (M2D_Environ*)NULL) return (1);
+  if (m2denv == nullptr) return (1);
   iptr = -1;
 
   /* Dispatch */
@@ -4053,10 +4047,10 @@ static int st_m2d_drift_inc_manage(M2D_Environ* m2denv,
 
     /* Check validity of drift at data points */
 
-    for (int iech = 0; iech < dbc->getNSample(); iech++)
+    for (Id iech = 0; iech < dbc->getNSample(); iech++)
     {
       if (!dbc->isActive(iech)) continue;
-      for (int ilayer = 0; ilayer < nlayer; ilayer++)
+      for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       {
         M = st_m2d_get_M(m2denv, dbc, 1, ilayer, iech);
         S = st_m2d_get_S(m2denv, dbc, 1, ilayer, iech);
@@ -4098,10 +4092,10 @@ static int st_m2d_drift_inc_manage(M2D_Environ* m2denv,
  *****************************************************************************/
 static void st_m2d_stats_init(M2D_Environ* m2denv,
                               Db* dbin,
-                              int nlayer,
-                              int verbose)
+                              Id nlayer,
+                              Id verbose)
 {
-  int nech;
+  Id nech;
   double lower, upper, nb, mm, vv, mini, maxi, delta;
   static double percent = 0.05;
 
@@ -4114,12 +4108,12 @@ static void st_m2d_stats_init(M2D_Environ* m2denv,
 
   /* Loop on the layers */
 
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
 
     /* Loop on the samples */
 
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
       if (!dbin->isActive(iech)) continue;
       lower = dbin->getLocVariable(ELoc::L, iech, ilayer);
@@ -4178,7 +4172,7 @@ static void st_m2d_stats_init(M2D_Environ* m2denv,
     mestitle(2, "Global Statistics on Raw Elevations (extended by %4.2lf)",
              percent);
     message("Statistics are derived from compiling bounds (when defined)\n");
-    message("Number of valid bounds = %d\n", (int)nb);
+    message("Number of valid bounds = %d\n", static_cast<Id>(nb));
     message("Mean                   = %lf\n", m2denv->zmean);
     message("St. Deviation          = %lf\n", m2denv->zstdv);
     message("Tolerance              = %lf\n", m2denv->zeps);
@@ -4200,10 +4194,10 @@ static void st_m2d_stats_init(M2D_Environ* m2denv,
  *****************************************************************************/
 static void st_m2d_stats_updt(M2D_Environ* m2denv,
                               Db* dbc,
-                              int nlayer,
-                              int verbose)
+                              Id nlayer,
+                              Id verbose)
 {
-  int nech;
+  Id nech;
   double nb, mm, vv, mini, maxi, zval, delta;
   static double percent = 0.05;
 
@@ -4216,12 +4210,12 @@ static void st_m2d_stats_updt(M2D_Environ* m2denv,
 
   /* Loop on the layers */
 
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
 
     /* Loop on the samples */
 
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
       zval = dbc->getZVariable(iech, ilayer);
 
@@ -4261,7 +4255,7 @@ static void st_m2d_stats_updt(M2D_Environ* m2denv,
   {
     mestitle(2, "Global Statistics on Centered Elevations");
     message("Statistics are compiled from initial values within bounds\n");
-    message("Number of values = %d\n", (int)nb);
+    message("Number of values = %d\n", static_cast<Id>(nb));
     message("Mean             = %lf\n", m2denv->zmean);
     message("St. Deviation    = %lf\n", m2denv->zstdv);
     message("Tolerance        = %lf\n", m2denv->zeps);
@@ -4287,29 +4281,29 @@ static void st_m2d_stats_updt(M2D_Environ* m2denv,
  ** \remarks - the initial value (ELoc::Z)
  **
  *****************************************************************************/
-static int st_m2d_initial_elevations(M2D_Environ* m2denv,
-                                     Db* dbc,
-                                     int nlayer,
-                                     VectorDouble& work)
+static Id st_m2d_initial_elevations(M2D_Environ* m2denv,
+                                    Db* dbc,
+                                    Id nlayer,
+                                    VectorDouble& work)
 {
-  int nech;
+  Id nech;
   double zmin, zmax, zval, eps;
-  static int njter_max = 20;
+  static Id njter_max = 20;
 
   /* Initializations */
 
-  nech          = dbc->getNSample();
-  eps           = m2denv->zeps;
-  int flag_jter = 0;
+  nech         = dbc->getNSample();
+  eps          = m2denv->zeps;
+  Id flag_jter = 0;
 
   /* Loop on the samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
 
     /* Define the values at sample as unconstrained information */
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
       zmin         = dbc->getLocVariable(ELoc::L, iech, ilayer);
       zmax         = dbc->getLocVariable(ELoc::U, iech, ilayer);
@@ -4318,13 +4312,13 @@ static int st_m2d_initial_elevations(M2D_Environ* m2denv,
 
     /* Loop on iterations for ordering the values */
 
-    for (int jter = 0; jter < njter_max; jter++)
+    for (Id jter = 0; jter < njter_max; jter++)
     {
       flag_jter = 0;
 
       /* Loop on the layers */
 
-      for (int ilayer = 0; ilayer < nlayer; ilayer++)
+      for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       {
 
         /* Determine the bounds at data locations */
@@ -4334,7 +4328,7 @@ static int st_m2d_initial_elevations(M2D_Environ* m2denv,
 
         /* Loop on the other layers */
 
-        for (int jlayer = 0; jlayer < nlayer; jlayer++)
+        for (Id jlayer = 0; jlayer < nlayer; jlayer++)
         {
           if (ilayer == jlayer) continue;
           zval = work[jlayer];
@@ -4390,7 +4384,7 @@ static int st_m2d_initial_elevations(M2D_Environ* m2denv,
               iech + 1, nech);
       messerr("has not been reached after %d iterations. Run is aborted",
               njter_max);
-      for (int ilayer = 0; ilayer < nlayer; ilayer++)
+      for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       {
         zmin = dbc->getLocVariable(ELoc::L, iech, ilayer);
         zmax = dbc->getLocVariable(ELoc::U, iech, ilayer);
@@ -4407,7 +4401,7 @@ static int st_m2d_initial_elevations(M2D_Environ* m2denv,
 
     /* Store the resulting values */
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       dbc->setLocVariable(ELoc::Z, iech, ilayer, work[ilayer]);
   }
 
@@ -4432,14 +4426,14 @@ static int st_m2d_initial_elevations(M2D_Environ* m2denv,
  ** \remarks - the external drift values (ELoc::F)
  **
  *****************************************************************************/
-static int st_m2d_drift_manage(M2D_Environ* m2denv,
-                               Db* dbin,
-                               Db* dbout,
-                               int nlayer,
-                               int verbose,
-                               int* iatt_f)
+static Id st_m2d_drift_manage(M2D_Environ* m2denv,
+                              Db* dbin,
+                              Db* dbout,
+                              Id nlayer,
+                              Id verbose,
+                              Id* iatt_f)
 {
-  int nechin, error, nb;
+  Id nechin, error, nb;
   double *dval, value, delta;
   static double percent = 0.05;
   VectorInt cols(1);
@@ -4472,7 +4466,7 @@ static int st_m2d_drift_manage(M2D_Environ* m2denv,
   /* Loop on the layers */
 
   nb = 0;
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
 
     /* Export External drift from 'dbout' to 'dbin' (optional) */
@@ -4487,7 +4481,7 @@ static int st_m2d_drift_manage(M2D_Environ* m2denv,
 
       // Calculate the statistics of the external drift on the grid
 
-      for (int iech = 0; iech < dbout->getNSample(); iech++)
+      for (Id iech = 0; iech < dbout->getNSample(); iech++)
       {
         if (!dbout->isActive(iech)) continue;
         value = dbout->getLocVariable(ELoc::F, iech, ilayer);
@@ -4500,7 +4494,7 @@ static int st_m2d_drift_manage(M2D_Environ* m2denv,
 
     /* Loop on the samples */
 
-    for (int iech = 0; iech < nechin; iech++)
+    for (Id iech = 0; iech < nechin; iech++)
     {
       if (!dbin->isActive(iech)) continue;
       if (m2denv->flag_ed)
@@ -4529,7 +4523,7 @@ static int st_m2d_drift_manage(M2D_Environ* m2denv,
   {
     mestitle(2, "Global Statistics on Trends (extended by %4.2lf)", percent);
     message("Statistics are derived from compiling drift at grid nodes\n");
-    message("Number of valid nodes  = %d\n", (int)nb);
+    message("Number of valid nodes  = %d\n", static_cast<Id>(nb));
     message("Minimum Drift          = %lf\n", m2denv->dmini);
     message("Maximum Drift          = %lf\n", m2denv->dmaxi);
     message("Range of Drift         = %lf\n", m2denv->dmaxi - m2denv->dmini);
@@ -4553,13 +4547,13 @@ label_end:
  ** \param[in]  ilayer      Rank of the target layer
  **
  *****************************************************************************/
-static void st_print_details(Db* dbc, int nech, int ilayer)
+static void st_print_details(Db* dbc, Id nech, Id ilayer)
 {
   double value, lower, upper;
-  int nvar, nbdmin, nbdmax;
+  Id nvar, nbdmin, nbdmax;
 
   nvar = nbdmin = nbdmax = 0;
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     value = dbc->getZVariable(iech, ilayer);
     if (!FFFF(value)) nvar++;
@@ -4596,13 +4590,13 @@ static void st_print_details(Db* dbc, int nech, int ilayer)
  ** \remarks samples (which correspond to constraints coming from 'dbin'.
  **
  *****************************************************************************/
-static int st_m2d_drift_fitting(M2D_Environ* m2denv,
-                                Db* dbc,
-                                int nlayer,
-                                int number_hard,
-                                int verbose)
+static Id st_m2d_drift_fitting(M2D_Environ* m2denv,
+                               Db* dbc,
+                               Id nlayer,
+                               Id number_hard,
+                               Id verbose)
 {
-  int nech, error, numb, nbfl;
+  Id nech, error, numb, nbfl;
   double ff, *a, *b, mean, ffmean, stdv, epais, mini, maxi, ffmini, ffmaxi;
 
   /* Initializations */
@@ -4623,7 +4617,7 @@ static int st_m2d_drift_fitting(M2D_Environ* m2denv,
 
   /* Loop on the layers */
 
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
 
     /* Initializations */
@@ -4632,14 +4626,14 @@ static int st_m2d_drift_fitting(M2D_Environ* m2denv,
     mean = ffmean = stdv = 0.;
     mini = ffmini = MAXIMUM_BIG;
     maxi = ffmaxi = MINIMUM_BIG;
-    for (int i = 0; i < nbfl; i++)
+    for (Id i = 0; i < nbfl; i++)
       b[i] = 0.;
-    for (int i = 0; i < nbfl * nbfl; i++)
+    for (Id i = 0; i < nbfl * nbfl; i++)
       a[i] = 0.;
 
     /* Loop on the samples */
 
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
 
       /* Get the values at the data point */
@@ -4737,11 +4731,11 @@ label_end:
  *****************************************************************************/
 static void st_m2d_drift_save(M2D_Environ* m2denv,
                               Db* dbout,
-                              int nlayer,
+                              Id nlayer,
                               double* gwork)
 {
   double drift, value;
-  int ngrid;
+  Id ngrid;
 
   /* Initializations */
 
@@ -4749,14 +4743,14 @@ static void st_m2d_drift_save(M2D_Environ* m2denv,
 
   /* Loop on the target nodes */
 
-  for (int igrid = 0; igrid < ngrid; igrid++)
+  for (Id igrid = 0; igrid < ngrid; igrid++)
   {
     if (!dbout->isActive(igrid)) continue;
     drift = m2denv->zmini;
 
     /* Loop no the layers */
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
       value = st_m2d_get_drift(m2denv, dbout, ilayer, igrid);
       if (FFFF(value))
@@ -4784,18 +4778,18 @@ static void st_m2d_drift_save(M2D_Environ* m2denv,
  ** \remark is defined
  **
  *****************************************************************************/
-static int st_active_sample(Db* db, int ndim, int nlayer, int iech, int bypass)
+static Id st_active_sample(Db* db, Id ndim, Id nlayer, Id iech, Id bypass)
 {
   double vmin, vmax;
 
   /* Check on the coordinates */
 
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     if (FFFF(db->getCoordinate(iech, idim))) return (0);
 
   /* Check on the inequality bounds */
 
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     vmin = db->getLocVariable(ELoc::L, iech, ilayer);
     vmax = db->getLocVariable(ELoc::U, iech, ilayer);
@@ -4827,18 +4821,18 @@ static int st_active_sample(Db* db, int ndim, int nlayer, int iech, int bypass)
  ** \param[in,out] tab        Array of samples
  **
  *****************************************************************************/
-static int st_record_sample(M2D_Environ* m2denv,
-                            Db* db,
-                            int iech,
-                            int ndim,
-                            int natt,
-                            int nlayer,
-                            int bypass,
-                            int* number_arg,
-                            double* tab)
+static Id st_record_sample(M2D_Environ* m2denv,
+                           Db* db,
+                           Id iech,
+                           Id ndim,
+                           Id natt,
+                           Id nlayer,
+                           Id bypass,
+                           Id* number_arg,
+                           double* tab)
 {
   double lower, upper;
-  int ecr, number;
+  Id ecr, number;
 
   // Skip the record
 
@@ -4852,16 +4846,16 @@ static int st_record_sample(M2D_Environ* m2denv,
 
   // Set the rank
 
-  tab[ecr++] = (double)number + 1;
+  tab[ecr++] = static_cast<double>(number) + 1;
 
   // Set the coordinates
 
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     tab[ecr++] = db->getCoordinate(iech, idim);
 
   // For each layer, set the bounds and the initial value
 
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     lower = db->getLocVariable(ELoc::L, iech, ilayer);
     upper = db->getLocVariable(ELoc::U, iech, ilayer);
@@ -4874,7 +4868,7 @@ static int st_record_sample(M2D_Environ* m2denv,
   // For each layer, set the External Drift value (optional)
 
   if (m2denv->flag_ed)
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       tab[ecr++] = db->getLocVariable(ELoc::F, iech, ilayer);
 
   /* Increment the number of records by 1 */
@@ -4900,16 +4894,16 @@ static int st_record_sample(M2D_Environ* m2denv,
  *****************************************************************************/
 static void st_define_locators(M2D_Environ* m2denv,
                                Db* db,
-                               int ndim,
-                               int nvar,
-                               int nlayer)
+                               Id ndim,
+                               Id nvar,
+                               Id nlayer)
 {
-  int ivar;
+  Id ivar;
 
   ivar = 1;
   db->setLocatorsByUID(ndim, ivar, ELoc::X, 0);
   ivar += ndim;
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     db->setLocatorByUID(ivar++, ELoc::L, ilayer);
     db->setLocatorByUID(ivar++, ELoc::U, ilayer);
@@ -4964,13 +4958,13 @@ static void st_m2d_print_environ(const char* title, M2D_Environ* m2denv)
 static Db* st_m2d_create_constraints(M2D_Environ* m2denv,
                                      Db* dbin,
                                      Db* dbout,
-                                     int ndim,
-                                     int nlayer,
-                                     int* number_hard)
+                                     Id ndim,
+                                     Id nlayer,
+                                     Id* number_hard)
 {
   Db* db;
   VectorDouble tab;
-  int nechin, nechout, nech, natt, number, error, ecr;
+  Id nechin, nechout, nech, natt, number, error, ecr;
 
   /* Initializations */
 
@@ -4991,7 +4985,7 @@ static Db* st_m2d_create_constraints(M2D_Environ* m2denv,
   /* Load information from 'dbin' */
 
   number = 0;
-  for (int iech = 0; iech < dbin->getNSample(); iech++)
+  for (Id iech = 0; iech < dbin->getNSample(); iech++)
   {
     if (!dbin->isActive(iech)) continue;
     if (st_record_sample(m2denv, dbin, iech, ndim, natt, nlayer, 0, &number,
@@ -5001,7 +4995,7 @@ static Db* st_m2d_create_constraints(M2D_Environ* m2denv,
 
   /* Load information from 'dbout' */
 
-  for (int iech = 0; iech < dbout->getNSample(); iech++)
+  for (Id iech = 0; iech < dbout->getNSample(); iech++)
   {
     if (!dbout->isActive(iech)) continue;
     if (st_record_sample(m2denv, dbout, iech, ndim, natt, nlayer, 0, &number,
@@ -5012,7 +5006,7 @@ static Db* st_m2d_create_constraints(M2D_Environ* m2denv,
 
   if (number <= 0)
   {
-    for (int iech = 0; iech < dbin->getNSample(); iech++)
+    for (Id iech = 0; iech < dbin->getNSample(); iech++)
     {
       if (!dbin->isActive(iech)) continue;
       if (st_record_sample(m2denv, dbin, iech, ndim, natt, nlayer, 1, &number,
@@ -5035,12 +5029,12 @@ static Db* st_m2d_create_constraints(M2D_Environ* m2denv,
 
   ecr = 0;
   db->setNameByUID(ecr++, "rank");
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     (void)gslSPrintf(string_encode, "X%d", idim + 1);
     db->setNameByUID(ecr++, string_encode);
   }
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     (void)gslSPrintf(string_encode, "Lower%d", ilayer + 1);
     db->setNameByUID(ecr++, string_encode);
@@ -5051,7 +5045,7 @@ static Db* st_m2d_create_constraints(M2D_Environ* m2denv,
   }
   if (m2denv->flag_ed)
   {
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
       (void)gslSPrintf(string_encode, "Drift%d", ilayer + 1);
       db->setNameByUID(ecr++, string_encode);
@@ -5086,7 +5080,7 @@ label_end:
 static QChol* st_derive_Qc(double s2, QChol* Qc, SPDE_Matelem& Matelem)
 {
   MatrixSparse *Bt, *B2, *Q, *B;
-  int error;
+  Id error;
 
   // Initializations
 
@@ -5149,10 +5143,10 @@ label_end:
  *****************************************************************************/
 static double st_m2d_draw_gaussian(M2D_Environ* m2denv,
                                    Db* dbc,
-                                   int verbose,
-                                   int iter,
-                                   int ilayer,
-                                   int iech,
+                                   Id verbose,
+                                   Id iter,
+                                   Id ilayer,
+                                   Id iech,
                                    double Zval,
                                    double Zcum,
                                    double Zmin,
@@ -5161,7 +5155,7 @@ static double st_m2d_draw_gaussian(M2D_Environ* m2denv,
                                    double Ysigma)
 {
   double M, S, Yval, Ymin, Ymax, Zminc, Zmaxc;
-  static int verif = 1;
+  static Id verif = 1;
 
   /* Initializations */
 
@@ -5268,17 +5262,17 @@ static double st_m2d_draw_gaussian(M2D_Environ* m2denv,
  *****************************************************************************/
 static void st_convert_Z2Y(M2D_Environ* m2denv,
                            Db* dbc,
-                           int nlayer,
-                           int type,
-                           int iech,
+                           Id nlayer,
+                           Id type,
+                           Id iech,
                            VectorDouble& tab)
 {
   double M, S, Yval, Zval, Zcur, Zcum;
-  int flag_undef;
+  Id flag_undef;
 
   flag_undef = 0;
   Zcum       = m2denv->zmini;
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     M = st_m2d_get_M(m2denv, dbc, type, ilayer, iech);
     S = st_m2d_get_S(m2denv, dbc, type, ilayer, iech);
@@ -5319,17 +5313,17 @@ static void st_convert_Z2Y(M2D_Environ* m2denv,
  *****************************************************************************/
 static void st_convert_Y2Z(M2D_Environ* m2denv,
                            Db* db,
-                           int nlayer,
-                           int type,
-                           int iech,
+                           Id nlayer,
+                           Id type,
+                           Id iech,
                            VectorDouble& tab)
 {
   double M, S, Zval, Yval, Zcur;
-  int flag_undef;
+  Id flag_undef;
 
   flag_undef = 0;
   Zcur       = m2denv->zmini;
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     M = st_m2d_get_M(m2denv, db, type, ilayer, iech);
     S = st_m2d_get_S(m2denv, db, type, ilayer, iech);
@@ -5362,17 +5356,17 @@ static void st_convert_Y2Z(M2D_Environ* m2denv,
 static void st_print_sample(const char* title,
                             M2D_Environ* /*m2denv*/,
                             Db* dbc,
-                            int nlayer,
-                            int iech,
+                            Id nlayer,
+                            Id iech,
                             VectorDouble& work)
 {
-  int nech;
+  Id nech;
   double zmin, zmax;
 
   nech = dbc->getNSample();
   message("%s - Sample #%d/%d\n", title, iech + 1, nech);
 
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     zmin = dbc->getLocVariable(ELoc::L, iech, ilayer);
     zmax = dbc->getLocVariable(ELoc::U, iech, ilayer);
@@ -5403,17 +5397,17 @@ static void st_print_sample(const char* title,
  ** \remarks be compared to the bounds.
  **
  *****************************************************************************/
-static int st_global_gibbs(M2D_Environ* m2denv,
-                           Db* dbc,
-                           int verbose,
-                           int iter,
-                           int nlayer,
-                           double sigma,
-                           VectorDouble& ymean,
-                           VectorDouble& ydat,
-                           VectorDouble& work)
+static Id st_global_gibbs(M2D_Environ* m2denv,
+                          Db* dbc,
+                          Id verbose,
+                          Id iter,
+                          Id nlayer,
+                          double sigma,
+                          VectorDouble& ymean,
+                          VectorDouble& ydat,
+                          VectorDouble& work)
 {
-  int nech;
+  Id nech;
   double zval, zmin, zmax, zcum;
 
   // Initializations
@@ -5422,12 +5416,12 @@ static int st_global_gibbs(M2D_Environ* m2denv,
 
   // Loop on the samples
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
 
     // Set the initial values
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       work[ilayer] = YDAT(ilayer, iech);
     st_convert_Y2Z(m2denv, dbc, nlayer, 1, iech, work);
     if (verbose)
@@ -5435,7 +5429,7 @@ static int st_global_gibbs(M2D_Environ* m2denv,
 
     // Loop on the layers
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
 
       // Get the elevation of the previous layer
@@ -5454,7 +5448,7 @@ static int st_global_gibbs(M2D_Environ* m2denv,
 
       // Loop on the other layers
 
-      for (int jlayer = 0; jlayer < nlayer; jlayer++)
+      for (Id jlayer = 0; jlayer < nlayer; jlayer++)
       {
         if (ilayer == jlayer) continue;
         zval = work[jlayer];
@@ -5499,7 +5493,7 @@ static int st_global_gibbs(M2D_Environ* m2denv,
 
     /* Store in the extracted vector */
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       YDAT(ilayer, iech) = work[ilayer];
   }
   return (0);
@@ -5521,15 +5515,15 @@ static int st_global_gibbs(M2D_Environ* m2denv,
  ** \param[out] work        Array of tentative values (Dimension: nlayer)
  **
  *****************************************************************************/
-static int st_check_gibbs_data(const char* title,
-                               M2D_Environ* m2denv,
-                               Db* dbc,
-                               int nlayer,
-                               int verbose,
-                               VectorDouble& ydat,
-                               VectorDouble& work)
+static Id st_check_gibbs_data(const char* title,
+                              M2D_Environ* m2denv,
+                              Db* dbc,
+                              Id nlayer,
+                              Id verbose,
+                              VectorDouble& ydat,
+                              VectorDouble& work)
 {
-  int error, nech;
+  Id error, nech;
   double zmin, zmax, depth, eps;
 
   // Initializations
@@ -5540,15 +5534,15 @@ static int st_check_gibbs_data(const char* title,
 
   // Loop on the constraints samples
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       work[ilayer] = YDAT(ilayer, iech);
     st_convert_Y2Z(m2denv, dbc, nlayer, 1, iech, work);
 
     // Loop on the layers
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
       depth = work[ilayer];
 
@@ -5603,8 +5597,8 @@ static int st_check_gibbs_data(const char* title,
  **                         (only used when mode==-1)
  **
  *****************************************************************************/
-static M2D_Environ* st_m2denv_manage(int mode,
-                                     int flag_ed,
+static M2D_Environ* st_m2denv_manage(Id mode,
+                                     Id flag_ed,
                                      double ystdv,
                                      M2D_Environ* m2denv_old)
 {
@@ -5618,7 +5612,7 @@ static M2D_Environ* st_m2denv_manage(int mode,
     // Allocation
 
     m2denv = (M2D_Environ*)mem_alloc(sizeof(M2D_Environ), 0);
-    if (m2denv == (M2D_Environ*)NULL) return (m2denv);
+    if (m2denv == nullptr) return (m2denv);
     m2denv->flag_ed = flag_ed;
     m2denv->iatt_fd = -1;
     m2denv->iatt_fg = -1;
@@ -5635,7 +5629,7 @@ static M2D_Environ* st_m2denv_manage(int mode,
   else
   {
     m2denv = m2denv_old;
-    if (m2denv != (M2D_Environ*)NULL)
+    if (m2denv != nullptr)
 
     {
       m2denv->dcoef = (double*)mem_free((char*)m2denv->dcoef);
@@ -5660,11 +5654,11 @@ static M2D_Environ* st_m2denv_manage(int mode,
  *****************************************************************************/
 static void st_m2d_vector_extract(M2D_Environ* m2denv,
                                   Db* dbc,
-                                  int nlayer,
+                                  Id nlayer,
                                   VectorDouble& ydat,
                                   VectorDouble& work)
 {
-  int nech;
+  Id nech;
 
   /* Initializations */
 
@@ -5672,12 +5666,12 @@ static void st_m2d_vector_extract(M2D_Environ* m2denv,
 
   /* Loop on the samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
 
     /* Loop on the layers */
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       work[ilayer] = dbc->getZVariable(iech, ilayer);
 
     /* Convert from the depth to thickness */
@@ -5686,7 +5680,7 @@ static void st_m2d_vector_extract(M2D_Environ* m2denv,
 
     /* Store in the extracted vector */
 
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       YDAT(ilayer, iech) = work[ilayer];
   }
 }
@@ -5712,15 +5706,15 @@ static void st_m2d_vector_extract(M2D_Environ* m2denv,
 static void st_print_db_constraints(const char* title,
                                     Db* db,
                                     const VectorDouble& ydat,
-                                    int nlayer,
-                                    int verbose)
+                                    Id nlayer,
+                                    Id verbose)
 {
   double value, lower, drift, upper, vgaus;
-  int nech, nprint;
+  Id nech, nprint;
 
   // Initializations
 
-  nprint = (int)get_keypone("Print_Data", 10.);
+  nprint = static_cast<Id>(get_keypone("Print_Data", 10.));
   if (!verbose || nprint == 0) return;
 
   // Printout
@@ -5728,10 +5722,10 @@ static void st_print_db_constraints(const char* title,
   mestitle(1, title);
   nech = db->getNSample();
   if (nprint > 0) nech = MIN(nech, nprint);
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActive(iech)) continue;
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
       lower = db->getLocVariable(ELoc::L, iech, ilayer);
       upper = db->getLocVariable(ELoc::U, iech, ilayer);
@@ -5756,12 +5750,12 @@ static void st_print_db_constraints(const char* title,
  **
  *****************************************************************************/
 static void st_m2d_stats_gaus(const char* title,
-                              int nlayer,
-                              int nech,
+                              Id nlayer,
+                              Id nech,
                               double* ydat)
 {
   if (!DEBUG) return;
-  for (int ilayer = 0; ilayer < nlayer; ilayer++)
+  for (Id ilayer = 0; ilayer < nlayer; ilayer++)
   {
     (void)gslSPrintf(string_encode, "%s (Layer #%d)", title, ilayer + 1);
     ut_stats_mima_print(string_encode, nech, &YDAT(ilayer, 0), NULL);
@@ -5802,22 +5796,22 @@ static void st_m2d_stats_gaus(const char* title,
  ** \remarks It will serve as a multiplier to the Mean thickness maps.
  **
  *****************************************************************************/
-int m2d_gibbs_spde(Db* dbin,
-                   Db* dbout,
-                   Model* model,
-                   int flag_ed,
-                   int nlayer,
-                   int niter,
-                   int seed,
-                   int nbsimu,
-                   int icol_pinch,
-                   int flag_drift,
-                   int flag_ce,
-                   int flag_cstd,
-                   int verbose)
+Id m2d_gibbs_spde(Db* dbin,
+                  Db* dbout,
+                  Model* model,
+                  Id flag_ed,
+                  Id nlayer,
+                  Id niter,
+                  Id seed,
+                  Id nbsimu,
+                  Id icol_pinch,
+                  Id flag_drift,
+                  Id flag_ce,
+                  Id flag_cstd,
+                  Id verbose)
 {
-  int error, iatt_f, iatt_out, nvertex, nech, ngrid, ndim, number_hard, nfois;
-  int iptr_ce, iptr_cstd, ecr;
+  Id error, iatt_f, iatt_out, nvertex, nech, ngrid, ndim, number_hard, nfois;
+  Id iptr_ce, iptr_cstd, ecr;
   double *gwork, nugget, ysigma, vartot;
   VectorDouble ydat;
   VectorDouble ymean;
@@ -5843,7 +5837,7 @@ int m2d_gibbs_spde(Db* dbin,
   gwork             = nullptr;
   dbc               = nullptr;
   Qc                = nullptr;
-  m2denv            = (M2D_Environ*)NULL;
+  m2denv            = nullptr;
   ysigma            = 0.;
   number_hard       = 0;
 
@@ -5914,7 +5908,7 @@ int m2d_gibbs_spde(Db* dbin,
   vartot = model->getTotalSill(0, 0);
 
   m2denv = st_m2denv_manage(1, flag_ed, sqrt(vartot), NULL);
-  if (m2denv == (M2D_Environ*)NULL) goto label_end;
+  if (m2denv == nullptr) goto label_end;
 
   /* Preparing the variables in 'dbout' */
 
@@ -5982,7 +5976,7 @@ int m2d_gibbs_spde(Db* dbin,
     gwork = (double*)mem_alloc(sizeof(double) * ngrid * nlayer, 0);
     if (gwork == nullptr) goto label_end;
     st_m2d_drift_save(m2denv, dbout, nlayer, gwork);
-    for (int ilayer = 0; ilayer < nlayer; ilayer++)
+    for (Id ilayer = 0; ilayer < nlayer; ilayer++)
     {
       dbout->setColumnByUIDOldStyle(&GWORK(ilayer, 0), iatt_out + ilayer);
       (void)gslSPrintf(string_encode, "Drift%d", ilayer + 1);
@@ -6040,7 +6034,7 @@ int m2d_gibbs_spde(Db* dbin,
 
     /* Loop on the simulations */
 
-    for (int isimu = 0; isimu < nbsimu; isimu++)
+    for (Id isimu = 0; isimu < nbsimu; isimu++)
     {
       message("Simulation #%d/%d\n", isimu + 1, nbsimu);
 
@@ -6049,7 +6043,7 @@ int m2d_gibbs_spde(Db* dbin,
       if (verbose)
         message("\n==> Launching the Simulations (%d iterations)\n", niter);
       nugget = vartot;
-      for (int iter = 0; iter < niter; iter++)
+      for (Id iter = 0; iter < niter; iter++)
       {
         if (verbose) message(">>>> Iteration #%d/%d\n", iter + 1, niter);
 
@@ -6065,7 +6059,7 @@ int m2d_gibbs_spde(Db* dbin,
 
         // Perform the conditional simulation at meshing vartices
 
-        for (int ilayer = 0; ilayer < nlayer; ilayer++)
+        for (Id ilayer = 0; ilayer < nlayer; ilayer++)
         {
           VH::extractInPlace(ydat, ydat_loc, ilayer * nech);
           VH::extractInPlace(yvert, yvert_loc, ilayer * nvertex);
@@ -6074,16 +6068,16 @@ int m2d_gibbs_spde(Db* dbin,
           // Non-conditional simulation
 
           st_simulate_cholesky(Qc, vwork, yvert_loc);
-          for (int i = 0; i < nvertex; i++)
+          for (Id i = 0; i < nvertex; i++)
             yvert_loc[i] *= ysigma;
 
           // Conditional simulation
 
-          for (int i = 0; i < nvertex; i++)
+          for (Id i = 0; i < nvertex; i++)
             zkrig[i] = vwork[i] = 0.;
           Matelem.Aproj->prodMatVecInPlaceC(ydat_loc, rhs, true);
           st_kriging_cholesky(Qc, rhs.data(), vwork, zkrig.data());
-          for (int i = 0; i < nvertex; i++)
+          for (Id i = 0; i < nvertex; i++)
             yvert_loc[i] += zkrig[i];
 
           // Project the Simulation from the vertices onto the Data
@@ -6115,7 +6109,7 @@ int m2d_gibbs_spde(Db* dbin,
 
       /* Project from vertices to grid nodes */
 
-      for (int ilayer = 0; ilayer < nlayer; ilayer++)
+      for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       {
         constvect cyvert(&YVERT(ilayer, 0), nvertex);
         vect cgwork(&GWORK(ilayer, 0), ngrid);
@@ -6124,18 +6118,18 @@ int m2d_gibbs_spde(Db* dbin,
 
       /* Convert from Gaussian to Depth */
 
-      for (int igrid = 0; igrid < ngrid; igrid++)
+      for (Id igrid = 0; igrid < ngrid; igrid++)
       {
         if (!dbout->isActive(igrid)) continue;
-        for (int ilayer = 0; ilayer < nlayer; ilayer++)
+        for (Id ilayer = 0; ilayer < nlayer; ilayer++)
           lwork[ilayer] = GWORK(ilayer, igrid);
         st_convert_Y2Z(m2denv, dbout, nlayer, 2, igrid, lwork);
-        for (int ilayer = 0; ilayer < nlayer; ilayer++)
+        for (Id ilayer = 0; ilayer < nlayer; ilayer++)
           GWORK(ilayer, igrid) = lwork[ilayer];
       }
 
       st_m2d_stats_gaus("Depth on grid", nlayer, ngrid, gwork);
-      for (int ilayer = 0; ilayer < nlayer; ilayer++)
+      for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       {
         dbout->setColumnByUIDOldStyle(&GWORK(ilayer, 0),
                                       iatt_out + isimu * nlayer + ilayer);
@@ -6145,9 +6139,9 @@ int m2d_gibbs_spde(Db* dbin,
     // Renaming the simulation outcomes
 
     ecr = 0;
-    for (int isimu = 0; isimu < nbsimu; isimu++)
+    for (Id isimu = 0; isimu < nbsimu; isimu++)
     {
-      for (int ilayer = 0; ilayer < nlayer; ilayer++)
+      for (Id ilayer = 0; ilayer < nlayer; ilayer++)
       {
         (void)gslSPrintf(string_encode, "Layer-%d_Simu-%d", ilayer + 1,
                          isimu + 1);
@@ -6184,13 +6178,13 @@ int m2d_gibbs_spde(Db* dbin,
       // Renaming the resulting variables
 
       if (iptr_ce >= 0)
-        for (int ilayer = 0; ilayer < nlayer; ilayer++)
+        for (Id ilayer = 0; ilayer < nlayer; ilayer++)
         {
           (void)gslSPrintf(string_encode, "Layer-%d_CE", ilayer + 1);
           dbout->setNameByUID(iptr_ce + ilayer, string_encode);
         }
       if (iptr_cstd >= 0)
-        for (int ilayer = 0; ilayer < nlayer; ilayer++)
+        for (Id ilayer = 0; ilayer < nlayer; ilayer++)
         {
           (void)gslSPrintf(string_encode, "Layer-%d_CStd", ilayer + 1);
           dbout->setNameByUID(iptr_cstd + ilayer, string_encode);

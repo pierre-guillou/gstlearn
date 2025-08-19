@@ -17,7 +17,7 @@
 
 namespace gstlrn
 {
-Tensor::Tensor(unsigned int ndim)
+Tensor::Tensor(size_t ndim)
   : AStringable()
   , _nDim(ndim)
   , _tensorDirect()
@@ -71,7 +71,7 @@ Tensor::~Tensor()
 {
 }
 
-void Tensor::init(int ndim)
+void Tensor::init(Id ndim)
 {
   _nDim = ndim;
   _radius.resize(_nDim, 1.);
@@ -99,7 +99,7 @@ void Tensor::setRadiusIsotropic(double radius)
 {
   if (isZero(radius))
     my_throw("Ellipsoid radius cannot be null");
-  VH::fill(_radius, radius, static_cast<int>(_radius.size()));
+  VH::fill(_radius, radius, static_cast<Id>(_radius.size()));
   _isotropic = true;
   _fillTensors();
 }
@@ -118,7 +118,7 @@ void Tensor::setRadiusVec(const VectorDouble& radius)
   _fillTensors();
 }
 
-void Tensor::setRadiusDir(unsigned int idim, double radius)
+void Tensor::setRadiusDir(size_t idim, double radius)
 {
   if (idim >= _nDim)
     my_throw("Wrong index of dimension");
@@ -146,7 +146,7 @@ void Tensor::setRotationAngles(const VectorDouble& angles)
   _fillTensors();
 }
 
-void Tensor::setRotationAngle(unsigned int idim, double angle)
+void Tensor::setRotationAngle(size_t idim, double angle)
 {
   if ((_nDim == 2 && idim != 0) ||
       (_nDim > 2 && idim >= _nDim))

@@ -60,7 +60,7 @@ public:
 
   void setCovList(const CovList* covs);
   virtual void addCov(const CovBase& cov);
-  CovBase* getCovBase(int icov) const { return getCovListModify()->getCovModify(icov); }
+  CovBase* getCovBase(Id icov) const { return getCovListModify()->getCovModify(icov); }
 
   void fitSills(Vario* vario = nullptr,
                 const DbGrid* dbmap = nullptr,

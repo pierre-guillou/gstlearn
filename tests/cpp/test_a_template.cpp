@@ -8,18 +8,20 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "API/SPDE.hpp"
-#include "Db/DbGrid.hpp"
-#include "LinearOp/ProjMatrix.hpp"
-#include "LinearOp/ProjMultiMatrix.hpp"
-#include "LinearOp/SPDEOpMatrix.hpp"
-#include "Mesh/MeshETurbo.hpp"
-#include "Model/Model.hpp"
 /**
  * This file is meant to parametrized the ModelGeneric in terms of ParamInfo
  * and to fit the values of these parameters according to the Maximum LogLikelihood
  * method and using the Vecchia approximation.
  */
+#include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
+#include "Enum/ECov.hpp"
+#include "Enum/ESpaceType.hpp"
+#include "LinearOp/ProjMatrix.hpp"
+#include "Mesh/MeshSphericalExt.hpp"
+#include "Model/Model.hpp"
+#include "Space/ASpaceObject.hpp"
+#include "geoslib_define.h"
 using namespace gstlrn;
 
 int main(int argc, char* argv[])
@@ -27,40 +29,39 @@ int main(int argc, char* argv[])
   DECLARE_UNUSED(argc);
   DECLARE_UNUSED(argv);
 
-  double rangev = 0.2;
-  double sill   = 1.;
+  defineDefaultSpace(ESpaceType::SN, EARTH_RADIUS);
 
-  int nx           = 200;
-  double dx        = 1. / (nx - 1);
-  VectorInt nxs    = {nx, nx};
-  VectorDouble dxs = {dx, dx};
-  VectorDouble x0s = {0., 0.};
+  auto mesh0 = MeshSphericalExt();
+  (void)mesh0.resetFromDb(nullptr, nullptr, "-r3");
 
-  int nxm           = 100;
-  double dxm        = 1.5 / (nxm - 1);
-  VectorInt nxms    = {nxm, nxm};
-  VectorDouble dxms = {dxm, dxm};
-  VectorDouble x0ms = {-0.25, -0.25};
+  int nsample = 4000;
+  VH::sample(mesh0.getNApices(), nsample);
+  VectorInt ind = VH::sampleRanks(mesh0.getNApices(), 0., nsample);
 
-  auto* grid          = DbGrid::create(nxs, dxs, x0s);
-  auto* gridExt       = DbGrid::create(nxms, dxms, x0ms);
-  auto* mesh          = MeshETurbo::createFromGrid(gridExt);
-  VectorMeshes meshes = {mesh};
+  // Creation of the db
+  VectorDouble X = mesh0.getCoordinatesPerApex(0);
+  VectorDouble Y = mesh0.getCoordinatesPerApex(1);
 
-  auto* model = Model::createFromParam(ECov::MATERN, rangev, sill);
+  Db dbdat;
+  VectorDouble dbX = VH::sample(X, ind);
+  VectorDouble dbY = VH::sample(Y, ind);
+  dbdat.addColumns(dbX, "x1", ELoc::X, 0);
+  dbdat.addColumns(dbY, "x2", ELoc::X, 1);
 
-  auto proj      = ProjMatrix(grid, mesh);
-  auto projmulti = ProjMultiMatrix({{&proj}});
+  double ratioRange   = 0.2;
+  double scale        = EARTH_RADIUS * ratioRange;
+  double sill         = 2.;
+  VectorDouble coeffs = {1, -1, .5};
+  auto* model         = Model::createFromParam(ECov::MARKOV, scale, sill);
+  model->setMarkovCoeffs(0, coeffs);
 
-  bool verbose = true;
-  auto spde    = SPDE(model, 1);
-  (void)spde.setDbout(grid);
-  (void)spde.defineMeshes(true, meshes, VectorMeshes(), verbose);
-  (void)spde.defineProjections(false, true, &projmulti, nullptr, verbose);
-  auto* spdeop = spde.defineShiftOperator(false, verbose);
+  auto mesh = MeshSphericalExt();
+  (void)mesh.resetFromDb(nullptr, nullptr, "-r2");
 
-  delete spdeop;
-  delete model;
+  auto Aproj = ProjMatrix(&dbdat, &mesh);
 
-  return (0);
+  Id ndef = VH::countUndefined(Aproj.getValues());
+  message("Number of undef = %ld\n", ndef);
+
+  exit(0);
 }

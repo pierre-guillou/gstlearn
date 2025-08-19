@@ -39,9 +39,9 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Fractures-");
 
   // Global parameters
-  int ndim     = 2;
+  Id ndim      = 2;
   bool verbose = true;
-  int ndisc    = 1000.;
+  Id ndisc     = 1000.;
   law_set_random_seed(32131);
 
   defineDefaultSpace(ESpaceType::RN, ndim);
@@ -59,22 +59,22 @@ int main(int argc, char* argv[])
   double deltay   = 0.;
   double mean     = 20.;
   double stdev    = 10.;
-  FracEnviron env = FracEnviron(xmax, ymax, deltax, deltay, mean, stdev);
+  FracEnviron env(xmax, ymax, deltax, deltay, mean, stdev);
 
   // Creating the Fault Families
 
   // Family1: orient=0, dorient=20, theta0=0.2, alpha=1, ratcst=1,
   //          prop1 = 0.5, prop2=0.2, aterm=1.2, bterm=2.4, range=5
-  FracFamily family1 = FracFamily(0., 20., 0.2, 1., 1., 0.5, 0.2, 1.2, 2.4, 5.);
+  FracFamily family1(0., 20., 0.2, 1., 1., 0.5, 0.2, 1.2, 2.4, 5.);
 
   // Family2: orient=30, dorient=5., theta0=0.2, alpha=1, ratcst=1,
   //          prop1 = 0.5, prop2=0.2, aterm=1.2, bterm=2.4, range=5
-  FracFamily family2 = FracFamily(30., 5., 0.2, 1., 1., 0.5, 0.2, 1.2, 2.4, 5.);
+  FracFamily family2(30., 5., 0.2, 1., 1., 0.5, 0.2, 1.2, 2.4, 5.);
 
   // Creating the Major Fault
   double coord    = 30.;
   double forient  = 0.;
-  FracFault fault = FracFault(coord, forient);
+  FracFault fault(coord, forient);
   double thetal   = 1.;
   double thetar   = 2.;
   double rangel   = 10.;
@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
   env.display();
 
   // Simulating fractures
-  FracList flist = FracList();
-  int seed       = 432431;
+  FracList flist;
+  Id seed = 432431;
   flist.simulate(env, true, true, seed, verbose, VectorDouble());
   flist.display();
 

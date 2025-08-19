@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("bench_Migrate-");
 
   // Global parameters
-  int ndim = 2;
+  Id ndim = 2;
   //  VectorDouble dmax = {0.01, 0.01};
   VectorDouble dmax;
   bool flag_stat = true;
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   NeighUnique* neigh = NeighUnique::create();
 
   // Generate the data set
-  int nech = 10000;
+  Id nech  = 10000;
   Db* data = Db::createFillRandom(nech, ndim, 0);
   if (!flag_simu)
   {
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
   if (flag_stat) data->display();
 
   // Generate the output grid
-  int nx       = 200;
+  Id nx        = 200;
   DbGrid* grid = DbGrid::createCoveringDb(data, {nx, nx});
   if (!flag_simu)
   {

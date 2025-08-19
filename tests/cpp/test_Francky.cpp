@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 
 {
   OptCustom::define("ompthreads", 1);
-  int seed = 10355;
+  Id seed = 10355;
   law_set_random_seed(seed);
 
   std::stringstream sfn;
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Francky-");
 
   // Creating the 2-D Grid
-  auto nx      = {101, 101};
+  VectorInt nx = {101, 101};
   DbGrid* grid = DbGrid::create(nx);
 
   // Creating the 2-D Data Db with a Normal Variable
@@ -65,10 +65,10 @@ int main(int argc, char* argv[])
   model->getCovAniso(0)->makeAngleNoStatFunctional(&spirale);
 
   // Simulating variable at data location (using SPDE)
-  int useCholesky = 0;
+  Id useCholesky = 0;
   law_set_random_seed(13256);
   (void)simulateSPDE(nullptr, dat, model, 1, useCholesky,
-                     VectorMeshes(), nullptr, VectorMeshes(), nullptr, SPDEParam(), false,
+                     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, SPDEParam(), false,
                      NamingConvention("Data", true, false));
   (void)dat->dumpToNF("Data.NF");
 

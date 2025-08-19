@@ -44,7 +44,7 @@ private:
 
   void _storeResultsForExport(const KrigingSystemSimpleCase& ksys,
                               KrigingAlgebraSimpleCase& algebra,
-                              int iechout);
+                              Id iechout);
 
 private:
   bool _flagEst;
@@ -54,11 +54,11 @@ private:
   EKrigOpt _calcul;
 
   VectorString _nameCoord;
-  int _iechSingleTarget;
+  Id _iechSingleTarget;
 
-  int _iptrEst;
-  int _iptrStd;
-  int _iptrVarZ;
+  Id _iptrEst;
+  Id _iptrStd;
+  Id _iptrVarZ;
 
   Krigtest_Res _ktest;
 };

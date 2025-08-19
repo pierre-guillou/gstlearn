@@ -20,7 +20,7 @@
 
 namespace gstlrn
 {
-NeighImage::NeighImage(const VectorInt& radius, int skip, const ASpaceSharedPtr& space)
+NeighImage::NeighImage(const VectorInt& radius, Id skip, const ASpaceSharedPtr& space)
     : ANeigh(space),
       _skip(skip),
       _imageRadius(radius)
@@ -68,13 +68,13 @@ bool NeighImage::_deserializeAscii(std::istream& is, bool verbose)
   bool ret = true;
 
   ret = ret && ANeigh::_deserializeAscii(is, verbose);
-  ret = ret && _recordRead<int>(is, "Skipping factor", _skip);
-  for (int idim = 0; ret && idim < (int) getNDim(); idim++)
+  ret = ret && _recordRead<Id>(is, "Skipping factor", _skip);
+  for (Id idim = 0; ret && idim < static_cast<Id>(getNDim()); idim++)
   {
     double loc_radius = 0.;
     ret = ret && _recordRead<double>(is, "Image NeighImageborhood Radius",
                                      loc_radius);
-    _imageRadius[idim] = static_cast<int> (loc_radius);
+    _imageRadius[idim] = static_cast<Id> (loc_radius);
   }
 
   return ret;
@@ -84,14 +84,14 @@ bool NeighImage::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
   ret = ret && ANeigh::_serializeAscii(os, verbose);
-  ret = ret && _recordWrite<int>(os, "", getSkip());
-  for (int idim = 0; ret && idim < (int) getNDim(); idim++)
-    ret = ret && _recordWrite<double>(os, "", (double) getImageRadius(idim));
+  ret = ret && _recordWrite<Id>(os, "", getSkip());
+  for (Id idim = 0; ret && idim < static_cast<Id>(getNDim()); idim++)
+    ret = ret && _recordWrite<double>(os, "", static_cast<double>(getImageRadius(idim)));
   ret = ret && _commentWrite(os, "Image NeighImageborhood parameters");
   return ret;
 }
 
-NeighImage* NeighImage::create(const VectorInt& radius, int skip, const ASpaceSharedPtr& space)
+NeighImage* NeighImage::create(const VectorInt& radius, Id skip, const ASpaceSharedPtr& space)
 {
   return new NeighImage(radius, skip, space);
 }
@@ -104,7 +104,7 @@ NeighImage* NeighImage::create(const VectorInt& radius, int skip, const ASpaceSh
  */
 NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighImage* neigh = new NeighImage();
+  auto* neigh = new NeighImage();
   if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
   delete neigh;
   return nullptr;
@@ -115,15 +115,15 @@ NeighImage* NeighImage::createFromNF(const String& NFFilename, bool verbose)
  * @param db Pointer to the target Db
  * @return
  */
-int NeighImage::getNSampleMax(const Db* /*db*/) const
+Id NeighImage::getNSampleMax(const Db* /*db*/) const
 {
-  int nmax = 1;
-  for (int idim = 0; idim < (int) getNDim(); idim++)
+  Id nmax = 1;
+  for (Id idim = 0; idim < static_cast<Id>(getNDim()); idim++)
     nmax *= (2 * _imageRadius[idim] + 1);
   return nmax;
 }
 
-bool NeighImage::hasChanged(int iech_out) const
+bool NeighImage::hasChanged(Id iech_out) const
 {
   DECLARE_UNUSED(iech_out);
   return (_iechMemo < 0 || _isNbghMemoEmpty());
@@ -134,9 +134,9 @@ bool NeighImage::hasChanged(int iech_out) const
  * @param iech_out Valid Rank of the sample in the output Db
  * @param ranks Vector of sample ranks in neighborhood (empty when error)
  */
-void NeighImage::getNeigh(int iech_out, VectorInt& ranks)
+void NeighImage::getNeigh(Id iech_out, VectorInt& ranks)
 {
-  int nech = _dbin->getNSample();
+  Id nech = _dbin->getNSample();
   ranks.resize(nech);
   ranks.fill(-1);
 
@@ -159,13 +159,13 @@ void NeighImage::getNeigh(int iech_out, VectorInt& ranks)
  ** \param[out]  ranks   Vector of samples elected in the Neighborhood
  **
  *****************************************************************************/
-void NeighImage::_uimage(int iech_out, VectorInt& ranks)
+void NeighImage::_uimage(Id iech_out, VectorInt& ranks)
 {
-  int nech = _dbin->getNSample();
+  Id nech = _dbin->getNSample();
 
   /* Loop on samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     /* Discard the masked input sample */
 
@@ -197,19 +197,19 @@ void NeighImage::_uimage(int iech_out, VectorInt& ranks)
  * the value of the corresponding variable is set to 'TEST'.
  * @remark The center point can never be skipped.
  */
-DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, int seed) const
+DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, Id seed) const
 {
   DbGrid* dbsub = nullptr;
 
   double seuil = 1. / (1. + _skip);
-  int ndim     = dbgrid->getNDim();
-  int nvar     = dbgrid->getNLoc(ELoc::Z);
+  Id ndim     = dbgrid->getNDim();
+  Id nvar     = dbgrid->getNLoc(ELoc::Z);
 
   /* Core allocation */
 
   VectorInt nx(ndim);
-  int nech = 1;
-  for (int i = 0; i < ndim; i++)
+  Id nech = 1;
+  for (Id i = 0; i < ndim; i++)
   {
     nx[i] = 2 * _imageRadius[i] + 1;
     nech *= nx[i];
@@ -217,13 +217,13 @@ DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, int seed) const
 
   law_set_random_seed(seed);
   VectorBool sel(nech);
-  for (int iech = 0; iech < nech; iech++) sel[iech] = (law_uniform(0., 1.) < seuil);
+  for (Id iech = 0; iech < nech; iech++) sel[iech] = (law_uniform(0., 1.) < seuil);
   sel[nech / 2] = 1.;
 
   VectorDouble tab(nech * nvar);
-  int iecr = 0;
-  for (int ivar = 0; ivar < nvar; ivar++)
-    for (int iech = 0; iech < nech; iech++) tab[iecr++] = (sel[iech]) ? 0. : TEST;
+  Id iecr = 0;
+  for (Id ivar = 0; ivar < nvar; ivar++)
+    for (Id iech = 0; iech < nech; iech++) tab[iecr++] = (sel[iech]) ? 0. : TEST;
 
   /* Create the grid */
 
@@ -234,7 +234,7 @@ DbGrid* NeighImage::buildImageGrid(const DbGrid* dbgrid, int seed) const
 
   VectorDouble coor(ndim);
   dbsub->rankToCoordinatesInPlace(nech / 2, coor);
-  for (int i = 0; i < ndim; i++) dbsub->setX0(i, dbsub->getX0(i) - coor[i]);
+  for (Id i = 0; i < ndim; i++) dbsub->setX0(i, dbsub->getX0(i) - coor[i]);
   if (db_grid_define_coordinates(dbsub)) return dbsub;
 
   return dbsub;
@@ -250,7 +250,7 @@ bool NeighImage::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
   /* Read the grid characteristics */
   bool ret = true;
-  int skip = 0;
+  Id skip = 0;
 
   ret = ret && SerializeHDF5::readValue(*neighG, "Skip", skip);
 

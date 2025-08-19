@@ -50,31 +50,31 @@ public:
 protected:
   bool _check() override;
   bool _preprocess() override;
-  int _getNDim() const { return _ndim; }
-  int _getNVar() const { return _nvar; }
-  bool _setNdim(int ndim, bool flagForce = false);
-  bool _setNvar(int nvar, bool flagForce = false);
+  Id _getNDim() const { return _ndim; }
+  Id _getNVar() const { return _nvar; }
+  bool _setNdim(Id ndim, bool flagForce = false);
+  bool _setNvar(Id nvar, bool flagForce = false);
 
-  int _addVariableDb(int whichDb,
-                     int status,
+  Id _addVariableDb(Id whichDb,
+                     Id status,
                      const ELoc& locatorType,
-                     int locatorIndex = 0,
-                     int number       = 1,
+                     Id locatorIndex = 0,
+                     Id number       = 1,
                      double valinit   = 0.);
-  void _renameVariable(int whichDb,
+  void _renameVariable(Id whichDb,
                        const VectorString& names,
                        const ELoc& locatorType,
-                       int nvar,
-                       int iptr,
+                       Id nvar,
+                       Id iptr,
                        const String& qualifier,
-                       int count,
+                       Id count,
                        bool flagSetLocator = true,
-                       int locatorShift    = 0);
-  void _storeInVariableList(int whichDb, int status, const VectorInt& iuids);
-  int _expandInformation(int mode, const ELoc& locatorType) const;
-  void _cleanVariableDb(int status);
-  Db* _whichDb(int whichDb);
-  String _identifyVariable(int iuid) const;
+                       Id locatorShift    = 0);
+  void _storeInVariableList(Id whichDb, Id status, const VectorInt& iuids);
+  Id _expandInformation(Id mode, const ELoc& locatorType) const;
+  void _cleanVariableDb(Id status);
+  Db* _whichDb(Id whichDb);
+  String _identifyVariable(Id iuid) const;
 
 private:
   bool _checkSpaceDimension();
@@ -89,7 +89,7 @@ private:
   VectorInt _listVariablePermDbOut;
   VectorInt _listVariableTempDbIn;
   VectorInt _listVariableTempDbOut;
-  int _ndim;
-  int _nvar;
+  Id _ndim;
+  Id _nvar;
 };
 } // namespace gstlrn

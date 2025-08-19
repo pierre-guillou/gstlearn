@@ -34,8 +34,8 @@ public:
   static PolyElem* createFromNF(const String& NFFilename, bool verbose = true);
   const VectorDouble& getX() const { return PolyLine2D::getX(); }
   const VectorDouble& getY() const { return PolyLine2D::getY(); }
-  double getX(int i) const { return PolyLine2D::getX(i); }
-  double getY(int i) const { return PolyLine2D::getY(i); }
+  double getX(Id i) const { return PolyLine2D::getX(i); }
+  double getY(Id i) const { return PolyLine2D::getY(i); }
   double getZmax() const { return _zmax; }
   double getZmin() const { return _zmin; }
 

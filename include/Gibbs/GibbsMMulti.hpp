@@ -31,8 +31,8 @@ public:
   GibbsMMulti& operator=(const GibbsMMulti &r);
   virtual ~GibbsMMulti();
 
-  void update(VectorVectorDouble &y, int isimu, int ipgs, int iter) override;
-  int covmatAlloc(bool verbose, bool verboseTimer = false) override;
+  void update(VectorVectorDouble &y, Id isimu, Id ipgs, Id iter) override;
+  Id covmatAlloc(bool verbose, bool verboseTimer = false) override;
 
   void setEps(double eps) { _eps = eps; }
   void cleanup() override;
@@ -40,22 +40,22 @@ public:
   void setFlagStoreInternal(bool flagStoreInternal) ;
 
 private:
-  int  _getNVar() const;
-  int  _getSize() const;
-  void _storeWeights(int icol);
-  void _storeWeightsMS(int icol, NF_Triplet& NF_T);
-  void _getWeights(int icol) const;
-  void _calculateWeights(int icol,
+  Id  _getNVar() const;
+  Id  _getSize() const;
+  void _storeWeights(Id icol);
+  void _storeWeightsMS(Id icol, NF_Triplet& NF_T);
+  void _getWeights(Id icol) const;
+  void _calculateWeights(Id icol,
                          VectorDouble &b,
                          double tol = EPSILON3) const;
-  int  _storeAllWeights(bool verbose = false);
-  int  _getSizeOfWeights(const VectorDouble& weights) const;
-  double _getEstimate(int ipgs, int icol, const VectorVectorDouble &y) const;
+  Id  _storeAllWeights(bool verbose = false);
+  Id  _getSizeOfWeights(const VectorDouble& weights) const;
+  double _getEstimate(Id ipgs, Id icol, const VectorVectorDouble &y) const;
   void _allocate();
-  double _getVariance(int icol) const;
-  int _getColumn(int iact, int ivar) const;
-  void _splitCol(int icol, int *iact, int *ivar) const;
-  void _updateStatWeights(int* nzero);
+  double _getVariance(Id icol) const;
+  Id _getColumn(Id iact, Id ivar) const;
+  void _splitCol(Id icol, Id *iact, Id *ivar) const;
+  void _updateStatWeights(Id* nzero);
 
 private:
   std::shared_ptr<MatrixSparse>   _Cmat;

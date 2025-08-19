@@ -43,9 +43,9 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_SimbiPGS-");
-  int error  = 0;
-  int ndim   = 2;
-  int nbsimu = 2;
+  Id error  = 0;
+  Id ndim   = 2;
+  Id nbsimu = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   CovContext ctxt(1, 2, 1.); // use default space
   DbStringFormat dbfmt;
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
   double slope           = 0.5;
   double shdown          = -0.2;
   double shdsup          = +0.5;
-  RuleShadow* ruleshadow = new RuleShadow(slope, shdsup, shdown, shift);
+  auto* ruleshadow = new RuleShadow(slope, shdsup, shdown, shift);
   ruleshadow->display();
   (void)ruleshadow->dumpToNF("PGSruleshadow.NF");
 
@@ -174,5 +174,5 @@ int main(int argc, char* argv[])
   delete rulepropshift;
   delete rulepropshadow;
   delete neighU;
-  return (error);
+  return static_cast<int>(error);
 }

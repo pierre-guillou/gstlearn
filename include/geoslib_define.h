@@ -26,6 +26,14 @@ namespace gstlrn
 typedef std::string String;
 typedef unsigned char UChar;
 
+/// Main type for gstlearn 64-bits integers, to be used in priority
+/// when an integer is needed.
+using Id = long;
+
+/// Secondary integer type. To be used instead of "int". No "int"
+/// should be voluntarily introduced in gstlearn.
+using I32 = int;
+
 #define EPSILON1  1.e-1
 #define EPSILON2  1.e-2
 #define EPSILON3  1.e-3
@@ -63,7 +71,7 @@ typedef unsigned char UChar;
   };
 
 // No need to this stuff through SWIG (using target language NAs)
-// => Not really : Using customized SWIG 4.2.0b, TEST is often a default argument value!
+// => Not really : Using customized SWIG 4.3.0, TEST is often a default argument value!
 // #ifndef SWIG
 #define TEST      1.234e30
 #define TEST_COMP 1.000e30
@@ -103,13 +111,13 @@ DISABLE_WARNING_BASE_NOT_EXPORTED_FROM_DLL
 #  ifdef USE_BOOST_SPAN
 typedef boost::span<const double> constvect;
 typedef boost::span<double> vect;
-using constvectint = boost::span<const int>;
-using vectint      = boost::span<int>;
+using constvectint = boost::span<const Id>;
+using vectint      = boost::span<Id>;
 #  else
 typedef std::span<const double> constvect;
 typedef std::span<double> vect;
-using constvectint = std::span<const int>;
-using vectint      = std::span<int>;
+using constvectint = std::span<const Id>;
+using vectint      = std::span<Id>;
 #  endif
 
 #endif

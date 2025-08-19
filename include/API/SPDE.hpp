@@ -12,8 +12,8 @@
 
 #include "API/SPDEParam.hpp"
 #include "Basic/NamingConvention.hpp"
+#include "LinearOp/ASimulable.hpp"
 #include "LinearOp/InvNuggetOp.hpp"
-#include "LinearOp/PrecisionOpMatrix.hpp"
 #include "LinearOp/PrecisionOpMulti.hpp"
 #include "LinearOp/PrecisionOpMultiMatrix.hpp"
 #include "LinearOp/ProjMultiMatrix.hpp"
@@ -23,7 +23,6 @@ namespace gstlrn
 {
 class ShiftOpMatrix;
 class PrecisionOp;
-class PrecisionOpMatrix;
 class Db;
 class DbGrid;
 class MeshETurbo;
@@ -41,18 +40,21 @@ class SPDEOp;
 class GSTLEARN_EXPORT SPDE
 {
 public:
-  SPDE(Model* model,
-       int useCholesky         = -1,
-       const SPDEParam& params = SPDEParam());
+  SPDE(const Db* dbin,
+       Model* model,
+       bool flagKrig,
+       bool flagSimu,
+       Id useCholesky          = -1,
+       const SPDEParam& params = SPDEParam(),
+       const Db* domain        = nullptr);
   SPDE(const SPDE& r)            = delete;
   SPDE& operator=(const SPDE& r) = delete;
   virtual ~SPDE();
 
 public:
   bool getFlagCholesky() const { return _flagCholesky; }
-  void setDbin(const Db* dbin) { _dbin = dbin; };
-  void setDbout(const Db* dbout) { _dbout = dbout; };
-
+  bool getFlagKrig() const { return _flagKrig; }
+  bool getFlagSimu() const { return _flagSimu; }
   const VectorMeshes& getMeshesK() const { return _meshesK; }
   const VectorMeshes& getMeshesS() const { return _meshesS; }
   const ProjMultiMatrix* getAinK() const { return _AinK; }
@@ -61,38 +63,67 @@ public:
   const ProjMultiMatrix* getAoutS() const { return _AoutS; }
   VectorDouble getDriftCoefficients() const { return _driftCoeffs; }
 
-  int getSeed() const { return _params.getSeedMC(); }
-  int getNMC() const { return _params.getNMC(); }
+  Id getSeed() const { return _params.getSeedMC(); }
+  Id getNMC() const { return _params.getNMC(); }
+  const SPDEOp* getSPDEOp() const { return _spdeop; }
 
-  int defineMeshes(bool flagSimu,
-                   const VectorMeshes& meshesK,
-                   const VectorMeshes& meshesS = VectorMeshes(),
-                   bool verbose                = false);
-  int defineProjections(bool flagSimu,
-                        bool flagCond,
-                        const ProjMultiMatrix* projInK,
-                        const ProjMultiMatrix* projInS = nullptr,
-                        bool verbose                   = false);
-  SPDEOp* defineShiftOperator(bool flagSimu, bool verbose = false);
-  int centerDataByDriftInPlace(const SPDEOp* spdeop, VectorDouble& Z, bool verbose = false);
-  void uncenterResultByDriftInPlace(VectorDouble& result);
-  void addNuggetToResult(VectorDouble& result);
+  const MatrixSparse* getQ() const;
+  const MatrixSparse* getProj() const;
+  const PrecisionOpMulti* getPrecisionKrig() const;
+  const MatrixSparse* getInvNoise() const;
+
+  Id defineSpdeOperator(bool verbose = false);
+  Id centerDataByDriftInPlace(VectorDouble& Z, bool verbose = false);
+  void uncenterResultByDriftInPlace(VectorDouble& result) const;
+  void addNuggetToResult(VectorDouble& result) const;
+
+  Id setMeshes(bool flagForKrig, const VectorMeshes* meshes);
+  Id setProjIn(bool flagForKrig, const ProjMultiMatrix* proj);
+  Id setInvNoise(const ASimulable* invnoise);
+  Id setDbAndProjOut(Db* dbout,
+                     const ProjMultiMatrix* projK = nullptr,
+                     const ProjMultiMatrix* projS = nullptr,
+                     bool flagApply               = true,
+                     bool verbose                 = false);
+  Id makeReady(bool verbose = false);
+  VectorDouble getData(bool flagCenter, bool verbose = false);
+  VectorDouble kriging(const VectorDouble& Z) const;
+  VectorDouble stdev(const VectorDouble& Z) const;
+  VectorDouble simulate(const VectorDouble& Z) const;
+  double loglikelihood(const VectorDouble& Z, bool verbose = false) const;
 
 private:
-  void _defineFlagCholesky(int useCholesky, const Model* model, bool verbose = false);
-  VectorMeshes _defineMeshFromDbs(bool flagKrige);
-  int _defineMesh(bool flagKrige, const VectorMeshes& meshesIn, bool verbose = false);
-  int _defineProjection(bool flagIn,
-                        bool flagKrige,
-                        const ProjMultiMatrix* projIn,
-                        bool verbose = false);
+  void _defineFlagCholesky(Id useCholesky, const Model* model, bool verbose = false);
+  VectorMeshes _defineMeshesFromDbs(bool flagKrige);
+  VectorMeshes _duplicateMeshes(bool flagForKrige);
+  void _defineMeshes(bool flagForKrige, bool verbose);
+  Id _defineProjection(bool flagIn, bool flagForKrige, bool verbose);
   static void _printMeshesDetails(const VectorMeshes& meshes);
+  static void _printProjectionDetails(const ProjMultiMatrix* proj);
+  bool _isValidProjection(const Db* db, const VectorMeshes* meshes, const ProjMultiMatrix* proj);
+  void _cleanMeshes(bool flagForKrige);
+  void _cleanProjection(bool flagIn, bool flagForKrige);
+  void _cleanSpdeOperator();
 
 private:
-  const Db* _dbin;  // External Pointer
-  const Db* _dbout; // External pointer
-  Model* _model;    // External pointer
+  // External pointers
+  const Db* _dbin;
+  const Db* _dbout;
+  const Db* _domain;
+  Model* _model;
+  const VectorMeshes* _meshesKInit;
+  const VectorMeshes* _meshesSInit;
+  const ProjMultiMatrix* _projInKInit;
+  const ProjMultiMatrix* _projInSInit;
+  const ProjMultiMatrix* _projOutKInit;
+  const ProjMultiMatrix* _projOutSInit;
+  const ASimulable* _invnoiseobjInit;
+
+  // Local information
+  bool _isReady;
   bool _flagCholesky;
+  bool _flagKrig;
+  bool _flagSimu;
   VectorDouble _driftCoeffs;
   bool _createMeshesK;
   VectorMeshes _meshesK;
@@ -109,60 +140,67 @@ private:
   PrecisionOpMulti* _QopK;
   PrecisionOpMulti* _QopS;
   PrecisionOpMultiMatrix* _Qom;
-  InvNuggetOp* _invnoiseobj;
+  bool _createInvNoise;
+  const ASimulable* _invnoiseobj;
+  SPDEOp* _spdeop;
   SPDEParam _params;
 };
 
 GSTLEARN_EXPORT VectorDouble trendSPDE(Db* dbin,
-                                       Db* dbout,
                                        Model* model,
-                                       int useCholesky                = -1,
-                                       const VectorMeshes& meshesK    = VectorMeshes(),
+                                       Id useCholesky                 = -1,
+                                       const VectorMeshes* meshesK    = nullptr,
                                        const ProjMultiMatrix* projInK = nullptr,
                                        const SPDEParam& params        = SPDEParam(),
                                        bool verbose                   = false);
-GSTLEARN_EXPORT int krigingSPDE(Db* dbin,
-                                Db* dbout,
-                                Model* model,
-                                bool flag_est                   = true,
-                                bool flag_std                   = false,
-                                int useCholesky                 = -1,
-                                const VectorMeshes& meshesK     = VectorMeshes(),
-                                const ProjMultiMatrix* projInK  = nullptr,
-                                const VectorMeshes& meshesS     = VectorMeshes(),
-                                const ProjMultiMatrix* projInS  = nullptr,
-                                const SPDEParam& params         = SPDEParam(),
-                                bool verbose                    = false,
-                                const NamingConvention& namconv = NamingConvention("KrigingSPDE"));
-GSTLEARN_EXPORT int simulateSPDE(Db* dbin,
-                                 Db* dbout,
-                                 Model* model,
-                                 int nbsimu                      = 1,
-                                 int useCholesky                 = -1,
-                                 const VectorMeshes& meshesK     = VectorMeshes(),
-                                 const ProjMultiMatrix* projInK  = nullptr,
-                                 const VectorMeshes& meshesS     = VectorMeshes(),
-                                 const ProjMultiMatrix* projInS  = nullptr,
-                                 const SPDEParam& params         = SPDEParam(),
-                                 bool verbose                    = false,
-                                 const NamingConvention& namconv = NamingConvention("SimuSPDE"));
-GSTLEARN_EXPORT int simPGSSPDE(Db* dbin,
+GSTLEARN_EXPORT Id krigingSPDE(Db* dbin,
                                Db* dbout,
                                Model* model,
-                               const RuleProp& ruleprop,
-                               int nbsimu                      = 1,
-                               int useCholesky                 = -1,
-                               const VectorMeshes& meshesK     = VectorMeshes(),
+                               bool flag_est                   = true,
+                               bool flag_std                   = false,
+                               Id useCholesky                  = -1,
+                               const VectorMeshes* meshesK     = nullptr,
                                const ProjMultiMatrix* projInK  = nullptr,
-                               const VectorMeshes& meshesS     = VectorMeshes(),
+                               const VectorMeshes* meshesS     = nullptr,
                                const ProjMultiMatrix* projInS  = nullptr,
+                               const ProjMultiMatrix* projOutK = nullptr,
+                               const ProjMultiMatrix* projOutS = nullptr,
                                const SPDEParam& params         = SPDEParam(),
                                bool verbose                    = false,
-                               const NamingConvention& namconv = NamingConvention("SimPGSSPDE"));
+                               const NamingConvention& namconv = NamingConvention("KrigingSPDE"));
+GSTLEARN_EXPORT Id simulateSPDE(Db* dbin,
+                                Db* dbout,
+                                Model* model,
+                                Id nbsimu                       = 1,
+                                Id useCholesky                  = -1,
+                                const VectorMeshes* meshesK     = nullptr,
+                                const ProjMultiMatrix* projInK  = nullptr,
+                                const VectorMeshes* meshesS     = nullptr,
+                                const ProjMultiMatrix* projInS  = nullptr,
+                                const ProjMultiMatrix* projOutK = nullptr,
+                                const ProjMultiMatrix* projOutS = nullptr,
+                                const SPDEParam& params         = SPDEParam(),
+                                bool verbose                    = false,
+                                const NamingConvention& namconv = NamingConvention("SimuSPDE"));
+GSTLEARN_EXPORT Id simPGSSPDE(Db* dbin,
+                              Db* dbout,
+                              Model* model,
+                              const RuleProp& ruleprop,
+                              Id nbsimu                       = 1,
+                              Id useCholesky                  = -1,
+                              const VectorMeshes* meshesK     = nullptr,
+                              const ProjMultiMatrix* projInK  = nullptr,
+                              const VectorMeshes* meshesS     = nullptr,
+                              const ProjMultiMatrix* projInS  = nullptr,
+                              const ProjMultiMatrix* projOutK = nullptr,
+                              const ProjMultiMatrix* projOutS = nullptr,
+                              const SPDEParam& params         = SPDEParam(),
+                              bool verbose                    = false,
+                              const NamingConvention& namconv = NamingConvention("SimPGSSPDE"));
 GSTLEARN_EXPORT double logLikelihoodSPDE(Db* dbin,
                                          Model* model,
-                                         int useCholesky               = -1,
-                                         const VectorMeshes& meshes    = VectorMeshes(),
+                                         Id useCholesky                = -1,
+                                         const VectorMeshes* meshes    = nullptr,
                                          const ProjMultiMatrix* projIn = nullptr,
                                          const SPDEParam& params       = SPDEParam(),
                                          bool verbose                  = false);
