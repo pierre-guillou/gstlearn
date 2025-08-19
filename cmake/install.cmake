@@ -102,6 +102,19 @@ install(
 )
 
 # Create the Config.cmake file
+
+# Set whether the package will depend on NLopt (see comment in cpp.cmake).
+set(NLOPT_REQUIRED TRUE)
+get_target_property(nlopt_lib_type NLopt::nlopt TYPE)
+if (${nlopt_lib_type} MATCHES STATIC_LIBRARY)
+  # NLopt is still required for gstlearn::static but installing it is optional,
+  # so ignore it. Users will get an error message for a missing dependency when
+  # using gstlearn::static rather than a more helpful error message about the
+  # NLopt package not being found when doing a find_package(gstlearn) but I
+  # don't see how to make it better.
+  set(NLOPT_REQUIRED FALSE)
+endif()
+
 configure_package_config_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
