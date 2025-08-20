@@ -103,7 +103,7 @@ install(
 
 # Create the Config.cmake file
 
-# Set whether the package will depend on NLopt (see comment in cpp.cmake).
+# Set whether the package will depend on NLopt.
 set(NLOPT_REQUIRED TRUE)
 get_target_property(nlopt_lib_type NLopt::nlopt TYPE)
 if (${nlopt_lib_type} MATCHES STATIC_LIBRARY)

@@ -195,14 +195,7 @@ foreach(FLAVOR ${FLAVORS})
   target_link_libraries(${FLAVOR} PRIVATE OpenMP::OpenMP_CXX)
 
   # Link to gmtsph
-  # gmtsph is only used internally and always compiled as a static library so
-  # the shared target can use a PRIVATE dependency. The static target needs to
-  # link with it so it must be PUBLIC (it is packaged with gstlearn itself).
-  set(gmtsph_link PUBLIC)
-  if (${FLAVOR} MATCHES shared)
-    set(gmtsph_link PRIVATE)
-  endif()
-  target_link_libraries(${FLAVOR} ${gmtsph_link} gmtsph)
+  target_link_libraries(${FLAVOR} PRIVATE gmtsph)
 
   # Link to Eigen
   target_link_libraries(${FLAVOR} PUBLIC Eigen3::Eigen)
@@ -218,17 +211,7 @@ foreach(FLAVOR ${FLAVORS})
   endif()
 
   # Link to NLopt
-  # NLopt is only used internally so a PUBLIC dependency for e.g., headers is
-  # not needed. Moreover, if using a static library for NLopt, the shared
-  # library will bundle it, thus the dependency can be made PRIVATE. In all
-  # other cases, the dependency must be PUBLIC as users of gstlearn will have
-  # to provide their own NLopt.
-  set(nlopt_link PUBLIC)
-  get_target_property(nlopt_lib_type NLopt::nlopt TYPE)
-  if (${FLAVOR} MATCHES shared AND ${nlopt_lib_type} MATCHES STATIC_LIBRARY)
-    set(nlopt_link PRIVATE)
-  endif()
-  target_link_libraries(${FLAVOR} ${nlopt_link} NLopt::nlopt)
+  target_link_libraries(${FLAVOR} PRIVATE NLopt::nlopt)
 
   # Link to HDF5
   if(USE_HDF5)
