@@ -76,8 +76,7 @@ foreach(TARGET_EXE ${TARGETS_EXE})
     cmake_path(APPEND GLOBAL_DST_DIR ${TARGET_EXE}
                OUTPUT_VARIABLE TARGET_EXE)
     # Retrieve all test cases
-#    file(GLOB TEST_SRC_DIRS ${BDIR}*)
-    file(GLOB TEST_SRC_DIRS ${BDIR})
+    file(GLOB TEST_SRC_DIRS ${BDIR}*)
     foreach(TEST_SRC_DIR ${TEST_SRC_DIRS})
         # Drop absolute directory path
         get_filename_component(DIR_NAME "${TEST_SRC_DIR}" NAME)
