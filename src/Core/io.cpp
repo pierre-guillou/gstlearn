@@ -356,8 +356,9 @@ static Id _stripToken(std::string& token, const char* format)
 
 static Id _decodeToken(const std::string& token, const char* format, void* out)
 {
-  if (strcmp(format, "%ld") == 0)
+  if (strcmp(format, "%ld") == 0 || strcmp(format, "%d") == 0)
   {
+    // Both formats are kept for compatibility, even if the result is always a Id
     char* endptr;
     Id val = std::strtol(token.c_str(), &endptr, 10);
     if (*endptr != '\0') return 1; // conversion échouée
@@ -382,8 +383,23 @@ static Id _decodeToken(const std::string& token, const char* format, void* out)
   }
   if (strcmp(format, "%s") == 0)
   {
-    *static_cast<std::string*>(out) = token;
-    return 0;
+    // Cas 1: l'utilisateur a passé un std::string*
+    if (out != nullptr)
+    {
+      auto* strloc = static_cast<std::string*>(out);
+      strloc->resize(token.size());
+      *strloc = token;
+      return 0;
+    }
+
+    // Cas 2: l'utilisateur a passé un char*
+    char* buffer = static_cast<char*>(out);
+    if (buffer != nullptr)
+    {
+      std::strncpy(buffer, token.c_str(), 99); // sécurité
+      buffer[99] = '\0';
+      return 0;
+    }
   }
   return 1;
 }
