@@ -196,7 +196,7 @@ foreach(FLAVOR ${FLAVORS})
 
   # Link to gmtsph
   target_link_libraries(${FLAVOR} PRIVATE gmtsph)
-    
+
   # Link to Eigen
   target_link_libraries(${FLAVOR} PUBLIC Eigen3::Eigen)
 
