@@ -160,7 +160,7 @@ bool CalcKrigingSimpleCase::_run()
     if (!getDbout()->isActive(iech_out)) continue;
     if (neigh == nullptr)
     {
-      neigh = (ANeigh*)getNeigh()->clone();
+      neigh = static_cast<ANeigh*>(getNeigh()->clone());
       getDbout()->initThread();
     }
     else
