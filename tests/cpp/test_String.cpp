@@ -56,23 +56,23 @@ int main(int argc, char* argv[])
   message("Testing gslSPrintf2:\n");
   message("- Expected result: BC+fgh\n");
 
-  gslSPrintf2(dst_vec, "BC+%s", newbuf_char);
+  gslSPrintf(dst_vec, "BC+%s", newbuf_char);
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing gslAddSPrintf2
   message("Testing gslAddSPrintf2:\n");
   Id one = 1;
-  gslSPrintfCat2(dst_vec, " added %d times", one);
+  gslSPrintfCat(dst_vec, " added %d times", one);
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing gslStrcat2
   message("Testing gslStrcat2:\n");
-  gslStrcat2(dst_vec, " (Tested successfully)");
+  gslStrcat(dst_vec, " (Tested successfully)");
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing gslStrcpy2
   message("Testing gslStrcpy2:\n");
-  gslStrcpy2(dst_vec, "After a copy");
+  gslStrcpy(dst_vec, "After a copy");
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing the string lengt

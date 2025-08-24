@@ -116,7 +116,7 @@ static void st_record_write(const char* format, ...)
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
       ASCII_BUFFER.resize(ASCII_BUFFER_LENGTH);
     }
-    (void)gslStrcat2(ASCII_BUFFER, buf.data());
+    (void)gslStrcat(ASCII_BUFFER, buf.data());
   }
 
   va_end(ap);
@@ -149,16 +149,16 @@ static void st_filename_patch(const char* ref_name,
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf2(filename, "%s/%s.%s",
-                          STUDY.data(), ref_name, EXT_DAT);
+        (void)gslSPrintf(filename, "%s/%s.%s",
+                         STUDY.data(), ref_name, EXT_DAT);
         break;
 
       case 1:
-        (void)gslSPrintf2(filename, "%s.%s", ref_name, EXT_OUT);
+        (void)gslSPrintf(filename, "%s.%s", ref_name, EXT_OUT);
         break;
 
       case -1:
-        (void)gslSPrintf2(filename, "%s", ref_name);
+        (void)gslSPrintf(filename, "%s", ref_name);
         break;
     }
   }
@@ -167,18 +167,18 @@ static void st_filename_patch(const char* ref_name,
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf2(filename, "%s/%s%1d.%s",
-                          STUDY.data(), ref_name, rank,
-                          EXT_DAT);
+        (void)gslSPrintf(filename, "%s/%s%1d.%s",
+                         STUDY.data(), ref_name, rank,
+                         EXT_DAT);
         break;
 
       case 1:
-        (void)gslSPrintf2(filename, "%s%1d.%s", ref_name, rank,
-                          EXT_OUT);
+        (void)gslSPrintf(filename, "%s%1d.%s", ref_name, rank,
+                         EXT_OUT);
         break;
 
       case -1:
-        (void)gslSPrintf2(filename, "%s%1d", ref_name, rank);
+        (void)gslSPrintf(filename, "%s%1d", ref_name, rank);
         break;
     }
   }
@@ -235,7 +235,7 @@ void ascii_filename(const char* type, Id rank, Id mode, String& filename)
 void ascii_study_define(const char* study)
 
 {
-  (void)gslStrcpy2(STUDY, study);
+  (void)gslStrcpy(STUDY, study);
 }
 
 /****************************************************************************/

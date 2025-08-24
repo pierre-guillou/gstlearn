@@ -2626,7 +2626,7 @@ static void st_wgt_print(ST_Seismic_Neigh* ngh,
   tab_prints(NULL, "Data");
   for (ivar = 0; ivar < nvar; ivar++)
   {
-    (void)gslSPrintf2(string, "Z%d*", ivar + 1);
+    (void)gslSPrintf(string, "Z%d*", ivar + 1);
     tab_prints(NULL, string.data());
   }
   message("\n");

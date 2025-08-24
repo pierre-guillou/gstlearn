@@ -70,7 +70,7 @@ static void st_memory_leak_add(const char* call_file,
   Id nb_mem_chunk = static_cast<Id>(MemLeak.size());
   MemLeak.resize(nb_mem_chunk + 1);
   MemChunk& chunk = MemLeak[nb_mem_chunk];
-  gslStrcpy2(chunk.call_file, call_file);
+  gslStrcpy(chunk.call_file, call_file);
   chunk.call_line = call_line;
   chunk.size      = size;
   chunk.ptr       = ptr;

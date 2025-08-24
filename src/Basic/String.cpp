@@ -711,12 +711,12 @@ String erase(const String& s, const String& t)
   return d;
 }
 
-char* gslStrcpy(char* dst, int n, const char* src)
+char* gslStrcpy(char* dst, Id n, const char* src)
 {
   return strncpy(dst, src, n);
 }
 
-void gslStrcpy2(String& dst, const char* src)
+void gslStrcpy(String& dst, const char* src)
 {
   if (!src)
   {
@@ -733,7 +733,7 @@ void gslStrcpy2(String& dst, const char* src)
   std::memcpy(dst.data(), src, len);
 }
 
-void gslStrcpy2(String& dst, const String& src)
+void gslStrcpy(String& dst, const String& src)
 {
   size_t len = src.size();
 
@@ -744,12 +744,12 @@ void gslStrcpy2(String& dst, const String& src)
   std::memcpy(dst.data(), src.data(), len);
 }
 
-char* gslStrcat(char* dst, int n, const char* src)
+char* gslStrcat(char* dst, Id n, const char* src)
 {
   return strncat(dst, src, n);
 }
 
-void gslStrcat2(String& dst, const char* src)
+void gslStrcat(String& dst, const char* src)
 {
   if (!src) return; // sécurité
 
@@ -763,7 +763,7 @@ void gslStrcat2(String& dst, const char* src)
   std::memcpy(&dst[old_len], src, add_len);
 }
 
-void gslStrcat2(String& dst, const String& src)
+void gslStrcat(String& dst, const String& src)
 {
   size_t old_len = dst.size();
   size_t add_len = src.size();
@@ -775,7 +775,7 @@ void gslStrcat2(String& dst, const String& src)
   std::memcpy(&dst[old_len], src.data(), add_len);
 }
 
-Id gslSPrintf(char* dst, int n, const char* fmt, ...)
+Id gslSPrintf(char* dst, Id n, const char* fmt, ...)
 {
   DECLARE_UNUSED(n);
   va_list ap;
@@ -785,7 +785,7 @@ Id gslSPrintf(char* dst, int n, const char* fmt, ...)
   return nout;
 }
 
-Id gslSPrintfCat2(String& dst, const char* fmt, ...)
+Id gslSPrintfCat(String& dst, const char* fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
@@ -818,7 +818,7 @@ Id gslSPrintfCat2(String& dst, const char* fmt, ...)
   return size;
 }
 
-Id gslSPrintf2(String& dst, const char* fmt, ...)
+Id gslSPrintf(String& dst, const char* fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);

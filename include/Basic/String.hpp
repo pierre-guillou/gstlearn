@@ -96,18 +96,17 @@ GSTLEARN_EXPORT VectorInt decodeGridSorting(const String& string,
                                             const VectorInt& nx,
                                             bool verbose = false);
 
-GSTLEARN_EXPORT char* gslStrcpy(char* dst, int n, const char* src);
-GSTLEARN_EXPORT char* gslStrcat(char* dst, int n, const char* src);
-GSTLEARN_EXPORT Id gslSPrintf(char* dst, int n, const char* fmt, ...);
+GSTLEARN_EXPORT char* gslStrcpy(char* dst, Id n, const char* src);
+GSTLEARN_EXPORT void gslStrcpy(String& dst, const String& src);
+GSTLEARN_EXPORT void gslStrcpy(String& dst, const char* src);
+GSTLEARN_EXPORT char* gslStrcat(char* dst, Id n, const char* src);
+GSTLEARN_EXPORT void gslStrcat(String& dst, const char* src);
+GSTLEARN_EXPORT void gslStrcat(String& dst, const String& src);
+GSTLEARN_EXPORT Id gslSPrintf(char* dst, Id n, const char* fmt, ...);
+GSTLEARN_EXPORT Id gslSPrintf(String& dst, const char* fmt, ...);
+GSTLEARN_EXPORT Id gslSPrintfCat(String& dst, const char* fmt, ...);
 GSTLEARN_EXPORT char* gslStrtok(char* str, const char* delim);
 GSTLEARN_EXPORT Id gslScanf(const char* fmt, ...);
 GSTLEARN_EXPORT Id gslSScanf(const char* str, const char* fmt, ...);
-
-GSTLEARN_EXPORT void gslStrcpy2(String& dst, const String& src);
-GSTLEARN_EXPORT void gslStrcpy2(String& dst, const char* src);
-GSTLEARN_EXPORT void gslStrcat2(String& dst, const char* src);
-GSTLEARN_EXPORT void gslStrcat2(String& dst, const String& src);
-GSTLEARN_EXPORT Id gslSPrintf2(String& dst, const char* fmt, ...);
-GSTLEARN_EXPORT Id gslSPrintfCat2(String& dst, const char* fmt, ...);
 
 } // namespace gstlrn

@@ -520,54 +520,54 @@ void _buffer_write(String& buffer, const char* format, va_list ap)
   if (!strcmp(format, "%s"))
   {
     ret_s = va_arg(ap, char*);
-    (void)gslSPrintf2(buffer, "%s", ret_s);
+    (void)gslSPrintf(buffer, "%s", ret_s);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded String = %s\n", ret_s);
   }
   else if (!strcmp(format, "%ld"))
   {
     ret_i = va_arg(ap, Id);
     if (ret_i == TEST)
-      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf2(buffer, "%ld", ret_i);
+      (void)gslSPrintf(buffer, "%ld", ret_i);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Integer = %i\n", ret_i);
   }
   else if (!strcmp(format, "%f"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf2(buffer, "%f", ret_d);
+      (void)gslSPrintf(buffer, "%f", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Float = %s\n", ret_d);
   }
   else if (!strcmp(format, "%lf"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf2(buffer, "%lf", ret_d);
+      (void)gslSPrintf(buffer, "%lf", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Double = %lf\n", ret_d);
   }
   else if (!strcmp(format, "%lg"))
   {
     ret_d = va_arg(ap, double);
     if (ret_d == TEST)
-      (void)gslSPrintf2(buffer, "%5.1lf", ASCII_TEST);
+      (void)gslSPrintf(buffer, "%5.1lf", ASCII_TEST);
     else
-      (void)gslSPrintf2(buffer, "%lg", ret_d);
+      (void)gslSPrintf(buffer, "%lg", ret_d);
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Double = %lg\n", ret_d);
   }
   else if (!strcmp(format, "\n"))
   {
-    (void)gslSPrintf2(buffer, "\n");
+    (void)gslSPrintf(buffer, "\n");
     no_blank = 1;
   }
   else if (!strcmp(format, "#"))
   {
     ret_s = va_arg(ap, char*);
-    (void)gslSPrintf2(buffer, "# %s\n", ret_s);
+    (void)gslSPrintf(buffer, "# %s\n", ret_s);
     no_blank = 1;
     if (OptDbg::query(EDbg::INTERFACE)) message("Encoded Comment = %s\n", ret_s);
   }
@@ -576,7 +576,7 @@ void _buffer_write(String& buffer, const char* format, va_list ap)
     messerr("Wrong format %s", format);
     return;
   }
-  if (!no_blank) (void)gslStrcat2(buffer, " ");
+  if (!no_blank) (void)gslStrcat(buffer, " ");
 }
 
 /****************************************************************************/

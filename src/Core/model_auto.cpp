@@ -149,13 +149,13 @@ static void st_modify_optvar_for_anam(Model* model, Option_VarioFit& optvar)
 static void st_name_range(Id ivar)
 {
   if (ivar == 0)
-    (void)gslStrcpy2(string, "Range U");
+    (void)gslStrcpy(string, "Range U");
   else if (ivar == 1)
-    (void)gslStrcpy2(string, "Range V");
+    (void)gslStrcpy(string, "Range V");
   else if (ivar == 2)
-    (void)gslStrcpy2(string, "Range W");
+    (void)gslStrcpy(string, "Range W");
   else
-    (void)gslSPrintf2(string, "Range in direction %d", ivar);
+    (void)gslSPrintf(string, "Range in direction %d", ivar);
 }
 
 /****************************************************************************/
@@ -168,13 +168,13 @@ static void st_name_range(Id ivar)
 static void st_name_scale(Id ivar)
 {
   if (ivar == 0)
-    (void)gslStrcpy2(string, "Scale U");
+    (void)gslStrcpy(string, "Scale U");
   else if (ivar == 1)
-    (void)gslStrcpy2(string, "Scale V");
+    (void)gslStrcpy(string, "Scale V");
   else if (ivar == 2)
-    (void)gslStrcpy2(string, "Scale W");
+    (void)gslStrcpy(string, "Scale W");
   else
-    (void)gslSPrintf2(string, "Scale in direction %d", ivar);
+    (void)gslSPrintf(string, "Scale in direction %d", ivar);
 }
 
 /****************************************************************************/
@@ -187,13 +187,13 @@ static void st_name_scale(Id ivar)
 static void st_name_rotation(Id rank)
 {
   if (rank == 0)
-    (void)gslStrcpy2(string, "Anisotropy Rotation Angle around Oz");
+    (void)gslStrcpy(string, "Anisotropy Rotation Angle around Oz");
   else if (rank == 1)
-    (void)gslStrcpy2(string, "Anisotropy Rotation Angle around Oy");
+    (void)gslStrcpy(string, "Anisotropy Rotation Angle around Oy");
   else if (rank == 2)
-    (void)gslStrcpy2(string, "Anisotropy Rotation Angle around Ox");
+    (void)gslStrcpy(string, "Anisotropy Rotation Angle around Ox");
   else
-    (void)gslSPrintf2(string, "Anisotropy Rotation Angle %d", rank);
+    (void)gslSPrintf(string, "Anisotropy Rotation Angle %d", rank);
 }
 
 /****************************************************************************/
@@ -1265,7 +1265,7 @@ static void st_goulard_debug_title(Id nvar, Id ncova)
     for (Id ivar = 0; ivar < nvar; ivar++)
       for (Id jvar = 0; jvar <= ivar; jvar++)
       {
-        (void)gslSPrintf2(loc_string, "St%d(%d-%d)", icov + 1, ivar + 1, jvar + 1);
+        (void)gslSPrintf(loc_string, "St%d(%d-%d)", icov + 1, ivar + 1, jvar + 1);
         tab_prints(NULL, loc_string.data());
       }
   message("\n");
@@ -1295,7 +1295,7 @@ static void st_keypair_sill(Id mode, Model* model)
   {
     for (Id icova = 0; icova < ncova; icova++)
     {
-      (void)gslSPrintf2(loc_string, "Fitted_Sill_%d", icova + 1);
+      (void)gslSPrintf(loc_string, "Fitted_Sill_%d", icova + 1);
       set_keypair(loc_string.data(), 1, nvar, nvar,
                   model->getSills(icova).getValues().data());
     }
@@ -1328,9 +1328,9 @@ static void st_keypair_results(Id mode,
   }
   else
   {
-    (void)gslSPrintf2(loc_string, "Model_Auto_Eigen_Values_%d", icov + 1);
+    (void)gslSPrintf(loc_string, "Model_Auto_Eigen_Values_%d", icov + 1);
     set_keypair(loc_string.data(), 1, 1, nvar, valpro);
-    (void)gslSPrintf2(loc_string, "Model_Auto_Eigen_Vector_%d", icov + 1);
+    (void)gslSPrintf(loc_string, "Model_Auto_Eigen_Vector_%d", icov + 1);
     set_keypair(loc_string.data(), 1, nvar, nvar, vecpro);
   }
 }
