@@ -48,9 +48,9 @@ ASpaceSharedPtr SpaceRN::create(Id ndim)
 
 void SpaceRN::_move(SpacePoint& p1, const VectorDouble& vec) const
 {
-  auto offset = getOffset();
-  auto ndim   = getNDim();
-  for (size_t i = offset; i < ndim + offset; i++)
+  auto offset = static_cast<Id>(getOffset());
+  auto ndim   = static_cast<Id>(getNDim());
+  for (Id i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
   }
@@ -72,11 +72,11 @@ double SpaceRN::_getDistance(const SpacePoint& p1,
                              Id ispace) const
 {
   DECLARE_UNUSED(ispace);
-  double dist         = 0.;
-  double delta        = 0.;
-  auto offset         = getOffset();
-  auto ndim           = getNDim();
-  for (size_t i = offset; i < ndim + offset; i++)
+  double dist  = 0.;
+  double delta = 0.;
+  auto offset  = static_cast<Id>(getOffset());
+  auto ndim    = static_cast<Id>(getNDim());
+  for (Id i = offset; i < ndim + offset; i++)
   {
     delta = p2.getCoord(i) - p1.getCoord(i);
     dist += delta * delta;
@@ -127,11 +127,11 @@ void SpaceRN::_getIncrementInPlace(const SpacePoint& p1,
                                    Id ispace) const
 {
   DECLARE_UNUSED(ispace);
-  Id j                  = 0;
-  auto offset            = getOffset();
-  auto ndim              = getNDim();
-  size_t maxlength       = ndim + offset;
-  for (size_t i = offset; i < maxlength; i++)
+  Id j         = 0;
+  auto offset  = static_cast<Id>(getOffset());
+  auto ndim    = static_cast<Id>(getNDim());
+  Id maxlength = ndim + offset;
+  for (Id i = offset; i < maxlength; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
 }
 

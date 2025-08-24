@@ -62,12 +62,12 @@ static void st_mem_update(Id size)
  *****************************************************************************/
 static void st_memory_leak_add(const char* call_file,
                                Id call_line,
-                               size_t size,
+                               Id size,
                                void* ptr)
 {
   if (!MEMORY_LEAK) return;
 
-  Id nb_mem_chunk = MemLeak.size();
+  Id nb_mem_chunk = static_cast<Id>(MemLeak.size());
   MemLeak.resize(nb_mem_chunk + 1);
   MemChunk& chunk = MemLeak[nb_mem_chunk];
   gslStrcpy2(chunk.call_file, call_file);
@@ -94,7 +94,7 @@ static void st_memory_leak_delete(const char* call_file,
   // Look for the chunk to be freed
 
   Id found = -1;
-  for (Id i = 0, n = MemLeak.size(); i < n && found < 0; i++)
+  for (Id i = 0, n = static_cast<Id>(MemLeak.size()); i < n && found < 0; i++)
   {
     MemChunk& chunk = MemLeak[i];
     if (chunk.ptr == ptr) found = i;
@@ -111,7 +111,7 @@ static void st_memory_leak_delete(const char* call_file,
 
   // Compress the array of Memory chunks
 
-  Id nb_mem_chunk = MemLeak.size();
+  Id nb_mem_chunk = static_cast<Id>(MemLeak.size());
   MemLeak[found]  = MemLeak[nb_mem_chunk - 1];
   MemLeak.resize(nb_mem_chunk - 1);
 }
@@ -175,7 +175,7 @@ char* mem_free_(const char* call_file,
 
   if (MEMORY_DEBUG)
   {
-    (void)memcpy((char*)&size_eff, (char*)tab_aux, sizeof(Id));
+    (void)memcpy((char*)&size_eff, tab_aux, sizeof(Id));
     st_mem_update(-size_eff);
     st_mem_message(call_file, call_line, "De-allocation", -1, size_eff);
   }
@@ -224,7 +224,7 @@ char* mem_alloc_(const char* call_file,
 
   if (MEMORY_DEBUG)
   {
-    (void)memcpy((char*)tab_aux, (char*)&size_eff, sizeof(Id));
+    (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
     st_mem_update(size_eff);
     st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
   }
@@ -274,7 +274,7 @@ char* mem_copy_(const char* call_file,
 
   if (MEMORY_DEBUG)
   {
-    (void)memcpy((char*)tab_aux, (char*)&size_eff, sizeof(Id));
+    (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
     st_mem_update(size_eff);
     st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
   }
@@ -329,7 +329,7 @@ char* mem_calloc_(const char* call_file,
 
   if (MEMORY_DEBUG)
   {
-    (void)memcpy((char*)tab_aux, (char*)&size_eff, sizeof(Id));
+    (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
     st_mem_update(size_eff);
     st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
   }
@@ -379,7 +379,7 @@ char* mem_realloc_(const char* call_file,
       tab_aux = (char*)malloc(size);
       if (MEMORY_DEBUG)
       {
-        (void)memcpy((char*)tab_aux, (char*)&size_eff, sizeof(Id));
+        (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
         st_mem_update(size_eff);
         st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
       }
@@ -396,7 +396,7 @@ char* mem_realloc_(const char* call_file,
       tab_aux = &tab[-SHIFT()];
       if (MEMORY_DEBUG)
       {
-        (void)memcpy((char*)&size_old, (char*)tab_aux, sizeof(Id));
+        (void)memcpy((char*)&size_old, tab_aux, sizeof(Id));
         st_mem_update(-size_old);
         st_mem_message(call_file, call_line, "Re_allocation", -1, size_old);
       }
@@ -408,7 +408,7 @@ char* mem_realloc_(const char* call_file,
       tab_aux           = (char*)placeholder;
       if (MEMORY_DEBUG)
       {
-        (void)memcpy((char*)tab_aux, (char*)&size_eff, sizeof(Id));
+        (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
         st_mem_update(size_eff);
         st_mem_message(call_file, call_line, "Re-allocation", +1, size_eff);
       }
@@ -435,7 +435,7 @@ char* mem_realloc_(const char* call_file,
       tab_aux = &tab[-SHIFT()];
       if (MEMORY_DEBUG)
       {
-        (void)memcpy((char*)&size_old, (char*)tab_aux, sizeof(Id));
+        (void)memcpy((char*)&size_old, tab_aux, sizeof(Id));
         st_mem_update(-size_old);
         st_mem_message(call_file, call_line, "Re-allocation", -1, size_old);
       }

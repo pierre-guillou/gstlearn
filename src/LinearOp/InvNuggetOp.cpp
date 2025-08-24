@@ -191,7 +191,7 @@ void InvNuggetOp::_buildInvNugget(const Db* db, Model* model, const SPDEParam& p
   // 'cumul' counts the number of valid positions for all variables before 'ivar'
   VectorInt cumul = VH::cumulIncrement(index1);
 
-  size_t sizetot = VH::count(index1);
+  Id sizetot = VH::count(index1);
   // Convert from triplet to sparse matrix
   _allocate(sizetot, sizetot, nvar);
   _cholNuggetMatrix = std::make_shared<MatrixSparse>(sizetot, sizetot, nvar);

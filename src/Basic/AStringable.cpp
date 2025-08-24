@@ -368,6 +368,7 @@ bool checkArg(const char* title, Id current, Id nmax)
  */
 void mestitle(Id level, const char* format, ...)
 {
+  Id STRING_MAX = 1000;
   char STRING[1000];
   va_list ap;
 
@@ -377,30 +378,30 @@ void mestitle(Id level, const char* format, ...)
   va_end(ap);
   Id size = static_cast<Id>(strlen(STRING));
 
-  (void)gslStrcat(STRING, "\n");
+  (void)gslStrcat(STRING, STRING_MAX, "\n");
   message_extern(STRING);
 
   /* Underline the string */
 
-  (void)gslStrcpy(STRING, "");
+  (void)gslStrcpy(STRING, STRING_MAX, "");
   for (Id i = 0; i < size; i++)
   {
     switch (level)
     {
       case 0:
-        (void)gslStrcat(STRING, "=");
+        (void)gslStrcat(STRING, STRING_MAX, "=");
         break;
 
       case 1:
-        (void)gslStrcat(STRING, "-");
+        (void)gslStrcat(STRING, STRING_MAX, "-");
         break;
 
       case 2:
-        (void)gslStrcat(STRING, ".");
+        (void)gslStrcat(STRING, STRING_MAX, ".");
         break;
     }
   }
-  (void)gslStrcat(STRING, "\n");
+  (void)gslStrcat(STRING, STRING_MAX, "\n");
   message_extern(STRING);
 }
 
@@ -440,6 +441,7 @@ void mes_process(const char* string, Id ntot, Id iech)
 String toTitle(Id level, const char* format, ...)
 {
   std::stringstream sstr;
+  Id STRING_MAX = 1000;
   char STRING[1000];
   va_list ap;
 
@@ -452,21 +454,21 @@ String toTitle(Id level, const char* format, ...)
   /* Underline the string */
 
   Id size = static_cast<Id>(strlen(STRING));
-  (void)gslStrcpy(STRING, "");
+  (void)gslStrcpy(STRING, STRING_MAX, "");
   for (Id i = 0; i < size; i++)
   {
     switch (level)
     {
       case 0:
-        (void)gslStrcat(STRING, "=");
+        (void)gslStrcat(STRING, STRING_MAX, "=");
         break;
 
       case 1:
-        (void)gslStrcat(STRING, "-");
+        (void)gslStrcat(STRING, STRING_MAX, "-");
         break;
 
       case 2:
-        (void)gslStrcat(STRING, ".");
+        (void)gslStrcat(STRING, STRING_MAX, ".");
         break;
     }
   }

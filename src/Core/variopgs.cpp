@@ -3656,7 +3656,7 @@ static void st_manage_pgs(Id mode,
       local_pgs->model       = model;
       if (model != nullptr)
       {
-        Id ndim = model->getNDim();
+        Id ndim = static_cast<Id>(model->getNDim());
         local_pgs->d0.resize(ndim);
         local_pgs->d1.resize(ndim);
       }
@@ -4120,22 +4120,22 @@ static void st_calcul_covmatrix(Local_Pgs* local_pgs,
   else if (rule->getModeRule() == ERule::SHIFT)
   {
     auto* ruleshift = (RuleShift*)rule;
-    cov[0]               = covh.getValue(0, 0);                                     /* C11(h)  */
-    cov[5]               = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 1); /* C22(h)  */
+    cov[0]          = covh.getValue(0, 0);                                     /* C11(h)  */
+    cov[5]          = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 1); /* C22(h)  */
 
-    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
+    for (Id i = 0; i < static_cast<Id>(local_pgs->model->getNDim()); i++)
       local_pgs->d0[i] = ruleshift->getShift(i);
 
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[1] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(s)  */
     cov[4] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(s)  */
 
-    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
+    for (Id i = 0; i < static_cast<Id>(local_pgs->model->getNDim()); i++)
       local_pgs->d0[i] = local_pgs->d1[i] - ruleshift->getShift(i);
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[2] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(h-s) */
 
-    for (size_t i = 0; i < local_pgs->model->getNDim(); i++)
+    for (Id i = 0; i < static_cast<Id>(local_pgs->model->getNDim()); i++)
       local_pgs->d0[i] = local_pgs->d1[i] + ruleshift->getShift(i);
     local_pgs->model->evaluateMatInPlace(nullptr, local_pgs->d0, covh);
     cov[3] = (nvar == 1) ? covh.getValue(0, 0) : covh.getValue(1, 0); /* C21(h+s)  */

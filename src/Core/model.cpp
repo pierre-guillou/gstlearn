@@ -73,7 +73,7 @@ Model* model_duplicate_for_gradient(const Model* model, double ball_radius)
 
   new_model = nullptr;
   Id nvar   = model->getNVar();
-  Id ndim   = model->getNDim();
+  Id ndim   = static_cast<Id>(model->getNDim());
   Id ncova  = model->getNCov();
 
   // Create the new model (linked drift functions)
@@ -169,149 +169,6 @@ Model* model_duplicate_for_gradient(const Model* model, double ball_radius)
 
 /****************************************************************************/
 /*!
- **  Update the model for fitting Covariance or Covariogram
- **
- ** \param[in]  model         Model structure
- ** \param[in]  c0            Array of variance values at the origin
- ** \param[in]  flag_verbose  1 for verbose output
- **
- ** \param[out] flag_nugget  1 if a nugget component must be added
- ** \param[out] nugget       Array of sills for the nugget component
- **
- *****************************************************************************/
-void model_covupdt(Model* model,
-                   const double* c0,
-                   Id flag_verbose,
-                   Id* flag_nugget,
-                   double* nugget)
-{
-  /// TODO : dead code ?
-  CovAniso* cova;
-  double diff;
-  Id i, icov, jcov, nvar, ncova, rank_nugget, rank_exceed, ivar, jvar;
-  Id flag_update, flag_rescale;
-  VectorInt rank;
-  VectorDouble range;
-  VectorDouble silltot;
-
-  /* Initializations */
-
-  nvar        = model->getNVar();
-  ncova       = model->getNCov();
-  flag_update = 0;
-
-  /* Core allocation */
-
-  rank.resize(ncova);
-  range.resize(ncova);
-  silltot.resize(nvar * nvar, 0.);
-
-  /* Sort the basic structures by increasing range */
-  rank_nugget = -1;
-  for (icov = 0; icov < ncova; icov++)
-  {
-    cova = model->getCovAniso(icov);
-    if (cova->getType() == ECov::NUGGET) rank_nugget = icov;
-    rank[icov]  = icov;
-    range[icov] = cova->getRangeIso();
-  }
-  ut_sort_double(0, ncova, rank.data(), range.data());
-
-  /* Loop on the basic structures, in order to : */
-  /* - cumulate the sills (excluding the nugget effect component) */
-  /* - find the rank of the structure which exceeds the total variance */
-
-  rank_exceed = -1;
-  for (jcov = 0; jcov < ncova && rank_exceed < 0; jcov++)
-  {
-    icov = rank[ncova - 1 - jcov];
-    cova = model->getCovAniso(icov);
-    if (cova->getType() == ECov::NUGGET) continue;
-    for (ivar = 0; ivar < nvar; ivar++)
-    {
-      silltot[AD(ivar, ivar)] += model->getSill(icov, ivar, ivar);
-      if (silltot[AD(ivar, ivar)] > c0[AD(ivar, ivar)]) rank_exceed = icov;
-    }
-  }
-
-  if (rank_exceed >= 0)
-  {
-    flag_rescale = (rank_exceed == 0);
-    if (flag_rescale) rank_nugget = rank_exceed;
-    if (flag_verbose)
-    {
-      message("Error in the Covariance or Covariogram Model\n");
-      message("The cumulated sill exceeds the experimental C(0)\n");
-
-      if (rank_exceed > 0)
-      {
-        message("The following basic structures are discarded : ");
-        for (jcov = rank_exceed; jcov < ncova; jcov++)
-        {
-          icov = rank[ncova - 1 - jcov];
-          message(" #%d", icov + 1);
-        }
-        message("\n");
-      }
-      else
-      {
-        message("All the structures are discarded\n");
-        message("except the structure #%d which is rescaled\n",
-                rank[ncova - 1 - rank_exceed] + 1);
-      }
-    }
-
-    /* Discard the exceeded basic structures */
-
-    for (jcov = rank_exceed; jcov < ncova; jcov++)
-    {
-      icov = rank[ncova - 1 - jcov];
-      cova = model->getCovAniso(icov);
-      if (cova->getType() == ECov::NUGGET) continue;
-      for (ivar = 0; ivar < nvar; ivar++)
-        for (jvar = 0; jvar < nvar; jvar++)
-          model->setSill(icov, ivar, jvar, 0.);
-    }
-
-    /* Update the cumulated sill */
-
-    for (i = 0; i < nvar * nvar; i++)
-      silltot[i] = 0.;
-    for (jcov = 0; jcov < ncova; jcov++)
-    {
-      icov = rank[ncova - 1 - jcov];
-      cova = model->getCovAniso(icov);
-      if (cova->getType() == ECov::NUGGET) continue;
-      for (ivar = 0; ivar < nvar; ivar++)
-        silltot[AD(ivar, ivar)] += model->getSill(icov, ivar, ivar);
-    }
-  }
-
-  /* Calculate the additional nugget effect */
-  for (ivar = 0; ivar < nvar; ivar++)
-  {
-    diff = c0[AD(ivar, ivar)] - silltot[AD(ivar, ivar)];
-    if (diff > 0) flag_update = 1;
-    for (jvar = 0; jvar < nvar; jvar++)
-    {
-      if (rank_nugget >= 0)
-        model->setSill(rank_nugget, ivar, jvar, (ivar == jvar) ? diff : 0.);
-      else
-        nugget[AD(ivar, jvar)] = (ivar == jvar) ? diff : 0.;
-    }
-  }
-
-  /* Returning arguments */
-
-  *flag_nugget = flag_update && (rank_nugget < 0);
-  if (flag_verbose && (*flag_nugget))
-  {
-    message("A Nugget Effect component is added so as to match the experimental variance\n");
-  }
-}
-
-/****************************************************************************/
-/*!
  **  Returns the characteristics of the covariance
  **
  ** \param[in]  type           Type of the covariance
@@ -347,7 +204,7 @@ void model_cova_characteristics(const ECov& type,
   auto space = SpaceRN::create(1); // Use 1-D in order to retrieve all covariances
   CovContext ctxt(1, 1);
   ACovFunc* cov = CovFactory::createCovFunc(type, ctxt);
-  (void)gslStrcpy(static_cast<char*>(cov_name), cov->getCovName().c_str());
+  (void)gslStrcpy(static_cast<char*>(cov_name), STRING_LENGTH, cov->getCovName().c_str());
   *flag_range    = cov->hasRange();
   *flag_param    = cov->hasParam();
   *min_order     = cov->getMinOrder();

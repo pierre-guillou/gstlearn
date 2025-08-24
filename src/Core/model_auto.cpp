@@ -283,7 +283,7 @@ static Id st_parid_alloc(StrMod* strmod, Id npar0)
   /* Initializations */
 
   Option_VarioFit optvar = strmod->optvar;
-  Id ndim                = strmod->models[0]->getNDim();
+  Id ndim                = static_cast<Id>(strmod->models[0]->getNDim());
   Id nvar                = strmod->models[0]->getNVar();
   Id first_covrot        = -1;
 
@@ -897,7 +897,7 @@ static void st_prepar_goulard_vario(Id imod)
 {
   Model* model                 = STRMOD->models[imod];
   Id npadir                    = RECINT.npadir;
-  Id ndim                      = model->getNDim();
+  Id ndim                      = static_cast<Id>(model->getNDim());
   Id nvar                      = model->getNVar();
   Id nvs2                      = nvar * (nvar + 1) / 2;
   VectorDouble& dd             = RECINT.dd;
@@ -962,7 +962,7 @@ static void st_load_ge(const Vario* vario,
                        VectorDouble& dd,
                        std::vector<MatrixDense>& ge)
 {
-  Id ndim   = model->getNDim();
+  Id ndim   = static_cast<Id>(model->getNDim());
   Id ndir   = vario->getNDir();
   Id nvar   = vario->getNVar();
   Id nvs2   = nvar * (nvar + 1) / 2;
@@ -1742,7 +1742,7 @@ static void st_model_auto_strmod_print(Id flag_title,
   if (skip) return;
 
   Option_VarioFit optvar = strmod->optvar;
-  Id ndim                = strmod->models[0]->getNDim();
+  Id ndim                = static_cast<Id>(strmod->models[0]->getNDim());
   Id nvar                = strmod->models[0]->getNVar();
   Id imod_mem            = -1;
   Id icov_mem            = -1;
@@ -2051,7 +2051,7 @@ static void st_model_auto_strmod_define(StrMod* strmod,
   /* Initializations */
 
   Id nvar                = strmod->models[0]->getNVar();
-  Id ndim                = strmod->models[0]->getNDim();
+  Id ndim                = static_cast<Id>(strmod->models[0]->getNDim());
   Option_VarioFit optvar = strmod->optvar;
   Id size                = nvar * (nvar + 1) / 2;
   VectorDouble ranges(ndim, 0.);
@@ -2212,7 +2212,7 @@ static Id st_structure_reduce(StrMod* strmod,
 {
   Model* model = strmod->models[imod];
   Id nvar      = model->getNVar();
-  Id ndim      = model->getNDim();
+  Id ndim      = static_cast<Id>(model->getNDim());
   VectorDouble d1(ndim, hmax);
   MatrixSquare tab(nvar);
   CovCalcMode mode(ECalcMember::RHS);
@@ -2278,7 +2278,7 @@ static void st_evaluate_vario(Id imod,
 static void st_evaluate_vmap(Id imod, StrMod* strmod, VectorDouble& tabge)
 {
   Model* model = strmod->models[imod];
-  Id ndim      = model->getNDim();
+  Id ndim      = static_cast<Id>(model->getNDim());
   Id nvar      = model->getNVar();
   Id nech      = DBMAP->getNSample();
   VectorDouble d0(ndim);
@@ -3790,7 +3790,7 @@ static Id st_alter_model_optvar(const Vario* vario,
                                 Constraints& constraints,
                                 Option_VarioFit& optvar)
 {
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   Id ndir = vario->getNDir();
   Id n_2d = 0;
   Id n_3d = 0;
@@ -4093,7 +4093,7 @@ static void st_prepar_goulard_vmap(Id imod)
 {
   Model* model                 = STRMOD->models[imod];
   std::vector<MatrixDense>& ge = RECINT.ge;
-  Id ndim                      = model->getNDim();
+  Id ndim                      = static_cast<Id>(model->getNDim());
   Id nvar                      = model->getNVar();
   Id ncova                     = model->getNCov();
   Id nech                      = DBMAP->getNSample();
@@ -4187,7 +4187,7 @@ static void st_vario_varchol_manage(const Vario* vario,
                                     Model* model,
                                     VectorDouble& varchol)
 {
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   Id nvar = vario->getNVar();
 
   MatrixSymmetric mat(nvar);
@@ -4405,7 +4405,7 @@ Id model_auto_fit(Vario* vario,
   Id status = 0;
   Id npadir = 0;
   Id ncova  = model->getNCov();
-  Id ndim   = model->getNDim();
+  Id ndim   = static_cast<Id>(model->getNDim());
   Id nvar   = vario->getNVar();
   VectorDouble angles;
   st_regularize_init();
@@ -4605,7 +4605,7 @@ Id model_fitting_sills(Vario* vario,
   if (model == nullptr) return (1);
   if (vario == nullptr) return (1);
   Id ndir  = vario->getNDir();
-  Id ndim  = model->getNDim();
+  Id ndim  = static_cast<Id>(model->getNDim());
   Id nvar  = model->getNVar();
   Id ncova = model->getNCov();
 
@@ -4679,7 +4679,7 @@ static Id st_vmap_auto_count(const Db* dbmap,
 
   /* Initializations */
 
-  Id ndim         = model->getNDim();
+  Id ndim         = static_cast<Id>(model->getNDim());
   Id nvar         = model->getNVar();
   Id first_covrot = -1;
 
@@ -4863,7 +4863,7 @@ Id vmap_auto_fit(const DbGrid* dbmap,
   Id npadir      = 0;
   Id ncova       = model->getNCov();
   Id nvar        = model->getNVar();
-  Id ndim        = model->getNDim();
+  Id ndim        = static_cast<Id>(model->getNDim());
   double hmax    = 0.;
   double gmax    = 0.;
   StrMod* strmod = nullptr;

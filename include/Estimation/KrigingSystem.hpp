@@ -81,7 +81,7 @@ public:
   void conclusion();
 
   // Methods used to return algebraic internal information
-  Id getNDim() const { return (_model != nullptr) ? _model->getNDim() : 0; }
+  Id getNDim() const { return (_model != nullptr) ? static_cast<Id>(_model->getNDim()) : 0; }
   Id getNVar() const { return (_model != nullptr) ? _model->getNVar() : 0; }
   Id getNech() const { return static_cast<Id>(_nbgh.size()); }
   Id getCovSize() const { return (!_Sigma.empty()) ? _Sigma.getNRows() : 0; }

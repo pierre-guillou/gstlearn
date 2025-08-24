@@ -189,7 +189,7 @@ bool ACalcInterpolator::_preprocess()
 
   if (_model != nullptr)
   {
-    if (!_setNdim(_model->getNDim())) return false;
+    if (!_setNdim(static_cast<Id>(_model->getNDim()))) return false;
   }
   if (_neigh != nullptr)
   {

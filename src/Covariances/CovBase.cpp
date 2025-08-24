@@ -569,7 +569,7 @@ void CovBase::appendParams(ListParams& listParams,
 {
   const auto oldSize = gradFuncs->size();
   _cor->appendParams(listParams, gradFuncs);
-  _multiplyCorDerivativesBySills(oldSize, gradFuncs);
+  _multiplyCorDerivativesBySills(static_cast<Id>(oldSize), gradFuncs);
 
   for (const auto& [ivar, jvar]: _itRange)
     listParams.addParam(_cholSillsInfo(ivar, jvar));

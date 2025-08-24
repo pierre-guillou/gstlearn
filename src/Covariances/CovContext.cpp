@@ -220,7 +220,7 @@ const CovContext* CovContext::createReduce(const VectorInt& validVars) const
       lec++;
     }
 
-  auto* newctxt = new CovContext(nvar, ndim, covar0);
+  auto* newctxt = new CovContext(nvar, static_cast<Id>(ndim), covar0);
   return newctxt;
 }
 } // namespace gstlrn

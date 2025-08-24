@@ -690,7 +690,7 @@ static Id st_model_manage(Id mode, Model* model)
     d1_1_global.resize(ndim);
     d1_2_global.resize(ndim);
     d1_t_global.resize(ndim);
-    auto covaux_global = st_core(nvar, nvar);
+    covaux_global = st_core(nvar, nvar);
     if (covaux_global.empty()) return (1);
     MODEL_INIT = 1;
   }

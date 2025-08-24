@@ -245,7 +245,7 @@ static void st_cov(Model* model,
                    VectorDouble& covGp,
                    VectorDouble& covGG)
 {
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   VectorDouble vec(ndim);
   if (ndim >= 1) vec[0] = dx;
   if (ndim >= 2) vec[1] = dy;
@@ -3426,7 +3426,7 @@ Id potential_cov(Model* model,
   // Preliminary checks
 
   VERBOSE = verbose;
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   covtab.resize(ndim * ndim, TEST);
 
   /* Preliminary checks */

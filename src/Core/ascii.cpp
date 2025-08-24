@@ -71,16 +71,11 @@ static char Fichier_frac[]    = "Frac";
  *****************************************************************************/
 static Id st_record_read(const char* title, const char* format, void* vout)
 {
-  Id error;
+  Id error = 1;
 
   if (FILE_MEM != nullptr)
   {
     error = _record_read(FILE_MEM, format, vout);
-  }
-  else
-  {
-    message(">>>>>>>>>>>>>>>>>>>>> par buffer_read\n");
-    error = _buffer_read(ASCII_BUFFER, format, vout);
   }
 
   if (error > 0)
@@ -114,7 +109,7 @@ static void st_record_write(const char* format, ...)
   else
   {
     _buffer_write(buf, format, ap);
-    long1 = buf.size();
+    long1 = static_cast<Id>(buf.size());
     long2 = (!ASCII_BUFFER.empty()) ? ASCII_BUFFER.size() : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {

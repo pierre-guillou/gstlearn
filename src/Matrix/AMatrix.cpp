@@ -388,7 +388,7 @@ VectorDouble AMatrix::prodMatVec(const VectorDouble& x, bool transpose) const
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodMatVec",
                            this, 0, transpose,
-                           nullptr, x.size(), false)) return VectorDouble();
+                           nullptr, static_cast<Id>(x.size()), false)) return VectorDouble();
   Id size = (transpose) ? _nCols : _nRows;
   VectorDouble y(size, 0.);
   _addProdMatVecInPlacePtr(x, y, transpose);
@@ -408,7 +408,7 @@ void AMatrix::prodMatVecInPlace(const VectorDouble& x,
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodMatVecInPlace",
                            this, 0, transpose,
-                           nullptr, x.size(), false)) return;
+                           nullptr, static_cast<Id>(x.size()), false)) return;
   Id size = (transpose) ? _nCols : _nRows;
   y.fill(0., size);
   _addProdMatVecInPlacePtr(x, y, transpose);
@@ -421,7 +421,7 @@ void AMatrix::prodMatVecInPlaceC(const constvect x,
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodMatVecInPlaceC",
                            this, 0, transpose,
-                           nullptr, x.size(), false)) return;
+                           nullptr, static_cast<Id>(x.size()), false)) return;
   Id size = (transpose) ? _nCols : _nRows;
   std::fill(y.begin(), y.begin() + size, 0.0);
   _addProdMatVecInPlacePtr(x, y, transpose);
@@ -434,7 +434,7 @@ void AMatrix::addProdMatVecInPlaceC(const constvect x,
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::addProdMatVecInPlaceC",
                            this, 0, transpose,
-                           nullptr, x.size(), false)) return;
+                           nullptr, static_cast<Id>(x.size()), false)) return;
   _addProdMatVecInPlacePtr(x, y, transpose);
 }
 
@@ -442,7 +442,7 @@ VectorDouble AMatrix::prodVecMat(const VectorDouble& x, bool transpose) const
 {
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodVecMat",
-                           nullptr, x.size(), true,
+                           nullptr, static_cast<Id>(x.size()), true,
                            this, 0, transpose)) return VectorDouble();
   Id size = (transpose) ? _nRows : _nCols;
   VectorDouble y(size, 0.);
@@ -454,7 +454,7 @@ void AMatrix::prodVecMatInPlace(const VectorDouble& x, VectorDouble& y, bool tra
 {
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodVecMat",
-                           nullptr, x.size(), true,
+                           nullptr, static_cast<Id>(x.size()), true,
                            this, 0, transpose)) return;
   Id size = (transpose) ? _nRows : _nCols;
   y.fill(0., size);
@@ -466,7 +466,7 @@ void AMatrix::prodVecMatInPlaceC(const constvect x, vect y, bool transpose) cons
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::prodVecMatInPlaceC",
                            this, 0, transpose,
-                           nullptr, x.size(), false)) return;
+                           nullptr, static_cast<Id>(x.size()), false)) return;
   Id size = (transpose) ? _nCols : _nRows;
   std::fill(y.begin(), y.begin() + size, 0.0);
   _addProdVecMatInPlacePtr(x, y, transpose);
@@ -479,7 +479,7 @@ void AMatrix::addProdVecMatInPlaceC(const constvect x,
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::addProdVecMatInPlaceC",
                            this, 0, transpose,
-                           nullptr, x.size(), false)) return;
+                           nullptr, static_cast<Id>(x.size()), false)) return;
   _addProdVecMatInPlacePtr(x, y, transpose);
 }
 
@@ -661,9 +661,9 @@ double AMatrix::prodVecMatVec(const VectorDouble& x, const VectorDouble& y) cons
 {
   if (_flagMatrixCheck &&
       !_isMatrixCompatible("AMatrix::quadraticMatrix",
-                           nullptr, x.size(), true,
+                           nullptr, static_cast<Id>(x.size()), true,
                            this, 0, false,
-                           nullptr, y.size(), false)) return TEST;
+                           nullptr, static_cast<Id>(y.size()), false)) return TEST;
 
   VectorDouble left(_nRows);
   prodMatVecInPlace(y, left, false);
@@ -1338,7 +1338,7 @@ void AMatrix::dumpRange(const char* title)
 
   /* Calculate the extreme values */
 
-  StatResults stats = ut_statistics(elements.size(), elements.data());
+  StatResults stats = ut_statistics(static_cast<Id>(elements.size()), elements.data());
 
   /* Printout */
 

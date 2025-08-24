@@ -77,6 +77,7 @@ FileLAS::~FileLAS()
 Db* FileLAS::readFromFile()
 {
   Db* db = nullptr;
+  Id string_max = 1000;
   char string[1000], *lcur, sep_blank[2], sep_point[2], *token;
   double value;
   static I32 s_length = 1000;
@@ -98,7 +99,7 @@ Db* FileLAS::readFromFile()
   // Loop on the lines
 
   Id numline = 0;
-  (void)gslStrcpy(string, "");
+  (void)gslStrcpy(string, string_max, "");
 
   // Decode the header
   if (_readFind(s_length, "~Well", &numline, string)) return db;

@@ -83,6 +83,12 @@ static void st_print(const char* string)
  *****************************************************************************/
 static void st_read(const char* prompt, char* buffer)
 {
+  // TODO: buffer maximum length should be defined inthe calling function
+  // which seems to be the interface between R and C++.
+  // It is set to 1000 here as a temporary solution
+  // to avoid buffer overflow
+  Id buffer_max = 1000;
+
   // Id buffer_length = 1000; // TODO to be adjusted dependeing on calling function
   message("%s :", prompt);
 
@@ -90,8 +96,7 @@ static void st_read(const char* prompt, char* buffer)
   if (std::getline(std::cin, ligne))
   {
     // ligne contient le texte lu (sans le '\n')
-    (void)gslStrcpy(buffer, ligne.data());
-    // (void)gslStrcpy(buffer, buffer_length, ligne.data());
+    (void)gslStrcpy(buffer, buffer_max, ligne.data());
     buffer[strlen(buffer) - 1] = '\0';
   }
   else
@@ -402,65 +407,6 @@ static Id _decodeToken(const std::string& token, const char* format, void* out)
     }
   }
   return 1;
-}
-
-/****************************************************************************/
-/*!
- **  Read the next token from the buffer
- **
- ** \return  -1 if the end-of-record has been found
- ** \return   1 for a decoding error
- ** \return   0 otherwise
- **
- ** \param[in]  line       Line to be read
- ** \param[in]  format     format
- **
- ** \param[out] out        Output argument
- **
- ** This method is not documented on purpose. It should remain private
- **
- *****************************************************************************/
-Id _buffer_read(const String& line, const char* format, void* out)
-{
-
-  // initialisation au premier appel
-  if (currentLine.empty())
-  {
-    currentLine = line;
-    pos         = 0;
-
-    // supprimer les commentaires
-    size_t cmt = currentLine.find(DEL_COM);
-    if (cmt != std::string::npos)
-      currentLine.erase(cmt);
-
-    // supprimer CR/LF fin de ligne
-    while (!currentLine.empty() &&
-           (currentLine.back() == '\n' || currentLine.back() == '\r'))
-      currentLine.pop_back();
-  }
-
-  if (pos >= currentLine.size()) return 1; // plus de tokens
-
-  // extraire le prochain token jusqu'au séparateur
-  size_t sepPos = currentLine.find(DEL_SEP, pos);
-  std::string token;
-  if (sepPos != std::string::npos)
-  {
-    token = currentLine.substr(pos, sepPos - pos);
-    pos   = sepPos + 1;
-  }
-  else
-  {
-    token = currentLine.substr(pos);
-    pos   = currentLine.size();
-  }
-
-  // supprimer blancs autour du token
-  if (_stripToken(token, format)) return 1;
-
-  // conversion selon format
-  return _decodeToken(token, format, out);
 }
 
 /****************************************************************************/

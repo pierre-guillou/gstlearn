@@ -711,9 +711,9 @@ String erase(const String& s, const String& t)
   return d;
 }
 
-char* gslStrcpy(char* dst, const char* src)
+char* gslStrcpy(char* dst, int n, const char* src)
 {
-  return strcpy(dst, src);
+  return strncpy(dst, src, n);
 }
 
 void gslStrcpy2(String& dst, const char* src)
@@ -744,9 +744,9 @@ void gslStrcpy2(String& dst, const String& src)
   std::memcpy(dst.data(), src.data(), len);
 }
 
-char* gslStrcat(char* dst, const char* src)
+char* gslStrcat(char* dst, int n, const char* src)
 {
-  return strcat(dst, src);
+  return strncat(dst, src, n);
 }
 
 void gslStrcat2(String& dst, const char* src)
@@ -775,13 +775,14 @@ void gslStrcat2(String& dst, const String& src)
   std::memcpy(&dst[old_len], src.data(), add_len);
 }
 
-Id gslSPrintf(char* dst, const char* fmt, ...)
+Id gslSPrintf(char* dst, int n, const char* fmt, ...)
 {
+  DECLARE_UNUSED(n);
   va_list ap;
   va_start(ap, fmt);
-  Id n = vsprintf(dst, fmt, ap);
+  Id nout = vsprintf(dst, fmt, ap);
   va_end(ap);
-  return n;
+  return nout;
 }
 
 Id gslSPrintfCat2(String& dst, const char* fmt, ...)

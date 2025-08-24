@@ -28,7 +28,7 @@ CovGradientGeneric::CovGradientGeneric(const ACov& cova, double ballradius)
 {
   setContext(cova.getContext());
   if (!_isValidForGradient()) return;
-  _nVar = _ctxt.getNVar() + _ctxt.getNDim(); // Consider the variable and its gradient(s)
+  _nVar = _ctxt.getNVar() + static_cast<Id>(_ctxt.getNDim()); // Consider the variable and its gradient(s)
   _ctxt.setNVar(_nVar);
 }
 

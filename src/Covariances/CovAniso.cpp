@@ -495,7 +495,7 @@ CovAniso* CovAniso::createReduce(const VectorInt& validVars) const
 
   // Modify the Matrix of sills
   newCovAniso->setContext(ctxt);
-  MatrixSymmetric* newsill = dynamic_cast<MatrixSymmetric*>(MatrixFactory::createReduce(&_sillCur, validVars, validVars));
+  auto* newsill = dynamic_cast<MatrixSymmetric*>(MatrixFactory::createReduce(&_sillCur, validVars, validVars));
   newCovAniso->setSill(*newsill);
   return newCovAniso;
 }
