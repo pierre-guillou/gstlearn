@@ -9,10 +9,10 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Space/SpaceSN.hpp"
-#include "Space/ASpace.hpp"
-#include "Space/SpacePoint.hpp"
 #include "Basic/AException.hpp"
 #include "Geometry/GeometryHelper.hpp"
+#include "Space/ASpace.hpp"
+#include "Space/SpacePoint.hpp"
 #include <memory>
 
 namespace gstlrn
@@ -22,16 +22,16 @@ SpaceSN::SpaceSN(size_t ndim, double radius)
   , _radius(radius)
 {
   if (ndim != 2)
-  my_throw("SN is only implemented for ndim=2 (sphere)");
+    my_throw("SN is only implemented for ndim=2 (sphere)");
 }
 
-SpaceSN::SpaceSN(const SpaceSN &r)
-    : ASpace(r),
-      _radius(r._radius)
+SpaceSN::SpaceSN(const SpaceSN& r)
+  : ASpace(r)
+  , _radius(r._radius)
 {
 }
 
-SpaceSN& SpaceSN::operator=(const SpaceSN &r)
+SpaceSN& SpaceSN::operator=(const SpaceSN& r)
 {
   if (this != &r)
   {
@@ -68,19 +68,19 @@ String SpaceSN::toString(const AStringFormat* strfmt, Id idx) const
   return sstr.str();
 }
 
-bool SpaceSN::isEqual(const ASpace *space) const
+bool SpaceSN::isEqual(const ASpace* space) const
 {
   if (!ASpace::isEqual(space)) return false;
   const auto* s = dynamic_cast<const SpaceSN*>(space);
   return s != nullptr && _radius == s->_radius;
 }
 
-void SpaceSN::_move(SpacePoint &p1, const VectorDouble &vec) const
+void SpaceSN::_move(SpacePoint& p1, const VectorDouble& vec) const
 {
   /// TODO : SpaceSN::_move
-  auto offset = getOffset();
-  auto ndim   = getNDim();
-  for (size_t i = offset; i < ndim + offset; i++)
+  auto offset = static_cast<Id>(getOffset());
+  auto ndim   = static_cast<Id>(getNDim());
+  for (Id i = offset; i < ndim + offset; i++)
   {
     p1.setCoord(i, p1.getCoord(i) + vec[i]);
   }
@@ -91,7 +91,7 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
                              Id ispace) const
 {
   DECLARE_UNUSED(ispace)
-  auto offset = getOffset();
+  auto offset = static_cast<Id>(getOffset());
   return GH::geodeticAngularDistance(p1.getCoord(offset),
                                      p1.getCoord(offset + 1),
                                      p2.getCoord(offset),
@@ -107,11 +107,11 @@ double SpaceSN::_getDistance(const SpacePoint& p1,
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getDistance with tensor
   DECLARE_UNUSED(tensor);
-  auto offset = getOffset();
+  auto offset = static_cast<Id>(getOffset());
   return GH::geodeticAngularDistance(p1.getCoord(offset),
                                      p1.getCoord(offset + 1),
                                      p2.getCoord(offset),
-                                     p2.getCoord(offset + 1), 
+                                     p2.getCoord(offset + 1),
                                      _radius);
 }
 
@@ -144,10 +144,10 @@ void SpaceSN::_getIncrementInPlace(const SpacePoint& p1,
 {
   DECLARE_UNUSED(ispace)
   /// TODO : SpaceSN::_getIncrementInPlace
-  Id j = 0;
-  auto offset = getOffset();
-  auto ndim   = getNDim();
-  for (size_t i = offset; i < ndim + offset; i++)
+  Id j        = 0;
+  auto offset = static_cast<Id>(getOffset());
+  auto ndim   = static_cast<Id>(getNDim());
+  for (Id i = offset; i < ndim + offset; i++)
     ptemp[j++] = p2.getCoord(i) - p1.getCoord(i);
 }
 } // namespace gstlrn

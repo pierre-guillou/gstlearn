@@ -43,7 +43,7 @@ public:
   static Vecchia* createForOptim(ModelGeneric* model,
                                  const Db* db1,
                                  Id nb_neigh = 30,
-                                 bool reml    = false);
+                                 bool reml   = false);
 
   Id computeLower(const MatrixT<Id>& Ranks, bool verbose = false);
   const MatrixSparse& getLFull() const { return _LFull; }
@@ -68,19 +68,19 @@ private:
   void _computeCm1Y() override;
   double _computeLogDet() const override;
   Id _buildNeighborhood(const MatrixT<Id>& Ranks,
-                         Id isample,
-                         Id ivar,
-                         Id nb_neigh,
-                         std::vector<std::array<Id, 4>>& neighDescr) const;
+                        Id isample,
+                        Id ivar,
+                        Id nb_neigh,
+                        std::vector<std::array<Id, 4>>& neighDescr) const;
   void _buildLHS(Id nitems,
                  const std::vector<std::array<Id, 4>>& neighDescr,
-                 MatrixSymmetric& _matCov);
+                 MatrixSymmetric& matCov);
   void _buildRHS(Id icase2,
                  Id iabs2,
                  Id ivar2,
                  Id nitems,
                  const std::vector<std::array<Id, 4>>& neighDescr,
-                 MatrixDense& _vectCov);
+                 MatrixDense& vectCov);
   void _loadDataFlattened();
   Id _getAddressInMatrix(Id ip, Id ivar) const;
   Id _getAddressAbsolute(Id ip) const;
@@ -113,13 +113,13 @@ private:
 };
 
 GSTLEARN_EXPORT Id krigingVecchia(Db* dbin,
-                                   Db* dbout,
-                                   ModelGeneric* model,
-                                   Id nb_neigh                    = 5,
-                                   bool verbose                    = false,
-                                   const NamingConvention& namconv = NamingConvention("Vecchia"));
+                                  Db* dbout,
+                                  ModelGeneric* model,
+                                  Id nb_neigh                     = 5,
+                                  bool verbose                    = false,
+                                  const NamingConvention& namconv = NamingConvention("Vecchia"));
 GSTLEARN_EXPORT double logLikelihoodVecchia(const Db* db,
                                             ModelGeneric* model,
-                                            Id nb_neigh = 5,
+                                            Id nb_neigh  = 5,
                                             bool verbose = false);
 } // namespace gstlrn

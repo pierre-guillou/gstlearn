@@ -19,7 +19,7 @@ void ListParams::updateDispatch()
   for (size_t i = 0; i < _params.size(); ++i)
   {
     size_t index = _params[i].get().getAddress();
- 
+
     if (index > nmax)
     {
       nmax = nmax + 1;
@@ -40,7 +40,7 @@ void ListParams::addParam(ParamInfo& param)
 
   _dispatch.push_back(_params.size() - 1);
   _dispatchIndex.push_back(_params.size() - 1);
-  param.setAddress(_params.size() - 1);
+  param.setAddress(static_cast<Id>(_params.size()) - 1);
 }
 
 void ListParams::addParams(std::vector<ParamInfo>& params)
@@ -89,12 +89,11 @@ void ListParams::setValue(Id index, double value)
   _params[index].get().setValue(value);
 }
 
-
 String ListParams::toString(const AStringFormat* strfmt) const
 {
   DECLARE_UNUSED(strfmt);
   std::stringstream result;
-  result << toTitle(1,"List of Parameters:");
+  result << toTitle(1, "List of Parameters:");
   for (Id ipar = 0, jpar = 0, npar = static_cast<Id>(_dispatchIndex.size()); ipar < npar; ipar++)
   {
     jpar++;
@@ -102,7 +101,6 @@ String ListParams::toString(const AStringFormat* strfmt) const
   }
   return result.str();
 }
-
 
 void ListParams::makeDispatchIndexFromDispatch()
 {
@@ -158,4 +156,4 @@ void ListParams::setValues(const std::vector<double>& values)
     _params[i].get().setValue(values[_dispatch[i]]);
   }
 }
-}
+} // namespace gstlrn

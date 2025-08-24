@@ -35,12 +35,12 @@ void dual_swap(double* darr, Id* iarr, Id i1, Id i2)
   std::swap(iarr[i1], iarr[i2]);
 }
 
-void t_nheap::resize(Id n_pts, Id n_nbrs)
+void t_nheap::resize(Id n_ptsLocal, Id n_nbrsLocal)
 {
-  this->n_pts  = n_pts;
-  this->n_nbrs = n_nbrs;
-  this->distances.resize(n_pts, n_nbrs, INFINITY);
-  this->indices.resize(n_pts, n_nbrs, ITEST);
+  this->n_pts  = n_ptsLocal;
+  this->n_nbrs = n_nbrsLocal;
+  this->distances.resize(n_ptsLocal, n_nbrsLocal, INFINITY);
+  this->indices.resize(n_ptsLocal, n_nbrsLocal, ITEST);
 }
 
 void t_nheap::load(const t_btree& b, const MatrixT<double>& x)
@@ -62,7 +62,7 @@ Id t_nheap::push(Id row, double val, Id i_val)
 {
   Id ic1, ic2, i_swap;
 
-  Id size      = n_nbrs;
+  Id size       = n_nbrs;
   auto dist_arr = distances.getRow(row);
   auto ind_arr  = indices.getRow(row);
 

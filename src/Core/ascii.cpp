@@ -110,7 +110,7 @@ static void st_record_write(const char* format, ...)
   {
     _buffer_write(buf, format, ap);
     long1 = static_cast<Id>(buf.size());
-    long2 = (!ASCII_BUFFER.empty()) ? ASCII_BUFFER.size() : 0;
+    long2 = (!ASCII_BUFFER.empty()) ? static_cast<Id>(ASCII_BUFFER.size()) : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;

@@ -3953,7 +3953,7 @@ static Id st_model_auto_count(const Vario* vario,
 
     /* Initializations */
 
-    Id ndim         = model->getNDim();
+    Id ndim         = static_cast<Id>(model->getNDim());
     Id nvar         = model->getNVar();
     Id first_covrot = -1;
     if (st_alter_model_optvar(vario, model, constraints, optvar)) return (-2);

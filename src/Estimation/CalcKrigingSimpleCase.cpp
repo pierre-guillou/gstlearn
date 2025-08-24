@@ -143,7 +143,7 @@ bool CalcKrigingSimpleCase::_run()
 
   KrigingAlgebraSimpleCase algebra(ksys.getAlgebra());
   bool use_parallel = !getModel()->isNoStat();
-  Id nech_out      = getDbout()->getNSample();
+  Id nech_out       = getDbout()->getNSample();
   auto nbthread     = static_cast<I32>(OptCustom::query("ompthreads", 1)); // TODO : would like to use more threads
   omp_set_num_threads(nbthread);
 
@@ -168,7 +168,7 @@ bool CalcKrigingSimpleCase::_run()
       neigh->reset();
     }
     // TODO : encapsulate in Db (threadsafe)
-    for (size_t idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < static_cast<Id>(ndim); idim++)
     {
       pin.setCoord(idim, coords[idim][iech_out]);
     }

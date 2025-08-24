@@ -230,7 +230,7 @@ char* mem_alloc_(const char* call_file,
   }
   if (MEMORY_LEAK)
   {
-    st_memory_leak_add(call_file, call_line, size, tab_aux);
+    st_memory_leak_add(call_file, static_cast<Id>(call_line), size, tab_aux);
   }
 
   tab = &tab_aux[SHIFT()];
@@ -276,7 +276,7 @@ char* mem_copy_(const char* call_file,
   {
     (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
     st_mem_update(size_eff);
-    st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
+    st_mem_message(call_file, static_cast<Id>(call_line), "Allocation   ", +1, size_eff);
   }
   if (MEMORY_LEAK)
   {
@@ -335,7 +335,7 @@ char* mem_calloc_(const char* call_file,
   }
   if (MEMORY_LEAK)
   {
-    st_memory_leak_add(call_file, call_line, size, tab_aux);
+    st_memory_leak_add(call_file, static_cast<Id>(call_line), size, tab_aux);
   }
 
   tab = &tab_aux[SHIFT()];
@@ -385,7 +385,7 @@ char* mem_realloc_(const char* call_file,
       }
       if (MEMORY_LEAK)
       {
-        st_memory_leak_add(call_file, call_line, size, tab_aux);
+        st_memory_leak_add(call_file, static_cast<Id>(call_line), size, tab_aux);
       }
     }
     else
@@ -414,7 +414,7 @@ char* mem_realloc_(const char* call_file,
       }
       if (MEMORY_LEAK)
       {
-        st_memory_leak_add(call_file, call_line, size, tab_aux);
+        st_memory_leak_add(call_file, static_cast<Id>(call_line), size, tab_aux);
       }
     }
 

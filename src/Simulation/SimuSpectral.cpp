@@ -95,7 +95,7 @@ Id SimuSpectral::simulate(Id ns, Id seed, bool verbose, Id nd)
     return 1;
   }
 
-  _ndim = _model->getNDim();
+  _ndim = static_cast<Id>(_model->getNDim());
   _ns   = ns;
 
   // Cleaning any previously allocated memory

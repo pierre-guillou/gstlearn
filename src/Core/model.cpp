@@ -208,7 +208,7 @@ void model_cova_characteristics(const ECov& type,
   *flag_range    = cov->hasRange();
   *flag_param    = cov->hasParam();
   *min_order     = cov->getMinOrder();
-  *max_ndim      = cov->getMaxNDim();
+  *max_ndim      = static_cast<Id>(cov->getMaxNDim());
   *flag_int_1d   = cov->hasInt1D();
   *flag_int_2d   = cov->hasInt2D();
   *flag_aniso    = (((*flag_range) != 0) && (*max_ndim < 0 || *max_ndim > 1));
@@ -285,7 +285,7 @@ Model* model_combine(const Model* model1, const Model* model2, double r)
   cova0[3] = 1.;
 
   // Creating the context
-  CovContext ctxt(2, model1->getNDim(), cova0);
+  CovContext ctxt(2, static_cast<Id>(model1->getNDim()), cova0);
 
   // Creating the new Model
   model = new Model(ctxt);

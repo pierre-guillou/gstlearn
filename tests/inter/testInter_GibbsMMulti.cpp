@@ -135,7 +135,7 @@ int main()
       db->setLocator(names[isimu], ELoc::Z, 0);
       Vario vario(varioparam);
       vario.compute(db, ECalcVario::VARIOGRAM);
-      (void)vario.dumpToNF(incrementStringVersion("Vario", isimu + 1));
+      (void)vario.dumpToNF(incrementStringVersion("Vario", static_cast<Id>(isimu) + 1));
     }
   }
 

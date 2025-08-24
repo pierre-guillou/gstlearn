@@ -53,9 +53,9 @@ void Rotation::resetFromSpaceDimension(size_t ndim)
   _nDim    = ndim;
   _flagRot = false;
   _angles.resize(_nDim, 0.);
-  _rotMat.reset(_nDim, _nDim);
+  _rotMat.reset(static_cast<Id>(_nDim), static_cast<Id>(_nDim));
   _rotMat.setIdentity();
-  _rotInv.reset(_nDim, _nDim);
+  _rotInv.reset(static_cast<Id>(_nDim), static_cast<Id>(_nDim));
   _rotInv.setIdentity();
 }
 
@@ -81,11 +81,11 @@ Id Rotation::setMatrixDirectVec(const VectorDouble& rotmat)
   {
     if (static_cast<Id>(rotmat.size()) != _rotMat.size())
       my_throw("The argument 'rotmat' does not have same dimension as 'this'");
-    MatrixSquare local(_nDim);
+    MatrixSquare local(static_cast<Id>(_nDim));
     local.setValues(rotmat);
     if (!Rotation::isMatrixRotation(local, true)) return 1;
     _rotMat = local;
-    GH::rotationGetAnglesInPlace(_nDim, rotmat.data(), _angles.data());
+    GH::rotationGetAnglesInPlace(static_cast<Id>(_nDim), rotmat.data(), _angles.data());
     _directToInverse();
     _checkRotForIdentity();
   }
@@ -104,7 +104,7 @@ Id Rotation::setAngles(const VectorDouble& angles)
     if (_nDim == 2) _angles[1] = 0.;
 
     _local.resize(_nDim * _nDim);
-    GH::rotationMatrixInPlace(_nDim, _angles, _local);
+    GH::rotationMatrixInPlace(static_cast<Id>(_nDim), _angles, _local);
     _rotMat.setValues(_local);
     _directToInverse();
     _checkRotForIdentity();
@@ -115,7 +115,7 @@ Id Rotation::setAngles(const VectorDouble& angles)
 Id Rotation::getDerivativesInPlace(std::vector<MatrixSquare>& res) const
 {
 
-  GH::rotationMatrixDerivativesInPlace(_nDim, _angles, res);
+  GH::rotationMatrixDerivativesInPlace(static_cast<Id>(_nDim), _angles, res);
   for (auto& dR: res)
   {
     dR.prodScalar(GV_PI / 180);
@@ -161,9 +161,9 @@ String Rotation::toString(const AStringFormat* strfmt) const
   if (sf.getLevel() > 0)
   {
     sstr << toMatrix("Direct Rotation Matrix", VectorString(), VectorString(),
-                     true, _nDim, _nDim, _rotMat.getValues());
+                     true, static_cast<Id>(_nDim), static_cast<Id>(_nDim), _rotMat.getValues());
     sstr << toMatrix("Inverse Rotation Matrix", VectorString(), VectorString(),
-                     true, _nDim, _nDim, _rotInv.getValues());
+                     true, static_cast<Id>(_nDim), static_cast<Id>(_nDim), _rotInv.getValues());
   }
   return sstr.str();
 }
@@ -226,7 +226,7 @@ bool Rotation::isSame(const Rotation& rot) const
 {
   /* Find the minimum space dimension */
 
-  Id ndim = MIN(_nDim, rot.getNDim());
+  Id ndim = static_cast<Id>(MIN(_nDim, rot.getNDim()));
 
   /* Compare the rotations */
 

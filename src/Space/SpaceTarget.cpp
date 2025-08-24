@@ -82,7 +82,7 @@ void SpaceTarget::_initialize()
 {
   // Fill the extension with zeroes
   if (_extend.empty())
-    VH::fill(_extend, 0., getNDim());
+    VH::fill(_extend, 0., static_cast<Id>(getNDim()));
 }
 
 String SpaceTarget::toString(const AStringFormat* /*strfmt*/) const

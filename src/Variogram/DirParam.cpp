@@ -70,7 +70,7 @@ DirParam::DirParam(const DbGrid* dbgrid,
   , _grincr(grincr)
 {
   auto ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
 
   _codir      = dbgrid->getCodir(grincr);
   double dlag = 0.;
@@ -209,7 +209,7 @@ void DirParam::setTolAngle(double tolang)
 
 bool DirParam::isDimensionValid(Id idim) const
 {
-  return checkArg("Space Dimension", idim, getNDim());
+  return checkArg("Space Dimension", idim, static_cast<Id>(getNDim()));
 }
 
 bool DirParam::isLagValid(Id ilag, bool flagAsym, bool flagCheck) const
@@ -333,7 +333,7 @@ std::vector<DirParam> DirParam::createMultiple(Id ndir,
                                                const ASpaceSharedPtr& space)
 {
   auto ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
 
   VectorDouble angles(1);
   VectorDouble codir(ndim, 0.);
@@ -359,7 +359,7 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
 {
   std::vector<DirParam> dirs;
   auto ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
   if (ndim != 2)
   {
     messerr("This method is limited to 2D sapce");
@@ -368,7 +368,7 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
 
   VectorDouble anglesloc(1);
   VectorDouble codir(ndim);
-  Id ndir               = static_cast<Id>(angles.size());
+  Id ndir = static_cast<Id>(angles.size());
   if (FFFF(tolang)) tolang = 90. / ndir;
   for (Id idir = 0; idir < ndir; idir++)
   {
@@ -395,7 +395,7 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
 std::vector<DirParam> DirParam::createMultipleInSpace(Id nlag, double dlag, const ASpaceSharedPtr& space)
 {
   auto ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
 
   VectorDouble codir(ndim);
   std::vector<DirParam> dirs;

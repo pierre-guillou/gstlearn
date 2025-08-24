@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
   if (mode <= 0 || mode == 2)
   {
     (void)db_gradient_update(data); // Transform ELoc::G into ELoc::Z
-    CovContext ctxt(data->getNLoc(ELoc::Z), model->getNDim());
+    CovContext ctxt(data->getNLoc(ELoc::Z), static_cast<Id>(model->getNDim()));
     auto* new_model = new ModelGeneric(ctxt);
     auto covg       = CovGradientGeneric(*model->getCovAniso(0), ballradius);
     new_model->setCov(&covg);

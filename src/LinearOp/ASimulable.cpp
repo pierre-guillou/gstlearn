@@ -18,7 +18,6 @@ namespace gstlrn
 {
 
 ASimulable::ASimulable()
-  : ALinearOp()
 {
 }
 VectorDouble ASimulable::evalSimulate(const VectorDouble& whitenoise) const
@@ -37,7 +36,7 @@ VectorDouble ASimulable::simulate() const
   return res;
 }
 Id ASimulable::evalSimulate(const VectorDouble& whitenoise,
-                             VectorDouble& outv) const
+                            VectorDouble& outv) const
 {
   outv.resize(whitenoise.size());
   constvect ws(whitenoise);
@@ -62,4 +61,4 @@ double ASimulable::computeLogDet(Id nMC) const
   messerr("computeLogDet not implemented in ASimulable");
   return TEST;
 }
-}
+} // namespace gstlrn

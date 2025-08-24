@@ -28,7 +28,7 @@
 #include "geoslib_define.h"
 
 namespace gstlrn
-{ 
+{
 static void _modifyMopForAnam(ModelGeneric* model,
                               ModelOptimParam& mop)
 {
@@ -53,9 +53,9 @@ static void _modifyMopForAnam(ModelGeneric* model,
  **
  *****************************************************************************/
 static Id _modifyMopForVMap(const DbGrid* dbmap,
-                             ModelGeneric* model,
-                             Constraints* constraints,
-                             ModelOptimParam& mop)
+                            ModelGeneric* model,
+                            Constraints* constraints,
+                            ModelOptimParam& mop)
 {
   // Clever setting of options
   mop.setAuthAniso(true);
@@ -96,11 +96,11 @@ static Id _modifyMopForVMap(const DbGrid* dbmap,
  **
  *****************************************************************************/
 static Id _modifyMopForVario(const Vario* vario,
-                              ModelGeneric* model,
-                              Constraints* constraints,
-                              ModelOptimParam& mop)
+                             ModelGeneric* model,
+                             Constraints* constraints,
+                             ModelOptimParam& mop)
 {
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   Id ndir = vario->getNDir();
   Id n_2d = 0;
   Id n_3d = 0;
@@ -191,7 +191,7 @@ static void _modifyOneParam(const EConsType& cas,
 }
 
 static Id _modifyModelForConstraints(Constraints* constraints,
-                                      ModelGeneric* model)
+                                     ModelGeneric* model)
 {
   // Check the constraints
   if (constraints == nullptr) return 0;
@@ -199,10 +199,10 @@ static Id _modifyModelForConstraints(Constraints* constraints,
   if (ncons <= 0) return 0;
 
   // Check the ModelCovList
-  ModelCovList* mcv = dynamic_cast<ModelCovList*>(model);
+  auto* mcv = dynamic_cast<ModelCovList*>(model);
   if (mcv == nullptr) return 1;
 
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   Id nvar = model->getNVar();
   for (Id i = 0; i < ncons; i++)
   {
@@ -210,10 +210,10 @@ static Id _modifyModelForConstraints(Constraints* constraints,
     const EConsElem type     = consitem->getType();
     const EConsType cas      = consitem->getIcase();
     double value             = consitem->getValue();
-    Id igrf                 = consitem->getIGrf();
-    Id icov                 = consitem->getICov();
-    Id iv1                  = consitem->getIV1();
-    Id iv2                  = consitem->getIV2();
+    Id igrf                  = consitem->getIGrf();
+    Id icov                  = consitem->getICov();
+    Id iv1                   = consitem->getIV1();
+    Id iv2                   = consitem->getIV2();
 
     CovBase* covbase   = mcv->getCovBase(icov);
     CovAniso* covaniso = dynamic_cast<CovAniso*>(covbase);
@@ -300,7 +300,7 @@ static void _fixAllScalesFromIndex(CorAniso* coraniso, Id start = 0)
 }
 
 static Id _modifyModelForMop(const ModelOptimParam& mop,
-                              ModelGeneric* model)
+                             ModelGeneric* model)
 {
   ModelCovList* mcv = dynamic_cast<ModelCovList*>(model);
   if (mcv == nullptr) return 0;
@@ -411,4 +411,4 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
   }
   return nullptr;
 }
-}
+} // namespace gstlrn

@@ -722,7 +722,7 @@ Id Vario::regularizeFromModel(const Model& model,
 
       double dist = ilag * getDPas(idir);
       VectorDouble shift(ndim);
-      for (size_t idim = 0; idim < ndim; idim++)
+      for (Id idim = 0; idim < static_cast<Id>(ndim); idim++)
         shift[idim] = dist * getCodir(idir, idim);
 
       for (Id ivar = 0; ivar < nvar; ivar++)
@@ -2619,7 +2619,7 @@ void Vario::_calculateBiasGlobal(Db* db)
   /* Initializations */
 
   Id nbfl = _model->getNDrift();
-  Id ndim = _model->getNDim();
+  Id ndim = static_cast<Id>(_model->getNDim());
   Id nech = db->getNSampleActiveAndDefined(0);
   VectorDouble d1(ndim, 0.);
 
@@ -4568,7 +4568,7 @@ Id Vario::transformCut(Id nh, double ycut)
     return 1;
   }
   static double disc = 0.01;
-  Id ndisc          = static_cast<Id>(2. / disc + 1.);
+  Id ndisc           = static_cast<Id>(2. / disc + 1.);
 
   /* Core allocation */
 

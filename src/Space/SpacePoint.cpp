@@ -161,7 +161,7 @@ void SpacePoint::setFFFF()
 
 bool SpacePoint::isFFFF() const
 {
-  for (Id idim = 0, ndim = getNDim(); idim < ndim; idim++)
+  for (Id idim = 0, ndim = static_cast<Id>(getNDim()); idim < ndim; idim++)
     if (!FFFF(_coord[idim])) return false;
   return true;
 }

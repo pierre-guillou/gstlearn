@@ -1259,7 +1259,7 @@ static Id st_check_model(const Db* dbin, const Db* dbout, Model* model)
 
   if (model == nullptr) return (1);
 
-  ndim = model->getNDim();
+  ndim = static_cast<Id>(model->getNDim());
   nvar = model->getNVar();
   if (dbin != nullptr)
   {
@@ -5858,7 +5858,7 @@ Id m2d_gibbs_spde(Db* dbin,
     messerr("The function requires an output Db argument");
     goto label_end;
   }
-  ndim = model->getNDim();
+  ndim = static_cast<Id>(model->getNDim());
   if (model->getNVar() != 1)
   {
     messerr("This function should be called in the case of a single Model");

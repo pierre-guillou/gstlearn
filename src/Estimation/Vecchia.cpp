@@ -139,10 +139,10 @@ Id Vecchia::_getAddressInMatrix(Id ip, Id ivar) const
 }
 
 Id Vecchia::_buildNeighborhood(const MatrixT<Id>& Ranks,
-                                Id isample,
-                                Id ivar,
-                                Id nb_neigh,
-                                std::vector<std::array<Id, 4>>& neighDescr) const
+                               Id isample,
+                               Id ivar,
+                               Id nb_neigh,
+                               std::vector<std::array<Id, 4>>& neighDescr) const
 {
   // Loop on the ranks of the neighboring samples
   Id nitems = 0;
@@ -183,7 +183,7 @@ Id Vecchia::_buildNeighborhood(const MatrixT<Id>& Ranks,
 
 void Vecchia::_buildLHS(Id nitems,
                         const std::vector<std::array<Id, 4>>& neighDescr,
-                        MatrixSymmetric& _matCov)
+                        MatrixSymmetric& matCov)
 {
   SpacePoint p1;
   SpacePoint p2;
@@ -209,7 +209,7 @@ void Vecchia::_buildLHS(Id nitems,
         _db2->getSampleAsSPInPlace(p2, iabs2);
 
       double value = _model->evalCov(p1, p2, ivar1, ivar2);
-      _matCov.setValue(i1, i2, value);
+      matCov.setValue(i1, i2, value);
     }
   }
 }
@@ -219,7 +219,7 @@ void Vecchia::_buildRHS(Id icase2,
                         Id ivar2,
                         Id nitems,
                         const std::vector<std::array<Id, 4>>& neighDescr,
-                        MatrixDense& _vectCov)
+                        MatrixDense& vectCov)
 {
   SpacePoint p1;
   SpacePoint p2;
@@ -240,7 +240,7 @@ void Vecchia::_buildRHS(Id icase2,
       _db2->getSampleAsSPInPlace(p1, iabs1);
 
     double value = _model->evalCov(p1, p2, ivar1, ivar2);
-    _vectCov.setValue(i1, 0, value);
+    vectCov.setValue(i1, 0, value);
   }
 }
 
@@ -252,21 +252,21 @@ void Vecchia::_buildRHS(Id icase2,
 void Vecchia::_loadDataFlattened()
 {
   auto icase = _getCase();
-  Id ecr   = 0;
+  Id ecr     = 0;
   if (icase == 1)
   {
     _Y.resize(_Ntot1);
-    Id nvar = _cumulRanks1.size();
+    Id nvar = static_cast<Id>(_cumulRanks1.size());
     for (Id ivar = 0; ivar < nvar; ivar++)
-      for (Id iech = 0, nech = _varRanks1[ivar].size(); iech < nech; iech++)
+      for (Id iech = 0, nech = static_cast<Id>(_varRanks1[ivar].size()); iech < nech; iech++)
         _Y[ecr++] = _db1->getLocVariable(ELoc::Z, _varRanks1[ivar][iech], ivar);
   }
   else
   {
     _Y.resize(_Ntot2);
-    Id nvar = _cumulRanks2.size();
+    Id nvar = static_cast<Id>(_cumulRanks2.size());
     for (Id ivar = 0; ivar < nvar; ivar++)
-      for (Id iech = 0, nech = _varRanks2[ivar].size(); iech < nech; iech++)
+      for (Id iech = 0, nech = static_cast<Id>(_varRanks2[ivar].size()); iech < nech; iech++)
         _Y[ecr++] = _db2->getLocVariable(ELoc::Z, _varRanks2[ivar][iech], ivar);
   }
 }
@@ -336,7 +336,7 @@ Id Vecchia::computeLower(const MatrixT<Id>& Ranks, bool verbose)
   {
     for (Id isample = 0; isample < nsample; isample++)
     {
-      Id target = Ranks(isample, 0);
+      Id target   = Ranks(isample, 0);
       auto icase1 = _getSampleCase(target);
       auto iabs1  = _getAddressAbsolute(target);
       auto irel1  = _getAddressInMatrix(target, ivar);
@@ -473,11 +473,11 @@ MatrixSparse* Vecchia::calculateW(const VectorDouble& D_dd) const
 }
 
 Id krigingVecchia(Db* dbin,
-                   Db* dbout,
-                   ModelGeneric* model,
-                   Id nb_neigh,
-                   bool verbose,
-                   const NamingConvention& namconv)
+                  Db* dbout,
+                  ModelGeneric* model,
+                  Id nb_neigh,
+                  bool verbose,
+                  const NamingConvention& namconv)
 {
   Vecchia V(model, nb_neigh, dbout, dbin);
 
@@ -488,7 +488,7 @@ Id krigingVecchia(Db* dbin,
   VectorDouble DFull = V.getDFull();
   auto nd            = V.getND();
   auto nt            = V.getNT();
-  Id nvar           = model->getNVar();
+  Id nvar            = model->getNVar();
   VectorDouble D_dd(nd);
   VH::extractInPlace(DFull, D_dd, nt);
 

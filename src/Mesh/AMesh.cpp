@@ -930,7 +930,7 @@ bool AMesh::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
 void dumpMeshes(const VectorMeshes& meshes)
 {
   mestitle(1, "Contents of the VectorMeshes");
-  Id nmesh = meshes.size();
+  Id nmesh = static_cast<Id>(meshes.size());
   message("It contains %d mesh(es)\n", nmesh);
   for (Id imesh = 0; imesh < nmesh; imesh++)
     messageFlush(meshes[imesh]->toString());

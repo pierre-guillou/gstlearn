@@ -85,7 +85,7 @@ bool ASerializable::dumpToNF(const String& NFFilename,
   if (formatLocal == EFormatNF::H5)
   {
     auto file = SerializeHDF5::fileOpenWrite(*this, NFFilename);
-    bool ret  = _serializeH5(file, verbose);
+    ret       = _serializeH5(file, verbose);
     if (!ret)
       messerr("Problem writing in the HDF5 file.");
     return ret;
@@ -111,9 +111,9 @@ bool ASerializable::_fileOpenAndDeserialize(const String& filename, bool verbose
 #ifdef HDF5
   if (H5::H5File::isHdf5(filepath))
   {
-    auto file = SerializeHDF5::fileOpenRead(filename);
+    auto fileStr = SerializeHDF5::fileOpenRead(filename);
 
-    return _deserializeH5(file, verbose);
+    return _deserializeH5(fileStr, verbose);
   }
 #endif
 

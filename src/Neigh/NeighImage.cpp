@@ -58,7 +58,7 @@ String NeighImage::toString(const AStringFormat* strfmt) const
 
   sstr << "Skipping factor = " << _skip << std::endl;
   sstr << toMatrix("Image radius :", VectorString(), VectorString(), true,
-                   1, getNDim(), _imageRadius);
+                   1, static_cast<Id>(getNDim()), _imageRadius);
 
   return sstr.str();
 }
