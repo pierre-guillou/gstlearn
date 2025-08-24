@@ -694,7 +694,6 @@ setMethod(f = "show", signature = "_p_gstlrn__VectorTT_gstlrn__VectorNumTT_doubl
 
 setMethod(f = "show", signature = "_p_gstlrn__VectorTT_gstlrn__VectorNumTT_float_t_t",  definition = function(object){ VectorVectorFloat_display(object) })
 
-_p_gstlrn__VectorTT_gstlrn__VectorNumTT_double_t_t
 ##
 ## Add function for fixing inheritance issue (known caveat):
 ## https://github.com/gstlearn/gstlearn/issues/308
