@@ -594,7 +594,7 @@ void CovAnisoList::appendParams(ListParams& listParams,
       {
         for (Id i = 0; i < static_cast<Id>(anglesrefLoc.size()); i++)
         {
-          paramscur->at(i).setAddress(anglesrefLoc[i]);
+          paramscur->at(i).setAddress(static_cast<Id>(anglesrefLoc[i]));
         }
       }
     }

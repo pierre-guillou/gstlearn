@@ -780,7 +780,7 @@ Id gslSPrintf(char* dst, Id n, const char* fmt, ...)
   DECLARE_UNUSED(n);
   va_list ap;
   va_start(ap, fmt);
-  Id nout = vsprintf(dst, fmt, ap);
+  Id nout = vsnprintf(dst, n, fmt, ap);
   va_end(ap);
   return nout;
 }

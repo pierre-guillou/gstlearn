@@ -8,14 +8,12 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Enum/ECst.hpp"
-
 #include "Basic/File.hpp"
 #include "Basic/OptCst.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/String.hpp"
+#include "Enum/ECst.hpp"
 #include "Geometry/GeometryHelper.hpp"
-
 #include <cmath>
 
 #define VERBOSE 0

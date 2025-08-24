@@ -1605,7 +1605,7 @@ void CorAniso::appendParams(ListParams& listparams,
     i++;
   }
 
-  size_t istart = 0;
+  Id istart = 0;
   if (getNDim() == 3 && _optimLockIso2d)
   {
     // In 3D, the first angle is locked
