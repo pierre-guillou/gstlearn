@@ -26,7 +26,8 @@ public:
              Id ndim,
              const VectorDouble& covar0 = VectorDouble());
   CovContext(const Db* db, const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  CovContext(const Vario* vario, const ASpaceSharedPtr& space = ASpaceSharedPtr());
+  CovContext(const Vario* vario);
+  // CovContext(const Vario* vario, const ASpaceSharedPtr& space = ASpaceSharedPtr());
   CovContext(const CovContext& r);
   CovContext& operator=(const CovContext& r);
   virtual ~CovContext();

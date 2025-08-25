@@ -66,8 +66,8 @@ CovContext::CovContext(const Db* db, const ASpaceSharedPtr& space)
   _update();
 }
 
-CovContext::CovContext(const Vario* vario, const ASpaceSharedPtr& space)
-  : ASpaceObject(space)
+CovContext::CovContext(const Vario* vario)
+  : ASpaceObject(vario->getSpace())
   , _nVar(0)
   , _field(TEST)
   , _covar0()

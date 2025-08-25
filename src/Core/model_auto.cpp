@@ -443,7 +443,7 @@ static StrMod* st_model_auto_strmod_alloc(Model* model1,
 
   /* Core allocation */
 
-  StrMod* strmod    = new StrMod;
+  auto* strmod      = new StrMod;
   strmod->npar_init = npar0;
   strmod->norder    = norder;
   strmod->models[0] = model1;
