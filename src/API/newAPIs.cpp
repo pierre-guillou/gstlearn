@@ -11,11 +11,11 @@
 
 #include "API/newAPIs.hpp"
 #include "Basic/VectorT.hpp"
+#include "Covariances/CovAniso.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Db/Db.hpp"
 #include "Model/GaussianProcess.hpp"
 #include "Model/Model.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Db/Db.hpp"
 
 namespace gstlrn
 {
@@ -39,14 +39,14 @@ GaussianProcess* createModelFromData(const Db* dat,
 {
 
   auto* gp = new GaussianProcess();
-  CovContext ctxt(variables.size(), dat->getNDim());
+  CovContext ctxt(static_cast<Id>(variables.size()), dat->getNDim());
   Model model(ctxt);
   if (structs.empty())
   {
     messerr("No covariance structures provided.");
     return nullptr;
   }
- 
+
   if (addMeasurementError)
   {
     CovAniso nugget(ECov::NUGGET, ctxt);
@@ -64,4 +64,4 @@ GaussianProcess* createModelFromData(const Db* dat,
   data->setLocators(variables, ELoc::Z);
   return gp;
 }
-}
+} // namespace gstlrn

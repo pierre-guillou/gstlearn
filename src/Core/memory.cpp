@@ -280,7 +280,7 @@ char* mem_copy_(const char* call_file,
   }
   if (MEMORY_LEAK)
   {
-    st_memory_leak_add(call_file, call_line, size, tab_aux);
+    st_memory_leak_add(call_file, static_cast<Id>(call_line), size, tab_aux);
   }
 
   tab = &tab_aux[SHIFT()];

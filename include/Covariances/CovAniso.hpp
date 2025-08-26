@@ -122,48 +122,48 @@ public:
                                           const VectorDouble& angles = VectorDouble(),
                                           bool flagRange             = true);
 
-  FORWARD_METHOD_NON_CONST(getCorAniso, setParam)
-  FORWARD_METHOD_NON_CONST(getCorAniso, computeMarkovCoeffs)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setRangeIsotropic)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setRange)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setRanges)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setScale)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setScaleDim)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setScales)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setAnisoRotationMat)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setAnisoRotation)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setAnisoAngles)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setAnisoAngle)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setRotationAnglesAndRadius)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setType)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setParam)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, computeMarkovCoeffs)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setRangeIsotropic)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setRange)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setRanges)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setScale)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setScaleDim)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setScales)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setAnisoRotationMat)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setAnisoRotation)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setAnisoAngles)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setAnisoAngle)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setRotationAnglesAndRadius)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setType)
 
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeRangeNoStatDb)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeScaleNoStatDb)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeAngleNoStatDb)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeRangeNoStatDb)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeScaleNoStatDb)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeAngleNoStatDb)
 
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeTensorNoStatDb)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeParamNoStatDb)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeRangeNoStatFunctional)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeScaleNoStatFunctional)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeAngleNoStatFunctional)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeTensorNoStatFunctional)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeParamNoStatFunctional)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeRangeStationary)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeScaleStationary)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeAngleStationary)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeTensorStationary)
-  FORWARD_METHOD_NON_CONST(getCorAniso, makeParamStationary)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeTensorNoStatDb)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeParamNoStatDb)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeRangeNoStatFunctional)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeScaleNoStatFunctional)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeAngleNoStatFunctional)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeTensorNoStatFunctional)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeParamNoStatFunctional)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeRangeStationary)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeScaleStationary)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeAngleStationary)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeTensorStationary)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, makeParamStationary)
 
-  FORWARD_METHOD_NON_CONST(getCorAniso, setMarkovCoeffs)
-  FORWARD_METHOD_NON_CONST(getCorAniso, setMarkovCoeffsBySquaredPolynomials)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setMarkovCoeffs)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, setMarkovCoeffsBySquaredPolynomials)
 
-  FORWARD_METHOD_NON_CONST(getCorAniso, informDbInForAnisotropy)
-  FORWARD_METHOD_NON_CONST(getCorAniso, informDbOutForAnisotropy)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, informDbInForAnisotropy)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, informDbOutForAnisotropy)
 
-  FORWARD_METHOD_NON_CONST(getCorAniso, informMeshByMeshForAnisotropy)
-  FORWARD_METHOD_NON_CONST(getCorAniso, informMeshByApexForAnisotropy)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, informMeshByMeshForAnisotropy)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, informMeshByApexForAnisotropy)
 
-  FORWARD_METHOD_NON_CONST(getCorAniso, computeCorrec)
+  FORWARD_METHOD_NON_CONST(getCorAnisoModify, computeCorrec)
 
   FORWARD_METHOD(getCorAniso, getScaleIso, TEST)
   FORWARD_METHOD(getCorAniso, getScale, TEST)
@@ -210,7 +210,6 @@ public:
 
   double getSlope(Id ivar, Id jvar) const;
   const Rotation& getAnisoRotation() const { return getCorAniso()->getAniso().getRotation(); }
-  const CorAniso* getCorAniso() const;
   bool getFlagAniso() const { return !isIsotropic(); }
   bool getFlagRotation() const { return hasRotation(); }
   const VectorDouble& getAnisoAngles() const { return getCorAniso()->getAniso().getAngles(); }
@@ -226,7 +225,7 @@ public:
   bool isAsymptotic() const { return getScadef() != 1.; }
   bool hasRotation() const { return getCorAniso()->getAniso().hasRotation(); }
   const Tensor& getAniso() const { return getCorAniso()->getAniso(); }
-  void setAniso(const Tensor& aniso) { getCorAniso()->setAniso(aniso); }
+  void setAniso(const Tensor& aniso) { getCorAnisoModify()->setAniso(aniso); }
   const ACovFunc* getCorFunc() const { return getCorAniso()->getCorFunc(); }
 
   VectorDouble evalCovOnSphereVec(const VectorDouble& alpha,
@@ -236,21 +235,22 @@ public:
   Array evalCovFFT(const VectorDouble& hmax, Id N = 128, Id ivar = 0, Id jvar = 0) const;
 
   Id getNDim() const { return static_cast<Id>(_ctxt.getNDim()); }
-  CorAniso* getCorAniso();
+  const CorAniso* getCorAniso() const;
+  CorAniso* getCorAnisoModify();
   CovAniso* createReduce(const VectorInt& validVars) const;
 
   bool _isOptimEnabled() const override { return _optimEnabled && !isNoStatForAnisotropy(); }
 
-  std::vector<ParamInfo>& getScalesParam() { return getCorAniso()->getParamInfoScales(); }
-  std::vector<ParamInfo>& getAnglesParam() { return getCorAniso()->getParamInfoAngles(); }
+  std::vector<ParamInfo>& getScalesParam() { return getCorAnisoModify()->getParamInfoScales(); }
+  std::vector<ParamInfo>& getAnglesParam() { return getCorAnisoModify()->getParamInfoAngles(); }
 
   double _getSillValue(Id ivar, Id jvar, const CovCalcMode* mode) const;
 
-  virtual double _eval(const SpacePoint& p1,
-                       const SpacePoint& p2,
-                       Id ivar                 = 0,
-                       Id jvar                 = 0,
-                       const CovCalcMode* mode = nullptr) const override;
+  double _eval(const SpacePoint& p1,
+               const SpacePoint& p2,
+               Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 };
 
 GSTLEARN_EXPORT double scale2range(const ECov& type, double scale, double param = 1.);
