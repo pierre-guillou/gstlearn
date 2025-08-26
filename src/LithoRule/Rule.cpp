@@ -1107,7 +1107,7 @@ bool Rule::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   /* Read the grid characteristics */
   bool ret = true;
 
-  Id type;
+  Id type = 0;
   double rho;
   VectorInt nodes;
 

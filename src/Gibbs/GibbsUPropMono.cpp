@@ -98,7 +98,7 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
   Db* db       = getDb();
   Model* model = getModels(0);
   auto nact    = _getSampleRankNumber();
-  Id ndim     = model->getNDim();
+  Id ndim      = static_cast<Id>(model->getNDim());
   auto icase   = getRank(ipgs, 0);
 
   double eps = getEps();
@@ -169,4 +169,4 @@ void GibbsUPropMono::update(VectorVectorDouble& y,
 
   _updateStats(y, ipgs, iter);
 }
-}
+} // namespace gstlrn

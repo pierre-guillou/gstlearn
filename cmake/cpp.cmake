@@ -60,6 +60,8 @@ if(BUILD_ASAN)
   add_link_options(-fsanitize=address)
 endif()
 
+message(STATUS "BUILD_ASAN="  ${BUILD_ASAN})
+
 # Code coverage (GCC/Clang)
 option(BUILD_COVERAGE "Build with code coverage enabled" OFF)
 mark_as_advanced(BUILD_COVERAGE)

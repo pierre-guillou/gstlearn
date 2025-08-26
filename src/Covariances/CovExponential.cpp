@@ -40,14 +40,14 @@ double CovExponential::simulateTurningBand(double t0, TurningBandOperate& operTB
 
 MatrixDense CovExponential::simulateSpectralOmega(Id nb) const
 {
-  auto ndim    = getContext().getNDim();
+  auto ndim    = static_cast<Id>(getContext().getNDim());
   double param = 0.5;
   MatrixDense mat(nb, ndim);
 
   for (Id irow = 0; irow < nb; irow++)
   {
     double scale = sqrt(param / law_gamma(param));
-    for (size_t icol = 0; icol < ndim; icol++)
+    for (Id icol = 0; icol < ndim; icol++)
       mat.setValue(irow, icol, scale * law_gaussian());
   }
   return mat;

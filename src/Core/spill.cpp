@@ -131,12 +131,12 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
 
   /* Process the title */
 
-  (void)gslStrcpy2(STRING, "\n");
+  (void)gslStrcpy(STRING, "\n");
   if (flagMain)
   {
-    (void)gslSPrintfCat2(STRING, "\nEnd of Step %d === ", STEP);
-    (void)gslStrcat2(STRING, title.c_str());
-    (void)gslStrcat2(STRING, "\n");
+    (void)gslSPrintfCat(STRING, "\nEnd of Step %d === ", STEP);
+    (void)gslStrcat(STRING, title.c_str());
+    (void)gslStrcat(STRING, "\n");
   }
 
   /* Current address */
@@ -146,7 +146,7 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   if (pt_out != nullptr)
   {
     st_get_coordinates(pt_out, &ix0, &iy0);
-    (void)gslSPrintfCat2(STRING, "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
+    (void)gslSPrintfCat(STRING, "Step %d : Node (%d/%d, %d/%d)\n", STEP, ix0, TX, iy0, TY);
   }
   message(STRING.data());
 
@@ -170,49 +170,49 @@ static void st_dump(bool flagMain, const String& title, double* pt_out, SPIMG* i
   for (Id jy = 0; jy < TY; jy++)
   {
     Id iy = TY - jy - 1;
-    (void)gslStrcpy2(STRING, "");
+    (void)gslStrcpy(STRING, "");
     for (Id ix = 0; ix < TX; ix++)
     {
       Id value = BITALL(image, ix, iy);
       if (ix == ix0 && iy == iy0)
       {
-        (void)gslStrcat2(STRING, "X");
+        (void)gslStrcat(STRING, "X");
       }
       else if (ix == ix_spill && iy == iy_spill)
       {
-        (void)gslStrcat2(STRING, "#");
+        (void)gslStrcat(STRING, "#");
       }
       else if (value == INQUEUE)
       {
         numm1++;
-        (void)gslStrcat2(STRING, "?");
+        (void)gslStrcat(STRING, "?");
       }
       else if (value == SURFACE_UNKNOWN)
       {
         nump0++;
-        (void)gslStrcat2(STRING, " ");
+        (void)gslStrcat(STRING, " ");
       }
       else if (value == SURFACE_OUTSIDE)
       {
-        (void)gslStrcat2(STRING, ".");
+        (void)gslStrcat(STRING, ".");
         nump1++;
       }
       else if (value == SURFACE_INSIDE)
       {
-        (void)gslStrcat2(STRING, "*");
+        (void)gslStrcat(STRING, "*");
         nump2++;
       }
       else if (value == SURFACE_BELOW)
       {
-        (void)gslStrcat2(STRING, "-");
+        (void)gslStrcat(STRING, "-");
         numpb++;
       }
       else
       {
-        (void)gslStrcat2(STRING, "U");
+        (void)gslStrcat(STRING, "U");
       }
     }
-    (void)gslStrcat2(STRING, "\n");
+    (void)gslStrcat(STRING, "\n");
     message(STRING.data());
   }
   message("Spill'#' Queue'?'(%d) Unknown' '(%d) Out'.'(%d) In'*'(%d) Below'-'(%d) Heap(%d)\n",

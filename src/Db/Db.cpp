@@ -1146,7 +1146,7 @@ void Db::setLocators(const VectorString& names,
 
   if (locatorIndex < 0) locatorIndex = _getNextLocator(locatorType);
 
-  for (size_t i = 0; i < iuids.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(iuids.size()); i++)
     setLocatorByUID(iuids[i], locatorType, locatorIndex + i);
 }
 
@@ -1169,7 +1169,7 @@ void Db::setLocator(const String& name,
 
   if (locatorIndex < 0) locatorIndex = _getNextLocator(locatorType);
 
-  for (size_t i = 0; i < iuids.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(iuids.size()); i++)
     setLocatorByUID(iuids[i], locatorType, locatorIndex + i);
 }
 

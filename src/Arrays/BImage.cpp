@@ -153,7 +153,7 @@ String BImage::toString(const AStringFormat* strfmt) const
         for (Id ix = ixmin; ix < ixmax; ix++)
         {
           auto val = getValue(ix, jy, iz);
-          if (val > 0)
+          if (val)
             sstr << one;
           else
             sstr << zero;

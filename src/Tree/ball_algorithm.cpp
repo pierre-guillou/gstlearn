@@ -39,24 +39,24 @@ void swap(Id* arr, Id i1, Id i2)
 
 Id t_btree::init_node(Id i_node, Id idx_start, Id idx_end)
 {
-  Id n_features = this->n_features;
-  Id n_points   = idx_end - idx_start;
-  auto centroid = this->node_bounds.getRow(i_node);
+  Id n_featuresLocal = this->n_features;
+  Id n_points        = idx_end - idx_start;
+  auto centroid      = this->node_bounds.getRow(i_node);
 
-  for (Id j = 0; j < n_features; j++)
+  for (Id j = 0; j < n_featuresLocal; j++)
     centroid[j] = 0.0;
 
   for (Id i = idx_start; i < idx_end; i++)
-    for (Id j = 0; j < n_features; j++)
+    for (Id j = 0; j < n_featuresLocal; j++)
       centroid[j] += this->data(this->idx_array[i], j);
 
-  for (Id j = 0; j < n_features; j++)
+  for (Id j = 0; j < n_featuresLocal; j++)
     centroid[j] /= n_points;
 
   double radius        = 0.0;
   const auto dist_func = this->default_distance_function == 1 ? euclidean_distance : manhattan_distance;
   for (Id i = idx_start; i < idx_end; i++)
-    radius = fmax(radius, dist_func(centroid.data(), this->data.getRow(this->idx_array[i]).data(), n_features));
+    radius = fmax(radius, dist_func(centroid.data(), this->data.getRow(this->idx_array[i]).data(), n_featuresLocal));
 
   this->node_data[i_node].radius    = radius;
   this->node_data[i_node].idx_start = idx_start;
@@ -126,9 +126,9 @@ Id partition_node_indices(const MatrixT<double>& data, Id* node_indices, Id spli
 void t_btree::recursive_build(Id i_node, Id idx_start, Id idx_end)
 {
   Id imax;
-  Id n_features = this->n_features;
-  Id n_points   = idx_end - idx_start;
-  Id n_mid      = n_points / 2;
+  Id n_featuresLocal = this->n_features;
+  Id n_points        = idx_end - idx_start;
+  Id n_mid           = n_points / 2;
 
   // initialize the node data
   init_node(i_node, idx_start, idx_end);
@@ -147,7 +147,7 @@ void t_btree::recursive_build(Id i_node, Id idx_start, Id idx_end)
   else
   {
     this->node_data[i_node].is_leaf = false;
-    imax                            = find_node_split_dim(this->data, this->idx_array, n_features, n_points);
+    imax                            = find_node_split_dim(this->data, this->idx_array, n_featuresLocal, n_points);
     partition_node_indices(this->data, &this->idx_array[idx_start], imax, n_points, n_mid);
     recursive_build(2 * i_node + 1, idx_start, idx_start + n_mid);
     recursive_build(2 * i_node + 2, idx_start + n_mid, idx_end);

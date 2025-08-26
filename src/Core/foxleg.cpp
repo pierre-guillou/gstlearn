@@ -991,7 +991,7 @@ static void st_foxleg_debug_title(void)
   tab_prints(NULL, "Delta");
   for (Id ipar = 0; ipar < NPAR; ipar++)
   {
-    (void)gslSPrintf2(string, "Par-%d", ipar + 1);
+    (void)gslSPrintf(string, "Par-%d", ipar + 1);
     tab_prints(NULL, string.data());
   }
   message("\n");

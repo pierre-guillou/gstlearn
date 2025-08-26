@@ -76,25 +76,25 @@ static void _buildFormat(Id mode)
   switch (mode)
   {
     case CASE_INT:
-      (void)gslSPrintf2(FORMAT, "%%%dd", static_cast<Id>(OptCst::query(ECst::NTCAR)));
+      (void)gslSPrintf(FORMAT, "%%%dd", static_cast<Id>(OptCst::query(ECst::NTCAR)));
       break;
 
     case CASE_REAL:
-      (void)gslSPrintf2(FORMAT, "%%%d.%dlf", static_cast<Id>(OptCst::query(ECst::NTCAR)),
-                        static_cast<Id>(OptCst::query(ECst::NTDEC)));
+      (void)gslSPrintf(FORMAT, "%%%d.%dlf", static_cast<Id>(OptCst::query(ECst::NTCAR)),
+                       static_cast<Id>(OptCst::query(ECst::NTDEC)));
       break;
 
     case CASE_DOUBLE:
-      (void)gslSPrintf2(FORMAT, "%%%d.%dlg", static_cast<Id>(OptCst::query(ECst::NTCAR)),
-                        static_cast<Id>(OptCst::query(ECst::NTDEC)));
+      (void)gslSPrintf(FORMAT, "%%%d.%dlg", static_cast<Id>(OptCst::query(ECst::NTCAR)),
+                       static_cast<Id>(OptCst::query(ECst::NTDEC)));
       break;
 
     case CASE_COL:
-      (void)gslSPrintf2(FORMAT, "[,%%%dd]", static_cast<Id>(OptCst::query(ECst::NTCAR)) - 3);
+      (void)gslSPrintf(FORMAT, "[,%%%dd]", static_cast<Id>(OptCst::query(ECst::NTCAR)) - 3);
       break;
 
     case CASE_ROW:
-      (void)gslSPrintf2(FORMAT, "[%%%dd,]", static_cast<Id>(OptCst::query(ECst::NTCAR)) - 3);
+      (void)gslSPrintf(FORMAT, "[%%%dd,]", static_cast<Id>(OptCst::query(ECst::NTCAR)) - 3);
       break;
   }
 }
@@ -368,6 +368,7 @@ bool checkArg(const char* title, Id current, Id nmax)
  */
 void mestitle(Id level, const char* format, ...)
 {
+  Id STRING_MAX = 1000;
   char STRING[1000];
   va_list ap;
 
@@ -377,30 +378,30 @@ void mestitle(Id level, const char* format, ...)
   va_end(ap);
   Id size = static_cast<Id>(strlen(STRING));
 
-  (void)gslStrcat(STRING, "\n");
+  (void)gslStrcat(STRING, STRING_MAX, "\n");
   message_extern(STRING);
 
   /* Underline the string */
 
-  (void)gslStrcpy(STRING, "");
+  (void)gslStrcpy(STRING, STRING_MAX, "");
   for (Id i = 0; i < size; i++)
   {
     switch (level)
     {
       case 0:
-        (void)gslStrcat(STRING, "=");
+        (void)gslStrcat(STRING, STRING_MAX, "=");
         break;
 
       case 1:
-        (void)gslStrcat(STRING, "-");
+        (void)gslStrcat(STRING, STRING_MAX, "-");
         break;
 
       case 2:
-        (void)gslStrcat(STRING, ".");
+        (void)gslStrcat(STRING, STRING_MAX, ".");
         break;
     }
   }
-  (void)gslStrcat(STRING, "\n");
+  (void)gslStrcat(STRING, STRING_MAX, "\n");
   message_extern(STRING);
 }
 
@@ -440,6 +441,7 @@ void mes_process(const char* string, Id ntot, Id iech)
 String toTitle(Id level, const char* format, ...)
 {
   std::stringstream sstr;
+  Id STRING_MAX = 1000;
   char STRING[1000];
   va_list ap;
 
@@ -452,21 +454,21 @@ String toTitle(Id level, const char* format, ...)
   /* Underline the string */
 
   Id size = static_cast<Id>(strlen(STRING));
-  (void)gslStrcpy(STRING, "");
+  (void)gslStrcpy(STRING, STRING_MAX, "");
   for (Id i = 0; i < size; i++)
   {
     switch (level)
     {
       case 0:
-        (void)gslStrcat(STRING, "=");
+        (void)gslStrcat(STRING, STRING_MAX, "=");
         break;
 
       case 1:
-        (void)gslStrcat(STRING, "-");
+        (void)gslStrcat(STRING, STRING_MAX, "-");
         break;
 
       case 2:
-        (void)gslStrcat(STRING, ".");
+        (void)gslStrcat(STRING, STRING_MAX, ".");
         break;
     }
   }
@@ -1083,32 +1085,32 @@ void tab_prints(const char* title,
 
   /* Blank the string out */
 
-  (void)gslStrcpy2(TABSTR, "");
+  (void)gslStrcpy(TABSTR, "");
 
   /* Switch according to the justification */
 
   switch (justify.toEnum())
   {
     case EJustify::E_LEFT:
-      (void)gslStrcat2(TABSTR, string);
+      (void)gslStrcat(TABSTR, string);
       TABSTR[neff] = '\0';
       for (Id i = 0; i < nrst; i++)
-        (void)gslStrcat2(TABSTR, " ");
+        (void)gslStrcat(TABSTR, " ");
       break;
 
     case EJustify::E_CENTER:
       for (Id i = 0; i < n1; i++)
-        (void)gslStrcat2(TABSTR, " ");
-      (void)gslStrcat2(TABSTR, string);
+        (void)gslStrcat(TABSTR, " ");
+      (void)gslStrcat(TABSTR, string);
       TABSTR[n1 + neff] = '\0';
       for (Id i = 0; i < n2; i++)
-        (void)gslStrcat2(TABSTR, " ");
+        (void)gslStrcat(TABSTR, " ");
       break;
 
     case EJustify::E_RIGHT:
       for (Id i = 0; i < nrst; i++)
-        (void)gslStrcat2(TABSTR, " ");
-      (void)gslStrcat2(TABSTR, string);
+        (void)gslStrcat(TABSTR, " ");
+      (void)gslStrcat(TABSTR, string);
       break;
   }
   message(TABSTR.data());
@@ -1133,12 +1135,12 @@ void tab_printg(const char* title,
   _buildFormat(CASE_REAL);
 
   if (FFFF(value))
-    (void)gslStrcpy2(DECODE, "N/A");
+    (void)gslStrcpy(DECODE, "N/A");
   else
   {
     // Prevent -0.00 : https://stackoverflow.com/a/12536500/3952924
     value = (ABS(value) < _getThresh()) ? 0. : value;
-    (void)gslSPrintf2(DECODE, FORMAT.data(), value);
+    (void)gslSPrintf(DECODE, FORMAT.data(), value);
   }
   tab_prints(title, DECODE.data(), ncol, justify);
 }
@@ -1162,9 +1164,9 @@ void tab_printd(const char* title,
   _buildFormat(CASE_DOUBLE);
 
   if (FFFF(value))
-    (void)gslStrcpy2(DECODE, "N/A");
+    (void)gslStrcpy(DECODE, "N/A");
   else
-    (void)gslSPrintf2(DECODE, FORMAT.data(), value);
+    (void)gslSPrintf(DECODE, FORMAT.data(), value);
 
   tab_prints(title, DECODE.data(), ncol, justify);
 }
@@ -1185,9 +1187,9 @@ void tab_printi(const char* title, Id value, Id ncol, const EJustify& justify)
   _buildFormat(CASE_INT);
 
   if (IFFFF(value))
-    (void)gslStrcpy2(DECODE, "N/A");
+    (void)gslStrcpy(DECODE, "N/A");
   else
-    (void)gslSPrintf2(DECODE, FORMAT.data(), value);
+    (void)gslSPrintf(DECODE, FORMAT.data(), value);
 
   tab_prints(title, DECODE.data(), ncol, justify);
 }
@@ -1212,7 +1214,7 @@ void tab_print_rc(const char* title,
 {
   _buildFormat(mode);
 
-  (void)gslSPrintf2(DECODE, FORMAT.data(), value);
+  (void)gslSPrintf(DECODE, FORMAT.data(), value);
   string_strip_blanks(DECODE.data(), 0);
   tab_prints(title, DECODE.data(), ncol, justify);
 }
@@ -1235,11 +1237,11 @@ void tab_print_rowname(const char* string, Id taille)
 
   /* Blank the string out */
 
-  (void)gslStrcpy2(TABSTR, "");
-  (void)gslStrcat2(TABSTR, string);
+  (void)gslStrcpy(TABSTR, "");
+  (void)gslStrcat(TABSTR, string);
   TABSTR[neff] = '\0';
   for (Id i = 0; i < nrst; i++)
-    (void)gslStrcat2(TABSTR, " ");
+    (void)gslStrcat(TABSTR, " ");
   message(TABSTR.data());
 }
 

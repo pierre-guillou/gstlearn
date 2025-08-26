@@ -12,7 +12,6 @@
 #include "Anamorphosis/AAnam.hpp"
 #include "Anamorphosis/AnamDiscreteIR.hpp"
 #include "Anamorphosis/AnamHermite.hpp"
-#include "Basic/Memory.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/String.hpp"
 #include "Core/CSV.hpp"
@@ -38,8 +37,8 @@ namespace gstlrn
 
 static Id ASCII_BUFFER_LENGTH = 0;
 static Id ASCII_BUFFER_QUANT  = 1000;
-static char* ASCII_BUFFER     = NULL;
-static FILE* FILE_MEM         = NULL;
+static String ASCII_BUFFER;
+static FILE* FILE_MEM = NULL;
 static String FILE_NAME_MEM;
 
 /*! \endcond */
@@ -67,23 +66,16 @@ static char Fichier_frac[]    = "Frac";
  **
  ** \param[in]  title      Name of the quantity to be read
  ** \param[in]  format     Encoding format
- ** \param[in]  ...        Value to be written
+ ** \param[in]  vout       Returned argument
  **
  *****************************************************************************/
-static Id st_record_read(const char* title, const char* format, ...)
+static Id st_record_read(const char* title, const char* format, void* vout)
 {
-  va_list ap;
-
-  Id error;
-  va_start(ap, format);
+  Id error = 1;
 
   if (FILE_MEM != nullptr)
   {
-    error = _file_read(FILE_MEM, format, ap);
-  }
-  else
-  {
-    error = _buffer_read(&ASCII_BUFFER, format, ap);
+    error = _record_read(FILE_MEM, format, vout);
   }
 
   if (error > 0)
@@ -92,7 +84,6 @@ static Id st_record_read(const char* title, const char* format, ...)
     print_current_line();
   }
 
-  va_end(ap);
   return (error);
 }
 
@@ -118,12 +109,12 @@ static void st_record_write(const char* format, ...)
   else
   {
     _buffer_write(buf, format, ap);
-    long1 = buf.size();
-    long2 = (ASCII_BUFFER != NULL) ? static_cast<Id>(strlen(ASCII_BUFFER)) : 0;
+    long1 = static_cast<Id>(buf.size());
+    long2 = (!ASCII_BUFFER.empty()) ? static_cast<Id>(ASCII_BUFFER.size()) : 0;
     while (long1 + long2 > ASCII_BUFFER_LENGTH)
     {
       ASCII_BUFFER_LENGTH += ASCII_BUFFER_QUANT;
-      ASCII_BUFFER = mem_realloc(ASCII_BUFFER, ASCII_BUFFER_LENGTH, 1);
+      ASCII_BUFFER.resize(ASCII_BUFFER_LENGTH);
     }
     (void)gslStrcat(ASCII_BUFFER, buf.data());
   }
@@ -158,16 +149,16 @@ static void st_filename_patch(const char* ref_name,
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf2(filename, "%s/%s.%s",
-                          STUDY.data(), ref_name, EXT_DAT);
+        (void)gslSPrintf(filename, "%s/%s.%s",
+                         STUDY.data(), ref_name, EXT_DAT);
         break;
 
       case 1:
-        (void)gslSPrintf2(filename, "%s.%s", ref_name, EXT_OUT);
+        (void)gslSPrintf(filename, "%s.%s", ref_name, EXT_OUT);
         break;
 
       case -1:
-        (void)gslSPrintf2(filename, "%s", ref_name);
+        (void)gslSPrintf(filename, "%s", ref_name);
         break;
     }
   }
@@ -176,18 +167,18 @@ static void st_filename_patch(const char* ref_name,
     switch (mode)
     {
       case 0:
-        (void)gslSPrintf2(filename, "%s/%s%1d.%s",
-                          STUDY.data(), ref_name, rank,
-                          EXT_DAT);
+        (void)gslSPrintf(filename, "%s/%s%1d.%s",
+                         STUDY.data(), ref_name, rank,
+                         EXT_DAT);
         break;
 
       case 1:
-        (void)gslSPrintf2(filename, "%s%1d.%s", ref_name, rank,
-                          EXT_OUT);
+        (void)gslSPrintf(filename, "%s%1d.%s", ref_name, rank,
+                         EXT_OUT);
         break;
 
       case -1:
-        (void)gslSPrintf2(filename, "%s%1d", ref_name, rank);
+        (void)gslSPrintf(filename, "%s%1d", ref_name, rank);
         break;
     }
   }
@@ -244,7 +235,7 @@ void ascii_filename(const char* type, Id rank, Id mode, String& filename)
 void ascii_study_define(const char* study)
 
 {
-  (void)gslStrcpy2(STUDY, study);
+  (void)gslStrcpy(STUDY, study);
 }
 
 /****************************************************************************/
@@ -278,7 +269,7 @@ static FILE* st_file_open(const String& filename,
                           bool verbose)
 {
   FILE* file;
-  char idtype[LONG_SIZE];
+  String idtype;
 
   /* Open the file */
 
@@ -299,15 +290,15 @@ static FILE* st_file_open(const String& filename,
 
   if (mode == OLD)
   {
-    if (st_record_read("File Type", "%s", idtype))
+    if (st_record_read("File Type", "%s", &idtype))
     {
       FILE_MEM = NULL;
       return (NULL);
     }
-    if (strcmp(idtype, filetype) != 0)
+    if (idtype != filetype)
     {
       messerr("Error: in the File (%s), its Type (%s) does not match the requested one (%s)",
-              filename.data(), idtype, filetype);
+              filename.data(), idtype.data(), filetype);
       FILE_MEM = NULL;
       return (NULL);
     }
@@ -336,7 +327,7 @@ void ascii_environ_read(String& filename, bool verbose)
 
 {
   FILE* file;
-  char name[10];
+  String name;
   Id debug;
 
   /* Opening the Data file */
@@ -348,7 +339,7 @@ void ascii_environ_read(String& filename, bool verbose)
 
   while (1)
   {
-    if (st_record_read("Debug Keyword", "%s", name)) goto label_end;
+    if (st_record_read("Debug Keyword", "%s", &name)) goto label_end;
     if (st_record_read("Debug Value", "%ld", &debug)) goto label_end;
     String s = toUpper(String(name));
     if (debug == 1)
@@ -394,8 +385,8 @@ void ascii_simu_read(String& filename,
 
   /* Read the parameters */
 
-  if (st_record_read("Number of simulations", "%d", nbsimu)) return;
-  if (st_record_read("Number of Turning Bands", "%d", nbtuba)) return;
+  if (st_record_read("Number of simulations", "%ld", nbsimu)) return;
+  if (st_record_read("Number of Turning Bands", "%ld", nbtuba)) return;
   if (st_record_read("Random Seed", "%ld", seed)) return;
 
   st_file_close(file);
@@ -405,73 +396,42 @@ void ascii_simu_read(String& filename,
 /*!
  **   Check if an option is defined in the Options ASCII file
  **
- ** \return  1 if the option is defined and 0 otherwise
+ ** \return  True if the option is defined and False otherwise
  **
  ** \param[in]  filename    Name of the ASCII file
- ** \param[in]  verbose      Verbose option if the file cannot be opened
- ** \param[in]  option_name  Keyword for the requested option
- ** \param[in]  type         Answer type
- ** \li                      0 : Logical (returned as 0 or 1)
- ** \li                      1 : integer
- ** \li                      2 : real (returned as a double)
+ ** \param[in]  option_name Keyword for the requested option
+ ** \param[in]  verbose     Verbose option
  **
  ** \param[out]  answer      Answer
  **
  *****************************************************************************/
-Id ascii_option_defined(const String& filename,
-                        bool verbose,
-                        const char* option_name,
-                        Id type,
-                        void* answer)
+bool ascii_option_defined(const String& filename,
+                          const char* option_name,
+                          Id* answer,
+                          bool verbose)
 {
   FILE* file;
-  char keyword[100], keyval[100];
-  double rval;
-  Id lrep, ival;
-
-  /* Initializations */
-
-  lrep = 0;
+  String keyword;
 
   /* Opening the Data file */
 
   file = st_file_open(filename, "Option", OLD, verbose);
-  if (file == nullptr) return (lrep);
-
-  /* Implicit loop on the lines of the file */
+  if (file == nullptr) return false;
 
   while (1)
   {
-    if (st_record_read("Option Keyword", "%s", keyword)) goto label_end;
-    if (st_record_read("Option Key-value", "%s", keyval)) goto label_end;
-    if (strcmp(keyword, option_name) != 0) continue;
-
-    /* The keyword matches the option name */
-    switch (type)
+    if (st_record_read("Debug Keyword", "%s", &keyword)) goto label_end;
+    if (st_record_read("Debug Value", "%ld", answer)) goto label_end;
+    if (keyword == option_name)
     {
-      case 0:
-        ival = 0;
-        if (!strcmp(keyval, "Y") || !strcmp(keyval, "YES") || !strcmp(keyval, "y") || !strcmp(keyval, "yes") || atoi(keyval) == 1) ival = 1;
-        *(static_cast<Id*>(answer)) = ival;
-        break;
-
-      case 1:
-        ival           = atoi(keyval);
-        *(static_cast<Id*>(answer)) = ival;
-        break;
-
-      case 2:
-        rval               = atof(keyval);
-        *(static_cast<double*>(answer)) = rval;
-        break;
+      st_file_close(file);
+      return true;
     }
-    lrep = 1;
-    goto label_end;
   }
 
 label_end:
   st_file_close(file);
-  return (lrep);
+  return false;
 }
 
 /****************************************************************************/

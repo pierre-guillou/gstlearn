@@ -27,6 +27,7 @@ int main(int argc, char* argv[])
   // Testing string conversion Old to New style functions
   char buf_char[] = "abcde";
   message("Buffer (char) = %s\n", buf_char);
+  Id dst_char_max = 10;
   char dst_char[10];
   String dst_vec;
 
@@ -34,7 +35,7 @@ int main(int argc, char* argv[])
   message("Testing gslStrcpy:\n");
   message("- Expected result: abcde\n");
 
-  gslStrcpy(dst_char, buf_char);
+  gslStrcpy(dst_char, dst_char_max, buf_char);
   message("- Result = %s\n", dst_char);
 
   // Testing gslStrcat
@@ -42,36 +43,36 @@ int main(int argc, char* argv[])
   message("- Expected result: abcdefgh\n");
 
   char newbuf_char[] = "fgh";
-  gslStrcat(dst_char, newbuf_char);
+  gslStrcat(dst_char, dst_char_max, newbuf_char);
   message("- Result = %s\n", dst_char);
 
   // Testing gslSPrintf
   message("Testing gslSPrintf:\n");
   message("- Expected result: A+fgh\n");
-  gslSPrintf(dst_char, "A+%s", newbuf_char);
+  gslSPrintf(dst_char, dst_char_max, "A+%s", newbuf_char);
   message("- Result(char) = %s\n", dst_char);
 
   // Testing gslSPrintf2
   message("Testing gslSPrintf2:\n");
   message("- Expected result: BC+fgh\n");
 
-  gslSPrintf2(dst_vec, "BC+%s", newbuf_char);
+  gslSPrintf(dst_vec, "BC+%s", newbuf_char);
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing gslAddSPrintf2
   message("Testing gslAddSPrintf2:\n");
   Id one = 1;
-  gslSPrintfCat2(dst_vec, " added %d times", one);
+  gslSPrintfCat(dst_vec, " added %d times", one);
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing gslStrcat2
   message("Testing gslStrcat2:\n");
-  gslStrcat2(dst_vec, " (Tested successfully)");
+  gslStrcat(dst_vec, " (Tested successfully)");
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing gslStrcpy2
   message("Testing gslStrcpy2:\n");
-  gslStrcpy2(dst_vec, "After a copy");
+  gslStrcpy(dst_vec, "After a copy");
   message("- Result(char) = %s\n", dst_vec.data());
 
   // Testing the string lengt

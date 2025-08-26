@@ -30,7 +30,7 @@ Tensor::Tensor(size_t ndim)
   , _isotropic(true)
   , _flagDefinedBySquare(false)
 {
-  init(ndim);
+  init(static_cast<Id>(ndim));
 }
 
 Tensor::Tensor(const Tensor& r)
@@ -251,7 +251,7 @@ void Tensor::_fillTensors()
   _tensorInverse.divideRow(_radius);
 
   // Square of the Direct tensor
-  _tensorDirect2 = MatrixSymmetric(_nDim);
+  _tensorDirect2 = MatrixSymmetric(static_cast<Id>(_nDim));
   _tensorDirect2.prodMatMatInPlace(&_tensorDirect, &_tensorDirect, false, true);
 
   _tensorDirectSwap = _rotation.getMatrixDirect();

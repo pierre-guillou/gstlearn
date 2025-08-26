@@ -498,18 +498,16 @@ GSTLEARN_EXPORT void vario_order_print(Vario_Order* vorder,
                                        Id idir_target,
                                        Id ipas_target,
                                        Id verbose);
-GSTLEARN_EXPORT void vario_order_get_bounds(
-  Vario_Order* vorder,
-  Id idir,
-  Id ilag,
-  Id* ifirst,
-  Id* ilast);
-GSTLEARN_EXPORT void vario_order_get_indices(
-  Vario_Order* vorder,
-  Id ipair,
-  Id* iech,
-  Id* jech,
-  double* dist);
+GSTLEARN_EXPORT void vario_order_get_bounds(Vario_Order* vorder,
+                                            Id idir,
+                                            Id ilag,
+                                            Id* ifirst,
+                                            Id* ilast);
+GSTLEARN_EXPORT void vario_order_get_indices(Vario_Order* vorder,
+                                             Id ipair,
+                                             Id* iech,
+                                             Id* jech,
+                                             double* dist);
 GSTLEARN_EXPORT void vario_order_get_auxiliary(Vario_Order* vorder,
                                                Id ipair,
                                                char* aux_iech,

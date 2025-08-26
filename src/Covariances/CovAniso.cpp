@@ -106,9 +106,14 @@ CovAniso::~CovAniso()
 {
 }
 
-CorAniso* CovAniso::getCorAniso()
+const CorAniso* CovAniso::getCorAniso() const
 {
-  return (CorAniso*)getCor();
+  return static_cast<const CorAniso*>(getCor());
+}
+
+CorAniso* CovAniso::getCorAnisoModify()
+{
+  return static_cast<CorAniso*>(getCorModify());
 }
 
 double CovAniso::_getSillValue(Id ivar, Id jvar, const CovCalcMode* mode) const
@@ -480,11 +485,6 @@ Array CovAniso::evalCovFFT(const VectorDouble& hmax,
   return evalCovFFTSpatial(hmax, N, funcSpectrum);
 }
 
-const CorAniso* CovAniso::getCorAniso() const
-{
-  return dynamic_cast<const CorAniso*>(getCor());
-}
-
 CovAniso* CovAniso::createReduce(const VectorInt& validVars) const
 {
   CovAniso* newCovAniso = this->clone();
@@ -495,7 +495,7 @@ CovAniso* CovAniso::createReduce(const VectorInt& validVars) const
 
   // Modify the Matrix of sills
   newCovAniso->setContext(ctxt);
-  MatrixSymmetric* newsill = dynamic_cast<MatrixSymmetric*>(MatrixFactory::createReduce(&_sillCur, validVars, validVars));
+  auto* newsill = dynamic_cast<MatrixSymmetric*>(MatrixFactory::createReduce(&_sillCur, validVars, validVars));
   newCovAniso->setSill(*newsill);
   return newCovAniso;
 }

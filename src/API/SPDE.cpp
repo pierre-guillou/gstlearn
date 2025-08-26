@@ -157,7 +157,7 @@ Id SPDE::setMeshes(bool flagForKrig, const VectorMeshes* meshes)
     return 1;
   }
   Id ncov  = _model->getNCov(true);
-  Id nmesh = meshes->size();
+  Id nmesh = static_cast<Id>(meshes->size());
 
   // Preliminary check
   if (nmesh != 1 && nmesh != ncov)
@@ -383,7 +383,7 @@ void SPDE::_cleanMeshes(bool flagForKrige)
   {
     if (_createMeshesK && !_meshesK.empty())
     {
-      for (Id i = 0, n = _meshesK.size(); i < n; i++)
+      for (Id i = 0, n = static_cast<Id>(_meshesK.size()); i < n; i++)
         delete _meshesK[i];
     }
   }
@@ -391,7 +391,7 @@ void SPDE::_cleanMeshes(bool flagForKrige)
   {
     if (_createMeshesS && !_meshesS.empty())
     {
-      for (Id i = 0, n = _meshesS.size(); i < n; i++)
+      for (Id i = 0, n = static_cast<Id>(_meshesS.size()); i < n; i++)
         delete _meshesS[i];
     }
   }
@@ -404,7 +404,7 @@ void SPDE::_defineMeshes(bool flagForKrige, bool verbose)
   auto& createMesh = flagForKrige ? _createMeshesK : _createMeshesS;
 
   Id ncov  = _model->getNCov(true);
-  Id nmesh = (src != nullptr) ? src->size() : 0;
+  Id nmesh = (src != nullptr) ? static_cast<Id>(src->size()) : 0;
 
   // Cleaning already existing meshes inforation
   _cleanMeshes(flagForKrige);

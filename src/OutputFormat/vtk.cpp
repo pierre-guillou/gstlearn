@@ -111,11 +111,11 @@ static void open_file(const char* filename)
   String full_filename;
   if (strstr(filename, ".vtk") != NULL)
   {
-    gslStrcpy2(full_filename, filename);
+    gslStrcpy(full_filename, filename);
   }
   else
   {
-    gslSPrintf2(full_filename, "%s.vtk", filename);
+    gslSPrintf(full_filename, "%s.vtk", filename);
   }
 
   fp = gslFopen(full_filename.data(), "w+");
@@ -243,7 +243,7 @@ static void write_int(Id val)
   else
   {
     String str;
-    gslSPrintf2(str, "%d ", val);
+    gslSPrintf(str, "%d ", val);
     fprintf(fp, "%s", str.data());
     if (((numInColumn++) % 9) == 8)
     {
@@ -280,7 +280,7 @@ static void write_float(float val)
   else
   {
     String str;
-    gslSPrintf2(str, "%20.12e ", val);
+    gslSPrintf(str, "%20.12e ", val);
     fprintf(fp, "%s", str.data());
     if (((numInColumn++) % 9) == 8)
     {
@@ -343,7 +343,7 @@ void write_variables(Id nvars,
   Id num_scalars, num_vectors;
 
   new_section();
-  gslSPrintf2(str, "CELL_DATA %d\n", ncells);
+  gslSPrintf(str, "CELL_DATA %d\n", ncells);
   write_string(str.data());
 
   first_scalar = 0;
@@ -366,7 +366,7 @@ void write_variables(Id nvars,
         if (first_scalar == 0)
         {
           should_write = 1;
-          gslSPrintf2(str, "SCALARS %s float\n", varname[i]);
+          gslSPrintf(str, "SCALARS %s float\n", varname[i]);
           write_string(str.data());
           write_string("LOOKUP_TABLE default\n");
           first_scalar = 1;
@@ -379,7 +379,7 @@ void write_variables(Id nvars,
         if (first_vector == 0)
         {
           should_write = 1;
-          gslSPrintf2(str, "VECTORS %s float\n", varname[i]);
+          gslSPrintf(str, "VECTORS %s float\n", varname[i]);
           write_string(str.data());
           first_vector = 1;
         }
@@ -408,7 +408,7 @@ void write_variables(Id nvars,
   first_scalar = 0;
   if (num_scalars > 0)
   {
-    gslSPrintf2(str, "FIELD FieldData %d\n", num_scalars);
+    gslSPrintf(str, "FIELD FieldData %d\n", num_scalars);
     write_string(str.data());
     for (i = 0; i < nvars; i++)
     {
@@ -424,7 +424,7 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf2(str, "%s 1 %d float\n", varname[i], ncells);
+            gslSPrintf(str, "%s 1 %d float\n", varname[i], ncells);
             write_string(str.data());
           }
         }
@@ -445,7 +445,7 @@ void write_variables(Id nvars,
   first_vector = 0;
   if (num_vectors > 0)
   {
-    gslSPrintf2(str, "FIELD FieldData %d\n", num_vectors);
+    gslSPrintf(str, "FIELD FieldData %d\n", num_vectors);
     write_string(str.data());
     for (i = 0; i < nvars; i++)
     {
@@ -461,7 +461,7 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf2(str, "%s 3 %d float\n", varname[i], ncells);
+            gslSPrintf(str, "%s 3 %d float\n", varname[i], ncells);
             write_string(str.data());
           }
         }
@@ -480,7 +480,7 @@ void write_variables(Id nvars,
   }
 
   new_section();
-  gslSPrintf2(str, "POINT_DATA %d\n", npts);
+  gslSPrintf(str, "POINT_DATA %d\n", npts);
   write_string(str.data());
 
   first_scalar = 0;
@@ -503,7 +503,7 @@ void write_variables(Id nvars,
         if (first_scalar == 0)
         {
           should_write = 1;
-          gslSPrintf2(str, "SCALARS %s float\n", varname[i]);
+          gslSPrintf(str, "SCALARS %s float\n", varname[i]);
           write_string(str.data());
           write_string("LOOKUP_TABLE default\n");
           first_scalar = 1;
@@ -516,7 +516,7 @@ void write_variables(Id nvars,
         if (first_vector == 0)
         {
           should_write = 1;
-          gslSPrintf2(str, "VECTORS %s float\n", varname[i]);
+          gslSPrintf(str, "VECTORS %s float\n", varname[i]);
           write_string(str.data());
           first_vector = 1;
         }
@@ -545,7 +545,7 @@ void write_variables(Id nvars,
   first_scalar = 0;
   if (num_scalars > 0)
   {
-    gslSPrintf2(str, "FIELD FieldData %d\n", num_scalars);
+    gslSPrintf(str, "FIELD FieldData %d\n", num_scalars);
     write_string(str.data());
     for (i = 0; i < nvars; i++)
     {
@@ -561,7 +561,7 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf2(str, "%s 1 %d float\n", varname[i], npts);
+            gslSPrintf(str, "%s 1 %d float\n", varname[i], npts);
             write_string(str.data());
           }
         }
@@ -582,7 +582,7 @@ void write_variables(Id nvars,
   first_vector = 0;
   if (num_vectors > 0)
   {
-    gslSPrintf2(str, "FIELD FieldData %d\n", num_vectors);
+    gslSPrintf(str, "FIELD FieldData %d\n", num_vectors);
     write_string(str.data());
     for (i = 0; i < nvars; i++)
     {
@@ -598,7 +598,7 @@ void write_variables(Id nvars,
           else
           {
             should_write = 1;
-            gslSPrintf2(str, "%s 3 %d float\n", varname[i], npts);
+            gslSPrintf(str, "%s 3 %d float\n", varname[i], npts);
             write_string(str.data());
           }
         }
@@ -660,7 +660,7 @@ void write_point_mesh(const char* filename,
   write_header();
 
   write_string("DATASET UNSTRUCTURED_GRID\n");
-  gslSPrintf2(str, "POINTS %d float\n", npts);
+  gslSPrintf(str, "POINTS %d float\n", npts);
   write_string(str.data());
   for (i = 0; i < 3 * npts; i++)
   {
@@ -668,7 +668,7 @@ void write_point_mesh(const char* filename,
   }
 
   new_section();
-  gslSPrintf2(str, "CELLS %d %d\n", npts, 2 * npts);
+  gslSPrintf(str, "CELLS %d %d\n", npts, 2 * npts);
   write_string(str.data());
   for (i = 0; i < npts; i++)
   {
@@ -678,7 +678,7 @@ void write_point_mesh(const char* filename,
   }
 
   new_section();
-  gslSPrintf2(str, "CELL_TYPES %d\n", npts);
+  gslSPrintf(str, "CELL_TYPES %d\n", npts);
   write_string(str.data());
   for (i = 0; i < npts; i++)
   {
@@ -790,7 +790,7 @@ void write_unstructured_mesh(const char* filename,
   write_header();
 
   write_string("DATASET UNSTRUCTURED_GRID\n");
-  gslSPrintf2(str, "POINTS %d float\n", npts);
+  gslSPrintf(str, "POINTS %d float\n", npts);
   write_string(str.data());
   for (i = 0; i < 3 * npts; i++)
   {
@@ -803,7 +803,7 @@ void write_unstructured_mesh(const char* filename,
     Id npts_loc = num_points_for_cell(celltypes[i]);
     conn_size += npts_loc + 1;
   }
-  gslSPrintf2(str, "CELLS %d %d\n", ncells, conn_size);
+  gslSPrintf(str, "CELLS %d %d\n", ncells, conn_size);
   write_string(str.data());
   for (i = 0; i < ncells; i++)
   {
@@ -815,7 +815,7 @@ void write_unstructured_mesh(const char* filename,
   }
 
   new_section();
-  gslSPrintf2(str, "CELL_TYPES %d\n", ncells);
+  gslSPrintf(str, "CELL_TYPES %d\n", ncells);
   write_string(str.data());
   for (i = 0; i < ncells; i++)
   {
@@ -890,19 +890,19 @@ void write_rectilinear_mesh(const char* filename,
   write_header();
 
   write_string("DATASET RECTILINEAR_GRID\n");
-  gslSPrintf2(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
+  gslSPrintf(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
   write_string(str.data());
-  gslSPrintf2(str, "X_COORDINATES %d float\n", dims[0]);
+  gslSPrintf(str, "X_COORDINATES %d float\n", dims[0]);
   write_string(str.data());
   for (i = 0; i < dims[0]; i++)
     write_float(x[i]);
   new_section();
-  gslSPrintf2(str, "Y_COORDINATES %d float\n", dims[1]);
+  gslSPrintf(str, "Y_COORDINATES %d float\n", dims[1]);
   write_string(str.data());
   for (i = 0; i < dims[1]; i++)
     write_float(y[i]);
   new_section();
-  gslSPrintf2(str, "Z_COORDINATES %d float\n", dims[2]);
+  gslSPrintf(str, "Z_COORDINATES %d float\n", dims[2]);
   write_string(str.data());
   for (i = 0; i < dims[2]; i++)
     write_float(z[i]);
@@ -1030,9 +1030,9 @@ void write_curvilinear_mesh(const char* filename,
   write_header();
 
   write_string("DATASET STRUCTURED_GRID\n");
-  gslSPrintf2(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
+  gslSPrintf(str, "DIMENSIONS %d %d %d\n", dims[0], dims[1], dims[2]);
   write_string(str.data());
-  gslSPrintf2(str, "POINTS %d float\n", npts);
+  gslSPrintf(str, "POINTS %d float\n", npts);
   write_string(str.data());
   for (i = 0; i < 3 * npts; i++)
   {

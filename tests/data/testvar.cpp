@@ -37,15 +37,15 @@ int main(int argc, char* argv[])
   Option_AutoFit mauto;
   Option_VarioFit options;
   Constraints constraints;
-  Id nbsimu, nbtuba, seed, flag_norm_sill, flag_goulard_used;
+  Id nbsimu, nbtuba, seed, flag_norm_sill, flag_goulard_used, repval;
   double gof;
   static bool verbose = false;
 
   /* Initializations */
 
-  dbout             = (DbGrid*)NULL;
-  vario             = (Vario*)NULL;
-  model             = (Model*)NULL;
+  dbout             = nullptr;
+  vario             = nullptr;
+  model             = nullptr;
   flag_norm_sill    = 0;
   flag_goulard_used = 1;
 
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   /* Create the output name (for storage of dump files) */
 
   VectorString subparts = separateKeywords(argv[1]);
-  int nargs             = (int)subparts.size();
+  int nargs             = static_cast<int>(subparts.size());
   String outname        = concatenateStrings("", subparts[nargs - 2], subparts[nargs - 1], "-");
   ASerializable::setPrefixName(outname);
 
@@ -77,8 +77,8 @@ int main(int argc, char* argv[])
   /* Define the options */
 
   ascii_filename("Option", 0, 0, filename);
-  ascii_option_defined(filename, 0, "Norm_sill", 0, &flag_norm_sill);
-  ascii_option_defined(filename, 0, "Goulard_used", 0, &flag_goulard_used);
+  if (ascii_option_defined(filename, "Norm_sill", &repval)) flag_norm_sill = repval;
+  if (ascii_option_defined(filename, "Goulard_used", &repval)) flag_goulard_used = repval;
 
   /* Define the output grid file */
 
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
   ascii_filename("Vario", 0, 0, filename);
   vario = Vario::createFromNF(filename, verbose);
   if (vario == nullptr) goto label_end;
-  if (dbout != (Db*)NULL)
+  if (dbout != nullptr)
   {
     vario->compute(dbout, ECalcVario::VARIOGRAM);
     ascii_filename("Vario", 0, 1, filename);

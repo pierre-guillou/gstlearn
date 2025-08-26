@@ -10,12 +10,11 @@
 /******************************************************************************/
 #pragma once
 
-#include "Space/ASpace.hpp"
-#include "gstlearn_export.hpp"
-
 #include "Basic/VectorNumT.hpp"
+#include "Space/ASpace.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "geoslib_define.h"
+#include "gstlearn_export.hpp"
 
 namespace gstlrn
 {

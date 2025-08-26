@@ -106,12 +106,12 @@ void Likelihood::_updateModel(bool verbose)
 void Likelihood::evalGrad(vect res)
 {
   _temp.resize(_Y.size());
-  _gradCovMatTimesInvCov.resize(_Y.size(), _Y.size());
+  _gradCovMatTimesInvCov.resize(static_cast<Id>(_Y.size()), static_cast<Id>(_Y.size()));
   auto invcov = _covChol.inverse();
   RankHandler rkh(_db);
   rkh.defineSampleRanks();
   auto gradcov = _model->getGradients();
-  _gradCovMat.resize(_Y.size(), _Y.size());
+  _gradCovMat.resize(static_cast<Id>(_Y.size()), static_cast<Id>(_Y.size()));
   CholeskyDense XtCm1XChol;
   MatrixSymmetric invXtCm1X;
   if (_reml && _model->getNDriftEquation() > 0)
@@ -145,7 +145,7 @@ void Likelihood::_fillGradCovMat(RankHandler& rkh, covmaptype& gradcov)
   SpacePoint p1, p2;
   rkh.defineSampleRanks();
 
-  for (size_t jvar = 0; static_cast<Id>(jvar) < _model->getNVar(); jvar++)
+  for (Id jvar = 0; static_cast<Id>(jvar) < _model->getNVar(); jvar++)
   {
     auto indsj = rkh.getSampleRanksByVariable(jvar);
 
@@ -154,7 +154,7 @@ void Likelihood::_fillGradCovMat(RankHandler& rkh, covmaptype& gradcov)
       icur = 0;
       _db->getSampleAsSPInPlace(p1, j);
 
-      for (size_t ivar = 0; static_cast<Id>(ivar) < _model->getNVar(); ivar++)
+      for (Id ivar = 0; static_cast<Id>(ivar) < _model->getNVar(); ivar++)
       {
         auto indsi = rkh.getSampleRanksByVariable(ivar);
         for (auto& i: indsi)

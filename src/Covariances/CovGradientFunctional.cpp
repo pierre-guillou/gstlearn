@@ -60,7 +60,7 @@ void CovGradientFunctional::_calculateTrTtr(const VectorDouble& d,
                                             VectorDouble& u,
                                             VectorDouble& trttr) const
 {
-  auto ndim = getContext().getNDim();
+  auto ndim = static_cast<Id>(getContext().getNDim());
 
   VectorDouble h(3, 0.);
   VectorDouble Tr(9, 0.);
@@ -70,8 +70,8 @@ void CovGradientFunctional::_calculateTrTtr(const VectorDouble& d,
 
   // Matrix Tr = diag(coeffs) . R
 
-  for (size_t i = 0; i < 3; i++)
-    for (size_t j = 0; j < 3; j++)
+  for (Id i = 0; i < 3; i++)
+    for (Id j = 0; j < 3; j++)
     {
       if (i >= ndim || j >= ndim) continue;
       TR(i, j) = getAniso().getRotation().getMatrixDirect().getValue(i, j) / getScale(i);

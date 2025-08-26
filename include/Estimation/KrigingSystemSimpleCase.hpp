@@ -13,19 +13,18 @@
 #include "Basic/VectorNumT.hpp"
 #include "gstlearn_export.hpp"
 
-#include "Estimation/KrigingAlgebraSimpleCase.hpp"
-#include "Estimation/KrigOpt.hpp"
-#include "Model/ModelGeneric.hpp"
-#include "Space/SpaceRN.hpp"
-#include "Space/SpacePoint.hpp"
-#include "Neigh/ANeigh.hpp"
-#include "Matrix/MatrixDense.hpp"
-#include "LinearOp/CholeskyDense.hpp"
 #include "Enum/EKrigOpt.hpp"
-
+#include "Estimation/KrigOpt.hpp"
+#include "Estimation/KrigingAlgebraSimpleCase.hpp"
+#include "LinearOp/CholeskyDense.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Model/ModelGeneric.hpp"
+#include "Neigh/ANeigh.hpp"
+#include "Space/SpacePoint.hpp"
+#include "Space/SpaceRN.hpp"
 
 namespace gstlrn
-{ 
+{
 
 class Db;
 class DbGrid;
@@ -63,18 +62,18 @@ public:
                  ModelGeneric& model,
                  VectorDouble& tabwork);
   Id estimate(Id iechout,
-               SpacePoint& pin,
-               SpacePoint& pout,
-               VectorDouble& tabwork,
-               KrigingAlgebraSimpleCase& algebra,
-               ModelGeneric& model,
-               ANeigh* neigh = nullptr);
+              SpacePoint& pin,
+              SpacePoint& pout,
+              VectorDouble& tabwork,
+              KrigingAlgebraSimpleCase& algebra,
+              ModelGeneric& model,
+              ANeigh* neigh = nullptr);
   void conclusion();
 
   KrigingAlgebraSimpleCase& getAlgebra() { return _algebra; }
 
   // Methods used to return algebraic internal information
-  Id getNDim() const { return (_model != nullptr) ? _model->getNDim() : 0; }
+  Id getNDim() const { return (_model != nullptr) ? static_cast<Id>(_model->getNDim()) : 0; }
   Id getNVar() const { return (_model != nullptr) ? _model->getNVar() : 0; }
 
   VectorVectorDouble getSampleCoordinates(KrigingAlgebraSimpleCase& algebra, Id iechout) const;
@@ -155,4 +154,4 @@ private:
   bool _flagVerr;
   bool _flagNoStat;
 };
-}
+} // namespace gstlrn

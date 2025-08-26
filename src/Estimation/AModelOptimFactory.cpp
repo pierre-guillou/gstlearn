@@ -28,7 +28,7 @@
 #include "geoslib_define.h"
 
 namespace gstlrn
-{ 
+{
 static void _modifyMopForAnam(ModelGeneric* model,
                               ModelOptimParam& mop)
 {
@@ -53,9 +53,9 @@ static void _modifyMopForAnam(ModelGeneric* model,
  **
  *****************************************************************************/
 static Id _modifyMopForVMap(const DbGrid* dbmap,
-                             ModelGeneric* model,
-                             Constraints* constraints,
-                             ModelOptimParam& mop)
+                            ModelGeneric* model,
+                            Constraints* constraints,
+                            ModelOptimParam& mop)
 {
   // Clever setting of options
   mop.setAuthAniso(true);
@@ -96,11 +96,11 @@ static Id _modifyMopForVMap(const DbGrid* dbmap,
  **
  *****************************************************************************/
 static Id _modifyMopForVario(const Vario* vario,
-                              ModelGeneric* model,
-                              Constraints* constraints,
-                              ModelOptimParam& mop)
+                             ModelGeneric* model,
+                             Constraints* constraints,
+                             ModelOptimParam& mop)
 {
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   Id ndir = vario->getNDir();
   Id n_2d = 0;
   Id n_3d = 0;
@@ -191,7 +191,7 @@ static void _modifyOneParam(const EConsType& cas,
 }
 
 static Id _modifyModelForConstraints(Constraints* constraints,
-                                      ModelGeneric* model)
+                                     ModelGeneric* model)
 {
   // Check the constraints
   if (constraints == nullptr) return 0;
@@ -199,10 +199,10 @@ static Id _modifyModelForConstraints(Constraints* constraints,
   if (ncons <= 0) return 0;
 
   // Check the ModelCovList
-  ModelCovList* mcv = dynamic_cast<ModelCovList*>(model);
+  auto* mcv = dynamic_cast<ModelCovList*>(model);
   if (mcv == nullptr) return 1;
 
-  Id ndim = model->getNDim();
+  Id ndim = static_cast<Id>(model->getNDim());
   Id nvar = model->getNVar();
   for (Id i = 0; i < ncons; i++)
   {
@@ -210,10 +210,10 @@ static Id _modifyModelForConstraints(Constraints* constraints,
     const EConsElem type     = consitem->getType();
     const EConsType cas      = consitem->getIcase();
     double value             = consitem->getValue();
-    Id igrf                 = consitem->getIGrf();
-    Id icov                 = consitem->getICov();
-    Id iv1                  = consitem->getIV1();
-    Id iv2                  = consitem->getIV2();
+    Id igrf                  = consitem->getIGrf();
+    Id icov                  = consitem->getICov();
+    Id iv1                   = consitem->getIV1();
+    Id iv2                   = consitem->getIV2();
 
     CovBase* covbase   = mcv->getCovBase(icov);
     CovAniso* covaniso = dynamic_cast<CovAniso*>(covbase);
@@ -231,7 +231,7 @@ static Id _modifyModelForConstraints(Constraints* constraints,
         messerr("Setting Angle(%d) not possible as ndim=%d", iv1, ndim);
         return 1;
       }
-      param = &covaniso->getCorAniso()->getParamInfoAngle(iv1);
+      param = &covaniso->getCorAnisoModify()->getParamInfoAngle(iv1);
     }
     else if (type == EConsElem::RANGE)
     {
@@ -243,7 +243,7 @@ static Id _modifyModelForConstraints(Constraints* constraints,
       // Convert range into scale (using the current value for 'param')
       double scadef = covaniso->getCorAniso()->getScadef();
       value *= scadef;
-      param = &covaniso->getCorAniso()->getParamInfoScale(iv1);
+      param = &covaniso->getCorAnisoModify()->getParamInfoScale(iv1);
     }
     else if (type == EConsElem::SCALE)
     {
@@ -252,7 +252,7 @@ static Id _modifyModelForConstraints(Constraints* constraints,
         messerr("Setting Scale(%d) not possible as ndim=%d", iv1, ndim);
         return 1;
       }
-      param = &covaniso->getCorAniso()->getParamInfoScale(iv1);
+      param = &covaniso->getCorAnisoModify()->getParamInfoScale(iv1);
     }
     else if (type == EConsElem::SILL)
     {
@@ -300,7 +300,7 @@ static void _fixAllScalesFromIndex(CorAniso* coraniso, Id start = 0)
 }
 
 static Id _modifyModelForMop(const ModelOptimParam& mop,
-                              ModelGeneric* model)
+                             ModelGeneric* model)
 {
   ModelCovList* mcv = dynamic_cast<ModelCovList*>(model);
   if (mcv == nullptr) return 0;
@@ -328,9 +328,9 @@ static Id _modifyModelForMop(const ModelOptimParam& mop,
         }
     }
 
-    CovAniso* covaniso = dynamic_cast<CovAniso*>(covbase);
+    auto* covaniso = dynamic_cast<CovAniso*>(covbase);
     if (covaniso == nullptr) continue;
-    CorAniso* coraniso = covaniso->getCorAniso();
+    CorAniso* coraniso = covaniso->getCorAnisoModify();
     if (coraniso == nullptr) continue;
 
     // Anisotropy
@@ -411,4 +411,4 @@ AModelOptim* AModelOptimFactory::create(ModelGeneric* model,
   }
   return nullptr;
 }
-}
+} // namespace gstlrn

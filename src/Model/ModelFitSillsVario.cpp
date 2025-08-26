@@ -10,11 +10,11 @@
 /******************************************************************************/
 #include "Model/ModelFitSillsVario.hpp"
 
-#include "Variogram/Vario.hpp"
 #include "Covariances/CovBase.hpp"
+#include "Model/Constraints.hpp"
 #include "Model/Model.hpp"
 #include "Model/ModelOptimVario.hpp"
-#include "Model/Constraints.hpp"
+#include "Variogram/Vario.hpp"
 
 #define IJDIR(ijvar, ipadir)    ((ijvar) * _npadir + (ipadir))
 #define _WT(ijvar, ipadir)      _wt[IJDIR(ijvar, ipadir)]
@@ -84,7 +84,7 @@ Id ModelFitSillsVario::_prepare()
 
   // Initialize Model-free quantities
   Id wmode = _mop.getWmode();
-  _wt       = _vario->computeWeightsFromVario(wmode);
+  _wt      = _vario->computeWeightsFromVario(wmode);
   _compressArray(_wt, _wtc);
   _computeGg();
   _compressArray(_gg, _ggc);
@@ -127,10 +127,10 @@ Id ModelFitSillsVario::fitSillMatrices()
  *****************************************************************************/
 Id ModelFitSillsVario::_getDimensions()
 {
-  _ndim  = _model->getNDim();
+  _ndim  = static_cast<Id>(_model->getNDim());
   _nvar  = _model->getNVar();
   _ncova = _model->getNCov();
-  _nvs2 = _nvar * (_nvar + 1) / 2;
+  _nvs2  = _nvar * (_nvar + 1) / 2;
 
   Id nbexp  = 0;
   Id npadir = 0;
@@ -182,8 +182,8 @@ void ModelFitSillsVario::_computeGg()
           _GG(ijvar, ipadir) = TEST;
           if (_vario->getFlagAsym())
           {
-            Id iad    = _vario->getDirAddress(idir, ivar, jvar, ilag, false, 1);
-            Id jad    = _vario->getDirAddress(idir, ivar, jvar, ilag, false, -1);
+            Id iad     = _vario->getDirAddress(idir, ivar, jvar, ilag, false, 1);
+            Id jad     = _vario->getDirAddress(idir, ivar, jvar, ilag, false, -1);
             double c00 = _vario->getC00(idir, ivar, jvar);
             double n1  = _vario->getSwByIndex(idir, iad);
             double n2  = _vario->getSwByIndex(idir, jad);
@@ -196,7 +196,8 @@ void ModelFitSillsVario::_computeGg()
               {
                 _GG(ijvar, ipadir) = c00 - (n1 * g1 + n2 * g2) / (n1 + n2);
                 dist               = (ABS(_vario->getHhByIndex(idir, iad)) +
-                        ABS(_vario->getHhByIndex(idir, jad))) / 2.;
+                        ABS(_vario->getHhByIndex(idir, jad))) /
+                       2.;
               }
             }
           }
@@ -261,7 +262,8 @@ void ModelFitSillsVario::_updateFromModel()
               if (!_vario->isLagCorrect(idir, iad) ||
                   !_vario->isLagCorrect(idir, jad)) continue;
               dist = (ABS(_vario->getHhByIndex(idir, iad)) +
-                      ABS(_vario->getHhByIndex(idir, jad))) / 2.;
+                      ABS(_vario->getHhByIndex(idir, jad))) /
+                     2.;
             }
             else
             {
@@ -359,4 +361,4 @@ void ModelFitSillsVario::_compressArray(const VectorDouble& tabin,
         }
     }
 }
-}
+} // namespace gstlrn

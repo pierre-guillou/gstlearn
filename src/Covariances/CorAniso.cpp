@@ -1605,13 +1605,13 @@ void CorAniso::appendParams(ListParams& listparams,
     i++;
   }
 
-  size_t istart = 0;
+  Id istart = 0;
   if (getNDim() == 3 && _optimLockIso2d)
   {
     // In 3D, the first angle is locked
     istart = 1;
   }
-  for (size_t i = istart; i < _angles.size(); i++)
+  for (i = istart; i < static_cast<Id>(_angles.size()); i++)
   {
     gradFuncs->emplace_back(
       [this, i, derivCache](const SpacePoint& p1, const SpacePoint& p2, Id ivar, Id jvar, const CovCalcMode* mode) -> double
@@ -1642,7 +1642,7 @@ void CorAniso::_handleConstraints()
   Id count = static_cast<Id>(_scales.size());
   if (count > 0)
   {
-    Id ref = _scales[0].getAddress();
+    Id ref = static_cast<Id>(_scales[0].getAddress());
     if (_optimNoAniso)
     {
       for (Id i = 1; i < count; i++)

@@ -90,7 +90,7 @@ void NoStatArray::_informField(const VectorVectorDouble& coords,
   if (verbose)
   {
     String str;
-    (void)gslSPrintf2(str,"Statistics for Non-Stationary Parameter on Mesh");
+    (void)gslSPrintf(str, "Statistics for Non-Stationary Parameter on Mesh");
     VH::dumpStats(str, tab);
   }
 }

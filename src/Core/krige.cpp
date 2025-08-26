@@ -690,7 +690,7 @@ static Id st_model_manage(Id mode, Model* model)
     d1_1_global.resize(ndim);
     d1_2_global.resize(ndim);
     d1_t_global.resize(ndim);
-    auto covaux_global = st_core(nvar, nvar);
+    covaux_global = st_core(nvar, nvar);
     if (covaux_global.empty()) return (1);
     MODEL_INIT = 1;
   }
@@ -1240,13 +1240,13 @@ static void st_krige_wgt_print(Id status,
   if (KOPTION.flag_data_disc)
     for (idim = 0; idim < ndim; idim++)
     {
-      (void)gslSPrintf2(string, "Size%d", idim + 1);
+      (void)gslSPrintf(string, "Size%d", idim + 1);
       tab_prints(NULL, string.data());
     }
   tab_prints(NULL, "Data");
   for (ivar = 0; ivar < nvar; ivar++)
   {
-    (void)gslSPrintf2(string, "Z%d*", ivar + 1);
+    (void)gslSPrintf(string, "Z%d*", ivar + 1);
     tab_prints(NULL, string.data());
   }
   message("\n");
@@ -2853,7 +2853,7 @@ Id krigsum(Db* dbin,
     dbin->setLocatorByUID(iuids[ivar], ELoc::Z, 0);
     if (ksys.resetData()) return 1;
     if (ksys.updKrigOptEstim(iptr_est + ivar, -1, -1)) return 1;
-    (void)gslSPrintf2(string, "Kriging of variable #%d at sample", ivar + 1);
+    (void)gslSPrintf(string, "Kriging of variable #%d at sample", ivar + 1);
 
     /* Loop on the targets to be processed */
 

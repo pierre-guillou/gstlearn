@@ -163,7 +163,7 @@ Model* Model::createFromParam(const ECov& type,
 
   if (!ranges.empty())
   {
-    Id ndim       = spaceloc->getNDim();
+    Id ndim       = static_cast<Id>(spaceloc->getNDim());
     Id ndimRanges = static_cast<Id>(ranges.size());
     if (ndimRanges != 1 && ndimRanges != ndim)
     {
@@ -175,7 +175,7 @@ Model* Model::createFromParam(const ECov& type,
   }
 
   CovContext ctxt(nvar, space);
-  auto* model     = new Model(ctxt);
+  auto* model = new Model(ctxt);
   model->addCovFromParam(type, range, sill, param, ranges, sills, angles,
                          flagRange);
 
@@ -200,7 +200,7 @@ Model* Model::createFromParamOldStyle(const ECov& type,
 
   if (!ranges.empty())
   {
-    Id ndim       = spaceloc->getNDim();
+    Id ndim       = static_cast<Id>(spaceloc->getNDim());
     Id ndimRanges = static_cast<Id>(ranges.size());
     if (ndimRanges != 1 && ndimRanges != ndim)
     {
@@ -212,7 +212,7 @@ Model* Model::createFromParamOldStyle(const ECov& type,
   }
 
   CovContext ctxt(nvar, spaceloc);
-  auto* model     = new Model(ctxt);
+  auto* model = new Model(ctxt);
   model->addCovFromParamOldStyle(type, range, sill, param, ranges, sills,
                                  angles, flagRange);
 
@@ -356,7 +356,7 @@ void Model::addCovFromParamOldStyle(const ECov& type,
 
   // Define the covariance
 
-  auto space = SpaceRN::create(ndim);
+  auto space = SpaceRN::create(static_cast<Id>(ndim));
   _ctxt      = CovContext(nvar, space);
   CovAniso cov(type, _ctxt);
 
@@ -452,7 +452,7 @@ void Model::addCovFromParam(const ECov& type,
 
   // Define the covariance
 
-  auto space = SpaceRN::create(ndim);
+  auto space = SpaceRN::create(static_cast<Id>(ndim));
   _ctxt      = CovContext(nvar, space);
   CovAniso cov(type, _ctxt);
 
@@ -628,11 +628,11 @@ void Model::_copyCovContext()
  * @return 0 if no error, 1 otherwise
  */
 Id Model::fitFromCovIndices(Vario* vario,
-                             const VectorECov& types,
-                             const Constraints& constraints,
-                             const Option_VarioFit& optvar,
-                             const Option_AutoFit& mauto,
-                             bool verbose)
+                            const VectorECov& types,
+                            const Constraints& constraints,
+                            const Option_VarioFit& optvar,
+                            const Option_AutoFit& mauto,
+                            bool verbose)
 {
   if (vario == nullptr) return 1;
 
@@ -668,11 +668,11 @@ Id Model::fitFromCovIndices(Vario* vario,
  * @return 0 if no error, 1 otherwise
  */
 Id Model::fit(Vario* vario,
-               const VectorECov& types,
-               const Constraints& constraints,
-               const Option_VarioFit& optvar,
-               const Option_AutoFit& mauto,
-               bool verbose)
+              const VectorECov& types,
+              const Constraints& constraints,
+              const Option_VarioFit& optvar,
+              const Option_AutoFit& mauto,
+              bool verbose)
 {
   if (vario == nullptr) return 1;
 
@@ -706,11 +706,11 @@ Id Model::fit(Vario* vario,
  * @return 0 if no error, 1 otherwise
  */
 Id Model::fitFromVMap(DbGrid* dbmap,
-                       const VectorECov& types,
-                       const Constraints& constraints,
-                       const Option_VarioFit& optvar,
-                       const Option_AutoFit& mauto,
-                       bool verbose)
+                      const VectorECov& types,
+                      const Constraints& constraints,
+                      const Option_VarioFit& optvar,
+                      const Option_AutoFit& mauto,
+                      bool verbose)
 {
   if (dbmap == nullptr) return 1;
 
@@ -869,7 +869,7 @@ bool Model::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 
   /* Write the Model structure */
 
-  ret = ret && _recordWrite<Id>(os, "", getNDim());
+  ret = ret && _recordWrite<Id>(os, "", static_cast<Id>(getNDim()));
   ret = ret && _recordWrite<Id>(os, "", getNVar());
   ret = ret && _recordWrite<double>(os, "General parameters", getField());
   ret = ret && _recordWrite<Id>(os, "Number of basic covariance terms", getNCov());
@@ -890,7 +890,7 @@ bool Model::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 
     if (!cova->getFlagAniso()) continue;
 
-    for (size_t idim = 0; ret && idim < getNDim(); idim++)
+    for (Id idim = 0; ret && idim < static_cast<Id>(getNDim()); idim++)
       ret = ret && _recordWrite<double>(os, "", cova->getAnisoCoeff(idim));
     ret = ret && _commentWrite(os, "Anisotropy Coefficients");
     ret = ret && _recordWrite<Id>(os, "Anisotropy Rotation Flag", static_cast<Id>(cova->getFlagRotation()));
@@ -898,8 +898,9 @@ bool Model::_serializeAscii(std::ostream& os, bool /*verbose*/) const
     if (!cova->getFlagRotation()) continue;
 
     // Storing the rotation matrix by Column (compatibility)
-    for (size_t idim = 0; ret && idim < getNDim(); idim++)
-      for (size_t jdim = 0; ret && jdim < getNDim(); jdim++)
+    Id ndim = static_cast<Id>(getNDim());
+    for (Id idim = 0; ret && idim < ndim; idim++)
+      for (Id jdim = 0; ret && jdim < ndim; jdim++)
         ret = ret && _recordWrite<double>(os, "", cova->getAnisoRotMatElement(jdim, idim));
     ret = ret && _commentWrite(os, "Anisotropy Rotation Matrix");
   }
@@ -982,7 +983,7 @@ Model* Model::duplicate() const
 Model* Model::createReduce(const VectorInt& validVars) const
 {
   VectorInt localValidVars = VH::filter(validVars, 0, getNVar());
-  Id nvar                 = static_cast<Id>(localValidVars.size());
+  Id nvar                  = static_cast<Id>(localValidVars.size());
   if (nvar <= 0)
   {
     messerr("Your new Model has no variable left");
@@ -1330,7 +1331,7 @@ Model* Model::createFillRandom(Id ndim,
                                Id seed)
 {
   // Create the Covariance Part
-  Model* model   = Model::create(CovContext(nvar, ndim));
+  Model* model  = Model::create(CovContext(nvar, ndim));
   Id ncov       = static_cast<Id>(types.size());
   Id seed_local = seed;
   for (Id icov = 0; icov < ncov; icov++)
@@ -1363,10 +1364,10 @@ bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
   if (!modelG) return false;
 
   bool ret     = true;
-  Id ndim     = 0;
-  Id nvar     = 0;
-  Id ncov     = 0;
-  Id ndrift   = 0;
+  Id ndim      = 0;
+  Id nvar      = 0;
+  Id ncov      = 0;
+  Id ndrift    = 0;
   double field = 0.;
 
   ret = ret && SerializeHDF5::readValue(*modelG, "NDim", ndim);
@@ -1394,8 +1395,8 @@ bool Model::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
 
     // General characteristics
     Id vartype       = 0;
-    double range      = 0.;
-    double param      = 0.;
+    double range     = 0.;
+    double param     = 0.;
     Id flag_aniso    = 0;
     Id flag_rotation = 0;
     VectorDouble aniso_ranges;
