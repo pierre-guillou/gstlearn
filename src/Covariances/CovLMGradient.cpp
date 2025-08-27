@@ -48,7 +48,7 @@ CovLMGradient::CovLMGradient(const CovAnisoList& r)
   }
   for (auto& e: _covs)
   {
-    ((CovAniso*)e.get())->setOptimEnabled(false);
+    static_cast<CovAniso*>(e.get())->setOptimEnabled(false);
   }
 }
 
@@ -75,11 +75,14 @@ void CovLMGradient::evalZAndGradients(const SpacePoint& p1,
                                       const CovCalcMode* mode,
                                       bool flagGrad) const
 {
-  _initGradients(covVal, covGp, covGG, flagGrad);
+  covVal = 0.;
+  covGp.fill(0.);
+  if (flagGrad)
+    covGG.fill(0.);
 
   for (size_t i = 0, n = getNCov(); i < n; i++)
   {
-    ACovGradient* covloc = dynamic_cast<ACovGradient *>(_covs[i].get());
+    auto* covloc = dynamic_cast<ACovGradient*>(_covs[i].get());
     if (covloc != nullptr)
       covloc->evalZAndGradients(p1, p2, covVal, covGp, covGG, mode, flagGrad);
   }
@@ -93,8 +96,8 @@ void CovLMGradient::evalZAndGradients(const VectorDouble& vec,
                                       bool flagGrad) const
 {
   /// TODO : Not true whatever the space
-  SpacePoint p1(getSpace()->getOrigin(),-1);
-  SpacePoint p2(getSpace()->getOrigin(),-1);
+  SpacePoint p1(getSpace()->getOrigin(), -1);
+  SpacePoint p2(getSpace()->getOrigin(), -1);
   p2.move(vec);
 
   evalZAndGradients(p1, p2, covVal, covGp, covGG, mode, flagGrad);
@@ -113,21 +116,4 @@ void CovLMGradient::addCov(const CovBase& cov)
   CovAnisoList::addCov(cov);
 }
 
-/**
- * Initialize the resulting arrays (coded explicitely for dimension 3)
- * @param covVal  Point covariance
- * @param covGp   Vector for Point-Gradient covariance
- * @param covGG   Vector for Gradient-Gradient covariance
- * @param flagGrad True if Gradient must be calculated
- */
-void CovLMGradient::_initGradients(double& covVal,
-                                   VectorDouble& covGp,
-                                   VectorDouble& covGG,
-                                   bool flagGrad)
-{
-  covVal = 0.;
-  for (Id i = 0; i < 3; i++) covGp[i] = 0.;
-  if (flagGrad)
-    for (Id i = 0; i < 9; i++) covGG[i] = 0.;
-}
-}
+} // namespace gstlrn

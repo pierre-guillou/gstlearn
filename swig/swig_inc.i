@@ -214,6 +214,7 @@
   #include "Covariances/CovAniso.hpp"
   #include "Covariances/ACovGradient.hpp"
   #include "Covariances/CovGradientGeneric.hpp"
+  #include "Covariances/CovPotential.hpp"
   #include "Covariances/CorGneiting.hpp"
   #include "Covariances/CorMatern.hpp"
   #include "Covariances/CovLMCTapering.hpp"

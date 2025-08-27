@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Potential-");
   int mode     = 1;
   bool debug   = true;
-  bool verbose = true;
+  bool verbose = false;
 
   //============================================================//
   // Exemple in 1-D
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 
     // Cross-validation
     (void)potential_xvalid(dbiso, dbgrd, nullptr, model, neighU,
-                           0., 0., true, true);
+                           0., 0., true, verbose);
 
     delete dbiso;
     delete dbgrd;

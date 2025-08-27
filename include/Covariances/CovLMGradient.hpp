@@ -23,13 +23,13 @@ class SpacePoint;
 class CovGradientNumerical;
 class CovCalcMode;
 
-class GSTLEARN_EXPORT CovLMGradient : public CovAnisoList
+class GSTLEARN_EXPORT CovLMGradient: public CovAnisoList
 {
 public:
   CovLMGradient(const CovContext& ctxt = CovContext());
   CovLMGradient(const CovLMGradient& r);
   CovLMGradient(const CovAnisoList& r);
-  CovLMGradient& operator= (const CovLMGradient &r);
+  CovLMGradient& operator=(const CovLMGradient& r);
   virtual ~CovLMGradient();
 
   /// ICloneable interface
@@ -39,25 +39,19 @@ public:
   void addCov(const CovBase& cov) override;
 
   /// ACov interface
-  
+
   void evalZAndGradients(const SpacePoint& p1,
                          const SpacePoint& p2,
                          double& covVal,
                          VectorDouble& covGp,
                          VectorDouble& covGG,
                          const CovCalcMode* mode = nullptr,
-                         bool flagGrad = false) const;
+                         bool flagGrad           = false) const;
   void evalZAndGradients(const VectorDouble& vec,
                          double& covVal,
                          VectorDouble& covGp,
                          VectorDouble& covGG,
                          const CovCalcMode* mode = nullptr,
-                         bool flagGrad = false) const;
-
-private:
-  static void _initGradients(double& covVal,
-                             VectorDouble& covGp,
-                             VectorDouble& covGG,
-                             bool flagGrad);
+                         bool flagGrad           = false) const;
 };
-}
+} // namespace gstlrn

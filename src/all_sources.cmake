@@ -80,6 +80,7 @@ set(SRC
   Covariances/CovGradientGeneric.cpp
   Covariances/CovGradientFunctional.cpp
   Covariances/CovGradientNumerical.cpp
+  Covariances/CovPotential.cpp
   Covariances/CovMatern.cpp
   Covariances/CovLMGradient.cpp
   Covariances/CovPower.cpp
