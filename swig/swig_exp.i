@@ -303,7 +303,7 @@
 %include API/TestInheritance.hpp
 %include API/Style.hpp
 %include API/SPDEParam.hpp
-ùinclude API/Potential.hpp
+%include API/Potential.hpp
 
 %include Db/Db.hpp
 %include Db/DbGrid.hpp
