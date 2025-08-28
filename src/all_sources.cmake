@@ -22,6 +22,7 @@ set(SRC
   API/Style.cpp
   API/SPDEParam.cpp
   API/TestInheritance.cpp
+  API/Potential.cpp
   Gibbs/GibbsUPropMono.cpp
   Gibbs/GibbsFactory.cpp
   Gibbs/GibbsMultiMono.cpp

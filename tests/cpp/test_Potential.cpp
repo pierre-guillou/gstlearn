@@ -18,7 +18,7 @@
 
 #include "Basic/File.hpp"
 #include "Basic/OptDbg.hpp"
-#include "Core/Potential.hpp"
+#include "Core/potential.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"

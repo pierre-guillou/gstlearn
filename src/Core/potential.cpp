@@ -8,7 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Core/Potential.hpp"
+#include "Core/potential.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/Utilities.hpp"
@@ -70,16 +70,16 @@ typedef struct
 
 typedef struct
 {
-  Id ndim;
-  Id nring;
-  Id nfull;
-  double range;
-  DbGrid* db;
-  Model* model;
-  VectorInt indg;
-  VectorInt indg0;
-  VectorDouble data;  // Dimension: nech
-  MatrixDense weight; // Dimension: nech * 4
+  Id _ndim2;
+  Id _nring;
+  Id _nfull;
+  double _rangeExt;
+  DbGrid* _dbExt;
+  Model* _modelExt;
+  VectorInt _indg;
+  VectorInt _indg0;
+  VectorDouble _dataExt; // Dimension: nech
+  MatrixDense _wgtExt;   // Dimension: nech * 4
 } Pot_Ext;
 
 static Id TAB_DRF[9];
@@ -267,7 +267,7 @@ static void st_cov(Model* model,
  *****************************************************************************/
 static Id st_extdrift_create_db(DbGrid* dbout, Pot_Ext* pot_ext)
 {
-  Id ndim = pot_ext->ndim;
+  Id ndim = pot_ext->_ndim2;
   VectorInt nx(ndim);
   VectorDouble x0(ndim);
 
@@ -276,29 +276,29 @@ static Id st_extdrift_create_db(DbGrid* dbout, Pot_Ext* pot_ext)
   Id nech = 1;
   for (Id idim = 0; idim < ndim; idim++)
   {
-    nx[idim] = 2 * pot_ext->nring + 1;
-    x0[idim] = -dbout->getDX(idim) * pot_ext->nring;
+    nx[idim] = 2 * pot_ext->_nring + 1;
+    x0[idim] = -dbout->getDX(idim) * pot_ext->_nring;
     nech *= nx[idim];
   }
 
   /* Creating the data grid */
 
-  pot_ext->db = DbGrid::create(nx, dbout->getDXs(), x0, dbout->getAngles(),
-                               ELoadBy::COLUMN, VectorDouble(),
-                               VectorString(), VectorString(), 1);
-  if (pot_ext->db == nullptr) return 1;
-  pot_ext->nfull = nech;
+  pot_ext->_dbExt = DbGrid::create(nx, dbout->getDXs(), x0, dbout->getAngles(),
+                                   ELoadBy::COLUMN, VectorDouble(),
+                                   VectorString(), VectorString(), 1);
+  if (pot_ext->_dbExt == nullptr) return 1;
+  pot_ext->_nfull = nech;
 
   /* Add the selection */
 
-  pot_ext->db->addColumnsByConstant(1, 0., String(), ELoc::SEL);
+  pot_ext->_dbExt->addColumnsByConstant(1, 0., String(), ELoc::SEL);
 
   /* Complementary core allocation */
 
-  pot_ext->data.resize(nech);
-  pot_ext->weight.resize(nech, 4);
-  pot_ext->indg0.resize(3);
-  pot_ext->indg.resize(3);
+  pot_ext->_dataExt.resize(nech);
+  pot_ext->_wgtExt.resize(nech, 4);
+  pot_ext->_indg0.resize(3);
+  pot_ext->_indg.resize(3);
   return 0;
 }
 
@@ -317,20 +317,20 @@ static Id st_extdrift_create_model(Pot_Ext* pot_ext)
 
   /* Creating the model */
 
-  CovContext ctxt(1, pot_ext->ndim, 1.);
-  pot_ext->model = new Model(ctxt);
-  if (pot_ext->model == nullptr) return 1;
+  CovContext ctxt(1, pot_ext->_ndim2, 1.);
+  pot_ext->_modelExt = new Model(ctxt);
+  if (pot_ext->_modelExt == nullptr) return 1;
 
   // Covariance part
   CovLMGradient covs(ctxt);
-  CovAniso cov(ECov::CUBIC, pot_ext->range, 0., sill, ctxt);
+  CovAniso cov(ECov::CUBIC, pot_ext->_rangeExt, 0., sill, ctxt);
   covs.addCov(cov);
-  pot_ext->model->setCovAnisoList(&covs);
+  pot_ext->_modelExt->setCovAnisoList(&covs);
 
   // Drift part
   DriftList drifts(ctxt);
   drifts.setFlagLinked(true);
-  pot_ext->model->setDriftList(&drifts);
+  pot_ext->_modelExt->setDriftList(&drifts);
 
   return 0;
 }
@@ -358,13 +358,13 @@ static MatrixDense st_extdrift_establish(Pot_Ext* pot_ext, Id number)
   /* Establish the Right-Hand side */
 
   Id ecr = 0;
-  for (Id iech = 0; iech < pot_ext->nfull; iech++)
+  for (Id iech = 0; iech < pot_ext->_nfull; iech++)
   {
-    if (!pot_ext->db->isActive(iech)) continue;
-    st_cov(pot_ext->model, 1,
-           pot_ext->db->getCoordinate(iech, 0),
-           pot_ext->db->getCoordinate(iech, 1),
-           pot_ext->db->getCoordinate(iech, 2),
+    if (!pot_ext->_dbExt->isActive(iech)) continue;
+    st_cov(pot_ext->_modelExt, 1,
+           pot_ext->_dbExt->getCoordinate(iech, 0),
+           pot_ext->_dbExt->getCoordinate(iech, 1),
+           pot_ext->_dbExt->getCoordinate(iech, 2),
            covar, covGp, covGG);
     b.setValue(ecr, 0, covar);
     b.setValue(ecr, 1, -covGp[0]);
@@ -391,7 +391,7 @@ static Id st_extdrift_calc_init(DbGrid* dbout, Pot_Ext* pot_ext)
   /* Creating the Db for neighborhood */
 
   if (st_extdrift_create_db(dbout, pot_ext)) return 1;
-  Id number = pot_ext->nfull;
+  Id number = pot_ext->_nfull;
 
   /* Creating the model */
 
@@ -399,12 +399,12 @@ static Id st_extdrift_calc_init(DbGrid* dbout, Pot_Ext* pot_ext)
 
   /* Solve the kriging system */
 
-  MatrixSymmetric a = pot_ext->model->evalCovMatSym(pot_ext->db);
+  MatrixSymmetric a = pot_ext->_modelExt->evalCovMatSym(pot_ext->_dbExt);
   if (a.invert()) return 1;
 
   MatrixDense b = st_extdrift_establish(pot_ext, number);
 
-  a.prodMatMatInPlace(&b, &pot_ext->weight);
+  a.prodMatMatInPlace(&b, &pot_ext->_wgtExt);
 
   return 0;
 }
@@ -431,26 +431,26 @@ static Id st_potext_manage(Id mode,
   switch (mode)
   {
     case 0: /* Initialization */
-      pot_ext->ndim  = 0;
-      pot_ext->nring = 0;
-      pot_ext->nfull = 0;
-      pot_ext->range = 0.;
-      pot_ext->db    = nullptr;
-      pot_ext->model = nullptr;
+      pot_ext->_ndim2    = 0;
+      pot_ext->_nring    = 0;
+      pot_ext->_nfull    = 0;
+      pot_ext->_rangeExt = 0.;
+      pot_ext->_dbExt    = nullptr;
+      pot_ext->_modelExt = nullptr;
       return (0);
 
     case 1: /* Allocation */
-      pot_ext->ndim  = dbout->getNDim();
-      pot_ext->nring = nring;
-      pot_ext->range = range;
+      pot_ext->_ndim2    = dbout->getNDim();
+      pot_ext->_nring    = nring;
+      pot_ext->_rangeExt = range;
       if (st_extdrift_calc_init(dbout, pot_ext)) return (1);
       return (0);
 
     case -1: /* Deletion */
-      delete pot_ext->db;
-      pot_ext->db = nullptr;
-      delete pot_ext->model;
-      pot_ext->model = nullptr;
+      delete pot_ext->_dbExt;
+      pot_ext->_dbExt = nullptr;
+      delete pot_ext->_modelExt;
+      pot_ext->_modelExt = nullptr;
       return (0);
 
     default:
@@ -459,14 +459,14 @@ static Id st_potext_manage(Id mode,
   return (1);
 }
 
-bool st_potenv_valid(Pot_Env* pot_env,
-                     Pot_Ext* pot_ext,
-                     Db* dbiso,
-                     Db* dbgrd,
-                     Db* dbtgt,
-                     DbGrid* dbout,
-                     Model* model,
-                     ANeigh* neigh)
+static bool st_potenv_valid(Pot_Env* pot_env,
+                            Pot_Ext* pot_ext,
+                            Db* dbiso,
+                            Db* dbgrd,
+                            Db* dbtgt,
+                            DbGrid* dbout,
+                            Model* model,
+                            ANeigh* neigh)
 {
   static Id nring = 1;
 
@@ -1005,29 +1005,29 @@ static Id st_extdrift_neigh(DbGrid* dbgrid, Pot_Ext* pot_ext)
   /* Loop on the neighboring samples defined in the neighboring grid */
 
   Id ecr = 0;
-  for (Id iz = 0; iz < pot_ext->db->getNX(2); iz++)
-    for (Id iy = 0; iy < pot_ext->db->getNX(1); iy++)
-      for (Id ix = 0; ix < pot_ext->db->getNX(0); ix++)
+  for (Id iz = 0; iz < pot_ext->_dbExt->getNX(2); iz++)
+    for (Id iy = 0; iy < pot_ext->_dbExt->getNX(1); iy++)
+      for (Id ix = 0; ix < pot_ext->_dbExt->getNX(0); ix++)
       {
 
         /* Calculate the index of the sample within the Ext Drift grid */
 
-        pot_ext->indg[0] = pot_ext->indg0[0] + ix - pot_ext->nring;
-        if (pot_ext->indg[0] < 0 || pot_ext->indg[0] > dbgrid->getNX(0))
+        pot_ext->_indg[0] = pot_ext->_indg0[0] + ix - pot_ext->_nring;
+        if (pot_ext->_indg[0] < 0 || pot_ext->_indg[0] > dbgrid->getNX(0))
           return (1);
-        pot_ext->indg[1] = pot_ext->indg0[1] + iy - pot_ext->nring;
-        if (pot_ext->indg[1] < 0 || pot_ext->indg[1] > dbgrid->getNX(1))
+        pot_ext->_indg[1] = pot_ext->_indg0[1] + iy - pot_ext->_nring;
+        if (pot_ext->_indg[1] < 0 || pot_ext->_indg[1] > dbgrid->getNX(1))
           return (1);
-        pot_ext->indg[2] = pot_ext->indg0[2] + iz - pot_ext->nring;
-        if (pot_ext->indg[2] < 0 || pot_ext->indg[2] > dbgrid->getNX(2))
+        pot_ext->_indg[2] = pot_ext->_indg0[2] + iz - pot_ext->_nring;
+        if (pot_ext->_indg[2] < 0 || pot_ext->_indg[2] > dbgrid->getNX(2))
           return (1);
-        Id iech = dbgrid->indiceToRank(pot_ext->indg);
+        Id iech = dbgrid->indiceToRank(pot_ext->_indg);
 
         /* Check that the external drift value is defined */
 
         double drift = dbgrid->getLocVariable(ELoc::F, iech, 0);
         if (FFFF(drift)) return (1);
-        pot_ext->data[ecr] = drift;
+        pot_ext->_dataExt[ecr] = drift;
         ecr++;
       }
   return (0);
@@ -1069,7 +1069,7 @@ static Id st_extdrift_eval(const char* target,
 
   /* Find the location of the target within the external drift grid */
 
-  if (point_to_grid(dbgrid, coor.data(), 0, pot_ext->indg0.data()) < 0) return 1;
+  if (point_to_grid(dbgrid, coor.data(), 0, pot_ext->_indg0.data()) < 0) return 1;
 
   /* Find the neighborhood around the target grid node */
 
@@ -1078,12 +1078,12 @@ static Id st_extdrift_eval(const char* target,
   /* Perform the estimation */
 
   VectorDouble result(4);
-  pot_ext->weight.prodVecMatInPlace(pot_ext->data, result);
+  pot_ext->_wgtExt.prodVecMatInPlace(pot_ext->_dataExt, result);
 
   /* Retrieve the results */
 
   *extval = result[0];
-  for (Id idim = 0; idim < pot_ext->ndim; idim++)
+  for (Id idim = 0; idim < pot_ext->_ndim2; idim++)
     extgrd[idim] = result[1 + idim];
 
   return 0;
@@ -3344,332 +3344,4 @@ label_end:
   return (error);
 }
 
-/****************************************************************************/
-/*!
- **  Print the type of information for the Potential covariance
- **
- ** \param[in]  rank      Rank of the point
- ** \param[in]  type      Type of the first point
- **                       1 for gradient; 2 for tangent; 3 for isopotential
- **
- *****************************************************************************/
-static void st_print_type(Id rank, Id type)
-{
-  message("Data Set #%d: ", rank);
-  switch (type)
-  {
-    case -1:
-      message("Target Gradient\n");
-      break;
-    case 1:
-      message("Gradient\n");
-      break;
-    case 2:
-      message("Tangent\n");
-      break;
-    case -3:
-      message("Target IsoPotential\n");
-      break;
-    case 3:
-      message("IsoPotential\n");
-      break;
-    default:
-      break;
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Potential covariance
- **
- ** \return Error return code
- **
- ** \param[in]  model      Model structure
- ** \param[in]  verbose    Verbose flag
- ** \param[in]  type1      Type of the first point
- **                        1 for gradient; 2 for tangent; 3 for isopotential
- ** \param[in]  x10        Coordinates of the centering for first point
- ** \param[in]  x1p        Coordinates of the first point
- ** \param[in]  tx1        Tangent values at the first point
- ** \param[in]  type2      Type of the second point
- **                        1 for gradient; 2 for tangent; 3 for isopotential
- **                        (Sign is negative for target point)
- ** \param[in]  x20        Coordinates of the centering for second point
- ** \param[in]  x2p        Coordinates of the second point
- ** \param[in]  tx2        Tangent values at the second point
- **
- ** \param[out] covtab     Array of returned values (dimensionned to ndim*ndim)
- **
- *****************************************************************************/
-Id potential_cov(Model* model,
-                 bool verbose,
-                 Id type1,
-                 const VectorDouble& x10,
-                 const VectorDouble& x1p,
-                 const VectorDouble& tx1,
-                 Id type2,
-                 const VectorDouble& x20,
-                 const VectorDouble& x2p,
-                 const VectorDouble& tx2,
-                 VectorDouble& covtab)
-{
-  VectorDouble covGp(3, 0.);
-  VectorDouble cov2Gp(3, 0.);
-  VectorDouble covGG(9, 0.);
-  VectorDouble dd(3, 0.);
-  double covar  = 0;
-  double covar1 = 0;
-  double covar2 = 0;
-  double covar3 = 0;
-  double covar4 = 0;
-
-  // Preliminary checks
-
-  VERBOSE = verbose;
-  Id ndim = static_cast<Id>(model->getNDim());
-  covtab.resize(ndim * ndim, TEST);
-
-  /* Preliminary checks */
-
-  if (type1 < 1 || type1 > 3)
-  {
-    messerr("Argument 'type1'(%d) must be equal to 1, 2 or 3", type1);
-    return (1);
-  }
-  if (type2 < -3 || type2 > 3 || type2 == -2 || type2 == 0)
-  {
-    messerr("Argument 'type2'(%d) must be equal to -3,-1,1,2 or 3", type2);
-    return (1);
-  }
-
-  /* Optional printout */
-
-  if (VERBOSE)
-  {
-    st_print_type(1, type1);
-    if (!x10.empty()) print_matrix("x10", 0, 1, 1, ndim, NULL, x10.data());
-    if (!x1p.empty()) print_matrix("x1p", 0, 1, 1, ndim, NULL, x1p.data());
-    if (!tx1.empty()) print_matrix("tx1", 0, 1, 1, ndim, NULL, tx1.data());
-    st_print_type(2, type2);
-    if (!x20.empty()) print_matrix("x20", 0, 1, 1, ndim, NULL, x20.data());
-    if (!x2p.empty()) print_matrix("x2p", 0, 1, 1, ndim, NULL, x2p.data());
-    if (!tx2.empty()) print_matrix("tx2", 0, 1, 1, ndim, NULL, tx2.data());
-  }
-
-  /* Dispatch */
-
-  Id n1 = 1;
-  Id n2 = 1;
-  switch (type1)
-  {
-    case 1: // 1-Gradient
-      n1 = ndim;
-      switch (type2)
-      {
-        case 1:  // 2-Gradient
-        case -1: // 2-Gradient-Target
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          Id ecr = 0;
-          Id lec = 0;
-          for (Id idim = 0; idim < 3; idim++)
-            for (Id jdim = 0; jdim < 3; jdim++, lec++)
-            {
-              if (idim < ndim && jdim < ndim) covtab[ecr++] = covGG[lec];
-            }
-          n2 = ndim;
-          break;
-        }
-
-        case 2: // 2-Tangent
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-          {
-            Id i         = 3 * idim;
-            covtab[idim] = setMatUV(ndim, tx2[0], tx2[1], tx2[2], covGG[i + 0],
-                                    covGG[i + 1], covGG[i + 2]);
-          }
-          n2 = 1;
-          break;
-        }
-
-        case 3: // 2-IsoPotential
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, cov2Gp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x20[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            covtab[idim] = cov2Gp[idim] - covGp[idim];
-          n2 = 1;
-          break;
-        }
-
-        case -3: // 2-IsoPotential-Target
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, cov2Gp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            covtab[idim] = cov2Gp[idim];
-          n2 = 1;
-          break;
-        }
-        default:
-          break;
-      }
-      break;
-
-    case 2: // 1-Tangent
-      n1 = 1;
-      switch (type2)
-      {
-        case 1:  // 2-Gradient
-        case -1: // 2-Gradient-Target
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-          {
-            Id i         = 3 * idim;
-            covtab[idim] = setMatUV(ndim,
-                                    tx1[0], tx1[1], tx1[2], covGG[i + 0],
-                                    covGG[i + 1], covGG[i + 2]);
-          }
-          n2 = ndim;
-          break;
-        }
-
-        case 2: // 2-Tangent
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x2p[idim] - x1p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          covtab[0] = setMatUAV(ndim, covGG.data(),
-                                tx1[0], tx1[1], tx1[2],
-                                tx2[0], tx2[1], tx2[2]);
-          n2        = 1;
-          break;
-        }
-
-        case 3: // 2-IsoPotential
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, cov2Gp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x20[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          covtab[0] = setMatUV(ndim, tx1[0], tx1[1], tx1[2],
-                               cov2Gp[0] - covGp[0], cov2Gp[1] - covGp[1],
-                               cov2Gp[2] - covGp[2]);
-          n2        = 1;
-          break;
-        }
-
-        case -3: // 2-IsoPotential-Target
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, cov2Gp, covGG);
-          covtab[0] = setMatUV(ndim, tx1[0], tx1[1], tx1[2], cov2Gp[0],
-                               cov2Gp[1], cov2Gp[2]);
-          n2        = 1;
-          break;
-        }
-
-        default:
-          break;
-      }
-      break;
-
-    case 3: // 1-IsoPotential
-      n1 = 1;
-      switch (type2)
-      {
-        case 1:  // 2-Gradient
-        case -1: // 2-Gradient-Target
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x10[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, cov2Gp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            covtab[idim] = covGp[idim] - cov2Gp[idim];
-          n2 = ndim;
-          break;
-        }
-
-        case 2: // 2-Tangent
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x1p[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x10[idim] - x2p[idim];
-          st_cov(model, 1, dd[0], dd[1], dd[2], covar, cov2Gp, covGG);
-          covtab[0] = setMatUV(ndim, tx2[0], tx2[1], tx2[2],
-                               cov2Gp[0] - covGp[0], cov2Gp[1] - covGp[1],
-                               cov2Gp[2] - covGp[2]);
-          n2        = 1;
-          break;
-        }
-
-        case 3: // 2-IsoPotential
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x2p[idim] - x1p[idim];
-          st_cov(model, 0, dd[0], dd[1], dd[2], covar1, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x2p[idim] - x10[idim];
-          st_cov(model, 0, dd[0], dd[1], dd[2], covar2, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x20[idim] - x1p[idim];
-          st_cov(model, 0, dd[0], dd[1], dd[2], covar3, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x20[idim] - x10[idim];
-          st_cov(model, 0, dd[0], dd[1], dd[2], covar4, covGp, covGG);
-          covtab[0] = covar1 - covar2 - covar3 + covar4;
-          n2        = 1;
-          break;
-        }
-
-        case -3: // 2-IsoPotential-Target
-        {
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x2p[idim] - x1p[idim];
-          st_cov(model, 0, dd[0], dd[1], dd[2], covar1, covGp, covGG);
-          for (Id idim = 0; idim < ndim; idim++)
-            dd[idim] = x2p[idim] - x10[idim];
-          st_cov(model, 0, dd[0], dd[1], dd[2], covar2, covGp, covGG);
-          covtab[0] = covar1 - covar2;
-          n2        = 1;
-          break;
-        }
-
-        default:
-          break;
-      }
-      break;
-
-    default:
-      break;
-  }
-
-  /* Printout (verbose option) */
-
-  if (VERBOSE) print_matrix("Covariance", 0, 1, n2, n1, NULL, covtab.data());
-
-  return (0);
-}
 } // namespace gstlrn

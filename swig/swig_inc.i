@@ -274,11 +274,11 @@
   #include "Matrix/Table.hpp"
   #include "LinearOp/InvNuggetOp.hpp"
 
-  
   #include "API/SPDE.hpp"
   #include "API/TestInheritance.hpp"
   #include "API/Style.hpp"
   #include "API/SPDEParam.hpp"
+  #include "API/Potential.hpp"
   
   #include "Db/Db.hpp"
   #include "Db/DbGrid.hpp"
@@ -379,7 +379,7 @@
   #include "Spatial/SpatialIndices.hpp"
 
   #include "Core/Acknowledge.hpp"
-  #include "Core/Potential.hpp"
+  #include "Core/potential.hpp"
   #include "Core/Seismic.hpp"
 
   #include "API/newAPIs.hpp"

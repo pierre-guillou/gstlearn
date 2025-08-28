@@ -303,6 +303,7 @@
 %include API/TestInheritance.hpp
 %include API/Style.hpp
 %include API/SPDEParam.hpp
+ùinclude API/Potential.hpp
 
 %include Db/Db.hpp
 %include Db/DbGrid.hpp
@@ -405,7 +406,7 @@
 %include Spatial/SpatialIndices.hpp
 
 %include Core/Acknowledge.hpp
-%include Core/Potential.hpp
+%include Core/potential.hpp
 %include Core/Seismic.hpp
 
 %include/API/newAPIs.hpp
@@ -414,7 +415,6 @@
 #pragma SWIG nowarn=511
 #pragma SWIG nowarn=506
 #pragma SWIG nowarn=509
-
 
 %template(LinearOpCGSolver) LinearOpCGSolver< ScaleOp >;
 %template(LinearSPDEOpCGSolver) LinearOpCGSolver< SPDEOp >;
