@@ -19,7 +19,7 @@
 #include "Db/DbHelper.hpp"
 #include "Drifts/DriftList.hpp"
 #include "Matrix/MatrixFactory.hpp"
-#include "Model/ModelGeneric.hpp"
+#include "Model/Model.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
 #include "geoslib_old_f.h"
 
@@ -39,7 +39,7 @@ static Id TAB_DRF[9];
 Potential::Potential(Db* dbiso,
                      Db* dbgrd,
                      Db* dbtgt,
-                     ModelGeneric* model,
+                     Model* model,
                      double nugget_grd,
                      double nugget_tgt)
   : _dbiso(dbiso)
@@ -486,7 +486,7 @@ void Potential::_saveResultData(Db* db,
 /*!
  **  Calculate the covariance and the derivatives
  **
- ** \param[in] model     ModelGeneric to be used for the calculations
+ ** \param[in] model     Model to be used for the calculations
  ** \param[in] flag_grad True if the Gradients must be calculated
  ** \param[in] dx        Increment along X
  ** \param[in] dy        Increment along Y
@@ -497,7 +497,7 @@ void Potential::_saveResultData(Db* db,
  ** \param[out] covGG    Covariance between gradient and gradient
  **
  *****************************************************************************/
-void Potential::_calculateCovs(ModelGeneric* model,
+void Potential::_calculateCovs(Model* model,
                                bool flag_grad,
                                double dx,
                                double dy,
@@ -2739,7 +2739,7 @@ Id krigingPotential(Db* dbiso,
                     Db* dbgrd,
                     Db* dbtgt,
                     DbGrid* dbout,
-                    ModelGeneric* model,
+                    Model* model,
                     double nugget_grd,
                     double nugget_tgt,
                     bool flag_pot,
@@ -2784,7 +2784,7 @@ Id simulatePotential(Db* dbiso,
                      Db* dbgrd,
                      Db* dbtgt,
                      DbGrid* dbout,
-                     ModelGeneric* model,
+                     Model* model,
                      double nugget_grd,
                      double nugget_tgt,
                      double dist_tempere,
@@ -2820,7 +2820,7 @@ Id simulatePotential(Db* dbiso,
 Id xvalidPotential(Db* dbiso,
                    Db* dbgrd,
                    Db* dbtgt,
-                   ModelGeneric* model,
+                   Model* model,
                    double nugget_grd,
                    double nugget_tgt,
                    bool flag_dist_conv,

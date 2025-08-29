@@ -31,10 +31,10 @@
 
 using namespace gstlrn;
 
-static ModelGeneric* st_duplicate_for_potential(const Model* model)
+static Model* st_duplicate_for_potential(const Model* model)
 {
-  auto* new_model      = new ModelGeneric(*model->getContext());
-  auto covp            = CovPotential(*model->getCovAniso(0));
+  auto* new_model = new Model(*model->getContext());
+  auto covp       = CovPotential(*model->getCovAniso(0));
   new_model->setCov(&covp);
 
   DriftList* drifts = DriftFactory::createDriftListForGradients(model->getDriftList());
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   int mode         = 0;
   bool debug       = true;
   bool verbose     = true;
-  bool new_version = false;
+  bool new_version = true;
 
   //============================================================//
   // Exemple in 1-D
@@ -95,9 +95,9 @@ int main(int argc, char* argv[])
     NeighUnique* neighU = NeighUnique::create(false, space);
 
     // Create the model
-    double range            = scale2range(ECov::GAUSSIAN, 20.);
-    Model* model            = Model::createFromParam(ECov::GAUSSIAN, range);
-    ModelGeneric* new_model = nullptr;
+    double range     = scale2range(ECov::GAUSSIAN, 20.);
+    Model* model     = Model::createFromParam(ECov::GAUSSIAN, range);
+    Model* new_model = nullptr;
 
     // Modify the Model for Gradients
     if (!new_version)
@@ -194,8 +194,8 @@ int main(int argc, char* argv[])
     NeighUnique* neighU = NeighUnique::create();
 
     // Create the model
-    Model* model = Model::createFromParam(ECov::CUBIC, 6.);
-    ModelGeneric* new_model = nullptr;
+    Model* model     = Model::createFromParam(ECov::CUBIC, 6.);
+    Model* new_model = nullptr;
 
     // Modify the Model for Gradients
     if (!new_version)

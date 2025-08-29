@@ -21,7 +21,7 @@ namespace gstlrn
 class Db;
 class DbGrid;
 class NeighUnique;
-class ModelGeneric;
+class Model;
 
 class GSTLEARN_EXPORT Potential
 {
@@ -29,7 +29,7 @@ public:
   Potential(Db* dbiso,
             Db* dbgrd,
             Db* dbtgt,
-            ModelGeneric* model,
+            Model* model,
             double nugget_grd = 0.,
             double nugget_tgt = 0.);
   Potential(const Potential& r)            = delete;
@@ -87,7 +87,7 @@ private:
                        const ELoc& loctype_grad,
                        VectorInt& uid_pot,
                        VectorInt& uid_grad) const;
-  void _calculateCovs(ModelGeneric* model,
+  void _calculateCovs(Model* model,
                       bool flag_grad,
                       double dx,
                       double dy,
@@ -204,8 +204,8 @@ private:
   Db* _dbgrd;
   Db* _dbtgt;
   DbGrid* _dbExt;
-  ModelGeneric* _model;
-  ModelGeneric* _modelExt;
+  Model* _model;
+  Model* _modelExt;
 
   Id _ndim;    /* Space dimension */
   Id _niso;    /* Number of Iso-potential information */
@@ -250,7 +250,7 @@ GSTLEARN_EXPORT Id krigingPotential(Db* dbiso,
                                     Db* dbgrd,
                                     Db* dbtgt,
                                     DbGrid* dbout,
-                                    ModelGeneric* model,
+                                    Model* model,
                                     double nugget_grd   = 0.,
                                     double nugget_tgt   = 0.,
                                     bool flag_pot       = true,
@@ -263,7 +263,7 @@ GSTLEARN_EXPORT Id simulatePotential(Db* dbiso,
                                      Db* dbgrd,
                                      Db* dbtgt,
                                      DbGrid* dbout,
-                                     ModelGeneric* model,
+                                     Model* model,
                                      double nugget_grd   = 0.,
                                      double nugget_tgt   = 0.,
                                      double dist_tempere = TEST,
@@ -275,7 +275,7 @@ GSTLEARN_EXPORT Id simulatePotential(Db* dbiso,
 GSTLEARN_EXPORT Id xvalidPotential(Db* dbiso,
                                    Db* dbgrd,
                                    Db* dbtgt,
-                                   ModelGeneric* model,
+                                   Model* model,
                                    double nugget_grd   = 0.,
                                    double nugget_tgt   = 0.,
                                    bool flag_dist_conv = false,
