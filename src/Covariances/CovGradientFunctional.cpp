@@ -173,6 +173,7 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
     {
       double d2cov = getSill(0, 0) * getCorFunc()->evalCovDerivative(2, h);
       double a     = (dcovsr - d2cov) / (h * h);
+
       if (getAniso().isIsotropic())
       {
 

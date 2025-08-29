@@ -31,7 +31,7 @@ class CovAniso;
 class GSTLEARN_EXPORT CovPotential: public ACov
 {
 public:
-  CovPotential(const CovAniso& cova, bool flagGradient);
+  CovPotential(const CovAniso& cova);
   CovPotential(const CovPotential& r);
   CovPotential& operator=(const CovPotential& r) = delete;
   virtual ~CovPotential();
@@ -51,6 +51,9 @@ public:
   /// ACov Interface
   Id getNVar() const override { return _nVar; }
 
+  void launchCalculations(bool status) { _launchCalculations = status; }
+  void setFlagGradient(bool status) { _flagGradient = status; }
+
 protected:
   double _eval(const SpacePoint& p1,
                const SpacePoint& p2,
@@ -61,24 +64,23 @@ protected:
 
 private:
   bool _isValidForPotential() const;
-  void _checkPointHasChanged(const SpacePoint& p1,
-                             const SpacePoint& p2) const;
-  void _calculateTrTtr(const VectorDouble& d) const;
+  void _calculateTrTtr() const;
   void _evalZAndGradients(const SpacePoint& p1, const SpacePoint& p2) const;
 
 private:
   Id _nVar;
-  bool _flagGradient;
   const CovAniso& _covRef;
 
-  mutable SpacePoint _p1Mem;
-  mutable SpacePoint _p2Mem;
+  mutable bool _launchCalculations;
+  mutable bool _flagGradient;
   // covpp  Covariance value
   mutable double _covpp;
   // covGp  Covariance <G[i](x0+x,y0+y,z0+z), P(x0,y0,z0)> (dim=3)
   mutable VectorDouble _covGp;
   // covGG  Covariance <G[i](x0+x,y0+y,z0+z), G[j](x0,y0,z0)> (dim=3)
   mutable VectorDouble _covGG;
+
+  // Working arrays
   mutable VectorDouble _dF;
   mutable VectorDouble _uF;
   mutable VectorDouble _hF;

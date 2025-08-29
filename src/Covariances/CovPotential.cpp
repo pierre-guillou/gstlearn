@@ -2,9 +2,9 @@
 /*                                                                            */
 /*                            gstlearn C++ Library                            */
 /*                                                                            */
-/* Copyrig_hFt (c) (2023) MINES Paris / ARMINES                                 */
-/* Aut_hFors: gstlearn Team                                                     */
-/* Website: _hFttps://gstlearn.org                                              */
+/* Copyright (c) (2023) MINES Paris / ARMINES                                 */
+/* Authors: gstlearn Team                                                     */
+/* Website: https://gstlearn.org                                              */
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
@@ -21,27 +21,22 @@
 
 namespace gstlrn
 {
-CovPotential::CovPotential(const CovAniso& cova, bool flagGradient)
+CovPotential::CovPotential(const CovAniso& cova)
   : ACov()
   , _nVar(0)
-  , _flagGradient(flagGradient)
   , _covRef(cova)
+  , _launchCalculations(true)
+  , _flagGradient(false)
   , _covpp(0.)
   , _covGp()
   , _covGG()
 {
   setContext(cova.getContext());
   if (!_isValidForPotential()) return;
-  _nVar = _ctxt.getNVar() + static_cast<Id>(_ctxt.getNDim()); // Consider the variable and its gradient(s)
+  _nVar = _ctxt.getNVar();
   _ctxt.setNVar(_nVar);
 
   // Initialize the working quantities
-  // Note: their dimension is constant (not depending on space dimension)
-  _p1Mem = SpacePoint(_ctxt.getSpace());
-  _p2Mem = SpacePoint(_ctxt.getSpace());
-  // Set the first coordinate of _p1Mem or _p2Mem to TEST as dummy initialization value
-  _p1Mem.setCoord(0, TEST);
-  _p2Mem.setCoord(0, TEST);
   _covpp = 0.;
   _covGp.resize(3);
   _covGG.resize(9);
@@ -55,8 +50,9 @@ CovPotential::CovPotential(const CovAniso& cova, bool flagGradient)
 CovPotential::CovPotential(const CovPotential& r)
   : ACov(r)
   , _nVar(r._nVar)
-  , _flagGradient(r._flagGradient)
   , _covRef(r._covRef)
+  , _launchCalculations(r._launchCalculations)
+  , _flagGradient(r._flagGradient)
   , _covpp(r._covpp)
   , _covGp(r._covGp)
   , _covGG(r._covGG)
@@ -116,21 +112,22 @@ double CovPotential::_eval(const SpacePoint& p1,
                            Id jvar,
                            const CovCalcMode* mode) const
 {
-  // Update the contents of the class member if points have changed
-  _checkPointHasChanged(p1, p2);
+  if (_launchCalculations)
+    _evalZAndGradients(p1, p2);
+  _launchCalculations = false;
 
   if (ivar == 0)
   {
     if (jvar == 0)
       return _covRef.evalCov(p1, p2, ivar, jvar, mode);
 
-    int jdim = jvar - 10;
+    int jdim = jvar - 1;
     return _covGp[jdim];
   }
-  int idim = ivar - 10;
+  int idim = ivar - 1;
   if (jvar == 0)
     return _covGp[idim];
-  int jdim = jvar - 10;
+  int jdim = jvar - 1;
   return _covGG[3 * idim + jdim];
 }
 
@@ -143,43 +140,17 @@ String CovPotential::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-void CovPotential::_checkPointHasChanged(const SpacePoint& p1,
-                                         const SpacePoint& p2) const
-{
-  auto ndim = getNDim();
-
-  bool hasChanged = false;
-  for (Id i = 0; i < ndim && !hasChanged; i++)
-  {
-    if (p1.getCoord(i) != _p1Mem.getCoord(i) || p2.getCoord(i) != _p2Mem.getCoord(i))
-      hasChanged = true;
-  }
-
-  if (hasChanged)
-  {
-    _p1Mem = p1;
-    _p2Mem = p2;
-    _evalZAndGradients(p1, p2);
-  }
-}
-
 /**
  * Calculate the square of the transformation matrix which transforms
  * a vector into its isotropic equivalent
- * @param d Vector giving the distance in initial space
  */
-void CovPotential::_calculateTrTtr(const VectorDouble& d) const
+void CovPotential::_calculateTrTtr() const
 {
+  auto ndim = getNDim();
   _uF.fill(0.);
-  _dF.fill(0.);
   _hF.fill(0.);
   _Tr.fill(0.);
   _trttr.fill(0.);
-
-  // Save actual distance (in space dimension)
-  auto ndim = getNDim();
-  for (Id i = 0; i < ndim; i++)
-    _dF[i] = d[i];
 
   // Matrix Tr = diag(coeffs) . R
   const MatrixSquare& mat    = _covRef.getAniso().getRotation().getMatrixDirect();
@@ -230,6 +201,9 @@ void CovPotential::_calculateTrTtr(const VectorDouble& d) const
 void CovPotential::_evalZAndGradients(const SpacePoint& p1,
                                       const SpacePoint& p2) const
 {
+  _covGp.fill(0);
+  _covGG.fill(0);
+
   // Calculate the isotropic distance
   double hh = getSpace()->getDistance(p1, p2, _covRef.getAniso());
 
@@ -238,12 +212,15 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
   _covpp += covar;
   if (_covRef.getCorFunc()->getType() == ECov::NUGGET) return;
 
-  VectorDouble d = VH::subtract(p1.getCoords(), p2.getCoords());
-  _calculateTrTtr(d);
+  // Calculate distance and plunge into a 3-D vector
+  VectorDouble d1 = VH::subtract(p1.getCoords(), p2.getCoords());
+  for (Id i = 0; i < 3; i++)
+    _dF[i] = (i < static_cast<Id>(d1.size())) ? d1[i] : 0.;
+
+  _calculateTrTtr();
   double dcovsr = _covRef.getSill(0, 0) * _covRef.getCorFunc()->evalCovDerivative(1, hh);
 
   //  Case where distance is null
-
   if (hh < EPSGRAD)
   {
     if (_flagGradient)
@@ -254,33 +231,29 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
   }
   else
   {
-
     //  Calculate covariance between point and gradient
-
     for (Id i = 0; i < 3; i++)
     {
       _covGp[i] += _uF[i] * dcovsr;
     }
 
     //  Calculate the covariance between gradient and gradient
-
     if (_flagGradient)
     {
       double d2cov = _covRef.getSill(0, 0) * _covRef.getCorFunc()->evalCovDerivative(2, hh);
       double a     = (dcovsr - d2cov) / (hh * hh);
+
       if (_covRef.getAniso().isIsotropic())
       {
 
         //  Isotropic case
 
         double b = dcovsr * _trttr[0];
-        Id ecr   = 0;
-        for (Id i = 0; i < 3; i++)
-          for (Id j = 0; j < 3; j++)
+        for (Id i = 0, ecr = 0; i < 3; i++)
+          for (Id j = 0; j < 3; j++, ecr++)
           {
             _covGG[ecr] += a * _uF[i] * _uF[j];
             if (i == j) _covGG[ecr] -= b;
-            ecr++;
           }
       }
       else
@@ -288,12 +261,10 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
 
         //  Anisotropic case
 
-        Id ecr = 0;
-        for (Id i = 0; i < 3; i++)
-          for (Id j = 0; j < 3; j++)
+        for (Id i = 0, ecr = 0; i < 3; i++)
+          for (Id j = 0; j < 3; j++, ecr++)
           {
             _covGG[ecr] += a * _uF[i] * _uF[j] - dcovsr * _trttr[ecr];
-            ecr++;
           }
       }
     }

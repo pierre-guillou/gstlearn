@@ -1826,7 +1826,7 @@ static void st_build_rhs(Pot_Env* pot_env,
   // Printout (optional)
 
   if (OptDbg::query(EDbg::KRIGING))
-    krige_rhs_print(nsol, 0, nequa, nequa, NULL, rhs.getValues().data());
+    print_matrix("RHS", 0, 1, nequa, nsol, NULL, rhs.getValues().data());
 }
 
 /****************************************************************************/
@@ -1879,7 +1879,7 @@ static void st_calc_point(Pot_Env* pot_env,
 
   if (OptDbg::query(EDbg::KRIGING) || OptDbg::query(EDbg::NBGH))
   {
-    mestitle(1, "Target location6");
+    mestitle(1, "Target location");
     db_sample_print(db_target, iech0, 1, 0, 0, 0);
   }
 
@@ -2930,7 +2930,7 @@ Id potential_kriging(Db* dbiso,
   if (st_build_lhs(&pot_env, &pot_ext, dbout, model,
                    nugget_grd, nugget_tgt, lhs)) goto label_end;
   if (OptDbg::isReferenceDefined() || OptDbg::query(EDbg::KRIGING))
-    krige_lhs_print(0, nequa, nequa, NULL, lhs.getValues().data());
+    print_matrix("LHS", 0, 1, nequa, nequa, NULL, lhs.getValues().data());
 
   // Invert the matrix
 
