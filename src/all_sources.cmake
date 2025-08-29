@@ -140,7 +140,6 @@ set(SRC
   Core/spill.cpp
   Core/acknowledge.cpp
   Core/geophy.cpp
-  Core/potential.cpp
   Core/foxleg.cpp
   Core/util.cpp
   Core/ascii.cpp

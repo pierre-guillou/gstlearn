@@ -406,7 +406,6 @@
 %include Spatial/SpatialIndices.hpp
 
 %include Core/Acknowledge.hpp
-%include Core/potential.hpp
 %include Core/Seismic.hpp
 
 %include/API/newAPIs.hpp

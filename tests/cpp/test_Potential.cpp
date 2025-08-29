@@ -16,7 +16,6 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/File.hpp"
 #include "Basic/OptDbg.hpp"
-#include "Core/potential.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "Covariances/CovPotential.hpp"
 #include "Db/Db.hpp"
@@ -25,9 +24,7 @@
 #include "Enum/ECov.hpp"
 #include "Enum/ESpaceType.hpp"
 #include "Model/Model.hpp"
-#include "Neigh/NeighUnique.hpp"
 #include "Space/ASpaceObject.hpp"
-#include "Space/SpaceRN.hpp"
 
 using namespace gstlrn;
 
@@ -55,10 +52,9 @@ int main(int argc, char* argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   ASerializable::setPrefixName("test_Potential-");
-  int mode         = 0;
-  bool debug       = true;
-  bool verbose     = true;
-  bool new_version = true;
+  int mode     = 0;
+  bool debug   = true;
+  bool verbose = true;
 
   //============================================================//
   // Exemple in 1-D
@@ -90,59 +86,28 @@ int main(int argc, char* argv[])
     VectorDouble dx = {1};
     DbGrid* grid    = DbGrid::create(nx, dx);
 
-    // Create the Neighborhood (unique)
-    auto space          = SpaceRN::create(ndim);
-    NeighUnique* neighU = NeighUnique::create(false, space);
-
     // Create the model
     double range     = scale2range(ECov::GAUSSIAN, 20.);
     Model* model     = Model::createFromParam(ECov::GAUSSIAN, range);
-    Model* new_model = nullptr;
-
-    // Modify the Model for Gradients
-    if (!new_version)
-    {
-      model->switchToGradient();
-    }
-    else
-    {
-      new_model = st_duplicate_for_potential(model);
-    }
+    Model* new_model = st_duplicate_for_potential(model);
 
     if (debug) OptDbg::setReference(1);
-    if (!new_version)
-    {
-      (void)potential_kriging(dbiso, dbgrd, nullptr, grid, model, neighU,
-                              0., 0., true, true, false, true, 0, verbose);
-    }
-    else
-    {
-      (void)krigingPotential(dbiso, dbgrd, nullptr, grid, new_model,
-                             0., 0., true, true, false, true, 0, verbose);
-    }
+    (void)krigingPotential(dbiso, dbgrd, nullptr, grid, new_model,
+                           0., 0., true, true, false, true, 0, verbose);
     OptDbg::setReference(-1);
 
     // Visualize the results
     (void)grid->dumpToNF("Grid1D.NF");
 
     // Cross-validation
-    if (!new_version)
-    {
-      (void)potential_xvalid(dbiso, dbgrd, nullptr, model, neighU,
-                             0., 0., true, verbose);
-    }
-    else
-    {
-      (void)xvalidPotential(dbiso, dbgrd, nullptr, new_model,
-                            0., 0., true, verbose);
-    }
+    (void)xvalidPotential(dbiso, dbgrd, nullptr, new_model,
+                          0., 0., true, verbose);
 
     delete dbiso;
     delete dbgrd;
     delete grid;
     delete model;
     delete new_model;
-    delete neighU;
   }
 
   //============================================================//
@@ -190,33 +155,11 @@ int main(int argc, char* argv[])
     VectorDouble dx = {0.1, 0.1};
     DbGrid* grid    = DbGrid::create(nx, dx);
 
-    // Create the Neighborhood (unique)
-    NeighUnique* neighU = NeighUnique::create();
-
     // Create the model
     Model* model     = Model::createFromParam(ECov::CUBIC, 6.);
-    Model* new_model = nullptr;
-
-    // Modify the Model for Gradients
-    if (!new_version)
-    {
-      model->switchToGradient();
-    }
-    else
-    {
-      new_model = st_duplicate_for_potential(model);
-    }
-
-    if (!new_version)
-    {
-      (void)potential_kriging(dbiso, dbgrd, dbtgt, grid, model, neighU,
-                              0., 0., true, false, false, false, 0, true);
-    }
-    else
-    {
-      (void)krigingPotential(dbiso, dbgrd, dbtgt, grid, new_model,
-                             0., 0., true, false, false, false, 0, true);
-    }
+    Model* new_model = st_duplicate_for_potential(model);
+    (void)krigingPotential(dbiso, dbgrd, dbtgt, grid, new_model,
+                           0., 0., true, false, false, false, 0, true);
 
     (void)grid->dumpToNF("Grid2D.NF");
 
@@ -227,7 +170,6 @@ int main(int argc, char* argv[])
     delete grid;
     delete model;
     delete new_model;
-    delete neighU;
   }
 
   return (0);
