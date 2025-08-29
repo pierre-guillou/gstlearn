@@ -121,13 +121,13 @@ double CovPotential::_eval(const SpacePoint& p1,
     if (jvar == 0)
       return _covRef.evalCov(p1, p2, ivar, jvar, mode);
 
-    int jdim = jvar - 1;
+    Id jdim = jvar - 1;
     return _covGp[jdim];
   }
-  int idim = ivar - 1;
+  Id idim = ivar - 1;
   if (jvar == 0)
     return _covGp[idim];
-  int jdim = jvar - 1;
+  Id jdim = jvar - 1;
   return _covGG[3 * idim + jdim];
 }
 
