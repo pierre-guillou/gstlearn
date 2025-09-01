@@ -13,7 +13,7 @@
 #include "Basic/OptDbg.hpp"
 #include "Basic/Utilities.hpp"
 #include "Covariances/CovAniso.hpp"
-#include "Covariances/CovPotential.hpp"
+#include "Covariances/CovGradientAnalytic.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Db/DbHelper.hpp"
@@ -132,11 +132,11 @@ bool Potential::_isEnvironmentValid(DbGrid* dbout, Id nring)
     messerr("The input Db must contain a LAYER locator");
     return false;
   }
-  const auto* covpot = dynamic_cast<const CovPotential*>(_model->getCov());
+  const auto* covpot = dynamic_cast<const CovGradientAnalytic*>(_model->getCov());
   if (covpot == nullptr)
   {
     messerr("The Model is invalid for Potential calculations");
-    messerr("It may only contain CovPotential(s)");
+    messerr("It may only contain CovGradientAnalytic(s)");
     return false;
   }
   if (_model->getNVar() != 1)
@@ -506,7 +506,7 @@ void Potential::_calculateCovs(ModelGeneric* model,
   if (_ndim >= 2) vec[1] = dy;
   if (_ndim >= 3) vec[2] = dz;
 
-  auto* covpot = dynamic_cast<CovPotential*>(model->_getCovModify());
+  auto* covpot = dynamic_cast<CovGradientAnalytic*>(model->_getCovModify());
   if (covpot == nullptr) return;
 
   // Define a new pair of points
@@ -514,7 +514,7 @@ void Potential::_calculateCovs(ModelGeneric* model,
   SpacePoint p2(model->getSpace()->getOrigin(), -1);
   p2.move(vec);
   covpot->launchCalculations(true);
-  covpot->setFlagGradient(flag_grad);
+  covpot->setFlagCalculateGG(flag_grad);
 
   covar = covpot->evalCov(p1, p2, 0, 0);
   for (Id idim = 0, ecr = 0; idim < 3; idim++)
@@ -1323,7 +1323,7 @@ Id Potential::_extdriftCreateModel()
 
   // Covariance part
   const CovAniso* cova = CovAniso::createFromParam(ECov::CUBIC, _rangeExt, 1.);
-  auto covp            = CovPotential(*cova);
+  auto covp            = CovGradientAnalytic(*cova);
   _modelExt->setCov(&covp);
 
   // Drift part

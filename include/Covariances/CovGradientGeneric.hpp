@@ -42,12 +42,6 @@ public:
   /// AStringable Interface
   String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  bool isConsistent(const ASpace* space) const override
-  {
-    DECLARE_UNUSED(space)
-    return true;
-  }
-
   double getBallRadius() const { return _ballRadius; }
   const ACov& getCovRef() const { return _covRef; }
 
@@ -60,17 +54,15 @@ protected:
   void _optimizationSetTarget(SpacePoint& pt) const override;
 
 private:
-  bool _isValidForGradient() const;
+  virtual bool _isValid() const;
   double _evalZGradientNumeric(const SpacePoint& p1,
                                const SpacePoint& p2,
                                Id idim,
-                               double radius,
                                const CovCalcMode* mode) const;
   double _evalGradientGradientNumeric(const SpacePoint& p1,
                                       const SpacePoint& p2,
                                       Id idim,
                                       Id jdim,
-                                      double radius,
                                       const CovCalcMode* mode) const;
 
 private:

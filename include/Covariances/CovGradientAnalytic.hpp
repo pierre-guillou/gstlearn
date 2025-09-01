@@ -28,28 +28,21 @@ class CovAniso;
  * It uses Functional Derivation and therefore is suitable for a limited
  * set of differentiable covariances.
  */
-class GSTLEARN_EXPORT CovPotential: public CovGradientGeneric
+class GSTLEARN_EXPORT CovGradientAnalytic: public CovGradientGeneric
 {
 public:
-  CovPotential(const CovAniso& cova);
-  CovPotential(const CovPotential& r);
-  CovPotential& operator=(const CovPotential& r) = delete;
-  virtual ~CovPotential();
+  CovGradientAnalytic(const CovAniso& cova);
+  CovGradientAnalytic(const CovGradientAnalytic& r);
+  CovGradientAnalytic& operator=(const CovGradientAnalytic& r) = delete;
+  virtual ~CovGradientAnalytic();
 
   /// ICloneable Interface
-  IMPLEMENT_CLONING(CovPotential)
+  IMPLEMENT_CLONING(CovGradientAnalytic)
 
   /// AStringable Interface
   String toString(const AStringFormat* strfmt = nullptr) const override;
-
-  bool isConsistent(const ASpace* space) const override
-  {
-    DECLARE_UNUSED(space)
-    return true;
-  }
-
   void launchCalculations(bool status) { _launchCalculations = status; }
-  void setFlagGradient(bool status) { _flagGradient = status; }
+  void setFlagCalculateGG(bool status) { _flagCalculateGG = status; }
 
 protected:
   double _eval(const SpacePoint& p1,
@@ -60,14 +53,14 @@ protected:
   void _optimizationSetTarget(SpacePoint& pt) const override;
 
 private:
-  bool _isValidForPotential() const;
+  bool _isValid() const override;
   void _calculateTrTtr() const;
   void _evalZAndGradients(const SpacePoint& p1, const SpacePoint& p2) const;
   const CovAniso* _getCovRefAniso() const;
 
 private:
   mutable bool _launchCalculations;
-  mutable bool _flagGradient;
+  mutable bool _flagCalculateGG;
   // covpp  Covariance value
   mutable double _covpp;
   // covGp  Covariance <G[i](x0+x,y0+y,z0+z), P(x0,y0,z0)> (dim=3)

@@ -171,8 +171,8 @@ GSTLEARN_EXPORT Id model_covmat_inchol(Id verbose,
                                        VectorInt& pvec,
                                        VectorDouble& Gmatrix,
                                        const CovCalcMode* mode = nullptr);
-GSTLEARN_EXPORT Model* model_duplicate_for_gradient(const Model* model,
-                                                    double ball_radius);
+GSTLEARN_EXPORT ModelGeneric* model_duplicate_for_gradient(const Model* model,
+                                                           double ball_radius);
 GSTLEARN_EXPORT void model_cova_characteristics(const ECov& type,
                                                 char cov_name[STRING_LENGTH],
                                                 Id* flag_range,

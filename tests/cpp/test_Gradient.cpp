@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
   {
     // Update the Model for Gradients
     (void)db_gradient_update(data);
-    Model* new_model = model_duplicate_for_gradient(model, ballradius);
+    ModelGeneric* new_model = model_duplicate_for_gradient(model, ballradius);
 
     // Perform Kriging
     (void)kriging(data, grid, new_model, neigh, 1, 1, 0);

@@ -17,7 +17,7 @@
 #include "Basic/File.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Covariances/CovAniso.hpp"
-#include "Covariances/CovPotential.hpp"
+#include "Covariances/CovGradientAnalytic.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Drifts/DriftFactory.hpp"
@@ -31,7 +31,7 @@ using namespace gstlrn;
 static ModelGeneric* st_duplicate_for_potential(const Model* model)
 {
   auto* new_model = new ModelGeneric(*model->getContext());
-  auto covp       = CovPotential(*model->getCovAniso(0));
+  auto covp       = CovGradientAnalytic(*model->getCovAniso(0));
   new_model->setCov(&covp);
 
   DriftList* drifts = DriftFactory::createDriftListForGradients(model->getDriftList());
@@ -87,8 +87,8 @@ int main(int argc, char* argv[])
     DbGrid* grid    = DbGrid::create(nx, dx);
 
     // Create the model
-    double range     = scale2range(ECov::GAUSSIAN, 20.);
-    Model* model     = Model::createFromParam(ECov::GAUSSIAN, range);
+    double range            = scale2range(ECov::GAUSSIAN, 20.);
+    Model* model            = Model::createFromParam(ECov::GAUSSIAN, range);
     ModelGeneric* new_model = st_duplicate_for_potential(model);
 
     if (debug) OptDbg::setReference(1);
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     DbGrid* grid    = DbGrid::create(nx, dx);
 
     // Create the model
-    Model* model     = Model::createFromParam(ECov::CUBIC, 6.);
+    Model* model            = Model::createFromParam(ECov::CUBIC, 6.);
     ModelGeneric* new_model = st_duplicate_for_potential(model);
     (void)krigingPotential(dbiso, dbgrd, dbtgt, grid, new_model,
                            0., 0., true, false, false, false, 0, true);

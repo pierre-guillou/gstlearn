@@ -8,7 +8,7 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Covariances/CovPotential.hpp"
+#include "Covariances/CovGradientAnalytic.hpp"
 #include "Covariances/CovAniso.hpp"
 #include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
@@ -21,16 +21,16 @@
 
 namespace gstlrn
 {
-CovPotential::CovPotential(const CovAniso& cova)
+CovGradientAnalytic::CovGradientAnalytic(const CovAniso& cova)
   : CovGradientGeneric(cova)
   , _launchCalculations(true)
-  , _flagGradient(false)
+  , _flagCalculateGG(false)
   , _covpp(0.)
   , _covGp()
   , _covGG()
 {
   setContext(cova.getContext());
-  if (!_isValidForPotential()) return;
+  if (!_isValid()) return;
   _ctxt.setNVar(1);
 
   // Initialize the working quantities
@@ -44,10 +44,10 @@ CovPotential::CovPotential(const CovAniso& cova)
   _trttr.resize(9);
 }
 
-CovPotential::CovPotential(const CovPotential& r)
+CovGradientAnalytic::CovGradientAnalytic(const CovGradientAnalytic& r)
   : CovGradientGeneric(r)
   , _launchCalculations(r._launchCalculations)
-  , _flagGradient(r._flagGradient)
+  , _flagCalculateGG(r._flagCalculateGG)
   , _covpp(r._covpp)
   , _covGp(r._covGp)
   , _covGG(r._covGG)
@@ -59,17 +59,17 @@ CovPotential::CovPotential(const CovPotential& r)
 {
 }
 
-CovPotential::~CovPotential()
+CovGradientAnalytic::~CovGradientAnalytic()
 {
 }
 
-bool CovPotential::_isValidForPotential() const
+bool CovGradientAnalytic::_isValid() const
 {
   auto ndim = getCovRef().getNDim();
   auto nvar = getCovRef().getNVar();
   if (ndim > 3)
   {
-    messerr("This class is limited to 1-D or 2-D");
+    messerr("The Gradient class (Analytic) is limited to 3-D");
     return false;
   }
   if (nvar != 1)
@@ -80,7 +80,7 @@ bool CovPotential::_isValidForPotential() const
   return true;
 }
 
-void CovPotential::_optimizationSetTarget(SpacePoint& pt) const
+void CovGradientAnalytic::_optimizationSetTarget(SpacePoint& pt) const
 {
   DECLARE_UNUSED(pt)
 }
@@ -100,33 +100,35 @@ void CovPotential::_optimizationSetTarget(SpacePoint& pt) const
  * @remark Instead the following convention applies for 'ivar' and 'jvar':
  * @remark - when =0, it refers to the variable itself
  * @remark - when >10, it applies to the gradient component (10 alongX, 11 along Y, ...)
+ * @remark Note that if the space dimension is exceeded (it happens voluntarily in the code),
+ * nothing particular must be done: the returned value will not be considered.
  */
-double CovPotential::_eval(const SpacePoint& p1,
-                           const SpacePoint& p2,
-                           Id ivar,
-                           Id jvar,
-                           const CovCalcMode* mode) const
+double CovGradientAnalytic::_eval(const SpacePoint& p1,
+                                  const SpacePoint& p2,
+                                  Id ivar,
+                                  Id jvar,
+                                  const CovCalcMode* mode) const
 {
   if (_launchCalculations)
     _evalZAndGradients(p1, p2);
   _launchCalculations = false;
+
+  Id idim = ivar - 1;
+  Id jdim = jvar - 1;
 
   if (ivar == 0)
   {
     if (jvar == 0)
       return getCovRef().evalCov(p1, p2, ivar, jvar, mode);
 
-    Id jdim = jvar - 1;
     return _covGp[jdim];
   }
-  Id idim = ivar - 1;
   if (jvar == 0)
     return _covGp[idim];
-  Id jdim = jvar - 1;
   return _covGG[3 * idim + jdim];
 }
 
-String CovPotential::toString(const AStringFormat* strfmt) const
+String CovGradientAnalytic::toString(const AStringFormat* strfmt) const
 {
   DECLARE_UNUSED(strfmt);
   std::stringstream sstr;
@@ -135,9 +137,9 @@ String CovPotential::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-const CovAniso* CovPotential::_getCovRefAniso() const
+const CovAniso* CovGradientAnalytic::_getCovRefAniso() const
 {
-  const CovAniso* cova = dynamic_cast<const CovAniso*>(&getCovRef());
+  const auto* cova = dynamic_cast<const CovAniso*>(&getCovRef());
   return cova;
 }
 
@@ -145,7 +147,7 @@ const CovAniso* CovPotential::_getCovRefAniso() const
  * Calculate the square of the transformation matrix which transforms
  * a vector into its isotropic equivalent
  */
-void CovPotential::_calculateTrTtr() const
+void CovGradientAnalytic::_calculateTrTtr() const
 {
   auto ndim = getNDim();
   _uF.fill(0.);
@@ -199,8 +201,8 @@ void CovPotential::_calculateTrTtr() const
  * @param p2     Second point of the increment
  */
 
-void CovPotential::_evalZAndGradients(const SpacePoint& p1,
-                                      const SpacePoint& p2) const
+void CovGradientAnalytic::_evalZAndGradients(const SpacePoint& p1,
+                                             const SpacePoint& p2) const
 {
   _covGp.fill(0);
   _covGG.fill(0);
@@ -209,9 +211,9 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
   double hh = getSpace()->getDistance(p1, p2, _getCovRefAniso()->getAniso());
 
   //  Calculate the covariance
-  const CovAniso* covref = _getCovRefAniso();
+  const CovAniso* covref  = _getCovRefAniso();
   const ACovFunc* covfunc = covref->getCorFunc();
-  double covar = covref->getSill(0, 0) * covfunc->evalCorFunc(hh);
+  double covar            = covref->getSill(0, 0) * covfunc->evalCorFunc(hh);
   _covpp += covar;
   if (covfunc->getType() == ECov::NUGGET) return;
 
@@ -226,7 +228,7 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
   //  Case where distance is null
   if (hh < EPSGRAD)
   {
-    if (_flagGradient)
+    if (_flagCalculateGG)
     {
       for (Id i = 0; i < 9; i++)
         _covGG[i] -= dcovsr * _trttr[i];
@@ -241,7 +243,7 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
     }
 
     //  Calculate the covariance between gradient and gradient
-    if (_flagGradient)
+    if (_flagCalculateGG)
     {
       double d2cov = covref->getSill(0, 0) * covfunc->evalCovDerivative(2, hh);
       double a     = (dcovsr - d2cov) / (hh * hh);

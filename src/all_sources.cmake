@@ -79,11 +79,8 @@ set(SRC
   Covariances/CovWendland1.cpp
   Covariances/CovWendland2.cpp
   Covariances/CovGradientGeneric.cpp
-  Covariances/CovGradientFunctional.cpp
-  Covariances/CovGradientNumerical.cpp
-  Covariances/CovPotential.cpp
+  Covariances/CovGradientAnalytic.cpp
   Covariances/CovMatern.cpp
-  Covariances/CovLMGradient.cpp
   Covariances/CovPower.cpp
   Covariances/CovStorkey.cpp
   Covariances/CovGC5.cpp
@@ -98,7 +95,6 @@ set(SRC
   Covariances/CovLMCTapering.cpp
   Covariances/CovLMCConvolution.cpp
   Covariances/CovLMCAnamorphosis.cpp
-  Covariances/ACovGradient.cpp
   Covariances/CorGneiting.cpp
   Covariances/CorMatern.cpp
   Covariances/CovGCspline2.cpp

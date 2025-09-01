@@ -42,11 +42,10 @@ using namespace gstlrn;
 ** IN_ARGS:  db   : Input Db structure
 **
 *****************************************************************************/
-static Model* st_modify(Model* model,
-                        Db* db)
+static ModelGeneric* st_modify(Model* model, Db* db)
 {
-  Model* new_model   = nullptr;
-  double ball_radius = 0.01;
+  ModelGeneric* new_model = nullptr;
+  double ball_radius      = 0.01;
 
   /* Modify the model */
 
@@ -72,7 +71,9 @@ int main(int argc, char* argv[])
   Db* dbin;
   DbGrid* dbout;
   Vario* vario;
-  Model *model, *new_model;
+  Model* model;
+  Model* new_modelAniso;
+  ModelGeneric* new_model;
   ANeigh* neigh;
   Constraints constraints;
   DbStringFormat dbfmt;
@@ -83,12 +84,13 @@ int main(int argc, char* argv[])
 
   /* Initializations */
 
-  dbin      = nullptr;
-  dbout     = nullptr;
-  vario     = nullptr;
-  model     = nullptr;
-  neigh     = nullptr;
-  new_model = nullptr;
+  dbin           = nullptr;
+  dbout          = nullptr;
+  vario          = nullptr;
+  model          = nullptr;
+  neigh          = nullptr;
+  new_model      = nullptr;
+  new_modelAniso = nullptr;
 
   /* Standard output redirection to file */
 
@@ -158,6 +160,7 @@ int main(int argc, char* argv[])
   }
   new_model = st_modify(model, dbin);
   if (new_model == nullptr) goto label_end;
+  new_modelAniso = dynamic_cast<Model*>(new_model);
 
   /* Define the neighborhood */
 
@@ -180,7 +183,8 @@ int main(int argc, char* argv[])
   {
     if (verbose) message("Performing Gibbs Sampler\n");
     dbin->clearLocators(ELoc::Z);
-    if (gibbs_sampler(dbin, new_model,
+    if (new_modelAniso == nullptr) messageAbort("Wrong new Model type");
+    if (gibbs_sampler(dbin, new_modelAniso,
                       1, seed, nboot, niter, false, false, true, false, false, 0,
                       5., true, true, true))
       messageAbort("gibbs_sampler");
@@ -198,7 +202,8 @@ int main(int argc, char* argv[])
       /* Simulation case */
 
       if (verbose) message("Performing Simulations");
-      if (simtub(dbin, dbout, new_model, neigh, nbsimu, seed, nbtuba, 0))
+      if (new_modelAniso == nullptr) messageAbort("Wrong new Model type");
+      if (simtub(dbin, dbout, new_modelAniso, neigh, nbsimu, seed, nbtuba, 0))
         messageAbort("Simulations");
       dbfmt.setFlags(true, false, true, true, true);
       dbout->display(&dbfmt);
