@@ -22,19 +22,19 @@ namespace gstlrn
 {
 CovGradientGeneric::CovGradientGeneric(const ACov& cova, double ballradius)
   : ACov()
-  , _nVar(0)
   , _ballRadius(ballradius)
   , _covRef(cova)
 {
   setContext(cova.getContext());
   if (!_isValidForGradient()) return;
-  _nVar = _ctxt.getNVar() + static_cast<Id>(_ctxt.getNDim()); // Consider the variable and its gradient(s)
-  _ctxt.setNVar(_nVar);
+
+  // Consider the variable and its gradient(s)
+  Id nVar = _ctxt.getNVar() + static_cast<Id>(_ctxt.getNDim());
+  _ctxt.setNVar(nVar);
 }
 
 CovGradientGeneric::CovGradientGeneric(const CovGradientGeneric& r)
   : ACov(r)
-  , _nVar(r._nVar)
   , _ballRadius(r._ballRadius)
   , _covRef(r._covRef)
 {
@@ -92,12 +92,12 @@ double CovGradientGeneric::_eval(const SpacePoint& p1,
   Id idim = ivar - 1;
   Id jdim = jvar - 1;
   if (ivar == 0)
-    return -_covRef.evalZGNumeric(p1, p2, 0, 0, jdim, _ballRadius, mode);
+    return -_evalZGradientNumeric(p1, p2, jdim, _ballRadius, mode);
   if (jvar == 0)
-    return +_covRef.evalZGNumeric(p1, p2, 0, 0, idim, _ballRadius, mode);
+    return +_evalZGradientNumeric(p1, p2, idim, _ballRadius, mode);
   if (jdim == idim)
-    return _covRef.evalGGNumeric(p1, p2, 0, 0, idim, jdim, _ballRadius, mode);
-  return -_covRef.evalGGNumeric(p1, p2, 0, 0, idim, jdim, _ballRadius, mode);
+    return _evalGradientGradientNumeric(p1, p2, idim, jdim, _ballRadius, mode);
+  return -_evalGradientGradientNumeric(p1, p2, idim, jdim, _ballRadius, mode);
 }
 
 String CovGradientGeneric::toString(const AStringFormat* strfmt) const
@@ -108,6 +108,86 @@ String CovGradientGeneric::toString(const AStringFormat* strfmt) const
   sstr << "Covariance for Variable and its Gradients" << std::endl;
   sstr << "Derivation distance" << _ballRadius << std::endl;
   return sstr.str();
+}
+
+double CovGradientGeneric::_evalZGradientNumeric(const SpacePoint& p1,
+                                                 const SpacePoint& p2,
+                                                 Id idim,
+                                                 double radius,
+                                                 const CovCalcMode* mode) const
+{
+  SpacePoint paux;
+  auto ndim = getContext().getNDim();
+  VectorDouble vec(ndim, 0);
+
+  vec[idim] = +radius / 2.;
+  paux      = p2;
+  paux.move(vec);
+  double covp0 = _covRef.evalCov(p1, paux, 0, 0, mode);
+  vec[idim]    = -radius / 2.;
+  paux         = p2;
+  paux.move(vec);
+  double covm0 = _covRef.evalCov(p1, paux, 0, 0, mode);
+
+  double cov = (covm0 - covp0) / radius;
+  return (cov);
+}
+
+double CovGradientGeneric::_evalGradientGradientNumeric(const SpacePoint& p1,
+                                                        const SpacePoint& p2,
+                                                        Id idim,
+                                                        Id jdim,
+                                                        double radius,
+                                                        const CovCalcMode* mode) const
+{
+  SpacePoint paux;
+  auto ndim = getContext().getNDim();
+  VectorDouble vec(ndim, 0);
+
+  double cov;
+  if (idim != jdim)
+  {
+    vec[idim] = -radius / 2.;
+    vec[jdim] = +radius / 2.;
+    paux      = p2;
+    paux.move(vec);
+    double covmp = _covRef.evalCov(p1, paux, 0, 0, mode);
+    vec[idim]    = -radius / 2.;
+    vec[jdim]    = -radius / 2.;
+    paux         = p2;
+    paux.move(vec);
+    double covmm = _covRef.evalCov(p1, paux, 0, 0, mode);
+    vec[idim]    = +radius / 2.;
+    vec[jdim]    = -radius / 2.;
+    paux         = p2;
+    paux.move(vec);
+    double covpm = _covRef.evalCov(p1, paux, 0, 0, mode);
+    vec[idim]    = +radius / 2.;
+    vec[jdim]    = +radius / 2.;
+    paux         = p2;
+    paux.move(vec);
+    double covpp = _covRef.evalCov(p1, paux, 0, 0, mode);
+
+    cov = (covmm + covpp - covmp - covpm) / (radius * radius);
+  }
+  else
+  {
+    vec[idim] = +radius;
+    paux      = p2;
+    paux.move(vec);
+    double cov2m = _covRef.evalCov(p1, paux, 0, 0, mode);
+    vec[idim]    = -radius;
+    paux         = p2;
+    paux.move(vec);
+    double cov2p = _covRef.evalCov(p1, paux, 0, 0, mode);
+    vec[idim]    = 0;
+    paux         = p2;
+    paux.move(vec);
+    double cov00 = _covRef.evalCov(p1, paux, 0, 0, mode);
+
+    cov = -2. * (cov2p - 2. * cov00 + cov2m) / (radius * radius);
+  }
+  return (cov);
 }
 
 } // namespace gstlrn

@@ -28,9 +28,9 @@
 
 using namespace gstlrn;
 
-static Model* st_duplicate_for_potential(const Model* model)
+static ModelGeneric* st_duplicate_for_potential(const Model* model)
 {
-  auto* new_model = new Model(*model->getContext());
+  auto* new_model = new ModelGeneric(*model->getContext());
   auto covp       = CovPotential(*model->getCovAniso(0));
   new_model->setCov(&covp);
 
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     // Create the model
     double range     = scale2range(ECov::GAUSSIAN, 20.);
     Model* model     = Model::createFromParam(ECov::GAUSSIAN, range);
-    Model* new_model = st_duplicate_for_potential(model);
+    ModelGeneric* new_model = st_duplicate_for_potential(model);
 
     if (debug) OptDbg::setReference(1);
     (void)krigingPotential(dbiso, dbgrd, nullptr, grid, new_model,
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 
     // Create the model
     Model* model     = Model::createFromParam(ECov::CUBIC, 6.);
-    Model* new_model = st_duplicate_for_potential(model);
+    ModelGeneric* new_model = st_duplicate_for_potential(model);
     (void)krigingPotential(dbiso, dbgrd, dbtgt, grid, new_model,
                            0., 0., true, false, false, false, 0, true);
 

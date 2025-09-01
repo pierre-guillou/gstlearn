@@ -10,7 +10,7 @@
 /******************************************************************************/
 #pragma once
 
-#include "Covariances/ACov.hpp"
+#include "Covariances/CovGradientGeneric.hpp"
 #include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
@@ -28,7 +28,7 @@ class CovAniso;
  * It uses Functional Derivation and therefore is suitable for a limited
  * set of differentiable covariances.
  */
-class GSTLEARN_EXPORT CovPotential: public ACov
+class GSTLEARN_EXPORT CovPotential: public CovGradientGeneric
 {
 public:
   CovPotential(const CovAniso& cova);
@@ -48,9 +48,6 @@ public:
     return true;
   }
 
-  /// ACov Interface
-  Id getNVar() const override { return _nVar; }
-
   void launchCalculations(bool status) { _launchCalculations = status; }
   void setFlagGradient(bool status) { _flagGradient = status; }
 
@@ -66,11 +63,9 @@ private:
   bool _isValidForPotential() const;
   void _calculateTrTtr() const;
   void _evalZAndGradients(const SpacePoint& p1, const SpacePoint& p2) const;
+  const CovAniso* _getCovRefAniso() const;
 
 private:
-  Id _nVar;
-  const CovAniso& _covRef;
-
   mutable bool _launchCalculations;
   mutable bool _flagGradient;
   // covpp  Covariance value

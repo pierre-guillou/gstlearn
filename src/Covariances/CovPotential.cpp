@@ -22,9 +22,7 @@
 namespace gstlrn
 {
 CovPotential::CovPotential(const CovAniso& cova)
-  : ACov()
-  , _nVar(0)
-  , _covRef(cova)
+  : CovGradientGeneric(cova)
   , _launchCalculations(true)
   , _flagGradient(false)
   , _covpp(0.)
@@ -33,8 +31,7 @@ CovPotential::CovPotential(const CovAniso& cova)
 {
   setContext(cova.getContext());
   if (!_isValidForPotential()) return;
-  _nVar = _ctxt.getNVar();
-  _ctxt.setNVar(_nVar);
+  _ctxt.setNVar(1);
 
   // Initialize the working quantities
   _covpp = 0.;
@@ -48,9 +45,7 @@ CovPotential::CovPotential(const CovAniso& cova)
 }
 
 CovPotential::CovPotential(const CovPotential& r)
-  : ACov(r)
-  , _nVar(r._nVar)
-  , _covRef(r._covRef)
+  : CovGradientGeneric(r)
   , _launchCalculations(r._launchCalculations)
   , _flagGradient(r._flagGradient)
   , _covpp(r._covpp)
@@ -70,8 +65,8 @@ CovPotential::~CovPotential()
 
 bool CovPotential::_isValidForPotential() const
 {
-  auto ndim = _covRef.getNDim();
-  auto nvar = _covRef.getNVar();
+  auto ndim = getCovRef().getNDim();
+  auto nvar = getCovRef().getNVar();
   if (ndim > 3)
   {
     messerr("This class is limited to 1-D or 2-D");
@@ -119,7 +114,7 @@ double CovPotential::_eval(const SpacePoint& p1,
   if (ivar == 0)
   {
     if (jvar == 0)
-      return _covRef.evalCov(p1, p2, ivar, jvar, mode);
+      return getCovRef().evalCov(p1, p2, ivar, jvar, mode);
 
     Id jdim = jvar - 1;
     return _covGp[jdim];
@@ -140,6 +135,12 @@ String CovPotential::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
+const CovAniso* CovPotential::_getCovRefAniso() const
+{
+  const CovAniso* cova = dynamic_cast<const CovAniso*>(&getCovRef());
+  return cova;
+}
+
 /**
  * Calculate the square of the transformation matrix which transforms
  * a vector into its isotropic equivalent
@@ -153,8 +154,8 @@ void CovPotential::_calculateTrTtr() const
   _trttr.fill(0.);
 
   // Matrix Tr = diag(coeffs) . R
-  const MatrixSquare& mat    = _covRef.getAniso().getRotation().getMatrixDirect();
-  const VectorDouble& scales = _covRef.getCorAniso()->getScales();
+  const MatrixSquare& mat    = _getCovRefAniso()->getAniso().getRotation().getMatrixDirect();
+  const VectorDouble& scales = _getCovRefAniso()->getCorAniso()->getScales();
 
   for (Id i = 0; i < 3; i++)
     for (Id j = 0; j < 3; j++)
@@ -205,12 +206,14 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
   _covGG.fill(0);
 
   // Calculate the isotropic distance
-  double hh = getSpace()->getDistance(p1, p2, _covRef.getAniso());
+  double hh = getSpace()->getDistance(p1, p2, _getCovRefAniso()->getAniso());
 
   //  Calculate the covariance
-  double covar = _covRef.getSill(0, 0) * _covRef.getCorFunc()->evalCorFunc(hh);
+  const CovAniso* covref = _getCovRefAniso();
+  const ACovFunc* covfunc = covref->getCorFunc();
+  double covar = covref->getSill(0, 0) * covfunc->evalCorFunc(hh);
   _covpp += covar;
-  if (_covRef.getCorFunc()->getType() == ECov::NUGGET) return;
+  if (covfunc->getType() == ECov::NUGGET) return;
 
   // Calculate distance and plunge into a 3-D vector
   VectorDouble d1 = VH::subtract(p1.getCoords(), p2.getCoords());
@@ -218,7 +221,7 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
     _dF[i] = (i < static_cast<Id>(d1.size())) ? d1[i] : 0.;
 
   _calculateTrTtr();
-  double dcovsr = _covRef.getSill(0, 0) * _covRef.getCorFunc()->evalCovDerivative(1, hh);
+  double dcovsr = covref->getSill(0, 0) * covfunc->evalCovDerivative(1, hh);
 
   //  Case where distance is null
   if (hh < EPSGRAD)
@@ -240,10 +243,10 @@ void CovPotential::_evalZAndGradients(const SpacePoint& p1,
     //  Calculate the covariance between gradient and gradient
     if (_flagGradient)
     {
-      double d2cov = _covRef.getSill(0, 0) * _covRef.getCorFunc()->evalCovDerivative(2, hh);
+      double d2cov = covref->getSill(0, 0) * covfunc->evalCovDerivative(2, hh);
       double a     = (dcovsr - d2cov) / (hh * hh);
 
-      if (_covRef.getAniso().isIsotropic())
+      if (covref->isIsotropic())
       {
 
         //  Isotropic case

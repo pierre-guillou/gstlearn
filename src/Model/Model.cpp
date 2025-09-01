@@ -8,38 +8,32 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Model/Model.hpp"
+#include "Anamorphosis/AnamHermite.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/SerializeHDF5.hpp"
-#include "Model/ModelCovList.hpp"
-#include "Space/ASpace.hpp"
-#include "Space/ASpaceObject.hpp"
-#include "geoslib_define.h"
-#include "geoslib_f.h"
-
-#include "Enum/ECov.hpp"
-#include "Enum/EModelProperty.hpp"
-
-#include "Anamorphosis/AnamHermite.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Covariances/CovAnisoList.hpp"
-#include "Covariances/CovGradientFunctional.hpp"
-#include "Covariances/CovGradientNumerical.hpp"
 #include "Covariances/CovLMCAnamorphosis.hpp"
 #include "Covariances/CovLMCConvolution.hpp"
 #include "Covariances/CovLMCTapering.hpp"
 #include "Covariances/CovLMGradient.hpp"
+#include "Db/Db.hpp"
 #include "Drifts/ADrift.hpp"
 #include "Drifts/DriftFactory.hpp"
 #include "Drifts/DriftList.hpp"
+#include "Enum/ECov.hpp"
+#include "Enum/EModelProperty.hpp"
 #include "Model/CovInternal.hpp"
-#include "Model/Model.hpp"
+#include "Model/ModelCovList.hpp"
 #include "Model/Option_AutoFit.hpp"
+#include "Space/ASpace.hpp"
+#include "Space/ASpaceObject.hpp"
 #include "Space/SpaceRN.hpp"
 #include "Variogram/Vario.hpp"
-
-#include "Db/Db.hpp"
-
+#include "geoslib_define.h"
+#include "geoslib_f.h"
 #include <cmath>
 
 namespace gstlrn
@@ -1007,28 +1001,6 @@ bool Model::isFlagGradient() const
 {
   if (_cova == nullptr) return false;
   return getCovMode() == EModelProperty::GRAD;
-}
-
-bool Model::isFlagGradientNumerical() const
-{
-  if (!isFlagGradient()) return false;
-
-  // Check is performed on the first covariance
-  const CovAnisoList* covalist = castInCovAnisoListConst(0);
-  if (covalist == nullptr) return false;
-  const auto* cova = dynamic_cast<const CovGradientNumerical*>(covalist->getCovAniso(0));
-  return (cova != nullptr);
-}
-
-bool Model::isFlagGradientFunctional() const
-{
-  if (!isFlagGradient()) return false;
-
-  // Check is performed on the first covariance
-  const CovAnisoList* covalist = castInCovAnisoListConst(0);
-  if (covalist == nullptr) return false;
-  const auto* cova = dynamic_cast<const CovGradientFunctional*>(covalist->getCovAniso(0));
-  return (cova != nullptr);
 }
 
 VectorECov Model::initCovList(const VectorInt& covranks)

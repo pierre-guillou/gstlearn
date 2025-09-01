@@ -199,8 +199,6 @@ public:
   Id setAnam(const AAnam* anam, const VectorInt& strcnt = VectorInt());
   Id unsetAnam();
   bool isFlagGradient() const;
-  bool isFlagGradientNumerical() const;
-  bool isFlagGradientFunctional() const;
   void switchToGradient();
 
   ////////////////////////////////////////////////

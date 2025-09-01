@@ -39,7 +39,7 @@ static Id TAB_DRF[9];
 Potential::Potential(Db* dbiso,
                      Db* dbgrd,
                      Db* dbtgt,
-                     Model* model,
+                     ModelGeneric* model,
                      double nugget_grd,
                      double nugget_tgt)
   : _dbiso(dbiso)
@@ -94,18 +94,6 @@ Potential::~Potential()
   delete _modelExt;
 }
 
-bool Potential::_isModelValid()
-{
-  const auto* covpot = dynamic_cast<const CovPotential*>(_model->getCov());
-  if (covpot == nullptr)
-  {
-    messerr("The Model is invalid for Potential calculations");
-    messerr("It may only contain CovPotential(s)");
-    return false;
-  }
-  return true;
-}
-
 bool Potential::_isEnvironmentValid(DbGrid* dbout, Id nring)
 {
   if (_ndim > 3)
@@ -138,10 +126,17 @@ bool Potential::_isEnvironmentValid(DbGrid* dbout, Id nring)
     messerr("The Db files 'dbin' and 'dbout' should have the same dimension");
     return false;
   }
-  if (!_isModelValid()) return false;
+
   if (!_dbiso->hasLocator(ELoc::LAYER))
   {
     messerr("The input Db must contain a LAYER locator");
+    return false;
+  }
+  const auto* covpot = dynamic_cast<const CovPotential*>(_model->getCov());
+  if (covpot == nullptr)
+  {
+    messerr("The Model is invalid for Potential calculations");
+    messerr("It may only contain CovPotential(s)");
     return false;
   }
   if (_model->getNVar() != 1)
@@ -497,7 +492,7 @@ void Potential::_saveResultData(Db* db,
  ** \param[out] covGG    Covariance between gradient and gradient
  **
  *****************************************************************************/
-void Potential::_calculateCovs(Model* model,
+void Potential::_calculateCovs(ModelGeneric* model,
                                bool flag_grad,
                                double dx,
                                double dy,
@@ -1324,7 +1319,7 @@ Id Potential::_extdriftCreateDb(DbGrid* dbout)
 Id Potential::_extdriftCreateModel()
 {
   CovContext ctxt(1, _ndim, 1.);
-  _modelExt = new Model(ctxt);
+  _modelExt = new ModelGeneric(ctxt);
 
   // Covariance part
   const CovAniso* cova = CovAniso::createFromParam(ECov::CUBIC, _rangeExt, 1.);
@@ -2739,7 +2734,7 @@ Id krigingPotential(Db* dbiso,
                     Db* dbgrd,
                     Db* dbtgt,
                     DbGrid* dbout,
-                    Model* model,
+                    ModelGeneric* model,
                     double nugget_grd,
                     double nugget_tgt,
                     bool flag_pot,
@@ -2784,7 +2779,7 @@ Id simulatePotential(Db* dbiso,
                      Db* dbgrd,
                      Db* dbtgt,
                      DbGrid* dbout,
-                     Model* model,
+                     ModelGeneric* model,
                      double nugget_grd,
                      double nugget_tgt,
                      double dist_tempere,
@@ -2820,7 +2815,7 @@ Id simulatePotential(Db* dbiso,
 Id xvalidPotential(Db* dbiso,
                    Db* dbgrd,
                    Db* dbtgt,
-                   Model* model,
+                   ModelGeneric* model,
                    double nugget_grd,
                    double nugget_tgt,
                    bool flag_dist_conv,

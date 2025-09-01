@@ -48,8 +48,8 @@ public:
     return true;
   }
 
-  /// ACov Interface
-  Id getNVar() const override { return _nVar; }
+  double getBallRadius() const { return _ballRadius; }
+  const ACov& getCovRef() const { return _covRef; }
 
 protected:
   double _eval(const SpacePoint& p1,
@@ -61,11 +61,21 @@ protected:
 
 private:
   bool _isValidForGradient() const;
+  double _evalZGradientNumeric(const SpacePoint& p1,
+                               const SpacePoint& p2,
+                               Id idim,
+                               double radius,
+                               const CovCalcMode* mode) const;
+  double _evalGradientGradientNumeric(const SpacePoint& p1,
+                                      const SpacePoint& p2,
+                                      Id idim,
+                                      Id jdim,
+                                      double radius,
+                                      const CovCalcMode* mode) const;
 
 private:
-  Id _nVar;
   double _ballRadius;
-  const ACov& _covRef;
+  const ACov& _covRef; // Monovariate Reference structure
 };
 
 } // namespace gstlrn
