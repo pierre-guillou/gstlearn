@@ -11,16 +11,14 @@
 #include "API/SPDE.hpp"
 #include "Basic/File.hpp"
 #include "Basic/OptCst.hpp"
-#include "Basic/OptCustom.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Covariances/CovGradientGeneric.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
-#include "Drifts/DriftFactory.hpp"
 #include "Enum/ECst.hpp"
 #include "Enum/ESpaceType.hpp"
 #include "Estimation/CalcKriging.hpp"
+#include "Estimation/CalcKrigingGradient.hpp"
 #include "LinearOp/PrecisionOpMatrix.hpp"
 #include "Mesh/MeshETurbo.hpp"
 #include "Model/Model.hpp"
@@ -37,7 +35,6 @@ using namespace gstlrn;
 **
 *****************************************************************************/
 int main(int argc, char* argv[])
-
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
@@ -49,7 +46,7 @@ int main(int argc, char* argv[])
   Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   ASerializable::setPrefixName("test_Gradient-");
-  int mode = 2;
+  bool flagForceNumeric = true;
 
   // Setup constants
   OptDbg::reset();
@@ -82,40 +79,7 @@ int main(int argc, char* argv[])
   OptDbg::setReference(3);
   double ballradius = 0.01;
 
-  // Using the old-style Depth and Gradient fake LMC Model
-  if (mode <= 0 || mode == 1)
-  {
-    // Update the Model for Gradients
-    (void)db_gradient_update(data);
-    ModelGeneric* new_model = model_duplicate_for_gradient(model, ballradius);
-
-    // Perform Kriging
-    (void)kriging(data, grid, new_model, neigh, 1, 1, 0);
-
-    delete new_model;
-  }
-
-  // Use the new CovGradientGeneric
-  if (mode <= 0 || mode == 2)
-  {
-    (void)db_gradient_update(data); // Transform ELoc::G into ELoc::Z
-    CovContext ctxt(data->getNLoc(ELoc::Z), static_cast<Id>(model->getNDim()));
-    auto* new_model = new ModelGeneric(ctxt);
-    auto covg       = CovGradientGeneric(*model->getCovAniso(0), ballradius);
-    new_model->setCov(&covg);
-
-    DriftList* drifts = DriftFactory::createDriftListForGradients(model->getDriftList(), ctxt);
-    new_model->setDriftList(drifts);
-
-    new_model->setContext(ctxt);
-
-    // Perform Kriging
-    OptCustom::define("NotOptimSimpleCase", 1.);
-    (void)kriging(data, grid, new_model, neigh, 1, 1, 0);
-
-    delete drifts;
-    delete new_model;
-  }
+  (void)krigingGradient(data, grid, model, neigh, true, true, ballradius, flagForceNumeric);
 
   // Free memory
   delete data;

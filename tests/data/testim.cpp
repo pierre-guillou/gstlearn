@@ -18,7 +18,7 @@
 #include "Db/Db.hpp"
 #include "Db/DbStringFormat.hpp"
 #include "Estimation/CalcKriging.hpp"
-#include "Model/Model.hpp"
+#include "Estimation/CalcKrigingGradient.hpp"
 #include "Neigh/ANeigh.hpp"
 #include "Neigh/NeighBench.hpp"
 #include "Neigh/NeighImage.hpp"
@@ -29,37 +29,6 @@
 #include "Variogram/Vario.hpp"
 
 using namespace gstlrn;
-
-/****************************************************************************
-**
-** FUNCTION: st_modify
-**
-** PURPOSE:  Duplicate and transform the model
-**
-** RETURNS:  The duplicated model
-**
-** IN_ARGS:  model: Input model
-** IN_ARGS:  db   : Input Db structure
-**
-*****************************************************************************/
-static ModelGeneric* st_modify(Model* model, Db* db)
-{
-  ModelGeneric* new_model = nullptr;
-  double ball_radius      = 0.01;
-
-  /* Modify the model */
-
-  if (db->getNLoc(ELoc::G) > 0)
-  {
-    if (db_gradient_update(db)) return (new_model);
-    new_model = model_duplicate_for_gradient(model, ball_radius);
-  }
-  else
-  {
-    new_model = model->clone();
-  }
-  return (new_model);
-}
 
 /*********************/
 /* Program principal */
@@ -72,8 +41,6 @@ int main(int argc, char* argv[])
   DbGrid* dbout;
   Vario* vario;
   Model* model;
-  Model* new_modelAniso;
-  ModelGeneric* new_model;
   ANeigh* neigh;
   Constraints constraints;
   DbStringFormat dbfmt;
@@ -84,13 +51,11 @@ int main(int argc, char* argv[])
 
   /* Initializations */
 
-  dbin           = nullptr;
-  dbout          = nullptr;
-  vario          = nullptr;
-  model          = nullptr;
-  neigh          = nullptr;
-  new_model      = nullptr;
-  new_modelAniso = nullptr;
+  dbin  = nullptr;
+  dbout = nullptr;
+  vario = nullptr;
+  model = nullptr;
+  neigh = nullptr;
 
   /* Standard output redirection to file */
 
@@ -158,9 +123,6 @@ int main(int argc, char* argv[])
     if (!model->dumpToNF(filename, EFormatNF::DEFAULT, verbose))
       messageAbort("ascii_model_write");
   }
-  new_model = st_modify(model, dbin);
-  if (new_model == nullptr) goto label_end;
-  new_modelAniso = dynamic_cast<Model*>(new_model);
 
   /* Define the neighborhood */
 
@@ -183,8 +145,7 @@ int main(int argc, char* argv[])
   {
     if (verbose) message("Performing Gibbs Sampler\n");
     dbin->clearLocators(ELoc::Z);
-    if (new_modelAniso == nullptr) messageAbort("Wrong new Model type");
-    if (gibbs_sampler(dbin, new_modelAniso,
+    if (gibbs_sampler(dbin, model,
                       1, seed, nboot, niter, false, false, true, false, false, 0,
                       5., true, true, true))
       messageAbort("gibbs_sampler");
@@ -194,7 +155,7 @@ int main(int argc, char* argv[])
 
   /* Perform the estimation */
 
-  if (dbin != nullptr && new_model != nullptr && neigh != nullptr)
+  if (dbin != nullptr && model != nullptr && neigh != nullptr)
   {
     if (nbsimu > 0)
     {
@@ -202,8 +163,7 @@ int main(int argc, char* argv[])
       /* Simulation case */
 
       if (verbose) message("Performing Simulations");
-      if (new_modelAniso == nullptr) messageAbort("Wrong new Model type");
-      if (simtub(dbin, dbout, new_modelAniso, neigh, nbsimu, seed, nbtuba, 0))
+      if (simtub(dbin, dbout, model, neigh, nbsimu, seed, nbtuba, 0))
         messageAbort("Simulations");
       dbfmt.setFlags(true, false, true, true, true);
       dbout->display(&dbfmt);
@@ -216,7 +176,7 @@ int main(int argc, char* argv[])
 
         /* Cross-validation */
         if (verbose) message("Performing Cross-validation\n");
-        if (xvalid(dbin, new_model, neigh, false, 1, 0, 0)) messageAbort("xvalid");
+        if (xvalid(dbin, model, neigh, false, 1, 0, 0)) messageAbort("xvalid");
         dbfmt.setFlags(true, false, true, true, true);
         dbin->display(&dbfmt);
       }
@@ -225,8 +185,18 @@ int main(int argc, char* argv[])
 
         /* Estimation case */
         if (verbose) message("Performing Kriging\n");
-        if (kriging(dbin, dbout, new_model, neigh,
-                    1, 1, 0)) messageAbort("kriging");
+
+        if (dbin->getNLoc(ELoc::G) > 0)
+        {
+          double ballradius = 0.01;
+          if (krigingGradient(dbin, dbout, model, neigh,
+                              true, true, ballradius, true)) messageAbort("kriging");
+        }
+        else
+        {
+          if (kriging(dbin, dbout, model, neigh,
+                      true, true, false)) messageAbort("kriging");
+        }
         dbfmt.setFlags(true, false, true, true, true);
         dbout->display(&dbfmt);
         dbout->dumpToNF("Krige.out", EFormatNF::DEFAULT, verbose);
@@ -240,7 +210,6 @@ label_end:
   delete dbin;
   delete dbout;
   delete model;
-  delete new_model;
   delete neigh;
   delete vario;
   return (0);

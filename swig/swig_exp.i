@@ -348,6 +348,7 @@
 %include Estimation/KrigingAlgebra.hpp
 %include Estimation/CalcKriging.hpp
 %include Estimation/CalcKrigingFactors.hpp
+%include Estimation/CalcKrigingGradient.hpp
 %include Estimation/CalcSimpleInterpolation.hpp
 %include Estimation/CalcImage.hpp
 %include Estimation/CalcGlobal.hpp

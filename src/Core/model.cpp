@@ -22,7 +22,6 @@
 #include "Covariances/CovLMCTapering.hpp"
 #include "Db/Db.hpp"
 #include "Drifts/ADrift.hpp"
-#include "Drifts/DriftFactory.hpp"
 #include "Drifts/DriftList.hpp"
 #include "Model/CovInternal.hpp"
 #include "Space/SpaceRN.hpp"
@@ -48,61 +47,6 @@ namespace gstlrn
 Id NDIM_LOCAL = 0;
 VectorDouble X1_LOCAL;
 VectorDouble X2_LOCAL;
-
-/****************************************************************************/
-/*!
- **  Duplicates a Model from another Model for Gradients
- **
- ** \return  The modified Model structure
- **
- ** \param[in]  model       Input Model
- ** \param[in]  ball_radius Radius for Gradient calculation
- **
- *****************************************************************************/
-ModelGeneric* model_duplicate_for_gradient(const Model* model, double ball_radius)
-
-{
-  Id nvar  = model->getNVar();
-  Id ndim  = static_cast<Id>(model->getNDim());
-  Id ncova = model->getNCov();
-
-  // Create the new model (linked drift functions)
-
-  if (nvar != 1 || ndim != 2)
-  {
-    messerr("This procedure is limited to a single variable in 2-D");
-    return nullptr;
-  }
-  if (ncova != 1)
-  {
-    messerr("The Gradient Model requires a single Covariance to be defined");
-    return nullptr;
-  }
-
-  Id new_nvar = 1 + ndim;
-  CovContext ctxt(*model->getContext());
-  ctxt.setNVar(new_nvar);
-
-  auto* new_model = new ModelGeneric(*model->getContext());
-  if (new_model == nullptr) return new_model;
-
-  // **************************************
-  // Create the basic covariance structures
-  // **************************************
-
-  auto* covnew = new CovGradientGeneric(*model->getCov(), ball_radius);
-  new_model->setCov(covnew);
-  delete covnew;
-
-  // *********************************
-  // Create the basic drift structures
-  // *********************************
-
-  DriftList* drifts = DriftFactory::createDriftListForGradients(model->getDriftList(), ctxt);
-  new_model->setDriftList(drifts);
-  delete drifts;
-  return (new_model);
-}
 
 /****************************************************************************/
 /*!

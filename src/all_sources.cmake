@@ -315,6 +315,7 @@ set(SRC
   Estimation/CalcKriging.cpp
   Estimation/CalcKrigingSimpleCase.cpp
   Estimation/CalcKrigingFactors.cpp
+  Estimation/CalcKrigingGradient.cpp
   Estimation/CalcSimpleInterpolation.cpp
   Estimation/CalcImage.cpp
   Estimation/CalcGlobal.cpp
