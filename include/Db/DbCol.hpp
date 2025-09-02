@@ -15,6 +15,7 @@
 #include "Basic/VectorT.hpp"
 #include "gstlearn_export.hpp"
 
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -60,44 +61,41 @@ public:
   void AddArray(ADbCol& array);
   void RemoveArray(const String& name);
   void RemoveArray(const Id index);
-  ADbCol* GetArray(const Id index)
+
+  std::optional<std::reference_wrapper<ADbCol>> GetArray(const Id index)
   {
     if (index < 0 || index >= static_cast<Id>(_cols.size()))
     {
       return {};
     }
-    return _cols[index].get();
+    return {*_cols[index]};
   }
-  ADbCol* GetArray(const String& name, Id& index)
+
+  std::optional<std::pair<std::reference_wrapper<ADbCol>, Id>> GetArray(const String& name)
   {
-    index = 0;
+    Id index {};
     for (const auto& col: _cols)
     {
       if (col->GetName() == name)
       {
-        return col.get();
+        return {{*col, index}};
       }
       index++;
     }
 
-    index = -1;
     return {};
   }
-  ADbCol* GetArray(const String& name)
-  {
-    Id i;
-    return this->GetArray(name, i);
-  }
+
   std::optional<String> GetArrayName(const Id index)
   {
-    auto* arr = this->GetArray(index);
-    return arr ? std::optional<String> {arr->GetName()} : std::nullopt;
+    auto arr = this->GetArray(index);
+    return arr ? std::optional<String> {arr->get().GetName()} : std::nullopt;
   }
+
   bool HasArray(const String& name)
   {
-    Id i;
-    auto* arr = this->GetArray(name, i);
-    return arr != nullptr;
+    auto arr = this->GetArray(name);
+    return arr.has_value();
   }
 
 private:
