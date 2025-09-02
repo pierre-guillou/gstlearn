@@ -362,8 +362,6 @@ set(SRC
   Interfaces/AVariable.cpp
   Interfaces/Category.cpp
   Interfaces/Dictionary.cpp
-  Interfaces/ParamCSV.cpp
-  Interfaces/ParamGrid.cpp
   Interfaces/VariableBool.cpp
   Interfaces/VariableCategorical.cpp
   Interfaces/VariableDouble.cpp
