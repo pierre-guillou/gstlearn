@@ -2,6 +2,10 @@ This file contains the logs between consecutive releases
 ********************************************************
 # Make last version consistent with CMakeLists.txt
 
+Release 1.9.0
+=============
+
+
 Release 1.8.0
 =============
 - Export all gstlearn classes and functions through a C++ namespace 'gstlrn" (#108)
