@@ -8,20 +8,20 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
 #include "Db/DbHelper.hpp"
-
+#include "Basic/Law.hpp"
+#include "Core/Keypair.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Skin/Skin.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/Memory.hpp"
-#include "Core/Keypair.hpp"
+#include "geoslib_old_f.h"
 
-static DbGrid *DB_GRID_FILL;
 
 #define R(i,j)              (R[(i) * n + (j)])
+
+namespace gstlrn
+{
+static DbGrid *DB_GRID_FILL;
 
 class LocalSkin: public ISkinFunctions
 {
@@ -34,10 +34,10 @@ class LocalSkin: public ISkinFunctions
    ** \param[in]  ipos  Absolute grid index of the input grid node
    **
    *****************************************************************************/
-  int isAlreadyFilled(int ipos) const override
+  Id isAlreadyFilled(Id ipos) const override
   {
     if (!DB_GRID_FILL->getSelection(ipos)) return (0);
-    int value = FFFF(DB_GRID_FILL->getZVariable(ipos, 0)) ? 0 : 1;
+    Id value = FFFF(DB_GRID_FILL->getZVariable(ipos, 0)) ? 0 : 1;
     return (value);
   }
   /****************************************************************************/
@@ -49,11 +49,11 @@ class LocalSkin: public ISkinFunctions
    ** \param[in]  ipos  Absolute grid index of the input grid node
    **
    *****************************************************************************/
-  int isToBeFilled(int ipos) const override
+  Id isToBeFilled(Id ipos) const override
 
   {
     if (!DB_GRID_FILL->getSelection(ipos)) return (0);
-    int value = FFFF(DB_GRID_FILL->getZVariable(ipos, 0)) ? 1 : 0;
+    Id value = FFFF(DB_GRID_FILL->getZVariable(ipos, 0)) ? 1 : 0;
     return (value);
   }
 };
@@ -78,12 +78,12 @@ class LocalSkin: public ISkinFunctions
  ** \remarks resulting value is 1.
  **
  *****************************************************************************/
-static int st_code_comparable(const Db *db1,
-                              const Db *db2,
-                              int iech,
-                              int jech,
-                              int opt_code,
-                              int tolcode)
+static Id st_code_comparable(const Db* db1,
+                              const Db* db2,
+                              Id iech,
+                              Id jech,
+                              Id opt_code,
+                              Id tolcode)
 {
   double code1, code2;
 
@@ -95,14 +95,14 @@ static int st_code_comparable(const Db *db1,
       break;
 
     case 1: /* Code must be close */
-      code1 = db1->getLocVariable(ELoc::C,iech,0);
-      code2 = db2->getLocVariable(ELoc::C,jech,0);
+      code1 = db1->getLocVariable(ELoc::C, iech, 0);
+      code2 = db2->getLocVariable(ELoc::C, jech, 0);
       if (ABS(code1 - code2) > tolcode) return (1);
       break;
 
     case 2: /* Code must be different */
-      code1 = db1->getLocVariable(ELoc::C,iech,0);
-      code2 = db2->getLocVariable(ELoc::C,jech,0);
+      code1 = db1->getLocVariable(ELoc::C, iech, 0);
+      code2 = db2->getLocVariable(ELoc::C, jech, 0);
       if (code1 == code2) return (1);
       break;
   }
@@ -122,25 +122,25 @@ static int st_code_comparable(const Db *db1,
  ** \param[out] tabval   Value of the neighboring sample
  **
  *****************************************************************************/
-static void st_grid_fill_neigh(int ipos,
-                               int ndim,
-                               int radius,
-                               int *nech_loc,
-                               int *tabind,
-                               double *tabval)
+static void st_grid_fill_neigh(Id ipos,
+                               Id ndim,
+                               Id radius,
+                               Id* nech_loc,
+                               Id* tabind,
+                               double* tabval)
 {
   double value;
-  int ix, iy, iz, jpos, nech, nrx, nry, nrz, nmx, nmy, nmz;
+  Id ix, iy, iz, jpos, nech, nrx, nry, nrz, nmx, nmy, nmz;
 
   /* Initializations */
 
   nech = 0;
-  nrx = (ndim >= 1) ? radius : 0;
-  nry = (ndim >= 2) ? radius : 0;
-  nrz = (ndim >= 3) ? radius : 0;
-  nmx = (ndim >= 1) ? DB_GRID_FILL->getNX(0) : 1;
-  nmy = (ndim >= 2) ? DB_GRID_FILL->getNX(1) : 1;
-  nmz = (ndim >= 3) ? DB_GRID_FILL->getNX(2) : 1;
+  nrx  = (ndim >= 1) ? radius : 0;
+  nry  = (ndim >= 2) ? radius : 0;
+  nrz  = (ndim >= 3) ? radius : 0;
+  nmx  = (ndim >= 1) ? DB_GRID_FILL->getNX(0) : 1;
+  nmy  = (ndim >= 2) ? DB_GRID_FILL->getNX(1) : 1;
+  nmz  = (ndim >= 3) ? DB_GRID_FILL->getNX(2) : 1;
 
   /* Locate the central cell (compulsorily performed in 3-D) */
 
@@ -162,7 +162,7 @@ static void st_grid_fill_neigh(int ipos,
       {
         iwork2[2] = iwork1[2] + iz;
         if (iwork2[2] < 0 || iwork2[2] >= nmz) continue;
-        jpos = DB_GRID_FILL->indiceToRank(iwork2);
+        jpos  = DB_GRID_FILL->indiceToRank(iwork2);
         value = DB_GRID_FILL->getZVariable(jpos, 0);
         if (FFFF(value)) continue;
         tabind[nech] = jpos;
@@ -193,11 +193,11 @@ static void st_grid_fill_neigh(int ipos,
  ** \param[in]  tabval  Value of the neighboring sample
  **
  *****************************************************************************/
-static int st_grid_fill_calculate(int ipos,
-                                  int mode,
-                                  int nech,
-                                  int *tabind,
-                                  const double *tabval)
+static Id st_grid_fill_calculate(Id ipos,
+                                  Id mode,
+                                  Id nech,
+                                  Id* tabind,
+                                  const double* tabval)
 {
   double dist, dist2, dmin;
 
@@ -206,22 +206,22 @@ static int st_grid_fill_calculate(int ipos,
   double result = 0.;
   double top    = 0.;
   double bot    = 0.;
-  int ndim      = DB_GRID_FILL->getNDim();
- 
+  Id ndim      = DB_GRID_FILL->getNDim();
+
   /* Dispatch according to the extrapolation mode */
 
   switch (mode)
   {
     case 0:
     {
-      for (int iech = 0; iech < nech; iech++) top += tabval[iech];
-      result = top / (double)nech;
+      for (Id iech = 0; iech < nech; iech++) top += tabval[iech];
+      result = top / static_cast<double>(nech);
       break;
     }
 
     case 1:
     {
-      for (int iech = 0; iech < nech; iech++)
+      for (Id iech = 0; iech < nech; iech++)
       {
         dist  = distance_intra(DB_GRID_FILL, ipos, tabind[iech], NULL);
         dist2 = dist * dist;
@@ -235,7 +235,7 @@ static int st_grid_fill_calculate(int ipos,
     case 2:
     {
       if (nech < 3) return (1);
-      int neq = ndim + 1;
+      Id neq = ndim + 1;
       VectorInt indg(ndim, 0);
       VectorDouble coor(ndim, 0.);
       MatrixSymmetric a(neq);
@@ -244,23 +244,23 @@ static int st_grid_fill_calculate(int ipos,
       VectorDouble f(neq, 0.);
       a.fill(0.);
       b.fill(0.);
-      for (int iech = 0; iech < nech; iech++)
+      for (Id iech = 0; iech < nech; iech++)
       {
         DB_GRID_FILL->rankToIndice(tabind[iech], indg);
         DB_GRID_FILL->indicesToCoordinateInPlace(indg, coor);
-        for (int idim = 0; idim < ndim; idim++) f[1+idim] = coor[idim];
-        for (int j = 0; j < neq; j++)
+        for (Id idim = 0; idim < ndim; idim++) f[1 + idim] = coor[idim];
+        for (Id j = 0; j < neq; j++)
         {
           b[j] += tabval[iech] * f[j];
-          for (int k = 0; k < neq; k++)
+          for (Id k = 0; k < neq; k++)
             a.updValue(j, k, EOperator::ADD, f[j] * f[k]);
         }
       }
       if (a.solve(b, sol)) return 1;
       DB_GRID_FILL->rankToIndice(ipos, indg);
       DB_GRID_FILL->indicesToCoordinateInPlace(indg, coor);
-      for (int idim = 0; idim < ndim; idim++) f[1+idim] = coor[idim];
-      for (int j = 0; j < neq; j++)
+      for (Id idim = 0; idim < ndim; idim++) f[1 + idim] = coor[idim];
+      for (Id j = 0; j < neq; j++)
         result += sol[j] * f[j];
       break;
     }
@@ -268,7 +268,7 @@ static int st_grid_fill_calculate(int ipos,
     case 3:
     {
       dmin = 0.;
-      for (int iech = 0; iech < nech; iech++)
+      for (Id iech = 0; iech < nech; iech++)
       {
         dist = tabval[iech];
         if (dist > dmin) dmin = dist;
@@ -280,7 +280,7 @@ static int st_grid_fill_calculate(int ipos,
 
   /* Assign the result */
 
-  DB_GRID_FILL->setLocVariable(ELoc::Z,ipos, 0, result);
+  DB_GRID_FILL->setLocVariable(ELoc::Z, ipos, 0, result);
   return (0);
 }
 
@@ -295,13 +295,13 @@ static int st_grid_fill_calculate(int ipos,
  ** \param[in]  tab       Array of values
  **
  *****************************************************************************/
-static void st_write_active_sample(Db *db,
-                                   int iech,
-                                   int nvar,
-                                   int *iatt,
-                                   double *tab)
+static void st_write_active_sample(Db* db,
+                                   Id iech,
+                                   Id nvar,
+                                   Id* iatt,
+                                   double* tab)
 {
-  int ivar;
+  Id ivar;
 
   for (ivar = 0; ivar < nvar; ivar++)
     db->setArray(iech, iatt[ivar], tab[ivar]);
@@ -323,15 +323,15 @@ static void st_write_active_sample(Db *db,
  ** \param[out] tab       Array of values
  **
  *****************************************************************************/
-static int st_read_active_sample(Db *db,
-                                 int flag_zero,
-                                 int iech,
-                                 int nvar,
-                                 int *iatt,
+static Id st_read_active_sample(Db* db,
+                                 Id flag_zero,
+                                 Id iech,
+                                 Id nvar,
+                                 Id* iatt,
                                  double eps,
-                                 double *tab)
+                                 double* tab)
 {
-  int ivar, number;
+  Id ivar, number;
 
   /* Initialize the output array */
 
@@ -382,13 +382,13 @@ static int st_read_active_sample(Db *db,
  ** \remarks Array X is assumed to be increasingly ordered
  **
  *****************************************************************************/
-static int st_find_interval(double x, int ndef, const double *X)
+static Id st_find_interval(double x, Id ndef, const double* X)
 {
   if (ndef < 2) return -1;
   if (x < X[0] || x > X[ndef - 1]) return -1;
 
   // The target belongs to an interval
-  for (int k = 0; k < ndef - 1; k++)
+  for (Id k = 0; k < ndef - 1; k++)
     if (x >= X[k] && x < X[k + 1]) return k;
 
   // The target matches the upper bound of the last interval
@@ -408,24 +408,24 @@ static int st_find_interval(double x, int ndef, const double *X)
  ** \param[in]  Y       Vector of values of valued samples
  **
  *****************************************************************************/
-static void st_grid1D_interpolate_linear(Db *dbgrid,
-                                         int ivar,
-                                         int ndef,
-                                         const double *X,
-                                         const double *Y)
+static void st_grid1D_interpolate_linear(Db* dbgrid,
+                                         Id ivar,
+                                         Id ndef,
+                                         const double* X,
+                                         const double* Y)
 {
-  int nech = dbgrid->getNSample();
+  Id nech = dbgrid->getNSample();
 
   // Loop on the grid nodes
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!dbgrid->isActive(iech)) continue;
     double x = dbgrid->getCoordinate(iech, 0);
-    int k = st_find_interval(x, ndef, X);
+    Id k    = st_find_interval(x, ndef, X);
     if (k < 0) continue;
     double y = Y[k] + (Y[k + 1] - Y[k]) * (x - X[k]) / (X[k + 1] - X[k]);
-    dbgrid->setLocVariable(ELoc::Z,iech, ivar, y);
+    dbgrid->setLocVariable(ELoc::Z, iech, ivar, y);
   }
 }
 
@@ -443,38 +443,38 @@ static void st_grid1D_interpolate_linear(Db *dbgrid,
  ** \param[in]  Y       Vector of values of valued samples
  **
  *****************************************************************************/
-static int st_grid1D_interpolate_spline(Db *dbgrid,
-                                        int ivar,
-                                        int ndef,
-                                        const double *X,
-                                        const double *Y)
+static Id st_grid1D_interpolate_spline(Db* dbgrid,
+                                        Id ivar,
+                                        Id ndef,
+                                        const double* X,
+                                        const double* Y)
 {
   VectorDouble h, F, R, M, C, Cp;
-  int nech = dbgrid->getNSample();
+  Id nech = dbgrid->getNSample();
 
   // Preliminary calculations
 
-  int n = ndef;
-  int nm1 = n - 1;
+  Id n   = ndef;
+  Id nm1 = n - 1;
 
   h.resize(nm1);
-  for (int i = 0; i < nm1; i++)
+  for (Id i = 0; i < nm1; i++)
     h[i] = X[i + 1] - X[i];
 
   F.resize(n);
-  for (int i = 1; i < nm1; i++)
+  for (Id i = 1; i < nm1; i++)
     F[i] = (Y[i + 1] - Y[i]) / h[i] - (Y[i] - Y[i - 1]) / h[i - 1];
-  F[0] = 0;
+  F[0]   = 0;
   F[nm1] = 0;
 
   R.resize(n * n, 0);
-  R(0,0) = 1;
-  R(nm1,nm1) = 1.;
-  for (int i = 1; i < nm1; i++)
+  R(0, 0)     = 1;
+  R(nm1, nm1) = 1.;
+  for (Id i = 1; i < nm1; i++)
   {
-    R(i,i) = (h[i - 1] + h[i]) / 3;
-    R(i,i+1) = h[i] / 6;
-    R(i,i-1) = h[i - 1] / 6;
+    R(i, i)     = (h[i - 1] + h[i]) / 3;
+    R(i, i + 1) = h[i] / 6;
+    R(i, i - 1) = h[i - 1] / 6;
   }
 
   M.resize(n, 0);
@@ -483,30 +483,30 @@ static int st_grid1D_interpolate_spline(Db *dbgrid,
 
   C.resize(nm1, 0);
   Cp.resize(nm1, 0);
-  for (int i = 0; i < nm1; i++)
+  for (Id i = 0; i < nm1; i++)
   {
-    C[i] = (Y[i + 1] - Y[i]) / h[i] - (M[i + 1] - M[i]) * h[i] / 6;
+    C[i]  = (Y[i + 1] - Y[i]) / h[i] - (M[i + 1] - M[i]) * h[i] / 6;
     Cp[i] = Y[i] - M[i] * h[i] * h[i] / 6;
   }
 
   // Loop on the grid nodes
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     double y = TEST;
     if (dbgrid->isActive(iech))
     {
       double x = dbgrid->getCoordinate(iech, 0);
-      int k = st_find_interval(x, ndef, X);
+      Id k    = st_find_interval(x, ndef, X);
       if (k >= 0)
       {
         double d1 = X[k + 1] - x;
         double d2 = x - X[k];
         double h6 = 6 * h[k];
-        y = (M[k] * pow(d1, 3) + M[k + 1] * pow(d2, 3)) / h6 + C[k] * d2 + Cp[k];
+        y         = (M[k] * pow(d1, 3) + M[k + 1] * pow(d2, 3)) / h6 + C[k] * d2 + Cp[k];
       }
     }
-    dbgrid->setLocVariable(ELoc::Z,iech, ivar, y);
+    dbgrid->setLocVariable(ELoc::Z, iech, ivar, y);
   }
   return 0;
 }
@@ -528,7 +528,7 @@ static int st_grid1D_interpolate_spline(Db *dbgrid,
  ** \remark The perturbation is calculated as DX(i) * eps
  **
  *****************************************************************************/
-int DbHelper::centerPointToGrid(Db *db_point, DbGrid *db_grid, double eps_random)
+Id DbHelper::centerPointToGrid(Db* db_point, DbGrid* db_grid, double eps_random)
 {
   if (db_point == nullptr) return 1;
   if (db_grid == nullptr) return 1;
@@ -537,7 +537,7 @@ int DbHelper::centerPointToGrid(Db *db_point, DbGrid *db_grid, double eps_random
     messerr("For centering, 'dbin' and 'dbout' should share the same Space Dimension");
     return 1;
   }
-  int ndim = db_point->getNDim();
+  Id ndim = db_point->getNDim();
 
   /* Core allocation */
 
@@ -545,12 +545,12 @@ int DbHelper::centerPointToGrid(Db *db_point, DbGrid *db_grid, double eps_random
 
   /* Loop on the samples of the Point Db */
 
-  for (int iech = 0; iech < db_point->getNSample(); iech++)
+  for (Id iech = 0; iech < db_point->getNSample(); iech++)
   {
 
     /* Read the coordinates of the point sample */
 
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       coor[idim] = db_point->getCoordinate(iech, idim);
 
     /* Get the indices of the grid node */
@@ -560,12 +560,12 @@ int DbHelper::centerPointToGrid(Db *db_point, DbGrid *db_grid, double eps_random
     /* Randomize the processed center */
 
     if (eps_random > 0)
-      for (int idim = 0; idim < ndim; idim++)
+      for (Id idim = 0; idim < ndim; idim++)
         coor[idim] += db_grid->getDX(idim) * law_uniform(0., eps_random);
 
     /* Correct the sample locations */
 
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       db_point->setCoordinate(iech, idim, coor[idim]);
   }
   return 0;
@@ -591,17 +591,17 @@ int DbHelper::centerPointToGrid(Db *db_point, DbGrid *db_grid, double eps_random
  ** \param[out]  sel       Array containing the selection
  **
  *****************************************************************************/
-int DbHelper::findDuplicates(Db *db1,
-                             Db *db2,
+Id DbHelper::findDuplicates(Db* db1,
+                             Db* db2,
                              bool flag_same,
                              bool verbose,
-                             int opt_code,
+                             Id opt_code,
                              double tolcode,
-                             const VectorDouble &dist,
-                             VectorDouble &sel)
+                             const VectorDouble& dist,
+                             VectorDouble& sel)
 {
   bool flag_code = db1->hasLocVariable(ELoc::C) && db2->hasLocVariable(ELoc::C);
-  int nmerge = 0;
+  Id nmerge     = 0;
 
   // Title (optional)
 
@@ -609,15 +609,15 @@ int DbHelper::findDuplicates(Db *db1,
 
   /* Set the selection */
 
-  for (int iech2 = 0; iech2 < db2->getNSample(); iech2++)
+  for (Id iech2 = 0; iech2 < db2->getNSample(); iech2++)
     sel[iech2] = db2->getSelection(iech2);
 
   /* Loop on the samples of the second Db */
 
-  for (int iech2 = 0; iech2 < db2->getNSample(); iech2++)
+  for (Id iech2 = 0; iech2 < db2->getNSample(); iech2++)
   {
     if (!db2->isActive(iech2)) continue;
-    for (int iech1 = 0; iech1 < db1->getNSample(); iech1++)
+    for (Id iech1 = 0; iech1 < db1->getNSample(); iech1++)
     {
       if (!db1->isActive(iech1)) continue;
       if (flag_same)
@@ -629,13 +629,13 @@ int DbHelper::findDuplicates(Db *db1,
       /* Check if the two points have similar coordinates */
 
       bool flag_diff = false;
-      for (int idim = 0; idim < db1->getNDim() && !flag_diff; idim++)
+      for (Id idim = 0; idim < db1->getNDim() && !flag_diff; idim++)
       {
         double v1 = db1->getCoordinate(iech1, idim);
         double v2 = db2->getCoordinate(iech2, idim);
         if (flag_code)
         {
-          if (st_code_comparable(db1, db2, iech1, iech2, opt_code, (int) tolcode))
+          if (st_code_comparable(db1, db2, iech1, iech2, opt_code, static_cast<Id>(tolcode)))
             continue;
         }
         double dval = (!dist.empty()) ? dist[idim] : 0.;
@@ -687,24 +687,26 @@ int DbHelper::findDuplicates(Db *db1,
  ** \param[in]  stdv   Theoretical Standard Deviation value
  **
  *****************************************************************************/
-int DbHelper::normalizeVariables(Db *db,
-                                 const char *oper,
+Id DbHelper::normalizeVariables(Db* db,
+                                 const char* oper,
                                  const VectorInt& cols,
                                  double center,
                                  double stdv)
 {
-  int jcol, ndef, iptr;
-  double *num, *mm, *vv, proptot, value;
+  Id jcol, ndef, iptr;
+  double proptot, value;
+  VectorDouble num;
+  VectorDouble mm;
+  VectorDouble vv;
 
   /* Initializations */
 
-  int nech = db->getNSample();
-  num = mm = vv = nullptr;
-  int ncol = (int) cols.size();
+  Id nech = db->getNSample();
+  Id ncol = static_cast<Id>(cols.size());
 
   /* Check that all variables are defined */
 
-  for (int icol = 0; icol < ncol; icol++)
+  for (Id icol = 0; icol < ncol; icol++)
   {
     jcol = cols[icol];
     if (!db->isColIdxValid(jcol))
@@ -716,16 +718,13 @@ int DbHelper::normalizeVariables(Db *db,
 
   /* Core allocation */
 
-  num = (double*) mem_alloc(sizeof(double) * ncol, 0);
-  if (num == nullptr) goto label_end;
-  mm = (double*) mem_alloc(sizeof(double) * ncol, 0);
-  if (mm == nullptr) goto label_end;
-  vv = (double*) mem_alloc(sizeof(double) * ncol, 0);
-  if (vv == nullptr) goto label_end;
+  num.resize(ncol);
+  mm.resize(ncol);
+  vv.resize(ncol);
 
   /* Initializations */
 
-  for (int icol = 0; icol < ncol; icol++)
+  for (Id icol = 0; icol < ncol; icol++)
     num[icol] = mm[icol] = vv[icol] = 0.;
 
   /* Printout */
@@ -745,7 +744,7 @@ int DbHelper::normalizeVariables(Db *db,
   }
   else if (!strcmp(oper, "prop"))
   {
-    center = 0.;                  // Useless line
+    center = 0.; // Useless line
   }
   else
   {
@@ -765,19 +764,19 @@ int DbHelper::normalizeVariables(Db *db,
 
   /* Loop on the samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActive(iech)) continue;
 
     /* Loop on the variables */
 
-    ndef = 0;
+    ndef    = 0;
     proptot = 0.;
-    for (int icol = 0; icol < ncol; icol++)
+    for (Id icol = 0; icol < ncol; icol++)
     {
       value = db->getArray(iech, cols[icol]);
       if (FFFF(value)) continue;
-      if (!strcmp(oper, "prop")) value = MIN(1., MAX(0.,value));
+      if (!strcmp(oper, "prop")) value = MIN(1., MAX(0., value));
 
       /* Update statistics */
 
@@ -792,10 +791,10 @@ int DbHelper::normalizeVariables(Db *db,
 
     if (!strcmp(oper, "prop"))
     {
-      for (int icol = 0; icol < ncol; icol++)
+      for (Id icol = 0; icol < ncol; icol++)
       {
         value = db->getArray(iech, cols[icol]);
-        value = MIN(1., MAX(0.,value));
+        value = MIN(1., MAX(0., value));
         if (ndef == ncol && proptot > 0.)
           db->setArray(iech, iptr + icol, value / proptot);
       }
@@ -807,7 +806,7 @@ int DbHelper::normalizeVariables(Db *db,
 
     /* Global Normation */
 
-    for (int icol = 0; icol < ncol; icol++)
+    for (Id icol = 0; icol < ncol; icol++)
     {
       if (num[icol] <= 0)
       {
@@ -823,11 +822,11 @@ int DbHelper::normalizeVariables(Db *db,
 
     /* Set the output array */
 
-    for (int iech = 0; iech < nech; iech++)
+    for (Id iech = 0; iech < nech; iech++)
     {
-      for (int icol = 0; icol < ncol; icol++)
+      for (Id icol = 0; icol < ncol; icol++)
       {
-        jcol = cols[icol];
+        jcol  = cols[icol];
         value = db->getArray(iech, jcol);
         if (!strcmp(oper, "mean"))
         {
@@ -848,13 +847,7 @@ int DbHelper::normalizeVariables(Db *db,
       }
     }
   }
-
-  label_end:
-  mem_free((char* ) num);
-  mem_free((char* ) mm);
-  mem_free((char* ) vv);
-
-  return (0);
+  return 0;
 }
 
 /****************************************************************************/
@@ -875,17 +868,18 @@ int DbHelper::normalizeVariables(Db *db,
  ** \param[in]  namconv Naming convention
  **
  *****************************************************************************/
-int DbHelper::dbgrid_filling(DbGrid *dbgrid,
-                             int mode,
-                             int seed,
-                             int radius,
+Id DbHelper::dbgrid_filling(DbGrid* dbgrid,
+                             Id mode,
+                             Id seed,
+                             Id radius,
                              bool verbose,
-                             const NamingConvention &namconv)
+                             const NamingConvention& namconv)
 {
-  Skin *skin = nullptr;
-  double *tabval;
-  int *tabind, error, rank, ipos, ndim, count, nech;
+  Skin* skin = nullptr;
+  Id error, rank, ipos, ndim, count, nech;
   LocalSkin SKF;
+  VectorDouble tabval;
+  VectorInt tabind;
 
   /* Initializations */
 
@@ -893,7 +887,7 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
 
   /* Preliminary checks */
 
-  if (! dbgrid->isGrid())
+  if (!dbgrid->isGrid())
   {
     messerr("This function is limited to Grid Db");
     return (1);
@@ -918,26 +912,22 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
 
   // Create the new variable and duplicate the Z-locator variable
 
-  int iatt_in = dbgrid->getUIDByLocator(ELoc::Z, 0);
-  int iatt_out = dbgrid->addColumnsByConstant(1);
+  Id iatt_in  = dbgrid->getUIDByLocator(ELoc::Z, 0);
+  Id iatt_out = dbgrid->addColumnsByConstant(1);
   dbgrid->duplicateColumnByUID(iatt_in, iatt_out);
   dbgrid->setLocatorByUID(iatt_out, ELoc::Z, 0);
 
   /* Global variables */
 
   DB_GRID_FILL = dbgrid;
-  skin = nullptr;
-  tabval = nullptr;
-  tabind = nullptr;
-  count = (int) pow(2. * radius + 1., (double) ndim) - 1;
+  skin         = nullptr;
+  count        = static_cast<Id>(pow(2. * radius + 1., static_cast<double>(ndim))) - 1;
 
   /* Core allocation */
 
   law_set_random_seed(seed);
-  tabval = (double*) mem_alloc(sizeof(double) * count, 0);
-  if (tabval == nullptr) goto label_end;
-  tabind = (int*) mem_alloc(sizeof(int) * count, 0);
-  if (tabind == nullptr) goto label_end;
+  tabval.resize(count);
+  tabind.resize(count);
 
   skin = new Skin(&SKF, dbgrid);
 
@@ -958,11 +948,11 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
 
     /* Find the neighborhood */
 
-    st_grid_fill_neigh(ipos, ndim, radius, &nech, tabind, tabval);
+    st_grid_fill_neigh(ipos, ndim, radius, &nech, tabind.data(), tabval.data());
 
     /* Calculate the extrapolated value */
 
-    if (st_grid_fill_calculate(ipos, mode, nech, tabind, tabval)) continue;
+    if (st_grid_fill_calculate(ipos, mode, nech, tabind.data(), tabval.data())) continue;
 
     /* Deduce the initial influence of the central cell */
 
@@ -978,10 +968,8 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
   error = 0;
   namconv.setNamesAndLocators(dbgrid, iatt_in, dbgrid, iatt_out);
 
-  label_end:
+label_end:
   delete skin;
-  tabval = (double*) mem_free((char* ) tabval);
-  tabind = (int*) mem_free((char* ) tabind);
   return (error);
 }
 
@@ -1002,12 +990,12 @@ int DbHelper::dbgrid_filling(DbGrid *dbgrid,
  ** \param[in]  namconv    Naming convention
  **
  *****************************************************************************/
-int DbHelper::db_duplicate(Db *db,
+Id DbHelper::db_duplicate(Db* db,
                            bool verbose,
-                           const VectorDouble &dist,
-                           int opt_code,
+                           const VectorDouble& dist,
+                           Id opt_code,
                            double tolcode,
-                           const NamingConvention &namconv)
+                           const NamingConvention& namconv)
 {
   if (db == nullptr)
   {
@@ -1025,7 +1013,7 @@ int DbHelper::db_duplicate(Db *db,
                                sel)) return 1;
 
   // Add the variable to the Db
-  int iatt = db->addColumns(sel);
+  Id iatt = db->addColumns(sel);
 
   // Setting the output variable
   namconv.setNamesAndLocators(db, iatt);
@@ -1068,32 +1056,30 @@ int DbHelper::db_duplicate(Db *db,
  ** \remarks  Math Geosciences (2008) 40: 233-248
  **
  *****************************************************************************/
-int DbHelper::db_compositional_transform(Db *db,
-                                         int verbose,
-                                         int mode,
-                                         int type,
-                                         int number,
-                                         int *iatt_in,
-                                         int *iatt_out,
-                                         int *numout)
+Id DbHelper::db_compositional_transform(Db* db,
+                                         Id verbose,
+                                         Id mode,
+                                         Id type,
+                                         Id number,
+                                         Id* iatt_in,
+                                         Id* iatt_out,
+                                         Id* numout)
 {
-  int error, nech, number1, iech, ivar, jvar;
-  double *tabin, *tabout, sum, eps;
+  Id nech, number1, iech, ivar, jvar;
+  double sum, eps;
+  VectorDouble tabin;
+  VectorDouble tabout;
 
   /* Initializations */
 
-  error = 1;
   nech = db->getNSample();
-  tabin = tabout = nullptr;
-  eps = get_keypone("CompositionalEps", EPSILON3);
+  eps  = get_keypone("CompositionalEps", EPSILON3);
 
   /* Core allocation (may be one more than needed, but general) */
 
   number1 = number + 1;
-  tabin = (double*) mem_alloc(sizeof(double) * number1, 0);
-  if (tabin == nullptr) goto label_end;
-  tabout = (double*) mem_alloc(sizeof(double) * number1, 0);
-  if (tabout == nullptr) goto label_end;
+  tabin.resize(number1);
+  tabout.resize(number1);
 
   /* Verbose output */
 
@@ -1115,14 +1101,13 @@ int DbHelper::db_compositional_transform(Db *db,
       for (iech = 0; iech < nech; iech++)
       {
         if (!db->isActive(iech)) continue;
-        (void) st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin);
+        (void)st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data());
         sum = 0.;
         for (ivar = 0; ivar < (*numout); ivar++)
           sum += tabin[ivar];
         for (ivar = 0; ivar < (*numout); ivar++)
-          tabout[ivar] = (sum > 0) ? tabin[ivar] / sum :
-                                     TEST;
-        st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          tabout[ivar] = (sum > 0) ? tabin[ivar] / sum : TEST;
+        st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
       }
       break;
 
@@ -1136,12 +1121,12 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data()))
           {
             for (ivar = 0; ivar < (*numout); ivar++)
               tabout[ivar] = log(tabin[ivar] / tabin[(*numout)]);
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       else
@@ -1153,7 +1138,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin.data()))
           {
             sum = 1.;
             for (ivar = 0; ivar < number; ivar++)
@@ -1165,7 +1150,7 @@ int DbHelper::db_compositional_transform(Db *db,
               tabout[ivar] /= sum;
             tabout[number] = 1 / sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       break;
@@ -1180,7 +1165,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data()))
           {
             sum = 0.;
             for (ivar = 0; ivar < number; ivar++)
@@ -1191,7 +1176,7 @@ int DbHelper::db_compositional_transform(Db *db,
             for (ivar = 0; ivar < number; ivar++)
               tabout[ivar] = tabout[ivar] - 0.5 * sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       else
@@ -1203,7 +1188,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin.data()))
           {
             sum = 0.;
             for (ivar = 0; ivar < number; ivar++)
@@ -1214,11 +1199,10 @@ int DbHelper::db_compositional_transform(Db *db,
             for (ivar = 0; ivar < number; ivar++)
               tabout[ivar] /= sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       break;
-
     case 3: /* Isometric Logratio */
       if (mode > 0)
       {
@@ -1229,7 +1213,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 1, iech, number, iatt_in, eps, tabin.data()))
           {
             for (ivar = 0; ivar < number; ivar++)
               tabin[ivar] = log(tabin[ivar]);
@@ -1237,11 +1221,10 @@ int DbHelper::db_compositional_transform(Db *db,
             for (ivar = 0; ivar < (*numout); ivar++)
             {
               sum += tabin[ivar];
-              tabout[ivar] = (sum / (ivar + 1.) - tabin[ivar + 1])
-                  * sqrt((ivar + 1.) / (ivar + 2.));
+              tabout[ivar] = (sum / (ivar + 1.) - tabin[ivar + 1]) * sqrt((ivar + 1.) / (ivar + 2.));
             }
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       else
@@ -1253,7 +1236,7 @@ int DbHelper::db_compositional_transform(Db *db,
         for (iech = 0; iech < nech; iech++)
         {
           if (!db->isActive(iech)) continue;
-          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin))
+          if (st_read_active_sample(db, 0, iech, number, iatt_in, eps, tabin.data()))
           {
             tabin[number] = 0.;
             for (ivar = 0; ivar < (*numout); ivar++)
@@ -1275,19 +1258,13 @@ int DbHelper::db_compositional_transform(Db *db,
             for (ivar = 0; ivar < (*numout); ivar++)
               tabout[ivar] /= sum;
           }
-          st_write_active_sample(db, iech, *numout, iatt_out, tabout);
+          st_write_active_sample(db, iech, *numout, iatt_out, tabout.data());
         }
       }
       break;
   }
 
-  /* Set the error return code */
-
-  error = 0;
-
-  label_end: tabin = (double*) mem_free((char* ) tabin);
-  tabout = (double*) mem_free((char* ) tabout);
-  return (error);
+  return 0;
 }
 
 /*****************************************************************************/
@@ -1300,18 +1277,18 @@ int DbHelper::db_compositional_transform(Db *db,
  ** \param[in]  nmult Array of multiplicity coefficients
  **
  *****************************************************************************/
-DbGrid* DbHelper::dbgrid_sampling(DbGrid *dbin, const VectorInt &nmult)
+DbGrid* DbHelper::dbgrid_sampling(DbGrid* dbin, const VectorInt& nmult)
 {
-  DbGrid *dbout;
+  DbGrid* dbout;
   VectorDouble coor;
-  int ncol, icol, iech, iad, item, rank, ndim;
+  Id ncol, icol, iech, iad, item, rank, ndim;
   ELoc locatorType;
 
   /* Initializations */
 
   dbout = nullptr;
-  ncol = dbin->getNColumn();
-  ndim = dbin->getNDim();
+  ncol  = dbin->getNColumn();
+  ndim  = dbin->getNDim();
 
   /* Core allocation */
 
@@ -1325,7 +1302,7 @@ DbGrid* DbHelper::dbgrid_sampling(DbGrid *dbin, const VectorInt &nmult)
   if (rank < 0) goto label_end;
   for (icol = 0; icol < ncol; icol++)
   {
-    (void) dbin->getLocatorByColIdx(icol, &locatorType, &item);
+    (void)dbin->getLocatorByColIdx(icol, &locatorType, &item);
     dbout->setLocatorByUID(icol, locatorType, item);
   }
 
@@ -1344,7 +1321,7 @@ DbGrid* DbHelper::dbgrid_sampling(DbGrid *dbin, const VectorInt &nmult)
       dbout->setValueByColIdx(iech, icol, dbin->getValueByColIdx(iad, icol));
   }
 
-  label_end:
+label_end:
   return (dbout);
 }
 
@@ -1362,19 +1339,19 @@ DbGrid* DbHelper::dbgrid_sampling(DbGrid *dbin, const VectorInt &nmult)
  ** \param[in]  namconv Naming convention
  **
  *****************************************************************************/
-int DbHelper::db_grid1D_fill(DbGrid *dbgrid,
-                             int mode,
-                             int seed,
-                             const NamingConvention &namconv)
+Id DbHelper::db_grid1D_fill(DbGrid* dbgrid,
+                             Id mode,
+                             Id seed,
+                             const NamingConvention& namconv)
 {
   /* Preliminary checks */
 
-  if (! dbgrid->isGrid())
+  if (!dbgrid->isGrid())
   {
     messerr("This function is limited to Grid Db");
     return (1);
   }
-  int ndim = dbgrid->getNDim();
+  Id ndim = dbgrid->getNDim();
   if (ndim != 1)
   {
     messerr("This function is limited to 1-D space");
@@ -1385,7 +1362,7 @@ int DbHelper::db_grid1D_fill(DbGrid *dbgrid,
     messerr("The argument 'mode' should lie between 0 and 1");
     return (1);
   }
-  int nvar = dbgrid->getNLoc(ELoc::Z);
+  Id nvar = dbgrid->getNLoc(ELoc::Z);
   if (nvar <= 0)
   {
     messerr("You must have at least one Z-locator defined");
@@ -1394,14 +1371,14 @@ int DbHelper::db_grid1D_fill(DbGrid *dbgrid,
 
   // Add the variables (they must be defined as ELoc::Z) for following functions
 
-  int iatt_out = dbgrid->addColumnsByConstant(nvar);
-  for (int ivar = 0; ivar < nvar; ivar++)
+  Id iatt_out = dbgrid->addColumnsByConstant(nvar);
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
-    int iatt_in = dbgrid->getUIDByLocator(ELoc::Z, ivar);
+    Id iatt_in = dbgrid->getUIDByLocator(ELoc::Z, ivar);
     dbgrid->duplicateColumnByUID(iatt_in, iatt_out + ivar);
   }
 
-  int nech = dbgrid->getNSample();
+  Id nech = dbgrid->getNSample();
 
   /* Core allocation */
 
@@ -1411,14 +1388,14 @@ int DbHelper::db_grid1D_fill(DbGrid *dbgrid,
 
   /* Loop on the variables to be filled */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     // Copy the input variable
 
     // Look for the defined values
 
-    int ndef = 0;
-    for (int iech = 0; iech < nech; iech++)
+    Id ndef = 0;
+    for (Id iech = 0; iech < nech; iech++)
     {
       if (!dbgrid->isActive(iech)) continue;
       double value = dbgrid->getZVariable(iech, ivar);
@@ -1446,3 +1423,4 @@ int DbHelper::db_grid1D_fill(DbGrid *dbgrid,
   return 0;
 }
 
+}

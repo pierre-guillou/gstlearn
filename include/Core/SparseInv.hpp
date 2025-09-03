@@ -10,19 +10,23 @@
 /******************************************************************************/
 #pragma once
 
+#include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
-GSTLEARN_EXPORT int sparseinv(int n,
-                              int* Lp,
-                              int* Li,
+namespace gstlrn 
+{
+GSTLEARN_EXPORT Id sparseinv(Id n,
+                              Id* Lp,
+                              Id* Li,
                               double* Lx,
                               double* d,
-                              int* Up,
-                              int* Uj,
+                              Id* Up,
+                              Id* Uj,
                               double* Ux,
-                              int* Zp,
-                              int* Zi,
+                              Id* Zp,
+                              Id* Zi,
                               double* Zx,
                               double* z,
-                              int* Zdiagp,
-                              int* Lmunch);
+                              Id* Zdiagp,
+                              Id* Lmunch);
+}

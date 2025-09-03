@@ -15,7 +15,9 @@
 #include "Db/Db.hpp"
 #include "Db/DbStringFormat.hpp"
 #include "Db/DbHelper.hpp"
+#include "utils.hpp"
 
+using namespace gstlrn;
 /**
  * This test is meant to check the CSV loading procedure
  */
@@ -25,7 +27,7 @@ int main(int argc, char *argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  String filename = ASerializable::getTestData("Pollution","Pollution.dat");
+  String filename = getTestData("Pollution","Pollution.dat");
   Db* mydb = Db::createFromCSV(filename,CSVformat(),false);
 
   mydb->setLocator("X", ELoc::X, 0);

@@ -9,25 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGC1.hpp"
-
-#include "Simulation/TurningBandOperate.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Simulation/TurningBandOperate.hpp"
 
+namespace gstlrn
+{
 CovGC1::CovGC1(const CovContext& ctxt)
-: ACovFunc(ECov::ORDER1_GC, ctxt)
+  : ACovFunc(ECov::ORDER1_GC, ctxt)
 {
 }
 
-CovGC1::CovGC1(const CovGC1 &r)
-: ACovFunc(r)
+CovGC1::CovGC1(const CovGC1& r)
+  : ACovFunc(r)
 {
 }
 
-CovGC1& CovGC1::operator=(const CovGC1 &r)
+CovGC1& CovGC1::operator=(const CovGC1& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -40,7 +41,7 @@ double CovGC1::_evaluateCov(double h) const
 {
   double cov;
   double r = getContext().getField();
-  int ndim = getContext().getNDim();
+  auto ndim = getContext().getNDim();
 
   if (ndim == 1)
     cov = r - h;
@@ -52,7 +53,8 @@ double CovGC1::_evaluateCov(double h) const
   return (cov);
 }
 
-double CovGC1::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovGC1::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.IRFProcessOne(t0);
+}
 }

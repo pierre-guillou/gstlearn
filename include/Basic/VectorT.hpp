@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <cmath>
 
+namespace gstlrn
+{
 class AStringFormat;
 
 /***************************************************************************
@@ -75,9 +77,9 @@ public:
   inline bool operator>=(const VectorT& other) const                  { return _v >= other._v; }
 
   // For SWIG users (size_type is not much appreciated)
-  inline const T& getAt(int pos) const;
-  inline void setAt(int pos, const T& v);
-  inline int length() const;
+  inline const T& getAt(Id pos) const;
+  inline void setAt(Id pos, const T& v);
+  inline Id length() const;
 
 #ifndef SWIG
   inline const T& at(size_type pos) const;
@@ -162,7 +164,7 @@ protected:
 };
 
 template <typename T>
-const T& VectorT<T>::getAt(int pos) const
+const T& VectorT<T>::getAt(Id pos) const
 {
   if (pos < 0 || pos >= length())
     my_throw("VectorT<T>::get: index out of range");
@@ -170,16 +172,16 @@ const T& VectorT<T>::getAt(int pos) const
 }
 
 template <typename T>
-void VectorT<T>::setAt(int pos, const T& v)
+void VectorT<T>::setAt(Id pos, const T& v)
 {
   if (pos < 0 || pos >= length())
     my_throw("VectorT<T>::set: index out of range");
   operator[](pos) = v;
 }
 template <typename T>
-int VectorT<T>::length() const
+Id VectorT<T>::length() const
 {
-  return static_cast<int>(_v.size());
+  return static_cast<Id>(_v.size());
 }
 
 template <typename T>
@@ -289,3 +291,4 @@ std::ostream& operator<<(std::ostream& os, const VectorT<T>& vec)
 typedef VectorT<UChar>  VectorBool; // Use UChar because std::vector of bool has a specific implementation
 typedef VectorT<String> VectorString;
 
+}

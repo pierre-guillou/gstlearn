@@ -8,17 +8,18 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Gibbs/GibbsUMulti.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Db/Db.hpp"
+#include "Model/Model.hpp"
 #include "geoslib_old_f.h"
 
-#include "Gibbs/GibbsUMulti.hpp"
-#include "Model/Model.hpp"
-#include "Db/Db.hpp"
-#include "Basic/OptDbg.hpp"
+#include <cmath>
 
-#include <math.h>
+#define COVMAT(i, j) (_covmat[(i) * neq + (j)])
 
-#define COVMAT(i,j)              (_covmat[(i) * neq + (j)])
-
+namespace gstlrn
+{
 GibbsUMulti::GibbsUMulti()
   : GibbsMulti()
   , _covmat()
@@ -31,13 +32,13 @@ GibbsUMulti::GibbsUMulti(Db* db, Model* model)
 {
 }
 
-GibbsUMulti::GibbsUMulti(const GibbsUMulti &r)
+GibbsUMulti::GibbsUMulti(const GibbsUMulti& r)
   : GibbsMulti(r)
   , _covmat(r._covmat)
 {
 }
 
-GibbsUMulti& GibbsUMulti::operator=(const GibbsUMulti &r)
+GibbsUMulti& GibbsUMulti::operator=(const GibbsUMulti& r)
 {
   if (this != &r)
   {
@@ -61,16 +62,16 @@ GibbsUMulti::~GibbsUMulti()
 ** \param[in]  verboseTimer True to show elapse times
 **
 *****************************************************************************/
-int GibbsUMulti::covmatAlloc(bool verbose, bool /*verboseTimer*/)
+Id GibbsUMulti::covmatAlloc(bool verbose, bool /*verboseTimer*/)
 {
   // Initialization
 
-  if (verbose) mestitle(1,"Gibbs using Unique Neighborhood");
-  Db* db = getDb();
+  if (verbose) mestitle(1, "Gibbs using Unique Neighborhood");
+  Db* db       = getDb();
   Model* model = getModel();
-  int nvar = model->getNVar();
-  int nact = _getSampleRankNumber();
-  int neq  = nvar * nact;
+  Id nvar     = model->getNVar();
+  auto nact    = _getSampleRankNumber();
+  Id neq      = nvar * nact;
 
   // Establish Covariance Matrix
 
@@ -83,7 +84,7 @@ int GibbsUMulti::covmatAlloc(bool verbose, bool /*verboseTimer*/)
   // Invert Covariance Matrix
 
   if (verbose) message("Invert Covariance matrix\n");
-  if (matrix_invert(_covmat.data(),neq,-1))
+  if (matrix_invert(_covmat.data(), neq, -1))
   {
     messerr("Error during the covariance matrix inversion");
     return 1;
@@ -96,30 +97,30 @@ int GibbsUMulti::covmatAlloc(bool verbose, bool /*verboseTimer*/)
   return 0;
 }
 
-int GibbsUMulti::_getSize() const
+Id GibbsUMulti::_getSize() const
 {
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNvar();
   return nact * nvar;
 }
 
-double GibbsUMulti::_getVariance(int iecr) const
+double GibbsUMulti::_getVariance(Id iecr) const
 {
-  int neq  = _getSize();
+  auto neq = _getSize();
   return (1. / COVMAT(iecr, iecr));
 }
 
-double GibbsUMulti::_getEstimate(int ipgs, int iecr, VectorVectorDouble& y)
+double GibbsUMulti::_getEstimate(Id ipgs, Id iecr, VectorVectorDouble& y)
 {
-  int nvar = getNvar();
-  int nact = _getSampleRankNumber();
-  int neq  = _getSize();
+  auto nvar = getNvar();
+  auto nact = _getSampleRankNumber();
+  auto neq  = _getSize();
 
   double yk = 0.;
-  for (int jvar = 0, jecr = 0; jvar < nvar; jvar++)
+  for (Id jvar = 0, jecr = 0; jvar < nvar; jvar++)
   {
-    int jcase = getRank(ipgs, jvar);
-    for (int jact = 0; jact < nact; jact++, jecr++)
+    auto jcase = getRank(ipgs, jvar);
+    for (Id jact = 0; jact < nact; jact++, jecr++)
     {
       yk -= y[jcase][jact] * COVMAT(iecr, jecr);
     }
@@ -138,26 +139,26 @@ double GibbsUMulti::_getEstimate(int ipgs, int iecr, VectorVectorDouble& y)
 **
 *****************************************************************************/
 void GibbsUMulti::update(VectorVectorDouble& y,
-                         int isimu,
-                         int ipgs,
-                         int iter)
+                         Id isimu,
+                         Id ipgs,
+                         Id iter)
 {
   double valsim, yk, vk;
-  int nvar = getNvar();
-  int nact = _getSampleRankNumber();
+  auto nvar = getNvar();
+  auto nact = _getSampleRankNumber();
 
   /* Print the title */
 
   if (OptDbg::query(EDbg::CONVERGE))
-    mestitle(1,"Iterative Conditional Expectation (GS:%d - Simu:%d)",
-             ipgs+1,isimu+1);
+    mestitle(1, "Iterative Conditional Expectation (GS:%d - Simu:%d)",
+             ipgs + 1, isimu + 1);
 
   /* Loop on the target */
 
-  for (int ivar = 0, iecr = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0, iecr = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs,ivar);
-    for (int iact = 0; iact < nact; iact++, iecr++)
+    auto icase = getRank(ipgs, ivar);
+    for (Id iact = 0; iact < nact; iact++, iecr++)
     {
       if (!_isConstraintTight(icase, iact, &valsim))
       {
@@ -179,4 +180,5 @@ void GibbsUMulti::update(VectorVectorDouble& y,
   // Update statistics (optional)
 
   _updateStats(y, ipgs, iter);
+}
 }

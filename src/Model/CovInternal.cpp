@@ -11,6 +11,8 @@
 #include "Model/CovInternal.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 CovInternal::CovInternal()
     : _icas1(-1),
       _iech1(-1),
@@ -24,11 +26,11 @@ CovInternal::CovInternal()
 {
 }
 
-CovInternal::CovInternal(int icas1,
-                         int iech1,
-                         int icas2,
-                         int iech2,
-                         int ndim,
+CovInternal::CovInternal(Id icas1,
+                         Id iech1,
+                         Id icas2,
+                         Id iech2,
+                         Id ndim,
                          const Db* db1,
                          const Db* db2)
     : _icas1(-1),
@@ -80,11 +82,11 @@ CovInternal::~CovInternal()
 
 }
 
-void CovInternal::init(int icas1,
-                       int iech1,
-                       int icas2,
-                       int iech2,
-                       int ndim,
+void CovInternal::init(Id icas1,
+                       Id iech1,
+                       Id icas2,
+                       Id iech2,
+                       Id ndim,
                        const Db* db1,
                        const Db* db2)
 {
@@ -98,13 +100,13 @@ void CovInternal::init(int icas1,
   _calculateCoordinates();
 }
 
-void CovInternal::setIech1(int iech1)
+void CovInternal::setIech1(Id iech1)
 {
   _iech1 = iech1;
   _calculateCoordinates();
 }
 
-void CovInternal::setIech2(int iech2)
+void CovInternal::setIech2(Id iech2)
 {
   _iech2 = iech2;
   _calculateCoordinates();
@@ -120,7 +122,7 @@ void CovInternal::_calculateCoordinates()
   {
     if (_db1 != nullptr && _iech1 >= 0)
     {
-      for (int idim = 0; idim<_ndim; idim++)
+      for (Id idim = 0; idim<_ndim; idim++)
         _x1[idim] = _db1->getCoordinate(_iech1, idim);
     }
   }
@@ -128,7 +130,7 @@ void CovInternal::_calculateCoordinates()
   {
     if (_db2 != nullptr && _iech2 >= 0)
     {
-      for (int idim = 0; idim< _ndim; idim++)
+      for (Id idim = 0; idim< _ndim; idim++)
         _x1[idim] = _db2->getCoordinate(_iech2, idim);
     }
   }
@@ -139,7 +141,7 @@ void CovInternal::_calculateCoordinates()
   {
     if (_db1 != nullptr && _iech1 >= 0)
     {
-      for (int idim = 0; idim<_ndim; idim++)
+      for (Id idim = 0; idim<_ndim; idim++)
         _x2[idim] = _db1->getCoordinate(_iech1, idim);
     }
   }
@@ -147,8 +149,9 @@ void CovInternal::_calculateCoordinates()
   {
     if (_db2 != nullptr && _iech2 >= 0)
     {
-      for (int idim = 0; idim< _ndim; idim++)
+      for (Id idim = 0; idim< _ndim; idim++)
         _x2[idim] = _db2->getCoordinate(_iech2, idim);
     }
   }
+}
 }

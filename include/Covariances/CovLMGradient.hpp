@@ -16,6 +16,8 @@
 
 #include "Covariances/CovAnisoList.hpp"
 
+namespace gstlrn
+{
 class ASpace;
 class SpacePoint;
 class CovGradientNumerical;
@@ -34,7 +36,7 @@ public:
   IMPLEMENT_CLONING(CovLMGradient)
 
   // Add an elementary covariance structure
-  virtual void addCov(const CovBase* cov) override;
+  void addCov(const CovBase& cov) override;
 
   /// ACov interface
   
@@ -58,3 +60,4 @@ private:
                              VectorDouble& covGG,
                              bool flagGrad);
 };
+}

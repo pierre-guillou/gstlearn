@@ -16,13 +16,14 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <unsupported/Eigen/IterativeSolvers>
 
+using namespace gstlrn;
 int main(int argc, char *argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  int n = 5;
+  Id n = 5;
 
   VectorDouble b({2, 4, 6, 8, 10});
 

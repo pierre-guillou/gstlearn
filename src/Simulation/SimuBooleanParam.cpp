@@ -10,7 +10,9 @@
 /******************************************************************************/
 #include "Simulation/SimuBooleanParam.hpp"
 
-SimuBooleanParam::SimuBooleanParam(int maxiter,
+namespace gstlrn
+{
+SimuBooleanParam::SimuBooleanParam(Id maxiter,
                                    double tmax,
                                    double background,
                                    double facies,
@@ -52,7 +54,7 @@ SimuBooleanParam::~SimuBooleanParam()
 {
 }
 
-int    _maxiter;
+Id    _maxiter;
 double _tmax;
 double _background;
 double _facies;
@@ -71,8 +73,9 @@ String SimuBooleanParam::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-double SimuBooleanParam::getDilate(int idim) const
+double SimuBooleanParam::getDilate(Id idim) const
 {
   if (_dilate.empty()) return 0.;
   return _dilate[idim];
+}
 }

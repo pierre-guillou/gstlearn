@@ -15,6 +15,9 @@
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{
+
 /**
  * \brief
  * Class containing the ModelCovList Information describing the formal Spatial (or Temporal) Characteristics
@@ -41,16 +44,29 @@ public:
   FORWARD_METHOD_NON_CONST(getCovListModify, makeSillStationary)
   FORWARD_METHOD_NON_CONST(getCovListModify, makeSillsStationary)
   FORWARD_METHOD_NON_CONST(getCovListModify, makeSillNoStatFunctional)
+  FORWARD_METHOD_NON_CONST(getCovListModify, setSill)
+  FORWARD_METHOD_NON_CONST(getCovListModify, setSills)
+  FORWARD_METHOD_NON_CONST(getCovListModify, normalize)
 
+  FORWARD_METHOD(getCovList, setFitSills)
+  FORWARD_METHOD(getCovList, deleteFitSills)
   FORWARD_METHOD(getCovList, getNCov)
   FORWARD_METHOD(getCovList, getSills)
   FORWARD_METHOD(getCovList, getSill, TEST) 
   FORWARD_METHOD(getCovList, getTotalSill)
   FORWARD_METHOD(getCovList, getTotalSills)
   FORWARD_METHOD(getCovList, isAllActiveCovList)
+  FORWARD_METHOD(getCovList, getFitSills,nullptr)
 
+  void setCovList(const CovList* covs);
+  virtual void addCov(const CovBase& cov);
+  CovBase* getCovBase(Id icov) const { return getCovListModify()->getCovModify(icov); }
 
-  void setCovList(CovList* covs);
-  virtual void addCov(const CovBase* cov);
-
+  void fitSills(Vario* vario = nullptr,
+                const DbGrid* dbmap = nullptr,
+                Constraints* constraints = nullptr,
+                const ModelOptimParam& mop = ModelOptimParam(),
+                bool verbose = false,
+                bool trace = false);
 };
+}

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 class CovContext;
 
 class GSTLEARN_EXPORT CovTriangle : public ACovFunc
@@ -23,13 +25,13 @@ public:
   CovTriangle& operator= (const CovTriangle &r);
   virtual ~CovTriangle();
 
-  unsigned int   getMaxNDim()   const  override { return 1; }
+  size_t getMaxNDim() const override { return 1; }
 
   String         getCovName() const override { return "Triangle"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
 protected:
   double _evaluateCov(double h) const override;
 };
-
+}

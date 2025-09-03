@@ -11,7 +11,10 @@
 #include "Simulation/ACalcSimulation.hpp"
 #include "Calculators/ACalcInterpolator.hpp"
 
-ACalcSimulation::ACalcSimulation(int nbsimu, int seed)
+namespace gstlrn
+{
+
+ACalcSimulation::ACalcSimulation(Id nbsimu, Id seed)
   : ACalcInterpolator()
   , _nbsimu(nbsimu)
   , _seed(seed)
@@ -37,4 +40,5 @@ bool ACalcSimulation::_check()
 bool ACalcSimulation::_preprocess()
 {
   return ACalcInterpolator::_preprocess();
+}
 }

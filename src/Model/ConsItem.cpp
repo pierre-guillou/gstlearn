@@ -14,6 +14,8 @@
 #include "Model/ConsItem.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 ConsItem::ConsItem(const CovParamId& paramid,
                    const EConsType& type,
                    double value)
@@ -57,19 +59,19 @@ ConsItem* ConsItem::create(const CovParamId &paramid,
   return new ConsItem(paramid, type, value);
 }
 
-ConsItem* ConsItem::createFromParamId(int icov,
+ConsItem* ConsItem::createFromParamId(Id icov,
                                       const EConsElem &elem,
                                       const EConsType &type,
                                       double value,
-                                      int igrf,
-                                      int iv1,
-                                      int iv2)
+                                      Id igrf,
+                                      Id iv1,
+                                      Id iv2)
 {
   CovParamId paramid(igrf, icov, elem, iv1, iv2);
   return new ConsItem(paramid, type, value);
 }
 
-int ConsItem::_init(const CovParamId& paramid,
+Id ConsItem::_init(const CovParamId& paramid,
                    const EConsType& type,
                    double value)
 {
@@ -126,12 +128,13 @@ String ConsItem::toString(const AStringFormat* strfmt) const
 }
 
 ConsItem ConsItem::define(const EConsElem& elem,
-                          int icov,
-                          int iv1,
-                          int iv2,
+                          Id icov,
+                          Id iv1,
+                          Id iv2,
                           const EConsType& type,
                           double value)
 {
   CovParamId parid(0, icov, elem, iv1, iv2);
   return ConsItem(parid, type, value);
+}
 }

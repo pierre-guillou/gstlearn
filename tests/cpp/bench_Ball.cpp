@@ -10,25 +10,26 @@
 /******************************************************************************/
 #include "Enum/ESpaceType.hpp"
 
-#include "LinearOp/ProjMatrix.hpp"
-#include "Mesh/MeshSphericalExt.hpp"
-#include "Space/ASpaceObject.hpp"
-#include "Space/SpaceSN.hpp"
-#include "Db/Db.hpp"
-#include "Model/Model.hpp"
 #include "Basic/File.hpp"
 #include "Basic/Timer.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "Calculators/CalcMigrate.hpp"
+#include "Db/Db.hpp"
+#include "LinearOp/ProjMatrix.hpp"
+#include "Mesh/MeshSphericalExt.hpp"
+#include "Model/Model.hpp"
+#include "Space/ASpaceObject.hpp"
+#include "Space/SpaceSN.hpp"
 #include "Tree/Ball.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program
  ** This is meant to exhibit the Ball tree mechanism (for future improvements)
  **
  *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   Timer timer;
   VectorDouble vec;
@@ -39,23 +40,22 @@ int main(int argc, char *argv[])
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setContainerName(true);
-  ASerializable::setPrefixName("Tree-");
+  ASerializable::setPrefixName("bench_Ball-");
 
   // Global parameters
   bool verbose = false;
-  int ndim = 2;
-  int mode = 0;
+  Id ndim      = 2;
+  Id mode      = 0;
   defineDefaultSpace(ESpaceType::RN, ndim);
 
   // Constructing the Data Set
-  int nech = 100;
+  Id nech  = 100;
   Db* data = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
                                   VectorDouble(), VectorDouble(),
                                   VectorDouble(), 131343);
   if (verbose) data->display();
 
-  int nb_neigh = 5;
+  Id nb_neigh = 5;
   VectorInt neighs;
   VectorDouble distances;
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     mestitle(0, "Traditional use of the Ball Tree");
 
     // Constructing the Ball Tree
-    Ball ball(data, nullptr, nullptr, 10, false);
+    Ball ball(data, nullptr, 10, false);
     if (verbose) ball.display(0);
 
     // My target sample
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     mestitle(1, "Various ways of inquiring the Ball Tree");
 
     // - for the closest sample
-    int ineigh = ball.queryClosest(target);
+    Id ineigh = ball.queryClosest(target);
     message("The closest sample to the Target is : %d\n", ineigh);
 
     // - for a set of neighboring samples
@@ -101,16 +101,16 @@ int main(int argc, char *argv[])
     verbose              = true;
 
     // Constructing the Ball Tree from Db(s)
-    Ball ball(data, nullptr, nullptr, 10, has_constraints);
+    Ball ball(data, nullptr, 10, has_constraints);
     if (verbose) ball.display(1);
 
     // Loop on the samples for the FNN search
     SpacePoint pt2;
     // VectorInt ranks = law_random_path(nech);
     VectorInt ranks = VH::sequence(nech);
-    for (int jech = 0; jech < nech; jech++)
+    for (Id jech = 0; jech < nech; jech++)
     {
-      int iech = ranks[jech];
+      Id iech = ranks[jech];
       data->getSampleAsSPInPlace(pt2, iech);
       ball.setConstraint(iech, true);
       (void)ball.queryOneInPlace(pt2.getCoordUnprotected(), nb_neigh, neighs, distances);
@@ -126,18 +126,19 @@ int main(int argc, char *argv[])
     mestitle(0, "Demonstrating the findNN algorithm");
     bool flagShuffle = true;
 
-    int nech = 20;
+    nech    = 20;
     Db* aux = Db::createFillRandom(nech, ndim, 1, 0, 0, 0., 0.,
-                                    VectorDouble(), VectorDouble(),
-                                    VectorDouble(), 24813);
-    MatrixT<int> mat = findNN(data, aux, nb_neigh, flagShuffle);
-    int nrows        = mat.getNRows();
-    int ncols        = mat.getNCols();
-    for (int irow = 0; irow < nrows; irow++)
+                                   VectorDouble(), VectorDouble(),
+                                   VectorDouble(), 24813);
+
+    auto mat   = findNN(data, aux, nb_neigh, flagShuffle);
+    auto nrows = static_cast<Id>(mat.getNRows());
+    auto ncols = static_cast<Id>(mat.getNCols());
+    for (Id irow = 0; irow < nrows; irow++)
     {
-      for (int icol = 0; icol < ncols; icol++)
+      for (Id icol = 0; icol < ncols; icol++)
       {
-        int value = mat(irow, icol);
+        Id value = mat(irow, icol);
         if (IFFFF(value))
           message("   NA");
         else
@@ -158,11 +159,11 @@ int main(int argc, char *argv[])
     mestitle(0, "Demonstrating BallTree algorithm on a Sphere");
 
     // Global parameters
-    bool verbose = false;
+    verbose = false;
     defineDefaultSpace(ESpaceType::SN, 2);
 
     // Constructing the Meshing on the Sphere
-    MeshSphericalExt mesh = MeshSphericalExt();
+    MeshSphericalExt mesh;
     mesh.resetFromDb(NULL, NULL, "-r3");
     if (verbose) mesh.display();
 
@@ -178,7 +179,7 @@ int main(int argc, char *argv[])
     mestitle(1, "Various ways of inquiring the Ball Tree");
 
     // - for the closest sample
-    int ineigh = ball.queryClosest(target);
+    Id ineigh = ball.queryClosest(target);
     message("The closest sample to the Target is : %d\n", ineigh);
 
     // - for a set of neighboring samples

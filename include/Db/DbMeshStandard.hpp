@@ -16,6 +16,8 @@
 #include "Basic/ICloneable.hpp"
 #include "Mesh/MeshEStandard.hpp"
 
+namespace gstlrn
+{
 /**
  * \brief
  * Class containing the Data Information organized as a General Meshing
@@ -27,8 +29,8 @@
 class GSTLEARN_EXPORT DbMeshStandard: public Db
 {
 public:
-  DbMeshStandard(int ndim                         = 0,
-                 int napexpermesh                 = 1,
+  DbMeshStandard(Id ndim                         = 0,
+                 Id napexpermesh                 = 1,
                  const VectorDouble& apices       = VectorDouble(),
                  const VectorInt& meshes          = VectorInt(),
                  const ELoadBy& order             = ELoadBy::fromKey("SAMPLE"),
@@ -45,7 +47,7 @@ public:
   IMPLEMENT_CLONING(DbMeshStandard)
 
   /// AStringable Interface
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   /// Db Interface
   bool isMesh() const override { return true; }
@@ -53,8 +55,8 @@ public:
   bool isConsistent() const override;
 
   static DbMeshStandard*
-  create(int ndim,
-         int napexpermesh,
+  create(Id ndim,
+         Id napexpermesh,
          const VectorDouble& apices,
          const VectorInt& meshes,
          const ELoadBy& order             = ELoadBy::fromKey("SAMPLE"),
@@ -62,8 +64,7 @@ public:
          const VectorString& names        = VectorString(),
          const VectorString& locatorNames = VectorString(),
          bool verbose                     = false);
-  static DbMeshStandard* createFromNF(const String& neutralFilename,
-                                      bool verbose = true);
+  static DbMeshStandard* createFromNF(const String& NFFilename, bool verbose = true);
   static DbMeshStandard*
   createFromExternal(const MatrixDense& apices,
                      const MatrixInt& meshes,
@@ -73,22 +74,25 @@ public:
                      const VectorString& locatorNames = VectorString(),
                      bool verbose                     = false);
 
-  int getNApices() const { return _mesh.getNApices(); }
-  int getNMeshes() const { return _mesh.getNMeshes(); }
-  int getApex(int imesh, int rank) const { return _mesh.getApex(imesh, rank); }
-  double getCoor(int imesh, int rank, int idim) const;
-  void getCoordinatesPerMeshInPlace(int imesh, int rank, VectorDouble& coords) const;
-  double getApexCoor(int i, int idim) const;
-  void getApexCoordinatesInPlace(int i, VectorDouble& coords) const;
-  VectorDouble getCoordinatesPerMesh(int imesh, int idim, bool flagClose = false) const;
+  Id getNApices() const { return _mesh.getNApices(); }
+  Id getNMeshes() const { return _mesh.getNMeshes(); }
+  Id getApex(Id imesh, Id rank) const { return _mesh.getApex(imesh, rank); }
+  double getCoor(Id imesh, Id rank, Id idim) const;
+  void getCoordinatesPerMeshInPlace(Id imesh, Id rank, VectorDouble& coords) const;
+  double getApexCoor(Id i, Id idim) const;
+  void getApexCoordinatesInPlace(Id i, VectorDouble& coords) const;
+  VectorDouble getCoordinatesPerMesh(Id imesh, Id idim, bool flagClose = false) const;
   
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os,
-                          bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "DbMeshStandard"; }
 
 private:
   MeshEStandard _mesh;
 };
+}

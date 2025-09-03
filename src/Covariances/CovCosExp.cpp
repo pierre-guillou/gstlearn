@@ -9,26 +9,28 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovCosExp.hpp"
-
-#include "math.h"
 #include "Covariances/CovContext.hpp"
 
+#include <cmath>
+
+namespace gstlrn
+{
 CovCosExp::CovCosExp(const CovContext& ctxt)
-: ACovFunc(ECov::COSEXP, ctxt)
+  : ACovFunc(ECov::COSEXP, ctxt)
 {
   setParam(1);
 }
 
-CovCosExp::CovCosExp(const CovCosExp &r)
-: ACovFunc(r)
+CovCosExp::CovCosExp(const CovCosExp& r)
+  : ACovFunc(r)
 {
 }
 
-CovCosExp& CovCosExp::operator=(const CovCosExp &r)
+CovCosExp& CovCosExp::operator=(const CovCosExp& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -46,8 +48,9 @@ double CovCosExp::_evaluateCov(double h) const
 {
   double cov = 1.;
   if (h > 100) return (0.);
-  cov = exp(-h);
+  cov       = exp(-h);
   double h2 = h / getParam();
   cov *= cos(2. * GV_PI * h2);
   return (cov);
 }
+} // namespace gstlrn

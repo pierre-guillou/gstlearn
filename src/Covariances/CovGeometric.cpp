@@ -9,27 +9,29 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGeometric.hpp"
-
-#include "math.h"
 #include "Basic/VectorHelper.hpp"
 #include "Covariances/CovContext.hpp"
 
+#include <cmath>
+
+namespace gstlrn
+{
 CovGeometric::CovGeometric(const CovContext& ctxt)
-: ACovFunc(ECov::GEOMETRIC, ctxt)
+  : ACovFunc(ECov::GEOMETRIC, ctxt)
 {
   setParam(1);
 }
 
-CovGeometric::CovGeometric(const CovGeometric &r)
-: ACovFunc(r)
+CovGeometric::CovGeometric(const CovGeometric& r)
+  : ACovFunc(r)
 {
 }
 
-CovGeometric& CovGeometric::operator=(const CovGeometric &r)
+CovGeometric& CovGeometric::operator=(const CovGeometric& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -40,20 +42,20 @@ CovGeometric::~CovGeometric()
 
 double CovGeometric::_evaluateCovOnSphere(double alpha,
                                           double scale,
-                                          int degree) const
+                                          Id degree) const
 {
   DECLARE_UNUSED(degree);
   double rho = scale;
   return ((1. - rho) / sqrt(1. - 2. * rho * cos(alpha) + rho * rho));
 }
 
-VectorDouble CovGeometric::_evaluateSpectrumOnSphere(int n, double scale) const
+VectorDouble CovGeometric::_evaluateSpectrumOnSphere(Id n, double scale) const
 {
   double rho = scale;
-  VectorDouble sp(1+n, 0.);
+  VectorDouble sp(1 + n, 0.);
 
   double rhoprod = 1.;
-  for (int k = 0; k <= n; k++)
+  for (Id k = 0; k <= n; k++)
   {
     sp[k] = rhoprod;
     rhoprod *= rho;
@@ -63,3 +65,4 @@ VectorDouble CovGeometric::_evaluateSpectrumOnSphere(int n, double scale) const
 
   return sp;
 }
+} // namespace gstlrn

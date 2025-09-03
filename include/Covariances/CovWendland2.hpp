@@ -18,6 +18,8 @@
 // Advances in Computational Mathematics, Vol. 4 (389-396), 1995
 // It corresponds to Wendland \psi_{4,2}
 
+namespace gstlrn
+{
 class CovContext;
 
 class GSTLEARN_EXPORT CovWendland2 : public ACovFunc
@@ -28,14 +30,15 @@ public:
   CovWendland2& operator= (const CovWendland2 &r);
   virtual ~CovWendland2();
 
-  unsigned int   getMaxNDim() const  override { return 3; }
+  size_t getMaxNDim() const override { return 3; }
   String         getCovName() const override { return "Wendland-4,2"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
-  virtual bool   hasCovDerivative() const override { return true; }
+  bool   hasCovDerivative() const override { return true; }
 
 protected:
   double _evaluateCov(double h) const override;
-  double _evaluateCovDerivative(int degree, double h) const override;
+  double _evaluateCovDerivative(Id degree, double h) const override;
 };
 
+}

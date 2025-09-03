@@ -8,53 +8,23 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/String.hpp"
-#include "Basic/Memory.hpp"
-#include "Basic/AStringable.hpp"
 #include "Core/Acknowledge.hpp"
-
+#include "Basic/AStringable.hpp"
 #include "version.h"
-#include <string.h>
 
-/****************************************************************************/
-/*!
-**  Inquiry about the Version release and Date
-**
-** \param[out]  release : Array of characters with Release Name
-** \param[out]  date    : Array of characters with Data
-**
-** \remarks The output arrays should be freed by the calling program
-**
-****************************************************************************/
-void inquire_gstlearn(char **release, char **date)
+namespace gstlrn
 {
-  char *buffer;
-
-  int size  = static_cast<int> (strlen(GSTLEARN_VERSION));
-  buffer = (char *) mem_alloc(sizeof(char) * (size+1),1);
-  (void) gslStrcpy(buffer,GSTLEARN_VERSION);
-  buffer[size] = '\0';
-  *release = buffer;
-
-  size  = static_cast<int> (strlen(GSTLEARN_VERSION));
-  buffer = (char *) mem_alloc(sizeof(char) * (size+1),1);
-  (void) gslStrcpy(buffer,GSTLEARN_VERSION);
-  buffer[size] = '\0';
-  *date = buffer;
-}
-  
 /****************************************************************************/
 /*!
  *  Acknowledgment of the authors for gstlearn Library
  *
  ****************************************************************************/
 void acknowledge_gstlearn(void)
-
 {
-  // Print the header 
+  // Print the header
 
   message("gstlearn Library (Version: %s - Date: %s - Commit: %s)",
-          GSTLEARN_VERSION, GSTLEARN_DATE, GSTLEARN_COMMIT);
+          GSTLEARN_FULL_VERSION, GSTLEARN_DATE, GSTLEARN_COMMIT);
 
   // Print the list of authors
 
@@ -68,3 +38,4 @@ void acknowledge_gstlearn(void)
   message("Mike PEREIRA     (mike.pereira@minesparis.psl.eu)\n");
 }
 
+}

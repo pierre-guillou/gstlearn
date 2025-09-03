@@ -12,9 +12,12 @@
 
 #include "gstlearn_export.hpp"
 
-GSTLEARN_EXPORT int fftn(int ndim,
-                         const int dims[],
+namespace gstlrn
+{
+GSTLEARN_EXPORT Id fftn(Id ndim,
+                         const Id dims[],
                          double Re[],
                          double Im[],
-                         int iSign = 1,
+                         Id iSign = 1,
                          double scaling = 1.);
+}

@@ -8,16 +8,18 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Enum/ETape.hpp"
-#include "Space/ASpace.hpp"
-#include "Model/Model.hpp"
-#include "Covariances/CovAniso.hpp"
-#include "Covariances/CovFactory.hpp"
-#include "Covariances/CovAnisoList.hpp"
 #include "Covariances/CovLMCTapering.hpp"
+#include "Covariances/CovAniso.hpp"
+#include "Covariances/CovAnisoList.hpp"
+#include "Covariances/CovFactory.hpp"
+#include "Enum/ETape.hpp"
+#include "Model/Model.hpp"
+#include "Space/ASpace.hpp"
 
-#include <math.h>
+#include <cmath>
 
+namespace gstlrn
+{
 CovLMCTapering::CovLMCTapering(const ETape& tapetype,
                                double taperange,
                                const CovContext& ctxt)
@@ -35,12 +37,12 @@ CovLMCTapering::CovLMCTapering(const CovLMCTapering& r)
 {
 }
 
-CovLMCTapering& CovLMCTapering::operator=(const CovLMCTapering &r)
+CovLMCTapering& CovLMCTapering::operator=(const CovLMCTapering& r)
 {
   if (this != &r)
   {
     CovAnisoList::operator=(r);
-    _tapeType = r._tapeType;
+    _tapeType  = r._tapeType;
     _tapeRange = r._tapeRange;
   }
   return *this;
@@ -50,11 +52,11 @@ CovLMCTapering::~CovLMCTapering()
 {
 }
 
-int CovLMCTapering::init(const ETape& tapetype, double taperange)
+Id CovLMCTapering::init(const ETape& tapetype, double taperange)
 {
-  for (auto &e: _covs)
+  for (auto& e: _covs)
   {
-    ((CovAniso*)e)->setOptimEnabled(false);
+    ((CovAniso*)e.get())->setOptimEnabled(false);
   }
   /* Preliminary check */
 
@@ -66,24 +68,23 @@ int CovLMCTapering::init(const ETape& tapetype, double taperange)
 
   /* Load the tapering parameters */
 
-  _tapeType    = tapetype;
-  _tapeRange   = taperange;
+  _tapeType  = tapetype;
+  _tapeRange = taperange;
 
   return 0;
 }
 
-Def_Tapering& D_TAPE(int rank)
+Def_Tapering& D_TAPE(Id rank)
 {
   static Def_Tapering DEF_TAPES[] =
-  {
-   {"Spherical"    , 3, _tape_spherical },
-   {"Cubic"        , 3, _tape_cubic     },
-   {"Triangle"     , 1, _tape_triangle  },
-   {"Pentamodel"   , 3, _tape_penta     },
-   {"Storkey"      , 1, _tape_storkey   },
-   {"Wendland1"    , 3, _tape_wendland1 },
-   {"Wendland2"    , 3, _tape_wendland2 }
-  };
+    {
+      {"Spherical", 3, _tape_spherical},
+      {"Cubic", 3, _tape_cubic},
+      {"Triangle", 1, _tape_triangle},
+      {"Pentamodel", 3, _tape_penta},
+      {"Storkey", 1, _tape_storkey},
+      {"Wendland1", 3, _tape_wendland1},
+      {"Wendland2", 3, _tape_wendland2}};
   return DEF_TAPES[rank];
 }
 
@@ -101,7 +102,7 @@ double _tape_cubic(double h)
   double h2, cov;
 
   cov = 0.;
-  h2 = h * h;
+  h2  = h * h;
   if (h < 1) cov = 1. - h2 * (7. + h * (-8.75 + h2 * (3.5 - 0.75 * h2)));
   cov = MAX(0., cov);
 
@@ -121,13 +122,9 @@ double _tape_penta(double h)
   double h2, cov;
 
   cov = 0.;
-  h2 = h * h;
+  h2  = h * h;
   if (h < 1)
-    cov = 1.
-        - h2 * (22. / 3.
-            - h2 * (33.
-                - h * (77. / 2.
-                    - h2 * (33. / 2. - h2 * (11. / 2. - 5. / 6. * h2)))));
+    cov = 1. - h2 * (22. / 3. - h2 * (33. - h * (77. / 2. - h2 * (33. / 2. - h2 * (11. / 2. - 5. / 6. * h2)))));
 
   return (cov);
 }
@@ -139,8 +136,7 @@ double _tape_storkey(double h)
   cov = 0.;
   pi2 = 2. * GV_PI;
   if (h < 1)
-    cov = (2. * (1. - h) * (1. + cos(pi2 * h) / 2.) + 3 / pi2 * sin(pi2 * h))
-        / 3.;
+    cov = (2. * (1. - h) * (1. + cos(pi2 * h) / 2.) + 3 / pi2 * sin(pi2 * h)) / 3.;
 
   return (cov);
 }
@@ -150,7 +146,7 @@ double _tape_wendland1(double h)
   double h2, cov;
 
   cov = 0.;
-  h2 = h * h;
+  h2  = h * h;
   if (h < 1) cov = 1 - h2 * (10 - h * (20 - h * (15 - h * 4)));
   return (cov);
 }
@@ -160,12 +156,9 @@ double _tape_wendland2(double h)
   double h2, cov;
 
   cov = 0.;
-  h2 = h * h;
+  h2  = h * h;
   if (h < 1)
-    cov = 1
-        - h2 * ((28. / 3.)
-            - h2 * (70
-                - h * ((448. / 3.) - h * (140 - h * (64 - h * (35. / 3.))))));
+    cov = 1 - h2 * ((28. / 3.) - h2 * (70 - h * ((448. / 3.) - h * (140 - h * (64 - h * (35. / 3.))))));
   return (cov);
 }
 
@@ -180,8 +173,8 @@ String CovLMCTapering::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-double CovLMCTapering::eval0(int ivar,
-                             int jvar,
+double CovLMCTapering::eval0(Id ivar,
+                             Id jvar,
                              const CovCalcMode* mode) const
 {
   double cov0 = CovAnisoList::eval0(ivar, jvar, mode);
@@ -190,14 +183,14 @@ double CovLMCTapering::eval0(int ivar,
 
 double CovLMCTapering::_eval(const SpacePoint& p1,
                              const SpacePoint& p2,
-                             int ivar,
-                             int jvar,
+                             Id ivar,
+                             Id jvar,
                              const CovCalcMode* mode) const
 {
   // The calculation flag 'as.Vario' must be treated here rather than relying on calculation
   // performed in generic 'eval' method
-  double cov = 0.;
-  double cov0 = 0.;
+  double cov   = 0.;
+  double cov0  = 0.;
   bool asVario = false;
   if (mode == nullptr)
   {
@@ -208,7 +201,7 @@ double CovLMCTapering::_eval(const SpacePoint& p1,
     CovCalcMode modeloc(*mode);
     asVario = mode->getAsVario();
     modeloc.setAsVario(false);
-    cov = CovAnisoList::_eval(p1, p2, ivar, jvar, &modeloc);
+    cov  = CovAnisoList::_eval(p1, p2, ivar, jvar, &modeloc);
     cov0 = CovAnisoList::_eval(p1, p1, ivar, jvar, &modeloc); // or eval0 if stationary
   }
 
@@ -223,3 +216,4 @@ std::string_view CovLMCTapering::getName() const
 {
   return _tapeType.getDescr();
 }
+} // namespace gstlrn

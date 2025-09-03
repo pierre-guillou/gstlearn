@@ -12,9 +12,10 @@
 
 #include "gstlearn_export.hpp"
 #include "LithoRule/Rule.hpp"
-#include "LithoRule/Node.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class PropDef;
 class DbGrid;
 
@@ -32,31 +33,31 @@ public:
 
   String displaySpecific() const override;
 
-  int particularities(Db *db,
+  Id particularities(Db *db,
                       const Db *dbprop,
                       Model *model,
-                      int flag_grid_check,
-                      int flag_stat)  const override;
-  int gaus2facData(PropDef *propdef,
+                      Id flag_grid_check,
+                      Id flag_stat)  const override;
+  Id gaus2facData(PropDef *propdef,
                    Db *dbin,
                    Db *dbout,
-                   int *flag_used,
-                   int ipgs,
-                   int isimu,
-                   int nbsimu) override;
-  int gaus2facResult(PropDef *propdef,
+                   Id *flag_used,
+                   Id ipgs,
+                   Id isimu,
+                   Id nbsimu) override;
+  Id gaus2facResult(PropDef *propdef,
                      Db *dbout,
-                     int *flag_used,
-                     int ipgs,
-                     int isimu,
-                     int nbsimu) const override;
-  int evaluateBounds(PropDef *propdef,
+                     Id *flag_used,
+                     Id ipgs,
+                     Id isimu,
+                     Id nbsimu) const override;
+  Id evaluateBounds(PropDef *propdef,
                      Db *dbin,
                      Db *dbout,
-                     int isimu,
-                     int igrf,
-                     int ipgs,
-                     int nbsimu) const override;
+                     Id isimu,
+                     Id igrf,
+                     Id ipgs,
+                     Id nbsimu) const override;
 
 
   double getShDown() const { return _shDown; }
@@ -66,23 +67,26 @@ public:
   double getTgte()   const { return _tgte;   }
   double getIncr()   const { return _incr;   }
   const VectorDouble& getShift() const { return _shift; }
-  double getShift(int idim) const { return _shift[idim]; }
+  double getShift(Id idim) const { return _shift[idim]; }
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "RuleShadow"; }
 
 private:
   void _st_shadow_max(const Db *dbprop,
-                      int flag_stat,
+                      Id flag_stat,
                       double *sh_dsup_max,
                       double *sh_down_max) const;
   double _st_grid_eval(DbGrid *dbgrid,
-                       int isimu,
-                       int icase,
-                       int nbsimu,
+                       Id isimu,
+                       Id icase,
+                       Id nbsimu,
                        VectorDouble& xyz0) const;
   void _normalizeShift();
 
@@ -99,3 +103,4 @@ private:
   mutable VectorInt    _ind1;
   mutable VectorInt    _ind2;
 };
+}

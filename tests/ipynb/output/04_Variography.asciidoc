@@ -1,5 +1,7 @@
 #NO_DIFF#XXX
-----<IPython.core.display.Javascript object>----
+----
+
+<IPython.core.display.Javascript object>----
 
 
 #NO_DIFF#XXX
@@ -86,6 +88,7 @@ Number of variable(s)       = 1
 Number of direction(s)      = 1
 Space dimension             = 2
 Variable(s)                 = [January_temp]
+
 Variance-Covariance Matrix     1.020
 
 Direction #1

@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       # https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
-      project_version: ${{ steps.main_step.outputs.PROJECT_VERSION }}
+      project_full_version: ${{ steps.main_step.outputs.PROJECT_FULL_VERSION }}
 
     steps:
     - uses: actions/checkout@v4
@@ -50,9 +50,8 @@ jobs:
       id: main_step
       run: |
         cmake -B${{env.BUILD_DIR}} -DBUILD_PYTHON=OFF -DBUILD_R=OFF
-        PROJECT_VERSION=$(cmake --build ${{env.BUILD_DIR}} --target print_version | grep PROJECT_VERSION | cut -d "=" -f2 | xargs)
-        echo "PROJECT_VERSION=${PROJECT_VERSION}" >> "$GITHUB_OUTPUT"
-        echo "PROJECT_VERSION=${PROJECT_VERSION}" >> "$GITHUB_ENV"
+        PROJECT_FULL_VERSION=$(cmake --build ${{env.BUILD_DIR}} --target print_version | grep PROJECT_FULL_VERSION | cut -d "=" -f2 | xargs)
+        echo "PROJECT_FULL_VERSION=${PROJECT_FULL_VERSION}" >> "$GITHUB_OUTPUT"
         echo "BIB_FILE=$(ls ${{env.BUILD_DIR}}/doc/*.bib)" >> "$GITHUB_ENV"
 
     - name: Generate R Readme file using grip
@@ -95,71 +94,72 @@ jobs:
     
     steps:
       - env:
-          PROJECT_VERSION: ${{needs.get-version.outputs.project_version}}
+          PROJECT_FULL_VERSION: ${{needs.get-version.outputs.project_full_version}}
+
         uses: fabien-ors/folder-publish-action@v4
         with:
           host: ${{ secrets.CG_HOST }}
           username: ${{ secrets.CG_USR }}
           password: ${{ secrets.CG_PWD }}
-          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_VERSION}}"
+          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_FULL_VERSION}}"
           name: demos
 
       - env:
-          PROJECT_VERSION: ${{needs.get-version.outputs.project_version}}
+          PROJECT_FULL_VERSION: ${{needs.get-version.outputs.project_full_version}}
         uses: fabien-ors/folder-publish-action@v4
         with:
           host: ${{ secrets.CG_HOST }}
           username: ${{ secrets.CG_USR }}
           password: ${{ secrets.CG_PWD }}
-          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_VERSION}}"
+          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_FULL_VERSION}}"
           name: courses
 
       - env:
-          PROJECT_VERSION: ${{needs.get-version.outputs.project_version}}
+          PROJECT_FULL_VERSION: ${{needs.get-version.outputs.project_full_version}}
         uses: fabien-ors/folder-publish-action@v4
         with:
           host: ${{ secrets.CG_HOST }}
           username: ${{ secrets.CG_USR }}
           password: ${{ secrets.CG_PWD }}
-          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_VERSION}}"
+          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_FULL_VERSION}}"
           name: doxygen
 
       - env:
-          PROJECT_VERSION: ${{needs.get-version.outputs.project_version}}
+          PROJECT_FULL_VERSION: ${{needs.get-version.outputs.project_full_version}}
         uses: fabien-ors/folder-publish-action@v4
         with:
           host: ${{ secrets.CG_HOST }}
           username: ${{ secrets.CG_USR }}
           password: ${{ secrets.CG_PWD }}
-          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_VERSION}}"
+          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_FULL_VERSION}}"
           name: data
 
       - env:
-          PROJECT_VERSION: ${{needs.get-version.outputs.project_version}}
+          PROJECT_FULL_VERSION: ${{needs.get-version.outputs.project_full_version}}
         uses: fabien-ors/folder-publish-action@v4
         with:
           host: ${{ secrets.CG_HOST }}
           username: ${{ secrets.CG_USR }}
           password: ${{ secrets.CG_PWD }}
-          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_VERSION}}"
+          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_FULL_VERSION}}"
           name: references
 
       - env:
-          PROJECT_VERSION: ${{needs.get-version.outputs.project_version}}
+          PROJECT_FULL_VERSION: ${{needs.get-version.outputs.project_full_version}}
         uses: fabien-ors/files-publish-action@v3
         with:
           host: ${{ secrets.CG_HOST }}
           username: ${{ secrets.CG_USR }}
           password: ${{ secrets.CG_PWD }}
-          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_VERSION}}"
+          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_FULL_VERSION}}"
           pattern: "*.bib"
 
       - env:
-          PROJECT_VERSION: ${{needs.get-version.outputs.project_version}}
+          PROJECT_FULL_VERSION: ${{needs.get-version.outputs.project_full_version}}
         uses: fabien-ors/files-publish-action@v3
         with:
           host: ${{ secrets.CG_HOST }}
           username: ${{ secrets.CG_USR }}
           password: ${{ secrets.CG_PWD }}
-          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_VERSION}}"
+          dest-path: "/var/www/html/gstlearn/${{env.PROJECT_FULL_VERSION}}"
           pattern: "R_README.html"

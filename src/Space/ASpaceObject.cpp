@@ -10,12 +10,14 @@
 /******************************************************************************/
 #include "geoslib_define.h"
 
-#include "Space/ASpaceObject.hpp"
+#include "Basic/AException.hpp"
 #include "Space/ASpace.hpp"
+#include "Space/ASpaceObject.hpp"
 #include "Space/SpaceRN.hpp"
 #include "Space/SpaceSN.hpp"
-#include "Basic/AException.hpp"
 
+namespace gstlrn
+{
 /// Unique default global space
 static ASpaceSharedPtr defaultSpace = nullptr;
 
@@ -26,8 +28,8 @@ ASpaceObject::ASpaceObject(const ASpaceSharedPtr& space)
 }
 
 ASpaceObject::ASpaceObject(const ASpaceObject& r)
-  : AStringable(r),
-    _space(r._space)
+  : AStringable(r)
+  , _space(r._space)
 {
 }
 
@@ -47,7 +49,6 @@ ASpaceObject& ASpaceObject::operator=(const ASpaceObject& r)
 
 ASpaceObject::~ASpaceObject()
 {
-
 }
 
 /// AStringable interface
@@ -59,18 +60,15 @@ String ASpaceObject::toString(const AStringFormat* /*strfmt*/) const
 
 VectorDouble ASpaceObject::getUnitaryVector() const
 {
-  VectorDouble uni;
-  uni.resize(getNDim(), 0.);
-  uni[0] = 1;
-  return uni;
+  return _space->getUnitaryVector();
 }
 
-unsigned int ASpaceObject::getNDim(int ispace) const
+size_t ASpaceObject::getNDim(Id ispace) const
 {
   return (_space->getNDim(ispace));
 }
 
-const VectorDouble& ASpaceObject::getOrigin(int ispace) const
+const VectorDouble& ASpaceObject::getOrigin(Id ispace) const
 {
   if (_space == nullptr)
     return _dummy;
@@ -79,7 +77,7 @@ const VectorDouble& ASpaceObject::getOrigin(int ispace) const
 
 double ASpaceObject::getDistance(const SpacePoint& p1,
                                  const SpacePoint& p2,
-                                 int ispace) const
+                                 Id ispace) const
 {
   return (_space->getDistance(p1, p2, ispace));
 }
@@ -92,9 +90,17 @@ VectorDouble ASpaceObject::getDistances(const SpacePoint& p1,
 
 VectorDouble ASpaceObject::getIncrement(const SpacePoint& p1,
                                         const SpacePoint& p2,
-                                        int ispace) const
+                                        Id ispace) const
 {
   return (_space->getIncrement(p1, p2, ispace));
+}
+
+void ASpaceObject::getIncrementInPlace(const SpacePoint& p1,
+                                       const SpacePoint& p2,
+                                       VectorDouble& ptemp,
+                                       Id ispace) const
+{
+  _space->getIncrementInPlace(p1, p2, ptemp, ispace);
 }
 
 /**
@@ -102,7 +108,7 @@ VectorDouble ASpaceObject::getIncrement(const SpacePoint& p1,
  * (To be used only during creation ... in particular when reading NF)
  * @param ndim
  */
-void ASpaceObject::setNDim(int ndim)
+void ASpaceObject::setNDim(Id ndim)
 {
   if (_space->getType() != ESpaceType::RN)
     my_throw("Object is not in Space RN");
@@ -118,7 +124,7 @@ void ASpaceObject::setNDim(int ndim)
  * @param ndim Number of dimensions
  * @param param Optional space parameter (ex: radius of the sphere)
  */
-void defineDefaultSpace(const ESpaceType& type, unsigned int ndim, double param)
+void defineDefaultSpace(const ESpaceType& type, size_t ndim, double param)
 {
 
   switch (type.getValue())
@@ -127,12 +133,12 @@ void defineDefaultSpace(const ESpaceType& type, unsigned int ndim, double param)
     {
       ndim = 2;
       if (param <= 0.) param = EARTH_RADIUS;
-      defaultSpace = SpaceSN::create(ndim, param);
+      defaultSpace = SpaceSN::create(static_cast<Id>(ndim), param);
       break;
     }
     case ESpaceType::E_RN:
     {
-      defaultSpace = SpaceRN::create(ndim);
+      defaultSpace = SpaceRN::create(static_cast<Id>(ndim));
       break;
     }
     default:
@@ -158,10 +164,10 @@ ESpaceType getDefaultSpaceType()
   return defaultSpace->getType();
 }
 
-int getDefaultSpaceDimension()
+Id getDefaultSpaceDimension()
 {
   if (nullptr == defaultSpace) defineDefaultSpace(ESpaceType::RN, 2);
-  return defaultSpace->getNDim();
+  return static_cast<Id>(defaultSpace->getNDim());
 }
 
 const ASpace* getDefaultSpace()
@@ -179,3 +185,4 @@ bool isDefaultSpaceSphere()
 {
   return (getDefaultSpaceType() == ESpaceType::SN);
 }
+} // namespace gstlrn

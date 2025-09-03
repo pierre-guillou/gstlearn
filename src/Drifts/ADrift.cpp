@@ -11,17 +11,19 @@
 #include "Drifts/ADrift.hpp"
 #include "Drifts/DriftFactory.hpp"
 
+namespace gstlrn
+{
 ADrift::ADrift()
-    : AStringable()
+  : AStringable()
 {
 }
 
-ADrift::ADrift(const ADrift &r)
-    : AStringable(r)
+ADrift::ADrift(const ADrift& r)
+  : AStringable(r)
 {
 }
 
-ADrift& ADrift::operator=(const ADrift &r)
+ADrift& ADrift::operator=(const ADrift& r)
 {
   if (this != &r)
   {
@@ -39,4 +41,5 @@ String ADrift::toString(const AStringFormat* /*strfmt*/) const
   std::stringstream sstr;
   sstr << getDriftName();
   return sstr.str();
+}
 }

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 class CovContext;
 class TurningBandOperate;
 
@@ -25,9 +27,9 @@ public:
   virtual ~CovSincard();
 
   double         getScadef() const override;
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Cardinal Sine"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
   bool isValidForTurningBand() const override { return true; }
@@ -37,3 +39,4 @@ protected:
   double _evaluateCov(double h) const override;
 };
 
+}

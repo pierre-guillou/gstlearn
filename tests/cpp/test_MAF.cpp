@@ -20,7 +20,9 @@
 #include "Variogram/VarioParam.hpp"
 #include "Basic/OptDbg.hpp"
 #include "geoslib_define.h"
+#include "utils.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
 ** Main Program for testing MAF
@@ -33,12 +35,12 @@ int main(int argc, char *argv[])
   StdoutRedirect sr(sfn.str(), argc, argv);
 
   DECLARE_UNUSED(argc, argv)
-  int nlag = 10;
+  Id nlag                = 10;
   double lag = 0.025;
   VarioParam* varioparam = VarioParam::createOmniDirection(nlag, lag);
 
   String filename;
-  filename = ASerializable::getTestData("MAF", "data_for_MAF.dat");
+  filename = getTestData("MAF", "data_for_MAF.dat");
   Db* data = Db::createFromNF(filename);
   data->display();
 
@@ -53,7 +55,7 @@ int main(int argc, char *argv[])
   auto types = ECov::fromKeys({"NUGGET", "EXPONENTIAL", "SPHERICAL"});
   bool verbose = true;
   OptDbg::define(EDbg::CONVERGE);
-  int err = model_MAF->fit(vario_MAF, types, ctr, ovf, oaf, verbose);
+  auto err = model_MAF->fit(vario_MAF, types, ctr, ovf, oaf, verbose);
   model_MAF->display();
 
   delete varioparam;
@@ -61,5 +63,5 @@ int main(int argc, char *argv[])
   delete vario_MAF;
   delete model_MAF;
 
-  return (err);
+  return static_cast<int>(err);
 }

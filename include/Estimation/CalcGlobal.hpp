@@ -17,21 +17,23 @@
 
 #include "Calculators/ACalcInterpolator.hpp"
 
+namespace gstlrn
+{
+
 class Db;
 class DbGrid;
 class KrigingSystem;
-
 class GSTLEARN_EXPORT Global_Result
 {
 public:
-  int ntot; // Total Number of Data
-  int np;   // Number of active Data
-  int ng;   // Number of grid nodes for Domain discretization
-  double surface; // Surface of Domain
-  double zest;    // Estimate
-  double sse;     // Standard deviation of estimation
-  double cvgeo;   // Coefficient of Variation
-  double cvv;     // Variance of Domain
+  Id ntot;             // Total Number of Data
+  Id np;               // Number of active Data
+  Id ng;               // Number of grid nodes for Domain discretization
+  double surface;       // Surface of Domain
+  double zest;          // Estimate
+  double sse;           // Standard deviation of estimation
+  double cvgeo;         // Coefficient of Variation
+  double cvv;           // Variance of Domain
   VectorDouble weights; // Weights attached to data
 
   /// Has a specific implementation in the Target language
@@ -41,10 +43,10 @@ public:
 class GSTLEARN_EXPORT CalcGlobal: public ACalcInterpolator
 {
 public:
-  CalcGlobal(int ivar0 = 0,
+  CalcGlobal(Id ivar0    = 0,
              bool verbose = false);
-  CalcGlobal(const CalcGlobal &r) = delete;
-  CalcGlobal& operator=(const CalcGlobal &r) = delete;
+  CalcGlobal(const CalcGlobal& r)            = delete;
+  CalcGlobal& operator=(const CalcGlobal& r) = delete;
   virtual ~CalcGlobal();
 
   void setFlagArithmetic(bool flagArithmetic) { _flagArithmetic = flagArithmetic; }
@@ -53,32 +55,33 @@ public:
   Global_Result getGRes() const { return _gRes; }
 
 private:
-  virtual bool _check() override;
-  virtual bool _preprocess() override;
-  virtual bool _run() override;
-  virtual bool _postprocess() override;
-  virtual void _rollback() override;
+  bool _check() override;
+  bool _preprocess() override;
+  bool _run() override;
+  bool _postprocess() override;
+  void _rollback() override;
 
-  int _globalKriging();
-  int _globalArithmetic();
+  Id _globalKriging();
+  Id _globalArithmetic();
 
 private:
   bool _flagArithmetic;
   bool _flagKriging;
-  int    _ivar0;
-  bool   _verbose;
+  Id _ivar0;
+  bool _verbose;
   Model* _modelLocal;
 
   Global_Result _gRes;
 };
 
-GSTLEARN_EXPORT Global_Result global_arithmetic(Db *dbin,
-                                                DbGrid *dbgrid,
-                                                ModelGeneric *model,
-                                                int ivar0,
-                                                bool verbose);
-GSTLEARN_EXPORT Global_Result global_kriging(Db *dbin,
-                                             Db *dbout,
-                                             ModelGeneric *model,
-                                             int ivar0,
-                                             bool verbose);
+GSTLEARN_EXPORT Global_Result global_arithmetic(Db* dbin,
+                                                DbGrid* dbgrid,
+                                                ModelGeneric* model,
+                                                Id ivar0    = 0,
+                                                bool verbose = false);
+GSTLEARN_EXPORT Global_Result global_kriging(Db* dbin,
+                                             Db* dbout,
+                                             ModelGeneric* model,
+                                             Id ivar0    = 0,
+                                             bool verbose = false);
+} // namespace gstlrn

@@ -15,6 +15,8 @@
 
 /* Be careful ! This is not a real covariance */
 
+namespace gstlrn
+{
 class CovContext;
 class TurningBandOperate;
 
@@ -26,10 +28,10 @@ public:
   CovPower& operator= (const CovPower &r);
   virtual ~CovPower();
 
-  int            hasRange()    const override { return -1; }
+  Id            hasRange()    const override { return -1; }
   bool           hasParam()    const override { return true; }
   double         getParMax()   const override { return 1.99; }
-  int            getMinOrder() const override { return 0; }
+  Id            getMinOrder() const override { return 0; }
   String         getCovName()  const override { return "Power"; }
   bool           getCompatibleSpaceR() const override { return true; }
 
@@ -40,3 +42,4 @@ protected:
   double _evaluateCov(double h) const override;
 };
 
+}

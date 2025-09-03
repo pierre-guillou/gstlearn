@@ -13,6 +13,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace gstlrn
+{
 AException::AException(const std::string& msg)
 : std::exception()
 , _msg(msg)
@@ -30,7 +32,7 @@ const char* AException::what() const noexcept
 
 void throw_exp(const std::string& msg,
                const std::string& file,
-               int line)
+               Id line)
 {
   std::stringstream sstr;
   if (!file.empty())
@@ -42,4 +44,5 @@ void throw_exp(const std::string& msg,
   sstr << msg;
   std::cout << "Error: " << sstr.str() << std::endl;
   throw(AException(sstr.str()));
+}
 }

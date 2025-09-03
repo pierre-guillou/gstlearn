@@ -16,6 +16,7 @@
 #include "Space/SpacePoint.hpp"
 #include <iostream>
 
+using namespace gstlrn;
 /**
  * Demonstration of space composite features
  */
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
 
   auto psp = getDefaultSpaceSh();
   psp->display();  // Long description (level 1)
-  psp->display(0); // Short description (level 0)
+  psp->display(Id{}); // Short description (level 0)
 
   SpacePoint pt1({4.5, 6.5, 10});
   SpacePoint pt2({3.0, 2.5, 15});

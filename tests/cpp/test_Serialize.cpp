@@ -8,203 +8,423 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/Db.hpp"
-#include "Db/DbGrid.hpp"
-#include "Variogram/VarioParam.hpp"
-#include "Variogram/Vario.hpp"
-#include "Matrix/Table.hpp"
-#include "Model/Model.hpp"
+#include "Basic/AStringFormat.hpp"
 #include "Basic/File.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/PolyLine2D.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "Basic/AStringFormat.hpp"
-#include "Polygon/Polygons.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "LithoRule/Rule.hpp"
+#include "Matrix/Table.hpp"
+#include "Mesh/MeshETurbo.hpp"
+#include "Model/Model.hpp"
+#include "Neigh/NeighMoving.hpp"
+#include "Neigh/NeighUnique.hpp"
+#include "Polygon/Polygons.hpp"
+#include "Variogram/Vario.hpp"
+#include "Variogram/VarioParam.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
-** Main Program for testing the sparse matrix algebra
+** Main Program for testing Serialize/Deserialize
+** in Neutral or HDF5 format
 **
 *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setContainerName(true);
-  ASerializable::setPrefixName("TS-");
+  ASerializable::setPrefixName("test_Serialize-");
 
-  // =======================
-  // Checking Db
-  // =======================
+  // Next flag indicates if the format is NF (true) or H5 (false)
+  bool flagNeutral = false;
+  bool verbose     = false;
+  Id mode          = 0;
 
-  // ===== Create the Db db1
-  int nech = 20;
-  bool verbose = false;
+  // =================
+  // Preliminary tasks
+  // =================
 
-  Db* db1 = Db::createFromBox(nech,{0.,0.},{1.,1.}, 32432);
+  Id nech           = 20;
+  Db* db            = Db::createFromBox(nech, {0., 0.}, {1., 1.}, 32432);
   VectorDouble vec1 = VH::simulateGaussian(nech);
-  db1->addColumns(vec1,"myvar1",ELoc::Z, 0);
+  db->addColumns(vec1, "myvar1", ELoc::Z, 0);
   VectorDouble vec2 = VH::simulateGaussian(nech);
-  db1->addColumns(vec2,"myvar2");
-  db1->display();
-  
-  // Serialize db1
-  (void) db1->dumpToNF("Neutral.Db.ascii");
-  (void) db1->dumpToNF("Neutral2.Db.ascii");
+  db->addColumns(vec2, "myvar2");
 
-  // Deserialize db2
-  Db* db2 = Db::createFromNF("Neutral.Db.ascii",verbose);
-  db2->display();
-  delete db2;
-  db2 = Db::createFromNF("Neutral2.Db.ascii",verbose);
-  db2->display();
-  (void) db2->dumpToNF("Neutral22.Db.ascii");
-
-  // =======================
-  // Checking Db (grid)
-  // =======================
-
-  // ===== Create the Grid Db
-  DbGrid* dbg1 = DbGrid::create({12,10},{0.1,0.3},{0.2,0.4});
-  vec1 = VH::simulateGaussian(dbg1->getNSample());
-  dbg1->addColumns(vec1,"myvar1",ELoc::Z, 0);
-  vec2 = VH::simulateGaussian(dbg1->getNSample());
+  DbGrid* dbg = DbGrid::create({12, 10}, {0.1, 0.3}, {0.2, 0.4});
+  vec1        = VH::simulateGaussian(dbg->getNSample());
+  dbg->addColumns(vec1, "myvar1", ELoc::Z, 0);
+  vec2    = VH::simulateGaussian(dbg->getNSample());
   vec2[2] = TEST;
   vec2[5] = TEST;
-  dbg1->addColumns(vec2,"myvar2",ELoc::Z, 1);
-  dbg1->display();
+  dbg->addColumns(vec2, "myvar2", ELoc::Z, 1);
 
-  // Serialize dbg1
-  (void) dbg1->dumpToNF("Neutral.Dbg.ascii");
+  // ==
+  // Db
+  // ==
 
-  // Deserialize dbg2
-  Db* dbg2 = DbGrid::createFromNF("Neutral.Dbg.ascii",verbose);
-  dbg2->display();
+  if (mode == 0 || mode == 1)
+  {
+    Db* db1 = db->clone();
+    db1->display();
 
-  // =======================
-  // Checking Polygons
-  // =======================
+    // Serialize
+    if (flagNeutral)
+      (void)db1->dumpToNF("Db.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)db1->dumpToNF("Db.NF.h5", EFormatNF::H5);
 
-  // ===== Create the Polygon poly1
-  Polygons poly1;
-  poly1.resetFromDb(db1);
-  Polygons polyb;
-  polyb.resetFromDb(dbg1);
-  poly1.addPolyElem(polyb.getPolyElem(0));
-  poly1.display();
+    // Deserialize
+    Db* db2 = nullptr;
+    if (flagNeutral)
+      db2 = Db::createFromNF("Db.NF.ascii", verbose);
+    else
+      db2 = Db::createFromNF("Db.NF.h5", verbose);
+    db2->display();
 
-  // Serialize poly1
-  (void) poly1.dumpToNF("Neutral.Polygon.ascii");
+    delete db1;
+    delete db2;
+  }
 
-  // Deserialize poly2
-  Polygons* poly2 = Polygons::createFromNF("Neutral.Polygon.ascii",verbose);
-  poly2->display();
-  delete poly2;
+  // ======
+  // DbGrid
+  // ======
 
-  // =======================
-  // Checking Vario
-  // =======================
+  if (mode == 0 || mode == 2)
+  {
+    DbGrid* dbg1 = dbg->clone();
+    dbg1->display();
 
-  // ===== Compute an experimental variogram
-  VarioParam varioparam1;
-  DirParam dirparam(10, 0.02);
-  varioparam1.addDir(dirparam);
-  Vario vario1 = Vario(varioparam1);
-  vario1.compute(db1, ECalcVario::VARIOGRAM);
-  vario1.display();
+    // Serialize
+    if (flagNeutral)
+      (void)dbg1->dumpToNF("Dbg.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)dbg1->dumpToNF("Dbg.NF.h5", EFormatNF::H5);
 
-  // Serialize vario1
-  (void) vario1.dumpToNF("Neutral.Vario.ascii");
+    // Deserialize
+    Db* dbg2 = nullptr;
+    if (flagNeutral)
+      dbg2 = DbGrid::createFromNF("Dbg.NF.ascii", verbose);
+    else
+      dbg2 = DbGrid::createFromNF("Dbg.NF.h5", verbose);
+    dbg2->display();
 
-  // Deserialize vario2
-  Vario* vario2 = Vario::createFromNF("Neutral.Vario.ascii",verbose);
-  vario2->display();
+    delete dbg1;
+    delete dbg2;
+  }
 
-  // =======================
-  // Checking Model
-  // =======================
+  // ========
+  // Polygons
+  // ========
 
-  // ===== Create a Model
-  Model* model1 = Model::createFromParam(ECov::EXPONENTIAL, 0.3, 0.2, 1.);
-  model1->display();
+  if (mode == 0 || mode == 3)
+  {
+    auto* poly1 = new Polygons();
+    poly1->resetFromDb(db);
+    auto* polyb = new Polygons();
+    polyb->resetFromDb(dbg);
+    poly1->addPolyElem(polyb->getPolyElem(0));
+    poly1->display();
 
-  // Serialize model1
-  (void) model1->dumpToNF("Neutral.Model.ascii");
+    // Serialize
+    if (flagNeutral)
+      (void)poly1->dumpToNF("Polygon.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)poly1->dumpToNF("Polygon.NF.h5", EFormatNF::H5);
 
-  // Deserialize model2
-  Model* model2 = Model::createFromNF("Neutral.Model.ascii",verbose);
-  model2->display();
+    // Deserialize
+    Polygons* poly2 = nullptr;
+    if (flagNeutral)
+      poly2 = Polygons::createFromNF("Polygon.NF.ascii", verbose);
+    else
+      poly2 = Polygons::createFromNF("Polygon.NF.h5", verbose);
+    poly2->display();
 
-  // =======================
-  // Checking Table
-  // =======================
+    delete polyb;
+    delete poly1;
+    delete poly2;
+  }
 
-  // ===== Create a Table
-  VectorVectorDouble table;
-  int ncols = 3;
-  int nrows = 10;
-  Table* table1 = Table::create(nrows, ncols);
-  for (int irow = 0; irow < nrows; irow++)
-    for (int icol = 0; icol < ncols; icol++)
-      table1->setValue(irow, icol, law_uniform());
-  table1->display();
+  // =====
+  // Vario
+  // =====
 
-  // Serialize table
-  (void) table1->dumpToNF("Neutral.Table.ascii");
+  if (mode == 0 || mode == 4)
+  {
+    VarioParam varioparam;
+    DirParam dirparam(10, 0.02);
+    varioparam.addDir(dirparam);
+    Vario vario1(varioparam);
+    vario1.compute(db, ECalcVario::VARIOGRAM);
+    vario1.display();
 
-  // Deserialize table1
-  Table* table2 = Table::createFromNF("Neutral.Table.ascii",verbose);
-  table2->display();
+    // Serialize
+    if (flagNeutral)
+      (void)vario1.dumpToNF("Vario.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)vario1.dumpToNF("Vario.NF.h5", EFormatNF::H5);
 
-  // =======================
-  // Checking Rule
-  // =======================
+    // Deserialize
+    Vario* vario2 = nullptr;
+    if (flagNeutral)
+      vario2 = Vario::createFromNF("Vario.NF.ascii", verbose);
+    else
+      vario2 = Vario::createFromNF("Vario.NF.h5", verbose);
+    vario2->display();
 
-  Rule* rule = Rule::createFromNames({"S","F1","T","F2","S","F3","F4"});
-  rule->display();
+    delete vario2;
+  }
 
-  // Serialize
-  (void) rule->dumpToNF("Neutral.Rule.ascii");
+  // ==========
+  // Covariance
+  // ==========
 
-  // Deserialize
-  Rule* rule2 = Rule::createFromNF("Neutral.Rule.ascii",verbose);
-  rule2->display();
+  if (mode == 0 || mode == 5)
+  {
+    VarioParam varioparam;
+    DirParam dirparam(10, 0.02);
+    varioparam.addDir(dirparam);
+    Vario covariance1(varioparam);
+    covariance1.compute(db, ECalcVario::COVARIANCE);
+    covariance1.display();
 
-  // ======================
-  // Checking PolyLine2D
-  // ======================
+    // Serialize
+    if (flagNeutral)
+      // (void)covariance1.dumpToNF("Covariance.NF.ascii", EFormatNF::ASCII);
+      messerr("Useless trying to save a Covariance in old format");
+    else
+      (void)covariance1.dumpToNF("Covariance.NF.h5", EFormatNF::H5);
 
-  int npolyline = 100;
-  VectorDouble xpolyline = VH::simulateGaussian(npolyline);
-  VectorDouble ypolyline = VH::simulateGaussian(npolyline);
-  PolyLine2D* polyline   = new PolyLine2D(xpolyline, ypolyline);
-  AStringFormat afmt(3);
-  polyline->display(&afmt);
+    // Deserialize
+    Vario* covariance2 = nullptr;
+    if (flagNeutral)
+      // covariance2 = Vario::createFromNF("Covariance.NF.ascii", verbose);
+      messerr("Useless trying to recover a Covariance in old format");
+    else
+      covariance2 = Vario::createFromNF("Covariance.NF.h5", verbose);
+    covariance2->display();
 
-  // Serialize
-  (void) polyline->dumpToNF("Neutral.Polyline.ascii");
+    delete covariance2;
+  }
 
-  // Deserialize
-  PolyLine2D* polyline2 =
-    PolyLine2D::createFromNF("Neutral.Polyline.ascii", verbose);
-  polyline2->display(&afmt);
+  // =====
+  // Model
+  // =====
 
-  delete db1;
-  delete db2;
-  delete dbg1;
-  delete dbg2;
-  delete vario2;
-  delete model1;
-  delete model2;
-  delete table1;
-  delete table2;
-  delete rule;
-  delete rule2;
-  delete polyline;
-  delete polyline2;
+  if (mode == 0 || mode == 6)
+  {
+    Model* model1 = Model::createFromParam(ECov::EXPONENTIAL, 0.3, 0.2, 1.);
+    model1->display();
 
-  return(0);
+    // Serialize model1
+    if (flagNeutral)
+      (void)model1->dumpToNF("Model.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)model1->dumpToNF("Model.NF.h5", EFormatNF::H5);
+
+    // Deserialize model2
+    Model* model2 = nullptr;
+    if (flagNeutral)
+      model2 = Model::createFromNF("Model.NF.ascii", verbose);
+    else
+      model2 = Model::createFromNF("Model.NF.h5", verbose);
+    model2->display();
+
+    delete model1;
+    delete model2;
+  }
+
+  // =====
+  // Table
+  // =====
+
+  if (mode == 0 || mode == 7)
+  {
+    VectorVectorDouble table;
+    Id ncols      = 3;
+    Id nrows      = 10;
+    Table* table1 = Table::create(nrows, ncols);
+    for (Id irow = 0; irow < nrows; irow++)
+      for (Id icol = 0; icol < ncols; icol++)
+        table1->setValue(irow, icol, law_uniform());
+    table1->display();
+
+    // Serialize table
+    if (flagNeutral)
+      (void)table1->dumpToNF("Table.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)table1->dumpToNF("Table.NF.h5", EFormatNF::H5);
+
+    // Deserialize table1
+    Table* table2 = nullptr;
+    if (flagNeutral)
+      table2 = Table::createFromNF("Table.NF.ascii", verbose);
+    else
+      table2 = Table::createFromNF("Table.NF.h5", verbose);
+    table2->display();
+
+    delete table1;
+    delete table2;
+  }
+
+  // ====
+  // Rule
+  // ====
+
+  if (mode == 0 || mode == 8)
+  {
+    Rule* rule1 = Rule::createFromNames({"S", "F1", "T", "F2", "S", "F3", "F4"});
+    rule1->display();
+
+    // Serialize
+    if (flagNeutral)
+      (void)rule1->dumpToNF("Rule.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)rule1->dumpToNF("Rule.NF.h5", EFormatNF::H5);
+
+    // Deserialize
+    Rule* rule2 = nullptr;
+    if (flagNeutral)
+      rule2 = Rule::createFromNF("Rule.NF.ascii", verbose);
+    else
+      rule2 = Rule::createFromNF("Rule.NF.h5", verbose);
+    rule2->display();
+
+    delete rule1;
+    delete rule2;
+  }
+
+  // ==========
+  // PolyLine2D
+  // ==========
+
+  if (mode == 0 || mode == 9)
+  {
+    Id npolyline           = 100;
+    VectorDouble xpolyline = VH::simulateGaussian(npolyline);
+    VectorDouble ypolyline = VH::simulateGaussian(npolyline);
+    auto* polyline1        = new PolyLine2D(xpolyline, ypolyline);
+    AStringFormat afmt(3);
+    polyline1->display(&afmt);
+
+    // Serialize
+    if (flagNeutral)
+      (void)polyline1->dumpToNF("Polyline.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)polyline1->dumpToNF("Polyline.NF.h5", EFormatNF::H5);
+
+    // Deserialize
+    PolyLine2D* polyline2 = nullptr;
+    if (flagNeutral)
+      polyline2 = PolyLine2D::createFromNF("Polyline.NF.ascii", verbose);
+    else
+      polyline2 = PolyLine2D::createFromNF("Polyline.NF.h5", verbose);
+    polyline2->display(&afmt);
+
+    delete polyline1;
+    delete polyline2;
+  }
+
+  // ===================
+  // Moving Neighborhood
+  // ===================
+
+  if (mode == 0 || mode == 10)
+  {
+    Id nmaxi            = 20;
+    double radius       = 4.;
+    Id nmini            = 2;
+    Id nsect            = 5;
+    Id nsmax            = 3;
+    VectorDouble coeffs = {2., 3.};
+    VectorDouble angles = {25., 0.};
+    bool useBallTree    = true;
+
+    NeighMoving* neigh1 = NeighMoving::create(false, nmaxi, radius,
+                                              nmini, nsect, nsmax,
+                                              coeffs, angles, useBallTree);
+    neigh1->display();
+
+    // Serialize
+    if (flagNeutral)
+      (void)neigh1->dumpToNF("NeighMoving.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)neigh1->dumpToNF("NeighMoving.NF.h5", EFormatNF::H5);
+
+    // Deserialize
+    NeighMoving* neigh2 = nullptr;
+    if (flagNeutral)
+      neigh2 = NeighMoving::createFromNF("NeighMoving.NF.ascii", verbose);
+    else
+      neigh2 = NeighMoving::createFromNF("NeighMoving.NF.h5", verbose);
+    neigh2->display();
+
+    delete neigh1;
+    delete neigh2;
+  }
+
+  // ===================
+  // Unique Neighborhood
+  // ===================
+
+  if (mode == 0 || mode == 11)
+  {
+    NeighUnique* neigh1 = NeighUnique::create();
+    neigh1->display();
+
+    // Serialize
+    if (flagNeutral)
+      (void)neigh1->dumpToNF("NeighUnique.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)neigh1->dumpToNF("NeighUnique.NF.h5", EFormatNF::H5);
+
+    // Deserialize
+    NeighUnique* neigh2 = nullptr;
+    if (flagNeutral)
+      neigh2 = NeighUnique::createFromNF("NeighUnique.NF.ascii", verbose);
+    else
+      neigh2 = NeighUnique::createFromNF("NeighUnique.NF.h5", verbose);
+    neigh2->display();
+
+    delete neigh1;
+    delete neigh2;
+  }
+
+  // ===============
+  // Meshing (Turbo)
+  // ===============
+
+  if (mode == 0 || mode == 12)
+  {
+    MeshETurbo* mesh1 = MeshETurbo::create({10, 10});
+    mesh1->display();
+
+    // Serialize
+    if (flagNeutral)
+      (void)mesh1->dumpToNF("Mesh.NF.ascii", EFormatNF::ASCII);
+    else
+      (void)mesh1->dumpToNF("Mesh.NF.h5", EFormatNF::H5);
+
+    // Deserialize
+    MeshETurbo* mesh2 = nullptr;
+    if (flagNeutral)
+      mesh2 = MeshETurbo::createFromNF("Mesh.NF.ascii", verbose);
+    else
+      mesh2 = MeshETurbo::createFromNF("Mesh.NF.h5", verbose);
+    mesh2->display();
+
+    delete mesh1;
+    delete mesh2;
+  }
+
+  // Cleaning procedure
+  delete db;
+  delete dbg;
+
+  return (0);
 }

@@ -13,172 +13,174 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/VectorHelper.hpp"
 #include "LinearOp/IProj.hpp"
+#include "LinearOp/ProjMultiMatrix.hpp"
 
-int ProjMulti::findFirstNoNullOnRow(int j) const
+namespace gstlrn
 {
-    int i = 0;
+Id ProjMulti::findFirstNoNullOnRow(Id j) const
+{
+  Id i = 0;
 
-    while (i < (int)_projs[j].size() && _projs[j][i]==nullptr)
-    {
-        i++;
-    }
-    if (i == (int)_projs[j].size())
-    {
-        messerr("All the projectors of row %d are nullptr",j);
-        return -1;    
-    }
-    return i;
+  while (i < static_cast<Id>(_projs[j].size()) && _projs[j][i] == nullptr)
+  {
+    i++;
+  }
+  if (i == static_cast<Id>(_projs[j].size()))
+  {
+    messerr("All the projectors of row %d are nullptr", j);
+    return -1;
+  }
+  return i;
 }
 
-int ProjMulti::findFirstNoNullOnCol(int j) const
+Id ProjMulti::findFirstNoNullOnCol(Id j) const
 {
-    int i = 0;
-    while (i < (int)_projs.size() && _projs[i][j]==nullptr)
-    {
-        i++;
-    }
-    if (i == (int)_projs.size())
-    {
-        i = -1;
-        messerr("All the projectors of column %d are nullptr.",j);
-    }
-    return i;
+  Id i = 0;
+  while (i < static_cast<Id>(_projs.size()) && _projs[i][j] == nullptr)
+  {
+    i++;
+  }
+  if (i == static_cast<Id>(_projs.size()))
+  {
+    i = -1;
+    messerr("All the projectors of column %d are nullptr.", j);
+  }
+  return i;
 }
 
-bool ProjMulti::_checkArg(const std::vector<std::vector<const IProj*>> &projs) const
+bool ProjMulti::_checkArg(const std::vector<std::vector<const IProj*>>& projs) const
 {
-    if (projs.empty())
-    {   
-        if (!_silent)
-            messerr("projs is empty.");
-        return true;
-    }
+  if (projs.empty())
+  {
+    if (!_silent)
+      messerr("projs is empty.");
+    return true;
+  }
 
-    int nvariable = (int)projs.size();
-    int nlatent = (int)projs[0].size();
-    
-    if (nlatent == 0)
-    {
-        messerr("There is no projection in line 0.");
-        return true;
-    }
+  Id nvariable = static_cast<Id>(projs.size());
+  Id nlatent   = static_cast<Id>(projs[0].size());
 
-    for (int i = 1; i < nvariable; i++)
+  if (nlatent == 0)
+  {
+    messerr("There is no projection in line 0.");
+    return true;
+  }
+
+  for (Id i = 1; i < nvariable; i++)
+  {
+    if (static_cast<Id>(projs[i].size()) != nlatent)
     {
-        if ((int)projs[i].size() != nlatent)
+      messerr("All the elements of proj have to share the same size.");
+      messerr("Line %d has %d elements instead of %d.", i, projs[i].size(), nlatent);
+      return true;
+    }
+  }
+
+  for (Id i = 0; i < nvariable; i++)
+  {
+    Id fcol = findFirstNoNullOnRow(i);
+    if (fcol == -1)
+      return true;
+
+    auto npoints = projs[i][fcol]->getNPoint();
+    for (Id j = fcol + 1; j < nlatent; j++)
+    {
+      if (projs[i][j] != nullptr)
+      {
+        if (projs[i][j]->getNPoint() != npoints)
         {
-            messerr("All the elements of proj have to share the same size.");
-            messerr("Line %d has %d elements instead of %d.",i,projs[i].size(),nlatent);
-            return true;
+          messerr("Inconsistency between the IProj Point Numbers.");
+          messerr("Element [%d,%d] should have Point Number = %d  instead of %d.",
+                  i, j, npoints, projs[i][j]->getNPoint());
+          return true;
         }
-    } 
+      }
+    }
+  }
 
-    for (int i = 0; i < nvariable; i++)
+  for (Id j = 0; j < nlatent; j++)
+  {
+    Id frow = findFirstNoNullOnCol(j);
+    if (frow == -1)
+      return true;
+
+    auto nvertex = projs[frow][j]->getNApex();
+    for (Id i = frow + 1; i < nvariable; i++)
     {
-        int fcol = findFirstNoNullOnRow(i);
-        if (fcol == -1)
-            return true;
-        
-        auto npoints = projs[i][fcol]->getNPoint();
-        for (int j = fcol + 1; j < nlatent; j++)
-        {   if( projs[i][j] != nullptr)
-            {
-                if ( projs[i][j]->getNPoint() != npoints)
-                {
-                    messerr("Inconsistency between the IProj Point Numbers.");
-                    messerr("Element [%d,%d] should have Point Number = %d  instead of %d.",
-                            i,j,npoints, projs[i][j]->getNPoint());
-                    return true;
-                }
-            }
+      if (projs[i][j] != nullptr)
+      {
+        if (projs[i][j]->getNApex() != nvertex)
+        {
+          messerr("Inconsistency between the IProj Apex Numbers.");
+          messerr("Element [%d,%d] should have Apex Number = %d  instead of %d.",
+                  i, j, nvertex, projs[i][j]->getNApex());
+          return true;
         }
+      }
     }
-
-    for (int j = 0; j < nlatent; j++)
-    {   
-        int frow = findFirstNoNullOnCol(j);
-        if (frow == -1)
-            return true;
-
-        auto nvertex = projs[frow][j]->getNApex();
-        for (int i = frow + 1; i < nvariable; i++)
-        {   
-            if (projs[i][j] != nullptr)
-            {
-                if (projs[i][j]->getNApex() != nvertex)
-                {
-                    messerr("Inconsistency between the IProj Apex Numbers.");
-                    messerr("Element [%d,%d] should have Apex Number = %d  instead of %d.",
-                            i,j,nvertex,projs[i][j]->getNApex());
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+  }
+  return false;
 }
 
 void ProjMulti::_init()
 {
-    _nvariable = (int)_projs.size();
-    _nlatent = (int)_projs[0].size();
+  _nvariable = static_cast<Id>(_projs.size());
+  _nlatent   = static_cast<Id>(_projs[0].size());
 
-    for (int i = 0; i < _nvariable; i++)
-    {
-        int fcol = findFirstNoNullOnRow(i);
-        auto npoints = _projs[i][fcol]->getNPoint();
-        _pointNumbers.push_back(npoints);
-        _pointNumber += npoints;
-    }
+  for (Id i = 0; i < _nvariable; i++)
+  {
+    Id fcol      = findFirstNoNullOnRow(i);
+    auto npoints = _projs[i][fcol]->getNPoint();
+    _pointNumbers.push_back(npoints);
+    _pointNumber += npoints;
+  }
 
-    for (int j = 0; j < _nlatent; j++)
-    {   
-        int frow = findFirstNoNullOnCol(j);
-        auto nvertex = _projs[frow][j]->getNApex();
-        _apexNumbers.push_back(nvertex);
-        _apexNumber += nvertex;
-    }
-
-
+  for (Id j = 0; j < _nlatent; j++)
+  {
+    Id frow      = findFirstNoNullOnCol(j);
+    auto nvertex = _projs[frow][j]->getNApex();
+    _apexNumbers.push_back(nvertex);
+    _apexNumber += nvertex;
+  }
 }
 
 ProjMulti::~ProjMulti()
 {
-     _clear();
+  _clear();
 }
 
-ProjMulti::ProjMulti(const std::vector<std::vector<const IProj*>> &projs, bool silent)
-: _projs(projs)
-, _pointNumber(0)
-, _apexNumber(0)
-, _nlatent(0)
-, _nvariable(0)
-, _silent(silent)
-{   
-
-    if (_checkArg(_projs))
-    {   if (_projs.size()!=0)
-        {
-            messerr("Problem in initialization of ProjMulti.");
-        }
-        _projs.resize(0);
-        return;
+ProjMulti::ProjMulti(const std::vector<std::vector<const IProj*>>& projs, bool silent)
+  : _projs(projs)
+  , _pointNumber(0)
+  , _apexNumber(0)
+  , _nlatent(0)
+  , _nvariable(0)
+  , _silent(silent)
+{
+  if (_checkArg(_projs))
+  {
+    if (_projs.size() != 0)
+    {
+      messerr("Problem in initialization of ProjMulti.");
     }
+    _projs.resize(0);
+    return;
+  }
 
-    _init();
+  _init();
 }
 
-int ProjMulti::_addPoint2mesh(const constvect inv, vect outv) const
+Id ProjMulti::_addPoint2mesh(const constvect inv, vect outv) const
 {
   vect wms;
-  int iadvar = 0;
-  for (int i = 0; i < _nlatent; i++)
+  Id iadvar = 0;
+  for (Id i = 0; i < _nlatent; i++)
   {
-    int iad     = 0;
-    int nvertex = _apexNumbers[i];
+    Id iad     = 0;
+    Id nvertex = _apexNumbers[i];
     _workmesh.resize(nvertex);
     std::fill(_workmesh.begin(), _workmesh.end(), 0.);
-    for (int j = 0; j < _nvariable; j++)
+    for (Id j = 0; j < _nvariable; j++)
     {
       if (_projs[j][i] != nullptr)
       {
@@ -196,17 +198,17 @@ int ProjMulti::_addPoint2mesh(const constvect inv, vect outv) const
   return 0;
 }
 
-int ProjMulti::_addMesh2point(const constvect inv, vect outv) const
+Id ProjMulti::_addMesh2point(const constvect inv, vect outv) const
 {
   vect ws;
-  int iadvar = 0;
-  for (int i = 0; i < _nvariable; i++)
+  Id iadvar = 0;
+  for (Id i = 0; i < _nvariable; i++)
   {
-    int iad    = 0;
-    int npoint = _pointNumbers[i];
+    Id iad    = 0;
+    Id npoint = _pointNumbers[i];
     _work.resize(npoint);
     std::fill(_work.begin(), _work.end(), 0.);
-    for (int j = 0; j < _nlatent; j++)
+    for (Id j = 0; j < _nlatent; j++)
     {
       if (_projs[i][j] != nullptr)
       {
@@ -223,12 +225,46 @@ int ProjMulti::_addMesh2point(const constvect inv, vect outv) const
   return 0;
 }
 
-int ProjMulti::getNApex() const
+Id ProjMulti::getNApex() const
 {
   return _apexNumber;
 }
 
-int ProjMulti::getNPoint() const
+Id ProjMulti::getNPoint() const
 {
   return _pointNumber;
 }
+
+String ProjMulti::toString(const AStringFormat* /*strfmt*/) const
+{
+  std::stringstream sstr;
+
+  const auto* test = dynamic_cast<const ProjMultiMatrix*>(this);
+  if (test != nullptr)
+    sstr << "Description of the ProjMultiMatrix" << std::endl;
+  else
+    sstr << "Description of the ProjMulti" << std::endl;
+
+  sstr << "Number of Variables = " << _nvariable << std::endl;
+  sstr << "Number of Latents = " << _nlatent << std::endl;
+
+  for (Id irow = 0; irow < _nvariable; irow++)
+  {
+    for (Id icol = 0; icol < _nlatent; icol++)
+    {
+      sstr << "- Row (" << irow + 1 << ") - Col (" << icol + 1 << ") : ";
+      const IProj* proj = _projs[irow][icol];
+      if (proj == nullptr)
+        sstr << "empty";
+      else
+        sstr << " Mesh (" << getNPoint() << " - " << proj->getNApex() << ")";
+      sstr << std::endl;
+    }
+  }
+
+  sstr << "Total Number of Rows    = " << getNPoint() << std::endl;
+  sstr << "Total Number of Columns = " << getNApex() << std::endl;
+
+  return sstr.str();
+}
+} // namespace gstlrn

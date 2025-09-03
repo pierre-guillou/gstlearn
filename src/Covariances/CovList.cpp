@@ -10,23 +10,29 @@
 /******************************************************************************/
 #include "Covariances/CovList.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/Iterators.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Covariances/ACov.hpp"
 #include "Covariances/CovBase.hpp"
 #include "Covariances/CovCalcMode.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Enum/ECalcMember.hpp"
-#include "Space/ASpace.hpp"
 #include "Covariances/CovFactory.hpp"
 #include "Covariances/CovLMGradient.hpp"
 #include "Db/Db.hpp"
+#include "Enum/ECalcMember.hpp"
+#include "Model/ModelFitSillsVMap.hpp"
+#include "Model/ModelFitSillsVario.hpp"
+#include "Space/ASpace.hpp"
 #include "Space/SpacePoint.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "geoslib_define.h"
 
-#include <math.h>
+#include <cmath>
 #include <memory>
 #include <vector>
+
+namespace gstlrn
+{
 
 CovList::CovList(const CovContext& ctxt)
   : ACov(ctxt)
@@ -35,6 +41,8 @@ CovList::CovList(const CovContext& ctxt)
   , _allActiveCov(true)
   , _allActiveCovList()
   , _activeCovList()
+  , _modelFitSills(nullptr)
+  , _itergCum(0)
 {
   _updateLists();
 }
@@ -42,14 +50,16 @@ CovList::CovList(const CovContext& ctxt)
 CovList::CovList(const CovList& r)
   : ACov(r)
 {
-  for (const auto* e: r._covs)
+  for (const auto& e: r._covs)
   {
-    _covs.push_back((CovBase*)e->clone());
+    _covs.push_back(std::dynamic_pointer_cast<CovBase>(e->cloneShared()));
   }
   _filtered         = r._filtered;
   _allActiveCov     = r._allActiveCov;
   _allActiveCovList = r._allActiveCovList;
   _activeCovList    = r._activeCovList;
+  _modelFitSills    = (r._modelFitSills != nullptr) ? (AModelFitSills*)r._modelFitSills->clone() : nullptr;
+  _itergCum         = r._itergCum;
   _updateLists();
 }
 
@@ -59,14 +69,16 @@ CovList& CovList::operator=(const CovList& r)
   if (this != &r)
   {
     ACov::operator=(r);
-    for (const auto* e: r._covs)
+    for (const auto& e: r._covs)
     {
-      _covs.push_back((CovBase*)e->clone());
+      _covs.push_back(std::dynamic_pointer_cast<CovBase>(e->cloneShared()));
     }
     _filtered         = r._filtered;
     _allActiveCov     = r._allActiveCov;
     _allActiveCovList = r._allActiveCovList;
     _activeCovList    = r._activeCovList;
+    _modelFitSills    = (r._modelFitSills != nullptr) ? (AModelFitSills*)r._modelFitSills->clone() : nullptr;
+    _itergCum         = r._itergCum;
   }
   _updateLists();
   return *this;
@@ -74,20 +86,22 @@ CovList& CovList::operator=(const CovList& r)
 
 CovList::~CovList()
 {
+  delete _modelFitSills;
+  _modelFitSills = nullptr;
   delAllCov();
 }
 
-void CovList::addCovList(const CovList* covs)
+void CovList::addCovList(const CovList& covs)
 {
-  for (int icov = 0, ncov = covs->getNCov(); icov < ncov; icov++)
-    addCov(covs->getCov(icov));
+  for (Id icov = 0, ncov = covs.getNCov(); icov < ncov; icov++)
+    addCov(*covs.getCov(icov));
 }
 
-void CovList::addCov(const CovBase* cov)
+void CovList::addCov(const CovBase& cov)
 {
   if (getNCov() == 0)
   {
-    setNVar(cov->getNVar());
+    setNVar(cov.getNVar());
   }
   else
   {
@@ -95,34 +109,33 @@ void CovList::addCov(const CovBase* cov)
     // Check that the current Context is similar to the one of the newly
     // added covariance
 
-    if (!cov->getContext().isEqual(_covs[0]->getContext()))
+    if (!cov.getContext().isEqual(_covs[0]->getContext()))
     {
       messerr("Error: Covariances in the same CovList should share the same Context");
       messerr("Operation is cancelled");
       return;
     }
   }
-  _covs.push_back((CovBase*)cov->clone());
+  _covs.push_back(std::dynamic_pointer_cast<CovBase>(cov.cloneShared()));
   _filtered.push_back(false);
   _updateLists();
 }
 
 void CovList::_updateLists()
 {
-  int ncov          = getNCov();
+  auto ncov         = getNCov();
   _allActiveCovList = VH::sequence(ncov);
 
   _activeCovList.clear();
-  for (int icov = 0; icov < ncov; icov++)
+  for (Id icov = 0; icov < ncov; icov++)
     if (!_filtered[icov]) _activeCovList.push_back(icov);
 
   _allActiveCov = _activeCovList.size() == _allActiveCovList.size();
 }
 
-void CovList::delCov(int icov)
+void CovList::delCov(Id icov)
 {
   if (!_isCovarianceIndexValid(icov)) return;
-  delete _covs[icov];
   _covs.erase(_covs.begin() + icov);
   _filtered.erase(_filtered.begin() + icov);
   _delCov(icov);
@@ -131,10 +144,6 @@ void CovList::delCov(int icov)
 
 void CovList::delAllCov()
 {
-  for (auto& e: _covs)
-  {
-    delete e;
-  }
   _covs.clear();
   _filtered.clear();
   _allActiveCovList.clear();
@@ -145,7 +154,8 @@ void CovList::delAllCov()
 bool CovList::_isNoStat() const
 {
   // return true if any of the covariances is not stationary
-  return std::any_of(_covs.cbegin(), _covs.cend(), [](const auto& e) { return e->isNoStat(); });
+  return std::any_of(_covs.cbegin(), _covs.cend(), [](const auto& e)
+                     { return e->isNoStat(); });
 }
 
 void CovList::_makeStationary()
@@ -154,19 +164,19 @@ void CovList::_makeStationary()
     e->makeStationary();
 }
 
-void CovList::_attachNoStatDb(const Db* db) 
+void CovList::_attachNoStatDb(const Db* db)
 {
   DECLARE_UNUSED(db)
   std::shared_ptr<const Db> dbptr = _tabNoStat->getDbNoStatRef();
   for (const auto& e: _covs)
     e->setNoStatDbIfNecessary(dbptr);
 }
-int CovList::makeElemNoStat(const EConsElem& econs,
-                            int iv1,
-                            int iv2,
-                            const AFunctional* func,
-                            const Db* db,
-                            const String& namecol)
+Id CovList::makeElemNoStat(const EConsElem& econs,
+                           Id iv1,
+                           Id iv2,
+                           const AFunctional* func,
+                           const Db* db,
+                           const String& namecol)
 {
   DECLARE_UNUSED(econs, iv1, iv2, func, db, namecol)
   messerr("Error: CovList::_makeElemNoStat is not impemented for this classe");
@@ -174,34 +184,28 @@ int CovList::makeElemNoStat(const EConsElem& econs,
   return 1;
 }
 
-void CovList::makeSillNoStatDb(int icov, const String& namecol, int ivar, int jvar)
+void CovList::makeSillNoStatDb(Id icov, const String& namecol, Id ivar, Id jvar)
 {
   if (!_isCovarianceIndexValid(icov)) return;
   getCovModify(icov)->makeSillNoStatDb(namecol, ivar, jvar);
 }
-void CovList::makeSillStationary(int icov, int ivar, int jvar)
+void CovList::makeSillStationary(Id icov, Id ivar, Id jvar)
 {
   if (!_isCovarianceIndexValid(icov)) return;
   getCovModify(icov)->makeSillStationary(ivar, jvar);
 }
-void CovList::makeSillsStationary(int icov,bool silent)
+void CovList::makeSillsStationary(Id icov, bool silent)
 {
   if (!_isCovarianceIndexValid(icov)) return;
   getCovModify(icov)->makeSillsStationary(silent);
 }
-void CovList::makeSillNoStatFunctional(int icov, const AFunctional* func, int ivar, int jvar)
+void CovList::makeSillNoStatFunctional(Id icov, const AFunctional* func, Id ivar, Id jvar)
 {
   if (!_isCovarianceIndexValid(icov)) return;
   getCovModify(icov)->makeSillNoStatFunctional(func, ivar, jvar);
 }
 
-bool CovList::isConsistent(const ASpace* /*space*/) const
-{
-  /// TODO : CovList::isConsistent
-  return true;
-}
-
-int CovList::getNVar() const
+Id CovList::getNVar() const
 {
   if (getNCov() > 0)
     return _covs[0]->getNVar();
@@ -223,33 +227,36 @@ const VectorInt& CovList::_getListActiveCovariances(const CovCalcMode* mode) con
   return _allActiveCovList;
 }
 
-int CovList::addEvalCovVecRHSInPlace(vect vect,
-                                     const VectorInt& index1,
-                                     int iech2,
-                                     const KrigOpt& krigopt,
-                                     SpacePoint& pin,
-                                     SpacePoint& pout,
-                                     VectorDouble& tabwork,
-                                     double lambda) const
+Id CovList::addEvalCovVecRHSInPlace(vect vect,
+                                    const VectorInt& index1,
+                                    Id iech2,
+                                    const KrigOpt& krigopt,
+                                    SpacePoint& pin,
+                                    SpacePoint& pout,
+                                    VectorDouble& tabwork,
+                                    double lambda,
+                                    const ECalcMember& calcMember) const
 {
   CovCalcMode mode(ECalcMember::RHS);
   const VectorInt& list = _getListActiveCovariances(&mode);
   for (const auto& j: list.getVector())
   {
     if (_covs[j]->isOptimEnabled())
-      _covs[j]->addEvalCovVecRHSInPlace(vect, index1, iech2, krigopt, pin, pout, tabwork, lambda);
+      _covs[j]->addEvalCovVecRHSInPlace(vect, index1, iech2, krigopt, pin, pout, tabwork, lambda, calcMember);
     else
-      _covs[j]->ACov::addEvalCovVecRHSInPlace(vect, index1, iech2, krigopt, pin, pout, tabwork, lambda);
+      _covs[j]->ACov::addEvalCovVecRHSInPlace(vect, index1, iech2, krigopt, pin, pout, tabwork, lambda, calcMember);
   }
   return 0;
 }
 
-double CovList::eval0(int ivar, int jvar, const CovCalcMode* mode) const
+double CovList::eval0(Id ivar, Id jvar, const CovCalcMode* mode) const
 {
   double cov            = 0.;
   const VectorInt& list = _getListActiveCovariances(mode);
   for (const auto& j: list.getVector())
+  {
     cov += _covs[j]->eval0(ivar, jvar, mode);
+  }
   return cov;
 }
 
@@ -268,14 +275,16 @@ void CovList::setOptimEnabled(bool flag) const
 
 double CovList::_eval(const SpacePoint& p1,
                       const SpacePoint& p2,
-                      int ivar,
-                      int jvar,
+                      Id ivar,
+                      Id jvar,
                       const CovCalcMode* mode) const
 {
   double cov            = 0.;
   const VectorInt& list = _getListActiveCovariances(mode);
   for (const auto& j: list.getVector())
+  {
     cov += _covs[j]->evalCov(p1, p2, ivar, jvar, mode);
+  }
   return cov;
 }
 
@@ -283,7 +292,9 @@ void CovList::_load(const SpacePoint& p, bool case1) const
 {
   const VectorInt& list = _getListActiveCovariances(nullptr);
   for (const auto& j: list.getVector())
+  {
     _covs[j]->load(p, case1);
+  }
 }
 
 String CovList::toString(const AStringFormat* /*strfmt*/) const
@@ -291,7 +302,7 @@ String CovList::toString(const AStringFormat* /*strfmt*/) const
   std::stringstream sstr;
   if (getNCov() <= 0) return sstr.str();
 
-  for (int icov = 0, ncov = getNCov(); icov < ncov; icov++)
+  for (Id icov = 0, ncov = getNCov(); icov < ncov; icov++)
   {
     sstr << getCov(icov)->toString();
     if (isFiltered(icov))
@@ -302,13 +313,23 @@ String CovList::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-int CovList::getNCov() const
+Id CovList::getNCov() const
 {
-  int ncov = (int)_covs.size();
+  Id ncov = static_cast<Id>(_covs.size());
   return ncov;
 }
 
-bool CovList::isFiltered(int icov) const
+Id CovList::getNCovNuggetExcluded() const
+{
+  Id ntotal = 0;
+  for (Id icov = 0, ncov = getNCov(); icov < ncov; icov++)
+  {
+    if (getCovType(icov) != ECov::NUGGET) ntotal++;
+  }
+  return ntotal;
+}
+
+bool CovList::isFiltered(Id icov) const
 {
   if (!_isCovarianceIndexValid(icov)) return false;
   return _filtered[icov];
@@ -316,61 +337,59 @@ bool CovList::isFiltered(int icov) const
 
 bool CovList::isAllActiveCovList() const
 {
-  for (int i = 0, n = getNCov(); i < n; i++)
+  for (Id i = 0, n = getNCov(); i < n; i++)
   {
     if (_filtered[i]) return false;
   }
   return true;
 }
 
-const CovBase* CovList::getCov(int icov) const
+const CovBase* CovList::getCov(Id icov) const
 {
   if (!_isCovarianceIndexValid(icov)) return nullptr;
-  return _covs[icov];
+  return _covs[icov].get();
 }
 
-
-CovBase* CovList::getCovModify(int icov)
+CovBase* CovList::getCovModify(Id icov)
 {
   if (!_isCovarianceIndexValid(icov)) return nullptr;
-  return _covs[icov];
+  return _covs[icov].get();
 }
 
-void CovList::setCov(int icov, const CovBase* covs)
+void CovList::setCov(Id icov, const CovBase* covs)
 {
   if (!_isCovarianceIndexValid(icov)) return;
-  delete _covs[icov];
-  _covs[icov] = (CovBase*)covs->clone();
+  _covs[icov] = std::dynamic_pointer_cast<CovBase>(covs->cloneShared());
 }
 
-const ECov& CovList::getCovType(int icov) const
+const ECov& CovList::getCovType(Id icov) const
 {
   DECLARE_UNUSED(icov)
   return ECov::UNKNOWN;
 }
 
-String CovList::getCovName(int icov) const
+String CovList::getCovName(Id icov) const
 {
   DECLARE_UNUSED(icov)
   ECov unknown = ECov::UNKNOWN;
   return std::string(unknown.getKey());
 }
 
-const MatrixSymmetric& CovList::getSills(int icov) const
+const MatrixSymmetric& CovList::getSills(Id icov) const
 {
   return _covs[icov]->getSill();
 }
-double CovList::getSill(int icov, int ivar, int jvar) const
+double CovList::getSill(Id icov, Id ivar, Id jvar) const
 {
   if (!_isCovarianceIndexValid(icov)) return 0.;
   return _covs[icov]->getSill(ivar, jvar);
 }
-void CovList::setSill(int icov, int ivar, int jvar, double value)
+void CovList::setSill(Id icov, Id ivar, Id jvar, double value)
 {
   if (!_isCovarianceIndexValid(icov)) return;
   _covs[icov]->setSill(ivar, jvar, value);
 }
-void CovList::setSills(int icov, const MatrixSymmetric& sills)
+void CovList::setSills(Id icov, const MatrixSymmetric& sills)
 {
   if (!_isCovarianceIndexValid(icov)) return;
   _covs[icov]->setSill(sills);
@@ -380,10 +399,10 @@ void CovList::setSills(int icov, const MatrixSymmetric& sills)
  * @param ivar Rank of the first variable
  * @param jvar Rank of the second variable
  */
-double CovList::getTotalSill(int ivar, int jvar) const
+double CovList::getTotalSill(Id ivar, Id jvar) const
 {
   double sill_total = 0.;
-  for (int icov = 0, ncov = getNCov(); icov < ncov; icov++)
+  for (Id icov = 0, ncov = getNCov(); icov < ncov; icov++)
   {
     const CovBase* cova = getCov(icov);
     sill_total += cova->getSill(ivar, jvar);
@@ -393,28 +412,28 @@ double CovList::getTotalSill(int ivar, int jvar) const
 
 MatrixSymmetric CovList::getTotalSills() const
 {
-  int nvar = getNVar();
+  auto nvar = getNVar();
   MatrixSymmetric mat(nvar);
-  for (int ivar = 0; ivar < nvar; ivar++)
-    for (int jvar = 0; jvar <= ivar; jvar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
+    for (Id jvar = 0; jvar <= ivar; jvar++)
       mat.setValue(ivar, jvar, getTotalSill(ivar, jvar));
   return mat;
 }
 
-bool CovList::_isCovarianceIndexValid(int icov) const
+bool CovList::_isCovarianceIndexValid(Id icov) const
 {
   return checkArg("Covariance Index", icov, getNCov());
 }
 
-void CovList::_optimizationPreProcess(int mode, const std::vector<SpacePoint>& ps) const
+void CovList::_optimizationPreProcess(Id mode, const std::vector<SpacePoint>& ps) const
 {
   for (const auto& e: _covs)
     e->optimizationPreProcess(mode, ps);
 }
 
-SpacePoint& CovList::_optimizationLoadInPlace(int iech, int mode, int rank) const
+SpacePoint& CovList::_optimizationLoadInPlace(Id iech, Id mode, Id rank) const
 {
-  for (int is = 1, ns = getNCov(); is < ns; is++)
+  for (Id is = 1, ns = getNCov(); is < ns; is++)
     (void)_covs[is]->optimizationLoadInPlace(iech, mode, rank);
   return _covs[0]->optimizationLoadInPlace(iech, mode, rank);
 }
@@ -439,13 +458,13 @@ void CovList::_manage(const Db* db1, const Db* db2) const
  * @param iech2 Rank of the target within Dbout (or -2)
  */
 
-void CovList::updateCovByPoints(int icas1, int iech1, int icas2, int iech2) const
+void CovList::updateCovByPoints(Id icas1, Id iech1, Id icas2, Id iech2) const
 {
   for (const auto& e: _covs)
     e->updateCovByPoints(icas1, iech1, icas2, iech2);
 }
 
-void CovList::setActiveCovListFromOne(int keepOnlyCovIdx) const
+void CovList::setActiveCovListFromOne(Id keepOnlyCovIdx) const
 {
   _allActiveCov = true;
   _activeCovList.clear();
@@ -461,10 +480,10 @@ void CovList::setActiveCovListFromOne(int keepOnlyCovIdx) const
  * @param inddeb Lower bound of the interval (included)
  * @param indto  Upper bound of the interval (excluded)
  */
-void CovList::setActiveCovListFromInterval(int inddeb, int indto) const
+void CovList::setActiveCovListFromInterval(Id inddeb, Id indto) const
 {
   _activeCovList.clear();
-  for (int i = inddeb; i < indto; i++) _activeCovList.push_back(i);
+  for (Id i = inddeb; i < indto; i++) _activeCovList.push_back(i);
   _allActiveCov = false;
 }
 
@@ -484,25 +503,89 @@ void CovList::_setContext(const CovContext& ctxt)
 
 void CovList::copyCovContext(const CovContext& ctxt)
 {
-  int number = (int)_covs.size();
-  for (int i = 0; i < number; i++) _covs[i]->copyCovContext(ctxt);
+  Id number = static_cast<Id>(_covs.size());
+  for (Id i = 0; i < number; i++) _covs[i]->copyCovContext(ctxt);
 }
 
-void CovList::normalize(double sill, int ivar, int jvar)
+void CovList::normalize(double sill, Id ivar, Id jvar)
 {
   double covval = 0.;
-  for (int i = 0, n = getNCov(); i < n; i++) covval += _covs[i]->eval0(ivar, jvar);
+  for (Id i = 0, n = getNCov(); i < n; i++) covval += _covs[i]->eval0(ivar, jvar);
 
   if (covval <= 0. || isEqual(covval, sill)) return;
   double ratio = sill / covval;
 
-  for (int i = 0, n = getNCov(); i < n; i++)
+  for (Id i = 0, n = getNCov(); i < n; i++)
     _covs[i]->setSill(_covs[i]->getSill(ivar, jvar) * ratio);
 }
 
-void CovList::setCovFiltered(int icov, bool filtered)
+void CovList::setCovFiltered(Id icov, bool filtered)
 {
   if (!_isCovarianceIndexValid(icov)) return;
   _filtered[icov] = filtered;
   _updateLists();
 }
+
+void CovList::appendParams(ListParams& listParams,
+                           std::vector<covmaptype>* gradFuncs)
+{
+  for (const auto& cov: _covs)
+  {
+    cov->appendParams(listParams, gradFuncs);
+  }
+}
+
+void CovList::initParams(const MatrixSymmetric& vars, double href)
+{
+  auto ncov                        = getNCov();
+  MatrixSymmetric varsPerStructure = vars;
+  LowerTriangularRange itRange(getNVar());
+  for (const auto& [ivar, jvar]: itRange)
+    varsPerStructure.setValue(ivar, jvar, vars.getValue(ivar, jvar) / ncov);
+
+  Id jcov       = 0;
+  auto ntotal   = getNCovNuggetExcluded();
+  double hlocal = href / ntotal / 2;
+  for (Id icov = 0; icov < ncov; icov++)
+  {
+    if (getCovType(icov) != ECov::NUGGET)
+      jcov++;
+    CovBase* cov = getCovModify(icov);
+    cov->initParams(varsPerStructure, hlocal * jcov);
+  }
+}
+
+void CovList::updateCov()
+{
+  for (const auto& cov: _covs)
+    cov->updateCov();
+
+  if (_modelFitSills)
+  {
+    _modelFitSills->fitSillMatrices();
+    _itergCum += _modelFitSills->getNiter();
+  }
+}
+
+void CovList::deleteFitSills() const
+{
+  delete _modelFitSills;
+  _modelFitSills = nullptr;
+}
+
+void CovList::setFitSills(AModelFitSills* amopts) const
+{
+  if (amopts == nullptr) return;
+
+  // Delete previously existing structure
+  delete _modelFitSills;
+
+  // Store the new pointer
+  _modelFitSills = amopts;
+}
+
+AModelFitSills* CovList::getFitSills() const
+{
+  return _modelFitSills;
+}
+} // namespace gstlrn

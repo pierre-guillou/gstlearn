@@ -9,24 +9,25 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovReg1D.hpp"
-
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 CovReg1D::CovReg1D(const CovContext& ctxt)
-: ACovFunc(ECov::REG1D, ctxt)
+  : ACovFunc(ECov::REG1D, ctxt)
 {
 }
 
-CovReg1D::CovReg1D(const CovReg1D &r)
-: ACovFunc(r)
+CovReg1D::CovReg1D(const CovReg1D& r)
+  : ACovFunc(r)
 {
 }
 
-CovReg1D& CovReg1D::operator=(const CovReg1D &r)
+CovReg1D& CovReg1D::operator=(const CovReg1D& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -54,3 +55,4 @@ double CovReg1D::_evaluateCov(double h) const
   return (cov);
 }
 
+}

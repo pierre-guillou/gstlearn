@@ -14,6 +14,8 @@
 // Use corners <> for other include files
 #include <iostream>
 
+namespace gstlrn
+{
 /**
  * Default constructor
  *
@@ -74,7 +76,7 @@ Style::~Style() {}
  *
  * \return Description of the returned value
  */
-int Style::documentedStandard(int myArg)
+Id Style::documentedStandard(Id myArg)
 {
   std::cout << "Documented Function" << std::endl;
   message("Value of MyArg = %d\n", myArg);
@@ -95,7 +97,7 @@ int Style::documentedStandard(int myArg)
  *
  * \return The value of the argument + 1
  */
-int Style::documentedWithFormula(int myArg)
+Id Style::documentedWithFormula(Id myArg)
 {
   message("Input Argument = %d\n", myArg);
   return _increment(myArg);
@@ -107,9 +109,9 @@ int Style::documentedWithFormula(int myArg)
  * \param[in] myArgInt Integer argument
  * \param[in] myArgDoubleDef Double argument
  */
-void Style::myFunction(int myArgInt, double myArgDoubleDef)
+void Style::myFunction(Id myArgInt, double myArgDoubleDef)
 {
-  message("Input Argument (int) = %d\n", myArgInt);
+  message("Input Argument (Id) = %d\n", myArgInt);
   message("Input Argument (double with default value) = %lf\n", myArgDoubleDef);
 }
 
@@ -121,7 +123,7 @@ void Style::myFunction(int myArgInt, double myArgDoubleDef)
  *
  * \return Error returned code
  */
-int Style::unusedArgument(int a)
+Id Style::unusedArgument(Id a)
 {
   // Use the DECLARE_UNUSED macro to prevent compiler warning
   // Do not comment the argument (NOT /*a*/)
@@ -137,10 +139,11 @@ int Style::unusedArgument(int a)
  *
  * \return The input argument incremented
  */
-int Style::_increment(int arg, bool verbose)
+Id Style::_increment(Id arg, bool verbose)
 {
   if (verbose)
     std::cout << "Coucou" << std::endl;
   arg++;
   return arg;
+}
 }

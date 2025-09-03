@@ -8,19 +8,21 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Db/DbGraphO.hpp"
+#include "Basic/AStringable.hpp"
+#include "Basic/SerializeHDF5.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbStringFormat.hpp"
 #include "Matrix/NF_Triplet.hpp"
+#include "Polygon/Polygons.hpp"
+#include "Stats/Classical.hpp"
 #include "geoslib_define.h"
 
-#include "Db/Db.hpp"
-#include "Db/DbGraphO.hpp"
-#include "Db/DbStringFormat.hpp"
-#include "Polygon/Polygons.hpp"
-#include "Basic/AStringable.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Stats/Classical.hpp"
+#include <cmath>
 
-#include <math.h>
-
+namespace gstlrn
+{
 DbGraphO::DbGraphO()
   : Db()
   , _downArcs()
@@ -52,10 +54,9 @@ String DbGraphO::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
 
-  const DbStringFormat* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
+  const auto* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
   DbStringFormat dsf;
   if (dbfmt != nullptr) dsf = *dbfmt;
-
 
   sstr << toTitle(0, "Data Base Oriented Graph Characteristics");
 
@@ -71,7 +72,7 @@ String DbGraphO::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-DbGraphO* DbGraphO::createFromSamples(int nech,
+DbGraphO* DbGraphO::createFromSamples(Id nech,
                                       const ELoadBy& order,
                                       const VectorDouble& tab,
                                       NF_Triplet& NF_arcs,
@@ -81,7 +82,7 @@ DbGraphO* DbGraphO::createFromSamples(int nech,
 {
   DbGraphO* dbgraphO = new DbGraphO;
   if (dbgraphO->resetFromSamples(nech, order, tab, NF_arcs, names, locatorNames,
-                               flagAddSampleRank))
+                                 flagAddSampleRank))
   {
     messerr("Error when creating DbGraphO from Samples");
     delete dbgraphO;
@@ -90,7 +91,7 @@ DbGraphO* DbGraphO::createFromSamples(int nech,
   return dbgraphO;
 }
 
-DbGraphO* DbGraphO::createFromMatrix(int nech,
+DbGraphO* DbGraphO::createFromMatrix(Id nech,
                                      const ELoadBy& order,
                                      const VectorDouble& tab,
                                      const MatrixSparse& MatArcs,
@@ -106,19 +107,19 @@ DbGraphO* DbGraphO::createFromMatrix(int nech,
     delete dbgraphO;
     return nullptr;
   }
-  //message("arcs\n");
-  //message("nrows=%d ncols=%d\n", MatArcs.getNRows(), MatArcs.getNCols());
+  // message("arcs\n");
+  // message("nrows=%d ncols=%d\n", MatArcs.getNRows(), MatArcs.getNCols());
   return dbgraphO;
 }
 
-int DbGraphO::_arcLinkage(NF_Triplet& NF_arcs, int nech)
+Id DbGraphO::_arcLinkage(NF_Triplet& NF_arcs, Id nech)
 {
   NF_arcs.force(nech, nech);
   _downArcs.resetFromTriplet(NF_arcs);
   return 0;
 }
 
-void DbGraphO::_checkForceDimension(int nech)
+void DbGraphO::_checkForceDimension(Id nech)
 {
   if (_downArcs.getValue(nech - 1, nech - 1) > 0) return;
 
@@ -138,15 +139,15 @@ void DbGraphO::_checkForceDimension(int nech)
  * @param names Names given to the output variables
  * @param locatorNames Name of the locators given to the output variables
  * @param flagAddSampleRank When TRUE, the 'rank' variable is added
- * @return int Error returned code
+ * @return Id Error returned code
  */
-int DbGraphO::resetFromSamples(int nech,
-                             const ELoadBy& order,
-                             const VectorDouble& tab,
-                             NF_Triplet& NF_arcs,
-                             const VectorString& names,
-                             const VectorString& locatorNames,
-                             bool flagAddSampleRank)
+Id DbGraphO::resetFromSamples(Id nech,
+                               const ELoadBy& order,
+                               const VectorDouble& tab,
+                               NF_Triplet& NF_arcs,
+                               const VectorString& names,
+                               const VectorString& locatorNames,
+                               bool flagAddSampleRank)
 {
   if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
                            flagAddSampleRank) != 0)
@@ -170,15 +171,15 @@ int DbGraphO::resetFromSamples(int nech,
  * @param names Names given to the output variables
  * @param locatorNames Name of the locators given to the output variables
  * @param flagAddSampleRank When TRUE, the 'rank' variable is added
- * @return int Error returned code
+ * @return Id Error returned code
  */
-int DbGraphO::resetFromMatrix(int nech,
-                               const ELoadBy& order,
-                               const VectorDouble& tab,
-                               const MatrixSparse& MatArcs,
-                               const VectorString& names,
-                               const VectorString& locatorNames,
-                               bool flagAddSampleRank)
+Id DbGraphO::resetFromMatrix(Id nech,
+                              const ELoadBy& order,
+                              const VectorDouble& tab,
+                              const MatrixSparse& MatArcs,
+                              const VectorString& names,
+                              const VectorString& locatorNames,
+                              bool flagAddSampleRank)
 {
   if (Db::resetFromSamples(nech, order, tab, names, locatorNames,
                            flagAddSampleRank) != 0)
@@ -193,54 +194,54 @@ int DbGraphO::resetFromMatrix(int nech,
   return (!isConsistent());
 }
 
-bool DbGraphO::_deserialize(std::istream& is, bool verbose)
+bool DbGraphO::_deserializeAscii(std::istream& is, bool verbose)
 {
-  int ndim = 0;
-  int narcs = 0;
+  Id ndim  = 0;
+  Id narcs = 0;
   VectorString locators;
   VectorString names;
   VectorDouble values;
   VectorDouble allvalues;
 
-    /* Initializations */
+  /* Initializations */
 
-    bool ret = true;
-  ret = ret && _recordRead<int>(is, "Space Dimension", ndim);
+  bool ret = true;
+  ret      = ret && _recordRead<Id>(is, "Space Dimension", ndim);
 
   // Reading the set of arcs for the Oriented Graph organization
 
   NF_Triplet nft;
-  ret = ret && _recordRead<int>(is, "Number of arcs", narcs);
+  ret = ret && _recordRead<Id>(is, "Number of arcs", narcs);
   VectorDouble tab(3);
-  for (int i = 0; i < narcs; i++)
+  for (Id i = 0; i < narcs; i++)
   {
     ret = ret && _recordReadVec<double>(is, "", tab, 3);
-    nft.add((int) tab[0], (int) tab[1], tab[2]);
+    nft.add(static_cast<Id>(tab[0]), static_cast<Id>(tab[1]), tab[2]);
   }
   _downArcs.resetFromTriplet(nft);
 
   // Writing the set of addresses for Line organization
 
-  ret = ret && Db::_deserialize(is, verbose);
+  ret = ret && Db::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
+bool DbGraphO::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
   /* Writing the header */
 
-  ret = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+  ret = ret && _recordWrite<Id>(os, "Space Dimension", getNDim());
 
   // Writing the set of arcs for the Oriented Graph organization
 
   NF_Triplet nft = _downArcs.getMatrixToTriplet();
-  ret            = ret && _recordWrite<int>(os, "Number of arcs", getNArc());
+  ret            = ret && _recordWrite<Id>(os, "Number of arcs", getNArc());
 
   VectorDouble tab(3);
-  for (int i = 0, n = getNArc(); i < n; i++)
+  for (Id i = 0, n = getNArc(); i < n; i++)
   {
     tab[0] = nft.getRow(i);
     tab[1] = nft.getCol(i);
@@ -250,7 +251,7 @@ bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
 
   /* Writing the tail of the file */
 
-  ret = ret && Db::_serialize(os, verbose);
+  ret = ret && Db::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -258,27 +259,18 @@ bool DbGraphO::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a Db by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (Db format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (Db format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbGraphO* DbGraphO::createFromNF(const String& neutralFilename, bool verbose)
+DbGraphO* DbGraphO::createFromNF(const String& NFFilename, bool verbose)
 {
   DbGraphO* dbgraphO = new DbGraphO;
-  std::ifstream is;
-  bool success = false;
-  if (dbgraphO->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = dbgraphO->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbgraphO;
-    dbgraphO = nullptr;
-  }
-  return dbgraphO;
+  if (dbgraphO->_fileOpenAndDeserialize(NFFilename, verbose)) return dbgraphO;
+  delete dbgraphO;
+  return nullptr;
 }
 
 /**
@@ -289,7 +281,7 @@ DbGraphO* DbGraphO::createFromNF(const String& neutralFilename, bool verbose)
 bool DbGraphO::isConsistent() const
 {
   // Check on the count of addresses
-  int nech = getNNode();
+  auto nech = getNNode();
   if (_downArcs.getNRows() > nech)
   {
     messerr("Number of rows of '_connectedArcs' (%d)", _downArcs.getNRows());
@@ -305,8 +297,8 @@ bool DbGraphO::isConsistent() const
   }
 
   // Check that all arcs valuation are positive
-  for (int irow = 0, nrows = _downArcs.getNRows(); irow < nrows; irow++)
-    for (int icol = 0, ncols = _downArcs.getNCols(); icol < ncols; icol++)
+  for (Id irow = 0, nrows = _downArcs.getNRows(); irow < nrows; irow++)
+    for (Id icol = 0, ncols = _downArcs.getNCols(); icol < ncols; icol++)
     {
       double value = _downArcs.getValue(irow, icol);
       if (value < 0)
@@ -320,24 +312,24 @@ bool DbGraphO::isConsistent() const
   return true;
 }
 
-int DbGraphO::getNArc() const
+Id DbGraphO::getNArc() const
 {
   return _downArcs.getNonZeros();
 }
 
-int DbGraphO::getNNode() const
+Id DbGraphO::getNNode() const
 {
   return getNSample();
 }
 
-bool DbGraphO::_isValidArcRank(int iarc) const
+bool DbGraphO::_isValidArcRank(Id iarc) const
 {
   if (iarc < 0)
   {
     messerr("Argument 'iarc' (%d) should not be negative", iarc);
     return false;
   }
-  int narcs = getNArc();
+  auto narcs = getNArc();
   if (iarc >= narcs)
   {
     messerr("Argument 'iarc' (%d) should be smaller than Number of arcs (%d)", iarc, narcs);
@@ -346,24 +338,24 @@ bool DbGraphO::_isValidArcRank(int iarc) const
   return true;
 }
 
-bool DbGraphO::_isValidNode(int node) const
+bool DbGraphO::_isValidNode(Id node) const
 {
   if (node < 0)
   {
     messerr("Argument 'node' (%d) should not be negative", node);
     return false;
   }
-  int nodeNumber = getNNode();
+  auto nodeNumber = getNNode();
   if (node >= nodeNumber)
   {
     messerr("Argument 'node' (%d) should be smaller than Number of Samples (%d)",
-      node, nodeNumber);
+            node, nodeNumber);
     return false;
   }
   return true;
 }
 
-VectorDouble DbGraphO::getArc(int iarc, int idim) const
+VectorDouble DbGraphO::getArc(Id iarc, Id idim) const
 {
   if (!_isValidArcRank(iarc)) return VectorDouble();
   NF_Triplet nft = _downArcs.getMatrixToTriplet();
@@ -373,28 +365,28 @@ VectorDouble DbGraphO::getArc(int iarc, int idim) const
   return vec;
 }
 
-double DbGraphO::getArcValue(int iarc) const
+double DbGraphO::getArcValue(Id iarc) const
 {
   if (!_isValidArcRank(iarc)) return TEST;
   NF_Triplet nft = _downArcs.getMatrixToTriplet();
   return nft.getValue(iarc);
 }
 
-void DbGraphO::_updateOrder(int rank, const VectorDouble& v, VectorInt& order)
+void DbGraphO::_updateOrder(Id rank, const VectorDouble& v, VectorInt& order)
 {
-  int nech = (int)v.size();
+  Id nech = static_cast<Id>(v.size());
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (v[iech] > 0.) order[iech] = MAX(order[iech], rank);
   }
 }
 
-void DbGraphO::_updateCumul(int rank, const VectorDouble& v, VectorDouble& cumul)
+void DbGraphO::_updateCumul(Id rank, const VectorDouble& v, VectorDouble& cumul)
 {
-  int nech = (int)v.size();
+  Id nech = static_cast<Id>(v.size());
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (v[iech] <= 0.) continue;
     cumul[iech] = MAX(cumul[iech], v[iech] + cumul[rank]);
@@ -404,17 +396,17 @@ void DbGraphO::_updateCumul(int rank, const VectorDouble& v, VectorDouble& cumul
 VectorInt DbGraphO::_getRanks(const VectorDouble& v)
 {
   VectorInt retvec;
-  for (int iech = 0, nech = (int)v.size(); iech < nech; iech++)
+  for (Id iech = 0, nech = static_cast<Id>(v.size()); iech < nech; iech++)
   {
     if (v[iech] > 0.) retvec.push_back(iech);
   }
   return retvec;
 }
 
-VectorInt DbGraphO::getIndicesNextDown(int node) const
+VectorInt DbGraphO::getIndicesNextDown(Id node) const
 {
   if (!_isValidNode(node)) return VectorInt();
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
@@ -423,37 +415,37 @@ VectorInt DbGraphO::getIndicesNextDown(int node) const
   return _getRanks(v2);
 }
 
-VectorInt DbGraphO::getIndicesNextUp(int node) const
+VectorInt DbGraphO::getIndicesNextUp(Id node) const
 {
   if (!_isValidNode(node)) return VectorInt();
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
   v1[node] = 1.;
-  _downArcs.prodMatVecInPlace(v1, v2);
+  _downArcs.prodMatVecInPlaceC(v1, v2);
   return _getRanks(v2);
 }
 
-bool DbGraphO::isEndDown(int node) const
+bool DbGraphO::isEndDown(Id node) const
 {
   if (!_isValidNode(node)) return false;
   VectorInt inds = getIndicesNextDown(node);
   return inds.empty();
 }
 
-bool DbGraphO::isEndUp(int node) const
+bool DbGraphO::isEndUp(Id node) const
 {
   if (!_isValidNode(node)) return false;
   VectorInt inds = getIndicesNextUp(node);
   return inds.empty();
 }
 
-bool DbGraphO::areConnected(int node1, int node2) const
+bool DbGraphO::areConnected(Id node1, Id node2) const
 {
   if (!_isValidNode(node1)) return false;
   if (!_isValidNode(node2)) return false;
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorInt order(nech, 0);
   VectorDouble v1(nech, 0.);
@@ -472,8 +464,8 @@ bool DbGraphO::areConnected(int node1, int node2) const
 VectorInt DbGraphO::getEndsDown() const
 {
   VectorInt vec;
-  int nech = getNNode();
-  for (int iech = 0; iech < nech; iech++)
+  auto nech = getNNode();
+  for (Id iech = 0; iech < nech; iech++)
     if (isEndDown(iech)) vec.push_back(iech);
   return vec;
 }
@@ -481,8 +473,8 @@ VectorInt DbGraphO::getEndsDown() const
 VectorInt DbGraphO::getEndsUp() const
 {
   VectorInt vec;
-  int nech = getNNode();
-  for (int iech = 0; iech < nech; iech++)
+  auto nech = getNNode();
+  for (Id iech = 0; iech < nech; iech++)
     if (isEndUp(iech)) vec.push_back(iech);
   return vec;
 }
@@ -490,23 +482,23 @@ VectorInt DbGraphO::getEndsUp() const
 VectorInt DbGraphO::getOrphans() const
 {
   VectorInt vec;
-  int nech = getNNode();
-  for (int iech = 0; iech < nech; iech++)
+  auto nech = getNNode();
+  for (Id iech = 0; iech < nech; iech++)
     if (isEndUp(iech) && isEndDown(iech)) vec.push_back(iech);
   return vec;
 }
 
-VectorInt DbGraphO::getOrderDown(int node) const
+VectorInt DbGraphO::getOrderDown(Id node) const
 {
   if (!_isValidNode(node)) return VectorInt();
-  int nech = getNNode();
+  auto nech = getNNode();
 
-  VectorInt order(nech,0);
+  VectorInt order(nech, 0);
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
   v2[node] = 1.;
 
-  int rank = 1;
+  Id rank = 1;
   _updateOrder(rank, v2, order);
   while (VH::cumul(v2) > 0.)
   {
@@ -521,10 +513,10 @@ VectorInt DbGraphO::getOrderDown(int node) const
 
 VectorInt DbGraphO::_getNoneZeroIndices(const VectorDouble& v)
 {
-  int nech = (int)v.size();
+  Id nech = static_cast<Id>(v.size());
 
   VectorInt vall;
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (v[iech] <= 0.) continue;
     vall.push_back(iech);
@@ -534,10 +526,10 @@ VectorInt DbGraphO::_getNoneZeroIndices(const VectorDouble& v)
 
 /**
  * @brief Local recursive function for finding cumul
- * 
+ *
  * @param inds  List of indices of nodes connceted downwards
  * @param cumul Array contaiing the cumulative values per node
- * @param v1    Working array  
+ * @param v1    Working array
  * @param v2    Working array
  */
 void DbGraphO::_iterateCumul(const VectorInt& inds,
@@ -545,9 +537,9 @@ void DbGraphO::_iterateCumul(const VectorInt& inds,
                              VectorDouble& v1,
                              VectorDouble& v2) const
 {
-  for (int ind = 0, nind = (int)inds.size(); ind < nind; ind++)
+  for (Id ind = 0, nind = static_cast<Id>(inds.size()); ind < nind; ind++)
   {
-    int rank = inds[ind];
+    Id rank = inds[ind];
     v1.fill(0.);
     v1[rank] = 1.;
     _downArcs.prodVecMatInPlace(v1, v2);
@@ -557,10 +549,10 @@ void DbGraphO::_iterateCumul(const VectorInt& inds,
   }
 }
 
-VectorDouble DbGraphO::getCumulDown(int node) const
+VectorDouble DbGraphO::getCumulDown(Id node) const
 {
   if (!_isValidNode(node)) return VectorDouble();
-  int nech = getNNode();
+  auto nech = getNNode();
 
   VectorDouble v1(nech, 0.);
   VectorDouble v2(nech, 0.);
@@ -572,11 +564,83 @@ VectorDouble DbGraphO::getCumulDown(int node) const
 
 void DbGraphO::setArcLine(const VectorInt& nodes, double value)
 {
-  int number = (int)nodes.size();
-  for (int i = 1; i < number; i++)
+  Id number = static_cast<Id>(nodes.size());
+  for (Id i = 1; i < number; i++)
   {
-    int i1 = nodes[i - 1];
-    int i2 = nodes[i];
+    Id i1 = nodes[i - 1];
+    Id i2 = nodes[i];
     _downArcs.setValue(i1, i2, value);
   }
 }
+
+#ifdef HDF5
+bool DbGraphO::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto dbG = SerializeHDF5::getGroup(grp, "DbGraphO");
+  if (!dbG) return false;
+
+  /* Read the grid characteristics */
+  bool ret  = true;
+  Id ndim  = 0;
+  Id narcs = 0;
+
+  ret = ret && SerializeHDF5::readValue(*dbG, "NDim", ndim);
+  ret = ret && SerializeHDF5::readValue(*dbG, "Narcs", narcs);
+
+  // Reading the set of arcs for the Oriented Graph organization
+  auto dbgs = SerializeHDF5::getGroup(*dbG, "Arcs");
+  if (!dbgs) return false;
+  NF_Triplet nft;
+  VectorDouble tab(3);
+  for (Id i = 0; i < narcs; i++)
+  {
+    String locName = "Arc" + std::to_string(i);
+    auto arcg      = SerializeHDF5::getGroup(*dbgs, locName);
+    if (!arcg) return false;
+
+    ret = ret && SerializeHDF5::readVec(*arcg, "Arc", tab);
+    nft.add(static_cast<Id>(tab[0]), static_cast<Id>(tab[1]), tab[2]);
+  }
+  _downArcs.resetFromTriplet(nft);
+
+  // Writing the set of addresses for Line organization
+
+  ret = ret && Db::_deserializeH5(*dbG, verbose);
+
+  return ret;
+}
+
+bool DbGraphO::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto dbG = grp.createGroup("DbGraphO");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+  ret = ret && SerializeHDF5::writeValue(dbG, "Narcs", getNArc());
+
+  // Writing the set of arcs for the Oriented Graph organization
+
+  auto dbGs = dbG.createGroup("Arcs");
+
+  NF_Triplet nft = _downArcs.getMatrixToTriplet();
+  VectorDouble tab(3);
+  for (Id iarc = 0, narcs = getNArc(); iarc < narcs; iarc++)
+  {
+    String locName = "Arc" + std::to_string(iarc);
+    auto arcG      = dbGs.createGroup(locName);
+
+    tab[0] = nft.getRow(iarc);
+    tab[1] = nft.getCol(iarc);
+    tab[2] = nft.getValue(iarc);
+    ret    = ret && SerializeHDF5::writeVec(arcG, "Arc", tab);
+  }
+
+  /* Writing the tail of the file */
+
+  ret = ret && Db::_serializeH5(dbG, verbose);
+
+  return ret;
+}
+#endif
+} // namespace gstlrn

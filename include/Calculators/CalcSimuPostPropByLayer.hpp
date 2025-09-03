@@ -21,6 +21,9 @@
 #include "Basic/NamingConvention.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{ 
+
 /**
  * This particular Multivariate Simulation post_processing considers each simulated variable as a thickness
  * of ordered layers (define in R_N). For each cell of the output grid (defined in R_{N+1}, we calculate the
@@ -39,7 +42,7 @@ public:
 protected:
   bool _check() override;
 
-  int _getTransfoNvar() const override;
+  Id _getTransfoNvar() const override;
   void _transformFunction(const VectorDouble& Z_n_k_s,
                           VectorDouble& Y_p_k_s) const override;
 
@@ -49,7 +52,7 @@ private:
 
 };
 
-GSTLEARN_EXPORT int simuPostPropByLayer(Db *dbin,
+GSTLEARN_EXPORT Id simuPostPropByLayer(Db *dbin,
                                         DbGrid *dbout,
                                         const VectorString &names,
                                         bool flag_match = false,
@@ -58,5 +61,6 @@ GSTLEARN_EXPORT int simuPostPropByLayer(Db *dbin,
                                         const std::vector<EPostStat> &stats = EPostStat::fromKeys({"MEAN"}),
                                         bool verbose = false,
                                         const VectorInt& check_targets = VectorInt(),
-                                        int check_level = 0,
+                                        Id check_level = 0,
                                         const NamingConvention &namconv = NamingConvention("Prop"));
+}

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Basic/AFunctional.hpp"
 
+namespace gstlrn
+{
 class MatrixSquare;
 class CovAniso;
 
@@ -25,7 +27,7 @@ public:
   FunctionalSpirale& operator=(const FunctionalSpirale &m);
   virtual ~FunctionalSpirale();
 
-  virtual double getFunctionValue(const VectorDouble& coor) const override;
+  double getFunctionValue(const VectorDouble& coor) const override;
 
   MatrixSquare getFunctionMatrix(const VectorDouble& coor) const;
   VectorVectorDouble getFunctionVectors(const Db *db, const CovAniso* cova) const;
@@ -41,3 +43,4 @@ private:
   double _xcenter;
   double _ycenter;
 };
+}

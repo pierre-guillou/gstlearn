@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <cmath>
 
+namespace gstlrn
+{
 /***************************************************************************
  **
  ** Vector of T values (numerical type).
@@ -218,7 +220,7 @@ std::ostream& operator<<(std::ostream& os,
                          const VectorT<VectorNumT<T>>& vec)
 {
   os << "[";
-  for (int i = 0, n = (int)vec.size(); i < n; i++)
+  for (Id i = 0, n = static_cast<Id>(vec.size()); i < n; i++)
   {
     os << vec.at(i).toString();
     if (i != n - 1) os << " ";
@@ -228,10 +230,11 @@ std::ostream& operator<<(std::ostream& os,
 }
 #endif
 
-typedef VectorNumT<int>       VectorInt;
+typedef VectorNumT<Id>       VectorInt;
 typedef VectorNumT<double>    VectorDouble;
 typedef VectorNumT<float>     VectorFloat;
 typedef VectorNumT<UChar>     VectorUChar; // Use typedef because swig doesn't like 'unsigned char' in two words
 typedef VectorT<VectorInt>    VectorVectorInt;
 typedef VectorT<VectorDouble> VectorVectorDouble;
 typedef VectorT<VectorFloat>  VectorVectorFloat;
+}

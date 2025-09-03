@@ -22,6 +22,8 @@
 #include "Space/SpaceRN.hpp"
 #include "Space/SpaceComposite.hpp"
 #include "Estimation/CalcKriging.hpp"
+
+using namespace gstlrn;
 /**
  * This file is meant to test Kriging with Gneiting Model
  */
@@ -61,7 +63,7 @@ int main(int argc, char* argv[])
                                                   false);
 
   double sep           = 1.;
-  CorGneiting covGneiting = CorGneiting(covS->getCorAniso(), covT->getCorAniso(), sep);
+  CorGneiting covGneiting(covS->getCorAniso(), covT->getCorAniso(), sep);
   message("Space dimension of Gneiting Covariance = %d\n", covGneiting.getNDim());
 
   // Testing the covariance calculation between two points
@@ -75,9 +77,9 @@ int main(int argc, char* argv[])
   std::cout << "Value of Gneiting (by Covariance) = " << cres <<std::endl;
 
   // Create the Data Base
-  int ndim = 3;
-  int ndat = 10;
-  int nvar = 1;
+  Id ndim  = 3;
+  Id ndat  = 10;
+  Id nvar  = 1;
   Db* data = Db::createFillRandom(ndat, ndim, nvar);
 
   // Create the Target
@@ -86,7 +88,7 @@ int main(int argc, char* argv[])
   DbGrid* grid = DbGrid::create(nx, dx);
 
   // Create the Model
-  ModelGeneric* model = new ModelGeneric();
+  auto* model = new ModelGeneric();
   model->setCov(&covGneiting);
   model->evalCov(p1, p2);
   message("Model dimension = %d\n", model->getNDim());

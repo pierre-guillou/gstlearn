@@ -8,20 +8,23 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/DbGrid.hpp"
-#include "Db/Db.hpp"
 #include "Estimation/CalcKriging.hpp"
+#include "Basic/OptCustom.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "Enum/EKrigOpt.hpp"
 #include "Estimation/CalcKrigingSimpleCase.hpp"
 #include "Estimation/KrigOpt.hpp"
 #include "Estimation/KrigingSystem.hpp"
-#include "Basic/OptDbg.hpp"
-#include "Basic/OptCustom.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/NeighBench.hpp"
 #include "Neigh/NeighUnique.hpp"
 
-#include <math.h>
+#include <cmath>
+
+namespace gstlrn
+{
 
 CalcKriging::CalcKriging(bool flag_est, bool flag_std, bool flag_varZ)
   : ACalcInterpolator()
@@ -56,12 +59,12 @@ CalcKriging::~CalcKriging()
 
 bool CalcKriging::_check()
 {
-  if (! ACalcInterpolator::_check()) return false;
+  if (!ACalcInterpolator::_check()) return false;
 
-  if (! hasDbin()) return false;
-  if (! hasDbout()) return false;
-  if (! hasModel()) return false;
-  if (! hasNeigh()) return false;
+  if (!hasDbin()) return false;
+  if (!hasDbout()) return false;
+  if (!hasModel()) return false;
+  if (!hasNeigh()) return false;
   if (getNeigh()->getType() == ENeigh::IMAGE)
   {
     messerr("This tool cannot function with an IMAGE neighborhood");
@@ -85,7 +88,7 @@ bool CalcKriging::_preprocess()
 
   if (getKrigopt().hasMatLC()) _setNvar(getKrigopt().getMatLCNRows(), true);
 
-  int status = 1;
+  Id status = 1;
   if (_iechSingleTarget >= 0) status = 2;
 
   if (_flagEst)
@@ -131,7 +134,7 @@ bool CalcKriging::_postprocess()
   /* Free the temporary variables */
   _cleanVariableDb(2);
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
   if (_flagXvalid)
   {
     if (_flagXvalidStd > 0)
@@ -171,7 +174,7 @@ bool CalcKriging::_postprocess()
   }
   else
   {
-    if (! getKrigopt().hasMatLC())
+    if (!getKrigopt().hasMatLC())
     {
       _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrVarZ, "varz", 1);
       _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrStd, "stdev", 1);
@@ -248,7 +251,7 @@ bool CalcKriging::_run()
   /* Loop on the targets to be processed */
   /***************************************/
 
-  for (int iech_out = 0, nech_out = getDbout()->getNSample(); iech_out < nech_out; iech_out++)
+  for (Id iech_out = 0, nech_out = getDbout()->getNSample(); iech_out < nech_out; iech_out++)
   {
     if (_iechSingleTarget > 0)
     {
@@ -296,7 +299,7 @@ bool CalcKriging::_run()
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-int kriging(Db* dbin,
+Id kriging(Db* dbin,
             Db* dbout,
             ModelGeneric* model,
             ANeigh* neigh,
@@ -306,17 +309,12 @@ int kriging(Db* dbin,
             const KrigOpt& krigopt,
             const NamingConvention& namconv)
 {
-  //NeighUnique* neighUnique = dynamic_cast<NeighUnique*>(neigh);
-  NeighBench* neighBench = dynamic_cast<NeighBench*>(neigh);
-  bool avoidSimpleCase = (OptCustom::query("DoNotUseSimpleCase", 1) == 1);
-
-  if (krigopt.getCalcul() == EKrigOpt::POINT && 
+  auto* neighBench = dynamic_cast<NeighBench*>(neigh);
+  if (krigopt.getCalcul() == EKrigOpt::POINT &&
       !krigopt.hasColcok() &&
-      !krigopt.hasMatLC() && 
-      //neighUnique != nullptr &&
+      !krigopt.hasMatLC() &&
       neighBench == nullptr &&
-      model->getNVar() == 1 && 
-      ! avoidSimpleCase &&
+      model->getNVar() == 1 &&
       OptCustom::query("NotOptimSimpleCase", 0) == 0)
   {
     OptCustom::define("Optim", 1);
@@ -326,7 +324,7 @@ int kriging(Db* dbin,
     krige.setModel(model);
     krige.setNeigh(neigh);
     krige.setNamingConvention(namconv);
-    int result = krige.run();
+    Id result = krige.run();
     OptCustom::undefine("Optim");
     return 1 - result;
   }
@@ -340,7 +338,7 @@ int kriging(Db* dbin,
   krige.setNamingConvention(namconv);
 
   // Run the calculator
-  int error = 1 - krige.run();
+  Id error = 1 - krige.run();
 
   return error;
 }
@@ -361,7 +359,7 @@ int kriging(Db* dbin,
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-int krigcell(Db* dbin,
+Id krigcell(Db* dbin,
              Db* dbout,
              ModelGeneric* model,
              ANeigh* neigh,
@@ -379,7 +377,7 @@ int krigcell(Db* dbin,
   krige.setNamingConvention(namconv);
 
   // Run the calculator
-  int error = (krige.run()) ? 0 : 1;
+  Id error = (krige.run()) ? 0 : 1;
   return error;
 }
 
@@ -401,7 +399,7 @@ int krigcell(Db* dbin,
  ** \param[in]  namconv     Naming convention
  **
  *****************************************************************************/
-int kribayes(Db* dbin,
+Id kribayes(Db* dbin,
              Db* dbout,
              ModelGeneric* model,
              ANeigh* neigh,
@@ -423,7 +421,7 @@ int kribayes(Db* dbin,
   krige.setPriorCov(prior_cov);
 
   // Run the calculator
-  int error = (krige.run()) ? 0 : 1;
+  Id error = (krige.run()) ? 0 : 1;
   return error;
 }
 
@@ -447,7 +445,7 @@ Krigtest_Res krigtest(Db* dbin,
                       Db* dbout,
                       ModelGeneric* model,
                       ANeigh* neigh,
-                      int iech0,
+                      Id iech0,
                       const KrigOpt& krigopt,
                       bool verbose)
 {
@@ -479,7 +477,7 @@ Krigtest_Res krigtest(Db* dbin,
  ** \param[in]  namconv    Naming convention
  **
  *****************************************************************************/
-int kriggam(Db* dbin,
+Id kriggam(Db* dbin,
             Db* dbout,
             ModelGeneric* model,
             ANeigh* neigh,
@@ -497,7 +495,7 @@ int kriggam(Db* dbin,
   krige.setAnam(anam);
 
   // Run the calculator
-  int error = (krige.run()) ? 0 : 1;
+  Id error = (krige.run()) ? 0 : 1;
   return error;
 }
 
@@ -518,13 +516,13 @@ int kriggam(Db* dbin,
  * @param namconv Naming Convention
  * @return Error return code
  */
-int xvalid(Db* db,
+Id xvalid(Db* db,
            ModelGeneric* model,
            ANeigh* neigh,
            bool flag_kfold,
-           int flag_xvalid_est,
-           int flag_xvalid_std,
-           int flag_xvalid_varz,
+           Id flag_xvalid_est,
+           Id flag_xvalid_std,
+           Id flag_xvalid_varz,
            const KrigOpt& krigopt,
            const NamingConvention& namconv)
 {
@@ -544,7 +542,7 @@ int xvalid(Db* db,
   krige.setKrigopt(krigopt);
 
   // Run the calculator
-  int error = (krige.run()) ? 0 : 1;
+  Id error = (krige.run()) ? 0 : 1;
   return error;
 }
 
@@ -568,7 +566,7 @@ int xvalid(Db* db,
  ** \remark 5 - The number of consecutive empty sectors
  **
  *****************************************************************************/
-int test_neigh(Db* dbin,
+Id test_neigh(Db* dbin,
                Db* dbout,
                ModelGeneric* model,
                ANeigh* neigh,
@@ -584,6 +582,8 @@ int test_neigh(Db* dbin,
   krige.setFlagNeighOnly(true);
 
   // Run the calculator
-  int error = (krige.run()) ? 0 : 1;
+  Id error = (krige.run()) ? 0 : 1;
   return error;
 }
+
+} // namespace gstlrn

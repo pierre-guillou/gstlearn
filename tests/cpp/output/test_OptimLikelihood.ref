@@ -1,0 +1,88 @@
+
+Test fit likelihood
+===================
+
+True Model
+----------
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 1
+Number of basic structure(s) = 1
+Number of drift function(s)  = 0
+Number of drift equation(s)  = 0
+
+Covariance Part
+---------------
+Exponential
+- Sill         =      2.000
+- Ranges       =      0.100     0.300
+- Theo. Ranges =      0.033     0.100
+- Angles       =     30.000     0.000
+- Rotation Matrix
+               [,  0]    [,  1]
+     [  0,]     0.866    -0.500
+     [  1,]     0.500     0.866
+Total Sill     =      2.000
+Known Mean(s)     0.000
+Start Fitting Model with Vecchia Approximation
+(Gradient Option is 0)
+
+Fitted Model
+------------
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 1
+Number of basic structure(s) = 1
+Number of drift function(s)  = 1
+Number of drift equation(s)  = 1
+
+Covariance Part
+---------------
+Exponential
+- Sill         =      2.158
+- Ranges       =      0.102     0.220
+- Theo. Ranges =      0.034     0.073
+- Angles       =     23.978     0.000
+- Rotation Matrix
+               [,  0]    [,  1]
+     [  0,]     0.914    -0.406
+     [  1,]     0.406     0.914
+Total Sill     =      2.158
+
+Drift Part
+----------
+Universality_Condition
+Start Fitting Model with Likelihood
+(Gradient Option is 1)
+
+Fitted Model
+------------
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 1
+Number of basic structure(s) = 1
+Number of drift function(s)  = 1
+Number of drift equation(s)  = 1
+
+Covariance Part
+---------------
+Exponential
+- Sill         =      2.157
+- Ranges       =      0.102     0.219
+- Theo. Ranges =      0.034     0.073
+- Angles       =     23.905     0.000
+- Rotation Matrix
+               [,  0]    [,  1]
+     [  0,]     0.914    -0.405
+     [  1,]     0.405     0.914
+Total Sill     =      2.157
+
+Drift Part
+----------
+Universality_Condition

@@ -8,41 +8,42 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
-#include "Morpho/Morpho.hpp"
-#include "Basic/VectorNumT.hpp"
-#include "Basic/Utilities.hpp"
+#include "Basic/Grid.hpp"
 #include "Basic/Law.hpp"
-#include "Basic/String.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/String.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorNumT.hpp"
+#include "Core/Keypair.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
+#include "Morpho/Morpho.hpp"
 #include "Stats/Classical.hpp"
-#include "Basic/Memory.hpp"
-#include "Basic/Grid.hpp"
-#include "Core/Keypair.hpp"
+#include "geoslib_old_f.h"
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 /*! \cond */
-#define G_ADDRESS(ix,iy,iz,nxyz)    ((ix) + nxyz[0] * ((iy) + nxyz[1] * (iz)))
-#define N1_TAB(ix,iy,iz) (numtab1[G_ADDRESS(ix,iy,iz,nxyz1)])
-#define N2_TAB(ix,iy,iz) (numtab2[G_ADDRESS(ix,iy,iz,nxyz2)])
-#define V1_TAB(ix,iy,iz) (valtab1[G_ADDRESS(ix,iy,iz,nxyz1)])
-#define V2_TAB(ix,iy,iz) (valtab2[G_ADDRESS(ix,iy,iz,nxyz2)])
-#define D1_TAB(ix,iy,iz) (N1_TAB(ix,iy,iz) > 0 &&     \
-                          ! FFFF(V1_TAB(ix,iy,iz)) && \
-                          V1_TAB(ix,iy,iz) > 0)
-#define RESIDUALS(icut,iech) (residuals[(icut) * nech + (iech)])
-#define NBGH(ivois,idim)     (nbgh[ndim * (ivois) + (idim)])
-#define TABINI(iseed,idim)   (tabini[ndim * (iseed) + (idim)])
-#define TABCUR(iseed,idim)   (tabcur[ndim * (iseed) + (idim)])
-#define TRAJEC(iseed,iter,idim) (trsave[(niter * (iseed) + (iter)) * ndim + (idim)])
+#define G_ADDRESS(ix, iy, iz, nxyz) ((ix) + nxyz[0] * ((iy) + nxyz[1] * (iz)))
+#define N1_TAB(ix, iy, iz)          (numtab1[G_ADDRESS(ix, iy, iz, nxyz1)])
+#define N2_TAB(ix, iy, iz)          (numtab2[G_ADDRESS(ix, iy, iz, nxyz2)])
+#define V1_TAB(ix, iy, iz)          (valtab1[G_ADDRESS(ix, iy, iz, nxyz1)])
+#define V2_TAB(ix, iy, iz)          (valtab2[G_ADDRESS(ix, iy, iz, nxyz2)])
+#define D1_TAB(ix, iy, iz)          (N1_TAB(ix, iy, iz) > 0 && \
+                            !FFFF(V1_TAB(ix, iy, iz)) &&       \
+                            V1_TAB(ix, iy, iz) > 0)
+#define RESIDUALS(icut, iech)     (residuals[(icut) * nech + (iech)])
+#define NBGH(ivois, idim)         (nbgh[ndim * (ivois) + (idim)])
+#define TABINI(iseed, idim)       (tabini[ndim * (iseed) + (idim)])
+#define TABCUR(iseed, idim)       (tabcur[ndim * (iseed) + (idim)])
+#define TRAJEC(iseed, iter, idim) (trsave[(niter * (iseed) + (iter)) * ndim + (idim)])
 /*! \endcond */
 
-static int DEBUG = 0;
+namespace gstlrn
+{
+
+static Id DEBUG = 0;
 
 /****************************************************************************/
 /*!
@@ -67,32 +68,32 @@ static int DEBUG = 0;
  ** \remarks  The array ind0, ixyz and nxyz are dimensioned to ndim
  **
  *****************************************************************************/
-static double st_extract_subgrid(int verbose,
-                                 int flag_ffff,
-                                 int iech0,
-                                 int nech0,
-                                 int ntot,
-                                 DbGrid *dbgrid,
-                                 int *ind0,
-                                 int *ixyz,
-                                 int *nxyz,
-                                 double *numtab1,
-                                 double *valtab1)
+static double st_extract_subgrid(Id verbose,
+                                 Id flag_ffff,
+                                 Id iech0,
+                                 Id nech0,
+                                 Id ntot,
+                                 DbGrid* dbgrid,
+                                 Id* ind0,
+                                 Id* ixyz,
+                                 Id* nxyz,
+                                 double* numtab1,
+                                 double* valtab1)
 {
-  int ix, iy, iz, jx, jy, jz, ind, ecr, ndim;
+  Id ix, iy, iz, jx, jy, jz, ind, ecr, ndim;
   double proba, value;
 
   /* Initializations */
 
   ndim = dbgrid->getNDim();
   VectorInt iwork2(ndim);
-  for (int i = 0; i < ntot; i++)
+  for (Id i = 0; i < ntot; i++)
   {
     numtab1[i] = 0;
     valtab1[i] = 0.;
   }
 
-  for (int idim = 0; idim < 3; idim++)
+  for (Id idim = 0; idim < 3; idim++)
   {
     if (idim < ndim) continue;
     ixyz[idim] = 0;
@@ -100,7 +101,7 @@ static double st_extract_subgrid(int verbose,
     ind0[idim] = 0;
   }
 
-  ecr = 0;
+  ecr   = 0;
   proba = 0.;
   for (iz = 0; iz < nxyz[2]; iz++)
     for (iy = 0; iy < nxyz[1]; iy++)
@@ -121,13 +122,11 @@ static double st_extract_subgrid(int verbose,
         if (ndim >= 1) iwork2[0] = jx;
         if (ndim >= 2) iwork2[1] = jy;
         if (ndim >= 3) iwork2[2] = jz;
-        ind = dbgrid->indiceToRank(iwork2);
+        ind          = dbgrid->indiceToRank(iwork2);
         numtab1[ecr] = 1.;
-        value = dbgrid->isActive(ind) ? dbgrid->getZVariable(ind, 0) :
-                                        TEST;
+        value        = dbgrid->isActive(ind) ? dbgrid->getZVariable(ind, 0) : TEST;
         if (FFFF(value))
-          valtab1[ecr] = (flag_ffff) ? 0 :
-                                       TEST;
+          valtab1[ecr] = (flag_ffff) ? 0 : TEST;
         else
         {
           valtab1[ecr] = value;
@@ -141,7 +140,7 @@ static double st_extract_subgrid(int verbose,
   if (verbose)
   {
     message("Output cell %3d/%3d = %d", iech0 + 1, nech0, nxyz[0]);
-    for (int idim = 1; idim < ndim; idim++)
+    for (Id idim = 1; idim < ndim; idim++)
       message("x%d", nxyz[idim]);
     message(" cells of Input Grid (Proba=%lf)\n", proba);
   }
@@ -158,14 +157,14 @@ static double st_extract_subgrid(int verbose,
  ** \param[in]  orient    Rank of the target direction
  **
  *****************************************************************************/
-static int st_divide_by_2(int *nxyz, int orient)
+static Id st_divide_by_2(Id* nxyz, Id orient)
 {
-  int ival;
+  Id ival;
 
   ival = nxyz[orient];
   if (ival <= 1) return (0);
 
-  ival = (int) floor((double) (ival + 1.) / 2);
+  ival         = static_cast<Id>(floor((ival + 1.) / 2));
   nxyz[orient] = ival;
   return (1);
 }
@@ -184,21 +183,21 @@ static int st_divide_by_2(int *nxyz, int orient)
  ** \param[out] valtab2   Array containing the sample value
  **
  *****************************************************************************/
-static void st_mean_arith(int idim,
-                          const int *nxyz1,
-                          const int *nxyz2,
-                          const double *numtab1,
-                          double *numtab2,
-                          double *valtab1,
-                          double *valtab2)
+static void st_mean_arith(Id idim,
+                          const Id* nxyz1,
+                          const Id* nxyz2,
+                          const double* numtab1,
+                          double* numtab2,
+                          double* valtab1,
+                          double* valtab2)
 {
-  int ix, iy, iz, ix1, ix2, iy1, iy2, iz1, iz2;
+  Id ix, iy, iz, ix1, ix2, iy1, iy2, iz1, iz2;
 
   for (iz = 0; iz < nxyz2[2]; iz++)
     for (iy = 0; iy < nxyz2[1]; iy++)
       for (ix = 0; ix < nxyz2[0]; ix++)
       {
-        N2_TAB(ix,iy,iz) = V2_TAB(ix,iy,iz) = 0.;
+        N2_TAB(ix, iy, iz) = V2_TAB(ix, iy, iz) = 0.;
         switch (idim)
         {
           case 0:
@@ -206,13 +205,13 @@ static void st_mean_arith(int idim,
             ix2 = 2 * ix + 1;
             if (D1_TAB(ix1, iy, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix1, iy, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix1,iy,iz) * V1_TAB(ix1, iy, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix1, iy, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix1, iy, iz) * V1_TAB(ix1, iy, iz);
             }
             if (ix2 < nxyz1[0] && D1_TAB(ix2, iy, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix2, iy, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix2,iy,iz) * V1_TAB(ix2, iy, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix2, iy, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix2, iy, iz) * V1_TAB(ix2, iy, iz);
             }
             break;
 
@@ -221,13 +220,13 @@ static void st_mean_arith(int idim,
             iy2 = 2 * iy + 1;
             if (D1_TAB(ix, iy1, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy1, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy1,iz) * V1_TAB(ix, iy1, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy1, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy1, iz) * V1_TAB(ix, iy1, iz);
             }
             if (iy2 < nxyz1[1] && D1_TAB(ix, iy2, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy2, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy2,iz) * V1_TAB(ix, iy2, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy2, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy2, iz) * V1_TAB(ix, iy2, iz);
             }
             break;
 
@@ -236,20 +235,18 @@ static void st_mean_arith(int idim,
             iz2 = 2 * iz + 1;
             if (D1_TAB(ix, iy, iz1))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy, iz1);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy,iz1) * V1_TAB(ix, iy, iz1);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz1);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz1) * V1_TAB(ix, iy, iz1);
             }
             if (iz2 < nxyz1[2] && D1_TAB(ix, iy, iz2))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy, iz2);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy,iz2) * V1_TAB(ix, iy, iz2);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz2);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz2) * V1_TAB(ix, iy, iz2);
             }
             break;
         }
-        V2_TAB(ix,iy,iz) =
-            (N2_TAB(ix,iy,iz) > 0) ?
-                                     V2_TAB(ix,iy,iz) / N2_TAB(ix, iy, iz) :
-                                     TEST;
+        V2_TAB(ix, iy, iz) =
+          (N2_TAB(ix, iy, iz) > 0) ? V2_TAB(ix, iy, iz) / N2_TAB(ix, iy, iz) : TEST;
       }
 }
 
@@ -267,21 +264,21 @@ static void st_mean_arith(int idim,
  ** \param[out] valtab2   Array containing the output sample value
  **
  *****************************************************************************/
-static void st_mean_harmo(int idim,
-                          const int *nxyz1,
-                          const int *nxyz2,
-                          const double *numtab1,
-                          double *numtab2,
-                          double *valtab1,
-                          double *valtab2)
+static void st_mean_harmo(Id idim,
+                          const Id* nxyz1,
+                          const Id* nxyz2,
+                          const double* numtab1,
+                          double* numtab2,
+                          double* valtab1,
+                          double* valtab2)
 {
-  int ix, iy, iz, ix1, ix2, iy1, iy2, iz1, iz2;
+  Id ix, iy, iz, ix1, ix2, iy1, iy2, iz1, iz2;
 
   for (iz = 0; iz < nxyz2[2]; iz++)
     for (iy = 0; iy < nxyz2[1]; iy++)
       for (ix = 0; ix < nxyz2[0]; ix++)
       {
-        N2_TAB(ix,iy,iz) = V2_TAB(ix,iy,iz) = 0.;
+        N2_TAB(ix, iy, iz) = V2_TAB(ix, iy, iz) = 0.;
         switch (idim)
         {
           case 0:
@@ -289,13 +286,13 @@ static void st_mean_harmo(int idim,
             ix2 = 2 * ix + 1;
             if (D1_TAB(ix1, iy, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix1, iy, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix1,iy,iz) / V1_TAB(ix1, iy, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix1, iy, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix1, iy, iz) / V1_TAB(ix1, iy, iz);
             }
             if (ix2 < nxyz1[0] && D1_TAB(ix2, iy, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix2, iy, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix2,iy,iz) / V1_TAB(ix2, iy, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix2, iy, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix2, iy, iz) / V1_TAB(ix2, iy, iz);
             }
             break;
 
@@ -304,13 +301,13 @@ static void st_mean_harmo(int idim,
             iy2 = 2 * iy + 1;
             if (D1_TAB(ix, iy1, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy1, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy1,iz) / V1_TAB(ix, iy1, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy1, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy1, iz) / V1_TAB(ix, iy1, iz);
             }
             if (iy2 < nxyz1[1] && D1_TAB(ix, iy2, iz))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy2, iz);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy2,iz) / V1_TAB(ix, iy2, iz);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy2, iz);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy2, iz) / V1_TAB(ix, iy2, iz);
             }
             break;
 
@@ -319,19 +316,19 @@ static void st_mean_harmo(int idim,
             iz2 = 2 * iz + 1;
             if (D1_TAB(ix, iy, iz1))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy, iz1);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy,iz1) / V1_TAB(ix, iy, iz1);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz1);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz1) / V1_TAB(ix, iy, iz1);
             }
             if (iz2 < nxyz1[2] && D1_TAB(ix, iy, iz2))
             {
-              N2_TAB(ix,iy,iz) += N1_TAB(ix, iy, iz2);
-              V2_TAB(ix,iy,iz) += N1_TAB(ix,iy,iz2) / V1_TAB(ix, iy, iz2);
+              N2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz2);
+              V2_TAB(ix, iy, iz) += N1_TAB(ix, iy, iz2) / V1_TAB(ix, iy, iz2);
             }
             break;
         }
         V2_TAB(ix, iy, iz) = (ABS(V2_TAB(ix, iy, iz)) > 1.e-10)
-                               ? N2_TAB(ix, iy, iz) / V2_TAB(ix, iy, iz)
-                               : TEST;
+                             ? N2_TAB(ix, iy, iz) / V2_TAB(ix, iy, iz)
+                             : TEST;
       }
 }
 
@@ -350,14 +347,14 @@ static void st_mean_harmo(int idim,
  ** \param[out] valtab2   Array containing the sample value
  **
  *****************************************************************************/
-static int st_recopy(const int *nxyz1,
-                     const double *numtab1,
-                     const double *valtab1,
-                     int *nxyz2,
-                     double *numtab2,
-                     double *valtab2)
+static Id st_recopy(const Id* nxyz1,
+                    const double* numtab1,
+                    const double* valtab1,
+                    Id* nxyz2,
+                    double* numtab2,
+                    double* valtab2)
 {
-  int i, ncell;
+  Id i, ncell;
 
   /* Update the dimension */
 
@@ -390,13 +387,13 @@ static int st_recopy(const int *nxyz1,
  ** \param[out] valtab    Array containing the sample value
  **
  ****************************************************************************/
-static void st_print_grid(const char *subtitle,
-                          int nxyz[3],
-                          double *numtab,
-                          double *valtab)
+static void st_print_grid(const char* subtitle,
+                          Id nxyz[3],
+                          double* numtab,
+                          double* valtab)
 {
-  char string[100];
-  int iz, shift;
+  String string;
+  Id iz, shift;
 
   /* Initializations */
 
@@ -406,11 +403,11 @@ static void st_print_grid(const char *subtitle,
 
   for (iz = 0; iz < nxyz[2]; iz++)
   {
-    (void) gslSPrintf(string, "%s Values (iz=%d)\n", subtitle, iz + 1);
-    message(string);
+    (void)gslSPrintf(string, "%s Values (iz=%d)\n", subtitle, iz + 1);
+    message(string.data());
     print_matrix(NULL, 0, 0, nxyz[0], nxyz[1], NULL, &valtab[iz * shift]);
-    (void) gslSPrintf(string, "%s Counts (iz=%d)\n", subtitle, iz + 1);
-    message(string);
+    (void)gslSPrintf(string, "%s Counts (iz=%d)\n", subtitle, iz + 1);
+    message(string.data());
     print_matrix(NULL, 0, 0, nxyz[0], nxyz[1], NULL, &numtab[iz * shift]);
   }
   message("\n");
@@ -425,17 +422,17 @@ static void st_print_grid(const char *subtitle,
  ** \param[out] valtab    Array containing the sample value
  **
  *****************************************************************************/
-static void st_print_upscale(const char *title, int *nxyz, const double *valtab)
+static void st_print_upscale(const char* title, Id* nxyz, const double* valtab)
 {
   double mini, maxi, value;
-  int lec, ndef;
+  Id lec, ndef;
 
-  mini = 1.e30;
-  maxi = -1.e30;
+  mini = MAXIMUM_BIG;
+  maxi = MINIMUM_BIG;
   lec = ndef = 0;
-  for (int iz = 0; iz < nxyz[2]; iz++)
-    for (int iy = 0; iy < nxyz[1]; iy++)
-      for (int ix = 0; ix < nxyz[0]; ix++)
+  for (Id iz = 0; iz < nxyz[2]; iz++)
+    for (Id iy = 0; iy < nxyz[1]; iy++)
+      for (Id ix = 0; ix < nxyz[0]; ix++)
       {
         value = valtab[lec++];
         if (FFFF(value)) continue;
@@ -467,19 +464,19 @@ static void st_print_upscale(const char *title, int *nxyz, const double *valtab)
  ** \param[out] res2      First result (Arithmetic first)
  **
  *****************************************************************************/
-static void st_upscale(int orient,
-                       int *nxyz,
-                       int flag_save,
-                       double *numtab0,
-                       double *numtab1,
-                       double *numtab2,
-                       double *valtab0,
-                       double *valtab1,
-                       double *valtab2,
-                       double *res1,
-                       double *res2)
+static void st_upscale(Id orient,
+                       Id* nxyz,
+                       Id flag_save,
+                       double* numtab0,
+                       double* numtab1,
+                       double* numtab2,
+                       double* valtab0,
+                       double* valtab1,
+                       double* valtab2,
+                       double* res1,
+                       double* res2)
 {
-  int idim, nxyz1[3], nxyz2[3], ncell, flag_debug;
+  Id idim, nxyz1[3], nxyz2[3], ncell, flag_debug;
 
   /* Initializations */
 
@@ -586,23 +583,23 @@ static void st_upscale(int orient,
  ** \param[out] ntot       Total number of grid nodes
  **
  *****************************************************************************/
-static int st_is_subgrid(int verbose,
-                         const char *title,
-                         DbGrid *dbgrid1,
-                         DbGrid *dbgrid2,
-                         int *ind0,
-                         int *nxyz,
-                         int *ntot)
+static Id st_is_subgrid(Id verbose,
+                        const char* title,
+                        DbGrid* dbgrid1,
+                        DbGrid* dbgrid2,
+                        Id* ind0,
+                        Id* nxyz,
+                        Id* ntot)
 {
   double d;
-  int ndim;
+  Id ndim;
 
   /* Initializations */
 
   ndim = dbgrid1->getNDim();
 
   (*ntot) = 1;
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     /* Initializations */
 
@@ -615,10 +612,10 @@ static int st_is_subgrid(int verbose,
     if (!isInteger(d))
     {
       messerr(
-          "The origin of the Output Grid does not coincide with a node of the Input Grid");
+        "The origin of the Output Grid does not coincide with a node of the Input Grid");
       return (0);
     }
-    ind0[idim] = (int) floor(d + 0.5);
+    ind0[idim] = static_cast<Id>(floor(d + 0.5));
 
     /* Are grid meshes multiple */
 
@@ -626,10 +623,10 @@ static int st_is_subgrid(int verbose,
     if (!isInteger(d))
     {
       messerr(
-          "The grid cell of the Output Grid is not a multiple of the grid cell of the Input Grid");
+        "The grid cell of the Output Grid is not a multiple of the grid cell of the Input Grid");
       return (0);
     }
-    nxyz[idim] = (int) floor(d + 0.5);
+    nxyz[idim] = static_cast<Id>(floor(d + 0.5));
     (*ntot) *= nxyz[idim];
   }
 
@@ -637,11 +634,11 @@ static int st_is_subgrid(int verbose,
   {
     mestitle(1, title);
     message("- Number of Cells =");
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       message(" %d", nxyz[idim]);
     message("\n");
     message("- Index of Origin =");
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       message(" %d", ind0[idim]);
     message("\n");
   }
@@ -660,19 +657,23 @@ static int st_is_subgrid(int verbose,
  ** \param[in]  verbose    Verbose flag
  **
  *****************************************************************************/
-int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
+Id db_upscale(DbGrid* dbgrid1, DbGrid* dbgrid2, Id orient, Id verbose)
 {
-  double *valtab0, *valtab1, *valtab2, *numtab0, *numtab1, *numtab2;
   double result1, result2, result, probtot;
-  int error, ndim, ind0[3], nxyz[3], iech, iptr, ntot, ncol;
-  int flag_save, iech_save;
+  Id error, ndim, ind0[3], nxyz[3], iech, iptr, ntot, ncol;
+  Id flag_save, iech_save;
+  VectorDouble numtab0;
+  VectorDouble numtab1;
+  VectorDouble numtab2;
+  VectorDouble valtab0;
+  VectorDouble valtab1;
+  VectorDouble valtab2;
 
   /* Initializations */
 
-  valtab0 = valtab1 = valtab2 = numtab0 = numtab1 = numtab2 = nullptr;
-  error = 1;
-  iech_save = (int)get_keypone("Upscale.Converge.Block", 0);
-  int ndim2 = dbgrid2->getNDim();
+  error     = 1;
+  iech_save = static_cast<Id>(get_keypone("Upscale.Converge.Block", 0));
+  Id ndim2  = dbgrid2->getNDim();
   VectorInt ixyz(ndim2);
 
   /* Preliminary checks */
@@ -706,18 +707,12 @@ int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
 
   /* Core allocation */
 
-  numtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab0 == nullptr) goto label_end;
-  numtab1 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab1 == nullptr) goto label_end;
-  numtab2 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab2 == nullptr) goto label_end;
-  valtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab0 == nullptr) goto label_end;
-  valtab1 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab1 == nullptr) goto label_end;
-  valtab2 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab2 == nullptr) goto label_end;
+  numtab0.resize(ntot);
+  numtab1.resize(ntot);
+  numtab2.resize(ntot);
+  valtab0.resize(ntot);
+  valtab1.resize(ntot);
+  valtab2.resize(ntot);
 
   /* Loop on the cells of the Output Grid */
 
@@ -733,16 +728,18 @@ int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
       /* Load the subgrid to be upscaled */
 
       probtot = st_extract_subgrid(verbose, 0, iech, dbgrid2->getNSample(),
-                                   ntot, dbgrid1, ind0, ixyz.data(), nxyz, numtab0,
-                                   valtab0);
+                                   ntot, dbgrid1, ind0, ixyz.data(), nxyz,
+                                   numtab0.data(), valtab0.data());
 
       if (probtot > 0)
       {
 
         /* Upscale the corresponding subgrid of the Input Grid */
 
-        st_upscale(orient, nxyz, flag_save, numtab0, numtab1, numtab2, valtab0,
-                   valtab1, valtab2, &result1, &result2);
+        st_upscale(orient, nxyz, flag_save,
+                   numtab0.data(), numtab1.data(), numtab2.data(),
+                   valtab0.data(), valtab1.data(), valtab2.data(),
+                   &result1, &result2);
         result = sqrt(result1 * result2);
       }
       else
@@ -753,22 +750,17 @@ int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
 
     /* Store the result */
 
-    dbgrid2->setLocVariable(ELoc::Z,iech, 0, result1);
-    dbgrid2->setLocVariable(ELoc::Z,iech, 1, result2);
-    dbgrid2->setLocVariable(ELoc::Z,iech, 2, result);
+    dbgrid2->setLocVariable(ELoc::Z, iech, 0, result1);
+    dbgrid2->setLocVariable(ELoc::Z, iech, 1, result2);
+    dbgrid2->setLocVariable(ELoc::Z, iech, 2, result);
   }
 
   /* Set the error return code */
 
   error = 0;
 
-  label_end: OptDbg::setCurrentIndex(0);
-  mem_free((char* ) numtab0);
-  mem_free((char* ) numtab1);
-  mem_free((char* ) numtab2);
-  mem_free((char* ) valtab0);
-  mem_free((char* ) valtab1);
-  mem_free((char* ) valtab2);
+label_end:
+  OptDbg::setCurrentIndex(0);
   return (error);
 }
 
@@ -784,15 +776,15 @@ int db_upscale(DbGrid *dbgrid1, DbGrid *dbgrid2, int orient, int verbose)
  ** \param[in]  loccur    Current seed positions
  **
  *****************************************************************************/
-static double st_squared_distance(int orient,
-                                  int ndim,
-                                  const int *locini,
-                                  const int *loccur)
+static double st_squared_distance(Id orient,
+                                  Id ndim,
+                                  const Id* locini,
+                                  const Id* loccur)
 {
   double delta, dist;
 
   dist = 0.;
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     if (orient != 0 && orient != (idim + 1)) continue;
     delta = locini[idim] - loccur[idim];
@@ -813,13 +805,13 @@ static double st_squared_distance(int orient,
  ** \param[out]  indg Grid indices
  **
  *****************************************************************************/
-static void st_sample_to_grid(int ndim,
-                              int ntot,
-                              const int *nxyz,
-                              int iech,
-                              int *indg)
+static void st_sample_to_grid(Id ndim,
+                              Id ntot,
+                              const Id* nxyz,
+                              Id iech,
+                              Id* indg)
 {
-  for (int idim = ndim - 1; idim >= 0; idim--)
+  for (Id idim = ndim - 1; idim >= 0; idim--)
   {
     ntot /= nxyz[idim];
     indg[idim] = iech / ntot;
@@ -838,9 +830,9 @@ static void st_sample_to_grid(int ndim,
  ** \param[in]  indg  Grid indices
  **
  *****************************************************************************/
-static int st_grid_to_sample(int ndim, const int *nxyz, const int *indg)
+static Id st_grid_to_sample(Id ndim, const Id* nxyz, const Id* indg)
 {
-  int idim, ival;
+  Id idim, ival;
 
   ival = indg[ndim - 1];
   if (ival < 0 || ival >= nxyz[ndim - 1]) return (-1);
@@ -864,11 +856,11 @@ static int st_grid_to_sample(int ndim, const int *nxyz, const int *indg)
  ** \param[in]  cell  Cell location
  **
  *****************************************************************************/
-static int st_fixed_position(int ntot, const double *tab, int cell)
+static Id st_fixed_position(Id ntot, const double* tab, Id cell)
 {
-  int j;
+  Id j;
 
-  for (int i = 0; i < ntot; i++)
+  for (Id i = 0; i < ntot; i++)
   {
     j = cell + i;
     if (j < ntot && tab[j] > 0) return (j);
@@ -889,12 +881,12 @@ static int st_fixed_position(int ntot, const double *tab, int cell)
  ** \param[in]  proba Local probability
  **
  *****************************************************************************/
-static int st_find_cell(int ntot, const double *tab, double proba)
+static Id st_find_cell(Id ntot, const double* tab, double proba)
 {
   double sum1, sum2;
 
   sum1 = sum2 = 0.;
-  for (int i = 0; i < ntot; i++)
+  for (Id i = 0; i < ntot; i++)
   {
     sum2 += tab[i];
     if (proba >= sum1 && proba < sum2) return (i);
@@ -917,16 +909,16 @@ static int st_find_cell(int ntot, const double *tab, double proba)
  ** \param[in,out] loccur    Current seed position
  **
  *****************************************************************************/
-static void st_migrate_seed(int ndim,
-                            int n_nbgh,
-                            int *nxyz,
-                            const int *nbgh,
-                            double *valwrk,
-                            const double *valtab0,
-                            int *locwrk,
-                            int *loccur)
+static void st_migrate_seed(Id ndim,
+                            Id n_nbgh,
+                            Id* nxyz,
+                            const Id* nbgh,
+                            double* valwrk,
+                            const double* valtab0,
+                            Id* locwrk,
+                            Id* loccur)
 {
-  int iabs, ivois;
+  Id iabs, ivois;
   double probtot, proba;
 
   /* Count the number of available neighboring cells */
@@ -934,12 +926,12 @@ static void st_migrate_seed(int ndim,
   probtot = 0.;
   for (ivois = 0; ivois < n_nbgh; ivois++)
   {
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
       locwrk[idim] = loccur[idim] + NBGH(ivois, idim);
       locwrk[idim] = Grid::generateMirrorIndex(nxyz[idim], locwrk[idim]);
     }
-    iabs = st_grid_to_sample(ndim, nxyz, locwrk);
+    iabs          = st_grid_to_sample(ndim, nxyz, locwrk);
     valwrk[ivois] = valtab0[iabs];
     probtot += valwrk[ivois];
   }
@@ -950,7 +942,7 @@ static void st_migrate_seed(int ndim,
   {
     proba = law_uniform(0., probtot);
     ivois = st_find_cell(n_nbgh, valwrk, proba);
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       loccur[idim] += NBGH(ivois, idim);
   }
 }
@@ -968,11 +960,11 @@ static void st_migrate_seed(int ndim,
  ** \remark  and the internal flag DEBUG is TRUE (this requires compiling)
  **
  *****************************************************************************/
-static void st_print_position(int ndim, int iseed, int iter, int *tab)
+static void st_print_position(Id ndim, Id iseed, Id iter, Id* tab)
 {
   if (!DEBUG) return;
   message("Trajectory %d - Iteration %d:", iseed + 1, iter + 1);
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     message(" %4d", tab[idim]);
   message("\n");
 }
@@ -1009,36 +1001,36 @@ static void st_print_position(int ndim, int iseed, int iter, int *tab)
  **              set_keypair("Fixed_Position",...)
  **
  *****************************************************************************/
-static void st_updiff(int orient,
-                      int ndim,
-                      int ntot,
-                      int nseed,
-                      int niter,
-                      int n_nbgh,
-                      int flag_save,
+static void st_updiff(Id orient,
+                      Id ndim,
+                      Id ntot,
+                      Id nseed,
+                      Id niter,
+                      Id n_nbgh,
+                      Id flag_save,
                       double probtot,
-                      int *nxyz,
-                      int *nbgh,
-                      int *tabini,
-                      int *tabcur,
-                      int *tabwrk,
-                      double *valwrk,
-                      double *valtab0,
-                      int verbose,
-                      double *cvdist2,
-                      double *trsave)
+                      Id* nxyz,
+                      Id* nbgh,
+                      Id* tabini,
+                      Id* tabcur,
+                      Id* tabwrk,
+                      double* valwrk,
+                      double* valtab0,
+                      Id verbose,
+                      double* cvdist2,
+                      double* trsave)
 {
   double d2, dmoy, proba;
-  int rank, fixed_position, flag_fixed;
+  Id rank, fixed_position, flag_fixed;
 
   /* Check if a fixed starting position has been defined */
 
-  fixed_position = (int) get_keypone("Fixed_Position", -1);
-  flag_fixed = fixed_position >= 0;
+  fixed_position = static_cast<Id>(get_keypone("Fixed_Position", -1));
+  flag_fixed     = fixed_position >= 0;
 
   /* Draw initial seed locations */
 
-  for (int iseed = 0; iseed < nseed; iseed++)
+  for (Id iseed = 0; iseed < nseed; iseed++)
   {
     if (flag_fixed)
     {
@@ -1047,23 +1039,23 @@ static void st_updiff(int orient,
     else
     {
       proba = law_uniform(0., probtot);
-      rank = st_find_cell(ntot, valtab0, proba);
+      rank  = st_find_cell(ntot, valtab0, proba);
     }
     st_sample_to_grid(ndim, ntot, nxyz, rank, &TABINI(iseed, 0));
-    for (int idim = 0; idim < ndim; idim++)
-      TABCUR(iseed,idim) = TABINI(iseed, idim);
+    for (Id idim = 0; idim < ndim; idim++)
+      TABCUR(iseed, idim) = TABINI(iseed, idim);
     if (verbose) st_print_position(ndim, iseed, -1, &TABCUR(iseed, 0));
   }
 
   /* Loop on the iterations */
 
-  for (int iter = 0; iter < niter; iter++)
+  for (Id iter = 0; iter < niter; iter++)
   {
     dmoy = 0.;
 
     /* Loop on the seed points */
 
-    for (int iseed = 0; iseed < nseed; iseed++)
+    for (Id iseed = 0; iseed < nseed; iseed++)
     {
 
       /* Migrate the seed */
@@ -1084,15 +1076,15 @@ static void st_updiff(int orient,
 
       if (flag_save && trsave != nullptr)
       {
-        for (int idim = 0; idim < ndim; idim++)
-          TRAJEC(iseed,iter,idim) = TABCUR(iseed, idim);
+        for (Id idim = 0; idim < ndim; idim++)
+          TRAJEC(iseed, iter, idim) = TABCUR(iseed, idim);
       }
 
       /* Update the mean distance */
 
       dmoy += d2;
     }
-    cvdist2[iter] = dmoy / (double) nseed;
+    cvdist2[iter] = dmoy / static_cast<double>(nseed);
   }
 }
 
@@ -1113,11 +1105,11 @@ static void st_updiff(int orient,
  *****************************************************************************/
 static void st_update_regression(double x,
                                  double y,
-                                 double *count,
-                                 double *sum_x,
-                                 double *sum_y,
-                                 double *sum_xx,
-                                 double *sum_xy)
+                                 double* count,
+                                 double* sum_x,
+                                 double* sum_y,
+                                 double* sum_xx,
+                                 double* sum_xy)
 {
   (*count) += 1.;
   (*sum_x) += x;
@@ -1142,41 +1134,41 @@ static void st_update_regression(double x,
  ** \param[out] cvsave     Array containing the storage (Dimension: 3 * niter)
  **
  *****************************************************************************/
-static double st_get_diff_coeff(int niter,
-                                int verbose,
+static double st_get_diff_coeff(Id niter,
+                                Id verbose,
                                 double pmid,
-                                int flag_save,
-                                double *cvdist2,
-                                double *cvsave)
+                                Id flag_save,
+                                double* cvdist2,
+                                double* cvsave)
 {
   double slope, origin, slope_ref, origin_ref, sum_x, sum_y, sum_xy, sum_xx,
-      count;
+    count;
   double mx, my, var, cov;
-  int iter, rank_mid;
+  Id iter, rank_mid;
 
   slope_ref = origin_ref = TEST;
-  rank_mid = (int) (pmid * niter / 100.);
+  rank_mid               = static_cast<Id>(pmid * niter / 100.);
   count = sum_x = sum_y = sum_xx = sum_xy = origin = slope = 0.;
 
-  for (int jter = 0; jter < niter; jter++)
+  for (Id jter = 0; jter < niter; jter++)
   {
     iter = niter - jter - 1;
 
     /* Calculate the average slope */
 
-    st_update_regression((double) (iter + 1), cvdist2[iter], &count, &sum_x,
+    st_update_regression(static_cast<double>(iter + 1), cvdist2[iter], &count, &sum_x,
                          &sum_y, &sum_xx, &sum_xy);
     if (count > 1)
     {
-      mx = sum_x / count;
-      my = sum_y / count;
-      var = sum_xx / count - mx * mx;
-      cov = sum_xy / count - mx * my;
-      slope = cov / var;
+      mx     = sum_x / count;
+      my     = sum_y / count;
+      var    = sum_xx / count - mx * mx;
+      cov    = sum_xy / count - mx * my;
+      slope  = cov / var;
       origin = my - slope * mx;
       if (iter == rank_mid)
       {
-        slope_ref = slope;
+        slope_ref  = slope;
         origin_ref = origin;
       }
     }
@@ -1186,7 +1178,7 @@ static double st_get_diff_coeff(int niter,
     if (verbose && !FFFF(slope) && !FFFF(origin))
     {
       message("  Rank=%5d Slope=%lf Origin=%lf (Count=%d)", iter + 1, slope,
-              origin, (int) count);
+              origin, static_cast<Id>(count));
       if (iter == rank_mid) message(" - Stored");
       message("\n");
     }
@@ -1246,40 +1238,45 @@ static double st_get_diff_coeff(int niter,
  ** \remarks      set.keypair("Diffusion.Trajectory.XX")
  **
  *****************************************************************************/
-int db_diffusion(DbGrid *dbgrid1,
-                 DbGrid *dbgrid2,
-                 int orient,
-                 int niter,
-                 int nseed,
-                 int seed,
-                 int verbose)
+Id db_diffusion(DbGrid* dbgrid1,
+                DbGrid* dbgrid2,
+                Id orient,
+                Id niter,
+                Id nseed,
+                Id seed,
+                Id verbose)
 {
-  double *valtab0, *numtab0, *valwrk, *cvdist2, *cvsave, *trsave;
   double diff_coeff, pmid, probtot;
-  int error, ndim, ind0[3], nxyz[3], iech, nech, iptr, opt_center;
-  int ntot, iech_save, flag_save, opt_morpho, flag_traj;
-  int *tabini, *tabcur, *tabwrk, *numrank, n_nbgh;
-  char name[40];
+  Id error, ndim, ind0[3], nxyz[3], iech, nech, iptr, opt_center;
+  Id ntot, iech_save, flag_save, opt_morpho, flag_traj, n_nbgh;
+  String name;
   VectorInt nbgh;
+  VectorInt tabini;
+  VectorInt tabcur;
+  VectorInt tabwrk;
+  VectorDouble numtab0;
+  VectorDouble valtab0;
+  VectorDouble cvdist2;
+  VectorDouble cvsave;
+  VectorDouble trsave;
+  VectorDouble valwrk;
 
   /* Initializations */
 
-  valtab0 = valwrk = numtab0 = cvdist2 = cvsave = trsave = nullptr;
-  tabini = tabcur = tabwrk = numrank = nullptr;
-  error = 1;
-  iech_save = (int) get_keypone("Diffusion.Converge.Block", 0);
-  opt_morpho = (int) get_keypone("Diffusion.Converge.Morpho", 1);
-  opt_center = (int) get_keypone("Diffusion.Converge.Center", 1);
-  flag_traj = (int) get_keypone("Diffusion.Flag.Trajectory", 0);
-  pmid = get_keypone("Diffusion.Converge.PMid", 70.);
+  error      = 1;
+  iech_save  = static_cast<Id>(get_keypone("Diffusion.Converge.Block", 0));
+  opt_morpho = static_cast<Id>(get_keypone("Diffusion.Converge.Morpho", 1));
+  opt_center = static_cast<Id>(get_keypone("Diffusion.Converge.Center", 1));
+  flag_traj  = static_cast<Id>(get_keypone("Diffusion.Flag.Trajectory", 0));
+  pmid       = get_keypone("Diffusion.Converge.PMid", 70.);
   if (seed != 0) law_set_random_seed(seed);
 
   /* Preliminary checks */
 
-  ndim = dbgrid1->getNDim();
-  nech = dbgrid2->getNSample();
-  int ndim2 = dbgrid2->getNDim();
-  VectorInt ixyz(ndim2,0);
+  ndim     = dbgrid1->getNDim();
+  nech     = dbgrid2->getNSample();
+  Id ndim2 = dbgrid2->getNDim();
+  VectorInt ixyz(ndim2, 0);
   if (ndim < 1 || ndim > 3)
   {
     messerr("This function is limited to 2-D or 3-D input grids");
@@ -1305,34 +1302,21 @@ int db_diffusion(DbGrid *dbgrid1,
 
   /* Core allocation */
 
-  tabini = (int*) mem_alloc(sizeof(int) * ndim * nseed, 0);
-  if (tabini == nullptr) goto label_end;
-  tabcur = (int*) mem_alloc(sizeof(int) * ndim * nseed, 0);
-  if (tabcur == nullptr) goto label_end;
-  tabwrk = (int*) mem_alloc(sizeof(int) * ndim, 0);
-  if (tabwrk == nullptr) goto label_end;
-  numrank = (int*) mem_alloc(sizeof(int) * ndim * nseed, 0);
-  if (numrank == nullptr) goto label_end;
-  numtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (numtab0 == nullptr) goto label_end;
-  valtab0 = (double*) mem_alloc(sizeof(double) * ntot, 0);
-  if (valtab0 == nullptr) goto label_end;
-  cvdist2 = (double*) mem_alloc(sizeof(double) * niter, 0);
-  if (cvdist2 == nullptr) goto label_end;
-  cvsave = (double*) mem_alloc(sizeof(double) * niter * 3, 0);
-  if (cvsave == nullptr) goto label_end;
+  tabini.resize(ndim * nseed);
+  tabcur.resize(ndim * nseed);
+  tabwrk.resize(ndim);
+  numtab0.resize(ntot);
+  valtab0.resize(ntot);
+  cvdist2.resize(niter);
+  cvsave.resize(niter * 3);
   if (flag_traj)
-  {
-    trsave = (double*) mem_alloc(sizeof(double) * niter * nseed * ndim, 0);
-    if (trsave == nullptr) goto label_end;
-  }
+    trsave.resize(niter * nseed * ndim);
 
   /* Allocate the neighboring displacement array */
 
-  nbgh = gridcell_neigh(ndim, opt_morpho, 1, opt_center, verbose);
-  n_nbgh = (int) nbgh.size() / ndim;
-  valwrk = (double*) mem_alloc(sizeof(double) * n_nbgh, 0);
-  if (valwrk == nullptr) goto label_end;
+  nbgh   = gridcell_neigh(ndim, opt_morpho, 1, opt_center, verbose);
+  n_nbgh = static_cast<Id>(nbgh.size()) / ndim;
+  valwrk.resize(n_nbgh);
 
   /* Create the new variable in the output file */
 
@@ -1353,7 +1337,8 @@ int db_diffusion(DbGrid *dbgrid1,
       /* Load the subgrid to be upscaled */
 
       probtot = st_extract_subgrid(verbose, 1, iech, nech, ntot, dbgrid1, ind0,
-                                   ixyz.data(), nxyz, numtab0, valtab0);
+                                   ixyz.data(), nxyz, numtab0.data(),
+                                   valtab0.data());
 
       if (probtot > 0)
       {
@@ -1361,26 +1346,27 @@ int db_diffusion(DbGrid *dbgrid1,
         /* Upscale the diffusion */
 
         st_updiff(orient, ndim, ntot, nseed, niter, n_nbgh, flag_save, probtot,
-                  nxyz, nbgh.data(), tabini, tabcur, tabwrk, valwrk, valtab0,
-                  verbose, cvdist2, trsave);
+                  nxyz, nbgh.data(), tabini.data(), tabcur.data(),
+                  tabwrk.data(), valwrk.data(), valtab0.data(),
+                  verbose, cvdist2.data(), trsave.data());
 
         /* Derive the diffusion coefficient */
 
-        diff_coeff = st_get_diff_coeff(niter, verbose, pmid, flag_save, cvdist2,
-                                       cvsave);
+        diff_coeff = st_get_diff_coeff(niter, verbose, pmid, flag_save,
+                                       cvdist2.data(), cvsave.data());
 
         /* Save the trajectory (optional) */
 
-        if (flag_save && trsave != nullptr)
+        if (flag_save && !trsave.empty())
         {
-          for (int iseed = 0; iseed < nseed; iseed++)
+          for (Id iseed = 0; iseed < nseed; iseed++)
           {
-            (void) gslSPrintf(name, "Diffusion.Trajectory.%d", iseed + 1);
-            for (int iter = 0; iter < niter; iter++)
-              for (int idim = 0; idim < ndim; idim++)
-                TRAJEC(iseed,iter,idim) = dbgrid2->getCoordinate(iech, idim) +
-                TRAJEC(iseed,iter,idim) * dbgrid1->getDX(idim);
-            set_keypair(name, 1, niter, ndim, &TRAJEC(iseed, 0, 0));
+            (void)gslSPrintf(name, "Diffusion.Trajectory.%d", iseed + 1);
+            for (Id iter = 0; iter < niter; iter++)
+              for (Id idim = 0; idim < ndim; idim++)
+                TRAJEC(iseed, iter, idim) = dbgrid2->getCoordinate(iech, idim) +
+                                            TRAJEC(iseed, iter, idim) * dbgrid1->getDX(idim);
+            set_keypair(name.data(), 1, niter, ndim, &TRAJEC(iseed, 0, 0));
           }
         }
       }
@@ -1395,17 +1381,8 @@ int db_diffusion(DbGrid *dbgrid1,
 
   error = 0;
 
-  label_end: OptDbg::setCurrentIndex(0);
-  mem_free((char* ) tabini);
-  mem_free((char* ) tabcur);
-  mem_free((char* ) tabwrk);
-  mem_free((char* ) numrank);
-  mem_free((char* ) valwrk);
-  mem_free((char* ) numtab0);
-  mem_free((char* ) valtab0);
-  mem_free((char* ) cvdist2);
-  mem_free((char* ) cvsave);
-  mem_free((char* ) trsave);
+label_end:
+  OptDbg::setCurrentIndex(0);
   return (error);
 }
 
@@ -1428,29 +1405,29 @@ int db_diffusion(DbGrid *dbgrid1,
  ** \param[out] Q         Array of for metal quantity
  **
  *****************************************************************************/
-int stats_residuals(int verbose,
-                    int nech,
-                    const double *tab,
-                    int ncut,
-                    double *zcut,
-                    int *nsorted,
-                    double *mean,
-                    double *residuals,
-                    double *T,
-                    double *Q)
+Id stats_residuals(Id verbose,
+                   Id nech,
+                   const double* tab,
+                   Id ncut,
+                   double* zcut,
+                   Id* nsorted,
+                   double* mean,
+                   double* residuals,
+                   double* T,
+                   double* Q)
 {
   double value, moyenne;
-  int iech, icut, jcut, nactive;
+  Id iech, icut, jcut, nactive;
 
   /* Initializations */
 
   nactive = (*nsorted) = 0;
-  moyenne = 0.;
+  moyenne              = 0.;
   for (icut = 0; icut < ncut; icut++)
   {
     T[icut] = Q[icut] = 0.;
     for (iech = 0; iech < nech; iech++)
-      RESIDUALS(icut,iech) = 0.;
+      RESIDUALS(icut, iech) = 0.;
   }
 
   /* Loop on the samples to calculate the indicators */
@@ -1467,7 +1444,7 @@ int stats_residuals(int verbose,
     for (icut = 0; icut < ncut; icut++)
     {
       if (value < zcut[icut]) continue;
-      RESIDUALS(icut,iech) = 1.;
+      RESIDUALS(icut, iech) = 1.;
       Q[icut] += value;
       T[icut] += 1.;
     }
@@ -1480,11 +1457,11 @@ int stats_residuals(int verbose,
 
   /* Calculate the tonnage and meal quantity per class */
 
-  moyenne /= (double) nactive;
+  moyenne /= static_cast<double>(nactive);
   for (icut = 0; icut < ncut; icut++)
   {
-    T[icut] /= (double) nactive;
-    Q[icut] /= (double) nactive;
+    T[icut] /= static_cast<double>(nactive);
+    Q[icut] /= static_cast<double>(nactive);
   }
 
   /* Calculate the residuals */
@@ -1498,17 +1475,17 @@ int stats_residuals(int verbose,
 
     for (icut = ncut - 1; icut >= 0; icut--)
     {
-      value = RESIDUALS(icut,iech) / T[icut];
+      value = RESIDUALS(icut, iech) / T[icut];
       if (icut > 0)
       {
         jcut = icut - 1;
-        value -= RESIDUALS(jcut,iech) / T[jcut];
+        value -= RESIDUALS(jcut, iech) / T[jcut];
       }
       else
       {
         value -= 1.;
       }
-      RESIDUALS(icut,iech) = value;
+      RESIDUALS(icut, iech) = value;
     }
   }
 
@@ -1524,6 +1501,7 @@ int stats_residuals(int verbose,
   }
 
   (*nsorted) = nactive;
-  (*mean) = moyenne;
+  (*mean)    = moyenne;
   return (0);
 }
+} // namespace gstlrn

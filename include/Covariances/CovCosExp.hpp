@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 class CovContext;
 
 class GSTLEARN_EXPORT CovCosExp : public ACovFunc
@@ -28,10 +30,10 @@ public:
   double getScadef() const override;
 
   String getCovName() const override { return "Cosexp"; }
-  int    getMinOrder() const override { return -1; }
+  Id    getMinOrder() const override { return -1; }
   bool   getCompatibleSpaceR() const override { return true; }
 
 protected:
   double _evaluateCov(double h) const override;
 };
-
+}

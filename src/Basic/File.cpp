@@ -10,31 +10,34 @@
 /******************************************************************************/
 #include "Basic/File.hpp"
 #include "geoslib_define.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdlib.h>
+
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 
+#include <filesystem>
 #include <fstream>
 
 #if defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
-#include <io.h>
-#include <fcntl.h>
+#  include <fcntl.h>
+#  include <io.h>
+#  include <windows.h>
 #endif
-
-StdoutRedirect::StdoutRedirect(const String &file,
-                               int argc,
-                               char *argv[],
-                               int number)
-    :
-  _flagActive(true),
+namespace gstlrn
+{
+StdoutRedirect::StdoutRedirect(const String& file,
+                               Id argc,
+                               char* argv[],
+                               Id number)
+  : _flagActive(true)
+  ,
 #if defined(_WIN32) || defined(_WIN64)
   _old_stdout(0)
 #else
-  _coutbuf(nullptr),
-  _out()
+  _coutbuf(nullptr)
+  , _out()
 #endif
 {
   DECLARE_UNUSED(argv);
@@ -58,10 +61,10 @@ void StdoutRedirect::start(const String& file)
 {
 #if defined(_WIN32) || defined(_WIN64)
   // https://stackoverflow.com/questions/54094127/redirecting-stdout-in-win32-does-not-redirect-stdout/54096218
-  _old_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
+  _old_stdout       = GetStdHandle(STD_OUTPUT_HANDLE);
   HANDLE new_stdout = CreateFileA(file.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   SetStdHandle(STD_OUTPUT_HANDLE, new_stdout);
-  int fd = _open_osfhandle((intptr_t)new_stdout, _O_WRONLY|_O_TEXT);
+  Id fd = _open_osfhandle((intptr_t)new_stdout, _O_WRONLY | _O_TEXT);
   _dup2(fd, _fileno(stdout));
   _close(fd);
 #else
@@ -79,11 +82,11 @@ void StdoutRedirect::stop()
 #if defined(_WIN32) || defined(_WIN64)
   // https://stackoverflow.com/questions/32185512/output-to-console-from-a-win32-gui-application-on-windows-10
   SetStdHandle(STD_OUTPUT_HANDLE, _old_stdout);
-  int fd = _open_osfhandle((intptr_t)_old_stdout, _O_WRONLY|_O_TEXT);
+  Id fd = _open_osfhandle((intptr_t)_old_stdout, _O_WRONLY | _O_TEXT);
   if (fd >= 0) // fd could be negative for an unknown reason (https://github.com/gstlearn/gstlearn/issues/111)
   {
     FILE* fp = _fdopen(fd, "w");
-    freopen_s( &fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stdout);
   }
 #else
   std::cout.rdbuf(_coutbuf);
@@ -92,8 +95,8 @@ void StdoutRedirect::stop()
 }
 
 // Skips the Byte Order Mark (BOM) that defines UTF-8 in some text files.
-//https://stackoverflow.com/a/17219495
-void skipBOM(std::ifstream &in)
+// https://stackoverflow.com/a/17219495
+void skipBOM(std::ifstream& in)
 {
   char test[3] = {0};
   in.read(test, 3);
@@ -101,21 +104,21 @@ void skipBOM(std::ifstream &in)
       (unsigned char)test[1] == 0xBB &&
       (unsigned char)test[2] == 0xBF)
   {
-      return;
+    return;
   }
   in.seekg(0);
 }
 
 FILE* gslFopen(const char* path, const char* mode)
 {
-  FILE *file;
+  FILE* file;
 
 #if defined(__linux__) || defined(__APPLE__)
   file = fopen(path, mode);
 #else
   errno_t err;
-  err = fopen_s( &file, path, mode );
-  if ( err != 0 ) return nullptr;
+  err = fopen_s(&file, path, mode);
+  if (err != 0) return nullptr;
 #endif
   return file;
 }
@@ -125,9 +128,9 @@ FILE* gslFopen(const String& path, const String& mode)
   return gslFopen(path.c_str(), mode.c_str());
 }
 
-bool gslFileExist(const char *path, const char* mode)
+bool gslFileExist(const char* path, const char* mode)
 {
-  FILE* file = gslFopen(path, mode);
+  FILE* file  = gslFopen(path, mode);
   bool exists = file != nullptr;
   if (exists) fclose(file);
   return exists;
@@ -135,7 +138,7 @@ bool gslFileExist(const char *path, const char* mode)
 
 bool gslFileExist(const String& path, const String& mode)
 {
-  FILE* file = gslFopen(path, mode);
+  FILE* file  = gslFopen(path, mode);
   bool exists = file != nullptr;
   if (exists) fclose(file);
   return exists;
@@ -143,17 +146,9 @@ bool gslFileExist(const String& path, const String& mode)
 
 String gslBaseName(const String& path, bool keepExtension)
 {
-  // TODO c++17 : use #include <filesystem> to retrieve base name
-  // https://stackoverflow.com/questions/8520560/get-a-file-name-from-a-path
-  String base_filename = path.substr(path.find_last_of("/\\") + 1);
-  if (!keepExtension)
-  {
-    String::size_type p(base_filename.find_last_of('.'));
-    base_filename = base_filename.substr(0, p);
-  }
-  return base_filename;
+  std::filesystem::path p {path};
+  return (keepExtension ? p.filename() : p.stem()).string();
 }
-
 
 String gslGetEnv(const String& name)
 {
@@ -165,7 +160,7 @@ String gslGetEnv(const String& name)
     text = String(buffer);
 #elif defined(__linux__) || defined(__APPLE__)
   char* value = std::getenv(name.c_str());
-  if (value != NULL)
+  if (value != nullptr)
     text = String(value);
 #endif
   return text;
@@ -182,11 +177,11 @@ std::istream& gslSafeGetline(std::istream& is, String& t)
   // such as thread synchronization and updating the stream state.
 
   std::istream::sentry se(is, true);
-  std::streambuf *sb = is.rdbuf();
+  std::streambuf* sb = is.rdbuf();
 
   for (;;)
   {
-    int c = sb->sbumpc();
+    Id c = sb->sbumpc();
     switch (c)
     {
       case '\n':
@@ -199,10 +194,8 @@ std::istream& gslSafeGetline(std::istream& is, String& t)
         if (t.empty()) is.setstate(std::ios::eofbit);
         return is;
       default:
-        t += (char) c;
+        t += (char)c;
     }
   }
-  return is;
 }
-
-
+} // namespace gstlrn

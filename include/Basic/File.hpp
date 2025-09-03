@@ -24,6 +24,9 @@
 #endif
 */
 
+namespace gstlrn
+{
+
 // Standard output stream redirection
 
 /**
@@ -42,9 +45,9 @@
 class GSTLEARN_EXPORT StdoutRedirect {
 public:
   StdoutRedirect(const String &file = "",
-                 int argc = 0,
+                 Id argc = 0,
                  char *argv[] = nullptr,
-                 int number = 1);
+                 Id number = 1);
   ~StdoutRedirect();
   StdoutRedirect(const StdoutRedirect&) = delete;
   StdoutRedirect& operator=(const StdoutRedirect&) = delete;
@@ -89,3 +92,4 @@ GSTLEARN_EXPORT String gslGetEnv(const String& name);
  */
 GSTLEARN_EXPORT std::istream& gslSafeGetline(std::istream& is, String& t);
 
+}

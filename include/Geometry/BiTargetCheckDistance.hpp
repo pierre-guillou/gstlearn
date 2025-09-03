@@ -14,6 +14,8 @@
 
 #include "Geometry/ABiTargetCheck.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT BiTargetCheckDistance: public ABiTargetCheck
 {
 public:
@@ -27,7 +29,7 @@ public:
   /// ICloneable Interface
   IMPLEMENT_CLONING(BiTargetCheckDistance)
 
-  virtual bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
+  bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
 
   static BiTargetCheckDistance*
   create(double radius              = TEST,
@@ -35,33 +37,33 @@ public:
          const VectorDouble& angles = VectorDouble());
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
-  int getNDim() const { return _ndim; }
+  Id getNDim() const { return _ndim; }
   const VectorDouble& getAnisoCoeffs() const { return _anisoCoeffs; }
-  double getAnisoCoeff(int i) const { return _anisoCoeffs[i]; }
+  double getAnisoCoeff(Id i) const { return _anisoCoeffs[i]; }
   const VectorDouble& getAnisoRotMats() const { return _anisoRotMat; }
-  double getAnisoRotMat(int i) const { return _anisoRotMat[i]; }
-  int getFlagAniso() const { return _flagAniso; }
-  int getFlagRotation() const { return _flagRotation; }
+  double getAnisoRotMat(Id i) const { return _anisoRotMat[i]; }
+  Id getFlagAniso() const { return _flagAniso; }
+  Id getFlagRotation() const { return _flagRotation; }
   double getRadius() const { return _radius; }
 
-  void setNDim(int ndim) { _ndim = ndim; }
+  void setNDim(Id ndim) { _ndim = ndim; }
   void setAnisoCoeffs(const VectorDouble& anisoCoeffs) { _anisoCoeffs = anisoCoeffs; }
   void setAnisoRotMat(const VectorDouble& anisoRotMat) { _anisoRotMat = anisoRotMat; }
-  void setFlagAniso(int flagAniso) { _flagAniso = flagAniso; }
-  void setFlagRotation(int flagRotation) { _flagRotation = flagRotation; }
+  void setFlagAniso(Id flagAniso) { _flagAniso = flagAniso; }
+  void setFlagRotation(Id flagRotation) { _flagRotation = flagRotation; }
   void setRadius(double radius) { _radius = radius; }
 
   double getDistance() const { return _dist; }
-  VectorDouble getIncr() const { return _movingIncr; }
+  const VectorDouble& getIncr() const { return _movingIncr; }
   double getNormalizedDistance(const VectorDouble& dd) const;
 
 private:
   void _calculateDistance() const;
 
 private:
-  int    _ndim;                  /* Space dimension (used for array dimensioning) */
+  Id    _ndim;                  /* Space dimension (used for array dimensioning) */
   bool   _flagAniso;             /* 1 if the MOVING neigh. is anisotropic */
   bool   _flagRotation;          /* 1 if the anisotropy is rotated */
   double _radius;                /* Maximum isotropic distance */
@@ -72,3 +74,4 @@ private:
   mutable VectorDouble _movingIncr;
   mutable VectorDouble _movingAux;
 };
+}

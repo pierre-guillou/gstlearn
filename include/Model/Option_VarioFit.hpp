@@ -15,6 +15,8 @@
 // WARNING: Make this include list as small as possible!
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 /**
  * This class defines the options and parameters used during the Variogram Fitting.
  * All the parameters described hereafter are either available in the construction,
@@ -36,6 +38,7 @@
  * - flag_instrinsic: When True, fit a Model which includes at least one Intrinsic basic Structure
  */
 
+
 class GSTLEARN_EXPORT Option_VarioFit: public AStringable
 {
  public:
@@ -50,7 +53,7 @@ class GSTLEARN_EXPORT Option_VarioFit: public AStringable
   Option_VarioFit& operator= (const Option_VarioFit &m);
   virtual ~Option_VarioFit();
 
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
   bool getAuthAniso() const { return _auth_aniso; }
   void setAuthAniso(bool authAniso) { _auth_aniso = authAniso; }
   bool getAuthRotation() const { return _auth_rotation; }
@@ -84,3 +87,4 @@ private:
   bool _keep_intstr;       /* Keep at least one intrinsic structure */
   bool _flag_intrinsic;    /* Ask for an intrinsic model */
 };
+}

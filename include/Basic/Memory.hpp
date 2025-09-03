@@ -10,7 +10,10 @@
 /******************************************************************************/
 #pragma once
 
+#include "geoslib_define.h"
 #include "gstlearn_export.hpp"
+
+#include <cstdlib>
 
 #define mem_free(tab)          mem_free_(__FILE__, __LINE__, tab)
 #define mem_alloc(a, b)        mem_alloc_(__FILE__, __LINE__, a, b)
@@ -18,32 +21,31 @@
 #define mem_realloc(tab, a, b) mem_realloc_(__FILE__, __LINE__, tab, a, b)
 #define mem_copy(tab, a, b)    mem_copy_(__FILE__, __LINE__, tab, a, b)
 
-GSTLEARN_EXPORT void memory_leak_set(int flag);
-GSTLEARN_EXPORT void memory_leak_reset(void);
-GSTLEARN_EXPORT void memory_leak_report(void);
+namespace gstlrn
+{
 GSTLEARN_EXPORT char* mem_alloc_(const char* call_file,
-                                 unsigned int call_line,
-                                 int size,
-                                 int flag_fatal);
+                                 size_t call_line,
+                                 Id size,
+                                 Id flag_fatal);
 GSTLEARN_EXPORT char* mem_calloc_(const char* call_file,
-                                  unsigned int call_line,
-                                  int size_t,
-                                  int size,
-                                  int flag_fatal);
+                                  size_t call_line,
+                                  Id size_t,
+                                  Id size,
+                                  Id flag_fatal);
 GSTLEARN_EXPORT char* mem_realloc_(const char* call_file,
-                                   unsigned int call_line,
+                                   size_t call_line,
                                    char* tab,
-                                   int size,
-                                   int flag_fatal);
+                                   Id size,
+                                   Id flag_fatal);
 GSTLEARN_EXPORT char* mem_copy_(const char* call_file,
-                                unsigned int call_line,
+                                size_t call_line,
                                 char* tabin,
-                                int size,
-                                int flag_fatal);
-GSTLEARN_EXPORT char*
-mem_free_(const char* call_file, unsigned int call_line, char* tab);
-GSTLEARN_EXPORT void mem_debug_set(int flag);
-GSTLEARN_EXPORT void memory_status(const char* title);
-GSTLEARN_EXPORT double** mem_tab_free(double** tab, int nvar);
-GSTLEARN_EXPORT double** mem_tab_alloc(int nvar, int size, int flag_fatal);
+                                Id size,
+                                Id flag_fatal);
+GSTLEARN_EXPORT char* mem_free_(const char* call_file,
+                                size_t call_line,
+                                char* tab);
+GSTLEARN_EXPORT double** mem_tab_free(double** tab, Id nvar);
+GSTLEARN_EXPORT double** mem_tab_alloc(Id nvar, Id size, Id flag_fatal);
 GSTLEARN_EXPORT unsigned long long getTotalSystemMemory();
+} // namespace gstlrn

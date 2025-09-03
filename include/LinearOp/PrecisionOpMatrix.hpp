@@ -13,15 +13,17 @@
 #include "LinearOp/CholeskySparse.hpp"
 #include "LinearOp/PrecisionOp.hpp"
 
+
+namespace gstlrn
+{
 class AMesh;
-class ShiftOpMatrix;
 class CovAniso;
 class Model;
+class ShiftOpMatrix;
 
 /** This class is just a specialization of PrecisionOp when the shift
 * Operator is built with sparse matrices and therefore algebra can be performed with Cholesky.
 * It allows to return the precision matrix as a Sparse Matrix. */
-
 class GSTLEARN_EXPORT PrecisionOpMatrix : public PrecisionOp
 {
 public:
@@ -36,23 +38,23 @@ public:
   // Interface for PrecisionOp class
 #ifndef SWIG
   void evalInverse(const constvect vecin, std::vector<double>& vecout) override;
-  int _addSimulateToDest(const constvect whitenoise, vect outv) const override;
-  int _addToDest(const constvect inv, vect outv) const override;
+  Id _addSimulateToDest(const constvect whitenoise, vect outv) const override;
+  Id _addToDest(const constvect inv, vect outv) const override;
 #endif
 
-  double getLogDeterminant(int nbsimu = 1) override;
+  double computeLogDet(Id nMC = 1) const override;
   VectorDouble extractDiag() const override;
 
-  //void evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,int iapex,int igparam) override;
+  //void evalDerivPoly(const VectorDouble& inv, VectorDouble& outv,Id iapex,Id igparam) override;
 #ifndef SWIG
   void evalDeriv(const constvect inv,
                  vect outv,
-                 int iapex,
-                 int igparam,
+                 Id iapex,
+                 Id igparam,
                  const EPowerPT& power) override;
   void evalDerivOptim(vect outv,
-                      int iapex,
-                      int igparam,
+                      Id iapex,
+                      Id igparam,
                       const EPowerPT& power) override;
   void gradYQX(const constvect X,
                const constvect Y,
@@ -63,7 +65,7 @@ public:
                     vect result,
                     const EPowerPT& power) override;
 #endif
-  const MatrixSparse* getQ() const { return _Q; }
+  const MatrixSparse* getQ() const { return _Q.get(); }
   const MatrixSparse* getS() const;
 
 private:
@@ -71,6 +73,8 @@ private:
   MatrixSparse* _build_Q();
 
 private:
-  MatrixSparse* _Q;
+  std::shared_ptr<MatrixSparse> _Q;
   mutable CholeskySparse* _chol;
 };
+
+}

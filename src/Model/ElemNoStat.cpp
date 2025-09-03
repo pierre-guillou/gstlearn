@@ -11,6 +11,8 @@
 #include "Model/ElemNostat.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 ElemNostat::ElemNostat()
     : AStringable(),
       _locType(EConsElem::UNKNOWN),
@@ -59,10 +61,10 @@ ElemNostat::~ElemNostat()
 }
 
 void ElemNostat::init(const EConsElem& loctype,
-                      int rank_grf,
-                      int rank_str,
-                      int rank_v1,
-                      int rank_v2)
+                      Id rank_grf,
+                      Id rank_str,
+                      Id rank_v1,
+                      Id rank_v2)
 {
   _locType = loctype;
   _rankGRF = rank_grf;
@@ -124,4 +126,5 @@ String ElemNostat::toString(const AStringFormat* /*strfmt*/) const
   if (!IFFFF(getRankV2())) sstr << " - " << getRankV2() + 1;
 
   return sstr.str();
+}
 }

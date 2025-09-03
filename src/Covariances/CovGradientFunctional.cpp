@@ -9,35 +9,37 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGradientFunctional.hpp"
-#include "Basic/VectorNumT.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Basic/VectorNumT.hpp"
 #include "Space/ASpace.hpp"
 
-#include <math.h>
+#include <cmath>
 
-#define TR(i,j) (Tr[3 * (i) + (j)])
+#define TR(i, j) (Tr[3 * (i) + (j)])
 
+namespace gstlrn
+{
 CovGradientFunctional::CovGradientFunctional(const ECov& type,
                                              const CovContext& ctxt)
-    : ACovGradient(type, ctxt)
+  : ACovGradient(type, ctxt)
 {
 }
 
-CovGradientFunctional::CovGradientFunctional(const CovGradientFunctional &r)
-    : ACovGradient(r)
+CovGradientFunctional::CovGradientFunctional(const CovGradientFunctional& r)
+  : ACovGradient(r)
 {
 }
 
-CovGradientFunctional::CovGradientFunctional(const CovAniso &r)
-    : ACovGradient(r)
+CovGradientFunctional::CovGradientFunctional(const CovAniso& r)
+  : ACovGradient(r)
 {
 }
 
-CovGradientFunctional& CovGradientFunctional::operator=(const CovGradientFunctional &r)
+CovGradientFunctional& CovGradientFunctional::operator=(const CovGradientFunctional& r)
 {
   if (this != &r)
   {
-    ACovGradient::operator =(r);
+    ACovGradient::operator=(r);
   }
   return *this;
 }
@@ -58,9 +60,9 @@ void CovGradientFunctional::_calculateTrTtr(const VectorDouble& d,
                                             VectorDouble& u,
                                             VectorDouble& trttr) const
 {
-  int ndim = getContext().getNDim();
+  auto ndim = static_cast<Id>(getContext().getNDim());
 
-  VectorDouble h(3,0.);
+  VectorDouble h(3, 0.);
   VectorDouble Tr(9, 0.);
 
   VH::fill(u, 0.);
@@ -68,21 +70,21 @@ void CovGradientFunctional::_calculateTrTtr(const VectorDouble& d,
 
   // Matrix Tr = diag(coeffs) . R
 
-  for (int i=0; i<3; i++)
-    for (int j=0; j<3; j++)
+  for (Id i = 0; i < 3; i++)
+    for (Id j = 0; j < 3; j++)
     {
       if (i >= ndim || j >= ndim) continue;
-      TR(i,j) = getAniso().getRotation().getMatrixDirect().getValue(i,j) / getScale(i);
+      TR(i, j) = getAniso().getRotation().getMatrixDirect().getValue(i, j) / getScale(i);
     }
 
   // Calculate the t(Tr) %*% Tr matrix
 
-  int ecr = 0;
-  for (int i=0; i<3; i++)
-    for (int j=0; j<3; j++)
+  Id ecr = 0;
+  for (Id i = 0; i < 3; i++)
+    for (Id j = 0; j < 3; j++)
     {
       double prod = 0.;
-      for (int k=0; k<3; k++) prod += TR(k,i) * TR(k,j);
+      for (Id k = 0; k < 3; k++) prod += TR(k, i) * TR(k, j);
       trttr[ecr++] = prod;
     }
 
@@ -95,7 +97,7 @@ void CovGradientFunctional::_calculateTrTtr(const VectorDouble& d,
   u[0] = Tr[0] * h[0] + Tr[3] * h[1] + Tr[6] * h[2];
   u[1] = Tr[1] * h[0] + Tr[4] * h[1] + Tr[7] * h[2];
   u[2] = Tr[2] * h[0] + Tr[5] * h[1] + Tr[8] * h[2];
- }
+}
 
 /**
  * Evaluates the covariance and gradient components
@@ -127,23 +129,23 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
                                               const CovCalcMode* /*mode*/,
                                               bool flagGrad) const
 {
-  VectorDouble d(3),trttr(9),u(3);
+  VectorDouble d(3), trttr(9), u(3);
 
   // Calculate the isotropic distance
 
-  double h = getSpace()->getDistance(p1, p2, getAniso());
+  double h        = getSpace()->getDistance(p1, p2, getAniso());
   VectorDouble d1 = VH::subtract(p1.getCoords(), p2.getCoords());
-  for (int i=0; i < 3; i++)
-    d[i] = (i < (int) d1.size()) ? d1[i] : 0.;
+  for (Id i = 0; i < 3; i++)
+    d[i] = (i < static_cast<Id>(d1.size())) ? d1[i] : 0.;
 
   //  Calculate the covariance
 
-  double covar = getSill(0,0) * getCorFunc()->evalCorFunc(h);
+  double covar = getSill(0, 0) * getCorFunc()->evalCorFunc(h);
   covVal += covar;
   if (getCorFunc()->getType() == ECov::NUGGET) return;
 
   _calculateTrTtr(d, u, trttr);
-  double dcovsr = getSill(0,0) * getCorFunc()->evalCovDerivative(1,h);
+  double dcovsr = getSill(0, 0) * getCorFunc()->evalCovDerivative(1, h);
 
   //  Case where distance is null
 
@@ -151,7 +153,7 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
   {
     if (flagGrad)
     {
-      for (int i = 0; i < 9; i++)
+      for (Id i = 0; i < 9; i++)
         covGG[i] -= dcovsr * trttr[i];
     }
   }
@@ -160,7 +162,7 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
 
     //  Calculate covariance between point and gradient
 
-    for (int i = 0; i < 3; i++)
+    for (Id i = 0; i < 3; i++)
     {
       covGp[i] += u[i] * dcovsr;
     }
@@ -169,17 +171,17 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
 
     if (flagGrad)
     {
-      double d2cov = getSill(0,0) * getCorFunc()->evalCovDerivative(2,h);
-      double a = (dcovsr - d2cov) / (h * h);
+      double d2cov = getSill(0, 0) * getCorFunc()->evalCovDerivative(2, h);
+      double a     = (dcovsr - d2cov) / (h * h);
       if (getAniso().isIsotropic())
       {
 
         //  Isotropic case
 
         double b = dcovsr * trttr[0];
-        int ecr = 0;
-        for (int i = 0; i < 3; i++)
-          for (int j = 0; j < 3; j++)
+        Id ecr   = 0;
+        for (Id i = 0; i < 3; i++)
+          for (Id j = 0; j < 3; j++)
           {
             covGG[ecr] += a * u[i] * u[j];
             if (i == j) covGG[ecr] -= b;
@@ -191,9 +193,9 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
 
         //  Anisotropic case
 
-        int ecr = 0;
-        for (int i = 0; i < 3; i++)
-          for (int j = 0; j < 3; j++)
+        Id ecr = 0;
+        for (Id i = 0; i < 3; i++)
+          for (Id j = 0; j < 3; j++)
           {
             covGG[ecr] += a * u[i] * u[j] - dcovsr * trttr[ecr];
             ecr++;
@@ -202,4 +204,4 @@ void CovGradientFunctional::evalZAndGradients(const SpacePoint& p1,
     }
   }
 }
-
+} // namespace gstlrn

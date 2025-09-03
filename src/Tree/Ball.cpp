@@ -9,209 +9,177 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Tree/Ball.hpp"
-#include "Tree/ball_algorithm.h"
-#include "Db/Db.hpp"
-#include "Space/SpacePoint.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
 #include "Mesh/AMesh.hpp"
+#include "Space/SpacePoint.hpp"
+#include "Tree/ball_algorithm.h"
 
-Ball::Ball(const double** data,
-  int n_samples,
-  int n_features,
-  double (*dist_function)(const double* x1,
-                          const double* x2,
-                          int n_features),
-  int leaf_size,
-  int default_distance_function)
-: _tree(nullptr)
+namespace gstlrn
 {
-_tree = btree_init(data, n_samples, n_features, false, dist_function, leaf_size,
-            default_distance_function);
-}
 
 Ball::Ball(const Db* dbin,
            const Db* dbout,
-           double (*dist_function)(const double* x1,
-                                   const double* x2,
-                                   int n_features),
-           int leaf_size,
+           Id leaf_size,
            bool has_constraints,
-           int default_distance_function,
+           Id default_distance_function,
            bool useSel)
-  : _tree(nullptr)
+  : _tree()
 {
-  _master = true;
-  int n_samples;
-  int n_features;
-  double** internal = _getInformationFromDb(dbin, dbout, useSel, &n_samples, &n_features);
-  if (internal == nullptr) return;
+  Id n_samples;
+  Id n_features;
+  auto internal = _getInformationFromDb(dbin, dbout, useSel, &n_samples, &n_features);
+  if (internal.empty()) return;
 
-  _tree = btree_init((const double**)internal, n_samples, n_features, has_constraints,
-                     dist_function, leaf_size, default_distance_function);
-  free_2d_double(internal, n_samples);
+  _tree = t_btree(std::move(internal), n_samples, n_features, has_constraints,
+                  leaf_size, default_distance_function);
 }
 
 /**
  * @brief Construct a new Ball object based on the barycenters of the meshes
- * 
+ *
  * @param mesh  AMesh description
- * @param dist_function template distance function
  * @param leaf_size Number of elements in the leafs of the Ball tree
  * @param has_constraints True if constraints are applied on the Ball Tree
  * @param default_distance_function 1 for Euclidean distance, 2 for Manhattan
  */
 Ball::Ball(const AMesh* mesh,
-           double (*dist_function)(const double* x1,
-                                   const double* x2,
-                                   int n_features),
-           int leaf_size,
+           Id leaf_size,
            bool has_constraints,
-           int default_distance_function)
+           Id default_distance_function)
 {
-  _master = true;
-  int n_samples;
-  int n_features;
-  double **internal = _getInformationFromMesh(mesh, &n_samples, &n_features);
-  if (internal == nullptr) return;
+  Id n_samples;
+  Id n_features;
+  auto internal = _getInformationFromMesh(mesh, &n_samples, &n_features);
+  if (internal.empty()) return;
 
-  _master = true;
-  _tree = btree_init((const double**)internal, n_samples, n_features, has_constraints,
-                     dist_function, leaf_size, default_distance_function);
-  free_2d_double(internal, n_samples);
+  _tree = t_btree(std::move(internal), n_samples, n_features, has_constraints,
+                  leaf_size, default_distance_function);
 }
 
-Ball::Ball(const Ball& r)
-  : _tree(r._tree)
-{
-  _master = false;
-}
-
-Ball& Ball::operator=(const Ball& p)
-{
-  if (this != &p)
-  {
-    _tree = p._tree;
-    _master = false;
-  }
-  return *this;
-}
 void Ball::init(const Db* db,
-                double (*dist_function)(const double* x1,
-                                        const double* x2,
-                                        int n_features),
-                int leaf_size,
-                int default_distance_function,
+                Id leaf_size,
+                Id default_distance_function,
                 bool useSel)
 {
-  if (_tree != nullptr) free_tree(_tree);
+  Id n_samples;
+  Id n_features;
+  auto internal = _getInformationFromDb(db, nullptr, useSel, &n_samples, &n_features);
+  if (internal.empty()) return;
 
-  int n_samples;
-  int n_features;
-  double** internal = _getInformationFromDb(db, nullptr, useSel, &n_samples, &n_features);
-  if (internal == nullptr) return;
-
-  _tree = btree_init((const double**)internal, n_samples, n_features, false,
-                     dist_function, leaf_size, default_distance_function);
-  free_2d_double(internal, n_samples);
+  _tree = t_btree(std::move(internal), n_samples, n_features, false, leaf_size, default_distance_function);
 }
 
-Ball::~Ball()
-{
-  if (_master)
-    free_tree(_tree);
-}
-
-KNN Ball::query(const double **test, int n_samples, int n_features, int n_neighbors)
-{
-  KNN knn;
-  (void) knn.btree_query(_tree, test, n_samples, n_features, n_neighbors);
-  return knn;
-}
-
-KNN Ball::queryAsVVD(const VectorVectorDouble& test, int n_neighbors)
+KNN Ball::queryAsVVD(const VectorVectorDouble& test, Id n_neighbors)
 {
   KNN knn;
   if (test.empty()) return knn;
-  int n_samples = (int) test[0].size();
-  int n_features = (int) test.size();
-  double** internal = copy_double_arrAsVVD(test);
-  (void) knn.btree_query(_tree, (const double**) internal, n_samples, n_features, n_neighbors);
-  //  free_2d_double(internal, n_features);
-  free_2d_double(internal, n_samples);
+  Id n_samples  = static_cast<Id>(test[0].size());
+  Id n_features = static_cast<Id>(test.size());
+  MatrixT<double> internal(n_samples, n_features);
+  // transpose
+  for (Id i = 0; i < n_samples; ++i)
+  {
+    for (Id j = 0; j < n_features; ++j)
+    {
+      internal(i, j) = test[j][i];
+    }
+  }
+  (void)knn.btree_query(_tree, internal, n_samples, n_features, n_neighbors);
   return knn;
 }
 
-KNN Ball::queryOne(const double *test, int n_features, int n_neighbors)
+KNN Ball::queryOne(const double* test, Id n_features, Id n_neighbors)
 {
   KNN knn;
-  (void) knn.btree_query(_tree, (const double**) &test, 1, n_features, n_neighbors);
+  MatrixT<double> internal(1, n_features);
+  for (Id i = 0; i < n_features; ++i)
+  {
+    internal(0, i) = test[i];
+  }
+  (void)knn.btree_query(_tree, internal, 1, n_features, n_neighbors);
   return knn;
 }
 
-KNN Ball::queryOneAsVD(const VectorDouble& test, int n_neighbors)
+KNN Ball::queryOneAsVD(const VectorDouble& test, Id n_neighbors)
 {
   KNN knn;
-  int n_features = (int) test.size();
-  const double* internal = test.data();
-  (void) knn.btree_query(_tree, (const double**) &internal, 1, n_features, n_neighbors);
+  Id n_features = static_cast<Id>(test.size());
+  MatrixT<double> internal(1, n_features);
+  for (Id i = 0; i < n_features; ++i)
+  {
+    internal(0, i) = test[i];
+  }
+  (void)knn.btree_query(_tree, internal, 1, n_features, n_neighbors);
   return knn;
 }
 
-KNN Ball::queryOneAsVDFromSP(const SpacePoint& Pt, int n_neighbors)
+KNN Ball::queryOneAsVDFromSP(const SpacePoint& Pt, Id n_neighbors)
 {
   KNN knn;
-  int n_features = Pt.getNDim();
-  const double* internal = Pt.getCoords().data();
-  (void)knn.btree_query(_tree, (const double**)&internal, 1, n_features,
-                        n_neighbors);
+  Id n_features = static_cast<Id>(Pt.getNDim());
+  MatrixT<double> internal(1, n_features);
+  for (Id i = 0; i < n_features; ++i)
+  {
+    internal(0, i) = Pt.getCoord(i);
+  }
+  (void)knn.btree_query(_tree, internal, 1, n_features, n_neighbors);
   return knn;
 }
 
-VectorInt Ball::getIndices(const SpacePoint& Pt, int n_neighbors)
+VectorInt Ball::getIndices(const SpacePoint& Pt, Id n_neighbors)
 {
   KNN knn = queryOneAsVDFromSP(Pt, n_neighbors);
-  return knn.getIndices(0);
+  return {knn.getIndices(0).begin(), knn.getIndices(0).end()};
 }
 
-int Ball::queryClosest(const VectorDouble& test)
+Id Ball::queryClosest(const VectorDouble& test)
 {
   KNN knn;
-  int n_features = (int) test.size();
-  const double* internal = test.data();
-  if (knn.btree_query(_tree, (const double**) &internal, 1, n_features, 1)) return ITEST;
+  Id n_features = static_cast<Id>(test.size());
+  MatrixT<double> internal(1, n_features);
+  for (Id i = 0; i < n_features; ++i)
+  {
+    internal(0, i) = test[i];
+  }
+  if (knn.btree_query(_tree, internal, 1, n_features, 1)) return ITEST;
   return knn.getIndex(0, 0);
 }
 
-int Ball::queryOneInPlace(const VectorDouble& test,
-                          int n_neighbors,
-                          VectorInt& indices,
-                          VectorDouble& distances,
-                          int rank)
+Id Ball::queryOneInPlace(const VectorDouble& test,
+                         Id n_neighbors,
+                         VectorInt& indices,
+                         VectorDouble& distances,
+                         Id rank)
 {
   KNN knn;
-  int n_features         = (int)test.size();
-  const double* internal = test.data();
-  return knn.btree_query_inPlace(_tree, (const double**)&internal, 1,
+  Id n_features = static_cast<Id>(test.size());
+  MatrixT<double> internal(1, n_features);
+  for (Id i = 0; i < n_features; ++i)
+  {
+    internal(0, i) = test[i];
+  }
+  return knn.btree_query_inPlace(_tree, internal, 1,
                                  n_features, n_neighbors, rank, indices, distances);
 }
 
 /**
  * @brief Ask for information regarding the Ball Tree organization
- * 
+ *
  * @param level Level of details
  *              -1 Just the general volumetry information
  *               0 List of the different nodes
  *               1 List of Leaves and attached list of samples
  */
-void Ball::display(int level) const
+void Ball::display(Id level) const
 {
-  btree_display(_tree, level);
+  _tree.display(level);
 }
 
 bool Ball::_isConstraintDefined() const
 {
-  if (_tree->accept == nullptr)
+  if (_tree.accept.empty())
   {
     messerr("You may not set one Constraint if not initialized in Ball constructor");
     return false;
@@ -219,39 +187,36 @@ bool Ball::_isConstraintDefined() const
   return true;
 }
 
-int Ball::setConstraint(int rank, bool status)
+Id Ball::setConstraint(Id rank, bool status)
 {
-  if (_tree == nullptr) return 1;
-  if (! _isConstraintDefined()) return 1;
-  if (rank < 0 || rank >= _tree->n_samples) return 1;
-  _tree->accept[rank] = status;
-  return 0;
-}
-
-int Ball::resetConstraints(bool status)
-{
-  if (_tree == nullptr) return 1;
+  if (empty()) return 1;
   if (!_isConstraintDefined()) return 1;
-  for (int i = 0, n = _tree->n_samples; i < n; i++)
-    _tree->accept[i] = status;
+  if (rank < 0 || rank >= _tree.n_samples) return 1;
+  _tree.accept[rank] = status;
   return 0;
 }
 
-MatrixT<int> findNN(Db* dbin,
-                    Db* dbout,
-                    int nb_neigh,
-                    bool flagShuffle,
-                    bool verbose,
-                    double (*dist_function)(const double* x1,
-                                            const double* x2,
-                                            int n_features),
-                    int leaf_size,
-                    int default_distance_function)
+Id Ball::resetConstraints(bool status)
 {
-  MatrixT<int> mat;
+  if (empty()) return 1;
+  if (!_isConstraintDefined()) return 1;
+  for (Id i = 0, n = _tree.n_samples; i < n; i++)
+    _tree.accept[i] = status;
+  return 0;
+}
+
+MatrixT<Id> findNN(const Db* dbin,
+                   const Db* dbout,
+                   Id nb_neigh,
+                   bool flagShuffle,
+                   bool verbose,
+                   Id leaf_size,
+                   Id default_distance_function)
+{
+  MatrixT<Id> mat;
 
   // Preliminary checks
-  int ndim = dbin->getNDim();
+  Id ndim = dbin->getNDim();
   if (dbout != nullptr && ndim != dbout->getNDim())
   {
     messerr("Dbin(%d) and Dbout(%d) should have the same dimension",
@@ -260,12 +225,12 @@ MatrixT<int> findNN(Db* dbin,
   }
 
   // Creating the Ball tree
-  Ball ball(dbin, dbout, dist_function, leaf_size, true, default_distance_function);
+  Ball ball(dbin, dbout, leaf_size, true, default_distance_function);
   if (verbose) ball.display(1);
 
   // Dimensioning the output matrix
-  int n1 = dbin->getNSample(true);
-  int n2 = (dbout != nullptr) ? dbout->getNSample(true) : 0;
+  Id n1 = dbin->getNSample(true);
+  Id n2 = (dbout != nullptr) ? dbout->getNSample(true) : 0;
   mat.resize(n1 + n2, nb_neigh);
 
   // Loop on the samples for the FNN search
@@ -275,16 +240,16 @@ MatrixT<int> findNN(Db* dbin,
   VectorDouble distances(nb_neigh);
 
   if (verbose)
-    mestitle(1, "List of Neighborhoors for NN search");
+    mestitle(1, "List of Neighbors for NN search");
 
   ranks = (flagShuffle) ? law_random_path(n1) : VH::sequence(n1);
-  for (int jech = 0; jech < n1; jech++)
+  for (Id jech = 0; jech < n1; jech++)
   {
-    int iech = ranks[jech];
+    Id iech = ranks[jech];
     dbin->getSampleAsSPInPlace(pt, iech);
     ball.setConstraint(iech, true);
     (void)ball.queryOneInPlace(pt.getCoordUnprotected(), nb_neigh, neighs, distances);
-    for (int i = 0; i < nb_neigh; i++) mat(jech, i) = neighs[i];
+    for (Id i = 0; i < nb_neigh; i++) mat(jech, i) = neighs[i];
 
     if (verbose)
     {
@@ -296,13 +261,13 @@ MatrixT<int> findNN(Db* dbin,
   if (dbout != nullptr)
   {
     ranks = (flagShuffle) ? law_random_path(n2) : VH::sequence(n2);
-    for (int jech = 0; jech < n2; jech++)
+    for (Id jech = 0; jech < n2; jech++)
     {
-      int iech = ranks[jech];
+      Id iech = ranks[jech];
       dbout->getSampleAsSPInPlace(pt, iech);
       ball.setConstraint(iech + n1, true);
       (void)ball.queryOneInPlace(pt.getCoordUnprotected(), nb_neigh, neighs, distances);
-      for (int i = 0; i < nb_neigh; i++) mat(n1 + jech, i) = neighs[i];
+      for (Id i = 0; i < nb_neigh; i++) mat(n1 + jech, i) = neighs[i];
 
       if (verbose)
       {
@@ -314,40 +279,38 @@ MatrixT<int> findNN(Db* dbin,
   return mat;
 }
 
-double** Ball::_getInformationFromDb(const Db* dbin,
-                                     const Db* dbout,
-                                     bool useSel,
-                                     int* n_samples,
-                                     int* n_features)
+MatrixT<double> Ball::_getInformationFromDb(const Db* dbin,
+                                            const Db* dbout,
+                                            bool useSel,
+                                            Id* n_samples,
+                                            Id* n_features)
 {
   VectorDouble oneColumn;
-  int ncol    = dbin->getNLoc(ELoc::X);
-  int nrowtot = dbin->getNSample(useSel);
+  Id ncol    = dbin->getNLoc(ELoc::X);
+  Id nrowtot = dbin->getNSample(useSel);
   if (dbout != nullptr)
   {
     if (ncol != dbout->getNLoc(ELoc::X))
     {
       messerr("'dbin' and 'dbout' should share the same space dimension");
-      return nullptr;
+      return {};
     }
     nrowtot += dbout->getNSample(useSel);
   }
 
   // Core allocation
-  double** internal = (double**)malloc(sizeof(double*) * nrowtot);
-  for (int irow = 0; irow < nrowtot; irow++)
-    internal[irow] = (double*)malloc(sizeof(double) * ncol);
+  MatrixT<double> internal(nrowtot, ncol);
 
   // Loading the information from dbin
-  int ns = 0;
+  Id ns = 0;
   if (dbin != nullptr)
   {
-    int nrow = dbin->getNSample(useSel);
-    for (int icol = 0; icol < ncol; icol++)
+    Id nrow = dbin->getNSample(useSel);
+    for (Id icol = 0; icol < ncol; icol++)
     {
       oneColumn = dbin->getOneCoordinate(icol, useSel);
-      for (int irow = 0; irow < nrow; irow++)
-        internal[ns + irow][icol] = oneColumn[irow];
+      for (Id irow = 0; irow < nrow; irow++)
+        internal(ns + irow, icol) = oneColumn[irow];
     }
     ns += nrow;
   }
@@ -355,12 +318,12 @@ double** Ball::_getInformationFromDb(const Db* dbin,
   // Loading information from dbout
   if (dbout != nullptr)
   {
-    int nrow = dbout->getNSample(useSel);
-    for (int icol = 0; icol < ncol; icol++)
+    Id nrow = dbout->getNSample(useSel);
+    for (Id icol = 0; icol < ncol; icol++)
     {
       oneColumn = dbout->getOneCoordinate(icol, useSel);
-      for (int irow = 0; irow < nrow; irow++)
-        internal[ns + irow][icol] = oneColumn[irow];
+      for (Id irow = 0; irow < nrow; irow++)
+        internal(ns + irow, icol) = oneColumn[irow];
     }
     ns += nrow;
   }
@@ -370,29 +333,25 @@ double** Ball::_getInformationFromDb(const Db* dbin,
   return internal;
 }
 
-double** Ball::_getInformationFromMesh(const AMesh* mesh,
-                                       int* n_samples,
-                                       int* n_features)
+MatrixT<double> Ball::_getInformationFromMesh(const AMesh* mesh,
+                                              Id* n_samples,
+                                              Id* n_features)
 {
   VectorDouble oneColumn;
-  int ndim    = mesh->getNDim();
-  int nmesh   = mesh->getNMeshes();
-  VectorDouble center(ndim);
+  Id ndim  = mesh->getNDim();
+  Id nmesh = mesh->getNMeshes();
 
   // Core allocation
-  double** internal = (double**)malloc(sizeof(double*) * nmesh);
-  for (int imesh = 0; imesh < nmesh; imesh++)
-    internal[imesh] = (double*)malloc(sizeof(double) * ndim);
+  MatrixT<double> internal(nmesh, ndim);
 
   // Loading the information from mesh
-  for (int imesh = 0; imesh < nmesh; imesh++)
+  for (Id imesh = 0; imesh < nmesh; imesh++)
   {
-    mesh->getBarycenterInPlace(imesh, center);
-    for (int idim = 0; idim < ndim; idim++)
-      internal[imesh][idim] = center[idim];
+    mesh->getBarycenterInPlace(imesh, internal.getRow(imesh));
   }
 
   *n_samples  = nmesh;
   *n_features = ndim;
   return internal;
 }
+} // namespace gstlrn

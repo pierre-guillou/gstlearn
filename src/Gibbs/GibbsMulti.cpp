@@ -9,38 +9,40 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Gibbs/GibbsMulti.hpp"
-#include "Gibbs/AGibbs.hpp"
-#include "Model/Model.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/OptDbg.hpp"
 #include "Basic/Utilities.hpp"
 #include "Db/Db.hpp"
+#include "Gibbs/AGibbs.hpp"
+#include "Model/Model.hpp"
 #include "geoslib_define.h"
 
-#include <math.h>
+#include <cmath>
 
-#define COVMAT(i,j)              (covmat[(i) * neq + (j)])
+#define COVMAT(i, j) (covmat[(i) * neq + (j)])
 
+namespace gstlrn
+{ 
 GibbsMulti::GibbsMulti()
-    : AGibbs(),
-      _model()
+  : AGibbs()
+  , _model()
 {
 }
 
-GibbsMulti::GibbsMulti(Db* db, Model * model)
-    : AGibbs(db),
-      _model(model)
+GibbsMulti::GibbsMulti(Db* db, Model* model)
+  : AGibbs(db)
+  , _model(model)
 {
 }
 
-GibbsMulti::GibbsMulti(const GibbsMulti &r)
+GibbsMulti::GibbsMulti(const GibbsMulti& r)
   : AGibbs(r)
   , _model(r._model)
 {
 }
 
-GibbsMulti& GibbsMulti::operator=(const GibbsMulti &r)
+GibbsMulti& GibbsMulti::operator=(const GibbsMulti& r)
 {
   if (this != &r)
   {
@@ -65,42 +67,42 @@ GibbsMulti::~GibbsMulti()
 ** \param[in]  ipgs          Rank of the GS
 **
 *****************************************************************************/
-int GibbsMulti::calculInitialize(VectorVectorDouble& y,
-                                 int isimu,
-                                 int ipgs)
+Id GibbsMulti::calculInitialize(VectorVectorDouble& y,
+                                 Id isimu,
+                                 Id ipgs)
 {
   const Model* model = getModel();
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
+  auto nact          = _getSampleRankNumber();
+  auto nvar          = getNvar();
 
   /* Print the title */
 
   if (OptDbg::query(EDbg::CONVERGE))
-    mestitle(1,"Initial Values for Gibbs Sampler (Simu:%d - GS:%d)",
-             isimu+1,ipgs+1);
+    mestitle(1, "Initial Values for Gibbs Sampler (Simu:%d - GS:%d)",
+             isimu + 1, ipgs + 1);
 
   /* Loop on the variables */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
-    int icase = getRank(ipgs,ivar);
+    auto icase = getRank(ipgs, ivar);
 
     /* Loop on the samples */
 
-    double sk = sqrt(model->getTotalSill(ivar,ivar));
-    for (int iact = 0; iact < nact; iact++)
+    double sk = sqrt(model->getTotalSill(ivar, ivar));
+    for (Id iact = 0; iact < nact; iact++)
     {
       double vmin, vmax;
       if (_boundsCheck(ipgs, ivar, iact, &vmin, &vmax)) return 1;
 
       /* Compute the median value of the interval */
 
-      double pmin = (FFFF(vmin)) ? 0. : law_cdf_gaussian(vmin);
-      double pmax = (FFFF(vmax)) ? 1. : law_cdf_gaussian(vmax);
+      double pmin    = (FFFF(vmin)) ? 0. : law_cdf_gaussian(vmin);
+      double pmax    = (FFFF(vmax)) ? 1. : law_cdf_gaussian(vmax);
       y[icase][iact] = sk * law_invcdf_gaussian((pmin + pmax) / 2.);
     }
   }
-  return(0);
+  return (0);
 }
 
 /**
@@ -118,24 +120,24 @@ int GibbsMulti::calculInitialize(VectorVectorDouble& y,
 double GibbsMulti::getSimulate(VectorVectorDouble& /*y*/,
                                double yk,
                                double sk,
-                               int icase,
-                               int ipgs,
-                               int ivar,
-                               int iact,
-                               int iter)
+                               Id icase,
+                               Id ipgs,
+                               Id ivar,
+                               Id iact,
+                               Id iter)
 {
   DECLARE_UNUSED(ivar);
   DECLARE_UNUSED(ipgs);
 
   // Define the environment
 
-  int iech  = getSampleRank(iact);
+  auto iech = getSampleRank(iact);
 
   // Read the Bounds
 
   const Db* db = getDb();
-  double vmin = db->getLocVariable(ELoc::L,iech, icase);
-  double vmax = db->getLocVariable(ELoc::U,iech, icase);
+  double vmin  = db->getLocVariable(ELoc::L, iech, icase);
+  double vmax  = db->getLocVariable(ELoc::U, iech, icase);
 
   // Apply optional decay
 
@@ -167,31 +169,31 @@ double GibbsMulti::getSimulate(VectorVectorDouble& /*y*/,
 ** \param[in]  ipgs       Rank of the GS
 **
 *****************************************************************************/
-int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
+Id GibbsMulti::checkGibbs(const VectorVectorDouble& y, Id isimu, Id ipgs)
 {
-  Db* db = getDb();
-  int nact = _getSampleRankNumber();
-  int nvar = getNvar();
-  mestitle(1,"Checking gaussian values from Gibbs vs. bounds (PGS=%d Simu=%d)",
-           ipgs+1,isimu+1);
+  Db* db   = getDb();
+  auto nact = _getSampleRankNumber();
+  auto nvar = getNvar();
+  mestitle(1, "Checking gaussian values from Gibbs vs. bounds (PGS=%d Simu=%d)",
+           ipgs + 1, isimu + 1);
 
-  int nerror = 0;
+  Id nerror = 0;
 
   /* Loop on the variables */
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
-    int icase   = getRank(ipgs,ivar);
+    auto icase = getRank(ipgs, ivar);
 
     /* Loop on the data */
 
-    for (int iact=0; iact<nact; iact++)
+    for (Id iact = 0; iact < nact; iact++)
     {
-      int iech = getSampleRank(iact);
-      double vmin = db->getLocVariable(ELoc::L,iech,icase);
-      double vmax = db->getLocVariable(ELoc::U,iech,icase);
-      if (FFFF(vmin)) vmin = -1.e30;
-      if (FFFF(vmax)) vmax =  1.e30;
+      auto iech   = getSampleRank(iact);
+      double vmin = db->getLocVariable(ELoc::L, iech, icase);
+      double vmax = db->getLocVariable(ELoc::U, iech, icase);
+      if (FFFF(vmin)) vmin = MINIMUM_BIG;
+      if (FFFF(vmax)) vmax = MAXIMUM_BIG;
 
       /* Read the gaussian value */
 
@@ -199,21 +201,21 @@ int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
 
       /* Check inconsistency */
 
-      if ((! FFFF(vmin) && gaus < vmin) ||
-          (! FFFF(vmax) && gaus > vmax))
+      if ((!FFFF(vmin) && gaus < vmin) ||
+          (!FFFF(vmax) && gaus > vmax))
       {
-        message("- Sample (#%d):",iech+1);
-        message(" Simu#%d of Y%d=%lf",isimu+1,ivar+1,gaus);
+        message("- Sample (#%d):", iech + 1);
+        message(" Simu#%d of Y%d=%lf", isimu + 1, ivar + 1, gaus);
         message(" does not lie within [");
         if (FFFF(vmin))
           message("NA,");
         else
-          message("%lf",vmin);
+          message("%lf", vmin);
         message(";");
         if (FFFF(vmax))
-         message(STRING_NA);
+          message(STRING_NA);
         else
-          message("%lf",vmax);
+          message("%lf", vmax);
         message("]\n");
         nerror++;
       }
@@ -224,3 +226,4 @@ int GibbsMulti::checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs)
   return nerror;
 }
 
+}

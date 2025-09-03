@@ -14,6 +14,8 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class DbGrid;
 class MatrixDense;
 
@@ -25,13 +27,13 @@ public:
   Convolution& operator=(const Convolution& m);
   virtual ~Convolution();
 
-  int ConvolveSparse(int iatt,
+  Id ConvolveSparse(Id iatt,
                      const VectorVectorInt& ranks,
                      const MatrixDense& wgt,
                      const VectorDouble& means = VectorDouble(),
-                     int optionVerbose         = 0);
-  int ConvolveFFT(int iatt,
-                  int nvar,
+                     Id optionVerbose         = 0);
+  Id ConvolveFFT(Id iatt,
+                  Id nvar,
                   const DbGrid* marpat,
                   const VectorDouble& means = VectorDouble());
 
@@ -41,3 +43,4 @@ private:
 private:
   DbGrid* _dbgrid; // Pointer to external DbGrid: do not delete
 };
+}

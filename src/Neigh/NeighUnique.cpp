@@ -11,9 +11,12 @@
 #include "Neigh/NeighUnique.hpp"
 #include "Mesh/AMesh.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Db/Db.hpp"
 #include "Space/ASpace.hpp"
 
+namespace gstlrn
+{
 NeighUnique::NeighUnique(bool flag_xvalid,  const ASpaceSharedPtr& space)
     : ANeigh(space)
 {
@@ -48,17 +51,17 @@ String NeighUnique::toString(const AStringFormat* strfmt) const
   return sstr.str();
 }
 
-bool NeighUnique::_deserialize(std::istream& is, bool verbose)
+bool NeighUnique::_deserializeAscii(std::istream& is, bool verbose)
 {
   bool ret = true;
-  ret = ret && ANeigh::_deserialize(is, verbose);
+  ret = ret && ANeigh::_deserializeAscii(is, verbose);
   return ret;
 }
 
-bool NeighUnique::_serialize(std::ostream& os, bool verbose) const
+bool NeighUnique::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && ANeigh::_serialize(os, verbose);
+  ret = ret && ANeigh::_serializeAscii(os, verbose);
   return ret;
 }
 
@@ -69,26 +72,16 @@ NeighUnique* NeighUnique::create(bool flag_xvalid, const ASpaceSharedPtr& space)
 
 /**
  * Create a NeighUniqueborhood by loading the contents of a Neutral File
- * @param neutralFilename Name of the Neutral File
- * @param verbose         Verbose flag
+ * @param NFFilename Name of the Neutral File
+ * @param verbose    Verbose flag
  * @return
  */
-NeighUnique* NeighUnique::createFromNF(const String& neutralFilename, bool verbose)
+NeighUnique* NeighUnique::createFromNF(const String& NFFilename, bool verbose)
 {
-  NeighUnique* neigh = nullptr;
-  std::ifstream is;
-  neigh = new NeighUnique;
-  bool success = false;
-  if (neigh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  neigh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete neigh;
-    neigh = nullptr;
-  }
-  return neigh;
+  auto* neigh = new NeighUnique;
+  if (neigh->_fileOpenAndDeserialize(NFFilename, verbose)) return neigh;
+  delete neigh;
+  return nullptr;
 }
 
 /**
@@ -96,12 +89,12 @@ NeighUnique* NeighUnique::createFromNF(const String& neutralFilename, bool verbo
  * @param db Pointer to the target Db
  * @return
  */
-int NeighUnique::getNSampleMax(const Db* db) const
+Id NeighUnique::getNSampleMax(const Db* db) const
 {
   return db->getNSample(true);
 }
 
-bool NeighUnique::hasChanged(int iech_out) const
+bool NeighUnique::hasChanged(Id iech_out) const
 {
   DECLARE_UNUSED(iech_out);
   return (_iechMemo < 0 || _isNbghMemoEmpty());
@@ -112,9 +105,9 @@ bool NeighUnique::hasChanged(int iech_out) const
  * @param iech_out Valid Rank of the sample in the output Db
  * @param ranks Vector of sample ranks in neighborhood (empty when error)
  */
-void NeighUnique::getNeigh(int iech_out, VectorInt& ranks)
+void NeighUnique::getNeigh(Id iech_out, VectorInt& ranks)
 {
-  int nech = _dbin->getNSample();
+  Id nech = _dbin->getNSample();
   ranks.resize(nech);
   ranks.fill(-1);
 
@@ -137,13 +130,13 @@ void NeighUnique::getNeigh(int iech_out, VectorInt& ranks)
  ** \param[out]  ranks   Vector of samples elected in the Neighborhood
  **
  *****************************************************************************/
-void NeighUnique::_unique(int iech_out, VectorInt& ranks)
+void NeighUnique::_unique(Id iech_out, VectorInt& ranks)
 {
-  int nech = _dbin->getNSample();
+  Id nech = _dbin->getNSample();
 
   /* Loop on samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     /* Discard the masked input sample */
 
@@ -163,3 +156,34 @@ void NeighUnique::_unique(int iech_out, VectorInt& ranks)
   }
 }
 
+#ifdef HDF5
+bool NeighUnique::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto neighG = SerializeHDF5::getGroup(grp, "NeighUnique");
+  if (!neighG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+
+  ret = ret && ANeigh::_deserializeH5(*neighG, verbose);
+  
+  return ret;
+}
+
+bool NeighUnique::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto neighG = grp.createGroup("NeighUnique");
+
+  bool ret = true;
+
+  /* Writing the tail of the file */
+
+  ret = ret && ANeigh::_serializeH5(neighG, verbose);
+
+  return ret;
+}
+#endif
+}

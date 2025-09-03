@@ -14,6 +14,8 @@
 
 #include "Gibbs/GibbsMultiMono.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -33,8 +35,8 @@ public:
   GibbsUPropMono& operator=(const GibbsUPropMono &r);
   virtual ~GibbsUPropMono();
 
-  void update(VectorVectorDouble &y, int isimu, int ipgs, int iter) override;
-  int covmatAlloc(bool verbose, bool verboseTimer = false) override;
+  void update(VectorVectorDouble &y, Id isimu, Id ipgs, Id iter) override;
+  Id covmatAlloc(bool verbose, bool verboseTimer = false) override;
 
   double getEps() const { return _eps; }
   void setEps(double eps) { _eps = eps; }
@@ -45,3 +47,4 @@ private:
   double _rval;
   double _eps;
 };
+}

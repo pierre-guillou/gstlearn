@@ -10,35 +10,36 @@
 /******************************************************************************/
 #include "Covariances/CovMarkov.hpp"
 #include "Covariances/CovContext.hpp"
-#include "Basic/MathFunc.hpp"
 
-#include "math.h"
+#include <cmath>
 
 #define MAXTAB 100
 
-CovMarkov::CovMarkov(const CovContext &ctxt)
-    : ACovFunc(ECov::MARKOV, ctxt),
-      _markovCoeffs(),
-      _correc(1.)
+namespace gstlrn
+{
+CovMarkov::CovMarkov(const CovContext& ctxt)
+  : ACovFunc(ECov::MARKOV, ctxt)
+  , _markovCoeffs()
+  , _correc(1.)
 {
   setParam(1);
   _markovCoeffs.push_back(1.);
 }
 
-CovMarkov::CovMarkov(const CovMarkov &r)
-  : ACovFunc(r),
-    _markovCoeffs(r._markovCoeffs),
-    _correc(r._correc)
+CovMarkov::CovMarkov(const CovMarkov& r)
+  : ACovFunc(r)
+  , _markovCoeffs(r._markovCoeffs)
+  , _correc(r._correc)
 {
 }
 
-CovMarkov& CovMarkov::operator=(const CovMarkov &r)
+CovMarkov& CovMarkov::operator=(const CovMarkov& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
     _markovCoeffs = r._markovCoeffs;
-    _correc = r._correc;
+    _correc       = r._correc;
   }
   return *this;
 }
@@ -57,54 +58,53 @@ String CovMarkov::getFormula() const
   return "C(h)=\\int_{R^d} \\frac{e^{-i\\omega^t.h}}{P(||\\omega||^2)}d\\omega";
 }
 
-VectorDouble CovMarkov::_evaluateSpectrumOnSphere(int n, double scale) const
+VectorDouble CovMarkov::_evaluateSpectrumOnSphere(Id n, double scale) const
 {
-  auto sp = _evaluateSpectrumOnSphereWithoutNormalization(n,scale);
-  VH::normalize(sp,1);
+  auto sp = _evaluateSpectrumOnSphereWithoutNormalization(n, scale);
+  VH::normalize(sp, 1);
   return sp;
 }
 
-VectorDouble CovMarkov::_evaluateSpectrumOnSphereWithoutNormalization(int n, double scale) const
+VectorDouble CovMarkov::_evaluateSpectrumOnSphereWithoutNormalization(Id n, double scale) const
 {
-  VectorDouble sp(1+n, 0.);
+  VectorDouble sp(1 + n, 0.);
 
-  for (int j = 0; j < (int)sp.size(); j++)
+  for (Id j = 0; j < static_cast<Id>(sp.size()); j++)
   {
-    double nnp1 = scale * scale * (double) j * ((double) j + 1.);
-    double s = 0.;
-    for (int i = 0; i < (int)_markovCoeffs.size(); i++)
+    double nnp1 = scale * scale * static_cast<double>(j) * (static_cast<double>(j) + 1.);
+    double s    = 0.;
+    for (Id i = 0; i < static_cast<Id>(_markovCoeffs.size()); i++)
     {
-      s += _markovCoeffs[i] * pow(nnp1,i);
+      s += _markovCoeffs[i] * pow(nnp1, i);
     }
     sp[j] = (2. * j + 1.) / (4 * GV_PI * s);
   }
   return sp;
-
 }
 
-double CovMarkov::normalizeOnSphere(int n, double scale) const 
-{ 
-  auto sp = _evaluateSpectrumOnSphereWithoutNormalization(n,scale);
+double CovMarkov::normalizeOnSphere(Id n, double scale) const
+{
+  auto sp  = _evaluateSpectrumOnSphereWithoutNormalization(n, scale);
   double s = 0.;
-  for (auto &e : sp)
+  for (auto& e: sp)
   {
     s += e;
   }
   return s;
 }
 
-
 double CovMarkov::evaluateSpectrum(double freq) const
 {
   double s = 0.;
-  int n = (int)_markovCoeffs.size();
+  Id n     = static_cast<Id>(_markovCoeffs.size());
   if (n == 0)
   {
     return TEST;
   }
-  for (int i = 0; i < n; i++)
+  for (Id i = 0; i < n; i++)
   {
-    s += _markovCoeffs[i] * pow(freq,i);
+    s += _markovCoeffs[i] * pow(freq, i);
   }
-  return 1. /  s;
+  return 1. / s;
 }
+} // namespace gstlrn

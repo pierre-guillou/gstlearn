@@ -8,20 +8,22 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Estimation/CalcKrigingSimpleCase.hpp"
+#include "Basic/OptCustom.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Db/Db.hpp"
-#include "Estimation/CalcKrigingSimpleCase.hpp"
 #include "Estimation/KrigingAlgebraSimpleCase.hpp"
 #include "Estimation/KrigingSystem.hpp"
 #include "Estimation/KrigingSystemSimpleCase.hpp"
-#include "Basic/OptCustom.hpp"
 #include "Model/Model.hpp"
 #include "Neigh/ANeigh.hpp"
 #include "Neigh/NeighUnique.hpp"
 
-#include <math.h>
+#include <cmath>
 #include <omp.h>
 
+namespace gstlrn
+{
 CalcKrigingSimpleCase::CalcKrigingSimpleCase(bool flag_est, bool flag_std, bool flag_varZ)
   : ACalcInterpolator()
   , _flagEst(flag_est)
@@ -29,11 +31,9 @@ CalcKrigingSimpleCase::CalcKrigingSimpleCase(bool flag_est, bool flag_std, bool 
   , _flagVarZ(flag_varZ)
   , _nameCoord()
   , _iechSingleTarget(-1)
-  , _nbNeigh(5)
   , _iptrEst(-1)
   , _iptrStd(-1)
   , _iptrVarZ(-1)
-  , _iptrNeigh(-1)
 {
 }
 
@@ -54,7 +54,8 @@ bool CalcKrigingSimpleCase::_check()
   {
     if (getModel()->isNoStat())
     {
-      messerr("Variance of Estimator is limited to Stationary Covariance");
+      messerr("Variance of Estimator is limited to Stationary Covariance"); // Why?
+      messerr("Variance of Estimator is limited to Stationary Covariance"); // Why?
       return false;
     }
   }
@@ -66,7 +67,7 @@ bool CalcKrigingSimpleCase::_preprocess()
 {
   if (!ACalcInterpolator::_preprocess()) return false;
 
-  int status = 1;
+  Id status = 1;
   if (_iechSingleTarget >= 0) status = 2;
 
   if (_flagEst)
@@ -93,7 +94,7 @@ bool CalcKrigingSimpleCase::_postprocess()
   /* Free the temporary variables */
   _cleanVariableDb(2);
 
-  int nvar = _getNVar();
+  auto nvar = _getNVar();
 
   _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrVarZ, "varz", 1);
   _renameVariable(2, VectorString(), ELoc::Z, nvar, _iptrStd, "stdev", 1);
@@ -109,14 +110,14 @@ void CalcKrigingSimpleCase::_rollback()
 
 void CalcKrigingSimpleCase::_storeResultsForExport(const KrigingSystemSimpleCase& ksys,
                                                    KrigingAlgebraSimpleCase& algebra,
-                                                   int iechout)
+                                                   Id iechout)
 {
   _ktest.ndim = ksys.getNDim();
   _ktest.nvar = ksys.getNVar();
   _ktest.xyz  = ksys.getSampleCoordinates(algebra, iechout);
   //_ktest.lhs   = ksys.getLHS();
-  _ktest.wgt = ksys.getWeights(algebra);
-  _ktest.mu  = ksys.getMu(algebra);
+  _ktest.wgt = gstlrn::KrigingSystemSimpleCase::getWeights(algebra);
+  _ktest.mu  = gstlrn::KrigingSystemSimpleCase::getMu(algebra);
   // _ktest.var   = ksys.getVariance();
 }
 
@@ -133,38 +134,33 @@ bool CalcKrigingSimpleCase::_run()
 
   KrigingSystemSimpleCase ksys(getDbin(), getDbout(), getModel(), getNeigh());
   if (ksys.updKrigOptEstim(_iptrEst, _iptrStd, _iptrVarZ)) return false;
-
-  if (!ksys.isReady()) return false;
+  VectorDouble tabwork(getDbin()->getNSample());
+  if (!ksys.isReady(tabwork)) return false;
 
   /***************************************/
   /* Loop on the targets to be processed */
   /***************************************/
 
-  VectorDouble tabwork(getDbin()->getNSample());
   KrigingAlgebraSimpleCase algebra(ksys.getAlgebra());
   bool use_parallel = !getModel()->isNoStat();
-  int nech_out      = getDbout()->getNSample();
-  int nbthread      = OptCustom::query("ompthreads", 5);
-  // if (dynamic_cast<NeighUnique*>(getNeigh()))
-  // {
-  //   use_parallel = true;
-  // }
+  Id nech_out       = getDbout()->getNSample();
+  auto nbthread     = static_cast<I32>(OptCustom::query("ompthreads", 1)); // TODO : would like to use more threads
   omp_set_num_threads(nbthread);
 
   SpacePoint pin(getModel()->getSpace());
   SpacePoint pout(getModel()->getSpace());
   ModelGeneric model(*ksys.getModel());
-  int ndim                        = getModel()->getSpace()->getNDim();
+  auto ndim                       = getModel()->getSpace()->getNDim();
   const VectorVectorDouble coords = getDbout()->getAllCoordinates();
-  static ANeigh* neigh = nullptr;
+  static ANeigh* neigh            = nullptr;
 #pragma omp threadprivate(neigh)
 #pragma omp parallel for firstprivate(pin, pout, tabwork, algebra, model) schedule(guided) if (use_parallel)
-  for (int iech_out = 0; iech_out < nech_out; iech_out++)
+  for (Id iech_out = 0; iech_out < nech_out; iech_out++)
   {
     if (!getDbout()->isActive(iech_out)) continue;
     if (neigh == nullptr)
     {
-      neigh = (ANeigh*)getNeigh()->clone();
+      neigh = static_cast<ANeigh*>(getNeigh()->clone());
       getDbout()->initThread();
     }
     else
@@ -172,11 +168,10 @@ bool CalcKrigingSimpleCase::_run()
       neigh->reset();
     }
     // TODO : encapsulate in Db (threadsafe)
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < static_cast<Id>(ndim); idim++)
     {
       pin.setCoord(idim, coords[idim][iech_out]);
     }
-
     ksys.estimate(iech_out, pin, pout, tabwork, algebra, model, neigh);
 
     // Store the results in an API structure (only if flagSingleTarget)
@@ -185,10 +180,11 @@ bool CalcKrigingSimpleCase::_run()
 
 #pragma omp parallel
   {
-    delete neigh; // ✅ Chaque thread supprime son propre ptr
+    delete neigh;
     neigh = nullptr;
   }
   ksys.conclusion();
 
   return true;
 }
+} // namespace gstlrn

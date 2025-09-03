@@ -29,6 +29,9 @@
 //  FLAG_LOCATOR = 32,  //!< Print the locators
 //} DISPLAY_PARAMS;
 //
+
+namespace gstlrn
+{
  static unsigned char FLAG_RESUME = 1;  //!< Print the Db summary
  static unsigned char FLAG_VARS = 2;   //!< Print the Field names
  static unsigned char FLAG_EXTEND = 4; //!< Print the Db extension
@@ -48,7 +51,7 @@ public:
   virtual ~DbStringFormat();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static DbStringFormat* create(unsigned char params = FLAG_RESUME | FLAG_VARS,
                                 const VectorString& names = VectorString(),
@@ -72,7 +75,7 @@ public:
 
   const VectorInt& getCols() const { return _cols; }
   bool getUseSel() const { return _useSel; }
-  int getMode() const { return _mode; }
+  Id getMode() const { return _mode; }
   unsigned char getParams() const { return _params; }
   const VectorString& getNames() const { return _names; }
 
@@ -90,7 +93,7 @@ public:
   /**
    * @param mode Way to consider the variable for Stats (1: Real; 2: Categorical)
    */
-  void setMode(int mode) { _mode = mode; }
+  void setMode(Id mode) { _mode = mode; }
   /**
    * Reduce the set of variables for which the print is provided
    * @param names Vector of Column names
@@ -133,12 +136,13 @@ public:
   bool matchLocator() const { return _matchFlag(FLAG_LOCATOR); }
 
 private:
-  bool _matchFlag(int flag) const;
+  bool _matchFlag(Id flag) const;
 
 private:
   unsigned char _params;
   VectorInt _cols;
   VectorString _names;
   bool _useSel;
-  int _mode;
+  Id _mode;
 };
+}

@@ -7,8 +7,7 @@ import time
 ndim = 2
 gl.defineDefaultSpace(gl.ESpaceType.RN,ndim)
 
-gl.ASerializable.setContainerName(True)
-gl.ASerializable.setPrefixName("BenchDb-");
+gl.ASerializable.setPrefixName("bench_Db-");
 
 # Creating a data file
 # 

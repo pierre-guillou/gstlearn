@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+ 
 class CovContext;
 
 class GSTLEARN_EXPORT CovPenta : public ACovFunc
@@ -23,13 +26,13 @@ public:
   CovPenta& operator= (const CovPenta &r);
   virtual ~CovPenta();
 
-  unsigned int getMaxNDim()   const  override { return 3; }
+  size_t getMaxNDim() const override { return 3; }
 
   String         getCovName() const override { return "Penta"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
 protected:
   double _evaluateCov(double h) const override;
 };
-
+}

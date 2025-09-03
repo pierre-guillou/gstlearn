@@ -10,7 +10,9 @@
 /******************************************************************************/
 #include "Basic/AStringFormat.hpp"
 
-AStringFormat::AStringFormat(int level)
+namespace gstlrn
+{
+AStringFormat::AStringFormat(Id level)
   : _level(level)
   , _title()
 {
@@ -41,4 +43,4 @@ AStringFormat& AStringFormat::operator=(const AStringFormat& r)
 AStringFormat::~AStringFormat()
 {
 }
-
+}

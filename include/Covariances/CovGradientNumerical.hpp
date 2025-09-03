@@ -16,6 +16,8 @@
 #include "Covariances/ACovGradient.hpp"
 #include "Covariances/CovContext.hpp"
 
+namespace gstlrn
+{
 class Rotation;
 
 /**
@@ -33,12 +35,11 @@ public:
   /// ICloneable interface
   IMPLEMENT_CLONING(CovGradientNumerical)
 
-  virtual double eval0(int ivar = 0,
-                       int jvar = 0,
-                       const CovCalcMode* mode = nullptr) const override;
+  double eval0(Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 
-
-  virtual double getBallRadius() const override { return _ballRadius; }
+  double getBallRadius() const override { return _ballRadius; }
 
   void evalZAndGradients(const SpacePoint& p1,
                          const SpacePoint& p2,
@@ -49,28 +50,28 @@ public:
                          bool flagGrad = false) const override;
 
 protected:
+  double _eval(const SpacePoint& p1,
+               const SpacePoint& p2,
+               Id ivar                 = 0,
+               Id jvar                 = 0,
+               const CovCalcMode* mode = nullptr) const override;
 
-virtual double _eval(const SpacePoint& p1,
-                     const SpacePoint& p2,
-                     int ivar = 0,
-                     int jvar = 0,
-                     const CovCalcMode* mode = nullptr) const override;
 private:
-  double _evalZZ(int ivar,
-                 int jvar,
+  double _evalZZ(Id ivar,
+                 Id jvar,
                  const SpacePoint& p1,
                  const SpacePoint& p2,
                  const CovCalcMode* mode = nullptr) const;
-  double _evalZGrad(int ivar,
-                    int jvar,
-                    int idim,
+  double _evalZGrad(Id ivar,
+                    Id jvar,
+                    Id idim,
                     const SpacePoint& p1,
                     const SpacePoint& p2,
                     const CovCalcMode* mode = nullptr) const;
-  double _evalGradGrad(int ivar,
-                       int jvar,
-                       int idim,
-                       int jdim,
+  double _evalGradGrad(Id ivar,
+                       Id jvar,
+                       Id idim,
+                       Id jdim,
                        const SpacePoint& p1,
                        const SpacePoint& p2,
                        const CovCalcMode* mode = nullptr) const;
@@ -79,3 +80,4 @@ private:
   double _ballRadius;   /*! Radius of the Ball for Numerical Gradient calculation */
 };
 
+}

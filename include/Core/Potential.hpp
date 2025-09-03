@@ -15,12 +15,14 @@
 
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class Db;
 class DbGrid;
 class ANeigh;
 class Model;
 
-GSTLEARN_EXPORT int potential_kriging(Db* db,
+GSTLEARN_EXPORT Id potential_kriging(Db* db,
                                       Db* dbgrd,
                                       Db* dbtgt,
                                       DbGrid* dbout,
@@ -32,20 +34,20 @@ GSTLEARN_EXPORT int potential_kriging(Db* db,
                                       bool flag_grad      = false,
                                       bool flag_trans     = false,
                                       bool flag_save_data = false,
-                                      int opt_part        = 0,
+                                      Id opt_part        = 0,
                                       bool verbose        = false);
-GSTLEARN_EXPORT int potential_cov(Model* model,
+GSTLEARN_EXPORT Id potential_cov(Model* model,
                                   bool verbose,
-                                  int type1,
+                                  Id type1,
                                   const VectorDouble& x10,
                                   const VectorDouble& x1p,
                                   const VectorDouble& tx1,
-                                  int type2,
+                                  Id type2,
                                   const VectorDouble& x20,
                                   const VectorDouble& x2p,
                                   const VectorDouble& tx2,
                                   VectorDouble& covtab);
-GSTLEARN_EXPORT int potential_simulate(Db* dbiso,
+GSTLEARN_EXPORT Id potential_simulate(Db* dbiso,
                                        Db* dbgrd,
                                        Db* dbtgt,
                                        DbGrid* dbout,
@@ -55,11 +57,11 @@ GSTLEARN_EXPORT int potential_simulate(Db* dbiso,
                                        double nugget_tgt   = 0.,
                                        double dist_tempere = TEST,
                                        bool flag_trans     = false,
-                                       int seed            = 135674,
-                                       int nbsimu          = 1,
-                                       int nbtuba          = 100,
+                                       Id seed            = 135674,
+                                       Id nbsimu          = 1,
+                                       Id nbtuba          = 100,
                                        bool verbose        = false);
-GSTLEARN_EXPORT int potential_xvalid(Db* dbiso,
+GSTLEARN_EXPORT Id potential_xvalid(Db* dbiso,
                                      Db* dbgrd,
                                      Db* dbtgt,
                                      Model* model,
@@ -68,3 +70,4 @@ GSTLEARN_EXPORT int potential_xvalid(Db* dbiso,
                                      double nugget_tgt   = 0.,
                                      bool flag_dist_conv = false,
                                      bool verbose        = false);
+}

@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Gibbs/AGibbs.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -26,19 +28,20 @@ public:
   virtual ~GibbsMulti();
 
   /// Interface for AGibbs
-  int calculInitialize(VectorVectorDouble &y, int isimu, int ipgs) override;
+  Id calculInitialize(VectorVectorDouble &y, Id isimu, Id ipgs) override;
   double getSimulate(VectorVectorDouble& y,
                      double yk,
                      double sk,
-                     int icase,
-                     int ipgs,
-                     int ivar,
-                     int iact,
-                     int iter) override;
-  int checkGibbs(const VectorVectorDouble& y, int isimu, int ipgs) override;
+                     Id icase,
+                     Id ipgs,
+                     Id ivar,
+                     Id iact,
+                     Id iter) override;
+  Id checkGibbs(const VectorVectorDouble& y, Id isimu, Id ipgs) override;
 
   Model* getModel() const { return _model; } // protect using const asap
 
 private:
   Model* _model;
 };
+}

@@ -12,6 +12,8 @@
 
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT AFunction
 {
 public:
@@ -22,3 +24,4 @@ public :
   virtual double eval(double x) const {return x;};
 
 };
+}

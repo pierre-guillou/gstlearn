@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+  // Forward declaration
 class CovContext;
 class TurningBandOperate;
 
@@ -24,19 +27,20 @@ public:
   CovCubic& operator= (const CovCubic &r);
   virtual ~CovCubic();
 
-  unsigned int getMaxNDim()   const  override { return 3; }
+  size_t getMaxNDim() const override { return 3; }
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Cubic"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
-  virtual bool   hasCovDerivative() const override { return true; }
+  bool   hasCovDerivative() const override { return true; }
 
   bool isValidForTurningBand() const override { return true; }
   double simulateTurningBand(double t0, TurningBandOperate &operTB) const override;
 
 protected:
   double _evaluateCov(double h) const override;
-  double _evaluateCovDerivative(int degree, double h) const override;
+  double _evaluateCovDerivative(Id degree, double h) const override;
 };
 
+}

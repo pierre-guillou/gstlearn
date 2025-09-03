@@ -3,10 +3,10 @@
 
 import sys
 import os
+
 import gstlearn as gl
 import gstlearn.plot as gp
 import matplotlib.pyplot as plt
-from attr._make import NOTHING
 from pandas.core.sorting import nargsort
 from numpy._core.defchararray import isnumeric
 
@@ -40,15 +40,15 @@ fileaux = ""
 if nargs > 2:
     fileaux = args[2]
 ranks = args[2:nargs]
+verbose = False
 
 # Get the Type of the File and stop if returned empty (file not found)
-filetype = gl.ASerializable.getFileIdentity(filename)
+filetype = gl.ASerializable.getFileIdentity(filename, verbose)
 if filetype == "":
     exit()
-filetaux = gl.ASerializable.getFileIdentity(fileaux)
 
 if filetype == "Db":
-    db = gl.Db.createFromNF(filename,False)
+    db = gl.Db.createFromNF(filename, verbose)
     checkValidPointer(db)
     if len(ranks) > 0:
         varnames = getVariableNames(db, ranks)
@@ -66,8 +66,8 @@ if filetype == "Db":
         print("Number of Variable ranks should be 0, 1 or 2")
         exit()
     if flagDb:
-        ax = gp.point(db, name)
-        ax.decoration(title=name)
+        gp.symbol(db, name)
+        gp.decoration(title=name)
         plt.show()
     else:
         gp.correlation(db, nameX, nameY, asPoint=True)
@@ -94,20 +94,21 @@ elif filetype == "DbGrid":
     
     if flagDb:
         if dbgrid.getNDim() > 1:
-            ax = gp.grid(dbgrid, name, flagLegend=True, legendName="")
-            ax.decoration(title=name)
+            gp.raster(dbgrid, name, flagLegend=True, legendName="")
+            gp.decoration(title=name)
             plt.show()
         else:
-            ax = gp.grid1D(dbgrid, name)
-            ax.decoration(title=name)
+            gp.grid1D(dbgrid, name)
+            gp.decoration(title=name)
             plt.show()
     else:
-        gp.correlation(dbgrid, nameX, nameY, asPoint=False, bins=100)
+        gp.correlation(dbgrid, nameX, nameY, asPoint=False, bins=100, cmin=1)
         plt.show()
         
 elif filetype == "Vario":
     vario = gl.Vario.createFromNF(filename,False)
     checkValidPointer(vario)
+    filetaux = gl.ASerializable.getFileIdentity(fileaux, verbose)
     
     if filetaux == "Model":
         model = gl.Model.createFromNF(fileaux,False)
@@ -121,6 +122,7 @@ elif filetype == "Vario":
 elif filetype == "Model":
     model = gl.Model.createFromNF(filename,False)
     checkValidPointer(model)
+    filetaux = gl.ASerializable.getFileIdentity(fileaux, verbose)
     
     if filetaux == "Vario":
         vario = gl.Vario.createFromNF(fileaux,False)
@@ -140,8 +142,8 @@ elif filetype == "Rule":
 elif filetype == "Table":
     table = gl.Table.createFromNF(filename,False)
     checkValidPointer(table)
-    ax = gp.table(table,ranks)
-    ax.decoration(title=filename)
+    gp.table(table,ranks)
+    gp.decoration(title=filename)
     plt.show()
 
 elif filetype == "Polygon":
@@ -153,7 +155,7 @@ elif filetype == "Polygon":
 elif filetype == "MeshETurbo":
     mesh = gl.MeshETurbo.createFromNF(filename, False)
     checkValidPointer(mesh)
-    gp.mesh(mesh)
+    gp.mesh(mesh, flagEdge=True, flagApex=True)
     plt.show()
  
 else:

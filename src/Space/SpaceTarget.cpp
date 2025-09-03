@@ -9,13 +9,15 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Space/SpaceTarget.hpp"
-#include "Space/ASpace.hpp"
-#include "Basic/VectorHelper.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Space/ASpace.hpp"
 
+#include <cmath>
 #include <iostream>
-#include <math.h>
 
+namespace gstlrn
+{
 
 SpaceTarget::SpaceTarget(const ASpaceSharedPtr& space,
                          bool checkExtend,
@@ -50,10 +52,10 @@ SpaceTarget& SpaceTarget::operator=(const SpaceTarget& r)
     SpacePoint::operator=(r);
     _checkExtend = r._checkExtend;
     _checkCode   = r._checkCode;
-    _checkDate = r._checkDate;
-    _extend = r._extend;
-    _code = r._code;
-    _date = r._date;
+    _checkDate   = r._checkDate;
+    _extend      = r._extend;
+    _code        = r._code;
+    _date        = r._date;
   }
   return *this;
 }
@@ -62,13 +64,13 @@ SpaceTarget::~SpaceTarget()
 {
 }
 
-SpaceTarget* SpaceTarget::create(const VectorDouble &center,
-                                 const VectorDouble &extend,
+SpaceTarget* SpaceTarget::create(const VectorDouble& center,
+                                 const VectorDouble& extend,
                                  double code,
                                  double date,
                                  const ASpaceSharedPtr& space)
 {
-  SpaceTarget* st = new SpaceTarget(space);
+  auto* st = new SpaceTarget(space);
   st->setCoords(center);
   st->setExtend(extend);
   st->setCode(code);
@@ -80,7 +82,7 @@ void SpaceTarget::_initialize()
 {
   // Fill the extension with zeroes
   if (_extend.empty())
-    VH::fill(_extend, 0., getNDim());
+    VH::fill(_extend, 0., static_cast<Id>(getNDim()));
 }
 
 String SpaceTarget::toString(const AStringFormat* /*strfmt*/) const
@@ -111,3 +113,4 @@ String SpaceTarget::toString(const AStringFormat* /*strfmt*/) const
   }
   return sstr.str();
 }
+} // namespace gstlrn

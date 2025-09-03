@@ -9,27 +9,29 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Anamorphosis/AnamDiscreteIR.hpp"
-#include "Db/Db.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Basic/Utilities.hpp"
+#include "Db/Db.hpp"
 
-#include <math.h>
+#include <cmath>
 
-#define RESIDUALS(icut,iech) (residuals[iech * ncut + icut])
+#define RESIDUALS(icut, iech) (residuals[iech * ncut + icut])
 
+namespace gstlrn
+{
 AnamDiscreteIR::AnamDiscreteIR(double rcoef)
-    : AnamDiscrete(),
-      _sCoef(rcoef)
+  : AnamDiscrete()
+  , _sCoef(rcoef)
 {
 }
 
-AnamDiscreteIR::AnamDiscreteIR(const AnamDiscreteIR &m)
-    : AnamDiscrete(m),
-      _sCoef(m._sCoef)
+AnamDiscreteIR::AnamDiscreteIR(const AnamDiscreteIR& m)
+  : AnamDiscrete(m)
+  , _sCoef(m._sCoef)
 {
-
 }
 
-AnamDiscreteIR& AnamDiscreteIR::operator=(const AnamDiscreteIR &m)
+AnamDiscreteIR& AnamDiscreteIR::operator=(const AnamDiscreteIR& m)
 {
   if (this != &m)
   {
@@ -41,25 +43,14 @@ AnamDiscreteIR& AnamDiscreteIR::operator=(const AnamDiscreteIR &m)
 
 AnamDiscreteIR::~AnamDiscreteIR()
 {
-
 }
 
-AnamDiscreteIR* AnamDiscreteIR::createFromNF(const String& neutralFilename, bool verbose)
+AnamDiscreteIR* AnamDiscreteIR::createFromNF(const String& NFFilename, bool verbose)
 {
-  AnamDiscreteIR* anam = nullptr;
-  std::ifstream is;
-  anam = new AnamDiscreteIR();
-  bool success = false;
-  if (anam->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success =  anam->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete anam;
-    anam = nullptr;
-  }
-  return anam;
+  auto* anam = new AnamDiscreteIR();
+  if (anam->_fileOpenAndDeserialize(NFFilename, verbose)) return anam;
+  delete anam;
+  return nullptr;
 }
 
 AnamDiscreteIR* AnamDiscreteIR::create(double rcoef)
@@ -67,10 +58,10 @@ AnamDiscreteIR* AnamDiscreteIR::create(double rcoef)
   return new AnamDiscreteIR(rcoef);
 }
 
-void AnamDiscreteIR::reset(int ncut,
+void AnamDiscreteIR::reset(Id ncut,
                            double r_coef,
-                           const VectorDouble &zcut,
-                           const VectorDouble &stats)
+                           const VectorDouble& zcut,
+                           const VectorDouble& stats)
 {
   setNCut(ncut);
   setZCut(zcut);
@@ -88,7 +79,7 @@ String AnamDiscreteIR::toString(const AStringFormat* strfmt) const
 
   sstr << AnamDiscrete::toString(strfmt);
 
-  if (! _isFitted()) return sstr.str();
+  if (!_isFitted()) return sstr.str();
 
   if (_sCoef != 1.)
   {
@@ -113,9 +104,9 @@ void AnamDiscreteIR::calculateMeanAndVariance()
 
   /* Loop on the classes */
 
-  int nclass = getNClass();
+  auto nclass = getNClass();
   var = mean = 0.;
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double zn = (iclass < nclass - 1) ? getIRStatR(iclass + 1) : 0.;
     double tn = (iclass < nclass - 1) ? getIRStatT(iclass + 1) : 0.;
@@ -126,17 +117,17 @@ void AnamDiscreteIR::calculateMeanAndVariance()
   setVariance(var);
 }
 
-int AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
-                                 const VectorDouble& /*wt*/)
+Id AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
+                                const VectorDouble& /*wt*/)
 {
   double mean, dt, dq, tnext, qnext, tcur, tprev;
-  int nsorted;
+  Id nsorted;
 
   /* Initializations */
 
-  int nech = static_cast<int> (tab.size());
-  int nclass = getNClass();
-  int ncut = getNCut();
+  Id nech     = static_cast<Id>(tab.size());
+  auto nclass = getNClass();
+  auto ncut   = getNCut();
 
   /* Core allocation */
 
@@ -155,7 +146,7 @@ int AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
   setMean(mean);
   setIRStatT(0, 1.);
   setIRStatQ(0, mean);
-  for (int icut = 0; icut < ncut; icut++)
+  for (Id icut = 0; icut < ncut; icut++)
   {
     setIRStatT(icut + 1, T[icut]);
     setIRStatQ(icut + 1, Q[icut]);
@@ -163,13 +154,13 @@ int AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
 
   /* Calculate the B coefficients */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     tnext = (iclass < nclass - 1) ? getIRStatT(iclass + 1) : 0.;
     qnext = (iclass < nclass - 1) ? getIRStatQ(iclass + 1) : 0.;
-    tcur = getIRStatT(iclass);
-    dt = tcur - tnext;
-    dq = getIRStatQ(iclass) - qnext;
+    tcur  = getIRStatT(iclass);
+    dt    = tcur - tnext;
+    dq    = getIRStatQ(iclass) - qnext;
     setIRStatZ(iclass, (dt > 0) ? dq / dt : 0.);
     setIRStatB(iclass, getIRStatQ(iclass) - tcur * getIRStatZ(iclass));
     if (iclass <= 0)
@@ -189,28 +180,28 @@ int AnamDiscreteIR::fitFromArray(const VectorDouble& tab,
   return 0;
 }
 
-int AnamDiscreteIR::_stats_residuals(int verbose,
-                                     int nech,
-                                     const VectorDouble &tab,
-                                     int *nsorted,
-                                     double *mean,
-                                     double *residuals,
-                                     double *T,
-                                     double *Q)
+Id AnamDiscreteIR::_stats_residuals(Id verbose,
+                                    Id nech,
+                                    const VectorDouble& tab,
+                                    Id* nsorted,
+                                    double* mean,
+                                    double* residuals,
+                                    double* T,
+                                    double* Q)
 {
   double value, moyenne;
-  int iech, icut, jcut, nactive;
+  Id iech, icut, jcut, nactive;
 
   /* Initializations */
 
-  int ncut = getNCut();
+  auto ncut = getNCut();
   nactive = (*nsorted) = 0;
-  moyenne = 0.;
+  moyenne              = 0.;
   for (icut = 0; icut < ncut; icut++)
   {
     T[icut] = Q[icut] = 0.;
     for (iech = 0; iech < nech; iech++)
-      RESIDUALS(icut,iech) = 0.;
+      RESIDUALS(icut, iech) = 0.;
   }
 
   /* Loop on the samples to calculate the indicators */
@@ -227,7 +218,7 @@ int AnamDiscreteIR::_stats_residuals(int verbose,
     for (icut = 0; icut < ncut; icut++)
     {
       if (value < getZCut(icut)) continue;
-      RESIDUALS(icut,iech) = 1.;
+      RESIDUALS(icut, iech) = 1.;
       Q[icut] += value;
       T[icut] += 1.;
     }
@@ -240,11 +231,11 @@ int AnamDiscreteIR::_stats_residuals(int verbose,
 
   /* Calculate the tonnage and meal quantity per class */
 
-  moyenne /= (double) nactive;
+  moyenne /= static_cast<double>(nactive);
   for (icut = 0; icut < ncut; icut++)
   {
-    T[icut] /= (double) nactive;
-    Q[icut] /= (double) nactive;
+    T[icut] /= static_cast<double>(nactive);
+    Q[icut] /= static_cast<double>(nactive);
   }
 
   /* Calculate the residuals */
@@ -258,17 +249,17 @@ int AnamDiscreteIR::_stats_residuals(int verbose,
 
     for (icut = ncut - 1; icut >= 0; icut--)
     {
-      value = RESIDUALS(icut,iech) / T[icut];
+      value = RESIDUALS(icut, iech) / T[icut];
       if (icut > 0)
       {
         jcut = icut - 1;
-        value -= RESIDUALS(jcut,iech) / T[jcut];
+        value -= RESIDUALS(jcut, iech) / T[jcut];
       }
       else
       {
         value -= 1.;
       }
-      RESIDUALS(icut,iech) = value;
+      RESIDUALS(icut, iech) = value;
     }
   }
 
@@ -284,21 +275,21 @@ int AnamDiscreteIR::_stats_residuals(int verbose,
   }
 
   (*nsorted) = nactive;
-  (*mean) = moyenne;
+  (*mean)    = moyenne;
   return (0);
 }
 
 VectorDouble AnamDiscreteIR::z2factor(double z, const VectorInt& ifacs) const
 {
   VectorDouble factors;
-  int nfact = (int) ifacs.size();
+  Id nfact = static_cast<Id>(ifacs.size());
   factors.resize(nfact, 0);
 
-  for (int ifac = 0; ifac < nfact; ifac++)
+  for (Id ifac = 0; ifac < nfact; ifac++)
   {
-    int iclass = ifacs[ifac] - 1;
-    double v1 = _getResidual(iclass, z);
-    double v2 = _getResidual(iclass - 1, z);
+    Id iclass     = ifacs[ifac] - 1;
+    double v1     = _getResidual(iclass, z);
+    double v2     = _getResidual(iclass - 1, z);
     factors[ifac] = v1 - v2;
   }
   return factors;
@@ -310,66 +301,65 @@ VectorDouble AnamDiscreteIR::z2factor(double z, const VectorInt& ifacs) const
  * @param z Input value
  * @return Calculate the normalized residual for a given value
  */
-double AnamDiscreteIR::_getResidual(int iclass, double z) const
+double AnamDiscreteIR::_getResidual(Id iclass, double z) const
 {
-  double seuil = (iclass < 0) ? 0. : getZCut(iclass);
+  double seuil  = (iclass < 0) ? 0. : getZCut(iclass);
   double retval = (z >= seuil) ? 1. : 0.;
   retval /= getIRStatT(iclass + 1);
 
   return (retval);
 }
 
-bool AnamDiscreteIR::_serialize(std::ostream& os, bool verbose) const
+bool AnamDiscreteIR::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
-  ret = ret && AnamDiscrete::_serialize(os, verbose);
-  ret = ret && _recordWrite<double>(os, "Change of support coefficient", getRCoef());
+  ret      = ret && AnamDiscrete::_serializeAscii(os, verbose);
+  ret      = ret && _recordWrite<double>(os, "Change of support coefficient", getRCoef());
   return ret;
 }
 
-bool AnamDiscreteIR::_deserialize(std::istream& is, bool verbose)
+bool AnamDiscreteIR::_deserializeAscii(std::istream& is, bool verbose)
 {
   double r = TEST;
 
   bool ret = true;
-  ret = ret && AnamDiscrete::_deserialize(is, verbose);
-  ret = ret && _recordRead<double>(is, "Anamorphosis 'r' coefficient", r);
+  ret      = ret && AnamDiscrete::_deserializeAscii(is, verbose);
+  ret      = ret && _recordRead<double>(is, "Anamorphosis 'r' coefficient", r);
   if (ret) setRCoef(r);
   return ret;
 }
 
 double AnamDiscreteIR::computeVariance(double sval) const
 {
-  if (! allowChangeSupport()) return TEST;
-  int nclass = getNClass();
+  if (!allowChangeSupport()) return TEST;
+  auto nclass = getNClass();
 
   double var = 0.;
-  for (int iclass = 0; iclass < nclass - 1; iclass++)
+  for (Id iclass = 0; iclass < nclass - 1; iclass++)
   {
-    double b = getIRStatB(iclass);
-    double tcur = getIRStatT(iclass + 1);
+    double b     = getIRStatB(iclass);
+    double tcur  = getIRStatT(iclass + 1);
     double tprev = getIRStatT(iclass);
-    double resid = (tprev > 0 && tcur > 0) ?
-        1. / pow(tcur, sval) - 1. / pow(tprev, sval) : 0.;
+    double resid = (tprev > 0 && tcur > 0) ? 1. / pow(tcur, sval) - 1. / pow(tprev, sval) : 0.;
     var += b * b * resid;
   }
   return (var);
 }
 
-int AnamDiscreteIR::updatePointToBlock(double r_coef)
+Id AnamDiscreteIR::updatePointToBlock(double r_coef)
 {
-  if (! allowChangeSupport()) return 1;
+  if (!allowChangeSupport()) return 1;
   setRCoef(r_coef);
 
-  int nclass = getNClass();
-  double zie = 0.;
-  double zik = 0.;
-  double zje = 0.;
-  double zjk = 0.;
+  auto nclass = getNClass();
+  double zie  = 0.;
+  double zik  = 0.;
+  double zje  = 0.;
+  double zjk  = 0.;
 
   /* Loop on the classes */
 
-  for (int iclass = 0; iclass < nclass; iclass++)
+  for (Id iclass = 0; iclass < nclass; iclass++)
   {
     double tcur = getIRStatT(iclass);
     if (iclass > 0)
@@ -393,10 +383,10 @@ int AnamDiscreteIR::updatePointToBlock(double r_coef)
       setIRStatRV(iclass, 0.);
     else
     {
-      tcur = getIRStatT(iclass);
+      tcur         = getIRStatT(iclass);
       double tprev = getIRStatT(iclass - 1);
       setIRStatRV(
-          iclass, (tprev > 0 && tcur > 0) ? 1. / tcur - 1 / tprev : 0.);
+        iclass, (tprev > 0 && tcur > 0) ? 1. / tcur - 1 / tprev : 0.);
     }
   }
 
@@ -426,11 +416,11 @@ void AnamDiscreteIR::_globalSelectivity(Selectivity* selectivity)
     selloc = selectivity->clone();
     selloc->resetCuts(getZCut());
   }
-  int ncuts = selloc->getNCuts();
+  Id ncuts = selloc->getNCuts();
 
   /* Calculate the Grade-Tonnage curves */
 
-  for (int icut = 0; icut < ncuts; icut++)
+  for (Id icut = 0; icut < ncuts; icut++)
   {
     selloc->setZcut(icut, (icut == 0) ? 0. : getZCut(icut - 1));
     selloc->setTest(icut, getIRStatT(icut));
@@ -468,16 +458,16 @@ void AnamDiscreteIR::_globalSelectivity(Selectivity* selectivity)
  ** \param[in]  iptr0        Rank for storing the results
  **
  *****************************************************************************/
-int AnamDiscreteIR::factor2Selectivity(Db *db,
-                                       Selectivity* selectivity,
-                                       const VectorInt& cols_est,
-                                       const VectorInt& cols_std,
-                                       int iptr0)
+Id AnamDiscreteIR::factor2Selectivity(Db* db,
+                                      Selectivity* selectivity,
+                                      const VectorInt& cols_est,
+                                      const VectorInt& cols_std,
+                                      Id iptr0)
 {
-  int nech = db->getNSample();
-  int nb_est = (int) cols_est.size();
-  int nb_std = (int) cols_std.size();
-  int ncleff = MAX(nb_est, nb_std);
+  Id nech         = db->getNSample();
+  Id nb_est       = static_cast<Id>(cols_est.size());
+  Id nb_std       = static_cast<Id>(cols_std.size());
+  Id ncleff       = MAX(nb_est, nb_std);
   bool cutDefined = (selectivity->getNCuts() > 0);
 
   if (db == nullptr)
@@ -485,7 +475,7 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
     messerr("You must define a Db");
     return 1;
   }
-  int nfactor = MAX(nb_est, nb_std);
+  Id nfactor = MAX(nb_est, nb_std);
   if (nfactor > getNClass())
   {
     messerr("Number of factors (%d) must be smaller or equal to Number of Classes",
@@ -506,14 +496,14 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
 
   /* Calculate the Recovery Functions from the factors */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (_isSampleSkipped(db, iech, cols_est, cols_std)) continue;
 
     /* Calculate the tonnage and the recovered grade */
 
     double total = 0.;
-    for (int ivar = 0; ivar < ncleff; ivar++)
+    for (Id ivar = 0; ivar < ncleff; ivar++)
     {
       double value = db->getArray(iech, cols_est[ivar]);
       total += value;
@@ -529,7 +519,7 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
     if (selloc->isUsedStD(ESelectivity::T))
     {
       total = 0.;
-      for (int ivar = 0; ivar < ncleff; ivar++)
+      for (Id ivar = 0; ivar < ncleff; ivar++)
       {
         double value = db->getArray(iech, cols_std[ivar]);
         total += value * value;
@@ -541,12 +531,11 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
 
     if (selloc->isUsedEst(ESelectivity::Q))
     {
-      selloc->setQest(ncleff-1, getIRStatZ(ncleff) * selloc->getTest(ncleff-1));
-      for (int ivar = ncleff - 2; ivar >= 0; ivar--)
+      selloc->setQest(ncleff - 1, getIRStatZ(ncleff) * selloc->getTest(ncleff - 1));
+      for (Id ivar = ncleff - 2; ivar >= 0; ivar--)
       {
         selloc->setQest(ivar,
-                       selloc->getQest(ivar+1) + getIRStatZ(ivar + 1)
-                       * (selloc->getTest(ivar) - selloc->getTest(ivar + 1)));
+                        selloc->getQest(ivar + 1) + getIRStatZ(ivar + 1) * (selloc->getTest(ivar) - selloc->getTest(ivar + 1)));
       }
     }
 
@@ -554,18 +543,18 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
 
     if (selloc->isUsedStD(ESelectivity::Q))
     {
-      for (int ivar = 0; ivar < ncleff; ivar++)
+      for (Id ivar = 0; ivar < ncleff; ivar++)
       {
         total = 0.;
-        for (int jvar = 0; jvar < ivar; jvar++)
+        for (Id jvar = 0; jvar < ivar; jvar++)
         {
           double value = db->getArray(iech, cols_std[jvar]);
           total += value * value;
         }
         double prod = getIRStatB(ivar + 1) +
-            getIRStatZ(ivar + 1) * getIRStatT(ivar + 1);
+                      getIRStatZ(ivar + 1) * getIRStatT(ivar + 1);
         total *= prod * prod;
-        for (int jvar = ivar + 1; jvar < ncleff; jvar++)
+        for (Id jvar = ivar + 1; jvar < ncleff; jvar++)
         {
           prod = db->getArray(iech, cols_std[jvar]) * getIRStatB(ivar + 1);
           total += prod * prod;
@@ -579,10 +568,9 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
     double zestim = 0.;
     if (selloc->isUsedEst(ESelectivity::Z))
     {
-      zestim = getIRStatZ(ncleff) * selloc->getTest(ncleff-1);
-      for (int ivar = 0; ivar < ncleff - 1; ivar++)
-        zestim += getIRStatZ(ivar + 1)
-            * (selloc->getTest(ivar) - selloc->getTest(ivar + 1));
+      zestim = getIRStatZ(ncleff) * selloc->getTest(ncleff - 1);
+      for (Id ivar = 0; ivar < ncleff - 1; ivar++)
+        zestim += getIRStatZ(ivar + 1) * (selloc->getTest(ivar) - selloc->getTest(ivar + 1));
     }
 
     /* Z: Standard Deviation */
@@ -591,10 +579,9 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
     if (selloc->isUsedStD(ESelectivity::Z))
     {
       total = 0.;
-      for (int ivar = 0; ivar < ncleff; ivar++)
+      for (Id ivar = 0; ivar < ncleff; ivar++)
       {
-        double prod = db->getArray(iech, cols_std[ivar])
-            * getIRStatB(ivar + 1);
+        double prod = db->getArray(iech, cols_std[ivar]) * getIRStatB(ivar + 1);
         total += prod * prod;
       }
       zstdev = sqrt(total);
@@ -616,3 +603,41 @@ int AnamDiscreteIR::factor2Selectivity(Db *db,
   }
   return (0);
 }
+
+#ifdef HDF5
+bool AnamDiscreteIR::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamDiscreteIR");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double r = 0.;
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "R", r);
+
+  ret = ret && AnamDiscrete::_deserializeH5(*anamG, verbose);
+
+  if (ret)
+    setRCoef(r);
+
+  return ret;
+}
+
+bool AnamDiscreteIR::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto anamG = grp.createGroup("AnamDiscreteIR");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "R", getRCoef());
+
+  ret = ret && AnamDiscrete::_serializeH5(anamG, verbose);
+
+  return ret;
+}
+#endif
+} // namespace gstlrn

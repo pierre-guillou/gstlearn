@@ -12,5 +12,7 @@
 
 #include "gstlearn_export.hpp"
 
-GSTLEARN_EXPORT void inquire_gstlearn(char** release, char** date);
+namespace gstlrn
+{
 GSTLEARN_EXPORT void acknowledge_gstlearn(void);
+}

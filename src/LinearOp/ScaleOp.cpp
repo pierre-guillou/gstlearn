@@ -9,10 +9,11 @@
 /*                                                                            */
 /******************************************************************************/
 #include "LinearOp/ScaleOp.hpp"
-#include "LinearOp/ALinearOp.hpp"
 
-ScaleOp::ScaleOp(int n, double scale) :
-  _n(n), _scale(scale)
+using namespace gstlrn;
+ScaleOp::ScaleOp(Id n, double scale)
+  : _n(n)
+  , _scale(scale)
 {
 }
 
@@ -27,9 +28,9 @@ ScaleOp::~ScaleOp() {}
 ** \param[out] outv    Array of output values
 **
 *****************************************************************************/
-int ScaleOp::_addToDest(const constvect inv, vect outv) const
+Id ScaleOp::_addToDest(const constvect inv, vect outv) const
 {
-  for (int i = 0, n = _n; i < n; i++)
+  for (Id i = 0, n = _n; i < n; i++)
     outv[i] += _scale * inv[i];
   return 0;
 }

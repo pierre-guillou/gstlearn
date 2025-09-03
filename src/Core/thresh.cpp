@@ -8,28 +8,29 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_old_f.h"
-
-#include "Basic/Utilities.hpp"
-#include "Basic/String.hpp"
 #include "Basic/OptDbg.hpp"
+#include "Basic/String.hpp"
+#include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
-#include "LithoRule/RuleProp.hpp"
-#include "LithoRule/PropDef.hpp"
-#include "LithoRule/Rule.hpp"
-#include "LithoRule/RuleShift.hpp"
-#include "LithoRule/RuleShadow.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
-#include "Variogram/Vario.hpp"
+#include "LithoRule/PropDef.hpp"
+#include "LithoRule/Rule.hpp"
+#include "LithoRule/RuleProp.hpp"
+#include "LithoRule/RuleShadow.hpp"
+#include "LithoRule/RuleShift.hpp"
 #include "Model/Model.hpp"
+#include "Variogram/Vario.hpp"
+#include "geoslib_old_f.h"
 
 /*! \cond */
-#define INDLOC(ifac1,ifac2)  ((ifac2)*propdef->nfac[0]+(ifac1))
-#define PROPFIX(ifac1,ifac2) (propdef->propfix[INDLOC(ifac1,ifac2)])
-#define PROPWRK(ifac1,ifac2) (propdef->propwrk[INDLOC(ifac1,ifac2)])
+#define INDLOC(ifac1, ifac2)  ((ifac2) * propdef->nfac[0] + (ifac1))
+#define PROPFIX(ifac1, ifac2) (propdef->propfix[INDLOC(ifac1, ifac2)])
+#define PROPWRK(ifac1, ifac2) (propdef->propwrk[INDLOC(ifac1, ifac2)])
 /*! \endcond */
 
+namespace gstlrn
+{
 /****************************************************************************/
 /*!
  **  Free a Rule structure
@@ -39,7 +40,7 @@
  ** \param[in]  rule Rule structure to be freed
  **
  *****************************************************************************/
-Rule* rule_free(const Rule *rule)
+Rule* rule_free(const Rule* rule)
 
 {
   delete rule;
@@ -55,9 +56,9 @@ Rule* rule_free(const Rule *rule)
  **                        (Only used for EProcessOper::CONDITIONAL)
  **
  ****************************************************************************/
-static int st_proportion_locate(PropDef *propdef, int ifac_ref)
+static Id st_proportion_locate(PropDef* propdef, Id ifac_ref)
 {
-  int ifac;
+  Id ifac;
 
   switch (propdef->mode.toEnum())
   {
@@ -88,11 +89,11 @@ static int st_proportion_locate(PropDef *propdef, int ifac_ref)
  ** \param[in]  propdef   PropDef structure
  **
  ****************************************************************************/
-static int st_proportion_transform(PropDef *propdef)
+static Id st_proportion_transform(PropDef* propdef)
 
 {
   double total, pp;
-  int ifac1, ifac2;
+  Id ifac1, ifac2;
 
   /* Dispatch */
 
@@ -103,19 +104,19 @@ static int st_proportion_transform(PropDef *propdef)
       {
         pp = PROPFIX(ifac1, 0);
         if (FFFF(pp)) return (-1);
-        PROPWRK(ifac1,0) = pp;
+        PROPWRK(ifac1, 0) = pp;
       }
       break;
 
     case EProcessOper::E_MARGINAL:
       for (ifac1 = 0; ifac1 < propdef->nfac[0]; ifac1++)
       {
-        PROPWRK(ifac1,0) = 0.;
+        PROPWRK(ifac1, 0) = 0.;
         for (ifac2 = 0; ifac2 < propdef->nfac[1]; ifac2++)
         {
           pp = PROPFIX(ifac1, ifac2);
           if (FFFF(pp)) return (-1);
-          PROPWRK(ifac1,0) += pp;
+          PROPWRK(ifac1, 0) += pp;
         }
       }
       break;
@@ -126,7 +127,7 @@ static int st_proportion_transform(PropDef *propdef)
         {
           pp = PROPFIX(ifac1, ifac2);
           if (FFFF(pp)) return (-1);
-          PROPWRK(ifac1,ifac2) = pp;
+          PROPWRK(ifac1, ifac2) = pp;
         }
 
       for (ifac1 = 0; ifac1 < propdef->nfac[0]; ifac1++)
@@ -136,8 +137,7 @@ static int st_proportion_transform(PropDef *propdef)
           total += PROPWRK(ifac1, ifac2);
 
         for (ifac2 = 0; ifac2 < propdef->nfac[1]; ifac2++)
-          PROPWRK(ifac1,ifac2) = (total <= 0.) ? 1. / propdef->nfac[1] :
-                                                 PROPWRK(ifac1,ifac2) / total;
+          PROPWRK(ifac1, ifac2) = (total <= 0.) ? 1. / propdef->nfac[1] : PROPWRK(ifac1, ifac2) / total;
       }
       break;
 
@@ -156,7 +156,7 @@ static int st_proportion_transform(PropDef *propdef)
  ** \param[in]  mode     Type of operation (EProcessOper)
  **
  ****************************************************************************/
-void proportion_rule_process(PropDef *propdef, const EProcessOper &mode)
+void proportion_rule_process(PropDef* propdef, const EProcessOper& mode)
 {
   /* Assignments */
 
@@ -180,7 +180,7 @@ void proportion_rule_process(PropDef *propdef, const EProcessOper &mode)
  ** \param[in]  propdef   PropDef structure
  **
  *****************************************************************************/
-void proportion_print(PropDef *propdef)
+void proportion_print(PropDef* propdef)
 
 {
   if (propdef == nullptr) return;
@@ -206,19 +206,19 @@ void proportion_print(PropDef *propdef)
  ** \param[in]  propdef PropDef structure
  **
  ****************************************************************************/
-static int st_proportion_changed(PropDef *propdef)
+static Id st_proportion_changed(PropDef* propdef)
 
 {
   /* Compare with the memory proportion array */
 
-  int modify = ! VH::isEqual(propdef->proploc, propdef->propmem);
+  Id modify = !VH::isEqual(propdef->proploc, propdef->propmem);
   if (!modify) return (1);
 
   /* Print the proportions (optional) */
 
   if (OptDbg::query(EDbg::PROPS)) proportion_print(propdef);
 
-  for (int ifac = 0; ifac < propdef->nfaccur; ifac++)
+  for (Id ifac = 0; ifac < propdef->nfaccur; ifac++)
     propdef->propmem[ifac] = propdef->proploc[ifac];
 
   return (0);
@@ -246,14 +246,14 @@ static int st_proportion_changed(PropDef *propdef)
  ** \remark            propdef->mode == EProcessOper::CONDITIONAL (simbipgs)
  **
  *****************************************************************************/
-static int st_proportion_define(PropDef *propdef,
-                                const Db *db,
-                                int iech,
-                                int isimu,
-                                int nbsimu,
-                                int *jech)
+static Id st_proportion_define(PropDef* propdef,
+                               const Db* db,
+                               Id iech,
+                               Id isimu,
+                               Id nbsimu,
+                               Id* jech)
 {
-  int ifac, ifac_ref;
+  Id ifac, ifac_ref;
 
   /* Non-stationary case : Load the proportions in propcst */
 
@@ -279,7 +279,7 @@ static int st_proportion_define(PropDef *propdef,
       double total = 0.;
       for (ifac = 0; ifac < propdef->nfacprod; ifac++)
       {
-        propdef->propfix[ifac] = propdef->dbprop->getLocVariable(ELoc::P,*jech, ifac);
+        propdef->propfix[ifac] = propdef->dbprop->getLocVariable(ELoc::P, *jech, ifac);
         total += propdef->propfix[ifac];
       }
       // Discard case where the proportions are not available
@@ -291,7 +291,7 @@ static int st_proportion_define(PropDef *propdef,
       /* The proportions are already available from the dbin */
 
       for (ifac = 0; ifac < propdef->nfacprod; ifac++)
-        propdef->propfix[ifac] = db->getLocVariable(ELoc::P,iech, ifac);
+        propdef->propfix[ifac] = db->getLocVariable(ELoc::P, iech, ifac);
     }
 
     /* Transform proportions (from CST to WRK) */
@@ -304,7 +304,7 @@ static int st_proportion_define(PropDef *propdef,
   ifac_ref = -1;
   if (propdef->mode == EProcessOper::CONDITIONAL)
   {
-    ifac_ref = (int) db->getSimvar(ELoc::FACIES, iech, isimu, 0, 0, nbsimu, 1);
+    ifac_ref = static_cast<Id>(db->getSimvar(ELoc::FACIES, iech, isimu, 0, 0, nbsimu, 1));
     if (ifac_ref < 1 || ifac_ref > propdef->nfac[0]) return (1);
   }
   st_proportion_locate(propdef, ifac_ref);
@@ -334,21 +334,21 @@ static int st_proportion_define(PropDef *propdef,
  ** \param[out] sh_down    Local or global downwards shift (shadow)
  **
  *****************************************************************************/
-int rule_thresh_define_shadow(PropDef *propdef,
-                              Db *db,
-                              const RuleShadow *rule,
-                              int facies,
-                              int iech,
-                              int isimu,
-                              int nbsimu,
-                              double *t1min,
-                              double *t1max,
-                              double *t2min,
-                              double *t2max,
-                              double *sh_dsup,
-                              double *sh_down)
+Id rule_thresh_define_shadow(PropDef* propdef,
+                             Db* db,
+                             const RuleShadow* rule,
+                             Id facies,
+                             Id iech,
+                             Id isimu,
+                             Id nbsimu,
+                             double* t1min,
+                             double* t1max,
+                             double* t2min,
+                             double* t2max,
+                             double* sh_dsup,
+                             double* sh_down)
 {
-  int unmodify, facloc, jech;
+  Id unmodify, facloc, jech;
 
   /* Set the debugging information */
 
@@ -379,10 +379,8 @@ int rule_thresh_define_shadow(PropDef *propdef,
 
   /* In case of Shadow, return the upwards and downwards values */
 
-  *sh_dsup = (propdef->case_stat) ? rule->getShDsup() :
-                                    propdef->proploc[1];
-  *sh_down = (propdef->case_stat) ? rule->getShDown() :
-                                    propdef->proploc[2];
+  *sh_dsup = (propdef->case_stat) ? rule->getShDsup() : propdef->proploc[1];
+  *sh_down = (propdef->case_stat) ? rule->getShDown() : propdef->proploc[2];
 
   /* In the special cases, only the first proportion is significant */
 
@@ -398,12 +396,12 @@ int rule_thresh_define_shadow(PropDef *propdef,
 
   /* Convert the proportions into thresholds */
 
-  facloc = (IFFFF(facies)) ? 1 : facies;
-  VectorDouble bounds = rule->getThresh(facloc);
-  *t1min = bounds[0];
-  *t1max = bounds[1];
-  *t2min = bounds[2];
-  *t2max = bounds[3];
+  facloc      = (IFFFF(facies)) ? 1 : facies;
+  auto bounds = rule->getThresh(facloc);
+  *t1min      = bounds[0];
+  *t1max      = bounds[1];
+  *t2min      = bounds[2];
+  *t2max      = bounds[3];
 
   return (0);
 }
@@ -430,20 +428,20 @@ int rule_thresh_define_shadow(PropDef *propdef,
  ** \param[out] t2max      Maximum threshold for Y2
  **
  *****************************************************************************/
-int rule_thresh_define(PropDef *propdef,
-                       Db *db,
-                       const Rule *rule,
-                       int facies,
-                       int iech,
-                       int isimu,
-                       int nbsimu,
-                       int flag_check,
-                       double *t1min,
-                       double *t1max,
-                       double *t2min,
-                       double *t2max)
+Id rule_thresh_define(PropDef* propdef,
+                      Db* db,
+                      const Rule* rule,
+                      Id facies,
+                      Id iech,
+                      Id isimu,
+                      Id nbsimu,
+                      Id flag_check,
+                      double* t1min,
+                      double* t1max,
+                      double* t2min,
+                      double* t2max)
 {
-  int unmodify, facloc, jech;
+  Id unmodify, facloc, jech;
 
   /* Set the debugging information */
 
@@ -478,8 +476,8 @@ int rule_thresh_define(PropDef *propdef,
     if (propdef->proploc[facies - 1] <= 0.)
     {
       messerr(
-          "The presence of facies (%d) at sample (%d) is not consistent with the zero proportion",
-          facies, iech + 1);
+        "The presence of facies (%d) at sample (%d) is not consistent with the zero proportion",
+        facies, iech + 1);
       if (!propdef->case_stat)
         messerr("Check the proportions in the cell (%d) of the Proportion Db",
                 jech + 1);
@@ -500,13 +498,12 @@ int rule_thresh_define(PropDef *propdef,
 
   /* Convert the proportions into thresholds */
 
-  facloc = (IFFFF(facies)) ? 1 :
-                             facies;
-  VectorDouble bounds = rule->getThresh(facloc);
-  *t1min = bounds[0];
-  *t1max = bounds[1];
-  *t2min = bounds[2];
-  *t2max = bounds[3];
+  facloc      = (IFFFF(facies)) ? 1 : facies;
+  auto bounds = rule->getThresh(facloc);
+  *t1min      = bounds[0];
+  *t1max      = bounds[1];
+  *t2min      = bounds[2];
+  *t2max      = bounds[3];
 
   return (0);
 }
@@ -530,22 +527,22 @@ int rule_thresh_define(PropDef *propdef,
  ** \remark It will be changed in this function to locator ELoc::SIMU
  **
  *****************************************************************************/
-int db_rule_shadow(Db* db,
-                   Db* dbprop,
-                   RuleShadow* rule,
-                   Model* model,
-                   const VectorDouble& props,
-                   int flag_stat,
-                   int nfacies)
+Id db_rule_shadow(Db* db,
+                  Db* dbprop,
+                  RuleShadow* rule,
+                  Model* model,
+                  const VectorDouble& props,
+                  Id flag_stat,
+                  Id nfacies)
 {
-  int iptr, error, flag_used[2], nbsimu, igrf, ngrf;
-  PropDef *propdef;
+  Id iptr, error, flag_used[2], nbsimu, igrf, ngrf;
+  PropDef* propdef;
 
   /* Initializations */
 
-  error = 1;
-  nbsimu = 1;
-  iptr = -1;
+  error   = 1;
+  nbsimu  = 1;
+  iptr    = -1;
   propdef = nullptr;
 
   /* Preliminary checks */
@@ -583,8 +580,8 @@ int db_rule_shadow(Db* db,
       if (iptr < 0)
       {
         messerr(
-            "The variable containing the simulation of the GRF %d is missing in the Db",
-            igrf + 1);
+          "The variable containing the simulation of the GRF %d is missing in the Db",
+          igrf + 1);
         goto label_end;
       }
       db->setLocatorByUID(iptr, ELoc::SIMU, igrf);
@@ -593,7 +590,7 @@ int db_rule_shadow(Db* db,
 
   /* Combine the conditional simulation for each GRF */
 
-  for (int isimu = 0; isimu < nbsimu; isimu++)
+  for (Id isimu = 0; isimu < nbsimu; isimu++)
     if (rule->gaus2facResult(propdef, db, flag_used, 0, isimu, nbsimu))
       goto label_end;
 
@@ -601,7 +598,7 @@ int db_rule_shadow(Db* db,
 
   error = 0;
 
-  label_end:
+label_end:
   proportion_manage(-1, 1, flag_stat, ngrf, 0, nfacies, 0,
                     db, dbprop, props, propdef);
   return (error);
@@ -622,10 +619,10 @@ int db_rule_shadow(Db* db,
  ** \remark The input variable must be locatorized as Z or ELoc::SIMU
  **
  *****************************************************************************/
-int _db_rule(Db *db,
-             const RuleProp *ruleprop,
-             Model *model,
-             const NamingConvention &namconv)
+Id _db_rule(Db* db,
+            const RuleProp* ruleprop,
+            Model* model,
+            const NamingConvention& namconv)
 {
   if (db == nullptr)
   {
@@ -637,28 +634,28 @@ int _db_rule(Db *db,
     messerr("RuleProp must be defined");
     return 1;
   }
-  int flag_stat = ruleprop->isFlagStat();
-  const Rule *rule = ruleprop->getRule();
-  const VectorDouble &propcst = ruleprop->getPropCst();
-  const Db *dbprop = ruleprop->getDbprop();
+  Id flag_stat                = ruleprop->isFlagStat();
+  const Rule* rule            = ruleprop->getRule();
+  const VectorDouble& propcst = ruleprop->getPropCst();
+  const Db* dbprop            = ruleprop->getDbprop();
 
-  int error = 1;
-  int iptr = -1;
-  PropDef *propdef = nullptr;
-  int ngrf = rule->getNGRF();
+  Id error           = 1;
+  Id iptr            = -1;
+  PropDef* propdef   = nullptr;
+  Id ngrf            = rule->getNGRF();
   VectorInt flagUsed = rule->whichGRFUsed();
-  int nfacies = rule->getNFacies();
-  bool flagReturn = false;
+  Id nfacies         = rule->getNFacies();
+  bool flagReturn    = false;
 
   /* Preliminary checks */
 
-  int nbsimu = db->getNLoc(ELoc::SIMU);
-  int nvar = db->getNLoc(ELoc::Z);
+  Id nbsimu = db->getNLoc(ELoc::SIMU);
+  Id nvar   = db->getNLoc(ELoc::Z);
   if (nbsimu != ngrf && nvar != ngrf)
   {
     messerr("The Rule specifies the use of %d underlying GRF(s)", ngrf);
     messerr(
-        "The input 'db' should have one variable per GRF with locator 'SIMU' or 'Z'");
+      "The input 'db' should have one variable per GRF with locator 'SIMU' or 'Z'");
     goto label_end;
   }
 
@@ -699,7 +696,7 @@ int _db_rule(Db *db,
   namconv.setNamesAndLocators(db, iptr);
   error = 0;
 
-  label_end:
+label_end:
   proportion_manage(-1, 1, flag_stat, ngrf, 0, nfacies, 0,
                     db, dbprop, propcst, propdef);
   return (error);
@@ -721,22 +718,22 @@ int _db_rule(Db *db,
  ** \param[in]  nfacies   Number of facies
  **
  *****************************************************************************/
-int db_bounds_shadow(Db* db,
-                     Db* dbprop,
-                     RuleShadow* rule,
-                     Model* model,
-                     const VectorDouble& props,
-                     int flag_stat,
-                     int nfacies)
+Id db_bounds_shadow(Db* db,
+                    Db* dbprop,
+                    RuleShadow* rule,
+                    Model* model,
+                    const VectorDouble& props,
+                    Id flag_stat,
+                    Id nfacies)
 {
-  int flag_used[2], iptr, igrf;
+  Id flag_used[2], iptr, igrf;
   VectorDouble coor;
 
   /* Initializations */
 
-  int error = 1;
-  int ngrf  = 0;
-  int ndim = 0;
+  Id error         = 1;
+  Id ngrf          = 0;
+  Id ndim          = 0;
   PropDef* propdef = nullptr;
 
   /**********************/
@@ -801,7 +798,7 @@ int db_bounds_shadow(Db* db,
 
   error = 0;
 
-  label_end:
+label_end:
   proportion_manage(-1, 1, flag_stat, ngrf, 0, nfacies, 0,
                     db, dbprop, props, propdef);
   return (error);
@@ -819,10 +816,10 @@ int db_bounds_shadow(Db* db,
  ** \param[in]  namconv   Naming convention
  **
  *****************************************************************************/
-int _db_bounds(Db *db,
-               const RuleProp *ruleprop,
-               Model *model,
-               const NamingConvention &namconv)
+Id _db_bounds(Db* db,
+              const RuleProp* ruleprop,
+              Model* model,
+              const NamingConvention& namconv)
 {
   NamingConvention nc(namconv);
 
@@ -836,22 +833,22 @@ int _db_bounds(Db *db,
     messerr("RuleProp must be defined");
     return 1;
   }
-  int flag_stat = ruleprop->isFlagStat();
-  const Rule *rule = ruleprop->getRule();
-  const VectorDouble &propcst = ruleprop->getPropCst();
-  const Db *dbprop = ruleprop->getDbprop();
+  Id flag_stat                = ruleprop->isFlagStat();
+  const Rule* rule            = ruleprop->getRule();
+  const VectorDouble& propcst = ruleprop->getPropCst();
+  const Db* dbprop            = ruleprop->getDbprop();
 
-  int error = 1;
-  int iptrl, iptru;
-  PropDef *propdef = nullptr;
+  Id error = 1;
+  Id iptrl, iptru;
+  PropDef* propdef = nullptr;
 
   VectorInt flagUsed = rule->whichGRFUsed();
-  int nfacies = rule->getNFacies();
-  int ngrf = rule->getNGRF();
+  Id nfacies         = rule->getNFacies();
+  Id ngrf            = rule->getNGRF();
 
   /* Input Db */
 
-  int nvar = db->getNLoc(ELoc::Z);
+  Id nvar = db->getNLoc(ELoc::Z);
   if (!db->isNVarComparedTo(1)) goto label_end;
 
   /* Model (for SHIFT case) */
@@ -885,7 +882,7 @@ int _db_bounds(Db *db,
 
   /* Calculate the thresholds and store them in the Db file */
 
-  for (int igrf = 0; igrf < ngrf; igrf++)
+  for (Id igrf = 0; igrf < ngrf; igrf++)
   {
     if (!flagUsed[igrf]) continue;
     if (rule->evaluateBounds(propdef, db, db, 0, igrf, 0, 0)) goto label_end;
@@ -899,7 +896,7 @@ int _db_bounds(Db *db,
   nc.setNamesAndLocators(nullptr, VectorInt(), db, iptru, "Upper", ngrf);
   error = 0;
 
-  label_end:
+label_end:
   proportion_manage(-1, 1, flag_stat, ngrf, 0, nfacies, 0,
                     db, dbprop, propcst, propdef);
   return (error);
@@ -912,12 +909,12 @@ int _db_bounds(Db *db,
  ** \param[in]  propdef     Pointer to Propdef structure
  **
  ****************************************************************************/
-void propdef_reset(PropDef *propdef)
+void propdef_reset(PropDef* propdef)
 {
   if (propdef == nullptr) return;
   if (propdef->propmem.empty()) return;
 
-  for (int ifac = 0; ifac < (int) propdef->propmem.size(); ifac++)
+  for (Id ifac = 0; ifac < static_cast<Id>(propdef->propmem.size()); ifac++)
     propdef->propmem[ifac] = -1;
 }
 
@@ -941,25 +938,25 @@ void propdef_reset(PropDef *propdef)
  ** \param[in]  proploc     PropDef structure (used for mode<0)
  **
  ****************************************************************************/
-PropDef* proportion_manage(int mode,
-                           int flag_facies,
-                           int flag_stat,
-                           int ngrf1,
-                           int ngrf2,
-                           int nfac1,
-                           int nfac2,
-                           Db *db,
-                           const Db *dbprop,
-                           const VectorDouble &propcst,
-                           PropDef *proploc)
+PropDef* proportion_manage(Id mode,
+                           Id flag_facies,
+                           Id flag_stat,
+                           Id ngrf1,
+                           Id ngrf2,
+                           Id nfac1,
+                           Id nfac2,
+                           Db* db,
+                           const Db* dbprop,
+                           const VectorDouble& propcst,
+                           PropDef* proploc)
 {
-  int ifac, error, nfacprod;
-  const Db *db_loc;
-  PropDef *propdef;
+  Id ifac, error, nfacprod;
+  const Db* db_loc;
+  PropDef* propdef;
 
   /* Initializations */
 
-  error = 1;
+  error    = 1;
   nfacprod = nfac1;
   if (nfac2 > 0) nfacprod *= nfac2;
 
@@ -967,17 +964,17 @@ PropDef* proportion_manage(int mode,
 
   if (mode > 0)
   {
-    propdef = new PropDef;
-    propdef->case_facies = flag_facies;
-    propdef->case_stat = flag_stat;
+    propdef                   = new PropDef;
+    propdef->case_facies      = flag_facies;
+    propdef->case_stat        = flag_stat;
     propdef->case_prop_interp = (dbprop != nullptr && dbprop->isGrid());
-    propdef->ngrf[0] = ngrf1;
-    propdef->ngrf[1] = ngrf2;
-    propdef->nfac[0] = nfac1;
-    propdef->nfac[1] = nfac2;
-    propdef->nfaccur = nfac1;
-    propdef->nfacprod = nfacprod;
-    propdef->mode = EProcessOper::UNDEFINED;
+    propdef->ngrf[0]          = ngrf1;
+    propdef->ngrf[1]          = ngrf2;
+    propdef->nfac[0]          = nfac1;
+    propdef->nfac[1]          = nfac2;
+    propdef->nfaccur          = nfac1;
+    propdef->nfacprod         = nfacprod;
+    propdef->mode             = EProcessOper::UNDEFINED;
     if (propdef->nfaccur <= 0)
     {
       messerr(" The number of facies may not be zero");
@@ -1006,7 +1003,7 @@ PropDef* proportion_manage(int mode,
           messerr("either in the input 'Db' or in 'dbprop'");
           goto label_end;
         }
-        const DbGrid* db_loc_grid = dynamic_cast<const DbGrid*>(db_loc);
+        const auto* db_loc_grid = dynamic_cast<const DbGrid*>(db_loc);
         if (db_loc_grid == nullptr)
         {
           messerr("The 'Db' used for Proportions must be a Grid");
@@ -1015,11 +1012,11 @@ PropDef* proportion_manage(int mode,
         if (db_loc->getNLoc(ELoc::P) != nfacprod)
         {
           messerr(
-              "In the non-stationary case, the number of proportion variables (%d)",
-              db_loc->getNLoc(ELoc::P));
+            "In the non-stationary case, the number of proportion variables (%d)",
+            db_loc->getNLoc(ELoc::P));
           messerr(
-              "must be equal to the number of facies (%d) in the Lithotype Rule",
-              nfacprod);
+            "must be equal to the number of facies (%d) in the Lithotype Rule",
+            nfacprod);
           goto label_end;
         }
         propdef->dbprop = db_loc_grid;
@@ -1030,17 +1027,13 @@ PropDef* proportion_manage(int mode,
 
         // Stationary case
 
-        double pref = 1. / (double) nfacprod;
+        double pref = 1. / static_cast<double>(nfacprod);
         for (ifac = 0; ifac < nfacprod; ifac++)
         {
-          propdef->propfix[ifac] = (propcst.empty()) ? pref :
-                                                       propcst[ifac];
-          propdef->propwrk[ifac] = (propcst.empty()) ? pref :
-                                                       propcst[ifac];
-          propdef->proploc[ifac] = (propcst.empty()) ? pref :
-                                                       propcst[ifac];
-          propdef->propmem[ifac] = (propcst.empty()) ? pref :
-                                                       propcst[ifac];
+          propdef->propfix[ifac] = (propcst.empty()) ? pref : propcst[ifac];
+          propdef->propwrk[ifac] = (propcst.empty()) ? pref : propcst[ifac];
+          propdef->proploc[ifac] = (propcst.empty()) ? pref : propcst[ifac];
+          propdef->propmem[ifac] = (propcst.empty()) ? pref : propcst[ifac];
         }
       }
 
@@ -1056,9 +1049,9 @@ PropDef* proportion_manage(int mode,
 
     /* Deallocation */
 
-    propdef->nfaccur = 0;
+    propdef->nfaccur  = 0;
     propdef->nfacprod = 0;
-    propdef->dbprop = nullptr;
+    propdef->dbprop   = nullptr;
 
     delete propdef;
     propdef = nullptr;
@@ -1068,7 +1061,7 @@ PropDef* proportion_manage(int mode,
 
   error = 0;
 
-  label_end:
+label_end:
 
   if (error)
   {
@@ -1090,10 +1083,10 @@ PropDef* proportion_manage(int mode,
  ** \param[in]  namconv   Naming Convention
  **
  *****************************************************************************/
-int _db_threshold(Db *db,
-                  const RuleProp *ruleprop,
-                  Model *model,
-                  const NamingConvention &namconv)
+Id _db_threshold(Db* db,
+                 const RuleProp* ruleprop,
+                 Model* model,
+                 const NamingConvention& namconv)
 {
   if (db == nullptr)
   {
@@ -1110,25 +1103,25 @@ int _db_threshold(Db *db,
     messerr("RuleProp must be defined");
     return 1;
   }
-  int flag_stat = ruleprop->isFlagStat();
-  const Rule *rule = ruleprop->getRule();
+  Id flag_stat     = ruleprop->isFlagStat();
+  const Rule* rule = ruleprop->getRule();
   if (rule->getModeRule() != ERule::STD)
   {
     messerr("This function is only programmed for standard rule");
     return 1;
   }
-  const VectorDouble &propcst = ruleprop->getPropCst();
-  const Db *dbprop = ruleprop->getDbprop();
+  const VectorDouble& propcst = ruleprop->getPropCst();
+  const Db* dbprop            = ruleprop->getDbprop();
 
-  int rank, iptr;
+  Id rank, iptr;
   double t1min, t1max, t2min, t2max;
 
   /* Initializations */
 
-  int error = 1;
-  int ngrf = 0;
-  int nfacies = 0;
-  PropDef *propdef = nullptr;
+  Id error         = 1;
+  Id ngrf          = 0;
+  Id nfacies       = 0;
+  PropDef* propdef = nullptr;
 
   /**********************/
   /* Preliminary checks */
@@ -1158,11 +1151,11 @@ int _db_threshold(Db *db,
 
   /* Calculate the thresholds and store them in the Db file */
 
-  for (int iech = 0; iech < db->getNSample(); iech++)
+  for (Id iech = 0; iech < db->getNSample(); iech++)
   {
     if (!db->isActive(iech)) continue;
     rank = 0;
-    for (int ifac = 0; ifac < nfacies; ifac++)
+    for (Id ifac = 0; ifac < nfacies; ifac++)
     {
       if (rule_thresh_define(propdef, db, rule, ifac + 1, iech, 0, 0, 0, &t1min,
                              &t1max, &t2min, &t2max)) goto label_end;
@@ -1181,29 +1174,29 @@ int _db_threshold(Db *db,
   // Naming convention
 
   rank = 0;
-  for (int ifac = 0; ifac < nfacies; ifac++)
+  for (Id ifac = 0; ifac < nfacies; ifac++)
   {
     namconv.setNamesAndLocators(
-        db, iptr + rank,
-        concatenateStrings("Thresh-F", toString(ifac + 1), "-Y1-Low"));
+      db, iptr + rank,
+      concatenateStrings("Thresh-F", toString(ifac + 1), "-Y1-Low"));
     rank++;
     namconv.setNamesAndLocators(
-        db, iptr + rank,
-        concatenateStrings("Thresh-F", toString(ifac + 1), "-Y1-Up"));
+      db, iptr + rank,
+      concatenateStrings("Thresh-F", toString(ifac + 1), "-Y1-Up"));
     rank++;
     if (ngrf == 1) continue;
     namconv.setNamesAndLocators(
-        db, iptr + rank,
-        concatenateStrings("Thresh-F", toString(ifac + 1), "-Y2-Low"));
+      db, iptr + rank,
+      concatenateStrings("Thresh-F", toString(ifac + 1), "-Y2-Low"));
     rank++;
     namconv.setNamesAndLocators(
-        db, iptr + rank,
-        concatenateStrings("Thresh-F", toString(ifac + 1), "-Y2-Up"));
+      db, iptr + rank,
+      concatenateStrings("Thresh-F", toString(ifac + 1), "-Y2-Up"));
     rank++;
   }
   error = 0;
 
-  label_end:
+label_end:
   proportion_manage(-1, 1, flag_stat, ngrf, 0, nfacies, 0,
                     db, dbprop, propcst, propdef);
 
@@ -1223,12 +1216,12 @@ int _db_threshold(Db *db,
  ** \remarks: The drift is not copied into the new model
  **
  *****************************************************************************/
-Model* model_rule_combine(const Model *model1,
-                          const Model *model2,
-                          const Rule *rule)
+Model* model_rule_combine(const Model* model1,
+                          const Model* model2,
+                          const Rule* rule)
 {
-  Model *new_model;
-  int ngrf;
+  Model* new_model;
+  Id ngrf;
   double rho;
 
   /* Initializations */
@@ -1296,3 +1289,4 @@ Model* model_rule_combine(const Model *model1,
   new_model = model_combine(model1, model2, rho);
   return (new_model);
 }
+} // namespace gstlrn

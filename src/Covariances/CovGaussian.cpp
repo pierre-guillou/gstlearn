@@ -9,28 +9,30 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovGaussian.hpp"
-#include "Covariances/CovContext.hpp"
-#include "Simulation/TurningBandOperate.hpp"
-#include "Matrix/MatrixDense.hpp"
 #include "Basic/Law.hpp"
+#include "Covariances/CovContext.hpp"
+#include "Matrix/MatrixDense.hpp"
+#include "Simulation/TurningBandOperate.hpp"
 
-#include "math.h"
+#include <cmath>
 
+namespace gstlrn
+{
 CovGaussian::CovGaussian(const CovContext& ctxt)
-: ACovFunc(ECov::GAUSSIAN, ctxt)
+  : ACovFunc(ECov::GAUSSIAN, ctxt)
 {
 }
 
-CovGaussian::CovGaussian(const CovGaussian &r)
-: ACovFunc(r)
+CovGaussian::CovGaussian(const CovGaussian& r)
+  : ACovFunc(r)
 {
 }
 
-CovGaussian& CovGaussian::operator=(const CovGaussian &r)
+CovGaussian& CovGaussian::operator=(const CovGaussian& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -52,7 +54,7 @@ double CovGaussian::_evaluateCov(double h) const
   return (cov);
 }
 
-double CovGaussian::_evaluateCovDerivative(int degree, double h) const
+double CovGaussian::_evaluateCovDerivative(Id degree, double h) const
 {
   double r2 = h * h;
   if (r2 > MAX_EXP) return 0.;
@@ -60,7 +62,7 @@ double CovGaussian::_evaluateCovDerivative(int degree, double h) const
   double cov = 0.;
   switch (degree)
   {
-    case 1:   // First order derivative
+    case 1: // First order derivative
       cov = 2. * exp(-r2);
       break;
 
@@ -74,7 +76,7 @@ double CovGaussian::_evaluateCovDerivative(int degree, double h) const
 
     case 4: // Fourth order derivative
       double r4 = r2 * r2;
-      cov = 8. * exp(-r2) * (6. - 15. * r2 + r4);
+      cov       = 8. * exp(-r2) * (6. - 15. * r2 + r4);
       break;
   }
   return (cov);
@@ -85,17 +87,18 @@ String CovGaussian::getFormula() const
   return "C(h)=1-\\frac{7h^2}{a^2}+\\frac{35h^3}{4a^3}-\\frac{7h^5}{2a^5}-\\frac{3h^7}{4a^7}";
 }
 
-double CovGaussian::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovGaussian::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.cosineOne(t0);
 }
 
-MatrixDense CovGaussian::simulateSpectralOmega(int nb) const
+MatrixDense CovGaussian::simulateSpectralOmega(Id nb) const
 {
-  int ndim = getContext().getNDim();
-  MatrixDense mat(nb, ndim);
-  for (int irow = 0; irow < nb; irow++)
-    for (int icol = 0; icol < ndim; icol++)
-      mat.setValue(irow, icol, law_gaussian());
+  auto ndim = getContext().getNDim();
+  MatrixDense mat(nb, static_cast<Id>(ndim));
+  for (Id irow = 0; irow < nb; irow++)
+    for (size_t icol = 0; icol < ndim; icol++)
+      mat.setValue(irow, static_cast<Id>(icol), law_gaussian());
   return mat;
 }
+} // namespace gstlrn

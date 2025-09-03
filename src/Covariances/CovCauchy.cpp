@@ -11,24 +11,26 @@
 #include "Covariances/CovCauchy.hpp"
 #include "Covariances/CovContext.hpp"
 
-#include "math.h"
+#include <cmath>
 
+namespace gstlrn
+{
 CovCauchy::CovCauchy(const CovContext& ctxt)
-: ACovFunc(ECov::CAUCHY, ctxt)
+  : ACovFunc(ECov::CAUCHY, ctxt)
 {
   setParam(1);
 }
 
-CovCauchy::CovCauchy(const CovCauchy &r)
-: ACovFunc(r)
+CovCauchy::CovCauchy(const CovCauchy& r)
+  : ACovFunc(r)
 {
 }
 
-CovCauchy& CovCauchy::operator=(const CovCauchy &r)
+CovCauchy& CovCauchy::operator=(const CovCauchy& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -52,3 +54,4 @@ String CovCauchy::getFormula() const
 {
   return "C(h)=\\frac{1}{\\left( 1+ \\frac{h^2}{a_t^2} \\right)^\\alpha";
 }
+} // namespace gstlrn

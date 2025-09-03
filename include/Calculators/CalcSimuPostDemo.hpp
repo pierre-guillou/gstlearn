@@ -21,6 +21,8 @@
 #include "Basic/NamingConvention.hpp"
 #include "Basic/VectorNumT.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT CalcSimuPostDemo: public CalcSimuPost
 {
 public:
@@ -30,12 +32,12 @@ public:
   virtual ~CalcSimuPostDemo();
 
 protected:
-  int _getTransfoNvar() const override;
+  Id _getTransfoNvar() const override;
   void _transformFunction(const VectorDouble& _Z_n_k_s,
                           VectorDouble& Y_p_k_s) const override;
 };
 
-GSTLEARN_EXPORT int simuPostDemo(Db *dbin,
+GSTLEARN_EXPORT Id simuPostDemo(Db *dbin,
                                  DbGrid *dbout,
                                  const VectorString &names,
                                  bool flag_match = false,
@@ -43,5 +45,6 @@ GSTLEARN_EXPORT int simuPostDemo(Db *dbin,
                                  const std::vector<EPostStat> &stats = EPostStat::fromKeys({"MEAN"}),
                                  bool verbose = false,
                                  const VectorInt& check_targets = VectorInt(),
-                                 int check_level = 0,
+                                 Id check_level = 0,
                                  const NamingConvention &namconv = NamingConvention("Post"));
+}

@@ -9,18 +9,18 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Space/SpacePoint.hpp"
-#include "Basic/AStringable.hpp"
-#include "Space/ASpace.hpp"
 #include "Basic/AException.hpp"
-#include "Basic/VectorHelper.hpp"
+#include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Space/ASpace.hpp"
 #include "Space/ASpaceObject.hpp"
 #include "geoslib_define.h"
 
 #include <cmath>
-#include <iostream>
-#include <math.h>
 
+namespace gstlrn
+{
 SpacePoint::SpacePoint(const ASpaceSharedPtr& space)
   : ASpaceObject(space)
   , _coord()
@@ -41,7 +41,7 @@ SpacePoint::SpacePoint(const SpacePoint& r)
 {
 }
 
-SpacePoint::SpacePoint(const VectorDouble& coord, int iech, const ASpaceSharedPtr& space)
+SpacePoint::SpacePoint(const VectorDouble& coord, Id iech, const ASpaceSharedPtr& space)
   : ASpaceObject(space)
   , _coord(coord)
   , _iech(iech)
@@ -57,7 +57,7 @@ SpacePoint::SpacePoint(const VectorDouble& coord, int iech, const ASpaceSharedPt
   }
 }
 
-double SpacePoint::getCoord(int idim) const
+double SpacePoint::getCoord(Id idim) const
 {
   return _coord[idim];
 }
@@ -90,32 +90,32 @@ void SpacePoint::setCoord(double coord)
 
 void SpacePoint::setCoords(const VectorDouble& coord)
 {
-  if ((int)getNDim() != (int)coord.size())
+  if (static_cast<Id>(getNDim()) != static_cast<Id>(coord.size()))
     std::cout << "Error: Wrong number of coordinates. Point not modified."
               << std::endl;
   else
     _coord = coord;
 }
 
-SpacePoint SpacePoint::spacePointOnSubspace(int ispace) const
+SpacePoint SpacePoint::spacePointOnSubspace(Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNDim())
+  if (ispace < 0 || ispace >= static_cast<Id>(getNDim()))
     return *this;
 
   /// TODO : Memory copies
   VectorDouble vec = getSpace()->projCoord(_coord, ispace);
-  const auto sp = getSpace()->getComponent(ispace);
+  const auto sp    = getSpace()->getComponent(ispace);
   SpacePoint p(vec, _iech, sp);
   return p;
 }
 
-void SpacePoint::setCoords(const double* coord, int size)
+void SpacePoint::setCoords(const double* coord, Id size)
 {
-  if ((int)getNDim() != size)
+  if (static_cast<Id>(getNDim()) != size)
     std::cout << "Error: Wrong number of coordinates. Point not modified." << std::endl;
   else
-    for (int idim = 0; idim < size; idim++)
-     _coord[idim] = coord[idim];
+    for (Id idim = 0; idim < size; idim++)
+      _coord[idim] = coord[idim];
 }
 
 bool SpacePoint::isConsistent(const ASpace* space) const
@@ -129,7 +129,7 @@ void SpacePoint::move(const VectorDouble& vec)
   getSpace()->move(*this, vec);
 }
 
-double SpacePoint::getDistance(const SpacePoint& pt, int ispace) const
+double SpacePoint::getDistance(const SpacePoint& pt, Id ispace) const
 {
   return ASpaceObject::getDistance(*this, pt, ispace);
 }
@@ -139,14 +139,19 @@ VectorDouble SpacePoint::getDistances(const SpacePoint& pt) const
   return ASpaceObject::getDistances(*this, pt);
 }
 
-VectorDouble SpacePoint::getIncrement(const SpacePoint& pt, int ispace) const
+VectorDouble SpacePoint::getIncrement(const SpacePoint& pt, Id ispace) const
 {
   return ASpaceObject::getIncrement(*this, pt, ispace);
 }
 
+void SpacePoint::getIncrementInPlace(VectorDouble& inc, const SpacePoint& pt, Id ispace) const
+{
+  ASpaceObject::getIncrementInPlace(*this, pt, inc, ispace);
+}
+
 String SpacePoint::toString(const AStringFormat* /*strfmt*/) const
 {
-  return VH::toStringAsSpan(constvect(_coord.data(),getNDim()));
+  return VH::toStringAsSpan(constvect(_coord.data(), getNDim()));
 }
 
 void SpacePoint::setFFFF()
@@ -156,22 +161,24 @@ void SpacePoint::setFFFF()
 
 bool SpacePoint::isFFFF() const
 {
-  for (int idim = 0, ndim = getNDim(); idim < ndim; idim++)
-    if (! FFFF(_coord[idim])) return false;
+  for (Id idim = 0, ndim = static_cast<Id>(getNDim()); idim < ndim; idim++)
+    if (!FFFF(_coord[idim])) return false;
   return true;
 }
 
-double SpacePoint::getCosineToDirection(const SpacePoint &T2,
-                                        const VectorDouble &codir) const
+double SpacePoint::getCosineToDirection(const SpacePoint& T2,
+                                        const VectorDouble& codir) const
 {
   double cosdir = 0.;
-  double dn1 = 0.;
-  double dn2 = 0.;
-  VectorDouble delta = getIncrement(T2);
-  for (int idim = 0; idim < (int)getNDim(); idim++)
+  double dn1    = 0.;
+  double dn2    = 0.;
+  _delta.clear();
+  _delta.resize(getNDim());
+  getIncrementInPlace(_delta, T2);
+  for (Id idim = 0; idim < static_cast<Id>(getNDim()); idim++)
   {
-    cosdir += delta[idim] * codir[idim];
-    dn1 += delta[idim] * delta[idim];
+    cosdir += _delta[idim] * codir[idim];
+    dn1 += _delta[idim] * _delta[idim];
     dn2 += codir[idim] * codir[idim];
   }
   double prod = dn1 * dn2;
@@ -179,19 +186,21 @@ double SpacePoint::getCosineToDirection(const SpacePoint &T2,
   return (cosdir / sqrt(prod));
 }
 
-double SpacePoint::getOrthogonalDistance(const SpacePoint &P2,
-                                         const VectorDouble &codir) const
+double SpacePoint::getOrthogonalDistance(const SpacePoint& P2,
+                                         const VectorDouble& codir) const
 {
-  double dn1 = 0.;
-  double dn2 = 0.;
-  double v = 0.;
+  double dn1   = 0.;
+  double dn2   = 0.;
+  double v     = 0.;
   double dproj = 0.;
-  VectorDouble delta = getIncrement(P2);
-  for (int idim = 0; idim < (int)getNDim(); idim++)
+  _delta.clear();
+  _delta.resize(getNDim());
+  getIncrementInPlace(_delta, P2);
+  for (Id idim = 0; idim < static_cast<Id>(getNDim()); idim++)
   {
-    dproj += delta[idim] * codir[idim];
+    dproj += _delta[idim] * codir[idim];
     dn1 += codir[idim] * codir[idim];
-    dn2 += delta[idim] * delta[idim];
+    dn2 += _delta[idim] * _delta[idim];
   }
   if (dn1 > 0.) v = sqrt(dn2 - dproj * dproj / dn1);
   return (v);
@@ -203,7 +212,7 @@ double SpacePoint::getOrthogonalDistance(const SpacePoint &P2,
  * TODO : initialize coordinates from angles for more than 2D & valid only for space RN ?
  * To be kept ?
  */
-#include <iostream>
+
 void SpacePoint::setCoordFromAngle(const VectorDouble& angles)
 {
   if (getNDim() == 1 || angles.size() == 0)
@@ -216,8 +225,8 @@ void SpacePoint::setCoordFromAngle(const VectorDouble& angles)
     {
       std::cout << "Warning: Extra angle values ignored" << std::endl;
     }
-    _coord[0] = cos( GV_PI * angles[0] / 180);
-    _coord[1] = sin( GV_PI * angles[0] / 180);
+    _coord[0] = cos(GV_PI * angles[0] / 180);
+    _coord[1] = sin(GV_PI * angles[0] / 180);
   }
   else
   {
@@ -225,3 +234,4 @@ void SpacePoint::setCoordFromAngle(const VectorDouble& angles)
   }
 }
 
+} // namespace gstlrn

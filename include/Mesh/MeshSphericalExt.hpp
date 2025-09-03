@@ -13,6 +13,9 @@
 #include "Mesh/LinkSphTriangle.hpp"
 #include "Mesh/MeshSpherical.hpp"
 
+namespace gstlrn
+{
+
 /**
  * Meshing defined in the Euclidean space
  */
@@ -24,7 +27,7 @@ public:
   MeshSphericalExt& operator=(const MeshSphericalExt &m);
   virtual ~MeshSphericalExt();
 
-  int resetFromDb(Db* dbin,
+  Id resetFromDb(Db* dbin,
                    Db* dbout,
                    const String& triswitch = "nqQ",
                    bool verbose            = false);
@@ -38,3 +41,4 @@ private:
   static AMesh* _load2DSph(bool verbose, Db *dbin, Db *dbout, const String &triswitch);
   void _meshesSphLoadVertices(SphTriangle *t);
 };
+}

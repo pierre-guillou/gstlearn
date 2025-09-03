@@ -10,6 +10,8 @@
 /******************************************************************************/
 #include "Simulation/TurningBandOperate.hpp"
 
+namespace gstlrn
+{
  TurningBandOperate:: TurningBandOperate()
     : _nt0(0),
       _flagScaled(false),
@@ -87,7 +89,7 @@ double TurningBandOperate::shotNoiseAffineOne(double t0)
   if (! isFlagScaled()) t0 /= scale;
 
   double dt = t0 - getTdeb() / scale;
-  int nt0 = (int) (dt);
+  Id nt0 = static_cast<Id>(dt);
   double dt0 = dt - nt0;
   return _t[nt0] * (2. * dt0 - 1.);
 }
@@ -98,14 +100,14 @@ double TurningBandOperate::shotNoiseCubicOne(double t0)
   if (! isFlagScaled()) t0 /= scale;
 
   double dt = t0 - getTdeb() / scale;
-  int nt0 = (int) (dt);
+  Id nt0 = static_cast<Id>(dt);
   double dt0 = dt - nt0;
   return _t[nt0] * dt0 * (dt0 - 0.5) * (dt0 - 1.);
 }
 
 double TurningBandOperate::spectralOne(double t0)
 {
-  int nt0 = _rankInPoisson(getNt0(), t0, _t);
+  Id nt0 = _rankInPoisson(getNt0(), t0, _t);
   setNt0(nt0);
 
   double vexp = getVexp();
@@ -114,7 +116,7 @@ double TurningBandOperate::spectralOne(double t0)
 
 double TurningBandOperate::IRFProcessOne(double t0)
 {
-  int nt0 = _rankInPoisson(getNt0(), t0, _t);
+  Id nt0 = _rankInPoisson(getNt0(), t0, _t);
   setNt0(nt0);
 
   return _irfProcessSample(nt0, t0);
@@ -137,7 +139,7 @@ double TurningBandOperate::cosineOne(double t0) const
  ** \param[in]  t0     starting time
  **
  *****************************************************************************/
-double TurningBandOperate::_irfProcessSample(int nt0, double t0)
+double TurningBandOperate::_irfProcessSample(Id nt0, double t0)
 {
   double value;
 
@@ -171,16 +173,16 @@ double TurningBandOperate::_irfProcessSample(int nt0, double t0)
  ** \param[in]  t  Poisson point process
  **
  *****************************************************************************/
-int TurningBandOperate::_rankInPoisson(int def_rank,
+Id TurningBandOperate::_rankInPoisson(Id def_rank,
                                        double t0,
                                        const VectorDouble &t)
 {
-  int it, itp, itn;
+  Id it, itp, itn;
 
   /* First, try with the default interval then the next one and finally
    the previous one */
 
-  int nt = (int) t.size();
+  Id nt = static_cast<Id>(t.size());
   if (t0 >= t[def_rank] && t0 < t[def_rank + 1])
     return (def_rank);
   if (def_rank < (nt - 2) && t0 >= t[def_rank + 1] && t0 < t[def_rank + 2])
@@ -221,4 +223,5 @@ void TurningBandOperate::pushV1(double value)
 void TurningBandOperate::pushV2(double value)
 {
   _v2.push_back(value);
+}
 }

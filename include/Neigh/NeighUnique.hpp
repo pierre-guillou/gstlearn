@@ -18,6 +18,9 @@
 
 #include "Neigh/ANeigh.hpp"
 #include "Space/ASpace.hpp"
+
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -41,23 +44,27 @@ public:
 
   IMPLEMENT_CLONING(NeighUnique)
   /// Interface for ANeigh
-  virtual void getNeigh(int iech_out, VectorInt& ranks) override;
-  virtual int getNSampleMax(const Db* db) const override;
-  virtual bool hasChanged(int iech_out) const override;
-  virtual ENeigh getType() const override { return ENeigh::fromKey("UNIQUE"); }
+  void getNeigh(Id iech_out, VectorInt& ranks) override;
+  Id getNSampleMax(const Db* db) const override;
+  bool hasChanged(Id iech_out) const override;
+  ENeigh getType() const override { return ENeigh::fromKey("UNIQUE"); }
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static NeighUnique* create(bool flag_xvalid = false, const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  static NeighUnique* createFromNF(const String& neutralFilename, bool verbose = true);
+  static NeighUnique* createFromNF(const String& NFFilename, bool verbose = true);
 
 protected:
-  /// Interface for ASerializable
-  virtual bool _deserialize(std::istream& is, bool verbose = false) override;
-  virtual bool _serialize(std::ostream& os, bool verbose = false) const override;
+  bool _deserializeAscii(std::istream& is, bool verbose = false) override;
+  bool _serializeAscii(std::ostream& os, bool verbose = false) const override;
+#ifdef HDF5
+  bool _deserializeH5(H5::Group& grp, bool verbose = false) override;
+  bool _serializeH5(H5::Group& grp, bool verbose = false) const override;
+#endif
   String _getNFName() const override { return "NeighUnique"; }
 
 private:
-  void _unique(int iech_out, VectorInt& ranks);
+  void _unique(Id iech_out, VectorInt& ranks);
 };
+}

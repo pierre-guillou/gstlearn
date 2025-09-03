@@ -10,7 +10,10 @@
 /******************************************************************************/
 #include "Anamorphosis/AnamContinuous.hpp"
 #include "Db/Db.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 AnamContinuous::AnamContinuous()
     : AAnam(),
       _az(),
@@ -100,20 +103,20 @@ void AnamContinuous::calculateMeanAndVariance()
 
 VectorDouble AnamContinuous::rawToGaussianVector(const VectorDouble &z) const
 {
-  int number = static_cast<int>(z.size());
+  Id number = static_cast<Id>(z.size());
   VectorDouble y;
   y.resize(number);
-  for (int i = 0; i < number; i++)
+  for (Id i = 0; i < number; i++)
     y[i] = (FFFF(z[i])) ? TEST : rawToTransformValue(z[i]);
   return y;
 }
 
 VectorDouble AnamContinuous::gaussianToRawVector(const VectorDouble &y) const
 {
-  int number = static_cast<int>(y.size());
+  Id number = static_cast<Id>(y.size());
   VectorDouble z;
   z.resize(number);
-  for (int i = 0; i < number; i++)
+  for (Id i = 0; i < number; i++)
     z[i] = (FFFF(y[i])) ? TEST : transformToRawValue(y[i]);
   return z;
 }
@@ -125,18 +128,18 @@ VectorDouble AnamContinuous::gaussianToRawVector(const VectorDouble &y) const
  * @param aymax Maximum Y value
  * @return AnamContinuousFit structure
  */
-AnamContinuousFit AnamContinuous::sample(int ndisc, double aymin, double aymax)
+AnamContinuousFit AnamContinuous::sample(Id ndisc, double aymin, double aymax)
 {
   VectorDouble y(ndisc);
   VectorDouble z(ndisc);
   double pas = (aymax - aymin) / ndisc;
-  int ind0 = ndisc / 2;
+  Id ind0 = ndisc / 2;
   y[ind0] = 0.;
   z[ind0] = transformToRawValue(y[ind0]);
 
   /* Calculating the values below y=0 */
 
-  for (int ind = ind0 - 1; ind >= 0; ind--)
+  for (Id ind = ind0 - 1; ind >= 0; ind--)
   {
     y[ind] = y[ind + 1] - pas;
     z[ind] = transformToRawValue(y[ind]);
@@ -144,7 +147,7 @@ AnamContinuousFit AnamContinuous::sample(int ndisc, double aymin, double aymax)
 
   /* Calculating the values above y=0 */
 
-  for (int ind = ind0 + 1; ind < ndisc; ind++)
+  for (Id ind = ind0 + 1; ind < ndisc; ind++)
   {
     y[ind] = y[ind - 1] + pas;
     z[ind] = transformToRawValue(y[ind]);
@@ -162,7 +165,7 @@ AnamContinuousFit AnamContinuous::sample(int ndisc, double aymin, double aymax)
   return retfit;
 }
 
-bool AnamContinuous::_serialize(std::ostream& os, bool /*verbose*/) const
+bool AnamContinuous::_serializeAscii(std::ostream& os, bool /*verbose*/) const
 {
   bool ret = true;
   ret = ret && _recordWrite<double>(os,"", getAzmin());
@@ -179,7 +182,7 @@ bool AnamContinuous::_serialize(std::ostream& os, bool /*verbose*/) const
   return ret;
 }
 
-bool AnamContinuous::_deserialize(std::istream& is, bool /*verbose*/)
+bool AnamContinuous::_deserializeAscii(std::istream& is, bool /*verbose*/)
 {
   double azmin = 0.;
   double azmax = 0.;
@@ -217,4 +220,81 @@ bool AnamContinuous::_deserialize(std::istream& is, bool /*verbose*/)
   setVariance(variance);
 
   return ret;
+}
+#ifdef HDF5
+bool AnamContinuous::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto anamG = SerializeHDF5::getGroup(grp, "AnamContinuous");
+  if (!anamG)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  double azmin = 0.;
+  double azmax = 0.;
+  double aymin = 0.;
+  double aymax = 0.;
+  double pzmin = 0.;
+  double pzmax = 0.;
+  double pymin = 0.;
+  double pymax = 0.;
+  double mean = 0.;
+  double variance = 0.;
+
+  // ret      = ret && SerializeHDF5::readVec(*anamG, "NX", nx);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Azmin", azmin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Azmax", azmax);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Aymin", aymin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Aymax", aymax);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pzmin", pzmin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pzmax", pzmax);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pymin", pymin);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Pymax", pymax);
+
+  ret = ret && SerializeHDF5::readValue(*anamG, "Mean", mean);
+  ret = ret && SerializeHDF5::readValue(*anamG, "Variance", variance);
+
+  if (ret)
+  {
+    setPymin(pymin);
+    setPzmin(pzmin);
+    setPymax(pymax);
+    setPzmax(pzmax);
+    setAymin(aymin);
+    setAzmin(azmin);
+    setAymax(aymax);
+    setAzmax(azmax);
+    setMean(mean);
+    setVariance(variance);
+  }
+
+  return ret;
+}
+
+bool AnamContinuous::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto anamG = grp.createGroup("AnamContinuous");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "Azmin", getAzmin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Azmax", getAzmax());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Aymin", getAymin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Aymax", getAymax());
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pzmin", getPzmin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pzmax", getPzmax());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pymin", getPymin());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Pymax", getPymax());
+
+  ret = ret && SerializeHDF5::writeValue(anamG, "Mean", getMean());
+  ret = ret && SerializeHDF5::writeValue(anamG, "Variance", getVariance());
+
+  return ret;
+}
+#endif
 }

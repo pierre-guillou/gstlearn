@@ -8,12 +8,15 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Db/Db.hpp"
 #include "Db/DbMeshTurbo.hpp"
-#include "Db/DbStringFormat.hpp"
 #include "Basic/AStringable.hpp"
+#include "Basic/SerializeHDF5.hpp"
 #include "Basic/VectorNumT.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbStringFormat.hpp"
 
+namespace gstlrn
+{
 DbMeshTurbo::DbMeshTurbo(const VectorInt& nx,
                          const VectorDouble& dx,
                          const VectorDouble& x0,
@@ -24,7 +27,7 @@ DbMeshTurbo::DbMeshTurbo(const VectorInt& nx,
                          const VectorString& locatorNames,
                          bool flag_polarized,
                          bool verbose,
-                         int mode)
+                         Id mode)
   : DbGrid()
   , _mesh(nx, dx, x0, angles, flag_polarized, verbose, mode)
 {
@@ -55,7 +58,7 @@ String DbMeshTurbo::toString(const AStringFormat* strfmt) const
 {
   std::stringstream sstr;
 
-  const DbStringFormat* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
+  const auto* dbfmt = dynamic_cast<const DbStringFormat*>(strfmt);
   DbStringFormat dsf;
   if (dbfmt != nullptr) dsf = *dbfmt;
 
@@ -85,7 +88,7 @@ DbMeshTurbo* DbMeshTurbo::create(const VectorInt& nx,
                                  bool verbose)
 {
   // Creating the MeshETurbo internal storage
-  DbMeshTurbo* dbmesh = new DbMeshTurbo(nx, dx, x0, angles, order, tab, names,
+  auto* dbmesh = new DbMeshTurbo(nx, dx, x0, angles, order, tab, names,
                                         locatorNames, flag_polarized, verbose);
   if (dbmesh == nullptr)
   {
@@ -96,41 +99,41 @@ DbMeshTurbo* DbMeshTurbo::create(const VectorInt& nx,
   return dbmesh;
 }
 
-bool DbMeshTurbo::_deserialize(std::istream& is, bool verbose)
+bool DbMeshTurbo::_deserializeAscii(std::istream& is, bool verbose)
 {
-  int ndim = 0;
+  Id ndim = 0;
   bool ret = true;
 
   // Reading the header
 
-  ret      = ret && _recordRead<int>(is, "Space Dimension", ndim);
+  ret = ret && _recordRead<Id>(is, "Space Dimension", ndim);
 
   // Reading the meshing information
 
-  ret      = ret && _mesh.deserialize(is);
+  ret = ret && _mesh._deserializeAscii(is);
 
   // Reading the Db information
 
-  ret      = ret && DbGrid::_deserialize(is, verbose);
+  ret = ret && DbGrid::_deserializeAscii(is, verbose);
 
   return ret;
 }
 
-bool DbMeshTurbo::_serialize(std::ostream& os, bool verbose) const
+bool DbMeshTurbo::_serializeAscii(std::ostream& os, bool verbose) const
 {
   bool ret = true;
 
   /* Writing the header */
 
-  ret      = ret && _recordWrite<int>(os, "Space Dimension", getNDim());
+  ret = ret && _recordWrite<Id>(os, "Space Dimension", getNDim());
 
   // Writing the Meshing information
 
-  ret      = ret && _mesh.serialize(os);
+  ret = ret && _mesh._serializeAscii(os);
 
   /* Writing the tail of the file */
 
-  ret      = ret && DbGrid::_serialize(os, verbose);
+  ret = ret && DbGrid::_serializeAscii(os, verbose);
 
   return ret;
 }
@@ -138,27 +141,18 @@ bool DbMeshTurbo::_serialize(std::ostream& os, bool verbose) const
 /**
  * Create a DbMesh by loading the contents of a Neutral File
  *
- * @param neutralFilename Name of the Neutral File (DbMesh format)
- * @param verbose         Verbose
+ * @param NFFilename Name of the Neutral File (DbMesh format)
+ * @param verbose    Verbose
  *
  * @remarks The name does not need to be completed in particular when defined by absolute path
  * @remarks or read from the Data Directory (in the gstlearn distribution)
  */
-DbMeshTurbo* DbMeshTurbo::createFromNF(const String& neutralFilename, bool verbose)
+DbMeshTurbo* DbMeshTurbo::createFromNF(const String& NFFilename, bool verbose)
 {
   DbMeshTurbo* dbmesh = new DbMeshTurbo;
-  std::ifstream is;
-  bool success = false;
-  if (dbmesh->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = dbmesh->deserialize(is, verbose);
-  }
-  if (! success)
-  {
-    delete dbmesh;
-    dbmesh = nullptr;
-  }
-  return dbmesh;
+  if (dbmesh->_fileOpenAndDeserialize(NFFilename, verbose)) return dbmesh;
+  delete dbmesh;
+  return nullptr;
 }
 
 /**
@@ -169,7 +163,7 @@ DbMeshTurbo* DbMeshTurbo::createFromNF(const String& neutralFilename, bool verbo
 bool DbMeshTurbo::isConsistent() const
 {
   // Check on the count of addresses
-  int nech = getNSample();
+  auto nech = getNSample();
   if (_mesh.getNApices() > nech)
   {
     messerr("Number of meshes (%d)", _mesh.getNApices());
@@ -177,4 +171,46 @@ bool DbMeshTurbo::isConsistent() const
     return false;
   }
   return true;
+}
+#ifdef HDF5
+bool DbMeshTurbo::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto dbg = SerializeHDF5::getGroup(grp, "DbMeshTurbo");
+  if (!dbg)
+  {
+    return false;
+  }
+
+  /* Read the grid characteristics */
+  bool ret = true;
+  Id ndim = 0;
+
+  ret = ret && SerializeHDF5::readValue(*dbg, "NDim", ndim);
+
+  // Writing the Meshing information
+  ret = ret && _mesh._deserializeH5(*dbg, verbose);
+
+  /* Writing the tail of the file */
+  ret = ret && DbGrid::_deserializeH5(*dbg, verbose);
+
+  return ret;
+}
+
+bool DbMeshTurbo::_serializeH5(H5::Group& grp, [[maybe_unused]] bool verbose) const
+{
+  auto dbG = grp.createGroup("DbMeshTurbo");
+
+  bool ret = true;
+
+  ret = ret && SerializeHDF5::writeValue(dbG, "NDim", getNDim());
+
+  // Writing the Meshing information
+  ret = ret && _mesh._serializeH5(dbG, verbose);
+
+  /* Writing the tail of the file */
+  ret = ret && DbGrid::_serializeH5(dbG, verbose);
+
+  return ret;
+}
+#endif
 }

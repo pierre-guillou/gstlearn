@@ -15,6 +15,8 @@
 #include "Geometry/ABiTargetCheck.hpp"
 #include "Faults/Faults.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT BiTargetCheckFaults: public ABiTargetCheck
 {
 public:
@@ -26,14 +28,14 @@ public:
   /// ICloneable Interface
   IMPLEMENT_CLONING(BiTargetCheckFaults)
 
-  virtual bool isOK(const SpaceTarget &T1,
-                    const SpaceTarget &T2) const override;
+  bool isOK(const SpaceTarget &T1, const SpaceTarget &T2) const override;
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   static BiTargetCheckFaults* create(const Faults* faults);
 
 private:
   const Faults* _faults;
 };
+}

@@ -15,6 +15,8 @@
 #include "Basic/VectorHelper.hpp"
 #include "Basic/File.hpp"
 
+using namespace gstlrn;
+
 int main(int argc, char *argv[])
 {
   std::stringstream sfn;

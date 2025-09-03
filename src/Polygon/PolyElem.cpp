@@ -12,7 +12,10 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/PolyLine2D.hpp"
+#include "Basic/SerializeHDF5.hpp"
 
+namespace gstlrn
+{
 PolyElem::PolyElem(const VectorDouble& x,
                  const VectorDouble& y,
                  double zmin,
@@ -81,11 +84,11 @@ void PolyElem::getExtension(double *xmin,
 
 double PolyElem::getSurface() const
 {
-  int np = getNPoints();
+  auto np        = getNPoints();
   double x0 = getX(0);
   double y0 = getY(0);
   double surface = 0.;
-  for (int i=1; i<np-2; i++)
+  for (Id i=1; i<np-2; i++)
   {
     double x1 = getX(i) - x0;
     double y1 = getY(i) - y0;
@@ -109,24 +112,24 @@ double PolyElem::getSurface() const
   return(surface);
 }
 
-bool PolyElem::_serialize(std::ostream& os, bool verbose) const
+bool PolyElem::_serializeAscii(std::ostream& os, bool verbose) const
 {
   if (getNPoints() <= 0) return false;
   bool ret = true;
   ret = ret && _recordWrite<double>(os, "Z-Minimum", _zmin);
   ret = ret && _recordWrite<double>(os, "Z-Maximum", _zmax);
-  ret = ret && PolyLine2D::_serialize(os, verbose);
+  ret = ret && PolyLine2D::_serializeAscii(os, verbose);
   return ret;
 }
 
-bool PolyElem::_deserialize(std::istream& is, bool verbose)
+bool PolyElem::_deserializeAscii(std::istream& is, bool verbose)
 {
   _zmin = TEST;
   _zmax = TEST;
   bool ret = true;
   ret = ret && _recordRead<double>(is, "Z-Minimum", _zmin);
   ret = ret && _recordRead<double>(is, "Z-Maximum", _zmax);
-  ret = ret && PolyLine2D::_deserialize(is, verbose);
+  ret = ret && PolyLine2D::_deserializeAscii(is, verbose);
   return ret;
 }
 
@@ -135,28 +138,17 @@ PolyElem* PolyElem::create()
   return new PolyElem();
 }
 
-PolyElem* PolyElem::createFromNF(const String& neutralFilename, bool verbose)
+PolyElem* PolyElem::createFromNF(const String& NFFilename, bool verbose)
 {
-  PolyElem* polyelem = nullptr;
-  std::ifstream is;
-  polyelem = new PolyElem();
-  bool success = false;
-  if (polyelem->_fileOpenRead(neutralFilename, is, verbose))
-  {
-    success = polyelem->deserialize(is, verbose);
-  }
-
-  if (! success)
-  {
-    delete polyelem;
-    polyelem = nullptr;
-  }
-  return polyelem;
+  auto* polyelem = new PolyElem();
+  if (polyelem->_fileOpenAndDeserialize(NFFilename, verbose)) return polyelem;
+  delete polyelem;
+  return nullptr;
 }
 
 bool PolyElem::_isClosed() const
 {
-  int nvert = getNPoints();
+  auto nvert = getNPoints();
   return (ABS(getX(0) - getX(nvert - 1)) <= EPSILON5 &&
           ABS(getY(0) - getY(nvert - 1)) <= EPSILON5);
 }
@@ -182,14 +174,14 @@ bool PolyElem::inside(const VectorDouble& coor)
 {
   double dx, dy, xj0, xj1, yj0, yj1, xinter;
 
-  int inter = 0;
-  int np = getNPoints();
+  Id inter = 0;
+  auto np   = getNPoints();
   double xx = coor[0];
   double yy = coor[1];
 
   /* Loop on the polygon vertices */
 
-  for (int j = 0; j < np - 1; j++)
+  for (Id j = 0; j < np - 1; j++)
   {
     xj0 = getX(j);
     xj1 = getX(j+1);
@@ -269,7 +261,7 @@ bool PolyElem::inside3D(double zz) const
 
 PolyElem PolyElem::reduceComplexity(double distmin) const
 {
-  int np = getNPoints();
+  auto np      = getNPoints();
   double dmin2 = distmin * distmin;
   PolyElem newpolyelem;
 
@@ -279,7 +271,7 @@ PolyElem PolyElem::reduceComplexity(double distmin) const
   double ycur = getY(0);
   newpolyelem.addPoint(xcur, ycur);
 
-  int ecr = 1;
+  Id ecr = 1;
   while (ecr < np)
   {
     double xnext = getX(ecr);
@@ -297,4 +289,38 @@ PolyElem PolyElem::reduceComplexity(double distmin) const
     ecr++;
   }
   return newpolyelem;
+}
+
+#ifdef HDF5
+bool PolyElem::_deserializeH5(H5::Group& grp, [[maybe_unused]] bool verbose)
+{
+  auto polyelemG = SerializeHDF5::getGroup(grp, "PolyElem");
+  if (!polyelemG)
+  {
+    return false;
+  }
+
+  // Read the local characteristics
+  bool ret = true;
+  ret      = ret && SerializeHDF5::readValue(*polyelemG, "zmin", _zmin);
+  ret      = ret && SerializeHDF5::readValue(*polyelemG, "zmax", _zmax);
+
+  ret      = ret && PolyLine2D::_deserializeH5(*polyelemG, verbose);
+
+  return ret;
+}
+
+bool PolyElem::_serializeH5(H5::Group& grp, bool verbose) const
+{
+  auto polyelemG = grp.createGroup("PolyElem");
+
+  bool ret = true;
+  ret      = ret && SerializeHDF5::writeValue(polyelemG, "zmin", _zmin);
+  ret      = ret && SerializeHDF5::writeValue(polyelemG, "zmax", _zmax);
+
+  ret      = ret && PolyLine2D::_serializeH5(polyelemG, verbose);
+
+  return ret;
+}
+#endif
 }

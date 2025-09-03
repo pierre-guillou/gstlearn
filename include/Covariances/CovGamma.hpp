@@ -13,6 +13,13 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+  // Be careful ! This is not a real covariance
+  // It is used to compute the gradient of the covariance function
+  // with respect to the parameter of the covariance function
+  // It is used in the context of optimization of the covariance function
+  // parameters.
 class CovContext;
 
 class GSTLEARN_EXPORT CovGamma : public ACovFunc
@@ -23,9 +30,9 @@ public:
   CovGamma& operator= (const CovGamma &r);
   virtual ~CovGamma();
 
-  virtual String getFormula() const override;
+  String getFormula() const override;
   String         getCovName() const override { return "Gamma"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
   bool   hasParam() const override { return true; }
@@ -36,3 +43,4 @@ protected:
   double _evaluateCov(double h) const override;
 };
 
+}

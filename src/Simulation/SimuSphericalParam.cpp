@@ -10,11 +10,13 @@
 /******************************************************************************/
 #include "Simulation/SimuSphericalParam.hpp"
 
-SimuSphericalParam::SimuSphericalParam(int special,
-                                       int nbf,
-                                       int nfmax,
-                                       int degmax,
-                                       int ndisc,
+namespace gstlrn
+{
+SimuSphericalParam::SimuSphericalParam(Id special,
+                                       Id nbf,
+                                       Id nfmax,
+                                       Id degmax,
+                                       Id ndisc,
                                        double tol)
     : AStringable(),
       _special(special),
@@ -76,4 +78,6 @@ String SimuSphericalParam::toString(const AStringFormat* /*strfmt*/) const
   sstr << "Spectrum Tolerance        = " << _tol << std::endl;
 
   return sstr.str();
+}
+
 }

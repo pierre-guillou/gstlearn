@@ -8,7 +8,6 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Basic/OptCustom.hpp"
 #include "geoslib_f.h"
 
 #include "Enum/ESpaceType.hpp"
@@ -34,7 +33,9 @@
 #include "Estimation/CalcImage.hpp"
 #include "Estimation/CalcGlobal.hpp"
 
-static Db* createLocalDb(int nech, int ndim, int nvar, int seed)
+using namespace gstlrn;
+
+static Db* createLocalDb(Id nech, Id ndim, Id nvar, Id seed)
 {
   // Define seed
   law_set_random_seed(seed);
@@ -42,7 +43,7 @@ static Db* createLocalDb(int nech, int ndim, int nvar, int seed)
   // Coordinates
   VectorDouble tab = VH::simulateGaussian(ndim * nech, 0., 50.);
   // Variable
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     VectorDouble tabvar = VH::simulateGaussian(nech);
     tab.insert(tab.end(), tabvar.begin(), tabvar.end());
@@ -55,7 +56,7 @@ static Db* createLocalDb(int nech, int ndim, int nvar, int seed)
   data->setLocatorByUID(1, ELoc::X, 0);
   data->setLocatorByUID(2, ELoc::X, 1);
 
-  for (int ivar = 0; ivar < nvar; ivar++)
+  for (Id ivar = 0; ivar < nvar; ivar++)
   {
     if (nvar == 1)
       data->setNameByUID(3 + ivar, "Var");
@@ -74,7 +75,7 @@ static Db* createLocalDb(int nech, int ndim, int nvar, int seed)
  * @param typemean 1 for defining a constant Mean
  * @return
  */
-static Model* createModel(int nvar, int typecov, int typedrift, int typemean)
+static Model* createModel(Id nvar, Id typecov, Id typedrift, Id typemean)
 {
   CovContext ctxt(nvar); // use default space
   Model* model = Model::create(ctxt);
@@ -83,34 +84,34 @@ static Model* createModel(int nvar, int typecov, int typedrift, int typemean)
   if (typecov == 1)
   {
     CovAniso cova1(ECov::SPHERICAL, 40., 0., 45., ctxt);
-    covs.addCov(&cova1);
+    covs.addCov(cova1);
     CovAniso cova2(ECov::NUGGET, 0., 0., 12., ctxt);
-    covs.addCov(&cova2);
+    covs.addCov(cova2);
     model->setCovAnisoList(&covs);
   }
   else if (typecov == 2)
   {
     CovAniso covaL(ECov::LINEAR, 1., 0., 1., ctxt);
-    covs.addCov(&covaL);
+    covs.addCov(covaL);
     model->setCovAnisoList(&covs);
   }
   else if (typecov == 3)
   {
     CovAniso cova1(ECov::SPHERICAL, 40., 0., 1., ctxt);
-    covs.addCov(&cova1);
+    covs.addCov(cova1);
     model->setCovAnisoList(&covs);
   }
 
   if (typedrift == 1)
   {
-    DriftM drift1 = DriftM();
+    DriftM drift1;
     model->addDrift(&drift1);
   }
   else if (typedrift == 2)
   {
-    DriftM drift1 = DriftM();
-    DriftM driftx = DriftM(VectorInt({1}));
-    DriftM drifty = DriftM({0, 1});
+    DriftM drift1;
+    DriftM driftx(VectorInt({1}));
+    DriftM drifty({0, 1});
     model->addDrift(&drift1);
     model->addDrift(&driftx);
     model->addDrift(&drifty);
@@ -144,9 +145,9 @@ int main(int argc, char* argv[])
   VectorDouble tab;
 
   // Global parameters
-  int ndim     = 2;
-  int nvar     = 1;
-  int mode     = 0;
+  Id ndim = 2;
+  Id nvar = 1;
+  Id mode = 0;
   law_set_random_seed(32131);
 
   defineDefaultSpace(ESpaceType::RN, ndim);
@@ -164,7 +165,7 @@ int main(int argc, char* argv[])
   grid->display();
 
   // Generate the data base
-  int nech = 100;
+  Id nech  = 100;
   Db* data = createLocalDb(nech, ndim, nvar, 342673);
   data->display(&dbfmt);
 

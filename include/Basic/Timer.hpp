@@ -15,6 +15,8 @@
 
 #include <chrono>
 
+namespace gstlrn
+{
 typedef std::chrono::high_resolution_clock hrc;
 typedef std::chrono::milliseconds ms;
 typedef std::chrono::duration<double> sec;
@@ -33,17 +35,18 @@ public:
   void reset();
 
   void displayIntervalSeconds(const String& title = "",
-                              int expected_time = -1,
+                              Id expected_time = -1,
                               bool flag_reset = true);
   double getIntervalSeconds(bool flag_reset = true);
-  static void displaySeconds(const String& title, double sec, int expected_time = -1);
+  static void displaySeconds(const String& title, double sec, Id expected_time = -1);
 
   void displayIntervalMilliseconds(const String& title = "",
-                                   int expected_time = -1,
+                                   Id expected_time = -1,
                                    bool flag_reset = true);
   double getIntervalMilliseconds(bool flag_reset = true);
-  static void displayMilliseconds(const String& title, double msec, int expected_time = -1);
+  static void displayMilliseconds(const String& title, double msec, Id expected_time = -1);
 
 private:
   hrc::time_point _refTime;
 };
+}

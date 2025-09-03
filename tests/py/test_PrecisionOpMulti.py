@@ -54,7 +54,7 @@ def create(nvar = 1, multistruct = True, nostatType = "Fake",nx1 = [4,4],nx2 = [
     if multistruct:
         modelMulti2 = gl.Model.createFromParam(gl.ECov.MATERN,param=2,
                                                sills = sills2,range = 10)
-        modelMulti.addCov(modelMulti2.getCovAniso(0))
+        modelMulti.addCov(modelMulti2.getCovAniso(0).clone())
 
     if nostat:
         grid  = gl.DbGrid.create(nx1)
@@ -115,7 +115,7 @@ class PrecisionOpMultiLocal:
  
             modelMono = gl.Model.createFromParam(cova.getType(),
                                                  param = cova.getParam(),
-                                                 range = cova.getRange(),
+                                                 range = cova.getRangeIso(),
                                                  sill = 1)
             covatemp = modelMono.getCovAniso(0)
             self.Qop += [createQ(meshes[i],covatemp)]

@@ -14,6 +14,8 @@
 #include "Covariances/TabNoStat.hpp"
 #include "Enum/EConsElem.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT TabNoStatSills : public TabNoStat
 {
   public:
@@ -25,12 +27,13 @@ class GSTLEARN_EXPORT TabNoStatSills : public TabNoStat
   IMPLEMENT_CLONING(TabNoStatSills)
 
   bool isDefinedForVariance() const;
-  int getNSills()  const;
+  Id getNSills()  const;
  
   String toString(const AStringFormat* strfmt = nullptr) const override;
-  String toStringInside(const AStringFormat* strfmt = nullptr,int i = 0) const;
+  String toStringInside(const AStringFormat* strfmt = nullptr,Id i = 0) const;
 protected:
 private:
   bool _isValid(const EConsElem &econs) const override;
 
 };
+}

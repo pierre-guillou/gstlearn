@@ -15,6 +15,7 @@
 // https://stackoverflow.com/a/26035360/3952924
 #%import "doc/documentation.i"
 
+//////////////////////////////////////////////////////////////
 //   Ignore functions that are not exportable with SWIG     //
 //////////////////////////////////////////////////////////////
 
@@ -32,11 +33,12 @@
 #include <iostream>
 %}
 
+namespace gstlrn {
 %fragment("ToCpp", "header")
 {
   template <typename Type> int convertToCpp(SEXP obj, Type& value);
   
-  template <> int convertToCpp(SEXP obj, int& value)
+  template <> int convertToCpp(SEXP obj, Id& value)
   {
     // Test argument
     if (obj == NULL) return SWIG_TypeError;
@@ -44,10 +46,10 @@
     int myres = SWIG_TypeError;
     if (Rf_length(obj) > 0) // Prevent NULL value from becoming NA
     {
-      myres = SWIG_AsVal_int(obj, &value);
+      myres = SWIG_AsVal_long(obj, &value);
       //std::cout << "convertToCpp(int): value=" << value << std::endl;
       if (SWIG_IsOK(myres) && value == R_NaInt) // NA, NaN, Inf or out of bounds value becomes NA
-        value = getNA<int>();
+        value = getNA<Id>();
     }
     return myres;
   }
@@ -59,7 +61,7 @@
     int myres = SWIG_TypeError;
     if (Rf_length(obj) > 0) // Prevent NULL value from becoming NA
     {
-       myres = SWIG_AsVal_double(obj, &value);
+      myres = SWIG_AsVal_double(obj, &value);
       //std::cout << "convertToCpp(double): value=" << value << std::endl;
       if (SWIG_IsOK(myres) && !R_finite(value)) // NA, NaN, Inf or out of bounds value becomes NA
         value = getNA<double>();
@@ -103,8 +105,8 @@
     int myres = SWIG_TypeError;
     if (Rf_length(obj) > 0) // Prevent NULL value from becoming NA
     {
-      int v = 0;
-      myres = SWIG_AsVal_int(obj, &v);
+      long v = 0;
+      myres = SWIG_AsVal_long(obj, &v);
       //std::cout << "convertToCpp(UChar): value=" << v << std::endl;
       if (myres == SWIG_OverflowError || 
           v < std::numeric_limits<UChar>::min() ||
@@ -128,8 +130,8 @@
     // Test argument
     if (obj == NULL) return SWIG_TypeError;
     
-    int v = 0;
-    int myres = SWIG_AsVal_int(obj, &v);
+    long v = 0;
+    int myres = SWIG_AsVal_long(obj, &v);
     //std::cout << "convertToCpp(bool): value=" << v << std::endl;
     if (v == 0)
       value = false;
@@ -282,7 +284,7 @@
     int nnz = Rf_length(R_x);
     double* data = REAL(R_x);
 
-    VectorInt Vrows(nnz);
+    std::vector<int> Vrows(nnz);
     int* rows = nullptr;
     if (R_i != R_NilValue)
       rows = INTEGER(R_i);
@@ -292,7 +294,7 @@
       convertIndptrToIndices(nrows, INTEGER(R_p), rows);
     }
 
-    VectorInt Vcols(nnz);
+    std::vector<int> Vcols(nnz);
     int* cols = nullptr;
     if (R_j != R_NilValue)
       cols = INTEGER(R_j);
@@ -315,28 +317,28 @@
 }
 
 // Add typecheck typemaps for dispatching functions
-%typemap(rtypecheck, noblock=1) const int&, int                               { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const double&, double                         { length($arg) == 1 &&  is.numeric(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const String&, String                         { length($arg) == 1 &&  is.character(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const std::string_view, std::string_view      { length($arg) == 1 &&  is.character(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const float&, float                           { length($arg) == 1 &&  is.numeric(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const UChar&, UChar                           { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const bool&, bool                             { length($arg) == 1 &&  is.logical(unlist($arg)) }
-%typemap(rtypecheck, noblock=1) const VectorInt&, VectorInt                   { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
-%typemap(rtypecheck, noblock=1) const VectorDouble&, VectorDouble             { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorString&, VectorString             { length($arg) == 0 || (length($arg) > 0 &&  is.character(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorFloat&, VectorFloat               { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorUChar&, VectorUChar               { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
-%typemap(rtypecheck, noblock=1) const VectorBool&, VectorBool                 { length($arg) == 0 || (length($arg) > 0 &&  is.logical(unlist($arg))) }
-%typemap(rtypecheck, noblock=1) const VectorVectorInt&, VectorVectorInt       { length($arg) == 0 || (length($arg) > 0 && 
+%typemap(rtypecheck, noblock=1) const Id&, Id                                                 { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const double&, double                                         { length($arg) == 1 &&  is.numeric(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const String&, String                                         { length($arg) == 1 &&  is.character(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const std::string_view, std::string_view                      { length($arg) == 1 &&  is.character(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const float&, float                                           { length($arg) == 1 &&  is.numeric(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const UChar&, UChar                                           { length($arg) == 1 && (is.integer(unlist($arg)) || is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const bool&, bool                                             { length($arg) == 1 &&  is.logical(unlist($arg)) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorInt&, gstlrn::VectorInt                   { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorDouble&, gstlrn::VectorDouble             { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorString&, gstlrn::VectorString             { length($arg) == 0 || (length($arg) > 0 &&  is.character(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorFloat&, gstlrn::VectorFloat               { length($arg) == 0 || (length($arg) > 0 &&  is.numeric(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorUChar&, gstlrn::VectorUChar               { length($arg) == 0 || (length($arg) > 0 && (is.integer(unlist($arg)) || is.numeric(unlist($arg)))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorBool&, gstlrn::VectorBool                 { length($arg) == 0 || (length($arg) > 0 &&  is.logical(unlist($arg))) }
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorVectorInt&, gstlrn::VectorVectorInt       { length($arg) == 0 || (length($arg) > 0 && 
                                                                                (length($arg[[1]]) == 0 || (length($arg[[1]]) > 0 && (is.integer(unlist($arg[[1]])) || is.numeric(unlist($arg[[1]])))))) }
-%typemap(rtypecheck, noblock=1) const VectorVectorDouble&, VectorVectorDouble { length($arg) == 0 || (length($arg) > 0 && 
+%typemap(rtypecheck, noblock=1) const gstlrn::VectorVectorDouble&, gstlrn::VectorVectorDouble { length($arg) == 0 || (length($arg) > 0 && 
                                                                                (length($arg[[1]]) == 0 || (length($arg[[1]]) > 0 && is.numeric(unlist($arg[[1]]))))) }
 
 %fragment("FromCpp", "header")
 {  
   template <typename InputType> struct OutTraits;
-  template <> struct OutTraits<int>     { using OutputType = int; };
+  template <> struct OutTraits<Id>      { using OutputType = Id; };
   template <> struct OutTraits<double>  { using OutputType = double; };
   template <> struct OutTraits<String>  { using OutputType = String; };
   template <> struct OutTraits<float>   { using OutputType = float; };
@@ -344,10 +346,10 @@
   template <> struct OutTraits<bool>    { using OutputType = bool; };
   
   template <typename Type> typename OutTraits<Type>::OutputType convertFromCpp(const Type& value);
-  template <> int convertFromCpp(const int& value)
+  template <> Id convertFromCpp(const Id& value)
   {
-    //std::cout << "convertFromCpp(int): value=" << value << std::endl;
-    if (isNA<int>(value))
+    //std::cout << "convertFromCpp(Id): value=" << value << std::endl;
+    if (isNA<Id>(value))
       return R_NaInt;
     return value;
   }
@@ -382,9 +384,9 @@
   }
   
   template <typename Type> SEXP objectFromCpp(const Type& value);
-  template <> SEXP objectFromCpp(const int& value)
+  template <> SEXP objectFromCpp(const Id& value)
   {
-    return Rf_ScalarInteger(convertFromCpp(value));
+    return Rf_ScalarInteger(static_cast<int>(convertFromCpp(value)));
   }
   template <> SEXP objectFromCpp(const double& value)
   {
@@ -455,8 +457,8 @@
   int matrixDenseFromCpp(SEXP* obj, const MatrixDense& mat)
   {
     // Local definitions
-    int nrows = mat.getNRows();
-    int ncols = mat.getNCols();
+    auto nrows = static_cast<int>(mat.getNRows());
+    auto ncols = static_cast<int>(mat.getNCols());
 
     // Create a Matrix
     PROTECT(*obj = Rf_allocMatrix(REALSXP, nrows, ncols));
@@ -472,7 +474,7 @@
 
   int matrixDenseFromCppCreate(SEXP* obj, const MatrixDense& mat)
   {
-    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_MatrixDense, 0 |  0 );
+    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_gstlrn__MatrixDense, 0 |  0 );
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
@@ -480,9 +482,9 @@
   int matrixSparseFromCpp(SEXP* obj, const MatrixSparse& mat)
   {
     // Type definitions
-    int nrows = mat.getNRows();
-    int ncols = mat.getNCols();
-    int nnz   = mat.getNonZeros();
+    auto nrows = mat.getNRows();
+    auto ncols = mat.getNCols();
+    auto nnz   = mat.getNonZeros();
 
     // Transform the input Matrix into a Triplet
     NF_Triplet NFT = mat.getMatrixToTriplet();
@@ -498,12 +500,12 @@
     int* cols = INTEGER(R_j);      // Pointer to 'R_j'
     double* data = REAL(R_x);      // Pointer to 'R_x'
 
-    dims[0] = nrows;
-    dims[1] = ncols;
+    dims[0] = static_cast<int>(nrows);
+    dims[1] = static_cast<int>(ncols);
     for (int i = 0; i < nnz; ++i) 
     {
-      rows[i] = NFT.getRow(i);
-      cols[i] = NFT.getCol(i);
+      rows[i] = static_cast<int>(NFT.getRow(i));
+      cols[i] = static_cast<int>(NFT.getCol(i));
       data[i] = NFT.getValue(i);
     }
 
@@ -526,7 +528,7 @@
 
   int matrixSparseFromCppCreate(SEXP* obj, const MatrixSparse& mat)
   {
-    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_MatrixSparse, 0 |  0 );
+    *obj = SWIG_R_NewPointerObj(SWIG_as_voidptr(&mat), SWIGTYPE_p_gstlrn__MatrixSparse, 0 |  0 );
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
@@ -562,7 +564,7 @@
   if (typeof($input) == "character") $input = NamingConvention($input);
   if (inherits($input, "ExternalReference")) $input = slot($input,"ref");
 %}
-
+}
 //////////////////////////////////////////////////////////////
 //         C++ library SWIG includes and typemaps           //
 //////////////////////////////////////////////////////////////
@@ -579,7 +581,7 @@
 //                    Add C++ extension                     //
 //////////////////////////////////////////////////////////////
 
-%include ../r/generated_r.i
+%include ../swig/generated_r.i
 %{
   #include <stdio.h>
   #include <string>
@@ -619,7 +621,7 @@
   void R_Write(const char *string)
   {
     if (string == NULL) return;
-    int length = strlen(string);
+    auto length = strlen(string);
     if (length > 0)
     {
       Rprintf("%s", string);
@@ -641,7 +643,7 @@
     (void) strcpy(reponse,"");
     (void) strcpy(answer ,"");
     ptr_R_ReadConsole(prompt,(unsigned char*) reponse,LNG,0);
-    int longueur = strlen(reponse);
+    auto longueur = strlen(reponse);
     reponse[longueur-1] = '\0';
     if (strlen(reponse) > 0) (void) strcpy(answer,reponse);
   }
@@ -673,24 +675,24 @@
 ## Add automatic display for all AStringable objects and vectors
 ## ------------------------------------------------------------- ##
 
-setMethod(f = "show", signature = "_p_AStringable",                     definition = function(object){ AStringable_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__AStringable",                     definition = function(object){ AStringable_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_double_t",               definition = function(object){ VectorTDouble_display(object) })
-setMethod(f = "show", signature = "_p_VectorNumTT_double_t",            definition = function(object){ VectorTDouble_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_double_t",               definition = function(object){ VectorTDouble_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorNumTT_double_t",            definition = function(object){ VectorTDouble_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_int_t",                  definition = function(object){ VectorTInt_display(object) })
-setMethod(f = "show", signature = "_p_VectorNumTT_int_t",               definition = function(object){ VectorTInt_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_long_t",                  definition = function(object){ VectorTInt_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorNumTT_long_t",               definition = function(object){ VectorTInt_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_float_t",                definition = function(object){ VectorTFloat_display(object) })
-setMethod(f = "show", signature = "_p_VectorNumTT_float_t",             definition = function(object){ VectorTFloat_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_float_t",                definition = function(object){ VectorTFloat_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorNumTT_float_t",             definition = function(object){ VectorTFloat_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_String_t",               definition = function(object){ VectorString_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_gstlrn__String_t",               definition = function(object){ VectorString_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_int_t_t",    definition = function(object){ VectorVectorInt_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_gstlrn__VectorNumTT_long_t_t",    definition = function(object){ VectorVectorInt_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_double_t_t", definition = function(object){ VectorVectorDouble_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_gstlrn__VectorNumTT_double_t_t", definition = function(object){ VectorVectorDouble_display(object) })
 
-setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_float_t_t",  definition = function(object){ VectorVectorFloat_display(object) })
+setMethod(f = "show", signature = "_p_gstlrn__VectorTT_gstlrn__VectorNumTT_float_t_t",  definition = function(object){ VectorVectorFloat_display(object) })
 
 ##
 ## Add function for fixing inheritance issue (known caveat):
@@ -730,7 +732,7 @@ setMethod(f = "show", signature = "_p_VectorTT_VectorNumTT_float_t_t",  definiti
 
 "addMethodsFromNames" <- function(derived,listmethods) {
   setMethod(
-    "$", paste0("_p_", derived),
+    "$", paste0("_p_gstlrn__", derived),
     function(x, name) {
       idx = match(name, names(listmethods))
       if (is.na(idx)) {
@@ -789,30 +791,30 @@ function(x, i, value)
   x
 }
 
-setMethod('[',    '_p_VectorTT_int_t',                  getVitem)
-setMethod('[<-',  '_p_VectorTT_int_t',                  setVitem)
-setMethod('[',    '_p_VectorTT_double_t',               getVitem)
-setMethod('[<-',  '_p_VectorTT_double_t',               setVitem)
-setMethod('[',    '_p_VectorTT_String_t',               getVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
-setMethod('[<-',  '_p_VectorTT_String_t',               setVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
-setMethod('[',    '_p_VectorTT_float_t',                getVitem)
-setMethod('[<-',  '_p_VectorTT_float_t',                setVitem)
-setMethod('[',    '_p_VectorTT_UChar_t',                getVitem)
-setMethod('[<-',  '_p_VectorTT_UChar_t',                setVitem)
-setMethod('[',    '_p_VectorNumTT_int_t',               getVitem)
-setMethod('[<-',  '_p_VectorNumTT_int_t',               setVitem)
-setMethod('[',    '_p_VectorNumTT_double_t',            getVitem)
-setMethod('[<-',  '_p_VectorNumTT_double_t',            setVitem)
-setMethod('[',    '_p_VectorNumTT_float_t',             getVitem)
-setMethod('[<-',  '_p_VectorNumTT_float_t',             setVitem)
-setMethod('[',    '_p_VectorNumTT_UChar_t',             getVitem)
-setMethod('[<-',  '_p_VectorNumTT_UChar_t',             setVitem)
-setMethod('[[',   '_p_VectorTT_VectorNumTT_int_t_t',    getVitem)
-setMethod('[[<-', '_p_VectorTT_VectorNumTT_int_t_t',    setVitem)
-setMethod('[[',   '_p_VectorTT_VectorNumTT_double_t_t', getVitem)
-setMethod('[[<-', '_p_VectorTT_VectorNumTT_double_t_t', setVitem)
-setMethod('[[',   '_p_VectorTT_VectorNumTT_float_t_t',  getVitem)
-setMethod('[[<-', '_p_VectorTT_VectorNumTT_float_t_t',  setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_long_t',                         getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_long_t',                         setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_double_t',                       getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_double_t',                       setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_gstlrn__String_t',               getVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
+setMethod('[<-',  '_p_gstlrn__VectorTT_gstlrn__String_t',               setVitem) # TODO : Different from swigex and don't know why (_p_VectorTT_std__string_t)
+setMethod('[',    '_p_gstlrn__VectorTT_float_t',                        getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_float_t',                        setVitem)
+setMethod('[',    '_p_gstlrn__VectorTT_gstlrn__UChar_t',                getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorTT_gstlrn__UChar_t',                setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_long_t',                      getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_long_t',                      setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_double_t',                    getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_double_t',                    setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_float_t',                     getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_float_t',                     setVitem)
+setMethod('[',    '_p_gstlrn__VectorNumTT_gstlrn__UChar_t',             getVitem)
+setMethod('[<-',  '_p_gstlrn__VectorNumTT_gstlrn__UChar_t',             setVitem)
+setMethod('[[',   '_p_gstlrn__VectorTT_gstlrn__VectorNumTT_long_t_t',   getVitem)
+setMethod('[[<-', '_p_gstlrn__VectorTT_gstlrn__VectorNumTT_long_t_t',   setVitem)
+setMethod('[[',   '_p_gstlrn__VectorTT_gstlrn__VectorNumTT_double_t_t', getVitem)
+setMethod('[[<-', '_p_gstlrn__VectorTT_gstlrn__VectorNumTT_double_t_t', setVitem)
+setMethod('[[',   '_p_gstlrn__VectorTT_gstlrn__VectorNumTT_float_t_t',  getVitem)
+setMethod('[[<-', '_p_gstlrn__VectorTT_gstlrn__VectorNumTT_float_t_t',  setVitem)
 
 ##
 ## Add toTL for Vector* R classes
@@ -980,10 +982,10 @@ function (x,i,j,...,drop=TRUE)
   db
 }
 
-setMethod('[',    '_p_Db',               getDbitem)
-setMethod('[<-',  '_p_Db',               setDbitem)
-setMethod('[',    '_p_DbGrid',           getDbitem)
-setMethod('[<-',  '_p_DbGrid',           setDbitem)
+setMethod('[',    '_p_gstlrn__Db',               getDbitem)
+setMethod('[<-',  '_p_gstlrn__Db',               setDbitem)
+setMethod('[',    '_p_gstlrn__DbGrid',           getDbitem)
+setMethod('[<-',  '_p_gstlrn__DbGrid',           setDbitem)
 
 ##
 ## Add toTL to Db R class
@@ -1066,8 +1068,8 @@ function (x,i,j,...,drop=TRUE)
   table
 }
 
-setMethod('[',    '_p_Table',               getTableitem)
-setMethod('[<-',  '_p_Table',               setTableitem)
+setMethod('[',    '_p_gstlrn__Table',               getTableitem)
+setMethod('[<-',  '_p_gstlrn__Table',               setTableitem)
 
 ##
 ## Add toTL to Table R class
@@ -1264,20 +1266,20 @@ setMethod('[<-',  '_p_Table',               setTableitem)
   vario
 }
 
-setMethod('[',    '_p_Vario',               getVarioitem)
-setMethod('[<-',  '_p_Vario',               setVarioitem)
+setMethod('[',    '_p_gstlrn__Vario',               getVarioitem)
+setMethod('[<-',  '_p_gstlrn__Vario',               setVarioitem)
 
 #"MatrixDense_create" <- function(mat)
 #{
 #  if (inherits(mat, "ExternalReference")) mat = slot(mat,"ref"); 
 #  ;ans = .Call('R_swig_MatrixDense_create', mat, PACKAGE='gstlearn');
 #  ans <- if (is.null(ans)) ans
-#  else new("_p_Plane", ref=ans);
+#  else new("_p_gstlrn__Plane", ref=ans);
 #  
 #  ans
 #}
-#attr(`MatrixDense_create`, 'returnType') = '_p_MatrixDense'
-#attr(`MatrixDense_create`, "inputTypes") = c('_p_MatrixDense')
+#attr(`MatrixDense_create`, 'returnType') = '_p_gstlrn__MatrixDense'
+#attr(`MatrixDense_create`, "inputTypes") = c('_p_gstlrn__MatrixDense')
 #class(`MatrixDense_create`) = c("SWIGFunction", class('MatrixDense_create'))
 
 #"MatrixSparse_create" <- function(mat)
@@ -1289,8 +1291,8 @@ setMethod('[<-',  '_p_Vario',               setVarioitem)
 #  
 #  ans
 #}
-#attr(`MatrixSparse_create`, 'returnType') = '_p_MatrixSparse'
-#attr(`MatrixSparse_create`, "inputTypes") = c('_p_MatrixSparse')
+#attr(`MatrixSparse_create`, 'returnType') = '_p_gstlrn__MatrixSparse'
+#attr(`MatrixSparse_create`, "inputTypes") = c('_p_gstlrn__MatrixSparse')
 #class(`MatrixSparse_create`) = c("SWIGFunction", class('MatrixSparse_create'))
 
 
@@ -1348,14 +1350,14 @@ setMethod('[<-',  '_p_Vario',               setVarioitem)
 }
 
 # Special function overloaded for plot.R
-setMethod("plot", signature(x="_p_AMesh"),    function(x,y=missing,...) plot.mesh(x,...))
-setMethod("plot", signature(x="_p_DbGrid"),   function(x,y=missing,...) plot.raster(x,...))
-setMethod("plot", signature(x="_p_Db"),       function(x,y=missing,...) plot.symbol(x,...))
-setMethod("plot", signature(x="_p_Polygons"), function(x,y=missing,...) plot.polygon(x,...))
-setMethod("plot", signature(x="_p_Vario"),    function(x,y=missing,...) plot.vario(x,...))
-setMethod("plot", signature(x="_p_Model"),    function(x,y=missing,...) plot.model(x,...))
-setMethod("plot", signature(x="_p_Rule"),     function(x,y=missing,...) plot.rule(x,...))
-setMethod("plot", signature(x="_p_AAnam"),    function(x,y=missing,...) plot.anam(x,...))
+setMethod("plot", signature(x="_p_gstlrn__AMesh"),    function(x,y=missing,...) plot.mesh(x,...))
+setMethod("plot", signature(x="_p_gstlrn__DbGrid"),   function(x,y=missing,...) plot.raster(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Db"),       function(x,y=missing,...) plot.symbol(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Polygons"), function(x,y=missing,...) plot.polygon(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Vario"),    function(x,y=missing,...) plot.vario(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Model"),    function(x,y=missing,...) plot.model(x,...))
+setMethod("plot", signature(x="_p_gstlrn__Rule"),     function(x,y=missing,...) plot.rule(x,...))
+setMethod("plot", signature(x="_p_gstlrn__AAnam"),    function(x,y=missing,...) plot.anam(x,...))
 
 #Add methods of ModelCovList (base) to Model (derived) (in case inheritance didn t work)
 
@@ -1368,6 +1370,4 @@ addMethods("CovAnisoList", c("ACov","CovList"))
 
 addMethods("Db", c("ASerializable"))
 addMethods("DbGrid", c("ASerializable"))
-
-
 %}

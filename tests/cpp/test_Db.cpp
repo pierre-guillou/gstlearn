@@ -10,17 +10,17 @@
 /******************************************************************************/
 #include "Enum/ECst.hpp"
 
-#include "Basic/VectorHelper.hpp"
-#include "Basic/OptCst.hpp"
-#include "Basic/Law.hpp"
+#include "API/SPDE.hpp"
 #include "Basic/File.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/OptCst.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Db/DbStringFormat.hpp"
-#include "API/SPDE.hpp"
 #include "Model/Model.hpp"
-#include "Mesh/MeshETurbo.hpp"
 
+using namespace gstlrn;
 /****************************************************************************/
 /*!
  ** Main Program
@@ -28,19 +28,18 @@
  ** This program is meant to check the manipulation of the Db
  **
  *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
   StdoutRedirect sr(sfn.str(), argc, argv);
 
-  ASerializable::setContainerName(true);
-  ASerializable::setPrefixName("TestDb-");
-  int seed = 10355;
+  ASerializable::setPrefixName("test_Db-");
+  Id seed = 10355;
   law_set_random_seed(seed);
 
   // Creating the Grid Rotated Db
-  DbGrid* grid = DbGrid::create({6,4}, {1.,2.}, {10.,20.}, {10.,0.});
+  DbGrid* grid = DbGrid::create({6, 4}, {1., 2.}, {10., 20.}, {10., 0.});
   grid->display();
 
   // Creating the Model
@@ -48,15 +47,11 @@ int main(int argc, char *argv[])
                                         MatrixSymmetric(), {30., 0.});
   model->display();
 
-  // Creating the MeshTurbo which contains the Db
-  MeshETurbo mesh;
-  mesh.initFromCova(*model->getCovAniso(0),grid,10,2,true, true,false,300,true);
-
   /////////////////////////
   // Testing the selections
   /////////////////////////
 
-  int nech = grid->getNSample();
+  auto nech = grid->getNSample();
 
   // First selection generated with Bernoulli (proba=0.6)
   VectorDouble sel1 = VH::simulateBernoulli(nech, 0.6);
@@ -66,18 +61,18 @@ int main(int argc, char *argv[])
   // Second selection generated with Bernoulli (proba=0.4) combined with previous one
   VectorDouble sel2 = VH::simulateBernoulli(nech, 0.4);
   VH::dump("sel2", sel2);
-  grid->addSelection(sel2, "Sel2","and");
+  grid->addSelection(sel2, "Sel2", "and");
 
   // Retrieve resulting selection for check
   VectorDouble sel3 = grid->getSelections();
-  VH::dump("sel1 && sel2",sel3);
+  VH::dump("sel1 && sel2", sel3);
 
   // Testing Filters on Db printout (only Statistics on the variables "Sel*")
-  DbStringFormat dbfmt(FLAG_VARS | FLAG_STATS,{"Sel*"});
+  DbStringFormat dbfmt(FLAG_VARS | FLAG_STATS, {"Sel*"});
   grid->display(&dbfmt);
 
   // Creating a Selection by setting individual values
-  OptCst::define(ECst::NTROW,-1);
+  OptCst::define(ECst::NTROW, -1);
   DbStringFormat dbfmt2(FLAG_VARS | FLAG_ARRAY);
   grid->addSelection(VectorDouble(), "mySel");
   grid->setValue("mySel", 12, 0.);
@@ -89,4 +84,3 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-

@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Drifts/ADrift.hpp"
 
+namespace gstlrn
+{
+
 /**
  * Monomial drift term.
  * Examples:
@@ -33,10 +36,10 @@ public:
   IMPLEMENT_CLONING(DriftM)
 
   String getDriftName() const override;
-  int    getOrderIRF()  const override;
-  int    getOrderIRFIdim(int idim) const override;
-  int    getDriftNDimMax()      const override;
-  double eval(const Db* db, int iech) const override;
+  Id    getOrderIRF()  const override;
+  Id    getOrderIRFIdim(Id idim) const override;
+  Id    getDriftNDimMax()      const override;
+  double eval(const Db* db, Id iech) const override;
   VectorInt getPowers() const override { return _monomialPower; }
 
   static DriftM* createByIdentifier(const String &driftname);
@@ -44,3 +47,4 @@ public:
 private:
   VectorInt _monomialPower;
 };
+}

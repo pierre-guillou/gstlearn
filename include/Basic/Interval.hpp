@@ -14,6 +14,8 @@
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT Interval : public AStringable
 {
 public:
@@ -26,7 +28,7 @@ public:
   virtual ~Interval();
 
   /// Interface for AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   void init(double vmin = TEST,
             double vmax = TEST,
@@ -62,3 +64,4 @@ private:
   bool _minIncluded;
   bool _maxIncluded;
 };
+}

@@ -14,6 +14,8 @@
 
 #include "Enum/ECov.hpp"
 
+namespace gstlrn
+{ 
 class CovAniso;
 class ACovFunc;
 class CovContext;
@@ -24,8 +26,9 @@ public:
   static ACovFunc*    createCovFunc(const ECov& type, const CovContext& ctxt);
   static ACovFunc*    duplicateCovFunc(const ACovFunc& cov);
   static void         displayCovList(const CovContext& ctxt);
-  static VectorString getCovList(const CovContext& ctxt, int order=3);
+  static VectorString getCovList(const CovContext& ctxt, Id order=3);
   static ECov         identifyCovariance(const String& cov_name,
                                          const CovContext& ctxt);
   static double       getScaleFactor(const ECov &type, double param);
 };
+}

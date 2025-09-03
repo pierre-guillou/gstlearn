@@ -12,42 +12,8 @@
 
 #include "LinearOp/ASimulable.hpp"
 
-#ifndef SWIG
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <Eigen/IterativeLinearSolvers>
-#include <Eigen/src/Core/Matrix.h>
-#include <unsupported/Eigen/IterativeSolvers>
-#include <cassert>
-
-#define DECLARE_EIGEN_TRAITS(TLinOP) \
-class TLinOP; \
-using Eigen::SparseMatrix; \
- \
-namespace Eigen { \
-namespace internal { \
-  template<> \
-  struct traits<TLinOP> :  public Eigen::internal::traits<Eigen::SparseMatrix<double> > \
-  {}; \
-} \
-}
-
-#define DECLARE_EIGEN_PRODUCT(TLinOP) \
-template<typename Rhs> \
-struct Eigen::internal::generic_product_impl<TLinOP, Rhs, Eigen::SparseShape, Eigen::DenseShape, Eigen::GemvProduct> \
-: Eigen::internal::generic_product_impl_base<TLinOP, Rhs, Eigen::internal::generic_product_impl<TLinOP,Rhs> > \
-{ \
-  typedef typename Product<TLinOP,Rhs>::Scalar Scalar; \
-  template<typename Dest> \
-  static void scaleAndAddTo(Dest& dst, const TLinOP& lhs, const Rhs& rhs, const Scalar& alpha) \
-  { \
-    assert(alpha==Scalar(1) && "scaling is not implemented"); \
-    EIGEN_ONLY_USED_FOR_DEBUG(alpha); \
-    lhs.addToDest(rhs, dst); \
-  } \
-};
-#endif
-
+namespace gstlrn
+{
 /**
  * @brief This class extends ASimulable to make it working with
  *        Eigen conjugate gradient algorithm
@@ -68,7 +34,7 @@ public:
   // Required typedefs, constants, and method:
   typedef double Scalar;
   typedef double RealScalar;
-  typedef int StorageIndex;
+  typedef Id StorageIndex;
   enum
   {
     ColsAtCompileTime    = Eigen::Dynamic,
@@ -86,3 +52,4 @@ public:
 #endif
 };
 
+}

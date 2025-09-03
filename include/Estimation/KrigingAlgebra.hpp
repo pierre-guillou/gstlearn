@@ -15,6 +15,8 @@
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/AMatrix.hpp"
 
+namespace gstlrn
+{
 /**
  * @brief Perform the Algebra for Kriging and CoKriging
  *
@@ -39,29 +41,26 @@ public:
                  const MatrixDense* X           = nullptr,
                  const MatrixSymmetric* Sigma00 = nullptr,
                  const VectorDouble* Means            = nullptr);
-  KrigingAlgebra(const KrigingAlgebra& r)            = delete;
-  KrigingAlgebra& operator=(const KrigingAlgebra& r) = delete;
-  virtual ~KrigingAlgebra();
 
   void setDual(bool status);
   void resetNewData();
-  int setData(const VectorDouble* Z          = nullptr,
+  Id setData(const VectorDouble* Z          = nullptr,
               const VectorVectorInt* indices = nullptr,
               const VectorDouble* Means      = nullptr);
-  int setLHS(const MatrixSymmetric* Sigma = nullptr,
+  Id setLHS(const MatrixSymmetric* Sigma = nullptr,
              const MatrixDense* X         = nullptr);
-  int setRHS(const MatrixDense* Sigma0 = nullptr,
+  Id setRHS(const MatrixDense* Sigma0 = nullptr,
              const MatrixDense* X0     = nullptr);
-  int setVariance(const MatrixSymmetric* Sigma00 = nullptr);
-  int setBayes(const VectorDouble* PriorMean         = nullptr,
+  Id setVariance(const MatrixSymmetric* Sigma00 = nullptr);
+  Id setBayes(const VectorDouble* PriorMean         = nullptr,
                const MatrixSymmetric* PriorCov = nullptr);
-  int setXvalidUnique(const VectorInt* rankXvalidEqs  = nullptr,
+  Id setXvalidUnique(const VectorInt* rankXvalidEqs  = nullptr,
                       const VectorInt* rankXvalidVars = nullptr);
-  int setColCokUnique(const VectorDouble* Zp      = nullptr,
+  Id setColCokUnique(const VectorDouble* Zp      = nullptr,
                       const VectorInt* rankColCok = nullptr);
 
   void printStatus() const;
-  void dumpLHS(int nbypas = 5) const;
+  void dumpLHS(Id nbypas = 5) const;
   void dumpRHS() const;
   void dumpWGT();
   void dumpAux();
@@ -80,10 +79,10 @@ public:
   bool isDual() const { return _flagDual; }
 
 private:
-  static bool _checkDimensionMatrix(const String& name, const AMatrix* mat, int* nrowsRef, int* ncolsRef);
-  static bool _checkDimensionVD(const String& name, const VectorDouble* vec, int* sizeRef);
-  static bool _checkDimensionVI(const String& name, const VectorInt* vec, int* sizeRef);
-  static bool _checkDimensionVVI(const String& name, const VectorVectorInt* vec, int* size1Ref, int* size2Ref);
+  static bool _checkDimensionMatrix(const String& name, const AMatrix* mat, Id* nrowsRef, Id* ncolsRef);
+  static bool _checkDimensionVD(const String& name, const VectorDouble* vec, Id* sizeRef);
+  static bool _checkDimensionVI(const String& name, const VectorInt* vec, Id* sizeRef);
+  static bool _checkDimensionVVI(const String& name, const VectorVectorInt* vec, Id* size1Ref, Id* size2Ref);
 
   static bool _isPresentMatrix(const String& name, const AMatrix* mat);
   static bool _isPresentVector(const String& name, const VectorDouble* vec);
@@ -99,43 +98,43 @@ private:
   void _resetLinkedToColCok();
   void _resetLinkedToXvalid();
 
-  int _needX();
-  int _needX0();
-  int _needSigma();
-  int _needSigma0();
-  int _needSigma00();
-  int _needBeta();
-  int _needInvSigma();
-  int _needLambdaSK();
-  int _needLambdaUK();
-  int _needMuUK();
-  int _needSigmac();
-  int _needZstar();
-  int _needY0();
-  int _needXtInvSigma();
-  int _needStdv();
-  int _needVarZSK();
-  int _needVarZUK();
-  int _needInvPriorCov();
-  int _needSigma0p();
-  int _needSigma00p();
-  int _needSigma00pp();
-  int _needX0p();
-  int _needY0p();
-  int _needZ0p();
-  int _needLambda0();
-  int _needInvSigmaSigma0();
-  int _needPriorCov();
-  int _needPriorMean();
-  int _needSampleRanks();
-  int _needZ();
-  int _needZp();
-  int _needColCok();
-  int _needXvalid();
-  int _needDual();
+  Id _needX();
+  Id _needX0();
+  Id _needSigma();
+  Id _needSigma0();
+  Id _needSigma00();
+  Id _needBeta();
+  Id _needInvSigma();
+  Id _needLambdaSK();
+  Id _needLambdaUK();
+  Id _needMuUK();
+  Id _needSigmac();
+  Id _needZstar();
+  Id _needY0();
+  Id _needXtInvSigma();
+  Id _needStdv();
+  Id _needVarZSK();
+  Id _needVarZUK();
+  Id _needInvPriorCov();
+  Id _needSigma0p();
+  Id _needSigma00p();
+  Id _needSigma00pp();
+  Id _needX0p();
+  Id _needY0p();
+  Id _needZ0p();
+  Id _needLambda0();
+  Id _needInvSigmaSigma0();
+  Id _needPriorCov();
+  Id _needPriorMean();
+  Id _needSampleRanks();
+  Id _needZ();
+  Id _needZp();
+  Id _needColCok();
+  Id _needXvalid();
+  Id _needDual();
 
-  int _patchRHSForXvalidUnique();
-  int _patchColCokVarianceZstar(MatrixSymmetric* varZK);
+  Id _patchRHSForXvalidUnique();
+  Id _patchColCokVarianceZstar(MatrixSymmetric* varZK);
 
   void _deleteX();
   void _deleteX0();
@@ -199,47 +198,48 @@ private:
   // Following elements can be retrieved by Interface functions
   VectorDouble _Zstar;            // Estimated values (Dim: _nrhs)
   VectorDouble _Beta;             // Drift coefficients (Dim: _nbfl)
-  MatrixDense* _LambdaSK;   // Weights for SK (Dim: _neq * _nrhs)
-  MatrixDense* _LambdaUK;   // Weights for UK (Dim: _neq * _nrhs)
-  MatrixDense* _MuUK;       // Lagrange multipliers (Dim: _nbfl * _nrhs)
-  MatrixSymmetric* _Stdv;   // Estimation stdv. (Dim: _nrhs * _nrhs)
-  MatrixSymmetric* _VarZSK; // Estimator variance in SK (Dim: _nrhs * _nrhs)
-  MatrixSymmetric* _VarZUK; // Estimator variance in UK (Dim: _nrhs * _nrhs)
+  MatrixDense _LambdaSK;          // Weights for SK (Dim: _neq * _nrhs)
+  MatrixDense _LambdaUK;          // Weights for UK (Dim: _neq * _nrhs)
+  MatrixDense _MuUK;              // Lagrange multipliers (Dim: _nbfl * _nrhs)
+  MatrixSymmetric _Stdv;          // Estimation stdv. (Dim: _nrhs * _nrhs)
+  MatrixSymmetric _VarZSK;        // Estimator variance in SK (Dim: _nrhs * _nrhs)
+  MatrixSymmetric _VarZUK;        // Estimator variance in UK (Dim: _nrhs * _nrhs)
 
   // Following elements are defined for internal storage
-  MatrixDense* _XtInvSigma;      // X^t * Inv{Sigma} (Dim: _nbfl * _neq);
-  MatrixDense* _Y0;              // X0 - LambdaSK * X^t (Dim: _nrhs * _nbfl)
-  MatrixDense* _InvSigmaSigma0;  // Inv{Sigma} * Sigma0 (Dim: _neq * _nrhs)
-  MatrixSymmetric* _InvSigma;    // Inv{Sigma} (Dim: _neq * _neq)
-  MatrixSymmetric* _Sigmac;      // Inv{X^t * Inv{Sigma} * X} (Dim: _nbfl * _nbfl)
-  MatrixSymmetric* _InvPriorCov; // Inv{PriorCov} (Dim: _nbfl * _nbfl)
+  MatrixDense _XtInvSigma;      // X^t * Inv{Sigma} (Dim: _nbfl * _neq);
+  MatrixDense _Y0;              // X0 - LambdaSK * X^t (Dim: _nrhs * _nbfl)
+  MatrixDense _InvSigmaSigma0;  // Inv{Sigma} * Sigma0 (Dim: _neq * _nrhs)
+  MatrixSymmetric _InvSigma;    // Inv{Sigma} (Dim: _neq * _neq)
+  MatrixSymmetric _Sigmac;      // Inv{X^t * Inv{Sigma} * X} (Dim: _nbfl * _nbfl)
+  MatrixSymmetric _InvPriorCov; // Inv{PriorCov} (Dim: _nbfl * _nbfl)
 
   // Following elements are defined for internal storage (collocated case in UN)
-  MatrixSymmetric* _Sigma00pp; // ColCok Variance T-T (Dim: _ncck * _ncck)
-  MatrixDense* _Sigma00p;      // ColCok Variance D-T (Dim: _ncck * _nrhs)
-  MatrixDense* _Sigma0p;       // Collocated Covariance (Dim: _neq * _ncck)
-  MatrixDense* _X0p;           // Collocated Drift (Dim: _ncck * _nbfl)
-  MatrixDense* _Y0p;           // X0p - Sigma0p^t * Inv{Sigma} * X (Dim: _ncck *_nbfl)
+  MatrixSymmetric _Sigma00pp;        // ColCok Variance T-T (Dim: _ncck * _ncck)
+  MatrixDense _Sigma00p;             // ColCok Variance D-T (Dim: _ncck * _nrhs)
+  MatrixDense _Sigma0p;              // Collocated Covariance (Dim: _neq * _ncck)
+  MatrixDense _X0p;                  // Collocated Drift (Dim: _ncck * _nbfl)
+  MatrixDense _Y0p;                  // X0p - Sigma0p^t * Inv{Sigma} * X (Dim: _ncck *_nbfl)
   VectorInt _rankColVars;            // Ranks of active collocated variables
   VectorDouble _Z0p;                 // Vector of (active) collocated values
-  MatrixDense* _Lambda0;       // Collocated weights (Dim: _ncck * _nrhs)
+  MatrixDense _Lambda0;              // Collocated weights (Dim: _ncck * _nrhs)
 
   // Following elements are defined for Dual programming
   VectorDouble _bDual; // Fake Covariance part in Dual (Dim: _neq)
   VectorDouble _cDual; // Fake Drift part in Dual (Dim: _nbfl)
 
   // Following elements are defined for internal storage (Cross-validation in UN)
-  MatrixDense* _C_RHS; // Fictitious Right-hand side (covariance part)
-  MatrixDense* _X_RHS; // Fictitious Right-hand side (drift part)
+  MatrixDense _C_RHS; // Fictitious Right-hand side (covariance part)
+  MatrixDense _X_RHS; // Fictitious Right-hand side (drift part)
 
   // Additional parameters
-  int _nvar;
-  int _neq;
-  int _nbfl;
-  int _nrhs;
-  int _ncck;    // Number of additional samples for ColCok in Unique Neighborhood
-  int _nxvalid; // Number of samples in XValid in Unique Neighborhood
+  Id _nvar;
+  Id _neq;
+  Id _nbfl;
+  Id _nrhs;
+  Id _ncck;    // Number of additional samples for ColCok in Unique Neighborhood
+  Id _nxvalid; // Number of samples in XValid in Unique Neighborhood
   bool _flagSK;
   bool _flagBayes;
   bool _flagDual;
 };
+}

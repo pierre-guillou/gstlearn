@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "@PYTHON_PACKAGE_NAME@"
-version = "@PROJECT_VERSION@"
+version = "@PROJECT_FULL_VERSION@"
 authors = [
   {name = "Team gstlearn", email = "gstlearn@groupes.mines-paristech.fr"}
 ]

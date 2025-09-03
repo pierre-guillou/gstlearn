@@ -36,6 +36,9 @@ else()
   if (APPLE)
     add_compile_options(-Wno-absolute-value -Wno-inconsistent-missing-override)
   endif()
+  if (CLANG)
+     add_compile_options(-Werror=shorten-64-to-32)
+  endif()
 endif()
 
 if (MSVC)
@@ -55,6 +58,27 @@ endif()
 if(BUILD_ASAN)
   add_compile_options(-fsanitize=address)
   add_link_options(-fsanitize=address)
+endif()
+
+message(STATUS "BUILD_ASAN="  ${BUILD_ASAN})
+
+# Code coverage (GCC/Clang)
+option(BUILD_COVERAGE "Build with code coverage enabled" OFF)
+mark_as_advanced(BUILD_COVERAGE)
+
+if(BUILD_COVERAGE AND MSVC)
+  message(WARNING "Cannot use BUILD_COVERAGE option with Microsoft Visual Studio compilers")
+  set(BUILD_COVERAGE OFF)
+endif()
+
+if(BUILD_COVERAGE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+  message(WARNING "Switch to Debug mode to get the best of BUILD_COVERAGE")
+  set(BUILD_COVERAGE OFF)
+endif()
+
+if(BUILD_COVERAGE)
+  add_compile_options(--coverage)
+  add_link_options(--coverage)
 endif()
 
 # For valgrind usage (use Debug)
@@ -163,7 +187,7 @@ foreach(FLAVOR ${FLAVORS})
   set_target_properties(${FLAVOR} PROPERTIES DEBUG_POSTFIX "d")
   
   # Set library version
-  set_target_properties(${FLAVOR} PROPERTIES VERSION ${PROJECT_VERSION})
+  set_target_properties(${FLAVOR} PROPERTIES VERSION ${PROJECT_FULL_VERSION})
 
   if(USE_BOOST_SPAN)
     target_compile_definitions(${FLAVOR} PUBLIC USE_BOOST_SPAN)
@@ -172,9 +196,9 @@ foreach(FLAVOR ${FLAVORS})
   # Enable OpenMP
   target_link_libraries(${FLAVOR} PRIVATE OpenMP::OpenMP_CXX)
 
-  # Link to csparse and gmtsph
-  target_link_libraries(${FLAVOR} PRIVATE csparse gmtsph)
-    
+  # Link to gmtsph
+  target_link_libraries(${FLAVOR} PRIVATE gmtsph)
+
   # Link to Eigen
   target_link_libraries(${FLAVOR} PUBLIC Eigen3::Eigen)
 
@@ -198,15 +222,22 @@ foreach(FLAVOR ${FLAVORS})
     target_link_libraries(${FLAVOR} PRIVATE ${HDF5_LIBRARIES})
   endif()
   
-  # Exclude [L]GPL features from Eigen
-  #target_compile_definitions(${FLAVOR} PUBLIC EIGEN_MPL2_ONLY) 
-
   # Link to specific libraries (only for Microsoft Visual Studio)
   if (MSVC)
     target_link_libraries(${FLAVOR} PUBLIC iphlpapi rpcrt4)
   endif()
   if (MINGW)
     target_link_libraries(${FLAVOR} PUBLIC -liphlpapi -lrpcrt4)
+  endif()
+
+  if(CMAKE_COMPILER_IS_GNUCC)
+    # Use of std::filesystem needs at least GCC 8.0
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+      message(SEND_ERROR "GCC>=8.0 is needed to build gstlearn")
+    elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+      # GCC 8.0 doesn't link automatically to std::filesystem
+      target_link_libraries(${FLAVOR} PUBLIC stdc++fs)
+    endif()
   endif()
 
   # Build a cmake file to be imported by library users

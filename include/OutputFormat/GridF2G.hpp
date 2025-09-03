@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "OutputFormat/AOF.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT GridF2G: public AOF
@@ -25,7 +27,8 @@ public:
 
   bool mustBeGrid() const override { return true; }
   bool mustBeOneVariable() const override { return false; }
-  bool mustBeForNDim(int ndim) const override { return ndim <= 3; }
-  bool mustBeForRotation(int mode) const override { return mode <= 1; }
+  bool mustBeForNDim(Id ndim) const override { return ndim <= 3; }
+  bool mustBeForRotation(Id mode) const override { return mode <= 1; }
   DbGrid* readGridFromFile() override;
 };
+}

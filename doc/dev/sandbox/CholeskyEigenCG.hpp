@@ -29,11 +29,12 @@ DISABLE_WARNING_DECLARATION_HIDE_GLOBAL
 DISABLE_WARNING_POP
 #endif
 
+namespace gstlrn {
 class css; /// TODO : Dependency to csparse to be removed
 class csn;
 class MatrixSparse;
-
 class CholeskyEigenCG;
+
 
 // Eigen stuff for conjugate gradient
 /////////////////////////////////////////////////////////////////////////////////
@@ -129,5 +130,6 @@ namespace internal {
     }
   };
  
+}
 }
 }

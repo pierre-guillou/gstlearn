@@ -8,31 +8,32 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "Enum/ELoc.hpp"
-
-#include "Basic/NamingConvention.hpp"
 #include "Calculators/CalcStatistics.hpp"
+#include "Basic/NamingConvention.hpp"
 #include "Calculators/ACalcDbToDb.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
+#include "Enum/ELoc.hpp"
 #include "Stats/Classical.hpp"
 #include "Stats/Regression.hpp"
-#include "Db/DbGrid.hpp"
-#include "Db/Db.hpp"
 
-#include <math.h>
+#include <cmath>
 
+namespace gstlrn
+{
 CalcStatistics::CalcStatistics()
-    : ACalcDbToDb(),
-      _iattOut(-1),
-      _dboutMustBeGrid(false),
-      _flagStats(false),
-      _oper(EStatOption::UNKNOWN),
-      _radius(0),
-      _flagRegr(false),
-      _flagCst(false),
-      _regrMode(0),
-      _nameResp(),
-      _nameAux(),
-      _model(nullptr)
+  : ACalcDbToDb()
+  , _iattOut(-1)
+  , _dboutMustBeGrid(false)
+  , _flagStats(false)
+  , _oper(EStatOption::UNKNOWN)
+  , _radius(0)
+  , _flagRegr(false)
+  , _flagCst(false)
+  , _regrMode(0)
+  , _nameResp()
+  , _nameAux()
+  , _model(nullptr)
 {
 }
 
@@ -42,12 +43,12 @@ CalcStatistics::~CalcStatistics()
 
 bool CalcStatistics::_check()
 {
-  if (! ACalcDbToDb::_check()) return false;
+  if (!ACalcDbToDb::_check()) return false;
 
-  if (! hasDbin()) return false;
-  if (! hasDbout()) return false;
+  if (!hasDbin()) return false;
+  if (!hasDbout()) return false;
 
-  int nvar = getDbin()->getNLoc(ELoc::Z);
+  auto nvar = getDbin()->getNLoc(ELoc::Z);
   if (nvar <= 0)
   {
     messerr("These methods require some variable to be defined");
@@ -56,7 +57,7 @@ bool CalcStatistics::_check()
 
   if (getDboutMustBeGrid())
   {
-    if (! getDbout()->isGrid())
+    if (!getDbout()->isGrid())
     {
       messerr("This method requires 'dbout' to be a Grid");
       return false;
@@ -65,7 +66,7 @@ bool CalcStatistics::_check()
 
   if (_flagRegr)
   {
-    if (! _flagCst && _nameAux.empty())
+    if (!_flagCst && _nameAux.empty())
     {
       messerr("This method requires Explanatory variables and/or constant term");
       return false;
@@ -78,7 +79,7 @@ bool CalcStatistics::_check()
 bool CalcStatistics::_preprocess()
 {
   if (!ACalcDbToDb::_preprocess()) return false;
-  
+
   if (_flagStats)
     _iattOut = _addVariableDb(2, 1, ELoc::UNKNOWN, 0, _getNVar(), 0.);
 
@@ -118,7 +119,7 @@ bool CalcStatistics::_run()
 {
   if (_flagStats)
   {
-    DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
+    DbGrid* dbgrid     = dynamic_cast<DbGrid*>(getDbout());
     VectorString names = getDbin()->getNamesByLocator(ELoc::Z);
     if (dbStatisticsInGridTool(getDbin(), dbgrid, names, _oper, _radius, _iattOut))
       return false;
@@ -146,11 +147,11 @@ bool CalcStatistics::_run()
  ** \param[in]  namconv Naming convention
  **
  *****************************************************************************/
-int dbStatisticsOnGrid(Db *db,
-                       DbGrid *dbgrid,
-                       const EStatOption &oper,
-                       int radius,
-                       const NamingConvention &namconv)
+Id dbStatisticsOnGrid(Db* db,
+                       DbGrid* dbgrid,
+                       const EStatOption& oper,
+                       Id radius,
+                       const NamingConvention& namconv)
 {
   CalcStatistics stats;
   stats.setDbin(db);
@@ -163,18 +164,18 @@ int dbStatisticsOnGrid(Db *db,
   stats.setRadius(radius);
 
   // Run the calculator
-  int error = (stats.run()) ? 0 : 1;
+  Id error = (stats.run()) ? 0 : 1;
   return error;
 }
 
-int dbRegression(Db *db1,
+Id dbRegression(Db* db1,
                  const String& nameResp,
                  const VectorString& nameAux,
-                 int mode,
+                 Id mode,
                  bool flagCst,
-                 Db *db2,
+                 Db* db2,
                  const Model* model,
-                 const NamingConvention &namconv)
+                 const NamingConvention& namconv)
 {
   if (db2 == nullptr) db2 = db1;
 
@@ -191,6 +192,7 @@ int dbRegression(Db *db1,
   stats.setModel(model);
 
   // Run the calculator
-  int error = (stats.run()) ? 0 : 1;
+  Id error = (stats.run()) ? 0 : 1;
   return error;
 }
+} // namespace gstlrn

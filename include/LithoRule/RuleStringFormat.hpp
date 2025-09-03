@@ -13,10 +13,12 @@
 #include "gstlearn_export.hpp"
 #include "Basic/AStringFormat.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT RuleStringFormat: public AStringFormat
 {
 public:
-  RuleStringFormat(int level = 1);
+  RuleStringFormat(Id level = 1);
   RuleStringFormat(const RuleStringFormat& r);
   RuleStringFormat& operator=(const RuleStringFormat& r);
   virtual ~RuleStringFormat();
@@ -30,3 +32,4 @@ private:
   bool _flagProp;
   bool _flagThresh;
 };
+}

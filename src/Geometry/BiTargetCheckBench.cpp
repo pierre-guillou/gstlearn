@@ -10,29 +10,30 @@
 /******************************************************************************/
 #include "Geometry/BiTargetCheckBench.hpp"
 #include "Db/Db.hpp"
-#include "Space/SpacePoint.hpp"
 
-BiTargetCheckBench::BiTargetCheckBench(int idim_bench, double width)
-    : ABiTargetCheck(),
-      _idimBench(idim_bench),
-      _width(width)
+namespace gstlrn
+{
+BiTargetCheckBench::BiTargetCheckBench(Id idim_bench, double width)
+  : ABiTargetCheck()
+  , _idimBench(idim_bench)
+  , _width(width)
 {
 }
 
-BiTargetCheckBench::BiTargetCheckBench(const BiTargetCheckBench &r)
-    : ABiTargetCheck(r),
-      _idimBench(r._idimBench),
-      _width(r._width)
+BiTargetCheckBench::BiTargetCheckBench(const BiTargetCheckBench& r)
+  : ABiTargetCheck(r)
+  , _idimBench(r._idimBench)
+  , _width(r._width)
 {
 }
 
-BiTargetCheckBench& BiTargetCheckBench::operator=(const BiTargetCheckBench &r)
+BiTargetCheckBench& BiTargetCheckBench::operator=(const BiTargetCheckBench& r)
 {
   if (this != &r)
   {
     ABiTargetCheck::operator=(r);
     _idimBench = r._idimBench;
-    _width = r._width;
+    _width     = r._width;
   }
   return *this;
 }
@@ -41,7 +42,7 @@ BiTargetCheckBench::~BiTargetCheckBench()
 {
 }
 
-BiTargetCheckBench* BiTargetCheckBench::create(int idim_bench, double width)
+BiTargetCheckBench* BiTargetCheckBench::create(Id idim_bench, double width)
 {
   return new BiTargetCheckBench(idim_bench, width);
 }
@@ -62,10 +63,11 @@ bool BiTargetCheckBench::isValid(const Db* dbin, const Db* dbout)
   return true;
 }
 
-bool BiTargetCheckBench::isOK(const SpaceTarget &T1,
-                             const SpaceTarget &T2) const
+bool BiTargetCheckBench::isOK(const SpaceTarget& T1,
+                              const SpaceTarget& T2) const
 {
   /* Discard sample located outside the bench */
 
   return (ABS(T1.getCoord(_idimBench) - T2.getCoord(_idimBench)) <= _width);
+}
 }

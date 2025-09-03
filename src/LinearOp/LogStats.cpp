@@ -11,6 +11,8 @@
 #include "LinearOp/LogStats.hpp"
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 LogStats::LogStats(bool mustPrint)
     : _mustPrint(mustPrint),
       _directNumber(0),
@@ -79,7 +81,7 @@ void LogStats::incrementStatsDirect(double time) const
   _directTime   += time * 1000;
 }
 
-void LogStats::incrementStatsInverseCG(int niter, double time) const
+void LogStats::incrementStatsInverseCG(Id niter, double time) const
 {
   _inverseCGNumber ++;
   _inverseCGNIter  += niter;
@@ -138,3 +140,4 @@ void LogStats::statsShow(void) const
             _simulateNumber, _simulateTime);
 }
 
+}

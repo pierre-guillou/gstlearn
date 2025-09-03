@@ -13,6 +13,8 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
 class CovContext;
 class TurningBandOperate;
 
@@ -29,7 +31,7 @@ public:
   double getParMax() const override { return 2; }
 
   String         getCovName() const override { return "Stable"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
   bool isValidForTurningBand() const override { return true; }
@@ -38,4 +40,4 @@ public:
 protected:
   double _evaluateCov(double h) const override;
 };
-
+}

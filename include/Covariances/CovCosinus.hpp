@@ -13,6 +13,9 @@
 #include "gstlearn_export.hpp"
 #include "Covariances/ACovFunc.hpp"
 
+namespace gstlrn
+{
+  // Forward declaration
 class CovContext;
 
 class GSTLEARN_EXPORT CovCosinus : public ACovFunc
@@ -23,13 +26,14 @@ public:
   CovCosinus& operator= (const CovCosinus &r);
   virtual ~CovCosinus();
 
-  unsigned int getMaxNDim() const override { return 1; }
+  size_t getMaxNDim() const override { return 1; }
 
   String         getCovName() const override { return "Cosinus"; }
-  int            getMinOrder() const override { return -1; }
+  Id            getMinOrder() const override { return -1; }
   bool           getCompatibleSpaceR() const override { return true; }
 
 protected:
   double _evaluateCov(double h) const override;
 };
 
+}

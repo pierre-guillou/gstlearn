@@ -1,6 +1,7 @@
 # Why is cmake file GLOB evil?
 # https://stackoverflow.com/questions/32411963/why-is-cmake-file-glob-evil
 set(SRC
+  API/newAPIs.cpp
   Enum/AEnum.cpp
   Enum/Enums.cpp
   Fractures/FracEnviron.cpp
@@ -8,7 +9,6 @@ set(SRC
   Fractures/FracFault.cpp
   Fractures/FracDesc.cpp
   Fractures/FracList.cpp
-  Matrix/LinkMatrixSparse.cpp
   Matrix/AMatrix.cpp
   Matrix/MatrixSparse.cpp
   Matrix/MatrixInt.cpp
@@ -18,7 +18,6 @@ set(SRC
   Matrix/MatrixFactory.cpp
   Matrix/Table.cpp
   Matrix/NF_Triplet.cpp
-  API/PGSSPDE.cpp
   API/SPDE.cpp
   API/Style.cpp
   API/SPDEParam.cpp
@@ -38,6 +37,7 @@ set(SRC
   LithoRule/RuleShift.cpp
   LithoRule/Node.cpp
   Model/ModelGeneric.cpp
+  Model/GaussianProcess.cpp
   Model/ModelCovList.cpp
   Model/ConsItem.cpp
   Model/CovParamId.cpp
@@ -47,13 +47,12 @@ set(SRC
   Model/Option_AutoFit.cpp
   Model/Option_VarioFit.cpp
   Model/Model.cpp
-  Model/AModelOptim.cpp
+  Model/ModelOptimParam.cpp
   Model/ModelOptimVario.cpp
   Model/ModelOptimVMap.cpp
-  Model/AModelOptimSills.cpp
-  Model/ModelOptimSillsVario.cpp
-  Model/ModelOptimSillsVMap.cpp
-  Model/ModelOptimLikelihood.cpp
+  Model/AModelFitSills.cpp
+  Model/ModelFitSillsVario.cpp
+  Model/ModelFitSillsVMap.cpp
   Calculators/ACalculator.cpp
   Calculators/ACalcDbToDb.cpp
   Calculators/CalcMigrate.cpp
@@ -78,7 +77,9 @@ set(SRC
   Covariances/CovWendland0.cpp
   Covariances/CovWendland1.cpp
   Covariances/CovWendland2.cpp
+  Covariances/CovGradientGeneric.cpp
   Covariances/CovGradientFunctional.cpp
+  Covariances/CovGradientNumerical.cpp
   Covariances/CovMatern.cpp
   Covariances/CovLMGradient.cpp
   Covariances/CovPower.cpp
@@ -110,7 +111,6 @@ set(SRC
   Covariances/ACovFunc.cpp
   Covariances/CorAniso.cpp
   Covariances/CovAniso.cpp
-  Covariances/CovGradientNumerical.cpp
   Covariances/CovCubic.cpp
   Covariances/CovNugget.cpp
   Covariances/CovBesselJ.cpp
@@ -126,7 +126,6 @@ set(SRC
   Covariances/CovHelper.cpp
   Polygon/Polygons.cpp
   Polygon/PolyElem.cpp
-  Core/surface.cpp
   Core/math.cpp
   Core/stats.cpp
   Core/io.cpp
@@ -143,7 +142,6 @@ set(SRC
   Core/foxleg.cpp
   Core/util.cpp
   Core/ascii.cpp
-  Core/pile.cpp
   Core/mlayers.cpp
   Core/thresh.cpp
   Core/fft.cpp
@@ -177,6 +175,7 @@ set(SRC
   Db/RankHandler.cpp
   LinearOp/LogStats.cpp
   LinearOp/CGParam.cpp
+  LinearOp/InvNuggetOp.cpp
   LinearOp/PrecisionOp.cpp
   LinearOp/TurboOptimizer.cpp
   LinearOp/ProjMatrix.cpp
@@ -197,7 +196,6 @@ set(SRC
   LinearOp/PrecisionOpMulti.cpp
   LinearOp/PrecisionOpMultiMatrix.cpp
   LinearOp/PrecisionOpMultiConditional.cpp
-  LinearOp/PrecisionOpMultiConditionalCs.cpp
   LinearOp/OptimCostColored.cpp
   LinearOp/ProjConvolution.cpp
   LinearOp/ACholesky.cpp
@@ -222,7 +220,9 @@ set(SRC
   Variogram/Vario.cpp
   Variogram/VarioParam.cpp
   Variogram/DirParam.cpp
+  Basic/Optim.cpp
   Basic/ParamInfo.cpp
+  Basic/ListParams.cpp
   Basic/Limits.cpp
   Basic/AStringable.cpp
   Basic/AStringFormat.cpp
@@ -308,6 +308,9 @@ set(SRC
   Neigh/NeighMoving.cpp
   Neigh/NeighBench.cpp
   Neigh/NeighCell.cpp
+  Estimation/AModelOptim.cpp
+  Estimation/ALikelihood.cpp
+  Estimation/AModelOptimFactory.cpp
   Estimation/KrigingSystem.cpp
   Estimation/KrigingSystemSimpleCase.cpp
   Estimation/KrigingAlgebra.cpp
@@ -320,6 +323,7 @@ set(SRC
   Estimation/CalcGlobal.cpp
   Estimation/KrigOpt.cpp
   Estimation/Vecchia.cpp
+  Estimation/Likelihood.cpp
   OutputFormat/AOF.cpp
   OutputFormat/GridIfpEn.cpp
   OutputFormat/GridEclipse.cpp

@@ -12,19 +12,19 @@
 // Export VectorXXX classes
 %include Basic/VectorT.hpp
 %include Basic/VectorNumT.hpp
-%template(VectorTInt)         VectorT< int >;
-%template(VectorTDouble)      VectorT< double >;
-%template(VectorTFloat)       VectorT< float >;
-%template(VectorBool)         VectorT< UChar >; // See VectorT.hpp
-%template(VectorString)       VectorT< String >;
-%template(VectorInt)          VectorNumT< int >;
-%template(VectorDouble)       VectorNumT< double >;
-%template(VectorFloat)        VectorNumT< float >;
-%template(VectorUChar)        VectorNumT< UChar >;
-%template(VectorVectorInt)    VectorT< VectorNumT< int > >;
-%template(VectorVectorDouble) VectorT< VectorNumT< double > >;
-%template(VectorVectorFloat)  VectorT< VectorNumT< float > >;
-
+%template(VectorTInt)         gstlrn::VectorT< long >;
+%template(VectorTDouble)      gstlrn::VectorT< double >;
+%template(VectorTFloat)       gstlrn::VectorT< float >;
+%template(VectorBool)         gstlrn::VectorT< UChar >; // See VectorT.hpp
+%template(VectorString)       gstlrn::VectorT< String >;
+%template(VectorInt)          gstlrn::VectorNumT< long >;
+%template(VectorDouble)       gstlrn::VectorNumT< double >;
+%template(VectorFloat)        gstlrn::VectorNumT< float >;
+%template(VectorUChar)        gstlrn::VectorNumT< UChar >;
+%template(VectorVectorInt)    gstlrn::VectorT< VectorNumT< long > >;
+%template(VectorVectorDouble) gstlrn::VectorT< VectorNumT< double > >;
+%template(VectorVectorFloat)  gstlrn::VectorT< VectorNumT< float > >;
+//}
 %include Basic/ICloneable.hpp
 %include Basic/RepeatMacro.hpp
 %include Basic/RepeatMacroSwig.hpp
@@ -65,6 +65,7 @@
 %include Enum/ECalcMember.hpp
 %include Enum/EPostUpscale.hpp
 %include Enum/EPostStat.hpp
+%include Enum/EFormatNF.hpp
 
 %include Basic/ArgumentTest.hpp
 %include Basic/AStringable.hpp
@@ -149,6 +150,7 @@
 %include Matrix/AMatrix.hpp
 %include Matrix/MatrixDense.hpp
 %include Matrix/MatrixSparse.hpp
+%include LinearOp/InvNuggetOp.hpp
 %include Matrix/MatrixSquare.hpp
 %include Matrix/NF_Triplet.hpp
 %include Matrix/MatrixSymmetric.hpp
@@ -218,17 +220,18 @@
 %include Variogram/VCloud.hpp
 
 %include Basic/ParamInfo.hpp
+%include Basic/ListParams.hpp
 %include Model/ModelGeneric.hpp
+%include Model/GaussianProcess.hpp
 %include Model/ModelCovList.hpp
 %include Model/Model.hpp
+%include Model/ModelOptimParam.hpp
 %include Model/Option_AutoFit.hpp
 %include Model/Option_VarioFit.hpp
 %include Model/Constraints.hpp
 %include Model/ConsItem.hpp
 %include Model/CovParamId.hpp
 %include Model/CovParamId.hpp
-%include Model/AModelOptim.hpp
-%include Model/ModelOptimLikelihood.hpp
 
 %include Covariances/ParamId.hpp
 %include Covariances/TabNoStat.hpp
@@ -246,6 +249,7 @@
 %include Covariances/CovAnisoList.hpp
 %include Covariances/CovAniso.hpp
 %include Covariances/ACovGradient.hpp
+%include Covariances/CovGradientGeneric.hpp
 %include Covariances/CorGneiting.hpp
 %include Covariances/CorMatern.hpp
 %include Covariances/CovLMCTapering.hpp
@@ -295,7 +299,6 @@
 %include Drifts/DriftFactory.hpp
 
 %include API/SPDE.hpp
-%include API/PGSSPDE.hpp
 %include API/TestInheritance.hpp
 %include API/Style.hpp
 %include API/SPDEParam.hpp
@@ -349,7 +352,11 @@
 %include Estimation/CalcImage.hpp
 %include Estimation/CalcGlobal.hpp
 %include Estimation/KrigOpt.hpp
+%include Estimation/AModelOptim.hpp
+%include Estimation/ALikelihood.hpp
 %include Estimation/Vecchia.hpp
+%include Estimation/Likelihood.hpp
+
 
 %include OutputFormat/AOF.hpp
 %include OutputFormat/FileLAS.hpp
@@ -400,6 +407,8 @@
 %include Core/Potential.hpp
 %include Core/Seismic.hpp
 
+%include/API/newAPIs.hpp
+
 // For suppressing SWIG warning due to -keyword option (if used)
 #pragma SWIG nowarn=511
 #pragma SWIG nowarn=506
@@ -408,4 +417,3 @@
 
 %template(LinearOpCGSolver) LinearOpCGSolver< ScaleOp >;
 %template(LinearSPDEOpCGSolver) LinearOpCGSolver< SPDEOp >;
-

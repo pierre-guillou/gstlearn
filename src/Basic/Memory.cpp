@@ -27,7 +27,7 @@ unsigned long long getTotalSystemMemory()
 
 unsigned long long getTotalSystemMemory()
 {
-  int rc;
+  gstlrn::I32 rc;
   u_int page_size;
   struct vmtotal vmt;
   size_t vmt_size, uint_size;
@@ -56,4 +56,3 @@ unsigned long long getTotalSystemMemory()
   return avail_pages * page_size;
 }
 #endif
-

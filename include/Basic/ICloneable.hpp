@@ -12,6 +12,10 @@
 
 #include "gstlearn_export.hpp"
 #include <assert.h>
+#include <memory>
+
+namespace gstlrn
+{
 
 /**
  * Inherits from this interface to make your class cloneable.
@@ -24,6 +28,16 @@ public:
   virtual ~ICloneable() {};
 
   virtual ICloneable* clone() const = 0;
+  #ifndef SWIG
+  std::shared_ptr<ICloneable> cloneShared() const
+  {
+    return std::shared_ptr<ICloneable>(clone());
+  }
+  std::unique_ptr<ICloneable> cloneUnique() const
+  {
+    return std::unique_ptr<ICloneable>(clone());
+  }
+  #endif
 };
 
 // Thanks to here (macro way):
@@ -39,4 +53,4 @@ public:                                            \
     assert(typeid(*this) == typeid(Class));        \
     return (new Class(*this));                     \
   }
-
+}

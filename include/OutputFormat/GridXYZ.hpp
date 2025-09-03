@@ -14,6 +14,8 @@
 #include "OutputFormat/AOF.hpp"
 #include "Db/Db.hpp"
 
+namespace gstlrn
+{
 class Db;
 
 class GSTLEARN_EXPORT GridXYZ: public AOF
@@ -26,6 +28,7 @@ public:
 
   bool mustBeGrid() const override { return true; }
   bool mustBeOneVariable() const override { return true; }
-  bool mustBeForNDim(int ndim) const override { return ndim == 2; }
-  int  writeInFile() override;
+  bool mustBeForNDim(Id ndim) const override { return ndim == 2; }
+  Id  writeInFile() override;
 };
+}

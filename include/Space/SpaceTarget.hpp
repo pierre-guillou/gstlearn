@@ -17,6 +17,8 @@
 #include "Space/ASpaceObject.hpp"
 #include "Space/SpacePoint.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SpaceTarget : public SpacePoint
 {
 public:
@@ -38,9 +40,9 @@ public:
   const SpacePoint& getCoordAsSP() const { return *this; }
 
   const VectorDouble& getExtend() const { return _extend; }
-  double getExtend(int idim) const { return _extend[idim]; }
+  double getExtend(Id idim) const { return _extend[idim]; }
   void setExtend(const VectorDouble& extend) { _extend = extend; }
-  void setExtend(int i, double val){ _extend[i] = val; }
+  void setExtend(Id i, double val){ _extend[i] = val; }
   const double* getExtendP() const {return _extend.data(); }
   double* getExtendPM() {return _extend.data(); }
   void setCode(double code) { _code = code; }
@@ -52,7 +54,7 @@ public:
   bool checkDate() const { return _checkDate; }
 
   /// Convert space point to string
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
 private:
   void _initialize();
@@ -65,3 +67,4 @@ protected:
   double _code;
   double _date;
 };
+}

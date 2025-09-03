@@ -9,14 +9,16 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Gibbs/GibbsFactory.hpp"
-#include "Gibbs/GibbsUMultiMono.hpp"
-#include "Gibbs/GibbsUMulti.hpp"
-#include "Gibbs/GibbsUPropMono.hpp"
-#include "Gibbs/GibbsMMulti.hpp"
-#include "Model/Model.hpp"
 #include "Basic/AStringable.hpp"
 #include "Db/Db.hpp"
+#include "Gibbs/GibbsMMulti.hpp"
+#include "Gibbs/GibbsUMulti.hpp"
+#include "Gibbs/GibbsUMultiMono.hpp"
+#include "Gibbs/GibbsUPropMono.hpp"
+#include "Model/Model.hpp"
 
+namespace gstlrn
+{
 GibbsFactory::GibbsFactory()
 {
 }
@@ -41,14 +43,14 @@ AGibbs* GibbsFactory::createGibbs(Db* db,
 
     // Moving Neighborhood
 
-    GibbsMMulti* gibbs = new GibbsMMulti(db, model);
-    return (static_cast<AGibbs *> (gibbs));
+    auto* gibbs = new GibbsMMulti(db, model);
+    return (static_cast<AGibbs*>(gibbs));
   }
 
   // Unique Neighborhood
 
-  GibbsUMulti* gibbs = new GibbsUMulti(db, model);
-  return (static_cast<AGibbs *> (gibbs));
+  auto* gibbs = new GibbsUMulti(db, model);
+  return (static_cast<AGibbs*>(gibbs));
 }
 
 /**
@@ -60,7 +62,7 @@ AGibbs* GibbsFactory::createGibbs(Db* db,
  * @return
  */
 AGibbs* GibbsFactory::createGibbs(Db* db,
-                                  const std::vector<Model *>& models,
+                                  const std::vector<Model*>& models,
                                   double rho,
                                   bool flag_propagation)
 {
@@ -82,14 +84,14 @@ AGibbs* GibbsFactory::createGibbs(Db* db,
 
       // Propagation algorithm
 
-      GibbsUPropMono* gibbs = new GibbsUPropMono(db, models, 1.);
-      return (static_cast<AGibbs *>(gibbs));
+      auto* gibbs = new GibbsUPropMono(db, models, 1.);
+      return (static_cast<AGibbs*>(gibbs));
     }
 
-      // Standard case
+    // Standard case
 
-      GibbsUMultiMono* gibbs = new GibbsUMultiMono(db, models, rho);
-      return (static_cast<AGibbs *>(gibbs));
+    auto* gibbs = new GibbsUMultiMono(db, models, rho);
+    return (static_cast<AGibbs*>(gibbs));
   }
 
   if (flag_propagation)
@@ -99,6 +101,7 @@ AGibbs* GibbsFactory::createGibbs(Db* db,
     return nullptr;
   }
 
-  GibbsUMultiMono* gibbs = new GibbsUMultiMono(db, models, rho);
+  auto* gibbs = new GibbsUMultiMono(db, models, rho);
   return (static_cast<AGibbs*>(gibbs));
+}
 }

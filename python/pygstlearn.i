@@ -100,7 +100,7 @@
 
   template <typename Type> int convertToCpp(PyObject* obj, Type& value);
   
-  template <> int convertToCpp(PyObject* obj, int& value)
+  template <> int convertToCpp(PyObject* obj, Id& value)
   {
     // Test argument
     if (obj == NULL) return SWIG_TypeError;
@@ -113,10 +113,10 @@
       if (myres == SWIG_OverflowError || v == NPY_INT_NA) // NaN, Inf or out of bound value becomes NA
       {
         myres = SWIG_OK;
-        value = getNA<int>();
+        value = getNA<Id>();
       }
       else
-        myres = SWIG_AsVal_int(obj, &value);
+        myres = SWIG_AsVal_long(obj, &value);
     }
     return myres;
   }
@@ -163,8 +163,8 @@
     // Test argument
     if (obj == NULL) return SWIG_TypeError;
     
-    int v = 0;
-    int myres = SWIG_AsVal_int(obj, &v);
+    long v = 0;
+    int myres = SWIG_AsVal_long(obj, &v);
     //std::cout << "convertToCpp(UChar): value=" << v << std::endl;
     if (myres == SWIG_OverflowError || 
         v < std::numeric_limits<UChar>::min() ||
@@ -187,8 +187,8 @@
     // Test argument
     if (obj == NULL) return SWIG_TypeError;
     
-    int v = 0;
-    int myres = SWIG_AsVal_int(obj, &v);
+    long v = 0;
+    int myres = SWIG_AsVal_long(obj, &v);
     //std::cout << "convertToCpp(bool): value=" << v << std::endl;
     if (v == 0)
       value = false;
@@ -281,20 +281,20 @@
     return myres;
   }
 
-  int matrixDenseToCpp(PyObject* obj, MatrixDense& mat)
+  int matrixDenseToCpp(PyObject* obj, gstlrn::MatrixDense& mat)
   {
     mat.resize(0, 0);
     if (obj == NULL) return SWIG_TypeError;
     if (obj == Py_None) return SWIG_NullReferenceError;
 
     // Conversion
-    VectorVectorDouble vvec;
+    gstlrn::VectorVectorDouble vvec;
     int myres = SWIG_OK;
     int size = (int)PySequence_Length(obj);
     if (size < 0)
     {
       // Not a sequence
-      VectorDouble vec;
+      gstlrn::VectorDouble vec;
       // Clear Python error indicator
       PyErr_Restore(NULL, NULL, NULL);
       // Try to convert
@@ -307,7 +307,7 @@
       for (int i = 0; i < size && SWIG_IsOK(myres); i++)
       {
         PyObject* item = PySequence_GetItem(obj, i);
-        VectorDouble vec;
+        gstlrn::VectorDouble vec;
         myres = vectorToCpp(item, vec);
         if (SWIG_IsOK(myres))
           vvec.push_back(vec);
@@ -324,7 +324,7 @@
     return myres;
   }
 
-  void convertIndices(PyObject* obj, VectorInt& vec)
+  void convertIndices(PyObject* obj, std::vector<int>& vec)
   {
     // Initialize output vector
     vec.clear();
@@ -352,7 +352,7 @@
         auto ni = PyArray_Size((PyObject*)(indices_array));
         vec.resize(ni);
         for (int i=0 ; i < ni; i++)
-          vec[i] = (int)indices[i];
+          vec[i] = static_cast<int>(indices[i]);
         break;
       }
       default :
@@ -364,7 +364,7 @@
     Py_XDECREF(indices_array);
   }
 
-  int matrixSparseToCpp(PyObject* obj, MatrixSparse& mat)
+  int matrixSparseToCpp(PyObject* obj, gstlrn::MatrixSparse& mat)
   {
     if (obj == NULL) return SWIG_TypeError;
     if (obj == Py_None) return SWIG_NullReferenceError;
@@ -380,8 +380,8 @@
       messerr("Could not extract shape from sparse matrix");
       return SWIG_TypeError;
     }
-    int nrows = PyLong_AsLong(PyTuple_GetItem(shape, 0));
-    int ncols = PyLong_AsLong(PyTuple_GetItem(shape, 1));
+    auto nrows = PyLong_AsLong(PyTuple_GetItem(shape, 0));
+    auto ncols = PyLong_AsLong(PyTuple_GetItem(shape, 1));
     
     // Reading the storage format
     PyObject* format_obj = PyObject_GetAttrString(obj, "format");
@@ -400,17 +400,17 @@
     double* values = (double*) PyArray_DATA(data_array);
 
     // Number of non empty cells
-    int nnz = PyArray_DIM(data_array, 0);
+    auto nnz = PyArray_DIM(data_array, 0);
 
     // Reading 'row' and 'col' or 'indices' and 'indptr' information
     // And build rows and cols indices vectors for creating triplets
-    VectorInt rows(nnz);
-    VectorInt cols(nnz);
+    std::vector<int> rows(nnz);
+    std::vector<int> cols(nnz);
     if (strcmp(format_str, "coo") != 0) 
     {
       // The format is CSC or CSR
-      VectorInt vindc;
-      VectorInt viptr;
+      std::vector<int> vindc;
+      std::vector<int> viptr;
       PyObject* indices_obj = PyObject_GetAttrString(obj, "indices");
       PyObject* indptr_obj  = PyObject_GetAttrString(obj, "indptr");
       
@@ -460,6 +460,9 @@
 
 %typecheck(SWIG_TYPECHECK_UINT8) UChar {}
 
+namespace gstlrn
+{
+ 
 // Add numerical vector typecheck typemaps for dispatching functions
 %typemap(typecheck, noblock=1, fragment="ToCpp", precedence=SWIG_TYPECHECK_DOUBLE_ARRAY) const VectorInt&,    VectorInt,
                                                                                          const VectorDouble&, VectorDouble,
@@ -478,7 +481,7 @@
 %fragment("FromCpp", "header")
 {
   template <typename Type> NPY_TYPES numpyType();
-  template <> NPY_TYPES numpyType<int>()     { return NPY_INT_TYPE; }
+  template <> NPY_TYPES numpyType<Id>()      { return NPY_INT_TYPE; }
   template <> NPY_TYPES numpyType<double>()  { return NPY_DOUBLE; }
   template <> NPY_TYPES numpyType<String>()  { return NPY_STRING; }
   template <> NPY_TYPES numpyType<float>()   { return NPY_FLOAT; }
@@ -486,7 +489,7 @@
   template <> NPY_TYPES numpyType<bool>()    { return NPY_BOOL; }
   
   template<typename Type> struct TypeHelper;
-  template <> struct TypeHelper<int>    { static bool hasFixedSize() { return true; } };
+  template <> struct TypeHelper<Id>    { static bool hasFixedSize() { return true; } };
   template <> struct TypeHelper<double> { static bool hasFixedSize() { return true; } };
   template <> struct TypeHelper<String> { static bool hasFixedSize() { return false; } };
   template <> struct TypeHelper<float>  { static bool hasFixedSize() { return true; } };
@@ -495,7 +498,7 @@
   template <typename Type> bool hasFixedSize() { return TypeHelper<Type>::hasFixedSize(); }
   
   template <typename InputType> struct OutTraits;
-  template <> struct OutTraits<int>     { using OutputType = NPY_INT_OUT_TYPE; };
+  template <> struct OutTraits<Id>      { using OutputType = NPY_INT_OUT_TYPE; };
   template <> struct OutTraits<double>  { using OutputType = double; };
   template <> struct OutTraits<String>  { using OutputType = const char*; };
   template <> struct OutTraits<float>   { using OutputType = float; };
@@ -503,11 +506,11 @@
   template <> struct OutTraits<bool>    { using OutputType = bool; };
   
   template <typename Type> typename OutTraits<Type>::OutputType convertFromCpp(const Type& value);
-  template <> NPY_INT_OUT_TYPE convertFromCpp(const int& value)
+  template <> NPY_INT_OUT_TYPE convertFromCpp(const Id& value)
   {
     //std::cout << "convertFromCpp(int): value=" << value << std::endl;
     NPY_INT_OUT_TYPE vres = static_cast<NPY_INT_OUT_TYPE>(value);
-    if (isNA<int>(value))
+    if (isNA<Id>(value))
       vres = NPY_INT_NA;
     return vres;
   }
@@ -542,7 +545,7 @@
   }
   
   template <typename Type> PyObject* objectFromCpp(const Type& value);
-  template <> PyObject* objectFromCpp(const int& value)
+  template <> PyObject* objectFromCpp(const Id& value)
   {
     return PyLong_FromLongLong(convertFromCpp(value));
   }
@@ -671,7 +674,7 @@
     return myres;
   }
 
-  int matrixDenseFromCpp(PyObject** obj, const MatrixDense& mat)
+  int matrixDenseFromCpp(PyObject** obj, const gstlrn::MatrixDense& mat)
   {
     // Conversion to a 2D numpy array
     npy_intp dims[2] = { mat.getNRows(), mat.getNCols() };
@@ -690,21 +693,21 @@
     return SWIG_OK;
   }
 
-  int matrixDenseFromCppCreate(PyObject** obj, const MatrixDense& mat)
+  int matrixDenseFromCppCreate(PyObject** obj, const gstlrn::MatrixDense& mat)
   {
-    *obj = SWIG_NewPointerObj((void*) new MatrixDense(mat), SWIGTYPE_p_MatrixDense, 0);
+    *obj = SWIG_NewPointerObj((void*) new gstlrn::MatrixDense(mat), SWIGTYPE_p_gstlrn__MatrixDense, 0);
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
 
-  int matrixSparseFromCpp(PyObject** obj, const MatrixSparse& mat)
+  int matrixSparseFromCpp(PyObject** obj, const gstlrn::MatrixSparse& mat)
   {
     if (mat.empty()) 
       return SWIG_OK;
     
     // Conversion to a 2D numpy array
-    int nrows = mat.getNRows();
-    int ncols = mat.getNCols();
+    auto nrows = mat.getNRows();
+    auto ncols = mat.getNCols();
 
     NF_Triplet NFT = mat.getMatrixToTriplet();
     const npy_intp nnz = NFT.getNElements();
@@ -723,8 +726,8 @@
 
     for (npy_intp i = 0; i < nnz; ++i) 
     {
-      rows_ptr[i] = NFT.getRow(i);
-      cols_ptr[i] = NFT.getCol(i);
+      rows_ptr[i] = static_cast<int>(NFT.getRow(i));
+      cols_ptr[i] = static_cast<int>(NFT.getCol(i));
       data_ptr[i] = NFT.getValue(i);
     }
 
@@ -750,9 +753,9 @@
     return SWIG_OK;
   }
 
-  int matrixSparseFromCppCreate(PyObject** obj, const MatrixSparse& mat)
+  int matrixSparseFromCppCreate(PyObject** obj, const gstlrn::MatrixSparse& mat)
   {
-    *obj = SWIG_NewPointerObj((void*) new MatrixSparse(mat), SWIGTYPE_p_MatrixSparse, 0);
+    *obj = SWIG_NewPointerObj((void*) new gstlrn::MatrixSparse(mat), SWIGTYPE_p_gstlrn__MatrixSparse, 0);
     int myres = (*obj) == NULL ? SWIG_TypeError : SWIG_OK;
     return myres;
   }
@@ -762,6 +765,53 @@
 //                Specific additionnal typemaps             //
 //////////////////////////////////////////////////////////////
 
+
+// Typemap IN pour accepter un pandas.DataFrame
+%typemap(in) std::map<std::string, std::vector<double, std::allocator<double> > > *  {
+  if (!PyObject_HasAttrString($input, "columns") || !PyObject_HasAttrString($input, "__getitem__")) {
+      PyErr_SetString(PyExc_TypeError, "Expected a pandas.DataFrame");
+      return NULL;
+  }
+
+  $1 = new std::map<std::string, std::vector<double>>();
+
+  PyObject *columns = PyObject_GetAttrString($input, "columns");
+  PyObject *iter = PyObject_GetIter(columns);
+  if (!iter) {
+      PyErr_SetString(PyExc_TypeError, "Could not iterate DataFrame columns");
+      Py_DECREF(columns);
+      return NULL;
+  }
+
+  PyObject *col;
+  while ((col = PyIter_Next(iter))) {
+      const char *colname = PyUnicode_AsUTF8(col);
+      PyObject *series = PyObject_GetItem($input, col);
+      PyObject *values = PyObject_GetAttrString(series, "values");
+
+      Py_ssize_t len = PyObject_Length(values);
+      std::vector<double> vec;
+      for (Py_ssize_t i = 0; i < len; ++i) {
+          PyObject *item = PySequence_GetItem(values, i);
+          double val = PyFloat_AsDouble(item);
+          Py_DECREF(item);
+          vec.push_back(val);
+      }
+
+      (*$1)[colname] = vec;
+
+      Py_DECREF(values);
+      Py_DECREF(series);
+      Py_DECREF(col);
+  }
+
+  Py_DECREF(iter);
+  Py_DECREF(columns);
+}
+
+%typemap(freearg) std::map<std::string, std::vector<double, std::allocator<double> > > * {
+  delete $1;
+}
 // This for automatically converting R string to NamingConvention
 
 %typemap(in) NamingConvention, NamingConvention &, const NamingConvention, const NamingConvention &
@@ -776,7 +826,7 @@
   }
   else
   {
-    myres = SWIG_ConvertPtr($input, (void **)(&localNC), SWIGTYPE_p_NamingConvention,  0  | 0);
+    myres = SWIG_ConvertPtr($input, (void **)(&localNC), SWIGTYPE_p_gstlrn__NamingConvention,  0  | 0);
     if (!SWIG_IsOK(myres)) {
       %argument_fail(myres, "$type", $symname, $argnum);
     }
@@ -790,7 +840,7 @@
 %typemap(typecheck, precedence=SWIG_TYPECHECK_STRING) const std::string_view {
   $1 = PyString_Check($input) ? 1 : 0;
 }
-
+}//namespace gstlrn
 //////////////////////////////////////////////////////////////
 //         C++ library SWIG includes and typemaps           //
 //////////////////////////////////////////////////////////////
@@ -844,11 +894,13 @@ void exit_f(void)
   redefine_exit(exit_f);
 %}
 
+namespace gstlrn {
+
 // Do not use VectorInt here
 %extend VectorT<String> {
   std::string __repr__() {  return $self->toString(); }
 }
-%extend VectorNumT<int> {
+%extend VectorNumT<long> {
   std::string __repr__() {  return $self->toString(); }
 }
 %extend VectorNumT<double> {
@@ -860,15 +912,17 @@ void exit_f(void)
 %extend VectorNumT<UChar> {
   std::string __repr__() {  return $self->toString(); }
 }
-%extend VectorT<VectorNumT<int> > {
+%extend VectorT<VectorNumT<long> > {
   std::string __repr__() {  return $self->toString(); }
 }
 %extend VectorT<VectorNumT<double> >{
   std::string __repr__() {  return $self->toString(); }
 }
 
+} // namespace gstlrn
+
 %include ../swig/toString.i
-%include generated_python.i
+%include ../swig/generated_python.i
 
 //////////////////////////////////////////////////////////////
 //       Add target language additional features below      //
@@ -1146,7 +1200,7 @@ def setdbitem(self,name,tab):
         
         tab_i[np.isnan(tab_i)] = np.nan
         VectD = np.double(tab_i)
-        self.setColumn(VectD, name, gl.ELoc.UNKNOWN, 0, useSel)
+        self.setColumn(VectD.tolist(), name, gl.ELoc.UNKNOWN, 0, useSel)
         
     return
 
@@ -1175,4 +1229,3 @@ except ModuleNotFoundError:
     pass
 
 %}
-

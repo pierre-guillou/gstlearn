@@ -32,6 +32,12 @@ For using this Python package you only need Python 3.8 (or higher) (with numpy, 
 pip install gstlearn
 ```
 
+For installing a prerelease version:
+
+```
+pip install --pre --force-reinstall gstlearn
+```
+
 The `gstlearn.plot` Python module requires additional dependencies,
 those can be installed alongside gstlearn with the following command:
 
@@ -73,8 +79,8 @@ mygrid = gl.DbGrid.create([nx,ny],[1,1])
 var = np.random.randn(nx * ny)
 mygrid.addColumns(var, "var1", gl.ELoc.Z)
 # Display the field
-ax = gp.grid(mygrid)
-ax.decoration(title="Gaussian random field")
+gp.raster(mygrid)
+gp.decoration(title="Gaussian random field")
 plt.show()
 ```
 
@@ -111,8 +117,7 @@ Please, look at [CHANGES file](https://github.com/gstlearn/gstlearn/blob/main/CH
 For building the *gstlearn* Python package, the requirements for compiling *gstlearn* C++ library must be installed beforehand. Then, the following additional tools must be also available:
 
 * SWIG 4 or higher
-* Python 3 or higher with *pip*, *numpy*, *pandas*, *scipy* and *matplotlib* modules installed
-* *pypandoc*, *scikit-sparse*, *plotly*, *jupyter* and *notebook* Python modules [Optional]
+* Python 3 or higher with *uv* and *numpy* modules installed
 
 If you modified your system, you must reinstall the requirements from scratch following next instructions. You must delete 'gstlearn' existing source folders (if so).
 
@@ -130,14 +135,7 @@ Note :
 sudo apt install python3
 sudo apt install python3-pip
 sudo apt install swig
-python3 -m pip install numpy pandas scipy matplotlib
-````
-
-3. Finally, execute the following commands (optional):
-
-````
-sudo apt install pandoc jupyter libsuitesparse-dev
-python3 -m pip install pypandoc plotly jupyter notebook scikit-sparse
+python3 -m pip install numpy uv
 ````
 
 #### MacOS
@@ -149,14 +147,7 @@ python3 -m pip install pypandoc plotly jupyter notebook scikit-sparse
 ````
 brew install python3
 brew install swig
-python3 -m pip install numpy pandas scipy matplotlib
-````
-
-3. Finally, execute the following commands (optional):
-
-````
-brew install pandoc jupyter libsuitesparse-dev
-python3 -m pip install pypandoc plotly jupyter notebook scikit-sparse
+python3 -m pip install numpy uv
 ````
 
 Notes:
@@ -173,18 +164,11 @@ Notes:
 
   * Python 3+ [from here](https://www.python.org/downloads) (*Windows installer* [exe] - check 'Add python.exe to PATH' in the first panel)
   * SWIG 4+ [from here](http://www.swig.org/download.html) (*swigwin archive* [zip], archive file to be extracted in a folder of your choice, but not in the *gstlearn* source folder - remind the installation folder, assume it is `C:\swigwin-4.1.0`))
-  * Pandoc [from here](https://github.com/jgm/pandoc/releases) (*msi installer* [msi] - simply execute the program)
 
 3. Then, install additional Python modules by running following instructions in a command prompt:
 
 ````
-python -m pip install numpy pandas scipy matplotlib
-````
-
-4. Finally, install optional Python modules by running following instructions in a command prompt:
-
-````
-python -m pip install pypandoc plotly jupyter notebook scikit-sparse
+python -m pip install numpy uv
 ````
 
 ##### Update the Path environment variable

@@ -15,19 +15,22 @@
 #include "Basic/VectorNumT.hpp"
 #include <vector>
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT VectorHelper
 {
 public:
-  static VectorInt          initVInt(int nval, int value = 0.);
-  static VectorDouble       initVDouble(int nval, double value = 0.);
-  static VectorVectorDouble initVVDouble(int nval1, int nval2, double value = 0.);
-  static VectorVectorInt    initVVInt(int nval1, int nval2, int value = 0);
+  static VectorInt          initVInt(Id nval, Id value = 0.);
+  static VectorDouble       initVDouble(Id nval, double value = 0.);
+  static VectorVectorDouble initVVDouble(Id nval1, Id nval2, double value = 0.);
+  static VectorVectorInt    initVVInt(Id nval1, Id nval2, Id value = 0);
 
-  static VectorInt          initVInt(const int* values, int number);
-  static VectorDouble       initVDouble(const double* values, int number);
-  static VectorVectorDouble initVVDouble(const double* value, int n1, int n2);
+  static VectorInt          initVInt(const Id* values, Id number);
+  static VectorInt          initVInt(const I32* values, Id number);
+  static VectorDouble       initVDouble(const double* values, Id number);
+  static VectorVectorDouble initVVDouble(const double* value, Id n1, Id n2);
 
-  static VectorString initVString(int ntab, char** names);
+  static VectorString initVString(Id ntab, char** names);
   
   static void dump(const String& title, const VectorVectorInt& vect, bool skipLine = true);
   static void dump(const String& title, const VectorVectorDouble& vect, bool skipLine = true);
@@ -41,30 +44,35 @@ public:
   static String toStringAsVS(const VectorString& vec);
   static String toStringAsVI(const VectorInt& vec);
 
-  static void dumpStats(const String &title, const VectorDouble &vect);
-  static void dumpRange(const String &title, const VectorDouble &vect);
+  #ifndef SWIG
+  static void dumpStats(const String& title, constvect vect, Id nmax = -1);
+  static void dumpRange(const String& title, constvect vect, Id nmax = -1);
+#endif
+  static void dumpStats(const String& title, const VectorDouble& vectin, Id nmax = -1);
+  static void dumpRange(const String &title, const VectorDouble& vectin, Id nmax = -1);
   static void dumpRange(const String &title, const VectorInt &vect);
-  static void dumpNNZ(const String &title, const VectorDouble &vect, int nclass = 10);
+  static void dumpNNZ(const String &title, const VectorDouble &vect, Id nclass = 10);
 
-  static int maximum(const VectorInt &vec, bool flagAbs = false);
-  static int minimum(const VectorInt &vec, bool flagAbs = false);
-  static double maximum(const VectorDouble &vec, bool flagAbs = false, const VectorDouble& aux = VectorDouble(), int mode=0);
-  static double minimum(const VectorDouble &vec, bool flagAbs = false, const VectorDouble& aux = VectorDouble(), int mode=0);
+  static Id maximum(const VectorInt &vec, bool flagAbs = false);
+  static Id minimum(const VectorInt &vec, bool flagAbs = false);
+  static double maximum(const VectorDouble &vec, bool flagAbs = false, const VectorDouble& aux = VectorDouble(), Id mode=0);
+  static double minimum(const VectorDouble &vec, bool flagAbs = false, const VectorDouble& aux = VectorDouble(), Id mode=0);
   static double maximum(const VectorVectorDouble &vec, bool flagAbs = false);
   static double maximum(const std::vector<std::vector<double>> &vec, bool flagAbs = false);
 
   static double minimum(const VectorVectorDouble &vec, bool flagAbs = false);
-  static int product(const VectorInt& vec);
+  static Id product(const VectorInt& vec);
   static double product(const VectorDouble& vec);
-  static int countUndefined(const VectorDouble& vec);
-  static int countDefined(const VectorDouble& vec);
+  static Id countUndefined(const VectorDouble& vec);
+  static Id countDefined(const VectorDouble& vec);
   static bool hasUndefined(const VectorDouble& vec);
   static double extensionDiagonal(const VectorDouble& mini, const VectorDouble& maxi);
 
-  static int    count(const VectorVectorInt& vec);
-  static int    cumul(const VectorInt& vec);
-  static int    cumul(const VectorVectorInt& vec);
+  static Id    count(const VectorVectorInt& vec);
+  static Id    cumul(const VectorInt& vec);
+  static Id    cumul(const VectorVectorInt& vec);
   static double cumul(const VectorDouble &vec);
+  static double cumulLog(const VectorDouble &vec);
   static VectorInt cumulIncrement(const VectorVectorInt& vec);
   static double mean(const VectorDouble& vec);
   static double variance(const VectorDouble &vec, bool scaleByN = false);
@@ -78,7 +86,7 @@ public:
   static VectorDouble quantiles(const VectorDouble& vec, const VectorDouble& probas);
 
   static bool isConstant(const VectorDouble& vect, double refval = TEST);
-  static bool isConstant(const VectorInt& vect, int refval = ITEST);
+  static bool isConstant(const VectorInt& vect, Id refval = ITEST);
   static bool isEqual(const VectorDouble &v1,
                      const VectorDouble &v2,
                      double eps = EPSILON10);
@@ -90,14 +98,14 @@ public:
                               bool flagAbsolute    = false,
                               const String& string = "");
 
-  static void sequenceInPlace(int n, VectorInt& vec);
-  static VectorInt sequence(int number, int ideb = 0, int step = 1);
+  static void sequenceInPlace(Id n, VectorInt& vec);
+  static VectorInt sequence(Id number, Id ideb = 0, Id step = 1);
   static VectorDouble sequence(double valFrom,
                                double valTo,
                                double valStep = 1.,
                                double ratio   = 1.);
-  static void fill(VectorDouble& vec, double v, int size = 0);
-  static void fill(VectorInt& vec, int v, int size = 0);
+  static void fill(VectorDouble& vec, double v, Id size = 0);
+  static void fill(VectorInt& vec, Id v, Id size = 0);
   static void fill(VectorVectorDouble &vec, double value);
   static void fillUndef(VectorDouble& vec, double repl);
   
@@ -105,13 +113,13 @@ public:
   static void addMultiplyConstantInPlace(double val1,
                                          const constvect in,
                                          vect out,
-                                         int iad);
+                                         Id iad);
   static double innerProduct(const constvect veca, const constvect vecb);
 
   static void addMultiplyVectVectInPlace(const constvect in1,
                                          const constvect in2,
                                          vect out,
-                                         int iad);
+                                         Id iad);
 
   static void addInPlace(constvect in, vect dest);
 
@@ -123,15 +131,15 @@ public:
   static void addInPlace(const VectorDouble& veca,
                          const VectorDouble& vecb,
                          VectorDouble& res,
-                         int size = 0);
+                         Id size = 0);
   static void addInPlace(const VectorInt& veca,
                          const VectorInt& vecb,
                          VectorInt& res,
-                         int size = 0);
+                         Id size = 0);
   static void addInPlace(const double *veca,
                          const double *vecb,
                          double *res,
-                         int size);
+                         Id size);
   static void addInPlace(const VectorVectorDouble& in1,
                          const VectorVectorDouble& in2,
                          VectorVectorDouble& outv);
@@ -175,25 +183,25 @@ public:
   static void addMultiplyConstantInPlace(double val1,
                                          const VectorDouble &in1,
                                          VectorDouble &outv,
-                                         int iad);
+                                         Id iad);
   static void addMultiplyConstantInPlace(double val1,
                                          const VectorVectorDouble &in1,
                                          VectorVectorDouble &outv);
   static void divideConstant(VectorDouble& vec, double v);
-  static void copy(const VectorDouble& vecin, VectorDouble& vecout, int size = -1);
-  static void copy(const VectorInt &vecin, VectorInt &vecout, int size = -1);
+  static void copy(const VectorDouble& vecin, VectorDouble& vecout, Id size = -1);
+  static void copy(const VectorInt &vecin, VectorInt &vecout, Id size = -1);
   static void copy(const VectorVectorDouble &inv, VectorVectorDouble &outv);
   static void copy(const std::vector<std::vector<double>> &inv, std::vector<std::vector<double>> &outv);
 
   static void addConstant(VectorDouble& vec, double v);
-  static void addConstant(VectorInt& vec, int v);
+  static void addConstant(VectorInt& vec, Id v);
   static void mean1AndMean2ToStdev(const VectorDouble &mean1,
                                    const VectorDouble &mean2,
                                    VectorDouble &std,
-                                   int number);
+                                   Id number);
 
-  static void normalize(VectorDouble& vec, int norm=2);
-  static void normalize(double *tab, int ntab);
+  static void normalize(VectorDouble& vec, Id norm=2);
+  static void normalize(double *tab, Id ntab);
   static void normalizeFromGaussianDistribution(VectorDouble &vec,
                                                 double mini = 0.,
                                                 double maxi = 1.);
@@ -205,12 +213,16 @@ public:
   static void concatenateInPlace(VectorDouble& veca, const VectorDouble& vecb);
   static VectorDouble power(const VectorDouble& vec, double power);
   static VectorDouble inverse(const VectorDouble& vec);
+#ifndef SWIG
+  static void power(VectorDouble& res, const constvect vec, double power);
+  static void inverse(VectorDouble& res, const constvect vec);
+#endif // !SWIG
 
-  static double innerProduct(const VectorDouble &veca, const VectorDouble &vecb, int size = -1);
-  static double innerProduct(const double* veca, const double* vecb, int size);
+  static double innerProduct(const VectorDouble &veca, const VectorDouble &vecb, Id size = -1);
+  static double innerProduct(const double* veca, const double* vecb, Id size);
   static double innerProduct(const VectorVectorDouble &x,
                              const VectorVectorDouble &y);
-  static double innerProduct(const std::vector<double> &veca, const std::vector<double> &vecb, int size = -1);
+  static double innerProduct(const std::vector<double> &veca, const std::vector<double> &vecb, Id size = -1);
 
   static VectorDouble crossProduct3D(const VectorDouble &veca, const VectorDouble &vecb);
   static void crossProduct3DInPlace(const double *a, const double *b, double *v);
@@ -218,58 +230,58 @@ public:
   static VectorDouble cumsum(const VectorDouble &vecin, bool flagAddZero, bool revert=false);
   static void cumulateInPlace(VectorDouble &vec);
   static void cumulate(VectorDouble &veca, const VectorDouble &vecb, double coeff = 1., double addval = 0.);
-  static void getMostSignificant(const VectorDouble& vec, double tol = EPSILON6, int nmax = -1);
+  static void getMostSignificant(const VectorDouble& vec, double tol = EPSILON6, Id nmax = -1);
 
-  static VectorDouble simulateUniform(int n = 1,
+  static VectorDouble simulateUniform(Id n = 1,
                                       double mini = 0.,
                                       double maxi = 1.);
-  static VectorDouble simulateBernoulli(int n = 1,
+  static VectorDouble simulateBernoulli(Id n = 1,
                                         double proba = 0.5,
                                         double vone = 1.,
                                         double velse = 0.);
-  static VectorDouble simulateGaussian(int n = 1,
+  static VectorDouble simulateGaussian(Id n = 1,
                                        double mean = 0.,
                                        double sigma = 1.);
   static void simulateGaussianInPlace(VectorDouble &vec,
                                       double mean = 0.,
                                       double sigma = 1.);
-  static VectorInt sampleRanks(int ntotal,
+  static VectorInt sampleRanks(Id ntotal,
                                double proportion = 0.,
-                               int number = 0,
-                               int seed = 242141,
-                               int optSort = 0);
-  static void normalizeCodir(int ndim, VectorDouble &codir);
+                               Id number = 0,
+                               Id seed = 242141,
+                               Id optSort = 0);
+  static void normalizeCodir(Id ndim, VectorDouble &codir);
 
-  static bool         isInList(const VectorInt& vec, int item);
-  static VectorInt    sort(const VectorInt& vecin, bool ascending = true, int size = -1);
-  static VectorDouble sort(const VectorDouble& vecin, bool ascending = true, int size = -1);
-  static void         sortInPlace(VectorInt& vecin, bool ascending = true, int size = -1);
-  static void         sortInPlace(VectorDouble& vecin, bool ascending = true, int size = -1);
+  static bool         isInList(const VectorInt& vec, Id item);
+  static VectorInt    sort(const VectorInt& vecin, bool ascending = true, Id size = -1);
+  static VectorDouble sort(const VectorDouble& vecin, bool ascending = true, Id size = -1);
+  static void         sortInPlace(VectorInt& vecin, bool ascending = true, Id size = -1);
+  static void         sortInPlace(VectorDouble& vecin, bool ascending = true, Id size = -1);
   static bool         isSorted(const VectorDouble& vec, bool ascending = true);
-  static VectorDouble unique(const VectorDouble& vecin, int size = -1);
-  static VectorInt    unique(const VectorInt& vecin, int size = -1);
-  static VectorInt    orderRanks(const VectorInt& vecin, bool ascending = true, int size = -1);
-  static VectorInt    orderRanks(const VectorDouble& vecin, bool ascending = true, int size = -1);
-  static VectorInt    sortRanks(const VectorDouble& vecin, bool ascending = true, int size = -1);
-  static VectorInt    reorder(const VectorInt& vecin, const VectorInt& order, int size = -1);
-  static VectorDouble reorder(const VectorDouble& vecin, const VectorInt& order, int size = -1);
+  static VectorDouble unique(const VectorDouble& vecin, Id size = -1);
+  static VectorInt    unique(const VectorInt& vecin, Id size = -1);
+  static VectorInt    orderRanks(const VectorInt& vecin, bool ascending = true, Id size = -1);
+  static VectorInt    orderRanks(const VectorDouble& vecin, bool ascending = true, Id size = -1);
+  static VectorInt    sortRanks(const VectorDouble& vecin, bool ascending = true, Id size = -1);
+  static VectorInt    reorder(const VectorInt& vecin, const VectorInt& order, Id size = -1);
+  static VectorDouble reorder(const VectorDouble& vecin, const VectorInt& order, Id size = -1);
   static VectorDouble revert(const VectorDouble& vecin);
   static VectorInt    revert(const VectorInt& vecin);
   static VectorDouble sample(const VectorDouble& vecin, const VectorInt& indKeep);
   
-  static void arrangeInPlace(int safe,
+  static void arrangeInPlace(Id safe,
                              VectorInt& ranks,
                              VectorDouble& values,
                              bool ascending = true,
-                             int size       = -1);
-  static void arrangeInPlace(int safe,
+                             Id size       = -1);
+  static void arrangeInPlace(Id safe,
                              VectorInt &ranks,
                              VectorInt &values,
                              bool ascending = true,
-                             int size = -1);
+                             Id size = -1);
   static VectorInt filter(const VectorInt &vecin,
-                          int vmin = ITEST,
-                          int vmax = ITEST,
+                          Id vmin = ITEST,
+                          Id vmax = ITEST,
                           bool ascending = true);
   static VectorInt complement(const VectorInt& vec, const VectorInt& sel);
 
@@ -300,10 +312,10 @@ public:
                                           std::vector<std::vector<double>> &outv);
 
   static VectorDouble suppressTest(const VectorDouble& vecin);
-  static void extractInPlace(const VectorDouble& vecin, VectorDouble& vecout, int start);
-  static void mergeInPlace(const VectorDouble& vecin, VectorDouble& vecout, int start);
+  static void extractInPlace(const VectorDouble& vecin, VectorDouble& vecout, Id start);
+  static void mergeInPlace(const VectorDouble& vecin, VectorDouble& vecout, Id start);
 
-  static void transformVD(VectorDouble& tab, int oper_choice = 1);
+  static void transformVD(VectorDouble& tab, Id oper_choice = 1);
 
   static void squeezeAndStretchInPlaceForward(const VectorDouble &vecin,
                                               VectorDouble &vecout,
@@ -318,17 +330,17 @@ public:
                                                double top,
                                                double bot);
 
-  static int whereMinimum(const VectorDouble& tab);
-  static int whereMaximum(const VectorDouble& tab);
-  static int whereElement(const VectorInt& tab, int target);
+  static Id whereMinimum(const VectorDouble& tab);
+  static Id whereMaximum(const VectorDouble& tab);
+  static Id whereElement(const VectorInt& tab, Id target);
   static double norm(const std::vector<double>& vec);
   static bool isIsotropic(const VectorVectorInt& sampleRanks);
 
-  static VectorDouble reduceOne(const VectorDouble &vecin, int index);
+  static VectorDouble reduceOne(const VectorDouble &vecin, Id index);
   static VectorDouble reduce(const VectorDouble &vecin, const VectorInt& vindex);
   static VectorDouble compress(const VectorDouble &vecin, const VectorInt& vindex);
-  static void truncateDecimalsInPlace(VectorDouble& vec, int ndec);
-  static void truncateDigitsInPlace(VectorDouble& vec, int ndec);
+  static void truncateDecimalsInPlace(VectorDouble& vec, Id ndec);
+  static void truncateDigitsInPlace(VectorDouble& vec, Id ndec);
   static void simulateGaussianInPlace(std::vector<double> &vec,
                                            double mean = 0.,
                                            double sigma = 1.);
@@ -337,3 +349,4 @@ public:
 //typedef VectorHelper VH;
 class VH: public VectorHelper {};
 
+}

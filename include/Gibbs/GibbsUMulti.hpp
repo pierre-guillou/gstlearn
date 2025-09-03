@@ -14,6 +14,8 @@
 
 #include "Gibbs/GibbsMulti.hpp"
 
+namespace gstlrn
+{
 class Db;
 class Model;
 
@@ -26,14 +28,15 @@ public:
   GibbsUMulti& operator=(const GibbsUMulti &r);
   virtual ~GibbsUMulti();
 
-  void update(VectorVectorDouble &y, int isimu, int ipgs, int iter) override;
-  int covmatAlloc(bool verbose, bool verboseTimer = false) override;
+  void update(VectorVectorDouble &y, Id isimu, Id ipgs, Id iter) override;
+  Id covmatAlloc(bool verbose, bool verboseTimer = false) override;
 
 private:
-  int    _getSize() const;
-  double _getVariance(int iecr) const;
-  double _getEstimate(int ipgs, int iecr, VectorVectorDouble& y);
+  Id    _getSize() const;
+  double _getVariance(Id iecr) const;
+  double _getEstimate(Id ipgs, Id iecr, VectorVectorDouble& y);
 
 private:
   VectorDouble _covmat;
 };
+}

@@ -8,22 +8,24 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
+#include "Simulation/CalcSimuPartition.hpp"
+#include "Basic/Law.hpp"
 #include "Calculators/CalcMigrate.hpp"
-#include "Db/DbGrid.hpp"
 #include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "Simulation/ACalcSimulation.hpp"
 #include "Simulation/CalcSimuTurningBands.hpp"
-#include "Simulation/CalcSimuPartition.hpp"
 #include "Simulation/SimuPartitionParam.hpp"
-#include "Basic/Law.hpp"
 
-#include <math.h>
+#include <cmath>
 
-#define COOR(iech,idim)    (coor[(iech) * ndim + (idim)])
+#define COOR(iech, idim) (coor[(iech) * ndim + (idim)])
 
-CalcSimuPartition::CalcSimuPartition(int mode,
-                                     int nbsimu,
-                                     int seed,
+namespace gstlrn
+{
+CalcSimuPartition::CalcSimuPartition(Id mode,
+                                     Id nbsimu,
+                                     Id seed,
                                      bool verbose)
   : ACalcSimulation(nbsimu, seed)
   , _mode(mode)
@@ -48,7 +50,7 @@ CalcSimuPartition::~CalcSimuPartition()
 bool CalcSimuPartition::_voronoi()
 {
   DbGrid* dbgrid = dynamic_cast<DbGrid*>(getDbout());
-  int ndim = _getNDim();
+  auto ndim      = _getNDim();
   VectorDouble simgrid(dbgrid->getNSample());
 
   /************************************/
@@ -58,18 +60,18 @@ bool CalcSimuPartition::_voronoi()
   double volume = 1.;
   VectorDouble field(ndim);
   VectorDouble origin(ndim);
-  for (int i = 0; i < ndim; i++)
+  for (Id i = 0; i < ndim; i++)
   {
     double dil = _parparam.getDilate(i);
-    field[i] = dbgrid->getDX(i) * dbgrid->getNX(i);
-    origin[i] = dbgrid->getX0(i) - dbgrid->getDX(i) / 2. - dil * field[i] / 2.;
-    field[i] = field[i] * (1. + dil);
+    field[i]   = dbgrid->getDX(i) * dbgrid->getNX(i);
+    origin[i]  = dbgrid->getX0(i) - dbgrid->getDX(i) / 2. - dil * field[i] / 2.;
+    field[i]   = field[i] * (1. + dil);
     volume *= field[i];
   }
 
   /* Derive the number of points */
 
-  int nbpoints = (int) (volume * _parparam.getIntensity());
+  Id nbpoints = static_cast<Id>(volume * _parparam.getIntensity());
   if (_verbose)
     message("Boolean simulation. Intensity = %lf - Nb. seeds = %d\n",
             _parparam.getIntensity(), nbpoints);
@@ -77,9 +79,9 @@ bool CalcSimuPartition::_voronoi()
   /* Simulate the uniform points */
 
   VectorDouble coor(nbpoints * ndim, 0.);
-  for (int idim = 0; idim < ndim; idim++)
-    for (int ip = 0; ip < nbpoints; ip++)
-      COOR(ip,idim) = origin[idim] + field[idim] * law_uniform(0., 1.);
+  for (Id idim = 0; idim < ndim; idim++)
+    for (Id ip = 0; ip < nbpoints; ip++)
+      COOR(ip, idim) = origin[idim] + field[idim] * law_uniform(0., 1.);
 
   /* Create the Point Data Base */
 
@@ -93,9 +95,9 @@ bool CalcSimuPartition::_voronoi()
 
   /* Expand the data values over the grid nodes */
 
-  int iattp = dbpoint->getNColumn() - 1;
+  Id iattp = dbpoint->getNColumn() - 1;
   if (expandPointToGrid(dbpoint, dbgrid, iattp, -1, 0, -1, -1, -1, -1, 0,
-                           VectorDouble(), simgrid)) return 1;
+                        VectorDouble(), simgrid)) return 1;
 
   /* Save the grid in dbgrid */
 
@@ -127,12 +129,12 @@ bool CalcSimuPartition::_poisson()
   std::vector<Plane> planes;
 
   law_set_random_seed(getSeed());
-  int np = 0;
-  int iattg = -1;
+  Id np    = 0;
+  Id iattg = -1;
 
   /* Preliminary checks */
 
-  int ndim = dbgrid->getNDim();
+  Id ndim = dbgrid->getNDim();
 
   /************************************/
   /* Simulation of the Gaussian field */
@@ -149,7 +151,7 @@ bool CalcSimuPartition::_poisson()
   /* Calculate the number of planes */
 
   double diagonal = dbgrid->getExtensionDiagonal();
-  np = law_poisson(diagonal * _parparam.getIntensity() * GV_PI);
+  np              = law_poisson(diagonal * _parparam.getIntensity() * GV_PI);
   if (np <= 0) return false;
 
   /* Generate the Poisson planes */
@@ -158,13 +160,13 @@ bool CalcSimuPartition::_poisson()
 
   /* Assigning a value to the half-space that contains the center */
 
-  for (int ip = 0; ip < np; ip++)
-    planes[ip].setValue( (planes[ip].getRndval() > 0.5) ? -1 : 1);
+  for (Id ip = 0; ip < np; ip++)
+    planes[ip].setValue((planes[ip].getRndval() > 0.5) ? -1 : 1);
 
   /* Simulating the directing function */
 
   VectorDouble cen(ndim);
-  for (int iech = 0; iech < dbgrid->getNSample(); iech++)
+  for (Id iech = 0; iech < dbgrid->getNSample(); iech++)
   {
     if (!dbgrid->isActive(iech)) continue;
     dbgrid->getCoordinatesInPlace(cen, iech);
@@ -172,13 +174,12 @@ bool CalcSimuPartition::_poisson()
     /* Loop on the planes */
 
     double valtot = 0.;
-    for (int ip = 0; ip < np; ip++)
+    for (Id ip = 0; ip < np; ip++)
     {
       double prod = 0.;
-      for (int i = 0; i < (int) cen.size(); i++)
+      for (Id i = 0; i < static_cast<Id>(cen.size()); i++)
         prod += planes[ip].getCoor(i) * cen[i];
-      valtot += (prod + planes[ip].getIntercept() > 0) ?
-          planes[ip].getRndval() : -planes[ip].getRndval();
+      valtot += (prod + planes[ip].getIntercept() > 0) ? planes[ip].getRndval() : -planes[ip].getRndval();
     }
     dbgrid->setArray(iech, _iattOut, valtot);
   }
@@ -192,7 +193,7 @@ bool CalcSimuPartition::_poisson()
   /* Coding process */
   /******************/
 
-  for (int iech = 0; iech < dbgrid->getNSample(); iech++)
+  for (Id iech = 0; iech < dbgrid->getNSample(); iech++)
   {
     if (!dbgrid->isActive(iech)) continue;
     double valref = dbgrid->getArray(iech, _iattOut);
@@ -228,30 +229,30 @@ bool CalcSimuPartition::_poisson()
   return true;
 }
 
-double CalcSimuPartition::_stackSearch(const std::vector<Stack> &stacks,
+double CalcSimuPartition::_stackSearch(const std::vector<Stack>& stacks,
                                        double valref)
 {
-  for (int i = 0; i < (int) stacks.size(); i++)
+  for (Id i = 0; i < static_cast<Id>(stacks.size()); i++)
   {
-    if (isEqual(stacks[i].valref,valref)) return stacks[i].valsim;
+    if (isEqual(stacks[i].valref, valref)) return stacks[i].valsim;
   }
   return TEST;
 }
 
 bool CalcSimuPartition::_check()
 {
-  if (! ACalcSimulation::_check()) return false;
+  if (!ACalcSimulation::_check()) return false;
 
-  if (! hasDbout()) return false;
-  if (! hasModel()) return false;
-  int ndim = _getNDim();
+  if (!hasDbout()) return false;
+  if (!hasModel()) return false;
+  auto ndim = _getNDim();
   if (ndim > 3)
   {
     messerr("The Partition Method is not a relevant simulation model");
     messerr("for this Space Dimension (%d)", ndim);
     return false;
   }
-  if (! getDbout()->isGrid())
+  if (!getDbout()->isGrid())
   {
     messerr("The argument 'dbout' should be a grid");
     return false;
@@ -321,12 +322,12 @@ void CalcSimuPartition::_rollback()
  ** \param[in]  namconv     Naming Convention
  **
  *****************************************************************************/
-int tessellation_poisson(DbGrid *dbgrid,
-                         Model *model,
-                         const SimuPartitionParam& parparam,
-                         int seed,
-                         int verbose,
-                         const NamingConvention& namconv)
+Id tessellation_poisson(DbGrid* dbgrid,
+                        Model* model,
+                        const SimuPartitionParam& parparam,
+                        Id seed,
+                        Id verbose,
+                        const NamingConvention& namconv)
 {
   CalcSimuPartition simpart(2, 1, seed, verbose);
   simpart.setDbout(dbgrid);
@@ -334,7 +335,7 @@ int tessellation_poisson(DbGrid *dbgrid,
   simpart.setNamingConvention(namconv);
   simpart.setParparam(parparam);
 
-  int error = (simpart.run()) ? 0 : 1;
+  Id error = (simpart.run()) ? 0 : 1;
   return error;
 }
 
@@ -352,12 +353,12 @@ int tessellation_poisson(DbGrid *dbgrid,
  ** \param[in]  namconv     Naming Convention
  **
  *****************************************************************************/
-int tessellation_voronoi(DbGrid *dbgrid,
-                         Model *model,
-                         const SimuPartitionParam& parparam,
-                         int seed,
-                         int verbose,
-                         const NamingConvention& namconv)
+Id tessellation_voronoi(DbGrid* dbgrid,
+                        Model* model,
+                        const SimuPartitionParam& parparam,
+                        Id seed,
+                        Id verbose,
+                        const NamingConvention& namconv)
 {
   CalcSimuPartition simpart(1, 1, seed, verbose);
   simpart.setDbout(dbgrid);
@@ -365,7 +366,8 @@ int tessellation_voronoi(DbGrid *dbgrid,
   simpart.setNamingConvention(namconv);
   simpart.setParparam(parparam);
 
-  int error = (simpart.run()) ? 0 : 1;
+  Id error = (simpart.run()) ? 0 : 1;
   return error;
 }
 
+} // namespace gstlrn

@@ -10,10 +10,14 @@
 /******************************************************************************/
 #pragma once
 
+#include "Matrix/MatrixT.hpp"
 #include "gstlearn_export.hpp"
 
 #include "Basic/VectorNumT.hpp"
+#include "memory"
 
+namespace gstlrn
+{
 class Db;
 
 /**
@@ -26,7 +30,7 @@ class Db;
 class GSTLEARN_EXPORT RankHandler
 {
 public:
-  RankHandler(const Db* db,
+  RankHandler(const Db* db = nullptr,
               bool useSel = true,
               bool useZ   = true,
               bool useVerr = false,
@@ -37,17 +41,20 @@ public:
 
   void defineSampleRanks(const VectorInt& nbgh = VectorInt());
 
-  const VectorInt& getSampleRanks(int ivar) const { return _index[ivar]; }
+  const VectorInt& getSampleRanks(Id ivar) const { return _index[ivar]; }
   const VectorVectorInt& getSampleRanks() const { return _index; }
-  const VectorInt& getSampleRanksByVariable(int ivar) const { return _index[ivar]; }
-  const VectorDouble& getZflatten() const { return _Zflatten; }
-  int getNumber() const;
-  int getCount(int ivar) const;
-  int getTotalCount() const;
-  int identifyVariableRank(int ipos) const;
-  int identifySampleRank(int ipos) const;
+  VectorInt& getSampleRanksByVariable(Id ivar)  { return _index[ivar]; }
+  std::shared_ptr<VectorDouble>& getZflatten()  { return _Zflatten; }
+  Id getNumber() const;
+  Id getCount(Id ivar) const;
+  Id getTotalCount() const;
+  Id identifyVariableRank(Id ipos) const;
+  Id identifySampleRank(Id ipos) const;
 
   void dump(bool flagFull = false) const;
+
+private:
+  void _initElligible();
 
 private:
   bool _useSel;
@@ -55,18 +62,19 @@ private:
   bool _useVerr;
   bool _useExtD;
 
-  int  _nvar;
-  int  _nExtD;
-  int  _iptrSel;
+  Id  _nvar;
+  Id  _nExtD;
+  Id  _iptrSel;
   VectorInt _iptrZ;
   VectorInt _iptrVerr;
   VectorInt _iptrExtD;
-
+  MatrixT<bool> _elligible; 
   constvectint _nbgh; // Span of internal buffer
 
   VectorVectorInt _index; // Vector of sample ranks per variable
-  VectorDouble _Zflatten; // Vector of Z values (fpr active samples of target variables)
+  std::shared_ptr<VectorDouble> _Zflatten; // Vector of Z values (fpr active samples of target variables)
 
   const Db* _db;       // Pointer to Db
   VectorInt _workNbgh; // Vector of ellible sample absolute ranks
 };
+}

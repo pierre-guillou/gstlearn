@@ -15,6 +15,8 @@
 #include "Basic/AStringable.hpp"
 #include "Space/SpaceTarget.hpp"
 
+namespace gstlrn
+{ 
 class Db;
 /**
  * This class performs the test between two Space Points (usually the target point first and the tentative point second)
@@ -41,7 +43,8 @@ public:
 /*
 #ifndef SWIG
   // Implement clone for permitting director feature
-  virtual ICloneable* clone() const override { return nullptr; } ;
+  ICloneable* clone() const override { return nullptr; } ;
 #endif
 */
 };
+}

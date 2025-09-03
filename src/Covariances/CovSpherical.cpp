@@ -9,25 +9,26 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Covariances/CovSpherical.hpp"
-
-#include "Simulation/TurningBandOperate.hpp"
 #include "Covariances/CovContext.hpp"
+#include "Simulation/TurningBandOperate.hpp"
 
+namespace gstlrn
+{
 CovSpherical::CovSpherical(const CovContext& ctxt)
-: ACovFunc(ECov::SPHERICAL, ctxt)
+  : ACovFunc(ECov::SPHERICAL, ctxt)
 {
 }
 
-CovSpherical::CovSpherical(const CovSpherical &r)
-: ACovFunc(r)
+CovSpherical::CovSpherical(const CovSpherical& r)
+  : ACovFunc(r)
 {
 }
 
-CovSpherical& CovSpherical::operator=(const CovSpherical &r)
+CovSpherical& CovSpherical::operator=(const CovSpherical& r)
 {
   if (this != &r)
   {
-    ACovFunc::operator =(r);
+    ACovFunc::operator=(r);
   }
   return *this;
 }
@@ -43,12 +44,20 @@ double CovSpherical::_evaluateCov(double h) const
   return (cov);
 }
 
+double CovSpherical::_evaluateCovDerivative(double h) const
+{
+  double cov = 0.;
+  if (h < 1) cov = -1.5 + 1.5 * h * h;
+  return (cov);
+}
+
 String CovSpherical::getFormula() const
 {
   return "C(h)=1-\\frac{3}{2}\\left(\\frac{h}{a}\\right)+ \\frac{1}{2}\\left(\\frac{h}{a}\\right)^3";
 }
 
-double CovSpherical::simulateTurningBand(double t0, TurningBandOperate &operTB) const
+double CovSpherical::simulateTurningBand(double t0, TurningBandOperate& operTB) const
 {
   return operTB.shotNoiseAffineOne(t0);
+}
 }

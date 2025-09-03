@@ -14,6 +14,8 @@
 
 #include "Basic/AStringable.hpp"
 
+namespace gstlrn
+{
 class GSTLEARN_EXPORT SimuFFTParam: public AStringable
 {
 public:
@@ -23,7 +25,7 @@ public:
   virtual ~SimuFFTParam();
 
   /// Interface to AStringable
-  virtual String toString(const AStringFormat* strfmt = nullptr) const override;
+  String toString(const AStringFormat* strfmt = nullptr) const override;
 
   bool isFlagAliasing() const { return _flagAliasing; }
   void setFlagAliasing(bool flagAliasing) { _flagAliasing = flagAliasing; }
@@ -34,3 +36,4 @@ private:
   bool _flagAliasing;
   double _percent;
 };
+}

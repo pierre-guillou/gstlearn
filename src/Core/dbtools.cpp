@@ -8,72 +8,61 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include "geoslib_define.h"
-#include "geoslib_old_f.h"
-
-#include "Mesh/MeshETurbo.hpp"
-#include "LinearOp/ShiftOpMatrix.hpp"
-#include "LinearOp/PrecisionOp.hpp"
-#include "LinearOp/ProjMatrix.hpp"
-#include "LinearOp/OptimCostColored.hpp"
-#include "Stats/Classical.hpp"
-#include "Model/Model.hpp"
-#include "Model/CovInternal.hpp"
+#include "Basic/Grid.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/NamingConvention.hpp"
+#include "Basic/PolyLine2D.hpp"
+#include "Basic/String.hpp"
+#include "Basic/Utilities.hpp"
+#include "Basic/VectorHelper.hpp"
+#include "Core/Keypair.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Db/DbHelper.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/NamingConvention.hpp"
-#include "Basic/Utilities.hpp"
-#include "Basic/String.hpp"
-#include "Basic/VectorHelper.hpp"
-#include "Basic/Grid.hpp"
-#include "Basic/PolyLine2D.hpp"
+#include "LinearOp/OptimCostColored.hpp"
+#include "LinearOp/PrecisionOp.hpp"
+#include "LinearOp/ProjMatrix.hpp"
+#include "LinearOp/ShiftOpMatrix.hpp"
+#include "Mesh/MeshETurbo.hpp"
+#include "Model/CovInternal.hpp"
+#include "Model/Model.hpp"
 #include "Polygon/Polygons.hpp"
+#include "Stats/Classical.hpp"
 #include "Tree/Ball.hpp"
-#include "Basic/Memory.hpp"
-#include "Core/Keypair.hpp"
-#include "Core/io.hpp"
-
-#include <math.h>
-#include <string.h>
+#include "geoslib_define.h"
+#include "geoslib_old_f.h"
+#include <cmath>
+#include <cstring>
 
 // https://stackoverflow.com/a/26359433/3952924
 #ifdef _MSC_VER
-#define strncasecmp _strnicmp
-#define strcasecmp _stricmp
+#  define strncasecmp _strnicmp
+#  define strcasecmp  _stricmp
+#  define strncasecmp _strnicmp
+#  define strcasecmp  _stricmp
 #endif
 
 /*! \cond */
-#define TRACE(i,iseg)       (trace[(i) * nseg + (iseg)])
-#define LINE(nbline,i)      (line[npline * (nbline) + (i)])
-#define PROP1(iz,iprop)     (prop1[(iz) * nprop + (iprop)])
-#define PROP2(iz,iprop)     (prop2[(iz) * nprop + (iprop)])
-#define WTAB(iz,icode,ivar) (wtab[(ivar) + nvar * ((iz) + nz * (icode))])
-#define WCOR(iz,icode,idim) (wcor[(idim) + ndim * ((iz) + nz * (icode))])
-#define WCNT(iz,icode)      (wcnt[                 (iz) + nz * (icode)])
+#define TRACE(i, iseg)        (trace[(i) * nseg + (iseg)])
+#define LINE(nbline, i)       (line[npline * (nbline) + (i)])
+#define PROP1(iz, iprop)      (prop1[(iz) * nprop + (iprop)])
+#define PROP2(iz, iprop)      (prop2[(iz) * nprop + (iprop)])
+#define WTAB(iz, icode, ivar) (wtab[(ivar) + nvar * ((iz) + nz * (icode))])
+#define WCOR(iz, icode, idim) (wcor[(idim) + ndim * ((iz) + nz * (icode))])
+#define WCNT(iz, icode)       (wcnt[(iz) + nz * (icode)])
+#define TRACE(i, iseg)        (trace[(i) * nseg + (iseg)])
+#define LINE(nbline, i)       (line[npline * (nbline) + (i)])
+#define PROP1(iz, iprop)      (prop1[(iz) * nprop + (iprop)])
+#define PROP2(iz, iprop)      (prop2[(iz) * nprop + (iprop)])
+#define WTAB(iz, icode, ivar) (wtab[(ivar) + nvar * ((iz) + nz * (icode))])
+#define WCOR(iz, icode, idim) (wcor[(idim) + ndim * ((iz) + nz * (icode))])
+#define WCNT(iz, icode)       (wcnt[(iz) + nz * (icode)])
 
-#define R(i,j)              (R[(i) * n + (j)])
+#define R(i, j) (R[(i) * n + (j)])
+#define R(i, j) (R[(i) * n + (j)])
 
-typedef struct
+namespace gstlrn
 {
-  char key[5];
-  char title[STRING_LENGTH];
-  int flag_rank;
-  int flag_bounds;
-} Edit_Item;
-static int N_EDIT = 10;
-static Edit_Item EDIT[] = { { "P", "Define the Properties", 0, 0 },
-                            { ".", "Same as previous Command", 0, 0 },
-                            { "S", "Shift the Sample Rank", 1, 0 },
-                            { "V", "Shift the Variable Rank", 1, 0 },
-                            { "AS", "Set the Sample Rank", 1, 0 },
-                            { "AV", "Set the Variable Rank", 1, 0 },
-                            { "M", "Modify the current Value", 0, 0 },
-                            { "FD", "Find Next value in Interval", 0, 1 },
-                            { "FU", "Find Next value in Interval", 0, 1 },
-                            { "D", "Current Display", 0, 0 } };
-
 /*! \endcond */
 
 /****************************************************************************/
@@ -93,34 +82,34 @@ static Edit_Item EDIT[] = { { "P", "Define the Properties", 0, 0 },
  **                      (Dimension = Number of samples in db_grid)
  **
  *****************************************************************************/
-int surface(Db *db_point,
-            DbGrid *db_grid,
-            int /*icol*/,
-            double dlim,
-            double *dtab,
-            double *gtab)
+Id surface(Db* db_point,
+           DbGrid* db_grid,
+           Id /*icol*/,
+           double dlim,
+           double* dtab,
+           double* gtab)
 {
   bool flagTest;
 
   if (!db_grid->hasSameDimension(db_point)) return (1);
-  int ndim = db_point->getNDim();
+  Id ndim = db_point->getNDim();
 
   /* Preliminary calculations */
 
-  double d2max = (FFFF(dlim)) ? 1.e30 : dlim * dlim;
+  double d2max  = (FFFF(dlim)) ? MAXIMUM_BIG : dlim * dlim;
   double maille = db_grid->getCellSize();
-  for (int iech = 0; iech < db_point->getNSample(); iech++)
+  for (Id iech = 0; iech < db_point->getNSample(); iech++)
     dtab[iech] = 0.;
 
   /* Loop on the target points */
 
   VectorDouble vgrid(ndim);
-  for (int igrid = 0; igrid < db_grid->getNSample(); igrid++)
+  for (Id igrid = 0; igrid < db_grid->getNSample(); igrid++)
   {
     gtab[igrid] = -1;
     if (!db_grid->isActive(igrid)) continue;
     flagTest = false;
-    for (int idim = 0; idim < ndim && ! flagTest; idim++)
+    for (Id idim = 0; idim < ndim && !flagTest; idim++)
     {
       vgrid[idim] = db_grid->getCoordinate(igrid, idim);
       if (FFFF(vgrid[idim])) flagTest = true;
@@ -130,15 +119,15 @@ int surface(Db *db_point,
     /* Loop on the data points */
 
     double d2min = d2max;
-    for (int iech = 0; iech < db_point->getNSample(); iech++)
+    for (Id iech = 0; iech < db_point->getNSample(); iech++)
     {
       if (!db_point->isActive(iech)) continue;
 
       /* Calculate the distance between node and data */
 
       double dist = 0.;
-      flagTest = false;
-      for (int idim = 0; idim < ndim && ! flagTest; idim++)
+      flagTest    = false;
+      for (Id idim = 0; idim < ndim && !flagTest; idim++)
       {
         double v2 = db_point->getCoordinate(iech, idim);
         if (FFFF(v2))
@@ -156,400 +145,30 @@ int surface(Db *db_point,
 
       if (dist > d2min) continue;
       gtab[igrid] = iech;
-      d2min = dist;
+      d2min       = dist;
     }
   }
 
   /* Calculate the influence of each datum */
 
-  for (int igrid = 0; igrid < db_grid->getNSample(); igrid++)
+  for (Id igrid = 0; igrid < db_grid->getNSample(); igrid++)
   {
-    int jech = (int) gtab[igrid];
+    Id jech = static_cast<Id>(gtab[igrid]);
     if (jech >= 0) dtab[jech]++;
   }
-  for (int iech = 0; iech < db_point->getNSample(); iech++)
+  for (Id iech = 0; iech < db_point->getNSample(); iech++)
     dtab[iech] *= maille;
 
   /* Evaluate each grid node with the size of the influence polygon */
   /* to which it belongs                                            */
 
-  for (int igrid = 0; igrid < db_grid->getNSample(); igrid++)
+  for (Id igrid = 0; igrid < db_grid->getNSample(); igrid++)
   {
-    int jech = (int) gtab[igrid];
+    Id jech = static_cast<Id>(gtab[igrid]);
     if (jech >= 0)
       gtab[igrid] = dtab[jech];
     else
       gtab[igrid] = TEST;
-  }
-  return (0);
-}
-
-/****************************************************************************/
-/*!
- **  Print the Db contents
- **
- ** \param[in]  db    Db descriptor
- ** \param[in]  nrdv  Radius of the variable display
- ** \param[in]  nrds  Radius of the sample display
- ** \param[in]  ivar  Rank of the Target Variable
- ** \param[in]  iech  Rank of the Target Sample
- **
- *****************************************************************************/
-static void st_edit_display(Db *db, int nrdv, int nrds, int ivar, int iech)
-{
-  int item, nvar, nech, ivar_deb, ivar_fin, iech_deb, iech_fin, jvar, jech;
-  ELoc locatorType;
-  char string[5];
-
-  /* Initializations */
-
-  (void) gslStrcpy(string, "NA");
-  nech = db->getNSample();
-  nvar = db->getNColumn();
-
-  ivar_deb = ivar - nrdv;
-  ivar_fin = ivar + nrdv;
-  if (ivar_deb < 0)
-  {
-    ivar_deb = 0;
-    ivar_fin = MIN(2 * nrdv, nvar - 1);
-  }
-  if (ivar_fin >= nvar)
-  {
-    ivar_fin = nvar - 1;
-    ivar_deb = MAX(0, ivar_fin - 2 * nrdv);
-  }
-
-  iech_deb = iech - nrds;
-  iech_fin = iech + nrds;
-  if (iech_deb < 0)
-  {
-    iech_deb = 0;
-    iech_fin = MIN(2 * nrds, nech - 1);
-  }
-  if (iech_fin >= nech)
-  {
-    iech_fin = nech - 1;
-    iech_deb = MAX(0, iech_fin - 2 * nrds);
-  }
-
-  /* Print the Header (Variable name) */
-
-  tab_prints(NULL, " ");
-  for (jvar = ivar_deb; jvar <= ivar_fin; jvar++)
-  {
-    if (db->getLocatorByColIdx(jvar, &locatorType, &item))
-    {
-      String strloc = getLocatorName(locatorType, item);
-      (void) gslStrcpy(string, strloc.c_str());
-    }
-    else
-      (void) gslStrcpy(string, "NA");
-    if (jvar == ivar) (void) gslStrcat(string, "*");
-    tab_prints(NULL, string);
-  }
-  message("\n");
-
-  /* Print the Header (Variable rank) */
-
-  tab_prints(NULL, " ");
-  for (jvar = ivar_deb; jvar <= ivar_fin; jvar++)
-    tab_print_rc(NULL, 2, jvar + 1);
-  message("\n");
-
-  /* Loop on the samples */
-
-  for (jech = iech_deb; jech <= iech_fin; jech++)
-  {
-    tab_print_rc(NULL, 3, jech + 1);
-    if (iech == jech)
-      message("*");
-    else
-      message(" ");
-    for (jvar = ivar_deb; jvar <= ivar_fin; jvar++)
-      tab_printg(NULL, db->getArray(jech, jvar));
-    message("\n");
-  }
-}
-
-/****************************************************************************/
-/*!
- **  Look for the next sample with a value within the interval
- **
- ** \return  Rank of the next sample
- **
- ** \param[in]  db      Db descriptor
- ** \param[in]  iech    Rank of the current sample
- ** \param[in]  ivar    Rank of the current variable
- ** \param[in]  orient  Orientation (1: downwards; -1: forwards)
- ** \param[in]  vmin    Minimum value
- ** \param[in]  vmax    Maximum value
- **
- *****************************************************************************/
-static int st_edit_find(Db *db,
-                        int iech,
-                        int ivar,
-                        int orient,
-                        double vmin,
-                        double vmax)
-{
-  double value;
-
-  /* Dispatch */
-
-  if (orient > 0)
-  {
-    for (int i = iech + 1; i < db->getNSample(); i++)
-    {
-      value = db->getArray(i, ivar);
-      if (FFFF(value)) continue;
-      if (!FFFF(vmin) && value < vmin) continue;
-      if (!FFFF(vmax) && value > vmax) continue;
-      return (i);
-    }
-    messerr("--> String not found before the end-of-file");
-    return (iech);
-  }
-  for (int i = iech - 1; i >= 0; i--)
-  {
-    value = db->getArray(i, ivar);
-    if (FFFF(value)) continue;
-    if (!FFFF(vmin) && value < vmin) continue;
-    if (!FFFF(vmax) && value > vmax) continue;
-    return (i);
-  }
-  messerr("--> String not found before the top-of-file");
-  return (iech);
-}
-
-/****************************************************************************/
-/*!
- **  Ask for the next keyword in the Editor
- **
- ** \return  Return code:
- ** \return  0 : A valid keyword has been found
- ** \return  1 : The 'stop' has been met
- ** \return -1 : The 'quit' has been met
- **
- ** \param[out]  item   Selected item
- ** \param[out]  rank   Value for the Shift
- ** \param[out]  vmin   Value for the lower bound
- ** \param[out]  vmax   Value for the upper bound
- **
- *****************************************************************************/
-static int st_edit_ask(int *item, int *rank, double *vmin, double *vmax)
-{
-  int found, flag_skip, mem_long;
-  char string[STRING_LENGTH], *decode;
-  static int mem_item = 1;
-  static int mem_rank = 1;
-  static double mem_vmin = 0.;
-  static double mem_vmax = 1.;
-
-  label_loop: _lire_string("Enter Command (or 'stop' or 'quit' or '?')", 0,
-  NULL,
-                           string);
-
-  /* Look for the string */
-
-  found = -1;
-  for (int i = 0; i < N_EDIT; i++)
-    if (!strncasecmp(string, EDIT[i].key, strlen(EDIT[i].key))) found = i;
-
-  /* Check for the special keyword */
-
-  if (!strcasecmp(string, "STOP")) return (1);
-  if (!strcasecmp(string, "QUIT")) return (-1);
-
-  /* A valid keyword has not been found */
-
-  if (found < 0)
-  {
-    mestitle(1, "List of the Valid Editor Keywords:");
-    for (int i = 0; i < N_EDIT; i++)
-      message("%2s : %s\n", EDIT[i].key, EDIT[i].title);
-    goto label_loop;
-  }
-
-  /* A valid keyword has been encountered: Check for the rest */
-
-  decode = &string[strlen(EDIT[found].key)];
-
-  /* The 'same' command has been encountered */
-
-  flag_skip = 0;
-  if (found == 1)
-  {
-    found = mem_item;
-    *rank = mem_rank;
-    *vmin = mem_vmin;
-    *vmax = mem_vmax;
-    flag_skip = 1;
-  }
-
-  /* Ask for complementary information */
-
-  if (!flag_skip)
-  {
-    /* A rank must be specified */
-
-    if (EDIT[found].flag_rank)
-    {
-      string_strip_blanks(decode, 1);
-      mem_long = static_cast<int>(strlen(decode));
-      if (mem_long > 0)
-      {
-        *rank = strtol(decode, &decode, 0);
-        if (mem_long == (int) strlen(decode))
-        {
-          messerr("Cannot convert '%s' into a valid Rank", decode);
-          goto label_loop;
-        }
-      }
-      else
-        *rank = _lire_int("Value for the Shift", 1, mem_rank, ITEST, ITEST);
-    }
-
-    /* Bounds must be specified */
-
-    if (EDIT[found].flag_bounds)
-    {
-      string_strip_blanks(decode, 1);
-      mem_long = static_cast<int>(strlen(decode));
-      if (mem_long > 0)
-      {
-        *vmin = strtod(decode, &decode);
-        if (mem_long == (int) strlen(decode))
-        {
-          messerr("Cannot convert '%s' into a valid Minimum Bound", decode);
-          goto label_loop;
-        }
-      }
-      else
-        *vmin = _lire_double("Minimum value", 1, mem_vmin, TEST, TEST);
-
-      string_strip_blanks(decode, 1);
-      mem_long = static_cast<int>(strlen(decode));
-      if (mem_long > 0)
-      {
-        *vmax = strtod(decode, &decode);
-        if (mem_long == (int) strlen(decode))
-        {
-          messerr("Cannot convert '%s' into a valid Maximum Bound", decode);
-          goto label_loop;
-        }
-        if (*vmax < *vmin)
-        {
-          messerr("Upper bound (%lf) may not be smaller than Lower bound (%lf)",
-                  (*vmax), (*vmin));
-        }
-      }
-      else
-        *vmax = _lire_double("Maximum value", 1, mem_vmax, *vmin, TEST);
-    }
-  }
-
-  /* Return argument */
-
-  *item = found;
-
-  /* Store the answers for default values in next operation */
-
-  mem_item = *item;
-  mem_rank = *rank;
-  mem_vmin = *vmin;
-  mem_vmax = *vmax;
-
-  return (0);
-}
-
-/****************************************************************************/
-/*!
- **  Edit the Data Base Db
- **
- ** \return  Error return code
- **
- ** \param[in]  db   Db descriptor
- **
- ** \param[out] flag_valid: 1 for 'stop' and 0 for 'quit'
- **
- *****************************************************************************/
-int db_edit(Db *db, int *flag_valid)
-
-{
-  int nech, nvar, ivar, iech, incr, type, ok, nrds, nrdv, flag_inter;
-  double vmin, vmax, value;
-
-  /* Initializations */
-
-  nech = db->getNSample();
-  nvar = db->getNColumn();
-  ivar = iech = 0;
-  nrds = nrdv = incr = 1;
-  vmin = vmax = TEST;
-  if (nech < 1 || nvar < 1) return (1);
-
-  ok = 1;
-  while (ok)
-  {
-    st_edit_display(db, nrdv, nrds, ivar, iech);
-    flag_inter = st_edit_ask(&type, &incr, &vmin, &vmax);
-    if (flag_inter > 0)
-    {
-      *flag_valid = 1;
-      ok = 0;
-      break;
-    }
-    if (flag_inter < 0)
-    {
-      *flag_valid = 0;
-      ok = 0;
-      break;
-    }
-
-    /* Dispatch */
-
-    switch (type)
-    {
-      case 0: /* Set the Parameters */
-        nrdv = _lire_int("Display Radius along Variable", 1, nrdv, 0, ITEST);
-        nrds = _lire_int("Display Radius along Sample", 1, nrds, 0, ITEST);
-        break;
-
-      case 2: /* Relative Sample Rank */
-        iech = MAX(0, MIN(iech + incr, nech - 1));
-        break;
-
-      case 3: /* Relative Variable Rank */
-        ivar = MAX(0, MIN(ivar + incr, nvar - 1));
-        break;
-
-      case 4: /* Absolute Sample Rank */
-        iech = MAX(0, MIN(incr - 1, nech - 1));
-        break;
-
-      case 5: /* Absolute Variable Rank */
-        ivar = MAX(0, MIN(incr - 1, nvar - 1));
-        break;
-
-      case 6: /* Modify the Value */
-        value = _lire_double("New value", 1, db->getArray(iech, ivar), TEST,
-        TEST);
-        db->setArray(iech, ivar, value);
-        break;
-
-      case 7: /* Next sample within an interval */
-        iech = st_edit_find(db, iech, ivar, 1, vmin, vmax);
-        break;
-
-      case 8: /* Previous sample within an interval */
-        iech = st_edit_find(db, iech, ivar, -1, vmin, vmax);
-        break;
-
-      case 9: /* Display the current selection */
-      default:
-        break;
-    }
   }
   return (0);
 }
@@ -564,32 +183,31 @@ int db_edit(Db *db, int *flag_valid)
  ** \param[in]  disc   Discretization distance
  **
  ** \param[out] np_arg   Number of discretized points
- ** \param[out] xp_arg   Array of first coordinates
- ** \param[out] yp_arg   Array of second coordinates
- ** \param[out] dd_arg   Array of distances between discretized points
- ** \param[out] del_arg  Array of distances between vertices
+ ** \param[out] xp       Array of first coordinates
+ ** \param[out] yp       Array of second coordinates
+ ** \param[out] dd       Array of distances between discretized points
+ ** \param[out] del      Array of distances between vertices
  ** \param[out] dist_arg Total distance of the trace
  **
  *****************************************************************************/
-void ut_trace_discretize(int nseg,
-                         const double *trace,
+void ut_trace_discretize(Id nseg,
+                         const double* trace,
                          double disc,
-                         int *np_arg,
-                         double **xp_arg,
-                         double **yp_arg,
-                         double **dd_arg,
-                         double **del_arg,
-                         double *dist_arg)
+                         Id* np_arg,
+                         VectorDouble& xp,
+                         VectorDouble& yp,
+                         VectorDouble& dd,
+                         VectorDouble& del,
+                         double* dist_arg)
 {
-  double *xp, *yp, *dd, *del, deltax, deltay, x0, y0, x1, y1, dist;
-  int iseg, np, ecr, nloc, ip;
+  double deltax, deltay, x0, y0, x1, y1, dist;
+  Id iseg, np, ecr, nloc, ip;
 
   /* Initializations */
 
-  xp = yp = dd = nullptr;
   (*np_arg) = np = 0;
   (*dist_arg) = x1 = y1 = 0.;
-  del = (double*) mem_alloc(sizeof(double) * nseg, 1);
+  del.resize(nseg);
   del[0] = 0.;
 
   /* Loop on the trace segments */
@@ -599,23 +217,23 @@ void ut_trace_discretize(int nseg,
 
     /* Consider a segment trace */
 
-    x0 = TRACE(0, iseg);
-    y0 = TRACE(1, iseg);
-    x1 = TRACE(0, iseg + 1);
-    y1 = TRACE(1, iseg + 1);
+    x0     = TRACE(0, iseg);
+    y0     = TRACE(1, iseg);
+    x1     = TRACE(0, iseg + 1);
+    y1     = TRACE(1, iseg + 1);
     deltax = x1 - x0;
     deltay = y1 - y0;
-    dist = sqrt(deltax * deltax + deltay * deltay);
+    dist   = sqrt(deltax * deltax + deltay * deltay);
     (*dist_arg) += dist;
     del[iseg + 1] = (*dist_arg);
 
     /* Discretize the trace segment */
 
-    nloc = (int) floor(dist / disc);
+    nloc = static_cast<Id>(floor(dist / disc));
     if (ABS(nloc * disc - dist) < dist / 1000) nloc--;
     np += nloc;
-    xp = (double*) mem_realloc((char* ) xp, sizeof(double) * np, 1);
-    yp = (double*) mem_realloc((char* ) yp, sizeof(double) * np, 1);
+    xp.resize(np);
+    yp.resize(np);
 
     for (ip = 0; ip < nloc; ip++, ecr++)
     {
@@ -627,30 +245,22 @@ void ut_trace_discretize(int nseg,
   /* Adding the last vertex */
 
   np++;
-  xp = (double*) mem_realloc((char* ) xp, sizeof(double) * np, 1);
-  yp = (double*) mem_realloc((char* ) yp, sizeof(double) * np, 1);
+  xp.resize(np);
+  yp.resize(np);
   xp[ecr] = x1;
   yp[ecr] = y1;
   ecr++;
 
   /* Elaborate the vector of distances */
 
-  dd = (double*) mem_alloc(sizeof(double) * np, 1);
+  dd.resize(np);
   dd[0] = 0.;
   for (ip = 0; ip < np - 1; ip++)
   {
-    deltax = xp[ip + 1] - xp[ip];
-    deltay = yp[ip + 1] - yp[ip];
+    deltax     = xp[ip + 1] - xp[ip];
+    deltay     = yp[ip + 1] - yp[ip];
     dd[ip + 1] = dd[ip] + sqrt(deltax * deltax + deltay * deltay);
   }
-
-  /* Returning arguments */
-
-  (*np_arg) = np;
-  (*xp_arg) = xp;
-  (*yp_arg) = yp;
-  (*dd_arg) = dd;
-  (*del_arg) = del;
 }
 
 /*****************************************************************************/
@@ -666,41 +276,39 @@ void ut_trace_discretize(int nseg,
  ** \param[in]  radius Neighborhood radius
  **
  ** \param[out] ns_arg     Number of sampled points
- ** \param[out] xs_arg     Array of first coordinates of sampled points
- ** \param[out] ys_arg     Array of second coordinates of sampled points
- ** \param[out] rks_arg    Array of sample indices (starting from 1)
- ** \param[out] lys_arg    Array of layer indices of sampled points
- ** \param[out] typ_arg    Array of data type
+ ** \param[out] xs         Array of first coordinates of sampled points
+ ** \param[out] ys         Array of second coordinates of sampled points
+ ** \param[out] rks        Array of sample indices (starting from 1)
+ ** \param[out] lys        Array of layer indices of sampled points
+ ** \param[out] typ        Array of data type
  **                        1 for hard data in Z or TIME
  **                        2 for lower bound
  **                        3 for upper bound
  **
  *****************************************************************************/
-void ut_trace_sample(Db *db,
+void ut_trace_sample(Db* db,
                      const ELoc& ptype,
-                     int np,
-                     const double *xp,
-                     const double *yp,
-                     const double *dd,
+                     Id np,
+                     const double* xp,
+                     const double* yp,
+                     const double* dd,
                      double radius,
-                     int *ns_arg,
-                     double **xs_arg,
-                     double **ys_arg,
-                     int **rks_arg,
-                     int **lys_arg,
-                     int **typ_arg)
+                     Id* ns_arg,
+                     VectorDouble& xs,
+                     VectorDouble& ys,
+                     VectorInt& rks,
+                     VectorInt& lys,
+                     VectorInt& typ)
 {
-  int *lys, *typ, *rks, iech, ip, ns, ipmin, nvar;
-  double *xs, *ys, cote, layer, bound[2];
+  Id iech, ip, ns, ipmin, nvar;
+  double cote, layer, bound[2];
   double radcarre, xx, yy, delx, dely, dist, ddmin;
 
   /* Initializations */
 
   radcarre = radius * radius;
-  xs = ys = nullptr;
-  lys = typ = rks = nullptr;
-  ns = 0;
-  nvar = db->getNInterval();
+  ns       = 0;
+  nvar     = db->getNInterval();
 
   /* Loop on the samples */
 
@@ -716,7 +324,7 @@ void ut_trace_sample(Db *db,
     /* Loop on the discretized samples */
 
     ipmin = -1;
-    ddmin = 1.e30;
+    ddmin = MAXIMUM_BIG;
     for (ip = 0; ip < np; ip++)
     {
       delx = xx - xp[ip];
@@ -734,14 +342,14 @@ void ut_trace_sample(Db *db,
     if (!FFFF(cote))
     {
       layer = db->getFromLocator(ELoc::LAYER, iech);
-      xs = (double*) mem_realloc((char* ) xs, sizeof(double) * (ns + 1), 1);
-      ys = (double*) mem_realloc((char* ) ys, sizeof(double) * (ns + 1), 1);
-      lys = (int*) mem_realloc((char* ) lys, sizeof(int) * (ns + 1), 1);
-      typ = (int*) mem_realloc((char* ) typ, sizeof(int) * (ns + 1), 1);
-      rks = (int*) mem_realloc((char* ) rks, sizeof(int) * (ns + 1), 1);
-      xs[ns] = dd[ipmin];
-      ys[ns] = cote;
-      lys[ns] = (FFFF(layer)) ? 1 : (int) layer + 1;
+      xs.resize(ns + 1);
+      ys.resize(ns + 1);
+      lys.resize(ns + 1);
+      typ.resize(ns + 1);
+      rks.resize(ns + 1);
+      xs[ns]  = dd[ipmin];
+      ys[ns]  = cote;
+      lys[ns] = (FFFF(layer)) ? 1 : static_cast<Id>(layer) + 1;
       typ[ns] = 1;
       rks[ns] = iech + 1;
       ns++;
@@ -749,20 +357,20 @@ void ut_trace_sample(Db *db,
 
     /* Keep sample defined by locator UP or LOW */
 
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
     {
-      bound[0] = db->getLocVariable(ELoc::L,iech, ivar);
-      bound[1] = db->getLocVariable(ELoc::U,iech, ivar);
-      for (int ib = 0; ib < 2; ib++)
+      bound[0] = db->getLocVariable(ELoc::L, iech, ivar);
+      bound[1] = db->getLocVariable(ELoc::U, iech, ivar);
+      for (Id ib = 0; ib < 2; ib++)
       {
         if (FFFF(bound[ib])) continue;
-        xs = (double*) mem_realloc((char* )xs, sizeof(double) * (ns + 1), 1);
-        ys = (double*) mem_realloc((char* )ys, sizeof(double) * (ns + 1), 1);
-        lys = (int*) mem_realloc((char* )lys, sizeof(int) * (ns + 1), 1);
-        typ = (int*) mem_realloc((char* )typ, sizeof(int) * (ns + 1), 1);
-        rks = (int*) mem_realloc((char* )rks, sizeof(int) * (ns + 1), 1);
-        xs[ns] = dd[ipmin];
-        ys[ns] = bound[ib];
+        xs.resize(ns + 1);
+        ys.resize(ns + 1);
+        lys.resize(ns + 1);
+        typ.resize(ns + 1);
+        rks.resize(ns + 1);
+        xs[ns]  = dd[ipmin];
+        ys[ns]  = bound[ib];
         lys[ns] = ivar + 1;
         typ[ns] = ib + 2;
         rks[ns] = iech + 1;
@@ -774,11 +382,6 @@ void ut_trace_sample(Db *db,
   /* Returning arguments */
 
   *ns_arg = ns;
-  *xs_arg = xs;
-  *ys_arg = ys;
-  *lys_arg = lys;
-  *typ_arg = typ;
-  *rks_arg = rks;
 }
 
 /*****************************************************************************/
@@ -795,9 +398,9 @@ void ut_trace_sample(Db *db,
  ** \param[in]  beta        Repulsion beta coefficient
  **
  *****************************************************************************/
-static VectorDouble st_point_init_homogeneous(int number,
-                                              const VectorDouble &coormin,
-                                              const VectorDouble &coormax,
+static VectorDouble st_point_init_homogeneous(Id number,
+                                              const VectorDouble& coormin,
+                                              const VectorDouble& coormax,
                                               bool flag_repulsion,
                                               double range,
                                               double beta)
@@ -810,7 +413,7 @@ static VectorDouble st_point_init_homogeneous(int number,
     return tab;
   }
   VectorDouble extend = VH::subtract(coormin, coormax);
-  int ndim = (int) coormin.size();
+  Id ndim             = static_cast<Id>(coormin.size());
   VectorDouble coor(ndim);
   VectorDouble delta(ndim);
 
@@ -818,10 +421,10 @@ static VectorDouble st_point_init_homogeneous(int number,
 
   tab.resize(ndim * number);
 
-  int ecr = 0;
-  for (int ip = 0; ip < number; ip++)
+  Id ecr = 0;
+  for (Id ip = 0; ip < number; ip++)
   {
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       coor[idim] = coormin[idim] + law_uniform(0., extend[idim]);
 
     // Check if the point is acceptable
@@ -832,10 +435,10 @@ static VectorDouble st_point_init_homogeneous(int number,
 
       // Calculate the shortest distance with the previous samples
 
-      double ddmin = 1.e30;
-      for (int jp = 0; jp < ip; jp++)
+      double ddmin = MAXIMUM_BIG;
+      for (Id jp = 0; jp < ip; jp++)
       {
-        for (int idim = 0; idim < ndim; idim++)
+        for (Id idim = 0; idim < ndim; idim++)
           delta[idim] = (tab[ndim * jp + idim] - coor[idim]) / range;
         double dd = VH::norm(delta);
         if (dd < ddmin) ddmin = dd;
@@ -844,13 +447,13 @@ static VectorDouble st_point_init_homogeneous(int number,
       /* Check the rejection criterion */
 
       double proba = exp(-pow(ddmin, beta));
-      double alea = law_uniform(0., 1.);
-      flag_drop = (alea < proba);
+      double alea  = law_uniform(0., 1.);
+      flag_drop    = (alea < proba);
     }
 
     // Add the new point
     if (flag_drop) continue;
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       tab[ndim * ecr + idim] = coor[idim];
     ecr++;
   }
@@ -875,27 +478,27 @@ static VectorDouble st_point_init_homogeneous(int number,
  ** \remarks as NOSTAT variables: Range-1, Range-2 and Angle
  **
  *****************************************************************************/
-static VectorDouble st_point_init_inhomogeneous(int number,
-                                                DbGrid *dbgrid,
+static VectorDouble st_point_init_inhomogeneous(Id number,
+                                                DbGrid* dbgrid,
                                                 bool flag_repulsion,
                                                 double range,
                                                 double beta)
 {
   VectorDouble tab;
 
-  int ndim = dbgrid->getNDim();
+  Id ndim = dbgrid->getNDim();
   if (dbgrid == nullptr)
   {
     messerr("This function requires a DbGrid data base");
     return tab;
   }
-  if (! dbgrid->isGrid())
+  if (!dbgrid->isGrid())
   {
     messerr("This function requires the Db organized as a grid");
     return tab;
   }
-  bool flag_dens = (dbgrid->getNLoc(ELoc::Z) == 1);
-  bool flag_region = (ndim == 2 && dbgrid->getNLoc(ELoc::NOSTAT) == (ndim+1));
+  bool flag_dens   = (dbgrid->getNLoc(ELoc::Z) == 1);
+  bool flag_region = (ndim == 2 && dbgrid->getNLoc(ELoc::NOSTAT) == (ndim + 1));
 
   VectorDouble coor(ndim);
   VectorDouble coorbis(ndim);
@@ -906,14 +509,14 @@ static VectorDouble st_point_init_inhomogeneous(int number,
 
   /* Evaluate the density */
 
-  int ngrid = dbgrid->getNSample(true);
+  Id ngrid = dbgrid->getNSample(true);
   VectorDouble dens;
-  dens.resize(ngrid,0.);
+  dens.resize(ngrid, 0.);
   double denstot = 0.;
   if (flag_dens)
   {
-    int ig = 0;
-    for (int jg = 0, ng = dbgrid->getNSampleActive(); jg < ng; jg++)
+    Id ig = 0;
+    for (Id jg = 0, ng = dbgrid->getNSampleActive(); jg < ng; jg++)
     {
       if (!dbgrid->isActiveAndDefined(jg, 0)) continue;
       double densloc = dbgrid->getZVariable(jg, 0);
@@ -928,10 +531,10 @@ static VectorDouble st_point_init_inhomogeneous(int number,
 
   /* Point generation */
 
-  int ecr = 0;
-  int indip = 0;
-  int indjp = 0;
-  int ntrial = 0;
+  Id ecr    = 0;
+  Id indip  = 0;
+  Id indjp  = 0;
+  Id ntrial = 0;
   while (number - ecr > ntrial / 10)
   {
     // Draw a probability
@@ -944,8 +547,8 @@ static VectorDouble st_point_init_inhomogeneous(int number,
     if (flag_dens)
     {
       double denscum = 0.;
-      indip = -1;
-      for (int ig = 0; ig < ngrid && indip < 0; ig++)
+      indip          = -1;
+      for (Id ig = 0; ig < ngrid && indip < 0; ig++)
       {
         if (!dbgrid->isActive(ig)) continue;
         double densloc = dbgrid->getZVariable(ig, 0);
@@ -957,18 +560,18 @@ static VectorDouble st_point_init_inhomogeneous(int number,
     }
     else
     {
-      indip = (int) proba;
+      indip = static_cast<Id>(proba);
     }
 
     // Draw the point within the elected cell
 
     dbgrid->rankToCoordinatesInPlace(indip, coor);
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       coor[idim] += law_uniform(0., dbgrid->getDX(idim));
     if (flag_region)
     {
-      for (int idim = 0; idim < ndim; idim++)
-        radip[idim] = dbgrid->getFromLocator(ELoc::NOSTAT,indip,idim);
+      for (Id idim = 0; idim < ndim; idim++)
+        radip[idim] = dbgrid->getFromLocator(ELoc::NOSTAT, indip, idim);
       angip = dbgrid->getFromLocator(ELoc::NOSTAT, indip, ndim);
     }
 
@@ -981,40 +584,40 @@ static VectorDouble st_point_init_inhomogeneous(int number,
       // Calculate the shortest distance with the previous samples
 
       flag_drop = false;
-      for (int jp = 0; jp < ecr && ! flag_drop; jp++)
+      for (Id jp = 0; jp < ecr && !flag_drop; jp++)
       {
         double dd = 0.;
-        for (int idim = 0; idim < ndim; idim++)
+        for (Id idim = 0; idim < ndim; idim++)
         {
           coorbis[idim] = tab[ndim * jp + idim];
-          delta[idim] = (coorbis[idim] - coor[idim]);
+          delta[idim]   = (coorbis[idim] - coor[idim]);
         }
 
-        if (! flag_region)
+        if (!flag_region)
         {
           dd = VH::norm(delta) / range;
         }
         else
         {
           indjp = dbgrid->coordinateToRank(coorbis);
-          for (int idim = 0; idim < ndim; idim++)
-            radius[idim] = 2. / (radip[idim] + dbgrid->getFromLocator(ELoc::NOSTAT,indjp,idim));
+          for (Id idim = 0; idim < ndim; idim++)
+            radius[idim] = 2. / (radip[idim] + dbgrid->getFromLocator(ELoc::NOSTAT, indjp, idim));
           double angle = (angip + dbgrid->getFromLocator(ELoc::NOSTAT, indjp, ndim)) / 2.;
           Tensor tensor(ndim);
-          tensor.setRotationAngle(0,angle);
+          tensor.setRotationAngle(0, angle);
           tensor.setRadiusVec(radius);
           dd = VH::norm(tensor.applyInverse(delta));
         }
 
         // Check if the point 'ip' must be dropped
-        proba = exp(-pow(dd, beta));
-        flag_drop = (law_uniform(0.,1.) < proba);
+        proba     = exp(-pow(dd, beta));
+        flag_drop = (law_uniform(0., 1.) < proba);
       }
     }
     if (flag_drop) continue;
 
     // Add the new point
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       tab.push_back(coor[idim]);
     ecr++;
   }
@@ -1035,11 +638,11 @@ static VectorDouble st_point_init_inhomogeneous(int number,
  ** \remarks The array 'zcut' must be provided in increasing order
  **
  *****************************************************************************/
-int db_resind(Db *db, int ivar, const VectorDouble& zcut)
+Id db_resind(Db* db, Id ivar, const VectorDouble& zcut)
 {
-  int nech = db->getNSample();
-  int ncut = (int) zcut.size();
-  if (! VH::isSorted(zcut, true))
+  Id nech = db->getNSample();
+  Id ncut = static_cast<Id>(zcut.size());
+  if (!VH::isSorted(zcut, true))
   {
     messerr("The cutoffs must be provided in increasing order");
     return 1;
@@ -1047,29 +650,29 @@ int db_resind(Db *db, int ivar, const VectorDouble& zcut)
 
   /* Calculate the tonnages */
 
-  int ntot = 0;
+  Id ntot = 0;
   VectorDouble tonnage(ncut, 0);
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActive(iech)) continue;
     double value = db->getArray(iech, ivar);
     if (FFFF(value)) continue;
     ntot++;
 
-    for (int icut = 0; icut < ncut; icut++)
+    for (Id icut = 0; icut < ncut; icut++)
       if (value >= zcut[icut]) tonnage[icut]++;
   }
-  for (int icut = 0; icut < ncut; icut++)
-    tonnage[icut] /= (double) ntot;
+  for (Id icut = 0; icut < ncut; icut++)
+    tonnage[icut] /= static_cast<double>(ntot);
 
   /* Create the variables */
 
-  int iptr = db->addColumnsByConstant(ncut, TEST);
+  Id iptr = db->addColumnsByConstant(ncut, TEST);
   if (iptr < 0) return 1;
 
   /* Loop on the samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     if (!db->isActive(iech)) continue;
     double value = db->getArray(iech, ivar);
@@ -1077,15 +680,15 @@ int db_resind(Db *db, int ivar, const VectorDouble& zcut)
 
     /* Loop on the cutoffs */
 
-    for (int icut = 0; icut < ncut; icut++)
+    for (Id icut = 0; icut < ncut; icut++)
     {
-      double zval = zcut[icut];
-      int ind_cut0 = (value > zval);
-      zval = (icut > 0) ? zcut[icut - 1] : 0.;
-      int ind_cut1 = (value > zval);
+      double zval     = zcut[icut];
+      Id ind_cut0     = (value > zval);
+      zval            = (icut > 0) ? zcut[icut - 1] : 0.;
+      Id ind_cut1     = (value > zval);
       double ton_cut0 = tonnage[icut];
       double ton_cut1 = (icut > 0) ? tonnage[icut - 1] : 1.;
-      int ir = ind_cut0 / ton_cut0 - ind_cut1 / ton_cut1;
+      Id ir           = ind_cut0 / ton_cut0 - ind_cut1 / ton_cut1;
       db->setArray(iech, iptr + icut, ir);
     }
   }
@@ -1100,11 +703,11 @@ int db_resind(Db *db, int ivar, const VectorDouble& zcut)
  ** \param[in]  dbgrid  Db structure (grid organized)
  **
  *****************************************************************************/
-static void st_gradient_normalize(Db *dbgrid)
+static void st_gradient_normalize(Db* dbgrid)
 
 {
   double norme, grad;
-  int ndim;
+  Id ndim;
 
   /* Initializations */
 
@@ -1112,23 +715,23 @@ static void st_gradient_normalize(Db *dbgrid)
 
   /* Loop on the samples */
 
-  for (int iech = 0; iech < dbgrid->getNSample(); iech++)
+  for (Id iech = 0; iech < dbgrid->getNSample(); iech++)
   {
 
     norme = 0.;
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
-      grad = dbgrid->getLocVariable(ELoc::G,iech, idim);
+      grad = dbgrid->getLocVariable(ELoc::G, iech, idim);
       norme += grad * grad;
     }
 
     if (norme <= 0) continue;
     norme = sqrt(norme);
 
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
-      grad = dbgrid->getLocVariable(ELoc::G,iech, idim);
-      dbgrid->setLocVariable(ELoc::G,iech, idim, grad / norme);
+      grad = dbgrid->getLocVariable(ELoc::G, iech, idim);
+      dbgrid->setLocVariable(ELoc::G, iech, idim, grad / norme);
     }
   }
 }
@@ -1142,19 +745,19 @@ static void st_gradient_normalize(Db *dbgrid)
  ** \param[in]  dbgrid  Db structure (grid organized)
  **
  *****************************************************************************/
-int db_gradient_components(DbGrid *dbgrid)
+Id db_gradient_components(DbGrid* dbgrid)
 
 {
-  int iptrz, iptr, nx, ny, nz, nmax, error, ndim, j1, j2, number;
+  Id iptrz, iptr, nx, ny, nz, nmax, error, ndim, j1, j2, number;
   double dinc, v1, v2, delta;
   VectorInt indg;
 
   /* Preliminary check */
 
   error = number = 1;
-  iptr = -1;
-  ndim = dbgrid->getNDim();
-  if (! dbgrid->isGrid())
+  iptr           = -1;
+  ndim           = dbgrid->getNDim();
+  if (!dbgrid->isGrid())
   {
     messerr("The Db should be organized as a Grid");
     goto label_end;
@@ -1181,11 +784,11 @@ int db_gradient_components(DbGrid *dbgrid)
 
   /* Calculate the Gradient components */
 
-  for (int ix = 0; ix < nx; ix++)
-    for (int iy = 0; iy < ny; iy++)
-      for (int iz = 0; iz < nz; iz++)
+  for (Id ix = 0; ix < nx; ix++)
+    for (Id iy = 0; iy < ny; iy++)
+      for (Id iz = 0; iz < nz; iz++)
       {
-        for (int idim = 0; idim < ndim; idim++)
+        for (Id idim = 0; idim < ndim; idim++)
         {
           nmax = dbgrid->getNX(idim);
           dinc = dbgrid->getDX(idim);
@@ -1233,7 +836,8 @@ int db_gradient_components(DbGrid *dbgrid)
 
   error = 0;
 
-  label_end: if (error)
+label_end:
+  if (error)
   {
     dbgrid->deleteColumnsByUIDRange(iptr, ndim);
     iptr = -1;
@@ -1252,12 +856,12 @@ int db_gradient_components(DbGrid *dbgrid)
  ** \param[in]  iech      Sample rank
  **
  *****************************************************************************/
-static int st_is_undefined(Db *dbgrid, int iptr_grad, int iech)
+static Id st_is_undefined(Db* dbgrid, Id iptr_grad, Id iech)
 {
-  int ndim;
+  Id ndim;
 
   ndim = dbgrid->getNDim();
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     if (FFFF(dbgrid->getArray(iech, iptr_grad + idim))) return (1);
   }
@@ -1275,14 +879,14 @@ static int st_is_undefined(Db *dbgrid, int iptr_grad, int iech)
  ** \param[in]  iech      Sample rank
  **
  *****************************************************************************/
-static int st_is_zero(Db *dbgrid, int iptr_grad, int iech)
+static Id st_is_zero(Db* dbgrid, Id iptr_grad, Id iech)
 {
   double grad, delta;
-  int ndim;
+  Id ndim;
 
   grad = 0.;
   ndim = dbgrid->getNDim();
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     delta = dbgrid->getArray(iech, iptr_grad + idim);
     grad += delta * delta;
@@ -1304,13 +908,13 @@ static int st_is_zero(Db *dbgrid, int iptr_grad, int iech)
  ** \param[out] surf      Local value of the surface
  **
  *****************************************************************************/
-static int st_get_next(DbGrid *dbgrid,
-                       int iptr_grad,
-                       VectorDouble &coor,
-                       int *knd,
-                       double *surf)
+static Id st_get_next(DbGrid* dbgrid,
+                      Id iptr_grad,
+                      VectorDouble& coor,
+                      Id* knd,
+                      double* surf)
 {
-  int knd_loc;
+  Id knd_loc;
   double surf_loc;
 
   knd_loc = dbgrid->coordinateToRank(coor);
@@ -1319,7 +923,7 @@ static int st_get_next(DbGrid *dbgrid,
   surf_loc = dbgrid->getZVariable(knd_loc, 0);
   if (FFFF(surf_loc) || st_is_undefined(dbgrid, iptr_grad, knd_loc)) return (1);
   if (st_is_zero(dbgrid, iptr_grad, knd_loc)) return (1);
-  *knd = knd_loc;
+  *knd  = knd_loc;
   *surf = surf_loc;
   return 0;
 }
@@ -1342,38 +946,37 @@ static int st_get_next(DbGrid *dbgrid,
  **
  ** \param[out] nbline_loc Number of streamline steps
  ** \param[out] npline_loc Number of values per line vertex
- ** \param[out] line_loc   Array of streamline steps (Dimension: 5 * nbline)
+ ** \param[out] line       Array of streamline steps (Dimension: 5 * nbline)
  **
  ** \remarks The returned array 'line_loc' must be freed by the calling function
  ** \remarks Use get_keypone("Streamline_Skip",1) to define the skipping ratio
  **
  *****************************************************************************/
-int db_streamline(DbGrid *dbgrid,
-                  Db *dbpoint,
-                  int niter,
-                  double step,
-                  int flag_norm,
-                  int use_grad,
-                  int save_grad,
-                  int *nbline_loc,
-                  int *npline_loc,
-                  double **line_loc)
+Id db_streamline(DbGrid* dbgrid,
+                 Db* dbpoint,
+                 Id niter,
+                 double step,
+                 Id flag_norm,
+                 Id use_grad,
+                 Id save_grad,
+                 Id* nbline_loc,
+                 Id* npline_loc,
+                 VectorDouble& line)
 {
-  int error, npline, idim, ecr;
-  int iptr_time, iptr_accu, iptr_grad, nbline, knd, nquant, nbyech, ndim;
-  double *line, surf, date;
-  static int quant = 1000;
+  Id error, npline, idim, ecr;
+  Id iptr_time, iptr_accu, iptr_grad, nbline, knd, nquant, nbyech, ndim;
+  double surf, date;
+  static Id quant = 1000;
   VectorDouble coor;
   VectorDouble coor0;
 
   /* Initializations */
 
-  error = 1;
+  error  = 1;
   nbline = nquant = 0;
-  iptr_grad = -1;
-  line = nullptr;
+  iptr_grad       = -1;
   if (dbpoint == nullptr) dbpoint = dbgrid;
-  nbyech = (int) get_keypone("Streamline_Skip", 1.);
+  nbyech = static_cast<Id>(get_keypone("Streamline_Skip", 1.));
 
   /* Preliminary checks */
 
@@ -1419,7 +1022,7 @@ int db_streamline(DbGrid *dbgrid,
 
   /* Loop on the drop points */
 
-  for (int iech = 0; iech < dbpoint->getNSample(); iech++)
+  for (Id iech = 0; iech < dbpoint->getNSample(); iech++)
   {
     if (!dbpoint->isActive(iech)) continue;
     if (iech % nbyech != 0) continue;
@@ -1431,17 +1034,16 @@ int db_streamline(DbGrid *dbgrid,
     if (nbline >= nquant * quant)
     {
       nquant++;
-      line = (double*) mem_realloc((char* ) line,
-                                   sizeof(double) * npline * nquant * quant, 1);
+      line.resize(npline * nquant * quant);
     }
     for (idim = ecr = 0; idim < ndim; idim++)
-      LINE(nbline,ecr++) = coor[idim];
-    LINE(nbline,ecr++) = surf;
-    LINE(nbline,ecr++) = knd + 1.;
-    LINE(nbline,ecr++) = 0.;
+      LINE(nbline, ecr++) = coor[idim];
+    LINE(nbline, ecr++) = surf;
+    LINE(nbline, ecr++) = knd + 1.;
+    LINE(nbline, ecr++) = 0.;
     nbline++;
 
-    for (int i = 0; i < niter; i++)
+    for (Id i = 0; i < niter; i++)
     {
       for (idim = 0; idim < ndim; idim++)
         coor[idim] -= step * dbgrid->getArray(knd, iptr_grad + idim);
@@ -1452,15 +1054,13 @@ int db_streamline(DbGrid *dbgrid,
       if (nbline >= nquant * quant)
       {
         nquant++;
-        line = (double*) mem_realloc((char* ) line,
-                                     sizeof(double) * npline * nquant * quant,
-                                     1);
+        line.resize(npline * nquant * quant);
       }
       for (idim = ecr = 0; idim < ndim; idim++)
-        LINE(nbline,ecr++) = coor[idim];
-      LINE(nbline,ecr++) = surf;
-      LINE(nbline,ecr++) = knd + 1.;
-      LINE(nbline,ecr++) = i + 1.;
+        LINE(nbline, ecr++) = coor[idim];
+      LINE(nbline, ecr++) = surf;
+      LINE(nbline, ecr++) = knd + 1.;
+      LINE(nbline, ecr++) = i + 1.;
       nbline++;
 
       /* Update variables in the grid Db */
@@ -1475,29 +1075,27 @@ int db_streamline(DbGrid *dbgrid,
     if (nbline >= nquant * quant)
     {
       nquant++;
-      line = (double*) mem_realloc((char* ) line,
-                                   sizeof(double) * npline * nquant * quant, 1);
+      line.resize(npline * nquant * quant);
     }
     for (idim = ecr = 0; idim < ndim; idim++)
-      LINE(nbline,ecr++) = TEST;
-    LINE(nbline,ecr++) = TEST;
-    LINE(nbline,ecr++) = TEST;
-    LINE(nbline,ecr++) = TEST;
+      LINE(nbline, ecr++) = TEST;
+    LINE(nbline, ecr++) = TEST;
+    LINE(nbline, ecr++) = TEST;
+    LINE(nbline, ecr++) = TEST;
     nbline++;
   }
 
   /* Final reallocation */
 
-  line = (double*) mem_realloc((char* ) line, sizeof(double) * npline * nbline, 1);
+  line.resize(npline * nbline);
 
   /* Set the error return code */
 
   *nbline_loc = nbline;
   *npline_loc = npline;
-  *line_loc = line;
-  error = 0;
+  error       = 0;
 
-  label_end:
+label_end:
   if (!use_grad && !save_grad && iptr_grad >= 0)
     dbgrid->deleteColumnsByUIDRange(iptr_grad, ndim);
   return (error);
@@ -1516,18 +1114,20 @@ int db_streamline(DbGrid *dbgrid,
  ** \remarks Work is performed IN PLACE
  **
  *****************************************************************************/
-int db_smooth_vpc(DbGrid *db, int width, double range)
+Id db_smooth_vpc(DbGrid* db, Id width, double range)
 {
-  int iz, nz, nprop, ecr, nkern, jz, error;
-  double *prop1, *prop2, *kernel, total, propval, dz, quant, quant0;
+  Id iz, nz, nprop, ecr, nkern, jz, error;
+  double total, propval, dz, quant, quant0;
+  VectorDouble prop1;
+  VectorDouble prop2;
+  VectorDouble kernel;
 
   /* Initializations */
 
   error = 1;
   nprop = db->getNLoc(ELoc::P);
-  nz = db->getNX(2);
-  dz = db->getDX(2);
-  prop1 = prop2 = kernel = nullptr;
+  nz    = db->getNX(2);
+  dz    = db->getDX(2);
 
   /* Core allocation */
 
@@ -1535,42 +1135,42 @@ int db_smooth_vpc(DbGrid *db, int width, double range)
   if (FFFF(range))
     range = dz * width / quant0;
   else if (IFFFF(width))
-    width = (int) (range * quant0 / dz);
+    width = static_cast<Id>(range * quant0 / dz);
   else
   {
     messerr("You must define either 'width' or 'range'");
     goto label_end;
   }
   nkern = 2 * width + 1;
-  prop1 = (double*) mem_alloc(sizeof(double) * nz * nprop, 1);
-  prop2 = (double*) mem_alloc(sizeof(double) * nz * nprop, 1);
-  kernel = (double*) mem_alloc(sizeof(double) * nkern, 1);
+  prop1.resize(nz * nprop);
+  prop2.resize(nz * nprop);
+  kernel.resize(nkern);
 
   /* Establish the Kernel */
 
-  for (int i = -width; i <= width; i++)
+  for (Id i = -width; i <= width; i++)
   {
-    quant = (i * dz) / range;
+    quant             = (i * dz) / range;
     kernel[i + width] = law_df_gaussian(quant) / range;
   }
 
   /* Preliminary checks */
 
-  if (! db->isGrid() || db->getNDim() != 3) goto label_end;
+  if (!db->isGrid() || db->getNDim() != 3) goto label_end;
 
   /* Loop on the 2-D grid cells */
 
-  for (int ix = 0; ix < db->getNX(0); ix++)
-    for (int iy = 0; iy < db->getNX(1); iy++)
+  for (Id ix = 0; ix < db->getNX(0); ix++)
+    for (Id iy = 0; iy < db->getNX(1); iy++)
     {
 
       /* Load the proportions */
 
-      if (db_prop_read(db, ix, iy, prop1)) goto label_end;
+      if (db_prop_read(db, ix, iy, prop1.data())) goto label_end;
 
       /* Loop on the proportions */
 
-      for (int iprop = 0; iprop < nprop; iprop++)
+      for (Id iprop = 0; iprop < nprop; iprop++)
       {
 
         /* Loop on the levels of the VPC */
@@ -1581,26 +1181,23 @@ int db_smooth_vpc(DbGrid *db, int width, double range)
           /* Loop on the kernel items */
 
           total = 0.;
-          for (int i = -width; i <= width; i++)
+          for (Id i = -width; i <= width; i++)
           {
-            jz = Grid::generateMirrorIndex(nz, iz+i);
+            jz      = Grid::generateMirrorIndex(nz, iz + i);
             propval = PROP1(jz, iprop);
             total += kernel[i + width] * propval;
           }
-          PROP2(iz,iprop) = total;
+          PROP2(iz, iprop) = total;
         }
       }
-      if (db_prop_write(db, ix, iy, prop2)) goto label_end;
+      if (db_prop_write(db, ix, iy, prop2.data())) goto label_end;
     }
 
   /* Set the error return code */
 
   error = 0;
 
-  label_end:
-  mem_free((char* ) prop1);
-  mem_free((char* ) prop2);
-  mem_free((char* ) kernel);
+label_end:
   return (error);
 }
 
@@ -1622,14 +1219,14 @@ int db_smooth_vpc(DbGrid *db, int width, double range)
  ** \remarks This function takes a sample into account only if isotopic
  **
  *****************************************************************************/
-Db* db_regularize(Db *db, DbGrid *dbgrid, int flag_center)
+Db* db_regularize(Db* db, DbGrid* dbgrid, Id flag_center)
 {
   Db* dbnew = nullptr;
   if (db == nullptr) return dbnew;
 
   // Preliminary checks */
 
-  if (! dbgrid->isGrid())
+  if (!dbgrid->isGrid())
   {
     messerr("This function requires 'dbgrid' to correspond to a Grid");
     return dbnew;
@@ -1653,22 +1250,22 @@ Db* db_regularize(Db *db, DbGrid *dbgrid, int flag_center)
     return dbnew;
   }
 
-  if (! db->isNVarComparedTo(1,1))
+  if (!db->isNVarComparedTo(1, 1))
   {
     messerr("You should define some Z-variables in input 'db'");
     return dbnew;
   }
 
-  // Core allocation 
+  // Core allocation
 
-  int iz = 0;
-  int nz   = dbgrid->getNX(2);
-  int nvar = db->getNLoc(ELoc::Z);
-  int ndim = db->getNDim();
-  int size = ndim + nvar + 1;
+  Id iz   = 0;
+  Id nz   = dbgrid->getNX(2);
+  Id nvar = db->getNLoc(ELoc::Z);
+  Id ndim = db->getNDim();
+  Id size = ndim + nvar + 1;
 
   VectorDouble codes = db->getCodeList();
-  int ncode = (int) codes.size();
+  Id ncode           = static_cast<Id>(codes.size());
   VectorDouble coor(ndim, 0);
   VectorDouble wcnt(ncode * nz, 0);
   VectorDouble wcor(ncode * nz * ndim, 0);
@@ -1676,62 +1273,60 @@ Db* db_regularize(Db *db, DbGrid *dbgrid, int flag_center)
 
   // Loop on the different samples
 
-  int ntot = db->getNSample();
+  Id ntot = db->getNSample();
 
-  //message("Before regularization: ncode = %d, nz = %d, ntot = %d\n", (int)ncode, (int)nz, (int)ntot);
-
-  for (int iech = 0; iech < ntot; iech++)
+  for (Id iech = 0; iech < ntot; iech++)
   {
     if (!db->isActive(iech)) continue;
     mes_process("Regularize Wells", ntot, iech);
-    int code = db->getLocVariable(ELoc::C,iech,0);
+    Id code = db->getLocVariable(ELoc::C, iech, 0);
 
     // Identify the rank of the code
 
-    int icode = -1;
-    for (int i = 0; i < ncode && icode < 0; i++)
-      if (isEqual(code,codes[i])) icode = i;
+    Id icode = -1;
+    for (Id i = 0; i < ncode && icode < 0; i++)
+      if (isEqual(code, codes[i])) icode = i;
     if (icode < 0) continue;
 
     // Load the coordinates
 
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       coor[idim] = db->getCoordinate(iech, idim);
 
-    int err = point_to_bench(dbgrid, coor.data(), 0, &iz);
+    Id err = point_to_bench(dbgrid, coor.data(), 0, &iz);
     if (err < 0) continue;
     if (iz < 0 || iz >= nz) continue;
 
     // Check if all variables are defined
 
-    int not_defined = 0;
-    for (int ivar = 0; ivar < nvar && not_defined == 0; ivar++)
+    Id not_defined = 0;
+    for (Id ivar = 0; ivar < nvar && not_defined == 0; ivar++)
       if (FFFF(db->getZVariable(iech, ivar))) not_defined = 1;
     if (not_defined) continue;
 
     // Cumulate this sample
 
-    WCNT(iz,icode) += 1.;
-    for (int idim = 0; idim < ndim; idim++)
-      WCOR(iz,icode,idim) += db->getCoordinate(iech, idim);
-    for (int ivar = 0; ivar < nvar; ivar++)
-      WTAB(iz,icode,ivar) += db->getZVariable(iech, ivar);
+    WCNT(iz, icode) += 1.;
+    for (Id idim = 0; idim < ndim; idim++)
+      WCOR(iz, icode, idim) += db->getCoordinate(iech, idim);
+    for (Id ivar = 0; ivar < nvar; ivar++)
+      WTAB(iz, icode, ivar) += db->getZVariable(iech, ivar);
   }
 
   // Normalization
 
-  int nech = 0;
-  for (int icode = 0; icode < ncode; icode++)
+  Id nech = 0;
+  for (Id icode = 0; icode < ncode; icode++)
     for (iz = 0; iz < nz; iz++)
     {
       double ratio = WCNT(iz, icode);
       if (ratio <= 0) continue;
-      for (int idim = 0; idim < ndim; idim++)
-        WCOR(iz,icode,idim) /= ratio;
+      for (Id idim = 0; idim < ndim; idim++)
+        WCOR(iz, icode, idim) /= ratio;
       if (flag_center)
-      WCOR(iz,icode,2) = dbgrid->getX0(2) + (0.5 + iz) * dbgrid->getDX(2);
-      for (int ivar = 0; ivar < nvar; ivar++)
-        WTAB(iz,icode,ivar) /= ratio;
+        WCOR(iz, icode, 2) = dbgrid->getX0(2) + (0.5 + iz) * dbgrid->getDX(2);
+      for (Id ivar = 0; ivar < nvar; ivar++)
+        WTAB(iz, icode, ivar) /= ratio;
       nech++;
     }
 
@@ -1739,16 +1334,16 @@ Db* db_regularize(Db *db, DbGrid *dbgrid, int flag_center)
 
   VectorDouble wecr(size * nech);
 
-  int ecr = 0;
-  for (int icode = 0; icode < ncode; icode++)
+  Id ecr = 0;
+  for (Id icode = 0; icode < ncode; icode++)
     for (iz = 0; iz < nz; iz++)
     {
       double ratio = WCNT(iz, icode);
       if (ratio <= 0) continue;
-      for (int idim = 0; idim < ndim; idim++)
+      for (Id idim = 0; idim < ndim; idim++)
         wecr[ecr++] = WCOR(iz, icode, idim);
       wecr[ecr++] = codes[icode];
-      for (int ivar = 0; ivar < nvar; ivar++)
+      for (Id ivar = 0; ivar < nvar; ivar++)
         wecr[ecr++] = WTAB(iz, icode, ivar);
     }
 
@@ -1766,7 +1361,7 @@ Db* db_regularize(Db *db, DbGrid *dbgrid, int flag_center)
   ecr += nvar;
   DECLARE_UNUSED(ecr);
 
-  label_end:
+label_end:
   return dbnew;
 }
 
@@ -1784,27 +1379,26 @@ Db* db_regularize(Db *db, DbGrid *dbgrid, int flag_center)
  ** \param[in]  nmini       Minimum number of nodes before drawing
  **
  ** \param[out] nech_ret    Number of selected samples
- ** \param[out] coor_ret    Array of coordinates
- ** \param[out] data_ret    Array of variables
+ ** \param[out] coor        Array of coordinates
+ ** \param[out] data        Array of variables
  **
  ** \remarks The returned arrays 'coor' and 'data' must be freed by
  ** \remarks the calling function
  **
  *****************************************************************************/
-int db_grid2point_sampling(DbGrid *dbgrid,
-                           int nvar,
-                           int *vars,
-                           const int *npacks,
-                           int npcell,
-                           int nmini,
-                           int *nech_ret,
-                           double **coor_ret,
-                           double **data_ret)
+Id db_grid2point_sampling(DbGrid* dbgrid,
+                          Id nvar,
+                          Id* vars,
+                          const Id* npacks,
+                          Id npcell,
+                          Id nmini,
+                          Id* nech_ret,
+                          VectorDouble& coor,
+                          VectorDouble& data)
 {
-  int ndim, ntotal, nech, nret, nfine, iech, ecrc, ecrd, error;
-  int *retain;
-  double *coor, *data;
+  Id ndim, ntotal, nech, nret, nfine, iech, ecrc, ecrd, error;
   VectorInt ranks;
+  VectorInt retain;
   VectorDouble rndval;
 
   // Initializations
@@ -1812,40 +1406,37 @@ int db_grid2point_sampling(DbGrid *dbgrid,
   *nech_ret = 0;
 
   error = 1;
-  coor = data = nullptr;
-  retain = nullptr;
-  ndim = dbgrid->getNDim();
+  ndim  = dbgrid->getNDim();
   nfine = dbgrid->getNSample();
-  nmini       = MAX(nmini, npcell);
-  VectorInt indg(ndim,0);
+  nmini = MAX(nmini, npcell);
+  VectorInt indg(ndim, 0);
   if (ndim > 3)
   {
     messerr("This function is limited to 3D or less");
     goto label_end;
   }
 
-  // Core allocation 
+  // Core allocation
 
   ntotal = 1;
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     ntotal *= npacks[idim];
   rndval.resize(ntotal);
   ranks.resize(ntotal);
-  retain = (int*) mem_alloc(sizeof(int) * nfine, 0);
-  if (retain == nullptr) goto label_end;
+  retain.resize(nfine);
 
   // Dispatch
 
   nret = 0;
   if (ndim == 1)
   {
-    for (int ixcell = 0; ixcell < dbgrid->getNX(0); ixcell += npacks[0])
+    for (Id ixcell = 0; ixcell < dbgrid->getNX(0); ixcell += npacks[0])
     {
 
       // Collect eligible samples
 
       nech = 0;
-      for (int ix = 0; ix < npacks[0]; ix++)
+      for (Id ix = 0; ix < npacks[0]; ix++)
       {
         indg[0] = ixcell + ix;
         if (indg[0] >= dbgrid->getNX(0)) break;
@@ -1854,26 +1445,26 @@ int db_grid2point_sampling(DbGrid *dbgrid,
       }
       if (nech < nmini) continue;
 
-      // Draw sample(s) at random 
+      // Draw sample(s) at random
 
-      for (int i = 0; i < nech; i++)
+      for (Id i = 0; i < nech; i++)
         rndval[i] = law_uniform(0., 1.);
       VH::arrangeInPlace(0, ranks, rndval, true, nech);
-      for (int i = 0; i < npcell; i++)
+      for (Id i = 0; i < npcell; i++)
         retain[nret++] = ranks[i];
     }
   }
   else if (ndim == 2)
   {
-    for (int ixcell = 0; ixcell < dbgrid->getNX(0); ixcell += npacks[0])
-      for (int iycell = 0; iycell < dbgrid->getNX(1); iycell += npacks[1])
+    for (Id ixcell = 0; ixcell < dbgrid->getNX(0); ixcell += npacks[0])
+      for (Id iycell = 0; iycell < dbgrid->getNX(1); iycell += npacks[1])
       {
 
         // Collect eligible samples
 
         nech = 0;
-        for (int ix = 0; ix < npacks[0]; ix++)
-          for (int iy = 0; iy < npacks[1]; iy++)
+        for (Id ix = 0; ix < npacks[0]; ix++)
+          for (Id iy = 0; iy < npacks[1]; iy++)
           {
             indg[0] = ixcell + ix;
             if (indg[0] >= dbgrid->getNX(0)) break;
@@ -1884,28 +1475,28 @@ int db_grid2point_sampling(DbGrid *dbgrid,
           }
         if (nech < nmini) continue;
 
-        // Draw sample(s) at random 
+        // Draw sample(s) at random
 
-        for (int i = 0; i < nech; i++)
+        for (Id i = 0; i < nech; i++)
           rndval[i] = law_uniform(0., 1.);
         VH::arrangeInPlace(0, ranks, rndval, true, nech);
-        for (int i = 0; i < npcell; i++)
+        for (Id i = 0; i < npcell; i++)
           retain[nret++] = ranks[i];
       }
   }
   else
   {
-    for (int ixcell = 0; ixcell < dbgrid->getNX(0); ixcell += npacks[0])
-      for (int iycell = 0; iycell < dbgrid->getNX(1); iycell += npacks[1])
-        for (int izcell = 0; izcell < dbgrid->getNX(2); izcell += npacks[2])
+    for (Id ixcell = 0; ixcell < dbgrid->getNX(0); ixcell += npacks[0])
+      for (Id iycell = 0; iycell < dbgrid->getNX(1); iycell += npacks[1])
+        for (Id izcell = 0; izcell < dbgrid->getNX(2); izcell += npacks[2])
         {
 
           // Collect eligible samples
 
           nech = 0;
-          for (int ix = 0; ix < npacks[0]; ix++)
-            for (int iy = 0; iy < npacks[1]; iy++)
-              for (int iz = 0; iz < npacks[2]; iz++)
+          for (Id ix = 0; ix < npacks[0]; ix++)
+            for (Id iy = 0; iy < npacks[1]; iy++)
+              for (Id iz = 0; iz < npacks[2]; iz++)
               {
                 indg[0] = ixcell + ix;
                 if (indg[0] >= dbgrid->getNX(0)) break;
@@ -1918,46 +1509,41 @@ int db_grid2point_sampling(DbGrid *dbgrid,
               }
           if (nech < nmini) continue;
 
-          // Draw sample(s) at random 
+          // Draw sample(s) at random
 
-          for (int i = 0; i < nech; i++)
+          for (Id i = 0; i < nech; i++)
             rndval[i] = law_uniform(0., 1.);
           VH::arrangeInPlace(0, ranks, rndval, true, nech);
-          for (int i = 0; i < npcell; i++)
+          for (Id i = 0; i < npcell; i++)
             retain[nret++] = ranks[i];
         }
   }
 
   // Allocate the array for coordinates and data
 
-  coor = (double*) mem_alloc(sizeof(double) * ndim * nret, 0);
-  if (coor == nullptr) goto label_end;
-  data = (double*) mem_alloc(sizeof(double) * nvar * nret, 0);
-  if (data == nullptr) goto label_end;
+  coor.resize(ndim * nret);
+  data.resize(nvar * nret);
 
   // Load the returned arrays
 
   ecrc = ecrd = 0;
-  for (int i = 0; i < nret; i++)
+  for (Id i = 0; i < nret; i++)
   {
     iech = retain[i];
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
       coor[ecrc++] = dbgrid->getCoordinate(iech, idim);
-    for (int ivar = 0; ivar < nvar; ivar++)
+    for (Id ivar = 0; ivar < nvar; ivar++)
       data[ecrd++] = dbgrid->getArray(iech, vars[ivar]);
   }
 
   // Set the error return code
 
   *nech_ret = nret;
-  *coor_ret = coor;
-  *data_ret = data;
-  error = 0;
+  error     = 0;
 
   // Core deallocation
 
-  label_end:
-  retain = (int*) mem_free((char* ) retain);
+label_end:
   return (error);
 }
 
@@ -1982,23 +1568,23 @@ int db_grid2point_sampling(DbGrid *dbgrid,
  ** \remarks Arguments 'extend' is only valid when 'dbgrid' is not defined
  **
  *****************************************************************************/
-Db* db_point_init(int nech,
-                  const VectorDouble &coormin,
-                  const VectorDouble &coormax,
-                  DbGrid *dbgrid,
+Db* db_point_init(Id nech,
+                  const VectorDouble& coormin,
+                  const VectorDouble& coormax,
+                  DbGrid* dbgrid,
                   bool flag_exact,
                   bool flag_repulsion,
                   double range,
                   double beta,
                   double extend,
-                  int seed,
+                  Id seed,
                   bool flagAddSampleRank)
 {
   VectorDouble tab;
-  Db* db = nullptr;
-  int ndim = 0;
+  Db* db  = nullptr;
+  Id ndim = 0;
   if (dbgrid == nullptr)
-    ndim = (int) coormin.size();
+    ndim = static_cast<Id>(coormin.size());
   else
     ndim = dbgrid->getNDim();
   if (ndim <= 0) return db;
@@ -2013,7 +1599,7 @@ Db* db_point_init(int nech,
   VectorDouble locmax = coormax;
   if (extend > 0)
   {
-    for (int idim = 0; idim < ndim; idim++)
+    for (Id idim = 0; idim < ndim; idim++)
     {
       locmin[idim] -= extend;
       locmax[idim] += extend;
@@ -2022,8 +1608,8 @@ Db* db_point_init(int nech,
 
   // Draw the number of data to be generated in the Poisson process
 
-  int number = nech;
-  if (! flag_exact) law_poisson(nech);
+  Id number = nech;
+  if (!flag_exact) law_poisson(nech);
 
   // Dispatch
 
@@ -2043,16 +1629,16 @@ Db* db_point_init(int nech,
 
   /* Allocate the main structure */
 
-  number = (int) tab.size() / ndim;
-  db = Db::createFromSamples(number, ELoadBy::SAMPLE, tab, VectorString(),
+  number = static_cast<Id>(tab.size()) / ndim;
+  db     = Db::createFromSamples(number, ELoadBy::SAMPLE, tab, VectorString(),
                                  VectorString(), flagAddSampleRank);
 
   /* Set the locators */
 
   VectorString names = generateMultipleNames("x", ndim);
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
-    int jdim = (flagAddSampleRank) ? idim + 1 : idim;
+    Id jdim = (flagAddSampleRank) ? idim + 1 : idim;
     db->setNameByUID(jdim, names[idim]);
     db->setLocatorByUID(jdim, ELoc::X, idim);
   }
@@ -2076,12 +1662,12 @@ Db* db_point_init(int nech,
  ** \remarks to describe the spatial structure
  **
  *****************************************************************************/
-int db_proportion_estimate(Db *dbin,
-                           DbGrid *dbout,
-                           Model *model,
-                           int niter,
-                           bool verbose,
-                           const NamingConvention &namconv)
+Id db_proportion_estimate(Db* dbin,
+                          DbGrid* dbout,
+                          Model* model,
+                          Id niter,
+                          bool verbose,
+                          const NamingConvention& namconv)
 {
   VectorVectorInt splits;
 
@@ -2110,29 +1696,29 @@ int db_proportion_estimate(Db *dbin,
 
   // Define the environment
 
-  MeshETurbo mesh = MeshETurbo(dbout);
-  ShiftOpMatrix S = ShiftOpMatrix(&mesh, model->getCovAniso(0), dbout);
-  PrecisionOp Qprop = PrecisionOp(&S, model->getCovAniso(0));
-  ProjMatrix AprojDat = ProjMatrix(dbin, &mesh);
-  ProjMatrix AprojOut = ProjMatrix(dbout, &mesh);
+  MeshETurbo mesh(dbout);
+  ShiftOpMatrix S(&mesh, model->getCovAniso(0), dbout);
+  PrecisionOp Qprop(&S, model->getCovAniso(0));
+  ProjMatrix AprojDat(dbin, &mesh);
+  ProjMatrix AprojOut(dbout, &mesh);
 
   // Invoke the calculation
 
   VectorDouble propGlob = dbStatisticsFacies(dbin);
-  int ncat = static_cast<int>(propGlob.size());
-  OptimCostColored Oc = OptimCostColored(ncat, &Qprop, &AprojDat);
+  Id ncat               = static_cast<Id>(propGlob.size());
+  OptimCostColored Oc(ncat, &Qprop, &AprojDat);
 
-  VectorDouble facies = dbin->getColumnByLocator(ELoc::Z);
+  VectorDouble facies      = dbin->getColumnByLocator(ELoc::Z);
   VectorVectorDouble props = Oc.minimize(facies, splits, propGlob, verbose, niter);
 
   // Loading the resulting results in the output 'dbout'
 
-  int iptr0 = -1;
+  Id iptr0 = -1;
   VectorDouble propout(dbout->getNSample(true));
-  for (int i = 0; i < ncat; i++)
+  for (Id i = 0; i < ncat; i++)
   {
-    AprojOut.mesh2point(props[i],propout);
-    int iptr = dbout->addColumns(propout,String(),ELoc::UNKNOWN,0,true);
+    AprojOut.mesh2point(props[i], propout);
+    Id iptr = dbout->addColumns(propout, String(), ELoc::UNKNOWN, 0, true);
     if (i == 0) iptr0 = iptr;
     namconv.setNamesAndLocators(nullptr, VectorString(), ELoc::UNKNOWN, -1, dbout, iptr,
                                 concatenateStrings("-", toString(i + 1)));
@@ -2141,4 +1727,4 @@ int db_proportion_estimate(Db *dbin,
 
   return 0;
 }
-
+} // namespace gstlrn

@@ -60,9 +60,12 @@
 #  - BUILD_DOC=1        Configure cmake to build documentation (default =0)
 #  - TEST=<test-target> Name of the test target to be launched (e.g. test_Model_py or test_simTub)
 #  - ASAN=1             Build with Address Sanitizer (default =0)
+#  - COVERAGE=1         Build with code coverage (default =0)
 #  - USE_HDF5=0         To remove HDF5 support (default =1)
 #  - NO_INTERNET=1      To prevent python pip from looking for dependencies through Internet
 #                       (useful when there is no Internet available) (default =0)
+#  - NO_BYTE_COMPILE=1  To prevent R from byte-compiling the R package during the installation
+#                       (useful to accelerate installation process) (default =0) 
 #  - EIGEN3_ROOT=<path> Path to Eigen3 library (optional)
 #  - BOOST_ROOT=<path>  Path to Boost library (optional)
 #  - NLOPT_ROOT=<path>  Path to NLopt library (optional)
@@ -84,6 +87,12 @@ ifeq ($(NO_INTERNET), 1)
   NO_INTERNET = ON
  else
   NO_INTERNET = OFF 
+endif
+
+ifeq ($(NO_BYTE_COMPILE), 1)
+  NO_BYTE_COMPILE = ON
+ else
+  NO_BYTE_COMPILE = OFF
 endif
 
 ifeq ($(USE_HDF5), 0)
@@ -119,6 +128,12 @@ ifeq ($(ASAN), 1)
   BUILD_ASAN = OFF
 endif
 
+ifeq ($(COVERAGE), 1)
+  BUILD_COVERAGE = ON
+ else
+  BUILD_COVERAGE = OFF
+endif
+
 ifndef BUILD_DIR
   ifeq ($(OS),Windows_NT)
     # Assume MinGW (via RTools) => so MSYS build folder
@@ -141,7 +156,7 @@ endif
 # Add  "| tee /dev/null" because Ninja prints output in a single line :
 # https://stackoverflow.com/questions/46970462/how-to-enable-multiline-logs-instead-of-single-line-progress-logs
 
-CMAKE_DEFINES := -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DUSE_HDF5=$(USE_HDF5) -DBUILD_ASAN=$(BUILD_ASAN) -DBUILD_TESTING=ON
+CMAKE_DEFINES := -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DUSE_HDF5=$(USE_HDF5) -DBUILD_ASAN=$(BUILD_ASAN) -DBUILD_TESTING=ON -DBUILD_COVERAGE=$(BUILD_COVERAGE)
 ifdef SWIG_EXEC
   CMAKE_DEFINES := $(CMAKE_DEFINES) -DSWIG_EXECUTABLE=$(SWIG_EXEC)
 endif
@@ -166,10 +181,10 @@ cmake-python:
 	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=$(BUILD_DOC) -DBUILD_PYTHON=ON -DNO_INTERNET=$(NO_INTERNET)
 
 cmake-r:
-	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=$(BUILD_DOC) -DBUILD_R=ON
+	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=$(BUILD_DOC) -DBUILD_R=ON -DNO_BYTE_COMPILE=$(NO_BYTE_COMPILE)
 
 cmake-python-r:
-	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=$(BUILD_DOC) -DBUILD_PYTHON=ON -DBUILD_R=ON -DNO_INTERNET=$(NO_INTERNET)
+	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=$(BUILD_DOC) -DBUILD_PYTHON=ON -DBUILD_R=ON -DNO_INTERNET=$(NO_INTERNET) -DNO_BYTE_COMPILE=$(NO_BYTE_COMPILE)
 
 cmake-doxygen:
 	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=ON
@@ -178,10 +193,10 @@ cmake-python-doxygen:
 	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=ON -DBUILD_PYTHON=ON -DNO_INTERNET=$(NO_INTERNET)
 
 cmake-r-doxygen:
-	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=ON -DBUILD_R=ON
+	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=ON -DBUILD_R=ON -DNO_BYTE_COMPILE=$(NO_BYTE_COMPILE)
 
 cmake-python-r-doxygen:
-	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=ON -DBUILD_PYTHON=ON -DBUILD_R=ON
+	@cmake -B$(BUILD_DIR) -S. $(GENERATOR) $(CMAKE_DEFINES) -DBUILD_DOC=ON -DBUILD_PYTHON=ON -DBUILD_R=ON -DNO_INTERNET=$(NO_INTERNET) -DNO_BYTE_COMPILE=$(NO_BYTE_COMPILE)
 
 print_version: cmake
 	@cmake --build $(BUILD_DIR) --target print_version --
@@ -195,10 +210,10 @@ static shared build_tests doxygen install uninstall: cmake-doxygen
 python_doc: cmake-python-doxygen
 	@cmake --build $(BUILD_DIR) --target python_doc -- $(N_PROC_OPT)
 
-python_build: python_doc
+python_build: cmake-python
 	@cmake --build $(BUILD_DIR) --target python_build -- $(N_PROC_OPT)
 
-python_install: python_build
+python_install: cmake-python
 	@cmake --build $(BUILD_DIR) --target python_install -- $(N_PROC_OPT)
 
 
@@ -207,10 +222,10 @@ python_install: python_build
 r_doc: cmake-r-doxygen
 	@cmake --build $(BUILD_DIR) --target r_doc -- $(N_PROC_OPT)
 
-r_build: r_doc
+r_build: cmake-r
 	@cmake --build $(BUILD_DIR) --target r_build -- $(N_PROC_OPT)
 
-r_install: r_build
+r_install: cmake-r
 	@cmake --build $(BUILD_DIR) --target r_install -- $(N_PROC_OPT)
 
 
@@ -238,13 +253,13 @@ check_rmd: cmake-r
 	@CTEST_OUTPUT_ON_FAILURE=1 cmake --build $(BUILD_DIR) --target check_rmd -- $(N_PROC_OPT)
 
 check_test_cpp: cmake
-	@cd $(BUILD_DIR); make $(TEST); CTEST_OUTPUT_ON_FAILURE=1 ctest -R $(TEST)
+	@cd $(BUILD_DIR); make $(TEST); CTEST_OUTPUT_ON_FAILURE=1 ctest -R '^$(TEST)$$'; CTEST_OUTPUT_ON_FAILURE=1 ctest -R '^$(TEST)_cmp$$'
 
 check_test_py: cmake-python
-	@cd $(BUILD_DIR); make prepare_check_py; CTEST_OUTPUT_ON_FAILURE=1 ctest -R $(TEST)
+	@cd $(BUILD_DIR); make python_install; make prepare_check_py; make prepare_check_ipynb; CTEST_OUTPUT_ON_FAILURE=1 ctest -R '^$(TEST)$$'; CTEST_OUTPUT_ON_FAILURE=1 ctest -R '^$(TEST)_cmp$$'
 
 check_test_r: cmake-r
-	@cd $(BUILD_DIR); make prepare_check_r; CTEST_OUTPUT_ON_FAILURE=1 ctest -R $(TEST)
+	@cd $(BUILD_DIR); make r_install; make prepare_check_r; make prepare_check_rmd; CTEST_OUTPUT_ON_FAILURE=1 ctest -R '^$(TEST)$$'; CTEST_OUTPUT_ON_FAILURE=1 ctest -R '^$(TEST)_cmp$$'
 
 dump_test_cpp: cmake
 	@cd $(BUILD_DIR); make $(TEST); "tests/cpp/$(BUILD_TYPE)/$(TEST)" dummy

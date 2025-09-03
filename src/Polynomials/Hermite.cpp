@@ -9,13 +9,15 @@
 /*                                                                            */
 /******************************************************************************/
 #include "Polynomials/Hermite.hpp"
-#include "Matrix/MatrixSquare.hpp"
-#include "Basic/Utilities.hpp"
 #include "Basic/Law.hpp"
+#include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Matrix/MatrixSquare.hpp"
 
-#include <math.h>
+#include <cmath>
 
+namespace gstlrn
+{
 double _convert2u(double yc, double krigest, double krigstd)
 {
   if (ABS(krigstd) < EPSILON6) return ((yc >= krigest) ? +10. : -10.);
@@ -30,16 +32,16 @@ double _convert2u(double yc, double krigest, double krigstd)
  * @param u  Lower bound of integral (-inf if set to TEST)
  * @param hnYc Vector of Hermite polynomials at cutoff
  */
-void _calculateIn(VectorDouble &In,
+void _calculateIn(VectorDouble& In,
                   double yk,
                   double sk,
                   double u,
-                  const VectorDouble &hnYc)
+                  const VectorDouble& hnYc)
 {
   double Gcomp, gusk;
   bool flag_u = !FFFF(u);
-  double r2 = 1 - sk * sk;
-  int nbpoly = static_cast<int>(In.size());
+  double r2   = 1 - sk * sk;
+  Id nbpoly   = static_cast<Id>(In.size());
   if (flag_u)
   {
     Gcomp = 1 - law_cdf_gaussian(u);
@@ -56,12 +58,12 @@ void _calculateIn(VectorDouble &In,
   In[1] = -(yk * In[0] + gusk);
 
   double cutval = 0.;
-  for (int ih = 2; ih < nbpoly; ih++)
+  for (Id ih = 2; ih < nbpoly; ih++)
   {
     if (flag_u) cutval = gusk * hnYc[ih - 1];
-    double sqh  = sqrt((double) ih);
-    double sqh1 = sqrt((double) (ih - 1.));
-    In[ih] = -(yk * In[ih - 1] + r2 * sqh1 * In[ih - 2] + cutval) / sqh;
+    double sqh  = sqrt(static_cast<double>(ih));
+    double sqh1 = sqrt((ih - 1.));
+    In[ih]      = -(yk * In[ih - 1] + r2 * sqh1 * In[ih - 2] + cutval) / sqh;
   }
 }
 
@@ -75,48 +77,47 @@ void _calculateIn(VectorDouble &In,
  * @param hnYc Vector of Hermite polynomials at cutoff
  * @param phi
  */
-void _calculateJJ(MatrixSquare &JJ,
-                  VectorDouble &In,
+void _calculateJJ(MatrixSquare& JJ,
+                  VectorDouble& In,
                   double yk,
                   double sk,
                   double u,
-                  const VectorDouble &hnYc,
-                  const VectorDouble &phi)
+                  const VectorDouble& hnYc,
+                  const VectorDouble& phi)
 {
-  int nbpoly = static_cast<int>(phi.size());
+  Id nbpoly = static_cast<Id>(phi.size());
 
   bool flag_u = !FFFF(u);
-  double s2 = sk * sk;
-  double r2 = 1 - s2;
-  double gusk = (flag_u) ? sk * law_df_gaussian(u) :  0.;
+  double s2   = sk * sk;
+  double r2   = 1 - s2;
+  double gusk = (flag_u) ? sk * law_df_gaussian(u) : 0.;
 
   _calculateIn(In, yk, sk, u, hnYc);
 
   double cutval = 0.;
-  for (int n = 0; n < nbpoly; n++)
+  for (Id n = 0; n < nbpoly; n++)
   {
     JJ.setValue(n, 0, In[n]);
     JJ.setValue(0, n, In[n]);
   }
-  for (int n = 1; n < nbpoly; n++)
+  for (Id n = 1; n < nbpoly; n++)
   {
     if (flag_u) cutval = gusk * hnYc[n];
-    double sqn = sqrt((double) n);
+    double sqn   = sqrt(static_cast<double>(n));
     double value = -yk * JJ.getValue(n, 0) + s2 * sqn * JJ.getValue(n - 1, 0) - cutval;
 
     JJ.setValue(n, 1, value);
     JJ.setValue(1, n, value);
   }
-  for (int n = 1; n < nbpoly; n++)
+  for (Id n = 1; n < nbpoly; n++)
   {
-    double sqn  = sqrt((double) n);
-    double sqn1 = sqrt((double) (n + 1.));
-    for (int p = n + 1; p < nbpoly; p++)
+    double sqn  = sqrt(static_cast<double>(n));
+    double sqn1 = sqrt((n + 1.));
+    for (Id p = n + 1; p < nbpoly; p++)
     {
       if (flag_u) cutval = gusk * hnYc[n] * hnYc[p];
-      double sqp = sqrt((double) p);
-      double value = -(yk * JJ.getValue(n, p) + sqn * r2 * JJ.getValue(n - 1, p)
-          - sqp * s2* JJ.getValue(n, p - 1) + cutval) / sqn1;
+      double sqp   = sqrt(static_cast<double>(p));
+      double value = -(yk * JJ.getValue(n, p) + sqn * r2 * JJ.getValue(n - 1, p) - sqp * s2 * JJ.getValue(n, p - 1) + cutval) / sqn1;
       JJ.setValue(n + 1, p, value);
       JJ.setValue(p, n + 1, value);
     }
@@ -131,7 +132,7 @@ void _calculateJJ(MatrixSquare &JJ,
  * @param nbpoly Number of Hermite polynomials
  * @return The vector of polynomials (Dimension: nbpoly)
  */
-VectorDouble hermitePolynomials(double y, double r, int nbpoly)
+VectorDouble hermitePolynomials(double y, double r, Id nbpoly)
 {
   VectorDouble poly(nbpoly);
   if (nbpoly < 1) return poly;
@@ -142,11 +143,11 @@ VectorDouble hermitePolynomials(double y, double r, int nbpoly)
     poly[1] = -y;
     if (nbpoly > 2)
     {
-      for (int ih = 2; ih < nbpoly; ih++)
+      for (Id ih = 2; ih < nbpoly; ih++)
       {
-        double sqh   = sqrt((double) ih);
-        double sqhm1 = sqrt((double) (ih - 1.));
-        poly[ih] = -(y * poly[ih - 1] + sqhm1 * poly[ih - 2]) / sqh;
+        double sqh   = sqrt(static_cast<double>(ih));
+        double sqhm1 = sqrt((ih - 1.));
+        poly[ih]     = -(y * poly[ih - 1] + sqhm1 * poly[ih - 2]) / sqh;
       }
     }
   }
@@ -154,7 +155,7 @@ VectorDouble hermitePolynomials(double y, double r, int nbpoly)
   if (r != 1)
   {
     double rk = 1;
-    for (int ih = 0; ih < nbpoly; ih++)
+    for (Id ih = 0; ih < nbpoly; ih++)
     {
       poly[ih] *= rk;
       rk *= r;
@@ -172,13 +173,13 @@ VectorDouble hermitePolynomials(double y, double r, int nbpoly)
  */
 VectorDouble hermitePolynomials(double y, double r, const VectorInt& ifacs)
 {
-  int nfact = (int) ifacs.size();
+  Id nfact = static_cast<Id>(ifacs.size());
   VectorDouble vec(nfact);
 
-  int nbpoly = VH::maximum(ifacs);
-  VectorDouble poly = hermitePolynomials(y, r, nbpoly+1);
+  Id nbpoly         = VH::maximum(ifacs);
+  VectorDouble poly = hermitePolynomials(y, r, nbpoly + 1);
 
-  for (int ifac = 0; ifac < nfact; ifac++)
+  for (Id ifac = 0; ifac < nfact; ifac++)
     vec[ifac] = poly[ifacs[ifac]];
 
   return vec;
@@ -186,7 +187,7 @@ VectorDouble hermitePolynomials(double y, double r, const VectorInt& ifacs)
 
 /**
  * Calculate the Conditional Expectation:
- *    E[Z | Z1=z1, Z2=z2, ..., Zn=zn] = int Phi(y_kk + s_k u) g(u) du
+ *    E[Z | Z1=z1, Z2=z2, ..., Zn=zn] = Id Phi(y_kk + s_k u) g(u) du
  *
  * @param krigest Vector of Kriging estimates
  * @param krigstd Vector of Kriging standard deviations
@@ -195,14 +196,14 @@ VectorDouble hermitePolynomials(double y, double r, const VectorInt& ifacs)
  */
 VectorDouble hermiteCondExp(VectorDouble krigest,
                             VectorDouble krigstd,
-                            const VectorDouble &phi)
+                            const VectorDouble& phi)
 {
   VectorDouble condexp;
 
-  int nech = static_cast<int>(krigest.size());
+  Id nech = static_cast<Id>(krigest.size());
   condexp.resize(nech);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     condexp[iech] = hermiteCondExpElement(krigest[iech], krigstd[iech], phi);
   }
@@ -211,14 +212,14 @@ VectorDouble hermiteCondExp(VectorDouble krigest,
 
 double hermiteCondExpElement(double krigest,
                              double krigstd,
-                             const VectorDouble &phi)
+                             const VectorDouble& phi)
 {
-  int nbpoly = static_cast<int>(phi.size());
+  Id nbpoly = static_cast<Id>(phi.size());
   VectorDouble In(nbpoly);
   _calculateIn(In, krigest, krigstd, TEST, VectorDouble());
 
   double condexp = 0.;
-  for (int ih = 0; ih < nbpoly; ih++)
+  for (Id ih = 0; ih < nbpoly; ih++)
     condexp += phi[ih] * In[ih];
   return condexp;
 }
@@ -232,14 +233,14 @@ double hermiteCondExpElement(double krigest,
  */
 VectorDouble hermiteCondStd(VectorDouble krigest,
                             VectorDouble krigstd,
-                            const VectorDouble &phi)
+                            const VectorDouble& phi)
 {
-  int nech = static_cast<int>(krigest.size());
+  Id nech = static_cast<Id>(krigest.size());
   VectorDouble condstd(nech, 0);
 
   /* Loop on the samples */
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
     condstd[iech] = hermiteCondStdElement(krigest[iech], krigstd[iech], phi);
 
   return condstd;
@@ -247,17 +248,17 @@ VectorDouble hermiteCondStd(VectorDouble krigest,
 
 double hermiteCondStdElement(double krigest,
                              double krigstd,
-                             const VectorDouble &phi)
+                             const VectorDouble& phi)
 {
   MatrixSquare JJ;
-  int nbpoly = static_cast<int>(phi.size());
+  Id nbpoly = static_cast<Id>(phi.size());
   VectorDouble In(nbpoly);
   JJ.resetFromValue(nbpoly, nbpoly, TEST);
   _calculateJJ(JJ, In, krigest, krigstd, TEST, VectorDouble(), phi);
 
   double constd = 0.;
-  for (int ih = 0; ih < nbpoly; ih++)
-    for (int jh = 0; jh < nbpoly; jh++)
+  for (Id ih = 0; ih < nbpoly; ih++)
+    for (Id jh = 0; jh < nbpoly; jh++)
       constd += JJ.getValue(ih, jh) * phi[ih] * phi[jh];
 
   double condexp = hermiteCondExpElement(krigest, krigstd, phi);
@@ -278,10 +279,10 @@ VectorDouble hermiteIndicator(double yc,
                               VectorDouble krigest,
                               VectorDouble krigstd)
 {
-  int nech = static_cast<int>(krigest.size());
+  Id nech = static_cast<Id>(krigest.size());
   VectorDouble proba(nech);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     proba[iech] = hermiteIndicatorElement(yc, krigest[iech], krigstd[iech]);
   }
@@ -302,10 +303,10 @@ VectorDouble hermiteIndicatorStd(double yc,
                                  VectorDouble krigest,
                                  VectorDouble krigstd)
 {
-  int nech = static_cast<int>(krigest.size());
+  Id nech = static_cast<Id>(krigest.size());
   VectorDouble probstd(nech);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
     probstd[iech] = hermiteIndicatorStdElement(yc, krigest[iech],
                                                krigstd[iech]);
 
@@ -314,7 +315,7 @@ VectorDouble hermiteIndicatorStd(double yc,
 
 double hermiteIndicatorStdElement(double yc, double krigest, double krigstd)
 {
-  double proba = hermiteIndicatorElement(yc, krigest, krigstd);
+  double proba   = hermiteIndicatorElement(yc, krigest, krigstd);
   double probstd = sqrt(proba * (1. - proba));
   return probstd;
 }
@@ -330,21 +331,21 @@ double hermiteIndicatorStdElement(double yc, double krigest, double krigstd)
 VectorDouble hermiteMetal(double yc,
                           VectorDouble krigest,
                           VectorDouble krigstd,
-                          const VectorDouble &phi)
+                          const VectorDouble& phi)
 {
-  int nech = static_cast<int>(krigest.size());
-  int nbpoly = static_cast<int>(phi.size());
+  Id nech   = static_cast<Id>(krigest.size());
+  Id nbpoly = static_cast<Id>(phi.size());
   VectorDouble In(nbpoly);
   VectorDouble metal(nech);
   VectorDouble hnYc = hermitePolynomials(yc, 1., nbpoly);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     double u = _convert2u(yc, krigest[iech], krigstd[iech]);
     _calculateIn(In, krigest[iech], krigstd[iech], u, hnYc);
 
     double result = 0.;
-    for (int ih = 0; ih < nbpoly; ih++)
+    for (Id ih = 0; ih < nbpoly; ih++)
       result += phi[ih] * In[ih];
     metal[iech] = result;
   }
@@ -354,9 +355,9 @@ VectorDouble hermiteMetal(double yc,
 double hermiteMetalElement(double yc,
                            double krigest,
                            double krigstd,
-                           const VectorDouble &phi)
+                           const VectorDouble& phi)
 {
-  int nbpoly = static_cast<int>(phi.size());
+  Id nbpoly = static_cast<Id>(phi.size());
   VectorDouble In(nbpoly);
   VectorDouble hnYc = hermitePolynomials(yc, 1., nbpoly);
 
@@ -364,7 +365,7 @@ double hermiteMetalElement(double yc,
   _calculateIn(In, krigest, krigstd, u, hnYc);
 
   double result = 0.;
-  for (int ih = 0; ih < nbpoly; ih++)
+  for (Id ih = 0; ih < nbpoly; ih++)
     result += phi[ih] * In[ih];
 
   return result;
@@ -373,27 +374,27 @@ double hermiteMetalElement(double yc,
 VectorDouble hermiteMetalStd(double yc,
                              VectorDouble krigest,
                              VectorDouble krigstd,
-                             const VectorDouble &phi)
+                             const VectorDouble& phi)
 {
   MatrixSquare JJ;
 
-  int nech = static_cast<int>(krigest.size());
-  int nbpoly = static_cast<int>(phi.size());
+  Id nech   = static_cast<Id>(krigest.size());
+  Id nbpoly = static_cast<Id>(phi.size());
   VectorDouble In(nbpoly);
   JJ.resetFromValue(nbpoly, nbpoly, TEST);
 
   VectorDouble metstd(nech, 0.);
-  VectorDouble hnYc = hermitePolynomials(yc, 1., nbpoly);
+  VectorDouble hnYc  = hermitePolynomials(yc, 1., nbpoly);
   VectorDouble metal = hermiteMetal(yc, krigest, krigstd, phi);
 
-  for (int iech = 0; iech < nech; iech++)
+  for (Id iech = 0; iech < nech; iech++)
   {
     double u = _convert2u(yc, krigest[iech], krigstd[iech]);
     _calculateJJ(JJ, In, krigest[iech], krigstd[iech], u, hnYc, phi);
 
     double result = 0.;
-    for (int ih = 0; ih < nbpoly; ih++)
-      for (int jh = 0; jh < nbpoly; jh++)
+    for (Id ih = 0; ih < nbpoly; ih++)
+      for (Id jh = 0; jh < nbpoly; jh++)
         result += JJ.getValue(ih, jh) * phi[ih] * phi[jh];
     result -= metal[iech] * metal[iech];
     if (result > 0) metstd[iech] = sqrt(result);
@@ -404,10 +405,10 @@ VectorDouble hermiteMetalStd(double yc,
 double hermiteMetalStdElement(double yc,
                               double krigest,
                               double krigstd,
-                              const VectorDouble &phi)
+                              const VectorDouble& phi)
 {
   MatrixSquare JJ;
-  int nbpoly = static_cast<int>(phi.size());
+  Id nbpoly = static_cast<Id>(phi.size());
   VectorDouble In(nbpoly);
   JJ.resetFromValue(nbpoly, nbpoly, TEST);
   VectorDouble hnYc = hermitePolynomials(yc, 1., nbpoly);
@@ -416,8 +417,8 @@ double hermiteMetalStdElement(double yc,
   _calculateJJ(JJ, In, krigest, krigstd, u, hnYc, phi);
 
   double result = 0.;
-  for (int ih = 0; ih < nbpoly; ih++)
-    for (int jh = 0; jh < nbpoly; jh++)
+  for (Id ih = 0; ih < nbpoly; ih++)
+    for (Id jh = 0; jh < nbpoly; jh++)
       result += JJ.getValue(ih, jh) * phi[ih] * phi[jh];
 
   double metal = hermiteMetalElement(yc, krigest, krigstd, phi);
@@ -434,13 +435,13 @@ double hermiteMetalStdElement(double yc,
  * @param nbpoly Number of Hermite polynomials
  * @return The vector of coefficients of the Indicator
  */
-VectorDouble hermiteCoefIndicator(double yc, int nbpoly)
+VectorDouble hermiteCoefIndicator(double yc, Id nbpoly)
 {
   VectorDouble hn = hermitePolynomials(yc, 1., nbpoly);
   VectorDouble an(nbpoly);
   double gyc = law_df_gaussian(yc);
-  an[0] = 1. - law_cdf_gaussian(yc);
-  for (int n = 1; n < nbpoly; n++)
+  an[0]      = 1. - law_cdf_gaussian(yc);
+  for (Id n = 1; n < nbpoly; n++)
     an[n] = -gyc * hn[n - 1] / sqrt(n);
 
   return an;
@@ -452,9 +453,9 @@ VectorDouble hermiteCoefIndicator(double yc, int nbpoly)
  * @param phi Coefficients of Hermite polynomial
  * @return The vector of coefficients of the Metal Quantity
  */
-VectorDouble hermiteCoefMetal(double yc, const VectorDouble &phi)
+VectorDouble hermiteCoefMetal(double yc, const VectorDouble& phi)
 {
-  int nbpoly = static_cast<int>(phi.size());
+  Id nbpoly = static_cast<Id>(phi.size());
   VectorDouble vect(nbpoly);
   MatrixSquare TAU = hermiteIncompleteIntegral(yc, nbpoly);
   TAU.prodMatVecInPlace(phi, vect);
@@ -467,18 +468,18 @@ VectorDouble hermiteCoefMetal(double yc, const VectorDouble &phi)
  * @param nbpoly Number of Hermite polynomials
  * @return The matrix of Incomplete Integral (Dimension: nbpoly * nbpoly)
  */
-MatrixSquare hermiteIncompleteIntegral(double yc, int nbpoly)
+MatrixSquare hermiteIncompleteIntegral(double yc, Id nbpoly)
 {
   MatrixSquare TAU;
 
   TAU.resetFromValue(nbpoly, nbpoly, 0.);
   VectorDouble hn = hermitePolynomials(yc, 1., nbpoly);
-  double gy = law_df_gaussian(yc);
+  double gy       = law_df_gaussian(yc);
 
   /* Calculation of S_0n */
 
   TAU.setValue(0, 0, law_cdf_gaussian(yc));
-  for (int ip = 1; ip < nbpoly; ip++)
+  for (Id ip = 1; ip < nbpoly; ip++)
   {
     double aa = hn[ip - 1] / sqrt(ip) * gy;
     TAU.setValue(ip, 0, aa);
@@ -487,18 +488,16 @@ MatrixSquare hermiteIncompleteIntegral(double yc, int nbpoly)
 
   /* Calculation of diagonals and symmetrization */
 
-  for (int n = 0; n < nbpoly - 1; n++)
-    for (int m = 1; m < nbpoly - n; m++)
+  for (Id n = 0; n < nbpoly - 1; n++)
+    for (Id m = 1; m < nbpoly - n; m++)
     {
-      double aa = sqrt((double) m / (double) (m + n))
-          * TAU.getValue(m - 1, n + m - 1)
-                  + gy * hn[m] * hn[m + n - 1] / sqrt((double) (m + n));
+      double aa = sqrt(static_cast<double>(m) / static_cast<double>(m + n)) * TAU.getValue(m - 1, n + m - 1) + gy * hn[m] * hn[m + n - 1] / sqrt(static_cast<double>(m + n));
       TAU.setValue(m, m + n, aa);
       TAU.setValue(m + n, m, aa);
     }
 
-  for (int n = 0; n < nbpoly; n++)
-    for (int m = 0; m < nbpoly; m++)
+  for (Id n = 0; n < nbpoly; n++)
+    for (Id m = 0; m < nbpoly; m++)
       TAU.setValue(m, n, (m == n) ? 1. - TAU.getValue(m, n) : -TAU.getValue(m, n));
 
   return TAU;
@@ -512,16 +511,16 @@ MatrixSquare hermiteIncompleteIntegral(double yc, int nbpoly)
  * @param nbpoly Number of Hermite polynomials
  * @return The array of coefficients
  */
-VectorDouble hermiteLognormal(double mean, double sigma, int nbpoly)
+VectorDouble hermiteLognormal(double mean, double sigma, Id nbpoly)
 {
   VectorDouble hn(nbpoly);
 
   double fact = 1.;
-  hn[0] = mean;
-  for (int i = 1; i < nbpoly; i++)
+  hn[0]       = mean;
+  for (Id i = 1; i < nbpoly; i++)
   {
-    fact *= (double) i;
-    hn[i] = mean * pow(-sigma, (double) i) / sqrt(fact);
+    fact *= static_cast<double>(i);
+    hn[i] = mean * pow(-sigma, static_cast<double>(i)) / sqrt(fact);
   }
   return hn;
 }
@@ -532,10 +531,10 @@ VectorDouble hermiteLognormal(double mean, double sigma, int nbpoly)
  * @param hn Hermite polynomial values
  * @return The result of the expansion
  */
-double hermiteSeries(const VectorDouble &an, const VectorDouble &hn)
+double hermiteSeries(const VectorDouble& an, const VectorDouble& hn)
 {
   double value = 0.;
-  for (int ih = 0; ih < (int) hn.size(); ih++)
+  for (Id ih = 0; ih < static_cast<Id>(hn.size()); ih++)
   {
     value += an[ih] * hn[ih];
   }
@@ -548,35 +547,36 @@ double hermiteSeries(const VectorDouble &an, const VectorDouble &hn)
  * @param nbpoly Number of Polynomial functions
  * @return Hermite Coefficients
  */
-VectorDouble hermiteCoefLower(double y, int nbpoly)
+VectorDouble hermiteCoefLower(double y, Id nbpoly)
 {
   VectorDouble hn = hermitePolynomials(y, 1., nbpoly);
   VectorDouble coeff(nbpoly);
 
   double dg = law_df_gaussian(y);
   double dG = law_cdf_gaussian(y);
-  coeff[0] = dg + y * dG;
-  coeff[1] = dG - 1.;
-  for (int n = 2; n < nbpoly; n++)
+  coeff[0]  = dg + y * dG;
+  coeff[1]  = dG - 1.;
+  for (Id n = 2; n < nbpoly; n++)
   {
-    double sqnnm1 = sqrt((double) n * (n - 1.));
-    coeff[n] = dg * hn[n - 2] / sqnnm1;
+    double sqnnm1 = sqrt(static_cast<double>(n) * (n - 1.));
+    coeff[n]      = dg * hn[n - 2] / sqnnm1;
   }
   return coeff;
 }
 
-VectorDouble hermiteIndicatorLower(double y, int nbpoly)
+VectorDouble hermiteIndicatorLower(double y, Id nbpoly)
 {
   VectorDouble hn = hermitePolynomials(y, 1., nbpoly);
   VectorDouble coeff(nbpoly);
 
   double dg = law_df_gaussian(y);
   double dG = law_cdf_gaussian(y);
-  coeff[0] = 1. - dG;
-  for (int n = 1; n < nbpoly; n++)
+  coeff[0]  = 1. - dG;
+  for (Id n = 1; n < nbpoly; n++)
   {
-    coeff[n] = -dg * hn[n - 1] / sqrt((double) n);
+    coeff[n] = -dg * hn[n - 1] / sqrt(static_cast<double>(n));
   }
   return coeff;
 }
 
+} // namespace gstlrn

@@ -15,22 +15,22 @@
 #include "Enum/ESpaceType.hpp"
 
 #include "API/SPDE.hpp"
-#include "API/SPDEParam.hpp"
 
-#include "Mesh/MeshETurbo.hpp"
-#include "Matrix/MatrixSparse.hpp"
-#include "Basic/Law.hpp"
-#include "Basic/OptDbg.hpp"
-#include "Basic/OptCst.hpp"
 #include "Basic/File.hpp"
+#include "Basic/Law.hpp"
+#include "Basic/OptCst.hpp"
+#include "Basic/OptDbg.hpp"
+#include "Covariances/CovContext.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
 #include "Db/DbStringFormat.hpp"
-#include "Space/ASpaceObject.hpp"
-#include "Covariances/CovContext.hpp"
-#include "Model/Model.hpp"
 #include "LinearOp/PrecisionOpMatrix.hpp"
-#include "Basic/Memory.hpp"
+#include "Matrix/MatrixSparse.hpp"
+#include "Mesh/MeshETurbo.hpp"
+#include "Model/Model.hpp"
+#include "Space/ASpaceObject.hpp"
+
+using namespace gstlrn;
 
 /*****************************************************************************/
 /*!
@@ -44,36 +44,36 @@
 ** \param[in]  z        Array giving the simulated field
 **
 *****************************************************************************/
-static int st_save(Db    *dbgrid,
-                   const VectorInt&    colors,
-                   const VectorDouble& consmin,
-                   const VectorDouble& consmax,
-                   const VectorDouble& z)
+static Id st_save(Db* dbgrid,
+                  const VectorInt& colors,
+                  const VectorDouble& consmin,
+                  const VectorDouble& consmax,
+                  const VectorDouble& z)
 {
-  int iptr;
-  int nech = dbgrid->getNSample();
+  Id iptr;
+  auto nech = dbgrid->getNSample();
 
   /* Add the terms to 'dbgrid' */
-  
-  if (! consmin.empty())
+
+  if (!consmin.empty())
   {
-    if (db_locator_attribute_add(dbgrid,ELoc::L,1,0,0.,&iptr)) return(1);
-    for (int i=0; i<nech; i++) dbgrid->setArray(i,iptr,consmin[i]);
+    if (db_locator_attribute_add(dbgrid, ELoc::L, 1, 0, 0., &iptr)) return (1);
+    for (Id i = 0; i < nech; i++) dbgrid->setArray(i, iptr, consmin[i]);
   }
-  if (! consmax.empty())
+  if (!consmax.empty())
   {
-    if (db_locator_attribute_add(dbgrid,ELoc::U,1,0,0.,&iptr)) return(1);
-    for (int i=0; i<nech; i++) dbgrid->setArray(i,iptr,consmax[i]);
+    if (db_locator_attribute_add(dbgrid, ELoc::U, 1, 0, 0., &iptr)) return (1);
+    for (Id i = 0; i < nech; i++) dbgrid->setArray(i, iptr, consmax[i]);
   }
-  iptr = dbgrid->addColumnsByConstant(1,0., "Color");
-  for (int i=0; i<nech; i++) dbgrid->setArray(i,iptr,colors[i]);
-  if (db_locator_attribute_add(dbgrid,ELoc::Z,1,0,0.,&iptr)) return(1);
-  for (int i=0; i<nech; i++) dbgrid->setArray(i,iptr,z[i]);
+  iptr = dbgrid->addColumnsByConstant(1, 0., "Color");
+  for (Id i = 0; i < nech; i++) dbgrid->setArray(i, iptr, colors[i]);
+  if (db_locator_attribute_add(dbgrid, ELoc::Z, 1, 0, 0., &iptr)) return (1);
+  for (Id i = 0; i < nech; i++) dbgrid->setArray(i, iptr, z[i]);
 
   /* Save the resulting 'dbgrid' in a neutral file */
 
-  (void) dbgrid->dumpToNF("Colored_Gibbs");
-  return(0);
+  (void)dbgrid->dumpToNF("Grid");
+  return (0);
 }
 
 /*****************************************************************************/
@@ -91,14 +91,14 @@ static void st_print_all(const VectorInt& colors,
                          const VectorDouble& consmin,
                          const VectorDouble& consmax,
                          const VectorDouble& sigma,
-                         const MatrixSparse *Q)
+                         const MatrixSparse* Q)
 {
-  if (! consmin.empty())
-    print_matrix ("consmin",0,0,1,10,NULL,consmin.data());
-  if (! consmax.empty())
-    print_matrix ("consmax",0,0,1,10,NULL,consmax.data());
-  print_matrix ("sigma"  ,0,0,1,10,NULL,sigma.data());
-  print_imatrix("colors" ,0,0,1,10,NULL,colors.data());
+  if (!consmin.empty())
+    print_matrix("consmin", 0, 0, 1, 10, NULL, consmin.data());
+  if (!consmax.empty())
+    print_matrix("consmax", 0, 0, 1, 10, NULL, consmax.data());
+  print_matrix("sigma", 0, 0, 1, 10, NULL, sigma.data());
+  print_imatrix("colors", 0, 0, 1, 10, NULL, colors.data());
   Q->display();
 }
 
@@ -114,28 +114,28 @@ static void st_print_all(const VectorInt& colors,
 ** \param[in]  z        Array of input values
 ** \param[in]  colors   Array of colors (same dimension as 'z')
 **
-** \param[out]  ind     Array which contains address in 'z' of items of 'zred'
+** \param[out]  ind     Array of complementary addresses
 ** \param[out]  zred    Array of output values retained
 **
 *****************************************************************************/
-static void st_vector_compress(int nvertex,
-                               int colref,
-                               const VectorDouble &z,
-                               const VectorInt &colors,
-                               VectorInt &ind,
-                               VectorDouble &zred)
+static void st_vector_compress(Id nvertex,
+                               Id colref,
+                               const VectorDouble& z,
+                               const VectorInt& colors,
+                               VectorInt& ind,
+                               VectorDouble& zred)
 {
   ind.clear();
   zred.clear();
-  for (int i=0; i<nvertex; i++)
+  for (Id i = 0; i < nvertex; i++)
   {
-    if (colors[i] != colref) 
+    if (colors[i] == colref)
       zred.push_back(z[i]);
     else
       ind.push_back(i);
   }
 }
-  
+
 /*****************************************************************************/
 /*!
 **  Draw a random value from a Gaussian distribution under the constraint
@@ -151,21 +151,21 @@ static void st_vector_compress(int nvertex,
 ** \param[in]  sigma    Standard deviation of the Gaussian distribution
 **
 *****************************************************************************/
-static double st_simcond(int    iter,
-                         int    niter,
+static double st_simcond(Id iter,
+                         Id niter,
                          double valmin,
                          double valmax,
                          double mean,
                          double sigma)
 {
-  double locmin,locmax,x,delta,ratio;
+  double locmin, locmax, x, delta, ratio;
 
-  ratio  = (double) (niter-iter-1) / (double) (iter+1);
-  delta  = valmax - valmin;
+  ratio = (double)(niter - iter - 1) / (double)(iter + 1);
+  delta = valmax - valmin;
   if (valmin == -10.)
     locmin = -10.;
-  else 
-  {    
+  else
+  {
     locmin = valmin - delta * ratio;
     locmin = (locmin - mean) / sigma;
   }
@@ -177,8 +177,8 @@ static double st_simcond(int    iter,
     locmax = (locmax - mean) / sigma;
   }
 
-  x = law_gaussian_between_bounds(locmin,locmax);
-  return(mean + x * sigma);
+  x = law_gaussian_between_bounds(locmin, locmax);
+  return (mean + x * sigma);
 }
 
 /*****************************************************************************/
@@ -208,40 +208,40 @@ static double st_simcond(int    iter,
 ** \remarks        (Dimension 'nvertex')
 **
 *****************************************************************************/
-static int st_gibbs(int  niter,
-                    int  ncolor,
-                    int  nvertex,
-                    const VectorInt& colors,
-                    const VectorInt& colref,
-                    MatrixSparse **Qcols,
-                    const VectorDouble& consmin,
-                    const VectorDouble& consmax,
-                    const VectorDouble& sigma,
-                    VectorDouble& z,
-                    VectorDouble& krig)
+static Id st_gibbs(Id niter,
+                   Id ncolor,
+                   Id nvertex,
+                   const VectorInt& colors,
+                   const VectorInt& colref,
+                   MatrixSparse** Qcols,
+                   const VectorDouble& consmin,
+                   const VectorDouble& consmax,
+                   const VectorDouble& sigma,
+                   VectorDouble& z,
+                   VectorDouble& krig)
 {
-  mestitle(1,"Entering in Gibbs algorithm with niter=%d and ncolor=%d",niter,ncolor);
+  mestitle(1, "Entering in Gibbs algorithm with niter=%d and ncolor=%d", niter, ncolor);
   VectorInt ind;
   VectorDouble zred;
 
-  for (int iter=0; iter<niter; iter++)
+  for (Id iter = 0; iter < niter; iter++)
   {
-    if (iter % 1000 == 0) message("Iteration %d\n",iter);
-    for (int icol=0; icol<ncolor; icol++)
+    if (iter % 1000 == 0) message("Iteration %d\n", iter);
+    for (Id icol = 0; icol < ncolor; icol++)
     {
-      st_vector_compress(nvertex,colref[icol],z,colors,ind,zred);
-      Qcols[icol]->prodVecMatInPlacePtr(zred.data(), krig.data(), false);
+      st_vector_compress(nvertex, colref[icol], z, colors, ind, zred);
+      Qcols[icol]->prodVecMatInPlace(zred, krig, false);
 
-      for (int ic=0, nc = (int) ind.size(); ic<nc; ic++)
+      for (Id ic = 0, nc = static_cast<Id>(ind.size()); ic < nc; ic++)
       {
-        int i  = ind[ic];
-        double valmin = (! consmin.empty()) ? consmin[i] : -10.;
-        double valmax = (! consmax.empty()) ? consmax[i] : +10.;
-        z[i] = st_simcond(iter, niter, valmin, valmax, krig[ic], sigma[i]);
+        auto i        = ind[ic];
+        double valmin = (!consmin.empty()) ? consmin[i] : -10.;
+        double valmax = (!consmax.empty()) ? consmax[i] : +10.;
+        z[i]          = st_simcond(iter, niter, valmin, valmax, krig[ic], sigma[i]);
       }
     }
   }
-  return(0);
+  return (0);
 }
 
 /****************************************************************************/
@@ -249,11 +249,11 @@ static int st_gibbs(int  niter,
 ** Main Program
 **
 *****************************************************************************/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 
 {
-  bool   flag_print =  false;
-  bool   flag_save  =  true;
+  bool flag_print = false;
+  bool flag_save  = true;
 
   std::stringstream sfn;
   sfn << gslBaseName(__FILE__) << ".out";
@@ -262,120 +262,115 @@ int main(int argc, char *argv[])
   /***********************/
   /* 1 - Initializations */
   /***********************/
-  int ndim     = 2;
+  Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
-  ASerializable::setContainerName(true);
-  ASerializable::setPrefixName("Gibbs-");
+  ASerializable::setPrefixName("test_Gibbs-");
 
   // Setup constants
 
   OptDbg::reset();
-  OptCst::define(ECst::NTCAR,10.);
-  OptCst::define(ECst::NTDEC,6.);
-  
-  setGlobalFlagEigen(true);
+  OptCst::define(ECst::NTCAR, 10.);
+  OptCst::define(ECst::NTDEC, 6.);
 
   // 2-D grid output file
 
-  VectorInt nx = { 100, 100 };
-  VectorDouble x0 = { 0., 0. };
-  VectorDouble dx = { 1., 1. };
-  DbGrid *dbgrid = DbGrid::create(nx, dx, x0, VectorDouble(), ELoadBy::COLUMN,
-                                  VectorDouble(), VectorString(), VectorString(), 1);
-    
+  VectorInt nx    = {100, 100};
+  VectorDouble x0 = {0., 0.};
+  VectorDouble dx = {1., 1.};
+  DbGrid* dbgrid  = DbGrid::create(nx, dx, x0, VectorDouble(), ELoadBy::COLUMN,
+                                   VectorDouble(), VectorString(), VectorString(), 1);
+
   // Model for SPDE
 
-  double range_spde =   30.;
-  double param_spde =    1.;
-  double sill_spde  =    1.;
-  Model* model1 = Model::createFromParam(ECov::MATERN,range_spde,sill_spde,param_spde);
+  double range_spde = 30.;
+  double param_spde = 1.;
+  double sill_spde  = 1.;
+  Model* model1     = Model::createFromParam(ECov::MATERN, range_spde, sill_spde, param_spde);
 
   // Model for constraints
 
-  double range_cons =   50.;
-  double param_cons =    2.;
-  double sill_cons  =    1.;
-  Model* model2 = Model::createFromParam(ECov::MATERN,range_cons,sill_cons,param_cons);
+  double range_cons = 50.;
+  double param_cons = 2.;
+  double sill_cons  = 1.;
+  Model* model2     = Model::createFromParam(ECov::MATERN, range_cons, sill_cons, param_cons);
 
   // Creating the meshing for extracting Q
 
   MeshETurbo mesh(dbgrid);
-  auto P = PrecisionOpMatrix(&mesh, model1->getCovAniso(0));
+  auto P                   = PrecisionOpMatrix(&mesh, model1->getCovAniso(0));
   const MatrixSparse* Qref = P.getQ();
-  MatrixSparse* Q = new MatrixSparse(*Qref);
-  int nvertex = mesh.getNApices();
+  auto* Q                  = new MatrixSparse(*Qref);
+  auto nvertex             = mesh.getNApices();
 
   // Coding the various colors
 
   VectorInt colors = Q->colorCoding();
   VectorInt colref = VH::unique(colors);
-  int ncolor = (int) colref.size();
+  Id ncolor        = static_cast<Id>(colref.size());
 
   // Core allocation
-  
-  VectorDouble z(nvertex,0);
-  VectorDouble krig(nvertex,0);
-  VectorDouble consmin(nvertex,0);
-  VectorDouble consmax(nvertex,0);
+
+  VectorDouble z(nvertex, 0);
+  VectorDouble krig(nvertex, 0);
+  VectorDouble consmin(nvertex, 0);
+  VectorDouble consmax(nvertex, 0);
 
   // Creating the constraints
 
-  bool verbose = false;
-  int seed = 31415;
+  Id seed = 31415;
   law_set_random_seed(seed);
-  int nsimu = 2;
-  int useCholesky = 1;
-  (void)simulateSPDE(NULL, dbgrid, model2, nullptr, nsimu, NULL, useCholesky,
-                     SPDEParam(), verbose);
+  Id nsimu       = 2;
+  Id useCholesky = 1;
+  (void)simulateSPDE(nullptr, dbgrid, model2, nsimu, useCholesky);
 
-  int rank = dbgrid->getNColumn();
-  for (int i=0; i<nvertex; i++)
+  auto rank = dbgrid->getNColumn();
+  for (Id i = 0; i < nvertex; i++)
   {
-    consmin[i] = MIN(dbgrid->getArray(i,rank-1), dbgrid->getArray(i,rank-2));
-    consmax[i] = MAX(dbgrid->getArray(i,rank-1), dbgrid->getArray(i,rank-2));
-    z[i] = (consmin[i] + consmax[i]) / 2.;
+    consmin[i] = MIN(dbgrid->getArray(i, rank - 1), dbgrid->getArray(i, rank - 2));
+    consmax[i] = MAX(dbgrid->getArray(i, rank - 1), dbgrid->getArray(i, rank - 2));
+    z[i]       = (consmin[i] + consmax[i]) / 2.;
   }
-  
+
   // Creating the variance
-  
+
   VectorDouble sigma = Q->getDiagonal(0);
   VH::transformVD(sigma, -3);
 
   // Scaling the Q matrix
-  
-  (void) Q->scaleByDiag();
+
+  (void)Q->scaleByDiag();
 
   // Check the imported information
 
-  if (flag_print) st_print_all(colors,consmin,consmax,sigma,Q);
+  if (flag_print) st_print_all(colors, consmin, consmax, sigma, Q);
 
   //----------------//
   // Main Algorithm //
   //----------------//
 
-  MatrixSparse** Qcols = (MatrixSparse **) mem_alloc(sizeof(MatrixSparse *) * ncolor,1);
-  for (int icol=0; icol<ncolor; icol++)
+  std::vector<MatrixSparse*> Qcols(ncolor);
+  for (Id icol = 0; icol < ncolor; icol++)
     Qcols[icol] = Q->extractSubmatrixByColor(colors, colref[icol], true, false);
 
   // Perform the Gibbs sampler
-  int niter = 10;
-  (void) st_gibbs(niter, ncolor, nvertex, colors, colref, Qcols, consmin, consmax,
-                  sigma, z, krig);
+  Id niter = 10;
+  (void)st_gibbs(niter, ncolor, nvertex, colors, colref, Qcols.data(), consmin, consmax,
+                 sigma, z, krig);
 
   // Add the newly created field to the grid for printout
   if (flag_save)
   {
-    (void) st_save(dbgrid,colors,consmin,consmax,z);
+    (void)st_save(dbgrid, colors, consmin, consmax, z);
     DbStringFormat dbfmt(FLAG_STATS);
     dbgrid->display(&dbfmt);
   }
-  
-  for (int icol=0; icol<ncolor; icol++)
+
+  for (Id icol = 0; icol < ncolor; icol++)
     delete Qcols[icol];
   delete dbgrid;
   delete model1;
   delete model2;
   delete Q;
-  
-  return(0);
+
+  return (0);
 }

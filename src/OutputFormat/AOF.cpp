@@ -13,8 +13,10 @@
 #include "Basic/File.hpp"
 #include "Db/DbGrid.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 
+namespace gstlrn
+{
 AOF::AOF(const String& filename, const Db* db)
   : _filename(filename)
   , _db(db)
@@ -26,11 +28,11 @@ AOF::AOF(const String& filename, const Db* db)
 }
 
 AOF::AOF(const AOF& r)
-    : _filename(r._filename),
-      _db(r._db),
-      _dbgrid(r._dbgrid),
-      _cols(r._cols),
-      _file(r._file)
+  : _filename(r._filename)
+  , _db(r._db)
+  , _dbgrid(r._dbgrid)
+  , _cols(r._cols)
+  , _file(r._file)
 {
 }
 
@@ -39,10 +41,10 @@ AOF& AOF::operator=(const AOF& r)
   if (this != &r)
   {
     _filename = r._filename;
-    _db = r._db;
-    _dbgrid = r._dbgrid;
-    _cols = r._cols;
-    _file = r._file;
+    _db       = r._db;
+    _dbgrid   = r._dbgrid;
+    _cols     = r._cols;
+    _file     = r._file;
   }
   return *this;
 }
@@ -53,7 +55,7 @@ AOF::~AOF()
 
 bool AOF::isValidForGrid() const
 {
-  if (! mustBeGrid()) return true;
+  if (!mustBeGrid()) return true;
   if (_dbgrid == nullptr)
   {
     messerr("This function requires a Grid organization");
@@ -64,10 +66,10 @@ bool AOF::isValidForGrid() const
 
 bool AOF::isValidForVariable() const
 {
-  int ncol = (int) _cols.size();
+  Id ncol = static_cast<Id>(_cols.size());
   if (mustBeOneVariable() && ncol > 1)
   {
-    messerr("This function requires a single Variable but ncol = %d",ncol);
+    messerr("This function requires a single Variable but ncol = %d", ncol);
     return false;
   }
   return true;
@@ -75,10 +77,10 @@ bool AOF::isValidForVariable() const
 
 bool AOF::isValidForNDim() const
 {
-  int ndim = _dbgrid->getNDim();
-  if (! mustBeForNDim(ndim))
+  Id ndim = _dbgrid->getNDim();
+  if (!mustBeForNDim(ndim))
   {
-    messerr("This function is not valid for the Space Dimension (%d)",ndim);
+    messerr("This function is not valid for the Space Dimension (%d)", ndim);
     return false;
   }
   return true;
@@ -86,25 +88,25 @@ bool AOF::isValidForNDim() const
 
 bool AOF::isValidForRotation() const
 {
-  int ndim = _dbgrid->getNDim();
+  Id ndim = _dbgrid->getNDim();
 
-  int mode = 0;
+  Id mode = 0;
   if (_dbgrid->isGridRotated())
   {
-    mode = 1;
+    mode                = 1;
     VectorDouble angles = _dbgrid->getAngles();
-    for (int idim = 1; idim < ndim; idim++)
+    for (Id idim = 1; idim < ndim; idim++)
       if (ABS(angles[idim]) > 1.e-6) mode = 2;
   }
-  if (! mustBeForRotation(mode))
+  if (!mustBeForRotation(mode))
   {
-    messerr("This function is not compatible with Grid Rotation (mode=%d)",mode);
+    messerr("This function is not compatible with Grid Rotation (mode=%d)", mode);
     return false;
   }
   return true;
 }
 
-int AOF::_fileWriteOpen()
+Id AOF::_fileWriteOpen()
 {
   _file = gslFopen(_filename.c_str(), "w");
   if (_file == nullptr)
@@ -115,7 +117,7 @@ int AOF::_fileWriteOpen()
   return 0;
 }
 
-int AOF::_fileReadOpen()
+Id AOF::_fileReadOpen()
 {
   _file = gslFopen(_filename.c_str(), "r");
   if (_file == nullptr)
@@ -133,16 +135,16 @@ void AOF::_fileClose()
   _file = nullptr;
 }
 
-void AOF::setCols(int ncol, const int* icols)
+void AOF::setCols(Id ncol, const Id* icols)
 {
   _cols = VectorInt(ncol);
-  for (int icol = 0; icol < ncol; icol++)
+  for (Id icol = 0; icol < ncol; icol++)
     _cols[icol] = icols[icol];
 }
 
-void AOF::setCol(int icol)
+void AOF::setCol(Id icol)
 {
-  _cols = VectorInt(1);
+  _cols    = VectorInt(1);
   _cols[0] = icol;
 }
 
@@ -153,9 +155,10 @@ bool AOF::isAuthorized() const
     messerr("The argument 'db' must be provided");
     return false;
   }
-  if (! isValidForGrid()) return false;
-  if (! isValidForVariable()) return false;
-  if (! isValidForNDim()) return false;
-  if (! isValidForRotation()) return false;
+  if (!isValidForGrid()) return false;
+  if (!isValidForVariable()) return false;
+  if (!isValidForNDim()) return false;
+  if (!isValidForRotation()) return false;
   return true;
 }
+} // namespace gstlrn

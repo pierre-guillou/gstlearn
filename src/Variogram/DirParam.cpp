@@ -8,24 +8,25 @@
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
 /******************************************************************************/
-#include <Geometry/GeometryHelper.hpp>
-
 #include "Variogram/DirParam.hpp"
-#include "Db/Db.hpp"
-#include "Db/DbGrid.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/Utilities.hpp"
 #include "Basic/VectorHelper.hpp"
+#include "Db/Db.hpp"
+#include "Db/DbGrid.hpp"
 #include "Space/ASpace.hpp"
+#include <Geometry/GeometryHelper.hpp>
 
-#include <math.h>
+#include <cmath>
 
-DirParam::DirParam(int nlag,
+namespace gstlrn
+{
+DirParam::DirParam(Id nlag,
                    double dlag,
                    double toldis,
                    double tolang,
-                   int opt_code,
-                   int idate,
+                   Id opt_code,
+                   Id idate,
                    double bench,
                    double cylrad,
                    double tolcode,
@@ -33,66 +34,66 @@ DirParam::DirParam(int nlag,
                    const VectorDouble& codir,
                    double angle2D,
                    const ASpaceSharedPtr& space)
-    : ASpaceObject(space),
-      _nLag(nlag),
-      _optionCode(opt_code),
-      _idate(idate),
-      _dLag(dlag),
-      _bench(bench),
-      _cylRad(cylrad),
-      _tolDist(toldis),
-      _tolAngle(tolang),
-      _tolCode(tolcode),
-      _breaks(breaks),
-      _codir(codir),
-      _grincr()
+  : ASpaceObject(space)
+  , _nLag(nlag)
+  , _optionCode(opt_code)
+  , _idate(idate)
+  , _dLag(dlag)
+  , _bench(bench)
+  , _cylRad(cylrad)
+  , _tolDist(toldis)
+  , _tolAngle(tolang)
+  , _tolCode(tolcode)
+  , _breaks(breaks)
+  , _codir(codir)
+  , _grincr()
 {
   _completeDefinition(angle2D);
 }
 
-DirParam::DirParam(const DbGrid *dbgrid,
-                   int nlag,
-                   const VectorInt &grincr,
+DirParam::DirParam(const DbGrid* dbgrid,
+                   Id nlag,
+                   const VectorInt& grincr,
                    const ASpaceSharedPtr& space)
-    : ASpaceObject(space),
-      _nLag(nlag),
-      _optionCode(0),
-      _idate(0),
-      _dLag(0),
-      _bench(TEST),
-      _cylRad(TEST),
-      _tolDist(0.5),
-      _tolAngle(0.),
-      _tolCode(0),
-      _breaks(),
-      _codir(),
-      _grincr(grincr)
+  : ASpaceObject(space)
+  , _nLag(nlag)
+  , _optionCode(0)
+  , _idate(0)
+  , _dLag(0)
+  , _bench(TEST)
+  , _cylRad(TEST)
+  , _tolDist(0.5)
+  , _tolAngle(0.)
+  , _tolCode(0)
+  , _breaks()
+  , _codir()
+  , _grincr(grincr)
 {
-  int ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  auto ndim = getDefaultSpaceDimension();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
 
-  _codir = dbgrid->getCodir(grincr);
+  _codir      = dbgrid->getCodir(grincr);
   double dlag = 0.;
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
     dlag += _codir[idim] * _codir[idim];
   _dLag = sqrt(dlag);
   VH::normalize(_codir);
 }
 
 DirParam::DirParam(const DirParam& r)
-    : ASpaceObject(r),
-      _nLag(r._nLag),
-      _optionCode(r._optionCode),
-      _idate(r._idate),
-      _dLag(r._dLag),
-      _bench(r._bench),
-      _cylRad(r._cylRad),
-      _tolDist(r._tolDist),
-      _tolAngle(r._tolAngle),
-      _tolCode(r._tolCode),
-      _breaks(r._breaks),
-      _codir(r._codir),
-      _grincr(r._grincr)
+  : ASpaceObject(r)
+  , _nLag(r._nLag)
+  , _optionCode(r._optionCode)
+  , _idate(r._idate)
+  , _dLag(r._dLag)
+  , _bench(r._bench)
+  , _cylRad(r._cylRad)
+  , _tolDist(r._tolDist)
+  , _tolAngle(r._tolAngle)
+  , _tolCode(r._tolCode)
+  , _breaks(r._breaks)
+  , _codir(r._codir)
+  , _grincr(r._grincr)
 {
 }
 
@@ -101,18 +102,18 @@ DirParam& DirParam::operator=(const DirParam& r)
   if (this != &r)
   {
     ASpaceObject::operator=(r);
-    _nLag = r._nLag;
+    _nLag       = r._nLag;
     _optionCode = r._optionCode;
-    _idate = r._idate;
-    _dLag = r._dLag;
-    _bench = r._bench;
-    _cylRad = r._cylRad;
-    _tolDist = r._tolDist;
-    _tolAngle = r._tolAngle;
-    _tolCode = r._tolCode;
-    _breaks = r._breaks;
-    _codir = r._codir;
-    _grincr = r._grincr;
+    _idate      = r._idate;
+    _dLag       = r._dLag;
+    _bench      = r._bench;
+    _cylRad     = r._cylRad;
+    _tolDist    = r._tolDist;
+    _tolAngle   = r._tolAngle;
+    _tolCode    = r._tolCode;
+    _breaks     = r._breaks;
+    _codir      = r._codir;
+    _grincr     = r._grincr;
   }
   return *this;
 }
@@ -121,12 +122,12 @@ DirParam::~DirParam()
 {
 }
 
-DirParam* DirParam::create(int nlag,
+DirParam* DirParam::create(Id nlag,
                            double dlag,
                            double toldis,
                            double tolang,
-                           int opt_code,
-                           int idate,
+                           Id opt_code,
+                           Id idate,
                            double bench,
                            double cylrad,
                            double tolcode,
@@ -139,11 +140,11 @@ DirParam* DirParam::create(int nlag,
                       bench, cylrad, tolcode, breaks, codir, angle2D, space);
 }
 
-DirParam* DirParam::createOmniDirection(int nlag,
+DirParam* DirParam::createOmniDirection(Id nlag,
                                         double dlag,
                                         double toldis,
-                                        int opt_code,
-                                        int idate,
+                                        Id opt_code,
+                                        Id idate,
                                         double bench,
                                         double cylrad,
                                         double tolcode,
@@ -155,37 +156,37 @@ DirParam* DirParam::createOmniDirection(int nlag,
 }
 
 DirParam* DirParam::createFromGrid(const DbGrid* dbgrid,
-                                   int nlag,
-                                   const VectorInt &grincr,
+                                   Id nlag,
+                                   const VectorInt& grincr,
                                    const ASpaceSharedPtr& space)
 {
   return new DirParam(dbgrid, nlag, grincr, space);
 }
 
-double DirParam::getBreak(int i) const
+double DirParam::getBreak(Id i) const
 {
-  if (!checkArg("Break Index", i, (int)_breaks.size())) return TEST;
+  if (!checkArg("Break Index", i, static_cast<Id>(_breaks.size()))) return TEST;
   return _breaks[i];
 }
 
-double DirParam::getCodir(int i) const
+double DirParam::getCodir(Id i) const
 {
-  if (!checkArg("Codir Index", i, (int)_codir.size())) return TEST;
+  if (!checkArg("Codir Index", i, static_cast<Id>(_codir.size()))) return TEST;
   return _codir[i];
 }
 
 void DirParam::_completeDefinition(double angle2D)
 {
-  if (! _breaks.empty())
+  if (!_breaks.empty())
   {
     if (_breaks.size() < 2) _breaks.clear();
   }
 
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
-  if (! FFFF(angle2D))
+  if (!FFFF(angle2D))
   {
-    _codir.resize(ndim,0.);
+    _codir.resize(ndim, 0.);
     _codir[0] = cos(angle2D * GV_PI / 180.);
     _codir[1] = sin(angle2D * GV_PI / 180.);
   }
@@ -206,15 +207,15 @@ void DirParam::setTolAngle(double tolang)
   if (_tolAngle > 90.) _tolAngle = 90.;
 }
 
-bool DirParam::isDimensionValid(int idim) const
+bool DirParam::isDimensionValid(Id idim) const
 {
-  return checkArg("Space Dimension", idim, getNDim());
+  return checkArg("Space Dimension", idim, static_cast<Id>(getNDim()));
 }
 
-bool DirParam::isLagValid(int ilag, bool flagAsym, bool flagCheck) const
+bool DirParam::isLagValid(Id ilag, bool flagAsym, bool flagCheck) const
 {
   if (!flagCheck) return true;
-  int nlag = getNLag();
+  auto nlag = getNLag();
   if (flagAsym) nlag = 2 * nlag + 1;
   return checkArg("Lag Index", ilag, nlag);
 }
@@ -227,7 +228,7 @@ void DirParam::setDPas(const DbGrid* db)
 {
   if (_grincr.empty()) return;
   double dlag = 0;
-  for (int idim = 0; idim < (int) getNDim(); idim++)
+  for (Id idim = 0; idim < static_cast<Id>(getNDim()); idim++)
   {
     double delta = _grincr[idim] * db->getDX(idim);
     dlag += delta * delta;
@@ -235,10 +236,10 @@ void DirParam::setDPas(const DbGrid* db)
   _dLag = sqrt(dlag);
 }
 
-int DirParam::getGrincr(int idim) const
+Id DirParam::getGrincr(Id idim) const
 {
   if (_grincr.empty()) return 0;
-  if (! isDimensionValid(idim)) return 0;
+  if (!isDimensionValid(idim)) return 0;
   return _grincr[idim];
 }
 
@@ -261,7 +262,7 @@ bool DirParam::isConsistent(const ASpace* /*space*/) const
 String DirParam::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;
-  int ndim = getNDim();
+  auto ndim = getNDim();
 
   if (getNLag() > 0)
     sstr << "Number of lags              = " << getNLag() << std::endl;
@@ -270,20 +271,20 @@ String DirParam::toString(const AStringFormat* /*strfmt*/) const
   if (ndim > 1)
   {
     VectorDouble angles(ndim);
-    (void) GH::rotationGetAnglesFromCodirInPlace(_codir,angles);
+    (void)GH::rotationGetAnglesFromCodirInPlace(_codir, angles);
     if (ndim > 2)
       sstr << toVector("Direction angles (degrees)  = ", angles);
     else
       sstr << "Direction angles (degrees)  = " << toDouble(angles[0]) << std::endl;
   }
 
-  if (! FFFF(_tolAngle))
+  if (!FFFF(_tolAngle))
     sstr << "Tolerance on direction      = " << toDouble(_tolAngle)
-    << " (degrees)" << std::endl;
+         << " (degrees)" << std::endl;
 
-  if (! FFFF(_bench)  && _bench > 0.)
+  if (!FFFF(_bench) && _bench > 0.)
     sstr << "Slice bench                 = " << toDouble(_bench) << std::endl;
-  if (! FFFF(_cylRad) && _cylRad > 0.)
+  if (!FFFF(_cylRad) && _cylRad > 0.)
     sstr << "Slice radius                = " << toDouble(_cylRad) << std::endl;
 
   if (getFlagRegular())
@@ -292,20 +293,20 @@ String DirParam::toString(const AStringFormat* /*strfmt*/) const
     {
       sstr << "Calculation lag             = " << toDouble(getDPas()) << std::endl;
       sstr << "Tolerance on distance       = " << toDouble(100. * getTolDist())
-                     << " (Percent of the lag value)" << std::endl;
+           << " (Percent of the lag value)" << std::endl;
     }
   }
   else
   {
     sstr << "Calculation intervals       = " << std::endl;
-    for (int i = 0; i < getNBreak(); i++)
+    for (Id i = 0; i < getNBreak(); i++)
     {
       sstr << " - Interval " << i + 1 << " = ["
-          << toInterval(getBreak(i), getBreak(i + 1)) << "]" << std::endl;
+           << toInterval(getBreak(i), getBreak(i + 1)) << "]" << std::endl;
     }
   }
 
-  if (! _grincr.empty())
+  if (!_grincr.empty())
   {
 
     // Case of a variogram defined on a Grid db
@@ -324,24 +325,24 @@ String DirParam::toString(const AStringFormat* /*strfmt*/) const
   return sstr.str();
 }
 
-std::vector<DirParam> DirParam::createMultiple(int ndir,
-                                               int nlag,
+std::vector<DirParam> DirParam::createMultiple(Id ndir,
+                                               Id nlag,
                                                double dlag,
                                                double toldis,
                                                double angref,
                                                const ASpaceSharedPtr& space)
 {
-  int ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  auto ndim = getDefaultSpaceDimension();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
 
-  VectorDouble angles = VectorDouble(1);
-  VectorDouble codir  = VectorDouble(ndim, 0.);
+  VectorDouble angles(1);
+  VectorDouble codir(ndim, 0.);
   std::vector<DirParam> dirs;
-  for (int idir = 0; idir < ndir; idir++)
+  for (Id idir = 0; idir < ndir; idir++)
   {
-    angles[0] = 180. * (double) idir / (double) ndir + angref;
-    (void) GH::rotationGetDirection2D(angles,codir);
-    double tolang = 90. / (double) ndir;
+    angles[0] = 180. * static_cast<double>(idir) / static_cast<double>(ndir) + angref;
+    (void)GH::rotationGetDirection2D(angles, codir);
+    double tolang     = 90. / static_cast<double>(ndir);
     DirParam dirparam = DirParam(nlag, dlag, toldis, tolang, 0, 0, TEST, TEST, 0.,
                                  VectorDouble(), codir, TEST, space);
     dirs.push_back(dirparam);
@@ -349,36 +350,35 @@ std::vector<DirParam> DirParam::createMultiple(int ndir,
   return dirs;
 }
 
-std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble &angles,
-                                                int nlag,
+std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble& angles,
+                                                Id nlag,
                                                 double dlag,
                                                 double toldis,
                                                 double tolang,
                                                 const ASpaceSharedPtr& space)
 {
   std::vector<DirParam> dirs;
-  int ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  auto ndim = getDefaultSpaceDimension();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
   if (ndim != 2)
   {
     messerr("This method is limited to 2D sapce");
     return dirs;
   }
 
-  VectorDouble anglesloc = VectorDouble(1);
-  VectorDouble codir  = VectorDouble(ndim);
-  int ndir = (int) angles.size();
+  VectorDouble anglesloc(1);
+  VectorDouble codir(ndim);
+  Id ndir = static_cast<Id>(angles.size());
   if (FFFF(tolang)) tolang = 90. / ndir;
-  for (int idir = 0; idir < ndir; idir++)
+  for (Id idir = 0; idir < ndir; idir++)
   {
     anglesloc[0] = angles[idir];
-    (void) GH::rotationGetDirection2D(anglesloc,codir);
+    (void)GH::rotationGetDirection2D(anglesloc, codir);
     DirParam dirparam = DirParam(nlag, dlag, toldis, tolang, 0, 0, TEST, TEST, 0.,
                                  VectorDouble(), codir, TEST, space);
     dirs.push_back(dirparam);
   }
   return dirs;
-
 }
 
 /**
@@ -392,17 +392,17 @@ std::vector<DirParam> DirParam::createSeveral2D(const VectorDouble &angles,
  *
  * @remark: the angular tolerance is set equal to 0
  */
-std::vector<DirParam> DirParam::createMultipleInSpace(int nlag, double dlag, const ASpaceSharedPtr& space)
+std::vector<DirParam> DirParam::createMultipleInSpace(Id nlag, double dlag, const ASpaceSharedPtr& space)
 {
-  int ndim = getDefaultSpaceDimension();
-  if (space != nullptr) ndim = space->getNDim();
+  auto ndim = getDefaultSpaceDimension();
+  if (space != nullptr) ndim = static_cast<Id>(space->getNDim());
 
-  VectorDouble codir = VectorDouble(ndim);
+  VectorDouble codir(ndim);
   std::vector<DirParam> dirs;
-  for (int idim = 0; idim < ndim; idim++)
+  for (Id idim = 0; idim < ndim; idim++)
   {
     VH::fill(codir, 0);
-    codir[idim] = 1;
+    codir[idim]        = 1;
     DirParam* dirparam = DirParam::create(nlag, dlag, 0.5, 0., 0, 0, TEST, TEST, 0., VectorDouble(), codir, TEST, space);
     dirs.push_back(*dirparam);
     delete dirparam;
@@ -419,25 +419,26 @@ std::vector<DirParam> DirParam::createMultipleInSpace(int nlag, double dlag, con
  ** \param[in]  dist         Distance
  **
  *****************************************************************************/
-int DirParam::getLagRank(double dist) const
+Id DirParam::getLagRank(double dist) const
 {
   double distloc = ABS(dist);
 
   /* Determine the rank of the lag */
 
-  int ilag = -1;
+  Id ilag = -1;
   if (getFlagRegular())
   {
-    ilag = (int) floor(distloc / getDPas() + 0.5);
+    ilag = static_cast<Id>(floor(distloc / getDPas() + 0.5));
     if (ABS(distloc - ilag * getDPas()) > getTolDist() * getDPas()) return (ITEST);
   }
   else
   {
     ilag = -1;
-    for (int k = 0; k < getNLag() && ilag < 0; k++)
+    for (Id k = 0; k < getNLag() && ilag < 0; k++)
       if (distloc > getBreaks()[k] && distloc <= getBreaks()[k + 1]) ilag = k;
   }
   if (ilag < 0 || ilag >= getNLag()) return (ITEST);
 
   return ilag;
 }
+} // namespace gstlrn

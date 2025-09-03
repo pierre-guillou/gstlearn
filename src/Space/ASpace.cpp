@@ -17,7 +17,9 @@
 #include <iostream>
 #include <sstream>
 
-ASpace::ASpace(unsigned int ndim)
+namespace gstlrn
+{
+ASpace::ASpace(size_t ndim)
   : AStringable()
   , _nDim(ndim)
   , _origin(VectorDouble(ndim, 0.))
@@ -77,21 +79,21 @@ void ASpace::setOrigin(const VectorDouble& origin)
 }
 
 /// Get the number of dimensions
-unsigned int ASpace::getNDim(int ispace) const
+size_t ASpace::getNDim(Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   return _nDim;
 }
 
 /// Get the offset index for coordinates
-unsigned int ASpace::getOffset(int ispace) const
+size_t ASpace::getOffset(Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   return _offset;
 }
 
 /// Return the space origin coordinates
-const VectorDouble& ASpace::getOrigin(int ispace) const
+const VectorDouble& ASpace::getOrigin(Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   return _origin;
@@ -104,20 +106,20 @@ ASpaceSharedPtr ASpace::getDefaultSpaceIfNull(const ASpaceSharedPtr& space)
 }
 
 /// Get the number of space components
-unsigned int ASpace::getNComponents() const
+size_t ASpace::getNComponents() const
 {
   return 1;
 }
 
 /// Return the space component at index ispace
-ASpaceSharedPtr ASpace::getComponent(int ispace) const
+ASpaceSharedPtr ASpace::getComponent(Id ispace) const
 {
   DECLARE_UNUSED(ispace)
   return ASpaceSharedPtr(this);
 }
 
 /// Dump a space in a string (given the space index)
-String ASpace::toString(const AStringFormat* strfmt, int ispace) const
+String ASpace::toString(const AStringFormat* strfmt, Id ispace) const
 {
   std::stringstream sstr;
   if (strfmt != nullptr && strfmt->getLevel() == 0)
@@ -179,10 +181,17 @@ void ASpace::move(SpacePoint& p1, const VectorDouble& vec) const
   _move(p1, vec);
 }
 
+VectorDouble ASpace::getUnitaryVector() const
+{
+  VectorDouble uni;
+  uni.resize(getNDim(), 0.);
+  uni[0] = 1;
+  return uni;
+}
 /// Return the distance between two space points
 double ASpace::getDistance(const SpacePoint &p1,
                            const SpacePoint &p2,
-                           int ispace) const
+                           Id ispace) const
 {
   if (p1.getNDim() != p2.getNDim())
   {
@@ -197,7 +206,7 @@ double ASpace::getDistance(const SpacePoint &p1,
 double ASpace::getDistance(const SpacePoint& p1,
                            const SpacePoint& p2,
                            const Tensor& tensor,
-                           int ispace) const
+                           Id ispace) const
 {
   if (p1.getNDim() != p2.getNDim())
   /// TODO : test Tensor dimension
@@ -213,7 +222,7 @@ double ASpace::getDistance(const SpacePoint& p1,
 double ASpace::getFrequentialDistance(const SpacePoint& p1,
                                       const SpacePoint& p2,
                                       const Tensor& tensor,
-                                      int ispace) const
+                                      Id ispace) const
 {
   if (p1.getNDim() != p2.getNDim())
   /// TODO : test tensor size
@@ -228,7 +237,7 @@ double ASpace::getFrequentialDistance(const SpacePoint& p1,
 /// Return the increment vector between two space points
 VectorDouble ASpace::getIncrement(const SpacePoint& p1,
                                   const SpacePoint& p2,
-                                  int ispace) const
+                                  Id ispace) const
 {
   if (p1.getNDim() != p2.getNDim())
   /// TODO : test tensor size
@@ -240,9 +249,24 @@ VectorDouble ASpace::getIncrement(const SpacePoint& p1,
   return _getIncrement(p1, p2, ispace);
 }
 
-VectorDouble ASpace::projCoord(const VectorDouble& coord, int ispace) const
+void ASpace::getIncrementInPlace(const SpacePoint& p1,
+                                 const SpacePoint& p2,
+                                 VectorDouble& ptemp,
+                                 Id ispace) const
 {
-  if (ispace < 0 || ispace >= (int)getNComponents()) return coord;
+  if (p1.getNDim() != p2.getNDim())
+  /// TODO : test tensor size
+  {
+    std::cout << "Error: Inconsistent point dimensions. Return empty vector."
+              << std::endl;
+    ptemp.clear();
+  }
+  _getIncrementInPlace(p1, p2, ptemp, ispace);
+}
+
+VectorDouble ASpace::projCoord(const VectorDouble& coord, Id ispace) const
+{
+  if (ispace < 0 || ispace >= static_cast<Id>(getNComponents())) return coord;
   auto sp = getComponent(ispace);
   auto first       = coord.cbegin() + sp->getOffset();
   auto last        = first          + sp->getNDim();
@@ -251,3 +275,4 @@ VectorDouble ASpace::projCoord(const VectorDouble& coord, int ispace) const
 }
 
 /////////////////////////////////////////////////////////
+}

@@ -10,8 +10,11 @@
 /******************************************************************************/
 #pragma once
 
+#include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
+namespace gstlrn
+{ 
 class GSTLEARN_EXPORT GlobalEnvironment
 {
 private:
@@ -23,11 +26,12 @@ public:
   static GlobalEnvironment* getEnv();
 
   bool isDomainReference() const { return _domainReference > 0; }
-  int  getDomainReference() const { return _domainReference; }
-  void setDomainReference(int domainReference, bool verbose = false);
+  Id  getDomainReference() const { return _domainReference; }
+  void setDomainReference(Id domainReference, bool verbose = false);
   void printDomainReference(void) const;
   bool matchDomainReference(double value) const;
 
 private:
-  int _domainReference;
+  Id _domainReference;
 };
+} // namespace gstlrn
