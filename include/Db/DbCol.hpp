@@ -33,7 +33,7 @@ public:
   {
   }
 
-  const String& GetName() const { return _name; }
+  const String& GetName() const { return this->_name; }
 
 private:
   String _name;
@@ -59,22 +59,32 @@ class DbData
 {
 public:
   void AddArray(ADbCol& array);
-  void RemoveArray(const String& name);
-  void RemoveArray(const Id index);
+
+  void RemoveArray(const String& name)
+  {
+    const auto col = this->GetArray(name);
+    const auto id  = col ? col->second : -1;
+    this->RemoveArray(id);
+  }
+
+  void RemoveArray(const Id index)
+  {
+    this->_cols.erase(this->_cols.begin() + index);
+  }
 
   std::optional<std::reference_wrapper<ADbCol>> GetArray(const Id index)
   {
-    if (index < 0 || index >= static_cast<Id>(_cols.size()))
+    if (index < 0 || index >= static_cast<Id>(this->_cols.size()))
     {
       return {};
     }
-    return {*_cols[index]};
+    return {*this->_cols[index]};
   }
 
   std::optional<std::pair<std::reference_wrapper<ADbCol>, Id>> GetArray(const String& name)
   {
     Id index {};
-    for (const auto& col: _cols)
+    for (const auto& col: this->_cols)
     {
       if (col->GetName() == name)
       {
