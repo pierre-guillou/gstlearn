@@ -43,6 +43,17 @@ template<typename VectorType>
 class DbColTemplate: public ADbCol
 {
   VectorType _values;
+
+public:
+  VectorType::value_type getValue(const Id i) const
+  {
+    return this->_values[i];
+  }
+
+  void setValue(const Id i, const VectorType::value_type& v)
+  {
+    this->_values[i] = v;
+  }
 };
 
 using DbColDouble = DbColTemplate<VectorDouble>;
