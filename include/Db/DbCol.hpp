@@ -58,7 +58,34 @@ using DbColBool   = DbColTemplate<VectorBool>;
 class DbData
 {
 public:
-  void AddArray(ADbCol& array);
+  template<typename VectorType>
+  void AddArray(const VectorType& array)
+  {
+    if constexpr (std::is_same<VectorType, VectorDouble>::value)
+    {
+      this->_cols.emplace_back(std::make_unique<DbColDouble>(array));
+    }
+    else if constexpr (std::is_same<VectorType, VectorFloat>::value)
+    {
+      this->_cols.emplace_back(std::make_unique<DbColFloat>(array));
+    }
+    else if constexpr (std::is_same<VectorType, VectorInt>::value)
+    {
+      this->_cols.emplace_back(std::make_unique<DbColId>(array));
+    }
+    else if constexpr (std::is_same<VectorType, VectorUChar>::value)
+    {
+      this->_cols.emplace_back(std::make_unique<DbColUchar>(array));
+    }
+    else if constexpr (std::is_same<VectorType, VectorString>::value)
+    {
+      this->_cols.emplace_back(std::make_unique<DbColStr>(array));
+    }
+    else if constexpr (std::is_same<VectorType, VectorBool>::value)
+    {
+      this->_cols.emplace_back(std::make_unique<DbColBool>(array));
+    }
+  }
 
   void RemoveArray(const String& name)
   {
