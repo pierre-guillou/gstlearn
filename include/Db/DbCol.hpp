@@ -18,6 +18,8 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <type_traits>
+#include <variant>
 
 namespace gstlrn
 {
@@ -35,8 +37,37 @@ public:
 
   const String& GetName() const { return this->_name; }
 
+  template<typename T>
+  const T& getValue(const Id i) const
+  {
+    return std::visit([=](auto&& arg)
+                      {
+                        using VectorType = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same<typename VectorType::value_type, T>::value)
+                        {
+                          return arg[i];
+                         }static_assert(false, "non-exhaustive visitor!"); });
+  }
+
+  template<typename T>
+  void setValue(const Id i, const T& v)
+  {
+    std::visit([&](auto&& arg)
+               {
+     using VectorType = std::decay_t<decltype(arg)>;
+     if constexpr (std::is_same<typename VectorType::value_type, T>::value)
+     {
+       arg[i] = v;
+     }
+     else
+     {
+       static_assert(false, "non-exhaustive visitor!");
+     } });
+  }
+
 private:
   String _name;
+  std::variant<VectorDouble, VectorFloat, VectorInt, VectorUChar, VectorString, VectorBool> _data;
 };
 
 template<typename VectorType>
