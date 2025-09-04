@@ -16,7 +16,6 @@
 #include "gstlearn_export.hpp"
 
 #include <functional>
-#include <memory>
 #include <optional>
 #include <type_traits>
 #include <variant>
@@ -46,7 +45,7 @@ public:
                         if constexpr (std::is_same<typename VectorType::value_type, T>::value)
                         {
                           return arg[i];
-                         }static_assert(false, "non-exhaustive visitor!"); });
+                        }static_assert(false, "non-exhaustive visitor!"); }, this->_data);
   }
 
   template<typename T>
@@ -62,37 +61,13 @@ public:
      else
      {
        static_assert(false, "non-exhaustive visitor!");
-     } });
+     } }, this->_data);
   }
 
 private:
   String _name;
   std::variant<VectorDouble, VectorFloat, VectorInt, VectorUChar, VectorString, VectorBool> _data;
 };
-
-template<typename VectorType>
-class DbColTemplate: public ADbCol
-{
-  VectorType _values;
-
-public:
-  VectorType::value_type getValue(const Id i) const
-  {
-    return this->_values[i];
-  }
-
-  void setValue(const Id i, const VectorType::value_type& v)
-  {
-    this->_values[i] = v;
-  }
-};
-
-using DbColDouble = DbColTemplate<VectorDouble>;
-using DbColFloat  = DbColTemplate<VectorFloat>;
-using DbColId     = DbColTemplate<VectorInt>;
-using DbColUchar  = DbColTemplate<VectorUChar>;
-using DbColStr    = DbColTemplate<VectorString>;
-using DbColBool   = DbColTemplate<VectorBool>;
 
 /**
  * @brief Similar to vtkFieldData
@@ -103,30 +78,7 @@ public:
   template<typename VectorType>
   void AddArray(const VectorType& array)
   {
-    if constexpr (std::is_same<VectorType, VectorDouble>::value)
-    {
-      this->_cols.emplace_back(std::make_unique<DbColDouble>(array));
-    }
-    else if constexpr (std::is_same<VectorType, VectorFloat>::value)
-    {
-      this->_cols.emplace_back(std::make_unique<DbColFloat>(array));
-    }
-    else if constexpr (std::is_same<VectorType, VectorInt>::value)
-    {
-      this->_cols.emplace_back(std::make_unique<DbColId>(array));
-    }
-    else if constexpr (std::is_same<VectorType, VectorUChar>::value)
-    {
-      this->_cols.emplace_back(std::make_unique<DbColUchar>(array));
-    }
-    else if constexpr (std::is_same<VectorType, VectorString>::value)
-    {
-      this->_cols.emplace_back(std::make_unique<DbColStr>(array));
-    }
-    else if constexpr (std::is_same<VectorType, VectorBool>::value)
-    {
-      this->_cols.emplace_back(std::make_unique<DbColBool>(array));
-    }
+    this->_cols.emplace_back(array);
   }
 
   void RemoveArray(const String& name)
@@ -147,17 +99,17 @@ public:
     {
       return {};
     }
-    return {*this->_cols[index]};
+    return {this->_cols[index]};
   }
 
   std::optional<std::pair<std::reference_wrapper<ADbCol>, Id>> GetArray(const String& name)
   {
     Id index {};
-    for (const auto& col: this->_cols)
+    for (auto& col: this->_cols)
     {
-      if (col->GetName() == name)
+      if (col.GetName() == name)
       {
-        return {{*col, index}};
+        return {{col, index}};
       }
       index++;
     }
@@ -178,7 +130,7 @@ public:
   }
 
 private:
-  std::vector<std::unique_ptr<ADbCol>> _cols;
+  std::vector<ADbCol> _cols;
 };
 
 } // namespace gstlrn
