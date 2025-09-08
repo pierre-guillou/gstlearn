@@ -15,6 +15,7 @@
 #include "Covariances/CovContext.hpp"
 #include "Db/Db.hpp"
 #include "Db/DbGrid.hpp"
+#include "Db/DbStringFormat.hpp"
 #include "Enum/ECst.hpp"
 #include "Enum/ESpaceType.hpp"
 #include "Estimation/CalcKriging.hpp"
@@ -46,7 +47,7 @@ int main(int argc, char* argv[])
   Id ndim = 2;
   defineDefaultSpace(ESpaceType::RN, ndim);
   ASerializable::setPrefixName("test_Gradient-");
-  bool flagForceNumeric = true;
+  bool flagForceNumeric;
 
   // Setup constants
   OptDbg::reset();
@@ -60,7 +61,9 @@ int main(int argc, char* argv[])
   data->addColumns({0., 0., 1., 2., 3.}, "z1", ELoc::Z, 0);
   data->addColumns({1., -1., 0., 1., 2.}, "g1", ELoc::G, 0);
   data->addColumns({1., -1., 0., 2., 1.}, "g2", ELoc::G, 1);
-  data->display();
+  DbStringFormat* dbfmt = DbStringFormat::create(FLAG_ARRAY);
+  data->display(dbfmt);
+  delete dbfmt;
 
   // Define the output Grid
   DbGrid* grid = DbGrid::create({4, 4});
@@ -76,10 +79,20 @@ int main(int argc, char* argv[])
   neigh->display();
 
   // Options
-  OptDbg::setReference(3);
+  OptDbg::setReference(1);
   double ballradius = 0.01;
 
-  (void)krigingGradient(data, grid, model, neigh, true, true, ballradius, flagForceNumeric);
+  // Gradient with Analytic solution
+  mestitle(0, "With Analytical Solution");
+  flagForceNumeric = false;
+  (void)krigingGradient(data, grid, model, neigh, true, true, ballradius, flagForceNumeric,
+                        NamingConvention("KrigGradAnalytic"));
+
+  // Gradient with Numeric solution
+  mestitle(0, "With Numerical Solution");
+  flagForceNumeric = true;
+  (void)krigingGradient(data, grid, model, neigh, true, true, ballradius, flagForceNumeric,
+                        NamingConvention("KrigGradNumeric"));
 
   // Free memory
   delete data;

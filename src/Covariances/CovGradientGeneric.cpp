@@ -132,8 +132,9 @@ double CovGradientGeneric::_evalZGradientNumeric(const SpacePoint& p1,
   paux      = p2;
   paux.move(vec);
   double covp0 = _covRef.evalCov(p1, paux, 0, 0, mode);
-  vec[idim]    = -_ballRadius / 2.;
-  paux         = p2;
+
+  vec[idim] = -_ballRadius / 2.;
+  paux      = p2;
   paux.move(vec);
   double covm0 = _covRef.evalCov(p1, paux, 0, 0, mode);
 
@@ -159,19 +160,22 @@ double CovGradientGeneric::_evalGradientGradientNumeric(const SpacePoint& p1,
     paux      = p2;
     paux.move(vec);
     double covmp = _covRef.evalCov(p1, paux, 0, 0, mode);
-    vec[idim]    = -_ballRadius / 2.;
-    vec[jdim]    = -_ballRadius / 2.;
-    paux         = p2;
+
+    vec[idim] = -_ballRadius / 2.;
+    vec[jdim] = -_ballRadius / 2.;
+    paux      = p2;
     paux.move(vec);
     double covmm = _covRef.evalCov(p1, paux, 0, 0, mode);
-    vec[idim]    = +_ballRadius / 2.;
-    vec[jdim]    = -_ballRadius / 2.;
-    paux         = p2;
+
+    vec[idim] = +_ballRadius / 2.;
+    vec[jdim] = -_ballRadius / 2.;
+    paux      = p2;
     paux.move(vec);
     double covpm = _covRef.evalCov(p1, paux, 0, 0, mode);
-    vec[idim]    = +_ballRadius / 2.;
-    vec[jdim]    = +_ballRadius / 2.;
-    paux         = p2;
+
+    vec[idim] = +_ballRadius / 2.;
+    vec[jdim] = +_ballRadius / 2.;
+    paux      = p2;
     paux.move(vec);
     double covpp = _covRef.evalCov(p1, paux, 0, 0, mode);
 
@@ -179,20 +183,19 @@ double CovGradientGeneric::_evalGradientGradientNumeric(const SpacePoint& p1,
   }
   else
   {
+    double cov00 = _covRef.evalCov(p1, p2, 0, 0, mode);
+
     vec[idim] = +_ballRadius;
     paux      = p2;
     paux.move(vec);
     double cov2m = _covRef.evalCov(p1, paux, 0, 0, mode);
-    vec[idim]    = -_ballRadius;
-    paux         = p2;
+
+    vec[idim] = -_ballRadius;
+    paux      = p2;
     paux.move(vec);
     double cov2p = _covRef.evalCov(p1, paux, 0, 0, mode);
-    vec[idim]    = 0;
-    paux         = p2;
-    paux.move(vec);
-    double cov00 = _covRef.evalCov(p1, paux, 0, 0, mode);
 
-    cov = -2. * (cov2p - 2. * cov00 + cov2m) / (_ballRadius * _ballRadius);
+    cov = -(cov2p - 2. * cov00 + cov2m) / (_ballRadius * _ballRadius);
   }
   return (cov);
 }

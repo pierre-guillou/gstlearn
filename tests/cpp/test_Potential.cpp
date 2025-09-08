@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   ASerializable::setPrefixName("test_Potential-");
   int mode     = 0;
   bool debug   = true;
-  bool verbose = true;
+  bool verbose = false;
 
   //============================================================//
   // Exemple in 1-D

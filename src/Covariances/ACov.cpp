@@ -1273,6 +1273,7 @@ Id ACov::evalCovMatRHSInPlaceFromIdx(MatrixDense& mat,
   else if (calcul == EKrigOpt::DRIFT)
   {
     // No calculation needed for Large scale drift estimation
+    // Returned covariance is 0.
   }
   else
   {

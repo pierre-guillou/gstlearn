@@ -23,9 +23,10 @@ namespace gstlrn
 {
 CovGradientAnalytic::CovGradientAnalytic(const CovAniso& cova)
   : CovGradientGeneric(cova)
-  , _launchCalculations(true)
-  , _flagCalculateGG(false)
-  , _covpp(0.)
+  , _flagCalculateGG(true)
+  , _p1()
+  , _p2()
+  , _covpp(TEST)
   , _covGp()
   , _covGG()
 {
@@ -33,8 +34,12 @@ CovGradientAnalytic::CovGradientAnalytic(const CovAniso& cova)
   if (!_isValid()) return;
   _ctxt.setNVar(1);
 
+  // Set the coordinate of memory space point to unprobable values
+  _p1.setCoord(0, TEST);
+  _p2.setCoord(0, TEST);
+
   // Initialize the working quantities
-  _covpp = 0.;
+  _covpp = TEST;
   _covGp.resize(3);
   _covGG.resize(9);
   _dF.resize(3);
@@ -46,8 +51,9 @@ CovGradientAnalytic::CovGradientAnalytic(const CovAniso& cova)
 
 CovGradientAnalytic::CovGradientAnalytic(const CovGradientAnalytic& r)
   : CovGradientGeneric(r)
-  , _launchCalculations(r._launchCalculations)
   , _flagCalculateGG(r._flagCalculateGG)
+  , _p1(r._p1)
+  , _p2(r._p2)
   , _covpp(r._covpp)
   , _covGp(r._covGp)
   , _covGG(r._covGG)
@@ -109,9 +115,9 @@ double CovGradientAnalytic::_eval(const SpacePoint& p1,
                                   Id jvar,
                                   const CovCalcMode* mode) const
 {
-  if (_launchCalculations)
+  DECLARE_UNUSED(mode);
+  if (_onePointHasChanged(p1, p2))
     _evalZAndGradients(p1, p2);
-  _launchCalculations = false;
 
   Id idim = ivar - 1;
   Id jdim = jvar - 1;
@@ -119,13 +125,36 @@ double CovGradientAnalytic::_eval(const SpacePoint& p1,
   if (ivar == 0)
   {
     if (jvar == 0)
-      return getCovRef().evalCov(p1, p2, ivar, jvar, mode);
+      return _covpp;
 
-    return _covGp[jdim];
+    return -_covGp[jdim];
   }
   if (jvar == 0)
     return _covGp[idim];
   return _covGG[3 * idim + jdim];
+}
+
+bool CovGradientAnalytic::_onePointHasChanged(const SpacePoint& p1, const SpacePoint& p2) const
+{
+  bool flagNew = false;
+  for (Id idim = 0, ndim = getNDim(); idim < ndim; idim++)
+  {
+    if (p1.getCoord(idim) != _p1.getCoord(idim))
+    {
+      flagNew = true;
+      break;
+    }
+    if (p2.getCoord(idim) != _p2.getCoord(idim))
+    {
+      flagNew = true;
+      break;
+    }
+  }
+
+  if (!flagNew) return false;
+  _p1 = p1;
+  _p2 = p2;
+  return true;
 }
 
 String CovGradientAnalytic::toString(const AStringFormat* strfmt) const
@@ -204,6 +233,7 @@ void CovGradientAnalytic::_calculateTrTtr() const
 void CovGradientAnalytic::_evalZAndGradients(const SpacePoint& p1,
                                              const SpacePoint& p2) const
 {
+  _covpp = 0.;
   _covGp.fill(0);
   _covGG.fill(0);
 
@@ -223,24 +253,22 @@ void CovGradientAnalytic::_evalZAndGradients(const SpacePoint& p1,
     _dF[i] = (i < static_cast<Id>(d1.size())) ? d1[i] : 0.;
 
   _calculateTrTtr();
-  double dcovsr = covref->getSill(0, 0) * covfunc->evalCovDerivative(1, hh);
+  double dcovsr = covref->getSill(0, 0) * covfunc->evalCovFirstDerivativeOverH(hh);
 
   //  Case where distance is null
   if (hh < EPSGRAD)
   {
     if (_flagCalculateGG)
     {
-      for (Id i = 0; i < 9; i++)
-        _covGG[i] -= dcovsr * _trttr[i];
+      for (Id ecr = 0; ecr < 9; ecr++)
+        _covGG[ecr] -= dcovsr * _trttr[ecr];
     }
   }
   else
   {
     //  Calculate covariance between point and gradient
-    for (Id i = 0; i < 3; i++)
-    {
-      _covGp[i] += _uF[i] * dcovsr;
-    }
+    for (Id ecr = 0; ecr < 3; ecr++)
+      _covGp[ecr] += _uF[ecr] * dcovsr;
 
     //  Calculate the covariance between gradient and gradient
     if (_flagCalculateGG)

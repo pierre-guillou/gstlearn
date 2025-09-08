@@ -85,6 +85,8 @@ Potential::Potential(Db* dbiso,
   , _indg0()
   , _dataExt()
   , _wgtExt()
+  , _p1()
+  , _p2()
 {
 }
 
@@ -227,6 +229,9 @@ void Potential::_environmentManage(bool flag_pot,
   _flagTrans   = flag_trans;
   _optionPart  = option_part;
   _ndim        = _dbiso->getNDim();
+
+  _p1 = SpacePoint(_ndim);
+  _p2 = SpacePoint(_ndim);
 }
 
 Id Potential::_updateIsopot()
@@ -483,9 +488,8 @@ void Potential::_saveResultData(Db* db,
  **
  ** \param[in] model     Model to be used for the calculations
  ** \param[in] flag_grad True if the Gradients must be calculated
- ** \param[in] dx        Increment along X
- ** \param[in] dy        Increment along Y
- ** \param[in] dz        Increment along Z
+ ** \param[in] x1,y1,z1  First point
+ ** \param[in] x2,y2,z2  Second point
  **
  ** \param[out] covar    Covariance of potential
  ** \param[out] covGp    Covariance between potential and gradient
@@ -494,37 +498,38 @@ void Potential::_saveResultData(Db* db,
  *****************************************************************************/
 void Potential::_calculateCovs(ModelGeneric* model,
                                bool flag_grad,
-                               double dx,
-                               double dy,
-                               double dz,
+                               double x1,
+                               double y1,
+                               double z1,
+                               double x2,
+                               double y2,
+                               double z2,
                                double& covar,
                                VectorDouble& covGp,
                                VectorDouble& covGG) const
 {
-  VectorDouble vec(_ndim);
-  if (_ndim >= 1) vec[0] = dx;
-  if (_ndim >= 2) vec[1] = dy;
-  if (_ndim >= 3) vec[2] = dz;
-
   auto* covpot = dynamic_cast<CovGradientAnalytic*>(model->_getCovModify());
   if (covpot == nullptr) return;
 
   // Define a new pair of points
-  SpacePoint p1(model->getSpace()->getOrigin(), -1);
-  SpacePoint p2(model->getSpace()->getOrigin(), -1);
-  p2.move(vec);
-  covpot->launchCalculations(true);
+  if (_ndim >= 1) _p1.setCoord(0, x1);
+  if (_ndim >= 2) _p1.setCoord(1, y1);
+  if (_ndim >= 3) _p1.setCoord(2, z1);
+  if (_ndim >= 1) _p2.setCoord(0, x2);
+  if (_ndim >= 2) _p2.setCoord(1, y2);
+  if (_ndim >= 3) _p2.setCoord(2, z2);
+
   covpot->setFlagCalculateGG(flag_grad);
 
-  covar = covpot->evalCov(p1, p2, 0, 0);
+  covar = covpot->evalCov(_p1, _p2, 0, 0);
   for (Id idim = 0, ecr = 0; idim < 3; idim++)
   {
-    covGp[idim] = covpot->evalCov(p1, p2, 1 + idim, 0);
+    covGp[idim] = covpot->evalCov(_p1, _p2, 1 + idim, 0);
     if (flag_grad)
     {
       for (Id jdim = 0; jdim < 3; jdim++, ecr++)
       {
-        covGG[ecr] = covpot->evalCov(p1, p2, 1 + idim, 1 + jdim);
+        covGG[ecr] = covpot->evalCov(_p1, _p2, 1 + idim, 1 + jdim);
       }
     }
   }
@@ -703,9 +708,8 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
     for (Id jg = 0; jg < ig; jg++)
     {
       _calculateCovs(_model, true,
-                     GRD_COO(ig, 0) - GRD_COO(jg, 0),
-                     GRD_COO(ig, 1) - GRD_COO(jg, 1),
-                     GRD_COO(ig, 2) - GRD_COO(jg, 2),
+                     GRD_COO(ig, 0), GRD_COO(ig, 1), GRD_COO(ig, 2),
+                     GRD_COO(jg, 0), GRD_COO(jg, 1), GRD_COO(jg, 2),
                      covar, covGp, covGG);
 
       _setLHS(lhs, GRX(ig), GRX(jg), covGG[0]);
@@ -718,7 +722,10 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
       _setLHS(lhs, GRZ(ig), GRY(jg), covGG[7]);
       _setLHS(lhs, GRZ(ig), GRZ(jg), covGG[8]);
     }
-    _calculateCovs(_model, true, 0., 0., 0., covar, covGp, covGG);
+    _calculateCovs(_model, true,
+                   GRD_COO(ig, 0), GRD_COO(ig, 1), GRD_COO(ig, 2),
+                   GRD_COO(ig, 0), GRD_COO(ig, 1), GRD_COO(ig, 2),
+                   covar, covGp, covGG);
     _setLHS(lhs, GRX(ig), GRX(ig), covGG[0] + _nugget_grd);
     _setLHS(lhs, GRX(ig), GRY(ig), covGG[1]);
     _setLHS(lhs, GRX(ig), GRZ(ig), covGG[2]);
@@ -742,9 +749,8 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
     for (Id ig = 0; ig < _ngrd; ig++)
     {
       _calculateCovs(_model, true,
-                     TGT_COO(it, 0) - GRD_COO(ig, 0),
-                     TGT_COO(it, 1) - GRD_COO(ig, 1),
-                     TGT_COO(it, 2) - GRD_COO(ig, 2),
+                     TGT_COO(it, 0), TGT_COO(it, 1), TGT_COO(it, 2),
+                     GRD_COO(ig, 0), GRD_COO(ig, 1), GRD_COO(ig, 2),
                      covar, covGp, covGG);
 
       _setLHS(lhs, TGT(it), GRX(ig),
@@ -763,9 +769,8 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
     for (Id jt = 0; jt < it; jt++)
     {
       _calculateCovs(_model, true,
-                     TGT_COO(it, 0) - TGT_COO(jt, 0),
-                     TGT_COO(it, 1) - TGT_COO(jt, 1),
-                     TGT_COO(it, 2) - TGT_COO(jt, 2),
+                     TGT_COO(it, 0), TGT_COO(it, 1), TGT_COO(it, 2),
+                     TGT_COO(jt, 0), TGT_COO(jt, 1), TGT_COO(jt, 2),
                      covar, covGp, covGG);
 
       _setLHS(lhs, TGT(it), TGT(jt),
@@ -773,7 +778,10 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
                          TGT_VAL(it, 0), TGT_VAL(it, 1), TGT_VAL(it, 2),
                          TGT_VAL(jt, 0), TGT_VAL(jt, 1), TGT_VAL(jt, 2)));
     }
-    _calculateCovs(_model, true, 0., 0., 0., covar, covGp, covGG);
+    _calculateCovs(_model, true,
+                   TGT_VAL(it, 0), TGT_VAL(it, 1), TGT_VAL(it, 2),
+                   TGT_VAL(it, 0), TGT_VAL(it, 1), TGT_VAL(it, 2),
+                   covar, covGp, covGG);
     _setLHS(lhs, TGT(it), TGT(it),
             _setMatUAV(covGG,
                        TGT_VAL(it, 0), TGT_VAL(it, 1), TGT_VAL(it, 2),
@@ -787,7 +795,7 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
 
   for (Id ic1 = 0; ic1 < _nlayers; ic1++)
   {
-    for (Id j = 1; j < _nbPerLayer[ic1]; j++)
+    for (Id j1 = 1; j1 < _nbPerLayer[ic1]; j1++)
     {
 
       /* Interactions isopotentials - gradients */
@@ -795,18 +803,16 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
       for (Id ig = 0; ig < _ngrd; ig++)
       {
         _calculateCovs(_model, true,
-                       GRD_COO(ig, 0) - ISO_COO(ic1, 0, 0),
-                       GRD_COO(ig, 1) - ISO_COO(ic1, 0, 1),
-                       GRD_COO(ig, 2) - ISO_COO(ic1, 0, 2),
+                       GRD_COO(ig, 0), GRD_COO(ig, 1), GRD_COO(ig, 2),
+                       ISO_COO(ic1, 0, 0), ISO_COO(ic1, 0, 1), ISO_COO(ic1, 0, 2),
                        covar, covGp, covGG);
         _calculateCovs(_model, true,
-                       GRD_COO(ig, 0) - ISO_COO(ic1, j, 0),
-                       GRD_COO(ig, 1) - ISO_COO(ic1, j, 1),
-                       GRD_COO(ig, 2) - ISO_COO(ic1, j, 2),
+                       GRD_COO(ig, 0), GRD_COO(ig, 1), GRD_COO(ig, 2),
+                       ISO_COO(ic1, j1, 0), ISO_COO(ic1, j1, 1), ISO_COO(ic1, j1, 2),
                        covar, cov2Gp, cov2GG);
-        _setLHS(lhs, ISC(ic1, j), GRX(ig), cov2Gp[0] - covGp[0]);
-        _setLHS(lhs, ISC(ic1, j), GRY(ig), cov2Gp[1] - covGp[1]);
-        _setLHS(lhs, ISC(ic1, j), GRZ(ig), cov2Gp[2] - covGp[2]);
+        _setLHS(lhs, ISC(ic1, j1), GRX(ig), cov2Gp[0] - covGp[0]);
+        _setLHS(lhs, ISC(ic1, j1), GRY(ig), cov2Gp[1] - covGp[1]);
+        _setLHS(lhs, ISC(ic1, j1), GRZ(ig), cov2Gp[2] - covGp[2]);
       }
 
       /* Interactions increments-tangentes */
@@ -814,19 +820,16 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
       for (Id it = 0; it < _ntgt; it++)
       {
         _calculateCovs(_model, true,
-                       TGT_COO(it, 0) - ISO_COO(ic1, 0, 0),
-                       TGT_COO(it, 1) - ISO_COO(ic1, 0, 1),
-                       TGT_COO(it, 2) - ISO_COO(ic1, 0, 2),
+                       TGT_COO(it, 0), TGT_COO(it, 1), TGT_COO(it, 2),
+                       ISO_COO(ic1, 0, 0), ISO_COO(ic1, 0, 1), ISO_COO(ic1, 0, 2),
                        covar, covGp, covGG);
         _calculateCovs(_model, true,
-                       TGT_COO(it, 0) - ISO_COO(ic1, j, 0),
-                       TGT_COO(it, 1) - ISO_COO(ic1, j, 1),
-                       TGT_COO(it, 2) - ISO_COO(ic1, j, 2),
+                       TGT_COO(it, 0), TGT_COO(it, 1), TGT_COO(it, 2),
+                       ISO_COO(ic1, j1, 0), ISO_COO(ic1, j1, 1), ISO_COO(ic1, j1, 2),
                        covar, cov2Gp, cov2GG);
-        _setLHS(lhs, ISC(ic1, j), TGT(it),
+        _setLHS(lhs, ISC(ic1, j1), TGT(it),
                 _setMatUV(TGT_VAL(it, 0), TGT_VAL(it, 1), TGT_VAL(it, 2),
-                          cov2Gp[0] - covGp[0], cov2Gp[1] - covGp[1],
-                          cov2Gp[2] - covGp[2]));
+                          cov2Gp[0] - covGp[0], cov2Gp[1] - covGp[1], cov2Gp[2] - covGp[2]));
       }
 
       /* Block diagonal for iso-potentials */
@@ -836,27 +839,22 @@ Id Potential::_buildLHS(Db* dbout, MatrixSymmetric& lhs)
         for (Id j2 = 1; j2 < _nbPerLayer[ic2]; j2++)
         {
           _calculateCovs(_model, false,
-                         ISO_COO(ic2, j2, 0) - ISO_COO(ic1, j, 0),
-                         ISO_COO(ic2, j2, 1) - ISO_COO(ic1, j, 1),
-                         ISO_COO(ic2, j2, 2) - ISO_COO(ic1, j, 2),
+                         ISO_COO(ic2, j2, 0), ISO_COO(ic2, j2, 1), ISO_COO(ic2, j2, 2),
+                         ISO_COO(ic1, j1, 0), ISO_COO(ic1, j1, 1), ISO_COO(ic1, j1, 2),
                          covar1, covGp, covGG);
           _calculateCovs(_model, false,
-                         ISO_COO(ic2, j2, 0) - ISO_COO(ic1, 0, 0),
-                         ISO_COO(ic2, j2, 1) - ISO_COO(ic1, 0, 1),
-                         ISO_COO(ic2, j2, 2) - ISO_COO(ic1, 0, 2),
+                         ISO_COO(ic2, j2, 0), ISO_COO(ic2, j2, 1), ISO_COO(ic2, j2, 2),
+                         ISO_COO(ic1, 00, 0), ISO_COO(ic1, 00, 1), ISO_COO(ic1, 00, 2),
                          covar2, covGp, covGG);
           _calculateCovs(_model, false,
-                         ISO_COO(ic2, 0, 0) - ISO_COO(ic1, j, 0),
-                         ISO_COO(ic2, 0, 1) - ISO_COO(ic1, j, 1),
-                         ISO_COO(ic2, 0, 2) - ISO_COO(ic1, j, 2),
+                         ISO_COO(ic2, 00, 0), ISO_COO(ic2, 00, 1), ISO_COO(ic2, 00, 2),
+                         ISO_COO(ic1, j1, 0), ISO_COO(ic1, j1, 1), ISO_COO(ic1, j1, 2),
                          covar3, covGp, covGG);
           _calculateCovs(_model, false,
-                         ISO_COO(ic2, 0, 0) - ISO_COO(ic1, 0, 0),
-                         ISO_COO(ic2, 0, 1) - ISO_COO(ic1, 0, 1),
-                         ISO_COO(ic2, 0, 2) - ISO_COO(ic1, 0, 2),
+                         ISO_COO(ic2, 00, 0), ISO_COO(ic2, 00, 1), ISO_COO(ic2, 00, 2),
+                         ISO_COO(ic1, 00, 0), ISO_COO(ic1, 00, 1), ISO_COO(ic1, 00, 2),
                          covar4, covGp, covGG);
-          _setLHS(lhs, ISC(ic1, j), ISC(ic2, j2),
-                  covar1 - covar2 - covar3 + covar4);
+          _setLHS(lhs, ISC(ic1, j1), ISC(ic2, j2), covar1 - covar2 - covar3 + covar4);
         }
       }
     }
@@ -1084,9 +1082,8 @@ void Potential::_buildRHS(bool flag_grad,
   for (Id ig = 0; ig < _ngrd; ig++)
   {
     _calculateCovs(_model, flag_grad,
-                   GRD_COO(ig, 0) - coor[0],
-                   GRD_COO(ig, 1) - coor[1],
-                   GRD_COO(ig, 2) - coor[2],
+                   GRD_COO(ig, 0), GRD_COO(ig, 1), GRD_COO(ig, 2),
+                   coor[0], coor[1], coor[2],
                    covar, covGp, covGG);
     _setRHS(rhs, GRX(ig), 0, covGp[0]);
     _setRHS(rhs, GRY(ig), 0, covGp[1]);
@@ -1110,9 +1107,8 @@ void Potential::_buildRHS(bool flag_grad,
   for (Id it = 0; it < _ntgt; it++)
   {
     _calculateCovs(_model, flag_grad,
-                   TGT_COO(it, 0) - coor[0],
-                   TGT_COO(it, 1) - coor[1],
-                   TGT_COO(it, 2) - coor[2],
+                   TGT_COO(it, 0), TGT_COO(it, 1), TGT_COO(it, 2),
+                   coor[0], coor[1], coor[2],
                    covar, covGp, covGG);
     _setRHS(rhs, TGT(it), 0,
             _setMatUV(TGT_VAL(it, 0), TGT_VAL(it, 1), TGT_VAL(it, 2),
@@ -1138,14 +1134,12 @@ void Potential::_buildRHS(bool flag_grad,
     for (Id j = 1; j < _nbPerLayer[ic]; j++)
     {
       _calculateCovs(_model, flag_grad,
-                     ISO_COO(ic, j, 0) - coor[0],
-                     ISO_COO(ic, j, 1) - coor[1],
-                     ISO_COO(ic, j, 2) - coor[2],
+                     ISO_COO(ic, j, 0), ISO_COO(ic, j, 1), ISO_COO(ic, j, 2),
+                     coor[0], coor[1], coor[2],
                      covar1, cov1Gp, cov1GG);
       _calculateCovs(_model, flag_grad,
-                     ISO_COO(ic, 0, 0) - coor[0],
-                     ISO_COO(ic, 0, 1) - coor[1],
-                     ISO_COO(ic, 0, 2) - coor[2],
+                     ISO_COO(ic, 0, 0), ISO_COO(ic, 0, 1), ISO_COO(ic, 0, 2),
+                     coor[0], coor[1], coor[2],
                      covar, covGp, covGG);
       _setRHS(rhs, ISC(ic, j), 0, covar1 - covar);
       if (flag_grad)
@@ -1350,10 +1344,12 @@ MatrixDense Potential::_extdriftBuildRHS()
   for (Id iech = 0; iech < _nfull; iech++)
   {
     if (!_dbExt->isActive(iech)) continue;
+    // TODO: check the validity of the bi-point for covariance calculation
     _calculateCovs(_modelExt, true,
                    _dbExt->getCoordinate(iech, 0),
                    _dbExt->getCoordinate(iech, 1),
                    _dbExt->getCoordinate(iech, 2),
+                   0., 0., 0.,
                    covar, covGp, covGG);
     b.setValue(ecr, 0, covar);
     b.setValue(ecr, 1, -covGp[0]);
@@ -1656,7 +1652,11 @@ void Potential::_estimateResult(bool flag_grad,
     // Printout (optional)
 
     if (OptDbg::query(EDbg::KRIGING))
-      message("Centered estimation = %lf\n", result[0]);
+    {
+      message("Estimation (centered) = %lf\n", result[0]);
+      for (int idim = 0; idim < _ndim; idim++)
+        message("Gradient %d = %lf\n", idim + 1, result[idim + 1]);
+    }
 
     // Translate from potential into layer
 
@@ -2144,7 +2144,7 @@ void Potential::_printResult(Id isimu, double* result, double tgtval) const
   for (Id idim = 0; idim < _ndim; idim++)
     message(" %10.5lf", roundZero(result[1 + idim]));
 
-  if (!FFFF(tgtval)) message(" - Tangent= %10.5lf", roundZero(tgtval));
+  if (!FFFF(tgtval)) message(" - Tang* = %10.5lf", roundZero(tgtval));
 
   message("\n");
 }
@@ -2185,7 +2185,6 @@ void Potential::_checkData(DbGrid* dbgrid,
     {
       for (Id j = 0; j < _nbPerLayer[ic]; j++, rank++)
       {
-        OptDbg::setCurrentIndex(rank);
         Id iech = _dbiso->getRankRelativeToAbsolute(rank);
         _calculatePoint(true, dbgrid, zdual, rhs, _dbiso, iech, result);
         result[0] -= refpot;
@@ -2201,13 +2200,12 @@ void Potential::_checkData(DbGrid* dbgrid,
 
           // Print the results
 
-          message(" %d - %d - Coor =", ic + 1, j + 1);
+          message(" %2d - %2d - Coor =", ic + 1, j + 1);
           for (Id idim = 0; idim < _ndim; idim++)
-            message(" %lf", ISO_COO(ic, j, idim));
+            message(" %7.4lf", ISO_COO(ic, j, idim));
           _printResult(isimu, result.data(), TEST);
         }
       }
-      OptDbg::setCurrentIndex(-1);
     }
   }
 
@@ -2219,7 +2217,6 @@ void Potential::_checkData(DbGrid* dbgrid,
 
     for (Id ig = 0; ig < _ngrd; ig++)
     {
-      OptDbg::setCurrentIndex(ig);
       Id iech = _dbgrd->getRankRelativeToAbsolute(ig);
       _calculatePoint(true, dbgrid, zdual, rhs, _dbgrd, iech, result);
       result[0] -= refpot;
@@ -2244,11 +2241,10 @@ void Potential::_checkData(DbGrid* dbgrid,
 
         message(" %2d - Coor =", ig + 1);
         for (Id idim = 0; idim < _ndim; idim++)
-          message(" %lf", GRD_COO(ig, idim));
+          message(" %7.4lf", GRD_COO(ig, idim));
         _printResult(isimu, result.data(), TEST);
       }
     }
-    OptDbg::setCurrentIndex(-1);
   }
 
   /* For the Tangent file */
@@ -2259,7 +2255,6 @@ void Potential::_checkData(DbGrid* dbgrid,
 
     for (Id it = 0; it < _ntgt; it++)
     {
-      OptDbg::setCurrentIndex(it);
       Id iech = _dbtgt->getRankRelativeToAbsolute(it);
       if (!_dbtgt->isActive(iech)) continue;
       _calculatePoint(true, dbgrid, zdual, rhs, _dbtgt, iech, result);
@@ -2277,11 +2272,10 @@ void Potential::_checkData(DbGrid* dbgrid,
 
         message(" %2d - Coor =", it + 1);
         for (Id idim = 0; idim < _ndim; idim++)
-          message(" %lf", TGT_COO(it, idim));
+          message(" %7.4lf", TGT_COO(it, idim));
         _printResult(isimu, result.data(), tgte);
       }
     }
-    OptDbg::setCurrentIndex(-1);
   }
 }
 
@@ -2473,7 +2467,7 @@ Id Potential::kriging(DbGrid* dbout,
   VectorDouble zdual(_nequa);
   lhs.prodMatVecInPlace(zval, zdual);
   if (OptDbg::isReferenceDefined() || OptDbg::query(EDbg::KRIGING))
-    print_matrix("\n[Z] *%* [LHS]-1", 0, 1, 1, _nequa, NULL, zdual.data());
+    print_matrix("\n[Z] * [LHS]-1", 0, 1, 1, _nequa, NULL, zdual.data());
 
   // Evaluate Potential at Reference point
   double refpot = _evaluateRefPot(dbout, zdual, rhs);

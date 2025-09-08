@@ -170,9 +170,6 @@ bool CalcKrigingGradient::_postprocess()
   /* Free the temporary variables */
   _cleanVariableDb(2);
 
-  // _renameVariable(2, VectorString(), ELoc::Z, _getNVar(), _iptrStd, "stdev", 1);
-  // _renameVariable(2, VectorString(), ELoc::Z, _getNVar(), _iptrEst, "estim", 1);
-
   return true;
 }
 

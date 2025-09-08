@@ -13,6 +13,7 @@
 #include "Basic/VectorNumT.hpp"
 #include "Db/Db.hpp"
 #include "Matrix/MatrixDense.hpp"
+#include "Space/SpacePoint.hpp"
 #include "geoslib_define.h"
 #include "gstlearn_export.hpp"
 
@@ -63,10 +64,10 @@ private:
   void set_IAD_TGT(Id it, Id value) { _rankTgt[it] = value; }
   double IAD_ISO(Id ic, Id i) const { return _rankIso[_ptrPerLayer[ic] + (i)]; }
   double TGT_COO(Id it, Id i) const { return _dbtgt->getCoordinate(IAD_TGT(it), i); }
-  double TGT_VAL(Id it, Id idim) const { return (idim >= _ndim) ? TEST : _dbtgt->getLocVariable(ELoc::TGTE, IAD_TGT(it), idim); }
-  double GRD_COO(Id ig, Id idim) const { return (idim >= _ndim) ? TEST : _dbgrd->getCoordinate(IAD_GRD(ig), idim); }
-  double GRD_VAL(Id ig, Id idim) const { return (idim >= _ndim) ? TEST : _dbgrd->getLocVariable(ELoc::G, IAD_GRD(ig), idim); }
-  double ISO_COO(Id ic, Id j, Id idim) const { return (idim >= _ndim) ? TEST : _dbiso->getCoordinate(IAD_ISO(ic, j), idim); }
+  double TGT_VAL(Id it, Id idim) const { return (idim >= _ndim) ? 0. : _dbtgt->getLocVariable(ELoc::TGTE, IAD_TGT(it), idim); }
+  double GRD_COO(Id ig, Id idim) const { return (idim >= _ndim) ? 0. : _dbgrd->getCoordinate(IAD_GRD(ig), idim); }
+  double GRD_VAL(Id ig, Id idim) const { return (idim >= _ndim) ? 0. : _dbgrd->getLocVariable(ELoc::G, IAD_GRD(ig), idim); }
+  double ISO_COO(Id ic, Id j, Id idim) const { return (idim >= _ndim) ? 0. : _dbiso->getCoordinate(IAD_ISO(ic, j), idim); }
   Id EXT(Id iext) const { return _startExt + (iext); }
 
   bool _isEnvironmentValid(DbGrid* dbout, Id nring = 1);
@@ -88,9 +89,12 @@ private:
                        VectorInt& uid_grad) const;
   void _calculateCovs(ModelGeneric* model,
                       bool flag_grad,
-                      double dx,
-                      double dy,
-                      double dz,
+                      double x1,
+                      double y1,
+                      double z1,
+                      double x2,
+                      double y2,
+                      double z2,
                       double& covar,
                       VectorDouble& covGp,
                       VectorDouble& covGG) const;
@@ -243,6 +247,8 @@ private:
   VectorInt _indg0;
   VectorDouble _dataExt; // Dimension: nech
   MatrixDense _wgtExt;   // Dimension: nech * 4
+  mutable SpacePoint _p1;
+  mutable SpacePoint _p2;
 };
 
 GSTLEARN_EXPORT Id krigingPotential(Db* dbiso,

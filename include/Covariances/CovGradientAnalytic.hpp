@@ -41,7 +41,6 @@ public:
 
   /// AStringable Interface
   String toString(const AStringFormat* strfmt = nullptr) const override;
-  void launchCalculations(bool status) { _launchCalculations = status; }
   void setFlagCalculateGG(bool status) { _flagCalculateGG = status; }
 
 protected:
@@ -57,10 +56,15 @@ private:
   void _calculateTrTtr() const;
   void _evalZAndGradients(const SpacePoint& p1, const SpacePoint& p2) const;
   const CovAniso* _getCovRefAniso() const;
+  bool _onePointHasChanged(const SpacePoint& p1, const SpacePoint& p2) const;
 
 private:
-  mutable bool _launchCalculations;
   mutable bool _flagCalculateGG;
+
+  // Memory SpacePoints... used to check if bipoint has changed
+  mutable SpacePoint _p1;
+  mutable SpacePoint _p2;
+
   // covpp  Covariance value
   mutable double _covpp;
   // covGp  Covariance <G[i](x0+x,y0+y,z0+z), P(x0,y0,z0)> (dim=3)
