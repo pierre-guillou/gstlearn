@@ -631,12 +631,6 @@ f = function(self,...)
 }
 
 assign('Model_getCovMode', f , envir = asNamespace('gstlearn'))
-f = function(self,...)
-{
-   return(Model_castInCovLMGradientConst(self)$evalZAndGradients(...))
-}
-
-assign('Model_evalZAndGradients', f , envir = asNamespace('gstlearn'))
 %}
 %insert(s)%{
 f = function(self,...)

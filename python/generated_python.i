@@ -528,11 +528,6 @@ def getCovMode(self, *args, **kwargs):
     return self.castInCovAnisoListConst().getCovMode(*args, **kwargs)
 
 setattr(gl.Model, 'getCovMode', getCovMode)
-
-def evalZAndGradients(self, *args, **kwargs):
-    return self.castInCovLMGradientConst().evalZAndGradients(*args, **kwargs)
-
-setattr(gl.Model, 'evalZAndGradients', evalZAndGradients)
 %}
 %pythoncode %{
 import gstlearn as gl
