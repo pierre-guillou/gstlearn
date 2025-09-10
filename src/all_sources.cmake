@@ -143,7 +143,6 @@ set(SRC
   Core/thresh.cpp
   Core/fft.cpp
   Core/convert.cpp
-  Core/memory.cpp
   Core/model.cpp
   Core/krige.cpp
   Core/seismic.cpp
