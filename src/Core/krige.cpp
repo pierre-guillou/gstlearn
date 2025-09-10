@@ -3237,8 +3237,8 @@ Id st_krige_data(Db* db,
     c00 = (double*)mem_free((char*)c00);
   }
 
-  mem_free((char*)s);
-  mem_free((char*)c00);
+  s   = (double*)mem_free((char*)s);
+  c00 = (double*)mem_free((char*)c00);
   return 0;
 }
 
@@ -3330,7 +3330,8 @@ Id st_crit_global(Db* db,
     if (rother[iech] < 0) continue;
 
     VectorInt vech = {iech};
-    cs             = model->evalCovMat(db, db, -1, -1, vech, ranks1).getValues().data();
+
+    cs = model->evalCovMat(db, db, -1, -1, vech, ranks1).getValues().data();
     if (cs == nullptr) return 1;
 
     cs1 = model->evalCovMat(db, db, -1, -1, vech, rother).getValues().data();
@@ -3350,10 +3351,10 @@ Id st_crit_global(Db* db,
     ecr++;
   }
 
-  mem_free((char*)c00);
-  mem_free((char*)invc);
-  mem_free((char*)cs);
-  mem_free((char*)cs1);
+  c00  = (double*)mem_free((char*)c00);
+  invc = (double*)mem_free((char*)invc);
+  cs   = (double*)mem_free((char*)cs);
+  cs1  = (double*)mem_free((char*)cs1);
   return 0;
 }
 
@@ -3643,8 +3644,8 @@ Id krigsampling_f(Db* dbin,
     c00 = (double*)mem_free((char*)c00);
   }
 
-  mem_free((char*)s);
-  mem_free((char*)c00);
+  s   = (double*)mem_free((char*)s);
+  c00 = (double*)mem_free((char*)c00);
   return 0;
 }
 

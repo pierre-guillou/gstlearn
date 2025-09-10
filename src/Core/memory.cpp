@@ -175,7 +175,7 @@ char* mem_free_(const char* call_file,
 
   if (MEMORY_DEBUG)
   {
-    (void)memcpy((char*)&size_eff, tab_aux, sizeof(Id));
+    (void)memcpy(reinterpret_cast<char*>(&size_eff), tab_aux, sizeof(Id));
     st_mem_update(-size_eff);
     st_mem_message(call_file, call_line, "De-allocation", -1, size_eff);
   }
@@ -214,7 +214,7 @@ char* mem_alloc_(const char* call_file,
   size_eff = size;
   size     = size_eff + SHIFT();
 
-  tab_aux = (char*)malloc(size);
+  tab_aux = static_cast<char*>(malloc(size));
   if (tab_aux == nullptr)
   {
     mem_error(size_eff);
@@ -224,112 +224,7 @@ char* mem_alloc_(const char* call_file,
 
   if (MEMORY_DEBUG)
   {
-    (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
-    st_mem_update(size_eff);
-    st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
-  }
-  if (MEMORY_LEAK)
-  {
-    st_memory_leak_add(call_file, static_cast<Id>(call_line), size, tab_aux);
-  }
-
-  tab = &tab_aux[SHIFT()];
-  return (tab);
-}
-
-/****************************************************************************/
-/*!
- ** Core routine for allocating and copying
- **
- ** \return  Pointer to the newly allocated (and copied) array
- **
- ** \param[in]  call_file  Name of the calling file
- ** \param[in]  call_line  Line in the calling file
- ** \param[in]  tabin      Array to be copied
- ** \param[in]  size       Number of bytes
- ** \param[in]  flag_fatal Error status (1 = the program stops)
- **
- *****************************************************************************/
-char* mem_copy_(const char* call_file,
-                size_t call_line,
-                char* tabin,
-                Id size,
-                Id flag_fatal)
-{
-  Id size_eff;
-  char *tab, *tab_aux;
-
-  tab = tab_aux = nullptr;
-  if (size <= 0) return (NULL);
-  size_eff = size;
-  size     = size_eff + SHIFT();
-
-  tab_aux = (char*)malloc(size);
-  if (tab_aux == nullptr)
-  {
-    mem_error(size_eff);
-    if (flag_fatal) messageAbort("Fatal error");
-    return (NULL);
-  }
-
-  if (MEMORY_DEBUG)
-  {
-    (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
-    st_mem_update(size_eff);
-    st_mem_message(call_file, static_cast<Id>(call_line), "Allocation   ", +1, size_eff);
-  }
-  if (MEMORY_LEAK)
-  {
-    st_memory_leak_add(call_file, static_cast<Id>(call_line), size, tab_aux);
-  }
-
-  tab = &tab_aux[SHIFT()];
-
-  /* Copy the input array */
-
-  (void)memcpy(tab, tabin, size);
-
-  return (tab);
-}
-
-/****************************************************************************/
-/*!
- ** Core allocation routine
- **
- ** \return  Pointer to the array to be allocated
- **
- ** \param[in]  call_file  Name of the calling file
- ** \param[in]  call_line  Line in the calling file
- ** \param[in]  size       Number of elements
- ** \param[in]  size_elem  Number of bytes per element
- ** \param[in]  flag_fatal Error status (1 = the program stops)
- **
- *****************************************************************************/
-char* mem_calloc_(const char* call_file,
-                  size_t call_line,
-                  Id size,
-                  Id size_elem,
-                  Id flag_fatal)
-{
-  Id size_eff;
-  char *tab, *tab_aux;
-
-  tab = tab_aux = nullptr;
-  if (size <= 0) return (NULL);
-  size_eff = size * size_elem;
-  size     = size_eff + SHIFT();
-
-  tab_aux = (char*)calloc(size_elem, size);
-  if (tab_aux == nullptr)
-  {
-    mem_error(size_eff);
-    if (flag_fatal) messageAbort("Fatal error");
-    return (NULL);
-  }
-
-  if (MEMORY_DEBUG)
-  {
-    (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
+    (void)memcpy(tab_aux, reinterpret_cast<char*>(&size_eff), sizeof(Id));
     st_mem_update(size_eff);
     st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
   }
@@ -376,10 +271,10 @@ char* mem_realloc_(const char* call_file,
 
       // The memory chunk does not already exist
 
-      tab_aux = (char*)malloc(size);
+      tab_aux = static_cast<char*>(malloc(size));
       if (MEMORY_DEBUG)
       {
-        (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
+        (void)memcpy(tab_aux, reinterpret_cast<char*>(&size_eff), sizeof(Id));
         st_mem_update(size_eff);
         st_mem_message(call_file, call_line, "Allocation   ", +1, size_eff);
       }
@@ -396,7 +291,7 @@ char* mem_realloc_(const char* call_file,
       tab_aux = &tab[-SHIFT()];
       if (MEMORY_DEBUG)
       {
-        (void)memcpy((char*)&size_old, tab_aux, sizeof(Id));
+        (void)memcpy(reinterpret_cast<char*>(&size_old), tab_aux, sizeof(Id));
         st_mem_update(-size_old);
         st_mem_message(call_file, call_line, "Re_allocation", -1, size_old);
       }
@@ -405,10 +300,10 @@ char* mem_realloc_(const char* call_file,
         st_memory_leak_delete(call_file, call_line, tab_aux);
       }
       auto* placeholder = realloc(tab_aux, size);
-      tab_aux           = (char*)placeholder;
+      tab_aux           = static_cast<char*>(placeholder);
       if (MEMORY_DEBUG)
       {
-        (void)memcpy(tab_aux, (char*)&size_eff, sizeof(Id));
+        (void)memcpy(tab_aux, reinterpret_cast<char*>(&size_eff), sizeof(Id));
         st_mem_update(size_eff);
         st_mem_message(call_file, call_line, "Re-allocation", +1, size_eff);
       }
@@ -435,7 +330,7 @@ char* mem_realloc_(const char* call_file,
       tab_aux = &tab[-SHIFT()];
       if (MEMORY_DEBUG)
       {
-        (void)memcpy((char*)&size_old, tab_aux, sizeof(Id));
+        (void)memcpy(reinterpret_cast<char*>(&size_old), tab_aux, sizeof(Id));
         st_mem_update(-size_old);
         st_mem_message(call_file, call_line, "Re-allocation", -1, size_old);
       }
@@ -451,61 +346,4 @@ char* mem_realloc_(const char* call_file,
   return (tab);
 }
 
-/****************************************************************************/
-/*!
- ** Core deallocation of an array of pointers
- **
- ** \return  Pointer to the freed array
- **
- ** \param[in]  tab   array of pointers to be freed
- ** \param[in]  nvar  Number of elements in the array
- **
- *****************************************************************************/
-double** mem_tab_free(double** tab, Id nvar)
-{
-  Id ivar;
-
-  if (tab == nullptr) return (tab);
-  for (ivar = 0; ivar < nvar; ivar++)
-    tab[ivar] = (double*)mem_free((char*)tab[ivar]);
-  tab = (double**)mem_free((char*)tab);
-  return (tab);
-}
-
-/****************************************************************************/
-/*!
- ** Core allocation of an array of double
- **
- ** \return  Pointer to the array of pointers to be allocated
- **
- ** \param[in]  nvar        number of elements in the array
- ** \param[in]  size        number of double values
- ** \param[in]  flag_fatal  error status (1 = the program stops)
- **
- *****************************************************************************/
-double** mem_tab_alloc(Id nvar, Id size, Id flag_fatal)
-{
-  double** tab;
-  Id ivar, i;
-
-  /* Allocate the array */
-
-  tab = (double**)mem_alloc(sizeof(double*) * nvar, flag_fatal);
-  if (tab == nullptr) return (tab);
-  for (ivar = 0; ivar < nvar; ivar++)
-    tab[ivar] = nullptr;
-
-  for (ivar = 0; ivar < nvar; ivar++)
-  {
-    tab[ivar] = (double*)mem_alloc(sizeof(double) * size, flag_fatal);
-    if (tab[ivar] == nullptr)
-    {
-      tab = mem_tab_free(tab, nvar);
-      return (tab);
-    }
-    for (i = 0; i < size; i++)
-      tab[ivar][i] = 0.;
-  }
-  return (tab);
-}
 } // namespace gstlrn
