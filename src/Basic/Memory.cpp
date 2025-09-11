@@ -20,6 +20,8 @@ unsigned long long getTotalSystemMemory()
   return status.ullTotalPhys;
 }
 #elif defined(__APPLE__)
+#  include "geoslib_define.h"
+
 #  include <sys/sysctl.h>
 #  include <sys/types.h>
 #  include <sys/vmmeter.h>
