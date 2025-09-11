@@ -126,12 +126,6 @@ GSTLEARN_EXPORT void matrix_transpose(Id n1, Id n2, VectorDouble& v1, VectorDoub
 GSTLEARN_EXPORT Id matrix_cholesky_decompose(const double* a,
                                              double* tl,
                                              Id neq);
-GSTLEARN_EXPORT void matrix_combine(Id nval,
-                                    double coeffa,
-                                    const double* a,
-                                    double coeffb,
-                                    const double* b,
-                                    double* c);
 
 /*****************************************/
 /* Prototyping the functions in morpho.c */
