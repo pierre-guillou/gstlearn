@@ -4,6 +4,8 @@ This file contains the logs between consecutive releases
 
 Release 1.9.0
 =============
+- Correction in Wendland1 and Wendland2 covariance functions (polynomial formula)
+- New API functions for launching Gradient and Potential based methods
 
 
 Release 1.8.0
