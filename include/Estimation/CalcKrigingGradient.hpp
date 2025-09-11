@@ -52,9 +52,6 @@ private:
   bool _flagEst;
   bool _flagStd;
   bool _flagForceNumeric;
-  Id _iptrEst;
-  Id _iptrStd;
-  Id _iptrGrad;
 };
 
 GSTLEARN_EXPORT Id krigingGradient(Db* dbin,
