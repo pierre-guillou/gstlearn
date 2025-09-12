@@ -32,9 +32,6 @@ CalcKrigingGradient::CalcKrigingGradient(bool flag_est,
   , _flagEst(flag_est)
   , _flagStd(flag_std)
   , _flagForceNumeric(false)
-  , _iptrEst(-1)
-  , _iptrStd(-1)
-  , _iptrGrad(-1)
 {
 }
 
