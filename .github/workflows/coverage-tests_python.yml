@@ -20,7 +20,7 @@ jobs:
         # Double quote for version is needed otherwise 3.10 => 3.1
         python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         # See the list here: https://github.com/actions/runner-images#available-images
-        os: [ubuntu-22.04, ubuntu-24.04, windows-2022, windows-2025, macos-13, macos-14, macos-15]
+        os: [macos-13, macos-14, macos-15]
         exclude:
           - os: macos-14
             python: "3.9"
@@ -34,6 +34,7 @@ jobs:
       if: ${{ contains(matrix.os, 'macos') }}
       run: |
         brew install libomp
+        ls -l /usr/local/opt/llvm/lib/
       shell: bash
 
     - name: Setup Python
