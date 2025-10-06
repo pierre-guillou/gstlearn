@@ -98,7 +98,7 @@ jobs:
           -DBUILD_DOC=ON
       env:
          LDFLAGS: "-L/opt/homebrew/opt/libomp/lib"
-         CPPFLAGS: "-I/opt/homebrew/opt/libomp/include"
+         CXXFLAGS: "-I/opt/homebrew/opt/libomp/include"
 
     - name : Build the package and save generated file name in the environment
       run : |
