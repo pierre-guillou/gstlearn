@@ -90,6 +90,13 @@ jobs:
           -DBUILD_PYTHON=OFF \
           -DBUILD_R=ON \
           -DSWIG_EXECUTABLE=${{env.SWIG_ROOT}}/bin/swig \
+          -DOpenMP_C_INCLUDE_DIRS=/opt/homebrew/opt/libomp/include \
+          -DOpenMP_CXX_INCLUDE_DIRS=/opt/homebrew/opt/libomp/include \
+          -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_C_LIB_NAMES="omp" \
+          -DOpenMP_CXX_LIB_NAMES="omp" \
+          -DOpenMP_omp_LIBRARY=omp \
           -DBUILD_DOC=ON
 
     - name : Build the package and save generated file name in the environment
