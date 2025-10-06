@@ -42,7 +42,7 @@ jobs:
       run: |
         if [[ "${{ matrix.os }}" =~ ^"macos" ]]; then
           brew install libomp
-           echo "DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/libomp/21.1.2/lib/" >> "$GITHUB_ENV"
+           echo "DYLD_LIBRARY_PATH=/usr/local/opt/libomp/lib" >> "$GITHUB_ENV"
         fi
       shell: bash
 
