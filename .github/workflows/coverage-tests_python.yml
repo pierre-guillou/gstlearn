@@ -1,8 +1,6 @@
 name: coverage-tests_python
 
 on:
-  push:
-    branches: [macos_llvm]
   # Permit calling trigger
   workflow_call:
   # Permit manual trigger
@@ -20,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         # Double quote for version is needed otherwise 3.10 => 3.1
-        python: ["3.11"]
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         # See the list here: https://github.com/actions/runner-images#available-images
-        os: [macos-13, macos-14, macos-15]
+        os: [ubuntu-22.04, ubuntu-24.04, windows-2022, windows-2025, macos-13, macos-14, macos-15]
         exclude:
           - os: macos-14
             python: "3.9"
@@ -35,9 +33,7 @@ jobs:
     - name: Install dependencies
       if: ${{ contains(matrix.os, 'macos') }}
       run: |
-        brew install libomp
-        brew list libomp
-        echo "DYLD_LIBRARY_PATH=/usr/local/opt/libomp/lib" >> "$GITHUB_ENV"
+        brew install llvm
       shell: bash
 
     - name: Setup Python
