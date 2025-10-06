@@ -33,7 +33,7 @@ jobs:
     - name: Install dependencies
       if: ${{ contains(matrix.os, 'macos') }}
       run: |
-        brew install llvm
+        brew install libomp
       shell: bash
 
     - name: Setup Python
