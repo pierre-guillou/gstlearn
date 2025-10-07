@@ -91,19 +91,14 @@ jobs:
           -DBUILD_PYTHON=OFF \
           -DBUILD_R=ON \
           -DSWIG_EXECUTABLE=${{env.SWIG_ROOT}}/bin/swig \
-          -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp" \
-          -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp" \
-          -DOpenMP_C_LIB_NAMES="omp" \
-          -DOpenMP_CXX_LIB_NAMES="omp" \
-          -DOpenMP_omp_LIBRARY=omp \
           -DBUILD_DOC=ON
       env:
-         LDFLAGS: "-L/opt/homebrew/opt/libomp/lib"
-         CXXFLAGS: "-I/opt/homebrew/opt/libomp/include"
+        CC: ${{matrix.arch.pat}}/opt/llvm/bin/clang
+        CXX: ${{matrix.arch.pat}}/opt/llvm/bin/clang++
 
     - name : Build the package and save generated file name in the environment
       run : |
-        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install --verbose
+        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install
         echo "MY_PKG=$(ls ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.tgz)" >> "$GITHUB_ENV"
 
     - name: Define the CRAN path on our server
