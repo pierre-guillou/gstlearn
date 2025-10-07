@@ -52,7 +52,8 @@ jobs:
     - name: Install dependencies
       run: |
         brew install --formula doxygen
-        brew install libomp
+        brew install llvm
+        brew ls -v llvm
         brew install bison
         brew install boost
         brew install eigen
