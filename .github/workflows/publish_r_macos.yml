@@ -54,8 +54,10 @@ jobs:
         brew install --formula doxygen
         brew install llvm
         brew ls -v llvm
+        find ${{matrix.arch.pat}}/opt/llvm/ -name libomp.dyld | xargs rm
         brew install libomp
         brew ls -v libomp
+        find ${{matrix.arch.pat}}/opt/libomp/ -name libomp.dyld | xargs rm
         brew install bison
         brew install boost
         brew install eigen
