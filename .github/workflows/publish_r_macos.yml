@@ -54,6 +54,8 @@ jobs:
         brew install --formula doxygen
         brew install llvm
         brew ls -v llvm
+        brew install libomp
+        brew ls -v libomp
         brew install bison
         brew install boost
         brew install eigen
