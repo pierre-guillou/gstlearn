@@ -57,6 +57,8 @@ jobs:
         brew install boost
         brew install eigen
         echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
+        echo "OpenMP_ROOT=$(brew --prefix)/opt/libomp" >> $GITHUB_ENV
+        echo 'LDFLAGS="$LDFLAGS -L${OpenMP_ROOT}/lib"' >> $GITHUB_ENV
 
     - name: Setup R Version
       uses: r-lib/actions/setup-r@v2
@@ -90,15 +92,7 @@ jobs:
           -DBUILD_PYTHON=OFF \
           -DBUILD_R=ON \
           -DSWIG_EXECUTABLE=${{env.SWIG_ROOT}}/bin/swig \
-          -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp" \
-          -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp" \
-          -DOpenMP_C_LIB_NAMES="omp" \
-          -DOpenMP_CXX_LIB_NAMES="omp" \
-          -DOpenMP_omp_LIBRARY=omp \
           -DBUILD_DOC=ON
-      env:
-         LDFLAGS: "-L/opt/homebrew/opt/libomp/lib"
-         CPPFLAGS: "-I/opt/homebrew/opt/libomp/include"
 
     - name : Build the package and save generated file name in the environment
       run : |
