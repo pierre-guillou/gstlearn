@@ -38,8 +38,9 @@ jobs:
     strategy:
       matrix:
         # Last releases from here https://cran.r-project.org/src/base/R-4/
-        r_version: [4.5.0]
+        r_version: [4.2.3, 4.3.3, 4.4.3, 4.5.0]
         arch: [
+            {ar: x86_64, os: macos-13, pat: /usr/local},
             {ar: arm64,  os: macos-14, pat: /opt/homebrew},
             {ar: arm64,  os: macos-15, pat: /opt/homebrew}
          ]
