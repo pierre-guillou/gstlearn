@@ -36,9 +36,8 @@ jobs:
     strategy:
       matrix:
         # Last releases from here https://cran.r-project.org/src/base/R-4/
-        r_version: [4.2.3, 4.3.3, 4.4.3, 4.5.0]
+        r_version: [4.5.0]
         arch: [
-            {ar: x86_64, os: macos-13, pat: /usr/local},
             {ar: arm64,  os: macos-14, pat: /opt/homebrew},
             {ar: arm64,  os: macos-15, pat: /opt/homebrew}
          ]
@@ -53,11 +52,7 @@ jobs:
     - name: Install dependencies
       run: |
         brew install --formula doxygen
-        brew install llvm
         brew install libomp
-        # remove libomp shared libraries (only keep the static one)
-        find ${{matrix.arch.pat}}/opt/llvm/ -name libomp.dyld | xargs rm
-        find ${{matrix.arch.pat}}/opt/libomp/ -name libomp.dyld | xargs rm
         brew install bison
         brew install boost
         brew install eigen
@@ -95,14 +90,19 @@ jobs:
           -DBUILD_PYTHON=OFF \
           -DBUILD_R=ON \
           -DSWIG_EXECUTABLE=${{env.SWIG_ROOT}}/bin/swig \
+          -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_C_LIB_NAMES="omp" \
+          -DOpenMP_CXX_LIB_NAMES="omp" \
+          -DOpenMP_omp_LIBRARY=omp \
           -DBUILD_DOC=ON
       env:
-        CC: ${{matrix.arch.pat}}/opt/llvm/bin/clang
-        CXX: ${{matrix.arch.pat}}/opt/llvm/bin/clang++
+         LDFLAGS: "-L/opt/homebrew/opt/libomp/lib"
+         CPPFLAGS: "-I/opt/homebrew/opt/libomp/include"
 
     - name : Build the package and save generated file name in the environment
       run : |
-        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install
+        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install --verbose
         echo "MY_PKG=$(ls ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.tgz)" >> "$GITHUB_ENV"
 
     - name: Define the CRAN path on our server
