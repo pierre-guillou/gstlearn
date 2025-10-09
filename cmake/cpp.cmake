@@ -123,8 +123,8 @@ option(USE_BOOST_SPAN "Use Boost span instead of std (C++17 builds)" OFF)
 mark_as_advanced(USE_BOOST_SPAN)
 
 # Look for OpenMP
-find_package(OpenMP REQUIRED)
-if (OPENMP_FOUND)
+find_package(OpenMP)
+if (OpenMP_FOUND)
   add_definitions(-DOPENMP)
 endif()
 
@@ -196,7 +196,9 @@ foreach(FLAVOR ${FLAVORS})
   endif()
 
   # Enable OpenMP
-  target_link_libraries(${FLAVOR} PRIVATE OpenMP::OpenMP_CXX)
+  if(OpenMP_FOUND)
+    target_link_libraries(${FLAVOR} PRIVATE OpenMP::OpenMP_CXX)
+  endif()
 
   # Link to gmtsph
   target_link_libraries(${FLAVOR} PRIVATE gmtsph)
