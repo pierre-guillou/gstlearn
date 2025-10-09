@@ -101,6 +101,7 @@ jobs:
     - name : Build the package and save generated file name in the environment
       run : |
         cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install --verbose
+        ls -l ${{env.BUILD_DIR}}/r/Release/gstlearn/src
         echo "MY_PKG=$(ls ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.tgz)" >> "$GITHUB_ENV"
 
     - name: Define the CRAN path on our server
@@ -167,6 +168,7 @@ jobs:
 
     - name: Test installed R package
       run: |
+        ls -l /Users/runner/work/_temp/Library/gstlearn/libs/
         Rscript -e "library('gstlearn'); acknowledge_gstlearn()"
         Rscript tests/r/test_Arguments.R
         Rscript tests/r/test_Assessors.R
