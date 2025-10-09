@@ -55,12 +55,10 @@ jobs:
     - name: Install dependencies
       run: |
         brew install --formula doxygen
-        brew install libomp
         brew install bison
         brew install boost
         brew install eigen
         echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
-        echo "OpenMP_ROOT=$(brew --prefix)/opt/libomp" >> $GITHUB_ENV
 
     - name: Setup R Version
       uses: r-lib/actions/setup-r@v2
@@ -95,8 +93,6 @@ jobs:
           -DBUILD_R=ON \
           -DSWIG_EXECUTABLE=${{env.SWIG_ROOT}}/bin/swig \
           -DBUILD_DOC=ON
-      env:
-        LDFLAGS: -L$OpenMP_ROOT/lib
 
     - name : Build the package and save generated file name in the environment
       run : |
@@ -149,9 +145,6 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         name: macos-r-package-${{matrix.arch.os}}-${{matrix.r_version}}
-
-    - name: Install dependencies
-      run: brew install libomp
 
     - name: Setup R Version
       uses: r-lib/actions/setup-r@v2
