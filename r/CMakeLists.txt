@@ -251,6 +251,11 @@ endforeach()
 #  )
 #endforeach()
 
+if(APPLE)
+  # copy libomp.dyld in package directory
+  file(COPY ${OpenMP_C_LIBRARIES} DESTINATION ${R_PACKAGE_SRC_FOLDER})
+endif()
+
 ######################################
 # INSTALLATION
 
