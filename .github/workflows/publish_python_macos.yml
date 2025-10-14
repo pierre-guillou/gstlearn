@@ -9,8 +9,6 @@ on:
         type: boolean
         required: false
         default: true
-  push:
-    branches: [macos_llvm]
   # Permit manual trigger
   workflow_dispatch:
     inputs:
@@ -36,9 +34,15 @@ jobs:
         # Python version
         python: [
           # Double quote for version is needed otherwise 3.10 => 3.1
+            {py: "3.9"},
+            {py: "3.10"},
+            {py: "3.11"},
             {py: "3.12"},
+            {py: "3.13"}
           ]
         arch: [
+            {ar: x86_64, os: macos-13, pat: /usr/local},
+            {ar: arm64,  os: macos-14, pat: /opt/homebrew},
             {ar: arm64,  os: macos-15, pat: /opt/homebrew}
           ]
         exclude:
@@ -90,8 +94,6 @@ jobs:
     - name : Build the package
       run : |
         cmake --build ${{env.BUILD_DIR}} --parallel 3 --target python_build
-
-    - run: curl -sSf https://sshx.io/get | sh -s run
 
     - name : Create Wheel
       run : |
