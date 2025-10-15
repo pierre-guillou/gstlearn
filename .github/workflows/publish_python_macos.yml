@@ -25,8 +25,6 @@ on:
 env:
   CMAKE_BUILD_TYPE : Release
   BUILD_DIR : build
-  CC: gcc-15
-  CXX: g++-15
 
 jobs:
   build:
@@ -54,7 +52,7 @@ jobs:
       run: |
         brew install swig
         brew install --formula doxygen
-        brew install gcc@15
+        brew install llvm
         brew install boost
         brew install eigen
 
@@ -83,6 +81,9 @@ jobs:
           -DBUILD_R=OFF \
           -DPython3_ROOT_DIR="${{env.pythonLocation}}" \
           -DBUILD_DOC=ON
+      env:
+        CC: ${{matrix.arch.pat}}/opt/llvm/bin/clang
+        CXX: ${{matrix.arch.pat}}/opt/llvm/bin/clang++
 
     - name : Build the package
       run : |
@@ -122,10 +123,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Uninstall gcc
-      run: |
-        brew rm gcc
 
     - uses: actions/download-artifact@v4
       with:

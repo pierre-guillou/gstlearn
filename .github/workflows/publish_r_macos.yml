@@ -26,8 +26,6 @@ env:
   CMAKE_BUILD_TYPE : Release
   BUILD_DIR : build
   SWIG_ROOT : ${{github.workspace}}/swig
-  CC: gcc-15
-  CXX: g++-15
 
 jobs:
   build:
@@ -55,7 +53,7 @@ jobs:
     - name: Install dependencies
       run: |
         brew install --formula doxygen
-        brew install gcc@15
+        brew install llvm
         brew install bison
         brew install boost
         brew install eigen
@@ -94,6 +92,9 @@ jobs:
           -DBUILD_R=ON \
           -DSWIG_EXECUTABLE=${{env.SWIG_ROOT}}/bin/swig \
           -DBUILD_DOC=ON
+      env:
+        CC: ${{matrix.arch.pat}}/opt/llvm/bin/clang
+        CXX: ${{matrix.arch.pat}}/opt/llvm/bin/clang++
 
     - name : Build the package and save generated file name in the environment
       run : |
