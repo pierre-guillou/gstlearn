@@ -61,7 +61,6 @@ add_custom_target(r_doc
   COMMAND ${CMAKE_COMMAND} -E cat ${R_PACKAGE_ROOT_FOLDER}/create_doc.out
   COMMENT "Generating documentation for R package"
   WORKING_DIRECTORY ${R_PACKAGE_DESTINATION_FOLDER}
-  BYPRODUCTS ${R_PACKAGE_ROOT_FOLDER}/create_doc.out
   VERBATIM
 )
 
@@ -295,4 +294,13 @@ add_custom_target(r_install
 add_dependencies(r_clean_namespace r_build)
 add_dependencies(r_install r_clean_namespace)
 
-
+if (APPLE)
+  add_custom_target(r_openmp
+    COMMAND ${CMAKE_COMMAND} -E copy ${OpenMP_C_LIBRARIES} ${R_PACKAGE_SRC_FOLDER}
+    COMMAND install_name_tool -change ${OpenMP_C_LIBRARIES} @loader_path/libomp.dylib $<TARGET_FILE:r_build>
+    COMMENT "Embedding libomp.dylib into the R package"
+    VERBATIM
+  )
+  add_dependencies(r_install r_openmp)
+  add_dependencies(r_openmp r_clean_namespace)
+endif()
