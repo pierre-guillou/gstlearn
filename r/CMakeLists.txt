@@ -61,6 +61,7 @@ add_custom_target(r_doc
   COMMAND ${CMAKE_COMMAND} -E cat ${R_PACKAGE_ROOT_FOLDER}/create_doc.out
   COMMENT "Generating documentation for R package"
   WORKING_DIRECTORY ${R_PACKAGE_DESTINATION_FOLDER}
+  BYPRODUCTS ${R_PACKAGE_ROOT_FOLDER}/create_doc.out
   VERBATIM
 )
 
