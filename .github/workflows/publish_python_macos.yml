@@ -25,6 +25,8 @@ on:
 env:
   CMAKE_BUILD_TYPE : Release
   BUILD_DIR : build
+  CC: gcc-15
+  CXX: g++-15
 
 jobs:
   build:
@@ -58,7 +60,7 @@ jobs:
       run: |
         brew install swig
         brew install --formula doxygen
-        brew install gcc
+        brew install gcc@15
         brew install boost
         brew install eigen
 
@@ -87,9 +89,6 @@ jobs:
           -DBUILD_R=OFF \
           -DPython3_ROOT_DIR="${{env.pythonLocation}}" \
           -DBUILD_DOC=ON
-      env:
-        CC: gcc-15
-        CXX: g++-15
 
     - name : Build the package
       run : |

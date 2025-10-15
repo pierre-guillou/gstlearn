@@ -26,6 +26,8 @@ env:
   CMAKE_BUILD_TYPE : Release
   BUILD_DIR : build
   SWIG_ROOT : ${{github.workspace}}/swig
+  CC: gcc-15
+  CXX: g++-15
 
 jobs:
   build:
@@ -53,7 +55,7 @@ jobs:
     - name: Install dependencies
       run: |
         brew install --formula doxygen
-        brew install llvm
+        brew install gcc@15
         brew install bison
         brew install boost
         brew install eigen
@@ -92,14 +94,10 @@ jobs:
           -DBUILD_R=ON \
           -DSWIG_EXECUTABLE=${{env.SWIG_ROOT}}/bin/swig \
           -DBUILD_DOC=ON
-      env:
-        CC: ${{matrix.arch.pat}}/opt/llvm/bin/clang
-        CXX: ${{matrix.arch.pat}}/opt/llvm/bin/clang++
 
     - name : Build the package and save generated file name in the environment
       run : |
-        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install --verbose
-        ls -l ${{env.BUILD_DIR}}/r/Release/gstlearn/src
+        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install
         echo "MY_PKG=$(ls ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.tgz)" >> "$GITHUB_ENV"
 
     - name: Define the CRAN path on our server
@@ -166,9 +164,32 @@ jobs:
 
     - name: Test installed R package
       run: |
-        ls -l /Users/runner/work/_temp/Library/gstlearn/libs/
         Rscript -e "library('gstlearn'); acknowledge_gstlearn()"
         Rscript tests/r/test_Arguments.R
         Rscript tests/r/test_Assessors.R
         Rscript tests/r/test_Matrix.R
         Rscript tests/r/test_dumpToNF.R
+
+  publish:
+    needs: test
+    if: ${{inputs.dry_publish == false}}
+
+    # Only ubuntu can upload via ssh
+    runs-on: ubuntu-latest
+
+    steps:
+      - env:
+          CRAN_PATH: ${{needs.build.outputs.cran_path}}
+
+        # Publish packages to our CRAN
+        uses: fabien-ors/cran-publish-action@v4
+        with:
+          host: ${{secrets.CG_HOST}}
+          username: ${{secrets.CG_USR}}
+          password: ${{secrets.CG_PWD}}
+          repo-path: ${{env.CRAN_PATH}}
+
+        # Delete the artifacts (for freeing storage space under github)
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: macos-r-package-*
