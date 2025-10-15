@@ -20,10 +20,7 @@
 #include "Neigh/NeighUnique.hpp"
 
 #include <cmath>
-
-#ifdef OPENMP
 #include <omp.h>
-#endif // OPENMP
 
 namespace gstlrn
 {
@@ -148,10 +145,7 @@ bool CalcKrigingSimpleCase::_run()
   bool use_parallel = !getModel()->isNoStat();
   Id nech_out       = getDbout()->getNSample();
   auto nbthread     = static_cast<I32>(OptCustom::query("ompthreads", 1)); // TODO : would like to use more threads
-
-#ifdef OPENMP
   omp_set_num_threads(nbthread);
-#endif // OPENMP
 
   SpacePoint pin(getModel()->getSpace());
   SpacePoint pout(getModel()->getSpace());
@@ -159,10 +153,8 @@ bool CalcKrigingSimpleCase::_run()
   auto ndim                       = getModel()->getSpace()->getNDim();
   const VectorVectorDouble coords = getDbout()->getAllCoordinates();
   static ANeigh* neigh            = nullptr;
-#ifdef OPENMP
 #pragma omp threadprivate(neigh)
 #pragma omp parallel for firstprivate(pin, pout, tabwork, algebra, model) schedule(guided) if (use_parallel)
-#endif // OPENMP
   for (Id iech_out = 0; iech_out < nech_out; iech_out++)
   {
     if (!getDbout()->isActive(iech_out)) continue;
@@ -186,9 +178,7 @@ bool CalcKrigingSimpleCase::_run()
     if (_iechSingleTarget >= 0) _storeResultsForExport(ksys, algebra, iech_out);
   }
 
-#ifdef OPENMP
 #pragma omp parallel
-#endif // OPENMP
   {
     delete neigh;
     neigh = nullptr;

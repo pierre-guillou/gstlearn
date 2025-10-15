@@ -574,10 +574,8 @@ void CovBase::appendParams(ListParams& listParams,
   for (const auto& [ivar, jvar]: _itRange)
     listParams.addParam(_cholSillsInfo(ivar, jvar));
 
-  for (const auto& el: _itRange)
+  for (const auto& [ivard, jvard]: _itRange)
   {
-    const auto& ivard = el.first;
-    const auto& jvard = el.second;
     if (_cholSillsInfo(ivard, jvard).isFixed()) continue; // Skip fixed parameters
     gradFuncs->emplace_back(
       [ivard, jvard, this](const SpacePoint& p1, const SpacePoint& p2, Id ivar, Id jvar, const CovCalcMode* mode) -> double

@@ -27,11 +27,7 @@ DISABLE_WARNING_PUSH
 DISABLE_WARNING_COND_EXPR_CONSTANT
 DISABLE_WARNING_UNUSED_BUT_SET_VARIABLE
 #include <Eigen/SparseCholesky>
-
-#ifdef OPENMP
 #include <omp.h>
-#endif // OPENMP
-
 DISABLE_WARNING_POP
 
 /**
@@ -917,9 +913,7 @@ void MatrixSparse::_allocate()
     {
       eigenMat().reserve(Eigen::VectorXi::Constant(getNCols(), static_cast<I32>(_nColMax)));
     }
-#ifdef OPENMP
     if (isMultiThread()) omp_set_num_threads(getMultiThread());
-#endif // OPENMP
   }
 }
 
