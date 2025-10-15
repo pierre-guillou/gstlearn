@@ -1,4 +1,4 @@
 exportPattern("*")
 
 useDynLib($<TARGET_FILE_BASE_NAME:r_build>)
-useDynLib(libomp.dylib)
+useDynLib(libomp)
