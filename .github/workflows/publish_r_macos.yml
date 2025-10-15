@@ -98,6 +98,14 @@ jobs:
 
     - name : Build the package and save generated file name in the environment
       run : |
+        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_build
+        cd ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}
+        cp ${{matrix.arch.pat}}/opt/llvm/lib/libomp.dylib gstlearn/src
+        ls -l gstlearn/src
+        otool -L gstlearn/src/*.so
+        install_name_tool -change ${{matrix.arch.pat}}/opt/llvm/lib/libomp.dylib @loader_path/libomp.dylib gstlearn/src/gstlearn.so
+        otool -L gstlearn/src/*.so
+        cd -
         cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install
         echo "MY_PKG=$(ls ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.tgz)" >> "$GITHUB_ENV"
 
