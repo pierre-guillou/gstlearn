@@ -247,6 +247,11 @@ foreach(MODULE ${MODULES})
   )
 endforeach()
 
+if(APPLE)
+  # copy libomp.dyld in package directory
+  file(COPY ${OpenMP_C_LIBRARIES} DESTINATION ${PYTHON_PACKAGE_ROOT_FOLDER}/${PYTHON_PACKAGE_NAME})
+endif()
+
 ######################################
 # INSTALLATION
 
