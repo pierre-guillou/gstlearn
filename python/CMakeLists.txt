@@ -174,6 +174,8 @@ endif()
 
 if (CLANG)
   target_compile_options(python_build PRIVATE -Wno-unused-parameter)
+elseif(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_compile_options(python_build PRIVATE -Wno-maybe-uninitialized)
 endif()
 
 # Tell that we need to generate docstring files before building python package (if required)

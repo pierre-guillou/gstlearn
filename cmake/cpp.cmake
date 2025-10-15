@@ -33,11 +33,15 @@ else()
     -Wvla
     -Wundef
   )
-  if (APPLE)
-    add_compile_options(-Wno-absolute-value -Wno-inconsistent-missing-override)
+  if (APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wno-psabi)
   endif()
-  if (CLANG)
-     add_compile_options(-Werror=shorten-64-to-32)
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(
+      -Wno-absolute-value
+      -Wno-inconsistent-missing-override
+      -Werror=shorten-64-to-32
+    )
   endif()
 endif()
 
