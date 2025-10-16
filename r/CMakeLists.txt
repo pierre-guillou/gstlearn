@@ -300,12 +300,9 @@ if (APPLE)
     OUTPUT_VARIABLE LLVM_PREFIX
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-  message(STATUS "LLVM prefix: ${LLVM_PREFIX}")
   add_custom_target(r_openmp
     COMMAND ${CMAKE_COMMAND} -E copy ${OpenMP_C_LIBRARIES} ${R_PACKAGE_SRC_FOLDER}/libomp.so
-    COMMAND echo "install_name_tool -change ${LLVM_PREFIX}/lib/libomp.dyld @loader_path/libomp.so $<TARGET_FILE:r_build>"
-    COMMAND install_name_tool -change ${LLVM_PREFIX}/lib/libomp.dyld @loader_path/libomp.so $<TARGET_FILE:r_build>
-    COMMAND otool -L $<TARGET_FILE:r_build>
+    COMMAND install_name_tool -change ${LLVM_PREFIX}/lib/libomp.dylib @loader_path/libomp.so $<TARGET_FILE:r_build>
     COMMENT "Embedding libomp.dylib into the R package"
     VERBATIM
   )
