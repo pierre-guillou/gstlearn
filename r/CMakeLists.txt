@@ -297,7 +297,7 @@ add_dependencies(r_install r_clean_namespace)
 if (APPLE)
   add_custom_target(r_openmp
     COMMAND ${CMAKE_COMMAND} -E copy ${OpenMP_C_LIBRARIES} ${R_PACKAGE_SRC_FOLDER}/libomp.so
-    COMMAND install_name_tool -change ${OpenMP_C_LIBRARIES} @loader_path/libomp.so $<TARGET_FILE:r_build>
+    COMMAND install_name_tool -change libomp.dyld @loader_path/libomp.so $<TARGET_FILE:r_build>
     COMMENT "Embedding libomp.dylib into the R package"
     VERBATIM
   )

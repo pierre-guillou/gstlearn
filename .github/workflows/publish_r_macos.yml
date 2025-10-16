@@ -96,7 +96,8 @@ jobs:
 
     - name : Build the package and save generated file name in the environment
       run : |
-        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install
+        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target r_install -v
+        otool -L ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn/src/gstlearn.so
         echo "MY_PKG=$(ls ${{env.BUILD_DIR}}/r/${{env.CMAKE_BUILD_TYPE}}/gstlearn_*.tgz)" >> "$GITHUB_ENV"
 
     - name: Define the CRAN path on our server
@@ -157,7 +158,13 @@ jobs:
       run: Rscript -e "install.packages (c('ggplot2', 'ggpubr', 'ggnewscale'), type='binary')"
         
     - name: Install R package
-      run: Rscript -e "install.packages(\"$(ls *.tgz)\", repos=NULL, type='source')"
+      run: |
+        Rscript -e "install.packages(\"$(ls *.tgz)\", repos=NULL, type='source')"
+        cd /Users/runner/work/_temp/Library/gstlearn/libs/
+        ls -l
+        otool -L gstlearn.so
+        install_name_tool -change /opt/homebrew/opt/llvm/lib/libomp.dylib @loader_path/libomp.so gstlearn.so
+        otool -L gstlearn.so
 
     - name: Test installed R package
       run: |
