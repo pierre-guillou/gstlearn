@@ -1,0 +1,232 @@
+
+Created Grid
+============
+
+Data Base Grid Characteristics
+==============================
+
+Data Base Summary
+-----------------
+File is organized as a regular grid
+Space dimension              = 2
+Number of Columns            = 3
+Total number of samples      = 10000
+
+Grid characteristics:
+---------------------
+Origin :      0.000     0.000
+Mesh   :      0.010     0.010
+Number :        100       100
+
+Variables
+---------
+Column = 0 - Name = rank - Locator = NA
+Column = 1 - Name = x1 - Locator = x1
+Column = 2 - Name = x2 - Locator = x2
+
+Simulating Structure #1 (Nugget)
+--------------------------------
+
+Simulating Structure #2 (Exponential)
+-------------------------------------
+
+Simulating Structure #3 (Cubic)
+-------------------------------
+
+Creating correlated variables
+-----------------------------
+
+Extracting data samples
+-----------------------
+
+Extracted Data
+==============
+
+Data Base Characteristics
+=========================
+
+Data Base Summary
+-----------------
+File is organized as a set of isolated points
+Space dimension              = 2
+Number of Columns            = 6
+Total number of samples      = 500
+
+Variables
+---------
+Column = 0 - Name = rank - Locator = NA
+Column = 1 - Name = x1 - Locator = x1
+Column = 2 - Name = x2 - Locator = x2
+Column = 3 - Name = Z1 - Locator = z1
+Column = 4 - Name = Z2 - Locator = z2
+Column = 5 - Name = Z3 - Locator = z3
+
+Computing experimental variogram on raw data
+--------------------------------------------
+
+Fitting variogram model on raw data
+-----------------------------------
+
+Fitted Model for Raw Data
+=========================
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 3
+Number of basic structure(s) = 2
+Number of drift function(s)  = 0
+Number of drift equation(s)  = 0
+
+Covariance Part
+---------------
+Exponential
+- Sill matrix:
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.016    -0.074     0.087
+     [  1,]    -0.074     0.443    -0.527
+     [  2,]     0.087    -0.527     0.628
+- Range        =      0.538
+- Theo. Range  =      0.180
+Cubic
+- Sill matrix:
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.052     0.139    -0.103
+     [  1,]     0.139     7.814     0.558
+     [  2,]    -0.103     0.558     1.915
+- Range        =      0.247
+Total Sill
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.069     0.066    -0.016
+     [  1,]     0.066     8.257     0.031
+     [  2,]    -0.016     0.031     2.543
+
+Known Mean(s)     0.000     0.000     0.000
+
+Testing PCA
+===========
+
+PCA Contents
+------------
+Means
+               [,  0]
+     [  0,]     0.985
+     [  1,]     1.695
+     [  2,]     3.224
+Covariance Matrix
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.071     0.003    -0.018
+     [  1,]     0.003     8.486     0.202
+     [  2,]    -0.018     0.202     2.170
+Variogram Matrix at lag h
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.000     0.000     0.000
+     [  1,]     0.000     0.000     0.000
+     [  2,]     0.000     0.000     0.000
+Matrix MZ2F to transform standardized Variables Z into Factors F
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.000    -0.006     3.766
+     [  1,]     0.343    -0.022    -0.002
+     [  2,]     0.011     0.679     0.032
+Y = (Z - m) * MZ2F)
+Matrix MF2Z to back-transform Factors F into standardized Variables Z
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.001     2.913     0.093
+     [  1,]    -0.013    -0.047     1.470
+     [  2,]     0.266     0.000     0.002
+Z = m + Y * MF2Z
+
+Computing and fitting variogram on PCA factors
+----------------------------------------------
+
+Fitted Model for PCA
+====================
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 3
+Number of basic structure(s) = 1
+Number of drift function(s)  = 0
+Number of drift equation(s)  = 0
+
+Covariance Part
+---------------
+Cubic
+- Sill matrix:
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.941     0.003     0.108
+     [  1,]     0.003     1.063    -0.067
+     [  2,]     0.108    -0.067     0.877
+- Range        =      0.239
+Total Sill
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.941     0.003     0.108
+     [  1,]     0.003     1.063    -0.067
+     [  2,]     0.108    -0.067     0.877
+
+Known Mean(s)     0.000     0.000     0.000
+
+Testing MAF
+===========
+
+PCA Contents
+------------
+Means
+               [,  0]
+     [  0,]     0.985
+     [  1,]     1.695
+     [  2,]     3.224
+Covariance Matrix
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.071     0.003    -0.018
+     [  1,]     0.003     8.486     0.202
+     [  2,]    -0.018     0.202     2.170
+Variogram Matrix at lag h
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.014     0.006    -0.010
+     [  1,]     0.006     1.940    -0.062
+     [  2,]    -0.010    -0.062     0.545
+Matrix MZ2F to transform standardized Variables Z into Factors F
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.748    -0.557     3.649
+     [  1,]     0.188     0.288     0.003
+     [  2,]    -0.563     0.326     0.197
+Y = (Z - m) * MZ2F)
+Matrix MF2Z to back-transform Factors F into standardized Variables Z
+               [,  0]    [,  1]    [,  2]
+     [  0,]     0.063     1.481    -1.198
+     [  1,]    -0.044     2.507     0.777
+     [  2,]     0.254     0.079     0.364
+Z = m + Y * MF2Z
+
+Computing and fitting variogram on MAF factors
+----------------------------------------------
+
+Fitted Model for MAF
+====================
+
+Model characteristics
+=====================
+Space dimension              = 2
+Number of variable(s)        = 3
+Number of basic structure(s) = 1
+Number of drift function(s)  = 0
+Number of drift equation(s)  = 0
+
+Covariance Part
+---------------
+Spherical
+- Sill matrix:
+               [,  0]    [,  1]    [,  2]
+     [  0,]     1.020    -0.049     0.064
+     [  1,]    -0.049     0.906     0.081
+     [  2,]     0.064     0.081     0.822
+- Range        =      0.198
+Total Sill
+               [,  0]    [,  1]    [,  2]
+     [  0,]     1.020    -0.049     0.064
+     [  1,]    -0.049     0.906     0.081
+     [  2,]     0.064     0.081     0.822
+
+Known Mean(s)     0.000     0.000     0.000
