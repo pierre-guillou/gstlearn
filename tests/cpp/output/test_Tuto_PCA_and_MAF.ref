@@ -67,6 +67,2508 @@ Computing experimental variogram on raw data
 Fitting variogram model on raw data
 -----------------------------------
 
+Trajectory of parameters in Foxleg Algorithm
+--------------------------------------------
+  Iteration      Score      Delta      Par-1      Par-2
+          1        2.3          1      0.113      0.169
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.056    -0.056
+     [  1,]     0.056     0.056
+bot
+     0.000     0.091     0.000     0.091
+hgnc
+     0.000     0.091
+hgnadm avant
+     0.000     0.000
+alpha_in=0.616375
+hgnadm apres
+     0.000     0.056
+GQO(  0) : Gain for initial solution  = 1.00294
+hgnadm
+     0.000     0.056
+denom=-1.002936 rho=0.954926
+hgn
+     0.000     0.056
+          2       1.34          3      0.113      0.225
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.056    -0.169
+     [  1,]     0.169     0.169
+bot
+     5.674    -0.038     5.674    -0.038
+hgnc
+     5.674    -0.038
+hgnadm avant
+     0.000     0.000
+alpha_in=0.029762
+hgnadm apres
+     0.169    -0.001
+GQO(  0) : Gain for initial solution  = 0.0251956
+hgnadm
+     0.169     0.008
+denom=-0.045157 rho=2.116383
+hgn
+     0.169     0.008
+          3       1.25          9      0.281      0.233
+hgnadm
+     0.472     0.034
+          4       1.25        4.5      0.281      0.233
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.253    -0.116
+     [  1,]     0.253     0.253
+bot
+     0.472     0.034     0.472     0.034
+hgnc
+     0.472     0.034
+hgnadm avant
+     0.000     0.000
+alpha_in=0.536226
+hgnadm apres
+     0.253     0.018
+GQO(  0) : Gain for initial solution  = 0.15101
+hgnadm
+     0.253     0.019
+          5       1.25       2.25      0.281      0.233
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.127    -0.127
+     [  1,]     0.127     0.127
+bot
+     0.253     0.019     0.253     0.019
+hgnc
+     0.253     0.019
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.127     0.009
+GQO(  0) : Gain for initial solution  = 0.089436
+hgnadm
+     0.127     0.010
+          6       1.25       1.12      0.281      0.233
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.063    -0.063
+     [  1,]     0.063     0.063
+bot
+     0.127     0.010     0.127     0.010
+hgnc
+     0.127     0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.063     0.005
+GQO(  0) : Gain for initial solution  = 0.0483015
+hgnadm
+     0.063     0.006
+          7       1.25      0.562      0.281      0.233
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.032    -0.032
+     [  1,]     0.032     0.032
+bot
+     0.063     0.006     0.063     0.006
+hgnc
+     0.063     0.006
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.032     0.003
+GQO(  0) : Gain for initial solution  = 0.0251459
+hgnadm
+     0.032     0.003
+          8       1.25      0.281      0.281      0.233
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.016    -0.016
+     [  1,]     0.016     0.016
+bot
+     0.032     0.003     0.032     0.003
+hgnc
+     0.032     0.003
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.016     0.002
+GQO(  0) : Gain for initial solution  = 0.012921
+hgnadm
+     0.016     0.002
+          9       1.25      0.141      0.281      0.233
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.008    -0.008
+     [  1,]     0.008     0.008
+bot
+     0.016     0.002     0.016     0.002
+hgnc
+     0.016     0.002
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.008     0.001
+GQO(  0) : Gain for initial solution  = 0.00664676
+hgnadm
+     0.008     0.002
+         10       1.24      0.141      0.289      0.234
+hgnadm
+    -0.001     0.007
+         11       1.24     0.0703      0.289      0.234
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.004    -0.004
+     [  1,]     0.004     0.004
+bot
+    -0.001     0.007    -0.001     0.007
+hgnc
+    -0.001     0.007
+hgnadm avant
+     0.000     0.000
+alpha_in=0.553971
+hgnadm apres
+    -0.001     0.004
+GQO(  0) : Gain for initial solution  = 0.0116803
+hgnadm
+    -0.003     0.004
+         12       1.24     0.0352      0.289      0.234
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.002    -0.002
+     [  1,]     0.002     0.002
+bot
+    -0.003     0.004    -0.003     0.004
+hgnc
+    -0.003     0.004
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+    -0.001     0.002
+GQO(  0) : Gain for initial solution  = 0.00847256
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.002    -0.002
+     [  1,]     0.002     0.002
+top
+    -0.001     0.002    -0.001     0.002
+bot
+    -0.002     0.000    -0.002     0.000
+hgnc
+    -0.004     0.002
+hgnadm avant
+    -0.001     0.002
+alpha_in=0.253309
+hgnadm apres
+    -0.002     0.002
+GQO(  1) : Gain for infeasible case   = 0.00908644
+GQO(  2) : Gain for feasible case     = 0.00908644
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.002    -0.002
+     [  1,]     0.002     0.002
+top
+    -0.002     0.002    -0.002     0.002
+bot
+    -0.002     0.000    -0.002     0.000
+hgnc
+    -0.004     0.002
+hgnadm avant
+    -0.002     0.002
+alpha_in=-0.000000
+hgnadm apres
+    -0.002     0.002
+GQO(  3) : Gain for infeasible case   = 0.00908644
+hgnadm
+    -0.002     0.002
+denom=-0.009086 rho=1.163607
+hgn
+    -0.002     0.002
+         13       1.23      0.105      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.006    -0.006
+     [  1,]     0.006     0.006
+bot
+     0.316     0.020     0.316     0.020
+hgnc
+     0.316     0.020
+hgnadm avant
+     0.000     0.000
+alpha_in=0.018815
+hgnadm apres
+     0.006     0.000
+GQO(  0) : Gain for initial solution  = 0.00595907
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.006    -0.006
+     [  1,]     0.006     0.006
+top
+     0.006     0.000     0.006     0.000
+bot
+     0.000    -0.009     0.000    -0.009
+hgnc
+     0.006    -0.009
+hgnadm avant
+     0.006     0.000
+alpha_in=0.673589
+hgnadm apres
+     0.006    -0.006
+GQO(  1) : Gain for infeasible case   = 0.0293311
+GQO(  2) : Gain for feasible case     = 0.0293311
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.006    -0.006
+     [  1,]     0.006     0.006
+top
+     0.006    -0.006     0.006    -0.006
+bot
+     0.000    -0.003     0.000    -0.003
+hgnc
+     0.006    -0.009
+hgnadm avant
+     0.006    -0.006
+alpha_in=-0.000000
+hgnadm apres
+     0.006    -0.006
+GQO(  3) : Gain for infeasible case   = 0.0293311
+hgnadm
+     0.006    -0.006
+         14       1.23     0.0527      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.003    -0.003
+     [  1,]     0.003     0.003
+bot
+     0.006    -0.009     0.006    -0.009
+hgnc
+     0.006    -0.009
+hgnadm avant
+     0.000     0.000
+alpha_in=0.330054
+hgnadm apres
+     0.002    -0.003
+GQO(  0) : Gain for initial solution  = 0.0166193
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.003    -0.003
+     [  1,]     0.003     0.003
+top
+     0.002    -0.003     0.002    -0.003
+bot
+     0.152     0.000     0.152     0.000
+hgnc
+     0.154    -0.003
+hgnadm avant
+     0.002    -0.003
+alpha_in=0.006617
+hgnadm apres
+     0.003    -0.003
+GQO(  1) : Gain for infeasible case   = 0.0178159
+GQO(  2) : Gain for feasible case     = 0.0178159
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.003    -0.003
+     [  1,]     0.003     0.003
+top
+     0.003    -0.003     0.003    -0.003
+bot
+     0.000    -0.006     0.000    -0.006
+hgnc
+     0.003    -0.009
+hgnadm avant
+     0.003    -0.003
+alpha_in=-0.000000
+hgnadm apres
+     0.003    -0.003
+GQO(  3) : Gain for infeasible case   = 0.0178159
+hgnadm
+     0.003    -0.003
+         15       1.23     0.0264      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+     0.003    -0.009     0.003    -0.009
+hgnc
+     0.003    -0.009
+hgnadm avant
+     0.000     0.000
+alpha_in=0.160122
+hgnadm apres
+     0.000    -0.001
+GQO(  0) : Gain for initial solution  = 0.00840446
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+top
+     0.000    -0.001     0.000    -0.001
+bot
+     0.164     0.000     0.164     0.000
+hgnc
+     0.165    -0.001
+hgnadm avant
+     0.000    -0.001
+alpha_in=0.006134
+hgnadm apres
+     0.001    -0.001
+GQO(  1) : Gain for infeasible case   = 0.00969551
+GQO(  2) : Gain for feasible case     = 0.00969551
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+top
+     0.001    -0.001     0.001    -0.001
+bot
+     0.000    -0.008     0.000    -0.008
+hgnc
+     0.001    -0.009
+hgnadm avant
+     0.001    -0.001
+alpha_in=-0.000000
+hgnadm apres
+     0.001    -0.001
+GQO(  3) : Gain for infeasible case   = 0.00969551
+hgnadm
+     0.001    -0.001
+         16       1.23     0.0132      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+     0.001    -0.009     0.001    -0.009
+hgnc
+     0.001    -0.009
+hgnadm avant
+     0.000     0.000
+alpha_in=0.078889
+hgnadm apres
+     0.000    -0.001
+GQO(  0) : Gain for initial solution  = 0.00421647
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+top
+     0.000    -0.001     0.000    -0.001
+bot
+     0.170     0.000     0.170     0.000
+hgnc
+     0.170    -0.001
+hgnadm avant
+     0.000    -0.001
+alpha_in=0.003674
+hgnadm apres
+     0.001    -0.001
+GQO(  1) : Gain for infeasible case   = 0.00504465
+GQO(  2) : Gain for feasible case     = 0.00504465
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+top
+     0.001    -0.001     0.001    -0.001
+bot
+     0.000    -0.009     0.000    -0.009
+hgnc
+     0.001    -0.009
+hgnadm avant
+     0.001    -0.001
+alpha_in=-0.000000
+hgnadm apres
+     0.001    -0.001
+GQO(  3) : Gain for infeasible case   = 0.00504465
+hgnadm
+     0.001    -0.001
+         17       1.23    0.00659      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.001    -0.009     0.001    -0.009
+hgnc
+     0.001    -0.009
+hgnadm avant
+     0.000     0.000
+alpha_in=0.039158
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 0.00211075
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.173     0.000     0.173     0.000
+hgnc
+     0.173     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.001979
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 0.00257155
+GQO(  2) : Gain for feasible case     = 0.00257155
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.009     0.000    -0.009
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 0.00257155
+hgnadm
+     0.000     0.000
+         18       1.23     0.0033      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.019508
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 0.00105588
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.174     0.000     0.174     0.000
+hgnc
+     0.174     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.001024
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 0.00129808
+GQO(  2) : Gain for feasible case     = 0.00129808
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.009     0.000    -0.009
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 0.00129808
+hgnadm
+     0.000     0.000
+         19       1.23    0.00165      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.009736
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 0.000528054
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000520
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 0.000652117
+GQO(  2) : Gain for feasible case     = 0.000652117
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.009     0.000    -0.009
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 0.000652117
+hgnadm
+     0.000     0.000
+         20       1.23   0.000824      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.004864
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 0.000264053
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000262
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 0.000326828
+GQO(  2) : Gain for feasible case     = 0.000326828
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.009     0.000    -0.009
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 0.000326828
+hgnadm
+     0.000     0.000
+         21       1.23   0.000412      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.002431
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 0.000132033
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000132
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 0.000163606
+GQO(  2) : Gain for feasible case     = 0.000163606
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 0.000163606
+hgnadm
+     0.000     0.000
+         22       1.23   0.000206      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.001215
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 6.60179e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000066
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 8.18511e-05
+GQO(  2) : Gain for feasible case     = 8.18511e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 8.18511e-05
+hgnadm
+     0.000     0.000
+denom=-0.000082 rho=1.287458
+hgn
+     0.000     0.000
+         23       1.23   0.000618      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.316     0.020     0.316     0.020
+hgnc
+     0.316     0.020
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000110
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 3.52251e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.003883
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 0.000244779
+GQO(  2) : Gain for feasible case     = 0.000244779
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.009     0.000    -0.009
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 0.000244779
+hgnadm
+     0.000     0.000
+         24       1.23   0.000309      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.001827
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 9.88001e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000099
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 0.000122498
+GQO(  2) : Gain for feasible case     = 0.000122498
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 0.000122498
+hgnadm
+     0.000     0.000
+         25       1.23   0.000154      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000913
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 4.94009e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000049
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 6.12759e-05
+GQO(  2) : Gain for feasible case     = 6.12759e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 6.12759e-05
+hgnadm
+     0.000     0.000
+         26       1.23   7.72e-05      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000457
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 2.47006e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000025
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 3.06447e-05
+GQO(  2) : Gain for feasible case     = 3.06447e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 3.06447e-05
+hgnadm
+     0.000     0.000
+         27       1.23   3.86e-05      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000228
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 1.23504e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000012
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 1.53241e-05
+GQO(  2) : Gain for feasible case     = 1.53241e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 1.53241e-05
+hgnadm
+     0.000     0.000
+         28       1.23   1.93e-05      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000114
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 6.1752e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000006
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 7.66245e-06
+GQO(  2) : Gain for feasible case     = 7.66245e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 7.66245e-06
+hgnadm
+     0.000     0.000
+         29       1.23   9.66e-06      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000057
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 3.0876e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.175     0.000     0.175     0.000
+hgnc
+     0.175     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000003
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 3.83133e-06
+GQO(  2) : Gain for feasible case     = 3.83133e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000    -0.010     0.000    -0.010
+hgnc
+     0.000    -0.010
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 3.83133e-06
+hgnadm
+     0.000     0.000
+
+Trajectory of parameters in Foxleg Algorithm
+--------------------------------------------
+  Iteration      Score      Delta      Par-1      Par-2
+          1       1.25          1      0.287      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.056    -0.056
+     [  1,]     0.056     0.056
+bot
+     1.344     0.009     1.344     0.009
+hgnc
+     1.344     0.009
+hgnadm avant
+     0.000     0.000
+alpha_in=0.041898
+hgnadm apres
+     0.056     0.000
+GQO(  0) : Gain for initial solution  = 0.0411009
+hgnadm
+     0.056    -0.007
+          2       1.23          1      0.344      0.229
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.056    -0.056
+     [  1,]     0.056     0.056
+bot
+     3.304     0.104     3.304     0.104
+hgnc
+     3.304     0.104
+hgnadm avant
+     0.000     0.000
+alpha_in=0.017037
+hgnadm apres
+     0.056     0.002
+GQO(  0) : Gain for initial solution  = 0.0244255
+hgnadm
+     0.056     0.011
+denom=-0.049146 rho=0.834511
+hgn
+     0.056     0.011
+          3       1.19          3      0.400      0.240
+hgnadm
+     0.052    -0.035
+          4       1.19        1.5      0.400      0.240
+hgnadm
+     0.052    -0.035
+          5       1.19       0.75      0.400      0.240
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.042    -0.042
+     [  1,]     0.042     0.042
+bot
+     0.052    -0.035     0.052    -0.035
+hgnc
+     0.052    -0.035
+hgnadm avant
+     0.000     0.000
+alpha_in=0.811207
+hgnadm apres
+     0.042    -0.029
+GQO(  0) : Gain for initial solution  = 0.315167
+hgnadm
+     0.042    -0.028
+          6       1.19      0.375      0.400      0.240
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.021    -0.021
+     [  1,]     0.021     0.021
+bot
+     0.042    -0.028     0.042    -0.028
+hgnc
+     0.042    -0.028
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.021    -0.014
+GQO(  0) : Gain for initial solution  = 0.215686
+hgnadm
+     0.021    -0.012
+          7       1.19      0.188      0.400      0.240
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.011    -0.011
+     [  1,]     0.011     0.011
+bot
+     0.021    -0.012     0.021    -0.012
+hgnc
+     0.021    -0.012
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.011    -0.006
+GQO(  0) : Gain for initial solution  = 0.135299
+hgnadm
+     0.011    -0.004
+          8       1.18     0.0938      0.411      0.236
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.005    -0.005
+     [  1,]     0.005     0.005
+bot
+     5.371     0.202     5.371     0.202
+hgnc
+     5.371     0.202
+hgnadm avant
+     0.000     0.000
+alpha_in=0.000983
+hgnadm apres
+     0.005     0.000
+GQO(  0) : Gain for initial solution  = 0.00140387
+hgnadm
+     0.005     0.004
+          9       1.18     0.0938      0.416      0.241
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.005    -0.005
+     [  1,]     0.005     0.005
+bot
+     3.842     0.132     3.842     0.132
+hgnc
+     3.842     0.132
+hgnadm avant
+     0.000     0.000
+alpha_in=0.001373
+hgnadm apres
+     0.005     0.000
+GQO(  0) : Gain for initial solution  = 0.00183155
+hgnadm
+     0.005    -0.002
+         10       1.18     0.0938      0.421      0.239
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.005    -0.005
+     [  1,]     0.005     0.005
+bot
+     5.096     0.191     5.096     0.191
+hgnc
+     5.096     0.191
+hgnadm avant
+     0.000     0.000
+alpha_in=0.001036
+hgnadm apres
+     0.005     0.000
+GQO(  0) : Gain for initial solution  = 0.00141267
+hgnadm
+     0.005     0.002
+denom=-0.002319 rho=0.854115
+hgn
+     0.005     0.002
+         11       1.18      0.281      0.426      0.240
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.016    -0.016
+     [  1,]     0.016     0.016
+bot
+     4.620     0.168     4.620     0.168
+hgnc
+     4.620     0.168
+hgnadm avant
+     0.000     0.000
+alpha_in=0.003427
+hgnadm apres
+     0.016     0.001
+GQO(  0) : Gain for initial solution  = 0.00458679
+hgnadm
+     0.016     0.000
+denom=-0.004791 rho=0.807376
+hgn
+     0.016     0.000
+         12       1.17      0.844      0.442      0.240
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.047    -0.047
+     [  1,]     0.047     0.047
+bot
+     5.427     0.209     5.427     0.209
+hgnc
+     5.427     0.209
+hgnadm avant
+     0.000     0.000
+alpha_in=0.008752
+hgnadm apres
+     0.047     0.002
+GQO(  0) : Gain for initial solution  = 0.00999929
+hgnadm
+     0.047     0.003
+         13       1.16      0.844      0.490      0.243
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.047    -0.047
+     [  1,]     0.047     0.047
+bot
+     2.524     0.103     2.524     0.103
+hgnc
+     2.524     0.103
+hgnadm avant
+     0.000     0.000
+alpha_in=0.018815
+hgnadm apres
+     0.047     0.002
+GQO(  0) : Gain for initial solution  = 0.00381017
+hgnadm
+     0.047     0.003
+         14       1.16      0.844      0.537      0.246
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.047    -0.047
+     [  1,]     0.047     0.047
+bot
+    -0.377    -0.014    -0.377    -0.014
+hgnc
+    -0.377    -0.014
+hgnadm avant
+     0.000     0.000
+alpha_in=0.125831
+hgnadm apres
+    -0.047    -0.002
+GQO(  0) : Gain for initial solution  = 0.000860686
+GQO(  1) : Gain for feasible case     = 0.00118516
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.047    -0.047
+     [  1,]     0.047     0.047
+top
+    -0.047    -0.001    -0.047    -0.001
+bot
+    -0.330    -0.013    -0.330    -0.013
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.047    -0.001
+alpha_in=-0.000000
+hgnadm apres
+    -0.047    -0.001
+GQO(  2) : Gain for infeasible case   = 0.00118516
+GQO(  3) : Gain for feasible case     = 0.00118516
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.047    -0.047
+     [  1,]     0.047     0.047
+top
+    -0.047    -0.001    -0.047    -0.001
+bot
+    -0.330    -0.013    -0.330    -0.013
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.047    -0.001
+alpha_in=-0.000000
+hgnadm apres
+    -0.047    -0.001
+GQO(  4) : Gain for infeasible case   = 0.00118516
+hgnadm
+    -0.047    -0.001
+         15       1.16      0.422      0.537      0.246
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.024    -0.024
+     [  1,]     0.024     0.024
+bot
+    -0.377    -0.014    -0.377    -0.014
+hgnc
+    -0.377    -0.014
+hgnadm avant
+     0.000     0.000
+alpha_in=0.062916
+hgnadm apres
+    -0.024    -0.001
+GQO(  0) : Gain for initial solution  = 0.00044479
+GQO(  1) : Gain for feasible case     = 0.000817655
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.024    -0.024
+     [  1,]     0.024     0.024
+top
+    -0.024     0.000    -0.024     0.000
+bot
+    -0.354    -0.014    -0.354    -0.014
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.024     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.024     0.000
+GQO(  2) : Gain for infeasible case   = 0.000817655
+GQO(  3) : Gain for feasible case     = 0.000817655
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.024    -0.024
+     [  1,]     0.024     0.024
+top
+    -0.024     0.000    -0.024     0.000
+bot
+    -0.354    -0.014    -0.354    -0.014
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.024     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.024     0.000
+GQO(  4) : Gain for infeasible case   = 0.000817655
+hgnadm
+    -0.024     0.000
+         16       1.16      0.211      0.537      0.246
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.012    -0.012
+     [  1,]     0.012     0.012
+bot
+    -0.377    -0.014    -0.377    -0.014
+hgnc
+    -0.377    -0.014
+hgnadm avant
+     0.000     0.000
+alpha_in=0.031458
+hgnadm apres
+    -0.012     0.000
+GQO(  0) : Gain for initial solution  = 0.000226006
+GQO(  1) : Gain for feasible case     = 0.000624326
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.012    -0.012
+     [  1,]     0.012     0.012
+top
+    -0.012     0.001    -0.012     0.001
+bot
+    -0.366    -0.015    -0.366    -0.015
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.012     0.001
+alpha_in=-0.000000
+hgnadm apres
+    -0.012     0.001
+GQO(  2) : Gain for infeasible case   = 0.000624326
+GQO(  3) : Gain for feasible case     = 0.000624326
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.012    -0.012
+     [  1,]     0.012     0.012
+top
+    -0.012     0.001    -0.012     0.001
+bot
+    -0.366    -0.015    -0.366    -0.015
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.012     0.001
+alpha_in=-0.000000
+hgnadm apres
+    -0.012     0.001
+GQO(  4) : Gain for infeasible case   = 0.000624326
+hgnadm
+    -0.012     0.001
+         17       1.16      0.105      0.537      0.246
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.006    -0.006
+     [  1,]     0.006     0.006
+bot
+    -0.377    -0.014    -0.377    -0.014
+hgnc
+    -0.377    -0.014
+hgnadm avant
+     0.000     0.000
+alpha_in=0.015729
+hgnadm apres
+    -0.006     0.000
+GQO(  0) : Gain for initial solution  = 0.000113906
+GQO(  1) : Gain for feasible case     = 0.000525268
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.006    -0.006
+     [  1,]     0.006     0.006
+top
+    -0.006     0.001    -0.006     0.001
+bot
+    -0.372    -0.015    -0.372    -0.015
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.006     0.001
+alpha_in=-0.000000
+hgnadm apres
+    -0.006     0.001
+GQO(  2) : Gain for infeasible case   = 0.000525268
+GQO(  3) : Gain for feasible case     = 0.000525268
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.006    -0.006
+     [  1,]     0.006     0.006
+top
+    -0.006     0.001    -0.006     0.001
+bot
+    -0.372    -0.015    -0.372    -0.015
+hgnc
+    -0.377    -0.014
+hgnadm avant
+    -0.006     0.001
+alpha_in=-0.000000
+hgnadm apres
+    -0.006     0.001
+GQO(  4) : Gain for infeasible case   = 0.000525268
+hgnadm
+    -0.006     0.001
+         18       1.16     0.0527      0.531      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.003    -0.003
+     [  1,]     0.003     0.003
+bot
+     0.719     0.028     0.719     0.028
+hgnc
+     0.719     0.028
+hgnadm avant
+     0.000     0.000
+alpha_in=0.004131
+hgnadm apres
+     0.003     0.000
+GQO(  0) : Gain for initial solution  = 7.79265e-05
+hgnadm
+     0.003    -0.001
+         19       1.16     0.0527      0.534      0.246
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.003    -0.003
+     [  1,]     0.003     0.003
+bot
+    -0.049    -0.001    -0.049    -0.001
+hgnc
+    -0.049    -0.001
+hgnadm avant
+     0.000     0.000
+alpha_in=0.060227
+hgnadm apres
+    -0.003     0.000
+GQO(  0) : Gain for initial solution  = 1.76184e-05
+GQO(  1) : Gain for feasible case     = 0.000106174
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.003    -0.003
+     [  1,]     0.003     0.003
+top
+    -0.003     0.000    -0.003     0.000
+bot
+    -0.046    -0.002    -0.046    -0.002
+hgnc
+    -0.049    -0.001
+hgnadm avant
+    -0.003     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.003     0.000
+GQO(  2) : Gain for infeasible case   = 0.000106174
+GQO(  3) : Gain for feasible case     = 0.000106174
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.003    -0.003
+     [  1,]     0.003     0.003
+top
+    -0.003     0.000    -0.003     0.000
+bot
+    -0.046    -0.002    -0.046    -0.002
+hgnc
+    -0.049    -0.001
+hgnadm avant
+    -0.003     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.003     0.000
+GQO(  4) : Gain for infeasible case   = 0.000106174
+hgnadm
+    -0.003     0.000
+         20       1.16     0.0264      0.531      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+     0.521     0.020     0.521     0.020
+hgnc
+     0.521     0.020
+hgnadm avant
+     0.000     0.000
+alpha_in=0.002849
+hgnadm apres
+     0.001     0.000
+GQO(  0) : Gain for initial solution  = 2.89035e-05
+hgnadm
+     0.001     0.000
+         21       1.16     0.0264      0.533      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+     0.125     0.005     0.125     0.005
+hgnc
+     0.125     0.005
+hgnadm avant
+     0.000     0.000
+alpha_in=0.011879
+hgnadm apres
+     0.001     0.000
+GQO(  0) : Gain for initial solution  = 7.96137e-06
+hgnadm
+     0.001     0.000
+denom=-0.000032 rho=1.018869
+hgn
+     0.001     0.000
+         22       1.16     0.0791      0.534      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.004    -0.004
+     [  1,]     0.004     0.004
+bot
+     0.206     0.008     0.206     0.008
+hgnc
+     0.206     0.008
+hgnadm avant
+     0.000     0.000
+alpha_in=0.021657
+hgnadm apres
+     0.004     0.000
+GQO(  0) : Gain for initial solution  = 3.55456e-05
+hgnadm
+     0.004     0.000
+         23       1.16     0.0396      0.539      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.002    -0.002
+     [  1,]     0.002     0.002
+bot
+    -0.117    -0.004    -0.117    -0.004
+hgnc
+    -0.117    -0.004
+hgnadm avant
+     0.000     0.000
+alpha_in=0.019096
+hgnadm apres
+    -0.002     0.000
+GQO(  0) : Gain for initial solution  = 1.12763e-05
+GQO(  1) : Gain for feasible case     = 2.5815e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.002    -0.002
+     [  1,]     0.002     0.002
+top
+    -0.002     0.000    -0.002     0.000
+bot
+    -0.114    -0.005    -0.114    -0.005
+hgnc
+    -0.117    -0.004
+hgnadm avant
+    -0.002     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.002     0.000
+GQO(  2) : Gain for infeasible case   = 2.5815e-05
+GQO(  3) : Gain for feasible case     = 2.5815e-05
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.002    -0.002
+     [  1,]     0.002     0.002
+top
+    -0.002     0.000    -0.002     0.000
+bot
+    -0.114    -0.005    -0.114    -0.005
+hgnc
+    -0.117    -0.004
+hgnadm avant
+    -0.002     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.002     0.000
+GQO(  4) : Gain for infeasible case   = 2.5815e-05
+hgnadm
+    -0.002     0.000
+         24       1.16     0.0198      0.536      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+     0.154     0.006     0.154     0.006
+hgnc
+     0.154     0.006
+hgnadm avant
+     0.000     0.000
+alpha_in=0.007252
+hgnadm apres
+     0.001     0.000
+GQO(  0) : Gain for initial solution  = 6.86949e-06
+hgnadm
+     0.001     0.000
+         25       1.16    0.00989      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+    -0.041    -0.002    -0.041    -0.002
+hgnc
+    -0.041    -0.002
+hgnadm avant
+     0.000     0.000
+alpha_in=0.013517
+hgnadm apres
+    -0.001     0.000
+GQO(  0) : Gain for initial solution  = 1.12267e-06
+GQO(  1) : Gain for feasible case     = 7.98983e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+top
+    -0.001     0.000    -0.001     0.000
+bot
+    -0.041    -0.002    -0.041    -0.002
+hgnc
+    -0.041    -0.002
+hgnadm avant
+    -0.001     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.001     0.000
+GQO(  2) : Gain for infeasible case   = 7.98983e-06
+GQO(  3) : Gain for feasible case     = 7.98983e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+top
+    -0.001     0.000    -0.001     0.000
+bot
+    -0.041    -0.002    -0.041    -0.002
+hgnc
+    -0.041    -0.002
+hgnadm avant
+    -0.001     0.000
+alpha_in=-0.000000
+hgnadm apres
+    -0.001     0.000
+GQO(  4) : Gain for infeasible case   = 7.98983e-06
+hgnadm
+    -0.001     0.000
+         26       1.16    0.00989      0.537      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+     0.075     0.003     0.075     0.003
+hgnc
+     0.075     0.003
+hgnadm avant
+     0.000     0.000
+alpha_in=0.007388
+hgnadm apres
+     0.001     0.000
+GQO(  0) : Gain for initial solution  = 1.71441e-06
+hgnadm
+     0.001     0.000
+         27       1.16    0.00494      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+    -0.020    -0.001    -0.020    -0.001
+hgnc
+    -0.020    -0.001
+hgnadm avant
+     0.000     0.000
+alpha_in=0.013835
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 2.74993e-07
+GQO(  1) : Gain for feasible case     = 1.98153e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+    -0.020    -0.001    -0.020    -0.001
+hgnc
+    -0.020    -0.001
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  2) : Gain for infeasible case   = 1.98153e-06
+GQO(  3) : Gain for feasible case     = 1.98153e-06
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+    -0.020    -0.001    -0.020    -0.001
+hgnc
+    -0.020    -0.001
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  4) : Gain for infeasible case   = 1.98153e-06
+hgnadm
+     0.000     0.000
+denom=-0.000002 rho=0.767175
+hgn
+     0.000     0.000
+         28       1.16     0.0148      0.537      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.001    -0.001
+     [  1,]     0.001     0.001
+bot
+     0.051     0.002     0.051     0.002
+hgnc
+     0.051     0.002
+hgnadm avant
+     0.000     0.000
+alpha_in=0.016464
+hgnadm apres
+     0.001     0.000
+GQO(  0) : Gain for initial solution  = 1.71048e-06
+hgnadm
+     0.001     0.000
+         29       1.16    0.00742      0.537      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.001     0.000     0.001     0.000
+hgnc
+     0.001     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 1.45396e-06
+hgnadm
+     0.000     0.000
+         30       1.16    0.00371      0.537      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 1.0321e-06
+hgnadm
+     0.000     0.000
+         31       1.16    0.00185      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+    -0.002     0.000    -0.002     0.000
+hgnc
+    -0.002     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.053367
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 4.81509e-08
+GQO(  1) : Gain for feasible case     = 3.93902e-07
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+    -0.002     0.000    -0.002     0.000
+hgnc
+    -0.002     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  2) : Gain for infeasible case   = 3.93902e-07
+GQO(  3) : Gain for feasible case     = 3.93902e-07
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+    -0.002     0.000    -0.002     0.000
+hgnc
+    -0.002     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  4) : Gain for infeasible case   = 3.93902e-07
+hgnadm
+     0.000     0.000
+denom=-0.000000 rho=0.771221
+hgn
+     0.000     0.000
+         32       1.16    0.00556      0.537      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.035     0.001     0.035     0.001
+hgnc
+     0.035     0.001
+hgnadm avant
+     0.000     0.000
+alpha_in=0.009074
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 4.35738e-07
+hgnadm
+     0.000     0.000
+         33       1.16    0.00278      0.537      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 3.37157e-07
+hgnadm
+     0.000     0.000
+         34       1.16    0.00278      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.002     0.000     0.002     0.000
+hgnc
+     0.002     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.067028
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 2.7585e-08
+hgnadm
+     0.000     0.000
+denom=-0.000000 rho=4.616139
+hgn
+     0.000     0.000
+         35       1.16    0.00834      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.004     0.000     0.004     0.000
+hgnc
+     0.004     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.129502
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 6.54757e-08
+hgnadm
+     0.000     0.000
+         36       1.16    0.00417      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 3.62518e-08
+hgnadm
+     0.000     0.000
+         37       1.16    0.00209      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 1.98343e-08
+hgnadm
+     0.000     0.000
+         38       1.16    0.00104      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 1.14161e-08
+hgnadm
+     0.000     0.000
+         39       1.16   0.000521      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 7.15459e-09
+hgnadm
+     0.000     0.000
+         40       1.16   0.000261      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 5.01075e-09
+hgnadm
+     0.000     0.000
+         41       1.16    0.00013      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 3.93556e-09
+hgnadm
+     0.000     0.000
+         42       1.16   6.52e-05      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 3.39715e-09
+hgnadm
+     0.000     0.000
+         43       1.16   3.26e-05      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.500000
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 3.12773e-09
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.232930
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 3.51988e-09
+GQO(  2) : Gain for feasible case     = 3.51988e-09
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 3.51988e-09
+hgnadm
+     0.000     0.000
+         44       1.16   1.63e-05      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.303562
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 2.04436e-09
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.002206
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 2.12202e-09
+GQO(  2) : Gain for feasible case     = 2.12202e-09
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 2.12202e-09
+hgnadm
+     0.000     0.000
+         45       1.16   8.15e-06      0.538      0.247
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.149955
+hgnadm apres
+     0.000     0.000
+GQO(  0) : Gain for initial solution  = 1.07745e-09
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=0.001836
+hgnadm apres
+     0.000     0.000
+GQO(  1) : Gain for infeasible case   = 1.15153e-09
+GQO(  2) : Gain for feasible case     = 1.15153e-09
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]     0.000     0.000
+     [  1,]     0.000     0.000
+top
+     0.000     0.000     0.000     0.000
+bot
+     0.000     0.000     0.000     0.000
+hgnc
+     0.000     0.000
+hgnadm avant
+     0.000     0.000
+alpha_in=-0.000000
+hgnadm apres
+     0.000     0.000
+GQO(  3) : Gain for infeasible case   = 1.15153e-09
+hgnadm
+     0.000     0.000
+
 Fitted Model for Raw Data
 =========================
 
@@ -318,10 +2820,65 @@ Optimization parameters
 - Variance percentage for stripping 5
 - Initial increment value           1
 
+Trajectory of parameters in Foxleg Algorithm
+--------------------------------------------
+  Iteration      Score      Delta      Par-1      Par-2
+          1   7.55e+29          1      0.113      0.169
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.056    -0.056
+     [  1,]     0.056     0.056
+bot
+     0.000     0.097     0.000     0.097
+hgnc
+     0.000     0.097
+hgnadm avant
+     0.000     0.000
+alpha_in=0.581745
+hgnadm apres
+     0.000     0.056
+GQO(  0) : Gain for initial solution  = 3.22711e+29
+hgnadm
+     0.000     0.056
+denom=-322710760392016309959761330176.000000 rho=0.908607
+hgn
+     0.000     0.056
+          2   4.62e+29          3      0.113      0.225
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.056    -0.169
+     [  1,]     0.169     0.169
+bot
+    11.020    -0.050    11.020    -0.050
+hgnc
+    11.020    -0.050
+hgnadm avant
+     0.000     0.000
+alpha_in=0.015325
+hgnadm apres
+     0.169    -0.001
+GQO(  0) : Gain for initial solution  = 5.58919e+27
+hgnadm
+     0.169    -0.050
+
 Suppressing the unnecessary basic structures
 ============================================
 Structure 'Nugget Effect' in model #1 is suppressed
 Structure 'Exponential' in model #1 is suppressed
+
+Trajectory of parameters in Foxleg Algorithm
+--------------------------------------------
+  Iteration      Score      Delta      Par-1
+          1   4.89e+29          1      0.240
+hgnadm
+    -0.006
+          2   4.89e+29        0.5      0.234
+hgnadm
+     0.005
 
 Fitted Model for PCA
 ====================
@@ -582,10 +3139,153 @@ Optimization parameters
 - Variance percentage for stripping 5
 - Initial increment value           1
 
+Trajectory of parameters in Foxleg Algorithm
+--------------------------------------------
+  Iteration      Score      Delta      Par-1      Par-2
+          1   1.69e+27          1      0.113      0.169
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.056    -0.056
+     [  1,]     0.056     0.056
+bot
+     0.000     0.096     0.000     0.096
+hgnc
+     0.000     0.096
+hgnadm avant
+     0.000     0.000
+alpha_in=0.584376
+hgnadm apres
+     0.000     0.056
+GQO(  0) : Gain for initial solution  = 2.6822e+26
+hgnadm
+     0.000     0.056
+          2   1.63e+27        0.5      0.113      0.225
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.028    -0.028
+     [  1,]     0.028     0.028
+bot
+     0.000    -0.057     0.000    -0.057
+hgnc
+     0.000    -0.057
+hgnadm avant
+     0.000     0.000
+alpha_in=0.497343
+hgnadm apres
+     0.000    -0.028
+GQO(  0) : Gain for initial solution  = 3.83009e+25
+GQO(  1) : Gain for feasible case     = 3.83009e+25
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 2
+               [,  0]    [,  1]
+     [  0,]    -0.028    -0.028
+     [  1,]     0.028     0.028
+top
+     0.000    -0.028     0.000    -0.028
+bot
+     0.000    -0.028     0.000    -0.028
+hgnc
+     0.000    -0.057
+hgnadm avant
+     0.000    -0.028
+alpha_in=-0.000000
+hgnadm apres
+     0.000    -0.028
+GQO(  2) : Gain for infeasible case   = 3.83009e+25
+hgnadm
+     0.000    -0.028
+denom=-38300926227308896711606272.000000 rho=0.785204
+hgn
+     0.000    -0.028
+
 Suppressing the unnecessary basic structures
 ============================================
 Structure 'Nugget Effect' in model #1 is suppressed
 Structure 'Exponential' in model #1 is suppressed
+
+Trajectory of parameters in Foxleg Algorithm
+--------------------------------------------
+  Iteration      Score      Delta      Par-1
+          1    1.6e+27          1      0.197
+hgnadm
+     0.003
+          2    1.6e+27        0.5      0.197
+hgnadm
+     0.003
+          3    1.6e+27       0.25      0.197
+hgnadm
+     0.003
+          4    1.6e+27      0.125      0.197
+hgnadm
+     0.003
+          5    1.6e+27     0.0625      0.197
+hgnadm
+     0.003
+          6    1.6e+27     0.0312      0.197
+hgnadm
+     0.003
+          7    1.6e+27     0.0156      0.197
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 1
+               [,  0]
+     [  0,]    -0.002
+     [  1,]     0.002
+bot
+     0.003     0.003
+hgnc
+     0.003
+hgnadm avant
+     0.000
+alpha_in=0.525027
+hgnadm apres
+     0.002
+GQO(  0) : Gain for initial solution  = 2.19865e+23
+hgnadm
+     0.002
+          8    1.6e+27    0.00781      0.199
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 1
+               [,  0]
+     [  0,]    -0.001
+     [  1,]     0.001
+bot
+    -0.003    -0.003
+hgnc
+    -0.003
+hgnadm avant
+     0.000
+alpha_in=0.309652
+hgnadm apres
+    -0.001
+GQO(  0) : Gain for initial solution  = 1.05666e+23
+GQO(  1) : Gain for feasible case     = 1.05666e+23
+dans st_minimum
+- Number of rows    = 2
+- Number of columns = 1
+               [,  0]
+     [  0,]    -0.001
+     [  1,]     0.001
+top
+    -0.001    -0.001
+bot
+    -0.002    -0.002
+hgnc
+    -0.003
+hgnadm avant
+    -0.001
+alpha_in=-0.000000
+hgnadm apres
+    -0.001
+GQO(  2) : Gain for infeasible case   = 1.05666e+23
+hgnadm
+    -0.001
 
 Fitted Model for MAF
 ====================

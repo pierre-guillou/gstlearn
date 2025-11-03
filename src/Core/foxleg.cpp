@@ -27,7 +27,7 @@
 
 namespace gstlrn
 {
-static Id VERBOSE_GQO = 0;
+static Id VERBOSE_GQO = 1;
 
 static Id NPAR, NPAR2, NPARAC, NPARAC2, NDAT, NCONT, NPCT, NPCT2;
 static Id ITERATION, SOUSITER;
@@ -38,8 +38,7 @@ static void (*FUNC_EVALUATE)(Id ndat,
 
 static bool doit()
 {
-  // return OptDbg::query(EDbg::CONVERGE);
-  return false;
+  return true;
 }
 
 /****************************************************************************/
@@ -865,7 +864,7 @@ static Id st_minimization_under_constraints(VectorInt& ind_util,
   nactive      = st_define_constraints(0, bords_red, ai_red, hgnadm, consts,
                                        flag_active, temp);
   min_adm_best = st_essai(hgnadm, grad_red, gauss_red);
-  if (VERBOSE_GQO && OptDbg::query(EDbg::CONVERGE))
+  if (VERBOSE_GQO)
     message("GQO(  0) : Gain for initial solution  = %lg\n", -min_adm_best);
 
   sortie = SOUSITER = 0;
@@ -896,7 +895,7 @@ static Id st_minimization_under_constraints(VectorInt& ind_util,
       nactive     = st_define_constraints(1, bords_red, ai_red, hgnadm, consts,
                                           flag_active, temp);
       min_adm_cur = st_essai(hgnadm, grad_red, gauss_red);
-      if (VERBOSE_GQO && OptDbg::query(EDbg::CONVERGE))
+      if (VERBOSE_GQO)
         message("GQO(%3d) : Gain for infeasible case   = %lg\n", SOUSITER,
                 -min_adm_cur);
       if (min_adm_cur >= min_adm_best) break;
@@ -910,7 +909,7 @@ static Id st_minimization_under_constraints(VectorInt& ind_util,
       {
         flag_active[lambda_neg] = 0;
         nactive--;
-        if (VERBOSE_GQO && OptDbg::query(EDbg::CONVERGE))
+        if (VERBOSE_GQO)
           message("GQO(%3d) : Gain for feasible case     = %lg\n", SOUSITER,
                   -st_essai(hgnadm, grad_red, gauss_red));
       }
@@ -1007,8 +1006,6 @@ static void st_define_bounds(const VectorDouble& param,
 static void st_foxleg_debug_title(void)
 
 {
-  if (!OptDbg::query(EDbg::CONVERGE)) return;
-
   String string;
   mestitle(1, "Trajectory of parameters in Foxleg Algorithm");
   tab_prints(NULL, "Iteration");
@@ -1031,7 +1028,6 @@ static void st_foxleg_debug_current(double mscur,
                                     double delta,
                                     VectorDouble& param)
 {
-  if (!OptDbg::query(EDbg::CONVERGE)) return;
   tab_printi(NULL, ITERATION);
   tab_printd(NULL, mscur);
   tab_printd(NULL, delta);
@@ -1316,7 +1312,6 @@ Id foxleg_f(Id ndat,
                                           flag_active, flag_actaux, a, b1, b2,
                                           b3, temp, acont))
     {
-      if (OptDbg::query(EDbg::CONVERGE))
       {
         messerr("Convergence not reached in minimization under constraints");
         messerr("The process is resumed in the final minimization status");
@@ -1386,7 +1381,7 @@ Id foxleg_f(Id ndat,
 label_ok:
   if (ITERATION >= mauto.getMaxiter())
   {
-    if (OptDbg::query(EDbg::CONVERGE)) messerr("Convergence has not been reached");
+    messerr("Convergence has not been reached");
     return -1;
   }
   else
