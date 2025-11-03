@@ -126,6 +126,9 @@ static double st_residuals(const VectorDouble& param,
   /* Evaluate the Model at conditioning points */
 
   FUNC_EVALUATE(NDAT, NPAR, param, tabmod);
+  std::cout << "--- st_residuals\n";
+  std::cout << "NDAT " << NDAT << " NPAR " << NPAR << "\n";
+  VH::dump("param", param);
 
   /* Evaluate the residuals */
 
@@ -134,9 +137,11 @@ static double st_residuals(const VectorDouble& param,
   {
     double weight = (!tabwgt.empty()) ? tabwgt[idat] : 1.;
     double value  = weight * (tabmod[idat] - tabexp[idat]);
+    std::cout << "weight" << weight << " " << tabmod[idat] << " " << tabexp[idat] << "\n";
     msse += value * value;
     residuals[idat] = value;
   }
+  std::cout << "msse" << msse << "\n";
   return (msse / 2.);
 }
 
