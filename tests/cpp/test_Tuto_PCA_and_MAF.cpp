@@ -231,6 +231,9 @@ int main(int argc, char* argv[])
   else
   {
     vario_PCA->display();
+    ctr.display();
+    ovf.display();
+    oaf.display();
     Model model_PCA {};
     error = model_PCA.fit(vario_PCA, types, ctr, ovf, oaf, true);
     if (error == 0)
@@ -277,17 +280,17 @@ int main(int argc, char* argv[])
   }
   else
   {
-    Model* model_MAF = Model::create();
-    if (model_MAF != nullptr)
+    vario_MAF->display();
+    ctr.display();
+    ovf.display();
+    oaf.display();
+    Model model_MAF {};
+    auto types_maf = ECov::fromKeys({"NUGGET", "EXPONENTIAL", "SPHERICAL"});
+    error          = model_MAF.fit(vario_MAF, types_maf, ctr, ovf, oaf, true);
+    if (error == 0)
     {
-      auto types_maf = ECov::fromKeys({"NUGGET", "EXPONENTIAL", "SPHERICAL"});
-      error          = model_MAF->fit(vario_MAF, types_maf, ctr, ovf, oaf, false);
-      if (error == 0)
-      {
-        mestitle(0, "Fitted Model for MAF");
-        model_MAF->display();
-      }
-      delete model_MAF;
+      mestitle(0, "Fitted Model for MAF");
+      model_MAF.display();
     }
     delete vario_MAF;
   }
