@@ -230,17 +230,15 @@ int main(int argc, char* argv[])
   }
   else
   {
-    Model* model_PCA = Model::create();
-    if (model_PCA != nullptr)
+    vario_PCA->display();
+    Model model_PCA {};
+    error = model_PCA.fit(vario_PCA, types, ctr, ovf, oaf, true);
+    if (error == 0)
     {
-      error = model_PCA->fit(vario_PCA, types, ctr, ovf, oaf, true);
-      if (error == 0)
-      {
-        mestitle(0, "Fitted Model for PCA");
-        model_PCA->display();
-      }
-      delete model_PCA;
+      mestitle(0, "Fitted Model for PCA");
+      model_PCA.display();
     }
+
     delete vario_PCA;
   }
 
