@@ -4495,9 +4495,9 @@ Id model_auto_fit(Vario* vario,
   /* Load the arrays */
 
   st_load_wt(vario, mauto.getWmode(), npadir, RECINT.wt);
-  VH::dump("fill", RECINT.wtc);
+  VH::dump("wt", RECINT.wt);
   st_compress_array(vario, npadir, RECINT.wt, RECINT.wtc);
-  VH::dump("compress", RECINT.wtc);
+  VH::dump("wtc", RECINT.wtc);
   st_load_gg(vario, npadir, strexps, RECINT.gg);
   st_compress_array(vario, npadir, RECINT.gg, RECINT.ggc);
   st_load_ge(vario, model, npadir, RECINT.dd, RECINT.ge);
