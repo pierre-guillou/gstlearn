@@ -1271,7 +1271,6 @@ Id foxleg_f(Id ndat,
   st_constraints_init(ind_util, ai);
 
   /* Calculate the gradient */
-  VH::dump("wgt", tabwgt);
   double ms0   = st_residuals(param, tabexp, tabwgt, tabmod1, residuals);
   double mscur = ms0;
   if (st_calcul0(param, lower, upper, scale, acont, tabwgt, residuals, Jr, grad,
