@@ -66,6 +66,17 @@ Computing experimental variogram on raw data
 
 Fitting variogram model on raw data
 -----------------------------------
+wt0
+               [,  0]    [,  1]    [,  2]    [,  3]    [,  4]    [,  5]    [,  6]
+     [  0,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [  7,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 14,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 21,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 28,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 35,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 42,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 49,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 56,]       N/A       N/A       N/A       N/A
 wt
                [,  0]    [,  1]    [,  2]    [,  3]    [,  4]    [,  5]    [,  6]
      [  0,]     0.542     1.598     1.576     1.662     1.586     1.539     1.522
@@ -339,6 +350,17 @@ Optimization parameters
 - Minimum increment value           1e-05
 - Variance percentage for stripping 5
 - Initial increment value           1
+wt0
+               [,  0]    [,  1]    [,  2]    [,  3]    [,  4]    [,  5]    [,  6]
+     [  0,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [  7,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 14,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 21,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 28,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 35,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 42,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 49,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 56,]       N/A       N/A       N/A       N/A
 wt
                [,  0]    [,  1]    [,  2]    [,  3]    [,  4]    [,  5]    [,  6]
      [  0,]     0.038     0.113     0.111     0.117     0.112     0.109     0.108
@@ -625,6 +647,17 @@ Optimization parameters
 - Minimum increment value           1e-05
 - Variance percentage for stripping 5
 - Initial increment value           1
+wt0
+               [,  0]    [,  1]    [,  2]    [,  3]    [,  4]    [,  5]    [,  6]
+     [  0,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [  7,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 14,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 21,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 28,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 35,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 42,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 49,]       N/A       N/A       N/A       N/A       N/A       N/A       N/A
+     [ 56,]       N/A       N/A       N/A       N/A
 wt
                [,  0]    [,  1]    [,  2]    [,  3]    [,  4]    [,  5]    [,  6]
      [  0,]     0.038     0.113     0.111     0.117     0.112     0.109     0.108
