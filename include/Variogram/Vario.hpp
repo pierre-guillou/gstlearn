@@ -142,7 +142,7 @@ public:
                               bool verr_mode           = false,
                               Model* model             = nullptr,
                               Id niter_UK              = 0,
-                              bool verbose             = false);
+                              bool verbose             = true);
 
   void resetReduce(const VectorInt& varcols,
                    const VectorInt& dircols,

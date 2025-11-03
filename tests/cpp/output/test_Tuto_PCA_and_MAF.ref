@@ -106,6 +106,48 @@ Known Mean(s)     0.000     0.000     0.000
 Testing PCA
 ===========
 
+PCA computation
+===============
+Number of variables         = 3
+Number of samples in the Db = 500
+Number of isotropic samples = 500
+Mean
+                  [,1]
+       [1,]      0.985
+       [2,]      1.695
+       [3,]      3.224
+St. Dev.
+                  [,1]
+       [1,]      0.266
+       [2,]      2.913
+       [3,]      1.473
+
+Variance-Covariance matrix for distance 0
+                  [,1]       [,2]       [,3]
+       [1,]      0.071      0.003     -0.018
+       [2,]      0.003      8.486      0.202
+       [3,]     -0.018      0.202      2.170
+Eigen values
+                  [,1]
+       [1,]      8.492
+       [2,]      2.164
+       [3,]      0.071
+Eigen Vectors
+                  [,1]       [,2]       [,3]
+       [1,]      0.000     -0.009      1.000
+       [2,]      0.999     -0.032     -0.001
+       [3,]      0.032      0.999      0.009
+PCA Z->F
+                  [,1]       [,2]       [,3]
+       [1,]      0.000     -0.006      3.766
+       [2,]      0.343     -0.022     -0.002
+       [3,]      0.011      0.679      0.032
+PCA F->Z
+                  [,1]       [,2]       [,3]
+       [1,]      0.001      2.913      0.093
+       [2,]     -0.013     -0.047      1.470
+       [3,]      0.266      0.000      0.002
+
 PCA Contents
 ------------
 Means
@@ -136,8 +178,31 @@ Matrix MF2Z to back-transform Factors F into standardized Variables Z
      [  2,]     0.266     0.000     0.002
 Z = m + Y * MF2Z
 
+Transform from Z to Factors
+===========================
+
+Statistics on Factors
+---------------------
+             Number    Minimum    Maximum       Mean   St. Dev.   Variance
+Factor-1        500     -2.591      2.395      0.000      0.999      0.998
+Factor-2        500     -2.798      2.710      0.000      0.999      0.998
+Factor-3        500     -2.894      2.984      0.000      0.999      0.998
+
+Number of isotopic active samples = 500
+Correlation matrix
+                  [,1]       [,2]       [,3]
+       [1,]      1.000      0.000      0.000
+       [2,]      0.000      1.000      0.000
+       [3,]      0.000      0.000      1.000
+
+
 Computing and fitting variogram on PCA factors
 ----------------------------------------------
+
+Suppressing the unnecessary basic structures
+============================================
+Structure 'Nugget Effect' in model #1 is suppressed
+Structure 'Exponential' in model #1 is suppressed
 
 Fitted Model for PCA
 ====================
@@ -170,6 +235,64 @@ Known Mean(s)     0.000     0.000     0.000
 Testing MAF
 ===========
 
+MAF computation
+===============
+Number of variables         = 3
+Number of samples in the Db = 500
+Number of isotropic samples = 500
+Mean
+                  [,1]
+       [1,]      0.985
+       [2,]      1.695
+       [3,]      3.224
+St. Dev.
+                  [,1]
+       [1,]      0.266
+       [2,]      2.913
+       [3,]      1.473
+
+Variance-Covariance matrix for distance 0
+                  [,1]       [,2]       [,3]
+       [1,]      0.071      0.003     -0.018
+       [2,]      0.003      8.486      0.202
+       [3,]     -0.018      0.202      2.170
+
+Number of lags              = 10
+Direction coefficients      =      1.000     0.000
+Direction angles (degrees)  =      0.000
+Tolerance on direction      =     90.000 (degrees)
+Calculation lag             =      0.025
+Tolerance on distance       =     50.000 (Percent of the lag value)
+Reference Lag               = 2
+Number of samples in the Db = 500
+Number of isotopic pairs    = 857
+
+Variogram matrix for distance h
+                  [,1]       [,2]       [,3]
+       [1,]      0.014      0.006     -0.010
+       [2,]      0.006      1.940     -0.062
+       [3,]     -0.010     -0.062      0.545
+GEigen values
+                  [,1]
+       [1,]      0.273
+       [2,]      0.213
+       [3,]      0.192
+GEigen Vectors
+                  [,1]       [,2]       [,3]
+       [1,]      0.748     -0.557      3.649
+       [2,]      0.188      0.288      0.003
+       [3,]     -0.563      0.326      0.197
+MAF Z->F
+                  [,1]       [,2]       [,3]
+       [1,]      0.748     -0.557      3.649
+       [2,]      0.188      0.288      0.003
+       [3,]     -0.563      0.326      0.197
+MAF F->Z
+                  [,1]       [,2]       [,3]
+       [1,]      0.063      1.481     -1.198
+       [2,]     -0.044      2.507      0.777
+       [3,]      0.254      0.079      0.364
+
 PCA Contents
 ------------
 Means
@@ -199,6 +322,24 @@ Matrix MF2Z to back-transform Factors F into standardized Variables Z
      [  1,]    -0.044     2.507     0.777
      [  2,]     0.254     0.079     0.364
 Z = m + Y * MF2Z
+
+Transform from Z to Factors
+===========================
+
+Statistics on Factors
+---------------------
+             Number    Minimum    Maximum       Mean   St. Dev.   Variance
+Factor-1        500     -2.597      2.873      0.000      0.999      0.998
+Factor-2        500     -2.251      2.395      0.000      0.999      0.998
+Factor-3        500     -2.866      2.932      0.000      0.999      0.998
+
+Number of isotopic active samples = 500
+Correlation matrix
+                  [,1]       [,2]       [,3]
+       [1,]      1.000      0.000      0.000
+       [2,]      0.000      1.000      0.000
+       [3,]      0.000      0.000      1.000
+
 
 Computing and fitting variogram on MAF factors
 ----------------------------------------------

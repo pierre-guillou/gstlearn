@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     return 1;
   }
   
-  error = pca->pca_compute(data, false);
+  error = pca->pca_compute(data, true);
   if (error != 0)
   {
     messerr("Error computing PCA");
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
   pca->display();
 
   // Store the transformed variables
-  error = pca->dbZ2F(data, false, NamingConvention("U", false));
+  error = pca->dbZ2F(data, true, NamingConvention("U", false));
   if (error != 0)
   {
     messerr("Error transforming Z to PCA factors");
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
     Model* model_PCA = Model::create();
     if (model_PCA != nullptr)
     {
-      error = model_PCA->fit(vario_PCA, types, ctr, ovf, oaf, false);
+      error = model_PCA->fit(vario_PCA, types, ctr, ovf, oaf, true);
       if (error == 0)
       {
         mestitle(0, "Fitted Model for PCA");
@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
   
   // MAF computation using variogram at a specific lag
   Id ilag = 3;  // lag index 3 (corresponding to ilag-1 in 0-based indexing)
-  error = maf->maf_compute(data, *varioparam, ilag - 1, 0, false);
+  error = maf->maf_compute(data, *varioparam, ilag - 1, 0, true);
   if (error != 0)
   {
     messerr("Error computing MAF");
@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
   maf->display();
 
   // Store the transformed variables
-  error = maf->dbZ2F(data, false, NamingConvention("F", false));
+  error = maf->dbZ2F(data, true, NamingConvention("F", false));
   if (error != 0)
   {
     messerr("Error transforming Z to MAF factors");
