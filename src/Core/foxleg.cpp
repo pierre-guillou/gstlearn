@@ -127,9 +127,6 @@ static double st_residuals(const VectorDouble& param,
   /* Evaluate the Model at conditioning points */
 
   FUNC_EVALUATE(NDAT, NPAR, param, tabmod);
-  std::cout << "\n--- st_residuals\n";
-  std::cout << "NDAT " << NDAT << " NPAR " << NPAR << "\n";
-  VH::dump("param", param);
 
   /* Evaluate the residuals */
 
@@ -138,11 +135,9 @@ static double st_residuals(const VectorDouble& param,
   {
     double weight = (!tabwgt.empty()) ? tabwgt[idat] : 1.;
     double value  = weight * (tabmod[idat] - tabexp[idat]);
-    std::cout << "weight " << weight << " " << tabmod[idat] << " " << tabexp[idat] << "\n";
     msse += value * value;
     residuals[idat] = value;
   }
-  std::cout << "msse " << msse << "\n\n";
   return (msse / 2.);
 }
 
@@ -1276,6 +1271,7 @@ Id foxleg_f(Id ndat,
   st_constraints_init(ind_util, ai);
 
   /* Calculate the gradient */
+  VH::dump("wgt", tabwgt);
   double ms0   = st_residuals(param, tabexp, tabwgt, tabmod1, residuals);
   double mscur = ms0;
   if (st_calcul0(param, lower, upper, scale, acont, tabwgt, residuals, Jr, grad,
