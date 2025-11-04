@@ -60,15 +60,13 @@ jobs:
 
     - name: Build the package
       run: |
-        cmake --build ${{env.BUILD_DIR}} --parallel 3
+        cmake --build ${{env.BUILD_DIR}} --parallel 3 --target test_Tuto_PCA_and_MAF
 
     - name: Install packages and execute non-regression tests
       run: |
          cd build
          tests/cpp/Release/test_Tuto_PCA_and_MAF
          diff test_Tuto_PCA_and_MAF.out ../tests/cpp/output/test_Tuto_PCA_and_MAF.ref || true
-         echo "\n"
-         cat test_Tuto_PCA_and_MAF.out
 
     - name: Compress output logs and neutral files
       if: success() || failure()
