@@ -1236,6 +1236,7 @@ static void st_load_wt(const Vario* vario,
 
   VH::dump("between scaling", wt);
   /* Scaling by variable variances */
+  VH::dump("vario", vario->getVars());
 
   Id ijvar0 = 0;
   for (Id ivar = 0; ivar < nvar; ivar++)
