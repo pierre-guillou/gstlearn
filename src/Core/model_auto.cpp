@@ -4495,6 +4495,8 @@ Id model_auto_fit(Vario* vario,
   /* Load the arrays */
 
   VH::dump("wt0", RECINT.wt);
+  vario->display();
+  std::cout << mauto.getWmode() << " " << npadir << "\n";  
   st_load_wt(vario, mauto.getWmode(), npadir, RECINT.wt);
   VH::dump("wt", RECINT.wt);
   st_compress_array(vario, npadir, RECINT.wt, RECINT.wtc);
