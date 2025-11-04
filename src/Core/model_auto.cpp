@@ -1081,6 +1081,8 @@ static void st_load_wt(const Vario* vario,
       }
   }
 
+  VH::dump("flag", flag);
+
   switch (wmode)
   {
     case 1:
@@ -1130,6 +1132,7 @@ static void st_load_wt(const Vario* vario,
               double n2 = vario->getSwByIndex(idir, jad);
               double d1 = ABS(vario->getHhByIndex(idir, iad));
               double d2 = ABS(vario->getHhByIndex(idir, jad));
+              std::cout << n1 << " " << n2 << " " << d1 << " " << d2 << "\n";
               if (d1 > 0 && d2 > 0)
                 WT(ijvar, ipadir) = sqrt((n1 + n2) * (n1 + n2) / (n1 * d1 + n2 * d2) / 2.);
             }
@@ -1139,6 +1142,7 @@ static void st_load_wt(const Vario* vario,
               if (INCORRECT(idir, iad)) continue;
               double nn = vario->getSwByIndex(idir, iad);
               double dd = ABS(vario->getHhByIndex(idir, iad));
+              std::cout << "sym " << nn << " " << dd << "\n";
               if (dd > 0)
                 WT(ijvar, ipadir) = nn / dd;
             }
@@ -4496,7 +4500,7 @@ Id model_auto_fit(Vario* vario,
 
   VH::dump("wt0", RECINT.wt);
   vario->display();
-  std::cout << mauto.getWmode() << " " << npadir << "\n";  
+  std::cout << mauto.getWmode() << " " << npadir << "\n";
   st_load_wt(vario, mauto.getWmode(), npadir, RECINT.wt);
   VH::dump("wt", RECINT.wt);
   st_compress_array(vario, npadir, RECINT.wt, RECINT.wtc);
