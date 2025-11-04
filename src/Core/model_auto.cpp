@@ -1243,7 +1243,7 @@ static void st_load_wt(const Vario* vario,
     {
       double ratio = (vario->getVar(ivar, jvar) > 0 && vario->getVar(jvar, ivar) > 0) ? sqrt(vario->getVar(ivar, jvar) * vario->getVar(jvar, ivar)) : 1.;
       ipadir       = 0;
-      std::cout << jvar << " " << ratio << "\n";
+      std::cout << jvar << " " << ratio << " " << vario->getVar(ivar, jvar) << " " << vario->getVar(jvar, ivar) << "\n";
       for (Id idir = 0; idir < ndir; idir++)
       {
         for (Id ilag = 0, nlag = vario->getNLag(idir); ilag < nlag; ilag++, ipadir++)
