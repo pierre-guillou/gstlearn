@@ -1208,6 +1208,7 @@ static void st_load_wt(const Vario* vario,
       break;
   }
 
+  VH::dump("before scaling", wt);
   /* Scaling by direction and by variable */
 
   for (Id ijvar = 0; ijvar < nvs2; ijvar++)
@@ -1233,6 +1234,7 @@ static void st_load_wt(const Vario* vario,
     }
   }
 
+  VH::dump("between scaling", wt);
   /* Scaling by variable variances */
 
   Id ijvar0 = 0;
@@ -1247,6 +1249,8 @@ static void st_load_wt(const Vario* vario,
           if (!FFFF(WT(ijvar0, ipadir))) WT(ijvar0, ipadir) /= ratio;
       }
     }
+
+  VH::dump("after scaling", wt);
 }
 
 /****************************************************************************/
