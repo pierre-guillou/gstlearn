@@ -3065,10 +3065,16 @@ void Vario::_getStatistics(Db* db)
       }
       else
       {
+        std::cout << s12wzz << "\n" << s12w << "\n" << s12wz1 << "\n" << s12wz2 << "\n\n";
         setVar(s12wzz / s12w - (s12wz1 / s12w) * (s12wz2 / s12w), ivar, jvar);
         setVar(s12wzz / s12w - (s12wz1 / s12w) * (s12wz2 / s12w), jvar, ivar);
       }
     }
+
+  for (size_t i = 0; i < _vars.size(); ++i)
+  {
+    std::cout << i << " " << _vars[i] << "\n";
+  }
 
   // Modification when the ultimate variogram is a transformed one
 

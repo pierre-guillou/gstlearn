@@ -4494,10 +4494,6 @@ Id model_auto_fit(Vario* vario,
 
   /* Load the arrays */
 
-  for (size_t i = 0; i < vario->getVars().size(); ++i)
-  {
-    std::cout << i << " " << vario->getVars()[i] << "\n";
-  }
   st_load_wt(vario, mauto.getWmode(), npadir, RECINT.wt);
   st_compress_array(vario, npadir, RECINT.wt, RECINT.wtc);
   st_load_gg(vario, npadir, strexps, RECINT.gg);
