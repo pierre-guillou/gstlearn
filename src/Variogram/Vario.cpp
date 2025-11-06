@@ -3051,6 +3051,8 @@ void Vario::_getStatistics(Db* db)
         z2 = _getIVAR(db, iech, jvar);
         if (FFFF(z1) || FFFF(z2)) continue;
 
+        std::cout << ww << "\n" << z1 << "\n" << z2 << "\n\n";
+
         s12w += ww;
         s12wz1 += ww * z1;
         s12wz2 += ww * z2;
@@ -3065,7 +3067,6 @@ void Vario::_getStatistics(Db* db)
       }
       else
       {
-        std::cout << s12wzz << "\n" << s12w << "\n" << s12wz1 << "\n" << s12wz2 << "\n\n";
         setVar(s12wzz / s12w - (s12wz1 / s12w) * (s12wz2 / s12w), ivar, jvar);
         setVar(s12wzz / s12w - (s12wz1 / s12w) * (s12wz2 / s12w), jvar, ivar);
       }
