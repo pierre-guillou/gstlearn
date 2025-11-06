@@ -45,6 +45,7 @@ jobs:
         pixi add libboost-headers `
                  eigen `
                  nlopt `
+                 gdal `
                  ninja `
                  python==${{env.PYTHON_VERSION}}
         pixi add --pypi numpy mlxtend uv
@@ -81,6 +82,9 @@ jobs:
 
     - name: Install packages and execute non-regression tests
       run: |
+        export GDAL_VERSION=$(pixi list | grep gdal | head -n 1 | awk '{print $2}')
+        export GDAL_INCLUDE_PATH=$CONDA_PREFIX/Library/include
+        export GDAL_LIBRARY_PATH=$CONDA_PREFIX/Library/lib
         cmake --build ${{env.BUILD_DIR}} --target check
       shell: pixi run bash -e {0}
 
