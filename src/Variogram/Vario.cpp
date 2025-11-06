@@ -3051,12 +3051,11 @@ void Vario::_getStatistics(Db* db)
         z2 = _getIVAR(db, iech, jvar);
         if (FFFF(z1) || FFFF(z2)) continue;
 
-        std::cout << ww << "\n" << z1 << "\n" << z2 << "\n\n";
-
         s12w += ww;
         s12wz1 += ww * z1;
         s12wz2 += ww * z2;
         s12wzz += ww * z1 * z2;
+        std::cout << s12wzz << "\n" << s12w << "\n" << s12wz1 << "\n" << s12wz2 << "\n\n";
       }
       if (s12w <= 0.) continue;
 
