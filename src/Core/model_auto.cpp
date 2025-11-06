@@ -1081,8 +1081,6 @@ static void st_load_wt(const Vario* vario,
       }
   }
 
-  VH::dump("flag", flag);
-
   switch (wmode)
   {
     case 1:
@@ -1132,7 +1130,6 @@ static void st_load_wt(const Vario* vario,
               double n2 = vario->getSwByIndex(idir, jad);
               double d1 = ABS(vario->getHhByIndex(idir, iad));
               double d2 = ABS(vario->getHhByIndex(idir, jad));
-              std::cout << n1 << " " << n2 << " " << d1 << " " << d2 << "\n";
               if (d1 > 0 && d2 > 0)
                 WT(ijvar, ipadir) = sqrt((n1 + n2) * (n1 + n2) / (n1 * d1 + n2 * d2) / 2.);
             }
@@ -1142,7 +1139,6 @@ static void st_load_wt(const Vario* vario,
               if (INCORRECT(idir, iad)) continue;
               double nn = vario->getSwByIndex(idir, iad);
               double dd = ABS(vario->getHhByIndex(idir, iad));
-              std::cout << "sym " << nn << " " << dd << "\n";
               if (dd > 0)
                 WT(ijvar, ipadir) = nn / dd;
             }
@@ -1208,7 +1204,6 @@ static void st_load_wt(const Vario* vario,
       break;
   }
 
-  VH::dump("before scaling", wt);
   /* Scaling by direction and by variable */
 
   for (Id ijvar = 0; ijvar < nvs2; ijvar++)
@@ -1234,13 +1229,7 @@ static void st_load_wt(const Vario* vario,
     }
   }
 
-  VH::dump("between scaling", wt);
   /* Scaling by variable variances */
-  const auto& vars = vario->getVars();
-  for (size_t i = 0; i < vars.size(); ++i)
-  {
-    std::cout << i << " " << vars[i] << "\n";
-  }
 
   Id ijvar0 = 0;
   for (Id ivar = 0; ivar < nvar; ivar++)
@@ -1248,15 +1237,12 @@ static void st_load_wt(const Vario* vario,
     {
       double ratio = (vario->getVar(ivar, jvar) > 0 && vario->getVar(jvar, ivar) > 0) ? sqrt(vario->getVar(ivar, jvar) * vario->getVar(jvar, ivar)) : 1.;
       ipadir       = 0;
-      std::cout << jvar << " " << ratio << " " << vario->getVar(ivar, jvar) << " " << vario->getVar(jvar, ivar) << "\n";
       for (Id idir = 0; idir < ndir; idir++)
       {
         for (Id ilag = 0, nlag = vario->getNLag(idir); ilag < nlag; ilag++, ipadir++)
           if (!FFFF(WT(ijvar0, ipadir))) WT(ijvar0, ipadir) /= ratio;
       }
     }
-
-  VH::dump("after scaling", wt);
 }
 
 /****************************************************************************/
@@ -4508,13 +4494,12 @@ Id model_auto_fit(Vario* vario,
 
   /* Load the arrays */
 
-  VH::dump("wt0", RECINT.wt);
-  vario->display();
-  std::cout << mauto.getWmode() << " " << npadir << "\n";
+  for (size_t i = 0; i < vario->getVars().size(); ++i)
+  {
+    std::cout << i << " " << vario->getVars()[i] << "\n";
+  }
   st_load_wt(vario, mauto.getWmode(), npadir, RECINT.wt);
-  VH::dump("wt", RECINT.wt);
   st_compress_array(vario, npadir, RECINT.wt, RECINT.wtc);
-  VH::dump("wtc", RECINT.wtc);
   st_load_gg(vario, npadir, strexps, RECINT.gg);
   st_compress_array(vario, npadir, RECINT.gg, RECINT.ggc);
   st_load_ge(vario, model, npadir, RECINT.dd, RECINT.ge);

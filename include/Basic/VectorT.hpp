@@ -50,7 +50,7 @@ public:
   inline VectorT(const VectorT& other) = default;
 #ifndef SWIG
   inline VectorT(std::initializer_list<T> init)                       : _v(init) { }
-  inline VectorT(VectorT&& other)                            noexcept { _v.swap(other._v); }
+  inline VectorT(VectorT&& other)                                      noexcept { _v.swap(other._v); }
 #endif
   inline ~VectorT() = default;
 
@@ -58,14 +58,14 @@ public:
   inline operator const Vector&() const                               { return _v; }
 #endif
 
-  inline Vector& getVector()                                          { return _v; }
-  inline const Vector& getVector() const                              { return _v; }
-  inline const Vector* getVectorPtr() const                           { return &_v; }
+  inline Vector& getVector()                                    { return _v; }
+  inline const Vector& getVector() const                                    { return _v; }
+  inline const Vector* getVectorPtr() const                                 { return &_v; }
 
 #ifndef SWIG
   inline VectorT& operator=(const Vector& vec)                        { _v = vec; return (*this); }
   inline VectorT& operator=(const VectorT& other)                     { _v = other._v; return (*this); }
-  inline VectorT& operator=(VectorT&& other)                 noexcept { _v.swap(other._v); return (*this); }
+  inline VectorT& operator=(VectorT&& other)                           noexcept { _v.swap(other._v); return (*this); }
   inline VectorT& operator=(std::initializer_list<T> init)            { _v = init; return (*this); }
 #endif
 
