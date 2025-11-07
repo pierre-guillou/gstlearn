@@ -115,6 +115,11 @@ int main(int argc, char* argv[])
 
   ascii_filename("Vario", 0, 0, filename);
   vario = Vario::createFromNF(filename, verbose);
+  for (size_t i = 0; i < vario->getVars().size(); ++i)
+  {
+    std::cout << i << " " << vario->getVars()[i] << "\n";
+  }
+  
   if (vario == nullptr) goto label_end;
   if (dbout != nullptr)
   {
