@@ -206,14 +206,14 @@ void Rotation::_recopy(const Rotation& r)
 
 void Rotation::_directToInverse()
 {
-  _rotInv = _rotMat;
-  _rotInv.transposeInPlace();
+  _rotInv.resize(_rotMat.getNRows(), _rotMat.getNCols());
+  _rotMat.transposeOutOfPlace(_rotInv);
 }
 
 void Rotation::_inverseToDirect()
 {
-  _rotMat = _rotInv;
-  _rotMat.transposeInPlace();
+  _rotMat.resize(_rotInv.getNRows(), _rotInv.getNCols());
+  _rotInv.transposeOutOfPlace(_rotMat);
 }
 
 void Rotation::_checkRotForIdentity()

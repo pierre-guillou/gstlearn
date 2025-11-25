@@ -160,6 +160,10 @@ public:
   }
 
   Id invert2(MatrixDense& res) const;
+  void transposeOutOfPlace(MatrixDense& res) const
+  {
+    res.eigenMat().noalias() = this->eigenMat().transpose();
+  }
   void unsample(const AMatrix* A,
                 const VectorInt& rowFetch,
                 const VectorInt& colFetch,
