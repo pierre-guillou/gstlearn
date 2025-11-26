@@ -232,8 +232,9 @@ void Potential::_environmentManage(bool flag_pot,
   _optionPart  = option_part;
   _ndim        = _dbiso->getNDim();
 
-  _p1 = SpacePoint(_ndim);
-  _p2 = SpacePoint(_ndim);
+  std::array<double, 1> ndim {static_cast<double>(_ndim)};
+  _p1 = SpacePoint(ndim);
+  _p2 = SpacePoint(ndim);
 }
 
 Id Potential::_updateIsopot()

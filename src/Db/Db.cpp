@@ -731,8 +731,9 @@ VectorVectorDouble Db::getIncrements(const VectorInt& iechs, const VectorInt& je
 {
   VectorVectorDouble tab;
   auto ndim = getNDim();
-  SpacePoint P1(ndim, -1);
-  SpacePoint P2(ndim, -1);
+  std::array<double, 1> ndim2 {static_cast<double>(ndim)};
+  SpacePoint P1(ndim2, -1);
+  SpacePoint P2(ndim2, -1);
 
   Id number = static_cast<Id>(iechs.size());
   if (static_cast<Id>(jechs.size()) != number)
@@ -6143,8 +6144,9 @@ void Db::copyByCol(Id icolIn, Id icolOut)
 void Db::dumpGeometry(Id iech, Id jech) const
 {
   auto ndim = getNDim();
-  SpacePoint P1(ndim);
-  SpacePoint P2(ndim);
+  std::array<double, 1> ndim2 {static_cast<double>(ndim)};
+  SpacePoint P1(ndim2);
+  SpacePoint P2(ndim2);
   getSampleAsSPInPlace(P1, iech);
   getSampleAsSPInPlace(P2, jech);
 

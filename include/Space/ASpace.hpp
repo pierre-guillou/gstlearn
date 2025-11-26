@@ -37,8 +37,6 @@ class GSTLEARN_EXPORT ASpace: public AStringable, public ICloneable
 {
 protected:
   ASpace(size_t ndim);
-  ASpace(const ASpace& r);
-  ASpace& operator=(const ASpace& r);
 
 public:
   virtual ~ASpace();
@@ -124,7 +122,7 @@ public:
 
   VectorDouble getUnitaryVector() const;
   /// Project the coordinates in the given space
-  virtual VectorDouble projCoord(const VectorDouble& coord,
+  virtual constvect projCoord(const VectorDouble& coord,
                                  Id ispace = -1) const;
 
   /// Customize the dimension offset index of the current space
