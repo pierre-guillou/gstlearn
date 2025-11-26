@@ -81,14 +81,12 @@ public:
     : Parent(first, last)
   {
   }
-  inline VectorNumT(const VectorNumT& other) = default;
 #ifndef SWIG
   inline VectorNumT(std::initializer_list<T> init)
     : Parent(init)
   {
   }
 #endif
-  inline ~VectorNumT() = default;
 
 private:
   // === Fonction utilitaire : nom du type final ===
