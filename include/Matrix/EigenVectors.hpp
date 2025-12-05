@@ -34,9 +34,6 @@ class GSTLEARN_EXPORT EigenVectors
 {
 public:
   EigenVectors(const MatrixSquare& mat, const MatrixSymmetric* b = nullptr, bool optionPositive = true);
-  EigenVectors(const EigenVectors& r) = delete;
-  EigenVectors& operator=(const EigenVectors& r) = delete;
-  virtual ~EigenVectors();
 
   const VectorDouble& getEigenValues() const { return _eigenValues; }
   const MatrixSquare& getEigenVectors() const { return _eigenVectors; }
@@ -54,7 +51,7 @@ protected:
   VectorDouble _eigenValues;
   MatrixSquare _eigenVectors;
 
-  const MatrixSquare& _mat; // Not to be deleted
+  const MatrixSquare& _mat;
   Id _nrows;
   Id _ncols;
 };

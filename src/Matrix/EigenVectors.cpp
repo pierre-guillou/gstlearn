@@ -45,10 +45,6 @@ EigenVectors::EigenVectors(const MatrixSquare& mat,
   _ready = true;
 }
 
-EigenVectors::~EigenVectors()
-{
-}
-
 void EigenVectors::_computeEigen(const MatrixSymmetric* b, bool optionPositive)
 {
   Eigen::VectorXd eigenValues;
