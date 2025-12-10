@@ -30,16 +30,6 @@ MatrixDense::MatrixDense(Id nrow, Id ncol)
   _allocate();
 }
 
-MatrixDense::MatrixDense(const MatrixDense& r)
-  : AMatrix(r)
-  , _eigenMatrix()
-  , _maxSize(r._maxSize)
-
-{
-  _allocate();
-  _recopy(r);
-}
-
 MatrixDense::MatrixDense(const AMatrix& r)
   : AMatrix(r)
   , _eigenMatrix()
@@ -47,23 +37,6 @@ MatrixDense::MatrixDense(const AMatrix& r)
 {
   _allocate();
   copyElements(r);
-}
-
-MatrixDense& MatrixDense::operator=(const MatrixDense& r)
-{
-  if (this != &r)
-  {
-    AMatrix::operator=(r);
-    _maxSize = r._maxSize;
-    _allocate();
-    _recopy(r);
-  }
-  return *this;
-}
-
-MatrixDense::~MatrixDense()
-{
-  _deallocate();
 }
 
 void MatrixDense::_allocate()

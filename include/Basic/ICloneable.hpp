@@ -25,7 +25,7 @@ class GSTLEARN_EXPORT ICloneable
 {
 public:
   ICloneable() {};
-  virtual ~ICloneable() {};
+  virtual ~ICloneable() = default;
 
   virtual ICloneable* clone() const = 0;
 #ifndef SWIG

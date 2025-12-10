@@ -47,10 +47,7 @@ class GSTLEARN_EXPORT MatrixDense: public AMatrix
 
 public:
   MatrixDense(Id nrow = 0, Id ncol = 0);
-  MatrixDense(const MatrixDense& r);
   MatrixDense(const AMatrix& r);
-  MatrixDense& operator=(const MatrixDense& r);
-  virtual ~MatrixDense();
 
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;

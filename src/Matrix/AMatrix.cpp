@@ -34,30 +34,6 @@ AMatrix::AMatrix(Id nrow, Id ncol)
 {
 }
 
-AMatrix::AMatrix(const AMatrix& m)
-  : AStringable(m)
-  , _nRows(m._nRows)
-  , _nCols(m._nCols)
-  , _nullTerm(m._nullTerm)
-{
-}
-
-AMatrix& AMatrix::operator=(const AMatrix& m)
-{
-  if (this != &m)
-  {
-    AStringable::operator=(m);
-    _nRows    = m._nRows;
-    _nCols    = m._nCols;
-    _nullTerm = m._nullTerm;
-  }
-  return *this;
-}
-
-AMatrix::~AMatrix()
-{
-}
-
 void AMatrix::reset(Id nrows, Id ncols)
 {
   // Check if numbers are valid

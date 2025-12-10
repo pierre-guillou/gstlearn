@@ -24,9 +24,7 @@ class GSTLEARN_EXPORT ALinearOp
 {
 public:
   ALinearOp();
-  ALinearOp(const ALinearOp& m)            = delete;
-  ALinearOp& operator=(const ALinearOp& m) = delete;
-  virtual ~ALinearOp() {}
+  virtual ~ALinearOp() = default;
   virtual Id getSize() const = 0;
 
   Id evalDirect(const VectorDouble& inv, VectorDouble& outv) const;

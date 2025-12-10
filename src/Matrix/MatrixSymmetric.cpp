@@ -28,11 +28,6 @@ MatrixSymmetric::MatrixSymmetric(Id nrow)
 {
 }
 
-MatrixSymmetric::MatrixSymmetric(const MatrixSymmetric& m)
-  : MatrixSquare(m)
-{
-}
-
 MatrixSymmetric::MatrixSymmetric(const AMatrix& m)
   : MatrixSquare(m)
 {
@@ -53,19 +48,6 @@ MatrixSymmetric::MatrixSymmetric(const AMatrix& m)
     this->addMat(m);
     this->prodScalar(0.5);
   }
-}
-
-MatrixSymmetric& MatrixSymmetric::operator=(const MatrixSymmetric& m)
-{
-  if (this != &m)
-  {
-    MatrixSquare::operator=(m);
-  }
-  return *this;
-}
-
-MatrixSymmetric::~MatrixSymmetric()
-{
 }
 
 /**

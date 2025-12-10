@@ -23,24 +23,6 @@ AStringable::AStringable()
 {
 }
 
-/**
- * Copy constructor: don't copy temporary file info
- */
-AStringable::AStringable(const AStringable& /*r*/)
-{
-}
-/**
- * Assignment operator: don't copy temporary file info
- */
-AStringable& AStringable::operator=(const AStringable& /*r*/)
-{
-  return *this;
-}
-
-AStringable::~AStringable()
-{
-}
-
 String AStringable::toString(const AStringFormat* /*strfmt*/) const
 {
   std::stringstream sstr;

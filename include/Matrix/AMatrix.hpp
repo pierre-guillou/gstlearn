@@ -41,9 +41,6 @@ class GSTLEARN_EXPORT AMatrix: public AStringable, public ICloneable
 {
 public:
   AMatrix(Id nrow = 0, Id ncol = 0);
-  AMatrix(const AMatrix& m);
-  AMatrix& operator=(const AMatrix& m);
-  virtual ~AMatrix();
 
   /// Interface to AStringable
   String toString(const AStringFormat* strfmt = nullptr) const override;

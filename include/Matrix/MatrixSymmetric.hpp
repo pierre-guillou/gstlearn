@@ -28,10 +28,7 @@ class GSTLEARN_EXPORT MatrixSymmetric: public MatrixSquare
 
 public:
   MatrixSymmetric(Id nrow = 0);
-  MatrixSymmetric(const MatrixSymmetric& m);
   MatrixSymmetric(const AMatrix& m);
-  MatrixSymmetric& operator=(const MatrixSymmetric& m);
-  virtual ~MatrixSymmetric();
 
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;

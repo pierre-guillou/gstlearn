@@ -28,9 +28,7 @@ class GSTLEARN_EXPORT AStringable
 {
 public:
   AStringable();
-  AStringable(const AStringable& r);
-  AStringable& operator=(const AStringable& r);
-  virtual ~AStringable();
+  virtual ~AStringable() = default;
 
   virtual String toString(const AStringFormat* strfmt = nullptr) const;
 

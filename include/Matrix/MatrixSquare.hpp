@@ -23,10 +23,7 @@ class GSTLEARN_EXPORT MatrixSquare: public MatrixDense
 
 public:
   MatrixSquare(Id nrow = 0);
-  MatrixSquare(const MatrixSquare& r);
   MatrixSquare(const AMatrix& m);
-  MatrixSquare& operator=(const MatrixSquare& r);
-  virtual ~MatrixSquare();
 
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;

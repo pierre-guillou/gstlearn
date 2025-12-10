@@ -45,32 +45,6 @@ MatrixSparse::MatrixSparse(Id nrow, Id ncol, Id ncolmax)
   _allocate();
 }
 
-MatrixSparse::MatrixSparse(const MatrixSparse& m)
-  : AMatrix(m)
-  // , ALinearOp(m)
-  , _eigenMatrix(m._eigenMatrix)
-{
-}
-
-MatrixSparse& MatrixSparse::operator=(const MatrixSparse& m)
-{
-  if (this != &m)
-  {
-    AMatrix::operator=(m);
-    // ALinearOp::operator=(m);
-    if (!m.empty())
-    {
-      _eigenMatrix = m._eigenMatrix;
-    }
-  }
-  return *this;
-}
-
-MatrixSparse::~MatrixSparse()
-{
-  _deallocate();
-}
-
 void MatrixSparse::resetFromValue(Id nrows, Id ncols, double value)
 {
   DECLARE_UNUSED(nrows);

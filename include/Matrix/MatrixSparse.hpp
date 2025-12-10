@@ -45,9 +45,6 @@ class GSTLEARN_EXPORT MatrixSparse: public AMatrix, public virtual ALinearOp
 {
 public:
   MatrixSparse(Id nrow = 0, Id ncol = 0, Id ncolmax = -1);
-  MatrixSparse(const MatrixSparse& m);
-  MatrixSparse& operator=(const MatrixSparse& m);
-  virtual ~MatrixSparse();
 
   /// Has a specific implementation in the Target language
   DECLARE_TOTL;

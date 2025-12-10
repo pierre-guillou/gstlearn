@@ -23,11 +23,6 @@ MatrixSquare::MatrixSquare(Id nrow)
 {
 }
 
-MatrixSquare::MatrixSquare(const MatrixSquare& r)
-  : MatrixDense(r)
-{
-}
-
 MatrixSquare::MatrixSquare(const AMatrix& m)
   : MatrixDense(m)
 {
@@ -37,19 +32,6 @@ MatrixSquare::MatrixSquare(const AMatrix& m)
     _clear();
     return;
   }
-}
-
-MatrixSquare& MatrixSquare::operator=(const MatrixSquare& r)
-{
-  if (this != &r)
-  {
-    MatrixDense::operator=(r);
-  }
-  return *this;
-}
-
-MatrixSquare::~MatrixSquare()
-{
 }
 
 void MatrixSquare::_setNSize(Id nval)
