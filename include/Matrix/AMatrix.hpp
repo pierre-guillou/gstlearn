@@ -302,7 +302,6 @@ private:
   mutable VectorDouble _diagonal;
   Id _nRows;
   Id _nCols;
-  double _nullTerm; // Used for returning a null constant address
 };
 
 /* Shortcut functions for C style aficionados */

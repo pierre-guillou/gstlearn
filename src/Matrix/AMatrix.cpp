@@ -30,7 +30,6 @@ AMatrix::AMatrix(Id nrow, Id ncol)
   : AStringable()
   , _nRows(nrow)
   , _nCols(ncol)
-  , _nullTerm(0.)
 {
 }
 
