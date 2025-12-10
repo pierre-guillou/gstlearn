@@ -31,9 +31,17 @@ SpacePoint::SpacePoint(const ASpaceSharedPtr& space)
   _coord = getOrigin();
 }
 
-SpacePoint::SpacePoint(const constvect coord, Id iech, const ASpaceSharedPtr& space)
+SpacePoint::SpacePoint(const SpacePoint& r)
+  : ASpaceObject(r)
+  , _coord(r._coord)
+  , _iech(r._iech)
+  , _isProjected(r._isProjected)
+{
+}
+
+SpacePoint::SpacePoint(const VectorDouble& coord, Id iech, const ASpaceSharedPtr& space)
   : ASpaceObject(space)
-  , _coord(coord.begin(), coord.end())
+  , _coord(coord)
   , _iech(iech)
   , _isProjected(false)
 {
@@ -50,6 +58,22 @@ SpacePoint::SpacePoint(const constvect coord, Id iech, const ASpaceSharedPtr& sp
 double SpacePoint::getCoord(Id idim) const
 {
   return _coord[idim];
+}
+
+SpacePoint& SpacePoint::operator=(const SpacePoint& r)
+{
+  if (this != &r)
+  {
+    ASpaceObject::operator=(r);
+    _coord       = r._coord;
+    _iech        = r._iech;
+    _isProjected = r._isProjected;
+  }
+  return *this;
+}
+
+SpacePoint::~SpacePoint()
+{
 }
 
 void SpacePoint::setCoord(double coord)
@@ -72,7 +96,7 @@ SpacePoint SpacePoint::spacePointOnSubspace(Id ispace) const
     return *this;
 
   /// TODO : Memory copies
-  auto vec         = getSpace()->projCoord(_coord, ispace);
+  VectorDouble vec = getSpace()->projCoord(_coord, ispace);
   const auto sp    = getSpace()->getComponent(ispace);
   SpacePoint p(vec, _iech, sp);
   return p;

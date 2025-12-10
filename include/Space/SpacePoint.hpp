@@ -23,7 +23,11 @@ class GSTLEARN_EXPORT SpacePoint : public ASpaceObject
 {
 public:
   SpacePoint(const ASpaceSharedPtr& space = ASpaceSharedPtr());
-  SpacePoint(const constvect coord, Id iech = -1, const ASpaceSharedPtr& space = ASpaceSharedPtr());
+  SpacePoint(const SpacePoint& r);
+  SpacePoint(const VectorDouble& coord, Id iech = -1,
+             const ASpaceSharedPtr& space = ASpaceSharedPtr());
+  SpacePoint& operator=(const SpacePoint& r);
+  virtual ~SpacePoint();
 
   SpacePoint spacePointOnSubspace(Id ispace = -1) const;
 
@@ -84,4 +88,4 @@ protected:
   mutable Id _iech;   // Absolute rank of the sample within the Db
   mutable bool _isProjected; // True if the coordinates are projected
 };
-} // namespace gstlrn
+}

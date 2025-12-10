@@ -29,6 +29,30 @@ ASpace::ASpace(size_t ndim)
 {
 }
 
+ASpace::ASpace(const ASpace& r)
+  : AStringable(r)
+  , _nDim(r._nDim)
+  , _origin(r._origin)
+  , _offset(r._offset)
+  , _work1(r._nDim) // No need to copy the contents, just allocate
+  , _work2(r._nDim)
+{
+}
+
+ASpace& ASpace::operator=(const ASpace& r)
+{
+  if (this != &r)
+  {
+    AStringable::operator=(r);
+    _nDim = r._nDim;
+    _origin = r._origin;
+    _offset = r._offset;
+    _work1 = r._work1;
+    _work2 = r._work2;
+  }
+  return *this;
+}
+
 ASpace::~ASpace() 
 {
   //messerr("coucou");
@@ -240,14 +264,14 @@ void ASpace::getIncrementInPlace(const SpacePoint& p1,
   _getIncrementInPlace(p1, p2, ptemp, ispace);
 }
 
-constvect ASpace::projCoord(const VectorDouble& coord, Id ispace) const
+VectorDouble ASpace::projCoord(const VectorDouble& coord, Id ispace) const
 {
   if (ispace < 0 || ispace >= static_cast<Id>(getNComponents())) return coord;
   auto sp = getComponent(ispace);
   auto first       = coord.cbegin() + sp->getOffset();
   auto last        = first          + sp->getNDim();
   /// TODO : Memory copies !
-  return {first, last};
+  return VectorDouble(first, last);
 }
 
 /////////////////////////////////////////////////////////
