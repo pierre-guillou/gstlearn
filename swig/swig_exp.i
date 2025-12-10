@@ -434,5 +434,5 @@
 #pragma SWIG nowarn=506
 #pragma SWIG nowarn=509
 
-%template(LinearOpCGSolver) LinearOpCGSolver< ScaleOp >;
-%template(LinearSPDEOpCGSolver) LinearOpCGSolver< SPDEOp >;
+%template(LinearOpCGSolver) gstlrn::LinearOpCGSolver< ScaleOp >;
+%template(LinearSPDEOpCGSolver) gstlrn::LinearOpCGSolver< SPDEOp >;
