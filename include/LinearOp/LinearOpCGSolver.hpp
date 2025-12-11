@@ -75,10 +75,10 @@ private:
 };
 }
 
-
+using namespace gstlrn;
 #ifndef SWIG
 template<typename TLinOP>
-gstlrn::LinearOpCGSolver<TLinOP>::LinearOpCGSolver(const TLinOP* linop) : ALinearOpCGSolver()
+LinearOpCGSolver<TLinOP>::LinearOpCGSolver(const TLinOP* linop) : ALinearOpCGSolver()
 {
   if (linop == nullptr)
     throw("linop must be valid and inherit from ALinearOpEigenCG to use Eigen CG");
@@ -87,7 +87,7 @@ gstlrn::LinearOpCGSolver<TLinOP>::LinearOpCGSolver(const TLinOP* linop) : ALinea
 }
 
 template<typename TLinOP>
-void gstlrn::LinearOpCGSolver<TLinOP>::solve(const VectorDouble& rhs, VectorDouble& out)
+void LinearOpCGSolver<TLinOP>::solve(const VectorDouble& rhs, VectorDouble& out)
 {
   ::Eigen::Map<const ::Eigen::VectorXd> myRhs(rhs.data(), rhs.size());
   ::Eigen::Map<::Eigen::VectorXd> myOut(out.data(), out.size());
@@ -96,7 +96,7 @@ void gstlrn::LinearOpCGSolver<TLinOP>::solve(const VectorDouble& rhs, VectorDoub
 }
 
 template<typename TLinOP>
-void gstlrn::LinearOpCGSolver<TLinOP>::solve(
+void LinearOpCGSolver<TLinOP>::solve(
   const ::Eigen::Map<const ::Eigen::VectorXd>& rhs,
   ::Eigen::Map<Eigen::VectorXd>& out)
 {
@@ -104,7 +104,7 @@ void gstlrn::LinearOpCGSolver<TLinOP>::solve(
 }
 
 template<typename TLinOP>
-void gstlrn::LinearOpCGSolver<TLinOP>::solveWithGuess(const Eigen::Map<const Eigen::VectorXd>& rhs,
+void LinearOpCGSolver<TLinOP>::solveWithGuess(const Eigen::Map<const Eigen::VectorXd>& rhs,
                                               const Eigen::Map<const Eigen::VectorXd>& guess,
                                               Eigen::Map<Eigen::VectorXd>& out)
 {
@@ -112,7 +112,7 @@ void gstlrn::LinearOpCGSolver<TLinOP>::solveWithGuess(const Eigen::Map<const Eig
 }
 
 template<typename TLinOP>
-void gstlrn::LinearOpCGSolver<TLinOP>::solve(const constvect in, const vect out)
+void LinearOpCGSolver<TLinOP>::solve(const constvect in, const vect out)
 {
   Eigen::Map<const Eigen::VectorXd> inm(in.data(),in.size());
   Eigen::Map<Eigen::VectorXd> outm(out.data(),out.size());
@@ -120,7 +120,7 @@ void gstlrn::LinearOpCGSolver<TLinOP>::solve(const constvect in, const vect out)
 }
 
 template<typename TLinOP>
-void gstlrn::LinearOpCGSolver<TLinOP>::solveWithGuess(const constvect rhs,
+void LinearOpCGSolver<TLinOP>::solveWithGuess(const constvect rhs,
                                               const constvect guess,
                                               vect out)
 {
