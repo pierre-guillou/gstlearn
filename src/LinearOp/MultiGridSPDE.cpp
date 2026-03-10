@@ -139,11 +139,10 @@ namespace gstlrn
     _cova->optimizationPreProcessForData(dbcoarse);
     _cova->manage(dbcoarse, dbfine);
     CovAniso cova(*_cova);
-    static RankHandler* rkh = nullptr;
+    thread_local std::unique_ptr<RankHandler> rkh;
     VectorInt indices_p1;
     VectorDouble lambdas;
     VectorInt all_parents;
-#pragma omp threadprivate(rkh)
 #pragma omp parallel for firstprivate(                                         \
     indices_p1, lambdas, all_parents, ones, pin, pout, tabwork, cova, C, c0,   \
       weights, s1) schedule(guided) num_threads(nbthread)
@@ -154,9 +153,9 @@ namespace gstlrn
       all_parents.clear();
       int tid = omp_get_thread_num();
 
-      if (rkh == nullptr)
+      if (!rkh)
       {
-        rkh = new RankHandler(dbcoarse);
+        rkh = std::make_unique<RankHandler>(dbcoarse);
         dbfine->initThread();
         dbcoarse->initThread();
         mesh_c.initThread();
@@ -219,9 +218,7 @@ namespace gstlrn
 
 #pragma omp parallel num_threads(nbthread)
     {
-
-      delete rkh;
-      rkh = nullptr;
+      rkh.reset();
     }
     _cova->optimizationPostProcess();
 

@@ -160,19 +160,18 @@ namespace gstlrn
     ModelGeneric model(*ksys.getModel());
     auto ndim = getModelGeneric()->getSpace()->getNDim();
     const VectorVectorDouble coords = getDbout()->getAllCoordinates();
-    static ANeigh* neigh = nullptr;
+    thread_local std::unique_ptr<ANeigh> neigh;
 
     const double* selcol = getDbout()->getColumnPtr(ELoc::SEL, 0);
     bool hassel = getDbout()->hasLocator(ELoc::SEL);
-#pragma omp threadprivate(neigh)
 #pragma omp parallel for firstprivate(pin, pout, tabwork, algebra, model)      \
   schedule(guided) num_threads(nbthread) if (use_parallel)
     for (Id iech_out = 0; iech_out < nech_out; iech_out++)
     {
       if (hassel && !selcol[iech_out]) continue; // Skip non-selected targets
-      if (neigh == nullptr)
+      if (!neigh)
       {
-        neigh = static_cast<ANeigh*>(getNeigh()->clone());
+        neigh.reset(static_cast<ANeigh*>(getNeigh()->clone()));
         getDbout()->initThread();
       }
       else
@@ -184,7 +183,7 @@ namespace gstlrn
       {
         pin.setCoord(idim, coords[idim][iech_out]);
       }
-      ksys.estimate(iech_out, pin, pout, tabwork, algebra, model, neigh);
+      ksys.estimate(iech_out, pin, pout, tabwork, algebra, model, neigh.get());
 
       // Store the results in an API structure (only if flagSingleTarget)
       if (_iechSingleTarget >= 0)
@@ -193,8 +192,7 @@ namespace gstlrn
 
 #pragma omp parallel num_threads(nbthread) if (use_parallel)
     {
-      delete neigh;
-      neigh = nullptr;
+      neigh.reset();
     }
     ksys.conclusion();
 
