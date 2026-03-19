@@ -12,6 +12,7 @@
 
 #include "Estimation/ALikelihood.hpp"
 #include "LinearOp/CholeskyDense.hpp"
+#include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSquare.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
 #include "gstlearn_export.hpp"
@@ -35,7 +36,7 @@ namespace gstlrn
       bool reml = false,
       bool verbose = false);
     void evalGrad(vect res) override;
-    MatrixSparse& getQMat() const override;
+    const MatrixSparse& getQMat() const override;
 
   private:
     void _fillGradCovMat(RankHandler& rkh, const covmaptype& gradcov);
@@ -49,6 +50,7 @@ namespace gstlrn
     std::shared_ptr<MatrixSymmetric> _cov;
     CholeskyDense _covChol;
     MatrixSymmetric _gradCovMat;
+    MatrixSparse _dummy;
     VectorDouble _temp;
     MatrixSquare _gradCovMatTimesInvCov;
   };

@@ -25,12 +25,6 @@
 namespace gstlrn
 {
 
-  static MatrixSparse& getDummySparse()
-  {
-    static MatrixSparse instance;
-    return instance;
-  }
-
   Likelihood::Likelihood(ModelGeneric* model, const Db* db, bool reml)
     : ALikelihood(model, db, reml)
     , _cov(std::make_shared<MatrixSymmetric>(0))
@@ -93,10 +87,10 @@ namespace gstlrn
     }
   }
 
-  MatrixSparse& Likelihood::getQMat() const
+  const MatrixSparse& Likelihood::getQMat() const
   {
     messerr("getQMat is not implemented for Likelihood.");
-    return getDummySparse();
+    return _dummy;
   }
 
   void Likelihood::_computeCm1Yc()
