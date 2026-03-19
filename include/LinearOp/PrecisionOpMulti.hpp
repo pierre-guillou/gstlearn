@@ -48,7 +48,7 @@ namespace gstlrn
       bool buildOp = true);
     PrecisionOpMulti(const PrecisionOpMulti& m) = delete;
     PrecisionOpMulti& operator=(const PrecisionOpMulti& m) = delete;
-    virtual ~PrecisionOpMulti();
+    ~PrecisionOpMulti() override = default;
 
     /// AStringable Interface
     String toString(const AStringFormat* strfmt = nullptr) const override;
@@ -88,11 +88,10 @@ namespace gstlrn
     Id _buildGlobalMatricesStationary(Id icov);
     Id _buildLocalMatricesNoStat(Id icov);
     Id _buildMatrices();
-    void _popsClear();
     void _computeSize();
 
   protected:
-    std::vector<PrecisionOp*> _pops;
+    std::vector<std::unique_ptr<PrecisionOp>> _pops;
     VectorBool _isNoStatForVariance;
     std::vector<MatrixSymmetric> _sills;
     std::vector<std::vector<MatrixSymmetric>>

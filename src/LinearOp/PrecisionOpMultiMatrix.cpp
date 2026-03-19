@@ -15,6 +15,7 @@
 #include "LinearOp/PrecisionOpMulti.hpp"
 #include "Matrix/MatrixSparse.hpp"
 #include "Matrix/MatrixSymmetric.hpp"
+#include "Polynomials/APolynomial.hpp"
 
 namespace gstlrn
 {
@@ -96,7 +97,7 @@ namespace gstlrn
   {
     if (_isSingle())
     {
-      return dynamic_cast<const PrecisionOpMatrix*>(_pops[0])->getQ();
+      return dynamic_cast<const PrecisionOpMatrix*>(_pops[0].get())->getQ();
     }
     return &_Q;
   }
@@ -114,7 +115,7 @@ namespace gstlrn
     for (Id istruct = 0; istruct < _getNCov(); istruct++)
     {
       const MatrixSparse* Q =
-        dynamic_cast<const PrecisionOpMatrix*>(_pops[istruct])->getQ();
+        dynamic_cast<const PrecisionOpMatrix*>(_pops[istruct].get())->getQ();
 
       if (_model->getNVar() == 1)
       {
@@ -146,7 +147,8 @@ namespace gstlrn
     for (Id icov = 0, number = _getNCov(); icov < number; icov++)
     {
       CovAniso* cova = _model->getCovAniso(_getCovInd(icov));
-      _pops.push_back(new PrecisionOpMatrix(_meshes(icov), cova));
+      _pops.push_back(
+        std::make_unique<PrecisionOp>(PrecisionOpMatrix(_meshes(icov), cova)));
     }
   }
 

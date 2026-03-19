@@ -159,13 +159,10 @@ namespace gstlrn
     {
       CovAniso* cova = _model->getCovAniso(_covList[i]);
       bool localStencil = stencil && !cova->isNoStatForAnisotropy();
-      _pops.push_back(PrecisionOp::create(_meshes(i), cova, localStencil));
+      _pops.push_back(
+        std::unique_ptr<PrecisionOp>(
+          PrecisionOp::create(_meshes(i), cova, localStencil)));
     }
-  }
-
-  PrecisionOpMulti::~PrecisionOpMulti()
-  {
-    _popsClear();
   }
 
   /*****************************************************************************/
@@ -216,12 +213,6 @@ namespace gstlrn
     _meshes = meshes;
 
     return true;
-  }
-
-  void PrecisionOpMulti::_popsClear()
-  {
-    for (Id i = 0, n = static_cast<Id>(_pops.size()); i < n; i++)
-      delete _pops[i];
   }
 
   bool PrecisionOpMulti::_matchModelAndMeshes() const
