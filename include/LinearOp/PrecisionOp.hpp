@@ -39,7 +39,7 @@ namespace gstlrn
       bool stencil = false,
       bool verbose = false);
     PrecisionOp(const PrecisionOp& pmat);
-    PrecisionOp(PrecisionOp&& pmat) noexcept;
+    PrecisionOp(PrecisionOp&& pmat) = default;
     PrecisionOp& operator=(const PrecisionOp& pmat);
     PrecisionOp& operator=(PrecisionOp&& pmat) noexcept;
     virtual ~PrecisionOp();

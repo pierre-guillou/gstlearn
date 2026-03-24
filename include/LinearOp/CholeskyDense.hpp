@@ -29,9 +29,9 @@ namespace gstlrn
   {
   public:
     CholeskyDense(const MatrixSymmetric& mat = MatrixSymmetric());
-    CholeskyDense(const CholeskyDense& m);
-    CholeskyDense(CholeskyDense&& m) noexcept;
-    CholeskyDense& operator=(const CholeskyDense& m);
+    CholeskyDense(const CholeskyDense& m) = default;
+    CholeskyDense(CholeskyDense&& m) = default;
+    CholeskyDense& operator=(const CholeskyDense& m) = default;
     CholeskyDense& operator=(CholeskyDense&& m) noexcept;
     virtual ~CholeskyDense();
 

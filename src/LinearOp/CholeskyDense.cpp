@@ -30,35 +30,6 @@ namespace gstlrn
     (void)_prepare(mat);
   }
 
-  CholeskyDense::CholeskyDense(const CholeskyDense& m)
-    : ACholesky(m)
-    , _tl(m._tl)
-    , _xl(m._xl)
-    , _factor(m._factor)
-  {
-  }
-
-  CholeskyDense& CholeskyDense::operator=(const CholeskyDense& m)
-  {
-    if (this != &m)
-    {
-      ACholesky::operator=(m);
-      _tl = m._tl;
-      _xl = m._xl;
-      _factor = m._factor;
-      _empty = m._empty;
-    }
-    return *this;
-  }
-
-  CholeskyDense::CholeskyDense(CholeskyDense&& m) noexcept
-    : ACholesky(std::move(m))
-    , _tl(std::move(m._tl))
-    , _xl(std::move(m._xl))
-    , _factor(std::move(m._factor))
-  {
-  }
-
   CholeskyDense& CholeskyDense::operator=(CholeskyDense&& m) noexcept
   {
     if (this != &m)

@@ -26,7 +26,7 @@ namespace gstlrn
     ACholesky(const AMatrix& mat);
 
     ACholesky(const ACholesky& m) = default;
-    ACholesky(ACholesky&& m) noexcept;
+    ACholesky(ACholesky&& m) = default;
     ACholesky& operator=(const ACholesky& m) = default;
     ACholesky& operator=(ACholesky&& m) noexcept;
     virtual ~ACholesky() = default;

@@ -139,21 +139,6 @@ namespace gstlrn
     return *this;
   }
 
-  PrecisionOp::PrecisionOp(PrecisionOp&& pmat) noexcept
-    : ASimulable(std::move(pmat))
-    , IPrecisionOp(std::move(pmat))
-    , _shiftOp(pmat._shiftOp)
-    , _cova(pmat._cova)
-    , _polynomials(std::move(pmat._polynomials))
-    , _verbose(pmat._verbose)
-    , _training(pmat._training)
-    , _destroyShiftOp(pmat._destroyShiftOp)
-    , _userPoly(pmat._userPoly)
-  {
-    pmat._shiftOp = nullptr;
-    pmat._cova = nullptr;
-  }
-
   PrecisionOp& PrecisionOp::operator=(PrecisionOp&& pmat) noexcept
   {
     if (this != &pmat)

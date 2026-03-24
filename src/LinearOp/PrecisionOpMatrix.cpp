@@ -45,14 +45,6 @@ namespace gstlrn
     _buildQ();
   }
 
-  PrecisionOpMatrix::PrecisionOpMatrix(PrecisionOpMatrix&& pmat) noexcept
-    : PrecisionOp(std::move(pmat))
-    , ASimulableMatrix(pmat)
-    , _Q(std::move(pmat._Q))
-    , _chol(pmat._chol)
-  {
-  }
-
   PrecisionOpMatrix&
     PrecisionOpMatrix::operator=(PrecisionOpMatrix&& pmat) noexcept
   {

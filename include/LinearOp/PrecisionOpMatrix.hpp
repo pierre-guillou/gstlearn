@@ -34,7 +34,7 @@ namespace gstlrn
       bool verbose = false);
     PrecisionOpMatrix(const AMesh* mesh, CovAniso* cova, bool verbose = false);
     PrecisionOpMatrix(const PrecisionOpMatrix& pmat) = default;
-    PrecisionOpMatrix(PrecisionOpMatrix&& pmat) noexcept;
+    PrecisionOpMatrix(PrecisionOpMatrix&& pmat) = default;
     PrecisionOpMatrix& operator=(const PrecisionOpMatrix& pmat) = default;
     PrecisionOpMatrix& operator=(PrecisionOpMatrix&& pmat) noexcept;
     virtual ~PrecisionOpMatrix();

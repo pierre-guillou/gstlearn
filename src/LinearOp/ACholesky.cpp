@@ -21,13 +21,6 @@ namespace gstlrn
     _size = mat.getNRows();
   }
 
-  ACholesky::ACholesky(ACholesky&& m) noexcept
-    : ASimulable(std::move(m))
-    , _size(m._size)
-    , _ready(m._ready)
-  {
-  }
-
   ACholesky& ACholesky::operator=(ACholesky&& m) noexcept
   {
     if (this != &m)

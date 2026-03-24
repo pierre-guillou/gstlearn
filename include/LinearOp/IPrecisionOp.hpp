@@ -22,12 +22,7 @@ namespace gstlrn
   public:
     IPrecisionOp(); // default but see below
     IPrecisionOp(const IPrecisionOp&) = default;
-
-    IPrecisionOp(IPrecisionOp&& m) noexcept
-    {
-      if (this != &m) ASimulable::operator=(std::move(m));
-    }
-
+    IPrecisionOp(IPrecisionOp&& m) = default;
     IPrecisionOp& operator=(const IPrecisionOp&) = default;
 
     IPrecisionOp& operator=(IPrecisionOp&& m) noexcept
