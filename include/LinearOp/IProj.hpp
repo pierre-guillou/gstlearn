@@ -21,8 +21,8 @@ namespace gstlrn
 #ifndef SWIG
     IProj(const IProj&) = default;
     IProj& operator=(const IProj&) = default;
-    IProj(IProj&&) noexcept = default;
-    IProj& operator=(IProj&&) noexcept = default;
+    IProj(IProj&&) = default;
+    IProj& operator=(IProj&&) = default;
 #endif
     virtual ~IProj() = default;
 
