@@ -83,10 +83,7 @@ namespace gstlrn
     };
 #endif
 
-    void compute(
-      Db* dbout,
-      const VectorBool& activeArray,
-      VectorVectorDouble& tab);
+    void compute(Db* dbout, const VectorBool& activeArray, MatrixDense& tab);
     MatrixDense computeToMatrix(Db* dbout);
 
     bool _isValidNs(Id i) const { return (i >= 0) && (i < getNs()); };

@@ -75,9 +75,8 @@ namespace gstlrn
 
     bool _initializeSimulations() override;
     bool _simulate(Id isimu) override;
-    void
-      _compute(Db* db, const VectorBool& activeArray, VectorVectorDouble& tab)
-        override;
+    void _compute(Db* db, const VectorBool& activeArray, MatrixDense& tab)
+      override;
 
     bool _resize();
     void _computePoint(
@@ -86,20 +85,20 @@ namespace gstlrn
       const ECov& type,
       Id is,
       const VectorBool& activeArray,
-      VectorVectorDouble& tab);
+      MatrixDense& tab);
     void _computeGrid(
       DbGrid* db,
       const CovAniso* cova,
       const ECov& type,
       Id is,
       const VectorBool& activeArray,
-      VectorVectorDouble& tab);
+      MatrixDense& tab);
     void _scaleResults(
       Db* db,
       const CovBase* cova,
       const VectorBool& activeArray,
-      const VectorVectorDouble& tabLoc,
-      VectorVectorDouble& tab) const;
+      const MatrixDense& tabLoc,
+      MatrixDense& tab) const;
 
     // Turning bands specific methods
     Id _getIBS(Id is, Id ib) const;
@@ -156,9 +155,8 @@ namespace gstlrn
     void _setDensity();
     static ECov _particularCase(const CovAniso* cova, double eps = EPSILON7);
     void _initializeSeedBands();
-    void _normalizeForBands(
-      const VectorBool& activeArray,
-      VectorVectorDouble& tab) const;
+    void
+      _normalizeForBands(const VectorBool& activeArray, MatrixDense& tab) const;
     Id _getCorrec(
       const ECov& type,
       Id is,
@@ -198,7 +196,7 @@ namespace gstlrn
       double correc,
       TurningBandOperate& operTB,
       const VectorBool& activeArray,
-      VectorDouble& tab);
+      vect tab);
     void _spreadRegularOnPoint(
       const Db* db,
       const CovAniso* cova,
@@ -206,7 +204,7 @@ namespace gstlrn
       double correc,
       TurningBandOperate& operTB,
       const VectorBool& activeArray,
-      VectorDouble& tab);
+      vect tab);
     void _spreadSpectralOnGrid(
       const DbGrid* dbgrid,
       const CovAniso* cova,
@@ -214,7 +212,7 @@ namespace gstlrn
       double correc,
       TurningBandOperate& operTB,
       const VectorBool& activeArray,
-      VectorDouble& tab);
+      vect tab);
     void _spreadSpectralOnPoint(
       const Db* db,
       const CovAniso* cova,
@@ -222,7 +220,7 @@ namespace gstlrn
       double correc,
       TurningBandOperate& operTB,
       const VectorBool& activeArray,
-      VectorDouble& tab);
+      vect tab);
     void _extendBands();
     void _initializeBox();
 

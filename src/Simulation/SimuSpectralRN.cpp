@@ -76,7 +76,7 @@ namespace gstlrn
   void SimuSpectralRN::_compute(
     Db* db,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     if (_sp == nullptr) return;
 

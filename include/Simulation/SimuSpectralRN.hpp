@@ -46,9 +46,8 @@ namespace gstlrn
 
   protected:
     bool _simulate(Id isimu) override;
-    void
-      _compute(Db* db, const VectorBool& activeArray, VectorVectorDouble& tab)
-        override;
+    void _compute(Db* db, const VectorBool& activeArray, MatrixDense& tab)
+      override;
 
   private:
     // Matrix nrows=_ns, ncols= number of variables of _cova

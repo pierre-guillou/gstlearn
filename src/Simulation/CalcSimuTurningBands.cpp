@@ -831,7 +831,7 @@ namespace gstlrn
     double correc,
     TurningBandOperate& operTB,
     const VectorBool& activeArray,
-    VectorDouble& tabvar)
+    vect tabvar)
   {
     double t0y, t0z, t0;
 
@@ -874,7 +874,7 @@ namespace gstlrn
     double correc,
     TurningBandOperate& operTB,
     const VectorBool& activeArray,
-    VectorDouble& tabvar)
+    vect tabvar)
   {
     double c1, s1, c0x, s0x, c0y, s0y, c0z, s0z, cxp, sxp, cyp, syp, czp, szp;
     Id ndim = dbgrid->getNDim();
@@ -922,7 +922,7 @@ namespace gstlrn
     double correc,
     TurningBandOperate& operTB,
     const VectorBool& activeArray,
-    VectorDouble& tabvar)
+    vect tabvar)
   {
     double t0;
     for (Id iech = 0, nech = db->getNSample(); iech < nech; iech++)
@@ -940,7 +940,7 @@ namespace gstlrn
     double correc,
     TurningBandOperate& operTB,
     const VectorBool& activeArray,
-    VectorDouble& tabvar)
+    vect tabvar)
   {
     double t0;
     for (Id iech = 0, nech = db->getNSample(); iech < nech; iech++)
@@ -974,13 +974,13 @@ namespace gstlrn
   void CalcSimuTurningBands::_compute(
     Db* db,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     auto* dbgrid = dynamic_cast<DbGrid*>(db);
     bool flagGrid = (dbgrid != nullptr);
 
     VectorBool activeLoc; // Not used
-    VectorVectorDouble tabLoc;
+    MatrixDense tabLoc;
     _allocateForOneSimulation(db, getNVar(), activeLoc, tabLoc, false);
 
     for (Id icov = 0, ncova = _getNCov(); icov < ncova; icov++)
@@ -990,7 +990,7 @@ namespace gstlrn
       if (type == ECov::NUGGET) continue;
 
       // Blank out the array 'tab'
-      for (auto& v: tabLoc) v.fill(0.);
+      tabLoc.fill(0.);
 
       // Evaluate the multivariate simulation on the target samples for current structure
       if (flagGrid)
@@ -1018,8 +1018,8 @@ namespace gstlrn
     Db* db,
     const CovBase* cova,
     const VectorBool& activeArray,
-    const VectorVectorDouble& tabLoc,
-    VectorVectorDouble& tab) const
+    const MatrixDense& tabLoc,
+    MatrixDense& tab) const
   {
     auto nvar = getNVar();
     for (Id iech = 0, nech = db->getNSample(); iech < nech; iech++)
@@ -1039,10 +1039,10 @@ namespace gstlrn
    */
   void CalcSimuTurningBands::_normalizeForBands(
     const VectorBool& activeArray,
-    VectorVectorDouble& tab) const
+    MatrixDense& tab) const
   {
-    Id nvar = tab.size();
-    Id nech = tab[0].size();
+    Id nvar = tab.getNRows();
+    Id nech = tab.getNCols();
     auto nbtuba = getNbtuba();
     double norme = sqrt(1. / nbtuba);
 
@@ -1140,7 +1140,7 @@ namespace gstlrn
     const ECov& type,
     Id is,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     TurningBandOperate operTB;
     double correc;
@@ -1188,7 +1188,7 @@ namespace gstlrn
     const ECov& type,
     Id is,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     TurningBandOperate operTB;
     double correc;
@@ -1391,7 +1391,7 @@ namespace gstlrn
     /* Non conditional simulations on the data points */
     if (dbiso != nullptr)
     {
-      VectorVectorDouble tab;
+      MatrixDense tab;
       VectorBool activeArray;
       _allocateForOneSimulation(getDbout(), getNVar(), activeArray, tab);
       for (Id isimu = 0; isimu < getNbSimu(); isimu++)
@@ -1404,7 +1404,7 @@ namespace gstlrn
     /* Non conditional simulations on the gradient points */
     if (dbgrd != nullptr)
     {
-      VectorVectorDouble tab;
+      MatrixDense tab;
       VectorBool activeArray;
       _allocateForOneSimulation(getDbout(), 1, activeArray, tab);
       for (Id isimu = 0; isimu < getNbSimu(); isimu++)
@@ -1417,7 +1417,7 @@ namespace gstlrn
     /* Non conditional simulations on the tangent points */
     if (dbtgt != nullptr)
     {
-      VectorVectorDouble tab;
+      MatrixDense tab;
       VectorBool activeArray;
       _allocateForOneSimulation(getDbout(), 1, activeArray, tab);
       for (Id isimu = 0; isimu < getNbSimu(); isimu++)
@@ -1428,7 +1428,7 @@ namespace gstlrn
     }
 
     /* Non conditional simulations on the target samples */
-    VectorVectorDouble tab;
+    MatrixDense tab;
     VectorBool activeArray;
     _allocateForOneSimulation(getDbout(), getNVar(), activeArray, tab);
     for (Id isimu = 0; isimu < getNbSimu(); isimu++)

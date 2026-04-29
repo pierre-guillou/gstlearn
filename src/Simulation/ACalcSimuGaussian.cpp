@@ -112,8 +112,8 @@ namespace gstlrn
 
   bool ACalcSimuGaussian::_run()
   {
-    VectorVectorDouble tabOut;
-    VectorVectorDouble tabIn;
+    MatrixDense tabOut;
+    MatrixDense tabIn;
     VectorBool activeOut;
     VectorBool activeIn;
     _allocateForOneSimulation(getDbout(), getNVar(), activeOut, tabOut);
@@ -124,9 +124,8 @@ namespace gstlrn
     for (Id isimu = 0, nbsimu = getNbSimu(); isimu < nbsimu; isimu++)
     {
       if (getVerbose()) message(">>> computing simulation %d\n", isimu + 1);
-      for (auto& v: tabOut) v.fill(0.);
-      if (_isConditional())
-        for (auto& v: tabIn) v.fill(0.);
+      tabOut.fill(0.);
+      if (_isConditional()) tabIn.fill(0.);
 
       law_set_random_seed(getSeedPerSimu(isimu));
 
@@ -196,7 +195,7 @@ namespace gstlrn
     Id isimu,
     double delta,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     Id jsimu;
     Id ndim = dbgrd->getNDim();
@@ -204,8 +203,8 @@ namespace gstlrn
 
     // Core allocation
     VectorBool activeLoc; // Not used
-    VectorVectorDouble tab1;
-    VectorVectorDouble tab2;
+    MatrixDense tab1;
+    MatrixDense tab2;
     _allocateForOneSimulation(dbgrd, 1, activeLoc, tab1, false);
     _allocateForOneSimulation(dbgrd, 1, activeLoc, tab2, false);
 
@@ -268,7 +267,7 @@ namespace gstlrn
     Id isimu,
     double delta,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     Id icase = 0;
     auto nvar = getNVar();
@@ -304,10 +303,10 @@ namespace gstlrn
    *****************************************************************************/
   void ACalcSimuGaussian::_correctMean(
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     if (_getFlagBayes()) return;
-    Id nech = tab[0].size();
+    Id nech = tab.getNCols();
 
     for (Id ivar = 0, nvar = getNVar(); ivar < nvar; ivar++)
     {
@@ -357,7 +356,7 @@ namespace gstlrn
   void ACalcSimuGaussian::_convertToDifference(
     Id isimu,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     auto* dbin = getDbin();
     auto nbsimu = getNbSimu();
@@ -567,7 +566,7 @@ namespace gstlrn
   void ACalcSimuGaussian::_simulateNugget(
     Db* db,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     /* Do nothing if there is no nugget effect in the model */
     auto* modelLocal = dynamic_cast<Model*>(getModelGeneric());
@@ -666,7 +665,7 @@ namespace gstlrn
     Db* db,
     Id isimu,
     const VectorBool& activeArray,
-    const VectorVectorDouble& tab) const
+    const MatrixDense& tab) const
   {
     auto nbsimu = getNbSimu();
     auto nvar = getNVar();
@@ -692,12 +691,12 @@ namespace gstlrn
     const Db* db,
     Id nvar,
     VectorBool& activeArray,
-    VectorVectorDouble& tab,
+    MatrixDense& tab,
     bool flagActive)
   {
     auto nech = db->getNSample();
-    tab.resize(nvar);
-    for (Id ivar = 0; ivar < nvar; ivar++) tab[ivar].fill(0., nech);
+    tab.resize(nvar, nech);
+    tab.fill(0.);
 
     if (flagActive) activeArray = db->getActiveArray();
   }

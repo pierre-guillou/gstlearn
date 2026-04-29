@@ -864,7 +864,7 @@ namespace gstlrn
   void CalcSimuFFT::_compute(
     Db* db,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     DECLARE_UNUSED(db);
 

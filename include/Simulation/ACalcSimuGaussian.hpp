@@ -32,7 +32,7 @@ namespace gstlrn
       Db* db,
       Id isimu,
       const VectorBool& activeArray,
-      const VectorVectorDouble& tab) const;
+      const MatrixDense& tab) const;
 
     void setFlagBayes(bool flag_bayes) { _flagBayes = flag_bayes; }
 
@@ -79,7 +79,7 @@ namespace gstlrn
     }
 
     virtual void
-      _compute(Db* db, const VectorBool& activeArray, VectorVectorDouble& tab)
+      _compute(Db* db, const VectorBool& activeArray, MatrixDense& tab)
     {
       DECLARE_UNUSED(db);
       DECLARE_UNUSED(activeArray);
@@ -93,31 +93,29 @@ namespace gstlrn
       Id isimu,
       double delta,
       const VectorBool& activeArray,
-      VectorVectorDouble& tab);
+      MatrixDense& tab);
     void _computeTangent(
       Db* dbtgt,
       Id isimu,
       double delta,
       const VectorBool& activeArray,
-      VectorVectorDouble& tab);
-    void _correctMean(const VectorBool& activeArray, VectorVectorDouble& tab);
+      MatrixDense& tab);
+    void _correctMean(const VectorBool& activeArray, MatrixDense& tab);
     void _convertToDifference(
       Id isimu,
       const VectorBool& activeArray,
-      VectorVectorDouble& tab);
+      MatrixDense& tab);
     void _convertToDifferencesForGrid() const;
     void _updateDataToTarget() const;
     static void _allocateForOneSimulation(
       const Db* db,
       Id nvar,
       VectorBool& activeArray,
-      VectorVectorDouble& tab,
+      MatrixDense& tab,
       bool flagActive = true);
     Id _conditionalKriging();
-    void _simulateNugget(
-      Db* db,
-      const VectorBool& activeArray,
-      VectorVectorDouble& tab);
+    void
+      _simulateNugget(Db* db, const VectorBool& activeArray, MatrixDense& tab);
 
   private:
     Id _iattOut;

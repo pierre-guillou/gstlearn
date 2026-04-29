@@ -43,9 +43,8 @@ namespace gstlrn
 
     bool _initializeSimulations() override;
     bool _simulate(Id isimu) override;
-    void
-      _compute(Db* db, const VectorBool& activeArray, VectorVectorDouble& tab)
-        override;
+    void _compute(Db* db, const VectorBool& activeArray, MatrixDense& tab)
+      override;
 
     void _allocate();
     static Id _getNOptimalEven(Id number, Id largeFactor = 11);

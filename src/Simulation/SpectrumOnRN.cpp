@@ -82,7 +82,7 @@ namespace gstlrn
   void SpectrumOnRN::compute(
     Db* dbout,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     // Loop on the samples
     auto nech = dbout->getNSample();
@@ -105,16 +105,11 @@ namespace gstlrn
   {
     auto nvar = getNVar();
     auto nech = dbout->getNSample();
-    VectorVectorDouble tab(nvar);
-    for (Id ivar = 0; ivar < nvar; ivar++) tab[ivar].resize(nech);
+    MatrixDense tab(nvar, nech);
     VectorBool activeArray = dbout->getActiveArray();
     compute(dbout, activeArray, tab);
-    MatrixDense res(nech, nvar);
-    for (Id ivar = 0; ivar < nvar; ivar++)
-    {
-      res.setColumn(ivar, tab[ivar]);
-    }
-    return res;
+    tab.transposeInPlace();
+    return tab;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////

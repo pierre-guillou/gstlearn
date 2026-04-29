@@ -235,7 +235,7 @@ namespace gstlrn
   void SimuSpectralS2::_compute(
     Db* db,
     const VectorBool& activeArray,
-    VectorVectorDouble& tab)
+    MatrixDense& tab)
   {
     auto nech = db->getNSample();
 
@@ -365,7 +365,10 @@ namespace gstlrn
     }
 
     // Normalize
-    tab[0] *= sqrt(2. / nb);
+    for (auto &val: tab[0])
+    {
+      val *= std::sqrt(2. / nb);
+    }
   }
 
 } // namespace gstlrn

@@ -47,9 +47,8 @@ namespace gstlrn
 
   protected:
     bool _simulate(Id isimu) override;
-    void
-      _compute(Db* db, const VectorBool& activeArray, VectorVectorDouble& tab)
-        override;
+    void _compute(Db* db, const VectorBool& activeArray, MatrixDense& tab)
+      override;
 
   private:
     static void _printSpSim(const spSim& spsim, Id status = 0);

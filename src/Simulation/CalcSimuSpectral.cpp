@@ -76,7 +76,7 @@ namespace gstlrn
    */
   Id CalcSimuSpectral::computeSpectralTest(Db* dbout, Id isimu)
   {
-    VectorVectorDouble tab;
+    MatrixDense tab;
     VectorBool activeArray;
     _allocateForOneSimulation(dbout, _getNVar(), activeArray, tab);
 
