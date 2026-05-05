@@ -325,6 +325,16 @@ namespace gstlrn
       return res;
     }
 
+    vect operator[](const size_t i)
+    {
+      return vect{_eigenMatrix}.subspan(i * getNCols(), getNCols());
+    }
+
+    constvect operator[](const size_t i) const
+    {
+      return constvect{_eigenMatrix}.subspan(i * getNCols(), getNCols());
+    }
+
 #endif
 
 #ifndef SWIG
