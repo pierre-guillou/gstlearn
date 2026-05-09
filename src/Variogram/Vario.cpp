@@ -810,7 +810,7 @@ namespace gstlrn
         if (!db.isActive(jech)) continue;
 
         // Calculate the distance between the two samples
-        db.getDistanceVecInPlace(iech, jech, dd);
+        db.getDistanceVecInPlace(jech, iech, dd);
         if (!incr.empty()) dd += incr;
 
         // Evaluate the covariance matrix between two samples
@@ -2832,7 +2832,7 @@ namespace gstlrn
         {
           if (!db->isActiveAndDefined(jech, 0)) continue;
           for (Id idim = 0; idim < ndim; idim++)
-            d1[idim] = db->getDistance1D(iech, jech, idim);
+            d1[idim] = db->getDistance1D(jech, iech, idim);
           covtab = _model->evaluateOneGeneric(nullptr, d1);
           value += (c00 - covtab) * _DRFTAB.getValue(jjech, il);
           jjech++;
@@ -3543,7 +3543,7 @@ namespace gstlrn
       for (Id jjech = ideb; jjech < nech; jjech++)
       {
         jech = rindex[jjech];
-        if (db->getDistance1D(iech, jech) > maxdist) break;
+        if (db->getDistance1D(jech, iech) > maxdist) break;
         if (hasSel && !db->isActive(jech)) continue;
         if (hasWeight && FFFF(db->getWeight(jech))) continue;
         db->getSampleAsSTInPlace(jech, T2);
@@ -3707,7 +3707,7 @@ namespace gstlrn
       for (Id jjech = ideb; jjech < nech; jjech++)
       {
         jech = rindex[jjech];
-        if (db->getDistance1D(iech, jech) > maxdist) break;
+        if (db->getDistance1D(jech, iech) > maxdist) break;
         if (hasSel && !db->isActive(jech)) continue;
         if (hasWeight && FFFF(db->getWeight(jech))) continue;
         db->getSampleAsSTInPlace(jech, T2);
@@ -4170,7 +4170,7 @@ namespace gstlrn
         for (Id jjech = ideb; jjech < nech; jjech++)
         {
           Id jech = rindex[jjech];
-          if (db->getDistance1D(iech, jech) > maxdist) break;
+          if (db->getDistance1D(jech, iech) > maxdist) break;
           if (hasSel && !db->isActive(jech)) continue;
           if (hasWeight && FFFF(db->getWeight(jech))) continue;
           db->getSampleAsSTInPlace(jech, T2);
@@ -4371,7 +4371,7 @@ namespace gstlrn
       for (Id jjech = iiech + 1; jjech < nech; jjech++)
       {
         jech = rindex[jjech];
-        if (db->getDistance1D(iech, jech) > maxdist) break;
+        if (db->getDistance1D(jech, iech) > maxdist) break;
         if (hasSel && !db->isActive(jech)) continue;
         if (hasWeight && FFFF(db->getWeight(jech))) continue;
         db->getSampleAsSTInPlace(jech, T2);
