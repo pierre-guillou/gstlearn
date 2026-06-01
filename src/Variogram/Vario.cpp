@@ -36,6 +36,8 @@
 #include "Variogram/Vario.hpp"
 #include "Variogram/VarioParam.hpp"
 
+#include <memory>
+
 namespace gstlrn
 {
   static Id NWGT[4] = {2, 3, 4, 5};
@@ -5617,18 +5619,21 @@ namespace gstlrn
     double tolang,
     bool verbose)
   {
-    VarioParam* varioparam = nullptr;
+    std::unique_ptr<VarioParam> varioparam;
     auto space = SpaceRN::create(db->getNDim());
     if (ndir > 1)
-      varioparam = VarioParam::createMultiple(
-        ndir, nlag, dlag, toldis, 0., 0., VectorDouble(), space);
+      varioparam.reset(
+        VarioParam::createMultiple(
+          ndir, nlag, dlag, toldis, 0., 0., VectorDouble(), space));
     else if (!angles.empty())
-      varioparam = VarioParam::createSeveral2D(
-        angles, nlag, dlag, toldis, tolang, 0., VectorDouble(), space);
+      varioparam.reset(
+        VarioParam::createSeveral2D(
+          angles, nlag, dlag, toldis, tolang, 0., VectorDouble(), space));
     else
-      varioparam = VarioParam::createOmniDirection(
-        nlag, dlag, toldis, 0, 0, TEST, TEST, 0., VectorDouble(), 0.,
-        VectorDouble(), space);
+      varioparam.reset(
+        VarioParam::createOmniDirection(
+          nlag, dlag, toldis, 0, 0, TEST, TEST, 0., VectorDouble(), 0.,
+          VectorDouble(), space));
 
     auto* vario = new Vario(*varioparam);
     if (vario->compute(
