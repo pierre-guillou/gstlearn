@@ -49,7 +49,11 @@ namespace gstlrn
     double getCoord(Id idim) const;
     void setCoord(double coord);
 
-    void setCoord(Id i, double val) { _coord[i] = val; }
+    void setCoord(Id i, double val)
+    {
+      _coord.resize(getNDim());
+      _coord[i] = val;
+    }
 
     void setCoords(const VectorDouble& coord);
 

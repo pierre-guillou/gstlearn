@@ -104,10 +104,18 @@ namespace gstlrn
   void SpacePoint::setCoords(const double* coord, Id size)
   {
     if (static_cast<Id>(getNDim()) != size)
+    {
       std::cout << "Error: Wrong number of coordinates. Point not modified."
                 << std::endl;
+    }
     else
-      for (Id idim = 0; idim < size; idim++) _coord[idim] = coord[idim];
+    {
+      _coord.resize(getNDim());
+      for (Id idim = 0; idim < size; idim++)
+      {
+        _coord[idim] = coord[idim];
+      }
+    }
   }
 
   bool SpacePoint::isConsistent(const ASpace* space) const
