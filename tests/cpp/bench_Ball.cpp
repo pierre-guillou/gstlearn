@@ -114,8 +114,7 @@ int main(int argc, char* argv[])
       Id iech = ranks[jech];
       data->getSampleAsSPInPlace(pt2, iech);
       ball.setAvailable(iech, true);
-      (void)ball.queryOneInPlace(
-        pt2.getCoordsUnprotected(), nb_neigh, neighs, distances);
+      (void)ball.queryOneInPlace(pt2.getCoords(), nb_neigh, neighs, distances);
       printVector(neighs, "Indices of the neighbors", true, true);
     }
   }

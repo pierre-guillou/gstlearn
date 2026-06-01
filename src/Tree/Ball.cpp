@@ -303,8 +303,8 @@ namespace gstlrn
       Id iech = ranks[jech];
       if (!dbin->isActive(iech)) continue;
       dbin->getSampleAsSPInPlace(pt, iech);
-      (void)ball.queryOneInPlace(
-        pt.getCoordsUnprotected(), nb_neigh - 1, neighs, distances);
+      (void)
+        ball.queryOneInPlace(pt.getCoords(), nb_neigh - 1, neighs, distances);
       for (Id i = 0; i < nb_neigh - 1; i++) mat(irel, i + 1) = neighs[i];
       mat(irel, 0) = iech;
       ball.setAvailable(
@@ -330,8 +330,7 @@ namespace gstlrn
         ball.setAvailable(
           iech + shift,
           true); // Provide absolute ranks (even when selection is present)
-        (void)ball.queryOneInPlace(
-          pt.getCoordsUnprotected(), nb_neigh, neighs, distances);
+        (void)ball.queryOneInPlace(pt.getCoords(), nb_neigh, neighs, distances);
         for (Id i = 0; i < nb_neigh; i++) mat(irel, i) = neighs[i];
 
         if (verbose)
