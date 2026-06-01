@@ -168,9 +168,11 @@ int main(int argc, char* argv[])
   mestitle(0, "Manipulation of variogram assessors");
 
   // Create a 2-D data set and calculate an omni-directional variogram
-  auto* dat = Db::createFillRandom(10, 2, 2);
-  auto* varioParam = VarioParam::createOmniDirection(10, 0.1);
-  auto* vario = Vario::computeFromDb(*varioParam, dat);
+  auto dat = std::unique_ptr<Db>(Db::createFillRandom(10, 2, 2));
+  auto varioParam =
+    std::unique_ptr<VarioParam>(VarioParam::createOmniDirection(10, 0.1));
+  auto vario =
+    std::unique_ptr<Vario>(Vario::computeFromDb(*varioParam, dat.get()));
   vario->display();
 
   bool compress = true;
