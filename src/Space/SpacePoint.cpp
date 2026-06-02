@@ -110,6 +110,13 @@ namespace gstlrn
       for (Id idim = 0; idim < size; idim++) _coord[idim] = coord[idim];
   }
 
+  void SpacePoint::setSpace(ASpaceSharedPtr&& space)
+  {
+    ASpaceObject::setSpace(std::move(space));
+    // make SpacePoint consistent
+    _coord.resize(_space->getNDim());
+  }
+
   bool SpacePoint::isConsistent(const ASpace* space) const
   {
     DECLARE_UNUSED(space)
