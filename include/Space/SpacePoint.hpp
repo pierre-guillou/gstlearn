@@ -63,6 +63,8 @@ namespace gstlrn
 
     bool isProjected() const { return _isProjected; }
 
+    void setSpace(ASpaceSharedPtr&& space) override;
+
     /// Return true if the point is consistent with the provided space
     bool isConsistent(const ASpace* space) const override;
 
