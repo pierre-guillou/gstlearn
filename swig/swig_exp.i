@@ -10,11 +10,18 @@
 
 // Export VectorXXX classes
 %include Basic/VectorT.hpp
+typedef unsigned char UChar; // Add to allow aliasing Boolean and UChar
+typedef std::string String; // Idem entre String et std::string
 %template(VectorTInt)         gstlrn::VectorT< long long >;
 %template(VectorTDouble)      gstlrn::VectorT< double >;
 %template(VectorTFloat)       gstlrn::VectorT< float >;
 %template(VectorBool)         gstlrn::VectorT< UChar >; // See VectorT.hpp
 %template(VectorString)       gstlrn::VectorT< String >;
+// TODO test
+%extend gstlrn::VectorT<gstlrn::String> {
+    int foocoucou() { return 123; }
+}
+
 
 %include Basic/VectorNumT.hpp
 %template(VectorInt)          gstlrn::VectorNumT< long long >;
@@ -73,6 +80,7 @@
 %include Enum/EPostStat.hpp
 %include Enum/EFormatNF.hpp
 %include Enum/ESimuType.hpp
+%include Enum/ERole.hpp
 
 %include Basic/ArgumentTest.hpp
 %include Basic/AStringable.hpp
@@ -343,6 +351,25 @@
 %include Db/DbHelper.hpp
 %include Db/RankHandler.hpp
 
+%include "DataBase/RoleID.hpp"
+%include "DataBase/ColID.hpp"
+
+// Specific Typemap for ColIDs and std::optional (used by methods listed below)
+#ifdef SWIGPYTHON
+%include "typemaps_optional_python.i"
+%include "typemaps_colID_python.i"
+#endif
+
+#ifdef SWIGR
+%include "typemaps_optional_r.i"
+%include "typemaps_colID_r.i"
+#endif
+
+%include "DataBase/DbData.hpp"
+%include "DataBase/DbCol.hpp"
+//%include DataBase/Dictionary.hpp
+//%include DataBase/VectorCategory.hpp
+
 %include Anamorphosis/CalcAnamTransform.hpp
 %include Anamorphosis/AAnam.hpp
 %include Anamorphosis/AnamContinuous.hpp
@@ -467,3 +494,20 @@
 
 %template(LinearOpCGSolver) LinearOpCGSolver< ScaleOp >;
 %template(LinearSPDEOpCGSolver) LinearOpCGSolver< SPDEOp >;
+
+// In DbData: addColumn()
+%template(addColumnEmptyD)  gstlrn::DbData::addColumnEmpty<VectorDouble>;
+%template(addColumnEmptyF)  gstlrn::DbData::addColumnEmpty<VectorFloat>;
+%template(addColumnEmptyI)  gstlrn::DbData::addColumnEmpty<VectorInt>;
+%template(addColumnEmptyU)  gstlrn::DbData::addColumnEmpty<VectorUChar>;
+%template(addColumnEmptyS)  gstlrn::DbData::addColumnEmpty<VectorString>;
+%template(addColumnEmptyB)  gstlrn::DbData::addColumnEmpty<VectorBool>;
+//%template(addColumnEmptyC)  gstlrn::DbData::addColumnEmpty<VectorCategory>;
+
+%template(addColumnD)  gstlrn::DbData::addColumn<VectorDouble>;
+%template(addColumnF)  gstlrn::DbData::addColumn<VectorFloat>;
+%template(addColumnI)  gstlrn::DbData::addColumn<VectorInt>;
+%template(addColumnU)  gstlrn::DbData::addColumn<VectorUChar>;
+%template(addColumnS)  gstlrn::DbData::addColumn<VectorString>;
+%template(addColumnB)  gstlrn::DbData::addColumn<VectorBool>;
+//%template(addColumnC)  gstlrn::DbData::addColumn<VectorCategory>;

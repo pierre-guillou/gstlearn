@@ -29,6 +29,25 @@ namespace gstlrn
     /**
      * @brief Map values to corresponding HDF5 C++ types
      */
+    template<typename T>
+    const H5::PredType& getHDF5PredType()
+    {
+      if constexpr (std::is_same_v<T, double>)
+        return H5::PredType::NATIVE_DOUBLE;
+      else if constexpr (std::is_same_v<T, float>)
+        return H5::PredType::NATIVE_FLOAT;
+      else if constexpr (std::is_same_v<T, int>)
+        return H5::PredType::NATIVE_INT;
+      else if constexpr (std::is_same_v<T, Id>)
+        return H5::PredType::NATIVE_LLONG;
+      else if constexpr (std::is_same_v<T, unsigned char>)
+        return H5::PredType::NATIVE_UCHAR;
+      else if constexpr (std::is_same_v<T, bool>)
+        return H5::PredType::NATIVE_HBOOL;
+      else
+        static_assert(!sizeof(T), "Unsupported HDF5 type");
+    }
+
     inline H5::DataType getHDF5Type([[maybe_unused]] const I32 a)
     {
       return H5::PredType::NATIVE_INT;

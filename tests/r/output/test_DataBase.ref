@@ -1,0 +1,15 @@
+Checking that the DbData is empty
+The Data Base contains 0 columns of 0 samples
+
+Adding Columns of various types
+===============================
+- Column 0 of type Double with role X, filled with [1.0, 2.0, 3.0]
+- Column 1 of type Int, filled with [5, 6, 7]
+- Column 2 of type Bool, filled with [1, 0, 1]
+- Column 3 of type String, filled with ['foo', 'bar', 'baz']
+
+DbData is not empty anymore
+The Data Base contains 3 columns of 3 samples
+Column 0/3 : hello (Double) {Role: x1}
+Column 1/3 : world (Int) {Role: z1}
+Column 2/3 : foobool (Bool) {Role: NA}

@@ -50,6 +50,7 @@
   #include "Enum/EPostUpscale.hpp"
   #include "Enum/EPostStat.hpp"
   #include "Enum/ESimuType.hpp"
+  #include "Enum/ERole.hpp"
 
   #include "Basic/VectorT.hpp"
   #include "Basic/VectorNumT.hpp"
@@ -312,6 +313,13 @@
   #include "Db/DbStringFormat.hpp"
   #include "Db/DbHelper.hpp"
   #include "Db/RankHandler.hpp"
+
+  #include "DataBase/ColID.hpp"
+  #include "DataBase/RoleID.hpp"
+  #include "DataBase/DbCol.hpp"
+  #include "DataBase/DbData.hpp"
+  //#include "DataBase/Dictionary.hpp"
+  //#include "DataBase/VectorCategory.hpp"
 
   #include "Anamorphosis/CalcAnamTransform.hpp"
   #include "Anamorphosis/AAnam.hpp"
@@ -1252,6 +1260,123 @@ namespace gstlrn {
   {
     return VectorHelper::divideCst(v1, v2, flagOpposite);
   }
+
+}
+
+%extend gstlrn::DbData {
+
+//----> In DbData: getValue()
+
+double getValueD(ColID&& colid, Id isample, double def = -1.)
+{
+  return $self->getValue<double>(std::move(colid), isample).value_or(def);
+}
+
+float getValueF(ColID&& colid, Id isample, float def = -1.)
+{
+  return $self->getValue<float>(std::move(colid), isample).value_or(def);
+}
+
+Id getValueI(ColID&& colid, Id isample, Id def = -1)
+{
+  return $self->getValue<Id>(std::move(colid), isample).value_or(def);
+}
+
+UChar getValueU(ColID&& colid, Id isample, UChar def = 0)
+{
+  return $self->getValue<UChar>(std::move(colid), isample).value_or(def);
+}
+
+String getValueS(ColID&& colid, Id isample,
+                 const String& def = String("failed"))
+{
+  return $self->getValue<String>(std::move(colid), isample).value_or(def);
+}
+
+bool getValueB(ColID&& colid, Id isample, bool def = false)
+{
+  return $self->getValue<bool>(std::move(colid), isample).value_or(def);
+}
+
+//Dictionary::Category getValueC(ColID&& colid, Id isample,
+//          const Dictionary::Category& def = Dictionary::Category())
+//{
+//    return $self->getValue<Dictionary::Category>(std::move(colid), isample).value_or(def);
+//}
+
+//----> In DbData: setValue()
+
+void setValueD(ColID&& colid, Id isample, double value)
+{
+  $self->setValue<double>(std::move(colid), isample, value);
+}
+
+void setValueF(ColID&& colid, Id isample, float value)
+{
+  $self->setValue<float>(std::move(colid), isample, value);
+}
+
+void setValueI(ColID&& colid, Id isample, Id value)
+{
+  $self->setValue<Id>(std::move(colid), isample, value);
+}
+
+void setValueU(ColID&& colid, Id isample, UChar value)
+{
+  $self->setValue<UChar>(std::move(colid), isample, value);
+}
+
+void setValueS(ColID&& colid, Id isample, const String& value)
+{
+  $self->setValue<String>(std::move(colid), isample, value);
+}
+
+void setValueB(ColID&& colid, Id isample, bool value)
+{
+  $self->setValue<bool>(std::move(colid), isample, value);
+}
+
+//void setValueC(ColID&& colid, Id isample, const Dictionary::Category& value)
+//{
+//    $self->setValue<Dictionary::Category>(std::move(colid), isample, value);
+//}
+
+//----> In DbData: getColumn()
+
+VectorDouble getColumnD(ColID&& colid)
+{
+  return $self->getColumn<VectorDouble>(std::move(colid));
+}
+
+VectorFloat getColumnF(ColID&& colid)
+{
+  return $self->getColumn<VectorFloat>(std::move(colid));
+}
+
+VectorInt getColumnI(ColID&& colid)
+{
+  return $self->getColumn<VectorInt>(std::move(colid));
+}
+
+VectorUChar getColumnU(ColID&& colid)
+{
+  return $self->getColumn<VectorUChar>(std::move(colid));
+}
+
+VectorString getColumnS(ColID&& colid)
+{
+  return $self->getColumn<VectorString>(std::move(colid));
+}
+
+VectorBool getColumnB(ColID&& colid)
+{
+  return $self->getColumn<VectorBool>(std::move(colid));
+}
+
+//VectorCategory getColumnC(ColID&& colid)
+//{
+//  return $self->getColumn<VectorCategory>(std::move(colid));
+//}
 
 }
 

@@ -876,6 +876,7 @@ namespace gstlrn
   $1 = PyUnicode_Check($input) || PyBytes_Check($input);
 }
 }//namespace gstlrn
+
 //////////////////////////////////////////////////////////////
 //         C++ library SWIG includes and typemaps           //
 //////////////////////////////////////////////////////////////
@@ -944,7 +945,13 @@ namespace gstlrn {
 %extend VectorNumT<float> {
   std::string __repr__() {  return $self->toString(); }
 }
-%extend VectorNumT<UChar> {
+%extend VectorT<UChar> {
+  std::string __repr__() {  return $self->toString(); }
+}
+%extend VectorT<unsigned char>{
+  std::string __repr__() {  return $self->toString(); }
+}
+%extend VectorT<std::string>{
   std::string __repr__() {  return $self->toString(); }
 }
 %extend VectorNumT<VectorNumT<long long> > {

@@ -4,6 +4,7 @@ This file contains the logs between consecutive releases
 
 Release 1.12.0
 ==============
+- Suppressing the warnings when producing R version (typemaps errors)
 - krigingVecchia can now handle any drift.
 - new function krigWeight and xvalidWeight to store the kriging weights in dbin.
 - db_vmap() is now called vmapFromDb()

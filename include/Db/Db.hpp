@@ -10,22 +10,20 @@
 /******************************************************************************/
 #pragma once
 
-#include "Space/ASpace.hpp"
-#include "gstlearn_export.hpp"
-
-#include "Enum/ELoadBy.hpp"
-#include "Enum/EStatOption.hpp"
-
 #include "Basic/ASerializable.hpp"
 #include "Basic/AStringable.hpp"
 #include "Basic/CSVformat.hpp"
 #include "Basic/ICloneable.hpp"
 #include "Basic/Limits.hpp"
 #include "Basic/NamingConvention.hpp"
-#include "Db/DbCol.hpp"
+#include "DataBase/DbData.hpp"
 #include "Db/PtrGeos.hpp"
+#include "Enum/ELoadBy.hpp"
+#include "Enum/EStatOption.hpp"
 #include "Matrix/MatrixDense.hpp"
 #include "Matrix/Table.hpp"
+#include "Space/ASpace.hpp"
+#include "gstlearn_export.hpp"
 
 namespace gstlrn
 {
@@ -1111,7 +1109,7 @@ namespace gstlrn
       auto icol = getColIdxByUID(iuid);
       if (!isColIdxValid(icol)) return dummy;
       if (!isSampleIndexValid(iech)) return dummy;
-      auto& vec = _data.GetArray(icol)->get().getVector<VectorDouble>()->get();
+      auto& vec = _data.getColumn<VectorDouble>(icol);
       return vec[iech];
     }
 
@@ -1123,7 +1121,7 @@ namespace gstlrn
       auto icol = getColIdxByUID(iuid);
       if (!isColIdxValid(icol)) return dummy;
       if (!isSampleIndexValid(iech)) return dummy;
-      return *_data.getValue<double>(iech, icol);
+      return *_data.getValue<double>(icol, iech);
     }
 
   protected:
@@ -1206,6 +1204,11 @@ namespace gstlrn
     bool
       _isCountValid(const VectorInt& iuids, bool flagOne, bool verbose = true)
         const;
+
+    static ERole toRole(const ELoc& loc)
+    {
+      return ERole::fromKey(loc.getKey());
+    }
 
   protected:
     void _defineVariableAndLocators(

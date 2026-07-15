@@ -517,7 +517,7 @@ namespace gstlrn
     {
       for (Id i = 0; i < ncol; ++i)
       {
-        _data.AddArray(VectorDouble(nech), _colNames[i]);
+        _data.addColumnEmpty<VectorDouble>(_colNames[i], nech);
       }
     }
   }
@@ -533,7 +533,7 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return;
     auto icol = getColIdxByUID(iuid);
     if (!isColIdxValid(icol)) return;
-    _data.setValue(iech, icol, 0, value);
+    _data.setValue(icol, iech, value);
   }
 
   /**
@@ -549,7 +549,7 @@ namespace gstlrn
     auto icol = getColIdxByUID(iuid);
     if (!isColIdxValid(icol)) return;
     for (Id i = 0, n = static_cast<Id>(iechs.size()); i < n; i++)
-      _data.setValue(iechs[i], icol, 0, values[i]);
+      _data.setValue(icol, iechs[i], values[i]);
   }
 
   /**
@@ -589,7 +589,7 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return (TEST);
     auto icol = getColIdxByUID(iuid);
     if (!isColIdxValid(icol)) return (TEST);
-    return *_data.getValue<double>(iech, icol);
+    return *_data.getValue<double>(icol, iech);
   }
 
   /**
@@ -606,7 +606,7 @@ namespace gstlrn
     if (!isColIdxValid(icol)) return;
     for (Id i = 0, n = static_cast<Id>(iechs.size()); i < n; i++)
     {
-      values[i] = *_data.getValue<double>(iechs[i], icol);
+      values[i] = *_data.getValue<double>(icol, iechs[i]);
     }
   }
 
@@ -672,9 +672,9 @@ namespace gstlrn
     auto icol = getColIdxByUID(iuid);
     if (!isColIdxValid(icol)) return;
 
-    double oldval = *_data.getValue<double>(iech, icol);
+    double oldval = *_data.getValue<double>(icol, iech);
     double newval = modifyOperator(oper, oldval, value);
-    _data.setValue(iech, icol, 0, newval);
+    _data.setValue(icol, iech, newval);
   }
 
   void Db::updArrayVec(
@@ -688,9 +688,9 @@ namespace gstlrn
 
     for (Id i = 0, n = static_cast<Id>(iechs.size()); i < n; i++)
     {
-      double oldval = *_data.getValue<double>(iechs[i], icol);
+      double oldval = *_data.getValue<double>(icol, iechs[i]);
       double newval = modifyOperator(oper, oldval, values[i]);
-      _data.setValue(iechs[i], icol, 0, newval);
+      _data.setValue(icol, iechs[i], newval);
     }
   }
 
@@ -896,7 +896,7 @@ namespace gstlrn
     {
       auto icol = getColIdxByLocator(ELoc::X, idim);
       if (icol < 0) continue;
-      coor[idim] = *_data.getValue<double>(iech, icol);
+      coor[idim] = *_data.getValue<double>(icol, iech);
     }
   }
 
@@ -1029,7 +1029,7 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return;
     auto icol = getColIdxByLocator(ELoc::X, idim);
     if (!isColIdxValid(icol)) return;
-    _data.setValue(iech, icol, 0, value);
+    _data.setValue(icol, iech, value);
   }
 
   void Db::setCoordinates(Id idim, const VectorDouble& coor, bool useSel)
@@ -1063,7 +1063,7 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return;
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (!isColIdxValid(icol)) return;
-    _data.setValue(iech, icol, 0, value);
+    _data.setValue(icol, iech, value);
   }
 
   double
@@ -1072,14 +1072,14 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return TEST;
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (!isColIdxValid(icol)) return TEST;
-    return *_data.getValue<double>(iech, icol);
+    return *_data.getValue<double>(icol, iech);
   }
 
   const double* Db::getColumnPtr(const ELoc& locatorType, Id locatorIndex)
   {
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (icol < 0) return nullptr;
-    return _data.GetArray(icol)->get().getVector<VectorDouble>()->get().data();
+    return _data.getColumn<VectorDouble>(icol).data();
   }
 
   bool Db::hasLocator(const ELoc& locatorType) const
@@ -1399,7 +1399,7 @@ namespace gstlrn
 
     for (Id i = ncol; i < nnew; ++i)
     {
-      _data.AddArray(VectorDouble(_nech), _colNames[i]);
+      _data.addColumnEmpty<VectorDouble>(_colNames[i], _nech);
     }
 
     // Initialize the variables with a given value
@@ -1446,7 +1446,7 @@ namespace gstlrn
 
     for (Id i = 0; i < nnew; ++i)
     {
-      _data.AddArray(VectorDouble(_nech), _colNames[i]);
+      _data.addColumn(_colNames[i], VectorDouble(_nech));
     }
 
     /* Dimension the UID pointer */
@@ -1949,10 +1949,7 @@ namespace gstlrn
 
     /* Copy the array */
 
-    for (Id icol = 0; icol < _ncol; icol++)
-    {
-      _data.GetArray(icol)->get().addSamples(nadd, valinit);
-    }
+    _data.addSamples(nadd, valinit);
 
     /* Core deallocation */
 
@@ -2017,10 +2014,7 @@ namespace gstlrn
 
     /* Copy the array */
 
-    for (Id icol = 0; icol < _ncol; icol++)
-    {
-      _data.GetArray(icol)->get().deleteSample(e_del);
-    }
+    _data.deleteSample(e_del);
 
     /* Core deallocation */
 
@@ -2063,7 +2057,7 @@ namespace gstlrn
       _uidcol[iuid]--;
     }
 
-    _data.RemoveArray(c_del);
+    _data.removeColumn(c_del);
 
     /* Resize the variable pointers */
 
@@ -2580,7 +2574,7 @@ namespace gstlrn
           || !hasLocator(ELoc::DOM))
       {
         for (Id iech = 0; iech < _nech; iech++)
-          _data.setValue(iech, icol, 0, flagCst ? valinit : law_gaussian());
+          _data.setValue(icol, iech, flagCst ? valinit : law_gaussian());
       }
       else
       {
@@ -2588,9 +2582,9 @@ namespace gstlrn
         {
           value = getFromLocator(ELoc::DOM, iech, 0);
           if (GlobalEnvironment::getEnv()->matchDomainReference(value))
-            _data.setValue(iech, icol, 0, value);
+            _data.setValue(icol, iech, value);
           else
-            _data.setValue(iech, icol, 0, TEST);
+            _data.setValue(icol, iech, TEST);
         }
       }
     }
@@ -2617,7 +2611,7 @@ namespace gstlrn
     {
       if (!isColIdxValid(icol)) return TEST;
     }
-    return *_data.getValue<double>(iech, icol);
+    return *_data.getValue<double>(icol, iech);
   }
 
   VectorDouble Db::getValuesByNames(
@@ -2670,7 +2664,7 @@ namespace gstlrn
       if (!isColIdxValid(icol)) return;
       if (!isSampleIndexValid(iech)) return;
     }
-    _data.setValue(iech, icol, 0, value);
+    _data.setValue(icol, iech, value);
   }
 
   void Db::setValueByUID(Id iech, Id iuid, double value, bool flagCheck)
@@ -2681,7 +2675,7 @@ namespace gstlrn
       if (!isColIdxValid(icol)) return;
       if (!isSampleIndexValid(iech)) return;
     }
-    _data.setValue(iech, icol, 0, value);
+    _data.setValue(iech, icol, value);
   }
 
   void Db::setValuesByNames(
@@ -2721,7 +2715,7 @@ namespace gstlrn
           Id iech = iechs[j];
           if (!isColIdxValid(icol)) return;
           if (!isSampleIndexValid(iech)) return;
-          _data.setValue(iech, icol, 0, values[lec++]);
+          _data.setValue(icol, iech, values[lec++]);
         }
     }
     else
@@ -2733,7 +2727,7 @@ namespace gstlrn
           Id iech = iechs[j];
           if (!isColIdxValid(icol)) return;
           if (!isSampleIndexValid(iech)) return;
-          _data.setValue(iech, icol, 0, values[lec++]);
+          _data.setValue(icol, iech, values[lec++]);
         }
     }
   }
@@ -2852,9 +2846,9 @@ namespace gstlrn
     auto icol = getColIdxByLocator(loctype, item);
     if (icol < 0) return;
 
-    const double oldval = *_data.getValue<double>(iech, icol);
+    const double oldval = *_data.getValue<double>(icol, iech);
     const double newval = modifyOperator(oper, oldval, value);
-    _data.setValue(iech, icol, 0, newval);
+    _data.setValue(icol, iech, newval);
   }
 
   void Db::updZVariable(Id iech, Id item, const EOperator& oper, double value)
@@ -2863,9 +2857,9 @@ namespace gstlrn
     auto icol = getColIdxByLocator(ELoc::Z, item);
     if (icol < 0) return;
 
-    const double oldval = *_data.getValue<double>(iech, icol);
+    const double oldval = *_data.getValue<double>(icol, iech);
     const double newval = modifyOperator(oper, oldval, value);
-    _data.setValue(iech, icol, 0, newval);
+    _data.setValue(icol, iech, newval);
   }
 
   /**
@@ -3323,9 +3317,9 @@ namespace gstlrn
     auto icol = getColIdxByLocator(locatorType, item);
     if (icol < 0) return;
 
-    const double oldval = *_data.getValue<double>(iech, icol);
+    const double oldval = *_data.getValue<double>(icol, iech);
     const double newval = modifyOperator(oper, oldval, value);
-    _data.setValue(iech, icol, 0, newval);
+    _data.setValue(icol, iech, newval);
   }
 
   bool Db::isActive(Id iech) const
@@ -3512,7 +3506,7 @@ namespace gstlrn
     if (!isColIdxValid(icol)) return;
     _colNames[icol] = name;
     correctNewNameForDuplicates(_colNames, icol);
-    _data.RenameArray(icol, _colNames[icol]);
+    _data.renameColumn(icol, _colNames[icol]);
   }
 
   void Db::setNameByUID(Id iuid, const String& name)
@@ -3521,14 +3515,14 @@ namespace gstlrn
     if (icol < 0) return;
     _colNames[icol] = name;
     correctNewNameForDuplicates(_colNames, icol);
-    _data.RenameArray(icol, _colNames[icol]);
+    _data.renameColumn(icol, _colNames[icol]);
   }
 
   void Db::setNameByColIdx(Id icol, const String& name)
   {
     if (!isColIdxValid(icol)) return;
     _colNames[icol] = name;
-    _data.RenameArray(icol, _colNames[icol]);
+    _data.renameColumn(icol, _colNames[icol]);
   }
 
   void Db::setName(const String& old_name, const String& name)
@@ -3537,7 +3531,7 @@ namespace gstlrn
     if (icol < 0) return;
     _colNames[icol] = name;
     correctNewNameForDuplicates(_colNames, icol);
-    _data.RenameArray(icol, _colNames[icol]);
+    _data.renameColumn(icol, _colNames[icol]);
   }
 
   void Db::setName(const VectorString& list, const String& name)
@@ -3547,7 +3541,7 @@ namespace gstlrn
       auto icol = getColIdx(list[i]);
       if (icol < 0) continue;
       _colNames[icol] = incrementStringVersion(name, i + 1);
-      _data.RenameArray(icol, _colNames[icol]);
+      _data.renameColumn(icol, _colNames[icol]);
     }
     correctNamesForDuplicates(_colNames);
   }
@@ -3562,7 +3556,7 @@ namespace gstlrn
       auto icol = getColIdxByLocator(locatorType, i);
       if (icol < 0) continue;
       _colNames[icol] = incrementStringVersion(name, i + 1);
-      _data.RenameArray(icol, _colNames[icol]);
+      _data.renameColumn(icol, _colNames[icol]);
     }
     correctNamesForDuplicates(_colNames);
   }
@@ -5242,7 +5236,7 @@ namespace gstlrn
       // The name may not be empty. In this case, we use "Undefined" as a placeholder name
       // (it is not possible to have an empty name in HDF5, but it is possible in Db)
       String temp = names[i];
-      if (temp.empty()) temp = "Undefined";
+      if (temp.empty()) temp = "Col_" + std::to_string(i);
       auto data = dbG.createDataSet(temp, H5::PredType::NATIVE_DOUBLE, ds);
       // Locators are semantically close to Db columns and H5::Attribute has a
       // nicer API than string H5::DataSets. Putting Locators inside Attribute
@@ -5306,8 +5300,7 @@ namespace gstlrn
       // read the column index (H5::Attribute)
       SerializeHDF5::readValue<Id>(data, "ColId", colIds[i]);
       // read the column values from H5::DataSet
-      auto& vec =
-        _data.GetArray(colIds[i])->get().getVector<VectorDouble>()->get();
+      auto& vec = _data.getColumn<VectorDouble>(colIds[i]);
       data.read(vec.data(), H5::PredType::NATIVE_DOUBLE);
     }
 
@@ -6395,7 +6388,7 @@ namespace gstlrn
     if (!isColIdxValid(icolOut)) return;
 
     for (Id iech = 0, nech = getNSample(); iech < nech; iech++)
-      _data.setValue(iech, icolOut, 0, *_data.getValue<double>(iech, icolIn));
+      _data.setValue(icolOut, iech, *_data.getValue<double>(icolIn, iech));
   }
 
   void Db::dumpGeometry(Id iech, Id jech) const

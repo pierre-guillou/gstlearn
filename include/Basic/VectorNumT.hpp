@@ -74,7 +74,12 @@ namespace gstlrn
     {
     }
 
-    inline VectorNumT(size_type count, const T& value = {})
+    inline VectorNumT(size_type count)
+      : Parent(count)
+    {
+    }
+
+    inline VectorNumT(size_type count, const T& value)
       : Parent(count, value)
     {
     }
