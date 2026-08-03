@@ -1210,6 +1210,20 @@ namespace gstlrn
       return ERole::fromKey(loc.getKey());
     }
 
+    const PtrGeos& _getPtrGeosByRank(Id rank) const { return _p[rank]; }
+
+    PtrGeos& _getPtrGeosByRankUnprotected(Id rank) { return _p[rank]; }
+
+    const PtrGeos& _getPtrGeosByType(const ELoc& type) const
+    {
+      return _p[type.getValue()];
+    }
+
+    PtrGeos& _getPtrGeosByTypeUnprotected(const ELoc& type)
+    {
+      return _p[type.getValue()];
+    }
+
   protected:
     void _defineVariableAndLocators(
       const Db* dbin,

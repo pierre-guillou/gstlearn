@@ -106,6 +106,52 @@ int main(int argc, char* argv[])
   message("%d\n", data.getValue<int>(1, isample).value_or(-1));
   message("%s\n", data.getValue<String>(2, isample).value_or("failed").c_str());
 
+  mestitle(1, "Testing implicit conversions");
+
+  double vd = data.getValue<double>("hello", 1).value_or(-1.);
+  int vi = data.getValue<int>("hello", 1).value_or(-1);
+
+  message("double from double: %lf\n", vd);
+  message("int from double: %d\n", vi);
+
+  double bad = data.getValue<double>("foobar", 1).value_or(-999.);
+  message("double from String: %lf\n", bad);
+
+  mestitle(1, "Testing proxy access syntax");
+
+  // Access through Role-based proxy
+  data.X()[2] = 123.;
+  message(
+    "Value of X(0) at sample 2: %lf\n",
+    data.getValue<double>(RoleID{ERole::X}, 2).value_or(-1.));
+
+  // Access through name-based proxy
+  data.col("hello")[1] = 456.;
+  message(
+    "Value of 'hello' at sample 1: %lf\n",
+    data.getValue<double>("hello", 1).value_or(-1.));
+
+  mestitle(1, "Testing proxy access syntax with versions");
+
+  // Column Bonjour: Double, Role F(0), 5 versions
+  data.F()[2](3) = 12.34;
+  message(
+    "Value of F(0) at sample 2 version 3: %lf\n",
+    data.getValue<double>(ColID(RoleID(ERole::F), 3), 2).value_or(-1.));
+
+  // Column MyVar: Int, Role Z(2), 5 versions
+  data.Z(2)[2](4) = 999;
+  message(
+    "Value of Z(2) at sample 2 version 4: %d\n",
+    data.getValue<int>(ColID(RoleID(ERole::Z, 2), 4), 2).value_or(-1));
+
+  mestitle(1, "Testing proxy read access");
+
+  message("X(2) read as double: %lf\n", static_cast<double>(data.X()[2]));
+  message("X(2) read as int: %d\n", static_cast<Id>(data.X()[2]));
+  double badread = data.col("foobar")[1];
+  message("String read as double: %lf\n", badread);
+
   mestitle(1, "Adding Columns with the same Name and/or Role");
   data.printContents("Initial");
   data.addColumn("hello", VectorDouble{1., 2., 3.}, RoleID{ERole::X, 10});

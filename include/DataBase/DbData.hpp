@@ -42,6 +42,11 @@ namespace gstlrn
   class GSTLEARN_EXPORT DbData: public ASerializable
   {
   public:
+#ifndef SWIG
+    class ColProxy;
+    class ValueProxy;
+#endif
+
     static DbData* createFromNF(const String& NFFilename, bool verbose);
 
     /// ASerializable interface
@@ -199,11 +204,10 @@ namespace gstlrn
     template<typename T>
     std::optional<T> getValue(ColID&& colid, Id isample) const
     {
-      const Id version = colid.getVersion();
-
       const auto array = this->_identifyColumn(std::move(colid));
       if (!array) return std::nullopt;
 
+      const Id version = colid.getVersion();
       return array->get().getValue<T>(isample, version);
     }
 
@@ -220,10 +224,10 @@ namespace gstlrn
     template<typename T>
     bool setValue(ColID&& colid, const Id isample, const T& value)
     {
-      const Id version = colid.getVersion();
-
       const auto array = this->_identifyColumn(std::move(colid));
       if (!array) return false;
+
+      const Id version = colid.getVersion();
       return array->get().setValue<T>(isample, version, value);
     }
 
@@ -334,6 +338,31 @@ namespace gstlrn
     }
 #endif
 
+    /*************************************************************************/
+    /* Column proxy access.                                                  */
+    /* It allows accessing to Columns dedicated to a specific Role and Rank. */
+    /* with the following syntax:                                            */
+    /*   data.X(ir)[is](iv)                                                  */
+    /*   - data is the name of the DbData object                             */
+    /*   - X is the Role of the Column (X, Z, W, F)                          */
+    /*   - ir is the Rank of the Column (optional, 0-based, default = 0)     */
+    /*   - is is the index of the sample (0-based)                           */
+    /*   - iv is the index of the version (optional, 0-based, default = 0)   */
+    /*************************************************************************/
+#ifndef SWIG
+    ColProxy X(Id rank = 0);
+    ColProxy Z(Id rank = 0);
+    ColProxy W(Id rank = 0);
+    ColProxy F(Id rank = 0);
+
+    ColProxy col(Id icol);
+    ColProxy col(const String& name);
+#endif
+
+    /***********************************************************************/
+    /* Other public methods                                                */
+    /***********************************************************************/
+
     bool renameColumn(ColID&& colid, const String& newName);
 
     void removeColumn(ColID&& colid);
@@ -369,6 +398,10 @@ namespace gstlrn
     void deleteSample(Id idel);
 
   private:
+    /***********************************************************************/
+    /* Other private methods                                               */
+    /***********************************************************************/
+
     std::optional<std::reference_wrapper<DbCol>> _identifyColumn(ColID&& colid);
     std::optional<std::reference_wrapper<const DbCol>>
       _identifyColumn(ColID&& colid) const;
@@ -427,10 +460,88 @@ namespace gstlrn
 
     VectorString _getNames() const;
     static void _checkVersion(Id& nversion);
+    static void _unknownName(const String& name);
+    static void _unknownRoleID(const RoleID& roleID);
 
   private:
+    /***********************************************************************/
+    /* DbData members                                                      */
+    /***********************************************************************/
     std::vector<DbCol> _cols;
     std::vector<RoleID> _roleIDs;
   };
 
+  /***************************************************************************/
+  /*                                                                         */
+  /*                     Internal proxy implementation                       */
+  /*                                                                         */
+  /***************************************************************************/
+#ifndef SWIG
+  class DbData::ColProxy
+  {
+  public:
+    ColProxy(DbData& db, const ColID& colid)
+      : _db(db)
+      , _colid(colid)
+    {
+    }
+
+    ValueProxy operator[](Id isample);
+
+  private:
+    DbData& _db;
+    ColID _colid;
+  };
+
+  class DbData::ValueProxy
+  {
+  public:
+    ValueProxy(DbData& db, const ColID& colid, Id isample)
+      : _db(db)
+      , _colid(colid)
+      , _isample(isample)
+    {
+    }
+
+    /**
+     * @brief Select the version of the value
+     *
+     * Syntax:
+     *   data.X()[isample](iversion) = value;
+     */
+    ValueProxy operator()(Id version)
+    {
+      auto copy = _colid;
+      copy.setVersion(version);
+      return ValueProxy(_db, copy, _isample);
+    }
+
+    template<typename T>
+    ValueProxy& operator=(const T& value)
+    {
+      _db.setValue<T>(std::move(_colid), _isample, value);
+      return *this;
+    }
+
+    template<typename T>
+    operator T() const
+    {
+      auto val = _db.getValue<T>(ColID(_colid), _isample);
+
+      if (val) return *val;
+
+      return getNA<T>();
+    }
+
+  private:
+    DbData& _db;
+    ColID _colid;
+    Id _isample;
+  };
+
+  inline DbData::ValueProxy DbData::ColProxy::operator[](Id isample)
+  {
+    return ValueProxy(_db, _colid, isample);
+  }
+#endif
 } // namespace gstlrn

@@ -317,6 +317,8 @@ namespace gstlrn
       {
         if (_cols[icol].getName() == localName) return icol;
       }
+      _unknownName(localName);
+      return std::nullopt;
     }
 
     // Try to identify by Column Role
@@ -327,11 +329,12 @@ namespace gstlrn
       {
         if (_roleIDs[icol].match(roleID)) return icol;
       }
+      _unknownRoleID(roleID);
+      return std::nullopt;
     }
 
     // Try to identify by Column rank
     if (colid.getICol() >= 0) return colid.getICol();
-
     messerr("Column does not exist.");
     return std::nullopt;
   }
@@ -471,4 +474,46 @@ namespace gstlrn
     }
   }
 
+  void DbData::_unknownName(const String& name)
+  {
+    messerr("Column '%s' does not exist.", name.c_str());
+  }
+
+  void DbData::_unknownRoleID(const RoleID& roleID)
+  {
+    messerr("Role '%s' does not exist.", roleID.getDescr().c_str());
+  }
+
+  /***********************************************************************/
+  /* Internal helper classes for column access syntax                    */
+  /***********************************************************************/
+  DbData::ColProxy DbData::X(Id rank)
+  {
+    return ColProxy(*this, ColID(ERole::X, rank));
+  }
+
+  DbData::ColProxy DbData::Z(Id rank)
+  {
+    return ColProxy(*this, ColID(ERole::Z, rank));
+  }
+
+  DbData::ColProxy DbData::W(Id rank)
+  {
+    return ColProxy(*this, ColID(ERole::W, rank));
+  }
+
+  DbData::ColProxy DbData::F(Id rank)
+  {
+    return ColProxy(*this, ColID(ERole::F, rank));
+  }
+
+  DbData::ColProxy DbData::col(Id icol)
+  {
+    return ColProxy(*this, ColID(icol));
+  }
+
+  DbData::ColProxy DbData::col(const String& name)
+  {
+    return ColProxy(*this, ColID(name));
+  }
 } // namespace gstlrn

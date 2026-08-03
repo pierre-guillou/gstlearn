@@ -10,6 +10,7 @@
 /******************************************************************************/
 #include "DataBase/DbCol.hpp"
 #include "Basic/SerializeHDF5.hpp"
+#include "Basic/VectorHelper.hpp"
 
 namespace gstlrn
 {
@@ -189,20 +190,9 @@ namespace gstlrn
       [](auto&& arg) -> String
       {
         using VectorType = std::decay_t<decltype(arg)>::vector_type;
-        if constexpr (std::is_same_v<VectorType, VectorDouble>)
-          return "Double";
-        else if constexpr (std::is_same_v<VectorType, VectorFloat>)
-          return "Float";
-        else if constexpr (std::is_same_v<VectorType, VectorInt>)
-          return "Int";
-        else if constexpr (std::is_same_v<VectorType, VectorUChar>)
-          return "Char";
-        else if constexpr (std::is_same_v<VectorType, VectorString>)
-          return "String";
-        else if constexpr (std::is_same_v<VectorType, VectorBool>)
-          return "Bool";
-        else
-          return "Unknown";
+        using ValueType = typename VectorType::value_type;
+
+        return getGenericTypeName<ValueType>();
       },
       this->_data);
   }
@@ -224,10 +214,10 @@ namespace gstlrn
     if (iversion < 0 || iversion >= nversion)
     {
       messerr(
-        "Version %lld is invalid for Column '%s' which contains %lld "
+        "Version %d is invalid for Column '%s' which contains %d "
         "version(s).",
-        static_cast<long long>(iversion), getName().c_str(),
-        static_cast<long long>(nversion));
+        static_cast<Id>(iversion), getName().c_str(),
+        static_cast<Id>(nversion));
       return false;
     }
     return true;
@@ -238,10 +228,9 @@ namespace gstlrn
     if (isample < 0 || isample >= nsample)
     {
       messerr(
-        "Sample index (%lld) is out of bounds for Column '%s' with %lld "
+        "Sample index (%d) is out of bounds for Column '%s' which contains %d "
         "samples.",
-        static_cast<long long>(isample), getName().c_str(),
-        static_cast<long long>(nsample));
+        static_cast<Id>(isample), getName().c_str(), static_cast<Id>(nsample));
       return false;
     }
     return true;

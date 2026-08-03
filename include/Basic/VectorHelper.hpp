@@ -843,4 +843,25 @@ namespace gstlrn
     return v1;
   }
 
+  template<typename T>
+  String getGenericTypeName()
+  {
+    if constexpr (std::is_same_v<T, double>)
+      return "Double";
+    else if constexpr (std::is_same_v<T, float>)
+      return "Float";
+    else if constexpr (std::is_same_v<T, int>)
+      return "Int";
+    else if constexpr (std::is_same_v<T, Id>)
+      return "Id";
+    else if constexpr (std::is_same_v<T, unsigned char>)
+      return "Char";
+    else if constexpr (std::is_same_v<T, String>)
+      return "String";
+    else if constexpr (std::is_same_v<T, bool>)
+      return "Bool";
+    else
+      return "Unknown";
+  }
+
 } // namespace gstlrn

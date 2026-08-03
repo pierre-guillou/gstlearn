@@ -11,5 +11,5 @@ Adding Columns of various types
 DbData is not empty anymore
 The Data Base contains 3 columns of 3 samples
 Column 0/3 : hello (Double) {Role: x1}
-Column 1/3 : world (Int) {Role: z1}
-Column 2/3 : foobool (Bool) {Role: NA}
+Column 1/3 : world (Id) {Role: z1}
+Column 2/3 : foobool (Char) {Role: NA}

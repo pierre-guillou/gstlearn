@@ -12,6 +12,7 @@
 
 #include "Basic/ASerializable.hpp"
 #include "Basic/Message.hpp"
+#include "Basic/VectorHelper.hpp"
 #include "Basic/VectorNumT.hpp"
 #include "Basic/VectorT.hpp"
 #include "DataBase/Array2D.hpp"
@@ -107,7 +108,7 @@ namespace gstlrn
      * @tparam VectorType
      */
     template<typename T, typename VectorType>
-    static constexpr bool isConsistent()
+    static constexpr bool _isConsistent()
     {
       return std::is_same_v<T, typename VectorType::value_type>
           || (std::is_same_v<T, bool> && std::is_same_v<VectorType, VectorBool>)
@@ -134,17 +135,14 @@ namespace gstlrn
           if (!_checkVersion(iversion, arg.outer())) return;
 
           using VectorType = std::decay_t<decltype(arg)>::vector_type;
-          if constexpr (isConsistent<T, VectorType>())
+          if constexpr (_isReadable<T, VectorType>())
           {
             auto val = arg.getValue(iversion, isample);
-            if (val) v = val.value();
+            if (val) v = static_cast<T>(val.value());
           }
           else
           {
-            messerr(
-              "Cannot get value from Column '%s': returned type is not "
-              "compatible with column type '%s'.",
-              this->getName().c_str(), this->getTypeName().c_str());
+            _wrongReadType<T>();
           }
         },
         this->_data);
@@ -173,16 +171,13 @@ namespace gstlrn
           if (!_checkVersion(iversion, arg.outer())) return;
 
           using VectorType = std::decay_t<decltype(arg)>::vector_type;
-          if constexpr (isConsistent<T, VectorType>())
+          if constexpr (_isWritable<T, VectorType>())
           {
             res = arg.setValue(iversion, isample, v);
           }
           else
           {
-            messerr(
-              "Cannot assign value to Column '%s': input type is not "
-              "compatible with column type '%s'.",
-              this->getName().c_str(), this->getTypeName().c_str());
+            _wrongWriteType<T>();
           }
         },
         this->_data);
@@ -196,15 +191,13 @@ namespace gstlrn
         [nnewsample, &val, this](auto&& arg)
         {
           using VectorType = std::decay_t<decltype(arg)>::vector_type;
-          if constexpr (isConsistent<T, VectorType>())
+          if constexpr (_isWritable<T, VectorType>())
           {
             arg.addSamples(nnewsample, val);
           }
           else
           {
-            messerr(
-              "Cannot add samples to Column '%s': incompatible value type.",
-              getName().c_str());
+            _wrongWriteType<T>();
           }
         },
         this->_data);
@@ -321,6 +314,20 @@ namespace gstlrn
       _data = Array2D<std::decay_t<VectorType>>(std::forward<VectorType>(vec));
     }
 
+    template<typename T, typename VectorType>
+    static constexpr bool _isReadable()
+    {
+      return std::is_convertible_v<typename VectorType::value_type, T>;
+    }
+
+    template<typename T, typename VectorType>
+    static constexpr bool _isWritable()
+    {
+      return std::is_same_v<T, typename VectorType::value_type>
+          || (std::is_same_v<T, bool>
+              && std::is_same_v<VectorType, VectorBool>);
+    }
+
     template<typename VectorType>
     Array2D<VectorType>* _getArray()
     {
@@ -413,6 +420,24 @@ namespace gstlrn
         return false;
       }
       return true;
+    }
+
+    template<typename T>
+    void _wrongReadType() const
+    {
+      messerr("Cannot read value from Column '%s':", this->getName().c_str());
+      messerr(
+        "Requested type '%s' is not compatible with Stored type '%s'.",
+        getGenericTypeName<T>().c_str(), this->getTypeName().c_str());
+    }
+
+    template<typename T>
+    void _wrongWriteType() const
+    {
+      messerr("Cannot assign value to Column '%s':", this->getName().c_str());
+      messerr(
+        "Input type '%s' is not compatible with column type '%s'.",
+        getGenericTypeName<T>().c_str(), this->getTypeName().c_str());
     }
 
     bool _checkVersion(Id iversion, Id nversion) const;

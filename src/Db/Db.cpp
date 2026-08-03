@@ -276,7 +276,7 @@ namespace gstlrn
    */
   bool Db::isLocatorIndexValid(const ELoc& locatorType, Id locatorIndex) const
   {
-    const PtrGeos& p = _p[locatorType.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(locatorType);
     return p.isLocatorIndexValid(locatorIndex);
   }
 
@@ -305,7 +305,7 @@ namespace gstlrn
 
   Id Db::getUIDByLocator(const ELoc& locatorType, Id locatorIndex) const
   {
-    const PtrGeos& p = _p[locatorType.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(locatorType);
     return p.getLocatorByIndex(locatorIndex);
   }
 
@@ -317,7 +317,7 @@ namespace gstlrn
    */
   Id Db::getColIdxByLocator(const ELoc& locatorType, Id locatorIndex) const
   {
-    const PtrGeos& p = _p[locatorType.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(locatorType);
     auto number = p.getNLoc();
     if (number <= 0 || locatorIndex >= number) return -1;
     auto icol = getColIdxByUID(p.getLocatorByIndex(locatorIndex));
@@ -326,7 +326,7 @@ namespace gstlrn
 
   Id Db::_findUIDInLocator(const ELoc& locatorType, Id iuid) const
   {
-    const PtrGeos& p = _p[locatorType.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(locatorType);
     if (!isUIDValid(iuid)) return -1;
     for (Id locatorIndex = 0; locatorIndex < p.getNLoc(); locatorIndex++)
       if (p.getLocatorByIndex(locatorIndex) == iuid) return (locatorIndex);
@@ -353,7 +353,7 @@ namespace gstlrn
     auto number = getNEloc();
     for (Id iloc = 0; iloc < number; iloc++)
     {
-      const PtrGeos& p = _p[iloc];
+      const PtrGeos& p = _getPtrGeosByRank(iloc);
       for (Id i = 0; i < p.getNLoc(); i++)
       {
         auto jcol = getColIdxByUID(p.getLocatorByIndex(i));
@@ -1084,7 +1084,7 @@ namespace gstlrn
 
   bool Db::hasLocator(const ELoc& locatorType) const
   {
-    const PtrGeos& p = _p[locatorType.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(locatorType);
     return p.hasLocator();
   }
 
@@ -1105,7 +1105,8 @@ namespace gstlrn
     _p.clear();
     auto number = getNEloc();
     _p.resize(number);
-    for (Id iloc = 0; iloc < number; iloc++) _p[iloc] = PtrGeos();
+    for (Id iloc = 0; iloc < number; iloc++)
+      _getPtrGeosByRankUnprotected(iloc) = PtrGeos();
   }
 
   Id Db::_getUIDcol(Id iuid) const
@@ -1130,7 +1131,7 @@ namespace gstlrn
     auto number = getNEloc();
     for (Id iloc = 0; iloc < number; iloc++)
     {
-      const PtrGeos& p = _p[iloc];
+      const PtrGeos& p = _getPtrGeosByRank(iloc);
       if (p.getNLoc() > 0)
       {
         sstr << p.dumpLocator(rank, ELoc::fromValue(iloc));
@@ -1164,7 +1165,7 @@ namespace gstlrn
 
   void Db::clearLocators(const ELoc& locatorType)
   {
-    PtrGeos& p = _p[locatorType.getValue()];
+    PtrGeos& p = _getPtrGeosByTypeUnprotected(locatorType);
     p.clear();
   }
 
@@ -1257,7 +1258,7 @@ namespace gstlrn
     auto number = getNEloc();
     for (Id iloc = 0; iloc < number; iloc++)
     {
-      PtrGeos& p = _p[iloc];
+      PtrGeos& p = _getPtrGeosByRankUnprotected(iloc);
       Id found = p.findUIDInLocator(iuid);
       if (found >= 0) p.erase(found);
     }
@@ -1269,7 +1270,7 @@ namespace gstlrn
 
     if (locatorType != ELoc::UNDEFINED)
     {
-      PtrGeos& p = _p[locatorType.getValue()];
+      PtrGeos& p = _getPtrGeosByTypeUnprotected(locatorType);
       auto nitem = p.getNLoc();
       if (locatorIndex >= nitem)
       {
@@ -2064,7 +2065,7 @@ namespace gstlrn
     auto number = getNEloc();
     for (Id iloc = 0; iloc < number; iloc++)
     {
-      PtrGeos& p = _p[iloc];
+      PtrGeos& p = _getPtrGeosByRankUnprotected(iloc);
       Id found = p.findUIDInLocator(iuid_del);
       if (found >= 0) p.erase(found);
     }
@@ -2084,7 +2085,7 @@ namespace gstlrn
    */
   void Db::deleteColumnsByLocator(const ELoc& locatorType)
   {
-    const PtrGeos& p = _p[locatorType.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(locatorType);
     auto nitem = p.getNLoc();
     // Loop is performed downwards as PtrGeos is modified by called routine
     for (Id locatorIndex = nitem - 1; locatorIndex >= 0; locatorIndex--)
@@ -2400,7 +2401,7 @@ namespace gstlrn
 
   Id Db::getNDim() const
   {
-    return _p[ELoc::X.getValue()].getNLoc();
+    return _getPtrGeosByRank(ELoc::X.getValue()).getNLoc();
   }
 
   bool Db::hasSameDimension(const Db* dbaux) const
@@ -2593,8 +2594,8 @@ namespace gstlrn
   void
     Db::switchLocator(const ELoc& locatorType_in, const ELoc& locatorType_out)
   {
-    PtrGeos& p_in = _p[locatorType_in.getValue()];
-    PtrGeos& p_out = _p[locatorType_out.getValue()];
+    PtrGeos& p_in = _getPtrGeosByTypeUnprotected(locatorType_in);
+    PtrGeos& p_out = _getPtrGeosByTypeUnprotected(locatorType_out);
     Id n_in = getNLoc(locatorType_in);
     Id n_out = getNLoc(locatorType_out);
 
@@ -2740,13 +2741,13 @@ namespace gstlrn
   Id Db::getNLoc(const ELoc& loctype) const
   {
     if (loctype == ELoc::UNDEFINED) return 0;
-    const PtrGeos& p = _p[loctype.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(loctype);
     return p.getNLoc();
   }
 
   Id Db::getNZValues() const
   {
-    const PtrGeos& p = _p[ELoc::Z.getValue()];
+    const PtrGeos& p = _getPtrGeosByType(ELoc::Z);
     return p.getNLoc();
   }
 
