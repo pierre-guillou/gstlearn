@@ -84,7 +84,7 @@ namespace gstlrn
 
     if (_icol >= 0) descr += "Index: " + std::to_string(_icol) + ", ";
 
-    if (_roleID.getRole() != ERole::UNDEFINED)
+    if (_roleID.getRole().isDifferent(ERole::UNDEFINED))
       descr += "Role: " + _roleID.getDescr() + ", ";
 
     descr += "Version: " + std::to_string(_version);

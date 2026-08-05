@@ -106,9 +106,9 @@ data.addColumnD(
 ##############################
 # Removing Columns of DbData #
 
-gl.mestitle(0, "Removing a Column (world)")
+gl.mestitle(0, "Deleting a Column (world)")
 data.printContents("- Initial situation")
-data.removeColumn("world.1")
+data.deleteColumn("world.1")
 data.printContents("- Final situation")
 
 ##########################################################
@@ -132,8 +132,8 @@ print("- Number of Versions in column 0: ", data.getNVersions(0))
 gl.mestitle(0, "Erroneous operations on the DbData")
 data.printContents("Initial situation")
 
-print("\nTrying to remove a non existing column (world.22)")
-data.removeColumn("world.22")
+print("\nTrying to delete a non existing column (world.22)")
+data.deleteColumn("world.22")
 
 print("\nTrying to add a Column with a different number of samples")
 data.addColumnD("hello", gl.VectorDouble([201.0, 202.0, 203.0, 204.0]))

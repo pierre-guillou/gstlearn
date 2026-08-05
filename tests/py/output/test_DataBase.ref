@@ -74,7 +74,7 @@ Adding a Column with an already existing Role (X) but non consecutive index (10)
 
 Adding a Column with an already existing Role (X) and existing Index (0)
 
-Removing a Column (world)
+Deleting a Column (world)
 =========================
 - Initial situation
 The Data Base contains 8 columns of 3 samples
@@ -128,7 +128,7 @@ Column 5/8 : hello.1 (Double) {Role: x2}
 Column 6/8 : hello.2 (Double) {Role: x1}
 Column 7/8 : Bonjour.1 [3] (Double) {Role: NA} [NA forbidden]
 
-Trying to remove a non existing column (world.22)
+Trying to delete a non existing column (world.22)
 Column 'world.22' does not exist.
 
 Trying to add a Column with a different number of samples

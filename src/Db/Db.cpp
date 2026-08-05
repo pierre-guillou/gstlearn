@@ -15,6 +15,7 @@
 #include "Basic/GlobalEnvironment.hpp"
 #include "Basic/Law.hpp"
 #include "Basic/Limits.hpp"
+#include "Basic/Message.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "Basic/SerializeHDF5.hpp"
 #include "Basic/String.hpp"
@@ -321,7 +322,8 @@ namespace gstlrn
     auto number = p.getNLoc();
     if (number <= 0 || locatorIndex >= number) return -1;
     auto icol = getColIdxByUID(p.getLocatorByIndex(locatorIndex));
-    return (icol);
+    _temporaryCheckLocator(locatorType, locatorIndex, icol);
+    return icol;
   }
 
   Id Db::_findUIDInLocator(const ELoc& locatorType, Id iuid) const
@@ -896,6 +898,7 @@ namespace gstlrn
     {
       auto icol = getColIdxByLocator(ELoc::X, idim);
       if (icol < 0) continue;
+      _temporaryCheckLocator(ELoc::X, idim, icol);
       coor[idim] = *_data.getValue<double>(icol, iech);
     }
   }
@@ -1030,6 +1033,7 @@ namespace gstlrn
     auto icol = getColIdxByLocator(ELoc::X, idim);
     if (!isColIdxValid(icol)) return;
     _data.setValue(icol, iech, value);
+    _temporaryCheckLocator(ELoc::X, idim, icol);
   }
 
   void Db::setCoordinates(Id idim, const VectorDouble& coor, bool useSel)
@@ -1037,6 +1041,7 @@ namespace gstlrn
     auto icol = getColIdxByLocator(ELoc::X, idim);
     if (!isColIdxValid(icol)) return;
     setColumnByColIdx(coor, icol, useSel);
+    _temporaryCheckLocator(ELoc::X, idim, icol);
   }
 
   void Db::setSampleCoordinates(Id iech, const VectorDouble& coor)
@@ -1064,6 +1069,7 @@ namespace gstlrn
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (!isColIdxValid(icol)) return;
     _data.setValue(icol, iech, value);
+    _temporaryCheckLocator(locatorType, locatorIndex, icol);
   }
 
   double
@@ -1072,6 +1078,7 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return TEST;
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (!isColIdxValid(icol)) return TEST;
+    _temporaryCheckLocator(locatorType, locatorIndex, icol);
     return *_data.getValue<double>(icol, iech);
   }
 
@@ -1079,6 +1086,7 @@ namespace gstlrn
   {
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (icol < 0) return nullptr;
+    _temporaryCheckLocator(locatorType, locatorIndex, icol);
     return _data.getColumn<VectorDouble>(icol).data();
   }
 
@@ -1167,6 +1175,9 @@ namespace gstlrn
   {
     PtrGeos& p = _getPtrGeosByTypeUnprotected(locatorType);
     p.clear();
+
+    // Suppress the roles in DbData
+    _temporaryCleanLocators(locatorType);
   }
 
   Id Db::_getNextLocator(const ELoc& locatorType) const
@@ -1277,6 +1288,10 @@ namespace gstlrn
         p.resize(locatorIndex + 1);
       }
       p.setLocatorByIndex(locatorIndex, iuid);
+
+      // Store the corresponding Role in DbData
+      auto icol = getColIdxByUID(iuid);
+      if (icol >= 0) _temporarySetLocator(locatorType, locatorIndex, icol);
     }
   }
 
@@ -2058,7 +2073,7 @@ namespace gstlrn
       _uidcol[iuid]--;
     }
 
-    _data.removeColumn(c_del);
+    _data.deleteColumn(c_del);
 
     /* Resize the variable pointers */
 
@@ -2602,7 +2617,13 @@ namespace gstlrn
     /* Move the gradient components into additional variables */
     p_out.resize(n_in + n_out);
     for (Id i_in = 0; i_in < n_in; i_in++)
+    {
       p_out.setLocatorByIndex(n_out + i_in, p_in.getLocatorByIndex(i_in));
+
+      // Correction for the Temporary Locator
+      auto icol = getColIdxByLocator(locatorType_in, i_in);
+      _temporarySetLocator(locatorType_out, n_out + i_in, icol);
+    }
     p_in.clear();
   }
 
@@ -2846,6 +2867,7 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return;
     auto icol = getColIdxByLocator(loctype, item);
     if (icol < 0) return;
+    _temporaryCheckLocator(loctype, item, icol);
 
     const double oldval = *_data.getValue<double>(icol, iech);
     const double newval = modifyOperator(oper, oldval, value);
@@ -2857,6 +2879,7 @@ namespace gstlrn
     if (!isSampleIndexValid(iech)) return;
     auto icol = getColIdxByLocator(ELoc::Z, item);
     if (icol < 0) return;
+    _temporaryCheckLocator(ELoc::Z, item, icol);
 
     const double oldval = *_data.getValue<double>(icol, iech);
     const double newval = modifyOperator(oper, oldval, value);
@@ -3213,7 +3236,11 @@ namespace gstlrn
     VectorDouble tab(nech);
 
     if (useSel) sel = getSelections();
-    if (hasLocVariable(ELoc::W)) icol = getColIdxByLocator(ELoc::W, 0);
+    if (hasLocVariable(ELoc::W))
+    {
+      icol = getColIdxByLocator(ELoc::W, 0);
+      _temporaryCheckLocator(ELoc::W, 0, icol);
+    }
 
     Id ecr = 0;
     for (Id iech = 0; iech < nech; iech++)
@@ -3317,6 +3344,7 @@ namespace gstlrn
     // This direct addressing is meant to save time
     auto icol = getColIdxByLocator(locatorType, item);
     if (icol < 0) return;
+    _temporaryCheckLocator(locatorType, item, icol);
 
     const double oldval = *_data.getValue<double>(icol, iech);
     const double newval = modifyOperator(oper, oldval, value);
@@ -3405,6 +3433,7 @@ namespace gstlrn
   {
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (icol < 0) return String();
+    _temporaryCheckLocator(locatorType, locatorIndex, icol);
     return _colNames[icol];
   }
 
@@ -3430,6 +3459,7 @@ namespace gstlrn
     {
       auto icol = getColIdxByLocator(locatorType, i);
       namelist.push_back(getNameByColIdx(icol));
+      _temporaryCheckLocator(locatorType, i, icol);
     }
     return namelist;
   }
@@ -3558,6 +3588,7 @@ namespace gstlrn
       if (icol < 0) continue;
       _colNames[icol] = incrementStringVersion(name, i + 1);
       _data.renameColumn(icol, _colNames[icol]);
+      _temporaryCheckLocator(locatorType, i, icol);
     }
     correctNamesForDuplicates(_colNames);
   }
@@ -3802,6 +3833,7 @@ namespace gstlrn
     if (!hasLocVariable(ELoc::SEL)) return tab;
     auto icol = getColIdxByLocator(ELoc::SEL, 0);
     if (!isColIdxValid(icol)) return tab;
+    _temporaryCheckLocator(ELoc::SEL, 0, icol);
 
     tab.resize(nech);
     for (Id iech = 0; iech < nech; iech++)
@@ -4099,7 +4131,12 @@ namespace gstlrn
     Id nech_init = static_cast<Id>(nbgh_init.size());
 
     // Create the column index for the selection (only if 'useSel')
-    Id icol = (useSel) ? getColIdxByLocator(ELoc::SEL, 0) : -1;
+    Id icol = -1;
+    if (useSel)
+    {
+      icol = getColIdxByLocator(ELoc::SEL, 0);
+      _temporaryCheckLocator(ELoc::SEL, 0, icol);
+    }
 
     // Update the search for variable, if no variable is defined
     if (getNLoc(ELoc::Z) <= 0) ivar = -1;
@@ -4259,6 +4296,7 @@ namespace gstlrn
   {
     auto icol = getColIdxByLocator(locatorType, locatorIndex);
     if (icol < 0) return VectorDouble();
+    _temporaryCheckLocator(locatorType, locatorIndex, icol);
     return getColumnByColIdx(icol, useSel, flagCompress);
   }
 
@@ -6519,6 +6557,59 @@ namespace gstlrn
       table.setColumn(icol, tabloc);
     }
     return table;
+  }
+
+  // The next section is meant to check the integration of DbData in Db class
+  void Db::_temporaryCleanLocators(const ELoc& locatorType)
+  {
+    auto role = _temporaryToRole(locatorType);
+    _data.clearRole(role);
+  }
+
+  void
+    Db::_temporarySetLocator(const ELoc& locatorType, Id locatorIndex, Id icol)
+  {
+    // The following action is voluntarily severe to help debugging
+    // in this temporary check, prior to cleaning PtrGeos from gstlearn.
+    if (icol >= _data.getNCols())
+      messageAbort(
+        "TemporarySetLocator: icol=%d is out of range (ncol=%d)", icol,
+        _data.getNCols());
+
+    auto role = _temporaryToRole(locatorType);
+    auto roleID = RoleID(role, locatorIndex);
+    _data.setRoleID(icol, roleID);
+  }
+
+  void Db::_temporaryCheckLocator(
+    const ELoc& locatorType,
+    Id locatorIndex,
+    Id icol) const
+  {
+    if (icol < 0) return;
+    auto role = _temporaryToRole(locatorType);
+    auto colID = _data.getColID(icol);
+    if (!role.isEqual(colID.getRole()) || locatorIndex != colID.getIndex())
+    {
+      // The following message is voluntarily verbose to help debugging
+      // in this temporary check, prior to cleaning PtrGeos from gstlearn.
+      messerr(
+        "\nError when checking Role against ELoc in Db for column #%d:", icol);
+      messerr(
+        "- Expected Role = %.*s", static_cast<int>(locatorType.getKey().size()),
+        locatorType.getKey().data());
+      messerr("- Expected Index = %d", locatorIndex);
+      messerr(
+        "- Found Role = %.*s", static_cast<int>(role.getKey().size()),
+        role.getKey().data());
+      messerr("- Found Index = %d", colID.getIndex());
+
+      message("\nOfficial Variables in Db:\n");
+      display();
+
+      message("\nOrder in DbData:\n");
+      _data.printContents();
+    }
   }
 
 } // namespace gstlrn

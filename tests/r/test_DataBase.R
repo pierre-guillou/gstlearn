@@ -108,11 +108,11 @@ invisible(data$printContents("\nDbData is not empty anymore"))
 # data$addColumnD("hello", VectorDouble(c(101.0, 102.0, 103.0)), RoleID(ERole_X(), 0))
 
 # ##############################
-# # Removing Columns of DbData #
+# # Deleting Columns of DbData #
 
-# invisible(mestitle(0, "Removing a Column (world)"))
+# invisible(mestitle(0, "Deleting a Column (world)"))
 # data$printContents("- Initial situation")
-# data$removeColumn("world.1")
+# data$deleteColumn("world.1")
 # data$printContents("- Final situation")
 
 # ##########################################################
@@ -136,8 +136,8 @@ invisible(data$printContents("\nDbData is not empty anymore"))
 # invisible(mestitle(0, "Erroneous operations on the DbData"))
 # data$printContents("Initial situation")
 
-# writeLines(paste("\nTrying to remove a non existing column (world.22)"))
-# data$removeColumn("world.22")
+# writeLines(paste("\nTrying to delete a non existing column (world.22)"))
+# data$deleteColumn("world.22")
 
 # writeLines(paste("\nTrying to add a Column with a different number of samples"))
 # data$addColumnD("hello", VectorDouble(c(201.0, 202.0, 203.0, 204.0))))

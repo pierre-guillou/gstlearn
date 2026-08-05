@@ -84,16 +84,20 @@ namespace gstlrn
     return true;
   }
 
-  void DbData::removeColumn(ColID&& colid)
+  void DbData::deleteColumn(ColID&& colid)
   {
     const auto icol = _getColumnIndex(colid);
     if (!icol) return;
 
+    auto roleID = _roleIDs[*icol];
     if (static_cast<Id>(this->_cols.size()) > (*icol))
     {
       this->_cols.erase(this->_cols.begin() + (*icol));
       this->_roleIDs.erase(this->_roleIDs.begin() + (*icol));
     }
+
+    // Update the RoleID list after deletion
+    _updateRoleIDDeletion(roleID);
   }
 
   void DbData::removeAllColumns()
@@ -178,6 +182,13 @@ namespace gstlrn
     return colIDout;
   }
 
+  void DbData::setRoleID(ColID&& colid, const RoleID& roleID)
+  {
+    const auto icol = _getColumnIndex(colid);
+    if (!icol) return;
+    _roleIDs[*icol] = roleID;
+  }
+
   /**
    * @brief Return a set of Column Identifiers starting from a Column Name
    *
@@ -228,7 +239,7 @@ namespace gstlrn
     std::vector<ColID> colIDs;
     for (const auto& id: this->_roleIDs)
     {
-      if (id.getRole() == role)
+      if (id.getRole().isEqual(role))
       {
         const auto colID = getColID(ColID(id));
         if (colID.getICol() >= 0) colIDs.push_back(colID);
@@ -322,7 +333,7 @@ namespace gstlrn
     }
 
     // Try to identify by Column Role
-    if (colid.getRole() != ERole::UNDEFINED)
+    if (colid.getRole().isDifferent(ERole::UNDEFINED))
     {
       const RoleID& roleID = colid.getRoleID();
       for (Id icol = 0; icol < ncol; ++icol)
@@ -361,9 +372,9 @@ namespace gstlrn
   }
 
   /**
-   * @brief Check if the RankID of the new column is compatible with existing ones
+   * @brief Check the addition of a new column with the roleID provided as argument
    *
-   * @param roleID RankID of the new column to be added (possibly modified)
+   * @param roleID RoleID of the new column to be added (possibly modified)
    *
    * @remark If the Role of the new Column is already present in the already defined ones:
    * - if the Rank of the new Column matches the one of the old matching Column:
@@ -372,7 +383,7 @@ namespace gstlrn
    * - if the Rank of the new Column does not match the one of the old matching Column,
    *  this rank is calculated as the largest Rank found in matching Columns incremented by 1.
    */
-  void DbData::_updateRoleID(RoleID& roleID)
+  void DbData::_updateRoleIDAddition(RoleID& roleID)
   {
     const auto& newRole = roleID.getRole();
     const auto newRank = roleID.getIndex();
@@ -381,7 +392,7 @@ namespace gstlrn
     // Look for already existing Columns with the same RoleID
     for (auto& id: this->_roleIDs)
     {
-      if (id.getRole() == newRole)
+      if (id.getRole().isEqual(newRole))
       {
         // Same role already exists
         auto oldRank = id.getIndex();
@@ -409,6 +420,23 @@ namespace gstlrn
     {
       // No same role already exists: set the rank to 0 whatever the input rank was
       roleID.setIndex(0);
+    }
+  }
+
+  void DbData::_updateRoleIDDeletion(RoleID& roleID)
+  {
+    const auto& role = roleID.getRole();
+    const auto rank = roleID.getIndex();
+
+    // Look for already existing Columns with the same RoleID
+    for (auto& id: this->_roleIDs)
+    {
+      if (id.getRole().isEqual(role) && id.getIndex() > rank)
+      {
+        // Same role and a larger rank already exists:
+        // Decrease the rank of the old one by 1
+        id.setIndex(id.getIndex() - 1);
+      }
     }
   }
 

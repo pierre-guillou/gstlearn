@@ -128,9 +128,9 @@ namespace gstlrn
 
       // Check the validity of the new Role (if defined)
       auto roleIDLocal = roleID;
-      if (roleIDLocal.getRole() != ERole::UNDEFINED)
+      if (roleIDLocal.getRole().isDifferent(ERole::UNDEFINED))
       {
-        _updateRoleID(roleIDLocal);
+        _updateRoleIDAddition(roleIDLocal);
       }
 
       // Check that input does not contain NA values if forbidNA is true
@@ -172,9 +172,9 @@ namespace gstlrn
 
       // Check the validity of the new Role (if defined)
       auto roleIDLocal = roleID;
-      if (roleIDLocal.getRole() != ERole::UNDEFINED)
+      if (roleIDLocal.getRole().isDifferent(ERole::UNDEFINED))
       {
-        _updateRoleID(roleIDLocal);
+        _updateRoleIDAddition(roleIDLocal);
       }
 
       // Check that input does not contain NA values if forbidNA is true
@@ -365,7 +365,7 @@ namespace gstlrn
 
     bool renameColumn(ColID&& colid, const String& newName);
 
-    void removeColumn(ColID&& colid);
+    void deleteColumn(ColID&& colid);
 
     void removeAllColumns();
 
@@ -389,6 +389,8 @@ namespace gstlrn
     Id getNCols() const { return static_cast<Id>(_cols.size()); }
 
     Id getNSamples() const;
+
+    void setRoleID(ColID&& colid, const RoleID& roleID);
 
     void printContents(const String& title = "") const;
 
@@ -438,7 +440,9 @@ namespace gstlrn
 
     void _updateName(String& name) const;
 
-    void _updateRoleID(RoleID& roleID);
+    void _updateRoleIDAddition(RoleID& roleID);
+
+    void _updateRoleIDDeletion(RoleID& roleID);
 
     template<typename VectorType>
     static bool _checkForbidNA(const VectorType& tab)

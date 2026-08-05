@@ -49,7 +49,7 @@ namespace gstlrn
    */
   bool RoleID::match(const RoleID& roleID) const
   {
-    return _role == roleID.getRole() && _index == roleID.getIndex();
+    return _role.isEqual(roleID.getRole()) && _index == roleID.getIndex();
   }
 
   /**

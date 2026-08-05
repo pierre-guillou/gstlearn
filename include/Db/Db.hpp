@@ -1205,11 +1205,6 @@ namespace gstlrn
       _isCountValid(const VectorInt& iuids, bool flagOne, bool verbose = true)
         const;
 
-    static ERole toRole(const ELoc& loc)
-    {
-      return ERole::fromKey(loc.getKey());
-    }
-
     const PtrGeos& _getPtrGeosByRank(Id rank) const { return _p[rank]; }
 
     PtrGeos& _getPtrGeosByRankUnprotected(Id rank) { return _p[rank]; }
@@ -1223,6 +1218,21 @@ namespace gstlrn
     {
       return _p[type.getValue()];
     }
+
+  private:
+    // This section is dedicated to smooth transition towards DbData
+    // For better legibility, all the methods of this section are prefixed with "_temporary"
+    static ERole _temporaryToRole(const ELoc& locatorType)
+    {
+      return ERole::fromKey(locatorType.getKey());
+    }
+
+    void _temporaryCleanLocators(const ELoc& locatorType);
+    void
+      _temporarySetLocator(const ELoc& locatorType, Id locatorIndex, Id icol);
+    void
+      _temporaryCheckLocator(const ELoc& locatorType, Id locatorIndex, Id icol)
+        const;
 
   protected:
     void _defineVariableAndLocators(
