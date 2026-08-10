@@ -24,19 +24,70 @@ namespace gstlrn
     return attr.isUnique;
   }
 
-  String RoleID::getDescr() const
+  String RoleID::getName() const
   {
-    if (_role == ERole::UNDEFINED) return STRING_NA;
+    if (!isDefined()) return STRING_NA;
 
-    String name(std::string(_role.getKey()));
+    String name(_role.getKey());
 
     std::transform(
       name.begin(), name.end(), name.begin(),
-      [](unsigned char c) { return std::tolower(c); });
+      [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
     if (!isUnique()) name += std::to_string(_index + 1);
 
     return name;
+  }
+
+  RoleID roleIDIdentify(const String& name)
+  {
+    if (name.empty()) return RoleID();
+
+    String lname = name;
+
+    std::transform(
+      lname.begin(), lname.end(), lname.begin(),
+      [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+    for (Id irank = 0; irank < static_cast<Id>(ERole::getSize()); irank++)
+    {
+      ERole role = ERole::fromValue(irank);
+
+      String roleName(role.getKey());
+
+      std::transform(
+        roleName.begin(), roleName.end(), roleName.begin(),
+        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+      // Test whether this role is unique
+      RoleID roleID(role, 0);
+
+      if (roleID.isUnique())
+      {
+        if (lname == roleName) return roleID;
+
+        continue;
+      }
+
+      // Non-unique role: a positive multiplicity is mandatory
+      if (lname.size() <= roleName.size()) continue;
+
+      if (lname.compare(0, roleName.size(), roleName) != 0) continue;
+
+      String suffix = lname.substr(roleName.size());
+
+      if (!std::all_of(
+            suffix.begin(), suffix.end(),
+            [](unsigned char c) { return std::isdigit(c); }))
+        continue;
+
+      Id multiplicity = std::stoll(suffix);
+
+      if (multiplicity <= 0) continue;
+
+      return RoleID(role, multiplicity - 1);
+    }
+    return RoleID();
   }
 
   /**
@@ -44,12 +95,15 @@ namespace gstlrn
    * A match is complete is they have the same Role and the same index
    *
    * @param roleID RoleID to compare with
+   * @param checkIndex When True, check the equality of the Index
    * @return true
    * @return false
    */
-  bool RoleID::match(const RoleID& roleID) const
+  bool RoleID::match(const RoleID& roleID, bool checkIndex) const
   {
-    return _role.isEqual(roleID.getRole()) && _index == roleID.getIndex();
+    if (_role.isDifferent(roleID.getRole())) return false;
+    if (!checkIndex) return true;
+    return _index == roleID.getIndex();
   }
 
   /**
@@ -62,7 +116,7 @@ namespace gstlrn
     // Mise en minuscules
     toLower(string);
 
-    // Extraction du nom du rôle et du rang éventuel
+    // Extracting the Role and the Index
     String roleName;
     String indexString;
 
@@ -97,7 +151,7 @@ namespace gstlrn
       it.toNext();
     }
 
-    if (role == ERole::UNDEFINED) return std::nullopt;
+    if (role == ERole::UNDEFINED) return RoleID(role, 0);
 
     // Conversion du rang utilisateur (1-based) en index interne (0-based)
     Id index = 0;

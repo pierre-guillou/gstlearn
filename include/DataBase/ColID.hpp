@@ -60,6 +60,8 @@ namespace gstlrn
 
     void setVersion(Id version) { _version = version; }
 
+    bool hasRoleDefined() const;
+
     /**
      * Factory helpers mainly intended for language bindings (SWIG).
      */

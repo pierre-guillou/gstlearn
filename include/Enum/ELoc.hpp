@@ -12,7 +12,6 @@
 
 #include "Enum/AEnum.hpp"
 
-// TODO Keep sync' with PtrGeos
 // clang-format off
 #define ENUM_LOC                                                       \
   ELoc, Z,                                                             \

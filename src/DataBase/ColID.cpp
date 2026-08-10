@@ -84,12 +84,16 @@ namespace gstlrn
 
     if (_icol >= 0) descr += "Index: " + std::to_string(_icol) + ", ";
 
-    if (_roleID.getRole().isDifferent(ERole::UNDEFINED))
-      descr += "Role: " + _roleID.getDescr() + ", ";
+    if (hasRoleDefined()) descr += "Role: " + _roleID.getName() + ", ";
 
     descr += "Version: " + std::to_string(_version);
 
     return descr;
+  }
+
+  bool ColID::hasRoleDefined() const
+  {
+    return _roleID.getRole().isDifferent(ERole::UNDEFINED);
   }
 
   ColID ColID::create()

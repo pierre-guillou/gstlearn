@@ -59,7 +59,7 @@ namespace gstlrn
     /// List of template functions
 
     /**
-     * @brief Initialize a new Column and fill it constantlywith default values
+     * @brief Initialize a new Column and fill it constantly with default values
      *
      * @tparam VectorType
      * @param name Name of the Column
@@ -128,10 +128,7 @@ namespace gstlrn
 
       // Check the validity of the new Role (if defined)
       auto roleIDLocal = roleID;
-      if (roleIDLocal.getRole().isDifferent(ERole::UNDEFINED))
-      {
-        _updateRoleIDAddition(roleIDLocal);
-      }
+      _updateRoleIDAddition(-1, roleIDLocal);
 
       // Check that input does not contain NA values if forbidNA is true
       if (forbidNA)
@@ -172,10 +169,7 @@ namespace gstlrn
 
       // Check the validity of the new Role (if defined)
       auto roleIDLocal = roleID;
-      if (roleIDLocal.getRole().isDifferent(ERole::UNDEFINED))
-      {
-        _updateRoleIDAddition(roleIDLocal);
-      }
+      _updateRoleIDAddition(-1, roleIDLocal);
 
       // Check that input does not contain NA values if forbidNA is true
       if (forbidNA)
@@ -367,20 +361,27 @@ namespace gstlrn
 
     void deleteColumn(ColID&& colid);
 
-    void removeAllColumns();
+    void deleteAllColumns();
 
     bool hasColumn(ColID&& colid) const;
     String getName(ColID&& colid) const;
+    VectorString getNames() const;
 
     Id getICol(ColID&& colid) const;
 
     RoleID getRoleID(ColID&& colid) const;
 
+    const ERole& getRole(ColID&& colid) const;
+
     ColID getColID(const ColID& colid) const;
 
     void removeRole(ColID&& colid);
 
-    Id getNVersions(ColID&& colid);
+    void removeAllRoles();
+
+    Id getNVersions(ColID&& colid) const;
+
+    Id getNRoles(ColID&& colid) const;
 
     std::vector<ColID> getColIDs(const String& name) const;
     std::vector<ColID> getColIDs(const VectorString& name) const;
@@ -390,6 +391,7 @@ namespace gstlrn
 
     Id getNSamples() const;
 
+    void setName(ColID&& colid, const String& newName);
     void setRoleID(ColID&& colid, const RoleID& roleID);
 
     void printContents(const String& title = "") const;
@@ -398,6 +400,8 @@ namespace gstlrn
 
     void addSamples(Id nadd, const double valinit);
     void deleteSample(Id idel);
+
+    String _summaryRoles(void) const;
 
   private:
     /***********************************************************************/
@@ -408,7 +412,8 @@ namespace gstlrn
     std::optional<std::reference_wrapper<const DbCol>>
       _identifyColumn(ColID&& colid) const;
 
-    std::optional<Id> _getColumnIndex(const ColID& colid) const;
+    std::optional<Id>
+      _getColumnIndex(const ColID& colid, bool verbose = true) const;
 
     template<class VectorType>
     VectorType _createEmptyVector(
@@ -440,7 +445,7 @@ namespace gstlrn
 
     void _updateName(String& name) const;
 
-    void _updateRoleIDAddition(RoleID& roleID);
+    void _updateRoleIDAddition(Id icol0, RoleID& roleID);
 
     void _updateRoleIDDeletion(RoleID& roleID);
 
@@ -462,7 +467,6 @@ namespace gstlrn
 
     // static bool _checkForbidNA(const VectorCategory& tab);
 
-    VectorString _getNames() const;
     static void _checkVersion(Id& nversion);
     static void _unknownName(const String& name);
     static void _unknownRoleID(const RoleID& roleID);

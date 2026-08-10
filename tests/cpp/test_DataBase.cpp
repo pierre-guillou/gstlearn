@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
   }
 
   mestitle(1, "Retrieving series of columns for various criteria");
-  data.removeAllColumns();
+  data.deleteAllColumns();
   data.addColumn("hello", VectorDouble{1., 2., 3.}, RoleID{ERole::X});
   data.addColumn("hellobis", VectorInt{5, 6, 7}, RoleID{ERole::X, 1});
   data.addColumn("helloback", VectorDouble{5, 6, 7}, RoleID{ERole::X, 2});

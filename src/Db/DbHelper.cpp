@@ -1303,7 +1303,7 @@ namespace gstlrn
   {
     DbGrid* dbout;
     VectorDouble coor;
-    Id ncol, icol, iech, iad, item, rank, ndim;
+    Id ncol, icol, iech, iad, item, rank, ndim, mult;
     ELoc locatorType;
 
     /* Initializations */
@@ -1324,7 +1324,7 @@ namespace gstlrn
     if (rank < 0) goto label_end;
     for (icol = 0; icol < ncol; icol++)
     {
-      (void)dbin->getLocatorByColIdx(icol, &locatorType, &item);
+      (void)dbin->getLocatorByColIdx(icol, &locatorType, &item, &mult);
       dbout->setLocatorByUID(icol, locatorType, item);
     }
 

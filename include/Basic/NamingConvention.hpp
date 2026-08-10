@@ -228,16 +228,12 @@ namespace gstlrn
 
   private:
     String _prefix; //!< String used as 'prefix'
-    String
-      _delim; //!< Character used as the 'delimitor' between different parts of the names
+    String _delim; //!< Character used as 'delimitor'
     bool _flagVarname; //!< When TRUE, add the 'variable name'
     bool _flagQualifier; //!< When TRUE, add the 'qualifier'
-    bool
-      _flagLocator; //!< When TRUE, assign a locator to the newly created variables
-    ELoc
-      _locatorOutType; //!< Type of locator assigned (if 'flagLocator' is TRUE)
-    bool
-      _cleanSameLocator; //!< Clean variables with the same locator beforehand
+    bool _flagLocator; //!< When TRUE, assign a locator to the new variables
+    ELoc _locatorOutType; //!< Type of locator assigned ('flagLocator' is TRUE)
+    bool _cleanSameLocator; //!< Clean variables with same locator beforehand
   };
 
   // typedef NamingConvention NC;

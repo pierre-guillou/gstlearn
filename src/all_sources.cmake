@@ -168,7 +168,6 @@ set(SRC
   Db/DbMeshTurbo.cpp
   Db/DbMeshStandard.cpp
   Db/DbStringFormat.cpp
-  Db/PtrGeos.cpp
   Db/DbHelper.cpp
   Db/RankHandler.cpp
   DataBase/ColID.cpp

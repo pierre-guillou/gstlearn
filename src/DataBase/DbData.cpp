@@ -54,7 +54,7 @@ namespace gstlrn
     SerializeHDF5::readValue(dbG, "NColumn", ncols);
 
     // Clear previous contents of the Data Base
-    removeAllColumns();
+    deleteAllColumns();
 
     for (Id i = 0; i < ncols; i++)
     {
@@ -100,7 +100,7 @@ namespace gstlrn
     _updateRoleIDDeletion(roleID);
   }
 
-  void DbData::removeAllColumns()
+  void DbData::deleteAllColumns()
   {
     this->_cols.clear();
     this->_roleIDs.clear();
@@ -154,7 +154,7 @@ namespace gstlrn
    */
   Id DbData::getICol(ColID&& colid) const
   {
-    const auto icol = _getColumnIndex(colid);
+    const auto icol = _getColumnIndex(colid, false);
     return icol ? *icol : -1;
   }
 
@@ -170,9 +170,15 @@ namespace gstlrn
     return icol ? _roleIDs[*icol] : RoleID();
   }
 
-  ColID DbData::getColID(const ColID& colid) const
+  const ERole& DbData::getRole(ColID&& colid) const
   {
     const auto icol = _getColumnIndex(colid);
+    return icol ? _roleIDs[*icol].getRole() : ERole::UNDEFINED;
+  }
+
+  ColID DbData::getColID(const ColID& colid) const
+  {
+    const auto icol = _getColumnIndex(colid, false);
     if (!icol) return ColID();
 
     ColID colIDout;
@@ -186,7 +192,22 @@ namespace gstlrn
   {
     const auto icol = _getColumnIndex(colid);
     if (!icol) return;
-    _roleIDs[*icol] = roleID;
+    if (roleID.match(_roleIDs[*icol], true)) return;
+
+    auto roleIDLocal = roleID;
+    _updateRoleIDAddition(*icol, roleIDLocal);
+    _roleIDs[*icol] = roleIDLocal;
+  }
+
+  void DbData::setName(ColID&& colid, const String& newName)
+  {
+    const auto icol = _getColumnIndex(colid);
+    if (!icol) return;
+    if (newName == _cols[*icol].getName()) return;
+
+    auto proposedName = newName;
+    _updateName(proposedName);
+    _cols[*icol].setName(proposedName);
   }
 
   /**
@@ -198,7 +219,7 @@ namespace gstlrn
   std::vector<ColID> DbData::getColIDs(const String& name) const
   {
     // Looking for matching names
-    VectorString matchNames = expandList(_getNames(), name);
+    VectorString matchNames = expandList(getNames(), name);
 
     // Loop to create the list of Column Identifiers
     std::vector<ColID> colIDs;
@@ -218,7 +239,7 @@ namespace gstlrn
    */
   std::vector<ColID> DbData::getColIDs(const VectorString& names) const
   {
-    VectorString matchNames = expandList(_getNames(), names);
+    VectorString matchNames = expandList(getNames(), names);
     std::vector<ColID> colIDs;
     for (const auto& matchName: matchNames)
     {
@@ -261,11 +282,33 @@ namespace gstlrn
     _roleIDs[*icol].removeRole();
   }
 
-  Id DbData::getNVersions(ColID&& colid)
+  void DbData::removeAllRoles()
+  {
+    for (auto& roleID: _roleIDs)
+    {
+      roleID.removeRole();
+    }
+  }
+
+  Id DbData::getNVersions(ColID&& colid) const
   {
     const auto icol = _getColumnIndex(colid);
     if (!icol) return 0;
     return _cols[*icol].getNVersions();
+  }
+
+  Id DbData::getNRoles(ColID&& colid) const
+  {
+    const auto icol = _getColumnIndex(colid, false);
+    if (!icol) return 0;
+
+    const auto& role = _roleIDs[*icol].getRole();
+    Id count = 0;
+    for (const auto& roleID: this->_roleIDs)
+    {
+      if (roleID.getRole().isEqual(role)) ++count;
+    }
+    return count;
   }
 
   /**
@@ -283,7 +326,7 @@ namespace gstlrn
   }
 
   /**
-   * @brief Produces a summary of the DbData content
+   * @brief Produces the contents of the DbData content
    */
   void DbData::printContents(const String& title) const
   {
@@ -299,7 +342,7 @@ namespace gstlrn
 
       std::cout << "Column " << icol << "/" << ncols;
       std::cout << " : " << c.getDescr();
-      std::cout << " {Role: " << id.getDescr() << "}";
+      std::cout << " {Role: " << id.getName() << "}";
       if (c.forbidNA()) std::cout << " [NA forbidden]";
       std::cout << std::endl;
     }
@@ -309,6 +352,7 @@ namespace gstlrn
    * @brief Returns the Column index corresponding to the given Column Indentifier (ColID)
    *
    * @param colid Column Indentifier
+   * @param verbose Whether to print error messages if the Column is not found (default = true)
    * @return std::optional<Id>
    *
    * @remark: The Column Indentifier (ColID) is searched in the following order:
@@ -316,7 +360,8 @@ namespace gstlrn
    * - by Column Role (and Rank)
    * - by Column index
    */
-  std::optional<Id> DbData::_getColumnIndex(const ColID& colid) const
+  std::optional<Id>
+    DbData::_getColumnIndex(const ColID& colid, bool verbose) const
   {
     auto ncol = getNCols();
 
@@ -326,9 +371,11 @@ namespace gstlrn
     {
       for (Id icol = 0; icol < ncol; ++icol)
       {
-        if (_cols[icol].getName() == localName) return icol;
+        // 'localName' may contain a regular expression, so we use matchRegexp to check for a match
+        if (matchRegexp(_cols[icol].getName(), localName)) return icol;
+        //  if (_cols[icol].getName() == localName) return icol;
       }
-      _unknownName(localName);
+      if (verbose) _unknownName(localName);
       return std::nullopt;
     }
 
@@ -338,15 +385,15 @@ namespace gstlrn
       const RoleID& roleID = colid.getRoleID();
       for (Id icol = 0; icol < ncol; ++icol)
       {
-        if (_roleIDs[icol].match(roleID)) return icol;
+        if (_roleIDs[icol].match(roleID, true)) return icol;
       }
-      _unknownRoleID(roleID);
+      if (verbose) _unknownRoleID(roleID);
       return std::nullopt;
     }
 
     // Try to identify by Column rank
     if (colid.getICol() >= 0) return colid.getICol();
-    messerr("Column does not exist.");
+    if (verbose) messerr("Column does not exist.");
     return std::nullopt;
   }
 
@@ -360,7 +407,7 @@ namespace gstlrn
   void DbData::_updateName(String& name) const
   {
     // Establish the list of already existing names
-    VectorString proposedNames = _getNames();
+    VectorString proposedNames = getNames();
     auto ncol = static_cast<Id>(proposedNames.size());
 
     // Add the new proposal to the list of already existing names
@@ -374,6 +421,7 @@ namespace gstlrn
   /**
    * @brief Check the addition of a new column with the roleID provided as argument
    *
+   * @param icol0 Index of the column to be added (<0 for a non existing column)
    * @param roleID RoleID of the new column to be added (possibly modified)
    *
    * @remark If the Role of the new Column is already present in the already defined ones:
@@ -381,57 +429,78 @@ namespace gstlrn
    *   the Old matching Column is moved to an UNDEFINED Role (and a Rank set to 0).
    *   the New Column keeps its Role and Rank unchanged
    * - if the Rank of the new Column does not match the one of the old matching Column,
-   *  this rank is calculated as the largest Rank found in matching Columns incremented by 1.
+   *   this rank is calculated as the largest Rank found in matching Columns incremented by 1.
    */
-  void DbData::_updateRoleIDAddition(RoleID& roleID)
+  void DbData::_updateRoleIDAddition(Id icol0, RoleID& roleID)
   {
-    const auto& newRole = roleID.getRole();
-    const auto newRank = roleID.getIndex();
-    Id rankMin = -1;
+    auto ncol = getNCols();
+    auto wasDefined = icol0 >= 0 && _roleIDs[icol0].isDefined();
+    const auto newRole = roleID.getRole();
+    const auto newIndex = roleID.getIndex();
 
-    // Look for already existing Columns with the same RoleID
-    for (auto& id: this->_roleIDs)
+    // Check if the target Column does not already have the same roleID (ERole and Index)
+    if (icol0 >= 0 && roleID.match(_roleIDs[icol0], true)) return;
+
+    // The ERole of the new Column is defined.
+    if (roleID.isDefined())
     {
-      if (id.getRole().isEqual(newRole))
+      Id rankMin = -1;
+
+      // Look for a Column with the same roleID (same ERole and same Index)
+      for (Id icol = 0; icol < ncol; icol++)
       {
-        // Same role already exists
-        auto oldRank = id.getIndex();
-        if (oldRank == newRank)
+        if (icol == icol0) continue;
+
+        // Look for a column (different from the new one) with the same RoleID
+        if (roleID.match(_roleIDs[icol], true))
         {
-          // Same role and same rank already exists:
-          // Move the old one to UNDEFINED; keep the new one unchanged
-          id.setRole(ERole::UNDEFINED);
-          id.setIndex(0);
-          return;
+          // Set it to UNDEFINED
+          _roleIDs[icol] = RoleID(ERole::UNDEFINED, 0);
         }
 
-        // Update the Minimum index
-        if (oldRank > rankMin) rankMin = oldRank;
+        // Calculate the highest index of the same RoleID already present in the DataBase
+        if (roleID.match(_roleIDs[icol], false))
+        {
+          auto curIndex = _roleIDs[icol].getIndex();
+          if (curIndex > rankMin) rankMin = curIndex;
+        }
       }
-    }
 
-    if (rankMin >= 0)
-    {
-      // Same role already exist but with different ranks:
-      // Set the new rank to the largest rank found + 1
-      roleID.setIndex(rankMin + 1);
+      // Modify the Index of the new Column (if necessary)
+      if (rankMin >= 0 && newIndex > rankMin) roleID.setIndex(rankMin + 1);
     }
     else
     {
-      // No same role already exists: set the rank to 0 whatever the input rank was
-      roleID.setIndex(0);
+      // The new Column exists: it is undefined, but was defined previously
+      if (wasDefined)
+      {
+        // Look for all Columns with same ERole (but possibly different Rank)
+        for (Id icol = 0; icol < ncol; icol++)
+        {
+          if (icol == icol0) continue;
+          if (!_roleIDs[icol0].match(_roleIDs[icol], false)) continue;
+
+          auto oldIndex = _roleIDs[icol0].getIndex();
+          auto curIndex = _roleIDs[icol].getIndex();
+          if (curIndex > oldIndex)
+          {
+            // Same role and a larger rank already exists: decrease the index of the old Column by one
+            _roleIDs[icol].setIndex(curIndex - 1);
+          }
+        }
+      }
     }
   }
 
   void DbData::_updateRoleIDDeletion(RoleID& roleID)
   {
-    const auto& role = roleID.getRole();
-    const auto rank = roleID.getIndex();
+    const auto& newRole = roleID.getRole();
+    const auto newIndex = roleID.getIndex();
 
     // Look for already existing Columns with the same RoleID
     for (auto& id: this->_roleIDs)
     {
-      if (id.getRole().isEqual(role) && id.getIndex() > rank)
+      if (id.getRole().isEqual(newRole) && id.getIndex() > newIndex)
       {
         // Same role and a larger rank already exists:
         // Decrease the rank of the old one by 1
@@ -463,7 +532,7 @@ namespace gstlrn
    *
    * @return VectorString
    */
-  VectorString DbData::_getNames() const
+  VectorString DbData::getNames() const
   {
     VectorString names;
     for (const auto& col: _cols)
@@ -502,6 +571,28 @@ namespace gstlrn
     }
   }
 
+  String DbData::_summaryRoles(void) const
+  {
+    std::stringstream sstr;
+
+    auto it = ERole::getIterator();
+    while (it.hasNext())
+    {
+      const auto& role = *it;
+
+      auto colIDs = getColIDs(role);
+      if (!colIDs.empty())
+      {
+        sstr << "Role: " << role.getKey() << " (" << getNRoles(role) << ")";
+        sstr << " - Columns = ";
+        for (const auto& colID: colIDs) sstr << colID.getICol() << " ";
+        sstr << std::endl;
+      }
+      it.toNext();
+    }
+    return sstr.str();
+  }
+
   void DbData::_unknownName(const String& name)
   {
     messerr("Column '%s' does not exist.", name.c_str());
@@ -509,7 +600,7 @@ namespace gstlrn
 
   void DbData::_unknownRoleID(const RoleID& roleID)
   {
-    messerr("Role '%s' does not exist.", roleID.getDescr().c_str());
+    messerr("Role '%s' does not exist.", roleID.getName().c_str());
   }
 
   /***********************************************************************/

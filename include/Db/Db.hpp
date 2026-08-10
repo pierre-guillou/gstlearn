@@ -17,7 +17,6 @@
 #include "Basic/Limits.hpp"
 #include "Basic/NamingConvention.hpp"
 #include "DataBase/DbData.hpp"
-#include "Db/PtrGeos.hpp"
 #include "Enum/ELoadBy.hpp"
 #include "Enum/EStatOption.hpp"
 #include "Matrix/MatrixDense.hpp"
@@ -121,11 +120,15 @@ namespace gstlrn
     virtual double getUnit(Id idim = 0) const;
     virtual Id getNDim() const;
 
+    virtual Id getNSamples() const { return _nsamples; };
+
     virtual bool mayChangeSampleNumber() const { return true; }
 
     virtual void resetDims(Id ncol, Id nech);
 
     virtual bool isConsistent() const { return true; };
+
+    void setNSamples(Id nsamples) { _nsamples = nsamples; }
 
     /**
      * \defgroup DB Db: Numerical Data Base
@@ -311,9 +314,11 @@ namespace gstlrn
 
     inline Id getNUIDMax() const { return static_cast<Id>(_uidcol.size()); }
 
-    inline Id getNColumn() const { return _ncol; }
+    inline Id getNColumn() const { return _data.getNCols(); }
 
-    static Id getNEloc();
+    // Unprotected access (used temporarily while DbData is part of Db)
+    DbData& getData() { return _data; }
+
     Id getNSample(bool useSel = false) const;
     Id getNSampleActiveAndDefined(Id item) const;
     Id getNSampleActiveAndDefined(const String& name) const;
@@ -428,6 +433,7 @@ namespace gstlrn
     Id deleteSamples(const VectorInt& e_dels);
     void resizeSamples(Id nnew);
     void switchLocator(const ELoc& locatorType_in, const ELoc& locatorType_out);
+    Id getLastColumn(Id number = 0) const;
     Id getLastUID(Id number = 0) const;
     String getLastName(Id number = 0) const;
 
@@ -513,16 +519,21 @@ namespace gstlrn
     bool getLocator(
       const String& name,
       ELoc* ret_locatorType,
-      Id* ret_locatorIndex) const;
-    bool
-      getLocatorByColIdx(Id icol, ELoc* ret_locatorType, Id* ret_locatorIndex)
-        const;
-    bool getLocatorByUID(Id iuid, ELoc* ret_locatorType, Id* ret_locatorIndex)
-      const;
+      Id* ret_locatorIndex,
+      Id* ret_mult) const;
+    bool getLocatorByColIdx(
+      Id icol,
+      ELoc* ret_locatorType,
+      Id* ret_locatorIndex,
+      Id* ret_mult) const;
+    bool getLocatorByUID(
+      Id iuid,
+      ELoc* ret_locatorType,
+      Id* ret_locatorIndex,
+      Id* ret_mult) const;
     VectorString getLocators(
       bool anyLocator = true,
       const ELoc& locatorType = ELoc::fromKey("UNDEFINED")) const;
-    bool isUIDDefined(Id iuid) const;
 
     Id getUID(const String& name) const;
     Id getUIDByColIdx(Id icol) const;
@@ -685,8 +696,6 @@ namespace gstlrn
       double value);
     /**@}*/
 
-    Id getNZValues() const;
-    bool hasZVariable() const;
     double getZVariable(Id iech, Id item) const;
     void setZVariable(Id iech, Id item, double value);
     void updZVariable(Id iech, Id item, const EOperator& oper, double value);
@@ -1143,7 +1152,6 @@ namespace gstlrn
       const VectorDouble& tab);
     void _defineDefaultNames(Id shift, const VectorString& names);
     void _defineDefaultLocators(Id shift, const VectorString& locatorNames);
-    void _setNameByColIdx(Id icol, const String& name);
     String _toStringCommon(const AStringFormat* strfmt) const;
     String _summaryString(void) const;
 
@@ -1165,8 +1173,6 @@ namespace gstlrn
 
     void _defineDefaultLocatorsByNames(Id shift, const VectorString& names);
     VectorInt _getUIDsBasic(const VectorString& names) const;
-
-    Id _getLastColumn(Id number = 0) const;
 
     Id _findColumnInLocator(const ELoc& locatorType, Id icol) const;
     Id _findUIDInLocator(const ELoc& locatorType, Id iuid) const;
@@ -1205,34 +1211,17 @@ namespace gstlrn
       _isCountValid(const VectorInt& iuids, bool flagOne, bool verbose = true)
         const;
 
-    const PtrGeos& _getPtrGeosByRank(Id rank) const { return _p[rank]; }
-
-    PtrGeos& _getPtrGeosByRankUnprotected(Id rank) { return _p[rank]; }
-
-    const PtrGeos& _getPtrGeosByType(const ELoc& type) const
-    {
-      return _p[type.getValue()];
-    }
-
-    PtrGeos& _getPtrGeosByTypeUnprotected(const ELoc& type)
-    {
-      return _p[type.getValue()];
-    }
-
-  private:
+  public:
     // This section is dedicated to smooth transition towards DbData
-    // For better legibility, all the methods of this section are prefixed with "_temporary"
-    static ERole _temporaryToRole(const ELoc& locatorType)
+    static ERole temporaryToRole(const ELoc& locatorType)
     {
       return ERole::fromKey(locatorType.getKey());
     }
 
-    void _temporaryCleanLocators(const ELoc& locatorType);
-    void
-      _temporarySetLocator(const ELoc& locatorType, Id locatorIndex, Id icol);
-    void
-      _temporaryCheckLocator(const ELoc& locatorType, Id locatorIndex, Id icol)
-        const;
+    static ELoc temporaryToLocator(const ERole& role)
+    {
+      return ELoc::fromKey(role.getKey());
+    }
 
   protected:
     void _defineVariableAndLocators(
@@ -1246,12 +1235,9 @@ namespace gstlrn
       Id shift = 0);
 
   private:
-    Id _ncol; //!< Number of Columns of data
-    Id _nech; //!< Number of samples
+    Id _nsamples; //!< Number of samples (needed when creating an empty Db)
     DbData _data;
     VectorInt _uidcol; //!< UID to Column
-    VectorString _colNames; //!< Names of the variables
-    std::vector<PtrGeos> _p; //!< Locator characteristics
 
     /// factor allocations
     mutable VectorInt _uids;
@@ -1267,5 +1253,12 @@ namespace gstlrn
     const Db* db2,
     const ModelGeneric* model,
     Id* nvar);
+  GSTLEARN_EXPORT String
+    getLocatorName(const ELoc& locatorType, Id locatorIndex = 1);
+  GSTLEARN_EXPORT Id locatorIdentify(
+    const String& string,
+    ELoc* ret_locatorType,
+    Id* ret_locatorIndex,
+    Id* ret_mult);
 
 } // namespace gstlrn

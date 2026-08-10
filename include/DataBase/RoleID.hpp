@@ -51,15 +51,17 @@ namespace gstlrn
 
     void setIndex(Id index) { _index = index; }
 
-    bool match(const RoleID& RoleID) const;
+    bool match(const RoleID& RoleID, bool checkIndex = true) const;
 
     bool isUnique() const;
 
-    String getDescr() const;
+    String getName() const;
 
     static std::optional<RoleID> createFromName(String string);
 
     void removeRole();
+
+    bool isDefined() const { return _role != ERole::UNDEFINED; }
 
   private:
     ERole _role;
