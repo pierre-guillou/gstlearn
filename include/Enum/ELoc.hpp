@@ -12,6 +12,8 @@
 
 #include "Enum/AEnum.hpp"
 
+// same as ERole
+
 // clang-format off
 #define ENUM_LOC                                                       \
   ELoc, Z,                                                             \
