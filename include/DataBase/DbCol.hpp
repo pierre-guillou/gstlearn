@@ -77,14 +77,6 @@ namespace gstlrn
     {
     }
 
-#ifndef SWIG
-    DbCol(const DbCol&) = default;
-    DbCol(DbCol&&) = default;
-    DbCol& operator=(const DbCol&) = default;
-    DbCol& operator=(DbCol&&) = default;
-    ~DbCol() = default;
-#endif
-
     /// ASerializable interface
     String getNFName() const override { return "Column"; }
 #ifdef HDF5
