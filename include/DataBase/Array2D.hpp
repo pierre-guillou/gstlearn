@@ -12,7 +12,7 @@
 
 #include "geoslib_define.h"
 
-// #include "DataBase/VectorCategory.hpp"
+#include "DataBase/VectorCategory.hpp"
 #include <optional>
 
 namespace gstlrn
@@ -88,11 +88,11 @@ namespace gstlrn
 
     std::optional<value_type> getValue(const size_t o, const size_t i) const
     {
-      // if constexpr (std::is_same_v<VectorType, VectorCategory>)
-      // {
-      //   return this->_buf.getCategory((o * this->_inner) + i);
-      // }
-      // else
+      if constexpr (std::is_same_v<VectorType, VectorCategory>)
+      {
+        return this->_buf.getCategory((o * this->_inner) + i);
+      }
+      else
       {
         return this->_buf[(o * this->_inner) + i];
       }
@@ -100,11 +100,11 @@ namespace gstlrn
 
     bool setValue(const size_t o, const size_t i, const value_type& val)
     {
-      // if constexpr (std::is_same_v<VectorType, VectorCategory>)
-      // {
-      //   return this->_buf.setCategory((o * this->_inner) + i, val);
-      // }
-      // else
+      if constexpr (std::is_same_v<VectorType, VectorCategory>)
+      {
+        return this->_buf.setCategory((o * this->_inner) + i, val);
+      }
+      else
       {
         this->_buf[(o * this->_inner) + i] = val;
         return true;

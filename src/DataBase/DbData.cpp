@@ -509,23 +509,23 @@ namespace gstlrn
     }
   }
 
-  // /**
-  //  * @brief Check if the new Category Column is Valid when forbidNA is true
-  //  *
-  //  * @param tab VectorCategory of the new column to be added
-  //  */
-  // bool DbData::_checkForbidNA(const VectorCategory& tab)
-  // {
-  //   for (size_t i = 0; i < tab.size(); i++)
-  //   {
-  //     if (!tab[i].has_value())
-  //     {
-  //       messerr("Column forbids NA values, but the input tab contains some.");
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // }
+  /**
+   * @brief Check if the new Category Column is Valid when forbidNA is true
+   *
+   * @param tab VectorCategory of the new column to be added
+   */
+  bool DbData::_checkForbidNA(const VectorCategory& tab)
+  {
+    for (size_t i = 0; i < tab.size(); i++)
+    {
+      if (!tab[i].has_value())
+      {
+        messerr("Column forbids NA values, but the input tab contains some.");
+        return false;
+      }
+    }
+    return true;
+  }
 
   /**
    * @brief Get the Names of all the Columns

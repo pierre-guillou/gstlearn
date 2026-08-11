@@ -13,9 +13,9 @@
 #include "Basic/ASerializable.hpp"
 #include "DataBase/ColID.hpp"
 #include "DataBase/DbCol.hpp"
-// #include "DataBase/Dictionary.hpp"
+#include "DataBase/Dictionary.hpp"
 #include "DataBase/RoleID.hpp"
-// #include "DataBase/VectorCategory.hpp"
+#include "DataBase/VectorCategory.hpp"
 #include "gstlearn_export.hpp"
 
 #include <functional>
@@ -68,6 +68,7 @@ namespace gstlrn
      * @param roleID RoleID of the Column
      * @param valinit Value to fill the Column with (or std::nullopt for default)
      * @param forbidNA Whether to forbid NA values in the new Column (default = false)
+     * @param dict Pointer to Dictionary instance (default = nullptr)
      *
      * @remark: The argument 'nsample' is only needed if the current column is the first one
      * of the current Data Base.
@@ -79,8 +80,8 @@ namespace gstlrn
       Id nversion = 1,
       const RoleID& roleID = RoleID(),
       std::optional<typename VectorType::value_type> valinit = std::nullopt,
-      bool forbidNA = false)
-    // const Dictionary* dict = nullptr)
+      bool forbidNA = false,
+      const Dictionary* dict = nullptr)
     {
       if (getNCols() > 0) nsamples = getNSamples();
       if (nsamples <= 0)
@@ -88,9 +89,8 @@ namespace gstlrn
         messerr("The number of samples (%d) must be positive.", nsamples);
         return;
       }
-      // auto array =
-      //   _createEmptyVector<VectorType>(nsamples * nversion, valinit, dict);
-      auto array = _createEmptyVector<VectorType>(nsamples * nversion, valinit);
+      auto array =
+        _createEmptyVector<VectorType>(nsamples * nversion, valinit, dict);
       addColumn(name, std::move(array), roleID, nversion, forbidNA);
     }
 
@@ -418,23 +418,23 @@ namespace gstlrn
     template<class VectorType>
     VectorType _createEmptyVector(
       Id n,
-      std::optional<typename VectorType::value_type> value)
-    // const Dictionary* dict = nullptr)
+      std::optional<typename VectorType::value_type> value,
+      const Dictionary* dict = nullptr)
     {
-      // if constexpr (std::is_same_v<VectorType, VectorCategory>)
-      // {
-      //   if (dict == nullptr)
-      //     throw std::invalid_argument("Dictionary is required");
+      if constexpr (std::is_same_v<VectorType, VectorCategory>)
+      {
+        if (dict == nullptr)
+          throw std::invalid_argument("Dictionary is required");
 
-      //   VectorCategory vec(n, *dict);
+        VectorCategory vec(n, *dict);
 
-      //   if (value)
-      //   {
-      //     for (Id i = 0; i < n; i++) vec[i] = *value;
-      //   }
-      //   return vec;
-      // }
-      // else
+        if (value)
+        {
+          for (Id i = 0; i < n; i++) vec[i] = *value;
+        }
+        return vec;
+      }
+      else
       {
         const auto actual =
           value.value_or(getNA<typename VectorType::value_type>());
@@ -465,7 +465,7 @@ namespace gstlrn
       return true;
     }
 
-    // static bool _checkForbidNA(const VectorCategory& tab);
+    static bool _checkForbidNA(const VectorCategory& tab);
 
     static void _checkVersion(Id& nversion);
     static void _unknownName(const String& name);
