@@ -59,7 +59,7 @@ namespace gstlrn
          */
         else
         {
-          const auto& type = SerializeHDF5::getHDF5PredType<T>();
+          const auto& type = SerializeHDF5::getHDF5Type<T>();
 
           auto ds = grp.createDataSet("Values", type, space);
 
@@ -104,7 +104,7 @@ namespace gstlrn
         if (H5Tget_size(type) == sizeof(double))
         {
           VectorDouble vec(size);
-          ds.read(vec.data(), SerializeHDF5::getHDF5PredType<double>());
+          ds.read(vec.data(), SerializeHDF5::getHDF5Type<double>());
           _data = Array2D<VectorDouble>(std::move(vec), outer);
           return true;
         }
@@ -112,7 +112,7 @@ namespace gstlrn
         if (H5Tget_size(type) == sizeof(float))
         {
           VectorFloat vec(size);
-          ds.read(vec.data(), SerializeHDF5::getHDF5PredType<float>());
+          ds.read(vec.data(), SerializeHDF5::getHDF5Type<float>());
           _data = Array2D<VectorFloat>(std::move(vec), outer);
           return true;
         }
@@ -124,7 +124,7 @@ namespace gstlrn
         if (H5Tget_sign(type) == H5T_SGN_2 && H5Tget_size(type) == sizeof(Id))
         {
           VectorInt vec(size);
-          ds.read(vec.data(), SerializeHDF5::getHDF5PredType<Id>());
+          ds.read(vec.data(), SerializeHDF5::getHDF5Type<Id>());
           _data = Array2D<VectorInt>(std::move(vec), outer);
           return true;
         }
@@ -133,7 +133,7 @@ namespace gstlrn
             && H5Tget_size(type) == sizeof(unsigned char))
         {
           VectorBool vec(size);
-          ds.read(vec.data(), SerializeHDF5::getHDF5PredType<unsigned char>());
+          ds.read(vec.data(), SerializeHDF5::getHDF5Type<unsigned char>());
           _data = Array2D<VectorBool>(std::move(vec), outer);
           return true;
         }
