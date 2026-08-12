@@ -36,10 +36,18 @@ namespace gstlrn
         H5::DataSpace space(2, dims);
 
         /*
+         * Category case
+         */
+        if constexpr (std::is_same_v<T, VectorCategory::Category>)
+        {
+          // TODO
+        }
+
+        /*
          * String case
          */
-        if constexpr (std::is_same_v<T, String>
-                      || std::is_same_v<T, std::string>)
+        else if constexpr (std::is_same_v<T, String>
+                           || std::is_same_v<T, std::string>)
         {
           H5::StrType strType(H5::PredType::C_S1, H5T_VARIABLE);
 

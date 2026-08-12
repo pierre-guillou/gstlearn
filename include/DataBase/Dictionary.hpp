@@ -30,8 +30,7 @@ namespace gstlrn
    * The category is represented by the @c Category type, which is a pair
    * containing the category identifier and its label.
    */
-  class Dictionary
-  // class GSTLEARN_EXPORT Dictionary
+  class GSTLEARN_EXPORT Dictionary
   {
   public:
     /**
