@@ -632,15 +632,15 @@ namespace gstlrn
 
   void Db::getArrayBySample(VectorDouble& vals, Id iech) const
   {
-    getAllUIDs(_uids);
-    vals.resize(_uids.size());
-    for (Id iuid = 0; iuid < static_cast<Id>(_uids.size()); iuid++)
-      vals[iuid] = getArray(iech, _uids[iuid]);
+    VectorInt uids = getUIDsDefined();
+    vals.resize(uids.size());
+    for (Id iuid = 0; iuid < static_cast<Id>(uids.size()); iuid++)
+      vals[iuid] = getArray(iech, uids[iuid]);
   }
 
   void Db::setArrayBySample(Id iech, const VectorDouble& vec)
   {
-    VectorInt uids = getAllUIDs();
+    VectorInt uids = getUIDsDefined();
     if (static_cast<Id>(uids.size()) != static_cast<Id>(vec.size()))
     {
       messerr(
@@ -4606,7 +4606,7 @@ namespace gstlrn
    */
   VectorDouble Db::getAllColumns(bool useSel, bool flagCompress) const
   {
-    VectorInt iuids = getAllUIDs();
+    VectorInt iuids = getUIDsDefined();
     return getColumnsByUID(iuids, useSel, flagCompress);
   }
 
@@ -4617,7 +4617,7 @@ namespace gstlrn
    */
   void Db::setAllColumns(const VectorVectorDouble& tabs)
   {
-    VectorInt iuids = getAllUIDs();
+    VectorInt iuids = getUIDsDefined();
     for (Id iuid = 0; iuid < static_cast<Id>(iuids.size()); iuid++)
       setColumnByUID(tabs[iuid], iuids[iuid], false);
   }
@@ -4806,19 +4806,12 @@ namespace gstlrn
     return iuids;
   }
 
-  VectorInt Db::getAllUIDs() const
+  VectorInt Db::getUIDsDefined() const
   {
     VectorInt iuids;
     for (Id i = 0; i < static_cast<Id>(_uidcol.size()); i++)
       if (_uidcol[i] >= 0) iuids.push_back(i);
     return iuids;
-  }
-
-  void Db::getAllUIDs(VectorInt& iuids) const
-  {
-    iuids.clear();
-    for (Id i = 0; i < static_cast<Id>(_uidcol.size()); i++)
-      if (_uidcol[i] >= 0) iuids.push_back(i);
   }
 
   void Db::_loadData(
@@ -4983,11 +4976,12 @@ namespace gstlrn
     VectorString nameloc = getNamesByUID(iuids);
     dbStatisticsVariables(this, nameloc, opers, iuidn, proba, vmin, vmax);
 
-    namconv.setNamesAndLocators(this, iuidn);
+    namconv.setOutput(VectorString(), 0, this, iuidn);
     for (Id i = 0; i < noper; i++)
     {
       const EStatOption& oper = opers[i];
-      namconv.setNamesAndLocators(this, iuidn + i, String{oper.getKey()});
+      namconv.setOutput(
+        VectorString(), 0, this, iuidn + i, String{oper.getKey()});
     }
   }
 
@@ -6455,6 +6449,12 @@ namespace gstlrn
     *ret_mult = roleID->isUnique() ? 1 : 0;
 
     return 0;
+  }
+
+  void Db::dumpLocators() const
+  {
+    message("Maximum UID = %d\n", getNUIDMax());
+    _uidcol.dump("List of Locators:", false);
   }
 
 } // namespace gstlrn

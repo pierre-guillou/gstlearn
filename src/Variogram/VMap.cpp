@@ -160,7 +160,6 @@ namespace gstlrn
       auto* dbgrid = dynamic_cast<DbGrid*>(db);
 
       // Case where Data are on a regular grid
-
       if (flag_FFT)
       {
         if (_grid_fft(dbgrid, false, namconv)) return 1;
@@ -174,16 +173,18 @@ namespace gstlrn
     {
 
       // Case where Data are on a set of points
-
       if (_vmap_general(db, radius, namconv)) return 1;
     }
 
+    auto names = db->getNamesByLocator(ELoc::Z);
     if (_IPTW >= 0)
-      namconv.setNamesAndLocators(
-        db, VectorString(), ELoc::Z, -1, _dbmap, _IPTW, "Nb", 1, false);
+    {
+      namconv.setOutput(names, 1, _dbmap, _IPTW, "Nb", 1, false);
+    }
     if (_IPTV >= 0)
-      namconv.setNamesAndLocators(
-        db, VectorString(), ELoc::Z, -1, _dbmap, _IPTV, "Var");
+    {
+      namconv.setOutput(names, 1, _dbmap, _IPTV, "Var", 1, true);
+    }
     return 0;
   }
 

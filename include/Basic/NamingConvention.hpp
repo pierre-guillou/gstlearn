@@ -57,7 +57,7 @@ namespace gstlrn
    * - MyPrefix.var.S2 (for second simulation)
    * ...
    *
-   * For multivariate simulations, the new setNamesAndLocatorsForSimulations method
+   * For multivariate simulations, the new setOutputForSimulations method
    * provides consistent naming with explicit Variable and Simulation indicators:
    *
    * Non-conditional multivariate simulations (e.g., 2 variables, 2 simulations):
@@ -98,39 +98,8 @@ namespace gstlrn
       const String& delim = ".",
       bool cleanSameLocator = true);
 
-    void setNamesAndLocators(
-      Db* dbout,
-      Id iattout_start,
-      const String& qualifier = "",
-      Id nitems = 1,
-      bool flagSetLocator = true,
-      Id locatorShift = 0) const;
-    void setNamesAndLocators(
+    void setOutput(
       const VectorString& names,
-      Db* dbout,
-      Id iattout_start,
-      const String& qualifier = "",
-      Id nitems = 1,
-      bool flagSetLocator = true,
-      Id locatorShift = 0) const;
-    void setNamesAndLocators(
-      Db* dbout,
-      Id iattout_start,
-      const VectorString& names,
-      bool flagSetLocator = true,
-      Id locatorShift = 0) const;
-    void setNamesAndLocators(
-      const String& namin,
-      Db* dbout,
-      Id iattout_start,
-      const String& qualifier = "",
-      Id nitems = 1,
-      bool flagSetLocator = true,
-      Id locatorShift = 0) const;
-    void setNamesAndLocators(
-      const Db* dbin,
-      const VectorString& names,
-      const ELoc& locatorInType,
       Id nvar,
       Db* dbout,
       Id iattout_start,
@@ -138,28 +107,8 @@ namespace gstlrn
       Id nitems = 1,
       bool flagSetLocator = true,
       Id locatorShift = 0) const;
-    void setNamesAndLocators(
-      const Db* dbin,
-      const VectorInt& iatts,
-      Db* dbout,
-      Id iattout_start,
-      const String& qualifier = "",
-      Id nitems = 1,
-      bool flagSetLocator = true,
-      Id locatorShift = 0) const;
-    void setNamesAndLocators(
-      const Db* dbin,
-      Id iatt,
-      Db* dbout,
-      Id iattout_start,
-      const String& qualifier = "",
-      Id nitems = 1,
-      bool flagSetLocator = true,
-      Id locatorShift = 0) const;
-    void setNamesAndLocatorsForSimulations(
-      const Db* dbin,
+    void setOutputForSimulations(
       const VectorString& names,
-      const ELoc& locatorInType,
       Id nvar,
       Db* dbout,
       Id iattout_start,

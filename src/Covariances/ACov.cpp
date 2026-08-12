@@ -2330,7 +2330,7 @@ namespace gstlrn
 
     /* Set the error return code */
 
-    namconv.setNamesAndLocators(dbgrid, iptr, "Model", nv2);
+    namconv.setOutput(VectorString(), 0, dbgrid, iptr, "Model");
     return 0;
   }
 

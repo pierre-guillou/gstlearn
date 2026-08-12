@@ -542,8 +542,7 @@ namespace gstlrn
     VectorInt getUIDs(const VectorString& names) const;
     VectorInt getUIDsByLocator(const ELoc& locatorType) const;
     VectorInt getUIDsByColIdx(const VectorInt& icols) const;
-    VectorInt getAllUIDs() const;
-    void getAllUIDs(VectorInt& iuids) const;
+    VectorInt getUIDsDefined() const;
 
     void copyByUID(Id iuidIn, Id iuidOut);
     void copyByCol(Id icolIn, Id icolOut);
@@ -1108,6 +1107,7 @@ namespace gstlrn
       bool skipTitle = false) const;
 
     void dumpGeometry(Id iech, Id jech) const;
+    void dumpLocators() const;
 
     // Operator overload
     double& operator()(Id iech, const String& name)
@@ -1238,9 +1238,6 @@ namespace gstlrn
     Id _nsamples; //!< Number of samples (needed when creating an empty Db)
     DbData _data;
     VectorInt _uidcol; //!< UID to Column
-
-    /// factor allocations
-    mutable VectorInt _uids;
   };
 
   GSTLEARN_EXPORT bool haveSameNDim(
