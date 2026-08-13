@@ -115,6 +115,9 @@ namespace gstlrn
       // Checking the validity of the number of versions
       _checkVersion(nversion);
 
+      // Check the number of samples
+      if (!_checkNSample(array, nversion)) return;
+
       // Check the validity of the new name
       auto nameLocal = name;
       for (const auto& col: this->_cols)
@@ -155,6 +158,9 @@ namespace gstlrn
     {
       // Checking the validity of the number of versions
       _checkVersion(nversion);
+
+      // Check the number of samples
+      if (!_checkNSample(array, nversion)) return;
 
       // Check the validity of the new name
       auto nameLocal = name;
@@ -463,6 +469,27 @@ namespace gstlrn
         }
       }
       return true;
+    }
+
+    template<typename VectorType>
+    bool _checkNSample(const VectorType& array, Id nversion) const
+    {
+      const Id nsample = getNSamples();
+
+      // Number of samples not yet defined
+      if (nsample <= 0) return true;
+
+      const Id size = static_cast<Id>(array.size());
+      const Id expected = nsample * nversion;
+
+      if (size == expected) return true;
+
+      messerr(
+        "The number of values (%lld) is not compatible with "
+        "the number of samples (%lld) and versions (%lld).",
+        size, nsample, nversion);
+
+      return false;
     }
 
     static bool _checkForbidNA(const VectorCategory& tab);

@@ -204,7 +204,7 @@ namespace gstlrn
     if (this->getNVersions() > 1)
       descr += " [" + std::to_string(this->getNVersions()) + "]";
 
-    descr += " (" + this->getTypeName() + ")";
+    descr += " (Type: " + this->getTypeName() + ")";
 
     return descr;
   }

@@ -312,10 +312,21 @@ namespace gstlrn
       return std::is_convertible_v<typename VectorType::value_type, T>;
     }
 
+    // template<typename T, typename VectorType>
+    // static constexpr bool _isWritable()
+    // {
+    //   return std::is_same_v<T, typename VectorType::value_type>
+    //       || (std::is_same_v<T, bool>
+    //           && std::is_same_v<VectorType, VectorBool>);
+    // }
+
     template<typename T, typename VectorType>
     static constexpr bool _isWritable()
     {
-      return std::is_same_v<T, typename VectorType::value_type>
+      using ValueType = typename VectorType::value_type;
+
+      return std::is_same_v<T, ValueType>
+          || (std::is_arithmetic_v<T> && std::is_arithmetic_v<ValueType>)
           || (std::is_same_v<T, bool>
               && std::is_same_v<VectorType, VectorBool>);
     }

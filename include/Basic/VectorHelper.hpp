@@ -856,7 +856,7 @@ namespace gstlrn
       return "Id";
     else if constexpr (std::is_same_v<T, unsigned char>)
       return "Char";
-    else if constexpr (std::is_same_v<T, String>)
+    else if constexpr (std::is_same_v<T, String> || std::is_array_v<T>)
       return "String";
     else if constexpr (std::is_same_v<T, bool>)
       return "Bool";

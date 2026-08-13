@@ -846,10 +846,101 @@ namespace gstlrn {
   }
 }
 
+%typemap(in, fragment="ToCpp")
+VectorNumT<double>&& (void *argp, VectorNumT<double> vec),
+VectorNumT<float>&& (void *argp, VectorNumT<float> vec),
+VectorNumT<long long>&& (void *argp, VectorNumT<long long> vec),
+VectorNumT<UChar>&& (void *argp, VectorNumT<UChar> vec),
+VectorNumT<bool>&& (void *argp, VectorNumT<bool> vec),
+VectorT<UChar>&& (void *argp, VectorT<UChar> vec)
+{
+  int errcode = vectorToCpp($input, vec);
+
+  if (errcode == SWIG_NullReferenceError)
+  {
+    $1 = &vec;
+  }
+  else if (!SWIG_IsOK(errcode))
+  {
+    try
+    {
+      errcode = SWIG_ConvertPtr($input, &argp, $descriptor, %convertptr_flags);
+      if (SWIG_IsOK(errcode))
+      {
+        if (!argp)
+          %argument_nullref("$type", $symname, $argnum);
+
+        $1 = %reinterpret_cast(argp, $ltype);
+      }
+      else
+      {
+        %argument_fail(errcode, "$type", $symname, $argnum);
+      }
+    }
+    catch(...)
+    {
+      %argument_fail(errcode, "$type", $symname, $argnum);
+    }
+  }
+  else
+  {
+    $1 = &vec;
+  }
+}
+
+%typemap(in, fragment="ToCpp")
+VectorT<std::string>&& (void *argp, VectorT<std::string> vec)
+{
+  int errcode = vectorToCpp($input, vec);
+
+  if (errcode == SWIG_NullReferenceError)
+  {
+    $1 = &vec;
+  }
+  else if (!SWIG_IsOK(errcode))
+  {
+    try
+    {
+      errcode = SWIG_ConvertPtr($input, &argp, $descriptor, %convertptr_flags);
+
+      if (SWIG_IsOK(errcode))
+      {
+        if (!argp)
+          %argument_nullref("$type", $symname, $argnum);
+
+        $1 = %reinterpret_cast(argp, $ltype);
+      }
+      else
+      {
+        %argument_fail(errcode, "$type", $symname, $argnum);
+      }
+    }
+    catch(...)
+    {
+      %argument_fail(errcode, "$type", $symname, $argnum);
+    }
+  }
+  else
+  {
+    $1 = &vec;
+  }
+}
+
+%typemap(in, fragment="ToCpp")
+VectorT<String> (VectorT<String> vec)
+{
+  int errcode = vectorToCpp($input, vec);
+
+  if (!SWIG_IsOK(errcode))
+    %argument_fail(errcode, "$type", $symname, $argnum);
+
+  $1 = vec;
+}
+
 %typemap(in, fragment="ToCpp") const MatrixDense&     (void *argp, MatrixDense mat),
                                const MatrixDense*     (void *argp, MatrixDense mat),
-                               const MatrixSquare&   (void *argp, MatrixSquare mat),
-                               const MatrixSquare*   (void *argp, MatrixSquare mat),
+                               const MatrixSquare&    (void *argp, MatrixSquare mat),
+                               const MatrixSquare*    (void *argp, MatrixSquare mat),
                                const MatrixSymmetric& (void *argp, MatrixSymmetric mat),
                                const MatrixSymmetric* (void *argp, MatrixSymmetric mat)
 {
@@ -957,6 +1048,14 @@ namespace gstlrn {
                                   bool*,   const bool*,   bool&,   const bool&
 {
   $result = objectFromCpp(*$1);
+}
+
+%typemap(out, fragment="FromCpp") VectorBool
+{
+  int errcode = vectorFromCpp(&($result), $1);
+  if (!SWIG_IsOK(errcode))
+    SWIG_exception_fail(SWIG_ArgError(errcode),
+                        "in method $symname, wrong return value: $type");
 }
 
 %typemap(out, fragment="FromCpp") VectorInt,

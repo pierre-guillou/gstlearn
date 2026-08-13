@@ -333,7 +333,7 @@ namespace gstlrn
     Id ncols = _cols.size();
 
     if (!title.empty()) std::cout << title << '\n';
-    std::cout << "The Data Base contains " << ncols << " columns of "
+    std::cout << "The Data Base contains " << ncols << " column(s) of "
               << getNSamples() << " samples\n";
     for (Id icol = 0; icol < ncols; ++icol)
     {
