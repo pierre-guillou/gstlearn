@@ -69,9 +69,12 @@ int main(int argc, char* argv[])
   auto is = 2;
   auto ind = 2;
   auto iv = 0;
-  message("- By Name: %d\n", data.getValue<Id>("VIS", is));
-  message("- By Name and Version: %d\n", data.getValue<Id>({"VIS", iv}, is));
-  message("- Role: %d\n", data.getValue<Id>(RoleID{ERole::Z, ind}, is));
+  message("- By Name: %d\n", data.getValue<Id>("VIS", is).value_or(-1));
+  message(
+    "- By Name and Version: %d\n",
+    data.getValue<Id>({"VIS", iv}, is).value_or(-1));
+  message(
+    "- Role: %d\n", data.getValue<Id>(RoleID{ERole::Z, ind}, is).value_or(-1));
 
   // Checking the different manners to refer to a Column in a DbData
   mestitle(1, "Different manners to refer to a Column");
@@ -90,9 +93,10 @@ int main(int argc, char* argv[])
   auto isample = 2;
 
   message("Initial values\n");
-  message("%lf\n", data.getValue<double>("VD", isample));
-  message("%d\n", data.getValue<int>("VI", isample));
-  message("%s\n", data.getValue<String>("VS", isample)->c_str());
+  message("%lf\n", data.getValue<double>("VD", isample).value_or(-1));
+  message("%d\n", data.getValue<int>("VI", isample).value_or(-1));
+  message(
+    "%s\n", data.getValue<String>("VS", isample).value_or(String()).c_str());
 
   data.setValue("VD", isample, 4.);
   data.setValue("VI", isample, static_cast<Id>(8));
@@ -100,9 +104,10 @@ int main(int argc, char* argv[])
 
   // Checking implicit conversions
   message("\nValues after modification\n");
-  message("%lf\n", data.getValue<double>("VD", isample));
-  message("%d\n", data.getValue<int>("VI", isample));
-  message("%s\n", data.getValue<String>("VS", isample)->c_str());
+  message("%lf\n", data.getValue<double>("VD", isample).value_or(-1));
+  message("%d\n", data.getValue<int>("VI", isample).value_or(-1));
+  message(
+    "%s\n", data.getValue<String>("VS", isample).value_or(String()).c_str());
 
   mestitle(1, "Testing implicit conversions");
 
@@ -121,20 +126,22 @@ int main(int argc, char* argv[])
   data.X()[2] = 123.;
   message(
     "Value of X(0) at sample 2: %lf\n",
-    data.getValue<double>(RoleID{ERole::X}, 2));
+    data.getValue<double>(RoleID{ERole::X}, 2).value_or(-1));
 
   data.col("VD")[1] = 456.;
-  message("Value of 'VD' at sample 1: %lf\n", data.getValue<double>("VD", 1));
+  message(
+    "Value of 'VD' at sample 1: %lf\n",
+    data.getValue<double>("VD", 1).value_or(-1));
 
   data.F()[2](3) = 12.34;
   message(
     "Value of F(0) at sample index 2 version index 3: %lf\n",
-    data.getValue<double>(ColID(RoleID(ERole::F), 3), 2));
+    data.getValue<double>(ColID(RoleID(ERole::F), 3), 2).value_or(-1));
 
   data.Z(2)[2](4) = 999;
   message(
     "Value of Z(2) at sample index 2 version index 4: %d\n",
-    data.getValue<int>(ColID(RoleID(ERole::Z, 2), 4), 2));
+    data.getValue<int>(ColID(RoleID(ERole::Z, 2), 4), 2).value_or(-1));
 
   // Checking Columns with same Name and/or Role
   mestitle(1, "Adding Columns with the same Name and/or Role");
