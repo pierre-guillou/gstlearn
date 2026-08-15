@@ -20,24 +20,21 @@
 
 #include <functional>
 #include <optional>
+#include <type_traits>
 
 namespace gstlrn
 {
   /**
-   * @brief The new heterogeneous DbData class is a container for a set of Columns (DbCol)
-   *        Each Column can be identified by:
-   *        - its name (unique)
-   *        - by its RoleID (Role + Rank)
-   *        - by its index in the DbData.
-   *       The DbData class provides methods to add, remove, and access Columns,
-   *        as well as to get and set values in the Columns.
-   *
-   *       Each Column in turn:
-   *       - is characterized by its type: Double, Int, String, etc.
-   *       - can have multiple versions
-   *
-   *       Limitation: all the Columns of the same DbData must have the same number of samples.
+   * @brief Tag structure and constant used to represent full dimension selection '*'
+   *        in slicing operations.
+   *        Only used for aliasing and slicing operations, not for data storage.
    */
+  struct AllType
+  {
+  };
+
+  constexpr AllType ALL{};
+  constexpr AllType _{};
 
   class GSTLEARN_EXPORT DbData: public ASerializable
   {
@@ -45,6 +42,7 @@ namespace gstlrn
 #ifndef SWIG
     class ColProxy;
     class ValueProxy;
+    class SliceProxy;
 #endif
 
     static DbData* createFromNF(const String& NFFilename, bool verbose);
@@ -56,23 +54,6 @@ namespace gstlrn
     bool serializeH5(H5::Group& grp) const override;
 #endif
 
-    /// List of template functions
-
-    /**
-     * @brief Initialize a new Column and fill it constantly with default values
-     *
-     * @tparam VectorType
-     * @param name Name of the Column
-     * @param nsamples Number of samples (default = 0)
-     * @param nversion Number of versions (default = 1)
-     * @param roleID RoleID of the Column
-     * @param valinit Value to fill the Column with (or std::nullopt for default)
-     * @param forbidNA Whether to forbid NA values in the new Column (default = false)
-     * @param dict Pointer to Dictionary instance (default = nullptr)
-     *
-     * @remark: The argument 'nsample' is only needed if the current column is the first one
-     * of the current Data Base.
-     */
     template<typename VectorType>
     void addColumnEmpty(
       const String& name,
@@ -94,16 +75,6 @@ namespace gstlrn
       addColumn(name, std::move(array), roleID, nversion, forbidNA);
     }
 
-    /**
-     * @brief Add a new Column
-     *
-     * @tparam VectorType
-     * @param name Name of the Column
-     * @param array Array of values to fill the Column with
-     * @param roleID RoleID of the Column (optional)
-     * @param nversion Number of versions (default = 1)
-     * @param forbidNA Whether to forbid NA values in the new Column (default = false)
-     */
     template<typename VectorType>
     void addColumn(
       String&& name,
@@ -112,13 +83,9 @@ namespace gstlrn
       Id nversion = 1,
       bool forbidNA = false)
     {
-      // Checking the validity of the number of versions
       _checkVersion(nversion);
-
-      // Check the number of samples
       if (!_checkNSample(array, nversion)) return;
 
-      // Check the validity of the new name
       auto nameLocal = name;
       for (const auto& col: this->_cols)
       {
@@ -129,22 +96,18 @@ namespace gstlrn
         }
       }
 
-      // Check the validity of the new Role (if defined)
       auto roleIDLocal = roleID;
       _updateRoleIDAddition(-1, roleIDLocal);
 
-      // Check that input does not contain NA values if forbidNA is true
       if (forbidNA)
       {
         if (!_checkForbidNA(array)) return;
       }
 
-      // Add the new column to the list of columns
       this->_cols.emplace_back(
         std::move(nameLocal), std::forward<VectorType>(array), nversion,
         forbidNA);
 
-      // Add the new RoleID to the list of RoleIDs
       _roleIDs.emplace_back(roleIDLocal);
     }
 
@@ -156,13 +119,9 @@ namespace gstlrn
       Id nversion = 1,
       bool forbidNA = false)
     {
-      // Checking the validity of the number of versions
       _checkVersion(nversion);
-
-      // Check the number of samples
       if (!_checkNSample(array, nversion)) return;
 
-      // Check the validity of the new name
       auto nameLocal = name;
       for (const auto& col: this->_cols)
       {
@@ -173,34 +132,22 @@ namespace gstlrn
         }
       }
 
-      // Check the validity of the new Role (if defined)
       auto roleIDLocal = roleID;
       _updateRoleIDAddition(-1, roleIDLocal);
 
-      // Check that input does not contain NA values if forbidNA is true
       if (forbidNA)
       {
         if (!_checkForbidNA(array)) return;
       }
 
-      // Add the new column to the list of columns
       this->_cols.emplace_back(
         std::move(nameLocal), std::forward<VectorType>(array), nversion,
         forbidNA);
 
-      // Add the new RoleID to the list of RoleIDs
       _roleIDs.emplace_back(roleIDLocal);
     }
 
 #ifndef SWIG
-    /**
-     * @brief Returns the Value of a Column for a given sample and version
-     *
-     * @tparam T Type of the value
-     * @param colid Identification of the Column
-     * @param isample Index of the sample
-     * @return std::optional<T>
-     */
     template<typename T>
     std::optional<T> getValue(ColID&& colid, Id isample) const
     {
@@ -211,16 +158,6 @@ namespace gstlrn
       return array->get().getValue<T>(isample, version);
     }
 
-    /**
-     * @brief Set the Value of a Column for a given sample
-     *
-     * @tparam T Type of the value
-     * @param colid Identification of the Column
-     * @param isample Index of the sample
-     * @param value Value to be assigned
-     * @return true
-     * @return false
-     */
     template<typename T>
     bool setValue(ColID&& colid, const Id isample, const T& value)
     {
@@ -231,15 +168,6 @@ namespace gstlrn
       return array->get().setValue<T>(isample, version, value);
     }
 
-    /**
-     * @brief returns the whole Target Column
-     *
-     * @tparam VectorType Type of returned values
-     * @param colid Identification of the Column
-     * @return VectorType&
-     *
-     * @remark If a Column contains multiple versions, the returned values correspond to all values of all versions concatenated.
-     */
     template<typename VectorType>
     VectorType& getColumn(ColID&& colid)
     {
@@ -268,14 +196,6 @@ namespace gstlrn
       return vec->get();
     }
 
-    /**
-     * @brief returns the Target Column for a given version
-     *
-     * @tparam VectorType Type of returned values
-     * @param colid Identification of the Column
-     * @param iversion Version of the Column to get
-     * @return std::span<typename VectorType::value_type>
-     */
     template<typename VectorType>
     std::span<typename VectorType::value_type>
       getVersion(ColID&& colid, Id iversion = 0)
@@ -302,15 +222,6 @@ namespace gstlrn
       return *span;
     }
 
-    /**
-     * @brief Set the contents of the Target Column
-     *
-     * @param colid Identification of the Column
-     * @param values Values to set
-     * @return bool
-     *
-     * @remark If a Column contains multiple versions, the values must correspond to all values of all versions concatenated.
-     */
     template<typename VectorType>
     bool setColumn(ColID&& colid, const VectorType& values)
     {
@@ -320,14 +231,6 @@ namespace gstlrn
       return col->get().template setVector<VectorType>(values);
     }
 
-    /**
-     * @brief Set the contents of the Target Column (for a given version)
-     *
-     * @param colid Identification of the Column
-     * @param values Values to set
-     * @param iversion Version of the Column to set
-     * @return bool
-     */
     template<typename VectorType>
     bool setVersion(ColID&& colid, const VectorType& values, Id iversion = 0)
     {
@@ -338,57 +241,32 @@ namespace gstlrn
     }
 #endif
 
-    /*************************************************************************/
-    /* Column proxy access.                                                  */
-    /* It allows accessing to Columns dedicated to a specific Role and Rank. */
-    /* with the following syntax:                                            */
-    /*   data.X(ir)[is](iv)                                                  */
-    /*   - data is the name of the DbData object                             */
-    /*   - X is the Role of the Column (X, Z, W, F)                          */
-    /*   - ir is the Rank of the Column (optional, 0-based, default = 0)     */
-    /*   - is is the index of the sample (0-based)                           */
-    /*   - iv is the index of the version (optional, 0-based, default = 0)   */
-    /*************************************************************************/
 #ifndef SWIG
     ColProxy X(Id rank = 0);
     ColProxy Z(Id rank = 0);
     ColProxy W(Id rank = 0);
     ColProxy F(Id rank = 0);
+    ColProxy SEL(Id rank = 0);
 
+    ColProxy role(const ERole& role, Id rank = 0);
     ColProxy col(Id icol);
     ColProxy col(const String& name);
 #endif
 
-    /***********************************************************************/
-    /* Other public methods                                                */
-    /***********************************************************************/
-
     bool renameColumn(ColID&& colid, const String& newName);
-
     void deleteColumn(ColID&& colid);
-
     void deleteAllColumns();
-
     bool hasColumn(ColID&& colid) const;
     String getName(ColID&& colid) const;
     VectorString getNames() const;
-
     Id getICol(ColID&& colid) const;
-
     RoleID getRoleID(ColID&& colid) const;
-
     const ERole& getRole(ColID&& colid) const;
-
     ColID getColID(const ColID& colid) const;
-
     void removeRole(ColID&& colid);
-
     void removeAllRoles();
-
     Id getNVersions(ColID&& colid) const;
-
     Id getNRoles(ColID&& colid) const;
-
     std::vector<ColID> getColIDs(const String& name) const;
     std::vector<ColID> getColIDs(const VectorString& name) const;
     std::vector<ColID> getColIDs(const ERole& role) const;
@@ -396,28 +274,18 @@ namespace gstlrn
     Id getNCols() const { return static_cast<Id>(_cols.size()); }
 
     Id getNSamples() const;
-
     void setName(ColID&& colid, const String& newName);
     void setRoleID(ColID&& colid, const RoleID& roleID);
-
     void printContents(const String& title = "") const;
-
     void clearRole(const ERole& role);
-
     void addSamples(Id nadd, const double valinit);
     void deleteSample(Id idel);
-
     String _summaryRoles(void) const;
 
   private:
-    /***********************************************************************/
-    /* Other private methods                                               */
-    /***********************************************************************/
-
     std::optional<std::reference_wrapper<DbCol>> _identifyColumn(ColID&& colid);
     std::optional<std::reference_wrapper<const DbCol>>
       _identifyColumn(ColID&& colid) const;
-
     std::optional<Id>
       _getColumnIndex(const ColID& colid, bool verbose = true) const;
 
@@ -433,7 +301,6 @@ namespace gstlrn
           throw std::invalid_argument("Dictionary is required");
 
         VectorCategory vec(n, *dict);
-
         if (value)
         {
           for (Id i = 0; i < n; i++) vec[i] = *value;
@@ -450,16 +317,13 @@ namespace gstlrn
     }
 
     void _updateName(String& name) const;
-
     void _updateRoleIDAddition(Id icol0, RoleID& roleID);
-
     void _updateRoleIDDeletion(RoleID& roleID);
 
     template<typename VectorType>
     static bool _checkForbidNA(const VectorType& tab)
     {
       using ValueType = typename VectorType::value_type;
-
       for (const auto& val: tab)
       {
         if (isNA<ValueType>(val))
@@ -475,8 +339,6 @@ namespace gstlrn
     bool _checkNSample(const VectorType& array, Id nversion) const
     {
       const Id nsample = getNSamples();
-
-      // Number of samples not yet defined
       if (nsample <= 0) return true;
 
       const Id size = static_cast<Id>(array.size());
@@ -493,41 +355,42 @@ namespace gstlrn
     }
 
     static bool _checkForbidNA(const VectorCategory& tab);
-
     static void _checkVersion(Id& nversion);
     static void _unknownName(const String& name);
     static void _unknownRoleID(const RoleID& roleID);
 
   private:
-    /***********************************************************************/
-    /* DbData members                                                      */
-    /***********************************************************************/
     std::vector<DbCol> _cols;
     std::vector<RoleID> _roleIDs;
   };
 
   /***************************************************************************/
-  /*                                                                         */
-  /*                     Internal proxy implementation                       */
-  /*                                                                         */
+  /* Internal Proxy Implementation                                           */
+  /* Only used for aliasing and slicing operations, not for data storage.    */
   /***************************************************************************/
 #ifndef SWIG
-  class DbData::ColProxy
+  /**
+   * @brief Type trait to detect if a type is an iterable vector container.
+   */
+  template<typename T, typename = void>
+  struct is_vector_like: std::false_type
   {
-  public:
-    ColProxy(DbData& db, const ColID& colid)
-      : _db(db)
-      , _colid(colid)
-    {
-    }
-
-    ValueProxy operator[](Id isample);
-
-  private:
-    DbData& _db;
-    ColID _colid;
   };
 
+  template<typename T>
+  struct is_vector_like<
+    T,
+    std::void_t<typename T::value_type, decltype(std::declval<T>().size())>>
+    : std::true_type
+  {
+  };
+
+  template<typename T>
+  inline constexpr bool is_vector_like_v = is_vector_like<T>::value;
+
+  /**
+   * @brief Proxy helper class for scalar read/write operations targeting an individual sample.
+   */
   class DbData::ValueProxy
   {
   public:
@@ -538,45 +401,386 @@ namespace gstlrn
     {
     }
 
-    /**
-     * @brief Select the version of the value
-     *
-     * Syntax:
-     *   data.X()[isample](iversion) = value;
-     */
-    ValueProxy operator()(Id version)
-    {
-      auto copy = _colid;
-      copy.setVersion(version);
-      return ValueProxy(_db, copy, _isample);
-    }
-
     template<typename T>
     ValueProxy& operator=(const T& value)
     {
-      _db.setValue<T>(std::move(_colid), _isample, value);
+      _db.setValue<T>(ColID(_colid), _isample, value);
       return *this;
     }
 
-    template<typename T>
-    operator T() const
-    {
-      auto val = _db.getValue<T>(ColID(_colid), _isample);
+    operator double() const { return _get<double>(); }
 
-      if (val) return *val;
+    operator int() const { return _get<int>(); }
 
-      return getNA<T>();
-    }
+    operator Id() const { return _get<Id>(); }
+
+    operator String() const { return _get<String>(); }
 
   private:
+    template<typename T>
+    T _get() const
+    {
+      auto val = _db.getValue<T>(ColID(_colid), _isample);
+      return val ? *val : getNA<T>();
+    }
+
     DbData& _db;
     ColID _colid;
     Id _isample;
   };
 
-  inline DbData::ValueProxy DbData::ColProxy::operator[](Id isample)
+  /**
+   * @brief Proxy class representing a multi-element slice of a DbData column.
+   *        Supports reading into VectorDouble/VectorType and direct assignment/writing back into DbData.
+   */
+  class GSTLEARN_EXPORT DbData::SliceProxy
   {
-    return ValueProxy(_db, _colid, isample);
+  public:
+    enum class SliceMode
+    {
+      ALL_SAMPLES_SINGLE_VERSION,
+      SINGLE_SAMPLE_ALL_VERSIONS,
+      FULL_MATRIX
+    };
+
+    SliceProxy(
+      DbData& db,
+      const ColID& colid,
+      SliceMode mode,
+      Id sampleOrVersion)
+      : _db(db)
+      , _colid(colid)
+      , _mode(mode)
+      , _targetIdx(sampleOrVersion)
+    {
+    }
+
+    /**
+     * @brief Build and extract the actual data slice as a vector.
+     */
+    template<typename VectorType = VectorDouble>
+    VectorType toVector() const
+    {
+      if (_mode == SliceMode::ALL_SAMPLES_SINGLE_VERSION)
+      {
+        std::span<const double> span =
+          _db.getVersion<VectorType>(ColID(_colid), _targetIdx);
+        return VectorType(span.begin(), span.end());
+      }
+      else if (_mode == SliceMode::SINGLE_SAMPLE_ALL_VERSIONS)
+      {
+        Id nversions = _db.getNVersions(ColID(_colid));
+        VectorType result(nversions);
+        for (Id v = 0; v < nversions; ++v)
+        {
+          ColID copy = _colid;
+          copy.setVersion(v);
+          auto val = _db.getValue<double>(std::move(copy), _targetIdx);
+          result[v] = val ? *val : getNA<double>();
+        }
+        return result;
+      }
+      else // FULL_MATRIX
+      {
+        Id nversions = _db.getNVersions(ColID(_colid));
+        Id nsamples = _db.getNSamples();
+        VectorType result(nsamples * nversions);
+        Id offset = 0;
+        for (Id v = 0; v < nversions; ++v)
+        {
+          ColID copy = _colid;
+          copy.setVersion(v);
+          for (Id i = 0; i < nsamples; ++i)
+          {
+            ColID copySample = copy;
+            auto val = _db.getValue<double>(std::move(copySample), i);
+            result[offset++] = val ? *val : getNA<double>();
+          }
+        }
+        return result;
+      }
+    }
+
+    /**
+     * @brief Implicit conversions to VectorType (e.g. VectorDouble).
+     */
+    template<typename VectorType = VectorDouble>
+    operator VectorType() const
+    {
+      return toVector<VectorType>();
+    }
+
+    /**
+     * @brief Direct pass-through method for .dump()
+     */
+    void dump(const String& title = "") const
+    {
+      toVector<VectorDouble>().dump(title);
+    }
+
+    // ------------------------------------------------------------------------
+    // Write Access Operators (Modifies the DbData)
+    // ------------------------------------------------------------------------
+
+    /**
+     * @brief Assign a scalar value to every element in the slice.
+     *        Enables: data.F()(_, 3) = 13;
+     *                 data.F()(2, _) = 14;
+     *                 data.F()() = 1234.;
+     */
+    template<typename T>
+    std::enable_if_t<!is_vector_like_v<T>, SliceProxy&>
+      operator=(const T& value)
+    {
+      if (_mode == SliceMode::ALL_SAMPLES_SINGLE_VERSION)
+      {
+        Id nsamples = _db.getNSamples();
+        for (Id i = 0; i < nsamples; ++i)
+        {
+          ColID copy = _colid;
+          copy.setVersion(_targetIdx);
+          _db.setValue<T>(std::move(copy), i, value);
+        }
+      }
+      else if (_mode == SliceMode::SINGLE_SAMPLE_ALL_VERSIONS)
+      {
+        Id nversions = _db.getNVersions(ColID(_colid));
+        for (Id v = 0; v < nversions; ++v)
+        {
+          ColID copy = _colid;
+          copy.setVersion(v);
+          _db.setValue<T>(std::move(copy), _targetIdx, value);
+        }
+      }
+      else // FULL_MATRIX
+      {
+        Id nsamples = _db.getNSamples();
+        Id nversions = _db.getNVersions(ColID(_colid));
+        for (Id v = 0; v < nversions; ++v)
+        {
+          for (Id i = 0; i < nsamples; ++i)
+          {
+            ColID copy = _colid;
+            copy.setVersion(v);
+            _db.setValue<T>(std::move(copy), i, value);
+          }
+        }
+      }
+      return *this;
+    }
+
+    /**
+     * @brief Assign a vector of values to the slice.
+     *        Enables: data.F()(_, 1) = myVector;
+     */
+    template<typename VectorType>
+    std::enable_if_t<is_vector_like_v<VectorType>, SliceProxy&>
+      operator=(const VectorType& values)
+    {
+      if (_mode == SliceMode::ALL_SAMPLES_SINGLE_VERSION)
+      {
+        _db.setVersion<VectorType>(ColID(_colid), values, _targetIdx);
+      }
+      else if (_mode == SliceMode::SINGLE_SAMPLE_ALL_VERSIONS)
+      {
+        Id nversions = _db.getNVersions(ColID(_colid));
+        for (Id v = 0; v < nversions && v < static_cast<Id>(values.size()); ++v)
+        {
+          ColID copy = _colid;
+          copy.setVersion(v);
+          _db.setValue(std::move(copy), _targetIdx, values[v]);
+        }
+      }
+      else // FULL_MATRIX
+      {
+        _db.setColumn<VectorType>(ColID(_colid), values);
+      }
+      return *this;
+    }
+
+  private:
+    DbData& _db;
+    ColID _colid;
+    SliceMode _mode;
+    Id _targetIdx;
+  };
+
+  /**
+   * @brief Column and Data Slicing Proxy (DbData).
+   */
+  class GSTLEARN_EXPORT DbData::ColProxy
+  {
+  public:
+    ColProxy(DbData& db, const ColID& colid)
+      : _db(db)
+      , _colid(colid)
+    {
+      ERole role = _colid.getRole();
+
+      if (role != ERole::UNDEFINED)
+      {
+        auto it = ERoleAttr.find(role.getKey());
+        bool isUnique = (it != ERoleAttr.end()) ? it->second.isUnique : false;
+
+        if (isUnique && _colid.getIndex() > 0)
+        {
+          message(
+            "Warning: Role '%s' is unique. Rank %d ignored, using rank 0.\n",
+            std::string(role.getKey()).c_str(), _colid.getIndex());
+
+          _colid = ColID(role, 0);
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 1. Scalar Access (Single sample/version -> ValueProxy)
+    // ------------------------------------------------------------------------
+
+    ValueProxy operator[](Id isample) { return operator()(isample, 0); }
+
+    ValueProxy operator[](Id isample) const { return operator()(isample, 0); }
+
+    ValueProxy operator()(Id isample)
+    {
+      ColID copy = _colid;
+      copy.setVersion(0);
+      return ValueProxy(_db, copy, isample);
+    }
+
+    ValueProxy operator()(Id isample) const
+    {
+      ColID copy = _colid;
+      copy.setVersion(0);
+      return ValueProxy(_db, copy, isample);
+    }
+
+    ValueProxy operator()(Id isample, Id iversion)
+    {
+      ColID copy = _colid;
+      copy.setVersion(iversion);
+      return ValueProxy(_db, copy, isample);
+    }
+
+    ValueProxy operator()(Id isample, Id iversion) const
+    {
+      ColID copy = _colid;
+      copy.setVersion(iversion);
+      return ValueProxy(_db, copy, isample);
+    }
+
+    // ------------------------------------------------------------------------
+    // 2. Slice Access via Expanders (ALL / _) returning SliceProxy
+    // ------------------------------------------------------------------------
+
+    SliceProxy operator()(AllType /*all*/, Id iversion)
+    {
+      return SliceProxy(
+        _db, _colid, SliceProxy::SliceMode::ALL_SAMPLES_SINGLE_VERSION,
+        iversion);
+    }
+
+    SliceProxy operator()(AllType /*all*/, Id iversion) const
+    {
+      return SliceProxy(
+        const_cast<DbData&>(_db), _colid,
+        SliceProxy::SliceMode::ALL_SAMPLES_SINGLE_VERSION, iversion);
+    }
+
+    SliceProxy operator()(Id isample, AllType /*all*/)
+    {
+      return SliceProxy(
+        _db, _colid, SliceProxy::SliceMode::SINGLE_SAMPLE_ALL_VERSIONS,
+        isample);
+    }
+
+    SliceProxy operator()(Id isample, AllType /*all*/) const
+    {
+      return SliceProxy(
+        const_cast<DbData&>(_db), _colid,
+        SliceProxy::SliceMode::SINGLE_SAMPLE_ALL_VERSIONS, isample);
+    }
+
+    SliceProxy operator()(AllType /*all1*/ = ALL, AllType /*all2*/ = ALL)
+    {
+      return SliceProxy(_db, _colid, SliceProxy::SliceMode::FULL_MATRIX, 0);
+    }
+
+    SliceProxy operator()(AllType /*all1*/ = ALL, AllType /*all2*/ = ALL) const
+    {
+      return SliceProxy(
+        const_cast<DbData&>(_db), _colid, SliceProxy::SliceMode::FULL_MATRIX,
+        0);
+    }
+
+    // ------------------------------------------------------------------------
+    // 3. Direct Version Setting
+    // ------------------------------------------------------------------------
+
+    template<typename VectorType>
+    void setVersion(Id iversion, const VectorType& values)
+    {
+      _db.setVersion<VectorType>(ColID(_colid), values, iversion);
+    }
+
+    // ------------------------------------------------------------------------
+    // 4. Full Column Vector & Scalar Assignment Operators
+    // ------------------------------------------------------------------------
+
+    template<typename VectorType>
+    std::enable_if_t<is_vector_like_v<VectorType>, ColProxy&>
+      operator=(const VectorType& values)
+    {
+      _db.setColumn<VectorType>(ColID(_colid), values);
+      return *this;
+    }
+
+    template<typename T>
+    std::enable_if_t<!is_vector_like_v<T>, ColProxy&> operator=(const T& value)
+    {
+      Id nsamples = _db.getNSamples();
+      Id nversions = _db.getNVersions(ColID(_colid));
+      for (Id v = 0; v < nversions; ++v)
+      {
+        for (Id i = 0; i < nsamples; ++i)
+        {
+          ColID copy = _colid;
+          copy.setVersion(v);
+          _db.setValue<T>(std::move(copy), i, value);
+        }
+      }
+      return *this;
+    }
+
+    // ------------------------------------------------------------------------
+    // 5. Implicit Conversions
+    // ------------------------------------------------------------------------
+
+    template<typename VectorType = VectorDouble>
+    operator VectorType&()
+    {
+      return _db.getColumn<VectorType>(ColID(_colid));
+    }
+
+    template<typename VectorType = VectorDouble>
+    operator const VectorType&() const
+    {
+      return _db.getColumn<VectorType>(ColID(_colid));
+    }
+
+  private:
+    DbData& _db;
+    ColID _colid;
+  };
+
+  inline DbData::ColProxy DbData::role(const ERole& role, Id rank)
+  {
+    return ColProxy(*this, ColID(role, rank));
+  }
+
+  inline DbData::ColProxy DbData::SEL(Id rank)
+  {
+    return ColProxy(*this, ColID(ERole::SEL, rank));
   }
 #endif
 } // namespace gstlrn

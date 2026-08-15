@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   data.addColumn("VI", VectorInt{5, 6, 7}, RoleID{ERole::Z});
   data.addColumn("VS", VectorString{"foo", "bar", "baz"}, RoleID{ERole::Z, 1});
   data.addColumn("VB", VectorBool{true, false, true});
-  data.addColumnEmpty<VectorDouble>("VDS", 0, 5, RoleID(ERole::F), 3.);
+  data.addColumn("VDS", VH::sequenceVD(2., 19., 1.), RoleID(ERole::F), 6);
   data.addColumn("VIS", VH::sequence(15, 3, 2), RoleID(ERole::Z, 2), 5);
   data.printContents();
 
@@ -133,19 +133,40 @@ int main(int argc, char* argv[])
     "Value of 'VD' at sample 1: %lf\n",
     data.getValue<double>("VD", 1).value_or(-1));
 
-  data.F()[2](3) = 12.34;
+  data.F()(2, 3) = 12.34;
   message(
     "Value of F(0) at sample index 2 version index 3: %lf\n",
     data.getValue<double>(ColID(RoleID(ERole::F), 3), 2).value_or(-1));
 
-  data.Z(2)[2](4) = 999;
+  data.Z(2)(2, 4) = 999;
   message(
     "Value of Z(2) at sample index 2 version index 4: %d\n",
     data.getValue<int>(ColID(RoleID(ERole::Z, 2), 4), 2).value_or(-1));
 
+  // Checking the aliases using ALL (or _) for accessing vectors of values in a DbData
+  message("\nChecking the aliases using ALL(_)\n");
+  data.printContents();
+  auto FAll0 = data.F()();
+  FAll0.dump("data.F()()");
+  auto FAll1 = data.F()(_, _);
+  FAll1.dump("data.F()(_, _)");
+  auto FAll2 = data.F()(_);
+  FAll2.dump("data.F()(_)");
+  VectorDouble FAll3 = data.F()(_, 1);
+  FAll3.dump("data.F()(_, 1)");
+  auto FAll4 = data.F()(1, _);
+  FAll4.dump("data.F()(1, _)");
+
+  data.F() = 1234.;
+  data.F()().dump("After global modification of F()");
+  data.F()(2, _) = 5678.;
+  data.F()().dump("After modification of F()(2, _)");
+  data.F()(_, 3) = 91011.;
+  data.F()().dump("After modification of F()(_, 3)");
+
   // Checking Columns with same Name and/or Role
   mestitle(1, "Adding Columns with the same Name and/or Role");
-  data.printContents("\nInitial");
+  data.printContents("Initial");
   data.addColumn("VD2", VectorDouble{1., 2., 3.}, RoleID{ERole::X, 10});
   data.addColumn("VI2", VectorDouble{1., 2., 3.}, RoleID{ERole::X, 0});
   data.addColumn("VI2", VectorDouble{1., 2., 3.}, RoleID{ERole::X, 10});

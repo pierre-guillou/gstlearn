@@ -603,9 +603,10 @@ namespace gstlrn
     messerr("Role '%s' does not exist.", roleID.getName().c_str());
   }
 
-  /***********************************************************************/
-  /* Internal helper classes for column access syntax                    */
-  /***********************************************************************/
+  /************************************************************************/
+  /* Internal helper classes for column access syntax                     */
+  /* Only used for aliasing and slicing operations, not for data storage. */
+  /************************************************************************/
   DbData::ColProxy DbData::X(Id rank)
   {
     return ColProxy(*this, ColID(ERole::X, rank));
