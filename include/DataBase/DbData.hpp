@@ -33,8 +33,10 @@ namespace gstlrn
   {
   };
 
+#ifndef SWIG
   constexpr AllType ALL{};
   constexpr AllType _{};
+#endif
 
   class GSTLEARN_EXPORT DbData: public ASerializable
   {
@@ -467,7 +469,7 @@ namespace gstlrn
           _db.getVersion<VectorType>(ColID(_colid), _targetIdx);
         return VectorType(span.begin(), span.end());
       }
-      else if (_mode == SliceMode::SINGLE_SAMPLE_ALL_VERSIONS)
+      if (_mode == SliceMode::SINGLE_SAMPLE_ALL_VERSIONS)
       {
         Id nversions = _db.getNVersions(ColID(_colid));
         VectorType result(nversions);
@@ -480,25 +482,23 @@ namespace gstlrn
         }
         return result;
       }
-      else // FULL_MATRIX
+      // FULL_MATRIX
+      Id nversions = _db.getNVersions(ColID(_colid));
+      Id nsamples = _db.getNSamples();
+      VectorType result(nsamples * nversions);
+      Id offset = 0;
+      for (Id v = 0; v < nversions; ++v)
       {
-        Id nversions = _db.getNVersions(ColID(_colid));
-        Id nsamples = _db.getNSamples();
-        VectorType result(nsamples * nversions);
-        Id offset = 0;
-        for (Id v = 0; v < nversions; ++v)
+        ColID copy = _colid;
+        copy.setVersion(v);
+        for (Id i = 0; i < nsamples; ++i)
         {
-          ColID copy = _colid;
-          copy.setVersion(v);
-          for (Id i = 0; i < nsamples; ++i)
-          {
-            ColID copySample = copy;
-            auto val = _db.getValue<double>(std::move(copySample), i);
-            result[offset++] = val ? *val : getNA<double>();
-          }
+          ColID copySample = copy;
+          auto val = _db.getValue<double>(std::move(copySample), i);
+          result[offset++] = val ? *val : getNA<double>();
         }
-        return result;
       }
+      return result;
     }
 
     /**
