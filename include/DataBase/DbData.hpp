@@ -64,18 +64,7 @@ namespace gstlrn
       const RoleID& roleID = RoleID(),
       std::optional<typename VectorType::value_type> valinit = std::nullopt,
       bool forbidNA = false,
-      const Dictionary* dict = nullptr)
-    {
-      if (getNCols() > 0) nsamples = getNSamples();
-      if (nsamples <= 0)
-      {
-        messerr("The number of samples (%d) must be positive.", nsamples);
-        return;
-      }
-      auto array =
-        _createEmptyVector<VectorType>(nsamples * nversion, valinit, dict);
-      addColumn(name, std::move(array), roleID, nversion, forbidNA);
-    }
+      const Dictionary* dict = nullptr);
 
     template<typename VectorType>
     void addColumn(
@@ -83,35 +72,7 @@ namespace gstlrn
       VectorType&& array,
       const RoleID& roleID = RoleID(),
       Id nversion = 1,
-      bool forbidNA = false)
-    {
-      _checkVersion(nversion);
-      if (!_checkNSample(array, nversion)) return;
-
-      auto nameLocal = name;
-      for (const auto& col: this->_cols)
-      {
-        if (col.getName() == name)
-        {
-          _updateName(nameLocal);
-          break;
-        }
-      }
-
-      auto roleIDLocal = roleID;
-      _updateRoleIDAddition(-1, roleIDLocal);
-
-      if (forbidNA)
-      {
-        if (!_checkForbidNA(array)) return;
-      }
-
-      this->_cols.emplace_back(
-        std::move(nameLocal), std::forward<VectorType>(array), nversion,
-        forbidNA);
-
-      _roleIDs.emplace_back(roleIDLocal);
-    }
+      bool forbidNA = false);
 
     template<typename VectorType>
     void addColumn(
@@ -119,128 +80,35 @@ namespace gstlrn
       VectorType&& array,
       const RoleID& roleID = RoleID(),
       Id nversion = 1,
-      bool forbidNA = false)
-    {
-      _checkVersion(nversion);
-      if (!_checkNSample(array, nversion)) return;
-
-      auto nameLocal = name;
-      for (const auto& col: this->_cols)
-      {
-        if (col.getName() == name)
-        {
-          _updateName(nameLocal);
-          break;
-        }
-      }
-
-      auto roleIDLocal = roleID;
-      _updateRoleIDAddition(-1, roleIDLocal);
-
-      if (forbidNA)
-      {
-        if (!_checkForbidNA(array)) return;
-      }
-
-      this->_cols.emplace_back(
-        std::move(nameLocal), std::forward<VectorType>(array), nversion,
-        forbidNA);
-
-      _roleIDs.emplace_back(roleIDLocal);
-    }
+      bool forbidNA = false);
 
 #ifndef SWIG
     template<typename T>
-    std::optional<T> getValue(ColID&& colid, Id isample) const
-    {
-      const auto array = this->_identifyColumn(std::move(colid));
-      if (!array) return std::nullopt;
-
-      const Id version = colid.getVersion();
-      return array->get().getValue<T>(isample, version);
-    }
+    std::optional<T> getValue(ColID&& colid, Id isample) const;
 
     template<typename T>
-    bool setValue(ColID&& colid, const Id isample, const T& value)
-    {
-      const auto array = this->_identifyColumn(std::move(colid));
-      if (!array) return false;
-
-      const Id version = colid.getVersion();
-      return array->get().setValue<T>(isample, version, value);
-    }
+    bool setValue(ColID&& colid, const Id isample, const T& value);
 
     template<typename VectorType>
-    VectorType& getColumn(ColID&& colid)
-    {
-      static VectorType empty{};
-
-      auto col = this->_identifyColumn(std::move(colid));
-      if (!col) return empty;
-
-      auto vec = col->get().template getVector<VectorType>();
-      if (!vec) return empty;
-
-      return vec->get();
-    }
+    VectorType& getColumn(ColID&& colid);
 
     template<typename VectorType>
-    const VectorType& getColumn(ColID&& colid) const
-    {
-      static const VectorType empty{};
-
-      auto col = this->_identifyColumn(std::move(colid));
-      if (!col) return empty;
-
-      auto vec = col->get().template getVector<VectorType>();
-      if (!vec) return empty;
-
-      return vec->get();
-    }
+    const VectorType& getColumn(ColID&& colid) const;
 
     template<typename VectorType>
     std::span<typename VectorType::value_type>
-      getVersion(ColID&& colid, Id iversion = 0)
-    {
-      auto col = this->_identifyColumn(std::move(colid));
-      if (!col) return {};
-
-      auto span = col->get().template getVersion<VectorType>(iversion);
-      if (!span) return {};
-
-      return *span;
-    }
+      getVersion(ColID&& colid, Id iversion = 0);
 
     template<typename VectorType>
     std::span<const typename VectorType::value_type>
-      getVersion(ColID&& colid, Id iversion = 0) const
-    {
-      auto col = this->_identifyColumn(std::move(colid));
-      if (!col) return {};
-
-      auto span = col->get().template getVersion<VectorType>(iversion);
-      if (!span) return {};
-
-      return *span;
-    }
+      getVersion(ColID&& colid, Id iversion = 0) const;
 
     template<typename VectorType>
-    bool setColumn(ColID&& colid, const VectorType& values)
-    {
-      auto col = _identifyColumn(std::move(colid));
-      if (!col) return false;
-
-      return col->get().template setVector<VectorType>(values);
-    }
+    bool setColumn(ColID&& colid, const VectorType& values);
 
     template<typename VectorType>
-    bool setVersion(ColID&& colid, const VectorType& values, Id iversion = 0)
-    {
-      auto col = this->_identifyColumn(std::move(colid));
-      if (!col) return false;
+    bool setVersion(ColID&& colid, const VectorType& values, Id iversion = 0);
 
-      return col->get().template setVersion<VectorType>(values, iversion);
-    }
 #endif
 
 #ifndef SWIG
@@ -295,66 +163,15 @@ namespace gstlrn
     VectorType _createEmptyVector(
       Id n,
       std::optional<typename VectorType::value_type> value,
-      const Dictionary* dict = nullptr)
-    {
-      if constexpr (std::is_same_v<VectorType, VectorCategory>)
-      {
-        if (dict == nullptr)
-          throw std::invalid_argument("Dictionary is required");
-
-        VectorCategory vec(n, *dict);
-        if (value)
-        {
-          for (Id i = 0; i < n; i++) vec[i] = *value;
-        }
-        return vec;
-      }
-      else
-      {
-        const auto actual =
-          value.value_or(getNA<typename VectorType::value_type>());
-
-        return VectorType(n, actual);
-      }
-    }
+      const Dictionary* dict = nullptr);
+    template<typename VectorType>
+    static bool _checkForbidNA(const VectorType& tab);
+    template<typename VectorType>
+    bool _checkNSample(const VectorType& array, Id nversion) const;
 
     void _updateName(String& name) const;
     void _updateRoleIDAddition(Id icol0, RoleID& roleID);
     void _updateRoleIDDeletion(RoleID& roleID);
-
-    template<typename VectorType>
-    static bool _checkForbidNA(const VectorType& tab)
-    {
-      using ValueType = typename VectorType::value_type;
-      for (const auto& val: tab)
-      {
-        if (isNA<ValueType>(val))
-        {
-          messerr("Column forbids NA values, but the input tab contains some.");
-          return false;
-        }
-      }
-      return true;
-    }
-
-    template<typename VectorType>
-    bool _checkNSample(const VectorType& array, Id nversion) const
-    {
-      const Id nsample = getNSamples();
-      if (nsample <= 0) return true;
-
-      const Id size = static_cast<Id>(array.size());
-      const Id expected = nsample * nversion;
-
-      if (size == expected) return true;
-
-      messerr(
-        "The number of values (%lld) is not compatible with "
-        "the number of samples (%lld) and versions (%lld).",
-        size, nsample, nversion);
-
-      return false;
-    }
 
     static bool _checkForbidNA(const VectorCategory& tab);
     static void _checkVersion(Id& nversion);
@@ -782,5 +599,254 @@ namespace gstlrn
   {
     return ColProxy(*this, ColID(ERole::SEL, rank));
   }
+#endif
+
+  template<typename VectorType>
+  void DbData::addColumnEmpty(
+    const String& name,
+    Id nsamples,
+    Id nversion,
+    const RoleID& roleID,
+    std::optional<typename VectorType::value_type> valinit,
+    bool forbidNA,
+    const Dictionary* dict)
+  {
+    if (getNCols() > 0) nsamples = getNSamples();
+    if (nsamples <= 0)
+    {
+      messerr("The number of samples (%d) must be positive.", nsamples);
+      return;
+    }
+    auto array =
+      _createEmptyVector<VectorType>(nsamples * nversion, valinit, dict);
+    addColumn(name, std::move(array), roleID, nversion, forbidNA);
+  }
+
+  template<typename VectorType>
+  void DbData::addColumn(
+    String&& name,
+    VectorType&& array,
+    const RoleID& roleID,
+    Id nversion,
+    bool forbidNA)
+  {
+    _checkVersion(nversion);
+    if (!_checkNSample(array, nversion)) return;
+
+    auto nameLocal = name;
+    for (const auto& col: this->_cols)
+    {
+      if (col.getName() == name)
+      {
+        _updateName(nameLocal);
+        break;
+      }
+    }
+
+    auto roleIDLocal = roleID;
+    _updateRoleIDAddition(-1, roleIDLocal);
+
+    if (forbidNA)
+    {
+      if (!_checkForbidNA(array)) return;
+    }
+
+    this->_cols.emplace_back(
+      std::move(nameLocal), std::forward<VectorType>(array), nversion,
+      forbidNA);
+
+    _roleIDs.emplace_back(roleIDLocal);
+  }
+
+  template<typename VectorType>
+  void DbData::addColumn(
+    const String& name,
+    VectorType&& array,
+    const RoleID& roleID,
+    Id nversion,
+    bool forbidNA)
+  {
+    _checkVersion(nversion);
+    if (!_checkNSample(array, nversion)) return;
+
+    auto nameLocal = name;
+    for (const auto& col: this->_cols)
+    {
+      if (col.getName() == name)
+      {
+        _updateName(nameLocal);
+        break;
+      }
+    }
+
+    auto roleIDLocal = roleID;
+    _updateRoleIDAddition(-1, roleIDLocal);
+
+    if (forbidNA)
+    {
+      if (!_checkForbidNA(array)) return;
+    }
+
+    this->_cols.emplace_back(
+      std::move(nameLocal), std::forward<VectorType>(array), nversion,
+      forbidNA);
+
+    _roleIDs.emplace_back(roleIDLocal);
+  }
+
+#ifndef SWIG
+  template<typename T>
+  std::optional<T> DbData::getValue(ColID&& colid, Id isample) const
+  {
+    const auto array = this->_identifyColumn(std::move(colid));
+    if (!array) return std::nullopt;
+
+    const Id version = colid.getVersion();
+    return array->get().getValue<T>(isample, version);
+  }
+
+  template<typename T>
+  bool DbData::setValue(ColID&& colid, const Id isample, const T& value)
+  {
+    const auto array = this->_identifyColumn(std::move(colid));
+    if (!array) return false;
+
+    const Id version = colid.getVersion();
+    return array->get().setValue<T>(isample, version, value);
+  }
+
+  template<typename VectorType>
+  VectorType& DbData::getColumn(ColID&& colid)
+  {
+    static VectorType empty{};
+
+    auto col = this->_identifyColumn(std::move(colid));
+    if (!col) return empty;
+
+    auto vec = col->get().template getVector<VectorType>();
+    if (!vec) return empty;
+
+    return vec->get();
+  }
+
+  template<typename VectorType>
+  const VectorType& DbData::getColumn(ColID&& colid) const
+  {
+    static const VectorType empty{};
+
+    auto col = this->_identifyColumn(std::move(colid));
+    if (!col) return empty;
+
+    auto vec = col->get().template getVector<VectorType>();
+    if (!vec) return empty;
+
+    return vec->get();
+  }
+
+  template<typename VectorType>
+  std::span<typename VectorType::value_type>
+    DbData::getVersion(ColID&& colid, Id iversion)
+  {
+    auto col = this->_identifyColumn(std::move(colid));
+    if (!col) return {};
+
+    auto span = col->get().template getVersion<VectorType>(iversion);
+    if (!span) return {};
+
+    return *span;
+  }
+
+  template<typename VectorType>
+  std::span<const typename VectorType::value_type>
+    DbData::getVersion(ColID&& colid, Id iversion) const
+  {
+    auto col = this->_identifyColumn(std::move(colid));
+    if (!col) return {};
+
+    auto span = col->get().template getVersion<VectorType>(iversion);
+    if (!span) return {};
+
+    return *span;
+  }
+
+  template<typename VectorType>
+  bool DbData::setColumn(ColID&& colid, const VectorType& values)
+  {
+    auto col = _identifyColumn(std::move(colid));
+    if (!col) return false;
+
+    return col->get().template setVector<VectorType>(values);
+  }
+
+  template<typename VectorType>
+  bool DbData::setVersion(ColID&& colid, const VectorType& values, Id iversion)
+  {
+    auto col = this->_identifyColumn(std::move(colid));
+    if (!col) return false;
+
+    return col->get().template setVersion<VectorType>(values, iversion);
+  }
+
+  template<class VectorType>
+  VectorType DbData::_createEmptyVector(
+    Id n,
+    std::optional<typename VectorType::value_type> value,
+    const Dictionary* dict)
+  {
+    if constexpr (std::is_same_v<VectorType, VectorCategory>)
+    {
+      if (dict == nullptr)
+        throw std::invalid_argument("Dictionary is required");
+
+      VectorCategory vec(n, *dict);
+      if (value)
+      {
+        for (Id i = 0; i < n; i++) vec[i] = *value;
+      }
+      return vec;
+    }
+    else
+    {
+      const auto actual =
+        value.value_or(getNA<typename VectorType::value_type>());
+
+      return VectorType(n, actual);
+    }
+  }
+
+  template<typename VectorType>
+  bool DbData::_checkForbidNA(const VectorType& tab)
+  {
+    using ValueType = typename VectorType::value_type;
+    for (const auto& val: tab)
+    {
+      if (isNA<ValueType>(val))
+      {
+        messerr("Column forbids NA values, but the input tab contains some.");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template<typename VectorType>
+  bool DbData::_checkNSample(const VectorType& array, Id nversion) const
+  {
+    const Id nsample = getNSamples();
+    if (nsample <= 0) return true;
+
+    const Id size = static_cast<Id>(array.size());
+    const Id expected = nsample * nversion;
+
+    if (size == expected) return true;
+
+    messerr(
+      "The number of values (%lld) is not compatible with "
+      "the number of samples (%lld) and versions (%lld).",
+      size, nsample, nversion);
+
+    return false;
+  }
+
 #endif
 } // namespace gstlrn
