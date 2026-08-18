@@ -151,7 +151,8 @@ Input type 'String' is not compatible with column type 'Double'.
 Trying to use a wrong version (5) in Column 'VDS' (4 versions)
 Version 5 is invalid for Column 'VDS' which contains 5 version(s).
 
-Trying to set a value to NA in Column 'VDS' (forbidNA = True)
+Trying to set a value to NA in Column 'VDS.1' (forbidNA = True)
+Cannot set NA to sample 0 of Column 'VDS.1': NA values are forbidden.
 - Final situation
 The Data Base contains 8 column(s) of 3 samples
 Column 0/8 : VD (Type: Double) {Role: NA}
