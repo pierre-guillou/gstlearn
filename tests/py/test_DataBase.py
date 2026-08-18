@@ -141,7 +141,7 @@ print("\nTrying to use a wrong version (5) in Column 'VDS' (4 versions)")
 colid = gl.ColID("VDS", 5)
 data.getValueD(("VDS", 5), 0)
 
-print("\nTrying to set a value to NA in Column 'VDS' (forbidNA = True)")
-data.setValueD("VDS", 0, gl.TEST)
+print("\nTrying to set a value to NA in Column 'VDS.1' (forbidNA = True)")
+data.setValueD("VDS.1", 0, gl.TEST)
 
 data.printContents("- Final situation")

@@ -27,12 +27,14 @@ namespace gstlrn
     ColID(const RoleID& roleID, Id version = 0);
     ColID(const ERole& role, Id index = 0, Id version = 0);
 
+#ifndef SWIG
     // catch string literals and dispatch them to the string_view constructor
     template<int N>
     ColID(const char (&name)[N], Id version = 0)
       : ColID{std::string_view{name}, version}
     {
     }
+#endif
 
     ColID(const ColID& r) = default;
     ColID& operator=(const ColID& r) = default;

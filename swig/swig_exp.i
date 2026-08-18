@@ -341,20 +341,7 @@ typedef std::string String; // Idem entre String et std::string
 %include API/SPDEParam.hpp
 %include API/Potential.hpp
 
-%include Db/Db.hpp
-%include Db/DbGrid.hpp
-%include Db/DbLine.hpp
-%include Db/DbGraphO.hpp
-%include Db/DbMeshTurbo.hpp
-%include Db/DbMeshStandard.hpp
-%include Db/DbStringFormat.hpp
-%include Db/DbHelper.hpp
-%include Db/RankHandler.hpp
-
-%include "DataBase/RoleID.hpp"
-%include "DataBase/ColID.hpp"
-
-// Specific Typemap for ColIDs and std::optional (used by methods listed below)
+// 1. Charger les typemaps D'ABORD pour que SWIG les connaisse
 #ifdef SWIGPYTHON
 %include "typemaps_optional_python.i"
 %include "typemaps_colID_python.i"
@@ -365,10 +352,25 @@ typedef std::string String; // Idem entre String et std::string
 %include "typemaps_colID_r.i"
 #endif
 
+// 2. Définitions des types
+%include "DataBase/RoleID.hpp"
+%include "DataBase/ColID.hpp"
+
+// 3. Charger les headers qui utilisent ColID
 %include "DataBase/DbData.hpp"
 %include "DataBase/DbCol.hpp"
 //%include DataBase/Dictionary.hpp
 //%include DataBase/VectorCategory.hpp
+
+%include Db/Db.hpp
+%include Db/DbGrid.hpp
+%include Db/DbLine.hpp
+%include Db/DbGraphO.hpp
+%include Db/DbMeshTurbo.hpp
+%include Db/DbMeshStandard.hpp
+%include Db/DbStringFormat.hpp
+%include Db/DbHelper.hpp
+%include Db/RankHandler.hpp
 
 %include Anamorphosis/CalcAnamTransform.hpp
 %include Anamorphosis/AAnam.hpp

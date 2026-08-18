@@ -558,11 +558,11 @@ namespace gstlrn {
 //                     MatrixSparse,          MatrixSparse*,          MatrixSparse&
 // %{    %}
 
-// This for automatically convert R string to NamingConvention
+// Conversion automatique au niveau R pour NamingConvention
 %typemap(scoercein) NamingConvention, NamingConvention &, const NamingConvention, const NamingConvention &
 %{
   if (typeof($input) == "character") $input = NamingConvention($input);
-  if (inherits($input, "ExternalReference")) $input = slot($input,"ref");
+  if (inherits($input, "ExternalReference")) $input = slot($input, "ref");
 %}
 }
 //////////////////////////////////////////////////////////////

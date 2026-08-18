@@ -1386,10 +1386,10 @@ UChar getValueU(ColID&& colid, Id isample, UChar def = 0)
   return $self->getValue<UChar>(std::move(colid), isample).value_or(def);
 }
 
-String getValueS(ColID&& colid, Id isample,
-                 const String& def = String("failed"))
+String getValueS(ColID&& colid, Id isample)
 {
-  return $self->getValue<String>(std::move(colid), isample).value_or(def);
+  return $self->getValue<String>(
+    std::move(colid), isample).value_or(String("failed"));
 }
 
 bool getValueB(ColID&& colid, Id isample, bool def = false)
