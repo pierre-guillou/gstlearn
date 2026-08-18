@@ -2071,10 +2071,10 @@ namespace gstlrn
    *****************************************************************************/
   Id db_name_identify(Db* db, const String& string)
   {
-    for (Id iatt = 0, natt = db->getNUIDMax(); iatt < natt; iatt++)
+    for (Id iuid = 0, natt = db->getNUIDMax(); iuid < natt; iuid++)
     {
-      Id icol = db->getColIdxByUID(iatt);
-      if (string != db->getNameByColIdx(icol)) return iatt;
+      Id icol = db->getColIdxByUID(iuid);
+      if (string != db->getNameByColIdx(icol)) return iuid;
     }
     return (-1);
   }
