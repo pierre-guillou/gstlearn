@@ -312,8 +312,6 @@ namespace gstlrn
 
     /**@}*/
 
-    inline Id getNUIDMax() const { return static_cast<Id>(_uidcol.size()); }
-
     inline Id getNColumn() const { return _data.getNCols(); }
 
     // Unprotected access (used temporarily while DbData is part of Db)
@@ -1107,7 +1105,6 @@ namespace gstlrn
       bool skipTitle = false) const;
 
     void dumpGeometry(Id iech, Id jech) const;
-    void dumpLocators() const;
 
     // Operator overload
     double& operator()(Id iech, const String& name)
@@ -1156,6 +1153,7 @@ namespace gstlrn
     String _summaryString(void) const;
 
   private:
+    Id _getNUIDMax() const;
     Id _getNextLocator(const ELoc& locatorType) const;
     Id _getUIDcol(Id iuid) const;
     Id _getAddress(Id iech, Id icol) const;
@@ -1168,7 +1166,6 @@ namespace gstlrn
     String _summaryExtensions(void) const;
     String _summaryStats(VectorInt cols, Id mode = 1, Id maxNClass = 50) const;
     String _summaryLocators(void) const;
-    String _summaryUIDs(void) const;
     String _summaryArrays(VectorInt cols, bool useSel = true) const;
 
     void _defineDefaultLocatorsByNames(Id shift, const VectorString& names);

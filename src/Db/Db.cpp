@@ -235,7 +235,8 @@ namespace gstlrn
    */
   bool Db::isUIDValid(Id iuid) const
   {
-    return checkArg("UID Index", iuid, getNUIDMax());
+    auto nmax = static_cast<Id>(_uidcol.size());
+    return checkArg("UID Index", iuid, nmax);
   }
 
   /**
@@ -294,7 +295,8 @@ namespace gstlrn
   Id Db::getUIDByColIdx(Id icol) const
   {
     if (!isColIdxValid(icol)) return -1;
-    for (Id iuid = 0; iuid < getNUIDMax(); iuid++)
+    auto nmax = _getNUIDMax();
+    for (Id iuid = 0; iuid < nmax; iuid++)
       if (_uidcol[iuid] == icol) return iuid;
     return -1;
   }
@@ -1105,28 +1107,15 @@ namespace gstlrn
     return sstr.str();
   }
 
-  String Db::_summaryUIDs(void) const
-  {
-    std::stringstream sstr;
-
-    sstr << toStrTitle(1, "List of unsorted UIDs");
-    sstr << "Maximum number of positions = " << getNUIDMax() << std::endl;
-    sstr << "Number of Columns           = " << getNColumn() << std::endl;
-
-    /* Loop on the UIDs */
-
-    if (getNUIDMax() <= 0) return sstr.str();
-
-    sstr << "UID = ";
-    for (Id iuid = 0; iuid < getNUIDMax(); iuid++) sstr << _uidcol[iuid] << " ";
-    sstr << std::endl;
-    return sstr.str();
-  }
-
   void Db::clearLocators(const ELoc& locatorType)
   {
     auto role = temporaryToRole(locatorType);
     _data.clearRole(role);
+  }
+
+  Id Db::_getNUIDMax() const
+  {
+    return static_cast<Id>(_uidcol.size());
   }
 
   Id Db::_getNextLocator(const ELoc& locatorType) const
@@ -1318,7 +1307,7 @@ namespace gstlrn
     Id nechInit)
   {
     Id ncol = getNColumn();
-    auto nmax = getNUIDMax();
+    auto nmax = _getNUIDMax();
     if (nadd <= 0) return (-1);
 
     /* Case of an empty Db, define the number of samples using 'nechInit' */
@@ -1375,7 +1364,7 @@ namespace gstlrn
     Id nechInit)
   {
     Id ncol = getNColumn();
-    auto nmax = getNUIDMax();
+    auto nmax = _getNUIDMax();
     if (nadd <= 0) return (-1);
 
     /* Case of an empty Db, define the number of samples using 'nechInit' */
@@ -1976,7 +1965,7 @@ namespace gstlrn
 
   void Db::deleteColumnByUID(Id iuid_del)
   {
-    auto nmax = getNUIDMax();
+    auto nmax = _getNUIDMax();
     if (!isUIDValid(iuid_del)) return;
 
     /* Identify the column to be deleted */
@@ -3666,7 +3655,6 @@ namespace gstlrn
 
     if (dsf.matchLocator())
     {
-      sstr << _summaryUIDs() << std::endl;
       sstr << _summaryLocators() << std::endl;
     }
     return sstr.str();
@@ -6449,12 +6437,6 @@ namespace gstlrn
     *ret_mult = roleID->isUnique() ? 1 : 0;
 
     return 0;
-  }
-
-  void Db::dumpLocators() const
-  {
-    message("Maximum UID = %d\n", getNUIDMax());
-    _uidcol.dump("List of Locators:", false);
   }
 
 } // namespace gstlrn

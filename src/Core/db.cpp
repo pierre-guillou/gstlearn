@@ -2061,26 +2061,6 @@ namespace gstlrn
 
   /****************************************************************************/
   /*!
-   **  Identify the attribute by its name
-   **
-   ** \return  Rank of the variable starting from 0 (or -1 if not found)
-   **
-   ** \param[in]  db       Db descriptor
-   ** \param[in]  string   attribute name
-   **
-   *****************************************************************************/
-  Id db_name_identify(Db* db, const String& string)
-  {
-    for (Id iuid = 0, natt = db->getNUIDMax(); iuid < natt; iuid++)
-    {
-      Id icol = db->getColIdxByUID(iuid);
-      if (string != db->getNameByColIdx(icol)) return iuid;
-    }
-    return (-1);
-  }
-
-  /****************************************************************************/
-  /*!
    **  Initialize the Grid iterator
    **
    ****************************************************************************/
