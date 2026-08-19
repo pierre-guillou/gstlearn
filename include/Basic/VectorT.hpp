@@ -53,12 +53,7 @@ namespace gstlrn
     {
     }
 
-    VectorT(size_type count)
-      : _v(count)
-    {
-    }
-
-    VectorT(size_type count, const T& value)
+    inline VectorT(size_type count, const T& value = {})
       : _v(count, value)
     {
     }
