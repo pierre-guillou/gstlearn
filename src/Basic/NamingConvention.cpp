@@ -3,7 +3,7 @@
 /*                            gstlearn C++ Library                            */
 /*                                                                            */
 /* Copyright (c) (2023) MINES Paris / ARMINES                                 */
-/* Authors: gstlearn Team                                                     */
+/* Authors: gstLearn Team                                                     */
 /* Website: https://gstlearn.org                                              */
 /* License: BSD 3-clause                                                      */
 /*                                                                            */
@@ -73,17 +73,6 @@ namespace gstlrn
 
   NamingConvention::~NamingConvention() {}
 
-  /**
-   * Construct an item of the Naming Convention Class
-   * @param prefix Name given to the prefix
-   * @param flag_varname When TRUE, the 'varname' is included in the output names
-   * @param flag_qualifier When TRUE, the 'qualifier' is included in the output names
-   * @param flag_locator When TRUE, the output variables receive a 'locator'
-   * @param locatorOutType Type of locator assigned to the output variables
-   * @param delim Symbol used as a delimitor separating the different parts of the output names
-   * @param cleanSameLocator When TRUE and if 'flag_locator' is TRUE, all variables assigned to the same locator are cancelled beforehand
-   * @return
-   */
   NamingConvention* NamingConvention::create(
     const String& prefix,
     bool flag_varname,
@@ -98,20 +87,6 @@ namespace gstlrn
       cleanSameLocator);
   }
 
-  /**
-   * Newly created variables are named as follows:
-   *
-   * 'prefix'.'names[i]'.qualifier'.'item_rank'
-   *
-   * @param names Vector of variable names
-   * @param nvar Number of variables
-   * @param dbout Pointer to the output Db
-   * @param iattout_start Starting attribute index
-   * @param qualifier Optional qualifier
-   * @param nitems Number of items
-   * @param flagSetLocator True if the variable must be assigned the locator
-   * @param locatorShift Shift to be applied to the locator currently defined
-   */
   void NamingConvention::setOutput(
     const VectorString& names,
     Id nvar,
@@ -161,27 +136,6 @@ namespace gstlrn
       setLocators(dbout, iattout_start, nvar, nitems, locatorShift);
   }
 
-  /**
-   * Newly created variables for multivariate simulations are named with explicit V/S indicators.
-   *
-   * For non-conditional simulations (names empty):
-   *   Names are: prefix.V1.S1, prefix.V2.S1, ..., prefix.Vnvar.S1, prefix.V1.S2, ...
-   *
-   * For conditional simulations (names provided):
-   *   Names are: prefix.name1.S1, prefix.name2.S1, ..., prefix.nameN.S1, prefix.name1.S2, ...
-   *
-   * @param names Vector of variable names (empty for non-conditional simulations)
-   * @param nvar Number of variables
-   * @param dbout Pointer to the output Db
-   * @param iattout_start Starting attribute index
-   * @param nbsimu Number of simulations
-   * @param flagSimuFirst True if simulations vary first in storage order (default: true)
-   * @param flagSetLocator True if the variable must be assigned the locator
-   * @param locatorShift Shift to be applied to the locator currently defined
-   *
-   * @note: If 'names' is not defined, simply pass VectorString(nvar) with empty strings.
-   *        If 'names' is defined, its size defines 'nvar'.
-   */
   void NamingConvention::setOutputForSimulations(
     const VectorString& names,
     Id nvar,
@@ -250,12 +204,6 @@ namespace gstlrn
         iattout_start + ecr, _locatorOutType, ecr + locatorShift);
   }
 
-  /**
-   * Define the rule for defining the number of variables
-   * @param names Vector of variable strings (may be empty)
-   * @param nvar  Number of variables (may be 0)
-   * @return A valid number of variables
-   */
   Id NamingConvention::_getNameCount(const VectorString& names, Id nvar)
   {
     if (nvar <= 0)
@@ -264,24 +212,15 @@ namespace gstlrn
       if (names.empty()) return 1;
       return static_cast<Id>(names.size());
     }
+
     // Argument 'nvar' is provided: is it consistent with 'names'
     if (names.empty()) return nvar;
+
     // Both 'nvar' and 'names' are provided. For safety reasons,
     // the number of variables is the minimum between the two
     return MIN(nvar, static_cast<Id>(names.size()));
   }
 
-  /**
-   * Defines the names of the output variables. These variables are located
-   * in 'dbout'; they have consecutive UIDs, starting from 'iattout_start'
-   *
-   * @param dbout   Pointer to the output Db structure
-   * @param iattout_start Rank of the first variable to be named
-   * @param names Vector of Names or empty (dimension: nvar)
-   * @param nvar Number of variables (if provided)
-   * @param qualifier Optional qualifier
-   * @param nitems Number of items to be renamed
-   */
   void NamingConvention::_setNames(
     Db* dbout,
     Id iattout_start,
@@ -305,16 +244,6 @@ namespace gstlrn
     }
   }
 
-  /**
-   * Defines the names of the output variables.
-   *
-   * @param names Vector of Names or empty (dimension: nvar)
-   * @param nvar Number of variables (or 0)
-   * @param qualifier Optional qualifier
-   * @param nitems Number of items to be renamed
-   *
-   * @return outnames An array of variable names (Dimension: nvar * nitems)
-   */
   VectorString NamingConvention::_createNames(
     const VectorString& names,
     Id nvar,
@@ -380,23 +309,6 @@ namespace gstlrn
     return outnames;
   }
 
-  /**
-   * Creates names for multivariate simulations with explicit V/S indicators
-   *
-   * @param names Vector of variable names (empty for non-conditional simulations)
-   * @param nvar Number of variables
-   * @param nbsimu Number of simulations
-   * @param flagSimuFirst True if simulations vary first (storage order)
-   *
-   * @return outnames An array of variable names (Dimension: nvar * nbsimu)
-   *
-   * @remarks For non-conditional simulations (names empty):
-   *   Names are: prefix.V1.S1, prefix.V2.S1, ..., prefix.Vnvar.S1, prefix.V1.S2, ...
-   *   (if flagSimuFirst=true, order is: prefix.V1.S1, prefix.V1.S2, ..., prefix.V2.S1, ...)
-   *
-   * @remarks For conditional simulations (names provided):
-   *   Names are: prefix.name1.S1, prefix.name2.S1, ..., prefix.nameN.S1, prefix.name1.S2, ...
-   */
   VectorString NamingConvention::_createSimulationNames(
     const VectorString& names,
     Id nvar,
@@ -482,36 +394,6 @@ namespace gstlrn
     return sstr.str();
   }
 
-  /**
-   * Defines the name of one output variable.
-   *
-   * @param prefix Initial part of the returned name
-   * @param db  Pointer to the Db where the variable name is searched for (optional)
-   * @param ivar Index of the variable (1 based) or -1 if not applicable
-   * @param nvar Number of variables
-   * @param isimu Index of the simulation (1 based) or -1 if not applicable
-   * @param nbsimu Number of simulations
-   * @param extension Optional extension
-   * @param delim Delimiter for concatenating parts
-   *
-   * @remark The returned 'name' is constructed as follows:
-   *              'prefix' + 'delim' + 'varname' + 'delim' + 'qualifier'
-   *   where:
-   *   - 'prefix' is always provided
-   *   - 'varname' is determined as follows:
-   *     - If 'db' is provided, the variable name is extracted from 'db' using the locator (ELoc::Z, ivar)
-   *     - If 'db' is not provided:
-   *       . If ivar<0, the variable name is generated as "*"
-   *       . If nvar<=1, the variable name is ignored
-   *       . If nvar>1 && ivar>0, the variable name is generated as "V" + "ivar"
-   *   - 'qualifier' is determined as follows:
-   *     - If 'extension' is provided, it is used as the qualifier
-   *     - If 'extension' is not provided:
-   *       . If isimu<0, the qualifier is generated as "*"
-   *       . If nbsimu <= 1, the qualifier is ignored
-   *       . If nbsimu > 1 && isimu>0, the qualifier is set as "S" + "isimu"
-   *   - If the resulting name is empty, it defaults to "Dummy"
-   */
   String NamingConvention::getNameEncoded(
     const String& prefix,
     const Db* db,

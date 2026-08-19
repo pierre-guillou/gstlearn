@@ -40,13 +40,6 @@ Column = 4 - Name = second-1 - Locator = z1
 Column = 5 - Name = first.1 - Locator = z2
 Column = 6 - Name = first.2 - Locator = z3
 
-List of unsorted UIDs
----------------------
-Maximum number of positions = 7
-Number of Columns           = 7
-UID = 0 1 2 3 4 5 6 
-
-
 List of Roles
 -------------
 Role: X (2) - Columns = 1 2 
@@ -77,13 +70,6 @@ Column = 2 - Name = first - Locator = NA
 Column = 3 - Name = second-1 - Locator = z1
 Column = 4 - Name = first.1 - Locator = z2
 Column = 5 - Name = first.2 - Locator = z3
-
-List of unsorted UIDs
----------------------
-Maximum number of positions = 7
-Number of Columns           = 6
-UID = 0 -1 1 2 3 4 5 
-
 
 List of Roles
 -------------

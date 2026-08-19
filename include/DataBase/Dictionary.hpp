@@ -21,24 +21,76 @@
 
 namespace gstlrn
 {
+  /**
+   * @brief Dictionary associating category identifiers with their labels.
+   *
+   * A dictionary stores a set of categories identified by an integer key.
+   * Each category is associated with a textual label.
+   *
+   * The category is represented by the @c Category type, which is a pair
+   * containing the category identifier and its label.
+   */
   class Dictionary
   // class GSTLEARN_EXPORT Dictionary
   {
   public:
+    /**
+     * @brief Category identifier and label.
+     *
+     * The first element is the category identifier and the second element
+     * is its associated label.
+     */
     using Category = std::pair<Id, std::string_view>;
 
+    /**
+     * @brief Creates an empty dictionary.
+     */
     Dictionary() = default;
 
+    /**
+     * @brief Constructs a dictionary from an existing map.
+     *
+     * The map is moved into the dictionary.
+     *
+     * @param data Map associating category identifiers with their labels.
+     */
     Dictionary(std::map<Id, String>&& data)
       : _data{std::move(data)}
     {
     }
 
+    /**
+     * @brief Adds a category to the dictionary.
+     *
+     * @param key Category identifier.
+     * @param val Category label.
+     *
+     * @return @c true if the category was successfully added,
+     *         @c false otherwise.
+     */
     bool addCategory(const Id key, const String& val);
 
+    /**
+     * @brief Checks whether a category is present in the dictionary.
+     *
+     * Both the category identifier and its label are checked.
+     *
+     * @param cat Category identifier and label to check.
+     *
+     * @return @c true if the specified category is present,
+     *         @c false otherwise.
+     */
     bool hasCategory(const Category& cat) const;
 
 #ifndef SWIG
+    /**
+     * @brief Retrieves a category by its identifier.
+     *
+     * @param key Category identifier.
+     *
+     * @return The corresponding category, or an empty optional if the
+     *         identifier is not present in the dictionary.
+     */
     std::optional<Category> operator[](const Id key) const
     {
       const auto it = this->_data.find(key);

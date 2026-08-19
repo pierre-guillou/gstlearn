@@ -119,7 +119,7 @@ invisible(data$printContents("After adding the 'VDS' column (with 4 versions)"))
 # Additional inquiries on DbData #
 
 invisible(mestitle(0, "Various inquiries on the DbData"))
-writeLines(paste0("- Number of columns: ", data$getNCols()))
+writeLines(paste0("- Number of columns: ", data$getNColumns()))
 writeLines(paste0("- Number of samples: ", data$getNSamples()))
 writeLines(paste0("- Number of Versions in column 'VDS.1': ", data$getNVersions("VDS.1")))
 

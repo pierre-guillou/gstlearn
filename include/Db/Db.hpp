@@ -112,12 +112,14 @@ namespace gstlrn
 
     virtual double
       getCoordinate(Id iech, Id idim, bool flag_rotate = true) const;
+
     virtual void getCoordinatesInPlace(
       VectorDouble& coor,
       Id iech,
       bool flag_rotate = true) const;
 
     virtual double getUnit(Id idim = 0) const;
+
     virtual Id getNDim() const;
 
     virtual Id getNSamples() const { return _nsamples; };
@@ -127,8 +129,6 @@ namespace gstlrn
     virtual void resetDims(Id ncol, Id nech);
 
     virtual bool isConsistent() const { return true; };
-
-    void setNSamples(Id nsamples) { _nsamples = nsamples; }
 
     /**
      * \defgroup DB Db: Numerical Data Base
@@ -276,6 +276,8 @@ namespace gstlrn
       double randperc = 0.,
       bool flagAddSampleRank = true);
 
+    virtual void initThread() const {}
+
     /**@}*/
 
     /** @addtogroup DB_Names Manipulating Names of the variables contained in a Db
@@ -288,8 +290,6 @@ namespace gstlrn
     String getNameByLocator(const ELoc& locatorType, Id locatorIndex = 0) const;
     String getNameByColIdx(Id icol) const;
     String getNameByUID(Id iuid) const;
-
-    virtual void initThread() const {}
 
     VectorString getName(const String& name) const;
     VectorString getNames(const VectorString& names) const;
@@ -312,10 +312,10 @@ namespace gstlrn
 
     /**@}*/
 
-    inline Id getNColumn() const { return _data.getNCols(); }
-
     // Unprotected access (used temporarily while DbData is part of Db)
     DbData& getData() { return _data; }
+
+    inline Id getNColumn() const { return _data.getNColumns(); }
 
     Id getNSample(bool useSel = false) const;
     Id getNSampleActiveAndDefined(Id item) const;
@@ -345,6 +345,7 @@ namespace gstlrn
       const ELoc& locatorType = ELoc::fromKey("UNDEFINED"),
       Id locatorIndex = 0,
       bool cleanSameLocator = false);
+
     void setLocators(
       const VectorString& names,
       const ELoc& locatorType = ELoc::fromKey("UNDEFINED"),
@@ -366,6 +367,9 @@ namespace gstlrn
       const ELoc& locatorType = ELoc::fromKey("UNDEFINED"),
       Id locatorIndex = 0,
       bool cleanSameLocator = false);
+
+    void switchLocator(const ELoc& locatorType_in, const ELoc& locatorType_out);
+
     void addColumnsByVVD(
       const VectorVectorDouble& tab,
       const String& radix,
@@ -430,7 +434,7 @@ namespace gstlrn
     Id deleteSample(Id e_del);
     Id deleteSamples(const VectorInt& e_dels);
     void resizeSamples(Id nnew);
-    void switchLocator(const ELoc& locatorType_in, const ELoc& locatorType_out);
+
     Id getLastColumn(Id number = 0) const;
     Id getLastUID(Id number = 0) const;
     String getLastName(Id number = 0) const;
@@ -449,8 +453,6 @@ namespace gstlrn
       const ELoc& locatorType = ELoc::fromKey("UNDEFINED"),
       Id locatorIndex = 0,
       bool useSel = false);
-    void
-      setColumnByUIDOldStyle(const double* tab, Id iuid, bool useSel = false);
     void setColumnByUID(const VectorDouble& tab, Id iuid, bool useSel = false);
     void
       setColumnByColIdx(const VectorDouble& tab, Id icol, bool useSel = false);
@@ -458,6 +460,8 @@ namespace gstlrn
       const VectorDouble& tabs,
       const VectorInt& icols,
       bool useSel = false);
+    void
+      setColumnByUIDOldStyle(const double* tab, Id iuid, bool useSel = false);
     void setColumnByColIdxOldStyle(
       const double* tab,
       Id icol,
@@ -565,7 +569,7 @@ namespace gstlrn
     Id getSampleClosestTo(const VectorDouble& coor, bool useSel = false) const;
 
     VectorDouble
-      getOneCoordinate(Id idim, bool useSel = false, bool flag_rotate = true)
+      getVecCoordinate(Id idim, bool useSel = false, bool flag_rotate = true)
         const;
     VectorVectorDouble getAllCoordinates(bool useSel = false) const;
     MatrixDense
@@ -587,21 +591,23 @@ namespace gstlrn
     void setValue(const String& name, Id iech, double value);
 
     double getArray(Id iech, Id iuid) const;
+    VectorDouble getArrayByUID(Id iuid, bool useSel = false) const;
+    void getArrayBySample(VectorDouble& vals, Id iech) const;
     void
       getArrayVec(const VectorInt& iechs, Id iuid, VectorDouble& values) const;
+
     void setArray(Id iech, Id iuid, double value);
+    void setArrayByUID(const VectorDouble& tab, Id iuid);
+    void setArrayBySample(Id iech, const VectorDouble& vec);
     void
       setArrayVec(const VectorInt& iechs, Id iuid, const VectorDouble& values);
+
     void updArray(Id iech, Id iuid, const EOperator& oper, double value);
     void updArrayVec(
       const VectorInt& iechs,
       Id iuid,
       const EOperator& oper,
       VectorDouble& values);
-    VectorDouble getArrayByUID(Id iuid, bool useSel = false) const;
-    void setArrayByUID(const VectorDouble& tab, Id iuid);
-    void getArrayBySample(VectorDouble& vals, Id iech) const;
-    void setArrayBySample(Id iech, const VectorDouble& vec);
 
     void getSamplesAsSP(
       std::vector<SpacePoint>& pvec,
@@ -634,12 +640,13 @@ namespace gstlrn
       const VectorInt& iechs,
       const VectorInt& icols,
       bool bySample = false) const;
-    void setValuesByNames(
+
+    void setValuesByNamesInPlace(
       const VectorInt& iechs,
       const VectorString& names,
       const VectorDouble& values,
       bool bySample = false);
-    void setValuesByColIdx(
+    void setValuesByColIdxInPlace(
       const VectorInt& iechs,
       const VectorInt& icols,
       const VectorDouble& values,
@@ -1111,8 +1118,8 @@ namespace gstlrn
     {
       static double dummy = std::numeric_limits<double>::quiet_NaN();
       auto iuid = getUID(name);
-      if (!isUIDValid(iuid)) return dummy;
       auto icol = getColIdxByUID(iuid);
+      if (icol < 0) return dummy;
       if (!isColIdxValid(icol)) return dummy;
       if (!isSampleIndexValid(iech)) return dummy;
       auto& vec = _data.getColumn<VectorDouble>(icol);
@@ -1123,8 +1130,8 @@ namespace gstlrn
     {
       static const double dummy = std::numeric_limits<double>::quiet_NaN();
       auto iuid = getUID(name);
-      if (!isUIDValid(iuid)) return dummy;
       auto icol = getColIdxByUID(iuid);
+      if (icol < 0) return dummy;
       if (!isColIdxValid(icol)) return dummy;
       if (!isSampleIndexValid(iech)) return dummy;
       return *_data.getValue<double>(icol, iech);
@@ -1153,9 +1160,11 @@ namespace gstlrn
     String _summaryString(void) const;
 
   private:
-    Id _getNUIDMax() const;
+    void _setNSamples(Id nsamples) { _nsamples = nsamples; }
+
+    Id _getNUIDMax() const { return _data.getUniqueIndexCounter(); }
+
     Id _getNextLocator(const ELoc& locatorType) const;
-    Id _getUIDcol(Id iuid) const;
     Id _getAddress(Id iech, Id icol) const;
     void _columnInit(
       Id ncol,
@@ -1234,7 +1243,6 @@ namespace gstlrn
   private:
     Id _nsamples; //!< Number of samples (needed when creating an empty Db)
     DbData _data;
-    VectorInt _uidcol; //!< UID to Column
   };
 
   GSTLEARN_EXPORT bool haveSameNDim(

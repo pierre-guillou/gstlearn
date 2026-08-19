@@ -44,12 +44,13 @@
 
 namespace gstlrn
 {
+  static String UIDString = "VariableUID";
+
   Db::Db()
     : AStringable()
     , ASerializable()
     , _nsamples(0)
     , _data()
-    , _uidcol()
   {
     _clear();
   }
@@ -235,8 +236,8 @@ namespace gstlrn
    */
   bool Db::isUIDValid(Id iuid) const
   {
-    auto nmax = static_cast<Id>(_uidcol.size());
-    return checkArg("UID Index", iuid, nmax);
+    Id icol = _data.getColMatchUniqueIndex(iuid);
+    return icol >= 0;
   }
 
   /**
@@ -279,26 +280,23 @@ namespace gstlrn
 
   Id Db::getColIdxByUID(Id iuid) const
   {
-    if (!isUIDValid(iuid)) return -1;
-    Id icol = _uidcol[iuid];
-    return icol;
+    return _data.getColMatchUniqueIndex(iuid);
   }
 
   VectorInt Db::getColIdxsByUID(const VectorInt& iuids) const
   {
-    VectorInt cols(iuids.size());
-    for (size_t i = 0; i < iuids.size(); i++)
-      cols[i] = getColIdxByUID(iuids[i]);
+    VectorInt cols;
+    for (const auto& iuid: iuids)
+    {
+      cols.push_back(getColIdxByUID(iuid));
+    }
     return cols;
   }
 
   Id Db::getUIDByColIdx(Id icol) const
   {
     if (!isColIdxValid(icol)) return -1;
-    auto nmax = _getNUIDMax();
-    for (Id iuid = 0; iuid < nmax; iuid++)
-      if (_uidcol[iuid] == icol) return iuid;
-    return -1;
+    return _data.getUniqueIndex(icol);
   }
 
   Id Db::getUIDByLocator(const ELoc& locatorType, Id locatorIndex) const
@@ -369,8 +367,8 @@ namespace gstlrn
     Id* ret_locatorIndex,
     Id* ret_mult) const
   {
-    if (!isUIDValid(iuid)) return false;
     auto icol = getColIdxByUID(iuid);
+    if (icol < 0) return false;
     return getLocatorByColIdx(
       icol, ret_locatorType, ret_locatorIndex, ret_mult);
   }
@@ -409,8 +407,8 @@ namespace gstlrn
   {
     VectorInt iuids = _ids(name, true);
     if (iuids.empty()) return false;
-    if (!isUIDValid(iuids[0])) return false;
     auto icol = getColIdxByUID(iuids[0]);
+    if (icol < 0) return false;
     ELoc ret_locatorType;
     Id ret_locatorIndex;
     Id ret_mult;
@@ -484,14 +482,9 @@ namespace gstlrn
 
   void Db::resetDims(Id ncol, Id nech)
   {
-    setNSamples(nech);
-    /* The UID pointers */
-
-    _uidcol.resize(ncol);
-    for (Id i = 0; i < ncol; i++) _uidcol[i] = i;
+    _setNSamples(nech);
 
     /* The variable pointers */
-
     auto it = ELoc::getIterator();
     while (it.hasNext())
     {
@@ -503,10 +496,11 @@ namespace gstlrn
 
     if (nech * ncol > 0)
     {
-      auto colNames = generateMultipleNames("New", ncol);
+      auto colNames = generateMultipleNames(UIDString, ncol);
       for (Id i = 0; i < ncol; ++i)
       {
-        _data.addColumnEmpty<VectorDouble>(colNames[i], nech);
+        _data.addColumnEmpty<VectorDouble>(
+          colNames[i], nech, 1, RoleID(), getNA<double>());
       }
     }
   }
@@ -957,7 +951,7 @@ namespace gstlrn
     VectorVectorDouble result;
     for (Id idim = 0, ndim = getNDim(); idim < ndim; idim++)
     {
-      VectorDouble local = getOneCoordinate(idim, useSel);
+      VectorDouble local = getVecCoordinate(idim, useSel);
       result.push_back(local);
     }
     return result;
@@ -1087,12 +1081,6 @@ namespace gstlrn
     _data.removeAllRoles();
   }
 
-  Id Db::_getUIDcol(Id iuid) const
-  {
-    if (!isUIDValid(iuid)) return ITEST;
-    return _uidcol[iuid];
-  }
-
   Id Db::_getAddress(Id iech, Id icol) const
   {
     return ((iech) + getNSamples() * icol);
@@ -1103,7 +1091,7 @@ namespace gstlrn
     std::stringstream sstr;
 
     sstr << toStrTitle(1, "List of Roles");
-    sstr << _data._summaryRoles();
+    sstr << _data.summaryRoles();
     return sstr.str();
   }
 
@@ -1111,11 +1099,6 @@ namespace gstlrn
   {
     auto role = temporaryToRole(locatorType);
     _data.clearRole(role);
-  }
-
-  Id Db::_getNUIDMax() const
-  {
-    return static_cast<Id>(_uidcol.size());
   }
 
   Id Db::_getNextLocator(const ELoc& locatorType) const
@@ -1179,7 +1162,7 @@ namespace gstlrn
 
   /**
    * Setting the locator for a variable designated by its UID
-   * @param iuid          Index of the UID
+   * @param icol          Index of the Column
    * @param locatorType   Type of locator
    * @param locatorIndex  Rank in the Locator (starting from 0)
    * @param cleanSameLocator When TRUE, clean variables with same locator beforehand
@@ -1188,30 +1171,6 @@ namespace gstlrn
    * @remark: Argument 'locatorIndex' can be set to a negative value: in that case,
    * @remark: the next index of the same 'locatorType' is generated automatically
    */
-  void Db::setLocatorByUID(
-    Id iuid,
-    const ELoc& locatorType,
-    Id locatorIndex,
-    bool cleanSameLocator)
-  {
-    if (!isUIDValid(iuid)) return;
-    if (locatorType.isDifferent(ELoc::UNDEFINED))
-    {
-      // Optional clean
-      if (cleanSameLocator) clearLocators(locatorType);
-
-      if (locatorIndex < 0) locatorIndex = _getNextLocator(locatorType);
-    }
-
-    // Store the corresponding Role in DbData
-    auto icol = getColIdxByUID(iuid);
-    if (icol >= 0)
-    {
-      auto role = temporaryToRole(locatorType);
-      _data.setRoleID(icol, RoleID(role, locatorIndex));
-    }
-  }
-
   void Db::setLocatorByColIdx(
     Id icol,
     const ELoc& locatorType,
@@ -1220,8 +1179,27 @@ namespace gstlrn
   {
     if (!isColIdxValid(icol)) return;
 
-    auto iuid = getUIDByColIdx(icol);
-    setLocatorByUID(iuid, locatorType, locatorIndex, cleanSameLocator);
+    if (locatorType.isDifferent(ELoc::UNDEFINED))
+    {
+      // Optional clean
+      if (cleanSameLocator) clearLocators(locatorType);
+
+      if (locatorIndex < 0) locatorIndex = _getNextLocator(locatorType);
+    }
+
+    auto role = temporaryToRole(locatorType);
+    _data.setRoleID(icol, RoleID(role, locatorIndex));
+  }
+
+  void Db::setLocatorByUID(
+    Id iuid,
+    const ELoc& locatorType,
+    Id locatorIndex,
+    bool cleanSameLocator)
+  {
+    auto icol = getColIdxByUID(iuid);
+    if (icol < 0) return;
+    setLocatorByColIdx(icol, locatorType, locatorIndex, cleanSameLocator);
   }
 
   String Db::_getLocatorNameByColIdx(Id icol) const
@@ -1306,20 +1284,16 @@ namespace gstlrn
     Id locatorIndex,
     Id nechInit)
   {
-    Id ncol = getNColumn();
-    auto nmax = _getNUIDMax();
     if (nadd <= 0) return (-1);
+    auto iuid0 = _getNUIDMax();
 
     /* Case of an empty Db, define the number of samples using 'nechInit' */
-
     auto nech = getNSamples();
-    if (nech <= 0) nech = nechInit;
-    setNSamples(nech);
-
-    /* Dimension the UID pointer */
-
-    _uidcol.resize(nmax + nadd);
-    for (Id i = 0; i < nadd; i++) _uidcol[nmax + i] = ncol + i;
+    if (nech <= 0)
+    {
+      nech = nechInit;
+      _setNSamples(nech);
+    }
 
     // Set the name
     VectorString newNames;
@@ -1330,18 +1304,14 @@ namespace gstlrn
 
     /* Dimension the array */
     for (Id i = 0; i < nadd; ++i)
-    {
-      _data.addColumnEmpty<VectorDouble>(newNames[i], nech);
-    }
-
-    // Initialize the variables with a given value
-    _columnInit(nadd, ncol, true, valinit);
+      _data.addColumnEmpty<VectorDouble>(
+        newNames[i], nech, 1, RoleID(), valinit);
 
     // Set the locator (if defined)
     if (locatorType.isDifferent(ELoc::UNDEFINED))
-      setLocatorsByUID(nadd, nmax, locatorType, locatorIndex);
+      setLocatorsByUID(nadd, iuid0, locatorType, locatorIndex);
 
-    return (nmax);
+    return (iuid0);
   }
 
   /**
@@ -1353,6 +1323,7 @@ namespace gstlrn
    * @param locatorIndex   Locator index (starting from 0)
    * @param seed     Seed value
    * @param nechInit Number of samples (used only if the Db is initially empty)
+   *
    * @return Rank of the first UID
    */
   Id Db::addColumnsRandom(
@@ -1364,42 +1335,22 @@ namespace gstlrn
     Id nechInit)
   {
     Id ncol = getNColumn();
-    auto nmax = _getNUIDMax();
     if (nadd <= 0) return (-1);
 
     /* Case of an empty Db, define the number of samples using 'nechInit' */
 
     auto nech = getNSamples();
     if (nech <= 0) nech = nechInit;
-    setNSamples(nech);
-
-    /* Dimension the UID pointer */
-
-    _uidcol.resize(nmax + nadd);
-    for (Id i = 0; i < nadd; i++) _uidcol[nmax + i] = ncol + i;
-
-    // Set the name
-    VectorString newNames;
-    if (nadd == 1)
-      newNames = {radix};
-    else
-      newNames = generateMultipleNames(radix, nadd);
+    _setNSamples(nech);
 
     /* Dimension the array */
-    for (Id i = 0; i < nadd; ++i)
-    {
-      _data.addColumn(newNames[i + ncol], VectorDouble(nech));
-    }
+    Id iuid0 = addColumnsByConstant(nadd, 0., radix, locatorType, locatorIndex);
 
     // Initialize the variables with a random value
     law_set_random_seed(seed);
     _columnInit(nadd, ncol, false);
 
-    // Set the locator (if defined)
-    if (locatorType.isDifferent(ELoc::UNDEFINED))
-      setLocatorsByUID(nadd, nmax, locatorType, locatorIndex);
-
-    return (nmax);
+    return iuid0;
   }
 
   void Db::addColumnsByVVD(
@@ -1461,7 +1412,7 @@ namespace gstlrn
         tab.size(), nvar, nech);
       return 1;
     }
-    setNSamples(nech);
+    _setNSamples(nech);
 
     // Adding the new Columns
     Id iuid =
@@ -1597,8 +1548,7 @@ namespace gstlrn
     if (!isUIDValid(iuid_out)) return;
     for (Id iech = 0; iech < getNSample(); iech++)
     {
-      double value = getArray(iech, iuid_in);
-      setArray(iech, iuid_out, value);
+      setArray(iech, iuid_out, getArray(iech, iuid_in));
     }
   }
 
@@ -1875,7 +1825,7 @@ namespace gstlrn
 
     _data.addSamples(nadd, valinit);
 
-    setNSamples(nech + nadd);
+    _setNSamples(nech + nadd);
     return (nech);
   }
 
@@ -1892,7 +1842,7 @@ namespace gstlrn
     for (size_t i = 0; i < ndel; i++)
       if (deleteSample(v[i]) != 0) return 1;
 
-    setNSamples(nech - ndel);
+    _setNSamples(nech - ndel);
     return 0;
   }
 
@@ -1940,7 +1890,7 @@ namespace gstlrn
 
     _data.deleteSample(e_del);
 
-    setNSamples(nech - 1);
+    _setNSamples(nech - 1);
     return 0;
   }
 
@@ -1962,23 +1912,11 @@ namespace gstlrn
    * Delete a variable specified by its user-identification rank
    *
    */
-
   void Db::deleteColumnByUID(Id iuid_del)
   {
-    auto nmax = _getNUIDMax();
-    if (!isUIDValid(iuid_del)) return;
-
-    /* Identify the column to be deleted */
-
     Id c_del = getColIdxByUID(iuid_del);
+    if (c_del < 0) return;
     if (!isColIdxValid(c_del)) return;
-
-    _uidcol[iuid_del] = -1;
-    for (Id iuid = 0; iuid < nmax; iuid++)
-    {
-      if (_uidcol[iuid] < c_del) continue;
-      _uidcol[iuid]--;
-    }
 
     _data.deleteColumn(c_del);
   }
@@ -2009,7 +1947,7 @@ namespace gstlrn
   {
     VectorDouble ext;
     if (!isDimensionIndexValid(idim)) return ext;
-    VectorDouble coor = getOneCoordinate(idim, useSel);
+    VectorDouble coor = getVecCoordinate(idim, useSel);
     ext.push_back(coor.minimum());
     ext.push_back(coor.maximum());
     return ext;
@@ -2032,7 +1970,7 @@ namespace gstlrn
     VectorDouble ext;
     for (Id idim = 0; idim < getNDim(); idim++)
     {
-      VectorDouble coor = getOneCoordinate(idim, useSel);
+      VectorDouble coor = getVecCoordinate(idim, useSel);
       ext.push_back(coor.maximum() - coor.minimum());
     }
     return ext;
@@ -2047,7 +1985,7 @@ namespace gstlrn
     VectorDouble ext;
     for (Id idim = 0; idim < getNDim(); idim++)
     {
-      VectorDouble coor = getOneCoordinate(idim, useSel);
+      VectorDouble coor = getVecCoordinate(idim, useSel);
       ext.push_back(coor.minimum());
     }
     return ext;
@@ -2062,7 +2000,7 @@ namespace gstlrn
     VectorDouble ext;
     for (Id idim = 0; idim < getNDim(); idim++)
     {
-      VectorDouble coor = getOneCoordinate(idim, useSel);
+      VectorDouble coor = getVecCoordinate(idim, useSel);
       ext.push_back(coor.maximum());
     }
     return ext;
@@ -2088,7 +2026,7 @@ namespace gstlrn
   double Db::getCenter(Id idim, bool useSel) const
   {
     if (!isDimensionIndexValid(idim)) return TEST;
-    VectorDouble coor = getOneCoordinate(idim, useSel);
+    VectorDouble coor = getVecCoordinate(idim, useSel);
     double mini = coor.minimum();
     double maxi = coor.maximum();
     return ((mini + maxi) / 2.);
@@ -2101,7 +2039,7 @@ namespace gstlrn
   double Db::getExtension(Id idim, bool useSel) const
   {
     if (!isDimensionIndexValid(idim)) return 0.;
-    VectorDouble coor = getOneCoordinate(idim, useSel);
+    VectorDouble coor = getVecCoordinate(idim, useSel);
     double mini = coor.minimum();
     double maxi = coor.maximum();
     return maxi - mini;
@@ -2150,7 +2088,7 @@ namespace gstlrn
 
     for (Id idim = 0; idim < getNDim(); idim++)
     {
-      VectorDouble coor = getOneCoordinate(idim, useSel);
+      VectorDouble coor = getVecCoordinate(idim, useSel);
       double vmin = coor.minimum();
       double vmax = coor.maximum();
       if (FFFF(mini[idim]) || vmin < mini[idim]) mini[idim] = vmin;
@@ -2591,17 +2529,17 @@ namespace gstlrn
     _data.setValue(iech, icol, value);
   }
 
-  void Db::setValuesByNames(
+  void Db::setValuesByNamesInPlace(
     const VectorInt& iechs,
     const VectorString& names,
     const VectorDouble& values,
     bool bySample)
   {
     VectorInt icols = getColIdxs(names);
-    setValuesByColIdx(iechs, icols, values, bySample);
+    setValuesByColIdxInPlace(iechs, icols, values, bySample);
   }
 
-  void Db::setValuesByColIdx(
+  void Db::setValuesByColIdxInPlace(
     const VectorInt& iechs,
     const VectorInt& icols,
     const VectorDouble& values,
@@ -3283,12 +3221,8 @@ namespace gstlrn
    */
   Id Db::getLastUID(Id number) const
   {
-    VectorInt ranks;
-    for (Id i = 0; i < static_cast<Id>(_uidcol.size()); i++)
-      if (_uidcol[i] >= 0) ranks.push_back(i);
-    Id size = static_cast<Id>(ranks.size());
-    if (number > size) return -1;
-    return ranks[size - number - 1];
+    Id nmax = _getNUIDMax();
+    return getColIdxByUID(nmax - number - 1);
   }
 
   String Db::getLastName(Id number) const
@@ -3318,7 +3252,7 @@ namespace gstlrn
   String Db::getNameByUID(Id iuid) const
   {
     auto icol = getColIdxByUID(iuid);
-    if (icol < 0) return ("");
+    if (icol < 0) return String();
     return getNameByColIdx(icol);
   }
 
@@ -3427,7 +3361,7 @@ namespace gstlrn
     {
       auto icol = _data.getICol(list[i]);
       if (icol < 0) continue;
-      auto newname = incrementStringVersion(name, i + 1);
+      auto newname = generateOneName(name, i + 1);
       _data.setName(icol, newname);
     }
   }
@@ -3441,7 +3375,7 @@ namespace gstlrn
     {
       auto icol = _data.getICol(std::move(colIDs[i]));
       if (icol < 0) continue;
-      auto newName = incrementStringVersion(name, i + 1);
+      auto newName = generateOneName(name, i + 1);
       _data.setName(icol, newName);
     }
   }
@@ -3477,7 +3411,7 @@ namespace gstlrn
     sstr << toStrTitle(1, "Data Base Extension");
     for (Id idim = 0; idim < ndim; idim++)
     {
-      VectorDouble coor = getOneCoordinate(idim, true);
+      VectorDouble coor = getVecCoordinate(idim, true);
       double vmin = coor.minimum();
       double vmax = coor.maximum();
 
@@ -4673,7 +4607,7 @@ namespace gstlrn
    * @return
    */
   VectorDouble
-    Db::getOneCoordinate(Id idim, bool useSel, bool flag_rotate) const
+    Db::getVecCoordinate(Id idim, bool useSel, bool flag_rotate) const
   {
     auto nech = getNSample();
     VectorDouble tab, sel;
@@ -4797,8 +4731,10 @@ namespace gstlrn
   VectorInt Db::getUIDsDefined() const
   {
     VectorInt iuids;
-    for (Id i = 0; i < static_cast<Id>(_uidcol.size()); i++)
-      if (_uidcol[i] >= 0) iuids.push_back(i);
+    for (Id icol = 0; icol < getNColumn(); icol++)
+    {
+      iuids.push_back(_data.getUniqueIndex(icol));
+    }
     return iuids;
   }
 
@@ -4901,7 +4837,7 @@ namespace gstlrn
       if (!names.empty())
         _data.setName(icol + shift, names[icol]);
       else
-        _data.setName(icol + shift, incrementStringVersion("New", icol + 1));
+        _data.setName(icol + shift, generateOneName("New", icol + 1));
     }
   }
 
@@ -5086,10 +5022,10 @@ namespace gstlrn
       _loadData(ELoadBy::SAMPLE, false, allvalues);
 
       // Update the column names and locators
-      for (Id i = 0; i < ncol; i++)
+      for (Id icol = 0; icol < ncol; icol++)
       {
-        setNameByUID(i, names[i]);
-        setLocatorByUID(i, tabloc[i], tabnum[i]);
+        setNameByColIdx(icol, names[icol]);
+        setLocatorByColIdx(icol, tabloc[icol], tabnum[icol]);
       }
     }
     return ret;
@@ -5235,15 +5171,16 @@ namespace gstlrn
 
     if (tab.empty()) return;
     Id ntab = (flagAddSampleRank) ? getNColumn() - 1 : getNColumn();
+    Id nsample = getNSample();
     Id ecr = 0;
     for (Id icol = 0; icol < ntab; icol++)
     {
-      for (Id iech = 0; iech < getNSample(); iech++, ecr++)
+      for (Id iech = 0; iech < nsample; iech++, ecr++)
       {
         if (order == ELoadBy::SAMPLE)
           setValueByColIdx(iech, jcol, tab[icol + ntab * iech]);
         else
-          setValueByColIdx(iech, jcol, tab[ecr]);
+          setValueByColIdx(iech, jcol, tab[icol * nsample + iech]);
       }
       jcol++;
     }

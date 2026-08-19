@@ -46,6 +46,7 @@ namespace gstlrn
       : _name{std::move(name)}
       , _data{Array2D<VectorDouble>{nsample, nversion}}
       , _forbidNA{forbidNA}
+      , _uniqueIndex{0}
     {
     }
 
@@ -54,14 +55,16 @@ namespace gstlrn
       String&& name,
       VectorType&& tab,
       const Id nversion = 1,
-      bool forbidNA = false);
+      bool forbidNA = false,
+      Id uniqueIndex = 0);
 
     template<typename VectorType>
     DbCol(
       const String& name,
       VectorType&& tab,
       const Id nversion = 1,
-      bool forbidNA = false);
+      bool forbidNA = false,
+      Id uniqueIndex = 0);
 
     /// ASerializable interface
     String getNFName() const override { return "Column"; }
@@ -138,6 +141,8 @@ namespace gstlrn
 
     void deleteSample(const Id isample);
 
+    Id getUniqueIndex() const { return _uniqueIndex; }
+
   private:
     // This line allows the deserialization of DbCol from DbData,
     // which needs to create a DbCol without knowing explicitly its type.
@@ -195,6 +200,7 @@ namespace gstlrn
       >
       _data;
     bool _forbidNA = false;
+    Id _uniqueIndex = 0;
   };
 
   template<typename VectorType>
@@ -202,12 +208,14 @@ namespace gstlrn
     String&& name,
     VectorType&& tab,
     const Id nversion,
-    bool forbidNA)
+    bool forbidNA,
+    Id uniqueIndex)
     : _name{std::move(name)}
     , _data{Array2D<std::decay_t<VectorType>>(
         std::forward<VectorType>(tab),
         nversion)}
     , _forbidNA{forbidNA}
+    , _uniqueIndex{uniqueIndex}
   {
   }
 
@@ -216,12 +224,14 @@ namespace gstlrn
     const String& name,
     VectorType&& tab,
     const Id nversion,
-    bool forbidNA)
+    bool forbidNA,
+    Id uniqueIndex)
     : _name{name}
     , _data{Array2D<std::decay_t<VectorType>>(
         std::forward<VectorType>(tab),
         nversion)}
     , _forbidNA{forbidNA}
+    , _uniqueIndex{uniqueIndex}
   {
   }
 

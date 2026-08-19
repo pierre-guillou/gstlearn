@@ -1061,7 +1061,7 @@ namespace gstlrn
     for (Id idim = 0; idim < ndim; idim++)
     {
       double taille = dbgrid->getDX(idim);
-      VectorDouble vec = dbgrid->getOneCoordinate(idim, false);
+      VectorDouble vec = dbgrid->getVecCoordinate(idim, false);
       for (Id i = 0; i < static_cast<Id>(vec.size()); i++)
         vec[i] += taille * law_uniform(-0.5, 0.5);
       db->addColumns(vec, names[idim], ELoc::X, idim);

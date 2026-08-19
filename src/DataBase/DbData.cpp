@@ -25,9 +25,9 @@ namespace gstlrn
   bool DbData::serializeH5(H5::Group& grp) const
   {
     auto dbG = grp.createGroup("DbData");
-    SerializeHDF5::writeValue(dbG, "NColumn", getNCols());
+    SerializeHDF5::writeValue(dbG, "NColumn", getNColumns());
 
-    for (Id i = 0; i < getNCols(); i++)
+    for (Id i = 0; i < getNColumns(); i++)
     {
       auto colG = dbG.createGroup("Column_" + std::to_string(i));
 
@@ -146,6 +146,12 @@ namespace gstlrn
     return icol ? _cols[*icol].getName() : String();
   }
 
+  Id DbData::getUniqueIndex(ColID&& colid) const
+  {
+    const auto icol = _getColumnIndex(colid);
+    return icol ? _cols[*icol].getUniqueIndex() : -1;
+  }
+
   /**
    * @brief Get the Index of the Column
    *
@@ -192,7 +198,7 @@ namespace gstlrn
   {
     const auto icol = _getColumnIndex(colid);
     if (!icol) return;
-    if (roleID.match(_roleIDs[*icol], true)) return;
+    if (roleID.isEqual(_roleIDs[*icol], true)) return;
 
     auto roleIDLocal = roleID;
     _updateRoleIDAddition(*icol, roleIDLocal);
@@ -271,7 +277,7 @@ namespace gstlrn
 
   Id DbData::getNSamples() const
   {
-    if (getNCols() <= 0) return 0;
+    if (getNColumns() <= 0) return 0;
     return _cols[0].getNSamples();
   }
 
@@ -297,18 +303,26 @@ namespace gstlrn
     return _cols[*icol].getNVersions();
   }
 
+  /**
+   * @brief Count the number of entries with a given Role
+   *
+   * @param role Target Role to be matched
+   */
+  Id DbData::getNRoles(const ERole& role) const
+  {
+    Id count = 0;
+    for (const auto& roleID: _roleIDs)
+      if (roleID.getRole().isEqual(role)) ++count;
+    return count;
+  }
+
   Id DbData::getNRoles(ColID&& colid) const
   {
     const auto icol = _getColumnIndex(colid, false);
     if (!icol) return 0;
 
     const auto& role = _roleIDs[*icol].getRole();
-    Id count = 0;
-    for (const auto& roleID: this->_roleIDs)
-    {
-      if (roleID.getRole().isEqual(role)) ++count;
-    }
-    return count;
+    return getNRoles(role);
   }
 
   /**
@@ -318,11 +332,13 @@ namespace gstlrn
    */
   void DbData::clearRole(const ERole& role)
   {
-    std::vector<ColID> ids = getColIDs(role);
-    for (const auto& id: ids)
-    {
-      _roleIDs[id.getICol()].removeRole();
-    }
+    std::vector<ColID> colIDs = getColIDs(role);
+    for (const auto& colID: colIDs) _roleIDs[colID.getICol()].removeRole();
+  }
+
+  void DbData::clearAllRoles()
+  {
+    for (auto& roleID: _roleIDs) roleID.removeRole();
   }
 
   /**
@@ -363,7 +379,7 @@ namespace gstlrn
   std::optional<Id>
     DbData::_getColumnIndex(const ColID& colid, bool verbose) const
   {
-    auto ncol = getNCols();
+    auto ncol = getNColumns();
 
     // Try to identify by Column Name
     const String& localName = colid.getName();
@@ -385,7 +401,7 @@ namespace gstlrn
       const RoleID& roleID = colid.getRoleID();
       for (Id icol = 0; icol < ncol; ++icol)
       {
-        if (_roleIDs[icol].match(roleID, true)) return icol;
+        if (_roleIDs[icol].isEqual(roleID, true)) return icol;
       }
       if (verbose) _unknownRoleID(roleID);
       return std::nullopt;
@@ -433,13 +449,13 @@ namespace gstlrn
    */
   void DbData::_updateRoleIDAddition(Id icol0, RoleID& roleID)
   {
-    auto ncol = getNCols();
+    auto ncol = getNColumns();
     auto wasDefined = icol0 >= 0 && _roleIDs[icol0].isDefined();
     const auto newRole = roleID.getRole();
     const auto newIndex = roleID.getIndex();
 
     // Check if the target Column does not already have the same roleID (ERole and Index)
-    if (icol0 >= 0 && roleID.match(_roleIDs[icol0], true)) return;
+    if (icol0 >= 0 && roleID.isEqual(_roleIDs[icol0], true)) return;
 
     // The ERole of the new Column is defined.
     if (roleID.isDefined())
@@ -452,14 +468,14 @@ namespace gstlrn
         if (icol == icol0) continue;
 
         // Look for a column (different from the new one) with the same RoleID
-        if (roleID.match(_roleIDs[icol], true))
+        if (roleID.isEqual(_roleIDs[icol], true))
         {
           // Set it to UNDEFINED
           _roleIDs[icol] = RoleID(ERole::UNDEFINED, 0);
         }
 
         // Calculate the highest index of the same RoleID already present in the DataBase
-        if (roleID.match(_roleIDs[icol], false))
+        if (roleID.isEqual(_roleIDs[icol], false))
         {
           auto curIndex = _roleIDs[icol].getIndex();
           if (curIndex > rankMin) rankMin = curIndex;
@@ -478,7 +494,7 @@ namespace gstlrn
         for (Id icol = 0; icol < ncol; icol++)
         {
           if (icol == icol0) continue;
-          if (!_roleIDs[icol0].match(_roleIDs[icol], false)) continue;
+          if (!_roleIDs[icol0].isEqual(_roleIDs[icol], false)) continue;
 
           auto oldIndex = _roleIDs[icol0].getIndex();
           auto curIndex = _roleIDs[icol].getIndex();
@@ -545,7 +561,7 @@ namespace gstlrn
   void DbData::addSamples(Id nadd, const double valinit)
   {
     if (nadd <= 0) return;
-    for (Id icol = 0, ncol = getNCols(); icol < ncol; icol++)
+    for (Id icol = 0, ncol = getNColumns(); icol < ncol; icol++)
     {
       _cols[icol].addSamples(nadd, valinit);
     }
@@ -553,10 +569,19 @@ namespace gstlrn
 
   void DbData::deleteSample(Id idel)
   {
-    for (Id icol = 0, ncol = getNCols(); icol < ncol; icol++)
+    for (Id icol = 0, ncol = getNColumns(); icol < ncol; icol++)
     {
       _cols[icol].deleteSample(idel);
     }
+  }
+
+  Id DbData::getColMatchUniqueIndex(Id uniqueIndex) const
+  {
+    for (Id icol = 0, ncol = getNColumns(); icol < ncol; icol++)
+    {
+      if (_cols[icol].getUniqueIndex() == uniqueIndex) return icol;
+    }
+    return -1;
   }
 
   void DbData::_checkVersion(Id& nversion)
@@ -571,7 +596,7 @@ namespace gstlrn
     }
   }
 
-  String DbData::_summaryRoles(void) const
+  String DbData::summaryRoles(void) const
   {
     std::stringstream sstr;
 

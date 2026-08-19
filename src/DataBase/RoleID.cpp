@@ -50,7 +50,7 @@ namespace gstlrn
     return name;
   }
 
-  bool RoleID::match(const RoleID& roleID, bool checkIndex) const
+  bool RoleID::isEqual(const RoleID& roleID, bool checkIndex) const
   {
     if (_role.isDifferent(roleID.getRole())) return false;
     return !checkIndex || (_index == roleID.getIndex());

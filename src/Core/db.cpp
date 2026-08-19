@@ -299,7 +299,7 @@ namespace gstlrn
 
     for (Id idim = 0; idim < db->getNDim(); idim++)
     {
-      VectorDouble tab = db->getOneCoordinate(idim);
+      VectorDouble tab = db->getVecCoordinate(idim);
       StatResults stats =
         ut_statistics(db->getNSample(), tab.data(), sel.data(), wgt.data());
       center[idim] = stats.mean;

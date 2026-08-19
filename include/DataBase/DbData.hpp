@@ -130,27 +130,36 @@ namespace gstlrn
     String getName(ColID&& colid) const;
     VectorString getNames() const;
     Id getICol(ColID&& colid) const;
+    Id getUniqueIndex(ColID&& colid) const;
     RoleID getRoleID(ColID&& colid) const;
     const ERole& getRole(ColID&& colid) const;
     ColID getColID(const ColID& colid) const;
     void removeRole(ColID&& colid);
     void removeAllRoles();
-    Id getNVersions(ColID&& colid) const;
-    Id getNRoles(ColID&& colid) const;
+
     std::vector<ColID> getColIDs(const String& name) const;
     std::vector<ColID> getColIDs(const VectorString& name) const;
     std::vector<ColID> getColIDs(const ERole& role) const;
 
-    Id getNCols() const { return static_cast<Id>(_cols.size()); }
+    Id getNColumns() const { return static_cast<Id>(_cols.size()); }
 
+    Id getNVersions(ColID&& colid) const;
     Id getNSamples() const;
+    Id getNRoles(const ERole& role) const;
+    Id getNRoles(ColID&& colid) const;
     void setName(ColID&& colid, const String& newName);
     void setRoleID(ColID&& colid, const RoleID& roleID);
     void printContents(const String& title = "") const;
     void clearRole(const ERole& role);
+    void clearAllRoles();
     void addSamples(Id nadd, const double valinit);
     void deleteSample(Id idel);
-    String _summaryRoles(void) const;
+
+    Id getColMatchUniqueIndex(Id uniqueIndex) const;
+
+    Id getUniqueIndexCounter() const { return _uniqueIndexCounter; }
+
+    String summaryRoles(void) const;
 
   private:
     std::optional<std::reference_wrapper<DbCol>> _identifyColumn(ColID&& colid);
@@ -164,8 +173,10 @@ namespace gstlrn
       Id n,
       std::optional<typename VectorType::value_type> value,
       const Dictionary* dict = nullptr);
+
     template<typename VectorType>
     static bool _checkForbidNA(const VectorType& tab);
+
     template<typename VectorType>
     bool _checkNSample(const VectorType& array, Id nversion) const;
 
@@ -178,9 +189,13 @@ namespace gstlrn
     static void _unknownName(const String& name);
     static void _unknownRoleID(const RoleID& roleID);
 
+    void _incrementUniqueIndexCounter() { ++_uniqueIndexCounter; }
+
   private:
+    // Private section of DbData
     std::vector<DbCol> _cols;
     std::vector<RoleID> _roleIDs;
+    Id _uniqueIndexCounter = 0;
   };
 
   /***************************************************************************/
@@ -236,6 +251,7 @@ namespace gstlrn
     operator String() const { return _get<String>(); }
 
   private:
+    // Private section of ValueProxy
     template<typename T>
     T _get() const
     {
@@ -586,6 +602,7 @@ namespace gstlrn
     }
 
   private:
+    // Private section of SliceProxy
     DbData& _db;
     ColID _colid;
   };
@@ -611,7 +628,7 @@ namespace gstlrn
     bool forbidNA,
     const Dictionary* dict)
   {
-    if (getNCols() > 0) nsamples = getNSamples();
+    if (getNColumns() > 0) nsamples = getNSamples();
     if (nsamples <= 0)
     {
       messerr("The number of samples (%d) must be positive.", nsamples);
@@ -652,10 +669,13 @@ namespace gstlrn
     }
 
     this->_cols.emplace_back(
-      std::move(nameLocal), std::forward<VectorType>(array), nversion,
-      forbidNA);
+      std::move(nameLocal), std::forward<VectorType>(array), nversion, forbidNA,
+      _uniqueIndexCounter);
 
     _roleIDs.emplace_back(roleIDLocal);
+
+    // Increment the unique index counter for each new column added
+    _incrementUniqueIndexCounter();
   }
 
   template<typename VectorType>
@@ -688,10 +708,13 @@ namespace gstlrn
     }
 
     this->_cols.emplace_back(
-      std::move(nameLocal), std::forward<VectorType>(array), nversion,
-      forbidNA);
+      std::move(nameLocal), std::forward<VectorType>(array), nversion, forbidNA,
+      _uniqueIndexCounter);
 
     _roleIDs.emplace_back(roleIDLocal);
+
+    // Increment the unique index counter for each new column added
+    _incrementUniqueIndexCounter();
   }
 
 #ifndef SWIG

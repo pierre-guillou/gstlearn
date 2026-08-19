@@ -115,7 +115,7 @@ data.printContents("After adding the 'VDS' column (with 4 versions)")
 # Additional inquiries on DbData #
 
 gl.mestitle(0, "Various inquiries on the DbData")
-print("- Number of columns: ", data.getNCols())
+print("- Number of columns: ", data.getNColumns())
 print("- Number of samples: ", data.getNSamples())
 print("- Number of Versions in column 'VDS.1': ", data.getNVersions("VDS.1"))
 

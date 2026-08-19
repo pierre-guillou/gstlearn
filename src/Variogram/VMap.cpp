@@ -605,7 +605,7 @@ namespace gstlrn
 
     /* Sorting the samples according to their first coordinate */
 
-    VectorDouble coor = db->getOneCoordinate(0);
+    VectorDouble coor = db->getVecCoordinate(0);
     for (Id i = 0; i < nech; i++) ind1[i] = i;
     ut_sort_double(1, nech, ind1.data(), coor.data());
 

@@ -51,7 +51,7 @@ namespace gstlrn
 
     void setIndex(Id index) { _index = index; }
 
-    bool match(const RoleID& RoleID, bool checkIndex = true) const;
+    bool isEqual(const RoleID& RoleID, bool checkIndex = true) const;
 
     bool isUnique() const;
 
