@@ -3215,14 +3215,12 @@ namespace gstlrn
   }
 
   /**
-   * Returns the rank of (one of) the lastly added UID in the Db
-   * @param number 0 designates the last, 1 the one before last...
+   * Returns the rank of the lastly added UID in the Db
    * @return
    */
-  Id Db::getLastUID(Id number) const
+  Id Db::getLastUID() const
   {
-    Id nmax = _getNUIDMax();
-    return getColIdxByUID(nmax - number - 1);
+    return getColIdxByUID(_getNUIDMax());
   }
 
   String Db::getLastName(Id number) const

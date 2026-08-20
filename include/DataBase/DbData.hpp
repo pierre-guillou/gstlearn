@@ -189,8 +189,6 @@ namespace gstlrn
     static void _unknownName(const String& name);
     static void _unknownRoleID(const RoleID& roleID);
 
-    void _incrementUniqueIndexCounter() { ++_uniqueIndexCounter; }
-
   private:
     // Private section of DbData
     std::vector<DbCol> _cols;
@@ -675,7 +673,7 @@ namespace gstlrn
     _roleIDs.emplace_back(roleIDLocal);
 
     // Increment the unique index counter for each new column added
-    _incrementUniqueIndexCounter();
+    _uniqueIndexCounter++;
   }
 
   template<typename VectorType>
@@ -714,7 +712,7 @@ namespace gstlrn
     _roleIDs.emplace_back(roleIDLocal);
 
     // Increment the unique index counter for each new column added
-    _incrementUniqueIndexCounter();
+    _uniqueIndexCounter++;
   }
 
 #ifndef SWIG

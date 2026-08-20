@@ -436,7 +436,7 @@ namespace gstlrn
     void resizeSamples(Id nnew);
 
     Id getLastColumn(Id number = 0) const;
-    Id getLastUID(Id number = 0) const;
+    Id getLastUID() const;
     String getLastName(Id number = 0) const;
 
     Id getColIdx(const String& name) const;

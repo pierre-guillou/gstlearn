@@ -977,7 +977,7 @@ function (x,i,j,...,drop=TRUE)
   {
     # Case of already an existing variable: replacement
 
-    db$setValuesByNames(rows,namcols, value)
+    db$setValuesByNamesInPlace(rows, namcols, value)
   }
   db
 }
