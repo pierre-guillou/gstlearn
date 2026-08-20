@@ -13,9 +13,9 @@
 #include "gstlearn_export.hpp"
 
 #include "DataBase/Dictionary.hpp"
-#include <cstddef> // size_t
-#include <optional> // std::optional
-#include <vector> // std::vector
+
+#include <optional>
+#include <vector>
 
 namespace gstlrn
 {
@@ -30,8 +30,7 @@ namespace gstlrn
    * A sample may have no category, in which case its value is represented
    * by an empty optional.
    */
-  class VectorCategory
-  // class GSTLEARN_EXPORT VectorCategory
+  class GSTLEARN_EXPORT VectorCategory
   {
   public:
     using Category = Dictionary::Category;
