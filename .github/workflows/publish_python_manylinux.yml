@@ -109,16 +109,20 @@ jobs:
       run : |
         cmake --build ${{ env.BUILD_DIR }} --parallel 3 --target python_build
 
-    - name: Create Wheel
-      uses: pypa/cibuildwheel@v4.2.1
-      with:
-        package-dir: ${{ env.BUILD_DIR }}/python/${{ env.CMAKE_BUILD_TYPE }}
+    - name : Create Wheel
+      run : |
+        cd ${{ env.BUILD_DIR }}/python/${{ env.CMAKE_BUILD_TYPE }}
+        # Note: wheel must be declared not pure (see setup.py)
+        uvx cibuildwheel
+        rm dist/*${{ matrix.python }}*.whl
+        cd ../../..
+        echo "MY_PKG=$(ls ${{ env.BUILD_DIR }}/python/${{ env.CMAKE_BUILD_TYPE }}/wheelhouse/*)" >> "$GITHUB_ENV"
 
     - uses: actions/upload-artifact@v6
       # Use specific artifact identifier for publishing all versions
       with:
         name: linux-python-package-${{ matrix.image }}
-        path: wheelhouse/*.whl
+        path: ${{env.MY_PKG}}
 
   test:
     needs: build
